@@ -1,0 +1,86 @@
+stages:
+  - build
+  - test
+
+##################
+# Build
+##################
+
+# Docker based Linux build (because of tag docker - see CI runners tags)
+build_linux_gcc:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  script:
+    - mkdir -p build; cd build
+    - qmake -recursive ..
+    - make -j4
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 day
+
+build_linux_clang:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  script: 
+    - mkdir -p build_clang
+    - cd build_clang
+    - qmake QMAKE_CC=clang QMAKE_CXX=clang++ -recursive ..
+    - make -j 4
+
+# MacOS Shell (because of tag macOS - see CI runners tags)
+build_MacOS:
+  stage: build
+  tags:
+    - macOS
+  script:
+    - qmake
+    - make -j 4
+
+#build_Windows:
+#  stage: build
+#  tags:
+#    - win10
+#    - vs2017
+#    - x64
+#  script:
+#    - c:/qt/5.11.1/bin/qmake.exe
+#    - c:/qt/5.11.1/bin/jom.exe
+
+##################
+# TEST
+##################
+
+test_docker:
+  stage: test
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  script:
+    - find build | xargs touch # Avoid rebuilding
+    - cd build
+    - export QT_QPA_PLATFORM=offscreen
+    - make check
+  dependencies:
+    - build_linux_gcc
+
+coverage_docker:
+  stage: test
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  script:
+    - mkdir -p build_coverage; cd build_coverage
+    - qmake CONFIG+=debug CONFIG+=coverage -recursive ..
+    - make -j4
+    - export QT_QPA_PLATFORM=offscreen
+    - make coverage-html
+  coverage: '/^ *lines\.*:\s+(\d+.\d+\%)/'
+  artifacts:
+    paths:
+      - build_coverage/coverage-html
+    expire_in: 1 week

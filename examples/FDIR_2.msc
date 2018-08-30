@@ -1,0 +1,236 @@
+
+
+/* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+/* CIF TextMode 0 */
+/* CIF Modified */
+MSCDOCUMENT CU_level
+/* CIF Specific Geode Version @(V) tool=geodedit V4.2.1 format=MSC92 cif=yes */
+/* CIF LastModified Wed Sep 18 17:26:21 2002 */ /* MSC REPEAT */;
+
+  /* MSC GOAL VERIFY; */
+  /* MSC TIME LOCAL */
+
+  /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+  /* CIF TextMode 0 */
+  /* CIF Modified */
+  MSCDOCUMENT run_unit /* MSC AND */;
+
+
+    /* CIF MSCDOCUMENT (20, 20), (1269, 834) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    /* CIF MscPageSize (2970, 2100) */
+    /* CIF Preview 0 0 0 */
+    MSCDOCUMENT init_operational;
+
+
+      MSC init_operational;
+
+      /* CIF TextMode 4 */
+      /* CIF Modified */
+      /* CIF INSTANCE (257, 100), (349, 150), (800, 463) */
+      INSTANCE inst_1_cu_nominal.cu_controller : PROCESS /
+      satellite/
+      cu_nominal/
+      cu_controller
+      (1) /* MSC AT [204] */ ;
+
+        /* CIF TextMode 6 */
+        /* CIF Modified */
+        /* CIF MESSAGE (332, 310) (432, 310) */
+        /* CIF POSITION (168, 269) */
+        IN poweron( operational ) /* MSC AT [147] */ ;
+        /* CIF TextMode 6 */
+        /* CIF Modified */
+        /* CIF MESSAGE (432, 371) (1031, 371) */
+        /* CIF POSITION (559, 329) */
+        OUT go( operational ) TO inst_1_cu_nominal.software VIA soft /* MSC AT [175] */ ;
+        /* CIF SET (432, 401), (150, 50) */
+        /* CIF TextMode 3 */
+        /* CIF Modified */
+        SET watchdog (101.0 ) /* MSC AT [189] */ ;
+      ENDINSTANCE;
+
+      /* CIF TextMode 4 */
+      /* CIF Modified */
+      /* CIF INSTANCE (874, 100), (312, 150), (800, 463) */
+      INSTANCE inst_1_cu_nominal.software : PROCESS /
+      satellite/
+      cu_nominal/
+      software(1) /* MSC AT [487] */ ;
+
+        /* CIF TextMode 6 */
+        /* CIF Modified */
+        /* CIF MESSAGE (432, 371) (1031, 371) */
+        /* CIF POSITION (559, 329) */
+        IN go( operational ) FROM inst_1_cu_nominal.cu_controller /* MSC AT [175] */ ;
+      ENDINSTANCE;
+      ENDMSC;
+      
+
+    ENDMSCDOCUMENT;
+
+    /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    MSCDOCUMENT watchdog /* MSC REPEAT */;
+
+
+      /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+      /* CIF TextMode 0 */
+      /* CIF Modified */
+      MSCDOCUMENT run_software /* MSC EXCEPTION */;
+
+
+        /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+        /* CIF TextMode 0 */
+        /* CIF Modified */
+        MSCDOCUMENT wait_refresh /* MSC EXCEPTION */;
+
+
+          /* CIF MSCDOCUMENT (20, 20), (1500, 1090) */
+          /* CIF TextMode 0 */
+          /* CIF Modified */
+          /* CIF MscPageSize (2970, 2100) */
+          /* CIF Preview 0 0 0 */
+          MSCDOCUMENT nominal;
+
+
+            MSC nominal;
+
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF INSTANCE (164, 65), (349, 150), (800, 696) */
+            INSTANCE inst_1_cu_nominal.cu_controller : PROCESS /
+            satellite/
+            cu_nominal/
+            cu_controller
+            (1) /* MSC AT [160] */ ;
+
+              /* CIF TextMode 4 */
+              /* CIF Modified */
+              /* CIF MESSAGE (925, 402) (339, 402) */
+              /* CIF POSITION (591, 360) */
+              IN refresh FROM inst_1_cu_nominal.software /* MSC AT [190] */ ;
+              /* CIF SET (339, 586), (83, 50) */
+              /* CIF TextMode 3 */
+              /* CIF Modified */
+              SET watchdog(101.0) /* MSC AT [277] */ ;
+            ENDINSTANCE;
+
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF INSTANCE (769, 65), (312, 150), (800, 688) */
+            INSTANCE inst_1_cu_nominal.software : PROCESS /
+            satellite/
+            cu_nominal/
+            software(1) /* MSC AT [437] */ ;
+
+              /* CIF TextMode 4 */
+              /* CIF Modified */
+              /* CIF MESSAGE (925, 402) (339, 402) */
+              /* CIF POSITION (591, 360) */
+              OUT refresh TO inst_1_cu_nominal.cu_controller /* MSC AT [190] */ ;
+            ENDINSTANCE;
+            ENDMSC;
+            
+
+          ENDMSCDOCUMENT;
+
+          /* CIF MSCDOCUMENT (20, 20), (1500, 1090) */
+          /* CIF TextMode 0 */
+          /* CIF Modified */
+          /* CIF MscPageSize (2970, 2100) */
+          /* CIF Preview 0 0 0 */
+          MSCDOCUMENT alarm;
+
+
+            MSC alarm;
+
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF INSTANCE (261, 65), (349, 150), (800, 696) */
+            INSTANCE inst_1_cu_nominal.cu_controller : PROCESS /
+            satellite/
+            cu_nominal/
+            cu_controller
+            (1) /* MSC AT [206] */ ;
+
+              /* CIF TIMEOUT (436, 303), (95, 110) */
+              /* CIF TextMode 3 */
+              /* CIF Modified */
+              TIMEOUT watchdog /* MSC AT [195] */ ;
+              /* CIF TextMode 4 */
+              /* CIF Modified */
+              /* CIF MESSAGE (436, 512) (20, 512) */
+              /* CIF POSITION (196, 470) */
+              OUT Alarm TO ENV /* MSC AT [242] */ ;
+            ENDINSTANCE;
+            ENDMSC;
+            
+
+          ENDMSCDOCUMENT;
+
+        ENDMSCDOCUMENT;
+
+        /* CIF MSCDOCUMENT (20, 20), (1500, 1090) */
+        /* CIF TextMode 0 */
+        /* CIF Modified */
+        /* CIF MscPageSize (2970, 2100) */
+        /* CIF Preview 0 0 0 */
+        MSCDOCUMENT force_off;
+
+
+          MSC force_off;
+
+          /* CIF TextMode 4 */
+          /* CIF Modified */
+          /* CIF INSTANCE (293, 53), (349, 150), (800, 709) */
+          INSTANCE inst_1_cu_nominal.cu_controller : PROCESS /
+          satellite/
+          cu_nominal/
+          cu_controller
+          (1) /* MSC AT [221] */ ;
+
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF MESSAGE (368, 324) (468, 324) */
+            /* CIF POSITION (341, 281) */
+            IN PowerOff /* MSC AT [153] */ ;
+            /* CIF RESET (468, 383), (95, 85) */
+            /* CIF TextMode 3 */
+            /* CIF Modified */
+            RESET watchdog /* MSC AT [221] */ ;
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF MESSAGE (468, 576) (1046, 576) */
+            /* CIF POSITION (695, 533) */
+            OUT Switch_Off TO inst_1_cu_nominal.software /* MSC AT [272] */ ;
+          ENDINSTANCE;
+
+          /* CIF TextMode 4 */
+          /* CIF Modified */
+          /* CIF INSTANCE (889, 65), (312, 150), (800, 688) */
+          INSTANCE inst_1_cu_nominal.software : PROCESS /
+          satellite/
+          cu_nominal/
+          software(1) /* MSC AT [494] */ ;
+
+            /* CIF TextMode 4 */
+            /* CIF Modified */
+            /* CIF MESSAGE (468, 576) (1046, 576) */
+            /* CIF POSITION (695, 533) */
+            IN Switch_Off FROM inst_1_cu_nominal.cu_controller /* MSC AT [272] */ ;
+          ENDINSTANCE;
+          ENDMSC;
+          
+
+        ENDMSCDOCUMENT;
+
+      ENDMSCDOCUMENT;
+
+    ENDMSCDOCUMENT;
+
+  ENDMSCDOCUMENT;
+
+ENDMSCDOCUMENT;
