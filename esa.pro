@@ -7,3 +7,5 @@ SUBDIRS += \
     libs \
     msceditor \
     tests
+
+CONFIG += ordered
