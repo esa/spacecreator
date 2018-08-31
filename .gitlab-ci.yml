@@ -41,15 +41,14 @@ build_MacOS:
     - qmake
     - make -j 4
 
-#build_Windows:
-#  stage: build
-#  tags:
-#    - win10
-#    - vs2017
-#    - x64
-#  script:
-#    - c:/qt/5.11.1/bin/qmake.exe
-#    - c:/qt/5.11.1/bin/jom.exe
+build_Windows:
+  stage: build
+  tags:
+    - win10
+    - vs2017
+    - x64
+  script:
+    - scripts\build_windows.bat
 
 ##################
 # TEST
