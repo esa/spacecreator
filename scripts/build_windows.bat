@@ -27,6 +27,14 @@ if exist %QMAKE% (
   exit /b 3
 )
 
+set BUILD_TOOL="C:\Qt\Tools\QtCreator\bin\jom.exe"
+if exist %BUILD_TOOL% (
+  echo "Using jom as build tool %BUILD_TOOL%"
+) else (
+  echo "Using nmake as build tool"
+  set BUILD_TOOL="nmake"
+)
+
 REM Build!
 echo "%VCVARSALLPATH%"
 call %VCVARSALLPATH%
@@ -35,7 +43,7 @@ mkdir build_win
 cd build_win
 
 call %qmake% ..
-call nmake
+call %BUILD_TOOL%
 
 cd ..
 
