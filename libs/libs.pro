@@ -2,5 +2,4 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     msclibrary \
-#    mscwidgets
-
+    mscwidgets
