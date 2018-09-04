@@ -13,7 +13,7 @@ SET CLASSPATH=.;%ANTLR_JAR%;%CLASSPATH%
 SET JAVA="C:\Program Files (x86)\Java\jre1.8.0_181\bin\java.exe"
 REM Check if Java is found
 if not exist %JAVA% (
-    SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath"
+    SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath\java.exe"
     if not exist %JAVA% (
         echo Error: Did not find Java - using path
         SET JAVA=java.exe
@@ -25,6 +25,7 @@ cd %~dp0
 cd ..
 cd libs\msclibrary\parser
 echo %cd%
-%JAVA% org.antlr.v4.Tool -Dlanguage=Cpp Msc.g4
+
+%JAVA% org.antlr.v4.Tool -Dlanguage=Cpp -no-listener -visitor Msc.g4
 
 exit /b

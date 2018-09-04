@@ -7,4 +7,4 @@ alias antlr4='java -jar $ANTLR_JAR'
 
 cd libs/msclibrary/parser
 
-antlr4 -Dlanguage=Cpp Msc.g4
+antlr4 -Dlanguage=Cpp -no-listener -visitor Msc.g4

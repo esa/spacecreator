@@ -21,10 +21,10 @@
 *.smod
 
 # Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+*libs/*.lai
+*libs/*.la
+*libs/*.a
+*libs/*.lib
 
 # Executables
 *.exe
@@ -37,3 +37,9 @@
 
 # System files
 .directory
+
+# ANTLR generated files
+libs/msclibrary/parser/*.cpp
+libs/msclibrary/parser/*.h
+libs/msclibrary/parser/*.interp
+libs/msclibrary/parser/*.tokens
