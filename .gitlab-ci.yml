@@ -21,6 +21,7 @@ build_linux_gcc:
   artifacts:
     paths:
       - build
+      - libs/msclibrary/parser
     expire_in: 1 day
 
 build_linux_clang:
@@ -66,8 +67,6 @@ test_docker:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
-    - apt-get update -yq
-    - apt-get install -y uuid-dev default-jre
     - find build | xargs touch # Avoid rebuilding
     - cd build
     - export QT_QPA_PLATFORM=offscreen
