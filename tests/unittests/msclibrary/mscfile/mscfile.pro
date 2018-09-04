@@ -27,4 +27,4 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../libs/msclibrary/libmsclibrary
 # Add ANTLR runtime
 win32: LIBS += -L$$clean_path("$$PWD/../../../3rdparty/antlr/cpp_runtime/lib/vs-2015/x64/Release DLL") -lantlr4-runtime
 unix: LIBS += -L$$clean_path($$PWD/../../../../3rdparty/antlr/cpp_runtime/dist) -lantlr4-runtime_linux_x64
-osx: LIBS += -L$$clean_path($$PWD/../../../../3rdparty/antlr/cpp_runtime/lib) -lantlr4-runtime-macos_x64
+osx: LIBS += -L$$clean_path($$PWD/../../../../3rdparty/antlr/cpp_runtime/lib) -lantlr4-runtime_macos_x64
