@@ -32,7 +32,7 @@ CONFIG(coverage) {
         "@echo Collecting coverage data"; \
         "lcov --capture --directory $${TOP_SRC_DIR} --output-file coverage_test.info --compat-libtool"; \
         "lcov --add-tracefile coverage_base.info --add-tracefile coverage_test.info --output-file coverage_total.info"; \
-        "lcov --remove coverage_total.info \"*moc_*.cpp\" \"*ui_*.h\" \"*/tests/*\" \"/opt/*\" \"/usr/*\" -o coverage_cleaned.info"; \
+        "lcov --remove coverage_total.info \"*3rdparty/*\" \"*moc_*.cpp\" \"*ui_*.h\" \"*/tests/*\" \"/opt/*\" \"/usr/*\" -o coverage_cleaned.info"; \
         "LANG=C genhtml --prefix $${TOP_SRC_DIR} --output-directory coverage-html --title \"Code Coverage\" --legend --show-details coverage_cleaned.info"
 
     clean-coverage-html.depends = clean-gcda

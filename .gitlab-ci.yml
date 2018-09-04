@@ -13,12 +13,15 @@ build_linux_gcc:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
+    - apt-get update -yq
+    - apt-get install -y uuid-dev default-jre
     - mkdir -p build; cd build
     - qmake -recursive ..
-    - make -j4
+    - make -j 8
   artifacts:
     paths:
       - build
+      - libs/msclibrary/parser
     expire_in: 1 day
 
 build_linux_clang:
@@ -27,10 +30,12 @@ build_linux_clang:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script: 
+    - apt-get update -yq
+    - apt-get install -y uuid-dev default-jre
     - mkdir -p build_clang
     - cd build_clang
     - qmake QMAKE_CC=clang QMAKE_CXX=clang++ -recursive ..
-    - make -j 4
+    - make -j 8
 
 # MacOS Shell (because of tag macOS - see CI runners tags)
 build_MacOS:
@@ -38,8 +43,10 @@ build_MacOS:
   tags:
     - macOS
   script:
-    - qmake
-    - make -j 4
+    - mkdir build_macos
+    - cd build_macos
+    - qmake ..
+    - make -j 8
 
 build_Windows:
   stage: build
@@ -73,9 +80,11 @@ coverage_docker:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
+    - apt-get update -yq
+    - apt-get install -y uuid-dev default-jre
     - mkdir -p build_coverage; cd build_coverage
     - qmake CONFIG+=debug CONFIG+=coverage -recursive ..
-    - make -j4
+    - make -j 8
     - export QT_QPA_PLATFORM=offscreen
     - make coverage-html
   coverage: '/^ *lines\.*:\s+(\d+.\d+\%)/'
