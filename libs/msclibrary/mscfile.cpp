@@ -9,12 +9,27 @@
 
 #include <fstream>
 
+/*!
+  \class MscFile
+  \inmodule MscLibrary
+
+  The class to load MSC files
+*/
+
 using namespace antlr4;
 
+/*!
+  \brief MscFile::MscFile
+*/
 MscFile::MscFile()
 {
 }
 
+/*!
+  \fn MscFile::parseFile(const QString &filename)
+
+  Loads the file \a filename
+*/
 void MscFile::parseFile(const QString &filename)
 {
     std::ifstream stream;

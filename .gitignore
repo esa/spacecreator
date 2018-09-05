@@ -43,3 +43,6 @@ libs/msclibrary/parser/*.cpp
 libs/msclibrary/parser/*.h
 libs/msclibrary/parser/*.interp
 libs/msclibrary/parser/*.tokens
+
+# QDoc generated files
+doc/html

@@ -1,0 +1,11 @@
+/*!
+\page index.html
+\title MSC Editor Documentation
+\brief This document contains information on MSC Editor
+
+Add some documentation
+*/
+
+/*!
+  \namespace msc
+*/
