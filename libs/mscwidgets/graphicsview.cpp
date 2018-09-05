@@ -3,12 +3,16 @@
 namespace msc {
 
 /*!
-    \class GraphicsView
-    \brief Basic view for an MSC diagram
+  \class msc::GraphicsView
+  \brief Basic view for an MSC diagram
+
+  \inmodule MscWidgets
+
+  Some documentation
 */
 
 /*!
-    Constructs a MSV view object with the parent \a parent.
+  Constructs a MSV view object with the parent \a parent.
 */
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
