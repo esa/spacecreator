@@ -11,7 +11,12 @@ HEADERS += \
     parser/MscLexer.h \
     parser/MscParser.h \
     parser/MscVisitor.h \
-    mscparservisitor.h
+    mscparservisitor.h \
+    exceptions.h \
+    mscdocument.h \
+    mscmodel.h \
+    mscchart.h \
+    mscinstance.h
 
 SOURCES += \
     mscfile.cpp \
@@ -19,7 +24,12 @@ SOURCES += \
     parser/MscLexer.cpp \
     parser/MscParser.cpp \
     parser/MscVisitor.cpp \
-    mscparservisitor.cpp
+    mscparservisitor.cpp \
+    exceptions.cpp \
+    mscdocument.cpp \
+    mscmodel.cpp \
+    mscchart.cpp \
+    mscinstance.cpp
 
 message("Creating parser out of antlr grammar file")
 linux {
@@ -34,3 +44,6 @@ osx {
 
 # Not using INCLUDEPATH, as the warnings should be disabled to the ANTLR runtime
 QMAKE_CXXFLAGS += -isystem $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+
+DISTFILES += \
+    parser/Msc.g4
