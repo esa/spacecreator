@@ -17,7 +17,7 @@ INSTANCEENDKEY: [eE][nN][dD][iI][nN][sS][tT][aA][nN][cC][eE];
 
 IDENTIFIER : Nondigit ( Nondigit | Digit )*;
 
-fragment Nondigit : [a-zA-Z_];
+fragment Nondigit : [a-zA-Z_.];
 
 fragment Digit : [0-9];
 

@@ -50,9 +50,9 @@ void tst_MscFile::testEmptyDocument()
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("CU_level"));
 
-    model = file->parseText("mscdocument CI_level;\nendmscdocument;");
+    model = file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;");
     QCOMPARE(model->documents().size(), 1);
-    QCOMPARE(model->documents().at(0)->name(), QString("CI_level"));
+    QCOMPARE(model->documents().at(0)->name(), QString("inst_1_cu_nominal.cu_controller"));
 
     model = file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  ");
     QCOMPARE(model->documents().size(), 1);
