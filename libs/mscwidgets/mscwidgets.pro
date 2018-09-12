@@ -8,7 +8,11 @@ CONFIG += static
 QT += core gui widgets
 
 HEADERS += \
-    graphicsview.h
+    graphicsview.h \
+    instanceitem.h \
+    messageitem.h
 
 SOURCES += \
-    graphicsview.cpp
+    graphicsview.cpp \
+    instanceitem.cpp \
+    messageitem.cpp

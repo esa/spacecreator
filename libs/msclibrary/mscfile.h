@@ -1,8 +1,6 @@
 #ifndef MSCFILE_H
 #define MSCFILE_H
 
-#include "mscmodel.h"
-
 #include <QString>
 
 namespace antlr4 {
@@ -10,21 +8,18 @@ class ANTLRInputStream;
 }
 
 namespace msc {
+class MscModel;
 
 class MscFile
 {
 public:
     MscFile();
 
-    void parseFile(const QString &filename);
-    void parseText(const QString &text);
-
-    const MscModel &model() const;
+    MscModel *parseFile(const QString &filename);
+    MscModel *parseText(const QString &text);
 
 private:
-    void parse(antlr4::ANTLRInputStream &input);
-
-    MscModel m_model;
+    MscModel *parse(antlr4::ANTLRInputStream &input);
 };
 
 } // namespace msc
