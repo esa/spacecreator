@@ -7,6 +7,7 @@
 
 namespace msc {
 
+static const double START_SYMBOL_HEIGHT = 15.0;
 static const double END_SYMBOL_HEIGHT = 10.0;
 
 InstanceItem::InstanceItem(QGraphicsItem *parent)
@@ -42,16 +43,18 @@ void InstanceItem::setName(const QString &name)
 {
     m_nameItem->setPlainText(name);
 
-    QRectF nameRect = m_nameItem->boundingRect();
-    m_headSymbol->setRect(nameRect);
+    QRectF rect = m_nameItem->boundingRect();
+    rect.moveTop(rect.bottom());
+    rect.setHeight(START_SYMBOL_HEIGHT);
+    m_headSymbol->setRect(rect);
 
-    double x = nameRect.center().x();
-    double y = nameRect.bottom();
+    double x = rect.center().x();
+    double y = rect.bottom();
     m_axisSymbol->setLine(x, y, x, y + 120.0);
 
-    x = nameRect.left();
+    x = rect.left();
     y = m_axisSymbol->boundingRect().bottom();
-    m_endSymbol->setRect(x, y, nameRect.width(), END_SYMBOL_HEIGHT);
+    m_endSymbol->setRect(x, y, rect.width(), END_SYMBOL_HEIGHT);
 
     emit horizontalCenterChanged();
     prepareGeometryChange();

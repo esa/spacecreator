@@ -102,6 +102,13 @@ void tst_MscFile::testInstance()
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->instances().at(0)->name(), QString("inst1"));
+
+    // with decomposition
+    model = file->parseText("MSC msc1;INSTANCE foo : PROCESS satellite com1;ENDINSTANCE;ENDMSC;");
+    QCOMPARE(model->charts().size(), 1);
+    chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instances().at(0)->name(), QString("foo"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

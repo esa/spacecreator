@@ -18,6 +18,9 @@ public:
     antlrcpp::Any visitDocument(MscParser::DocumentContext *ctx) override;
     antlrcpp::Any visitMsc(MscParser::MscContext *ctx) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *ctx) override;
+    antlrcpp::Any visitInstanceHeader(MscParser::InstanceHeaderContext *ctx) override;
+    antlrcpp::Any visitInstancekind(MscParser::InstancekindContext *ctx) override;
+    antlrcpp::Any visitDecomposition(MscParser::DecompositionContext *ctx) override;
 
 private:
     msc::MscModel *m_model = nullptr;

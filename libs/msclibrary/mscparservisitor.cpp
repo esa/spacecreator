@@ -59,3 +59,18 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *ctx)
     m_currentChart->addInstance(instance);
     return visitChildren(ctx);
 }
+
+antlrcpp::Any MscParserVisitor::visitInstanceHeader(MscParser::InstanceHeaderContext *ctx)
+{
+    return visitChildren(ctx);
+}
+
+antlrcpp::Any MscParserVisitor::visitInstancekind(MscParser::InstancekindContext *ctx)
+{
+    return visitChildren(ctx);
+}
+
+antlrcpp::Any MscParserVisitor::visitDecomposition(MscParser::DecompositionContext *ctx)
+{
+    return visitChildren(ctx);
+}
