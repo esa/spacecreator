@@ -7,6 +7,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class MainModel;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -15,8 +17,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void openFile();
+
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow *ui = nullptr;
+    MainModel *m_model = nullptr;
 };
 
 #endif // MAINWINDOW_H

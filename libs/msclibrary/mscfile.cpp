@@ -1,5 +1,6 @@
 #include "mscfile.h"
 #include "exceptions.h"
+#include "mscmodel.h"
 #include "mscparservisitor.h"
 
 #include "parser/MscLexer.h"
@@ -35,7 +36,7 @@ MscFile::MscFile()
 
   Loads the file \a filename
 */
-void MscFile::parseFile(const QString &filename)
+MscModel *MscFile::parseFile(const QString &filename)
 {
     if (!QFileInfo::exists(filename)) {
         throw FileNotFoundException();
@@ -48,24 +49,17 @@ void MscFile::parseFile(const QString &filename)
     }
 
     ANTLRInputStream input(stream);
-    parse(input);
+    return parse(input);
 }
 
-void MscFile::parseText(const QString &text)
+MscModel *MscFile::parseText(const QString &text)
 {
     ANTLRInputStream input(text.toStdString());
-    parse(input);
+    return parse(input);
 }
 
-const MscModel &MscFile::model() const
+MscModel *MscFile::parse(ANTLRInputStream &input)
 {
-    return m_model;
-}
-
-void MscFile::parse(ANTLRInputStream &input)
-{
-    m_model.clear();
-
     MscLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
 
@@ -73,16 +67,21 @@ void MscFile::parse(ANTLRInputStream &input)
 
     MscParser parser(&tokens);
 
+    auto model = new MscModel();
     MscParserVisitor visitor;
-    visitor.setModel(&m_model);
+    visitor.setModel(model);
     visitor.visit(parser.file());
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {
+        delete model;
         throw ParserException(QObject::tr("Syntax error"));
     }
     if (parser.getNumberOfSyntaxErrors() > 0) {
+        delete model;
         throw ParserException(QObject::tr("Syntax error"));
     }
+
+    return model;
 }
 
 } // namespace msc
