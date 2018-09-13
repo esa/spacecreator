@@ -1,11 +1,21 @@
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 
 namespace msc {
 
 MscChart::MscChart(const QString &name)
     : m_name(name)
 {
+}
+
+MscChart::~MscChart()
+{
+    qDeleteAll(m_instances);
+    m_instances.clear();
+
+    qDeleteAll(m_messages);
+    m_messages.clear();
 }
 
 const QString &MscChart::name() const
@@ -36,6 +46,16 @@ MscInstance *MscChart::instanceByName(const QString &name)
         }
     }
     return nullptr;
+}
+
+const QVector<MscMessage *> &MscChart::messages() const
+{
+    return m_messages;
+}
+
+void MscChart::addMessage(MscMessage *message)
+{
+    m_messages.append(message);
 }
 
 } // namespace msc

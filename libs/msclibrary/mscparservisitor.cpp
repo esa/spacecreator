@@ -91,7 +91,7 @@ antlrcpp::Any MscParserVisitor::visitInMessage(MscParser::InMessageContext *cont
     QString target = QString::fromStdString(context->messageTarget()->IDENTIFIER()->getText());
     message->setTargetInstance(m_currentChart->instanceByName(target));
 
-    m_model->addMessage(message);
+    m_currentChart->addMessage(message);
     return visitChildren(context);
 }
 
@@ -104,7 +104,7 @@ antlrcpp::Any MscParserVisitor::visitOutMessage(MscParser::OutMessageContext *co
     message->setSourceInstance(m_currentChart->instanceByName(source));
     message->setTargetInstance(m_currentInstance);
 
-    m_model->addMessage(message);
+    m_currentChart->addMessage(message);
     return visitChildren(context);
 }
 
