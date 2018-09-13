@@ -38,6 +38,7 @@ void MainModel::fillView()
     for (MscInstance *instance : chart->instances()) {
         auto *item = new InstanceItem();
         item->setName(instance->name());
+        item->setKind(instance->kind());
         item->setX(x);
         m_scene->addItem(item);
         x += 100.0;
