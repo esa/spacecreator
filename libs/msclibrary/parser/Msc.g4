@@ -11,12 +11,21 @@ msc : MSCKEY IDENTIFIER ';' instance* MSCENDKEY ';';
 MSCKEY : [mM][sS][cC]; // ignore case sensitivity
 MSCENDKEY : [eE][nN][dD][mM][sS][cC]; // ignore case sensitivity
 
-instance: INSTANCEKEY IDENTIFIER instanceHeader? ';' INSTANCEENDKEY ';';
+instance: INSTANCEKEY IDENTIFIER instanceHeader? ';' message* INSTANCEENDKEY ';';
 INSTANCEKEY: [iI][nN][sS][tT][aA][nN][cC][eE];
 INSTANCEENDKEY: [eE][nN][dD][iI][nN][sS][tT][aA][nN][cC][eE];
 instanceHeader : ':' instancekind decomposition*;
 instancekind : IDENTIFIER;
 decomposition : IDENTIFIER;
+
+message :  (inMessage|outMessage) ';';
+inMessage : INMESSAGEKEY IDENTIFIER FROMMESSAGEKEY messageTarget;
+outMessage : OUTMESSAGEKEY IDENTIFIER TOMESSAGEKEY messageTarget;
+INMESSAGEKEY : [iI][nN];
+OUTMESSAGEKEY : [oO][uU][tT];
+FROMMESSAGEKEY : [fF][rR][oO][mM];
+TOMESSAGEKEY : [tT][oO];
+messageTarget : IDENTIFIER;
 
 IDENTIFIER : Word;
 fragment Word : Nondigit (Nondigit|Digit)*;

@@ -18,6 +18,8 @@ public:
     const QVector<MscInstance *> &instances() const;
     void addInstance(MscInstance *instance);
 
+    MscInstance *instanceByName(const QString &name);
+
 private:
     QString m_name;
     QVector<MscInstance *> m_instances;

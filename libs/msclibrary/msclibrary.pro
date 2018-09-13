@@ -16,7 +16,8 @@ HEADERS += \
     mscdocument.h \
     mscmodel.h \
     mscchart.h \
-    mscinstance.h
+    mscinstance.h \
+    mscmessage.h
 
 SOURCES += \
     mscfile.cpp \
@@ -29,7 +30,8 @@ SOURCES += \
     mscdocument.cpp \
     mscmodel.cpp \
     mscchart.cpp \
-    mscinstance.cpp
+    mscinstance.cpp \
+    mscmessage.cpp
 
 message("Creating parser out of antlr grammar file")
 linux {

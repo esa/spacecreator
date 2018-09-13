@@ -28,4 +28,14 @@ void MscChart::addInstance(MscInstance *instance)
     m_instances.append(instance);
 }
 
+MscInstance *MscChart::instanceByName(const QString &name)
+{
+    for (MscInstance *instance : m_instances) {
+        if (instance->name() == name) {
+            return instance;
+        }
+    }
+    return nullptr;
+}
+
 } // namespace msc

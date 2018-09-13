@@ -1,6 +1,7 @@
 #include "mscmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
+#include "mscmessage.h"
 
 namespace msc {
 
@@ -33,6 +34,16 @@ void MscModel::addChart(MscChart *chart)
     m_charts.append(chart);
 }
 
+const QVector<MscMessage *> &MscModel::messages() const
+{
+    return m_messages;
+}
+
+void MscModel::addMessage(MscMessage *message)
+{
+    m_messages.append(message);
+}
+
 void MscModel::clear()
 {
     qDeleteAll(m_documents);
@@ -40,6 +51,9 @@ void MscModel::clear()
 
     qDeleteAll(m_charts);
     m_charts.clear();
+
+    qDeleteAll(m_messages);
+    m_messages.clear();
 }
 
 } // namespace msc
