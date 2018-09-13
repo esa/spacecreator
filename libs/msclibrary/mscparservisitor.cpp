@@ -55,6 +55,21 @@ antlrcpp::Any MscParserVisitor::visitMsc(MscParser::MscContext *context)
     return visitChildren(context);
 }
 
+antlrcpp::Any MscParserVisitor::visitInst(MscParser::InstContext *context)
+{
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitInstElements(MscParser::InstElementsContext *context)
+{
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitInstName(MscParser::InstNameContext *context)
+{
+    return visitChildren(context);
+}
+
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
 {
     QString name = QString::fromStdString(context->IDENTIFIER()->getText());

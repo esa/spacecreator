@@ -18,6 +18,9 @@ public:
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitDocument(MscParser::DocumentContext *context) override;
     antlrcpp::Any visitMsc(MscParser::MscContext *context) override;
+    antlrcpp::Any visitInst(MscParser::InstContext *context) override;
+    antlrcpp::Any visitInstElements(MscParser::InstElementsContext *context) override;
+    antlrcpp::Any visitInstName(MscParser::InstNameContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitInstanceHeader(MscParser::InstanceHeaderContext *context) override;
     antlrcpp::Any visitInstancekind(MscParser::InstancekindContext *context) override;
