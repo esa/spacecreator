@@ -39,5 +39,6 @@ fragment Nondigit : [a-zA-Z_.];
 fragment Digit : [0-9];
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+LB : '/\r' ->skip; // linebreak
 
 BLOCKCOMMENT : '/*' .*? '*/' -> skip;
