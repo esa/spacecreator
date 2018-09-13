@@ -25,6 +25,8 @@ public:
     const QVector<MscMessage *> &messages() const;
     void addMessage(MscMessage *message);
 
+    MscMessage *messageByName(const QString &name);
+
 private:
     QString m_name;
     QVector<MscInstance *> m_instances;

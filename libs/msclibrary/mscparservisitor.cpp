@@ -85,26 +85,28 @@ antlrcpp::Any MscParserVisitor::visitMessage(MscParser::MessageContext *context)
 antlrcpp::Any MscParserVisitor::visitInMessage(MscParser::InMessageContext *context)
 {
     QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    auto message = new MscMessage(name);
-
-    message->setSourceInstance(m_currentInstance);
     QString target = QString::fromStdString(context->messageTarget()->IDENTIFIER()->getText());
-    message->setTargetInstance(m_currentChart->instanceByName(target));
 
-    m_currentChart->addMessage(message);
+    if (m_currentChart->messageByName(name) == nullptr) {
+        auto message = new MscMessage(name);
+        message->setSourceInstance(m_currentInstance);
+        message->setTargetInstance(m_currentChart->instanceByName(target));
+        m_currentChart->addMessage(message);
+    }
     return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitOutMessage(MscParser::OutMessageContext *context)
 {
     QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    auto message = new MscMessage(name);
-
     QString source = QString::fromStdString(context->messageTarget()->IDENTIFIER()->getText());
-    message->setSourceInstance(m_currentChart->instanceByName(source));
-    message->setTargetInstance(m_currentInstance);
 
-    m_currentChart->addMessage(message);
+    if (m_currentChart->messageByName(name) == nullptr) {
+        auto message = new MscMessage(name);
+        message->setSourceInstance(m_currentChart->instanceByName(source));
+        message->setTargetInstance(m_currentInstance);
+        m_currentChart->addMessage(message);
+    }
     return visitChildren(context);
 }
 

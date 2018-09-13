@@ -25,6 +25,7 @@ private slots:
     void testMscInDocument();
     void testInstance();
     void testMessage();
+    void testSameMessageInTwoInstances();
 
 private:
     MscFile *file = nullptr;
@@ -135,6 +136,19 @@ void tst_MscFile::testMessage()
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), nullptr);
     QCOMPARE(message2->targetInstance(), instance);
+}
+
+void tst_MscFile::testSameMessageInTwoInstances()
+{
+    QString msc = { "MSC msc1; \
+                    INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
+                    INSTANCE Responder;out ICON to Initiator;ENDINSTANCE; \
+                    ENDMSC;" };
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->messages().size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

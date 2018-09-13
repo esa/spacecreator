@@ -58,4 +58,14 @@ void MscChart::addMessage(MscMessage *message)
     m_messages.append(message);
 }
 
+MscMessage *MscChart::messageByName(const QString &name)
+{
+    for (MscMessage *message : m_messages) {
+        if (message->name() == name) {
+            return message;
+        }
+    }
+    return nullptr;
+}
+
 } // namespace msc
