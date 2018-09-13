@@ -26,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString(), QString("*.msc"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
     if (!filename.isEmpty()) {
         m_model->loadFile(filename);
     }

@@ -4,6 +4,7 @@
 #include "mscdocument.h"
 #include "mscfile.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 
 #include "instanceitem.h"
@@ -33,13 +34,25 @@ void MainModel::fillView()
         return;
     }
 
-    double x = 0;
+    double x = 0.0;
     for (MscInstance *instance : chart->instances()) {
-        InstanceItem *iteam = new InstanceItem();
-        iteam->setName(instance->name());
-        iteam->setX(x);
-        m_scene->addItem(iteam);
+        auto *item = new InstanceItem();
+        item->setName(instance->name());
+        item->setKind(instance->kind());
+        item->setX(x);
+        m_scene->addItem(item);
         x += 100.0;
+    }
+
+    double y = 50.0;
+    for (MscMessage *message : chart->messages()) {
+        auto *item = new MessageItem();
+        item->setName(message->name());
+        item->setX(40.0);
+        item->setWidth(100.0);
+        item->setY(y);
+        m_scene->addItem(item);
+        y += 40.0;
     }
 }
 

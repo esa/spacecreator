@@ -3,6 +3,7 @@
 #include <mscdocument.h>
 #include <mscfile.h>
 #include <mscinstance.h>
+#include <mscmessage.h>
 #include <mscmodel.h>
 
 #include <QtTest>
@@ -23,6 +24,8 @@ private slots:
     void testNestedDocuments();
     void testMscInDocument();
     void testInstance();
+    void testMessage();
+    void testSameMessageInTwoInstances();
 
 private:
     MscFile *file = nullptr;
@@ -50,9 +53,9 @@ void tst_MscFile::testEmptyDocument()
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("CU_level"));
 
-    model = file->parseText("mscdocument CI_level;\nendmscdocument;");
+    model = file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;");
     QCOMPARE(model->documents().size(), 1);
-    QCOMPARE(model->documents().at(0)->name(), QString("CI_level"));
+    QCOMPARE(model->documents().at(0)->name(), QString("inst_1_cu_nominal.cu_controller"));
 
     model = file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  ");
     QCOMPARE(model->documents().size(), 1);
@@ -62,9 +65,9 @@ void tst_MscFile::testEmptyDocument()
 
 void tst_MscFile::testComments()
 {
-    MscModel *model = file->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;");
-    model = file->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;");
-    model = file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;");
+    file->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;");
+    file->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;");
+    file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;");
     // no exception thrown
 }
 
@@ -102,6 +105,50 @@ void tst_MscFile::testInstance()
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->instances().at(0)->name(), QString("inst1"));
+
+    // with decomposition
+    model = file->parseText("MSC msc1;INSTANCE foo : PROCESS satellite com1;ENDINSTANCE;ENDMSC;");
+    QCOMPARE(model->charts().size(), 1);
+    chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("foo"));
+    QCOMPARE(instance->kind(), QString("PROCESS"));
+    QStringList decomp = { "satellite", "com1" };
+    QCOMPARE(instance->decomposition(), decomp);
+}
+
+void tst_MscFile::testMessage()
+{
+    MscModel *model = file->parseText("MSC msc1;\nINSTANCE inst1;in ICONreq from env;out ICON to Responder;ENDINSTANCE;ENDMSC;");
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+
+    QCOMPARE(chart->messages().size(), 2);
+    MscMessage *message1 = chart->messages().at(0);
+    QCOMPARE(message1->name(), QString("ICONreq"));
+    QCOMPARE(message1->sourceInstance(), instance);
+    QCOMPARE(message1->targetInstance(), nullptr);
+
+    MscMessage *message2 = chart->messages().at(1);
+    QCOMPARE(message2->name(), QString("ICON"));
+    QCOMPARE(message2->sourceInstance(), nullptr);
+    QCOMPARE(message2->targetInstance(), instance);
+}
+
+void tst_MscFile::testSameMessageInTwoInstances()
+{
+    QString msc = { "MSC msc1; \
+                    INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
+                    INSTANCE Responder;out ICON to Initiator;ENDINSTANCE; \
+                    ENDMSC;" };
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->messages().size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

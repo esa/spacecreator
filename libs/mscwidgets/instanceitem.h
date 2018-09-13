@@ -24,6 +24,7 @@ public:
 
 public slots:
     void setName(const QString &name);
+    void setKind(const QString &kind);
 
 signals:
     void horizontalCenterChanged();
@@ -32,8 +33,11 @@ protected:
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
 private:
+    void buildLayout();
+
     QGraphicsRectItem *m_headSymbol = nullptr;
     QGraphicsTextItem *m_nameItem = nullptr;
+    QGraphicsTextItem *m_kindItem = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_endSymbol = nullptr;
 };
