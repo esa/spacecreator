@@ -10,6 +10,8 @@ class GraphicsView : public QGraphicsView
     Q_OBJECT
 public:
     GraphicsView(QWidget *parent = nullptr);
+
+    void setZoom(double percent);
 };
 
 } // namespace msc
