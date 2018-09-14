@@ -21,6 +21,8 @@ public slots:
     void openFile();
 
 private:
+    void setupUi();
+
     Ui::MainWindow *ui = nullptr;
     MainModel *m_model = nullptr;
 };

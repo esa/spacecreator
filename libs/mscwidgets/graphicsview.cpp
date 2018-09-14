@@ -19,4 +19,10 @@ GraphicsView::GraphicsView(QWidget *parent)
 {
 }
 
+void GraphicsView::setZoom(double percent)
+{
+    resetTransform();
+    scale(percent / 100.0, percent / 100.0);
+}
+
 } // namespace msc
