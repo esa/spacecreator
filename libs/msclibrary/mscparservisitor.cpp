@@ -7,6 +7,8 @@
 
 #include <QDebug>
 
+#include <string>
+
 using namespace msc;
 
 void MscParserVisitor::setModel(msc::MscModel *model)
@@ -30,12 +32,18 @@ antlrcpp::Any MscParserVisitor::visitDocument(MscParser::DocumentContext *contex
     } else {
         m_currentDocument->addDocument(doc);
     }
-    doc->setName(QString::fromStdString(context->IDENTIFIER()->getText()));
+    std::string docName = context->documentHead()->IDENTIFIER()->getText();
+    doc->setName(QString::fromStdString(docName));
 
     m_currentDocument = doc;
     auto ret = visitChildren(context);
     m_currentDocument = parent;
     return ret;
+}
+
+antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext *context)
+{
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMsc(MscParser::MscContext *context)
@@ -46,12 +54,23 @@ antlrcpp::Any MscParserVisitor::visitMsc(MscParser::MscContext *context)
     } else {
         m_currentDocument->addChart(chart);
     }
-    chart->setName(QString::fromStdString(context->IDENTIFIER()->getText()));
+    std::string mscName = context->mscHead()->IDENTIFIER()->getText();
+    chart->setName(QString::fromStdString(mscName));
 
     m_currentChart = chart;
-    for (auto instanceCtx : context->instance()) {
+    for (auto instanceCtx : context->mscBody()->instance()) {
         addInstance(instanceCtx);
     }
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitMscHead(MscParser::MscHeadContext *context)
+{
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitMscBody(MscParser::MscBodyContext *context)
+{
     return visitChildren(context);
 }
 
@@ -92,15 +111,15 @@ antlrcpp::Any MscParserVisitor::visitDecomposition(MscParser::DecompositionConte
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitMessage(MscParser::MessageContext *context)
+antlrcpp::Any MscParserVisitor::visitMessageEvent(MscParser::MessageEventContext *context)
 {
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitInMessage(MscParser::InMessageContext *context)
+antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext *context)
 {
     QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    QString target = QString::fromStdString(context->messageTarget()->IDENTIFIER()->getText());
+    QString target = QString::fromStdString(context->inputAddress()->IDENTIFIER()->getText());
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
@@ -111,10 +130,10 @@ antlrcpp::Any MscParserVisitor::visitInMessage(MscParser::InMessageContext *cont
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitOutMessage(MscParser::OutMessageContext *context)
+antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputContext *context)
 {
     QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    QString source = QString::fromStdString(context->messageTarget()->IDENTIFIER()->getText());
+    QString source = QString::fromStdString(context->outputAddress()->IDENTIFIER()->getText());
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
@@ -125,7 +144,12 @@ antlrcpp::Any MscParserVisitor::visitOutMessage(MscParser::OutMessageContext *co
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitMessageTarget(MscParser::MessageTargetContext *context)
+antlrcpp::Any MscParserVisitor::visitInputAddress(MscParser::InputAddressContext *context)
+{
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitOutputAddress(MscParser::OutputAddressContext *context)
 {
     return visitChildren(context);
 }

@@ -17,7 +17,10 @@ public:
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitDocument(MscParser::DocumentContext *context) override;
+    antlrcpp::Any visitDocumentHead(MscParser::DocumentHeadContext *context) override;
     antlrcpp::Any visitMsc(MscParser::MscContext *context) override;
+    antlrcpp::Any visitMscHead(MscParser::MscHeadContext *context) override;
+    antlrcpp::Any visitMscBody(MscParser::MscBodyContext *context) override;
     antlrcpp::Any visitInst(MscParser::InstContext *context) override;
     antlrcpp::Any visitInstElements(MscParser::InstElementsContext *context) override;
     antlrcpp::Any visitInstName(MscParser::InstNameContext *context) override;
@@ -25,10 +28,11 @@ public:
     antlrcpp::Any visitInstanceHeader(MscParser::InstanceHeaderContext *context) override;
     antlrcpp::Any visitInstancekind(MscParser::InstancekindContext *context) override;
     antlrcpp::Any visitDecomposition(MscParser::DecompositionContext *context) override;
-    antlrcpp::Any visitMessage(MscParser::MessageContext *context) override;
-    antlrcpp::Any visitInMessage(MscParser::InMessageContext *context) override;
-    antlrcpp::Any visitOutMessage(MscParser::OutMessageContext *context) override;
-    antlrcpp::Any visitMessageTarget(MscParser::MessageTargetContext *context) override;
+    antlrcpp::Any visitMessageEvent(MscParser::MessageEventContext *context) override;
+    antlrcpp::Any visitMessageInput(MscParser::MessageInputContext *context) override;
+    antlrcpp::Any visitMessageOutput(MscParser::MessageOutputContext *context) override;
+    antlrcpp::Any visitInputAddress(MscParser::InputAddressContext *context) override;
+    antlrcpp::Any visitOutputAddress(MscParser::OutputAddressContext *context) override;
 
 private:
     void addInstance(MscParser::InstanceContext *context);
