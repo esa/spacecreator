@@ -9,6 +9,9 @@ namespace msc {
 class MscChart;
 class MscDocument;
 class MscModel;
+
+class InstanceItem;
+class MessageItem;
 }
 
 class QGraphicsScene;
@@ -29,9 +32,13 @@ public slots:
 private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
+    msc::InstanceItem *instanceItem(const QString &name) const;
 
     msc::MscModel *m_mscModel = nullptr;
     QGraphicsScene *m_scene = nullptr;
+
+    QVector<msc::InstanceItem *> m_instanceItems;
+    QVector<msc::MessageItem *> m_messageItems;
 };
 
 #endif // MAINMODEL_H

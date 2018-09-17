@@ -1,6 +1,7 @@
 #include "instanceitem.h"
 
 #include <QBrush>
+#include <QDebug>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
@@ -41,16 +42,40 @@ double InstanceItem::horizontalCenter() const
     return x() + m_axisSymbol->line().x1();
 }
 
+QString InstanceItem::name() const
+{
+    return m_nameItem->toPlainText();
+}
+
+void InstanceItem::setAxisHeight(double height)
+{
+    if (m_axisHeight == height) {
+        return;
+    }
+    m_axisHeight = height;
+    updateLayout();
+}
+
+void InstanceItem::updateLayout()
+{
+    if (m_layoutDirty) {
+        return;
+    }
+
+    m_layoutDirty = true;
+    QMetaObject::invokeMethod(this, "buildLayout", Qt::QueuedConnection);
+}
+
 void InstanceItem::setName(const QString &name)
 {
     m_nameItem->setPlainText(name);
-    buildLayout();
+    updateLayout();
 }
 
 void InstanceItem::setKind(const QString &kind)
 {
     m_kindItem->setPlainText(kind);
-    buildLayout();
+    updateLayout();
 }
 
 QVariant InstanceItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
@@ -64,6 +89,7 @@ QVariant InstanceItem::itemChange(QGraphicsItem::GraphicsItemChange change, cons
 
 void InstanceItem::buildLayout()
 {
+    const double oldHorizontalZenter = horizontalCenter();
     QRectF nameRect = m_nameItem->boundingRect();
 
     const double centerX = std::max(nameRect.width(), SYMBOLS_WIDTH) / 2.0;
@@ -87,14 +113,18 @@ void InstanceItem::buildLayout()
     m_headSymbol->setRect(headSymbolRect);
 
     double y = headSymbolRect.bottom();
-    m_axisSymbol->setLine(centerX, y, centerX, y + 150.0);
+    m_axisSymbol->setLine(centerX, y, centerX, y + m_axisHeight);
 
     y = m_axisSymbol->boundingRect().bottom();
     m_endSymbol->setRect(symbolX, y, headSymbolRect.width(), END_SYMBOL_HEIGHT);
 
-    emit horizontalCenterChanged();
+    if (oldHorizontalZenter != horizontalCenter()) {
+        emit horizontalCenterChanged();
+    }
     prepareGeometryChange();
     update();
+
+    m_layoutDirty = false;
 }
 
 } // namespace msc

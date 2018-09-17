@@ -28,19 +28,22 @@ QGraphicsScene *MainModel::graphicsScene() const
 void MainModel::fillView()
 {
     m_scene->clear();
+    m_instanceItems.clear();
+    m_messageItems.clear();
 
     MscChart *chart = firstChart();
     if (chart == nullptr) {
         return;
     }
 
-    double x = 0.0;
+    double x = 100.0;
     for (MscInstance *instance : chart->instances()) {
         auto *item = new InstanceItem();
         item->setName(instance->name());
         item->setKind(instance->kind());
         item->setX(x);
         m_scene->addItem(item);
+        m_instanceItems.append(item);
         x += 100.0;
     }
 
@@ -48,11 +51,30 @@ void MainModel::fillView()
     for (MscMessage *message : chart->messages()) {
         auto *item = new MessageItem();
         item->setName(message->name());
-        item->setX(40.0);
-        item->setWidth(100.0);
         item->setY(y);
+
+        if (message->sourceInstance() != nullptr) {
+            QString sourceName = message->sourceInstance()->name();
+            InstanceItem *instItem = instanceItem(sourceName);
+            if (instItem != nullptr) {
+                item->setSourceInstanceItem(instItem);
+            }
+        }
+        if (message->targetInstance() != nullptr) {
+            QString targetName = message->targetInstance()->name();
+            InstanceItem *instItem = instanceItem(targetName);
+            if (instItem != nullptr) {
+                item->setTargetInstanceItem(instItem);
+            }
+        }
+
         m_scene->addItem(item);
+        m_messageItems.append(item);
         y += 40.0;
+    }
+
+    for (InstanceItem *item : m_instanceItems) {
+        item->setAxisHeight(y);
     }
 }
 
@@ -92,6 +114,19 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
         auto ret = firstChart(doc->documents());
         if (ret != nullptr) {
             return ret;
+        }
+    }
+    return nullptr;
+}
+
+InstanceItem *MainModel::instanceItem(const QString &name) const
+{
+    for (QGraphicsItem *item : m_scene->items()) {
+        InstanceItem *instance = dynamic_cast<InstanceItem *>(item);
+        if (instance != nullptr) {
+            if (instance->name() == name) {
+                return instance;
+            }
         }
     }
     return nullptr;

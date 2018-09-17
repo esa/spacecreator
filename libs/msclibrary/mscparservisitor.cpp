@@ -123,8 +123,8 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
-        message->setSourceInstance(m_currentInstance);
-        message->setTargetInstance(m_currentChart->instanceByName(target));
+        message->setSourceInstance(m_currentChart->instanceByName(target));
+        message->setTargetInstance(m_currentInstance);
         m_currentChart->addMessage(message);
     }
     return visitChildren(context);
@@ -137,8 +137,8 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
-        message->setSourceInstance(m_currentChart->instanceByName(source));
-        message->setTargetInstance(m_currentInstance);
+        message->setSourceInstance(m_currentInstance);
+        message->setTargetInstance(m_currentChart->instanceByName(source));
         m_currentChart->addMessage(message);
     }
     return visitChildren(context);
