@@ -8,6 +8,7 @@ class QGraphicsPolygonItem;
 class QGraphicsTextItem;
 
 namespace msc {
+class InstanceItem;
 
 class MessageItem : public QGraphicsObject
 {
@@ -15,7 +16,10 @@ class MessageItem : public QGraphicsObject
 public:
     explicit MessageItem(QGraphicsItem *parent = nullptr);
 
-    void setWidth(double width);
+    void setSourceInstanceItem(InstanceItem *sourceInstance);
+    void setTargetInstanceItem(InstanceItem *targetInstance);
+
+    void updateLayout();
 
     // QGraphicsItem interface
     QRectF boundingRect() const override;
@@ -24,12 +28,20 @@ public:
 public slots:
     void setName(const QString &name);
 
+private slots:
+    void buildLayout();
+
 private:
+    void setWidth(double width);
     void centerName();
 
     QGraphicsLineItem *m_line = nullptr;
-    QGraphicsPolygonItem *m_arrow = nullptr;
+    QGraphicsPolygonItem *m_leftArrow = nullptr;
+    QGraphicsPolygonItem *m_rightArrow = nullptr;
     QGraphicsTextItem *m_nameItem = nullptr;
+    InstanceItem *m_sourceInstance = nullptr;
+    InstanceItem *m_targetInstance = nullptr;
+    bool m_layoutDirty = false;
 };
 
 } // namespace mas

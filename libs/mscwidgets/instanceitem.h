@@ -18,6 +18,12 @@ public:
 
     double horizontalCenter() const;
 
+    QString name() const;
+
+    void setAxisHeight(double height);
+
+    void updateLayout();
+
     // QGraphicsItem interface
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -32,14 +38,17 @@ signals:
 protected:
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
-private:
+private slots:
     void buildLayout();
 
+private:
     QGraphicsRectItem *m_headSymbol = nullptr;
     QGraphicsTextItem *m_nameItem = nullptr;
     QGraphicsTextItem *m_kindItem = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_endSymbol = nullptr;
+    double m_axisHeight = 150.0;
+    bool m_layoutDirty = false;
 };
 
 } // namespace msc
