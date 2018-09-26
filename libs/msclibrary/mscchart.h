@@ -11,7 +11,7 @@ class MscMessage;
 class MscChart
 {
 public:
-    MscChart(const QString &name = "");
+    explicit MscChart(const QString &name = "");
     ~MscChart();
 
     const QString &name() const;
