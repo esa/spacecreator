@@ -110,7 +110,7 @@ clang_analyze:
     - mkdir -p build_clang_analyze; cd build_clang_analyze
     - qmake ..
     - /usr/share/clang/scan-build-6.0/bin/scan-build --status-bugs -o ../clang-analyze make -j8
-    artifacts:
-  paths:
-    - clang-analyze
-  expire_in: 1 week
+  artifacts:
+    paths:
+      - clang-analyze
+    expire_in: 1 week
