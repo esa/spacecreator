@@ -100,3 +100,17 @@ cppcheck:
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
     - scripts/cppcheck_run.sh
+
+clang_analyze:
+  stage: test
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  script:
+    - mkdir -p build_clang_analyze; cd build_clang_analyze
+    - qmake ..
+    - /usr/share/clang/scan-build-6.0/bin/scan-build --status-bugs -o ../clang-analyze make -j8
+  artifacts:
+    paths:
+      - clang-analyze
+    expire_in: 1 week
