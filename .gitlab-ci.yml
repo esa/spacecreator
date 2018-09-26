@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - checks
 
 ##################
 # Build
@@ -93,8 +94,12 @@ coverage_docker:
       - build_coverage/coverage-html
     expire_in: 1 week
 
+##################
+# CHECKS - static analyses
+##################
+
 cppcheck:
-  stage: test
+  stage: checks
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
@@ -102,7 +107,7 @@ cppcheck:
     - scripts/cppcheck_run.sh
 
 clang_analyze:
-  stage: test
+  stage: checks
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
