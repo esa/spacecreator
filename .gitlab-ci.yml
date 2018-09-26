@@ -106,7 +106,7 @@ clang_analyze:
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
-  scripts:
+  script:
     - mkdir -p build_clang_analyze; cd build_clang_analyze
     - qmake ..
     - /usr/share/clang/scan-build-6.0/bin/scan-build --status-bugs -o ../clang-analyze make -j8
