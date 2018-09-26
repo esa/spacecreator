@@ -9,7 +9,7 @@ class MscInstance;
 class MscMessage
 {
 public:
-    MscMessage(const QString &name = "");
+    explicit MscMessage(const QString &name = "");
 
     const QString &name() const;
     void setName(const QString &name);

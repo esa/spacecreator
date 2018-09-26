@@ -92,3 +92,11 @@ coverage_docker:
     paths:
       - build_coverage/coverage-html
     expire_in: 1 week
+
+cppcheck:
+  stage: test
+  tags:
+    - docker
+    image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+    script:
+      - scripts/cppcheck_run.sh
