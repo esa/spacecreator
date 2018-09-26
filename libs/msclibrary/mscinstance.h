@@ -9,7 +9,7 @@ namespace msc {
 class MscInstance
 {
 public:
-    MscInstance(const QString &name = "");
+    explicit MscInstance(const QString &name = "");
 
     const QString &name() const;
     void setName(const QString &name);
