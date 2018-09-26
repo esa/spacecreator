@@ -25,14 +25,6 @@ const QString &MscChart::name() const
 
 void MscChart::setName(const QString &name)
 {
-    // for checking clan-analyser on CI
-    QString *i;
-    i->clear();
-
-    int r;
-    r = 3 / 10;
-    // END
-
     m_name = name;
 }
 
