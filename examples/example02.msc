@@ -1,0 +1,17 @@
+/* from http://www.sdl-forum.org/MSC/msctutorial.pdf */
+
+msc connection;
+    inst Initiator, Responder;
+    instance Initiator: process ISAP_Manager_Ini;
+        in ICONreq from env;
+        out ICON to Responder;
+        in ICONF from Responder;
+        out ICONconf to env;
+    endinstance;
+    instance Responder: process ISAP_Manager_Resp;
+        in ICON from Initiator;
+        out ICONind to env;
+        in ICONresp from env;
+        out ICONF to Initiator;
+    endinstance;
+endmsc;

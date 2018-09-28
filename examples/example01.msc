@@ -1,0 +1,9 @@
+MSCDOCUMENT doc1;
+    MSC msc1;
+        INSTANCE inst1;
+        ENDINSTANCE;
+
+        INSTANCE inst2;
+        ENDINSTANCE;
+    ENDMSC;
+ENDMSCDOCUMENT;
