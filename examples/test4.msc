@@ -1,0 +1,16 @@
+mscdocument Untitled;
+   msc Msccc;
+      gate out Mes_1 to Inst_1;
+      gate in Mes_3 from Inst_2;
+      instance Inst_1;
+         in Mes_1 from env;
+         out Mes_2 to Inst_2;
+         out Msg_1 to Inst_2;
+      endinstance;
+      instance Inst_2;
+         out Mes_3 to env;
+         in Mes_2 from Inst_1;
+         in Msg_1 from Inst_1;
+      endinstance;
+   endmsc;
+endmscdocument;

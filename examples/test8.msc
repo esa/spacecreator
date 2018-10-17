@@ -1,0 +1,13 @@
+mscdocument Untitled_Document;
+   msc Untitled_1;
+      instance Inst_1;
+         starttimer message_timer;
+         out Msg_3 to Inst_2;
+         stoptimer message_timer;
+         timeout message_timer;
+      endinstance;
+      instance Inst_2;
+         in Msg_3 from Inst_1;
+      endinstance;
+   endmsc;
+endmscdocument;
