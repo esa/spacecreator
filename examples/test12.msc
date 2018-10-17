@@ -1,0 +1,18 @@
+mscdocument automade;
+language ASN.1; data TPos.asn;
+inst mygui_GUI : process;
+msg gui_send_tm: (T-POS);
+msg gui_int_send_tm: (MyInt);
+msc recorded;
+gate out gui_send_tm,a(longitude:-174.0) to mygui_GUI;
+gate out gui_send_tm,b(longitude:-174.0) to mygui_GUI;
+gate out gui_send_tm,c(longitude:-174.0) to mygui_GUI;
+gate in gui_int_send_tm(12) from mygui_GUI;
+mygui_GUI : instance  process;
+in gui_send_tm,a(longitude:-174.0)  from env;
+in gui_send_tm,b(longitude:-174.0)  from env;
+in gui_send_tm,c(longitude:-174.0)  from env;
+out gui_int_send_tm(12) to env;
+endinstance;
+endmsc;
+endmscdocument;
