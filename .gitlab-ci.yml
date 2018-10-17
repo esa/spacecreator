@@ -56,7 +56,7 @@ build_Windows:
     - vs2017
     - x64
   script:
-    - scripts\build_windows.bat
+    - 'call scripts\build_windows.bat'
 
 ##################
 # TEST
