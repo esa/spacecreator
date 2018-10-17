@@ -11,9 +11,21 @@
 
 using namespace msc;
 
-void MscParserVisitor::setModel(msc::MscModel *model)
+MscParserVisitor::MscParserVisitor()
+    : m_model(new MscModel)
 {
-    m_model = model;
+}
+
+MscParserVisitor::~MscParserVisitor()
+{
+    delete m_model;
+}
+
+msc::MscModel *MscParserVisitor::detachModel()
+{
+    msc::MscModel *model = m_model;
+    m_model = nullptr;
+    return model;
 }
 
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)

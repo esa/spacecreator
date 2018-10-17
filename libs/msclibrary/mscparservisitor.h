@@ -13,12 +13,17 @@ class MscModel;
 class MscParserVisitor : public MscVisitor
 {
 public:
-    void setModel(msc::MscModel *model);
+    MscParserVisitor();
+    ~MscParserVisitor();
+
+    // Returns the model that is built up during parsing
+    // The caller has to take over ownership of the model object
+    msc::MscModel *detachModel();
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
     antlrcpp::Any visitDefiningMscReference(MscParser::DefiningMscReferenceContext *context) override;
-    antlrcpp::Any visitVirtuality(MscParser::VirtualityContext* context) override;
+    antlrcpp::Any visitVirtuality(MscParser::VirtualityContext *context) override;
     antlrcpp::Any visitMscDefinition(MscParser::MscDefinitionContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitMscevent(MscParser::MsceventContext *context) override;

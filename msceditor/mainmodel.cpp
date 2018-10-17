@@ -20,6 +20,12 @@ MainModel::MainModel(QObject *parent)
 {
 }
 
+MainModel::~MainModel()
+{
+    delete m_scene;
+    delete m_mscModel;
+}
+
 QGraphicsScene *MainModel::graphicsScene() const
 {
     return m_scene;

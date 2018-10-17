@@ -67,21 +67,18 @@ MscModel *MscFile::parse(ANTLRInputStream &input)
 
     MscParser parser(&tokens);
 
-    auto model = new MscModel();
     MscParserVisitor visitor;
-    visitor.setModel(model);
     visitor.visit(parser.file());
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {
-        delete model;
         throw ParserException(QObject::tr("Syntax error"));
     }
     if (parser.getNumberOfSyntaxErrors() > 0) {
-        delete model;
         throw ParserException(QObject::tr("Syntax error"));
     }
 
-    return model;
+    return visitor.detachModel();
+    ;
 }
 
 } // namespace msc
