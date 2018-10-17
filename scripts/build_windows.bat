@@ -42,9 +42,9 @@ call %VCVARSALLPATH%
 mkdir build_win
 cd build_win
 
-call %qmake% ..
-call %BUILD_TOOL%
+call %qmake% .. || exit /b 1
+call %BUILD_TOOL% || exit /b 1
 
 cd ..
 
-exit /b
+exit /b 0
