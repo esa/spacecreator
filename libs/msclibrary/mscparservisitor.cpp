@@ -32,7 +32,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    std::string docName = context->NAME()->getText();
+    const std::string docName = context->NAME()->getText();
     doc->setName(QString::fromStdString(docName));
 
     m_currentDocument = doc;
@@ -59,7 +59,7 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
     } else {
         m_currentDocument->addChart(chart);
     }
-    std::string mscName = context->NAME()->getText();
+    const std::string mscName = context->NAME()->getText();
     chart->setName(QString::fromStdString(mscName));
 
     m_currentChart = chart;
@@ -71,21 +71,21 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
 
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
 {
-    QString name = QString::fromStdString(context->NAME(0)->getText());
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
     m_currentInstance = m_currentChart->instanceByName(name);
     return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *context)
 {
-    QString name = QString::fromStdString(context->NAME(0)->getText());
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
         if (context->a) {
             // is an input event
             if (context->a->NAME()) {
-                QString source = QString::fromStdString(context->a->NAME()->getText());
+                const QString source = QString::fromStdString(context->a->NAME()->getText());
                 message->setSourceInstance(m_currentChart->instanceByName(source));
             }
             message->setTargetInstance(m_currentInstance);
@@ -93,7 +93,7 @@ antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *contex
         if (context->c) {
             // is an output event
             if (context->c->NAME()) {
-                QString target = QString::fromStdString(context->c->NAME()->getText());
+                const QString target = QString::fromStdString(context->c->NAME()->getText());
                 message->setTargetInstance(m_currentChart->instanceByName(target));
             }
             message->setSourceInstance(m_currentInstance);
@@ -115,7 +115,7 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
         return;
     }
 
-    QString name = QString::fromStdString(context->NAME(0)->getText());
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
     auto instance = new MscInstance(name);
     //    if (context->instanceHeader() != nullptr) {
     //        QString kind = QString::fromStdString(context->instanceHeader()->instancekind()->getText());
