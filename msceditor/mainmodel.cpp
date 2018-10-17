@@ -20,6 +20,12 @@ MainModel::MainModel(QObject *parent)
 {
 }
 
+MainModel::~MainModel()
+{
+    delete m_scene;
+    delete m_mscModel;
+}
+
 QGraphicsScene *MainModel::graphicsScene() const
 {
     return m_scene;
@@ -82,11 +88,14 @@ void MainModel::loadFile(const QString &filename)
 {
     m_scene->clear();
     delete m_mscModel;
+    m_mscModel = nullptr;
 
     msc::MscFile file;
     try {
         m_mscModel = file.parseFile(filename);
     } catch (...) {
+        //print error message
+        return;
     }
 
     fillView();

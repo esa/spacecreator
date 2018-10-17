@@ -11,9 +11,21 @@
 
 using namespace msc;
 
-void MscParserVisitor::setModel(msc::MscModel *model)
+MscParserVisitor::MscParserVisitor()
+    : m_model(new MscModel)
 {
-    m_model = model;
+}
+
+MscParserVisitor::~MscParserVisitor()
+{
+    delete m_model;
+}
+
+msc::MscModel *MscParserVisitor::detachModel()
+{
+    msc::MscModel *model = m_model;
+    m_model = nullptr;
+    return model;
 }
 
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
@@ -22,7 +34,7 @@ antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitDocument(MscParser::DocumentContext *context)
+antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
 {
     MscDocument *parent = m_currentDocument;
 
@@ -32,7 +44,7 @@ antlrcpp::Any MscParserVisitor::visitDocument(MscParser::DocumentContext *contex
     } else {
         m_currentDocument->addDocument(doc);
     }
-    std::string docName = context->documentHead()->IDENTIFIER()->getText();
+    const std::string docName = context->NAME()->getText();
     doc->setName(QString::fromStdString(docName));
 
     m_currentDocument = doc;
@@ -41,12 +53,17 @@ antlrcpp::Any MscParserVisitor::visitDocument(MscParser::DocumentContext *contex
     return ret;
 }
 
-antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext *context)
+antlrcpp::Any MscParserVisitor::visitDefiningMscReference(MscParser::DefiningMscReferenceContext *context)
 {
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitMsc(MscParser::MscContext *context)
+antlrcpp::Any MscParserVisitor::visitVirtuality(MscParser::VirtualityContext *context)
+{
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionContext *context)
 {
     auto chart = new MscChart();
     if (m_currentDocument == nullptr) {
@@ -54,102 +71,51 @@ antlrcpp::Any MscParserVisitor::visitMsc(MscParser::MscContext *context)
     } else {
         m_currentDocument->addChart(chart);
     }
-    std::string mscName = context->mscHead()->IDENTIFIER()->getText();
+    const std::string mscName = context->NAME()->getText();
     chart->setName(QString::fromStdString(mscName));
 
     m_currentChart = chart;
-    for (auto instanceCtx : context->mscBody()->instance()) {
+    for (auto instanceCtx : context->instance()) {
         addInstance(instanceCtx);
     }
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitMscHead(MscParser::MscHeadContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitMscBody(MscParser::MscBodyContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitInst(MscParser::InstContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitInstElements(MscParser::InstElementsContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitInstName(MscParser::InstNameContext *context)
-{
-    return visitChildren(context);
-}
-
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
 {
-    QString name = QString::fromStdString(context->IDENTIFIER()->getText());
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
     m_currentInstance = m_currentChart->instanceByName(name);
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitInstanceHeader(MscParser::InstanceHeaderContext *context)
+antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *context)
 {
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitInstancekind(MscParser::InstancekindContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitDecomposition(MscParser::DecompositionContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitMessageEvent(MscParser::MessageEventContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext *context)
-{
-    QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    QString target = QString::fromStdString(context->inputAddress()->IDENTIFIER()->getText());
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
-        message->setSourceInstance(m_currentChart->instanceByName(target));
-        message->setTargetInstance(m_currentInstance);
+        if (context->a) {
+            // is an input event
+            if (context->a->NAME()) {
+                const QString source = QString::fromStdString(context->a->NAME()->getText());
+                message->setSourceInstance(m_currentChart->instanceByName(source));
+            }
+            message->setTargetInstance(m_currentInstance);
+        }
+        if (context->c) {
+            // is an output event
+            if (context->c->NAME()) {
+                const QString target = QString::fromStdString(context->c->NAME()->getText());
+                message->setTargetInstance(m_currentChart->instanceByName(target));
+            }
+            message->setSourceInstance(m_currentInstance);
+        }
         m_currentChart->addMessage(message);
     }
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputContext *context)
-{
-    QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    QString source = QString::fromStdString(context->outputAddress()->IDENTIFIER()->getText());
-
-    if (m_currentChart->messageByName(name) == nullptr) {
-        auto message = new MscMessage(name);
-        message->setSourceInstance(m_currentInstance);
-        message->setTargetInstance(m_currentChart->instanceByName(source));
-        m_currentChart->addMessage(message);
-    }
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitInputAddress(MscParser::InputAddressContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitOutputAddress(MscParser::OutputAddressContext *context)
+antlrcpp::Any MscParserVisitor::visitNameOrEnv(MscParser::NameOrEnvContext *context)
 {
     return visitChildren(context);
 }
@@ -157,16 +123,20 @@ antlrcpp::Any MscParserVisitor::visitOutputAddress(MscParser::OutputAddressConte
 void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
 {
     Q_ASSERT(m_currentChart != nullptr);
-    QString name = QString::fromStdString(context->IDENTIFIER()->getText());
-    auto instance = new MscInstance(name);
-    if (context->instanceHeader() != nullptr) {
-        QString kind = QString::fromStdString(context->instanceHeader()->instancekind()->getText());
-        instance->setKind(kind);
-        QStringList decomposition;
-        for (auto decomp : context->instanceHeader()->decomposition()) {
-            decomposition << QString::fromStdString(decomp->getText());
-        }
-        instance->setDecomposition(decomposition);
+    if (context->GATE()) {
+        return;
     }
+
+    const QString name = QString::fromStdString(context->NAME(0)->getText());
+    auto instance = new MscInstance(name);
+    //    if (context->instanceHeader() != nullptr) {
+    //        QString kind = QString::fromStdString(context->instanceHeader()->instancekind()->getText());
+    //        instance->setKind(kind);
+    //        QStringList decomposition;
+    //        for (auto decomp : context->instanceHeader()->decomposition()) {
+    //            decomposition << QString::fromStdString(decomp->getText());
+    //        }
+    //        instance->setDecomposition(decomposition);
+    //    }
     m_currentChart->addInstance(instance);
 }

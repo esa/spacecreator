@@ -21,6 +21,7 @@ class MainModel : public QObject
     Q_OBJECT
 public:
     explicit MainModel(QObject *parent = nullptr);
+    ~MainModel();
 
     QGraphicsScene *graphicsScene() const;
 
