@@ -44,8 +44,12 @@ osx {
     system(cd $$PWD/../../ ; ./scripts/create_msc_parser.sh)
 }
 
-# Not using INCLUDEPATH, as the warnings should be disabled to the ANTLR runtime
-QMAKE_CXXFLAGS += -isystem $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+win32 {
+    INCLUDEPATH += $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+} else {
+    # Not using INCLUDEPATH, as the warnings should be disabled to the ANTLR runtime
+    QMAKE_CXXFLAGS += -isystem $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+}
 
 DISTFILES += \
     parser/Msc.g4
