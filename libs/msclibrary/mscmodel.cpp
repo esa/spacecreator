@@ -4,7 +4,8 @@
 
 namespace msc {
 
-MscModel::MscModel()
+MscModel::MscModel(QObject *parent)
+    : QObject(parent)
 {
 }
 
@@ -21,6 +22,7 @@ const QVector<MscDocument *> &MscModel::documents() const
 void MscModel::addDocument(MscDocument *document)
 {
     m_documents.append(document);
+    Q_EMIT documentAdded(document);
 }
 
 const QVector<MscChart *> &MscModel::charts() const
@@ -31,6 +33,7 @@ const QVector<MscChart *> &MscModel::charts() const
 void MscModel::addChart(MscChart *chart)
 {
     m_charts.append(chart);
+    Q_EMIT chartAdded(chart);
 }
 
 void MscModel::clear()
@@ -40,6 +43,8 @@ void MscModel::clear()
 
     qDeleteAll(m_charts);
     m_charts.clear();
+
+    Q_EMIT cleared();
 }
 
 } // namespace msc

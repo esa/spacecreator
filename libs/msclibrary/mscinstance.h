@@ -3,13 +3,16 @@
 
 #include <QString>
 #include <QStringList>
+#include <QObject>
 
 namespace msc {
 
-class MscInstance
+class MscInstance : public QObject
 {
+    Q_OBJECT
 public:
-    explicit MscInstance(const QString &name = "");
+    explicit MscInstance(QObject *parent = nullptr);
+    MscInstance(const QString &name, QObject *parent = nullptr);
 
     const QString &name() const;
     void setName(const QString &name);
@@ -19,6 +22,11 @@ public:
 
     const QStringList &decomposition() const;
     void setDecomposition(const QStringList &decomposition);
+
+Q_SIGNALS:
+    void nameChanged(const QString &name);
+    void kindChanged(const QString &kind);
+    void decompositionChanged(const QStringList &decomposition);
 
 private:
     QString m_name;

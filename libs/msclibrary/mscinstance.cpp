@@ -2,8 +2,14 @@
 
 namespace msc {
 
-MscInstance::MscInstance(const QString &name)
-    : m_name(name)
+MscInstance::MscInstance(QObject *parent)
+    : QObject(parent)
+{
+}
+
+MscInstance::MscInstance(const QString &name, QObject *parent)
+    : QObject(parent)
+    , m_name(name)
 {
 }
 
@@ -14,7 +20,12 @@ const QString &MscInstance::name() const
 
 void MscInstance::setName(const QString &name)
 {
+    if (name == m_name) {
+        return;
+    }
+
     m_name = name;
+    Q_EMIT nameChanged(m_name);
 }
 
 const QString &MscInstance::kind() const
@@ -24,7 +35,12 @@ const QString &MscInstance::kind() const
 
 void MscInstance::setKind(const QString &kind)
 {
+    if (kind == m_kind) {
+        return;
+    }
+
     m_kind = kind;
+    Q_EMIT kindChanged(m_kind);
 }
 
 const QStringList &MscInstance::decomposition() const
@@ -34,7 +50,12 @@ const QStringList &MscInstance::decomposition() const
 
 void MscInstance::setDecomposition(const QStringList &decomposition)
 {
+    if (decomposition == m_decomposition) {
+        return;
+    }
+
     m_decomposition = decomposition;
+    Q_EMIT decompositionChanged(m_decomposition);
 }
 
 } // namespace msc
