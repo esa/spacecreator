@@ -21,6 +21,13 @@ const QVector<MscDocument *> &MscModel::documents() const
 
 void MscModel::addDocument(MscDocument *document)
 {
+    if (document == nullptr) {
+        return;
+    }
+    if (m_documents.contains(document)) {
+        return;
+    }
+
     m_documents.append(document);
     Q_EMIT documentAdded(document);
 }
@@ -32,6 +39,13 @@ const QVector<MscChart *> &MscModel::charts() const
 
 void MscModel::addChart(MscChart *chart)
 {
+    if (chart == nullptr) {
+        return;
+    }
+    if (m_charts.contains(chart)) {
+        return;
+    }
+
     m_charts.append(chart);
     Q_EMIT chartAdded(chart);
 }

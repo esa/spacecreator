@@ -46,6 +46,13 @@ const QVector<MscInstance *> &MscChart::instances() const
 
 void MscChart::addInstance(MscInstance *instance)
 {
+    if (instance == nullptr) {
+        return;
+    }
+    if (m_instances.contains(instance)) {
+        return;
+    }
+
     m_instances.append(instance);
     Q_EMIT instanceAdded(instance);
 }
@@ -67,6 +74,13 @@ const QVector<MscMessage *> &MscChart::messages() const
 
 void MscChart::addMessage(MscMessage *message)
 {
+    if (message == nullptr) {
+        return;
+    }
+    if (m_messages.contains(message)) {
+        return;
+    }
+
     m_messages.append(message);
     Q_EMIT messageAdded(message);
 }
