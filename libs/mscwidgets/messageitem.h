@@ -25,10 +25,10 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-public slots:
+public Q_SLOTS:
     void setName(const QString &name);
 
-private slots:
+private Q_SLOTS:
     void buildLayout();
 
 private:

@@ -4,8 +4,14 @@
 
 namespace msc {
 
-MscChart::MscChart(const QString &name)
-    : m_name(name)
+MscChart::MscChart(QObject *parent)
+    : QObject(parent)
+{
+}
+
+MscChart::MscChart(const QString &name, QObject *parent)
+    : QObject(parent)
+    , m_name(name)
 {
 }
 
@@ -25,7 +31,12 @@ const QString &MscChart::name() const
 
 void MscChart::setName(const QString &name)
 {
+    if (name == m_name) {
+        return;
+    }
+
     m_name = name;
+    Q_EMIT nameChanged(m_name);
 }
 
 const QVector<MscInstance *> &MscChart::instances() const
@@ -35,7 +46,15 @@ const QVector<MscInstance *> &MscChart::instances() const
 
 void MscChart::addInstance(MscInstance *instance)
 {
+    if (instance == nullptr) {
+        return;
+    }
+    if (m_instances.contains(instance)) {
+        return;
+    }
+
     m_instances.append(instance);
+    Q_EMIT instanceAdded(instance);
 }
 
 MscInstance *MscChart::instanceByName(const QString &name)
@@ -55,7 +74,15 @@ const QVector<MscMessage *> &MscChart::messages() const
 
 void MscChart::addMessage(MscMessage *message)
 {
+    if (message == nullptr) {
+        return;
+    }
+    if (m_messages.contains(message)) {
+        return;
+    }
+
     m_messages.append(message);
+    Q_EMIT messageAdded(message);
 }
 
 MscMessage *MscChart::messageByName(const QString &name)

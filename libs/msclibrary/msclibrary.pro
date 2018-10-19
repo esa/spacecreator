@@ -4,6 +4,7 @@ TARGET = msclibrary
 include(../../esa.pri)
 
 CONFIG += static
+CONFIG += no_keywords
 
 HEADERS += \
     mscfile.h \

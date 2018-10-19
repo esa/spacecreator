@@ -1,16 +1,19 @@
 #ifndef MSCDOCUMENT_H
 #define MSCDOCUMENT_H
 
+#include <QObject>
 #include <QString>
 #include <QVector>
 
 namespace msc {
 class MscChart;
 
-class MscDocument
+class MscDocument : public QObject
 {
+    Q_OBJECT
 public:
-    explicit MscDocument(const QString &name = "");
+    explicit MscDocument(QObject *parent = nullptr);
+    MscDocument(const QString &name, QObject *parent = nullptr);
     ~MscDocument();
 
     const QString &name() const;
@@ -23,6 +26,12 @@ public:
     void addChart(MscChart *chart);
 
     void clear();
+
+Q_SIGNALS:
+    void nameChanged(const QString &name);
+    void documentAdded(MscDocument *document);
+    void chartAdded(MscChart *chart);
+    void cleared();
 
 private:
     QString m_name;

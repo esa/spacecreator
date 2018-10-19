@@ -14,8 +14,7 @@ class tst_MscFile : public QObject
 {
     Q_OBJECT
 
-public:
-private slots:
+private Q_SLOTS:
     void init();
     void cleanup();
     void testFileOpenError();

@@ -28,17 +28,17 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-public slots:
+public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
 
-signals:
+Q_SIGNALS:
     void horizontalCenterChanged();
 
 protected:
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
-private slots:
+private Q_SLOTS:
     void buildLayout();
 
 private:

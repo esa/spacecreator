@@ -3,8 +3,14 @@
 
 namespace msc {
 
-MscDocument::MscDocument(const QString &name)
-    : m_name(name)
+MscDocument::MscDocument(QObject *parent)
+    : QObject(parent)
+{
+}
+
+MscDocument::MscDocument(const QString &name, QObject *parent)
+    : QObject(parent)
+    , m_name(name)
 {
 }
 
@@ -20,7 +26,12 @@ const QString &MscDocument::name() const
 
 void MscDocument::setName(const QString &name)
 {
+    if (name == m_name) {
+        return;
+    }
+
     m_name = name;
+    Q_EMIT nameChanged(m_name);
 }
 
 const QVector<MscDocument *> &MscDocument::documents() const
@@ -30,7 +41,15 @@ const QVector<MscDocument *> &MscDocument::documents() const
 
 void MscDocument::addDocument(MscDocument *document)
 {
+    if (document == nullptr) {
+        return;
+    }
+    if (m_documents.contains(document)) {
+        return;
+    }
+
     m_documents.append(document);
+    Q_EMIT documentAdded(document);
 }
 
 const QVector<MscChart *> &MscDocument::charts() const
@@ -40,7 +59,15 @@ const QVector<MscChart *> &MscDocument::charts() const
 
 void MscDocument::addChart(MscChart *chart)
 {
+    if (chart == nullptr) {
+        return;
+    }
+    if (m_charts.contains(chart)) {
+        return;
+    }
+
     m_charts.append(chart);
+    Q_EMIT chartAdded(chart);
 }
 
 void MscDocument::clear()
@@ -52,6 +79,8 @@ void MscDocument::clear()
 
     qDeleteAll(m_charts);
     m_charts.clear();
+
+    Q_EMIT cleared();
 }
 
 } // namespace msc
