@@ -44,8 +44,7 @@ void MainModel::fillView()
 
     double x = 100.0;
     for (MscInstance *instance : chart->instances()) {
-        auto *item = new InstanceItem();
-        item->setName(instance->name());
+        auto *item = new InstanceItem(instance);
         item->setKind(instance->kind());
         item->setX(x);
         m_scene->addItem(item);
@@ -55,8 +54,7 @@ void MainModel::fillView()
 
     double y = 50.0;
     for (MscMessage *message : chart->messages()) {
-        auto *item = new MessageItem();
-        item->setName(message->name());
+        auto *item = new MessageItem(message);
         item->setY(y);
 
         if (message->sourceInstance() != nullptr) {

@@ -9,15 +9,18 @@ class QGraphicsTextItem;
 
 namespace msc {
 class InstanceItem;
+class MscMessage;
 
 class MessageItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit MessageItem(QGraphicsItem *parent = nullptr);
+    explicit MessageItem(MscMessage *message, QGraphicsItem *parent = nullptr);
 
     void setSourceInstanceItem(InstanceItem *sourceInstance);
     void setTargetInstanceItem(InstanceItem *targetInstance);
+
+    QString name() const;
 
     void updateLayout();
 
@@ -35,6 +38,7 @@ private:
     void setWidth(double width);
     void centerName();
 
+    msc::MscMessage *m_message = nullptr;
     QGraphicsLineItem *m_line = nullptr;
     QGraphicsPolygonItem *m_leftArrow = nullptr;
     QGraphicsPolygonItem *m_rightArrow = nullptr;
