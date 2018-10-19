@@ -5,6 +5,13 @@ include(../../esa.pri)
 
 CONFIG += static
 
+win32 {
+    INCLUDEPATH += $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+    DEFINES += SUPPRESS_ANTLR_WRNS_WINDOWS
+} else {
+    # Not using INCLUDEPATH, as the warnings should be disabled to the ANTLR runtime
+    QMAKE_CXXFLAGS += -isystem $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
+}
 HEADERS += \
     mscfile.h \
     parser/MscBaseVisitor.h \
@@ -42,13 +49,6 @@ win32 {
 }
 osx {
     system(cd $$PWD/../../ ; ./scripts/create_msc_parser.sh)
-}
-
-win32 {
-    INCLUDEPATH += $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
-} else {
-    # Not using INCLUDEPATH, as the warnings should be disabled to the ANTLR runtime
-    QMAKE_CXXFLAGS += -isystem $$clean_path($$PWD/../../3rdparty/antlr/cpp_runtime/runtime/src)
 }
 
 DISTFILES += \

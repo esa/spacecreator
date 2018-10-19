@@ -1,6 +1,66 @@
 // Define a grammar called Msc
 grammar Msc;
 
+// TODO: It would be good
+// a) to activate the named actions below only on Windows;
+// b) to incorparate a single action for all names to reduce copy-n-paste here.
+
+// Parser
+
+@parser::preinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(push)
+    #pragma warning(disable:4251)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+@parser::postinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(pop)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+
+// BaseVisitor
+
+@parser::basevisitorpreinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(push)
+    #pragma warning(disable:4251)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+@parser::basevisitorpostinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(pop)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+
+// Visitor
+
+@parser::visitorpreinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(push)
+    #pragma warning(disable:4251)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+@parser::visitorpostinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(pop)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+
+// Lexer
+
+@lexer::preinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(push)
+    #pragma warning(disable:4251)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+@lexer::postinclude{
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(pop)
+#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
+}
+
 tokens {
     NAMEORENV,
     MSCFILE
@@ -240,3 +300,5 @@ CHARACTERSTRING :
 COMMENTLOST : '/*' .*? '*/' -> skip;
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : '/\r' ->skip; // linebreak
+
+

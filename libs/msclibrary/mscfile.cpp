@@ -1,13 +1,22 @@
 #include "mscfile.h"
 #include "exceptions.h"
 #include "mscmodel.h"
-#include "mscparservisitor.h"
 
+#include "mscparservisitor.h"
 #include "parser/MscLexer.h"
 #include "parser/MscParser.h"
 #include "parser/MscBaseVisitor.h"
 
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(push)
+    #pragma warning(disable:4251)
+#endif // SUPPRESz_ANTLR_WRNS_WINDOWS
+
 #include <antlr4-runtime.h>
+
+#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
+    #pragma warning(pop)
+#endif // SUPPRESz_ANTLR_WRNS_WINDOWS
 
 #include <QFileInfo>
 #include <QObject>
