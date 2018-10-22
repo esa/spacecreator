@@ -1,6 +1,8 @@
 #include "messageitem.h"
 #include "instanceitem.h"
 
+#include <mscmessage.h>
+
 #include <QBrush>
 #include <QGraphicsLineItem>
 #include <QGraphicsPolygonItem>
@@ -12,13 +14,15 @@ static const double ARROW_HEIGHT = 10.0;
 static const double ARROW_WIDTH = 20.0;
 static const double DEFAULT_WIDTH = 80.0;
 
-MessageItem::MessageItem(QGraphicsItem *parent)
+MessageItem::MessageItem(MscMessage *message, QGraphicsItem *parent)
     : QGraphicsObject(parent)
+    , m_message(message)
     , m_line(new QGraphicsLineItem(this))
     , m_leftArrow(new QGraphicsPolygonItem(this))
     , m_rightArrow(new QGraphicsPolygonItem(this))
     , m_nameItem(new QGraphicsTextItem(this))
 {
+    Q_ASSERT(m_message != nullptr);
     m_leftArrow->setBrush(QBrush(Qt::black));
     QPolygonF polygon;
     polygon.append(QPointF(0.0, ARROW_HEIGHT / 2.0));
@@ -32,6 +36,11 @@ MessageItem::MessageItem(QGraphicsItem *parent)
     polygon.append(QPointF(ARROW_WIDTH, ARROW_HEIGHT / 2.0));
     polygon.append(QPointF(0.0, ARROW_HEIGHT));
     m_rightArrow->setPolygon(polygon);
+
+    setName(m_message->name());
+    connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
+
+    updateLayout();
 }
 
 QRectF MessageItem::boundingRect() const
@@ -72,6 +81,11 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
         connect(m_targetInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::buildLayout);
     }
     updateLayout();
+}
+
+QString MessageItem::name() const
+{
+    return m_nameItem->toPlainText();
 }
 
 void MessageItem::updateLayout()

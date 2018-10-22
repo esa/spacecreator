@@ -3,6 +3,10 @@
 
 #include <QGraphicsObject>
 
+namespace msc {
+class MscInstance;
+}
+
 class QGraphicsRectItem;
 class QGraphicsTextItem;
 
@@ -14,11 +18,12 @@ class InstanceItem : public QGraphicsObject
     Q_PROPERTY(double horizontalCenter READ horizontalCenter NOTIFY horizontalCenterChanged)
 
 public:
-    explicit InstanceItem(QGraphicsItem *parent = nullptr);
+    explicit InstanceItem(MscInstance *instance, QGraphicsItem *parent = nullptr);
 
     double horizontalCenter() const;
 
     QString name() const;
+    QString kind() const;
 
     void setAxisHeight(double height);
 
@@ -42,6 +47,7 @@ private Q_SLOTS:
     void buildLayout();
 
 private:
+    msc::MscInstance *m_instance = nullptr;
     QGraphicsRectItem *m_headSymbol = nullptr;
     QGraphicsTextItem *m_nameItem = nullptr;
     QGraphicsTextItem *m_kindItem = nullptr;
