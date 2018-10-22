@@ -35,6 +35,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     updateLayout();
 }
 
+MscInstance *InstanceItem::modelItem() const
+{
+    return m_instance;
+}
+
 QRectF InstanceItem::boundingRect() const
 {
     QRectF rect = childrenBoundingRect();
@@ -87,12 +92,14 @@ void InstanceItem::setName(const QString &name)
 {
     m_nameItem->setPlainText(name);
     updateLayout();
+    m_instance->setName(name);
 }
 
 void InstanceItem::setKind(const QString &kind)
 {
     m_kindItem->setPlainText(kind);
     updateLayout();
+    m_instance->setKind(kind);
 }
 
 QVariant InstanceItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)

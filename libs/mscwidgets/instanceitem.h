@@ -20,6 +20,8 @@ class InstanceItem : public QGraphicsObject
 public:
     explicit InstanceItem(MscInstance *instance, QGraphicsItem *parent = nullptr);
 
+    MscInstance *modelItem() const;
+
     double horizontalCenter() const;
 
     QString name() const;
