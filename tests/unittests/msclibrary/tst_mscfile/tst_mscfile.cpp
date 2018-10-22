@@ -149,13 +149,13 @@ void tst_MscFile::testMessage()
     QCOMPARE(chart->messages().size(), 2);
     MscMessage *message1 = chart->messages().at(0);
     QCOMPARE(message1->name(), QString("ICONreq"));
-    QCOMPARE(message1->sourceInstance(), nullptr);
+    QCOMPARE(message1->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message1->targetInstance(), instance);
 
     MscMessage *message2 = chart->messages().at(1);
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), instance);
-    QCOMPARE(message2->targetInstance(), nullptr);
+    QCOMPARE(message2->targetInstance(), static_cast<MscInstance *>(nullptr));
     delete model;
 }
 

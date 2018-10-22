@@ -57,7 +57,7 @@ void MscChart::addInstance(MscInstance *instance)
     Q_EMIT instanceAdded(instance);
 }
 
-MscInstance *MscChart::instanceByName(const QString &name)
+MscInstance *MscChart::instanceByName(const QString &name) const
 {
     for (MscInstance *instance : m_instances) {
         if (instance->name() == name) {
@@ -85,7 +85,7 @@ void MscChart::addMessage(MscMessage *message)
     Q_EMIT messageAdded(message);
 }
 
-MscMessage *MscChart::messageByName(const QString &name)
+MscMessage *MscChart::messageByName(const QString &name) const
 {
     for (MscMessage *message : m_messages) {
         if (message->name() == name) {
