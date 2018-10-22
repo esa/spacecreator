@@ -25,9 +25,8 @@ public:
 
     QGraphicsScene *graphicsScene() const;
 
-    void fillView();
-
 public Q_SLOTS:
+    void fillView();
     void loadFile(const QString &filename);
 
 private:

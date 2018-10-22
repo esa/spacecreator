@@ -96,6 +96,10 @@ void MainModel::loadFile(const QString &filename)
         return;
     }
 
+    connect(m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::fillView);
+    connect(m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::fillView);
+    connect(m_mscModel, &msc::MscModel::cleared, this, &MainModel::fillView);
+
     fillView();
 }
 
