@@ -23,7 +23,9 @@ MainModel::MainModel(QObject *parent)
 MainModel::~MainModel()
 {
     delete m_scene;
+    m_scene = nullptr;
     delete m_mscModel;
+    m_mscModel = nullptr;
 }
 
 QGraphicsScene *MainModel::graphicsScene() const
@@ -33,6 +35,10 @@ QGraphicsScene *MainModel::graphicsScene() const
 
 void MainModel::fillView()
 {
+    if (!m_scene) {
+        return;
+    }
+
     m_scene->clear();
     m_instanceItems.clear();
     m_messageItems.clear();
