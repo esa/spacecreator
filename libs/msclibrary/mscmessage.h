@@ -1,15 +1,18 @@
 #ifndef MSCMESSAGE_H
 #define MSCMESSAGE_H
 
+#include <QObject>
 #include <QString>
 
 namespace msc {
 class MscInstance;
 
-class MscMessage
+class MscMessage : public QObject
 {
+    Q_OBJECT
 public:
-    explicit MscMessage(const QString &name = "");
+    explicit MscMessage(QObject *parent = nullptr);
+    MscMessage(const QString &name, QObject *parent = nullptr);
 
     const QString &name() const;
     void setName(const QString &name);
@@ -19,6 +22,11 @@ public:
 
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
+
+Q_SIGNALS:
+    void nameChanged(const QString &name);
+    void sourceChanged(MscInstance *source);
+    void targetChanged(MscInstance *target);
 
 private:
     QString m_name;

@@ -1,5 +1,7 @@
 #include "instanceitem.h"
 
+#include <mscinstance.h>
+
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsLineItem>
@@ -12,15 +14,25 @@ static const double SYMBOLS_WIDTH = 60.0;
 static const double START_SYMBOL_HEIGHT = 20.0;
 static const double END_SYMBOL_HEIGHT = 15.0;
 
-InstanceItem::InstanceItem(QGraphicsItem *parent)
+InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     : QGraphicsObject(parent)
+    , m_instance(instance)
     , m_headSymbol(new QGraphicsRectItem(this))
     , m_nameItem(new QGraphicsTextItem(this))
     , m_kindItem(new QGraphicsTextItem(this))
     , m_axisSymbol(new QGraphicsLineItem(this))
     , m_endSymbol(new QGraphicsRectItem(this))
 {
+    Q_ASSERT(m_instance != nullptr);
     m_endSymbol->setBrush(QBrush(Qt::black));
+
+    setName(m_instance->name());
+    connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
+
+    setKind(m_instance->kind());
+    connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
+
+    updateLayout();
 }
 
 QRectF InstanceItem::boundingRect() const
@@ -45,6 +57,11 @@ double InstanceItem::horizontalCenter() const
 QString InstanceItem::name() const
 {
     return m_nameItem->toPlainText();
+}
+
+QString InstanceItem::kind() const
+{
+    return m_kindItem->toPlainText();
 }
 
 void InstanceItem::setAxisHeight(double height)

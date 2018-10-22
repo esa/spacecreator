@@ -1,16 +1,18 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <QObject>
 #include <QVector>
 
 namespace msc {
 class MscChart;
 class MscDocument;
 
-class MscModel
+class MscModel : public QObject
 {
+    Q_OBJECT
 public:
-    MscModel();
+    explicit MscModel(QObject *parent = nullptr);
     ~MscModel();
 
     const QVector<MscDocument *> &documents() const;
@@ -20,6 +22,11 @@ public:
     void addChart(MscChart *chart);
 
     void clear();
+
+Q_SIGNALS:
+    void documentAdded(MscDocument *document);
+    void chartAdded(MscChart *chart);
+    void cleared();
 
 private:
     QVector<MscDocument *> m_documents;

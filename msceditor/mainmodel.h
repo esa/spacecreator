@@ -27,7 +27,7 @@ public:
 
     void fillView();
 
-public slots:
+public Q_SLOTS:
     void loadFile(const QString &filename);
 
 private:
