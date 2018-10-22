@@ -23,12 +23,12 @@ public:
     const QVector<MscInstance *> &instances() const;
     void addInstance(MscInstance *instance);
 
-    MscInstance *instanceByName(const QString &name);
+    MscInstance *instanceByName(const QString &name) const;
 
     const QVector<MscMessage *> &messages() const;
     void addMessage(MscMessage *message);
 
-    MscMessage *messageByName(const QString &name);
+    MscMessage *messageByName(const QString &name) const;
 
 Q_SIGNALS:
     void nameChanged(const QString &name);

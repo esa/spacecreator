@@ -78,7 +78,7 @@ void tst_MscChart::testInstanceByName()
     auto instance = new MscInstance("IN", m_chart);
     m_chart->addInstance(instance);
     QCOMPARE(m_chart->instanceByName("IN"), instance);
-    QCOMPARE(m_chart->instanceByName("OUT"), nullptr);
+    QCOMPARE(m_chart->instanceByName("OUT"), static_cast<MscInstance *>(nullptr));
 }
 
 void tst_MscChart::testAddMessage()
@@ -111,7 +111,7 @@ void tst_MscChart::testMessageByName()
     auto message = new MscMessage("IN", m_chart);
     m_chart->addMessage(message);
     QCOMPARE(m_chart->messageByName("IN"), message);
-    QCOMPARE(m_chart->messageByName("OUT"), nullptr);
+    QCOMPARE(m_chart->messageByName("OUT"), static_cast<MscMessage *>(nullptr));
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)
