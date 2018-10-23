@@ -46,8 +46,9 @@ MainModel::MainModel(QObject *parent)
 
 MainModel::~MainModel()
 {
-    delete d;
+    clearScene();
     clearMscModel();
+    delete d;
 }
 
 QGraphicsScene *MainModel::graphicsScene() const
