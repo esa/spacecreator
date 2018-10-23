@@ -37,17 +37,16 @@ CONFIG(debug, debug|release) {
 BuildTypeLower = $$lower($$BuildType)
 
 win32 {
-    WinLinbSuffix = lib
-    win32-g++: WinLinbSuffix = a
+    WinLibSuffix = lib
+    win32-g++: WinLibSuffix = a
     #TODO: check if the win32-g++ needs the lib prefix
 
     PRE_TARGETDEPS += \
-        $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/mscwidgets.$$WinLinbSuffix \
-        $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/msclibrary.$$WinLinbSuffix
+        $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/mscwidgets.$$WinLibSuffix \
+        $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/msclibrary.$$WinLibSuffix
 
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
-    LIBS += -L$$clean_path("$$PWD/../3rdparty/antlr/cpp_runtime/runtime/bin/vs-2017/x64/$$BuildType Static") -lantlr4-runtime
 } else:unix {
     PRE_TARGETDEPS += \
         $$OUT_PWD/../libs/mscwidgets/libmscwidgets.a \
@@ -55,7 +54,7 @@ win32 {
 
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary
-    LIBS += -L$$clean_path($$PWD/../3rdparty/antlr/cpp_runtime/dist)
-    osx: LIBS += -lantlr4-runtime_macos_x64
-    else: LIBS += -lantlr4-runtime_linux_x64
 }
+
+# Add ANTLR runtime
+include("../link_antlr_rt.pri")
