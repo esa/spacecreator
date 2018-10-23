@@ -1,9 +1,9 @@
 #!/bin/sh
 
 CHECK_DIRS="libs/msclibrary/*.cpp libs/msclibrary/*.h libs/mscwidgets msceditor tests"
-CHECKS="warning,style,performance,portability,information"
+CHECKS="warning,performance,portability"
 
-cppcheck -j4 --error-exitcode=1 --quiet \
+cppcheck -j4 --error-exitcode=1 \
     --language=c++ \
     --std=c++14  \
     --library=qt \
