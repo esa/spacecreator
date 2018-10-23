@@ -36,21 +36,25 @@ CONFIG(debug, debug|release) {
 } # Profiling, etc (if any) are defaulted to Release
 BuildTypeLower = $$lower($$BuildType)
 
-win32 {
-    WinLibSuffix = lib
-    win32-g++: WinLibSuffix = a
-    #TODO: check if the win32-g++ needs the lib prefix
+LibSuffix = a
+LibPrefix = lib
 
+win32:!win32-g++ {
+    LibSuffix = lib
+    LibPrefix = ""
+}
+
+win32 {
     PRE_TARGETDEPS += \
-        $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/mscwidgets.$$WinLibSuffix \
-        $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/msclibrary.$$WinLibSuffix
+        $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix \
+        $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
 } else:unix {
     PRE_TARGETDEPS += \
-        $$OUT_PWD/../libs/mscwidgets/libmscwidgets.a \
-        $$OUT_PWD/../libs/msclibrary/libmsclibrary.a
+        $$OUT_PWD/../libs/mscwidgets/$${LibPrefix}mscwidgets.$$LibSuffix \
+        $$OUT_PWD/../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary

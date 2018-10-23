@@ -19,8 +19,8 @@ win32:!win32-g++ {
     LibPrefix = ""
 }
 
-win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildTypeLower/$$(LibPrefix)msclibrary.$$LibSuffix
-else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$$(LibPrefix)msclibrary.$$LibSuffix
+win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
+else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$${LibPrefix}msclibrary.$$LibSuffix
 
 # Add ANTLR runtime
 include("$$PWD/../../../link_antlr_rt.pri")
