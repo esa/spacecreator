@@ -38,6 +38,8 @@ antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")
 
 win32 {
+    DEFINES += SUPPRESS_ANTLR_WRNS_WINDOWS
+
     INCLUDEPATH += $$shell_path($$ANTLR_RUNTIME_PATH/src)
     antlrGen.commands = $$PWD/../../scripts/create_msc_parser.bat
 
