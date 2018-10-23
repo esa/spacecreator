@@ -55,6 +55,7 @@ win32 {
 
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary
-    osx: LIBS += -L$$clean_path($$PWD/../3rdparty/antlr/cpp_runtime/lib) -lantlr4-runtime_macos_x64
-    else: LIBS += -L$$clean_path($$PWD/../3rdparty/antlr/cpp_runtime/dist) -lantlr4-runtime_linux_x64
+    LIBS += -L$$clean_path($$PWD/../3rdparty/antlr/cpp_runtime/dist)
+    osx: LIBS += -lantlr4-runtime_macos_x64
+    else: LIBS += -lantlr4-runtime_linux_x64
 }
