@@ -70,16 +70,6 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     return ret;
 }
 
-antlrcpp::Any MscParserVisitor::visitDefiningMscReference(MscParser::DefiningMscReferenceContext *context)
-{
-    return visitChildren(context);
-}
-
-antlrcpp::Any MscParserVisitor::visitVirtuality(MscParser::VirtualityContext *context)
-{
-    return visitChildren(context);
-}
-
 antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionContext *context)
 {
     auto chart = new MscChart();
@@ -132,11 +122,6 @@ antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *contex
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitNameOrEnv(MscParser::NameOrEnvContext *context)
-{
-    return visitChildren(context);
-}
-
 void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
 {
     Q_ASSERT(m_currentChart != nullptr);
@@ -145,15 +130,18 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
     }
 
     const QString name = QString::fromStdString(context->NAME(0)->getText());
-    auto instance = new MscInstance(name);
-    //    if (context->instanceHeader() != nullptr) {
-    //        QString kind = QString::fromStdString(context->instanceHeader()->instancekind()->getText());
-    //        instance->setKind(kind);
-    //        QStringList decomposition;
-    //        for (auto decomp : context->instanceHeader()->decomposition()) {
-    //            decomposition << QString::fromStdString(decomp->getText());
-    //        }
-    //        instance->setDecomposition(decomposition);
-    //    }
+
+    MscInstance *instance = m_currentChart->instanceByName(name);
+    if (!instance) {
+        instance = new MscInstance(name);
+    }
+    if (context->instanceKind() != nullptr) {
+        QString kind = QString::fromStdString(context->instanceKind()->NAME(0)->getText());
+        instance->setKind(kind);
+
+        if (context->instanceKind()->NAME(1) != nullptr) {
+            instance->setInheritance(QString::fromStdString(context->instanceKind()->NAME(1)->getText()));
+        }
+    }
     m_currentChart->addInstance(instance);
 }

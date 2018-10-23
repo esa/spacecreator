@@ -41,6 +41,8 @@ private Q_SLOTS:
     void testNestedDocuments();
     void testMscInDocument();
     void testInstance();
+    void testInstanceWithKind();
+    void testInstanceWithInheritance();
     void testMessage();
     void testSameMessageInTwoInstances();
     void testGateMessage();
@@ -141,18 +143,31 @@ void tst_MscFile::testInstance()
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->instances().at(0)->name(), QString("inst1"));
     delete model;
+}
 
-    // with decomposition
-    //    model = file->parseText("MSC msc1;INSTANCE foo : PROCESS satellite com1;ENDINSTANCE;ENDMSC;");
-    //    QCOMPARE(model->charts().size(), 1);
-    //    chart = model->charts().at(0);
-    //    QCOMPARE(chart->instances().size(), 1);
-    //    MscInstance *instance = chart->instances().at(0);
-    //    QCOMPARE(instance->name(), QString("foo"));
-    //    QCOMPARE(instance->kind(), QString("PROCESS"));
-    //    QStringList decomp = { "satellite", "com1" };
-    //    QCOMPARE(instance->decomposition(), decomp);
-    //    delete model;
+void tst_MscFile::testInstanceWithKind()
+{
+    MscModel *model = file->parseText("MSC msc1;INSTANCE foo : Process;ENDINSTANCE;ENDMSC;");
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("foo"));
+    QCOMPARE(instance->kind(), QString("Process"));
+    delete model;
+}
+
+void tst_MscFile::testInstanceWithInheritance()
+{
+    MscModel *model = file->parseText("MSC msc1;INSTANCE foo : PROCESS satellite;ENDINSTANCE;ENDMSC;");
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("foo"));
+    QCOMPARE(instance->kind(), QString("PROCESS"));
+    QCOMPARE(instance->inheritance(), QString("satellite"));
+    delete model;
 }
 
 void tst_MscFile::testMessage()

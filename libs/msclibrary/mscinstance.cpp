@@ -60,19 +60,19 @@ void MscInstance::setKind(const QString &kind)
     Q_EMIT kindChanged(m_kind);
 }
 
-const QStringList &MscInstance::decomposition() const
+const QString &MscInstance::inheritance() const
 {
-    return m_decomposition;
+    return m_inheritance;
 }
 
-void MscInstance::setDecomposition(const QStringList &decomposition)
+void MscInstance::setInheritance(const QString &inheritance)
 {
-    if (decomposition == m_decomposition) {
+    if (inheritance == m_inheritance) {
         return;
     }
 
-    m_decomposition = decomposition;
-    Q_EMIT decompositionChanged(m_decomposition);
+    m_inheritance = inheritance;
+    Q_EMIT inheritanceChanged(m_inheritance);
 }
 
 } // namespace msc

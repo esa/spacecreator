@@ -84,14 +84,14 @@ mscDefinition
     : MSC NAME SEMI instance* ENDMSC SEMI
         |       LANGUAGE NAME SEMI
         |       DATA FILENAME SEMI
-        |       INST NAME SEMI
         |       MSG NAME COLON VARIABLEVALUE SEMI
     ;
 
 instance
-    : INSTANCE NAME SEMI mscevent* ENDINSTANCE SEMI //-> (INSTANCE NAME mscevent*)
+    : INSTANCE NAME instanceKind? SEMI mscevent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE SEMI mscevent* ENDINSTANCE SEMI //-> (INSTANCE NAME mscevent*)
         |       GATE (IN|OUT) NAME VARIABLEVALUE? (TO|FROM) NAME SEMI
+        |       INST NAME (COMMA NAME)* SEMI
     ;
 
 mscevent
@@ -103,6 +103,10 @@ mscevent
 nameOrEnv
     : NAME
     | ENV
+    ;
+
+instanceKind
+    : COLON NAME (NAME)*
     ;
 
 
@@ -274,6 +278,7 @@ fragment
 APOSTROPHE : '\'';
 
 
+
 OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '/' | '*' | '"' | '=';
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA; //  ';' and ':' were here (ttsiod)
@@ -284,7 +289,7 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+ ;
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
