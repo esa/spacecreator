@@ -8,13 +8,13 @@
 namespace msc {
 class MscChart;
 class MscDocument;
-class MscModel;
 
 class InstanceItem;
-class MessageItem;
 }
 
 class QGraphicsScene;
+
+struct MainModelPrivate;
 
 class MainModel : public QObject
 {
@@ -33,12 +33,10 @@ private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
     msc::InstanceItem *instanceItem(const QString &name) const;
+    void clearMscModel();
+    void clearScene();
 
-    msc::MscModel *m_mscModel = nullptr;
-    QGraphicsScene *m_scene = nullptr;
-
-    QVector<msc::InstanceItem *> m_instanceItems;
-    QVector<msc::MessageItem *> m_messageItems;
+    MainModelPrivate *const d;
 };
 
 #endif // MAINMODEL_H

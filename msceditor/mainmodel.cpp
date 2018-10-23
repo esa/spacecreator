@@ -14,34 +14,33 @@
 
 using namespace msc;
 
+struct MainModelPrivate {
+    msc::MscModel *m_mscModel = nullptr;
+    QGraphicsScene m_scene;
+    QVector<msc::InstanceItem *> m_instanceItems;
+    QVector<msc::MessageItem *> m_messageItems;
+};
+
 MainModel::MainModel(QObject *parent)
     : QObject(parent)
-    , m_scene(new QGraphicsScene(this))
+    , d(new MainModelPrivate)
 {
 }
 
 MainModel::~MainModel()
 {
-    delete m_scene;
-    m_scene = nullptr;
-    delete m_mscModel;
-    m_mscModel = nullptr;
+    delete d;
+    clearMscModel();
 }
 
 QGraphicsScene *MainModel::graphicsScene() const
 {
-    return m_scene;
+    return &(d->m_scene);
 }
 
 void MainModel::fillView()
 {
-    if (!m_scene) {
-        return;
-    }
-
-    m_scene->clear();
-    m_instanceItems.clear();
-    m_messageItems.clear();
+    clearScene();
 
     MscChart *chart = firstChart();
     if (chart == nullptr) {
@@ -53,8 +52,8 @@ void MainModel::fillView()
         auto *item = new InstanceItem(instance);
         item->setKind(instance->kind());
         item->setX(x);
-        m_scene->addItem(item);
-        m_instanceItems.append(item);
+        d->m_scene.addItem(item);
+        d->m_instanceItems.append(item);
         x += 100.0;
     }
 
@@ -78,48 +77,46 @@ void MainModel::fillView()
             }
         }
 
-        m_scene->addItem(item);
-        m_messageItems.append(item);
+        d->m_scene.addItem(item);
+        d->m_messageItems.append(item);
         y += 40.0;
     }
 
-    for (InstanceItem *item : m_instanceItems) {
+    for (InstanceItem *item : d->m_instanceItems) {
         item->setAxisHeight(y);
     }
 }
 
 void MainModel::loadFile(const QString &filename)
 {
-    m_scene->clear();
-    delete m_mscModel;
-    m_mscModel = nullptr;
+    clearMscModel();
 
     msc::MscFile file;
     try {
-        m_mscModel = file.parseFile(filename);
+        d->m_mscModel = file.parseFile(filename);
     } catch (...) {
         //print error message
         return;
     }
 
-    connect(m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::fillView);
-    connect(m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::fillView);
-    connect(m_mscModel, &msc::MscModel::cleared, this, &MainModel::fillView);
+    connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::fillView);
+    connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::fillView);
+    connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::fillView);
 
     fillView();
 }
 
 MscChart *MainModel::firstChart() const
 {
-    if (m_mscModel == nullptr) {
+    if (d->m_mscModel == nullptr) {
         return nullptr;
     }
 
-    if (!m_mscModel->charts().empty()) {
-        return m_mscModel->charts().at(0);
+    if (!d->m_mscModel->charts().empty()) {
+        return d->m_mscModel->charts().at(0);
     }
 
-    return firstChart(m_mscModel->documents());
+    return firstChart(d->m_mscModel->documents());
 }
 
 MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
@@ -138,7 +135,7 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
 
 InstanceItem *MainModel::instanceItem(const QString &name) const
 {
-    for (QGraphicsItem *item : m_scene->items()) {
+    for (QGraphicsItem *item : d->m_scene.items()) {
         InstanceItem *instance = dynamic_cast<InstanceItem *>(item);
         if (instance != nullptr) {
             if (instance->name() == name) {
@@ -147,4 +144,17 @@ InstanceItem *MainModel::instanceItem(const QString &name) const
         }
     }
     return nullptr;
+}
+
+void MainModel::clearMscModel()
+{
+    delete d->m_mscModel;
+    d->m_mscModel = nullptr;
+}
+
+void MainModel::clearScene()
+{
+    d->m_scene.clear();
+    d->m_instanceItems.clear();
+    d->m_messageItems.clear();
 }
