@@ -80,11 +80,21 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
         return;
     }
 
+    if (m_sourceInstance) {
+        m_sourceInstance->disconnect(this);
+    }
+
     m_sourceInstance = sourceInstance;
-    if (sourceInstance) {
-        connect(m_sourceInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::buildLayout);
+    if (m_sourceInstance) {
+        connect(m_sourceInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::updateLayout);
     }
     updateLayout();
+
+    if (m_sourceInstance) {
+        m_message->setSourceInstance(m_sourceInstance->modelItem());
+    } else {
+        m_message->setSourceInstance(nullptr);
+    }
 }
 
 void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
@@ -93,11 +103,21 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
         return;
     }
 
+    if (m_targetInstance) {
+        m_targetInstance->disconnect(this);
+    }
+
     m_targetInstance = targetInstance;
-    if (m_targetInstance != nullptr) {
-        connect(m_targetInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::buildLayout);
+    if (m_targetInstance) {
+        connect(m_targetInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::updateLayout);
     }
     updateLayout();
+
+    if (m_targetInstance) {
+        m_message->setTargetInstance(m_targetInstance->modelItem());
+    } else {
+        m_message->setTargetInstance(nullptr);
+    }
 }
 
 QString MessageItem::name() const
@@ -119,6 +139,7 @@ void MessageItem::setName(const QString &name)
 {
     m_nameItem->setPlainText(name);
     updateLayout();
+    m_message->setName(name);
 }
 
 void MessageItem::buildLayout()

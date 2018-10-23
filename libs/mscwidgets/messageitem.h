@@ -39,13 +39,12 @@ public:
 
     QString name() const;
 
-    void updateLayout();
-
     // QGraphicsItem interface
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public Q_SLOTS:
+    void updateLayout();
     void setName(const QString &name);
 
 private Q_SLOTS:
