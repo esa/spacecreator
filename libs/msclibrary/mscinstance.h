@@ -37,18 +37,18 @@ public:
     const QString &kind() const;
     void setKind(const QString &kind);
 
-    const QStringList &decomposition() const;
-    void setDecomposition(const QStringList &decomposition);
+    const QString &inheritance() const;
+    void setInheritance(const QString &inheritance);
 
 Q_SIGNALS:
     void nameChanged(const QString &name);
     void kindChanged(const QString &kind);
-    void decompositionChanged(const QStringList &decomposition);
+    void inheritanceChanged(const QString &inheritance);
 
 private:
     QString m_name;
     QString m_kind;
-    QStringList m_decomposition;
+    QString m_inheritance;
 };
 
 } // namespace msc

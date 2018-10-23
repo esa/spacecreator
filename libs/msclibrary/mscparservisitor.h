@@ -18,7 +18,7 @@
 #ifndef MSCPARSERVISITOR_H
 #define MSCPARSERVISITOR_H
 
-#include "parser/MscVisitor.h"
+#include "parser/MscBaseVisitor.h"
 
 namespace msc {
 class MscChart;
@@ -27,7 +27,7 @@ class MscInstance;
 class MscModel;
 }
 
-class MscParserVisitor : public MscVisitor
+class MscParserVisitor : public MscBaseVisitor
 {
 public:
     MscParserVisitor();
@@ -39,12 +39,9 @@ public:
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
-    antlrcpp::Any visitDefiningMscReference(MscParser::DefiningMscReferenceContext *context) override;
-    antlrcpp::Any visitVirtuality(MscParser::VirtualityContext *context) override;
     antlrcpp::Any visitMscDefinition(MscParser::MscDefinitionContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitMscevent(MscParser::MsceventContext *context) override;
-    antlrcpp::Any visitNameOrEnv(MscParser::NameOrEnvContext *context) override;
 
 private:
     void addInstance(MscParser::InstanceContext *context);
