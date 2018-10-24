@@ -53,11 +53,11 @@ void DocumentItemModel::setMscModel(msc::MscModel *model)
     m_mscModel = model;
     if (m_mscModel) {
         connect(m_mscModel, &QObject::destroyed, this, [&]() { setMscModel(nullptr); });
-        connect(m_mscModel, &QObject::destroyed, this, [&]() {
+        connect(m_mscModel, &msc::MscModel::documentAdded, this, [&]() {
             beginResetModel();
             endResetModel();
         });
-        connect(m_mscModel, &QObject::destroyed, this, [&]() {
+        connect(m_mscModel, &msc::MscModel::chartAdded, this, [&]() {
             beginResetModel();
             endResetModel();
         });
