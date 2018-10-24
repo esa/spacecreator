@@ -19,9 +19,14 @@
 #include "ui_mainwindow.h"
 #include "mainmodel.h"
 
+#include <documentitemmodel.h>
+#include <mscchart.h>
+
 #include <QApplication>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QItemSelectionModel>
+#include <QTreeView>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAbout_Qt, &QAction::triggered, QApplication::instance(), &QApplication::aboutQt);
 
     ui->graphicsView->setScene(m_model->graphicsScene());
+    ui->documentTreeView->setModel(m_model->documentItemModel());
+    connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &MainWindow::showSelection);
 }
 
 MainWindow::~MainWindow()
@@ -47,6 +55,22 @@ void MainWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
     if (!filename.isEmpty()) {
         m_model->loadFile(filename);
+        ui->documentTreeView->expandAll();
+    }
+}
+
+void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
+{
+    Q_UNUSED(previous);
+    if (!current.isValid()) {
+        return;
+    }
+
+    auto *obj = static_cast<QObject *>(current.internalPointer());
+    auto chart = dynamic_cast<msc::MscChart *>(obj);
+
+    if (chart) {
+        m_model->fillView(chart);
     }
 }
 
@@ -73,6 +97,5 @@ void MainWindow::setupUi()
         }
         ui->graphicsView->setZoom(percent);
     });
-    statusBar()
-            ->addWidget(zoomBox);
+    statusBar()->addWidget(zoomBox);
 }

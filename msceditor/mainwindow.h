@@ -19,6 +19,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QModelIndex>
 
 namespace Ui {
 class MainWindow;
@@ -36,6 +37,9 @@ public:
 
 public Q_SLOTS:
     void openFile();
+
+private Q_SLOTS:
+    void showSelection(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     void setupUi();
