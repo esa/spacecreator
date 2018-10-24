@@ -229,7 +229,7 @@ QVariant DocumentItemModel::headerData(int section, Qt::Orientation orientation,
 {
     Q_UNUSED(section);
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        return QVariant(QString("Name"));
+        return QVariant(tr("Name"));
     }
 
     return QVariant();
