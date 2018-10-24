@@ -28,11 +28,22 @@
 #include "messageitem.h"
 
 #include <QGraphicsScene>
+#include <documentitemmodel.h>
 
 using namespace msc;
 
 struct MainModelPrivate {
+    explicit MainModelPrivate(MainModel *q)
+        : m_documentItemModel(new DocumentItemModel(q))
+    {
+    }
+    ~MainModelPrivate()
+    {
+        delete m_documentItemModel;
+    }
+
     msc::MscModel *m_mscModel = nullptr;
+    DocumentItemModel *m_documentItemModel = nullptr;
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
@@ -40,7 +51,7 @@ struct MainModelPrivate {
 
 MainModel::MainModel(QObject *parent)
     : QObject(parent)
-    , d(new MainModelPrivate)
+    , d(new MainModelPrivate(this))
 {
 }
 
@@ -56,11 +67,20 @@ QGraphicsScene *MainModel::graphicsScene() const
     return &(d->m_scene);
 }
 
-void MainModel::fillView()
+msc::DocumentItemModel *MainModel::documentItemModel() const
+{
+    return d->m_documentItemModel;
+}
+
+void MainModel::showFirstChart()
+{
+    fillView(firstChart());
+}
+
+void MainModel::fillView(msc::MscChart *chart)
 {
     clearScene();
 
-    MscChart *chart = firstChart();
     if (chart == nullptr) {
         return;
     }
@@ -117,11 +137,13 @@ void MainModel::loadFile(const QString &filename)
         return;
     }
 
-    connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::fillView);
-    connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::fillView);
-    connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::fillView);
+    d->m_documentItemModel->setMscModel(d->m_mscModel);
 
-    fillView();
+    connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
+
+    showFirstChart();
 }
 
 MscChart *MainModel::firstChart() const

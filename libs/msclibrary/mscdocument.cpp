@@ -65,6 +65,7 @@ void MscDocument::addDocument(MscDocument *document)
         return;
     }
 
+    document->setParent(this);
     m_documents.append(document);
     Q_EMIT documentAdded(document);
 }
@@ -83,6 +84,7 @@ void MscDocument::addChart(MscChart *chart)
         return;
     }
 
+    chart->setParent(this);
     m_charts.append(chart);
     Q_EMIT chartAdded(chart);
 }

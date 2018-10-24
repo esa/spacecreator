@@ -23,6 +23,7 @@
 #include <QVector>
 
 namespace msc {
+class DocumentItemModel;
 class MscChart;
 class MscDocument;
 
@@ -42,8 +43,11 @@ public:
 
     QGraphicsScene *graphicsScene() const;
 
+    msc::DocumentItemModel *documentItemModel() const;
+
 public Q_SLOTS:
-    void fillView();
+    void showFirstChart();
+    void fillView(msc::MscChart *chart);
     void loadFile(const QString &filename);
 
 private:
