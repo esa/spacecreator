@@ -102,4 +102,13 @@ void MscDocument::clear()
     Q_EMIT cleared();
 }
 
+/*!
+  \brief MscDocument::parentDocument
+  \return The document that this one is included in. Returns a nullptr if this document is at the root
+*/
+MscDocument *MscDocument::parentDocument() const
+{
+    return dynamic_cast<MscDocument *>(parent());
+}
+
 } // namespace msc

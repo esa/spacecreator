@@ -23,6 +23,7 @@
 #include <QVector>
 
 namespace msc {
+class MscDocument;
 class MscInstance;
 class MscMessage;
 
@@ -46,6 +47,8 @@ public:
     void addMessage(MscMessage *message);
 
     MscMessage *messageByName(const QString &name) const;
+
+    MscDocument *parentDocument() const;
 
 Q_SIGNALS:
     void nameChanged(const QString &name);

@@ -44,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->documentTreeView->setModel(m_model->documentItemModel());
     connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &MainWindow::showSelection);
+
+    connect(m_model, &MainModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
 }
 
 MainWindow::~MainWindow()
@@ -64,6 +66,13 @@ void MainWindow::openFile()
             setWindowTitle(tr("MSC Editor"));
         }
     }
+}
+
+void MainWindow::selectCurrentChart()
+{
+    msc::MscChart *chart = m_model->currentChart();
+    QModelIndex idx = m_model->documentItemModel()->index(chart);
+    ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)

@@ -40,6 +40,7 @@ private Q_SLOTS:
     void testRowCount();
     void testIndex();
     void testParent();
+    void testIndexForModel();
 
 private:
     DocumentItemModel *m_document = nullptr;
@@ -141,6 +142,25 @@ void tst_DocumentItemModel::testParent()
     QModelIndex idx22 = m_document->index(1, 0, idx2);
     QModelIndex parent22 = m_document->parent(idx22);
     QCOMPARE(parent22.internalPointer(), idx2.internalPointer());
+}
+
+void tst_DocumentItemModel::testIndexForModel()
+{
+    QModelIndex idx1 = m_document->index(0, 0, QModelIndex());
+    QModelIndex idx2 = m_document->index(0, 0, idx1);
+    QModelIndex idx21 = m_document->index(0, 0, idx2);
+
+    MscChart *chart1 = m_document->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    QModelIndex chart1Index = m_document->index(chart1);
+    QCOMPARE(chart1Index, idx21);
+
+    QModelIndex idx22 = m_document->index(1, 0, idx2);
+    MscChart *chart2 = m_document->mscModel()->documents().at(0)->documents().at(0)->charts().at(1);
+    QModelIndex chart2Index = m_document->index(chart2);
+    QCOMPARE(chart2Index, idx22);
+
+    QModelIndex index = m_document->index(nullptr);
+    QCOMPARE(index.isValid(), false);
 }
 
 QTEST_APPLESS_MAIN(tst_DocumentItemModel)

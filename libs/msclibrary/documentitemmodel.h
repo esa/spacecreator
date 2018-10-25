@@ -21,6 +21,7 @@
 #include <QAbstractItemModel>
 
 namespace msc {
+class MscChart;
 class MscModel;
 
 class DocumentItemModel : public QAbstractItemModel
@@ -29,7 +30,10 @@ class DocumentItemModel : public QAbstractItemModel
 public:
     explicit DocumentItemModel(QObject *parent = nullptr);
 
-    void setMscModel(MscModel *model);
+    void setMscModel(MscModel *mscModel);
+    MscModel *mscModel() const;
+
+    QModelIndex index(MscChart *chart) const;
 
     // QAbstractItemModel interface
 public:

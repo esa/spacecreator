@@ -65,6 +65,27 @@ void DocumentItemModel::setMscModel(msc::MscModel *model)
     endResetModel();
 }
 
+MscModel *DocumentItemModel::mscModel() const
+{
+    return m_mscModel;
+}
+
+/*!
+   \brief DocumentItemModel::index returns the ModelIndex of the given chart
+ */
+QModelIndex DocumentItemModel::index(MscChart *chart) const
+{
+    if (!chart || !m_mscModel) {
+        return QModelIndex();
+    }
+
+    if (chart->parentDocument()) {
+        return createIndex(chart->parentDocument()->charts().indexOf(chart), 0, chart);
+    } else {
+        return createIndex(m_mscModel->charts().indexOf(chart), 0, chart);
+    }
+}
+
 QModelIndex DocumentItemModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (column != 0 || !m_mscModel) {
@@ -124,10 +145,6 @@ QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
         return QModelIndex();
     }
     auto obj = static_cast<QObject *>(child.internalPointer());
-
-    //    if (!documentItem) {
-    //        return QModelIndex();
-    //    }
 
     auto parentItem = dynamic_cast<MscDocument *>(obj->parent());
 

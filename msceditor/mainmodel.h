@@ -45,10 +45,15 @@ public:
 
     msc::DocumentItemModel *documentItemModel() const;
 
+    msc::MscChart *currentChart() const;
+
 public Q_SLOTS:
     void showFirstChart();
     void fillView(msc::MscChart *chart);
     bool loadFile(const QString &filename);
+
+Q_SIGNALS:
+    void currentChartChagend(msc::MscChart *chart);
 
 private:
     msc::MscChart *firstChart() const;
