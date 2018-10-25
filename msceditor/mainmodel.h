@@ -48,7 +48,7 @@ public:
 public Q_SLOTS:
     void showFirstChart();
     void fillView(msc::MscChart *chart);
-    void loadFile(const QString &filename);
+    bool loadFile(const QString &filename);
 
 private:
     msc::MscChart *firstChart() const;

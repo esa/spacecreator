@@ -125,7 +125,7 @@ void MainModel::fillView(msc::MscChart *chart)
     }
 }
 
-void MainModel::loadFile(const QString &filename)
+bool MainModel::loadFile(const QString &filename)
 {
     clearMscModel();
 
@@ -134,7 +134,7 @@ void MainModel::loadFile(const QString &filename)
         d->m_mscModel = file.parseFile(filename);
     } catch (...) {
         //print error message
-        return;
+        return false;
     }
 
     d->m_documentItemModel->setMscModel(d->m_mscModel);
@@ -144,6 +144,7 @@ void MainModel::loadFile(const QString &filename)
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
 
     showFirstChart();
+    return true;
 }
 
 MscChart *MainModel::firstChart() const

@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QItemSelectionModel>
 #include <QTreeView>
 
@@ -54,8 +55,14 @@ void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
     if (!filename.isEmpty()) {
-        m_model->loadFile(filename);
-        ui->documentTreeView->expandAll();
+        bool ok = m_model->loadFile(filename);
+        if (ok) {
+            ui->documentTreeView->expandAll();
+            QFileInfo fileInfo(filename);
+            setWindowTitle(tr("MSC Editor") + " - " + fileInfo.fileName());
+        } else {
+            setWindowTitle(tr("MSC Editor"));
+        }
     }
 }
 
