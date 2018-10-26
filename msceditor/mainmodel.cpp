@@ -47,6 +47,7 @@ struct MainModelPrivate {
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
+    msc::MscChart *m_currentChart = nullptr;
 };
 
 MainModel::MainModel(QObject *parent)
@@ -72,6 +73,11 @@ msc::DocumentItemModel *MainModel::documentItemModel() const
     return d->m_documentItemModel;
 }
 
+MscChart *MainModel::currentChart() const
+{
+    return d->m_currentChart;
+}
+
 void MainModel::showFirstChart()
 {
     fillView(firstChart());
@@ -79,14 +85,20 @@ void MainModel::showFirstChart()
 
 void MainModel::fillView(msc::MscChart *chart)
 {
+    if (chart == d->m_currentChart) {
+        return;
+    }
+
+    d->m_currentChart = chart;
     clearScene();
 
-    if (chart == nullptr) {
+    if (d->m_currentChart == nullptr) {
+        Q_EMIT currentChartChagend(d->m_currentChart);
         return;
     }
 
     double x = 100.0;
-    for (MscInstance *instance : chart->instances()) {
+    for (MscInstance *instance : d->m_currentChart->instances()) {
         auto *item = new InstanceItem(instance);
         item->setKind(instance->kind());
         item->setX(x);
@@ -96,7 +108,7 @@ void MainModel::fillView(msc::MscChart *chart)
     }
 
     double y = 50.0;
-    for (MscMessage *message : chart->messages()) {
+    for (MscMessage *message : d->m_currentChart->messages()) {
         auto *item = new MessageItem(message);
         item->setY(y);
 
@@ -123,9 +135,11 @@ void MainModel::fillView(msc::MscChart *chart)
     for (InstanceItem *item : d->m_instanceItems) {
         item->setAxisHeight(y);
     }
+
+    Q_EMIT currentChartChagend(d->m_currentChart);
 }
 
-void MainModel::loadFile(const QString &filename)
+bool MainModel::loadFile(const QString &filename)
 {
     clearMscModel();
 
@@ -134,7 +148,7 @@ void MainModel::loadFile(const QString &filename)
         d->m_mscModel = file.parseFile(filename);
     } catch (...) {
         //print error message
-        return;
+        return false;
     }
 
     d->m_documentItemModel->setMscModel(d->m_mscModel);
@@ -144,6 +158,7 @@ void MainModel::loadFile(const QString &filename)
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
 
     showFirstChart();
+    return true;
 }
 
 MscChart *MainModel::firstChart() const

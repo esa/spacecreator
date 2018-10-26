@@ -44,6 +44,8 @@ public:
 
     void clear();
 
+    MscDocument *parentDocument() const;
+
 Q_SIGNALS:
     void nameChanged(const QString &name);
     void documentAdded(MscDocument *document);

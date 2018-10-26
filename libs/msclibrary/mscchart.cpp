@@ -16,6 +16,7 @@
 */
 
 #include "mscchart.h"
+#include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 
@@ -110,6 +111,16 @@ MscMessage *MscChart::messageByName(const QString &name) const
         }
     }
     return nullptr;
+}
+
+/*!
+  \brief MscChart::parentDocument
+  \return The document that this chart is included in. Returns a nullptr if this chart is at the root
+  of the model
+*/
+MscDocument *MscChart::parentDocument() const
+{
+    return dynamic_cast<MscDocument *>(parent());
 }
 
 } // namespace msc
