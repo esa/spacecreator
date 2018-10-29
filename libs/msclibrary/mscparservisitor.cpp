@@ -48,11 +48,7 @@ msc::MscModel *MscParserVisitor::detachModel()
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 {
     Q_ASSERT(m_model != nullptr);
-
-    auto result = visitChildren(context);;
-    orderMessages();
-
-    return result;
+    return visitChildren(context);;
 }
 
 antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
@@ -89,7 +85,12 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
     for (auto instanceCtx : context->instance()) {
         addInstance(instanceCtx);
     }
-    return visitChildren(context);
+
+    auto result = visitChildren(context);
+
+    orderMessages();
+
+    return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
@@ -157,7 +158,7 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
 
 void MscParserVisitor::resetMessages()
 {
-    if (m_messages.size()) {
+    if (!m_messages.isEmpty()) {
         m_messagesList.append(m_messages);
         m_messages.clear();
     }
@@ -212,4 +213,6 @@ void MscParserVisitor::orderMessages()
             }
         }
     }
+
+    m_messagesList.clear();
 }
