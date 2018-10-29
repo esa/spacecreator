@@ -18,12 +18,15 @@
 #ifndef MSCPARSERVISITOR_H
 #define MSCPARSERVISITOR_H
 
+#include <QVector>
+
 #include "parser/MscBaseVisitor.h"
 
 namespace msc {
 class MscChart;
 class MscDocument;
 class MscInstance;
+class MscMessage;
 class MscModel;
 }
 
@@ -44,13 +47,22 @@ public:
     antlrcpp::Any visitMscevent(MscParser::MsceventContext *context) override;
 
 private:
+    using Messages = QVector<msc::MscMessage*>;
+    using MessagesList = QVector<Messages>;
+
     void addInstance(MscParser::InstanceContext *context);
+
+    void resetMessages();
+    void orderMessages();
 
     msc::MscModel *m_model = nullptr;
 
     msc::MscDocument *m_currentDocument = nullptr;
     msc::MscChart *m_currentChart = nullptr;
     msc::MscInstance *m_currentInstance = nullptr;
+
+    Messages m_messages;
+    MessagesList m_messagesList;
 };
 
 #endif // MSCPARSERVISITOR_H

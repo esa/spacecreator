@@ -46,6 +46,7 @@ private Q_SLOTS:
     void testMessage();
     void testSameMessageInTwoInstances();
     void testGateMessage();
+    void testSortedMessage();
 
 private:
     MscFile *file = nullptr;
@@ -217,6 +218,66 @@ void tst_MscFile::testGateMessage()
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->messages().size(), 2);
+    delete model;
+}
+
+void tst_MscFile::testSortedMessage()
+{
+    QString msc = { "msc connection; \
+                        instance Initiator; \
+                            in ICONreq from env; \
+                            out ICON to Responder; \
+                            in ICONF from Responder; \
+                            out ICONconf to env; \
+                        endinstance; \
+                        instance Responder; \
+                            in ICON from Initiator; \
+                            out ICONind to env; \
+                            in ICONresp from env; \
+                            out ICONF to Initiator; \
+                        endinstance; \
+                    endmsc;" };
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 2);
+    MscInstance *initiator = chart->instances().at(0);
+    MscInstance *responder = chart->instances().at(1);
+
+    QCOMPARE(chart->messages().size(), 6);
+
+    MscMessage *message = chart->messages().at(0);
+    QCOMPARE(message->name(), QString("ICONreq"));
+    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(message->targetInstance(), initiator);
+
+    message = chart->messages().at(1);
+    QCOMPARE(message->name(), QString("ICON"));
+    QCOMPARE(message->sourceInstance(), initiator);
+    QCOMPARE(message->targetInstance(), responder);
+
+    message = chart->messages().at(2);
+    QCOMPARE(message->name(), QString("ICONind"));
+    QCOMPARE(message->sourceInstance(), responder);
+    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+
+    message = chart->messages().at(3);
+    QCOMPARE(message->name(), QString("ICONresp"));
+    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(message->targetInstance(), responder);
+
+    message = chart->messages().at(4);
+    QCOMPARE(message->name(), QString("ICONF"));
+    QCOMPARE(message->sourceInstance(), responder);
+    QCOMPARE(message->targetInstance(), initiator);
+
+    message = chart->messages().at(5);
+    QCOMPARE(message->name(), QString("ICONconf"));
+    QCOMPARE(message->sourceInstance(), initiator);
+    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+
     delete model;
 }
 

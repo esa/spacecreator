@@ -71,8 +71,11 @@ void MainWindow::openFile()
 void MainWindow::selectCurrentChart()
 {
     msc::MscChart *chart = m_model->currentChart();
-    QModelIndex idx = m_model->documentItemModel()->index(chart);
-    ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
+
+    if (chart != nullptr) {
+        QModelIndex idx = m_model->documentItemModel()->index(chart);
+        ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
+    }
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
