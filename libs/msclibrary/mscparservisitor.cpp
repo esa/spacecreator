@@ -85,14 +85,23 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
     for (auto instanceCtx : context->instance()) {
         addInstance(instanceCtx);
     }
-    return visitChildren(context);
+
+    auto result = visitChildren(context);
+
+    orderMessages();
+
+    return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
 {
     const QString name = QString::fromStdString(context->NAME(0)->getText());
     m_currentInstance = m_currentChart->instanceByName(name);
-    return visitChildren(context);
+    auto result = visitChildren(context);
+
+    resetMessages();
+
+    return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *context)
@@ -117,7 +126,8 @@ antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *contex
             }
             message->setSourceInstance(m_currentInstance);
         }
-        m_currentChart->addMessage(message);
+
+        m_messages.append(message);
     }
     return visitChildren(context);
 }
@@ -144,4 +154,65 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
         }
     }
     m_currentChart->addInstance(instance);
+}
+
+void MscParserVisitor::resetMessages()
+{
+    if (!m_messages.isEmpty()) {
+        m_messagesList.append(m_messages);
+        m_messages.clear();
+    }
+}
+
+void MscParserVisitor::orderMessages()
+{
+    bool found;
+
+    while (m_messagesList.size()) {
+        found = false;
+
+        for (int i = 0; i < m_messagesList.size(); ++i) {
+            bool inOther = false;
+
+            // annotate the first element of the list
+            auto firstMessage = m_messagesList[i][0];
+
+            // look first elements of others list
+            for (int j = i + 1; j < m_messagesList.size(); ++j) {
+                if (std::count_if(m_messagesList[j].begin(), m_messagesList[j].end(), [&](MscMessage* m){
+                                        return m->name() == firstMessage->name();} )) {
+                    if (m_messagesList[j][0]->name() == firstMessage->name()) {
+                        delete m_messagesList[j].takeFirst();
+
+                        if (m_messagesList[j].size() == 0) {
+                            m_messagesList.remove(j);
+                        }
+
+                        found = true;
+                        break;
+                    }
+                    else {
+                        inOther = true;
+                    }
+                }
+            }
+
+            if (found || !inOther) {
+                m_messagesList[i].removeFirst();
+                m_currentChart->addMessage(firstMessage);
+
+                if (m_messagesList[i].size() == 0) {
+                    m_messagesList.remove(i);
+                }
+
+                break;
+            }
+
+            if (found && inOther) {
+                delete m_messagesList[i].takeFirst();
+            }
+        }
+    }
+
+    m_messagesList.clear();
 }
