@@ -48,7 +48,7 @@ msc::MscModel *MscParserVisitor::detachModel()
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 {
     Q_ASSERT(m_model != nullptr);
-    return visitChildren(context);;
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
