@@ -44,7 +44,7 @@ public:
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
     antlrcpp::Any visitMscDefinition(MscParser::MscDefinitionContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
-    antlrcpp::Any visitMscevent(MscParser::MsceventContext *context) override;
+    antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
 
 private:
     using Messages = QVector<msc::MscMessage*>;

@@ -88,32 +88,62 @@ mscDefinition
     ;
 
 instance
-    : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI mscevent* ENDINSTANCE SEMI
-        |       NAME COLON INSTANCE SEMI mscevent* ENDINSTANCE SEMI
+    : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
+        |       NAME COLON INSTANCE SEMI instanceEvent* ENDINSTANCE SEMI
         |       GATE (IN|OUT) NAME variableValue? (TO|FROM) NAME SEMI
         |       INST NAME (COMMA NAME)* SEMI
-    ;
-
-mscevent
-    : CONDITION NAME (SHARED ALL)? SEMI
-    | IN NAME variableValue? FROM a=nameOrEnv SEMI
-    | OUT NAME variableValue? TO c=nameOrEnv ( VIA d=NAME )? SEMI
-    ;
-
-nameOrEnv
-    : NAME
-    | ENV
     ;
 
 instanceKind
     : COLON NAME (NAME)*
     ;
 
+instanceEvent
+    : (mscEvent | timerStatement) SEMI
+    ;
+
+mscEvent
+    : CONDITION NAME (SHARED ALL)?
+    | IN NAME variableValue? (FROM a=nameOrEnv)?
+    | OUT NAME variableValue? (TO c=nameOrEnv)? ( VIA d=NAME )?
+    ;
+
+nameOrEnv
+    : NAME | ENV
+    ;
+
+timerStatement
+    : startTimer | stopTimer | timeout
+    ;
+
+startTimer
+    : STARTTIMER NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
+    ;
+
+duration
+    : LEFTSQUAREBRACKET durationLimit (COMMA durationLimit)? RIGHTSQUAREBRACKET
+    ;
+
+durationLimit
+    : NAME /* TODO should be a <expression string> */
+    | INF
+    ;
+
+stopTimer
+    : STOPTIMER NAME (COMMA NAME)?
+    ;
+
+timeout
+    : TIMEOUT NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    ;
+
 parameterList
-    : NAME (',' parameterList)?;
+    : NAME (',' parameterList)?
+    ;
 
 variableValue
-    : LEFTOPEN NAME RIGHTOPEN;
+    : LEFTOPEN NAME RIGHTOPEN
+    ;
 
 /*Keywords*/
 
@@ -209,6 +239,8 @@ COMMA : ',';
 MINUS : '-';
 LEFTOPEN : '(';
 RIGHTOPEN : ')';
+LEFTSQUAREBRACKET : '[' ;
+RIGHTSQUAREBRACKET : ']' ;
 
 
 fragment
@@ -222,12 +254,6 @@ NATIONAL : LEFTCURLYBRACKET | VERTICALLINE | RIGHTCURLYBRACKET | OVERLINE | UPWA
 
 fragment
 ALPHANUMERIC : LETTER | DECIMALDIGIT | NATIONAL;
-
-fragment
-LEFTSQUAREBRACKET : '[' ;
-
-fragment
-RIGHTSQUAREBRACKET : ']' ;
 
 fragment
 LEFTCURLYBRACKET : '{' ;
