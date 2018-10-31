@@ -84,20 +84,20 @@ mscDefinition
     : MSC NAME SEMI instance* ENDMSC SEMI
         |       LANGUAGE NAME SEMI
         |       DATA FILENAME SEMI
-        |       MSG NAME COLON VARIABLEVALUE SEMI
+        |       MSG NAME COLON variableValue SEMI
     ;
 
 instance
-    : INSTANCE NAME instanceKind? SEMI mscevent* ENDINSTANCE SEMI
-        |       NAME COLON INSTANCE SEMI mscevent* ENDINSTANCE SEMI //-> (INSTANCE NAME mscevent*)
-        |       GATE (IN|OUT) NAME VARIABLEVALUE? (TO|FROM) NAME SEMI
+    : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI mscevent* ENDINSTANCE SEMI
+        |       NAME COLON INSTANCE SEMI mscevent* ENDINSTANCE SEMI
+        |       GATE (IN|OUT) NAME variableValue? (TO|FROM) NAME SEMI
         |       INST NAME (COMMA NAME)* SEMI
     ;
 
 mscevent
     : CONDITION NAME (SHARED ALL)? SEMI
-    | IN NAME VARIABLEVALUE? FROM a=nameOrEnv SEMI                 //-> (IN NAME VARIABLEVALUE? (NAMEORENV $a))
-    | OUT NAME VARIABLEVALUE? TO c=nameOrEnv ( VIA d=NAME )? SEMI  //-> (OUT NAME VARIABLEVALUE? (NAMEORENV $c) (VIA $d)? )
+    | IN NAME variableValue? FROM a=nameOrEnv SEMI
+    | OUT NAME variableValue? TO c=nameOrEnv ( VIA d=NAME )? SEMI
     ;
 
 nameOrEnv
@@ -109,6 +109,11 @@ instanceKind
     : COLON NAME (NAME)*
     ;
 
+parameterList
+    : NAME (',' parameterList)?;
+
+variableValue
+    : LEFTOPEN NAME RIGHTOPEN;
 
 /*Keywords*/
 
@@ -185,7 +190,6 @@ STARTTIMER:'starttimer'|'STARTTIMER';
 STOP:'stop'|'STOP';
 STOPTIMER:'stoptimer'|'STOPTIMER';
 SUSPENSION:'suspension'|'SUSPENSION';
-//TEXT:'text'|'TEXT';
 TIME:'time'|'TIME';
 TIMEOUT:'timeout'|'TIMEOUT';
 TIMER:'timer'|'TIMER';
@@ -203,6 +207,8 @@ SEMI : ';';
 COLON : ':';
 COMMA : ',';
 MINUS : '-';
+LEFTOPEN : '(';
+RIGHTOPEN : ')';
 
 
 fragment
@@ -233,13 +239,7 @@ fragment
 VERTICALLINE : '|';
 
 fragment
-LEFTOPEN : '(';
-
-fragment
 LEFTCLOSED : LEFTSQUAREBRACKET;
-
-fragment
-RIGHTOPEN : ')';
 
 fragment
 RIGHTCLOSED : RIGHTSQUAREBRACKET;
@@ -277,13 +277,22 @@ RIGHTANGULARBRACKET : '>';
 fragment
 APOSTROPHE : '\'';
 
+CHARACTERSTRING :
+    APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
 
+fragment
+TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | APOSTROPHE )*;
+
+MISC : OTHERCHARACTER | APOSTROPHE;
 
 OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '/' | '*' | '"' | '=';
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA; //  ';' and ':' were here (ttsiod)
 
 COMPOSITESPECIAL : QUALIFIERLEFT | QUALIFIERRIGHT;
+
+fragment
+NOTE : '/*' TEXT '*/';
 
 QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
@@ -292,14 +301,6 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
-
-//VARIABLEVALUE
-//    : ( '(' ( options {greedy=false;} : . )* ')' )?
-//    ;
-VARIABLEVALUE : '(' NAME ')';
-
-CHARACTERSTRING :
-    APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
 
 
 COMMENTLOST : '/*' .*? '*/' -> skip;
