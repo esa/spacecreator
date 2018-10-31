@@ -37,6 +37,7 @@ struct MainModelPrivate;
 class MainModel : public QObject
 {
     Q_OBJECT
+
 public:
     explicit MainModel(QObject *parent = nullptr);
     ~MainModel();
@@ -46,6 +47,8 @@ public:
     msc::DocumentItemModel *documentItemModel() const;
 
     msc::MscChart *currentChart() const;
+
+    QStringList errorMessages() const;
 
 public Q_SLOTS:
     void showFirstChart();
@@ -63,6 +66,8 @@ private:
     void clearScene();
 
     MainModelPrivate *const d;
+
+    QStringList m_errorMessages;
 };
 
 #endif // MAINMODEL_H

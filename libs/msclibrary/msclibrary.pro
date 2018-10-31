@@ -19,7 +19,8 @@ HEADERS += \
     mscchart.h \
     mscinstance.h \
     mscmessage.h \
-    documentitemmodel.h
+    documentitemmodel.h \
+    mscerrorlistener.h
 
 SOURCES += \
     mscfile.cpp \
@@ -34,7 +35,8 @@ SOURCES += \
     mscchart.cpp \
     mscinstance.cpp \
     mscmessage.cpp \
-    documentitemmodel.cpp
+    documentitemmodel.cpp \
+    mscerrorlistener.cpp
 
 antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")

@@ -15,32 +15,25 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCFILE_H
-#define MSCFILE_H
-
-#include <QString>
-
-namespace antlr4 {
-class ANTLRInputStream;
-}
+#include "mscerrorlistener.h"
 
 namespace msc {
-class MscModel;
 
-class MscFile
+void MscErrorListener::syntaxError(antlr4::Recognizer * /*recognizer*/,
+                                   antlr4::Token * /*offendingSymbol*/,
+                                   size_t line,
+                                   size_t charPositionInLine,
+                                   const std::string &msg,
+                                   std::exception_ptr e)
 {
-public:
-    MscFile();
+    m_errorMessages.append(QString("line %1:%2 %3").arg(line)
+                                                   .arg(charPositionInLine)
+                                                   .arg(QString::fromStdString(msg)));
+}
 
-    MscModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
-    MscModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
+QStringList MscErrorListener::getErrorMessages() const
+{
+    return m_errorMessages;
+}
 
-    QStringList getErrorMessages() const;
-
-private:
-    MscModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
-};
-
-} // namespace msc
-
-#endif // MSCFILE_H
+}

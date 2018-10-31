@@ -78,6 +78,11 @@ MscChart *MainModel::currentChart() const
     return d->m_currentChart;
 }
 
+QStringList MainModel::errorMessages() const
+{
+    return m_errorMessages;
+}
+
 void MainModel::showFirstChart()
 {
     fillView(firstChart());
@@ -144,8 +149,10 @@ bool MainModel::loadFile(const QString &filename)
     clearMscModel();
 
     msc::MscFile file;
+
     try {
-        d->m_mscModel = file.parseFile(filename);
+        m_errorMessages.clear();
+        d->m_mscModel = file.parseFile(filename, &m_errorMessages);
     } catch (...) {
         //print error message
         return false;
