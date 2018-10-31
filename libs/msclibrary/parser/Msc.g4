@@ -99,10 +99,10 @@ instanceKind
     ;
 
 instanceEvent
-    : (mscevent | timerStatement) SEMI
+    : (mscEvent | timerStatement) SEMI
     ;
 
-mscevent
+mscEvent
     : CONDITION NAME (SHARED ALL)?
     | IN NAME variableValue? (FROM a=nameOrEnv)?
     | OUT NAME variableValue? (TO c=nameOrEnv)? ( VIA d=NAME )?

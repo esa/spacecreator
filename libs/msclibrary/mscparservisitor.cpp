@@ -104,7 +104,7 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
     return result;
 }
 
-antlrcpp::Any MscParserVisitor::visitMscevent(MscParser::MsceventContext *context)
+antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
 {
     const QString name = QString::fromStdString(context->NAME(0)->getText());
 
