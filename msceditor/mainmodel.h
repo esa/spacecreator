@@ -66,8 +66,6 @@ private:
     void clearScene();
 
     MainModelPrivate *const d;
-
-    QStringList m_errorMessages;
 };
 
 #endif // MAINMODEL_H
