@@ -83,19 +83,19 @@ virtuality
 mscDefinition
     : MSC NAME SEMI instance* ENDMSC SEMI
         |       LANGUAGE NAME SEMI
-        |       DATA FILENAME SEMI
-        |       MSG NAME COLON variableValue SEMI
+        |       DATA NAME SEMI
+        |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
     ;
 
 instance
-    : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       NAME COLON INSTANCE SEMI instanceEvent* ENDINSTANCE SEMI
-        |       GATE (IN|OUT) NAME variableValue? (TO|FROM) NAME SEMI
-        |       INST NAME (COMMA NAME)* SEMI
+    : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
+        |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
+        |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
+        |       INST NAME (COLON instanceKind)? SEMI
     ;
 
 instanceKind
-    : COLON NAME (NAME)*
+    : NAME (NAME)*
     ;
 
 instanceEvent
@@ -104,12 +104,20 @@ instanceEvent
 
 mscEvent
     : CONDITION NAME (SHARED ALL)?
-    | IN NAME variableValue? (FROM a=nameOrEnv)?
-    | OUT NAME variableValue? (TO c=nameOrEnv)? ( VIA d=NAME )?
+    | IN messageIdentification (FROM outputAddress)?
+    | OUT messageIdentification (TO inputAddress)?
     ;
 
-nameOrEnv
-    : NAME | ENV
+messageIdentification
+    : NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    ;
+
+outputAddress
+    : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    ;
+
+inputAddress
+    : (instanceName=NAME | ENV) (VIA gateName=NAME)?
     ;
 
 timerStatement
@@ -138,7 +146,43 @@ timeout
     ;
 
 parameterList
-    : NAME (',' parameterList)?
+    : paramaterDefn (',' parameterList)?
+    ;
+
+paramaterDefn
+    : binding | expression | pattern
+    ;
+
+binding
+    : leftBinding | rightBinding
+    ;
+
+leftBinding
+    : pattern LEFTBINDSYMBOL expression
+    ;
+
+rightBinding
+    : expression RIGHTBINDSYMBOL pattern
+    ;
+
+expression
+    : expressionString
+    ;
+
+expressionString
+    : NAME COLON NAME // TODO not correct ?
+    ;
+
+pattern
+    : variableString | wildcard
+    ;
+
+variableString
+    : STRING // TODO not correct ?
+    ;
+
+wildcard
+    : NAME // TODO not correct ?
     ;
 
 variableValue
@@ -303,6 +347,10 @@ RIGHTANGULARBRACKET : '>';
 fragment
 APOSTROPHE : '\'';
 
+LEFTBINDSYMBOL : ':' '='?; // ':=' TODO should be ':=' only
+
+RIGHTBINDSYMBOL : '=:';
+
 CHARACTERSTRING :
     APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
 
@@ -324,13 +372,13 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP )+ ;
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
+STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
-COMMENTLOST : '/*' .*? '*/' -> skip;
+COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
+COMMENTLOST : NOTE -> skip;
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : '/\r' ->skip; // linebreak
-
-

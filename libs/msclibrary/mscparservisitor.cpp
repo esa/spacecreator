@@ -72,14 +72,18 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionContext *context)
 {
+    if (!context->MSC()) {
+        return visitChildren(context);
+    }
+
     auto chart = new MscChart();
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
         m_currentDocument->addChart(chart);
     }
-    if (context->NAME()) {
-        const std::string mscName = context->NAME()->getText();
+    if (context->NAME(0)) {
+        const std::string mscName = context->NAME(0)->getText();
         chart->setName(QString::fromStdString(mscName));
     }
 
@@ -117,27 +121,38 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
         return visitChildren(context);
     }
 
-    const QString name = QString::fromStdString(context->NAME(0)->getText());
+    QString name;
+    if (context->NAME()) {
+        name = QString::fromStdString(context->NAME()->getText());
+    }
+    if (context->messageIdentification()) {
+        name = QString::fromStdString(context->messageIdentification()->NAME(0)->getText());
+    }
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
-        if (context->a) {
+        if (context->IN()) {
             // is an input event
-            if (context->a->NAME()) {
-                const QString source = QString::fromStdString(context->a->NAME()->getText());
-                message->setSourceInstance(m_currentChart->instanceByName(source));
+            if (context->outputAddress()) {
+                MscParser::OutputAddressContext *outputAddress = context->outputAddress();
+                if (outputAddress->instanceName) {
+                    const QString source = QString::fromStdString(outputAddress->instanceName->getText());
+                    message->setSourceInstance(m_currentChart->instanceByName(source));
+                }
             }
             message->setTargetInstance(m_currentInstance);
         }
-        if (context->c) {
+        if (context->OUT()) {
             // is an output event
-            if (context->c->NAME()) {
-                const QString target = QString::fromStdString(context->c->NAME()->getText());
-                message->setTargetInstance(m_currentChart->instanceByName(target));
+            if (context->inputAddress()) {
+                MscParser::InputAddressContext *inputAddress = context->inputAddress();
+                if (inputAddress->instanceName) {
+                    const QString target = QString::fromStdString(inputAddress->instanceName->getText());
+                    message->setTargetInstance(m_currentChart->instanceByName(target));
+                }
+                message->setSourceInstance(m_currentInstance);
             }
-            message->setSourceInstance(m_currentInstance);
         }
-
         m_messages.append(message);
     }
     return visitChildren(context);
@@ -190,8 +205,7 @@ void MscParserVisitor::orderMessages()
 
             // look first elements of others list
             for (int j = i + 1; j < m_messagesList.size(); ++j) {
-                if (std::count_if(m_messagesList[j].begin(), m_messagesList[j].end(), [&](MscMessage* m){
-                                        return m->name() == firstMessage->name();} )) {
+                if (std::count_if(m_messagesList[j].begin(), m_messagesList[j].end(), [&](MscMessage *m) { return m->name() == firstMessage->name(); })) {
                     if (m_messagesList[j][0]->name() == firstMessage->name()) {
                         delete m_messagesList[j].takeFirst();
 
@@ -201,8 +215,7 @@ void MscParserVisitor::orderMessages()
 
                         found = true;
                         break;
-                    }
-                    else {
+                    } else {
                         inOther = true;
                     }
                 }
