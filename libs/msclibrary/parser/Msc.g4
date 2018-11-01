@@ -95,7 +95,7 @@ instance
     ;
 
 instanceKind
-    : NAME+
+    : NAME (NAME)*
     ;
 
 instanceEvent
