@@ -84,7 +84,7 @@ mscDefinition
     : MSC NAME SEMI instance* ENDMSC SEMI
         |       LANGUAGE NAME SEMI
         |       DATA NAME SEMI
-        |       MSG NAME COLON variableValue SEMI
+        |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
     ;
 
 instance

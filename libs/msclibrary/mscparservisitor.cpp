@@ -82,8 +82,8 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
     } else {
         m_currentDocument->addChart(chart);
     }
-    if (context->NAME()) {
-        const std::string mscName = context->NAME()->getText();
+    if (context->NAME(0)) {
+        const std::string mscName = context->NAME(0)->getText();
         chart->setName(QString::fromStdString(mscName));
     }
 
