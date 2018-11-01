@@ -88,14 +88,14 @@ mscDefinition
     ;
 
 instance
-    : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       NAME COLON INSTANCE SEMI instanceEvent* ENDINSTANCE SEMI
+    : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
+        |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
         |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
-        |       INST NAME instanceKind? SEMI
+        |       INST NAME (COLON instanceKind)? SEMI
     ;
 
 instanceKind
-    : COLON NAME (NAME)*
+    : NAME+
     ;
 
 instanceEvent
