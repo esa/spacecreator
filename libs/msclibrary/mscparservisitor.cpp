@@ -78,8 +78,10 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
     } else {
         m_currentDocument->addChart(chart);
     }
-    const std::string mscName = context->NAME()->getText();
-    chart->setName(QString::fromStdString(mscName));
+    if (context->NAME()) {
+        const std::string mscName = context->NAME()->getText();
+        chart->setName(QString::fromStdString(mscName));
+    }
 
     m_currentChart = chart;
     for (auto instanceCtx : context->instance()) {
@@ -90,11 +92,16 @@ antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionConte
 
     orderMessages();
 
+    m_currentChart = nullptr;
     return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *context)
 {
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
     const QString name = QString::fromStdString(context->NAME(0)->getText());
     m_currentInstance = m_currentChart->instanceByName(name);
     auto result = visitChildren(context);
@@ -106,6 +113,10 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
 
 antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
 {
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
     const QString name = QString::fromStdString(context->NAME(0)->getText());
 
     if (m_currentChart->messageByName(name) == nullptr) {

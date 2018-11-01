@@ -55,7 +55,7 @@ void tst_MscDocument::cleanup()
 
 void tst_MscDocument::testName()
 {
-    QCOMPARE(m_document->name(), QString());
+    QCOMPARE(m_document->name(), QString("Untitled"));
 
     const QString chartName("Rosetta");
     m_document->setName(chartName);

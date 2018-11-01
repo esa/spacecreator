@@ -56,7 +56,7 @@ Q_SIGNALS:
     void messageAdded(MscMessage *message);
 
 private:
-    QString m_name;
+    QString m_name = tr("Untitled");
     QVector<MscInstance *> m_instances;
     QVector<MscMessage *> m_messages;
 };
