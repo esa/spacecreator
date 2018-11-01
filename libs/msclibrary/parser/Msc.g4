@@ -104,12 +104,20 @@ instanceEvent
 
 mscEvent
     : CONDITION NAME (SHARED ALL)?
-    | IN NAME variableValue? (FROM a=nameOrEnv)?
-    | OUT NAME variableValue? (TO c=nameOrEnv)? ( VIA d=NAME )?
+    | IN messageIdentification (FROM outputAddress)?
+    | OUT messageIdentification (TO inputAddress)?
     ;
 
-nameOrEnv
-    : NAME | ENV
+messageIdentification
+    : NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    ;
+
+outputAddress
+    : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    ;
+
+inputAddress
+    : (instanceName=NAME | ENV) (VIA gateName=NAME)?
     ;
 
 timerStatement
@@ -339,7 +347,7 @@ RIGHTANGULARBRACKET : '>';
 fragment
 APOSTROPHE : '\'';
 
-LEFTBINDSYMBOL : ':=' | ':'; // TODO should be ':=' only
+LEFTBINDSYMBOL : ':' '='?; // ':=' TODO should be ':=' only
 
 RIGHTBINDSYMBOL : '=:';
 
