@@ -90,7 +90,7 @@ mscDefinition
 instance
     : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE SEMI instanceEvent* ENDINSTANCE SEMI
-        |       GATE (IN|OUT) NAME variableValue? (TO|FROM) NAME SEMI
+        |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
         |       INST NAME instanceKind? SEMI
     ;
 
