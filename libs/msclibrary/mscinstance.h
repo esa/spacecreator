@@ -46,7 +46,7 @@ Q_SIGNALS:
     void inheritanceChanged(const QString &inheritance);
 
 private:
-    QString m_name;
+    QString m_name = tr("Untitled");
     QString m_kind;
     QString m_inheritance;
 };

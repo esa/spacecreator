@@ -69,7 +69,7 @@ tokens {
 file : mscDocument | mscDefinition;
 
 mscDocument
-    : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition)* ENDMSCDOCUMENT SEMI definingMscReference*
+    : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition | instance)* ENDMSCDOCUMENT SEMI definingMscReference*
     ;
 
 definingMscReference

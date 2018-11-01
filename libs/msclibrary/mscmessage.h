@@ -46,7 +46,7 @@ Q_SIGNALS:
     void targetChanged(MscInstance *target);
 
 private:
-    QString m_name;
+    QString m_name = tr("Untitled");
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
 };

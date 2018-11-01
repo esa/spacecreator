@@ -53,7 +53,7 @@ Q_SIGNALS:
     void cleared();
 
 private:
-    QString m_name;
+    QString m_name = tr("Untitled");
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
 };

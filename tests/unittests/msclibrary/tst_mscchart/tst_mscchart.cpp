@@ -58,7 +58,7 @@ void tst_MscChart::cleanup()
 
 void tst_MscChart::testName()
 {
-    QCOMPARE(m_chart->name(), QString());
+    QCOMPARE(m_chart->name(), QString("Untitled"));
 
     const QString chartName("Rosetta");
     m_chart->setName(chartName);
