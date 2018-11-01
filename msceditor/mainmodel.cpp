@@ -48,6 +48,7 @@ struct MainModelPrivate {
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
     msc::MscChart *m_currentChart = nullptr;
+    QStringList m_errorMessages;
 };
 
 MainModel::MainModel(QObject *parent)
@@ -76,6 +77,11 @@ msc::DocumentItemModel *MainModel::documentItemModel() const
 MscChart *MainModel::currentChart() const
 {
     return d->m_currentChart;
+}
+
+QStringList MainModel::errorMessages() const
+{
+    return d->m_errorMessages;
 }
 
 void MainModel::showFirstChart()
@@ -144,8 +150,10 @@ bool MainModel::loadFile(const QString &filename)
     clearMscModel();
 
     msc::MscFile file;
+
     try {
-        d->m_mscModel = file.parseFile(filename);
+        d->m_errorMessages.clear();
+        d->m_mscModel = file.parseFile(filename, &d->m_errorMessages);
     } catch (...) {
         //print error message
         return false;

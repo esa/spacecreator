@@ -65,6 +65,8 @@ void MainWindow::openFile()
         } else {
             setWindowTitle(tr("MSC Editor"));
         }
+
+        ui->errorTextEdit->setPlainText(m_model->errorMessages().join("\n"));
     }
 }
 

@@ -20,6 +20,7 @@
 #include "mscmodel.h"
 
 #include "mscparservisitor.h"
+#include "mscerrorlistener.h"
 #include "parser/MscLexer.h"
 #include "parser/MscParser.h"
 #include "parser/MscBaseVisitor.h"
@@ -62,7 +63,7 @@ MscFile::MscFile()
 
   Loads the file \a filename
 */
-MscModel *MscFile::parseFile(const QString &filename)
+MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages)
 {
     if (!QFileInfo::exists(filename)) {
         throw FileNotFoundException();
@@ -75,16 +76,17 @@ MscModel *MscFile::parseFile(const QString &filename)
     }
 
     ANTLRInputStream input(stream);
-    return parse(input);
+    return parse(input, errorMessages);
 }
 
-MscModel *MscFile::parseText(const QString &text)
+MscModel *MscFile::parseText(const QString &text, QStringList *errorMessages)
 {
     ANTLRInputStream input(text.toStdString());
-    return parse(input);
+    return parse(input, errorMessages);
 }
 
-MscModel *MscFile::parse(ANTLRInputStream &input)
+
+MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
     MscLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
@@ -93,8 +95,15 @@ MscModel *MscFile::parse(ANTLRInputStream &input)
 
     MscParser parser(&tokens);
 
+    MscErrorListener errorListener;
+    parser.addErrorListener(&errorListener);
+
     MscParserVisitor visitor;
     visitor.visit(parser.file());
+
+    if (errorMessages != nullptr) {
+        *errorMessages = errorListener.getErrorMessages();
+    }
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {
         throw ParserException(QObject::tr("Syntax error"));
@@ -104,7 +113,6 @@ MscModel *MscFile::parse(ANTLRInputStream &input)
     }
 
     return visitor.detachModel();
-    ;
 }
 
 } // namespace msc
