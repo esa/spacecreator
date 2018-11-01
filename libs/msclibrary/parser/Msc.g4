@@ -328,9 +328,7 @@ NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
-
-COMMENTLOST : '/*' .*? '*/' -> skip;
+COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
+COMMENTLOST : NOTE -> skip;
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : '/\r' ->skip; // linebreak
-
-
