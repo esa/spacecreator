@@ -138,7 +138,43 @@ timeout
     ;
 
 parameterList
-    : NAME (',' parameterList)?
+    : paramaterDefn (',' parameterList)?
+    ;
+
+paramaterDefn
+    : binding | expression | pattern
+    ;
+
+binding
+    : leftBinding | rightBinding
+    ;
+
+leftBinding
+    : pattern LEFTBINDSYMBOL expression
+    ;
+
+rightBinding
+    : expression RIGHTBINDSYMBOL pattern
+    ;
+
+expression
+    : expressionString
+    ;
+
+expressionString
+    : NAME // TODO not correct ?
+    ;
+
+pattern
+    : variableString | wildcard
+    ;
+
+variableString
+    : NAME // TODO not correct ?
+    ;
+
+wildcard
+    : NAME // TODO not correct ?
     ;
 
 variableValue
@@ -302,6 +338,10 @@ RIGHTANGULARBRACKET : '>';
 
 fragment
 APOSTROPHE : '\'';
+
+LEFTBINDSYMBOL : ':=' | ':'; // TODO should be ':=' only
+
+RIGHTBINDSYMBOL : '=:';
 
 CHARACTERSTRING :
     APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
