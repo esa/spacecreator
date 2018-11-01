@@ -83,7 +83,7 @@ virtuality
 mscDefinition
     : MSC NAME SEMI instance* ENDMSC SEMI
         |       LANGUAGE NAME SEMI
-        |       DATA FILENAME SEMI
+        |       DATA NAME SEMI
         |       MSG NAME COLON variableValue SEMI
     ;
 
@@ -91,7 +91,7 @@ instance
     : INSTANCE NAME instanceKind? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE SEMI instanceEvent* ENDINSTANCE SEMI
         |       GATE (IN|OUT) NAME variableValue? (TO|FROM) NAME SEMI
-        |       INST NAME (COMMA NAME)* SEMI
+        |       INST NAME instanceKind? SEMI
     ;
 
 instanceKind
@@ -324,7 +324,7 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP )+ ;
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
