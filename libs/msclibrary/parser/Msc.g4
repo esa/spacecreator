@@ -170,7 +170,7 @@ expression
     ;
 
 expressionString
-    : NAME // TODO not correct ?
+    : NAME COLON NAME // TODO not correct ?
     ;
 
 pattern
@@ -178,7 +178,7 @@ pattern
     ;
 
 variableString
-    : NAME // TODO not correct ?
+    : STRING // TODO not correct ?
     ;
 
 wildcard
@@ -375,6 +375,8 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
+
+STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
 COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
 COMMENTLOST : NOTE -> skip;

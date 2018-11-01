@@ -72,6 +72,10 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionContext *context)
 {
+    if (!context->MSC()) {
+        return visitChildren(context);
+    }
+
     auto chart = new MscChart();
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
