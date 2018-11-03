@@ -66,6 +66,8 @@ private:
     void clearScene();
 
     MainModelPrivate *const d;
+
+    Q_INVOKABLE void layoutItems();
 };
 
 #endif // MAINMODEL_H

@@ -18,7 +18,7 @@
 #ifndef MESSAGEITEM_H
 #define MESSAGEITEM_H
 
-#include <QGraphicsObject>
+#include "baseitems/interactiveobject.h"
 
 class QGraphicsLineItem;
 class QGraphicsPolygonItem;
@@ -27,8 +27,9 @@ class QGraphicsTextItem;
 namespace msc {
 class InstanceItem;
 class MscMessage;
+class ArrowItem;
 
-class MessageItem : public QGraphicsObject
+class MessageItem : public InteractiveObject
 {
     Q_OBJECT
 public:
@@ -39,26 +40,26 @@ public:
 
     QString name() const;
 
-    // QGraphicsItem interface
-    QRectF boundingRect() const override;
+    void updateAnchorSource(const QPointF &delta);
+    void updateAnchorTarget(const QPointF &delta);
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QPainterPath shape() const override;
 
 public Q_SLOTS:
     void updateLayout();
     void setName(const QString &name);
 
+protected:
+    virtual void handleGripPointMovement(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    Q_INVOKABLE void updateGripPoints();
+
 private Q_SLOTS:
     void buildLayout();
 
 private:
-    void setWidth(double width);
-    void centerName();
-
     msc::MscMessage *m_message = nullptr;
-    QGraphicsLineItem *m_line = nullptr;
-    QGraphicsPolygonItem *m_leftArrow = nullptr;
-    QGraphicsPolygonItem *m_rightArrow = nullptr;
-    QGraphicsTextItem *m_nameItem = nullptr;
+    ArrowItem *m_arrowItem = nullptr;
     InstanceItem *m_sourceInstance = nullptr;
     InstanceItem *m_targetInstance = nullptr;
     bool m_layoutDirty = false;

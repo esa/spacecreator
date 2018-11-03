@@ -28,6 +28,8 @@
 #include <QFileInfo>
 #include <QItemSelectionModel>
 #include <QTreeView>
+#include <QKeySequence>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -36,16 +38,36 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setupUi();
 
+    ui->action_Open_file->setShortcut(QKeySequence::Open);
+    ui->actionQuit->setShortcut(QKeySequence::Quit);
+
     connect(ui->action_Open_file, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionQuit, &QAction::triggered, QApplication::instance(), &QApplication::quit);
     connect(ui->actionAbout_Qt, &QAction::triggered, QApplication::instance(), &QApplication::aboutQt);
 
     ui->graphicsView->setScene(m_model->graphicsScene());
+    m_model->graphicsScene()->setBackgroundBrush(QBrush(QColor::fromRgbF(.92, .92, .92, 1.), Qt::CrossPattern));
+
     ui->documentTreeView->setModel(m_model->documentItemModel());
     connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &MainWindow::showSelection);
 
     connect(m_model, &MainModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+
+    connect(ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
+        statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
+                                         .arg(screen.x())
+                                         .arg(screen.y())
+                                         .arg(scene.x())
+                                         .arg(scene.y())
+                                         .arg(item.x())
+                                         .arg(item.y()));
+    });
+    statusBar()->show();
+
+#ifdef DEVELOPER_AUTO_OPEN_MSC
+    doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("example02.msc"));
+#endif //DEVELOPER_AUTO_OPEN_MSC
 }
 
 MainWindow::~MainWindow()
@@ -55,19 +77,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
-    if (!filename.isEmpty()) {
-        bool ok = m_model->loadFile(filename);
-        if (ok) {
-            ui->documentTreeView->expandAll();
-            QFileInfo fileInfo(filename);
-            setWindowTitle(tr("MSC Editor") + " - " + fileInfo.fileName());
-        } else {
-            setWindowTitle(tr("MSC Editor"));
-        }
+    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
+    doOpenFile(filename);
+}
 
-        ui->errorTextEdit->setPlainText(m_model->errorMessages().join("\n"));
+bool MainWindow::doOpenFile(const QString &file)
+{
+    if (file.isEmpty() || !QFileInfo::exists(file))
+        return false;
+
+    const bool ok = m_model->loadFile(file);
+    if (ok) {
+        static const QString title = tr("%1 [%2]");
+        setWindowTitle(title.arg(qApp->applicationName()).arg(file));
+        ui->documentTreeView->expandAll();
     }
+    ui->errorTextEdit->setPlainText(m_model->errorMessages().join("\n"));
+
+    return ok;
 }
 
 void MainWindow::selectCurrentChart()
@@ -118,5 +145,5 @@ void MainWindow::setupUi()
         }
         ui->graphicsView->setZoom(percent);
     });
-    statusBar()->addWidget(zoomBox);
+    statusBar()->addPermanentWidget(zoomBox);
 }

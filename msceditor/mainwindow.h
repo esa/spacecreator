@@ -44,6 +44,7 @@ private Q_SLOTS:
 
 private:
     void setupUi();
+    bool doOpenFile(const QString &file);
 
     Ui::MainWindow *ui = nullptr;
     MainModel *m_model = nullptr;

@@ -118,20 +118,13 @@ void MainModel::fillView(msc::MscChart *chart)
         auto *item = new MessageItem(message);
         item->setY(y);
 
-        if (message->sourceInstance() != nullptr) {
-            QString sourceName = message->sourceInstance()->name();
-            InstanceItem *instItem = instanceItem(sourceName);
-            if (instItem != nullptr) {
+        if (message->sourceInstance() != nullptr)
+            if (InstanceItem *instItem = instanceItem(message->sourceInstance()->name()))
                 item->setSourceInstanceItem(instItem);
-            }
-        }
-        if (message->targetInstance() != nullptr) {
-            QString targetName = message->targetInstance()->name();
-            InstanceItem *instItem = instanceItem(targetName);
-            if (instItem != nullptr) {
+
+        if (message->targetInstance() != nullptr)
+            if (InstanceItem *instItem = instanceItem(message->targetInstance()->name()))
                 item->setTargetInstanceItem(instItem);
-            }
-        }
 
         d->m_scene.addItem(item);
         d->m_messageItems.append(item);
@@ -143,6 +136,22 @@ void MainModel::fillView(msc::MscChart *chart)
     }
 
     Q_EMIT currentChartChagend(d->m_currentChart);
+    QMetaObject::invokeMethod(this, "layoutItems", Qt::QueuedConnection);
+}
+
+void MainModel::layoutItems()
+{
+    qreal x = 0., bottom = 0.;
+    for (InstanceItem *item : d->m_instanceItems) {
+        QRectF bounds = item->boundingRect().translated(item->pos());
+
+        item->setX(item->x() + x);
+        x += bounds.width();
+
+        bounds.moveBottom(bottom);
+        item->setY(bounds.top());
+        bottom = bounds.bottom();
+    }
 }
 
 bool MainModel::loadFile(const QString &filename)
@@ -198,14 +207,14 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
 
 InstanceItem *MainModel::instanceItem(const QString &name) const
 {
-    for (QGraphicsItem *item : d->m_scene.items()) {
-        InstanceItem *instance = dynamic_cast<InstanceItem *>(item);
-        if (instance != nullptr) {
-            if (instance->name() == name) {
-                return instance;
+    if (!name.isEmpty())
+        for (QGraphicsItem *item : d->m_scene.items()) {
+            if (InstanceItem *instance = dynamic_cast<InstanceItem *>(item)) {
+                if (instance->name() == name) {
+                    return instance;
+                }
             }
         }
-    }
     return nullptr;
 }
 

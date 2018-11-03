@@ -17,6 +17,8 @@
 
 #include "messageitem.h"
 #include "instanceitem.h"
+#include "baseitems/arrowitem.h"
+#include "baseitems/grippointshandler.h"
 
 #include <mscmessage.h>
 
@@ -24,70 +26,56 @@
 #include <QGraphicsLineItem>
 #include <QGraphicsPolygonItem>
 #include <QPolygonF>
+#include <QPainter>
+#include <QGraphicsScene>
+
+#include <QDebug>
+#define LOG qDebug() << Q_FUNC_INFO << name()
 
 namespace msc {
 
-static const double ARROW_HEIGHT = 10.0;
-static const double ARROW_WIDTH = 20.0;
-static const double DEFAULT_WIDTH = 80.0;
-
 MessageItem::MessageItem(MscMessage *message, QGraphicsItem *parent)
-    : QGraphicsObject(parent)
+    : InteractiveObject(parent)
     , m_message(message)
-    , m_line(new QGraphicsLineItem(this))
-    , m_leftArrow(new QGraphicsPolygonItem(this))
-    , m_rightArrow(new QGraphicsPolygonItem(this))
-    , m_nameItem(new QGraphicsTextItem(this))
+    , m_arrowItem(new ArrowItem(this))
 {
     Q_ASSERT(m_message != nullptr);
-    m_leftArrow->setBrush(QBrush(Qt::black));
-    QPolygonF polygon;
-    polygon.append(QPointF(0.0, ARROW_HEIGHT / 2.0));
-    polygon.append(QPointF(ARROW_WIDTH, 0.0));
-    polygon.append(QPointF(ARROW_WIDTH, ARROW_HEIGHT));
-    m_leftArrow->setPolygon(polygon);
-
-    m_rightArrow->setBrush(QBrush(Qt::black));
-    polygon.clear();
-    polygon.append(QPointF(0.0, 0.0));
-    polygon.append(QPointF(ARROW_WIDTH, ARROW_HEIGHT / 2.0));
-    polygon.append(QPointF(0.0, ARROW_HEIGHT));
-    m_rightArrow->setPolygon(polygon);
 
     setName(m_message->name());
     connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
 
+    connect(this, &msc::InteractiveObject::resized, this, &msc::MessageItem::updateLayout);
+    connect(this, &msc::InteractiveObject::relocated, this, &msc::MessageItem::updateLayout);
+
+    m_gripPoints->setUsedPoints(
+            GripPoint::GPP_Center
+            | GripPoint::GPP_Left
+            | GripPoint::GPP_Right);
+
+    for (GripPoint *gp : m_gripPoints->gripPoints())
+        gp->setIsAnchor(true);
+
     updateLayout();
-}
 
-QRectF MessageItem::boundingRect() const
-{
-    QRectF rect = childrenBoundingRect();
-    rect.moveTo(pos());
-    return rect;
-}
-
-void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter)
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
+    m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }
 
 void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (sourceInstance == m_sourceInstance) {
+    if (sourceInstance == m_sourceInstance || sourceInstance == m_targetInstance) {
         return;
     }
 
     if (m_sourceInstance) {
-        m_sourceInstance->disconnect(this);
+        m_sourceInstance->unregisterOutgoing(this);
     }
 
     m_sourceInstance = sourceInstance;
     if (m_sourceInstance) {
-        connect(m_sourceInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::updateLayout);
+        m_sourceInstance->registerOutgoing(this);
     }
+
+    m_boundingRect = QRectF();
     updateLayout();
 
     if (m_sourceInstance) {
@@ -99,18 +87,20 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 
 void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (targetInstance == m_targetInstance) {
+    if (targetInstance == m_targetInstance || targetInstance == m_sourceInstance) {
         return;
     }
 
     if (m_targetInstance) {
-        m_targetInstance->disconnect(this);
+        m_targetInstance->unregisterIncoming(this);
     }
 
     m_targetInstance = targetInstance;
     if (m_targetInstance) {
-        connect(m_targetInstance, &InstanceItem::horizontalCenterChanged, this, &MessageItem::updateLayout);
+        m_targetInstance->registerIncoming(this);
     }
+
+    m_boundingRect = QRectF();
     updateLayout();
 
     if (m_targetInstance) {
@@ -122,7 +112,7 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 
 QString MessageItem::name() const
 {
-    return m_nameItem->toPlainText();
+    return m_arrowItem->text();
 }
 
 void MessageItem::updateLayout()
@@ -137,65 +127,151 @@ void MessageItem::updateLayout()
 
 void MessageItem::setName(const QString &name)
 {
-    m_nameItem->setPlainText(name);
+    m_arrowItem->setText(name);
     updateLayout();
     m_message->setName(name);
 }
 
 void MessageItem::buildLayout()
 {
-    double arrowY = m_nameItem->boundingRect().height();
-    m_leftArrow->setY(arrowY);
-    m_rightArrow->setY(arrowY);
+    if (m_boundingRect.isEmpty()) {
+        auto itemCenterLocal = [this](InstanceItem *item) {
+            return item
+                    ? mapFromScene(item->mapToScene(item->boundingRect().center()))
+                    : QPointF();
+        };
+        const QPointF fromC = itemCenterLocal(m_sourceInstance);
+        const QPointF toC = itemCenterLocal(m_targetInstance);
 
-    if (m_sourceInstance && m_targetInstance) {
-        double x1 = m_sourceInstance->horizontalCenter();
-        double x2 = m_targetInstance->horizontalCenter();
-
-        if (x1 > x2) {
-            double tmp = x1;
-            x1 = x2;
-            x2 = tmp;
-            m_leftArrow->setVisible(true);
-            m_rightArrow->setVisible(false);
-        } else {
-            m_leftArrow->setVisible(false);
-            m_rightArrow->setVisible(true);
+        QPointF pntFrom, pntTo;
+        if (m_sourceInstance && m_targetInstance) {
+            const QPointF minShift(qMin(fromC.x(), toC.x()), 0.);
+            pntFrom = fromC - minShift;
+            pntTo = toC - minShift;
+        } else if (m_sourceInstance) {
+            pntFrom = fromC;
+            pntTo = pntFrom - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
+        } else if (m_targetInstance) {
+            pntTo = toC;
+            pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
         }
-        setX(x1);
-        setWidth(x2 - x1);
-    }
-    if (m_sourceInstance && m_targetInstance == nullptr) {
-        setX(m_sourceInstance->horizontalCenter());
-        setWidth(DEFAULT_WIDTH);
-        m_leftArrow->setVisible(false);
-        m_rightArrow->setVisible(true);
-    }
-    if (m_sourceInstance == nullptr && m_targetInstance) {
-        setX(m_targetInstance->horizontalCenter() - DEFAULT_WIDTH);
-        setWidth(DEFAULT_WIDTH);
-        m_leftArrow->setVisible(false);
-        m_rightArrow->setVisible(true);
+
+        m_arrowItem->setPointFrom(pntFrom);
+        m_arrowItem->setPointTo(pntTo);
+
+        prepareGeometryChange();
+        m_boundingRect = m_arrowItem->boundingRect();
+        setPos({ qMin(fromC.x(), toC.x()), y() - m_boundingRect.topLeft().y() });
     }
 
-    centerName();
-
-    prepareGeometryChange();
-    update();
+    m_arrowItem->setFromArrowVisible(m_sourceInstance && m_targetInstance);
 
     m_layoutDirty = false;
+    QMetaObject::invokeMethod(this, "updateGripPoints", Qt::QueuedConnection);
 }
 
-void MessageItem::setWidth(double width)
+void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    m_rightArrow->setX(width - ARROW_WIDTH);
-    double y = m_nameItem->boundingRect().height() + ARROW_HEIGHT / 2.0;
-    m_line->setLine(0.0, y, width, y);
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
 
-void MessageItem::centerName()
+QPainterPath MessageItem::shape() const
 {
-    m_nameItem->setX((m_line->boundingRect().width() - m_nameItem->boundingRect().width()) / 2.0);
+    QPainterPath res;
+    res.addPath(m_arrowItem->shape());
+    return res;
 }
 
-} // namespace mas
+void MessageItem::updateAnchorSource(const QPointF &delta)
+{
+    if (m_sourceInstance) {
+        m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
+
+        if (!m_targetInstance)
+            m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
+
+        prepareGeometryChange();
+        m_boundingRect = m_arrowItem->boundingRect();
+        m_gripPoints->updateLayout();
+    }
+}
+
+void MessageItem::updateAnchorTarget(const QPointF &delta)
+{
+    if (m_targetInstance) {
+        m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
+
+        if (!m_sourceInstance)
+            m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
+
+        prepareGeometryChange();
+        m_boundingRect = m_arrowItem->boundingRect();
+        m_gripPoints->updateLayout();
+    }
+}
+
+void MessageItem::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    if (grip->location() == GripPoint::GPP_Center) {
+        InteractiveObject::handleGripPointMovement(grip, from, to);
+        return;
+    }
+
+    const QPointF fromLocal(m_arrowItem->mapFromScene(from));
+    const QPointF toLocal(m_arrowItem->mapFromScene(to));
+
+    const QLineF sourceLine(fromLocal, m_arrowItem->pointFrom());
+    const QLineF targetLine(fromLocal, m_arrowItem->pointTo());
+
+    const QPointF delta(toLocal - fromLocal);
+
+    InstanceItem *overInstance(nullptr);
+    QList<QGraphicsItem *> hovered(scene() ? scene()->items(to) : QList<QGraphicsItem *>());
+    for (QGraphicsItem *gi : hovered)
+        if (InstanceItem *instance = dynamic_cast<InstanceItem *>(gi))
+            if (instance != m_sourceInstance && instance != m_targetInstance) {
+                overInstance = instance;
+                break;
+            }
+
+    switch (grip->location()) {
+    case GripPoint::GPP_Left: {
+        m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
+        setSourceInstanceItem(overInstance);
+        break;
+    }
+    case GripPoint::GPP_Right: {
+        m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
+        setTargetInstanceItem(overInstance);
+        break;
+    }
+    default:
+        return;
+    }
+
+    m_arrowItem->setFromArrowVisible(m_sourceInstance && m_targetInstance);
+    m_arrowItem->setOrphanFrom(!m_sourceInstance);
+    m_arrowItem->setOrphanTo(!m_targetInstance);
+
+    prepareGeometryChange();
+    m_boundingRect = m_arrowItem->boundingRect();
+    m_gripPoints->updateLayout();
+    updateGripPoints();
+}
+
+void MessageItem::updateGripPoints()
+{
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::GPP_Left)) {
+        gp->setPos(mapFromItem(m_arrowItem, m_arrowItem->pointFrom()));
+    }
+
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::GPP_Right)) {
+        gp->setPos(mapFromItem(m_arrowItem, m_arrowItem->pointTo()));
+    }
+
+    m_gripPoints->updateLayout();
+}
+
+} // namespace msc

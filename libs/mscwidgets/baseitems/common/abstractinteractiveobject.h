@@ -15,28 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
+#pragma once
 
-#include <QGraphicsView>
+class QPointF;
 
 namespace msc {
 
-class GraphicsView : public QGraphicsView
+class GripPoint;
+class AbstractInteractiveObject
 {
-    Q_OBJECT
 public:
-    explicit GraphicsView(QWidget *parent = nullptr);
-
-    void setZoom(double percent);
-
-Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
-
-protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+    virtual ~AbstractInteractiveObject() {}
+    virtual void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
 };
 
-} // namespace msc
-
-#endif // GRAPHICSVIEW_H
+} // ns msc

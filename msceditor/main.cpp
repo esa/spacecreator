@@ -22,6 +22,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName(QObject::tr("MSC Editor"));
     MainWindow w;
     w.show();
 

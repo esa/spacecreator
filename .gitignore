@@ -46,3 +46,6 @@ libs/msclibrary/parser/*.tokens
 
 # QDoc generated files
 doc/html
+
+# Example files to be used locally
+examples/*.local.msc
