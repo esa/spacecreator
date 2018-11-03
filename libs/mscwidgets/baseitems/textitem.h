@@ -12,31 +12,31 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see
+   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
+#pragma once
 
-#include <QGraphicsView>
+#include <QGraphicsTextItem>
 
 namespace msc {
 
-class GraphicsView : public QGraphicsView
+class TextItem : public QGraphicsTextItem
 {
-    Q_OBJECT
 public:
-    explicit GraphicsView(QWidget *parent = nullptr);
+    TextItem(QGraphicsItem *parent = nullptr);
 
-    void setZoom(double percent);
+    QColor backgroundColor() const;
+    void setBackgroundColor(const QColor &color);
 
-Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    Qt::Alignment textAlignment() const;
+    void setTextAllignment(Qt::Alignment alignment);
 
-protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+private:
+    QColor m_bgrColor = Qt::white;
 };
 
-} // namespace msc
-
-#endif // GRAPHICSVIEW_H
+} // ns msc

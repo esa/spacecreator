@@ -17,6 +17,9 @@
 
 #include "graphicsview.h"
 
+#include <QMouseEvent>
+#include <QGraphicsItem>
+
 namespace msc {
 
 /*!
@@ -40,6 +43,20 @@ void GraphicsView::setZoom(double percent)
 {
     resetTransform();
     scale(percent / 100.0, percent / 100.0);
+}
+
+void GraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    const QPoint &screenPos(event->pos());
+    const QPointF &scenePos(mapToScene(screenPos));
+
+    QPointF itemPos(-1, -1);
+    if (QGraphicsItem *item = itemAt(screenPos))
+        itemPos = item->mapFromScene(scenePos);
+
+    Q_EMIT mouseMoved(screenPos, scenePos, itemPos);
+
+    QGraphicsView::mouseMoveEvent(event);
 }
 
 } // namespace msc

@@ -62,3 +62,7 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
+
+CONFIG(debug, debug|release) {
+    DEFINES += DEVELOPER_AUTO_OPEN_MSC=\\\"$${_PRO_FILE_PWD_}/../examples/\\\"
+}

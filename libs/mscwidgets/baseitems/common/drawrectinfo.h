@@ -15,28 +15,44 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
+#pragma once
 
-#include <QGraphicsView>
+#include <QBrush>
+#include <QPen>
 
 namespace msc {
 
-class GraphicsView : public QGraphicsView
+class DrawRectInfo
 {
-    Q_OBJECT
 public:
-    explicit GraphicsView(QWidget *parent = nullptr);
+    DrawRectInfo();
 
-    void setZoom(double percent);
+    DrawRectInfo(const QSizeF &rectSize, qreal borderWidth,
+                 const QColor &borderColor, const QColor &bodyColor);
+    QSizeF rectSize() const;
+    void setRectSize(const QSizeF &sz);
 
-Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    qreal borderWidth() const;
+    void setBorderWidth(qreal w);
 
-protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+    QColor borderColor() const;
+    void setBorderColor(const QColor &color);
+
+    QColor bodyColor() const;
+    void setBodyColor(const QColor &color);
+
+    QPen border() const;
+    QBrush body() const;
+
+private:
+    QSizeF m_rectSize;
+    qreal m_borderWidth;
+    QColor m_borderColor;
+    QColor m_bodyColor;
+    QPen m_border;
+    QBrush m_body;
+
+    void update();
 };
 
-} // namespace msc
-
-#endif // GRAPHICSVIEW_H
+} // ns msc
