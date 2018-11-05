@@ -53,3 +53,6 @@ win32 {
 
 INCLUDEPATH += $$PWD/../msclibrary
 DEPENDPATH += $$PWD/../msclibrary
+
+RESOURCES += \
+    resources.qrc

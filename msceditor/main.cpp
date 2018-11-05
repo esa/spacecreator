@@ -21,6 +21,8 @@
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(resources);
+
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));
     MainWindow w;

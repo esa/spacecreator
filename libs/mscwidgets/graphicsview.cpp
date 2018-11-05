@@ -37,6 +37,7 @@ namespace msc {
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
 {
+    setBackgroundBrush(QImage(":/resources/resources/texture.png"));
 }
 
 void GraphicsView::setZoom(double percent)
