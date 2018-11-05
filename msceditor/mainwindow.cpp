@@ -46,7 +46,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAbout_Qt, &QAction::triggered, QApplication::instance(), &QApplication::aboutQt);
 
     ui->graphicsView->setScene(m_model->graphicsScene());
-    m_model->graphicsScene()->setBackgroundBrush(QBrush(QColor::fromRgbF(.92, .92, .92, 1.), Qt::CrossPattern));
 
     ui->documentTreeView->setModel(m_model->documentItemModel());
     connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
