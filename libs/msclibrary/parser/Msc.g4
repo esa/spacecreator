@@ -68,6 +68,10 @@ tokens {
 
 file : mscDocument | mscDefinition;
 
+textDefinition
+    : ('text' | 'TEXT') STRING SEMI
+    ;
+
 mscDocument
     : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition | instance)* ENDMSCDOCUMENT SEMI definingMscReference*
     ;
@@ -81,10 +85,34 @@ virtuality
     ;
 
 mscDefinition
-    : MSC NAME SEMI instance* ENDMSC SEMI
+    : messageSequenceChart
         |       LANGUAGE NAME SEMI
         |       DATA NAME SEMI
         |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
+    ;
+
+messageSequenceChart
+    : MSC NAME SEMI mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    ;
+
+mscBody
+    : mscStatement* | instanceDeclStatement*
+    ;
+
+mscStatement
+    : textDefinition | eventDefinition
+    ;
+
+eventDefinition
+    : (NAME COLON instanceEventList) // TODO add "| (instanceNameList COLON multiInstanceEventList)"
+    ;
+
+instanceEventList
+    : METHOD instanceEvent* ENDMETHOD
+    ;
+
+instanceDeclStatement
+    : instance
     ;
 
 instance

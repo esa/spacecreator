@@ -42,12 +42,12 @@ public:
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
-    antlrcpp::Any visitMscDefinition(MscParser::MscDefinitionContext *context) override;
+    antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
 
 private:
-    using Messages = QVector<msc::MscMessage*>;
+    using Messages = QVector<msc::MscMessage *>;
     using MessagesList = QVector<Messages>;
 
     void addInstance(MscParser::InstanceContext *context);
