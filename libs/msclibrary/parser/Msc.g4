@@ -109,7 +109,8 @@ eventDefinition
 
 instanceEventList
     : METHOD instanceEvent* ENDMETHOD
-    ;
+    | instanceHeadStatement instanceEvent* instanceEndStatement
+    ; // TODO add suspension, ...
 
 instanceDeclStatement
     : instance
@@ -120,6 +121,14 @@ instance
         |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
         |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
         |       INST NAME (COLON instanceKind)? SEMI
+    ;
+
+instanceHeadStatement
+    : INSTANCE instanceKind decomposition? SEMI
+    ;
+
+instanceEndStatement
+    : ENDINSTANCE SEMI
     ;
 
 instanceKind
@@ -215,6 +224,14 @@ wildcard
 
 variableValue
     : LEFTOPEN NAME RIGHTOPEN
+    ;
+
+decomposition
+    : DECOMPOSED substructureReference
+    ;
+
+substructureReference
+    : AS NAME
     ;
 
 /*Keywords*/
