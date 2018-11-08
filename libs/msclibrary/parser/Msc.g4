@@ -162,7 +162,7 @@ timerStatement
     ;
 
 startTimer
-    : STARTTIMER NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
+    : (STARTTIMER|SET) NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
 duration
@@ -175,7 +175,7 @@ durationLimit
     ;
 
 stopTimer
-    : STOPTIMER NAME (COMMA NAME)?
+    : (STOPTIMER|RESET) NAME (COMMA NAME)?
     ;
 
 timeout
@@ -303,7 +303,9 @@ REFERENCE:'reference'|'REFERENCE';
 RELATED:'related'|'RELATED';
 REPLYIN:'replyin'|'REPLYIN';
 REPLYOUT:'replyout'|'REPLYOUT';
+RESET : 'reset'|'RESET'; // From the old standard - now it's stoptimer
 SEQ:'seq'|'SEQ';
+SET : 'set'|'SET'; // From the old standard - now it's startptimer
 SHARED:'shared'|'SHARED';
 STARTTIMER:'starttimer'|'STARTTIMER';
 STOP:'stop'|'STOP';
