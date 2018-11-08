@@ -11,9 +11,6 @@ HEADERS += \
     graphicsview.h \
     instanceitem.h \
     messageitem.h \
-    graphicsview.h \
-    instanceitem.h \
-    messageitem.h \
     baseitems/arrowitem.h \
     baseitems/textitem.h \
     baseitems/grippointshandler.h \
@@ -23,9 +20,6 @@ HEADERS += \
     baseitems/common/abstractinteractiveobject.h
 
 SOURCES += \
-    graphicsview.cpp \
-    instanceitem.cpp \
-    messageitem.cpp \
     graphicsview.cpp \
     instanceitem.cpp \
     messageitem.cpp \
