@@ -21,34 +21,18 @@
 namespace msc {
 
 MscDocument::MscDocument(QObject *parent)
-    : QObject(parent)
+    : MscElement(parent)
 {
 }
 
 MscDocument::MscDocument(const QString &name, QObject *parent)
-    : QObject(parent)
-    , m_name(name)
+    : MscElement(name, parent)
 {
 }
 
 MscDocument::~MscDocument()
 {
     clear();
-}
-
-const QString &MscDocument::name() const
-{
-    return m_name;
-}
-
-void MscDocument::setName(const QString &name)
-{
-    if (name == m_name) {
-        return;
-    }
-
-    m_name = name;
-    Q_EMIT nameChanged(m_name);
 }
 
 const QVector<MscDocument *> &MscDocument::documents() const
@@ -91,8 +75,6 @@ void MscDocument::addChart(MscChart *chart)
 
 void MscDocument::clear()
 {
-    m_name.clear();
-
     qDeleteAll(m_documents);
     m_documents.clear();
 

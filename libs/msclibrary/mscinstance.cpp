@@ -20,29 +20,13 @@
 namespace msc {
 
 MscInstance::MscInstance(QObject *parent)
-    : QObject(parent)
+    : MscElement(parent)
 {
 }
 
 MscInstance::MscInstance(const QString &name, QObject *parent)
-    : QObject(parent)
-    , m_name(name)
+    : MscElement(name, parent)
 {
-}
-
-const QString &MscInstance::name() const
-{
-    return m_name;
-}
-
-void MscInstance::setName(const QString &name)
-{
-    if (name == m_name) {
-        return;
-    }
-
-    m_name = name;
-    Q_EMIT nameChanged(m_name);
 }
 
 const QString &MscInstance::kind() const

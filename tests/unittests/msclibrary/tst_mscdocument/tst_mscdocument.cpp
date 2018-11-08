@@ -30,7 +30,6 @@ class tst_MscDocument : public QObject
 private Q_SLOTS:
     void init();
     void cleanup();
-    void testName();
     void testAddDocument();
     void DocumentInstance();
     void testNoNullPtrDocument();
@@ -51,15 +50,6 @@ void tst_MscDocument::cleanup()
 {
     delete m_document;
     m_document = nullptr;
-}
-
-void tst_MscDocument::testName()
-{
-    QCOMPARE(m_document->name(), QString("Untitled"));
-
-    const QString chartName("Rosetta");
-    m_document->setName(chartName);
-    QCOMPARE(m_document->name(), chartName);
 }
 
 void tst_MscDocument::testAddDocument()
