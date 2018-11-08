@@ -15,39 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCMESSAGE_H
-#define MSCMESSAGE_H
-
-#include "mscelement.h"
+#ifndef MSCELEMENT_H
+#define MSCELEMENT_H
 
 #include <QObject>
 #include <QString>
 
 namespace msc {
-class MscInstance;
 
-class MscMessage : public MscElement
+class MscElement : public QObject
 {
     Q_OBJECT
 public:
-    explicit MscMessage(QObject *parent = nullptr);
-    MscMessage(const QString &name, QObject *parent = nullptr);
+    explicit MscElement(QObject *parent = nullptr);
+    MscElement(const QString &name, QObject *parent = nullptr);
 
-    MscInstance *sourceInstance() const;
-    void setSourceInstance(MscInstance *source);
-
-    MscInstance *targetInstance() const;
-    void setTargetInstance(MscInstance *target);
+    const QString &name() const;
+    void setName(const QString &name);
 
 Q_SIGNALS:
-    void sourceChanged(MscInstance *source);
-    void targetChanged(MscInstance *target);
+    void nameChanged(const QString &name);
 
 private:
-    MscInstance *m_source = nullptr;
-    MscInstance *m_target = nullptr;
+    QString m_name = tr("Untitled");
 };
 
 } // namespace msc
 
-#endif // MSCMESSAGE_H
+#endif // MSCELEMENT_H

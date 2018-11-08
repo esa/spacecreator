@@ -18,21 +18,20 @@
 #ifndef MSCINSTANCE_H
 #define MSCINSTANCE_H
 
+#include "mscelement.h"
+
 #include <QString>
 #include <QStringList>
 #include <QObject>
 
 namespace msc {
 
-class MscInstance : public QObject
+class MscInstance : public MscElement
 {
     Q_OBJECT
 public:
     explicit MscInstance(QObject *parent = nullptr);
     MscInstance(const QString &name, QObject *parent = nullptr);
-
-    const QString &name() const;
-    void setName(const QString &name);
 
     const QString &kind() const;
     void setKind(const QString &kind);
@@ -41,12 +40,10 @@ public:
     void setInheritance(const QString &inheritance);
 
 Q_SIGNALS:
-    void nameChanged(const QString &name);
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);
 
 private:
-    QString m_name = tr("Untitled");
     QString m_kind;
     QString m_inheritance;
 };
