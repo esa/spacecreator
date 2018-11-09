@@ -57,6 +57,12 @@ build_Windows:
     - x64
   script:
     - 'call scripts\build_windows.bat'
+  cache:
+    key: antlrRuntime
+    policy: pull
+    paths:
+      - 3rdparty/antlr/cpp_runtime/runtime/bin
+      - 3rdparty/antlr/cpp_runtime/runtime/obj
 
 ##################
 # TEST
