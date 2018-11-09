@@ -38,6 +38,7 @@ public:
 public Q_SLOTS:
     void openFile();
     void selectCurrentChart();
+    void openAsn1Editor();
 
 private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);

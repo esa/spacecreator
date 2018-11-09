@@ -88,6 +88,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_Open_file"/>
+   <addaction name="actionAsn1Editor"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -216,6 +217,14 @@
   <action name="action_Open_file">
    <property name="text">
     <string>&amp;Open File ...</string>
+   </property>
+  </action>
+  <action name="actionAsn1Editor">
+   <property name="text">
+    <string>Asn1Editor</string>
+   </property>
+   <property name="toolTip">
+    <string>ASN.1 Editor</string>
    </property>
   </action>
  </widget>

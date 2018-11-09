@@ -3,19 +3,24 @@ TARGET = msceditor
 
 include(../esa.pri)
 
-QT += core gui widgets
+QT += core gui widgets xml
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mainmodel.cpp
+    mainmodel.cpp \
+    asn1editor.cpp \
+    asn1editor/xmlparser.cpp
 
 HEADERS += \
     mainwindow.h \
-    mainmodel.h
+    mainmodel.h \
+    asn1editor.h \
+    asn1editor/xmlparser.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    asn1editor.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -23,10 +28,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 INCLUDEPATH += \
+    $$PWD/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
+VPATH += $$PWD/asn1editor
+
 DEPENDPATH += \
+    $$PWD/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 

@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1editor.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "mainmodel.h"
@@ -44,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->action_Open_file, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionQuit, &QAction::triggered, QApplication::instance(), &QApplication::quit);
     connect(ui->actionAbout_Qt, &QAction::triggered, QApplication::instance(), &QApplication::aboutQt);
+    connect(ui->actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 
     ui->graphicsView->setScene(m_model->graphicsScene());
     m_model->graphicsScene()->setBackgroundBrush(QBrush(QColor::fromRgbF(.92, .92, .92, 1.), Qt::CrossPattern));
@@ -105,6 +107,12 @@ void MainWindow::selectCurrentChart()
         QModelIndex idx = m_model->documentItemModel()->index(chart);
         ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
     }
+}
+
+void MainWindow::openAsn1Editor()
+{
+    Asn1Editor editor;
+    editor.exec();
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
