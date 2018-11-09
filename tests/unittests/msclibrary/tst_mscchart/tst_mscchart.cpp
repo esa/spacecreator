@@ -31,7 +31,6 @@ class tst_MscChart : public QObject
 private Q_SLOTS:
     void init();
     void cleanup();
-    void testName();
     void testAddInstance();
     void testNoDuplicateInstance();
     void testNoNullPtrInstance();
@@ -54,15 +53,6 @@ void tst_MscChart::cleanup()
 {
     delete m_chart;
     m_chart = nullptr;
-}
-
-void tst_MscChart::testName()
-{
-    QCOMPARE(m_chart->name(), QString("Untitled"));
-
-    const QString chartName("Rosetta");
-    m_chart->setName(chartName);
-    QCOMPARE(m_chart->name(), chartName);
 }
 
 void tst_MscChart::testAddInstance()
