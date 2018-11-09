@@ -21,6 +21,7 @@
 
 #include <documentitemmodel.h>
 #include <mscchart.h>
+#include <chartviewmodel.h>
 
 #include <QApplication>
 #include <QComboBox>
@@ -51,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &MainWindow::showSelection);
 
-    connect(m_model, &MainModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+    connect(&(m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
 
     connect(ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
         statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
@@ -98,7 +99,7 @@ bool MainWindow::doOpenFile(const QString &file)
 
 void MainWindow::selectCurrentChart()
 {
-    msc::MscChart *chart = m_model->currentChart();
+    msc::MscChart *chart = m_model->chartViewModel().currentChart();
 
     if (chart != nullptr) {
         QModelIndex idx = m_model->documentItemModel()->index(chart);
@@ -117,7 +118,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     auto chart = dynamic_cast<msc::MscChart *>(obj);
 
     if (chart) {
-        m_model->fillView(chart);
+        m_model->chartViewModel().fillView(chart);
     }
 }
 
