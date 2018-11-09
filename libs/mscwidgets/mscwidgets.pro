@@ -17,7 +17,8 @@ HEADERS += \
     baseitems/grippoint.h \
     baseitems/interactiveobject.h \
     baseitems/common/drawrectinfo.h \
-    baseitems/common/abstractinteractiveobject.h
+    baseitems/common/abstractinteractiveobject.h \
+    chartviewmodel.h
 
 SOURCES += \
     graphicsview.cpp \
@@ -28,7 +29,8 @@ SOURCES += \
     baseitems/grippoint.cpp \
     baseitems/grippointshandler.cpp \
     baseitems/interactiveobject.cpp \
-    baseitems/common/drawrectinfo.cpp
+    baseitems/common/drawrectinfo.cpp \
+    chartviewmodel.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

@@ -15,54 +15,49 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINMODEL_H
-#define MAINMODEL_H
+#ifndef CHARTVIEWMODEL_H
+#define CHARTVIEWMODEL_H
 
 #include <QObject>
-#include <QString>
-#include <QVector>
 
 #include <memory>
 
-namespace msc {
-class ChartViewModel;
-class DocumentItemModel;
-class MscChart;
-class MscDocument;
-
-class InstanceItem;
-}
-
 class QGraphicsScene;
 
-struct MainModelPrivate;
+namespace msc {
+class MscChart;
+class InstanceItem;
 
-class MainModel : public QObject
+struct ChartViewModelPrivate;
+
+class ChartViewModel : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainModel(QObject *parent = nullptr);
-    ~MainModel();
+    explicit ChartViewModel(QObject *parent = nullptr);
+    ~ChartViewModel();
 
     QGraphicsScene *graphicsScene() const;
 
-    msc::DocumentItemModel *documentItemModel() const;
+    msc::MscChart *currentChart() const;
 
-    QStringList errorMessages() const;
-
-    msc::ChartViewModel &chartViewModel() const;
+    void clearScene();
 
 public Q_SLOTS:
-    void showFirstChart();
-    bool loadFile(const QString &filename);
+    void fillView(msc::MscChart *chart);
+
+Q_SIGNALS:
+    void currentChartChagend(msc::MscChart *chart);
+
+private Q_SLOTS:
+    Q_INVOKABLE void layoutItems();
 
 private:
-    msc::MscChart *firstChart() const;
-    msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
-    void clearMscModel();
+    msc::InstanceItem *instanceItem(const QString &name) const;
 
-    std::unique_ptr<MainModelPrivate> const d;
+    std::unique_ptr<ChartViewModelPrivate> const d;
 };
 
-#endif // MAINMODEL_H
+} // namespace msc
+
+#endif // CHARTVIEWMODEL_H

@@ -24,6 +24,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 
+#include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 
@@ -42,12 +43,9 @@ struct MainModelPrivate {
         delete m_documentItemModel;
     }
 
-    msc::MscModel *m_mscModel = nullptr;
+    MscModel *m_mscModel = nullptr;
+    ChartViewModel m_chartModel;
     DocumentItemModel *m_documentItemModel = nullptr;
-    QGraphicsScene m_scene;
-    QVector<msc::InstanceItem *> m_instanceItems;
-    QVector<msc::MessageItem *> m_messageItems;
-    msc::MscChart *m_currentChart = nullptr;
     QStringList m_errorMessages;
 };
 
@@ -59,14 +57,12 @@ MainModel::MainModel(QObject *parent)
 
 MainModel::~MainModel()
 {
-    clearScene();
     clearMscModel();
-    delete d;
 }
 
 QGraphicsScene *MainModel::graphicsScene() const
 {
-    return &(d->m_scene);
+    return d->m_chartModel.graphicsScene();
 }
 
 msc::DocumentItemModel *MainModel::documentItemModel() const
@@ -74,84 +70,19 @@ msc::DocumentItemModel *MainModel::documentItemModel() const
     return d->m_documentItemModel;
 }
 
-MscChart *MainModel::currentChart() const
-{
-    return d->m_currentChart;
-}
-
 QStringList MainModel::errorMessages() const
 {
     return d->m_errorMessages;
 }
 
+ChartViewModel &MainModel::chartViewModel() const
+{
+    return d->m_chartModel;
+}
+
 void MainModel::showFirstChart()
 {
-    fillView(firstChart());
-}
-
-void MainModel::fillView(msc::MscChart *chart)
-{
-    if (chart == d->m_currentChart) {
-        return;
-    }
-
-    d->m_currentChart = chart;
-    clearScene();
-
-    if (d->m_currentChart == nullptr) {
-        Q_EMIT currentChartChagend(d->m_currentChart);
-        return;
-    }
-
-    double x = 100.0;
-    for (MscInstance *instance : d->m_currentChart->instances()) {
-        auto *item = new InstanceItem(instance);
-        item->setKind(instance->kind());
-        item->setX(x);
-        d->m_scene.addItem(item);
-        d->m_instanceItems.append(item);
-        x += 100.0;
-    }
-
-    double y = 50.0;
-    for (MscMessage *message : d->m_currentChart->messages()) {
-        auto *item = new MessageItem(message);
-        item->setY(y);
-
-        if (message->sourceInstance() != nullptr)
-            if (InstanceItem *instItem = instanceItem(message->sourceInstance()->name()))
-                item->setSourceInstanceItem(instItem);
-
-        if (message->targetInstance() != nullptr)
-            if (InstanceItem *instItem = instanceItem(message->targetInstance()->name()))
-                item->setTargetInstanceItem(instItem);
-
-        d->m_scene.addItem(item);
-        d->m_messageItems.append(item);
-        y += 40.0;
-    }
-
-    for (InstanceItem *item : d->m_instanceItems) {
-        item->setAxisHeight(y);
-    }
-
-    Q_EMIT currentChartChagend(d->m_currentChart);
-    QMetaObject::invokeMethod(this, "layoutItems", Qt::QueuedConnection);
-}
-
-void MainModel::layoutItems()
-{
-    qreal x = 0., bottom = 0.;
-    for (InstanceItem *item : d->m_instanceItems) {
-        QRectF bounds = item->boundingRect().translated(item->pos());
-
-        item->setX(item->x() + x);
-        x += bounds.width();
-
-        bounds.moveBottom(bottom);
-        item->setY(bounds.top());
-        bottom = bounds.bottom();
-    }
+    d->m_chartModel.fillView(firstChart());
 }
 
 bool MainModel::loadFile(const QString &filename)
@@ -205,28 +136,9 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
     return nullptr;
 }
 
-InstanceItem *MainModel::instanceItem(const QString &name) const
-{
-    if (!name.isEmpty())
-        for (QGraphicsItem *item : d->m_scene.items()) {
-            if (InstanceItem *instance = dynamic_cast<InstanceItem *>(item)) {
-                if (instance->name() == name) {
-                    return instance;
-                }
-            }
-        }
-    return nullptr;
-}
-
 void MainModel::clearMscModel()
 {
     delete d->m_mscModel;
     d->m_mscModel = nullptr;
-}
-
-void MainModel::clearScene()
-{
-    d->m_scene.clear();
-    d->m_instanceItems.clear();
-    d->m_messageItems.clear();
+    d->m_chartModel.clearScene();
 }
