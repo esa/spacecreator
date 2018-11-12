@@ -17,44 +17,43 @@
 
 #pragma once
 
-#include <QBrush>
-#include <QPen>
+#include <QPointF>
+#include <QPainterPath>
 
 namespace msc {
 
-class DrawRectInfo
+class ArrowSign
 {
 public:
-    DrawRectInfo();
+    static constexpr qreal ARROW_HEIGHT = 10.0;
+    static constexpr qreal ARROW_WIDTH = 20.0;
 
-    DrawRectInfo(const QSizeF &rectSize, qreal borderWidth,
-                 const QColor &borderColor, const QColor &bodyColor);
-    QSizeF rectSize() const;
-    void setRectSize(const QSizeF &sz);
+    ArrowSign();
+    ArrowSign(const ArrowSign &other);
 
-    qreal borderWidth() const;
-    void setBorderWidth(qreal w);
+    QPointF head() const { return m_head; }
+    QPointF top() const { return m_top; }
+    QPointF bottom() const { return m_bottom; }
 
-    QColor borderColor() const;
-    void setBorderColor(const QColor &color);
+    QPainterPath path() const;
+    void pointTo(const QPointF &target);
 
-    QColor bodyColor() const;
-    void setBodyColor(const QColor &color);
-
-    QPen border() const;
-    QBrush body() const;
-
-    bool operator==(const DrawRectInfo &other) const;
+    static ArrowSign createArrowLeft();
+    static ArrowSign createArrowRight();
 
 private:
-    QSizeF m_rectSize;
-    qreal m_borderWidth;
-    QColor m_borderColor;
-    QColor m_bodyColor;
-    QPen m_border;
-    QBrush m_body;
+    enum class Flow
+    {
+        LeftToRight = 0,
+        RightToLeft
+    };
 
-    void update();
+    ArrowSign& operator=(const ArrowSign &) = delete;
+    QPointF m_head, m_top, m_bottom;
+    QPainterPath m_path;
+
+    static ArrowSign createArrow(ArrowSign::Flow direction);
+    void updatePath();
 };
 
 } // ns msc

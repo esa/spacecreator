@@ -37,12 +37,12 @@ struct ChartViewModelPrivate {
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
     msc::MscChart *m_currentChart = nullptr;
+    qreal m_instanceAxisHeight = 0.;
 };
 
 ChartViewModel::ChartViewModel(QObject *parent)
     : QObject(parent)
     , d(new ChartViewModelPrivate)
-
 {
 }
 
@@ -84,56 +84,79 @@ void ChartViewModel::fillView(MscChart *chart)
         return;
     }
 
-    double x = 100.0;
+    static qreal constexpr InterInstanceSpan(100.);
+    double x = .0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
         auto *item = new InstanceItem(instance);
         item->setKind(instance->kind());
         item->setX(x);
+
+        item->buildLayout(); // messages layout calculation is based on
+
         d->m_scene.addItem(item);
         d->m_instanceItems.append(item);
-        x += 100.0;
+
+        x += InterInstanceSpan + item->boundingRect().width();
     }
 
-    double y = 50.0;
+    static qreal constexpr InterMessageSpan(40);
+    d->m_instanceAxisHeight = InterMessageSpan;
     for (MscMessage *message : d->m_currentChart->messages()) {
+        InstanceItem *sourceInstance(nullptr);
+        qreal instanceVertiacalOffset(0);
+        if (message->sourceInstance()) {
+            sourceInstance = instanceItem(message->sourceInstance()->name());
+            instanceVertiacalOffset = sourceInstance->axis().p1().y();
+        }
+        InstanceItem *targetInstance(nullptr);
+        if (message->targetInstance()) {
+            targetInstance = instanceItem(message->targetInstance()->name());
+            if (qFuzzyIsNull(instanceVertiacalOffset))
+                instanceVertiacalOffset = targetInstance->axis().p1().y();
+        }
+
         auto *item = new MessageItem(message);
-        item->setY(y);
-
-        if (message->sourceInstance() != nullptr)
-            if (InstanceItem *instItem = instanceItem(message->sourceInstance()->name()))
-                item->setSourceInstanceItem(instItem);
-
-        if (message->targetInstance() != nullptr)
-            if (InstanceItem *instItem = instanceItem(message->targetInstance()->name()))
-                item->setTargetInstanceItem(instItem);
-
         d->m_scene.addItem(item);
-        d->m_messageItems.append(item);
-        y += 40.0;
-    }
+        const qreal y(d->m_instanceAxisHeight + instanceVertiacalOffset);
+        item->connectObjects(sourceInstance, targetInstance, y);
 
-    for (InstanceItem *item : d->m_instanceItems) {
-        item->setAxisHeight(y);
+        d->m_messageItems.append(item);
+        d->m_instanceAxisHeight += item->boundingRect().height() + InterMessageSpan;
     }
 
     Q_EMIT currentChartChagend(d->m_currentChart);
-    QMetaObject::invokeMethod(this, "layoutItems", Qt::QueuedConnection);
+    layoutItems();
 }
 
 void ChartViewModel::layoutItems()
 {
-    qreal x = 0.;
-    qreal bottom = 0.;
+    qreal x = 0., bottom = 0.;
+
+    // align instances bottoms:
     for (InstanceItem *item : d->m_instanceItems) {
         QRectF bounds = item->boundingRect().translated(item->pos());
 
-        item->setX(item->x() + x);
+        item->setAxisHeight(d->m_instanceAxisHeight);
         x += bounds.width();
 
         bounds.moveBottom(bottom);
         item->setY(bounds.top());
         bottom = bounds.bottom();
     }
+
+    // actualize scene's rect to avoid flickering on first show:
+    QRectF r;
+    for (QGraphicsItem *gi : d->m_scene.items()) {
+        const QRectF itemRect = gi->boundingRect().translated(gi->pos());
+        if (r.isEmpty())
+            r = itemRect;
+        else
+            r = r.united(itemRect);
+    }
+
+    static constexpr qreal margin(50.);
+    r.adjust(-margin, -margin, margin, margin);
+    d->m_scene.setSceneRect(r);
 }
 
 InstanceItem *ChartViewModel::instanceItem(const QString &name) const

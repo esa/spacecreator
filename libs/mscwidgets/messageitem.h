@@ -19,6 +19,7 @@
 #define MESSAGEITEM_H
 
 #include "baseitems/interactiveobject.h"
+#include "baseitems/common/objectanchor.h"
 
 class QGraphicsLineItem;
 class QGraphicsPolygonItem;
@@ -27,42 +28,54 @@ class QGraphicsTextItem;
 namespace msc {
 class InstanceItem;
 class MscMessage;
-class ArrowItem;
+class LabeledArrowItem;
 
 class MessageItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit MessageItem(MscMessage *message, QGraphicsItem *parent = nullptr);
+    explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr,
+                         InstanceItem *target = nullptr, qreal y = 0., QGraphicsItem *parent = nullptr);
 
+    void connectObjects(InstanceItem *source, InstanceItem *target, qreal y);
+
+    void setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance);
     void setSourceInstanceItem(InstanceItem *sourceInstance);
     void setTargetInstanceItem(InstanceItem *targetInstance);
 
     QString name() const;
 
-    void updateAnchorSource(const QPointF &delta);
-    void updateAnchorTarget(const QPointF &delta);
-
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPainterPath shape() const override;
+    QRectF boundingRect() const override;
+
+    void handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
 public Q_SLOTS:
     void updateLayout();
     void setName(const QString &name);
-
-protected:
-    virtual void handleGripPointMovement(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    Q_INVOKABLE void updateGripPoints();
+    void updateGripPoints();
 
 private Q_SLOTS:
-    void buildLayout();
+    void rebuildLayout();
+    void commitGeometryChange();
+
+    void onSourceMoved(const QPointF &from, const QPointF &to);
+    void onTargetMoved(const QPointF &from, const QPointF &to);
 
 private:
     msc::MscMessage *m_message = nullptr;
-    ArrowItem *m_arrowItem = nullptr;
+    LabeledArrowItem *m_arrowItem = nullptr;
     InstanceItem *m_sourceInstance = nullptr;
     InstanceItem *m_targetInstance = nullptr;
     bool m_layoutDirty = false;
+    bool m_connectingObjects = false;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    bool updateSource(const QPointF &to, ObjectAnchor::Snap snap);
+    bool updateTarget(const QPointF &to, ObjectAnchor::Snap snap);
+    bool updateSourceAndTarget(const QPointF &shift);
+    void updateTooltip();
 };
 
 } // namespace mas

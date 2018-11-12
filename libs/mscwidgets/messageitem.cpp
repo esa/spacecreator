@@ -17,8 +17,11 @@
 
 #include "messageitem.h"
 #include "instanceitem.h"
+#include "baseitems/labeledarrowitem.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/grippointshandler.h"
+#include "baseitems/common/utils.h"
+#include "baseitems/common/objectslink.h"
 
 #include <mscmessage.h>
 
@@ -29,85 +32,100 @@
 #include <QPainter>
 #include <QGraphicsScene>
 
-#include <QDebug>
-#define LOG qDebug() << Q_FUNC_INFO << name()
-
 namespace msc {
 
-MessageItem::MessageItem(MscMessage *message, QGraphicsItem *parent)
+MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y, QGraphicsItem *parent)
     : InteractiveObject(parent)
     , m_message(message)
-    , m_arrowItem(new ArrowItem(this))
+    , m_arrowItem(new LabeledArrowItem(this))
 {
     Q_ASSERT(m_message != nullptr);
-
-    setName(m_message->name());
     connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
+    setName(m_message->name());
 
-    connect(this, &msc::InteractiveObject::resized, this, &msc::MessageItem::updateLayout);
-    connect(this, &msc::InteractiveObject::relocated, this, &msc::MessageItem::updateLayout);
+    connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
 
-    m_gripPoints->setUsedPoints(
-            GripPoint::GPP_Center
-            | GripPoint::GPP_Left
-            | GripPoint::GPP_Right);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+
+    m_gripPoints->setUsedPoints( {GripPoint::Location::Center,
+                                  GripPoint::Location::Left,
+                                  GripPoint::Location::Right } );
 
     for (GripPoint *gp : m_gripPoints->gripPoints())
-        gp->setIsAnchor(true);
-
-    updateLayout();
+        gp->setGripType(GripPoint::GripType::Mover);
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
+
+    connectObjects(source, target, y);
+}
+
+void MessageItem::connectObjects(InstanceItem *source, InstanceItem *target, qreal y)
+{
+    m_connectingObjects = true; // ignore position changes in MessageItem::itemChange
+
+    setY(y);
+    if (source || target)
+        setInstances(source, target);
+
+    m_connectingObjects = false;
+}
+
+void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance)
+{
+    m_layoutDirty = true;
+    setSourceInstanceItem(sourceInstance);
+    setTargetInstanceItem(targetInstance);
+    m_layoutDirty = false;
+    rebuildLayout();
 }
 
 void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (sourceInstance == m_sourceInstance || sourceInstance == m_targetInstance) {
+    if (sourceInstance == m_sourceInstance) {
         return;
     }
 
     if (m_sourceInstance) {
-        m_sourceInstance->unregisterOutgoing(this);
+        disconnect(m_sourceInstance, nullptr, this, nullptr);
     }
 
     m_sourceInstance = sourceInstance;
     if (m_sourceInstance) {
-        m_sourceInstance->registerOutgoing(this);
-    }
-
-    m_boundingRect = QRectF();
-    updateLayout();
-
-    if (m_sourceInstance) {
+        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceMoved);
         m_message->setSourceInstance(m_sourceInstance->modelItem());
-    } else {
+    } else
         m_message->setSourceInstance(nullptr);
-    }
+
+    updateTooltip();
 }
 
 void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (targetInstance == m_targetInstance || targetInstance == m_sourceInstance) {
+    if (targetInstance == m_targetInstance) {
         return;
     }
 
     if (m_targetInstance) {
-        m_targetInstance->unregisterIncoming(this);
+        disconnect(m_targetInstance, nullptr, this, nullptr);
     }
 
     m_targetInstance = targetInstance;
     if (m_targetInstance) {
-        m_targetInstance->registerIncoming(this);
-    }
-
-    m_boundingRect = QRectF();
-    updateLayout();
-
-    if (m_targetInstance) {
+        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetMoved);
         m_message->setTargetInstance(m_targetInstance->modelItem());
-    } else {
+    } else
         m_message->setTargetInstance(nullptr);
-    }
+
+    updateTooltip();
+}
+
+void MessageItem::updateTooltip()
+{
+    const QString env(tr("Env"));
+    setToolTip(tr("%1: %2→%3")
+                       .arg(name(),
+                            m_sourceInstance ? m_sourceInstance->name() : env,
+                            m_targetInstance ? m_targetInstance->name() : env));
 }
 
 QString MessageItem::name() const
@@ -122,52 +140,52 @@ void MessageItem::updateLayout()
     }
 
     m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "buildLayout", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "rebuildLayout", Qt::QueuedConnection);
 }
 
 void MessageItem::setName(const QString &name)
 {
-    m_arrowItem->setText(name);
-    updateLayout();
     m_message->setName(name);
+    m_arrowItem->setText(m_message->name());
 }
 
-void MessageItem::buildLayout()
+QRectF MessageItem::boundingRect() const
 {
-    if (m_boundingRect.isEmpty()) {
-        auto itemCenterLocal = [this](InstanceItem *item) {
-            return item
-                    ? mapFromScene(item->mapToScene(item->boundingRect().center()))
-                    : QPointF();
-        };
-        const QPointF fromC = itemCenterLocal(m_sourceInstance);
-        const QPointF toC = itemCenterLocal(m_targetInstance);
+    return m_arrowItem->boundingRect();
+}
 
-        QPointF pntFrom, pntTo;
-        if (m_sourceInstance && m_targetInstance) {
-            const QPointF minShift(qMin(fromC.x(), toC.x()), 0.);
-            pntFrom = fromC - minShift;
-            pntTo = toC - minShift;
-        } else if (m_sourceInstance) {
-            pntFrom = fromC;
-            pntTo = pntFrom - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
-        } else if (m_targetInstance) {
-            pntTo = toC;
-            pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
+void MessageItem::rebuildLayout()
+{
+    auto itemCenterScene = [](InstanceItem *item) {
+        QPointF res;
+        if (item) {
+            const QPointF b = item->boundingRect().center();
+            res = item->mapToScene(b);
         }
 
-        m_arrowItem->setPointFrom(pntFrom);
-        m_arrowItem->setPointTo(pntTo);
+        return res;
+    };
+    const QPointF fromC(itemCenterScene(m_sourceInstance).x(), y());
+    const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
-        prepareGeometryChange();
-        m_boundingRect = m_arrowItem->boundingRect();
-        setPos({ qMin(fromC.x(), toC.x()), y() - m_boundingRect.topLeft().y() });
+    QPointF pntFrom, pntTo;
+    if (m_sourceInstance && m_targetInstance) {
+        pntFrom = fromC;
+        pntTo = toC;
+    } else if (m_sourceInstance) {
+        pntFrom = fromC;
+        pntTo = pntFrom - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
+    } else if (m_targetInstance) {
+        pntTo = toC;
+        pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
     }
 
-    m_arrowItem->setFromArrowVisible(m_sourceInstance && m_targetInstance);
+    const QPointF &linkCenterInScene = m_arrowItem->arrow()->makeArrow(
+            m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+    setPos(linkCenterInScene);
 
     m_layoutDirty = false;
-    QMetaObject::invokeMethod(this, "updateGripPoints", Qt::QueuedConnection);
+    commitGeometryChange();
 }
 
 void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -179,99 +197,158 @@ void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
 QPainterPath MessageItem::shape() const
 {
-    QPainterPath res;
-    res.addPath(m_arrowItem->shape());
-    return res;
+    QPainterPath result;
+    result.addPath(m_arrowItem->shape());
+    return result;
 }
 
-void MessageItem::updateAnchorSource(const QPointF &delta)
+void MessageItem::updateGripPoints()
 {
-    if (m_sourceInstance) {
-        m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
+    m_gripPoints->updateLayout();
 
-        if (!m_targetInstance)
-            m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
+    auto updateEdge = [this](GripPoint *gp, const QPointF &arrowPos) {
+        const QRectF &currentGripPointRect(gp->boundingRect());
+        const QPointF &posInMe(mapFromItem(m_arrowItem, arrowPos));
+        gp->setPos(posInMe - currentGripPointRect.center());
+    };
 
-        prepareGeometryChange();
-        m_boundingRect = m_arrowItem->boundingRect();
-        m_gripPoints->updateLayout();
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Left)) {
+        updateEdge(gp, m_arrowItem->arrowHead());
+    }
+
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Right)) {
+        updateEdge(gp, m_arrowItem->arrowTail());
+    }
+
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Center)) {
+        const QLineF arrowAxis(m_arrowItem->arrowHead(), m_arrowItem->arrowTail());
+        updateEdge(gp, arrowAxis.center());
     }
 }
 
-void MessageItem::updateAnchorTarget(const QPointF &delta)
+QVariant MessageItem::itemChange(GraphicsItemChange change,
+                                 const QVariant &value)
 {
-    if (m_targetInstance) {
-        m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
-
-        if (!m_sourceInstance)
-            m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
-
-        prepareGeometryChange();
-        m_boundingRect = m_arrowItem->boundingRect();
-        m_gripPoints->updateLayout();
+    switch (change) {
+    case ItemPositionHasChanged: {
+        if (!m_connectingObjects) {
+            const QPointF shift(value.toPointF() - m_prevPos);
+            updateSourceAndTarget(shift);
+        }
+        break;
     }
+    default:
+        break;
+    }
+    return InteractiveObject::itemChange(change, value);
 }
 
 void MessageItem::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    if (grip->location() == GripPoint::GPP_Center) {
-        InteractiveObject::handleGripPointMovement(grip, from, to);
+    switch (grip->location()) {
+    case GripPoint::Center: {
+        const QPointF shift(to - from);
+        moveBy(shift.x(), shift.y());
         return;
     }
-
-    const QPointF fromLocal(m_arrowItem->mapFromScene(from));
-    const QPointF toLocal(m_arrowItem->mapFromScene(to));
-
-    const QLineF sourceLine(fromLocal, m_arrowItem->pointFrom());
-    const QLineF targetLine(fromLocal, m_arrowItem->pointTo());
-
-    const QPointF delta(toLocal - fromLocal);
-
-    InstanceItem *overInstance(nullptr);
-    QList<QGraphicsItem *> hovered(scene() ? scene()->items(to) : QList<QGraphicsItem *>());
-    for (QGraphicsItem *gi : hovered)
-        if (InstanceItem *instance = dynamic_cast<InstanceItem *>(gi))
-            if (instance != m_sourceInstance && instance != m_targetInstance) {
-                overInstance = instance;
-                break;
-            }
-
-    switch (grip->location()) {
-    case GripPoint::GPP_Left: {
-        m_arrowItem->setPointFrom(m_arrowItem->pointFrom() + delta);
-        setSourceInstanceItem(overInstance);
+    case GripPoint::Left: {
+        updateSource(to, ObjectAnchor::Snap::SnapTo);
         break;
     }
-    case GripPoint::GPP_Right: {
-        m_arrowItem->setPointTo(m_arrowItem->pointTo() + delta);
-        setTargetInstanceItem(overInstance);
+    case GripPoint::Right: {
+        updateTarget(to, ObjectAnchor::Snap::SnapTo);
         break;
     }
     default:
         return;
     }
+}
 
-    m_arrowItem->setFromArrowVisible(m_sourceInstance && m_targetInstance);
-    m_arrowItem->setOrphanFrom(!m_sourceInstance);
-    m_arrowItem->setOrphanTo(!m_targetInstance);
+bool MessageItem::updateSourceAndTarget(const QPointF &shift)
+{
+    bool res(false);
+    const InstanceItem *prevSource(m_sourceInstance);
+    const InstanceItem *prevTarget(m_targetInstance);
 
+    const QPointF shiftedSource(m_arrowItem->arrow()->anchorPointSource() + shift);
+    res |= updateSource(shiftedSource, ObjectAnchor::Snap::NoSnap);
+    const QPointF shiftedTarget(m_arrowItem->arrow()->anchorPointTarget() + shift);
+    res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::NoSnap);
+
+    // snap to the instance's center:
+    const bool sourceFound(!prevSource && m_sourceInstance);
+    const bool targetFound(!prevTarget && m_targetInstance);
+
+    if (sourceFound) {
+        const QPointF instanceCenter(m_sourceInstance->boundingRect().center());
+        const QPointF instanceCenterScene(m_sourceInstance->mapToScene(instanceCenter));
+        const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
+        updateSource(newAnchor, ObjectAnchor::Snap::SnapTo);
+    }
+    if (targetFound) {
+        const QPointF instanceCenter(m_targetInstance->boundingRect().center());
+        const QPointF instanceCenterScene(m_targetInstance->mapToScene(instanceCenter));
+        const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
+
+        updateTarget(newAnchor, ObjectAnchor::Snap::SnapTo);
+    }
+
+    return res;
+}
+
+bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
+{
+    InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
+
+    setSourceInstanceItem(hoveredInstance);
+    const bool res = m_arrowItem->replaceSource(m_sourceInstance, to, snap);
+
+    commitGeometryChange();
+    return res;
+}
+
+bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
+{
+    InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
+    setTargetInstanceItem(hoveredInstance);
+    const bool res = m_arrowItem->replaceTarget(m_targetInstance, to, snap);
+
+    commitGeometryChange();
+    return res;
+}
+
+void MessageItem::commitGeometryChange()
+{
     prepareGeometryChange();
+    const QRectF prevRect = m_boundingRect;
     m_boundingRect = m_arrowItem->boundingRect();
     m_gripPoints->updateLayout();
     updateGripPoints();
+
+    if (prevRect != m_boundingRect)
+        Q_EMIT resized(prevRect, m_boundingRect);
 }
 
-void MessageItem::updateGripPoints()
+void MessageItem::onSourceMoved(const QPointF &from, const QPointF &to)
 {
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::GPP_Left)) {
-        gp->setPos(mapFromItem(m_arrowItem, m_arrowItem->pointFrom()));
+    const QPointF offset(to - from);
+    if (!m_targetInstance) {
+        moveBy(offset.x(), offset.y());
+        return;
     }
 
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::GPP_Right)) {
-        gp->setPos(mapFromItem(m_arrowItem, m_arrowItem->pointTo()));
+    updateSource(m_arrowItem->arrow()->anchorPointSource() + offset, ObjectAnchor::Snap::NoSnap);
+}
+
+void MessageItem::onTargetMoved(const QPointF &from, const QPointF &to)
+{
+    const QPointF offset(to - from);
+    if (!m_sourceInstance) {
+        moveBy(offset.x(), offset.y());
+        return;
     }
 
-    m_gripPoints->updateLayout();
+    updateTarget(m_arrowItem->arrow()->anchorPointTarget() + offset, ObjectAnchor::Snap::NoSnap);
 }
 
 } // namespace msc

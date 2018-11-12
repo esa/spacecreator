@@ -43,27 +43,20 @@ public:
     QString kind() const;
 
     void setAxisHeight(double height);
+    QLineF axis() const;
 
     void updateLayout();
 
-    void registerIncoming(MessageItem *rxMsg);
-    void unregisterIncoming(MessageItem *rxMsg);
-
-    void registerOutgoing(MessageItem *txMsg);
-    void unregisterOutgoing(MessageItem *txMsg);
-
-    QPainterPath shape() const;
+    QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
 
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
-
-private Q_SLOTS:
     void buildLayout();
+    void rebuildLayout();
 
-    void onRelocated(const QPointF &delta);
     void onResized(const QRectF &from, const QRectF &to);
 
 private:
@@ -73,15 +66,8 @@ private:
     QGraphicsTextItem *m_kindItem = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_endSymbol = nullptr;
-    double m_axisHeight = 150.0;
+    qreal m_axisHeight = 150.0;
     bool m_layoutDirty = false;
-
-    QVector<MessageItem *> m_txMessages, m_rxMessages;
-
-    void rememberMessageItem(MessageItem *msg, QVector<MessageItem *> &container);
-    void forgetMessageItem(MessageItem *msg, QVector<MessageItem *> &container);
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 };
 
 } // namespace msc

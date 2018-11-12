@@ -11,26 +11,40 @@ HEADERS += \
     graphicsview.h \
     instanceitem.h \
     messageitem.h \
+    chartviewmodel.h \
     baseitems/arrowitem.h \
     baseitems/textitem.h \
     baseitems/grippointshandler.h \
     baseitems/grippoint.h \
     baseitems/interactiveobject.h \
+    baseitems/objectslinkitem.h \
+    baseitems/labeledarrowitem.h \
     baseitems/common/drawrectinfo.h \
     baseitems/common/abstractinteractiveobject.h \
-    chartviewmodel.h
+    baseitems/common/arrowsign.h \
+    baseitems/common/utils.h \
+    baseitems/common/objectanchor.h \
+    baseitems/common/objectslink.h \
+    baseitems/common/highlightrectitem.h
 
 SOURCES += \
     graphicsview.cpp \
     instanceitem.cpp \
     messageitem.cpp \
+    chartviewmodel.cpp \
     baseitems/arrowitem.cpp \
     baseitems/textitem.cpp \
     baseitems/grippoint.cpp \
     baseitems/grippointshandler.cpp \
-    baseitems/interactiveobject.cpp \
     baseitems/common/drawrectinfo.cpp \
-    chartviewmodel.cpp
+    baseitems/objectslinkitem.cpp \
+    baseitems/interactiveobject.cpp \
+    baseitems/labeledarrowitem.cpp \
+    baseitems/common/arrowsign.cpp \
+    baseitems/common/utils.cpp \
+    baseitems/common/objectanchor.cpp \
+    baseitems/common/objectslink.cpp \
+    baseitems/common/highlightrectitem.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

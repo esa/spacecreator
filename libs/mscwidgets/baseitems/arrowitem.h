@@ -12,68 +12,52 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see
-   <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
 
-#include <QGraphicsLineItem>
-#include <QGraphicsRectItem>
-#include <QPainterPath>
-
-class QGraphicsTextItem;
+#include "objectslinkitem.h"
+#include "common/arrowsign.h"
+#include "common/objectanchor.h"
 
 namespace msc {
-class ArrowItem : public QGraphicsLineItem
+
+class ArrowItem : public ObjectsLinkItem
 {
+    Q_OBJECT
 public:
-    static constexpr qreal ARROW_HEIGHT = 10.0;
-    static constexpr qreal ARROW_WIDTH = 20.0;
     static constexpr qreal DEFAULT_WIDTH = 100.0;
 
-    ArrowItem(QGraphicsItem *parent = nullptr);
+    ArrowItem(QGraphicsItem *parent);
+    void buildLayout() override;
+    QPainterPath bodyPath() const override;
 
-    void setPointFrom(const QPointF &from);
-    QPointF pointFrom() const;
-
-    void setPointTo(const QPointF &to);
-    QPointF pointTo() const;
-
-    void setFromArrowVisible(bool visible);
-    bool isFromArrowVisible() const { return m_fromShown; }
-    void setToArrowVisible(bool visible);
-    bool isToArrowVisible() const { return m_toShown; }
-
-    void setText(const QString &txt);
-    QString text() const;
-
-    static QPainterPath lineShape(const QLineF &line, qreal span);
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) override;
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
 
-    void setOrphanFrom(bool orphan);
-    bool isOrphanFrom() const;
+    QPointF startSignLocal() const;
+    QPointF endSignLocal() const;
 
-    void setOrphanTo(bool orphan);
-    bool isOrphanTo() const;
+    QPointF makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint,
+                      InteractiveObject *target, const QPointF &targetAnchorPoint);
+
+    void updateLine(const QLineF &to);
+
+    bool updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
+    bool updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 
 protected:
-    QRectF m_boundingRect;
-    QGraphicsTextItem *m_txtItem;
-    QPainterPath m_fromArrow, m_toArrow;
-    bool m_fromShown = false;
-    bool m_toShown = true;
-    bool m_noInstanceFrom = true;
-    bool m_noInstanceTo = true;
-    QColor m_fromColor = Qt::black;
-    QColor m_toColor = Qt::black;
+    PairOf<ArrowSign> m_arrowHeads;
+    QPainterPath m_bodyPath;
 
-    void updateArrows();
-    void updateBounding();
+    void drawStartSign(QPainter *painter) override;
+    void drawEndSign(QPainter *painter) override;
+
+private:
+    QPointF pathPoint(int num) const;
+    bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject,
+                      const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 };
 
 } // ns msc

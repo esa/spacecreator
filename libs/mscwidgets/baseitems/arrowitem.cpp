@@ -12,253 +12,181 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see
-   <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #include "arrowitem.h"
-#include "interactiveobject.h"
-#include "textitem.h"
+#include "common/objectslink.h"
+#include "common/utils.h"
 
 #include <QPainter>
-#include <QGraphicsTextItem>
-
-#include <QDebug>
-#define LOG qDebug() << Q_FUNC_INFO
 
 namespace msc {
 
+/*!
+  \class msc::ArrowItem
+  \brief Arrow pointing to the "end" ObjectAnchor instance.
+
+  \inmodule MscWidgets
+
+*/
+
 ArrowItem::ArrowItem(QGraphicsItem *parent)
-    : QGraphicsLineItem(parent)
-    , m_txtItem(new TextItem(this))
+    : ObjectsLinkItem(parent)
+    , m_arrowHeads({ ArrowSign::createArrowLeft() }, { ArrowSign::createArrowRight()})
 {
 }
 
-void ArrowItem::setPointFrom(const QPointF &from)
+void ArrowItem::drawStartSign(QPainter *painter)
 {
-    QLineF l = line();
-    if (l.p1() != from) {
-        l.setP1(from);
-        setLine(l);
-        updateArrows();
-    }
-}
-
-QPointF ArrowItem::pointFrom() const
-{
-    return line().p1();
-}
-
-void ArrowItem::setPointTo(const QPointF &to)
-{
-    QLineF l = line();
-    if (l.p2() != to) {
-        l.setP2(to);
-        setLine(l);
-        updateArrows();
-    }
-}
-
-QPointF ArrowItem::pointTo() const
-{
-    return line().p2();
-}
-
-void ArrowItem::setFromArrowVisible(bool visible)
-{
-    if (m_fromShown == visible)
+    if (m_bodyPath.isEmpty())
         return;
-
-    m_fromShown = visible;
-    update();
-}
-
-void ArrowItem::setToArrowVisible(bool visible)
-{
-    if (m_toShown == visible)
-        return;
-
-    m_toShown = visible;
-    update();
-}
-
-void ArrowItem::setText(const QString &txt)
-{
-    if (m_txtItem->toPlainText() == txt)
-        return;
-
-    m_txtItem->setPlainText(txt);
-    m_txtItem->adjustSize();
-
-    updateArrows();
-}
-
-QString ArrowItem::text() const
-{
-    return m_txtItem->toPlainText();
-}
-
-QPainterPath ArrowItem::lineShape(const QLineF &line, qreal span)
-{
-    QPainterPath res;
-
-    QLineF normalSpan(line.normalVector());
-    normalSpan.setLength(span);
-
-    const QPointF delta = line.p1() - normalSpan.p2();
-    const QLineF dec(line.translated(delta));
-    const QLineF inc(line.translated(-delta));
-
-    res.moveTo(dec.p1());
-    res.lineTo(dec.p2());
-    res.lineTo(inc.p2());
-    res.lineTo(inc.p1());
-
-    return res;
-}
-
-void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                      QWidget *widget)
-{
-    {
-        // draw thin text frame:
-        painter->save();
-        static const qreal penWidth = 0.5;
-        QPen pen = painter->pen();
-        pen.setWidthF(penWidth);
-        painter->setPen(pen);
-        painter->drawRect(m_txtItem->boundingRect().translated(m_txtItem->pos()).adjusted(penWidth, penWidth, -penWidth, -penWidth));
-        painter->restore();
-    }
 
     painter->save();
-    QPen pen(Qt::black);
-    pen.setWidthF(1.5);
-    QBrush brush(Qt::black);
-    painter->setPen(pen);
-    painter->setBrush(brush);
-    painter->setRenderHint(QPainter::Antialiasing);
 
-    QGraphicsLineItem::paint(painter, option, widget);
+    const QPointF p1(m_bodyPath.elementAt(0));
+    const QPointF p2(m_bodyPath.elementAt(m_bodyPath.elementCount() - 1));
 
-    auto markOrphan = [](QPainter *painter, bool orphan) {
-        QBrush b(painter->brush());
-        QColor color = b.color();
-        color.setAlphaF(orphan ? 0.5 : 1.);
-        b.setColor(color);
-        painter->setBrush(b);
-    };
+    painter->translate(p1.x(), p1.y());
+    painter->rotate(-QLineF(p1, p2).angle());
+    painter->translate(-p1.x(), -p1.y());
 
-    if (m_fromShown) {
-        painter->save();
-
-        markOrphan(painter, m_noInstanceFrom);
-
-        painter->translate(line().p1());
-        painter->rotate(-line().angle());
-        painter->translate(-line().p1());
-
-        painter->drawPath(m_fromArrow);
-        painter->restore();
-    }
-    if (m_toShown) {
-        painter->save();
-
-        markOrphan(painter, m_noInstanceTo);
-
-        painter->translate(line().p2());
-        painter->rotate(-line().angle());
-        painter->translate(-line().p2());
-
-        painter->drawPath(m_toArrow);
-        painter->restore();
-    }
+    ObjectsLinkItem::drawStartSign(painter);
 
     painter->restore();
 }
 
-QPainterPath ArrowItem::shape() const
+void ArrowItem::drawEndSign(QPainter *painter)
 {
-    QPainterPath res;
-    res.addPath(lineShape(line(), InteractiveObject::SPAN));
-    return res;
+    if (m_bodyPath.isEmpty())
+        return;
+
+    painter->save();
+
+    const QPointF p1(m_bodyPath.elementAt(0));
+    const QPointF p2(m_bodyPath.elementAt(m_bodyPath.elementCount() - 1));
+
+    painter->translate(p2.x(), p2.y());
+    painter->rotate(-QLineF(p1, p2).angle());
+    painter->translate(-p2.x(), -p2.y());
+
+    ObjectsLinkItem::drawEndSign(painter);
+
+    painter->restore();
+}
+
+bool ArrowItem::updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+{
+    return updateAnchor(link()->source(), source, anchorPoint, snap);
+}
+
+bool ArrowItem::updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+{
+    return updateAnchor(link()->target(), target, anchorPoint, snap);
+}
+
+bool ArrowItem::updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject,
+                             const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+{
+    // keep silent to avoid rebuilding the layout,
+    // otherwise it will recenter the new line to (0,0)
+    QSignalBlocker anchorLinkSilent(link());
+    QSignalBlocker anchorSilent(anchor);
+
+    const bool updated = anchor->replace(anchorObject, anchorPoint, snap);
+    if (updated) {
+        const QPointF currStartLocal(mapFromScene(link()->source()->point()));
+        const QPointF currEndLolcal(mapFromScene(link()->target()->point()));
+        const QLineF line(currStartLocal, currEndLolcal);
+        updateLine(line);
+    }
+    return updated;
+}
+
+void ArrowItem::buildLayout()
+{
+    const QPointF currStart(link()->source()->point());
+    const QPointF currStartLocal(mapFromScene(currStart));
+    const QPointF currEnd(link()->target()->point());
+    const QPointF currEndLolcal(mapFromScene(currEnd));
+
+    QLineF line(currStartLocal, currEndLolcal);
+    line.translate(-line.center());
+
+    updateLine(line);
+}
+
+void ArrowItem::updateLine(const QLineF &newLine)
+{
+    prepareGeometryChange();
+
+    m_bodyPath = QPainterPath();
+    m_bodyPath.moveTo(newLine.p1());
+    m_bodyPath.lineTo(newLine.p2());
+
+    m_arrowHeads.Source.pointTo(newLine.p1());
+    m_arrowHeads.Target.pointTo(newLine.p2());
+
+    m_symbols.Source = m_arrowHeads.Source.path();
+    m_symbols.Target = m_arrowHeads.Target.path();
+
+    Q_EMIT geometryChanged(boundingRect());
+}
+
+QPainterPath ArrowItem::bodyPath() const
+{
+    return m_bodyPath;
 }
 
 QRectF ArrowItem::boundingRect() const
 {
-    return m_boundingRect;
+    return ArrowItem::shape().boundingRect();
 }
 
-void ArrowItem::updateBounding()
+QPointF ArrowItem::startSignLocal() const
 {
-    const QRectF textRect = m_txtItem->boundingRect().translated(m_txtItem->pos());
-    const QRectF lineRect = QGraphicsLineItem::boundingRect();
-
-    const qreal minHeight = textRect.height() + ARROW_HEIGHT;
-    // NOTE: cast is used here to fix "coverage" build on the CI server:
-    const qreal minWidth = qMax(static_cast<double>(DEFAULT_WIDTH), qMax(lineRect.width(), textRect.width()));
-
-    m_boundingRect = lineRect.united(textRect).translated(pos());
-    m_boundingRect.setWidth(qMax(minWidth, m_boundingRect.width()));
-    m_boundingRect.setHeight(qMax(minHeight, m_boundingRect.height()));
+    return pathPoint(0);
 }
 
-void ArrowItem::updateArrows()
+QPointF ArrowItem::endSignLocal() const
 {
-    auto createArrow = [](const QPointF &hit, bool isLeft) {
-        QPointF pntFrom(hit);
-        QPainterPath arrow;
-        arrow.moveTo(pntFrom);
-        pntFrom.rx() += ARROW_WIDTH * (isLeft ? 1. : -1.);
-        pntFrom.ry() -= ARROW_HEIGHT / 2.;
-        arrow.lineTo(pntFrom);
-        pntFrom.ry() += ARROW_HEIGHT;
-        arrow.lineTo(pntFrom);
-        arrow.closeSubpath();
-        return arrow;
-    };
-
-    const QPointF pntTo(pointTo());
-    m_fromArrow = createArrow(pointFrom(), true);
-    m_toArrow = createArrow(pntTo, false);
-
-    const QRectF lineBounds = QGraphicsLineItem::boundingRect();
-    const QRectF textBounds = m_txtItem->boundingRect().translated(m_txtItem->pos());
-    const QPointF delta = lineBounds.center() - textBounds.center();
-    const bool textAboveLine = lineBounds.height() <= textBounds.height() && lineBounds.width() <= textBounds.width();
-    m_txtItem->moveBy(delta.x(), textAboveLine ? lineBounds.top() - textBounds.bottom() : delta.y());
-
-    prepareGeometryChange();
-    updateBounding();
-    update();
+    return pathPoint(m_bodyPath.elementCount() - 1);
 }
 
-void ArrowItem::setOrphanFrom(bool orphan)
+QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint,
+                             InteractiveObject *target, const QPointF &targetAnchorPoint)
 {
-    if (m_noInstanceFrom == orphan)
-        return;
-
-    m_noInstanceFrom = orphan;
-    update();
+    const QPointF result(link()->makeLink(source, sourceAnchorPoint, target, targetAnchorPoint));
+    rebuildLayout();
+    return result;
 }
 
-bool ArrowItem::isOrphanFrom() const
+QPointF ArrowItem::pathPoint(int num) const
 {
-    return m_noInstanceFrom;
+    return utils::pointFromPath(m_bodyPath, num);
 }
 
-void ArrowItem::setOrphanTo(bool orphan)
+QPainterPath ArrowItem::shape() const
 {
-    if (m_noInstanceTo == orphan)
-        return;
+    QPainterPath result;
 
-    m_noInstanceTo = orphan;
-    update();
-}
+    const int pointsCount = m_bodyPath.elementCount();
+    int point(0);
+    while (point < pointsCount) {
+        const QPointF p1(m_bodyPath.elementAt(point));
+        if (++point < pointsCount) {
+            const QPointF p2(m_bodyPath.elementAt(point));
+            const QLineF line(p1, p2);
+            result.addPath(ObjectsLinkItem::hoverableLine(line));
+        } else {
+            break;
+        }
+    }
 
-bool ArrowItem::isOrphanTo() const
-{
-    return m_noInstanceTo;
+    if (result.isEmpty())
+        result = m_bodyPath;
+
+    return result;
 }
 
 } // ns msc

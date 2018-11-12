@@ -25,30 +25,39 @@
 namespace msc {
 
 class GripPointsHandler;
+class HighlightRectItem;
 class InteractiveObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
     InteractiveObject(QGraphicsItem *parent = nullptr);
 
-    static constexpr qreal SPAN = 10.;
-
     // QGraphicsItem interface
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
 
+    bool isHovered() const;
+
+    void highlightConnected();
+    void highlightDisconnected();
+
 Q_SIGNALS:
     void resized(const QRectF &from, const QRectF &to) const;
-    void relocated(const QPointF &delta);
+    void relocated(const QPointF &from, const QPointF &to) const;
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
     GripPointsHandler *m_gripPoints;
+    HighlightRectItem *m_highlighter;
     QRectF m_boundingRect;
     bool m_hovered = false;
     qreal m_storedZ = 0.;
+    QPointF m_prevPos;
+
+    QVariant itemChange(GraphicsItemChange change,
+                        const QVariant &value) override;
 
     virtual void handleGripPointMovement(GripPoint *gp, const QPointF &from, const QPointF &to);
 

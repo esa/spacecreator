@@ -23,6 +23,14 @@
 
 namespace msc {
 
+/*!
+  \class msc::TextItem
+  \brief Text holder with customizable alignment, background and frame.
+
+  \inmodule MscWidgets
+
+*/
+
 TextItem::TextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
 {
@@ -43,6 +51,33 @@ void TextItem::setBackgroundColor(const QColor &color)
     update();
 }
 
+QColor TextItem::frameColor() const
+{
+    return m_frameColor;
+}
+
+void TextItem::setFrameColor(const QColor &color)
+{
+    if (color == m_frameColor)
+        return;
+
+    m_frameColor = color;
+    update();
+}
+
+qreal TextItem::frameWidth() const
+{
+    return m_frameWidth;
+}
+
+void TextItem::setFrameWidth(qreal w)
+{
+    if (qFuzzyCompare(m_frameWidth, w))
+        return;
+
+    m_frameWidth = w;
+}
+
 Qt::Alignment TextItem::textAlignment() const
 {
     return document()->defaultTextOption().alignment();
@@ -55,10 +90,41 @@ void TextItem::setTextAllignment(Qt::Alignment alignment)
     document()->setDefaultTextOption(txtOpt);
 }
 
+bool TextItem::framed() const
+{
+    return m_showFrame;
+}
+
+void TextItem::setFramed(bool to)
+{
+    if (to == m_showFrame)
+        return;
+
+    m_showFrame = to;
+    update();
+}
+
 void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    painter->save();
+
+    if (framed()) {
+        QPen pen(painter->pen());
+        pen.setWidthF(frameWidth());
+        pen.setColor(frameColor());
+        painter->setPen(pen);
+    }
+
     const qreal shift = painter->pen().widthF();
-    painter->fillRect(boundingRect().adjusted(shift, shift, -shift, -shift), m_bgrColor);
+    const QRectF body = boundingRect().adjusted(shift, shift, -shift, -shift);
+
+    painter->fillRect(body, backgroundColor());
+
+    if (framed())
+        painter->drawRect(body);
+
+    painter->restore();
+
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
