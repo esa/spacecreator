@@ -106,9 +106,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QTreeView" name="treeView"/>
-   </item>
-   <item>
     <widget class="QFrame" name="btnFrame">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>

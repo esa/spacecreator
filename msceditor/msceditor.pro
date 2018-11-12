@@ -10,13 +10,17 @@ SOURCES += \
     mainwindow.cpp \
     mainmodel.cpp \
     asn1editor.cpp \
-    asn1editor/xmlparser.cpp
+    xmlparser.cpp \
+    asn1itemdelegate.cpp \
+    asn1editor/asn1treeview.cpp
 
 HEADERS += \
     mainwindow.h \
     mainmodel.h \
     asn1editor.h \
-    asn1editor/xmlparser.h
+    xmlparser.h \
+    asn1itemdelegate.h \
+    asn1editor/asn1treeview.h
 
 FORMS += \
     mainwindow.ui \
