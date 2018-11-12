@@ -47,6 +47,7 @@ struct MainModelPrivate {
     ChartViewModel m_chartModel;
     DocumentItemModel *m_documentItemModel = nullptr;
     QStringList m_errorMessages;
+    qreal m_instanceAxisHeight = 0.;
 };
 
 MainModel::MainModel(QObject *parent)

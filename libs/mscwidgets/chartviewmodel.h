@@ -50,7 +50,7 @@ Q_SIGNALS:
     void currentChartChagend(msc::MscChart *chart);
 
 private Q_SLOTS:
-    Q_INVOKABLE void layoutItems();
+    void layoutItems();
 
 private:
     msc::InstanceItem *instanceItem(const QString &name) const;

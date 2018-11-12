@@ -30,13 +30,25 @@ public:
     QColor backgroundColor() const;
     void setBackgroundColor(const QColor &color);
 
+    QColor frameColor() const;
+    void setFrameColor(const QColor &color);
+
+    qreal frameWidth() const;
+    void setFrameWidth(qreal w);
+
     Qt::Alignment textAlignment() const;
     void setTextAllignment(Qt::Alignment alignment);
+
+    bool framed() const;
+    void setFramed(bool to);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QColor m_bgrColor = Qt::white;
+    QColor m_frameColor = Qt::black;
+    qreal m_frameWidth = 0.5;
+    bool m_showFrame = false;
 };
 
 } // ns msc

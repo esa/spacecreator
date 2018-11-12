@@ -15,25 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscerrorlistener.h"
+#pragma once
+
+#include <QGraphicsObject>
+
+class QGraphicsRectItem;
 
 namespace msc {
 
-void MscErrorListener::syntaxError(antlr4::Recognizer * /*recognizer*/,
-                                   antlr4::Token * /*offendingSymbol*/,
-                                   size_t line,
-                                   size_t charPositionInLine,
-                                   const std::string &msg,
-                                   std::exception_ptr /*e*/)
+class HighlightRectItem : public QGraphicsObject
 {
-    m_errorMessages.append(QString("line %1:%2 %3").arg(QString::number(line),
-                                                        QString::number(charPositionInLine),
-                                                        QString::fromStdString(msg)));
-}
+    Q_OBJECT
+public:
+    HighlightRectItem(QGraphicsItem *parent);
+    // QGraphicsItem interface
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QRectF boundingRect() const override;
 
-QStringList MscErrorListener::getErrorMessages() const
-{
-    return m_errorMessages;
-}
+    void setRect(const QRectF &rect);
+    void setPen(const QPen &pen);
+    void setBrush(const QBrush &brush);
 
-}
+    void highlight();
+
+private:
+    QGraphicsRectItem *m_rectItem;
+};
+
+} // ns msc

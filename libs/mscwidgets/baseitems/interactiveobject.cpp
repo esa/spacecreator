@@ -18,17 +18,30 @@
 
 #include "interactiveobject.h"
 #include "grippointshandler.h"
+#include "common/highlightrectitem.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QPen>
+#include <QBrush>
 
 namespace msc {
+
+/*!
+  \class msc::InteractiveObject
+  \brief Movable/resizable QGraphicsObject with geometry change notifications.
+
+  \inmodule MscWidgets
+
+*/
 
 InteractiveObject::InteractiveObject(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_gripPoints(new GripPointsHandler(this))
+    , m_highlighter(new HighlightRectItem(this))
+
 {
-    setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+    m_highlighter->setVisible(false);
 
     connect(m_gripPoints, &GripPointsHandler::rectChanged, this,
             &InteractiveObject::gripPointMoved);
@@ -36,6 +49,10 @@ InteractiveObject::InteractiveObject(QGraphicsItem *parent)
     setAcceptHoverEvents(true);
 
     m_gripPoints->setZValue(0);
+
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+
+    setCursor(Qt::ArrowCursor);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -49,6 +66,7 @@ QRectF InteractiveObject::boundingRect() const
 {
     return m_boundingRect;
 }
+
 void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
                                        const QPointF &from, const QPointF &to)
 {
@@ -58,7 +76,6 @@ void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
 
 void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-
     const QRectF sourceBounds = m_boundingRect;
     const qreal minSideAllowed = m_gripPoints->minSize().width();
     QRectF targetBounds(sourceBounds);
@@ -92,17 +109,17 @@ void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &
 
     auto prepareResizeXOrY = [&grip, &prepareResizeX,
                               &prepareResizeY](QRectF &r, const QPointF &d) {
-        const bool isVertical = (grip->location() == GripPoint::GPP_Top || grip->location() == GripPoint::GPP_Bottom);
+        const bool isVertical = (grip->location() == GripPoint::Top || grip->location() == GripPoint::Bottom);
         const bool isHorizontal =
-                !isVertical && (grip->location() == GripPoint::GPP_Right || grip->location() == GripPoint::GPP_Left);
+                !isVertical && (grip->location() == GripPoint::Right || grip->location() == GripPoint::Left);
 
         if (isVertical) {
-            const bool isTop = grip->location() == GripPoint::GPP_Top;
+            const bool isTop = grip->location() == GripPoint::Top;
             return prepareResizeY(r, d, isTop, !isTop);
         }
 
         if (isHorizontal) {
-            const bool isLeft = grip->location() == GripPoint::GPP_Left;
+            const bool isLeft = grip->location() == GripPoint::Left;
             return prepareResizeX(r, d, isLeft, !isLeft);
         }
 
@@ -112,27 +129,27 @@ void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &
     auto justMoveMe = [this](const QPointF &d) { moveBy(d.x(), d.y()); };
 
     auto resizeInSingleDirection = [&grip, &targetBounds, &deltaCorrected, &prepareResizeXOrY, &prepareResizeXAndY]() {
-        if (grip->location() == GripPoint::GPP_Top || grip->location() == GripPoint::GPP_Left)
+        if (grip->location() == GripPoint::Top || grip->location() == GripPoint::Left)
             deltaCorrected *= -1.;
 
-        if (grip->location() == GripPoint::GPP_Top || grip->location() == GripPoint::GPP_Bottom)
+        if (grip->location() == GripPoint::Top || grip->location() == GripPoint::Bottom)
             deltaCorrected.rx() = 0;
-        else if (grip->location() == GripPoint::GPP_Right || grip->location() == GripPoint::GPP_Left)
+        else if (grip->location() == GripPoint::Right || grip->location() == GripPoint::Left)
             deltaCorrected.ry() = 0;
 
-        if (grip->isAnchor())
+        if (grip->isMover())
             targetBounds = prepareResizeXOrY(targetBounds, deltaCorrected);
         else
             targetBounds = prepareResizeXAndY(targetBounds, deltaCorrected);
     };
 
     switch (grip->location()) {
-    case GripPoint::GPP_TopLeft:
-    case GripPoint::GPP_TopRight:
-    case GripPoint::GPP_BottomRight:
-    case GripPoint::GPP_BottomLeft: {
+    case GripPoint::TopLeft:
+    case GripPoint::TopRight:
+    case GripPoint::BottomRight:
+    case GripPoint::BottomLeft: {
 
-        if (grip->isAnchor())
+        if (grip->isMover())
             resizeInSingleDirection();
         else {
             if (qFuzzyIsNull(deltaCorrected.x()))
@@ -140,7 +157,7 @@ void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &
             else
                 deltaCorrected.ry() = deltaCorrected.x();
 
-            if (GripPoint::GPP_BottomLeft == grip->location() || GripPoint::GPP_TopLeft == grip->location())
+            if (GripPoint::BottomLeft == grip->location() || GripPoint::TopLeft == grip->location())
                 deltaCorrected *= -1;
 
             targetBounds = prepareResizeXAndY(targetBounds, deltaCorrected);
@@ -148,16 +165,15 @@ void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &
 
         break;
     }
-    case GripPoint::GPP_Top:
-    case GripPoint::GPP_Right:
-    case GripPoint::GPP_Bottom:
-    case GripPoint::GPP_Left: {
+    case GripPoint::Top:
+    case GripPoint::Right:
+    case GripPoint::Bottom:
+    case GripPoint::Left: {
         resizeInSingleDirection();
         break;
     }
-    case GripPoint::GPP_Center:
+    case GripPoint::Center:
         justMoveMe(delta);
-        Q_EMIT relocated(delta);
         break;
     }
 
@@ -188,6 +204,56 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     setZValue(m_storedZ);
     m_gripPoints->hideAnimated();
     QGraphicsObject::hoverLeaveEvent(event);
+}
+
+QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    switch (change) {
+    case QGraphicsItem::ItemPositionChange:
+        m_prevPos = pos();
+        break;
+    case QGraphicsItem::ItemPositionHasChanged:
+        Q_EMIT relocated(m_prevPos, pos());
+        break;
+    default:
+        break;
+    }
+
+    return QGraphicsObject::itemChange(change, value);
+}
+
+bool InteractiveObject::isHovered() const
+{
+    if (!isUnderMouse())
+        return false;
+
+    return m_gripPoints->isVisible();
+}
+
+void InteractiveObject::highlightConnected()
+{
+    m_highlighter->setRect(m_boundingRect);
+    QColor color(Qt::green);
+    QPen p(color);
+    p.setWidthF(3.);
+    m_highlighter->setPen(p);
+    color.setAlphaF(0.25);
+    m_highlighter->setBrush(color);
+
+    m_highlighter->highlight();
+}
+
+void InteractiveObject::highlightDisconnected()
+{
+    m_highlighter->setRect(m_boundingRect);
+    QColor color(Qt::red);
+    QPen p(color);
+    p.setWidthF(3.);
+    m_highlighter->setPen(p);
+    color.setAlphaF(0.25);
+    m_highlighter->setBrush(color);
+
+    m_highlighter->highlight();
 }
 
 } // namespace msc
