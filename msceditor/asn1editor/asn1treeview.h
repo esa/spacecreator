@@ -18,24 +18,21 @@ public:
     void setAsn1Model(QVariantMap asn1Item, int row = 0);
 
 private Q_SLOTS:
-    void onSeqOf(const QModelIndex &index, QVariant value, QVariant maxRange);
-    void onChoice(const QModelIndex &index, QVariant lenght, QVariant currentIndex);
+    void onSequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange);
+    void onChoiceFieldChanged(const QModelIndex &index, QVariant length, QVariant currentIndex);
 
 private:
     using ItemMap = QMap<QString, QStandardItem*>;
 
-    // hide/show the columns containing the type and constraint
-    void hideExtraColumns(bool hide);
+    ItemMap createModelItems(QVariantMap asn1Item);
 
-    ItemMap addItem(QVariantMap asn1Item);
-
-    void addNumber(QVariantMap asn1Item, ItemMap &itemMap);
-    void addBool(QVariantMap asn1Item, ItemMap &itemMap);
-    void addSequence(QVariantMap asn1Item, ItemMap &itemMap);
-    void addSeqOf(QVariantMap asn1Item, ItemMap &itemMap);
-    void addEnum(QVariantMap asn1Item, ItemMap &itemMap);
-    void addChoice(QVariantMap asn1Item, ItemMap &itemMap);
-    void addString(QVariantMap asn1Item, ItemMap &itemMap);
+    void addNumberItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addBoolItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addSequenceItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addSequenceOfItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addEnumeratedItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addChoiceItem(QVariantMap asn1Item, ItemMap &itemMap);
+    void addStringItem(QVariantMap asn1Item, ItemMap &itemMap);
 
     void addPresentItem(QVariantMap asn1Item, ItemMap &itemMap);
 

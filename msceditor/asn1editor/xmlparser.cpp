@@ -52,14 +52,14 @@ QVariantMap XMLParser::parseAsn1Xml()
     m_fileName = root.attribute("FileName");
 
     QDomNodeList asn1Modules = root.elementsByTagName("Asn1Module");
-    for(int x = 0; x < asn1Modules.size(); ++x) {
+    for (int x = 0; x < asn1Modules.size(); ++x) {
         QDomElement asn1Module = asn1Modules.at(x).toElement();
 
         QString moduleID = asn1Module.attribute("ID");
         QDomNodeList typeAssignments = asn1Module.firstChildElement("TypeAssignments")
                                                  .elementsByTagName("TypeAssignment");
 
-        for(int x = 0; x < typeAssignments.size(); ++x) {
+        for (int x = 0; x < typeAssignments.size(); ++x) {
             QDomElement elem = typeAssignments.at(x).toElement();
 
             result[moduleID + ":" + elem.attribute("Name")] = parseType(elem.firstChildElement("Type"),
@@ -101,7 +101,7 @@ QVariantMap XMLParser::parseType(const QDomElement &type, const QString &name)
         parseSequenceType(typeElem, result);
     }
     else if (typeName == "SequenceOfType") {
-        result["type"]      = "seqof";
+        result["type"]      = "sequenceOf";
         result["min"]       = typeElem.attribute("Min").toInt();
         result["max"]       = typeElem.attribute("Max").toInt();
         result["seqoftype"] = parseType(typeElem.firstChild().toElement());
@@ -137,9 +137,9 @@ void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
     </SequenceOrSetChild>
  </SequenceType>
 */
-    result["children"] = QVariantList();
+    QVariantList children;
 
-    for(QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
+    for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
         QVariantMap childType = parseType(elem.firstChildElement("Type"),
@@ -150,8 +150,10 @@ void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
         childType["alwaysPresent"] = elem.attribute("alwaysPresent") == "True";
         childType["alwaysAbsent"]  = elem.attribute("alwaysAbsent") == "False";
 
-        result["children"].toList().append(childType);
+        children.append(childType);
     }
+
+    result["children"] = children;
 }
 
 void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
@@ -168,15 +170,18 @@ void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result
     // get all EnumValue elements
     QDomNodeList enumValueList = type.firstChildElement().elementsByTagName("EnumValue");
 
-    result["values"]    = QVariantList();
-    result["valuesInt"] = QVariantList();
+    QVariantList values;
+    QVariantList valuesInt;
 
-    for(int x = 0; x < enumValueList.size(); ++x) {
+    for (int x = 0; x < enumValueList.size(); ++x) {
         QDomElement enumValue = enumValueList.at(x).toElement();
 
-        result["values"].toList().append(enumValue.attribute("StringValue"));
-        result["valuesInt"].toList().append(enumValue.attribute("IntValue"));
+        values.append(enumValue.attribute("StringValue"));
+        valuesInt.append(enumValue.attribute("IntValue"));
     }
+
+    result["values"]    = values;
+    result["valuesInt"] = valuesInt;
 }
 
 void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
@@ -194,16 +199,19 @@ void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
 </ChoiceType>
 */
 
-    result["choices"]   = QVariantList();
-    result["choiceIdx"] = QVariantList();
+    QVariantList choices;
+    QVariantList choiceIdx;
 
-    for(QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
+    for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
-        result["choices"].toList().append(parseType(elem.firstChildElement("Type"),
+        choices.append(parseType(elem.firstChildElement("Type"),
                                                     elem.attribute("VarName")));
-        result["choiceIdx"].toList().append(elem.attribute("EnumID"));
+        choiceIdx.append(elem.attribute("EnumID"));
     }
+
+    result["choices"]   = choices;
+    result["choiceIdx"] = choiceIdx;
 }
 
 

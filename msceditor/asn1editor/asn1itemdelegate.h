@@ -20,21 +20,24 @@ class Asn1ItemDelegate : public QStyledItemDelegate
 public:
     Asn1ItemDelegate(QObject *parent = nullptr);
 
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const override;
+
     QWidget *createEditor(QWidget *parent,
                           const QStyleOptionViewItem &option,
                           const QModelIndex &index) const override;
 
-    void setEditorData(QWidget *editor, const QModelIndex &index);
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor,
                       QAbstractItemModel *model,
-                      const QModelIndex &index);
+                      const QModelIndex &index) const override;
 
     void updateEditorGeometry(QWidget *editor,
                               const QStyleOptionViewItem &option,
-                              const QModelIndex &index);
+                              const QModelIndex &index) const override;
  Q_SIGNALS:
-    void seqof(const QModelIndex &index, QVariant value, QVariant maxRange);
-    void choice(const QModelIndex &index, QVariant lenght, QVariant currentIndex);
+    void sequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange);
+    void choiceFieldChanged(const QModelIndex &index, QVariant lenght, QVariant currentIndex);
 
 };
 

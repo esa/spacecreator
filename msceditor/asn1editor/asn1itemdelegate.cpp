@@ -8,6 +8,11 @@ Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent) : QStyledItemDelegate(parent
 {
 }
 
+QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
+{
+    return QSize(100, 25);
+}
+
 QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
                                         const QStyleOptionViewItem &,
                                         const QModelIndex &index) const
@@ -15,7 +20,7 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
     QWidget *editor = nullptr;
     QString asnType = index.data(ASN1TYPE).toString();
 
-    if (asnType == "integer" || asnType == "seqof") {
+    if (asnType == "integer" || asnType == "sequenceOf") {
         editor = new QSpinBox(parent);
         qobject_cast<QSpinBox*>(editor)->setMinimum(index.data(MIN_RANGE).toInt());
         qobject_cast<QSpinBox*>(editor)->setMaximum(index.data(MAX_RANGE).toInt());
@@ -41,11 +46,11 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
     return editor;
 }
 
-void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
+void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QString asnType = index.data(ASN1TYPE).toString();
 
-    if (asnType == "integer" || asnType == "seqof")
+    if (asnType == "integer" || asnType == "sequenceOf")
         qobject_cast<QSpinBox*>(editor)->setValue(index.data().toInt());
     else if (asnType == "enumerated" ||
              asnType == "choice" ||
@@ -59,12 +64,12 @@ void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 
 void Asn1ItemDelegate::setModelData(QWidget *editor,
                                     QAbstractItemModel *model,
-                                    const QModelIndex &index)
+                                    const QModelIndex &index) const
 {
     QString asnType = index.data(ASN1TYPE).toString();
     QVariant value;
 
-    if (asnType == "integer" || asnType == "seqof")
+    if (asnType == "integer" || asnType == "sequenceOf")
         value = qobject_cast<QSpinBox*>(editor)->value();
     else if (asnType == "enumerated" ||
              asnType == "choice" ||
@@ -77,18 +82,20 @@ void Asn1ItemDelegate::setModelData(QWidget *editor,
 
     model->setData(index, value);
 
-    if (asnType == "seqof")
-        Q_EMIT seqof(index.sibling(index.row(), 0), value, index.data(MAX_RANGE));
+    if (asnType == "sequenceOf")
+        const_cast< Asn1ItemDelegate* >(this)->emit sequenceOfSizeChanged(index.sibling(index.row(), 0),
+                                                                          value,
+                                                                          index.data(MAX_RANGE));
 
     if (asnType == "choice")
-        Q_EMIT choice(index.sibling(index.row(), 0),
-                      index.data(CHOICE_LIST).toList().size(),
-                      qobject_cast<QComboBox*>(editor)->currentIndex());
+        const_cast< Asn1ItemDelegate* >(this)->emit choiceFieldChanged(index.sibling(index.row(), 0),
+                                                                       index.data(CHOICE_LIST).toList().size(),
+                                                                       qobject_cast<QComboBox*>(editor)->currentIndex());
 }
 
 void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option,
-                                            const QModelIndex &index)
+                                            const QModelIndex &index) const
 {
     QRect editorRect;
 
