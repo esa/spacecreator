@@ -42,6 +42,7 @@ T *instanceByPos(QGraphicsScene *scene, const QPointF &scenePos)
 }
 
 QPainterPath lineShape(const QLineF &line, qreal span);
+QPointF lineCenter(const QLineF &line);
 QPointF pointFromPath(const QPainterPath &path, int num);
 QPropertyAnimation *createLinearAnimation(QObject *target,
                                           const QString &propName,

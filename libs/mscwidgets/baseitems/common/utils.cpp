@@ -18,6 +18,7 @@
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
 
+#include <QtGlobal>
 #include <QPropertyAnimation>
 
 namespace msc {
@@ -50,11 +51,20 @@ QPainterPath lineShape(const QLineF &line, qreal span)
     return result;
 }
 
+QPointF lineCenter(const QLineF &line)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+    return line.center();
+#else
+    return 0.5 * line.p1() + 0.5 * line.p2();
+#endif
+}
+
 QPointF pointFromPath(const QPainterPath &path, int num)
 {
     QPointF result;
     if (!path.isEmpty()) {
-        num = qBound(0, num, path.elementCount()-1);
+        num = qBound(0, num, path.elementCount() - 1);
         result = path.elementAt(num);
     }
     return result;

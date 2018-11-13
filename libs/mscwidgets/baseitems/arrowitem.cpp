@@ -33,7 +33,7 @@ namespace msc {
 
 ArrowItem::ArrowItem(QGraphicsItem *parent)
     : ObjectsLinkItem(parent)
-    , m_arrowHeads({ ArrowSign::createArrowLeft() }, { ArrowSign::createArrowRight()})
+    , m_arrowHeads({ ArrowSign::createArrowLeft() }, { ArrowSign::createArrowRight() })
 {
 }
 
@@ -111,7 +111,7 @@ void ArrowItem::buildLayout()
     const QPointF currEndLolcal(mapFromScene(currEnd));
 
     QLineF line(currStartLocal, currEndLolcal);
-    line.translate(-line.center());
+    line.translate(-utils::lineCenter(line));
 
     updateLine(line);
 }

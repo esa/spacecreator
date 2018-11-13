@@ -108,7 +108,7 @@ protected Q_SLOTS:
 private:
     bool m_dirty = false;
 
-    template <class T>
+    template<class T>
     void updateDrawingTool(T &existent, const T &requested);
 };
 

@@ -33,7 +33,7 @@ ArrowSign ArrowSign::createArrow(ArrowSign::Flow direction)
     QPointF pntFrom;
     ArrowSign arrow;
     arrow.m_head = pntFrom;
-    if( ArrowSign::Flow::LeftToRight == direction)
+    if (ArrowSign::Flow::LeftToRight == direction)
         pntFrom.rx() += ARROW_WIDTH;
     else
         pntFrom.rx() -= ARROW_WIDTH;

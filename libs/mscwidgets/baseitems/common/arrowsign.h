@@ -42,13 +42,12 @@ public:
     static ArrowSign createArrowRight();
 
 private:
-    enum class Flow
-    {
+    enum class Flow {
         LeftToRight = 0,
         RightToLeft
     };
 
-    ArrowSign& operator=(const ArrowSign &) = delete;
+    ArrowSign &operator=(const ArrowSign &) = delete;
     QPointF m_head, m_top, m_bottom;
     QPainterPath m_path;
 

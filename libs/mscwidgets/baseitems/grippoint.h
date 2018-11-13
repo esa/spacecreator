@@ -49,8 +49,7 @@ public:
     Q_ENUM(Location)
     typedef QSet<GripPoint::Location> Locations;
 
-    enum class GripType
-    {
+    enum class GripType {
         Mover,
         Resizer
     };
