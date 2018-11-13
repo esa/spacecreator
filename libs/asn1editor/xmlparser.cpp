@@ -74,7 +74,7 @@ QVariantMap XMLParser::parseType(const QDomElement &type, const QString &name)
 {
     QVariantMap result;
 
-    result["id"]            = name;
+    result["name"]          = name;
     result["isOptional"]    = false;
     result["alwaysPresent"] = true;
     result["alwaysAbsent"]  = false;

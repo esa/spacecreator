@@ -62,7 +62,7 @@ Asn1TreeView::ItemMap Asn1TreeView::createModelItems(QVariantMap asn1Item)
     ItemMap itemMap;
     QString typeLimit;
 
-    itemMap["item"] = new QStandardItem(asn1Item["id"].toString());
+    itemMap["item"] = new QStandardItem(asn1Item["name"].toString());
     itemMap["item"]->setEditable(false);
 
     if (asn1Item["type"] == "integer" || asn1Item["type"] == "double") {
@@ -192,7 +192,7 @@ void Asn1TreeView::addChoiceItem(QVariantMap asn1Item, Asn1TreeView::ItemMap &it
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
     QList<QStandardItem *> presentItems;
-    QVariantList idList;
+    QVariantList chilsNames;
 
     QStandardItem *parent = itemMap["item"];
 
@@ -206,16 +206,16 @@ void Asn1TreeView::addChoiceItem(QVariantMap asn1Item, Asn1TreeView::ItemMap &it
         valueItems.append(choiceItem["value"]);
         presentItems.append(choiceItem["present"]);
 
-        idList.append(choices[x].toMap()["id"]);
+        chilsNames.append(choices[x].toMap()["name"]);
     }
 
     parent->appendColumn(typeItems);
     parent->appendColumn(valueItems);
     parent->appendColumn(presentItems);
 
-    itemMap["value"] = new QStandardItem(idList[0].toString());
+    itemMap["value"] = new QStandardItem(chilsNames[0].toString());
     itemMap["value"]->setData(asn1Item["type"],      ASN1TYPE);
-    itemMap["value"]->setData(idList,                CHOICE_LIST);
+    itemMap["value"]->setData(chilsNames,            CHOICE_LIST);
     itemMap["value"]->setData(asn1Item["choiceIdx"], INTMAP);
 }
 

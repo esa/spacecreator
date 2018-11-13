@@ -1,4 +1,5 @@
 #include <QComboBox>
+#include <QPainter>
 #include <QSpinBox>
 #include <QTextEdit>
 
@@ -8,9 +9,35 @@ Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent) : QStyledItemDelegate(parent
 {
 }
 
-QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
+void Asn1ItemDelegate::paint(QPainter *painter,
+                             const QStyleOptionViewItem &option,
+                             const QModelIndex &index) const
 {
-    return QSize(100, 25);
+    QStyledItemDelegate::paint(painter, option, index);
+
+    painter->save();
+
+    QPen pen( Qt::lightGray );
+    pen.setStyle( Qt::SolidLine );
+    pen.setWidth( 1 );
+    painter->setPen( pen );
+
+    QRect rc( option.rect );
+    if (index.column() == 0)
+        rc.setLeft(0);
+
+    QLine lines[2] = {
+        QLine( rc.left(), rc.bottom(), rc.right(), rc.bottom() ),
+        QLine( rc.right(), rc.top(), rc.right(), rc.bottom() )
+    };
+
+    painter->drawLines( &lines[0], 2 );
+    painter->restore();
+}
+
+QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    return QStyledItemDelegate::sizeHint( option, index ) + QSize( 3, 3 );
 }
 
 QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,

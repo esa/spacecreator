@@ -20,6 +20,10 @@ class Asn1ItemDelegate : public QStyledItemDelegate
 public:
     Asn1ItemDelegate(QObject *parent = nullptr);
 
+    void paint(QPainter *painter,
+               const QStyleOptionViewItem &option,
+               const QModelIndex &index) const override;
+
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const override;
 

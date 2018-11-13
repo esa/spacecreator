@@ -8,23 +8,14 @@ QT += core gui widgets xml
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mainmodel.cpp \
-    asn1editor.cpp \
-    xmlparser.cpp \
-    asn1itemdelegate.cpp \
-    asn1editor/asn1treeview.cpp
+    mainmodel.cpp
 
 HEADERS += \
     mainwindow.h \
-    mainmodel.h \
-    asn1editor.h \
-    xmlparser.h \
-    asn1itemdelegate.h \
-    asn1editor/asn1treeview.h
+    mainmodel.h 
 
 FORMS += \
-    mainwindow.ui \
-    asn1editor.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -32,14 +23,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 INCLUDEPATH += \
-    $$PWD/asn1editor \
+    $$PWD/../libs/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
-VPATH += $$PWD/asn1editor
 
 DEPENDPATH += \
-    $$PWD/asn1editor \
+    $$PWD/../libs/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
@@ -59,16 +49,20 @@ win32:!win32-g++ {
 
 win32 {
     PRE_TARGETDEPS += \
+        $$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/$${LibPrefix}asn1editor.$$LibSuffix \
         $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
 
+    LIBS += -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
 } else:unix {
     PRE_TARGETDEPS += \
+        $$OUT_PWD/../libs/asn1editor/$${LibPrefix}asn1editor.$$LibSuffix \
         $$OUT_PWD/../libs/mscwidgets/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
 
+    LIBS += -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor
     LIBS += -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
     LIBS += -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary
 }
