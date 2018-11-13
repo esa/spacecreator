@@ -162,7 +162,7 @@ void GripPoint::setGripType(GripPoint::GripType gpType)
     if (m_type == gpType)
         return;
 
-    m_type= gpType;
+    m_type = gpType;
     updateLayout();
 }
 

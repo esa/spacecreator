@@ -17,6 +17,7 @@
 
 #include "objectslink.h"
 #include "baseitems/interactiveobject.h"
+#include "utils.h"
 
 namespace msc {
 
@@ -51,7 +52,7 @@ ObjectAnchor *ObjectsLink::target() const
 
 QPointF ObjectsLink::linkCenter() const
 {
-    return QLineF(m_anchorStart->point(), m_anchorEnd->point()).center();
+    return utils::lineCenter({ m_anchorStart->point(), m_anchorEnd->point() });
 }
 
 QPointF ObjectsLink::makeLink(InteractiveObject *source,
@@ -68,7 +69,7 @@ QPointF ObjectsLink::makeLink(InteractiveObject *source,
     }
 
     // jsut one notification is enough:
-    if(sourceChanged || targetChanged)
+    if (sourceChanged || targetChanged)
         notifyChanged(sourceChanged ? m_anchorStart : m_anchorEnd);
 
     return linkCenter();

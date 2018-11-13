@@ -66,7 +66,7 @@ ObjectsLink *ObjectsLinkItem::link() const
     return m_link;
 }
 
-template <class T>
+template<class T>
 void ObjectsLinkItem::updateDrawingTool(T &existent, const T &requested)
 {
     if (requested == existent)
@@ -75,7 +75,6 @@ void ObjectsLinkItem::updateDrawingTool(T &existent, const T &requested)
     existent = requested;
     update();
 }
-
 
 void ObjectsLinkItem::setBodyBrush(const QBrush &brush)
 {

@@ -28,8 +28,7 @@ class ObjectAnchor : public QObject
 {
     Q_OBJECT
 public:
-    enum class Snap
-    {
+    enum class Snap {
         SnapTo,
         NoSnap
     };
@@ -54,7 +53,7 @@ Q_SIGNALS:
     void anchorChanged(InteractiveObject *object, const QPointF &scenePoint) const;
 
 private:
-    ObjectAnchor& operator=(const ObjectAnchor &other) = delete;
+    ObjectAnchor &operator=(const ObjectAnchor &other) = delete;
 
     InteractiveObject *m_anchorObject = nullptr;
     QPointF m_scenePoint;

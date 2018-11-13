@@ -47,9 +47,9 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
-    m_gripPoints->setUsedPoints( {GripPoint::Location::Center,
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
                                   GripPoint::Location::Left,
-                                  GripPoint::Location::Right } );
+                                  GripPoint::Location::Right });
 
     for (GripPoint *gp : m_gripPoints->gripPoints())
         gp->setGripType(GripPoint::GripType::Mover);
