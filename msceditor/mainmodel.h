@@ -22,7 +22,10 @@
 #include <QString>
 #include <QVector>
 
+#include <memory>
+
 namespace msc {
+class ChartViewModel;
 class DocumentItemModel;
 class MscChart;
 class MscDocument;
@@ -46,28 +49,20 @@ public:
 
     msc::DocumentItemModel *documentItemModel() const;
 
-    msc::MscChart *currentChart() const;
-
     QStringList errorMessages() const;
+
+    msc::ChartViewModel &chartViewModel() const;
 
 public Q_SLOTS:
     void showFirstChart();
-    void fillView(msc::MscChart *chart);
     bool loadFile(const QString &filename);
-
-Q_SIGNALS:
-    void currentChartChagend(msc::MscChart *chart);
 
 private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
-    msc::InstanceItem *instanceItem(const QString &name) const;
     void clearMscModel();
-    void clearScene();
 
-    MainModelPrivate *const d;
-
-    Q_INVOKABLE void layoutItems();
+    std::unique_ptr<MainModelPrivate> const d;
 };
 
 #endif // MAINMODEL_H

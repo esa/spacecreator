@@ -70,26 +70,23 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     return ret;
 }
 
-antlrcpp::Any MscParserVisitor::visitMscDefinition(MscParser::MscDefinitionContext *context)
+antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    if (!context->MSC()) {
-        return visitChildren(context);
-    }
-
     auto chart = new MscChart();
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
         m_currentDocument->addChart(chart);
     }
-    if (context->NAME(0)) {
-        const std::string mscName = context->NAME(0)->getText();
+    if (context->NAME()) {
+        const std::string mscName = context->NAME()->getText();
         chart->setName(QString::fromStdString(mscName));
     }
 
     m_currentChart = chart;
-    for (auto instanceCtx : context->instance()) {
-        addInstance(instanceCtx);
+    // add all instances first, so messages can reference them
+    for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
+        addInstance(instanceDeclCtx->instance());
     }
 
     auto result = visitChildren(context);

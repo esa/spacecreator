@@ -68,6 +68,10 @@ tokens {
 
 file : mscDocument | mscDefinition;
 
+textDefinition
+    : ('text' | 'TEXT') STRING SEMI
+    ;
+
 mscDocument
     : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition | instance)* ENDMSCDOCUMENT SEMI definingMscReference*
     ;
@@ -81,10 +85,35 @@ virtuality
     ;
 
 mscDefinition
-    : MSC NAME SEMI instance* ENDMSC SEMI
+    : messageSequenceChart
         |       LANGUAGE NAME SEMI
         |       DATA NAME SEMI
         |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
+    ;
+
+messageSequenceChart
+    : MSC NAME SEMI mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    ;
+
+mscBody
+    : mscStatement* | instanceDeclStatement*
+    ;
+
+mscStatement
+    : textDefinition | eventDefinition
+    ;
+
+eventDefinition
+    : (NAME COLON instanceEventList) // TODO add "| (instanceNameList COLON multiInstanceEventList)"
+    ;
+
+instanceEventList
+    : METHOD instanceEvent* ENDMETHOD
+    | instanceHeadStatement instanceEvent* instanceEndStatement
+    ; // TODO add suspension, ...
+
+instanceDeclStatement
+    : instance
     ;
 
 instance
@@ -92,6 +121,14 @@ instance
         |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
         |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
         |       INST NAME (COLON instanceKind)? SEMI
+    ;
+
+instanceHeadStatement
+    : INSTANCE instanceKind decomposition? SEMI
+    ;
+
+instanceEndStatement
+    : ENDINSTANCE SEMI
     ;
 
 instanceKind
@@ -125,7 +162,7 @@ timerStatement
     ;
 
 startTimer
-    : STARTTIMER NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
+    : (STARTTIMER|SET) NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
 duration
@@ -138,7 +175,7 @@ durationLimit
     ;
 
 stopTimer
-    : STOPTIMER NAME (COMMA NAME)?
+    : (STOPTIMER|RESET) NAME (COMMA NAME)?
     ;
 
 timeout
@@ -187,6 +224,14 @@ wildcard
 
 variableValue
     : LEFTOPEN NAME RIGHTOPEN
+    ;
+
+decomposition
+    : DECOMPOSED substructureReference
+    ;
+
+substructureReference
+    : AS NAME
     ;
 
 /*Keywords*/
@@ -258,7 +303,9 @@ REFERENCE:'reference'|'REFERENCE';
 RELATED:'related'|'RELATED';
 REPLYIN:'replyin'|'REPLYIN';
 REPLYOUT:'replyout'|'REPLYOUT';
+RESET : 'reset'|'RESET'; // From the old standard - now it's stoptimer
 SEQ:'seq'|'SEQ';
+SET : 'set'|'SET'; // From the old standard - now it's startptimer
 SHARED:'shared'|'SHARED';
 STARTTIMER:'starttimer'|'STARTTIMER';
 STOP:'stop'|'STOP';
@@ -379,6 +426,6 @@ FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
 COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
-COMMENTLOST : NOTE -> skip;
+COMMENTLOST : '/*' .*? '*/' -> skip;
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : '/\r' ->skip; // linebreak

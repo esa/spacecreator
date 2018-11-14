@@ -28,6 +28,14 @@
 
 namespace msc {
 
+/*!
+  \class msc::GripPoint
+  \brief Handler for resizing/moving item by mouse.
+
+  \inmodule MscWidgets
+
+*/
+
 DrawRectInfo GripPoint::m_uiDescr = DrawRectInfo();
 
 void GripPoint::setSideSize(qreal sz)
@@ -70,14 +78,14 @@ QColor GripPoint::bodyColor()
     return m_uiDescr.bodyColor();
 }
 
-GripPoint::GripPoint(Location pos, GripPointsHandler *parent, bool isAnchor)
+GripPoint::GripPoint(Location pos, GripPointsHandler *parent, GripPoint::GripType gpType)
     : QGraphicsItem(parent)
     , m_listener(parent)
-    , m_pos(pos)
-    , m_anchor(isAnchor)
+    , m_location(pos)
+    , m_type(gpType)
     , m_boundRect(QPointF(0., 0.), m_uiDescr.rectSize())
 {
-    setFlags(QGraphicsItem::ItemIsMovable);
+    setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIgnoresTransformations);
     setAcceptHoverEvents(true);
     setVisible(true);
 };
@@ -89,46 +97,46 @@ void GripPoint::updateLayout()
 
         const QRectF targetRect = targetObj->boundingRect();
         QPointF destination;
-        switch (m_pos) {
-        case GPP_TopLeft:
+        switch (m_location) {
+        case TopLeft:
             destination = targetRect.topLeft();
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeFDiagCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeFDiagCursor;
             break;
-        case GPP_Top:
+        case Top:
             destination = { targetRect.center().x(), targetRect.top() };
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeVerCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeVerCursor;
             break;
-        case GPP_TopRight:
+        case TopRight:
             destination = targetRect.topRight();
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeBDiagCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeBDiagCursor;
             break;
-        case GPP_Right:
+        case Right:
             destination = { targetRect.right(), targetRect.center().y() };
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeHorCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeHorCursor;
             break;
-        case GPP_BottomRight:
+        case BottomRight:
             destination = targetRect.bottomRight();
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeFDiagCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeFDiagCursor;
             break;
-        case GPP_Bottom:
+        case Bottom:
             destination = { targetRect.center().x(), targetRect.bottom() };
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeVerCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeVerCursor;
             break;
-        case GPP_BottomLeft:
+        case BottomLeft:
             destination = targetRect.bottomLeft();
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeBDiagCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeBDiagCursor;
             break;
-        case GPP_Left:
+        case Left:
             destination = { targetRect.left(), targetRect.center().y() };
-            c = isAnchor() ? Qt::SizeAllCursor : Qt::SizeHorCursor;
+            c = isMover() ? Qt::SizeAllCursor : Qt::SizeHorCursor;
             break;
-        case GPP_Center:
+        case Center:
             destination = targetRect.center();
             c = Qt::SizeAllCursor;
             break;
         }
 
-        if (!isAnchor() || m_pos == GPP_Center) {
+        if (!isMover() || m_location == Center) {
             prepareGeometryChange();
             m_boundRect.moveCenter(destination);
         }
@@ -144,17 +152,17 @@ QRectF GripPoint::boundingRect() const
     return m_boundRect;
 }
 
-bool GripPoint::isAnchor() const
+bool GripPoint::isMover() const
 {
-    return m_anchor;
+    return m_type == GripPoint::GripType::Mover;
 }
 
-void GripPoint::setIsAnchor(bool is)
+void GripPoint::setGripType(GripPoint::GripType gpType)
 {
-    if (m_anchor == is)
+    if (m_type == gpType)
         return;
 
-    m_anchor = is;
+    m_type = gpType;
     updateLayout();
 }
 

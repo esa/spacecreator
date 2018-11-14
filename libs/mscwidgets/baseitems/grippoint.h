@@ -36,21 +36,26 @@ class GripPoint : public QGraphicsItem
     Q_GADGET
 public:
     enum Location {
-        GPP_Top = 1,
-        GPP_Left = 2,
-        GPP_Bottom = 4,
-        GPP_Right = 8,
-        GPP_Center = 16,
-        GPP_TopLeft = 32,
-        GPP_BottomLeft = 64,
-        GPP_TopRight = 128,
-        GPP_BottomRight = 256,
+        Top,
+        Left,
+        Bottom,
+        Right,
+        Center,
+        TopLeft,
+        BottomLeft,
+        TopRight,
+        BottomRight
     };
     Q_ENUM(Location)
-    Q_DECLARE_FLAGS(Locations, Location)
+    typedef QSet<GripPoint::Location> Locations;
+
+    enum class GripType {
+        Mover,
+        Resizer
+    };
 
     GripPoint(Location pos, GripPointsHandler *parent = nullptr,
-              bool isAnchor = false);
+              GripPoint::GripType gpType = GripPoint::GripType::Resizer);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -68,21 +73,22 @@ public:
     static void setBodyColor(const QColor &color);
     static QColor bodyColor();
 
-    bool isAnchor() const;
-    void setIsAnchor(bool is);
+    GripPoint::GripType gripType() const;
+    void setGripType(GripPoint::GripType gpType);
+    bool isMover() const;
 
     bool isUsed() const;
     void setIsUsed(bool used);
 
-    Location location() const { return m_pos; }
+    Location location() const { return m_location; }
     void updateLayout();
 
 protected:
     static DrawRectInfo m_uiDescr;
 
     AbstractInteractiveObject *const m_listener;
-    Location m_pos;
-    bool m_anchor;
+    Location m_location;
+    GripPoint::GripType m_type;
 
     QRectF m_boundRect;
     QCursor m_cursor;
@@ -92,6 +98,5 @@ protected:
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(GripPoint::Locations)
 
 } // namespace msc

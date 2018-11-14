@@ -44,6 +44,8 @@ public:
     QPen border() const;
     QBrush body() const;
 
+    bool operator==(const DrawRectInfo &other) const;
+
 private:
     QSizeF m_rectSize;
     qreal m_borderWidth;

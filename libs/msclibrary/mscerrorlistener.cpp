@@ -24,11 +24,11 @@ void MscErrorListener::syntaxError(antlr4::Recognizer * /*recognizer*/,
                                    size_t line,
                                    size_t charPositionInLine,
                                    const std::string &msg,
-                                   std::exception_ptr e)
+                                   std::exception_ptr /*e*/)
 {
-    m_errorMessages.append(QString("line %1:%2 %3").arg(line)
-                                                   .arg(charPositionInLine)
-                                                   .arg(QString::fromStdString(msg)));
+    m_errorMessages.append(QString("line %1:%2 %3").arg(QString::number(line),
+                                                        QString::number(charPositionInLine),
+                                                        QString::fromStdString(msg)));
 }
 
 QStringList MscErrorListener::getErrorMessages() const

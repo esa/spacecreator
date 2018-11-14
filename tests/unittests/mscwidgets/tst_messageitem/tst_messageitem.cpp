@@ -40,7 +40,7 @@ private:
 void tst_MessageItem::init()
 {
     m_message = new MscMessage("Event1");
-    m_messageItem = new MessageItem(m_message);
+    m_messageItem = new MessageItem(m_message, nullptr, nullptr, 0.);
 }
 
 void tst_MessageItem::cleanup()

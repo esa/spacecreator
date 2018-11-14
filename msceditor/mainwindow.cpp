@@ -22,6 +22,7 @@
 
 #include <documentitemmodel.h>
 #include <mscchart.h>
+#include <chartviewmodel.h>
 
 #include <QApplication>
 #include <QComboBox>
@@ -48,13 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 
     ui->graphicsView->setScene(m_model->graphicsScene());
-    m_model->graphicsScene()->setBackgroundBrush(QBrush(QColor::fromRgbF(.92, .92, .92, 1.), Qt::CrossPattern));
 
     ui->documentTreeView->setModel(m_model->documentItemModel());
     connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &MainWindow::showSelection);
 
-    connect(m_model, &MainModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+    connect(&(m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
 
     connect(ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
         statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->show();
 
 #ifdef DEVELOPER_AUTO_OPEN_MSC
-    doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("example02.msc"));
+    doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("dengof.sample2.local.msc"));
 #endif //DEVELOPER_AUTO_OPEN_MSC
 }
 
@@ -85,23 +85,30 @@ void MainWindow::openFile()
 
 bool MainWindow::doOpenFile(const QString &file)
 {
-    if (file.isEmpty() || !QFileInfo::exists(file))
+    ui->errorTextEdit->setPlainText(tr("Opening file: %1").arg(file));
+
+    if (file.isEmpty() || !QFileInfo::exists(file)) {
+        ui->errorTextEdit->appendPlainText(tr("Invalid file name."));
         return false;
+    }
 
     const bool ok = m_model->loadFile(file);
     if (ok) {
         static const QString title = tr("%1 [%2]");
         setWindowTitle(title.arg(qApp->applicationName()).arg(file));
         ui->documentTreeView->expandAll();
+        ui->graphicsView->centerOn(ui->graphicsView->mapFromScene(ui->graphicsView->scene()->sceneRect().topLeft()));
     }
-    ui->errorTextEdit->setPlainText(m_model->errorMessages().join("\n"));
+
+    ui->errorTextEdit->appendPlainText(m_model->errorMessages().join("\n"));
+    ui->errorTextEdit->appendPlainText(tr("Model loading: %1").arg(ok ? tr("success") : tr("failed")));
 
     return ok;
 }
 
 void MainWindow::selectCurrentChart()
 {
-    msc::MscChart *chart = m_model->currentChart();
+    msc::MscChart *chart = m_model->chartViewModel().currentChart();
 
     if (chart != nullptr) {
         QModelIndex idx = m_model->documentItemModel()->index(chart);
@@ -126,7 +133,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     auto chart = dynamic_cast<msc::MscChart *>(obj);
 
     if (chart) {
-        m_model->fillView(chart);
+        m_model->chartViewModel().fillView(chart);
     }
 }
 
@@ -142,6 +149,7 @@ void MainWindow::setupUi()
     zoomBox->addItem(" 50 %");
     zoomBox->addItem("100 %");
     zoomBox->addItem("200 %");
+    zoomBox->addItem("400 %");
     zoomBox->setCurrentIndex(1);
     connect(zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
         double percent = 100.0;
@@ -150,6 +158,9 @@ void MainWindow::setupUi()
         }
         if (index == 2) {
             percent = 200.0;
+        }
+        if (index == 3) {
+            percent = 400.0;
         }
         ui->graphicsView->setZoom(percent);
     });

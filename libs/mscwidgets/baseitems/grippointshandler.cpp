@@ -17,36 +17,42 @@
 */
 
 #include "grippointshandler.h"
+#include "common/utils.h"
 
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QMetaEnum>
 
-#include <QDebug>
-#define LOG qDebug() << Q_FUNC_INFO
-
 namespace msc {
+
+/*!
+  \class msc::GripPointsHandler
+  \brief Set of handlers (up to 9) for resizing/moving item by mouse.
+
+  \inmodule MscWidgets
+
+*/
 
 const QMap<GripPoint::Location, GripPoint *> createGripPoints(GripPointsHandler *parent)
 {
-    QMap<GripPoint::Location, GripPoint *> res;
+    QMap<GripPoint::Location, GripPoint *> result;
 
     const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i)
-        res.insert(GripPoint::Location(e.value(i)), new GripPoint(GripPoint::Location(e.value(i)), parent));
+        result.insert(GripPoint::Location(e.value(i)), new GripPoint(GripPoint::Location(e.value(i)), parent));
 
-    return res;
+    return result;
 }
 
 GripPoint::Locations initUsedPoints()
 {
-    GripPoint::Locations res;
+    GripPoint::Locations result;
 
     const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i)
-        res = res.setFlag(GripPoint::Location(e.value(i)));
+        result.insert(GripPoint::Location(e.value(i)));
 
-    return res;
+    return result;
 }
 
 GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
@@ -86,8 +92,10 @@ GripPoint *GripPointsHandler::gripPoint(GripPoint::Location pnt) const
 void GripPointsHandler::updateLayout()
 {
     for (GripPoint *gp : m_gripPoints) {
-        gp->setIsUsed(m_usedPoints.testFlag(gp->location()));
-        gp->updateLayout();
+        const bool used = m_usedPoints.contains(gp->location());
+        gp->setIsUsed(used);
+        if (used)
+            gp->updateLayout();
     }
 
     const QRectF &bounds = boundingRect();
@@ -149,22 +157,6 @@ void GripPointsHandler::hideAnimated()
     changeVisibilityAnimated(false);
 }
 
-QPropertyAnimation *createLinearAnimation(QObject *target,
-                                          const QString &propName,
-                                          const QVariant &from,
-                                          const QVariant &to,
-                                          const int durationMs)
-{
-    QPropertyAnimation *anim = new QPropertyAnimation(target, propName.toUtf8());
-    anim->setDuration(durationMs);
-    anim->setEasingCurve(QEasingCurve::Linear);
-
-    anim->setStartValue(from);
-    anim->setEndValue(to);
-
-    return anim;
-}
-
 void GripPointsHandler::onVisibilityFinished()
 {
     if (!m_visible)
@@ -180,7 +172,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     setVisible(true);
 
     if (QPropertyAnimation *anim =
-                createLinearAnimation(this, "opacity", from, to, duration)) {
+                utils::createLinearAnimation(this, "opacity", from, to, duration)) {
         if (m_visible)
             connect(anim, &QPropertyAnimation::finished, this,
                     &GripPointsHandler::onVisibilityFinished);

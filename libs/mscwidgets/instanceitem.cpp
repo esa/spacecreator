@@ -18,9 +18,10 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "baseitems/textitem.h"
-#include "baseitems/arrowitem.h"
+#include "baseitems/objectslinkitem.h"
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
+#include "baseitems/common/utils.h"
 
 #include <mscinstance.h>
 
@@ -32,9 +33,6 @@
 #include <QPainter>
 #include <QApplication>
 #include <QTextDocument>
-
-#include <QDebug>
-#define LOG qDebug() << Q_FUNC_INFO
 
 namespace msc {
 
@@ -101,7 +99,12 @@ void InstanceItem::setAxisHeight(double height)
         return;
     }
     m_axisHeight = height;
-    updateLayout();
+    rebuildLayout();
+}
+
+QLineF InstanceItem::axis() const
+{
+    return m_axisSymbol->line().translated(pos());
 }
 
 void InstanceItem::updateLayout()
@@ -136,18 +139,10 @@ void InstanceItem::setKind(const QString &kind)
     updateLayout();
 }
 
-QVariant InstanceItem::itemChange(GraphicsItemChange change, const QVariant &value)
+void InstanceItem::rebuildLayout()
 {
-    switch (change) {
-    case QGraphicsItem::ItemPositionChange: {
-        onRelocated(value.toPointF() - pos());
-        break;
-    }
-    default:
-        break;
-    }
-
-    return InteractiveObject::itemChange(change, value);
+    m_boundingRect = QRectF();
+    buildLayout();
 }
 
 void InstanceItem::buildLayout()
@@ -188,74 +183,29 @@ void InstanceItem::buildLayout()
     m_axisSymbol->setLine(QLineF(p1, p2));
 
     for (QGraphicsItem *ci : childItems())
-        if (QGraphicsTextItem *ti = dynamic_cast<QGraphicsTextItem *>(ci))
+        if (QGraphicsTextItem *ti = dynamic_cast<QGraphicsTextItem *>(ci)) {
             ti->setTextWidth(m_boundingRect.width());
+        }
 
     m_layoutDirty = false;
-}
-
-void InstanceItem::rememberMessageItem(MessageItem *msg, QVector<MessageItem *> &container)
-{
-    if (!msg || container.contains(msg))
-        return;
-
-    container.append(msg);
-}
-
-void InstanceItem::forgetMessageItem(MessageItem *msg, QVector<MessageItem *> &container)
-{
-    if (!msg)
-        return;
-    container.removeAll(msg);
-}
-
-void InstanceItem::registerIncoming(MessageItem *rxMsg)
-{
-    rememberMessageItem(rxMsg, m_rxMessages);
-}
-
-void InstanceItem::unregisterIncoming(MessageItem *rxMsg)
-{
-    forgetMessageItem(rxMsg, m_rxMessages);
-}
-
-void InstanceItem::registerOutgoing(MessageItem *txMsg)
-{
-    rememberMessageItem(txMsg, m_txMessages);
-}
-
-void InstanceItem::unregisterOutgoing(MessageItem *txMsg)
-{
-    forgetMessageItem(txMsg, m_txMessages);
-}
-
-void InstanceItem::onRelocated(const QPointF &delta)
-{
-    for (MessageItem *msg : m_txMessages)
-        msg->updateAnchorSource(delta);
-
-    for (MessageItem *msg : m_rxMessages)
-        msg->updateAnchorTarget(delta);
 }
 
 void InstanceItem::onResized(const QRectF &from, const QRectF &to)
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
-    // TODO: move arrows of appropriate incoming/outgoing messages, if necessary
-
     updateLayout();
 }
 
 QPainterPath InstanceItem::shape() const
 {
-    QPainterPath res;
-    res.addRect(m_headSymbol->boundingRect());
-    res.addRect(m_nameItem->boundingRect());
-    res.addRect(m_kindItem->boundingRect());
-    res.addRect(m_endSymbol->boundingRect());
-    res.addPath(ArrowItem::lineShape(m_axisSymbol->line(), InteractiveObject::SPAN));
-    return res;
+    QPainterPath result;
+    result.addRect(m_headSymbol->boundingRect());
+    result.addRect(m_nameItem->boundingRect());
+    result.addRect(m_kindItem->boundingRect());
+    result.addRect(m_endSymbol->boundingRect());
+    result.addPath(ObjectsLinkItem::hoverableLine(m_axisSymbol->line()));
+    return result;
 }
 
 } // namespace msc

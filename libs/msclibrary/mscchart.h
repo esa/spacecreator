@@ -18,6 +18,8 @@
 #ifndef MSCCHART_H
 #define MSCCHART_H
 
+#include "mscelement.h"
+
 #include <QObject>
 #include <QString>
 #include <QVector>
@@ -27,16 +29,13 @@ class MscDocument;
 class MscInstance;
 class MscMessage;
 
-class MscChart : public QObject
+class MscChart : public MscElement
 {
     Q_OBJECT
 public:
     explicit MscChart(QObject *parent = nullptr);
     MscChart(const QString &name, QObject *parent = nullptr);
     ~MscChart();
-
-    const QString &name() const;
-    void setName(const QString &name);
 
     const QVector<MscInstance *> &instances() const;
     void addInstance(MscInstance *instance);
@@ -51,12 +50,10 @@ public:
     MscDocument *parentDocument() const;
 
 Q_SIGNALS:
-    void nameChanged(const QString &name);
     void instanceAdded(MscInstance *instance);
     void messageAdded(MscMessage *message);
 
 private:
-    QString m_name = tr("Untitled");
     QVector<MscInstance *> m_instances;
     QVector<MscMessage *> m_messages;
 };
