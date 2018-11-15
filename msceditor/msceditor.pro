@@ -33,6 +33,7 @@ DEPENDPATH += \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
+
 BuildType = Release
 CONFIG(debug, debug|release) {
     BuildType = Debug
@@ -53,18 +54,20 @@ win32 {
         $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
 
-    LIBS += -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor
-    LIBS += -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets
-    LIBS += -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
+    LIBS += \
+        -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor
+        -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets \
+        -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
 } else:unix {
     PRE_TARGETDEPS += \
         $$OUT_PWD/../libs/asn1editor/$${LibPrefix}asn1editor.$$LibSuffix \
         $$OUT_PWD/../libs/mscwidgets/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
 
-    LIBS += -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor
-    LIBS += -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
-    LIBS += -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary
+    LIBS += \
+        -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor
+        -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary \
+        -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
 }
 
 # Add ANTLR runtime

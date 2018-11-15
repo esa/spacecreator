@@ -49,19 +49,26 @@ public:
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
 
-    void handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    QPointF head() const;
+    void setHead(const QPointF &head);
+    QPointF tail() const;
+    void setTail(const QPointF &tail);
 
 public Q_SLOTS:
     void updateLayout();
     void setName(const QString &name);
     void updateGripPoints();
 
+protected:
+    void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+
 private Q_SLOTS:
     void rebuildLayout();
     void commitGeometryChange();
 
-    void onSourceMoved(const QPointF &from, const QPointF &to);
-    void onTargetMoved(const QPointF &from, const QPointF &to);
+    void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
+    void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
 
 private:
     msc::MscMessage *m_message = nullptr;

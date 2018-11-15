@@ -1,14 +1,17 @@
 #!/bin/sh
 
-# Package "uuid-dev" needs to be installed
+# Requirements
+# Package "uuid-dev"
+# Ninja build tool
+# cmake
 
 echo "Building ANTLR C++ runtime"
 
 cd 3rdparty/antlr
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TIME=Release ../cpp_runtime
-make -j8
+cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ../cpp_runtime
+ninja antlr4_static
 cd ..
 rm -rf build
 

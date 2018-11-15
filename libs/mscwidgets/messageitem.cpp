@@ -22,6 +22,7 @@
 #include "baseitems/grippointshandler.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/common/objectslink.h"
+#include "commands/common/commandsstack.h"
 
 #include <mscmessage.h>
 
@@ -31,6 +32,7 @@
 #include <QPolygonF>
 #include <QPainter>
 #include <QGraphicsScene>
+#include <QDebug>
 
 namespace msc {
 
@@ -50,9 +52,6 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
                                   GripPoint::Location::Left,
                                   GripPoint::Location::Right });
-
-    for (GripPoint *gp : m_gripPoints->gripPoints())
-        gp->setGripType(GripPoint::GripType::Mover);
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 
@@ -91,7 +90,7 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 
     m_sourceInstance = sourceInstance;
     if (m_sourceInstance) {
-        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceMoved);
+        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved);
         m_message->setSourceInstance(m_sourceInstance->modelItem());
     } else
         m_message->setSourceInstance(nullptr);
@@ -111,7 +110,7 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 
     m_targetInstance = targetInstance;
     if (m_targetInstance) {
-        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetMoved);
+        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved);
         m_message->setTargetInstance(m_targetInstance->modelItem());
     } else
         m_message->setTargetInstance(nullptr);
@@ -213,16 +212,16 @@ void MessageItem::updateGripPoints()
     };
 
     if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Left)) {
-        updateEdge(gp, m_arrowItem->arrowHead());
+        updateEdge(gp, m_arrowItem->startSignPos());
     }
 
     if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Right)) {
-        updateEdge(gp, m_arrowItem->arrowTail());
+        updateEdge(gp, m_arrowItem->endSignPos());
     }
 
     if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Center)) {
-        const QLineF arrowAxis(m_arrowItem->arrowHead(), m_arrowItem->arrowTail());
-        updateEdge(gp, arrowAxis.center());
+        const QLineF arrowAxis(m_arrowItem->startSignPos(), m_arrowItem->endSignPos());
+        updateEdge(gp, utils::lineCenter(arrowAxis));
     }
 }
 
@@ -241,27 +240,6 @@ QVariant MessageItem::itemChange(GraphicsItemChange change,
         break;
     }
     return InteractiveObject::itemChange(change, value);
-}
-
-void MessageItem::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    switch (grip->location()) {
-    case GripPoint::Center: {
-        const QPointF shift(to - from);
-        moveBy(shift.x(), shift.y());
-        return;
-    }
-    case GripPoint::Left: {
-        updateSource(to, ObjectAnchor::Snap::SnapTo);
-        break;
-    }
-    case GripPoint::Right: {
-        updateTarget(to, ObjectAnchor::Snap::SnapTo);
-        break;
-    }
-    default:
-        return;
-    }
 }
 
 bool MessageItem::updateSourceAndTarget(const QPointF &shift)
@@ -320,16 +298,12 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
 void MessageItem::commitGeometryChange()
 {
     prepareGeometryChange();
-    const QRectF prevRect = m_boundingRect;
     m_boundingRect = m_arrowItem->boundingRect();
     m_gripPoints->updateLayout();
     updateGripPoints();
-
-    if (prevRect != m_boundingRect)
-        Q_EMIT resized(prevRect, m_boundingRect);
 }
 
-void MessageItem::onSourceMoved(const QPointF &from, const QPointF &to)
+void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
     if (!m_targetInstance) {
@@ -340,7 +314,7 @@ void MessageItem::onSourceMoved(const QPointF &from, const QPointF &to)
     updateSource(m_arrowItem->arrow()->anchorPointSource() + offset, ObjectAnchor::Snap::NoSnap);
 }
 
-void MessageItem::onTargetMoved(const QPointF &from, const QPointF &to)
+void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
     if (!m_sourceInstance) {
@@ -349,6 +323,51 @@ void MessageItem::onTargetMoved(const QPointF &from, const QPointF &to)
     }
 
     updateTarget(m_arrowItem->arrow()->anchorPointTarget() + offset, ObjectAnchor::Snap::NoSnap);
+}
+
+QPointF MessageItem::head() const
+{
+    return m_arrowItem->mapToScene(m_arrowItem->endSignPos());
+}
+
+void MessageItem::setHead(const QPointF &head)
+{
+    if (head == this->head())
+        return;
+
+    updateTarget(head, ObjectAnchor::Snap::NoSnap);
+}
+
+QPointF MessageItem::tail() const
+{
+    return m_arrowItem->mapToScene(m_arrowItem->startSignPos());
+}
+
+void MessageItem::setTail(const QPointF &tail)
+{
+    if (tail == this->tail())
+        return;
+
+    updateSource(tail, ObjectAnchor::Snap::NoSnap);
+}
+
+void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+{
+    if (gp->location() == GripPoint::Location::Center)
+        msc::cmd::CommandsStack::push(msc::cmd::Id::MoveMessage,
+                                      { QVariant::fromValue<MessageItem *>(this), pos() + (to - from) });
+}
+
+void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+{
+    const QPointF &shift(to - from);
+    if (gp->location() == GripPoint::Left) {
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+                                      { QVariant::fromValue<MessageItem *>(this), head(), tail() + shift });
+    } else if (gp->location() == GripPoint::Right) {
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+                                      { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
+    }
 }
 
 } // namespace msc

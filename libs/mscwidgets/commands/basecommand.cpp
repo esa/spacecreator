@@ -14,34 +14,34 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+#include "basecommand.h"
 
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
-
-#include <QGraphicsView>
-
-class QUndoStack;
 namespace msc {
+namespace cmd {
 
-class GraphicsView : public QGraphicsView
+BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, QUndoCommand *parent)
+    : QUndoCommand(parent)
+    , m_id(id)
+    , m_graphicsItem(item)
 {
-    Q_OBJECT
-public:
-    explicit GraphicsView(QWidget *parent = nullptr);
+}
 
-    void setZoom(double percent);
+BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, const QString &text, QUndoCommand *parent)
+    : QUndoCommand(text, parent)
+    , m_id(id)
+    , m_graphicsItem(item)
+{
+}
 
-    QUndoStack *undoStack() const;
+int BaseCommand::id() const
+{
+    return m_id;
+}
 
-Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+bool BaseCommand::canMergeWith(const BaseCommand *cmd) const
+{
+    return cmd && cmd->id() == id() && cmd->m_graphicsItem == m_graphicsItem;
+}
 
-protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
-
-    QUndoStack *m_undoStack = nullptr;
-};
-
-} // namespace msc
-
-#endif // GRAPHICSVIEW_H
+} // ns cmd
+} // ns msc

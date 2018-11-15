@@ -21,11 +21,16 @@
 #include <QMainWindow>
 #include <QModelIndex>
 
+#include <memory>
+
 namespace Ui {
 class MainWindow;
 }
 
 class MainModel;
+class QUndoGroup;
+
+struct MainWindowPrivate;
 
 class MainWindow : public QMainWindow
 {
@@ -44,11 +49,15 @@ private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
 
 private:
-    void setupUi();
-    bool doOpenFile(const QString &file);
+    std::unique_ptr<MainWindowPrivate> const d;
 
-    Ui::MainWindow *ui = nullptr;
-    MainModel *m_model = nullptr;
+    void setupUi();
+    void initMenus();
+    void initMenuFile();
+    void initMenuEdit();
+    void initMenuHelp();
+
+    bool doOpenFile(const QString &file);
 };
 
 #endif // MAINWINDOW_H

@@ -60,22 +60,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="action_Open_file"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit"/>
-   </widget>
-   <widget class="QMenu" name="menu_Help">
-    <property name="title">
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="actionAbout_Qt"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menu_Help"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
@@ -87,8 +71,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Open_file"/>
-   <addaction name="actionAsn1Editor"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -204,29 +186,6 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionQuit">
-   <property name="text">
-    <string>&amp;Quit</string>
-   </property>
-  </action>
-  <action name="actionAbout_Qt">
-   <property name="text">
-    <string>About Qt</string>
-   </property>
-  </action>
-  <action name="action_Open_file">
-   <property name="text">
-    <string>&amp;Open File ...</string>
-   </property>
-  </action>
-  <action name="actionAsn1Editor">
-   <property name="text">
-    <string>Asn1Editor</string>
-   </property>
-   <property name="toolTip">
-    <string>ASN.1 Editor</string>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

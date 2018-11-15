@@ -15,33 +15,40 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
+#pragma once
 
-#include <QGraphicsView>
+#include "commands/common/commandids.h"
 
-class QUndoStack;
+#include <QObject>
+#include <QUndoStack>
+#include <QVariant>
+
 namespace msc {
+namespace cmd {
 
-class GraphicsView : public QGraphicsView
+class CommandsStack : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphicsView(QWidget *parent = nullptr);
+    static CommandsStack *instance();
 
-    void setZoom(double percent);
+    static void setCurrent(QUndoStack *stack);
+    static QUndoStack *current();
 
-    QUndoStack *undoStack() const;
+    static bool push(msc::cmd::Id id, const QVariantList &params);
 
 Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    void currentStackChanged(QUndoStack *to);
 
-protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+private:
+    CommandsStack(QObject *parent = nullptr);
 
-    QUndoStack *m_undoStack = nullptr;
+    void setCurrentStack(QUndoStack *stack);
+    QUndoStack *currentStack() const;
+
+    static CommandsStack *m_instance;
+    QUndoStack *m_current = nullptr;
 };
 
-} // namespace msc
-
-#endif // GRAPHICSVIEW_H
+} // namespace cmd
+} // ns msc
