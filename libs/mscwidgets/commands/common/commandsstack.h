@@ -15,48 +15,40 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
-#include <QMainWindow>
-#include <QModelIndex>
+#include "commands/common/commandids.h"
 
-#include <memory>
+#include <QObject>
+#include <QUndoStack>
+#include <QVariant>
 
-namespace Ui {
-class MainWindow;
-}
+namespace msc {
+namespace cmd {
 
-class MainModel;
-class QUndoGroup;
-
-struct MainWindowPrivate;
-
-class MainWindow : public QMainWindow
+class CommandsStack : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    static CommandsStack *instance();
 
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
+    static void setCurrent(QUndoStack *stack);
+    static QUndoStack *current();
 
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    static bool push(msc::cmd::Id id, const QVariantList &params);
+
+Q_SIGNALS:
+    void currentStackChanged(QUndoStack *to);
 
 private:
-    std::unique_ptr<MainWindowPrivate> const d;
+    CommandsStack(QObject *parent = nullptr);
 
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
+    void setCurrentStack(QUndoStack *stack);
+    QUndoStack *currentStack() const;
 
-    bool doOpenFile(const QString &file);
+    static CommandsStack *m_instance;
+    QUndoStack *m_current = nullptr;
 };
 
-#endif // MAINWINDOW_H
+} // namespace cmd
+} // ns msc

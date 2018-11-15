@@ -15,48 +15,30 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
-#include <QMainWindow>
-#include <QModelIndex>
+#include <QVariant>
 
-#include <memory>
+class QGraphicsItem;
+class QPointF;
+class QRectF;
+class QUndoCommand;
 
-namespace Ui {
-class MainWindow;
-}
+namespace msc {
+namespace cmd {
 
-class MainModel;
-class QUndoGroup;
-
-struct MainWindowPrivate;
-
-class MainWindow : public QMainWindow
+class CommandsFactory
 {
-    Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
-
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    static QUndoCommand *create_messageItemMove(const QVariantList &params);
+    static QUndoCommand *create_messageItemResize(const QVariantList &params);
+    static QUndoCommand *create_instanceItemMove(const QVariantList &params);
+    static QUndoCommand *create_instanceItemResize(const QVariantList &params);
 
 private:
-    std::unique_ptr<MainWindowPrivate> const d;
-
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
-
-    bool doOpenFile(const QString &file);
+    CommandsFactory() = delete;
+    CommandsFactory(const CommandsFactory &other) = delete;
 };
 
-#endif // MAINWINDOW_H
+} // ns cmd
+} // ns msc

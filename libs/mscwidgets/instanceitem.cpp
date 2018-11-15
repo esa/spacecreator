@@ -22,6 +22,7 @@
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/common/utils.h"
+#include "commands/common/commandsstack.h"
 
 #include <mscinstance.h>
 
@@ -58,7 +59,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     setKind(m_instance->kind());
     connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
 
-    connect(this, &msc::InteractiveObject::resized, this, &msc::InstanceItem::onResized);
     updateLayout();
 
     m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
@@ -190,11 +190,45 @@ void InstanceItem::buildLayout()
     m_layoutDirty = false;
 }
 
-void InstanceItem::onResized(const QRectF &from, const QRectF &to)
+void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-    updateLayout();
+    if (gp->location() == GripPoint::Location::Center)
+        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance, { QVariant::fromValue<InstanceItem *>(this), pos() + (to - from) });
+}
+
+void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+{
+    QPointF delta(to - from);
+    QRectF newRect(m_boundingRect);
+    switch (gp->location()) {
+    case GripPoint::Location::Left:
+    case GripPoint::Location::Right: {
+        if (gp->location() == GripPoint::Location::Left)
+            delta.rx() *= -1;
+        newRect.adjust(-delta.x(), 0., delta.x(), 0.);
+        break;
+    }
+    case GripPoint::Location::Top:
+    case GripPoint::Location::Bottom: {
+        newRect.adjust(0., -delta.y(), 0., delta.y());
+        break;
+    }
+    case GripPoint::Location::TopLeft:
+    case GripPoint::Location::TopRight:
+    case GripPoint::Location::BottomLeft:
+    case GripPoint::Location::BottomRight: {
+        if (gp->location() == GripPoint::Location::Left
+            || gp->location() == GripPoint::Location::TopLeft
+            || gp->location() == GripPoint::Location::BottomLeft)
+            delta.rx() *= -1;
+        newRect.adjust(-delta.x(), -delta.y(), delta.x(), delta.y());
+        break;
+    }
+    default:
+        return;
+    }
+
+    msc::cmd::CommandsStack::push(cmd::Id::ResizeInstance, { QVariant::fromValue<InstanceItem *>(this), newRect });
 }
 
 QPainterPath InstanceItem::shape() const
@@ -208,4 +242,14 @@ QPainterPath InstanceItem::shape() const
     return result;
 }
 
+void InstanceItem::setBoundingRect(const QRectF &geometry)
+{
+    if (geometry == boundingRect())
+        return;
+
+    prepareGeometryChange();
+    m_boundingRect = geometry;
+    m_gripPoints->updateLayout();
+    updateLayout();
+}
 } // namespace msc

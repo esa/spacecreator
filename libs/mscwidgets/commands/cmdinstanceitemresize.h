@@ -15,48 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
-#include <QMainWindow>
-#include <QModelIndex>
+#include "basecommand.h"
 
-#include <memory>
+#include <QRectF>
 
-namespace Ui {
-class MainWindow;
-}
+namespace msc {
 
-class MainModel;
-class QUndoGroup;
+class InstanceItem;
 
-struct MainWindowPrivate;
+namespace cmd {
 
-class MainWindow : public QMainWindow
+class CmdInstanceItemResize : public BaseCommand
 {
-    Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    CmdInstanceItemResize(InstanceItem *instanceItem, const QRectF &destination);
 
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
-
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
 
 private:
-    std::unique_ptr<MainWindowPrivate> const d;
+    InstanceItem *m_instanceItem = nullptr;
 
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
-
-    bool doOpenFile(const QString &file);
+    QRectF m_newGeometry;
+    QRectF m_oldGeometry;
 };
 
-#endif // MAINWINDOW_H
+} // ns cmd
+} // ns msc

@@ -20,6 +20,7 @@
 
 #include <QGraphicsView>
 
+class QUndoStack;
 namespace msc {
 
 class GraphicsView : public QGraphicsView
@@ -30,11 +31,15 @@ public:
 
     void setZoom(double percent);
 
+    QUndoStack *undoStack() const;
+
 Q_SIGNALS:
     void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
+
+    QUndoStack *m_undoStack = nullptr;
 };
 
 } // namespace msc

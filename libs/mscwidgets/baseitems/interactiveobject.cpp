@@ -53,6 +53,9 @@ InteractiveObject::InteractiveObject(QGraphicsItem *parent)
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     setCursor(Qt::ArrowCursor);
+
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
+        gp->setGripType(GripPoint::GripType::Mover);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -76,116 +79,10 @@ void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
 
 void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    const QRectF sourceBounds = m_boundingRect;
-    const qreal minSideAllowed = m_gripPoints->minSize().width();
-    QRectF targetBounds(sourceBounds);
-    const QPointF delta(to - from);
-    QPointF deltaCorrected(delta);
-
-    auto validateRectMinSize = [&minSideAllowed](QRectF &r) {
-        r.setHeight(qMax(r.height(), minSideAllowed));
-        r.setWidth(qMax(r.width(), minSideAllowed));
-        return r;
-    };
-    auto prepareResizeX = [&validateRectMinSize](QRectF &r, const QPointF &d,
-                                                 bool left, bool right) {
-        QRectF newBounds =
-                r.adjusted(left ? -d.x() : 0., -d.y(), right ? d.x() : 0, d.y());
-        return validateRectMinSize(newBounds);
-    };
-
-    auto prepareResizeY = [&validateRectMinSize](QRectF &r, const QPointF &d, bool top,
-                                                 bool bottom) {
-        QRectF newBounds =
-                r.adjusted(-d.x(), top ? -d.y() : 0., d.x(), bottom ? d.y() : 0.);
-        return validateRectMinSize(newBounds);
-    };
-
-    auto prepareResizeXAndY = [&prepareResizeX,
-                               &prepareResizeY](QRectF &r, const QPointF &d) {
-        QRectF newBounds = prepareResizeX(r, d, true, true);
-        return prepareResizeY(newBounds, d, true, true);
-    };
-
-    auto prepareResizeXOrY = [&grip, &prepareResizeX,
-                              &prepareResizeY](QRectF &r, const QPointF &d) {
-        const bool isVertical = (grip->location() == GripPoint::Top || grip->location() == GripPoint::Bottom);
-        const bool isHorizontal =
-                !isVertical && (grip->location() == GripPoint::Right || grip->location() == GripPoint::Left);
-
-        if (isVertical) {
-            const bool isTop = grip->location() == GripPoint::Top;
-            return prepareResizeY(r, d, isTop, !isTop);
-        }
-
-        if (isHorizontal) {
-            const bool isLeft = grip->location() == GripPoint::Left;
-            return prepareResizeX(r, d, isLeft, !isLeft);
-        }
-
-        return r;
-    };
-
-    auto justMoveMe = [this](const QPointF &d) { moveBy(d.x(), d.y()); };
-
-    auto resizeInSingleDirection = [&grip, &targetBounds, &deltaCorrected, &prepareResizeXOrY, &prepareResizeXAndY]() {
-        if (grip->location() == GripPoint::Top || grip->location() == GripPoint::Left)
-            deltaCorrected *= -1.;
-
-        if (grip->location() == GripPoint::Top || grip->location() == GripPoint::Bottom)
-            deltaCorrected.rx() = 0;
-        else if (grip->location() == GripPoint::Right || grip->location() == GripPoint::Left)
-            deltaCorrected.ry() = 0;
-
-        if (grip->isMover())
-            targetBounds = prepareResizeXOrY(targetBounds, deltaCorrected);
-        else
-            targetBounds = prepareResizeXAndY(targetBounds, deltaCorrected);
-    };
-
-    switch (grip->location()) {
-    case GripPoint::TopLeft:
-    case GripPoint::TopRight:
-    case GripPoint::BottomRight:
-    case GripPoint::BottomLeft: {
-
-        if (grip->isMover())
-            resizeInSingleDirection();
-        else {
-            if (qFuzzyIsNull(deltaCorrected.x()))
-                deltaCorrected.rx() = deltaCorrected.y();
-            else
-                deltaCorrected.ry() = deltaCorrected.x();
-
-            if (GripPoint::BottomLeft == grip->location() || GripPoint::TopLeft == grip->location())
-                deltaCorrected *= -1;
-
-            targetBounds = prepareResizeXAndY(targetBounds, deltaCorrected);
-        }
-
-        break;
-    }
-    case GripPoint::Top:
-    case GripPoint::Right:
-    case GripPoint::Bottom:
-    case GripPoint::Left: {
-        resizeInSingleDirection();
-        break;
-    }
-    case GripPoint::Center:
-        justMoveMe(delta);
-        break;
-    }
-
-    if (targetBounds != m_boundingRect) {
-        const QRectF prevRect = m_boundingRect;
-        prepareGeometryChange();
-        m_boundingRect = targetBounds;
-        m_gripPoints->updateLayout();
-        update();
-
-        Q_EMIT resized(prevRect, m_boundingRect);
-    }
+    if (grip->isMover())
+        onMoveRequested(grip, from, to);
+    else
+        onResizeRequested(grip, from, to);
 }
 
 void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
