@@ -118,7 +118,7 @@ void MainWindow::selectCurrentChart()
 
 void MainWindow::openAsn1Editor()
 {
-    Asn1Editor editor;
+    asn1::Asn1Editor editor;
     editor.exec();
 }
 

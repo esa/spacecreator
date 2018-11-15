@@ -1,39 +1,61 @@
+/*
+   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #include <QDomDocument>
 #include <QDomElement>
-#include <QFile>
+#include <QFileInfo>
+#include <QVariantMap>
 
 #include "xmlparser.h"
 
-XMLParser::XMLParser(const QString &file, QObject *parent) :
-    QObject(parent),
-    m_fileName(file)
-{
+namespace asn1 {
 
+XMLParser::XMLParser(QObject *parent)
+    : QObject(parent)
+{
 }
 
-QVariantMap XMLParser::parseAsn1Xml()
+QVariantMap XMLParser::parseAsn1XmlFile(const QString &filename)
 {
-    QVariantMap result;
+    if (QFileInfo::exists(filename)) {
+        QFile file(filename);
 
+        if (file.open(QIODevice::ReadOnly)) {
+            const auto content = file.readAll();
+            file.close();
+
+            return parseAsn1XmlContent(content);
+        } else
+            Q_EMIT parseError(file.errorString());
+    } else
+        Q_EMIT parseError(tr("File not found"));
+
+    return QVariantMap();
+}
+
+QVariantMap XMLParser::parseAsn1XmlContent(const QString &content)
+{
     QDomDocument doc;
     QDomElement root;
+    QString errorMsg;
+    QVariantMap result;
 
-    if (m_fileName.isEmpty())
-        return result;
-
-    QFile f(m_fileName);
-    if (f.open( QIODevice::ReadOnly )) {
-        QString errorMsg;
-
-        bool ok = doc.setContent(f.readAll(), &errorMsg);
-        f.close();
-        if (!ok) {
-            Q_EMIT parseError(errorMsg);
-            return result;
-        }
-    }
-    else {
-        Q_EMIT parseError(f.errorString());
+    if (!doc.setContent(content, &errorMsg)) {
+        Q_EMIT parseError(errorMsg);
         return result;
     }
 
@@ -49,15 +71,13 @@ QVariantMap XMLParser::parseAsn1Xml()
         return result;
     }
 
-    m_fileName = root.attribute("FileName");
-
     QDomNodeList asn1Modules = root.elementsByTagName("Asn1Module");
     for (int x = 0; x < asn1Modules.size(); ++x) {
         QDomElement asn1Module = asn1Modules.at(x).toElement();
 
         QString moduleID = asn1Module.attribute("ID");
         QDomNodeList typeAssignments = asn1Module.firstChildElement("TypeAssignments")
-                                                 .elementsByTagName("TypeAssignment");
+                                               .elementsByTagName("TypeAssignment");
 
         for (int x = 0; x < typeAssignments.size(); ++x) {
             QDomElement elem = typeAssignments.at(x).toElement();
@@ -74,50 +94,43 @@ QVariantMap XMLParser::parseType(const QDomElement &type, const QString &name)
 {
     QVariantMap result;
 
-    result["name"]          = name;
-    result["isOptional"]    = false;
+    result["name"] = name;
+    result["isOptional"] = false;
     result["alwaysPresent"] = true;
-    result["alwaysAbsent"]  = false;
+    result["alwaysAbsent"] = false;
 
     const QDomElement typeElem = type.firstChild().toElement();
     const QString typeName = typeElem.tagName();
 
     if (typeName == "IntegerType") {
         result["type"] = "integer";
-        result["min"]  = typeElem.attribute("Min").toInt();
-        result["max"]  = typeElem.attribute("Max").toInt();
-    }
-    else if (typeName == "RealType") {
+        result["min"] = typeElem.attribute("Min").toInt();
+        result["max"] = typeElem.attribute("Max").toInt();
+    } else if (typeName == "RealType") {
         result["type"] = "double";
-        result["min"]  = typeElem.attribute("Min").toDouble();
-        result["max"]  = typeElem.attribute("Max").toDouble();
-    }
-    else if (typeName == "BooleanType") {
-        result["type"]    = "bool";
+        result["min"] = typeElem.attribute("Min").toDouble();
+        result["max"] = typeElem.attribute("Max").toDouble();
+    } else if (typeName == "BooleanType") {
+        result["type"] = "bool";
         result["default"] = false;
-    }
-    else if (typeName == "SequenceType") {
+    } else if (typeName == "SequenceType") {
         result["type"] = "sequence";
         parseSequenceType(typeElem, result);
-    }
-    else if (typeName == "SequenceOfType") {
-        result["type"]      = "sequenceOf";
-        result["min"]       = typeElem.attribute("Min").toInt();
-        result["max"]       = typeElem.attribute("Max").toInt();
+    } else if (typeName == "SequenceOfType") {
+        result["type"] = "sequenceOf";
+        result["min"] = typeElem.attribute("Min").toInt();
+        result["max"] = typeElem.attribute("Max").toInt();
         result["seqoftype"] = parseType(typeElem.firstChild().toElement());
-    }
-    else if (typeName == "EnumeratedType") {
+    } else if (typeName == "EnumeratedType") {
         result["type"] = "enumerated";
         parseEnumeratedType(typeElem, result);
-    }
-    else if (typeName == "ChoiceType") {
+    } else if (typeName == "ChoiceType") {
         result["type"] = "choice";
         parseChoiceType(typeElem, result);
-    }
-    else if (typeName.endsWith("StringType")) {
+    } else if (typeName.endsWith("StringType")) {
         result["type"] = "string";
-        result["min"]  = typeElem.attribute("Min").toInt();
-        result["max"]  = typeElem.attribute("Max").toInt();
+        result["min"] = typeElem.attribute("Min").toInt();
+        result["max"] = typeElem.attribute("Max").toInt();
     }
 
     return result;
@@ -125,7 +138,7 @@ QVariantMap XMLParser::parseType(const QDomElement &type, const QString &name)
 
 void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
 {
-/*
+    /*
 <SequenceType>
     <SequenceOrSetChild VarName="foo" Optional="False" Line="8" CharPositionInLine="21">
         <Type Line="8" CharPositionInLine="25">
@@ -145,10 +158,9 @@ void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
         QVariantMap childType = parseType(elem.firstChildElement("Type"),
                                           elem.attribute("VarName"));
 
-
-        childType["isOptional"]    = elem.attribute("Optional") == "True";
+        childType["isOptional"] = elem.attribute("Optional") == "True";
         childType["alwaysPresent"] = elem.attribute("alwaysPresent") == "True";
-        childType["alwaysAbsent"]  = elem.attribute("alwaysAbsent") == "False";
+        childType["alwaysAbsent"] = elem.attribute("alwaysAbsent") == "False";
 
         children.append(childType);
     }
@@ -158,7 +170,7 @@ void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
 
 void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
 {
-/*
+    /*
 <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
     <EnumValues>
         <EnumValue StringValue="red" IntValue="0" Line="17" CharPositionInLine="4" EnumID ="red" />
@@ -180,13 +192,13 @@ void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result
         valuesInt.append(enumValue.attribute("IntValue"));
     }
 
-    result["values"]    = values;
+    result["values"] = values;
     result["valuesInt"] = valuesInt;
 }
 
 void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
 {
-/*
+    /*
 <ChoiceType>
     <ChoiceChild VarName="x" Line="20" CharPositionInLine="15" EnumID ="x_PRESENT">
         <Type Line="20" CharPositionInLine="17">
@@ -206,12 +218,12 @@ void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
         QDomElement elem = n.toElement();
 
         choices.append(parseType(elem.firstChildElement("Type"),
-                                                    elem.attribute("VarName")));
+                                 elem.attribute("VarName")));
         choiceIdx.append(elem.attribute("EnumID"));
     }
 
-    result["choices"]   = choices;
+    result["choices"] = choices;
     result["choiceIdx"] = choiceIdx;
 }
 
-
+} // namespace asn1
