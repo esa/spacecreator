@@ -8,43 +8,58 @@ CONFIG += static
 QT += core gui widgets
 
 HEADERS += \
-    graphicsview.h \
-    instanceitem.h \
-    messageitem.h \
-    chartviewmodel.h \
-    baseitems/arrowitem.h \
-    baseitems/textitem.h \
-    baseitems/grippointshandler.h \
-    baseitems/grippoint.h \
-    baseitems/interactiveobject.h \
-    baseitems/objectslinkitem.h \
-    baseitems/labeledarrowitem.h \
-    baseitems/common/drawrectinfo.h \
     baseitems/common/abstractinteractiveobject.h \
     baseitems/common/arrowsign.h \
-    baseitems/common/utils.h \
+    baseitems/common/drawrectinfo.h \
+    baseitems/common/highlightrectitem.h \
     baseitems/common/objectanchor.h \
     baseitems/common/objectslink.h \
-    baseitems/common/highlightrectitem.h
+    baseitems/common/utils.h \
+    baseitems/arrowitem.h \
+    baseitems/grippoint.h \
+    baseitems/grippointshandler.h \
+    baseitems/interactiveobject.h \
+    baseitems/labeledarrowitem.h \
+    baseitems/objectslinkitem.h \
+    baseitems/textitem.h \
+    commands/common/commandids.h \
+    commands/common/commandsfactory.h \
+    commands/common/commandsstack.h \
+    commands/basecommand.h \
+    commands/cmdinstanceitemmove.h \
+    commands/cmdinstanceitemresize.h \
+    commands/cmdmessageitemmove.h \
+    commands/cmdmessageitemresize.h \
+    chartviewmodel.h \
+    graphicsview.h \
+    instanceitem.h \
+    messageitem.h
 
 SOURCES += \
-    graphicsview.cpp \
-    instanceitem.cpp \
-    messageitem.cpp \
-    chartviewmodel.cpp \
-    baseitems/arrowitem.cpp \
-    baseitems/textitem.cpp \
-    baseitems/grippoint.cpp \
-    baseitems/grippointshandler.cpp \
-    baseitems/common/drawrectinfo.cpp \
-    baseitems/objectslinkitem.cpp \
-    baseitems/interactiveobject.cpp \
-    baseitems/labeledarrowitem.cpp \
     baseitems/common/arrowsign.cpp \
-    baseitems/common/utils.cpp \
+    baseitems/common/drawrectinfo.cpp \
+    baseitems/common/highlightrectitem.cpp \
     baseitems/common/objectanchor.cpp \
     baseitems/common/objectslink.cpp \
-    baseitems/common/highlightrectitem.cpp
+    baseitems/common/utils.cpp \
+    baseitems/arrowitem.cpp \
+    baseitems/grippoint.cpp \
+    baseitems/grippointshandler.cpp \
+    baseitems/interactiveobject.cpp \
+    baseitems/labeledarrowitem.cpp \
+    baseitems/objectslinkitem.cpp \
+    baseitems/textitem.cpp \
+    commands/common/commandsfactory.cpp \
+    commands/common/commandsstack.cpp \
+    commands/basecommand.cpp \
+    commands/cmdinstanceitemmove.cpp \
+    commands/cmdinstanceitemresize.cpp \
+    commands/cmdmessageitemmove.cpp \
+    commands/cmdmessageitemresize.cpp \
+    chartviewmodel.cpp \
+    graphicsview.cpp \
+    instanceitem.cpp \
+    messageitem.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

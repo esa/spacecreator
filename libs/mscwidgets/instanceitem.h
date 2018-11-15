@@ -51,13 +51,17 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
 
+    void setBoundingRect(const QRectF &geometry);
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
     void buildLayout();
     void rebuildLayout();
 
-    void onResized(const QRectF &from, const QRectF &to);
+protected:
+    void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
     msc::MscInstance *m_instance = nullptr;

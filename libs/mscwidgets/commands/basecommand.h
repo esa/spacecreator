@@ -15,48 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
-#include <QMainWindow>
-#include <QModelIndex>
+#include <QUndoCommand>
 
-#include <memory>
+#include "common/commandids.h"
 
-namespace Ui {
-class MainWindow;
-}
+class QGraphicsItem;
 
-class MainModel;
-class QUndoGroup;
+namespace msc {
+namespace cmd {
 
-struct MainWindowPrivate;
-
-class MainWindow : public QMainWindow
+class BaseCommand : public QUndoCommand
 {
-    Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit BaseCommand(msc::cmd::Id id, QGraphicsItem *item, QUndoCommand *parent = nullptr);
+    explicit BaseCommand(msc::cmd::Id id, QGraphicsItem *item, const QString &text, QUndoCommand *parent = nullptr);
 
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
+    virtual int id() const override;
 
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
+protected:
+    const msc::cmd::Id m_id;
+    QGraphicsItem *m_graphicsItem;
 
-private:
-    std::unique_ptr<MainWindowPrivate> const d;
-
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
-
-    bool doOpenFile(const QString &file);
+    bool canMergeWith(const BaseCommand *cmd) const;
 };
 
-#endif // MAINWINDOW_H
+} // ns cmd
+} // ns msc

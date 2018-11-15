@@ -23,6 +23,8 @@
 #include <mscchart.h>
 #include <chartviewmodel.h>
 
+#include <commands/common/commandsstack.h>
+
 #include <QApplication>
 #include <QComboBox>
 #include <QFileDialog>
@@ -31,30 +33,53 @@
 #include <QTreeView>
 #include <QKeySequence>
 #include <QApplication>
+#include <QUndoGroup>
+#include <QUndoStack>
+
+struct MainWindowPrivate {
+    explicit MainWindowPrivate(MainWindow *mainWindow)
+        : ui(new Ui::MainWindow)
+        , m_model(new MainModel(mainWindow))
+        , m_undoGroup(new QUndoGroup(mainWindow))
+    {
+    }
+
+    ~MainWindowPrivate()
+    {
+        delete ui;
+    }
+
+    Ui::MainWindow *ui = nullptr;
+    MainModel *m_model = nullptr;
+    QUndoGroup *m_undoGroup = nullptr;
+
+    QMenu *m_menuFile = nullptr;
+    QAction *m_actOpenFile = nullptr;
+    QAction *m_actQuit = nullptr;
+
+    QMenu *m_menuEdit = nullptr;
+    QAction *m_actUndo = nullptr;
+    QAction *m_actRedo = nullptr;
+
+    QMenu *m_menuHelp = nullptr;
+    QAction *m_actAboutQt = nullptr;
+};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , m_model(new MainModel(this))
+    , d(new MainWindowPrivate(this))
 {
     setupUi();
 
-    ui->action_Open_file->setShortcut(QKeySequence::Open);
-    ui->actionQuit->setShortcut(QKeySequence::Quit);
+    d->ui->graphicsView->setScene(d->m_model->graphicsScene());
 
-    connect(ui->action_Open_file, &QAction::triggered, this, &MainWindow::openFile);
-    connect(ui->actionQuit, &QAction::triggered, QApplication::instance(), &QApplication::quit);
-    connect(ui->actionAbout_Qt, &QAction::triggered, QApplication::instance(), &QApplication::aboutQt);
-
-    ui->graphicsView->setScene(m_model->graphicsScene());
-
-    ui->documentTreeView->setModel(m_model->documentItemModel());
-    connect(ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
+    d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
+    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &MainWindow::showSelection);
 
-    connect(&(m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
 
-    connect(ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
+    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
         statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
                                          .arg(screen.x())
                                          .arg(screen.y())
@@ -72,45 +97,58 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
 }
 
 void MainWindow::openFile()
 {
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
-    doOpenFile(filename);
+    if (!filename.isEmpty())
+        doOpenFile(filename);
 }
 
 bool MainWindow::doOpenFile(const QString &file)
 {
-    ui->errorTextEdit->setPlainText(tr("Opening file: %1").arg(file));
+    d->ui->errorTextEdit->setPlainText(tr("Opening file: %1").arg(file));
 
-    if (file.isEmpty() || !QFileInfo::exists(file)) {
-        ui->errorTextEdit->appendPlainText(tr("Invalid file name."));
+    if (!QFileInfo::exists(file)) {
+        d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
         return false;
     }
 
-    const bool ok = m_model->loadFile(file);
+    const bool ok = d->m_model->loadFile(file);
     if (ok) {
         static const QString title = tr("%1 [%2]");
         setWindowTitle(title.arg(qApp->applicationName()).arg(file));
-        ui->documentTreeView->expandAll();
-        ui->graphicsView->centerOn(ui->graphicsView->mapFromScene(ui->graphicsView->scene()->sceneRect().topLeft()));
+        d->ui->documentTreeView->expandAll();
+        d->ui->graphicsView->centerOn(d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
     }
 
-    ui->errorTextEdit->appendPlainText(m_model->errorMessages().join("\n"));
-    ui->errorTextEdit->appendPlainText(tr("Model loading: %1").arg(ok ? tr("success") : tr("failed")));
+    d->ui->errorTextEdit->appendPlainText(d->m_model->errorMessages().join("\n"));
+    d->ui->errorTextEdit->appendPlainText(tr("Model loading: %1").arg(ok ? tr("success") : tr("failed")));
 
     return ok;
 }
 
 void MainWindow::selectCurrentChart()
 {
-    msc::MscChart *chart = m_model->chartViewModel().currentChart();
+    msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
 
     if (chart != nullptr) {
-        QModelIndex idx = m_model->documentItemModel()->index(chart);
-        ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
+        const QModelIndex idx = d->m_model->documentItemModel()->index(chart);
+        d->ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
+
+        if (QUndoStack *currentStack = d->ui->graphicsView->undoStack()) {
+            if (!d->m_undoGroup->stacks().contains(currentStack))
+                d->m_undoGroup->addStack(currentStack);
+            d->m_undoGroup->setActiveStack(currentStack);
+        } else {
+            d->m_undoGroup->removeStack(d->m_undoGroup->activeStack());
+        }
+        msc::cmd::CommandsStack::setCurrent(d->m_undoGroup->activeStack());
+
+        // TODO: add routine to clear a stack on file close
+        // TODO: add support for dedicated stacks for each tab
     }
 }
 
@@ -125,19 +163,18 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     auto chart = dynamic_cast<msc::MscChart *>(obj);
 
     if (chart) {
-        m_model->chartViewModel().fillView(chart);
+        d->m_model->chartViewModel().fillView(chart);
     }
 }
 
 void MainWindow::setupUi()
 {
-    ui->setupUi(this);
+    d->ui->setupUi(this);
 
-    // toolbar
-    ui->action_Open_file->setIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    initMenus();
 
     // status bar
-    auto zoomBox = new QComboBox(ui->statusBar);
+    auto zoomBox = new QComboBox(d->ui->statusBar);
     zoomBox->addItem(" 50 %");
     zoomBox->addItem("100 %");
     zoomBox->addItem("200 %");
@@ -154,7 +191,43 @@ void MainWindow::setupUi()
         if (index == 3) {
             percent = 400.0;
         }
-        ui->graphicsView->setZoom(percent);
+        d->ui->graphicsView->setZoom(percent);
     });
     statusBar()->addPermanentWidget(zoomBox);
+}
+
+void MainWindow::initMenus()
+{
+    initMenuFile();
+    initMenuEdit();
+    initMenuHelp();
+}
+
+void MainWindow::initMenuFile()
+{
+    d->m_menuFile = menuBar()->addMenu(tr("File"));
+    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this, &MainWindow::openFile, QKeySequence::Open);
+    d->ui->mainToolBar->addAction(d->m_actOpenFile);
+    d->m_menuFile->addSeparator();
+    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), qApp, &QApplication::quit, QKeySequence::Quit);
+}
+
+void MainWindow::initMenuEdit()
+{
+    d->m_actUndo = d->m_undoGroup->createUndoAction(this, tr("Undo:"));
+    d->m_actUndo->setShortcut(QKeySequence::Undo);
+
+    d->m_actRedo = d->m_undoGroup->createRedoAction(this, tr("Redo:"));
+    d->m_actRedo->setShortcut(QKeySequence::Redo);
+
+    d->m_menuEdit = menuBar()->addMenu(tr("Edit"));
+    d->m_menuEdit->addAction(d->m_actUndo);
+    d->m_menuEdit->addAction(d->m_actRedo);
+    d->m_menuEdit->addSeparator();
+}
+
+void MainWindow::initMenuHelp()
+{
+    d->m_menuHelp = menuBar()->addMenu(tr("Help"));
+    d->m_actAboutQt = d->m_menuHelp->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }

@@ -14,49 +14,34 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+#include "basecommand.h"
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+namespace msc {
+namespace cmd {
 
-#include <QMainWindow>
-#include <QModelIndex>
-
-#include <memory>
-
-namespace Ui {
-class MainWindow;
+BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, QUndoCommand *parent)
+    : QUndoCommand(parent)
+    , m_id(id)
+    , m_graphicsItem(item)
+{
 }
 
-class MainModel;
-class QUndoGroup;
-
-struct MainWindowPrivate;
-
-class MainWindow : public QMainWindow
+BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, const QString &text, QUndoCommand *parent)
+    : QUndoCommand(text, parent)
+    , m_id(id)
+    , m_graphicsItem(item)
 {
-    Q_OBJECT
+}
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+int BaseCommand::id() const
+{
+    return m_id;
+}
 
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
+bool BaseCommand::canMergeWith(const BaseCommand *cmd) const
+{
+    return cmd && cmd->id() == id() && cmd->m_graphicsItem == m_graphicsItem;
+}
 
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
-
-private:
-    std::unique_ptr<MainWindowPrivate> const d;
-
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
-
-    bool doOpenFile(const QString &file);
-};
-
-#endif // MAINWINDOW_H
+} // ns cmd
+} // ns msc

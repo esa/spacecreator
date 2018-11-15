@@ -43,6 +43,10 @@ libs/msclibrary/parser/*.cpp
 libs/msclibrary/parser/*.h
 libs/msclibrary/parser/*.interp
 libs/msclibrary/parser/*.tokens
+# ANTLR internals (win build)
+3rdparty/antlr/cpp_runtime/runtime/.vs/
+3rdparty/antlr/cpp_runtime/runtime/bin/
+3rdparty/antlr/cpp_runtime/runtime/obj/
 
 # QDoc generated files
 doc/html

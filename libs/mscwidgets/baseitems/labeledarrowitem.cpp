@@ -67,12 +67,12 @@ ArrowItem *LabeledArrowItem::arrow() const
     return m_itemArrow;
 }
 
-QPointF LabeledArrowItem::arrowHead() const
+QPointF LabeledArrowItem::startSignPos() const
 {
     return mapFromItem(m_itemArrow, m_itemArrow->startSignLocal());
 }
 
-QPointF LabeledArrowItem::arrowTail() const
+QPointF LabeledArrowItem::endSignPos() const
 {
     return mapFromItem(m_itemArrow, m_itemArrow->endSignLocal());
 }
@@ -117,8 +117,9 @@ void LabeledArrowItem::updateLayout()
     const QRectF textRectCurrent(m_itemText->boundingRect().translated(m_itemText->pos()));
     QRectF textRect(textRectCurrent);
 
-    const QLineF axis(arrowHead(), arrowTail());
+    const QLineF axis(startSignPos(), endSignPos());
     textRect.moveCenter(utils::lineCenter(axis));
+
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
     const qreal textWidth = textRect.width();
     const qreal lineWidth = arrowRect.width() + 2 * ArrowSign::ARROW_WIDTH - 2 * utils::LineHoverTolerance;

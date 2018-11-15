@@ -42,7 +42,6 @@ public:
     void highlightDisconnected();
 
 Q_SIGNALS:
-    void resized(const QRectF &from, const QRectF &to) const;
     void relocated(const QPointF &from, const QPointF &to) const;
 
 protected Q_SLOTS:
@@ -63,6 +62,9 @@ protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    virtual void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
+    virtual void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
 };
 
 } // namespace msc

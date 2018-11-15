@@ -15,48 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
-#include <QMainWindow>
-#include <QModelIndex>
+namespace msc {
+namespace cmd {
 
-#include <memory>
+enum Id {
+    MoveMessage = 0,
+    RetargetMessage,
+    MoveInstance,
+    ResizeInstance,
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainModel;
-class QUndoGroup;
-
-struct MainWindowPrivate;
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
-public Q_SLOTS:
-    void openFile();
-    void selectCurrentChart();
-
-private Q_SLOTS:
-    void showSelection(const QModelIndex &current, const QModelIndex &previous);
-
-private:
-    std::unique_ptr<MainWindowPrivate> const d;
-
-    void setupUi();
-    void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
-    void initMenuHelp();
-
-    bool doOpenFile(const QString &file);
+    LastId
 };
-
-#endif // MAINWINDOW_H
+} // ns cmd
+} // ns msc

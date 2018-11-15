@@ -19,6 +19,7 @@
 
 #include <QMouseEvent>
 #include <QGraphicsItem>
+#include <QUndoStack>
 
 namespace msc {
 
@@ -36,6 +37,7 @@ namespace msc {
 */
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
+    , m_undoStack(new QUndoStack(this))
 {
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
 }
@@ -58,6 +60,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     Q_EMIT mouseMoved(screenPos, scenePos, itemPos);
 
     QGraphicsView::mouseMoveEvent(event);
+}
+
+QUndoStack *GraphicsView::undoStack() const
+{
+    return m_undoStack;
 }
 
 } // namespace msc

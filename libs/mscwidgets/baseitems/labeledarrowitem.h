@@ -38,8 +38,8 @@ public:
     QString text() const;
     ArrowItem *arrow() const;
 
-    QPointF arrowHead() const;
-    QPointF arrowTail() const;
+    QPointF startSignPos() const;
+    QPointF endSignPos() const;
 
     bool replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
