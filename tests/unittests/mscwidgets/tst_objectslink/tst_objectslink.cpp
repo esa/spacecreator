@@ -17,6 +17,7 @@
 
 #include <baseitems/common/objectslink.h>
 #include <baseitems/common/objectanchor.h>
+#include <baseitems/common/utils.h>
 
 #include <instanceitem.h>
 #include <mscinstance.h>
@@ -87,7 +88,7 @@ void tst_ObjectsLink::testMakeLink()
     ObjectsLink link;
     const QPointF linkCenter = link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
-    QCOMPARE(linkCenter, ab.center());
+    QCOMPARE(linkCenter, utils::lineCenter(ab));
 
     QCOMPARE(link.source()->object(), m_itemA);
     QCOMPARE(link.source()->point(), centerA);
@@ -105,7 +106,7 @@ void tst_ObjectsLink::testLinkCenter()
     ObjectsLink link;
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
-    QCOMPARE(link.linkCenter(), ab.center());
+    QCOMPARE(link.linkCenter(), utils::lineCenter(ab));
 }
 
 void tst_ObjectsLink::testReplaceSourceNoSnap()

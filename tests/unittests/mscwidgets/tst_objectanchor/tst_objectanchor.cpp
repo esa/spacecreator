@@ -119,7 +119,7 @@ void tst_ObjectAnchor::testReplaceNoSnap()
 {
     ObjectAnchor anchor;
 
-    QCOMPARE(anchor.object(), nullptr);
+    QCOMPARE(anchor.object(), static_cast<InstanceItem*>(nullptr));
     QCOMPARE(anchor.point(), QPointF());
 
     const QPointF pnt10(10., 10.);

@@ -222,7 +222,7 @@ void MessageItem::updateGripPoints()
 
     if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Center)) {
         const QLineF arrowAxis(m_arrowItem->arrowHead(), m_arrowItem->arrowTail());
-        updateEdge(gp, arrowAxis.center());
+        updateEdge(gp, utils::lineCenter(arrowAxis));
     }
 }
 

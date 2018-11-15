@@ -118,7 +118,7 @@ void LabeledArrowItem::updateLayout()
     QRectF textRect(textRectCurrent);
 
     const QLineF axis(arrowHead(), arrowTail());
-    textRect.moveCenter(axis.center());
+    textRect.moveCenter(utils::lineCenter(axis));
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
     const qreal textWidth = textRect.width();
     const qreal lineWidth = arrowRect.width() + 2 * ArrowSign::ARROW_WIDTH - 2 * utils::LineHoverTolerance;

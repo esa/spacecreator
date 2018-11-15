@@ -14,8 +14,6 @@ build_linux_gcc:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
-    - apt-get update -yq
-    - apt-get install -y uuid-dev default-jre
     - mkdir -p build; cd build
     - qmake -recursive ..
     - make -j 8
@@ -31,11 +29,20 @@ build_linux_clang:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script: 
-    - apt-get update -yq
-    - apt-get install -y uuid-dev default-jre
     - mkdir -p build_clang
     - cd build_clang
     - qmake QMAKE_CC=clang QMAKE_CXX=clang++ -recursive ..
+    - make -j 8
+
+build_debian9_gcc:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/debian_9_cpp:latest
+  script:
+    - scripts/build_antlr.sh
+    - mkdir -p build; cd build
+    - qmake -recursive ..
     - make -j 8
 
 # MacOS Shell (because of tag macOS - see CI runners tags)
@@ -87,8 +94,6 @@ coverage_docker:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
   script:
-    - apt-get update -yq
-    - apt-get install -y uuid-dev default-jre
     - mkdir -p build_coverage; cd build_coverage
     - qmake CONFIG+=debug CONFIG+=coverage -recursive ..
     - make -j 8
