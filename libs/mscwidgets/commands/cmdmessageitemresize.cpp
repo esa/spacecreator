@@ -24,7 +24,7 @@ namespace cmd {
 
 CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem,
                                            const QPointF &head, const QPointF &tail)
-    : BaseCommand(msc::cmd::Id::RetargetMessage, messageItem)
+    : BaseCommand(messageItem)
     , m_messageItem(messageItem)
     , m_newHead(head)
     , m_newTail(tail)
@@ -61,6 +61,11 @@ bool CmdMessageItemResize::mergeWith(const QUndoCommand *command)
     }
 
     return false;
+}
+
+int CmdMessageItemResize::id() const
+{
+    return msc::cmd::Id::RetargetMessage;
 }
 
 } // ns cmd

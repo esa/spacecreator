@@ -15,36 +15,38 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "instancecreatortool.h"
 
-#include "basecommand.h"
-
-#include <QPointF>
+#include <QGraphicsView>
+#include <QMouseEvent>
+#include <QDebug>
 
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+InstanceCreatorTool::InstanceCreatorTool(QGraphicsView *view, QObject *parent)
+    : BaseTool(view, parent)
 {
-public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    m_title = tr("Instance");
+    m_description = tr("Create new Instance item");
+}
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+ToolType InstanceCreatorTool::toolType() const
+{
+    return msc::ToolType::InstanceCreator;
+}
 
-private:
-    MessageItem *m_messageItem = nullptr;
+void InstanceCreatorTool::createPreviewItem()
+{
+    qDebug() << Q_FUNC_INFO << title();
+    if (!m_scene)
+        return;
+}
 
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
-};
+void InstanceCreatorTool::commitPreviewItem()
+{
+    qDebug() << Q_FUNC_INFO << title();
 
-} // ns cmd
+    if (!m_previewItem || !m_scene)
+        return;
+}
 } // ns msc

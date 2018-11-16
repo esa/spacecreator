@@ -15,36 +15,45 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "messagecreatortool.h"
 
-#include "basecommand.h"
+#include <mscmessage.h>
+#include <messageitem.h>
+#include <baseitems/arrowitem.h>
 
-#include <QPointF>
+#include <QGraphicsScene>
+#include <QMouseEvent>
+
+#include <QDebug>
 
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+MessageCreatorTool::MessageCreatorTool(QGraphicsView *view, QObject *parent)
+    : BaseTool(view, parent)
 {
-public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    m_title = tr("Message");
+    m_description = tr("Create new Message item");
+}
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+ToolType MessageCreatorTool::toolType() const
+{
+    return msc::ToolType::MessageCreator;
+}
 
-private:
-    MessageItem *m_messageItem = nullptr;
+void MessageCreatorTool::createPreviewItem()
+{
+    qDebug() << Q_FUNC_INFO << title();
 
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
-};
+    if (!m_scene)
+        return;
+}
 
-} // ns cmd
+void MessageCreatorTool::commitPreviewItem()
+{
+    qDebug() << Q_FUNC_INFO << title();
+
+    if (!m_previewItem || !m_scene)
+        return;
+}
+
 } // ns msc

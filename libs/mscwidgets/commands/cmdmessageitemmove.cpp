@@ -22,7 +22,7 @@ namespace msc {
 namespace cmd {
 
 CmdMessageItemMove::CmdMessageItemMove(MessageItem *messageItem, const QPointF &destination)
-    : BaseCommand(msc::cmd::Id::MoveMessage, messageItem)
+    : BaseCommand(messageItem)
     , m_posFrom(messageItem ? messageItem->pos() : QPointF())
     , m_posTo(destination)
 {
@@ -50,6 +50,11 @@ bool CmdMessageItemMove::mergeWith(const QUndoCommand *command)
     }
 
     return false;
+}
+
+int CmdMessageItemMove::id() const
+{
+    return msc::cmd::Id::MoveMessage;
 }
 
 } // ns cmd
