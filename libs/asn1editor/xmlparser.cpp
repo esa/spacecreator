@@ -29,7 +29,7 @@ XMLParser::XMLParser(QObject *parent)
 {
 }
 
-QVariantMap XMLParser::parseAsn1XmlFile(const QString &filename)
+QVariantList XMLParser::parseAsn1XmlFile(const QString &filename)
 {
     if (QFileInfo::exists(filename)) {
         QFile file(filename);
@@ -44,99 +44,126 @@ QVariantMap XMLParser::parseAsn1XmlFile(const QString &filename)
     } else
         Q_EMIT parseError(tr("File not found"));
 
-    return QVariantMap();
+    return QVariantList();
 }
 
-QVariantMap XMLParser::parseAsn1XmlContent(const QString &content)
+QVariantList XMLParser::parseAsn1XmlContent(const QString &content)
 {
     QDomDocument doc;
     QDomElement root;
     QString errorMsg;
-    QVariantMap result;
+    QVariantList asn1TypesData;
 
     if (!doc.setContent(content, &errorMsg)) {
         Q_EMIT parseError(errorMsg);
-        return result;
+        return asn1TypesData;
     }
 
     root = doc.documentElement();
     if (root.isNull() || root.tagName() != "ASN1AST") {
         Q_EMIT parseError(tr("Invalid XML format"));
-        return result;
+        return asn1TypesData;
     }
 
     root = root.firstChildElement("Asn1File");
     if (root.isNull()) {
         Q_EMIT parseError(tr("Invalid XML format"));
-        return result;
+        return asn1TypesData;
     }
 
     QDomNodeList asn1Modules = root.elementsByTagName("Asn1Module");
+    QList<QDomNodeList> typeAssignments;
+
     for (int x = 0; x < asn1Modules.size(); ++x) {
         QDomElement asn1Module = asn1Modules.at(x).toElement();
 
-        QString moduleID = asn1Module.attribute("ID");
-        QDomNodeList typeAssignments = asn1Module.firstChildElement("TypeAssignments")
-                                               .elementsByTagName("TypeAssignment");
+        // store all TypeAssignment nodes
+        typeAssignments.append(asn1Module.firstChildElement("TypeAssignments")
+                                       .elementsByTagName("TypeAssignment"));
+    }
 
-        for (int x = 0; x < typeAssignments.size(); ++x) {
-            QDomElement elem = typeAssignments.at(x).toElement();
+    for (const QDomNodeList &typeAssignment : typeAssignments) {
+        for (int x = 0; x < typeAssignment.size(); ++x) {
+            QDomElement elem = typeAssignment.at(x).toElement();
 
-            result[moduleID + ":" + elem.attribute("Name")] = parseType(elem.firstChildElement("Type"),
-                                                                        elem.attribute("Name"));
+            asn1TypesData.append(parseType(typeAssignments,
+                                           elem.firstChildElement("Type"),
+                                           elem.attribute("Name")));
         }
     }
 
-    return result;
+    return asn1TypesData;
 }
 
-QVariantMap XMLParser::parseType(const QDomElement &type, const QString &name)
+QVariantMap XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
+                                 const QDomElement &type,
+                                 const QString &name)
 {
-    QVariantMap result;
+    QVariantMap typeData;
 
-    result["name"] = name;
-    result["isOptional"] = false;
-    result["alwaysPresent"] = true;
-    result["alwaysAbsent"] = false;
+    typeData["name"] = name;
+    typeData["isOptional"] = false;
+    typeData["alwaysPresent"] = true;
+    typeData["alwaysAbsent"] = false;
 
-    const QDomElement typeElem = type.firstChild().toElement();
-    const QString typeName = typeElem.tagName();
+    QDomElement typeElem = type.firstChild().toElement();
+    QString typeName = typeElem.tagName();
 
-    if (typeName == "IntegerType") {
-        result["type"] = "integer";
-        result["min"] = typeElem.attribute("Min").toInt();
-        result["max"] = typeElem.attribute("Max").toInt();
-    } else if (typeName == "RealType") {
-        result["type"] = "double";
-        result["min"] = typeElem.attribute("Min").toDouble();
-        result["max"] = typeElem.attribute("Max").toDouble();
-    } else if (typeName == "BooleanType") {
-        result["type"] = "bool";
-        result["default"] = false;
-    } else if (typeName == "SequenceType") {
-        result["type"] = "sequence";
-        parseSequenceType(typeElem, result);
-    } else if (typeName == "SequenceOfType") {
-        result["type"] = "sequenceOf";
-        result["min"] = typeElem.attribute("Min").toInt();
-        result["max"] = typeElem.attribute("Max").toInt();
-        result["seqoftype"] = parseType(typeElem.firstChild().toElement());
-    } else if (typeName == "EnumeratedType") {
-        result["type"] = "enumerated";
-        parseEnumeratedType(typeElem, result);
-    } else if (typeName == "ChoiceType") {
-        result["type"] = "choice";
-        parseChoiceType(typeElem, result);
-    } else if (typeName.endsWith("StringType")) {
-        result["type"] = "string";
-        result["min"] = typeElem.attribute("Min").toInt();
-        result["max"] = typeElem.attribute("Max").toInt();
+    // find type node for ReferenceType
+    while (typeName == "ReferenceType") {
+        for (const QDomNodeList &typeAssignment : typeAssignments) {
+            for (int x = 0; x < typeAssignment.size(); ++x) {
+                QDomElement elem = typeAssignment.at(x).toElement();
+                if (elem.attribute("Name") == typeElem.attribute("ReferencedTypeName")) {
+                    typeElem = elem.firstChildElement("Type").firstChild().toElement();
+                    typeName = typeElem.tagName();
+
+                    break;
+                }
+            }
+
+            if (typeName != "ReferenceType")
+                break;
+        }
     }
 
-    return result;
+    if (typeName == "IntegerType") {
+        typeData["type"] = "integer";
+        typeData["min"] = typeElem.attribute("Min").toInt();
+        typeData["max"] = typeElem.attribute("Max").toInt();
+    } else if (typeName == "RealType") {
+        typeData["type"] = "double";
+        typeData["min"] = typeElem.attribute("Min").toDouble();
+        typeData["max"] = typeElem.attribute("Max").toDouble();
+    } else if (typeName == "BooleanType") {
+        typeData["type"] = "bool";
+        typeData["default"] = false;
+    } else if (typeName == "SequenceType") {
+        typeData["type"] = "sequence";
+        parseSequenceType(typeAssignments, typeElem, typeData);
+    } else if (typeName == "SequenceOfType") {
+        typeData["type"] = "sequenceOf";
+        typeData["min"] = typeElem.attribute("Min").toInt();
+        typeData["max"] = typeElem.attribute("Max").toInt();
+        typeData["seqoftype"] = parseType(typeAssignments, typeElem.firstChild().toElement());
+    } else if (typeName == "EnumeratedType") {
+        typeData["type"] = "enumerated";
+        parseEnumeratedType(typeElem, typeData);
+    } else if (typeName == "ChoiceType") {
+        typeData["type"] = "choice";
+        parseChoiceType(typeAssignments, typeElem, typeData);
+    } else if (typeName.endsWith("StringType")) {
+        typeData["type"] = "string";
+        typeData["min"] = typeElem.attribute("Min").toInt();
+        typeData["max"] = typeElem.attribute("Max").toInt();
+    }
+
+    return typeData;
 }
 
-void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
+void XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
+                                  const QDomElement &type,
+                                  QVariantMap &result)
 {
     /*
 <SequenceType>
@@ -155,7 +182,8 @@ void XMLParser::parseSequenceType(const QDomElement &type, QVariantMap &result)
     for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
-        QVariantMap childType = parseType(elem.firstChildElement("Type"),
+        QVariantMap childType = parseType(typeAssignments,
+                                          elem.firstChildElement("Type"),
                                           elem.attribute("VarName"));
 
         childType["isOptional"] = elem.attribute("Optional") == "True";
@@ -196,7 +224,9 @@ void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result
     result["valuesInt"] = valuesInt;
 }
 
-void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
+void XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
+                                const QDomElement &type,
+                                QVariantMap &result)
 {
     /*
 <ChoiceType>
@@ -217,7 +247,8 @@ void XMLParser::parseChoiceType(const QDomElement &type, QVariantMap &result)
     for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
-        choices.append(parseType(elem.firstChildElement("Type"),
+        choices.append(parseType(typeAssignments,
+                                 elem.firstChildElement("Type"),
                                  elem.attribute("VarName")));
         choiceIdx.append(elem.attribute("EnumID"));
     }

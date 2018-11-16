@@ -43,28 +43,27 @@ private Q_SLOTS:
 
 private:
     using ItemPtr = QSharedPointer<QStandardItem>;
-    using ItemMap = QMap<QString, ItemPtr>;
+    using ItemMap = QMap<QString, QStandardItem *>;
 
     ItemMap createModelItems(QVariantMap asn1Item);
 
-    ItemPtr createNumberItem(QVariantMap asn1Item);
-    ItemPtr createBoolItem(QVariantMap asn1Item);
-    ItemPtr createSequenceItem(QVariantMap asn1Item, ItemPtr &parent);
-    ItemPtr createSequenceOfItem(QVariantMap asn1Item, ItemPtr &parent);
-    ItemPtr createEnumeratedItem(QVariantMap asn1Item);
-    ItemPtr createChoiceItem(QVariantMap asn1Item, ItemPtr &parent);
-    ItemPtr createStringItem(QVariantMap asn1Item);
+    QStandardItem *createNumberItem(QVariantMap asn1Item);
+    QStandardItem *createBoolItem(QVariantMap asn1Item);
+    QStandardItem *createSequenceItem(QVariantMap asn1Item, QStandardItem *parent);
+    QStandardItem *createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent);
+    QStandardItem *createEnumeratedItem(QVariantMap asn1Item);
+    QStandardItem *createChoiceItem(QVariantMap asn1Item, QStandardItem *parent);
+    QStandardItem *createStringItem(QVariantMap asn1Item);
 
-    ItemPtr createPresentItem(QVariantMap asn1Item);
+    QStandardItem *createPresentItem(QVariantMap asn1Item);
 
     void hideExtraFields(const QStandardItem *item, bool hide = false, int row = 0);
 
 private:
-    using ModelPtr = QSharedPointer<QStandardItemModel>;
-
     Asn1ItemDelegate *m_itemDelegate;
-    ModelPtr m_model;
-    ItemPtr m_rootTreeItem;
+    ItemPtr m_nameItem;
+    ItemPtr m_typeItem;
+    ItemPtr m_valueItem;
 };
 
 } // namespace asn1

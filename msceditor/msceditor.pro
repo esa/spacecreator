@@ -55,7 +55,7 @@ win32 {
         $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += \
-        -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor
+        -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor \
         -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets \
         -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
 } else:unix {
@@ -65,7 +65,7 @@ win32 {
         $$OUT_PWD/../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += \
-        -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor
+        -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor \
         -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary \
         -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
 }

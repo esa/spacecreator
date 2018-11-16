@@ -73,7 +73,11 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi();
 
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
-    connect(ui->actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
+
+    // TODO: just for test Asn1Editor
+    QAction *actionAsn1Editor = new QAction("ASN.1 Editor");
+    d->ui->mainToolBar->addAction(actionAsn1Editor);
+    connect(actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
     connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,

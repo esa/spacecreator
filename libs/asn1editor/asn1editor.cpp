@@ -62,7 +62,12 @@ void Asn1Editor::showParseError(const QString &error)
 
 void Asn1Editor::showAsn1Type(const QString &text)
 {
-    m_ans1TreeView->setAsn1Model(m_asn1Types[text].toMap());
+    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
+        return value.toMap()["name"] == text;
+    });
+
+    if (find != m_asn1Types.end())
+        m_ans1TreeView->setAsn1Model((*find).toMap());
 }
 
 void Asn1Editor::loadFile(const QString &file)
@@ -72,7 +77,12 @@ void Asn1Editor::loadFile(const QString &file)
     connect(&parser, &XMLParser::parseError, this, &Asn1Editor::showParseError);
 
     m_asn1Types = parser.parseAsn1XmlFile(file);
-    ui->typesCB->addItems(m_asn1Types.keys());
+    QStringList typeNames;
+
+    for (const auto &asn1Type : m_asn1Types)
+        typeNames << asn1Type.toMap()["name"].toString();
+
+    ui->typesCB->addItems(typeNames);
 }
 
 } // namespace asn1

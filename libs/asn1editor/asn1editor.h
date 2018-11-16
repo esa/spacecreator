@@ -48,7 +48,7 @@ private:
 private:
     Ui::Asn1Editor *ui;
     Asn1TreeView *m_ans1TreeView;
-    QVariantMap m_asn1Types;
+    QVariantList m_asn1Types;
 };
 
 } // namespace asn1

@@ -21,6 +21,7 @@
 #include <QObject>
 
 class QDomElement;
+class QDomNodeList;
 
 namespace asn1 {
 
@@ -31,17 +32,23 @@ class XMLParser : public QObject
 public:
     XMLParser(QObject *parent = nullptr);
 
-    QVariantMap parseAsn1XmlFile(const QString &filename);
-    QVariantMap parseAsn1XmlContent(const QString &content);
+    QVariantList parseAsn1XmlFile(const QString &filename);
+    QVariantList parseAsn1XmlContent(const QString &content);
 
 Q_SIGNALS:
     void parseError(const QString &error);
 
 private:
-    QVariantMap parseType(const QDomElement &type, const QString &name = QString());
-    void parseSequenceType(const QDomElement &type, QVariantMap &result);
+    QVariantMap parseType(const QList<QDomNodeList> &typeAssignments,
+                          const QDomElement &type,
+                          const QString &name = QString());
+    void parseSequenceType(const QList<QDomNodeList> &typeAssignments,
+                           const QDomElement &type,
+                           QVariantMap &result);
     void parseEnumeratedType(const QDomElement &type, QVariantMap &result);
-    void parseChoiceType(const QDomElement &type, QVariantMap &result);
+    void parseChoiceType(const QList<QDomNodeList> &typeAssignments,
+                         const QDomElement &type,
+                         QVariantMap &result);
 };
 
 } // namespace asn1
