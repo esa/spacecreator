@@ -406,7 +406,7 @@ TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | 
 
 MISC : OTHERCHARACTER | APOSTROPHE;
 
-OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '/' | '*' | '"' | '=';
+OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '='; // exclude '/' as it's used for linebreaks
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA; //  ';' and ':' were here (ttsiod)
 
@@ -428,4 +428,4 @@ STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
 COMMENTLOST : '/*' .*? '*/' -> skip;
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
-LB : '/\r' ->skip; // linebreak
+LB : ('/\r'|'/\n') ->skip; // linebreak
