@@ -17,34 +17,12 @@
 
 #pragma once
 
-#include "basecommand.h"
-
-#include <QPointF>
-
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
-{
-public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
-
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
-
-private:
-    MessageItem *m_messageItem = nullptr;
-
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
+enum class ToolType {
+    Pointer = 0,
+    InstanceCreator,
+    MessageCreator
 };
 
-} // ns cmd
 } // ns msc

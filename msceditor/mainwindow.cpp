@@ -25,6 +25,10 @@
 
 #include <commands/common/commandsstack.h>
 
+#include <tools/pointertool.h>
+#include <tools/instancecreatortool.h>
+#include <tools/messagecreatortool.h>
+
 #include <QApplication>
 #include <QComboBox>
 #include <QFileDialog>
@@ -35,13 +39,21 @@
 #include <QApplication>
 #include <QUndoGroup>
 #include <QUndoStack>
+#include <QToolBar>
+#include <QActionGroup>
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
         , m_model(new MainModel(mainWindow))
+        , m_toolBar(new QToolBar(QObject::tr("Tools"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
+        , m_tools({ new msc::PointerTool(nullptr, mainWindow),
+                    new msc::InstanceCreatorTool(nullptr, mainWindow),
+                    new msc::MessageCreatorTool(nullptr, mainWindow) })
     {
+        m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
+        mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
     }
 
     ~MainWindowPrivate()
@@ -51,6 +63,7 @@ struct MainWindowPrivate {
 
     Ui::MainWindow *ui = nullptr;
     MainModel *m_model = nullptr;
+    QToolBar *m_toolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
     QMenu *m_menuFile = nullptr;
@@ -63,6 +76,8 @@ struct MainWindowPrivate {
 
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
+
+    const QVector<msc::BaseTool *> m_tools;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -93,6 +108,11 @@ MainWindow::MainWindow(QWidget *parent)
 #ifdef DEVELOPER_AUTO_OPEN_MSC
     doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("dengof.sample2.local.msc"));
 #endif //DEVELOPER_AUTO_OPEN_MSC
+}
+
+QGraphicsView *MainWindow::currentView() const
+{
+    return d->ui->graphicsView;
 }
 
 MainWindow::~MainWindow()
@@ -172,6 +192,7 @@ void MainWindow::setupUi()
     d->ui->setupUi(this);
 
     initMenus();
+    initTools();
 
     // status bar
     auto zoomBox = new QComboBox(d->ui->statusBar);
@@ -230,4 +251,22 @@ void MainWindow::initMenuHelp()
 {
     d->m_menuHelp = menuBar()->addMenu(tr("Help"));
     d->m_actAboutQt = d->m_menuHelp->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
+}
+
+void MainWindow::initTools()
+{
+    QActionGroup *toolsActions = new QActionGroup(this);
+    for (msc::BaseTool *tool : d->m_tools) {
+        QAction *toolAction = d->m_toolBar->addAction(tool->title());
+        toolAction->setCheckable(true);
+        toolAction->setIcon(tool->icon());
+        toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        tool->setView(currentView());
+        connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
+
+        toolsActions->addAction(toolAction);
+        connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
+    }
+
+    toolsActions->actions().first()->setChecked(true);
 }

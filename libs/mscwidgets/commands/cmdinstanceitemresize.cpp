@@ -23,7 +23,7 @@ namespace msc {
 namespace cmd {
 
 CmdInstanceItemResize::CmdInstanceItemResize(InstanceItem *instanceItem, const QRectF &destination)
-    : BaseCommand(msc::cmd::Id::ResizeInstance, instanceItem)
+    : BaseCommand(instanceItem)
     , m_instanceItem(instanceItem)
     , m_newGeometry(destination)
     , m_oldGeometry(instanceItem ? instanceItem->boundingRect() : QRectF())
@@ -52,6 +52,11 @@ bool CmdInstanceItemResize::mergeWith(const QUndoCommand *command)
     }
 
     return false;
+}
+
+int CmdInstanceItemResize::id() const
+{
+    return msc::cmd::Id::ResizeInstance;
 }
 
 } // ns cmd

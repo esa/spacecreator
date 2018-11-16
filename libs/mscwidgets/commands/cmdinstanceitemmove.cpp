@@ -25,7 +25,7 @@ namespace cmd {
 
 CmdInstanceItemMove::CmdInstanceItemMove(InstanceItem *instanceItem,
                                          const QPointF &destination)
-    : BaseCommand(msc::cmd::Id::MoveInstance, instanceItem)
+    : BaseCommand(instanceItem)
     , m_posFrom(instanceItem ? instanceItem->pos() : QPointF())
     , m_posTo(destination)
 {
@@ -53,6 +53,11 @@ bool CmdInstanceItemMove::mergeWith(const QUndoCommand *command)
     }
 
     return false;
+}
+
+int CmdInstanceItemMove::id() const
+{
+    return msc::cmd::Id::MoveInstance;
 }
 
 } // namespace cmd

@@ -17,34 +17,27 @@
 
 #pragma once
 
-#include "basecommand.h"
-
-#include <QPointF>
+#include "basetool.h"
 
 namespace msc {
 
+class MscMessage;
 class MessageItem;
 
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+class MessageCreatorTool : public BaseTool
 {
+    Q_OBJECT
 public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    MessageCreatorTool(QGraphicsView *view, QObject *parent = nullptr);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+    virtual ToolType toolType() const override;
 
-private:
+protected:
+    MscMessage *m_message = nullptr;
     MessageItem *m_messageItem = nullptr;
 
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
 };
 
-} // ns cmd
 } // ns msc

@@ -19,23 +19,16 @@
 namespace msc {
 namespace cmd {
 
-BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, QUndoCommand *parent)
+BaseCommand::BaseCommand(QGraphicsItem *item, QUndoCommand *parent)
     : QUndoCommand(parent)
-    , m_id(id)
     , m_graphicsItem(item)
 {
 }
 
-BaseCommand::BaseCommand(msc::cmd::Id id, QGraphicsItem *item, const QString &text, QUndoCommand *parent)
+BaseCommand::BaseCommand(QGraphicsItem *item, const QString &text, QUndoCommand *parent)
     : QUndoCommand(text, parent)
-    , m_id(id)
     , m_graphicsItem(item)
 {
-}
-
-int BaseCommand::id() const
-{
-    return m_id;
 }
 
 bool BaseCommand::canMergeWith(const BaseCommand *cmd) const
