@@ -96,5 +96,37 @@ QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal toler
     return result;
 }
 
+void deleteGraphicsItem(QGraphicsItem **item)
+{
+    if (!(*item) || !(*item)->scene())
+        return;
+
+    // Removing an item by QGraphicsScene::removeItem + delete
+    // crashes the application in QGraphicsSceneFindItemBspTreeVisitor::visit.
+    // It seems I messed something up with InteractiveItem's geometry updates,
+    // but it's not clear what exactly :(
+    //
+    // https://forum.qt.io/topic/71316/qgraphicsscenefinditembsptreevisitor-visit-crashes-due-to-an-obsolete-paintevent-after-qgraphicsscene-removeitem
+    // https://stackoverflow.com/questions/38458830/crash-after-qgraphicssceneremoveitem-with-custom-item-class
+    //
+    // Workaround from discussions above:
+    // Just delete the item (without removing it from scene). I'm not sure how,
+    // but with manual adding/removing it seems to work.
+    // But the crash is here agin when stresstesting with QBENCHMARK
+    //
+    // https://bugreports.qt.io/browse/QTBUG-18021
+    //
+    // The permanent switch of ItemIndexMethod to the QGraphicsScene::NoIndex leads to not so smooth
+    // expirience in a brief manual tests.
+    // This way a temporrary switch to QGraphicsScene::NoIndex seems to be a best option for now:
+
+    QGraphicsScene *scene((*item)->scene());
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    scene->removeItem(*item);
+    delete *item;
+    *item = nullptr;
+    scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+}
+
 } // ns utils
 } // ns msc

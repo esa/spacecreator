@@ -50,9 +50,15 @@ public:
     QRectF boundingRect() const override;
 
     QPointF head() const;
-    void setHead(const QPointF &head);
+    void setHead(const QPointF &head, ObjectAnchor::Snap snap);
     QPointF tail() const;
-    void setTail(const QPointF &tail);
+    void setTail(const QPointF &tail, ObjectAnchor::Snap snap);
+
+    bool isAutoResizable() const;
+    void setAutoResizable(bool resizable);
+
+    static MessageItem *createDefaultItem(MscMessage *message, const QPointF &pos);
+    static MessageItem *createDefaultItemSnapped(MscMessage *message, const QPointF &pos);
 
 public Q_SLOTS:
     void updateLayout();
@@ -77,12 +83,16 @@ private:
     InstanceItem *m_targetInstance = nullptr;
     bool m_layoutDirty = false;
     bool m_connectingObjects = false;
+    bool m_autoResize = true;
+
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     bool updateSource(const QPointF &to, ObjectAnchor::Snap snap);
     bool updateTarget(const QPointF &to, ObjectAnchor::Snap snap);
     bool updateSourceAndTarget(const QPointF &shift);
     void updateTooltip();
+
+    static MessageItem *createDefaultItemImpl(MscMessage *message, const QPointF &pos, ObjectAnchor::Snap snap);
 };
 
 } // namespace mas

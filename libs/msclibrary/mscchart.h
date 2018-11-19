@@ -44,6 +44,7 @@ public:
 
     const QVector<MscMessage *> &messages() const;
     void addMessage(MscMessage *message);
+    void removeMessage(MscMessage *message);
 
     MscMessage *messageByName(const QString &name) const;
 
@@ -52,6 +53,7 @@ public:
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void messageAdded(MscMessage *message);
+    void messageRemoved(MscMessage *message);
 
 private:
     QVector<MscInstance *> m_instances;

@@ -37,15 +37,12 @@ ToolType InstanceCreatorTool::toolType() const
 
 void InstanceCreatorTool::createPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
     if (!m_scene)
         return;
 }
 
 void InstanceCreatorTool::commitPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
-
     if (!m_previewItem || !m_scene)
         return;
 }

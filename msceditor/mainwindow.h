@@ -61,6 +61,7 @@ private:
     void initMenuEdit();
     void initMenuHelp();
     void initTools();
+    void initConnections();
 
     bool doOpenFile(const QString &file);
 };

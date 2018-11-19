@@ -20,14 +20,17 @@
 #include "tooltypes.h"
 
 #include <QObject>
+#include <QPointer>
 #include <QPixmap>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
 
-class QGraphicsView;
-class QGraphicsScene;
-class QGraphicsItem;
 class QMouseEvent;
 
 namespace msc {
+
+class ChartViewModel;
 
 class BaseTool : public QObject
 {
@@ -52,8 +55,8 @@ Q_SIGNALS:
     void activeChanged(bool to);
 
 protected:
-    QGraphicsView *m_view = nullptr;
-    QGraphicsScene *m_scene = nullptr;
+    QPointer<QGraphicsView> m_view;
+    QPointer<QGraphicsScene> m_scene;
     bool m_active = false;
     QPixmap m_icon;
     QString m_title = tr("Untitled");

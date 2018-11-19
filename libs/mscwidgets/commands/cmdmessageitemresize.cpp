@@ -38,16 +38,16 @@ CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem,
 void CmdMessageItemResize::redo()
 {
     if (m_messageItem) {
-        m_messageItem->setHead(m_newHead);
-        m_messageItem->setTail(m_newTail);
+        m_messageItem->setHead(m_newHead, ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setTail(m_newTail, ObjectAnchor::Snap::NoSnap);
     }
 }
 
 void CmdMessageItemResize::undo()
 {
     if (m_messageItem) {
-        m_messageItem->setHead(m_oldHead);
-        m_messageItem->setTail(m_oldTail);
+        m_messageItem->setHead(m_oldHead, ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setTail(m_oldTail, ObjectAnchor::Snap::NoSnap);
     }
 }
 

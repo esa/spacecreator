@@ -17,27 +17,38 @@
 
 #pragma once
 
-#include "basecreatortool.h"
+#include "commands/basecommand.h"
+#include "chartviewmodel.h"
+#include "messageitem.h"
 #include <mscmessage.h>
-#include <messageitem.h>
+
+#include <QPointF>
+#include <QPointer>
+
+#include <QGraphicsScene>
 
 namespace msc {
+namespace cmd {
 
-class MessageCreatorTool : public BaseCreatorTool
+class CmdMessageItemCreate : public BaseCommand
 {
-    Q_OBJECT
 public:
-    MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    CmdMessageItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos);
 
-    virtual ToolType toolType() const override;
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
-protected:
-    QPointer<MscMessage> m_message = nullptr;
-    QPointer<MessageItem> m_messageItem = nullptr;
+private:
+    QPointer<QGraphicsScene> m_scene;
+    QPointer<ChartViewModel> m_model;
+    QPointer<MscMessage> m_message;
+    QPointer<MessageItem> m_messageItem;
+    QPointF m_pos;
 
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
-    void removePreviewItem() override;
+    bool validateStorages(const char *caller) const;
 };
 
+} // ns cmd
 } // ns msc

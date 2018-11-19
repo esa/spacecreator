@@ -15,29 +15,19 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
 #include "basecreatortool.h"
-#include <mscmessage.h>
-#include <messageitem.h>
 
 namespace msc {
 
-class MessageCreatorTool : public BaseCreatorTool
+BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : BaseTool(view, parent)
+    , m_model(model)
 {
-    Q_OBJECT
-public:
-    MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+}
 
-    virtual ToolType toolType() const override;
-
-protected:
-    QPointer<MscMessage> m_message = nullptr;
-    QPointer<MessageItem> m_messageItem = nullptr;
-
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
-    void removePreviewItem() override;
-};
+void BaseCreatorTool::setModel(ChartViewModel *model)
+{
+    m_model = model;
+}
 
 } // ns msc

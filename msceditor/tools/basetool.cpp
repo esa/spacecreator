@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "basetool.h"
+#include "baseitems/common/utils.h"
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -86,8 +87,6 @@ void BaseTool::setActive(bool active)
             createPreviewItem();
         } else {
             m_view->viewport()->removeEventFilter(this);
-
-            removePreviewItem();
         }
     }
 
@@ -113,7 +112,7 @@ bool BaseTool::onMouseRelease(QMouseEvent *e)
 bool BaseTool::onMouseMove(QMouseEvent *e)
 {
     if (m_view)
-        movePreviewItem(m_view->mapToScene(e->pos()));
+        movePreviewItem(m_view->mapToScene(m_view->mapFromGlobal(e->globalPos())));
 
     return true;
 }
@@ -140,8 +139,6 @@ bool BaseTool::eventFilter(QObject *watched, QEvent *event)
 
 void BaseTool::movePreviewItem(const QPointF &scenePos)
 {
-    qDebug() << Q_FUNC_INFO << title();
-
     if (!m_previewItem)
         return;
 
@@ -150,12 +147,10 @@ void BaseTool::movePreviewItem(const QPointF &scenePos)
 
 void BaseTool::removePreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
     if (!m_previewItem || !m_scene)
         return;
 
-    m_scene->removeItem(m_previewItem);
-    m_previewItem = nullptr;
+    utils::deleteGraphicsItem(&m_previewItem);
 }
 
 QPointF BaseTool::scenePos() const
