@@ -50,7 +50,7 @@ struct MainWindowPrivate {
         , m_undoGroup(new QUndoGroup(mainWindow))
         , m_tools({ new msc::PointerTool(nullptr, mainWindow),
                     new msc::InstanceCreatorTool(nullptr, mainWindow),
-                    new msc::MessageCreatorTool(nullptr, mainWindow) })
+                    new msc::MessageCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow) })
     {
         m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
         mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
@@ -85,25 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     , d(new MainWindowPrivate(this))
 {
     setupUi();
-
-    d->ui->graphicsView->setScene(d->m_model->graphicsScene());
-
-    d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
-    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &MainWindow::showSelection);
-
-    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
-
-    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
-        statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
-                                         .arg(screen.x())
-                                         .arg(screen.y())
-                                         .arg(scene.x())
-                                         .arg(scene.y())
-                                         .arg(item.x())
-                                         .arg(item.y()));
-    });
-    statusBar()->show();
+    initConnections();
 
 #ifdef DEVELOPER_AUTO_OPEN_MSC
     doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("dengof.sample2.local.msc"));
@@ -190,6 +172,8 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
+    d->ui->graphicsView->setScene(d->m_model->graphicsScene());
+    d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
 
     initMenus();
     initTools();
@@ -215,6 +199,7 @@ void MainWindow::setupUi()
         d->ui->graphicsView->setZoom(percent);
     });
     statusBar()->addPermanentWidget(zoomBox);
+    statusBar()->show();
 }
 
 void MainWindow::initMenus()
@@ -269,4 +254,22 @@ void MainWindow::initTools()
     }
 
     toolsActions->actions().first()->setChecked(true);
+}
+
+void MainWindow::initConnections()
+{
+    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &MainWindow::showSelection);
+
+    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+
+    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
+        statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
+                                         .arg(screen.x())
+                                         .arg(screen.y())
+                                         .arg(scene.x())
+                                         .arg(scene.y())
+                                         .arg(item.x())
+                                         .arg(item.y()));
+    });
 }

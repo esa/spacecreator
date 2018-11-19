@@ -12,7 +12,8 @@ SOURCES += \
     tools/basetool.cpp \
     tools/pointertool.cpp \
     tools/instancecreatortool.cpp \
-    tools/messagecreatortool.cpp
+    tools/messagecreatortool.cpp \
+    tools/basecreatortool.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -21,7 +22,8 @@ HEADERS += \
     tools/tooltypes.h \
     tools/pointertool.h \
     tools/instancecreatortool.h \
-    tools/messagecreatortool.h
+    tools/messagecreatortool.h \
+    tools/basecreatortool.h
 
 FORMS += \
     mainwindow.ui

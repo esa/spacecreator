@@ -17,27 +17,21 @@
 
 #pragma once
 
-#include "basecreatortool.h"
-#include <mscmessage.h>
-#include <messageitem.h>
+#include "basetool.h"
+#include "chartviewmodel.h"
 
 namespace msc {
 
-class MessageCreatorTool : public BaseCreatorTool
+class BaseCreatorTool : public BaseTool
 {
     Q_OBJECT
 public:
-    MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
-
-    virtual ToolType toolType() const override;
+    BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+public slots:
+    void setModel(ChartViewModel *model);
 
 protected:
-    QPointer<MscMessage> m_message = nullptr;
-    QPointer<MessageItem> m_messageItem = nullptr;
-
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
-    void removePreviewItem() override;
+    QPointer<ChartViewModel> m_model = nullptr;
 };
 
 } // ns msc

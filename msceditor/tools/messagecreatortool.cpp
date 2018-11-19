@@ -17,9 +17,8 @@
 
 #include "messagecreatortool.h"
 
-#include <mscmessage.h>
-#include <messageitem.h>
 #include <baseitems/arrowitem.h>
+#include "commands/common/commandsstack.h"
 
 #include <QGraphicsScene>
 #include <QMouseEvent>
@@ -28,8 +27,8 @@
 
 namespace msc {
 
-MessageCreatorTool::MessageCreatorTool(QGraphicsView *view, QObject *parent)
-    : BaseTool(view, parent)
+MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Message");
     m_description = tr("Create new Message item");
@@ -42,18 +41,35 @@ ToolType MessageCreatorTool::toolType() const
 
 void MessageCreatorTool::createPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
-
-    if (!m_scene)
+    if (!m_scene || (m_message && m_messageItem))
         return;
+
+    m_message = new MscMessage(tr("New message"), this);
+    m_messageItem = MessageItem::createDefaultItem(m_message, scenePos());
+    m_scene->addItem(m_messageItem);
+    m_messageItem->setAutoResizable(false);
+
+    m_previewItem = m_messageItem;
+    m_previewItem->setOpacity(0.5);
 }
 
 void MessageCreatorTool::commitPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
-
     if (!m_previewItem || !m_scene)
         return;
+
+    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
+    const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
+                                      QVariant::fromValue<ChartViewModel *>(m_model),
+                                      messageItem->pos() };
+
+    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+}
+
+void MessageCreatorTool::removePreviewItem()
+{
+    BaseCreatorTool::removePreviewItem();
+    delete m_message;
 }
 
 } // ns msc

@@ -87,6 +87,19 @@ void MscChart::addMessage(MscMessage *message)
     Q_EMIT messageAdded(message);
 }
 
+void MscChart::removeMessage(MscMessage *message)
+{
+    if (message == nullptr) {
+        return;
+    }
+    if (!m_messages.contains(message)) {
+        return;
+    }
+
+    m_messages.removeAll(message);
+    Q_EMIT messageRemoved(message);
+}
+
 MscMessage *MscChart::messageByName(const QString &name) const
 {
     for (MscMessage *message : m_messages) {

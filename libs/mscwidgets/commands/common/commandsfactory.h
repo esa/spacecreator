@@ -30,10 +30,11 @@ namespace cmd {
 class CommandsFactory
 {
 public:
-    static QUndoCommand *create_messageItemMove(const QVariantList &params);
-    static QUndoCommand *create_messageItemResize(const QVariantList &params);
-    static QUndoCommand *create_instanceItemMove(const QVariantList &params);
-    static QUndoCommand *create_instanceItemResize(const QVariantList &params);
+    static QUndoCommand *createMessageItemMove(const QVariantList &params);
+    static QUndoCommand *createMessageItemResize(const QVariantList &params);
+    static QUndoCommand *createMessageItemCreate(const QVariantList &params);
+    static QUndoCommand *createInstanceItemMove(const QVariantList &params);
+    static QUndoCommand *createInstanceItemResize(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

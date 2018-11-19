@@ -55,12 +55,10 @@ bool PointerTool::onMouseMove(QMouseEvent *e)
 
 void PointerTool::createPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
 }
 
 void PointerTool::commitPreviewItem()
 {
-    qDebug() << Q_FUNC_INFO << title();
 }
 
 } // ns msc
