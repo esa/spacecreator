@@ -29,8 +29,6 @@ const int CHOICE_LIST = Qt::UserRole + 3;
 const int INTMAP = Qt::UserRole + 4;
 const int PLOTTERS = Qt::UserRole + 5;
 const int OPTIONAL = Qt::UserRole + 6;
-const int ALWAYS_PRESENT = Qt::UserRole + 7;
-const int ALWAYS_ABSENT = Qt::UserRole + 8;
 
 class Asn1ItemDelegate : public QStyledItemDelegate
 {

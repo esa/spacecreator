@@ -9,15 +9,15 @@ QT += core gui widgets xml
 
 HEADERS += \
     asn1editor.h \
-    xmlparser.h \
     asn1itemdelegate.h \
-    asn1treeview.h
+    asn1treeview.h \
+    asn1xmlparser.h
 
 SOURCES += \
     asn1editor.cpp \
-    xmlparser.cpp \
     asn1itemdelegate.cpp \
-    asn1treeview.cpp
+    asn1treeview.cpp \
+    asn1xmlparser.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

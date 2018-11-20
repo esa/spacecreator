@@ -20,7 +20,7 @@
 
 #include "asn1editor.h"
 #include "asn1treeview.h"
-#include "xmlparser.h"
+#include "asn1xmlparser.h"
 
 #include "ui_asn1editor.h"
 
@@ -72,9 +72,9 @@ void Asn1Editor::showAsn1Type(const QString &text)
 
 void Asn1Editor::loadFile(const QString &file)
 {
-    XMLParser parser;
+    Asn1XMLParser parser;
 
-    connect(&parser, &XMLParser::parseError, this, &Asn1Editor::showParseError);
+    connect(&parser, &Asn1XMLParser::parseError, this, &Asn1Editor::showParseError);
 
     m_asn1Types = parser.parseAsn1XmlFile(file);
     QStringList typeNames;

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ASN1AST>
+   <Asn1File FileName="test.asn">
+      <Asn1Module ID="ModuleTest">
+         <TypeAssignments>
+            <TypeAssignment Name="MyInt" Line="6" CharPositionInLine="0">
+               <Type Line="6" CharPositionInLine="10">
+                  <IntegerType Min="0" Max="20" />
+               </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="MyReal" Line="11" CharPositionInLine="3">
+               <Type Line="11" CharPositionInLine="19">
+                  <RealType Min="0.00000000000000000000E+000" Max="1.00000000000000000000E+003" />
+               </Type>
+            </TypeAssignment>
+         </TypeAssignments>
+      </Asn1Module>
+   </Asn1File>
+</ASN1AST>

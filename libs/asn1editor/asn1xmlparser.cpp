@@ -20,16 +20,16 @@
 #include <QFileInfo>
 #include <QVariantMap>
 
-#include "xmlparser.h"
+#include "asn1xmlparser.h"
 
 namespace asn1 {
 
-XMLParser::XMLParser(QObject *parent)
+Asn1XMLParser::Asn1XMLParser(QObject *parent)
     : QObject(parent)
 {
 }
 
-QVariantList XMLParser::parseAsn1XmlFile(const QString &filename)
+QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &filename)
 {
     if (QFileInfo::exists(filename)) {
         QFile file(filename);
@@ -38,7 +38,7 @@ QVariantList XMLParser::parseAsn1XmlFile(const QString &filename)
             const auto content = file.readAll();
             file.close();
 
-            return parseAsn1XmlContent(content);
+            return parseXml(content);
         } else
             Q_EMIT parseError(file.errorString());
     } else
@@ -47,7 +47,7 @@ QVariantList XMLParser::parseAsn1XmlFile(const QString &filename)
     return QVariantList();
 }
 
-QVariantList XMLParser::parseAsn1XmlContent(const QString &content)
+QVariantList Asn1XMLParser::parseXml(const QString &content)
 {
     QDomDocument doc;
     QDomElement root;
@@ -95,16 +95,14 @@ QVariantList XMLParser::parseAsn1XmlContent(const QString &content)
     return asn1TypesData;
 }
 
-QVariantMap XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
-                                 const QDomElement &type,
-                                 const QString &name)
+QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
+                                     const QDomElement &type,
+                                     const QString &name)
 {
     QVariantMap typeData;
 
     typeData["name"] = name;
     typeData["isOptional"] = false;
-    typeData["alwaysPresent"] = true;
-    typeData["alwaysAbsent"] = false;
 
     QDomElement typeElem = type.firstChild().toElement();
     QString typeName = typeElem.tagName();
@@ -161,9 +159,9 @@ QVariantMap XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     return typeData;
 }
 
-void XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
-                                  const QDomElement &type,
-                                  QVariantMap &result)
+void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
+                                      const QDomElement &type,
+                                      QVariantMap &result)
 {
     /*
 <SequenceType>
@@ -187,8 +185,6 @@ void XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
                                           elem.attribute("VarName"));
 
         childType["isOptional"] = elem.attribute("Optional") == "True";
-        childType["alwaysPresent"] = elem.attribute("alwaysPresent") == "True";
-        childType["alwaysAbsent"] = elem.attribute("alwaysAbsent") == "False";
 
         children.append(childType);
     }
@@ -196,7 +192,7 @@ void XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
     result["children"] = children;
 }
 
-void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
+void Asn1XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
 {
     /*
 <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
@@ -224,9 +220,9 @@ void XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result
     result["valuesInt"] = valuesInt;
 }
 
-void XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
-                                const QDomElement &type,
-                                QVariantMap &result)
+void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
+                                    const QDomElement &type,
+                                    QVariantMap &result)
 {
     /*
 <ChoiceType>

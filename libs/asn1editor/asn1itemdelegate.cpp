@@ -46,10 +46,9 @@ void Asn1ItemDelegate::paint(QPainter *painter,
     if (index.column() == 0)
         rc.setLeft(0);
 
-    QVector<QLine> lines { QLine(rc.left(), rc.bottom(), rc.right(), rc.bottom()),
-                           QLine(rc.right(), rc.top(), rc.right(), rc.bottom()) };
+    painter->drawLines({ QLineF(rc.left(), rc.bottom(), rc.right(), rc.bottom()),
+                         QLineF(rc.right(), rc.top(), rc.right(), rc.bottom()) });
 
-    painter->drawLines(&lines[0], 2);
     painter->restore();
 }
 

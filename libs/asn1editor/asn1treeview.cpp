@@ -147,7 +147,7 @@ QStandardItem *Asn1TreeView::createNumberItem(QVariantMap asn1Item)
 
 QStandardItem *Asn1TreeView::createBoolItem(QVariantMap asn1Item)
 {
-    static const QVariantList choices { QString("true"), QString("false") };
+    static const QVariantList choices { QString("True"), QString("False") };
 
     QStandardItem *item = new QStandardItem(asn1Item["default"].toString());
 
@@ -271,14 +271,12 @@ QStandardItem *Asn1TreeView::createPresentItem(QVariantMap asn1Item)
 {
     QStandardItem *item = new QStandardItem();
 
-    if (asn1Item["isOptional"].toBool() == true && asn1Item["alwaysPresent"].toBool() == false && asn1Item["alwaysAbsent"].toBool() == false) {
+    if (asn1Item["isOptional"].toBool() == true) {
         item->setCheckState(Qt::Checked);
         item->setCheckable(true);
     }
 
     item->setData(asn1Item["isOptional"], OPTIONAL);
-    item->setData(asn1Item["alwaysAbsent"], ALWAYS_ABSENT);
-    item->setData(asn1Item["alwaysPresent"], ALWAYS_PRESENT);
 
     return item;
 }
