@@ -7,6 +7,7 @@
 
 echo "Building ANTLR C++ runtime"
 
+export CXX=$(which g++)
 cd 3rdparty/antlr
 mkdir build
 cd build
