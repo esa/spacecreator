@@ -23,6 +23,7 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstanceitemresize.h"
+#include "commands/cmdinstanceitemcreate.h"
 
 #include <messageitem.h>
 #include <instanceitem.h>
@@ -95,6 +96,19 @@ QUndoCommand *CommandsFactory::createInstanceItemResize(const QVariantList &para
         if (item->boundingRect() != newGeometry)
             return new CmdInstanceItemResize(item, newGeometry);
     }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (QGraphicsScene *scene = params.at(0).value<QGraphicsScene *>())
+        if (ChartViewModel *model = params.at(1).value<ChartViewModel *>()) {
+            const QPointF &pos(params.at(2).toPointF());
+            return new CmdInstanceItemCreate(scene, model, pos);
+        }
 
     return nullptr;
 }

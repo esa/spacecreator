@@ -20,9 +20,6 @@
 #include <baseitems/arrowitem.h>
 #include "commands/common/commandsstack.h"
 
-#include <QGraphicsScene>
-#include <QMouseEvent>
-
 #include <QDebug>
 
 namespace msc {

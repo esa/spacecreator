@@ -252,4 +252,13 @@ void InstanceItem::setBoundingRect(const QRectF &geometry)
     m_gripPoints->updateLayout();
     updateLayout();
 }
+
+InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPointF &pos)
+{
+    InstanceItem *messageItem = new InstanceItem(instance);
+    messageItem->setPos(pos);
+
+    return messageItem;
+}
+
 } // namespace msc
