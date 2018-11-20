@@ -34,7 +34,8 @@ HEADERS += \
     graphicsview.h \
     instanceitem.h \
     messageitem.h \
-    commands/cmdmessageitemcreate.h
+    commands/cmdmessageitemcreate.h \
+    commands/cmdinstanceitemcreate.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -61,7 +62,8 @@ SOURCES += \
     graphicsview.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    commands/cmdmessageitemcreate.cpp
+    commands/cmdmessageitemcreate.cpp \
+    commands/cmdinstanceitemcreate.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

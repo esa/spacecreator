@@ -67,6 +67,9 @@ bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
     case cmd::ResizeInstance:
         command = cmd::CommandsFactory::createInstanceItemResize(params);
         break;
+    case cmd::CreateInstance:
+        command = cmd::CommandsFactory::createInstanceItemCreate(params);
+        break;
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;

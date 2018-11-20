@@ -16,15 +16,14 @@
 */
 
 #include "instancecreatortool.h"
+#include "commands/common/commandsstack.h"
 
-#include <QGraphicsView>
-#include <QMouseEvent>
 #include <QDebug>
 
 namespace msc {
 
-InstanceCreatorTool::InstanceCreatorTool(QGraphicsView *view, QObject *parent)
-    : BaseTool(view, parent)
+InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Instance");
     m_description = tr("Create new Instance item");
@@ -37,13 +36,33 @@ ToolType InstanceCreatorTool::toolType() const
 
 void InstanceCreatorTool::createPreviewItem()
 {
-    if (!m_scene)
+    if (!m_scene || (m_instance && m_instanceItem))
         return;
+
+    m_instance = new MscInstance(tr("New message"), this);
+    m_instanceItem = InstanceItem::createDefaultItem(m_instance, scenePos());
+    m_scene->addItem(m_instanceItem);
+
+    m_previewItem = m_instanceItem;
+    m_previewItem->setOpacity(0.5);
 }
 
 void InstanceCreatorTool::commitPreviewItem()
 {
     if (!m_previewItem || !m_scene)
         return;
+
+    const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
+                                      QVariant::fromValue<ChartViewModel *>(m_model),
+                                      m_previewItem->pos() };
+
+    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 }
+
+void InstanceCreatorTool::removePreviewItem()
+{
+    BaseCreatorTool::removePreviewItem();
+    delete m_instance;
+}
+
 } // ns msc

@@ -53,6 +53,8 @@ public:
 
     void setBoundingRect(const QRectF &geometry);
 
+    static InstanceItem *createDefaultItem(MscInstance *instance, const QPointF &pos);
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);

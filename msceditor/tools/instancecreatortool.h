@@ -17,20 +17,26 @@
 
 #pragma once
 
-#include "basetool.h"
+#include "basecreatortool.h"
+#include "instanceitem.h"
+#include "mscinstance.h"
 
 namespace msc {
 
-class InstanceCreatorTool : public BaseTool
+class InstanceCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    InstanceCreatorTool(QGraphicsView *view, QObject *parent = nullptr);
+    InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
     virtual ToolType toolType() const override;
 
 protected:
+    QPointer<MscInstance> m_instance = nullptr;
+    QPointer<InstanceItem> m_instanceItem = nullptr;
+
     void createPreviewItem() override;
     void commitPreviewItem() override;
+    void removePreviewItem() override;
 };
 
 } // ns msc

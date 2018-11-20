@@ -49,7 +49,7 @@ struct MainWindowPrivate {
         , m_toolBar(new QToolBar(QObject::tr("Tools"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
         , m_tools({ new msc::PointerTool(nullptr, mainWindow),
-                    new msc::InstanceCreatorTool(nullptr, mainWindow),
+                    new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow),
                     new msc::MessageCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow) })
     {
         m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);

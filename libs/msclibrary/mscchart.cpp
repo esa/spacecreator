@@ -59,6 +59,19 @@ void MscChart::addInstance(MscInstance *instance)
     Q_EMIT instanceAdded(instance);
 }
 
+void MscChart::removeInstance(MscInstance *instance)
+{
+    if (instance == nullptr) {
+        return;
+    }
+    if (!m_instances.contains(instance)) {
+        return;
+    }
+
+    m_instances.removeAll(instance);
+    Q_EMIT instanceRemoved(instance);
+}
+
 MscInstance *MscChart::instanceByName(const QString &name) const
 {
     for (MscInstance *instance : m_instances) {

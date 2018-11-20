@@ -32,6 +32,7 @@ private Q_SLOTS:
     void init();
     void cleanup();
     void testAddInstance();
+    void testRemoveInstance();
     void testNoDuplicateInstance();
     void testNoNullPtrInstance();
     void testInstanceByName();
@@ -70,6 +71,23 @@ void tst_MscChart::testAddInstance()
     auto instance2 = new MscInstance("OUT", m_chart);
     m_chart->addInstance(instance2);
     QCOMPARE(m_chart->instances().size(), 2);
+}
+
+void tst_MscChart::testRemoveInstance()
+{
+    QCOMPARE(m_chart->instances().size(), 0);
+
+    QScopedPointer<MscInstance> instance1(new MscInstance("IN", m_chart));
+    QScopedPointer<MscInstance> instance2(new MscInstance("OUT", m_chart));
+
+    m_chart->addInstance(instance1.data());
+    m_chart->addInstance(instance2.data());
+    QCOMPARE(m_chart->instances().size(), 2);
+
+    m_chart->removeInstance(instance1.data());
+    QCOMPARE(m_chart->instances().size(), 1);
+    m_chart->removeInstance(instance2.data());
+    QCOMPARE(m_chart->instances().size(), 0);
 }
 
 void tst_MscChart::testNoDuplicateInstance()
