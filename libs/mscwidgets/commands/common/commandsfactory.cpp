@@ -16,11 +16,14 @@
 */
 #include "commandsfactory.h"
 #include "commandsstack.h"
+#include "chartviewmodel.h"
 
 #include "commands/cmdmessageitemmove.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstanceitemresize.h"
+#include "commands/cmdinstanceitemcreate.h"
 
 #include <messageitem.h>
 #include <instanceitem.h>
@@ -32,7 +35,7 @@
 namespace msc {
 namespace cmd {
 
-QUndoCommand *CommandsFactory::create_messageItemMove(const QVariantList &params)
+QUndoCommand *CommandsFactory::createMessageItemMove(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 2);
 
@@ -45,7 +48,7 @@ QUndoCommand *CommandsFactory::create_messageItemMove(const QVariantList &params
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::create_messageItemResize(const QVariantList &params)
+QUndoCommand *CommandsFactory::createMessageItemResize(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 3);
 
@@ -58,7 +61,20 @@ QUndoCommand *CommandsFactory::create_messageItemResize(const QVariantList &para
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::create_instanceItemMove(const QVariantList &params)
+QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (QGraphicsScene *scene = params.at(0).value<QGraphicsScene *>())
+        if (ChartViewModel *model = params.at(1).value<ChartViewModel *>()) {
+            const QPointF &pos(params.at(2).toPointF());
+            return new CmdMessageItemCreate(scene, model, pos);
+        }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createInstanceItemMove(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 2);
 
@@ -71,7 +87,7 @@ QUndoCommand *CommandsFactory::create_instanceItemMove(const QVariantList &param
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::create_instanceItemResize(const QVariantList &params)
+QUndoCommand *CommandsFactory::createInstanceItemResize(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 2);
 
@@ -80,6 +96,19 @@ QUndoCommand *CommandsFactory::create_instanceItemResize(const QVariantList &par
         if (item->boundingRect() != newGeometry)
             return new CmdInstanceItemResize(item, newGeometry);
     }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (QGraphicsScene *scene = params.at(0).value<QGraphicsScene *>())
+        if (ChartViewModel *model = params.at(1).value<ChartViewModel *>()) {
+            const QPointF &pos(params.at(2).toPointF());
+            return new CmdInstanceItemCreate(scene, model, pos);
+        }
 
     return nullptr;
 }

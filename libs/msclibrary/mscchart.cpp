@@ -59,6 +59,19 @@ void MscChart::addInstance(MscInstance *instance)
     Q_EMIT instanceAdded(instance);
 }
 
+void MscChart::removeInstance(MscInstance *instance)
+{
+    if (instance == nullptr) {
+        return;
+    }
+    if (!m_instances.contains(instance)) {
+        return;
+    }
+
+    m_instances.removeAll(instance);
+    Q_EMIT instanceRemoved(instance);
+}
+
 MscInstance *MscChart::instanceByName(const QString &name) const
 {
     for (MscInstance *instance : m_instances) {
@@ -85,6 +98,19 @@ void MscChart::addMessage(MscMessage *message)
 
     m_messages.append(message);
     Q_EMIT messageAdded(message);
+}
+
+void MscChart::removeMessage(MscMessage *message)
+{
+    if (message == nullptr) {
+        return;
+    }
+    if (!m_messages.contains(message)) {
+        return;
+    }
+
+    m_messages.removeAll(message);
+    Q_EMIT messageRemoved(message);
 }
 
 MscMessage *MscChart::messageByName(const QString &name) const

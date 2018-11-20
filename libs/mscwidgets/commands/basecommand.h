@@ -29,13 +29,10 @@ namespace cmd {
 class BaseCommand : public QUndoCommand
 {
 public:
-    explicit BaseCommand(msc::cmd::Id id, QGraphicsItem *item, QUndoCommand *parent = nullptr);
-    explicit BaseCommand(msc::cmd::Id id, QGraphicsItem *item, const QString &text, QUndoCommand *parent = nullptr);
-
-    virtual int id() const override;
+    explicit BaseCommand(QGraphicsItem *item, QUndoCommand *parent = nullptr);
+    explicit BaseCommand(QGraphicsItem *item, const QString &text, QUndoCommand *parent = nullptr);
 
 protected:
-    const msc::cmd::Id m_id;
     QGraphicsItem *m_graphicsItem;
 
     bool canMergeWith(const BaseCommand *cmd) const;

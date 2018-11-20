@@ -253,6 +253,9 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     const QPointF shiftedTarget(m_arrowItem->arrow()->anchorPointTarget() + shift);
     res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::NoSnap);
 
+    if (!isAutoResizable())
+        return res;
+
     // snap to the instance's center:
     const bool sourceFound(!prevSource && m_sourceInstance);
     const bool targetFound(!prevTarget && m_targetInstance);
@@ -261,14 +264,14 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
         const QPointF instanceCenter(m_sourceInstance->boundingRect().center());
         const QPointF instanceCenterScene(m_sourceInstance->mapToScene(instanceCenter));
         const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
-        updateSource(newAnchor, ObjectAnchor::Snap::SnapTo);
+        updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
     }
     if (targetFound) {
         const QPointF instanceCenter(m_targetInstance->boundingRect().center());
         const QPointF instanceCenterScene(m_targetInstance->mapToScene(instanceCenter));
         const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
 
-        updateTarget(newAnchor, ObjectAnchor::Snap::SnapTo);
+        updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
     }
 
     return res;
@@ -330,12 +333,12 @@ QPointF MessageItem::head() const
     return m_arrowItem->mapToScene(m_arrowItem->endSignPos());
 }
 
-void MessageItem::setHead(const QPointF &head)
+void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
 {
     if (head == this->head())
         return;
 
-    updateTarget(head, ObjectAnchor::Snap::NoSnap);
+    updateTarget(head, snap);
 }
 
 QPointF MessageItem::tail() const
@@ -343,12 +346,25 @@ QPointF MessageItem::tail() const
     return m_arrowItem->mapToScene(m_arrowItem->startSignPos());
 }
 
-void MessageItem::setTail(const QPointF &tail)
+void MessageItem::setTail(const QPointF &tail, ObjectAnchor::Snap snap)
 {
     if (tail == this->tail())
         return;
 
-    updateSource(tail, ObjectAnchor::Snap::NoSnap);
+    updateSource(tail, snap);
+}
+
+bool MessageItem::isAutoResizable() const
+{
+    return m_autoResize;
+}
+
+void MessageItem::setAutoResizable(bool resizable)
+{
+    if (resizable == m_autoResize)
+        return;
+
+    m_autoResize = resizable;
 }
 
 void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -368,6 +384,29 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                                       { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
     }
+}
+
+MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
+{
+    return createDefaultItemImpl(message, pos, ObjectAnchor::Snap::NoSnap);
+}
+
+MessageItem *MessageItem::createDefaultItemSnapped(MscMessage *message, const QPointF &pos)
+{
+    return createDefaultItemImpl(message, pos, ObjectAnchor::Snap::SnapTo);
+}
+
+MessageItem *MessageItem::createDefaultItemImpl(MscMessage *message, const QPointF &pos, ObjectAnchor::Snap snap)
+{
+    MessageItem *messageItem = new MessageItem(message, nullptr, nullptr, pos.y());
+    static constexpr qreal halthLength(ArrowItem::DEFAULT_WIDTH / 2.);
+    const QPointF head(halthLength, pos.y());
+    const QPointF tail(-halthLength, pos.y());
+    messageItem->setHead(head, snap);
+    messageItem->setTail(tail, snap);
+    messageItem->setPos(pos);
+
+    return messageItem;
 }
 
 } // namespace msc

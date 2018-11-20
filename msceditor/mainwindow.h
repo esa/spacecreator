@@ -29,6 +29,7 @@ class MainWindow;
 
 class MainModel;
 class QUndoGroup;
+class QGraphicsView;
 
 struct MainWindowPrivate;
 
@@ -40,11 +41,15 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    QGraphicsView *currentView() const;
+
 public Q_SLOTS:
     void openFile();
     void selectCurrentChart();
     void openAsn1Editor();
 
+Q_SIGNALS:
+    void currentGraphicsViewChanged(QGraphicsView *view);
 private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
 
@@ -56,6 +61,8 @@ private:
     void initMenuFile();
     void initMenuEdit();
     void initMenuHelp();
+    void initTools();
+    void initConnections();
 
     bool doOpenFile(const QString &file);
 };

@@ -17,20 +17,23 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "commands/basecommand.h"
+#include "chartviewmodel.h"
+#include "instanceitem.h"
+#include <mscinstance.h>
 
 #include <QPointF>
+#include <QPointer>
+
+#include <QGraphicsScene>
 
 namespace msc {
-
-class MessageItem;
-
 namespace cmd {
 
-class CmdMessageItemResize : public BaseCommand
+class CmdInstanceItemCreate : public BaseCommand
 {
 public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    CmdInstanceItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos);
 
     void redo() override;
     void undo() override;
@@ -38,12 +41,13 @@ public:
     int id() const override;
 
 private:
-    MessageItem *m_messageItem = nullptr;
+    QPointer<QGraphicsScene> m_scene;
+    QPointer<ChartViewModel> m_model;
+    QPointer<MscInstance> m_instance;
+    QPointer<InstanceItem> m_instanceItem;
+    QPointF m_pos;
 
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
+    bool validateStorages(const char *caller) const;
 };
 
 } // ns cmd

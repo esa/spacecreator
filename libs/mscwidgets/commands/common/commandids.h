@@ -23,8 +23,10 @@ namespace cmd {
 enum Id {
     MoveMessage = 0,
     RetargetMessage,
+    CreateMessage,
     MoveInstance,
     ResizeInstance,
+    CreateInstance,
 
     LastId
 };

@@ -15,36 +15,19 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "basecommand.h"
-
-#include <QPointF>
+#include "basecreatortool.h"
 
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : BaseTool(view, parent)
+    , m_model(model)
 {
-public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+}
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+void BaseCreatorTool::setModel(ChartViewModel *model)
+{
+    m_model = model;
+}
 
-private:
-    MessageItem *m_messageItem = nullptr;
-
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
-};
-
-} // ns cmd
 } // ns msc

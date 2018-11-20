@@ -8,11 +8,22 @@ QT += core gui widgets xml
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mainmodel.cpp
+    mainmodel.cpp \
+    tools/basetool.cpp \
+    tools/pointertool.cpp \
+    tools/instancecreatortool.cpp \
+    tools/messagecreatortool.cpp \
+    tools/basecreatortool.cpp
 
 HEADERS += \
     mainwindow.h \
-    mainmodel.h 
+    mainmodel.h \
+    tools/basetool.h \
+    tools/tooltypes.h \
+    tools/pointertool.h \
+    tools/instancecreatortool.h \
+    tools/messagecreatortool.h \
+    tools/basecreatortool.h
 
 FORMS += \
     mainwindow.ui

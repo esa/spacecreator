@@ -15,36 +15,50 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "pointertool.h"
 
-#include "basecommand.h"
-
-#include <QPointF>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QDebug>
 
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+PointerTool::PointerTool(QGraphicsView *view, QObject *parent)
+    : BaseTool(view, parent)
 {
-public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    m_title = tr("Pointer");
+    m_description = tr("Select/move/resize items");
+}
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+ToolType PointerTool::toolType() const
+{
+    return msc::ToolType::Pointer;
+}
 
-private:
-    MessageItem *m_messageItem = nullptr;
+bool PointerTool::onMousePress(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
 
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
-};
+bool PointerTool::onMouseRelease(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
 
-} // ns cmd
+bool PointerTool::onMouseMove(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
+
+void PointerTool::createPreviewItem()
+{
+}
+
+void PointerTool::commitPreviewItem()
+{
+}
+
 } // ns msc

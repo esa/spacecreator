@@ -53,16 +53,22 @@ bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
 
     switch (id) {
     case cmd::MoveMessage:
-        command = cmd::CommandsFactory::create_messageItemMove(params);
+        command = cmd::CommandsFactory::createMessageItemMove(params);
         break;
     case cmd::RetargetMessage:
-        command = cmd::CommandsFactory::create_messageItemResize(params);
+        command = cmd::CommandsFactory::createMessageItemResize(params);
+        break;
+    case cmd::CreateMessage:
+        command = cmd::CommandsFactory::createMessageItemCreate(params);
         break;
     case cmd::MoveInstance:
-        command = cmd::CommandsFactory::create_instanceItemMove(params);
+        command = cmd::CommandsFactory::createInstanceItemMove(params);
         break;
     case cmd::ResizeInstance:
-        command = cmd::CommandsFactory::create_instanceItemResize(params);
+        command = cmd::CommandsFactory::createInstanceItemResize(params);
+        break;
+    case cmd::CreateInstance:
+        command = cmd::CommandsFactory::createInstanceItemCreate(params);
         break;
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;

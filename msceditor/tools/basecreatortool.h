@@ -17,34 +17,21 @@
 
 #pragma once
 
-#include "basecommand.h"
-
-#include <QPointF>
+#include "basetool.h"
+#include "chartviewmodel.h"
 
 namespace msc {
 
-class MessageItem;
-
-namespace cmd {
-
-class CmdMessageItemResize : public BaseCommand
+class BaseCreatorTool : public BaseTool
 {
+    Q_OBJECT
 public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+public slots:
+    void setModel(ChartViewModel *model);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
-
-private:
-    MessageItem *m_messageItem = nullptr;
-
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
+protected:
+    QPointer<ChartViewModel> m_model = nullptr;
 };
 
-} // ns cmd
 } // ns msc

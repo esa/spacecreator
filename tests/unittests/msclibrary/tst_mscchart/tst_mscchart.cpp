@@ -32,10 +32,12 @@ private Q_SLOTS:
     void init();
     void cleanup();
     void testAddInstance();
+    void testRemoveInstance();
     void testNoDuplicateInstance();
     void testNoNullPtrInstance();
     void testInstanceByName();
     void testAddMessage();
+    void testRemoveMessage();
     void testNoDuplicateMessage();
     void testNoNullPtrMessage();
     void testMessageByName();
@@ -51,6 +53,11 @@ void tst_MscChart::init()
 
 void tst_MscChart::cleanup()
 {
+    if (m_chart) {
+        while (!m_chart->messages().isEmpty())
+            m_chart->removeMessage(m_chart->messages().first());
+    }
+
     delete m_chart;
     m_chart = nullptr;
 }
@@ -64,6 +71,23 @@ void tst_MscChart::testAddInstance()
     auto instance2 = new MscInstance("OUT", m_chart);
     m_chart->addInstance(instance2);
     QCOMPARE(m_chart->instances().size(), 2);
+}
+
+void tst_MscChart::testRemoveInstance()
+{
+    QCOMPARE(m_chart->instances().size(), 0);
+
+    QScopedPointer<MscInstance> instance1(new MscInstance("IN", m_chart));
+    QScopedPointer<MscInstance> instance2(new MscInstance("OUT", m_chart));
+
+    m_chart->addInstance(instance1.data());
+    m_chart->addInstance(instance2.data());
+    QCOMPARE(m_chart->instances().size(), 2);
+
+    m_chart->removeInstance(instance1.data());
+    QCOMPARE(m_chart->instances().size(), 1);
+    m_chart->removeInstance(instance2.data());
+    QCOMPARE(m_chart->instances().size(), 0);
 }
 
 void tst_MscChart::testNoDuplicateInstance()
@@ -97,6 +121,23 @@ void tst_MscChart::testAddMessage()
     auto message2 = new MscMessage("OUT", m_chart);
     m_chart->addMessage(message2);
     QCOMPARE(m_chart->messages().size(), 2);
+}
+
+void tst_MscChart::testRemoveMessage()
+{
+    QCOMPARE(m_chart->messages().size(), 0);
+
+    QScopedPointer<MscMessage> message1(new MscMessage("IN", m_chart));
+    QScopedPointer<MscMessage> message2(new MscMessage("OUT", m_chart));
+
+    m_chart->addMessage(message1.data());
+    m_chart->addMessage(message2.data());
+    QCOMPARE(m_chart->messages().size(), 2);
+
+    m_chart->removeMessage(message1.data());
+    QCOMPARE(m_chart->messages().size(), 1);
+    m_chart->removeMessage(message2.data());
+    QCOMPARE(m_chart->messages().size(), 0);
 }
 
 void tst_MscChart::testNoDuplicateMessage()
