@@ -92,16 +92,16 @@ void tst_Asn1XMLParser::testIntRealTypes()
     QCOMPARE(asn1Types.count(), 2);
 
     auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 7);
-    QCOMPARE(typeMap["name"].toString(), "MyInt");
-    QCOMPARE(typeMap["type"].toString(), "integer");
+    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap["name"].toString(), QString("MyInt"));
+    QCOMPARE(typeMap["type"].toString(), QString("integer"));
     QCOMPARE(typeMap["min"].toInt(), 0);
     QCOMPARE(typeMap["max"].toInt(), 20);
 
     typeMap = asn1Types.at(1).toMap();
-    QCOMPARE(typeMap.size(), 7);
-    QCOMPARE(typeMap["name"].toString(), "MyReal");
-    QCOMPARE(typeMap["type"].toString(), "double");
+    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap["name"].toString(), QString("MyReal"));
+    QCOMPARE(typeMap["type"].toString(), QString("double"));
     QCOMPARE(typeMap["min"].toDouble(), 0);
     QCOMPARE(typeMap["max"].toDouble(), 1000);
 }
@@ -113,15 +113,15 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
     QCOMPARE(asn1Types.count(), 2);
 
     auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 6);
-    QCOMPARE(typeMap["name"].toString(), "MyBOOL");
-    QCOMPARE(typeMap["type"].toString(), "bool");
+    QCOMPARE(typeMap.size(), 4);
+    QCOMPARE(typeMap["name"].toString(), QString("MyBOOL"));
+    QCOMPARE(typeMap["type"].toString(), QString("bool"));
     QCOMPARE(typeMap["default"].toBool(), false);
 
     typeMap = asn1Types.at(1).toMap();
-    QCOMPARE(typeMap.size(), 7);
-    QCOMPARE(typeMap["name"].toString(), "TypeEnumerated");
-    QCOMPARE(typeMap["type"].toString(), "enumerated");
+    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap["name"].toString(), QString("TypeEnumerated"));
+    QCOMPARE(typeMap["type"].toString(), QString("enumerated"));
 
     auto values = typeMap["values"].toList();
     auto valuesInt = typeMap["valuesInt"].toList();
@@ -129,9 +129,9 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
     QCOMPARE(values.count(), 3);
     QCOMPARE(values.count(), valuesInt.count());
 
-    QCOMPARE(values.at(0).toString(), "red");
-    QCOMPARE(values.at(1).toString(), "green");
-    QCOMPARE(values.at(2).toString(), "blue");
+    QCOMPARE(values.at(0).toString(), QString("red"));
+    QCOMPARE(values.at(1).toString(), QString("green"));
+    QCOMPARE(values.at(2).toString(), QString("blue"));
 
     QCOMPARE(valuesInt.at(0).toInt(), 0);
     QCOMPARE(valuesInt.at(1).toInt(), 1);
@@ -145,9 +145,9 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(asn1Types.count(), 1);
 
     auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 7);
-    QCOMPARE(typeMap["name"].toString(), "MyChoice");
-    QCOMPARE(typeMap["type"].toString(), "choice");
+    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap["name"].toString(), QString("MyChoice"));
+    QCOMPARE(typeMap["type"].toString(), QString("choice"));
 
     auto choices = typeMap["choices"].toList();
     auto choiceIdx = typeMap["choiceIdx"].toList();
@@ -156,20 +156,20 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(choices.count(), choiceIdx.count());
 
     auto choiceItem = choices.at(0).toMap();
-    QCOMPARE(choiceItem.size(), 6);
-    QCOMPARE(choiceItem["name"].toString(), "hop");
-    QCOMPARE(choiceItem["type"].toString(), "bool");
+    QCOMPARE(choiceItem.size(), 4);
+    QCOMPARE(choiceItem["name"].toString(), QString("hop"));
+    QCOMPARE(choiceItem["type"].toString(), QString("bool"));
     QCOMPARE(choiceItem["default"].toBool(), false);
 
     choiceItem = choices.at(1).toMap();
-    QCOMPARE(choiceItem.size(), 7);
-    QCOMPARE(choiceItem["name"].toString(), "lat");
-    QCOMPARE(choiceItem["type"].toString(), "double");
+    QCOMPARE(choiceItem.size(), 5);
+    QCOMPARE(choiceItem["name"].toString(), QString("lat"));
+    QCOMPARE(choiceItem["type"].toString(), QString("double"));
     QCOMPARE(choiceItem["min"].toDouble(), -90);
     QCOMPARE(choiceItem["max"].toDouble(), 90);
 
-    QCOMPARE(choiceIdx.at(0).toString(), "hop_PRESENT");
-    QCOMPARE(choiceIdx.at(1).toString(), "lat_PRESENT");
+    QCOMPARE(choiceIdx.at(0).toString(), QString("hop_PRESENT"));
+    QCOMPARE(choiceIdx.at(1).toString(), QString("lat_PRESENT"));
 }
 
 void tst_Asn1XMLParser::testSequenceType()
@@ -179,23 +179,23 @@ void tst_Asn1XMLParser::testSequenceType()
     QCOMPARE(asn1Types.count(), 1);
 
     auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 6);
-    QCOMPARE(typeMap["name"].toString(), "MySeq");
-    QCOMPARE(typeMap["type"].toString(), "sequence");
+    QCOMPARE(typeMap.size(), 4);
+    QCOMPARE(typeMap["name"].toString(), QString("MySeq"));
+    QCOMPARE(typeMap["type"].toString(), QString("sequence"));
 
     auto children = typeMap["children"].toList();
     QCOMPARE(children.size(), 2);
 
     auto child = children.at(0).toMap();
-    QCOMPARE(child.size(), 6);
-    QCOMPARE(child["name"].toString(), "foo");
-    QCOMPARE(child["type"].toString(), "bool");
+    QCOMPARE(child.size(), 4);
+    QCOMPARE(child["name"].toString(), QString("foo"));
+    QCOMPARE(child["type"].toString(), QString("bool"));
     QCOMPARE(child["default"].toBool(), false);
 
     child = children.at(1).toMap();
-    QCOMPARE(child.size(), 7);
-    QCOMPARE(child["name"].toString(), "int2Val");
-    QCOMPARE(child["type"].toString(), "integer");
+    QCOMPARE(child.size(), 5);
+    QCOMPARE(child["name"].toString(), QString("int2Val"));
+    QCOMPARE(child["type"].toString(), QString("integer"));
     QCOMPARE(child["min"].toInt(), -10);
     QCOMPARE(child["max"].toInt(), 10);
 }
