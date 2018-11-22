@@ -3,7 +3,7 @@ TARGET = msceditor
 
 include(../esa.pri)
 
-QT += core gui widgets
+QT += core gui widgets xml
 
 SOURCES += \
     main.cpp \
@@ -34,10 +34,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 INCLUDEPATH += \
+    $$PWD/../libs/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
+
 DEPENDPATH += \
+    $$PWD/../libs/asn1editor \
     $$PWD/../libs/mscwidgets \
     $$PWD/../libs/msclibrary
 
@@ -58,18 +61,22 @@ win32:!win32-g++ {
 
 win32 {
     PRE_TARGETDEPS += \
+        $$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/$${LibPrefix}asn1editor.$$LibSuffix \
         $$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += \
+        -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor \
         -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets \
         -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
 } else:unix {
     PRE_TARGETDEPS += \
+        $$OUT_PWD/../libs/asn1editor/$${LibPrefix}asn1editor.$$LibSuffix \
         $$OUT_PWD/../libs/mscwidgets/$${LibPrefix}mscwidgets.$$LibSuffix \
         $$OUT_PWD/../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += \
+        -L$$OUT_PWD/../libs/asn1editor/ -lasn1editor \
         -L$$OUT_PWD/../libs/msclibrary/ -lmsclibrary \
         -L$$OUT_PWD/../libs/mscwidgets/ -lmscwidgets
 }

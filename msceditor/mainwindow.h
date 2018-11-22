@@ -46,6 +46,7 @@ public:
 public Q_SLOTS:
     void openFile();
     void selectCurrentChart();
+    void openAsn1Editor();
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);

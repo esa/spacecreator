@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     msclibrary \
-    mscwidgets
+    mscwidgets \
+    asn1editor 
 
 CONFIG += ordered

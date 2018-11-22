@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ASN1AST>
+   <Asn1File FileName="test.asn">
+      <Asn1Module ID="ModuleTest">
+         <TypeAssignments>
+            <TypeAssignment Name="MyChoice" Line="9" CharPositionInLine="0">
+               <Type Line="9" CharPositionInLine="13">
+                  <ChoiceType>
+                     <ChoiceChild VarName="hop" Line="9" CharPositionInLine="22" EnumID="hop_PRESENT">
+                        <Type Line="9" CharPositionInLine="26">
+                           <BooleanType />
+                        </Type>
+                     </ChoiceChild>
+                     <ChoiceChild VarName="lat" Line="51" CharPositionInLine="4" EnumID="lat_PRESENT">
+                        <Type Line="51" CharPositionInLine="13">
+                           <RealType Min="-9.00000000000000000000E+001" Max="9.00000000000000000000E+001" />
+                        </Type>
+                     </ChoiceChild>
+                  </ChoiceType>
+               </Type>
+            </TypeAssignment>
+         </TypeAssignments>
+      </Asn1Module>
+   </Asn1File>
+</ASN1AST>

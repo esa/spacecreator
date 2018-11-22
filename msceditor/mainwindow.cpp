@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1editor.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "mainmodel.h"
@@ -85,6 +86,12 @@ MainWindow::MainWindow(QWidget *parent)
     , d(new MainWindowPrivate(this))
 {
     setupUi();
+
+    // TODO: just for test Asn1Editor
+    QAction *actionAsn1Editor = new QAction("ASN.1 Editor");
+    d->ui->mainToolBar->addAction(actionAsn1Editor);
+    connect(actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
+
     initConnections();
 
 #ifdef DEVELOPER_AUTO_OPEN_MSC
@@ -152,6 +159,12 @@ void MainWindow::selectCurrentChart()
         // TODO: add routine to clear a stack on file close
         // TODO: add support for dedicated stacks for each tab
     }
+}
+
+void MainWindow::openAsn1Editor()
+{
+    asn1::Asn1Editor editor;
+    editor.exec();
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
