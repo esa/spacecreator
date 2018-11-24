@@ -98,7 +98,7 @@ QPointF ObjectAnchor::point() const
 
 bool ObjectAnchor::setPoint(const QPointF &scenePoint, ObjectAnchor::Snap snap)
 {
-    if (scenePoint == m_scenePoint)
+    if (scenePoint == m_scenePoint && snap == ObjectAnchor::Snap::NoSnap)
         return false;
 
     m_scenePoint = scenePoint;

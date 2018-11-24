@@ -14,12 +14,12 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+
 #include "basetool.h"
-#include "baseitems/common/utils.h"
+
+#include <baseitems/common/utils.h>
 
 #include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
 #include <QMouseEvent>
 #include <QDebug>
 
@@ -34,6 +34,8 @@ BaseTool::BaseTool(QGraphicsView *view, QObject *parent)
 
 BaseTool::~BaseTool()
 {
+    setActive(false); // uninstall view's eventFilter
+    removePreviewItem();
 }
 
 bool BaseTool::isActive() const
@@ -142,15 +144,11 @@ void BaseTool::movePreviewItem(const QPointF &scenePos)
     if (!m_previewItem)
         return;
 
-    m_previewItem->setPos(scenePos);
+    m_previewItem->setPos(scenePos - m_previewItem->boundingRect().center());
 }
 
 void BaseTool::removePreviewItem()
 {
-    if (!m_previewItem || !m_scene)
-        return;
-
-    utils::deleteGraphicsItem(&m_previewItem);
 }
 
 QPointF BaseTool::scenePos() const

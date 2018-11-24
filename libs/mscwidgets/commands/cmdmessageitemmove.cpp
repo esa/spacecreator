@@ -14,9 +14,9 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
-#include "cmdmessageitemmove.h"
 
-#include <messageitem.h>
+#include "cmdmessageitemmove.h"
+#include "messageitem.h"
 
 namespace msc {
 namespace cmd {

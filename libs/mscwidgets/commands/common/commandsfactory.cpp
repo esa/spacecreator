@@ -25,8 +25,8 @@
 #include "commands/cmdinstanceitemresize.h"
 #include "commands/cmdinstanceitemcreate.h"
 
-#include <messageitem.h>
-#include <instanceitem.h>
+#include "messageitem.h"
+#include "instanceitem.h"
 
 #include <QGraphicsItem>
 #include <QPointF>

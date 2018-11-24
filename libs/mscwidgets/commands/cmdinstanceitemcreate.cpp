@@ -17,10 +17,9 @@
 
 #include "cmdinstanceitemcreate.h"
 #include "chartviewmodel.h"
-#include <mscchart.h>
 #include "baseitems/common/utils.h"
-#include <QGraphicsScene>
 
+#include <QGraphicsScene>
 #include <QDebug>
 
 namespace msc {
@@ -49,9 +48,7 @@ void CmdInstanceItemCreate::redo()
     if (!validateStorages(Q_FUNC_INFO))
         return;
 
-    m_instance = new MscInstance(QObject::tr("New message"));
-    m_model->currentChart()->addInstance(m_instance);
-    m_instanceItem = InstanceItem::createDefaultItem(m_instance, m_pos);
+    m_instanceItem = m_model->createDefaultInstanceItem(nullptr, m_pos);
     m_scene->addItem(m_instanceItem);
 }
 
@@ -60,15 +57,8 @@ void CmdInstanceItemCreate::undo()
     if (!validateStorages(Q_FUNC_INFO))
         return;
 
-    if (m_instanceItem) {
-        QGraphicsItem *item(m_instanceItem);
-        utils::deleteGraphicsItem(&item);
-    }
-
-    if (m_instance) {
-        m_model->currentChart()->removeInstance(m_instance);
-        delete m_instance;
-    }
+    if (m_model->removeInstanceItem(m_instanceItem))
+        m_instanceItem = nullptr;
 }
 
 bool CmdInstanceItemCreate::mergeWith(const QUndoCommand *command)

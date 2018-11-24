@@ -17,11 +17,12 @@
 
 #include "cmdmessageitemcreate.h"
 #include "chartviewmodel.h"
-#include <mscchart.h>
 #include "baseitems/common/utils.h"
-#include <baseitems/arrowitem.h>
-#include <QGraphicsScene>
+#include "baseitems/arrowitem.h"
 
+#include <mscchart.h>
+
+#include <QGraphicsScene>
 #include <QDebug>
 
 namespace msc {
@@ -50,10 +51,9 @@ void CmdMessageItemCreate::redo()
     if (!validateStorages(Q_FUNC_INFO))
         return;
 
-    m_message = new MscMessage(QObject::tr("New message"));
-    m_model->currentChart()->addMessage(m_message);
-    m_messageItem = MessageItem::createDefaultItemSnapped(m_message, m_pos);
+    m_messageItem = m_model->createDefaultMessageItem(nullptr, m_pos);
     m_scene->addItem(m_messageItem);
+    m_messageItem->performSnap();
 }
 
 void CmdMessageItemCreate::undo()
@@ -61,15 +61,8 @@ void CmdMessageItemCreate::undo()
     if (!validateStorages(Q_FUNC_INFO))
         return;
 
-    if (m_messageItem) {
-        QGraphicsItem *item(m_messageItem);
-        utils::deleteGraphicsItem(&item);
-    }
-
-    if (m_message) {
-        m_model->currentChart()->removeMessage(m_message);
-        delete m_message;
-    }
+    if (m_model->removeMessageItem(m_messageItem))
+        m_messageItem = nullptr;
 }
 
 bool CmdMessageItemCreate::mergeWith(const QUndoCommand *command)

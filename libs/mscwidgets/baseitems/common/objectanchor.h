@@ -17,13 +17,15 @@
 
 #pragma once
 
+#include "baseitems/interactiveobject.h"
+
 #include <QObject>
 #include <QPointF>
 #include <QGraphicsItem>
+#include <QPointer>
 
 namespace msc {
 
-class InteractiveObject;
 class ObjectAnchor : public QObject
 {
     Q_OBJECT
@@ -55,7 +57,7 @@ Q_SIGNALS:
 private:
     ObjectAnchor &operator=(const ObjectAnchor &other) = delete;
 
-    InteractiveObject *m_anchorObject = nullptr;
+    QPointer<InteractiveObject> m_anchorObject = nullptr;
     QPointF m_scenePoint;
     QGraphicsItem::GraphicsItemFlags m_storedFlags;
 

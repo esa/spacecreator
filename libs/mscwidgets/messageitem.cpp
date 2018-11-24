@@ -16,15 +16,12 @@
 */
 
 #include "messageitem.h"
-#include "instanceitem.h"
 #include "baseitems/labeledarrowitem.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/common/objectslink.h"
 #include "commands/common/commandsstack.h"
-
-#include <mscmessage.h>
 
 #include <QBrush>
 #include <QGraphicsLineItem>
@@ -58,15 +55,20 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connectObjects(source, target, y);
 }
 
+MscMessage *MessageItem::modelItem() const
+{
+    return m_message;
+}
+
 void MessageItem::connectObjects(InstanceItem *source, InstanceItem *target, qreal y)
 {
-    m_connectingObjects = true; // ignore position changes in MessageItem::itemChange
+    setPositionChangeIgnored(true); // ignore position changes in MessageItem::itemChange
 
     setY(y);
     if (source || target)
         setInstances(source, target);
 
-    m_connectingObjects = false;
+    setPositionChangeIgnored(false);
 }
 
 void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance)
@@ -90,7 +92,7 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 
     m_sourceInstance = sourceInstance;
     if (m_sourceInstance) {
-        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved);
+        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved, Qt::DirectConnection);
         m_message->setSourceInstance(m_sourceInstance->modelItem());
     } else
         m_message->setSourceInstance(nullptr);
@@ -110,7 +112,7 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 
     m_targetInstance = targetInstance;
     if (m_targetInstance) {
-        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved);
+        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved, Qt::DirectConnection);
         m_message->setTargetInstance(m_targetInstance->modelItem());
     } else
         m_message->setTargetInstance(nullptr);
@@ -230,9 +232,8 @@ QVariant MessageItem::itemChange(GraphicsItemChange change,
 {
     switch (change) {
     case ItemPositionHasChanged: {
-        if (!m_connectingObjects) {
-            const QPointF shift(value.toPointF() - m_prevPos);
-            updateSourceAndTarget(shift);
+        if (proceedPositionChange()) {
+            updateSourceAndTarget(value.toPointF() - m_prevPos);
         }
         break;
     }
@@ -282,7 +283,7 @@ bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
     InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
 
     setSourceInstanceItem(hoveredInstance);
-    const bool res = m_arrowItem->replaceSource(m_sourceInstance, to, snap);
+    const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
 
     commitGeometryChange();
     return res;
@@ -292,7 +293,7 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
 {
     InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
     setTargetInstanceItem(hoveredInstance);
-    const bool res = m_arrowItem->replaceTarget(m_targetInstance, to, snap);
+    const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
 
     commitGeometryChange();
     return res;
@@ -302,30 +303,40 @@ void MessageItem::commitGeometryChange()
 {
     prepareGeometryChange();
     m_boundingRect = m_arrowItem->boundingRect();
-    m_gripPoints->updateLayout();
-    updateGripPoints();
 }
 
 void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 {
+    setPositionChangeIgnored(true);
     const QPointF offset(to - from);
+
+    const QPointF srcPoint(m_arrowItem->arrow()->anchorPointSource() + offset);
+    QPointF dstPoint(m_arrowItem->arrow()->anchorPointTarget());
+
     if (!m_targetInstance) {
         moveBy(offset.x(), offset.y());
-        return;
+        dstPoint += offset;
     }
 
-    updateSource(m_arrowItem->arrow()->anchorPointSource() + offset, ObjectAnchor::Snap::NoSnap);
+    m_arrowItem->updatePoints(srcPoint, dstPoint);
+    setPositionChangeIgnored(false);
 }
 
 void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 {
+    setPositionChangeIgnored(true);
     const QPointF offset(to - from);
+
+    QPointF srcPoint(m_arrowItem->arrow()->anchorPointSource());
+    const QPointF dstPoint(m_arrowItem->arrow()->anchorPointTarget() + offset);
+
     if (!m_sourceInstance) {
         moveBy(offset.x(), offset.y());
-        return;
+        srcPoint += offset;
     }
 
-    updateTarget(m_arrowItem->arrow()->anchorPointTarget() + offset, ObjectAnchor::Snap::NoSnap);
+    m_arrowItem->updatePoints(srcPoint, dstPoint);
+    setPositionChangeIgnored(false);
 }
 
 QPointF MessageItem::head() const
@@ -335,7 +346,7 @@ QPointF MessageItem::head() const
 
 void MessageItem::setHead(const QPointF &head, ObjectAnchor::Snap snap)
 {
-    if (head == this->head())
+    if (head == this->head() && snap == ObjectAnchor::Snap::NoSnap)
         return;
 
     updateTarget(head, snap);
@@ -348,7 +359,7 @@ QPointF MessageItem::tail() const
 
 void MessageItem::setTail(const QPointF &tail, ObjectAnchor::Snap snap)
 {
-    if (tail == this->tail())
+    if (tail == this->tail() && snap == ObjectAnchor::Snap::NoSnap)
         return;
 
     updateSource(tail, snap);
@@ -384,29 +395,39 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                                       { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
     }
+    updateGripPoints();
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
-{
-    return createDefaultItemImpl(message, pos, ObjectAnchor::Snap::NoSnap);
-}
-
-MessageItem *MessageItem::createDefaultItemSnapped(MscMessage *message, const QPointF &pos)
-{
-    return createDefaultItemImpl(message, pos, ObjectAnchor::Snap::SnapTo);
-}
-
-MessageItem *MessageItem::createDefaultItemImpl(MscMessage *message, const QPointF &pos, ObjectAnchor::Snap snap)
 {
     MessageItem *messageItem = new MessageItem(message, nullptr, nullptr, pos.y());
     static constexpr qreal halthLength(ArrowItem::DEFAULT_WIDTH / 2.);
     const QPointF head(halthLength, pos.y());
     const QPointF tail(-halthLength, pos.y());
-    messageItem->setHead(head, snap);
-    messageItem->setTail(tail, snap);
+    messageItem->setHead(head, ObjectAnchor::Snap::NoSnap);
+    messageItem->setTail(tail, ObjectAnchor::Snap::NoSnap);
     messageItem->setPos(pos);
 
     return messageItem;
+}
+
+void MessageItem::performSnap()
+{
+    setHead(head(), ObjectAnchor::Snap::SnapTo);
+    setTail(tail(), ObjectAnchor::Snap::SnapTo);
+}
+
+bool MessageItem::ignorePositionChange() const
+{
+    return m_posChangeIgnored;
+}
+bool MessageItem::proceedPositionChange() const
+{
+    return !ignorePositionChange();
+}
+void MessageItem::setPositionChangeIgnored(bool ignored)
+{
+    m_posChangeIgnored = ignored;
 }
 
 } // namespace msc

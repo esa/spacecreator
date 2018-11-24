@@ -16,8 +16,7 @@
 */
 
 #include "cmdmessageitemresize.h"
-
-#include <messageitem.h>
+#include "messageitem.h"
 
 namespace msc {
 namespace cmd {
@@ -38,16 +37,16 @@ CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem,
 void CmdMessageItemResize::redo()
 {
     if (m_messageItem) {
-        m_messageItem->setHead(m_newHead, ObjectAnchor::Snap::NoSnap);
-        m_messageItem->setTail(m_newTail, ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setHead(m_newHead, ObjectAnchor::Snap::SnapTo);
+        m_messageItem->setTail(m_newTail, ObjectAnchor::Snap::SnapTo);
     }
 }
 
 void CmdMessageItemResize::undo()
 {
     if (m_messageItem) {
-        m_messageItem->setHead(m_oldHead, ObjectAnchor::Snap::NoSnap);
-        m_messageItem->setTail(m_oldTail, ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setHead(m_oldHead, ObjectAnchor::Snap::SnapTo);
+        m_messageItem->setTail(m_oldTail, ObjectAnchor::Snap::SnapTo);
     }
 }
 

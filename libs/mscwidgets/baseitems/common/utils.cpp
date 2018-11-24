@@ -96,11 +96,8 @@ QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal toler
     return result;
 }
 
-void deleteGraphicsItem(QGraphicsItem **item)
+bool removeSceneItem(QGraphicsItem *item)
 {
-    if (!(*item) || !(*item)->scene())
-        return;
-
     // Removing an item by QGraphicsScene::removeItem + delete
     // crashes the application in QGraphicsSceneFindItemBspTreeVisitor::visit.
     // It seems I messed something up with InteractiveItem's geometry updates,
@@ -117,15 +114,18 @@ void deleteGraphicsItem(QGraphicsItem **item)
     // https://bugreports.qt.io/browse/QTBUG-18021
     //
     // The permanent switch of ItemIndexMethod to the QGraphicsScene::NoIndex leads to not so smooth
-    // expirience in a brief manual tests.
+    // expirience in a brief manual test.
     // This way a temporrary switch to QGraphicsScene::NoIndex seems to be a best option for now:
 
-    QGraphicsScene *scene((*item)->scene());
+    if (!item || !item->scene())
+        return false;
+
+    QGraphicsScene *scene(item->scene());
+    const QGraphicsScene::ItemIndexMethod original = scene->itemIndexMethod();
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->removeItem(*item);
-    delete *item;
-    *item = nullptr;
-    scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+    scene->removeItem(item);
+    scene->setItemIndexMethod(original);
+    return true;
 }
 
 } // ns utils

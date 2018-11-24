@@ -91,6 +91,8 @@ void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     m_storedZ = zValue();
     setZValue(m_storedZ + 1.);
 
+    updateGripPoints();
+
     m_gripPoints->showAnimated();
     QGraphicsObject::hoverEnterEvent(event);
 }
@@ -101,6 +103,10 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     setZValue(m_storedZ);
     m_gripPoints->hideAnimated();
     QGraphicsObject::hoverLeaveEvent(event);
+}
+
+void InteractiveObject::updateGripPoints()
+{
 }
 
 QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)

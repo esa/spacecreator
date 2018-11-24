@@ -17,8 +17,6 @@
 
 #include "pointertool.h"
 
-#include <QMouseEvent>
-#include <QPixmap>
 #include <QDebug>
 
 namespace msc {

@@ -139,7 +139,10 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
 
 void MainModel::clearMscModel()
 {
-    delete d->m_mscModel;
-    d->m_mscModel = nullptr;
+    if (d->m_mscModel) {
+        disconnect(d->m_mscModel, nullptr, this, nullptr);
+        delete d->m_mscModel;
+        d->m_mscModel = nullptr;
+    }
     d->m_chartModel.clearScene();
 }
