@@ -20,14 +20,12 @@
 
 #include "baseitems/interactiveobject.h"
 #include "baseitems/common/objectanchor.h"
+#include <instanceitem.h>
+#include <mscmessage.h>
 
-class QGraphicsLineItem;
-class QGraphicsPolygonItem;
-class QGraphicsTextItem;
+#include <QPointer>
 
 namespace msc {
-class InstanceItem;
-class MscMessage;
 class LabeledArrowItem;
 
 class MessageItem : public InteractiveObject
@@ -36,6 +34,8 @@ class MessageItem : public InteractiveObject
 public:
     explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr,
                          InstanceItem *target = nullptr, qreal y = 0., QGraphicsItem *parent = nullptr);
+
+    MscMessage *modelItem() const;
 
     void connectObjects(InstanceItem *source, InstanceItem *target, qreal y);
 
@@ -58,31 +58,32 @@ public:
     void setAutoResizable(bool resizable);
 
     static MessageItem *createDefaultItem(MscMessage *message, const QPointF &pos);
-    static MessageItem *createDefaultItemSnapped(MscMessage *message, const QPointF &pos);
+
+    void performSnap();
+
+    void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
+    void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
 
 public Q_SLOTS:
     void updateLayout();
     void setName(const QString &name);
-    void updateGripPoints();
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void updateGripPoints() override;
 
 private Q_SLOTS:
     void rebuildLayout();
     void commitGeometryChange();
 
-    void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
-    void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
-
 private:
-    msc::MscMessage *m_message = nullptr;
+    QPointer<msc::MscMessage> m_message = nullptr;
     LabeledArrowItem *m_arrowItem = nullptr;
-    InstanceItem *m_sourceInstance = nullptr;
-    InstanceItem *m_targetInstance = nullptr;
+    QPointer<InstanceItem> m_sourceInstance = nullptr;
+    QPointer<InstanceItem> m_targetInstance = nullptr;
     bool m_layoutDirty = false;
-    bool m_connectingObjects = false;
+    bool m_posChangeIgnored = false;
     bool m_autoResize = true;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -92,7 +93,9 @@ private:
     bool updateSourceAndTarget(const QPointF &shift);
     void updateTooltip();
 
-    static MessageItem *createDefaultItemImpl(MscMessage *message, const QPointF &pos, ObjectAnchor::Snap snap);
+    bool ignorePositionChange() const;
+    bool proceedPositionChange() const;
+    void setPositionChangeIgnored(bool ignored);
 };
 
 } // namespace mas

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "basecreatortool.h"
+
 #include <mscmessage.h>
 #include <messageitem.h>
 
@@ -31,9 +32,6 @@ public:
     virtual ToolType toolType() const override;
 
 protected:
-    QPointer<MscMessage> m_message = nullptr;
-    QPointer<MessageItem> m_messageItem = nullptr;
-
     void createPreviewItem() override;
     void commitPreviewItem() override;
     void removePreviewItem() override;

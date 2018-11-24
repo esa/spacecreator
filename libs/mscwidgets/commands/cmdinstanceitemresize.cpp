@@ -16,8 +16,7 @@
 */
 
 #include "cmdinstanceitemresize.h"
-
-#include <instanceitem.h>
+#include "instanceitem.h"
 
 namespace msc {
 namespace cmd {

@@ -43,7 +43,6 @@ public:
 private:
     QPointer<QGraphicsScene> m_scene;
     QPointer<ChartViewModel> m_model;
-    QPointer<MscMessage> m_message;
     QPointer<MessageItem> m_messageItem;
     QPointF m_pos;
 

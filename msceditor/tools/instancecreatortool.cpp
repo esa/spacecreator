@@ -16,7 +16,8 @@
 */
 
 #include "instancecreatortool.h"
-#include "commands/common/commandsstack.h"
+
+#include <commands/common/commandsstack.h>
 
 #include <QDebug>
 
@@ -36,14 +37,11 @@ ToolType InstanceCreatorTool::toolType() const
 
 void InstanceCreatorTool::createPreviewItem()
 {
-    if (!m_scene || (m_instance && m_instanceItem))
+    if (!m_scene || m_previewItem)
         return;
 
-    m_instance = new MscInstance(tr("New message"), this);
-    m_instanceItem = InstanceItem::createDefaultItem(m_instance, scenePos());
-    m_scene->addItem(m_instanceItem);
-
-    m_previewItem = m_instanceItem;
+    m_previewItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
+    m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
 }
 
@@ -61,8 +59,11 @@ void InstanceCreatorTool::commitPreviewItem()
 
 void InstanceCreatorTool::removePreviewItem()
 {
-    BaseCreatorTool::removePreviewItem();
-    delete m_instance;
+    if (!m_previewItem)
+        return;
+
+    if (m_model->removeInstanceItem(static_cast<InstanceItem *>(m_previewItem)))
+        m_previewItem = nullptr;
 }
 
 } // ns msc

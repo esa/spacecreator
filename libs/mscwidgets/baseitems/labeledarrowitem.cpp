@@ -77,14 +77,25 @@ QPointF LabeledArrowItem::endSignPos() const
     return mapFromItem(m_itemArrow, m_itemArrow->endSignLocal());
 }
 
-bool LabeledArrowItem::replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+bool LabeledArrowItem::updateSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
 {
     return arrow()->updateStart(source, anchorPoint, snap);
 }
 
-bool LabeledArrowItem::replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+bool LabeledArrowItem::updateTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
 {
     return arrow()->updateEnd(target, anchorPoint, snap);
+}
+
+void LabeledArrowItem::updatePoints(const QPointF &source, const QPointF &target)
+{
+    QSignalBlocker arrowBlock(m_itemArrow);
+
+    updateSource(arrow()->link()->source()->object(), source, ObjectAnchor::Snap::NoSnap);
+    updateTarget(arrow()->link()->target()->object(), target, ObjectAnchor::Snap::NoSnap);
+
+    QSignalBlocker keepSilent(this);
+    updateLayout();
 }
 
 void LabeledArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

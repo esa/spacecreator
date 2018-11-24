@@ -17,8 +17,7 @@
 */
 
 #include "cmdinstanceitemmove.h"
-
-#include <instanceitem.h>
+#include "instanceitem.h"
 
 namespace msc {
 namespace cmd {

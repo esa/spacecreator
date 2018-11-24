@@ -65,6 +65,8 @@ protected:
 
     virtual void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
     virtual void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
+
+    virtual void updateGripPoints();
 };
 
 } // namespace msc

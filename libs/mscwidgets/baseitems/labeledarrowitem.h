@@ -41,8 +41,9 @@ public:
     QPointF startSignPos() const;
     QPointF endSignPos() const;
 
-    bool replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
-    bool replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
+    bool updateSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
+    bool updateTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
+    void updatePoints(const QPointF &source, const QPointF &target);
 
 Q_SIGNALS:
     void layoutChanged() const;

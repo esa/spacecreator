@@ -43,7 +43,6 @@ public:
 private:
     QPointer<QGraphicsScene> m_scene;
     QPointer<ChartViewModel> m_model;
-    QPointer<MscInstance> m_instance;
     QPointer<InstanceItem> m_instanceItem;
     QPointF m_pos;
 

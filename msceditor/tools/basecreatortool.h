@@ -18,7 +18,8 @@
 #pragma once
 
 #include "basetool.h"
-#include "chartviewmodel.h"
+
+#include <chartviewmodel.h>
 
 namespace msc {
 

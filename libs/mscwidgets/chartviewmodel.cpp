@@ -18,9 +18,11 @@
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "messageitem.h"
-#include "mscchart.h"
-#include "mscinstance.h"
-#include "mscmessage.h"
+#include "baseitems/common/utils.h"
+
+#include <mscchart.h>
+#include <mscinstance.h>
+#include <mscmessage.h>
 
 #include <QGraphicsScene>
 #include <QVector>
@@ -170,6 +172,64 @@ InstanceItem *ChartViewModel::instanceItem(const QString &name) const
             }
         }
     return nullptr;
+}
+
+InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)
+{
+    if (currentChart()) {
+        if (!orphanInstance) {
+            orphanInstance = new MscInstance(tr("Instance #%1").arg(currentChart()->instances().size()));
+            currentChart()->addInstance(orphanInstance);
+        }
+
+        InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
+        instanceItem->setAxisHeight(d->m_instanceAxisHeight);
+        return instanceItem;
+    }
+    return nullptr;
+}
+
+bool ChartViewModel::removeInstanceItem(msc::InstanceItem *item)
+{
+    if (item && utils::removeSceneItem(item)) {
+        if (MscInstance *instance = item->modelItem()) {
+            currentChart()->removeInstance(instance);
+            delete instance;
+        }
+        delete item;
+
+        return true;
+    }
+
+    return false;
+}
+
+msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orphanMessage, const QPointF &pos)
+{
+    if (currentChart()) {
+        if (!orphanMessage) {
+            orphanMessage = new MscMessage(tr("Message #%1").arg(currentChart()->messages().size()));
+            currentChart()->addMessage(orphanMessage);
+        }
+
+        return MessageItem::createDefaultItem(orphanMessage, pos);
+    }
+    return nullptr;
+}
+
+bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
+{
+    if (item && utils::removeSceneItem(item)) {
+        if (MscMessage *message = item->modelItem()) {
+            currentChart()->removeMessage(message);
+            delete message;
+        }
+        delete item;
+
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace msc

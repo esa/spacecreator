@@ -52,7 +52,7 @@ QPropertyAnimation *createLinearAnimation(QObject *target,
                                           const QVariant &to,
                                           const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
-void deleteGraphicsItem(QGraphicsItem **item);
+bool removeSceneItem(QGraphicsItem *item);
 
 } // ns utils
 } // ns msc

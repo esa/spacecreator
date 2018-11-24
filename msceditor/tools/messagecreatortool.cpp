@@ -18,7 +18,7 @@
 #include "messagecreatortool.h"
 
 #include <baseitems/arrowitem.h>
-#include "commands/common/commandsstack.h"
+#include <commands/common/commandsstack.h>
 
 #include <QDebug>
 
@@ -38,15 +38,15 @@ ToolType MessageCreatorTool::toolType() const
 
 void MessageCreatorTool::createPreviewItem()
 {
-    if (!m_scene || (m_message && m_messageItem))
+    if (!m_scene || m_previewItem)
         return;
 
-    m_message = new MscMessage(tr("New message"), this);
-    m_messageItem = MessageItem::createDefaultItem(m_message, scenePos());
-    m_scene->addItem(m_messageItem);
-    m_messageItem->setAutoResizable(false);
+    m_previewItem = m_model->createDefaultMessageItem(nullptr, scenePos());
 
-    m_previewItem = m_messageItem;
+    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
+    messageItem->setAutoResizable(false);
+
+    m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
 }
 
@@ -55,18 +55,20 @@ void MessageCreatorTool::commitPreviewItem()
     if (!m_previewItem || !m_scene)
         return;
 
-    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
     const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
                                       QVariant::fromValue<ChartViewModel *>(m_model),
-                                      messageItem->pos() };
+                                      m_previewItem->pos() };
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 }
 
 void MessageCreatorTool::removePreviewItem()
 {
-    BaseCreatorTool::removePreviewItem();
-    delete m_message;
+    if (!m_previewItem)
+        return;
+
+    if (m_model->removeMessageItem(static_cast<MessageItem *>(m_previewItem)))
+        m_previewItem = nullptr;
 }
 
 } // ns msc

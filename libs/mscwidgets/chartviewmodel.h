@@ -19,14 +19,19 @@
 #define CHARTVIEWMODEL_H
 
 #include <QObject>
+#include <QPointF>
 
 #include <memory>
 
 class QGraphicsScene;
 
 namespace msc {
+
 class MscChart;
 class InstanceItem;
+class MessageItem;
+class MscInstance;
+class MscMessage;
 
 struct ChartViewModelPrivate;
 
@@ -42,6 +47,11 @@ public:
     msc::MscChart *currentChart() const;
 
     void clearScene();
+
+    msc::InstanceItem *createDefaultInstanceItem(msc::MscInstance *orphanInstance = nullptr, const QPointF &pos = QPointF());
+    bool removeInstanceItem(msc::InstanceItem *item);
+    msc::MessageItem *createDefaultMessageItem(msc::MscMessage *orphanMessage = nullptr, const QPointF &pos = QPointF());
+    bool removeMessageItem(msc::MessageItem *item);
 
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);
