@@ -48,8 +48,8 @@ protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
-    GripPointsHandler *m_gripPoints;
-    HighlightRectItem *m_highlighter;
+    GripPointsHandler *m_gripPoints = nullptr;
+    HighlightRectItem *m_highlighter = nullptr;
     QRectF m_boundingRect;
     bool m_hovered = false;
     qreal m_storedZ = 0.;

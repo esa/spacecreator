@@ -147,6 +147,8 @@ void InstanceItem::rebuildLayout()
 
 void InstanceItem::buildLayout()
 {
+    prepareGeometryChange();
+
     QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
     const QRectF kindRect(m_kindItem->boundingRect());
     QRectF kindR(nameRect.bottomLeft(),
@@ -157,6 +159,7 @@ void InstanceItem::buildLayout()
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
         m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + END_SYMBOL_HEIGHT);
+        updateGripPoints();
     }
 
     // move name to the top:

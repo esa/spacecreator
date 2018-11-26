@@ -107,6 +107,7 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void InteractiveObject::updateGripPoints()
 {
+    m_gripPoints->updateLayout();
 }
 
 QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)

@@ -37,7 +37,7 @@ const QMap<GripPoint::Location, GripPoint *> createGripPoints(GripPointsHandler 
 {
     QMap<GripPoint::Location, GripPoint *> result;
 
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum &e = QMetaEnum::fromType<msc::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i)
         result.insert(GripPoint::Location(e.value(i)), new GripPoint(GripPoint::Location(e.value(i)), parent));
 
@@ -48,7 +48,7 @@ GripPoint::Locations initUsedPoints()
 {
     GripPoint::Locations result;
 
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum &e = QMetaEnum::fromType<msc::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i)
         result.insert(GripPoint::Location(e.value(i)));
 
