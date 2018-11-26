@@ -23,7 +23,6 @@
 #include <QColor>
 #include <QCursor>
 #include <QPainter>
-
 #include <QGraphicsSceneMouseEvent>
 
 namespace msc {
@@ -137,8 +136,9 @@ void GripPoint::updateLayout()
         }
 
         if (!isMover() || m_location == Center) {
-            prepareGeometryChange();
-            m_boundRect.moveCenter(destination);
+            QRectF r(m_boundRect.translated(pos()));
+            r.moveCenter(destination);
+            setPos(r.topLeft());
         }
         setCursor(c);
     }
@@ -154,12 +154,17 @@ QRectF GripPoint::boundingRect() const
 
 bool GripPoint::isMover() const
 {
-    return m_type == GripPoint::GripType::Mover;
+    return gripType() == GripPoint::GripType::Mover;
+}
+
+GripPoint::GripType GripPoint::gripType() const
+{
+    return m_type;
 }
 
 void GripPoint::setGripType(GripPoint::GripType gpType)
 {
-    if (m_type == gpType)
+    if (gripType() == gpType)
         return;
 
     m_type = gpType;
