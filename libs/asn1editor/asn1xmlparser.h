@@ -43,6 +43,9 @@ private:
     QVariantMap parseType(const QList<QDomNodeList> &typeAssignments,
                           const QDomElement &type,
                           const QString &name = QString());
+    template<typename T>
+    void parseRange(const QDomElement &type,
+                    QVariantMap &result);
     void parseSequenceType(const QList<QDomNodeList> &typeAssignments,
                            const QDomElement &type,
                            QVariantMap &result);

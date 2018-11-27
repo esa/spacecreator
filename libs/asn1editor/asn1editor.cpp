@@ -20,6 +20,7 @@
 
 #include "asn1editor.h"
 #include "asn1treeview.h"
+#include "asn1valueparser.h"
 #include "asn1xmlparser.h"
 
 #include "ui_asn1editor.h"
@@ -39,6 +40,7 @@ Asn1Editor::Asn1Editor(QWidget *parent)
 
     connect(ui->openBtn, &QPushButton::clicked, this, &Asn1Editor::openFile);
     connect(ui->typesCB, &QComboBox::currentTextChanged, this, &Asn1Editor::showAsn1Type);
+    connect(ui->valueBtn, &QPushButton::clicked, this, &Asn1Editor::setAsn1Value);
 }
 
 Asn1Editor::~Asn1Editor()
@@ -52,7 +54,8 @@ void Asn1Editor::openFile()
                                                           tr("ASN1"),
                                                           QString(""),
                                                           tr("XML files (*.xml);;All files (*.*)"));
-    loadFile(filename);
+    if (!filename.isEmpty())
+        loadFile(filename);
 }
 
 void Asn1Editor::showParseError(const QString &error)
@@ -70,10 +73,23 @@ void Asn1Editor::showAsn1Type(const QString &text)
         m_ans1TreeView->setAsn1Model((*find).toMap());
 }
 
+void Asn1Editor::setAsn1Value()
+{
+    Asn1ValueParser valueParser;
+    connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
+
+    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
+        return value.toMap()["name"] == ui->typesCB->currentText();
+    });
+
+    m_ans1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
+}
+
 void Asn1Editor::loadFile(const QString &file)
 {
     Asn1XMLParser parser;
 
+    ui->typesCB->clear();
     connect(&parser, &Asn1XMLParser::parseError, this, &Asn1Editor::showParseError);
 
     m_asn1Types = parser.parseAsn1XmlFile(file);

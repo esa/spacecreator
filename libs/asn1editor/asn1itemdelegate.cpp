@@ -67,15 +67,21 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
     if (asnType == "integer" || asnType == "sequenceOf") {
         QSpinBox *spinBox = new QSpinBox(parent);
 
-        spinBox->setMinimum(index.data(MIN_RANGE).toInt());
-        spinBox->setMaximum(index.data(MAX_RANGE).toInt());
+        if (index.data(MIN_RANGE).isValid())
+            spinBox->setMinimum(index.data(MIN_RANGE).toInt());
+
+        if (index.data(MAX_RANGE).isValid())
+            spinBox->setMaximum(index.data(MAX_RANGE).toInt());
 
         editor = spinBox;
     } else if (asnType == "double") {
         QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
 
-        spinBox->setMinimum(index.data(MIN_RANGE).toDouble());
-        spinBox->setMaximum(index.data(MAX_RANGE).toDouble());
+        if (index.data(MIN_RANGE).isValid())
+            spinBox->setMinimum(index.data(MIN_RANGE).toDouble());
+
+        if (index.data(MAX_RANGE).isValid())
+            spinBox->setMaximum(index.data(MAX_RANGE).toDouble());
 
         editor = spinBox;
     } else if (asnType == "enumerated" || asnType == "choice" || asnType == "bool") {

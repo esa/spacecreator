@@ -41,6 +41,7 @@ private Q_SLOTS:
     void openFile();
     void showParseError(const QString &error);
     void showAsn1Type(const QString &text);
+    void setAsn1Value();
 
 private:
     void loadFile(const QString &file);

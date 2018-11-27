@@ -35,11 +35,12 @@ class Asn1TreeView : public QTreeView
 public:
     Asn1TreeView(QWidget *parent = nullptr);
 
-    void setAsn1Model(QVariantMap asn1Item, int row = 0);
+    void setAsn1Model(const QVariantMap &asn1Item, int row = 0);
+    void setAsn1Value(const QVariantMap &asn1Value);
 
 private Q_SLOTS:
-    void onSequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange);
-    void onChoiceFieldChanged(const QModelIndex &index, QVariant length, QVariant currentIndex);
+    void onSequenceOfSizeChanged(const QModelIndex &index, const QVariant value, const QVariant maxRange);
+    void onChoiceFieldChanged(const QModelIndex &index, const QVariant length, const QVariant currentIndex);
 
 private:
     using ItemPtr = QSharedPointer<QStandardItem>;

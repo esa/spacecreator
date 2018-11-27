@@ -22,6 +22,10 @@
 #include "asn1itemdelegate.h"
 #include "asn1treeview.h"
 
+const int MODEL_NAME_INDEX = 0;
+const int MODEL_TYPE_INDEX = 1;
+const int MODEL_VALUE_INDEX = 2;
+
 namespace asn1 {
 
 Asn1TreeView::Asn1TreeView(QWidget *parent)
@@ -39,13 +43,13 @@ Asn1TreeView::Asn1TreeView(QWidget *parent)
     connect(m_itemDelegate, &Asn1ItemDelegate::choiceFieldChanged, this, &Asn1TreeView::onChoiceFieldChanged);
 }
 
-void Asn1TreeView::setAsn1Model(QVariantMap asn1Item, int row)
+void Asn1TreeView::setAsn1Model(const QVariantMap &asn1Item, int row)
 {
     QStandardItemModel *model = new QStandardItemModel(1, 4, this);
     QStringList headers = QStringList() << tr("Field")
                                         << tr("Type")
                                         << tr("Value")
-                                        << tr("Present");
+                                        << tr("Optional");
     model->setHorizontalHeaderLabels(headers);
     setModel(model);
 
@@ -58,16 +62,51 @@ void Asn1TreeView::setAsn1Model(QVariantMap asn1Item, int row)
     m_typeItem.reset(itemMap["type"]);
     m_valueItem.reset(itemMap["value"]);
 
-    model->setItem(row, 0, m_nameItem.data());
-    model->setItem(row, 1, m_typeItem.data());
-    model->setItem(row, 2, m_valueItem.data());
+    model->setItem(row, MODEL_NAME_INDEX, m_nameItem.data());
+    model->setItem(row, MODEL_TYPE_INDEX, m_typeItem.data());
+    model->setItem(row, MODEL_VALUE_INDEX, m_valueItem.data());
 
     hideExtraFields(m_nameItem.data(), true, row);
 
     expandAll();
 }
 
-void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange)
+void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
+{
+    if (model() == nullptr || asn1Value.empty())
+        return;
+
+    QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
+
+    int row = m_nameItem->row();
+    QString asnType = model->item(row, MODEL_TYPE_INDEX)->text();
+
+    if (asnType.startsWith("sequenceOf")) {
+        int numElem = asn1Value["seqofvalue"].toList().count();
+        model->item(row, MODEL_VALUE_INDEX)->setText(QString::number(numElem));
+        //        updateModel(root, ptr=asn1Instance, nbRows=nbElem)
+    } else if (asnType.startsWith("choice")) {
+        model->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["choice"].toMap()["name"].toString());
+        //        for rownb in xrange(root.rowCount()):
+        //            if enumerant == root.child(rownb, 0).text():
+        //                break
+        //        else:
+        //            raise TypeError('(SET) CHOICE ROW not found')
+        //        updateModel(root, asn1Instance, choice=rownb)
+    } else if (asnType.startsWith("integer") || asnType.startsWith("double") || asnType.startsWith("string") || asnType.startsWith("enumerated"))
+        model->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString());
+    else if (asnType.startsWith("bool"))
+        model->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString().toLower());
+    //else
+    //        updateModel(root, asn1Instance)
+
+    hideExtraFields(m_nameItem.data(), true, row);
+    expandAll();
+}
+
+void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index,
+                                           const QVariant value,
+                                           const QVariant maxRange)
 {
     for (int x = 0; x < maxRange.toInt(); ++x)
         setRowHidden(x, index, x < value.toInt() ? false : true);
@@ -75,7 +114,9 @@ void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index, QVariant va
     expand(index);
 }
 
-void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index, QVariant length, QVariant currentIndex)
+void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index,
+                                        const QVariant length,
+                                        const QVariant currentIndex)
 {
     for (int x = 0; x < length.toInt(); ++x)
         setRowHidden(x, index, x == currentIndex.toInt() ? false : true);
@@ -95,7 +136,8 @@ Asn1TreeView::ItemMap Asn1TreeView::createModelItems(QVariantMap asn1Item)
     if (asn1Item["type"] == "integer" || asn1Item["type"] == "double") {
         valueItem = createNumberItem(asn1Item);
 
-        typeLimit = QString(" (%1..%2)").arg(asn1Item["min"].toString(), asn1Item["max"].toString());
+        if (asn1Item.contains("min") && asn1Item.contains("max"))
+            typeLimit = QString(" (%1..%2)").arg(asn1Item["min"].toString(), asn1Item["max"].toString());
     } else if (asn1Item["type"] == "bool")
         valueItem = createBoolItem(asn1Item);
     else if (asn1Item["type"] == "sequence")
@@ -103,10 +145,12 @@ Asn1TreeView::ItemMap Asn1TreeView::createModelItems(QVariantMap asn1Item)
     else if (asn1Item["type"] == "sequenceOf") {
         valueItem = createSequenceOfItem(asn1Item, nameItem);
 
-        if (asn1Item["min"] == asn1Item["max"])
-            typeLimit = QString(tr(" Size(%1)")).arg(asn1Item["min"].toString());
-        else
-            typeLimit = QString(tr(" Size(%1..%2)")).arg(asn1Item["min"].toString(), asn1Item["max"].toString());
+        if (asn1Item.contains("min") && asn1Item.contains("max")) {
+            if (asn1Item["min"] == asn1Item["max"])
+                typeLimit = QString(tr(" Size(%1)")).arg(asn1Item["min"].toString());
+            else
+                typeLimit = QString(tr(" Size(%1..%2)")).arg(asn1Item["min"].toString(), asn1Item["max"].toString());
+        }
     } else if (asn1Item["type"] == "enumerated")
         valueItem = createEnumeratedItem(asn1Item);
     else if (asn1Item["type"] == "choice")
@@ -114,10 +158,12 @@ Asn1TreeView::ItemMap Asn1TreeView::createModelItems(QVariantMap asn1Item)
     else if (asn1Item["type"] == "string") {
         valueItem = createStringItem(asn1Item);
 
-        if (asn1Item["min"] == asn1Item["max"])
-            typeLimit = QString(tr(" Length(%1)")).arg(asn1Item["min"].toString());
-        else
-            typeLimit = QString(tr(" Length(%1..%2)")).arg(asn1Item["min"].toString(), asn1Item["max"].toString());
+        if (asn1Item.contains("min") && asn1Item.contains("max")) {
+            if (asn1Item["min"] == asn1Item["max"])
+                typeLimit = QString(tr(" Length(%1)")).arg(asn1Item["min"].toString());
+            else
+                typeLimit = QString(tr(" Length(%1..%2)")).arg(asn1Item["min"].toString(), asn1Item["max"].toString());
+        }
     } else
         valueItem = new QStandardItem();
 
@@ -139,15 +185,19 @@ QStandardItem *Asn1TreeView::createNumberItem(QVariantMap asn1Item)
     QStandardItem *item = new QStandardItem(asn1Item["min"].toString());
 
     item->setData(asn1Item["type"], ASN1TYPE);
-    item->setData(asn1Item["min"], MIN_RANGE);
-    item->setData(asn1Item["max"], MAX_RANGE);
+
+    if (asn1Item.contains("min"))
+        item->setData(asn1Item["min"], MIN_RANGE);
+
+    if (asn1Item.contains("max"))
+        item->setData(asn1Item["max"], MAX_RANGE);
 
     return item;
 }
 
 QStandardItem *Asn1TreeView::createBoolItem(QVariantMap asn1Item)
 {
-    static const QVariantList choices { QString("True"), QString("False") };
+    static const QVariantList choices { QString("true"), QString("false") };
 
     QStandardItem *item = new QStandardItem(asn1Item["default"].toString());
 
@@ -261,8 +311,12 @@ QStandardItem *Asn1TreeView::createStringItem(QVariantMap asn1Item)
     QStandardItem *item = new QStandardItem();
 
     item->setData(asn1Item["type"], ASN1TYPE);
-    item->setData(asn1Item["min"], MIN_RANGE);
-    item->setData(asn1Item["max"], MAX_RANGE);
+
+    if (asn1Item.contains("min"))
+        item->setData(asn1Item["min"], MIN_RANGE);
+
+    if (asn1Item.contains("max"))
+        item->setData(asn1Item["max"], MAX_RANGE);
 
     return item;
 }
@@ -272,7 +326,7 @@ QStandardItem *Asn1TreeView::createPresentItem(QVariantMap asn1Item)
     QStandardItem *item = new QStandardItem();
 
     if (asn1Item["isOptional"].toBool() == true) {
-        item->setCheckState(Qt::Checked);
+        item->setCheckState(Qt::Unchecked);
         item->setCheckable(true);
     }
 
@@ -284,32 +338,32 @@ QStandardItem *Asn1TreeView::createPresentItem(QVariantMap asn1Item)
 void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row)
 {
     QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
-    QString asnType = model->item(row, 1)->text();
+    QString asnType = model->item(row, MODEL_TYPE_INDEX)->text();
 
     if (asnType == "choice" && hide) {
-        QVariantList choices = model->item(row, 2)->data(CHOICE_LIST).toList();
+        QVariantList choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST).toList();
         onChoiceFieldChanged(model->item(row)->index(),
                              choices.size(),
-                             choices.indexOf(model->item(row, 2)->text()));
+                             choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
     } else if (asnType.indexOf("sequenceOf") >= 0 && hide) {
         onSequenceOfSizeChanged(model->item(row)->index(),
-                                model->item(row, 2)->text(),
-                                model->item(row, 2)->data(MAX_RANGE));
+                                model->item(row, MODEL_VALUE_INDEX)->text(),
+                                model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE));
     }
 
     for (int x = 0; x < item->rowCount(); ++x) {
         hideExtraFields(item->child(x));
 
-        asnType = item->child(x, 1)->text();
+        asnType = item->child(x, MODEL_TYPE_INDEX)->text();
         if (asnType.indexOf("sequenceOf") >= 0)
             onSequenceOfSizeChanged(item->child(x)->index(),
-                                    item->child(x, 2)->text(),
-                                    item->child(x, 2)->data(MAX_RANGE));
+                                    item->child(x, MODEL_VALUE_INDEX)->text(),
+                                    item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE));
         else if (asnType == "choice") {
-            QVariantList choices = item->child(x, 2)->data(CHOICE_LIST).toList();
+            QVariantList choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST).toList();
             onChoiceFieldChanged(item->child(x)->index(),
                                  choices.size(),
-                                 choices.indexOf(item->child(x, 2)->text()));
+                                 choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));
         }
     }
 }
