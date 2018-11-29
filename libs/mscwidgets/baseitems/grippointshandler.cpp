@@ -22,6 +22,8 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QMetaEnum>
+#include <QDebug>
+#include <QGraphicsView>
 
 namespace msc {
 
@@ -61,7 +63,7 @@ GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
     , m_gripPoints(createGripPoints(this))
     , m_usedPoints(initUsedPoints())
 {
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges);
+    setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemSendsGeometryChanges);
     hide();
 }
 
@@ -111,7 +113,19 @@ void GripPointsHandler::updateLayout()
 
 QRectF GripPointsHandler::boundingRect() const
 {
-    return parentItem() ? parentItem()->boundingRect() : QRectF();
+    QRectF bounds;
+    if (QGraphicsItem *parent = parentItem()) {
+        bounds = parent->boundingRect();
+
+        const QPointF &scaleFactor(viewScale());
+        bounds = {
+            bounds.topLeft().x() * scaleFactor.x(),
+            bounds.topLeft().y() * scaleFactor.y(),
+            bounds.width() * scaleFactor.x(),
+            bounds.height() * scaleFactor.y()
+        };
+    }
+    return bounds;
 }
 
 QVariant GripPointsHandler::itemChange(GraphicsItemChange change,
@@ -185,6 +199,35 @@ QSizeF GripPointsHandler::minSize() const
     static const qreal SpanBetweenTwoGrips = 2.;
     const qreal oneSide = GripPoint::sideSize() * 3. + SpanBetweenTwoGrips * 2.;
     return { oneSide, oneSide };
+}
+
+QPointF GripPointsHandler::viewScale() const
+{
+    if (QGraphicsItem *parent = parentItem()) {
+        if (scene()) {
+            const int viewsCount = scene()->views().size();
+            if (viewsCount) {
+                if (viewsCount > 1) {
+                    qWarning() << Q_FUNC_INFO << "The multiple views support is not implemented yet.";
+                }
+
+                const QTransform &t = parent->deviceTransform(scene()->views().first()->viewportTransform());
+                return { t.m11(), t.m22() };
+            }
+        }
+    }
+
+    return { 1., 1. };
+}
+
+void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &pos)
+{
+    if (GripPoint *gp = gripPoint(location)) {
+        const QPointF &currScale(viewScale());
+        const QPointF &destination(mapFromScene(pos));
+        const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
+        gp->setPos(destinationScaled);
+    }
 }
 
 } // namespace msc

@@ -82,9 +82,9 @@ GripPoint::GripPoint(Location pos, GripPointsHandler *parent, GripPoint::GripTyp
     , m_listener(parent)
     , m_location(pos)
     , m_type(gpType)
-    , m_boundRect(QPointF(0., 0.), m_uiDescr.rectSize())
+    , m_boundRect(QPointF(-m_uiDescr.rectSize().width() / 2., -m_uiDescr.rectSize().height() / 2.), m_uiDescr.rectSize())
 {
-    setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIgnoresTransformations);
+    setFlags(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
     setVisible(true);
 };
@@ -138,7 +138,7 @@ void GripPoint::updateLayout()
         if (!isMover() || m_location == Center) {
             QRectF r(m_boundRect.translated(pos()));
             r.moveCenter(destination);
-            setPos(r.topLeft());
+            setPos(r.center());
         }
         setCursor(c);
     }
