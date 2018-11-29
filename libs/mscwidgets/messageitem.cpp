@@ -207,24 +207,12 @@ void MessageItem::updateGripPoints()
 {
     m_gripPoints->updateLayout();
 
-    auto updateEdge = [this](GripPoint *gp, const QPointF &arrowPos) {
-        const QRectF &currentGripPointRect(gp->boundingRect());
-        const QPointF &posInMe(mapFromItem(m_arrowItem, arrowPos));
-        gp->setPos(posInMe - currentGripPointRect.center());
-    };
+    const QPointF &start(m_arrowItem->arrow()->anchorPointSource());
+    const QPointF &end(m_arrowItem->arrow()->anchorPointTarget());
 
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Left)) {
-        updateEdge(gp, m_arrowItem->startSignPos());
-    }
-
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Right)) {
-        updateEdge(gp, m_arrowItem->endSignPos());
-    }
-
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Center)) {
-        const QLineF arrowAxis(m_arrowItem->startSignPos(), m_arrowItem->endSignPos());
-        updateEdge(gp, utils::lineCenter(arrowAxis));
-    }
+    m_gripPoints->setGripPointPos(GripPoint::Left, start);
+    m_gripPoints->setGripPointPos(GripPoint::Right, end);
+    m_gripPoints->setGripPointPos(GripPoint::Center, utils::lineCenter(QLineF(start, end)));
 }
 
 QVariant MessageItem::itemChange(GraphicsItemChange change,
