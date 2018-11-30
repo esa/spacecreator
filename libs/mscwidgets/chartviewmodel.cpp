@@ -189,7 +189,8 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         }
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
-        instanceItem->setAxisHeight(d->m_instanceAxisHeight);
+        if (!qFuzzyIsNull(d->m_instanceAxisHeight))
+            instanceItem->setAxisHeight(d->m_instanceAxisHeight);
         return instanceItem;
     }
     return nullptr;
