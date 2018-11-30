@@ -67,10 +67,10 @@ QLinearGradient InstanceItem::createGradientFor(const QGraphicsItem *target)
 InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     : InteractiveObject(parent)
     , m_instance(instance)
+    , m_axisSymbol(new QGraphicsLineItem(this))
     , m_headSymbol(new QGraphicsRectItem(this))
     , m_nameItem(new TextItem(this))
     , m_kindItem(new TextItem(this))
-    , m_axisSymbol(new QGraphicsLineItem(this))
     , m_endSymbol(new QGraphicsRectItem(this))
 {
     Q_ASSERT(m_instance != nullptr);
@@ -87,6 +87,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     setFlags(QGraphicsItem::ItemSendsGeometryChanges);
 
     m_kindItem->setBackgroundColor(Qt::transparent);
+
+    // values are based on screenshot from https://git.vikingsoftware.com/esa/msceditor/issues/30
+    QPen axisPen(Qt::darkGray);
+    axisPen.setWidthF(3.);
+    m_axisSymbol->setPen(axisPen);
 }
 
 void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

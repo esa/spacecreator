@@ -70,10 +70,10 @@ protected:
 
 private:
     msc::MscInstance *m_instance = nullptr;
+    QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_headSymbol = nullptr;
     TextItem *m_nameItem = nullptr;
     TextItem *m_kindItem = nullptr;
-    QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
     bool m_layoutDirty = false;
