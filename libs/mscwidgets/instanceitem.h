@@ -23,6 +23,7 @@
 namespace msc {
 class MscInstance;
 class MessageItem;
+class TextItem;
 }
 
 class QGraphicsRectItem;
@@ -70,12 +71,14 @@ protected:
 private:
     msc::MscInstance *m_instance = nullptr;
     QGraphicsRectItem *m_headSymbol = nullptr;
-    QGraphicsTextItem *m_nameItem = nullptr;
-    QGraphicsTextItem *m_kindItem = nullptr;
+    TextItem *m_nameItem = nullptr;
+    TextItem *m_kindItem = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     QGraphicsRectItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
     bool m_layoutDirty = false;
+
+    static QLinearGradient createGradientFor(const QGraphicsItem *target);
 };
 
 } // namespace msc

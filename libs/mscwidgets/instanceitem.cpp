@@ -33,13 +33,36 @@
 #include <QGraphicsTextItem>
 #include <QPainter>
 #include <QApplication>
-#include <QTextDocument>
+#include <QLinearGradient>
 
 namespace msc {
 
 static const double SYMBOLS_WIDTH = 60.0;
 static const double START_SYMBOL_HEIGHT = 20.0;
 static const double END_SYMBOL_HEIGHT = 15.0;
+
+QLinearGradient InstanceItem::createGradientFor(const QGraphicsItem *target)
+{
+    static QLinearGradient prototype;
+    if (!target)
+        return prototype;
+
+    static bool prototypeFilled(false);
+
+    if (!prototypeFilled) {
+        // colors were colorpicked from https://git.vikingsoftware.com/esa/msceditor/issues/30
+        prototype.setColorAt(0.0, QColor("#fefef9"));
+        prototype.setColorAt(0.5, QColor("#fefeca"));
+        prototype.setColorAt(1.0, QColor("#dedbb4"));
+        prototypeFilled = true;
+    }
+
+    QLinearGradient gradient(prototype);
+    const QRectF &bounds = target->boundingRect();
+    gradient.setStart(bounds.topLeft());
+    gradient.setFinalStop(bounds.bottomRight());
+    return gradient;
+}
 
 InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     : InteractiveObject(parent)
@@ -62,6 +85,8 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     updateLayout();
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges);
+
+    m_kindItem->setBackgroundColor(Qt::transparent);
 }
 
 void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -183,6 +208,9 @@ void InstanceItem::buildLayout()
         if (QGraphicsTextItem *ti = dynamic_cast<QGraphicsTextItem *>(ci)) {
             ti->setTextWidth(m_boundingRect.width());
         }
+
+    // update head gradient:
+    m_headSymbol->setBrush(createGradientFor(m_headSymbol));
 
     m_layoutDirty = false;
 }
