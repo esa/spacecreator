@@ -56,7 +56,7 @@ public Q_SLOTS:
     void hideAnimated();
 
 protected Q_SLOTS:
-    void onVisibilityFinished();
+    void onOpacityAnimationFinished();
 
 Q_SIGNALS:
     void rectChanged(GripPoint::Location pos, const QPointF &from, const QPointF &to);

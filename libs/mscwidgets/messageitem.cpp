@@ -46,12 +46,6 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
-                                  GripPoint::Location::Left,
-                                  GripPoint::Location::Right });
-
-    m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
-
     connectObjects(source, target, y);
 }
 
@@ -205,14 +199,16 @@ QPainterPath MessageItem::shape() const
 
 void MessageItem::updateGripPoints()
 {
-    m_gripPoints->updateLayout();
+    if (m_gripPoints) {
+        m_gripPoints->updateLayout();
 
-    const QPointF &start(m_arrowItem->arrow()->anchorPointSource());
-    const QPointF &end(m_arrowItem->arrow()->anchorPointTarget());
+        const QPointF &start(m_arrowItem->arrow()->anchorPointSource());
+        const QPointF &end(m_arrowItem->arrow()->anchorPointTarget());
 
-    m_gripPoints->setGripPointPos(GripPoint::Left, start);
-    m_gripPoints->setGripPointPos(GripPoint::Right, end);
-    m_gripPoints->setGripPointPos(GripPoint::Center, utils::lineCenter(QLineF(start, end)));
+        m_gripPoints->setGripPointPos(GripPoint::Left, start);
+        m_gripPoints->setGripPointPos(GripPoint::Right, end);
+        m_gripPoints->setGripPointPos(GripPoint::Center, utils::lineCenter(QLineF(start, end)));
+    }
 }
 
 QVariant MessageItem::itemChange(GraphicsItemChange change,
@@ -409,13 +405,25 @@ bool MessageItem::ignorePositionChange() const
 {
     return m_posChangeIgnored;
 }
+
 bool MessageItem::proceedPositionChange() const
 {
     return !ignorePositionChange();
 }
+
 void MessageItem::setPositionChangeIgnored(bool ignored)
 {
     m_posChangeIgnored = ignored;
+}
+
+void MessageItem::prepareHoverMark()
+{
+    InteractiveObject::prepareHoverMark();
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
+                                  GripPoint::Location::Left,
+                                  GripPoint::Location::Right });
+
+    m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }
 
 } // namespace msc

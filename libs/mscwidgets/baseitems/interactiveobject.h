@@ -19,12 +19,13 @@
 #pragma once
 
 #include "grippoint.h"
+#include "grippointshandler.h"
 
 #include <QGraphicsObject>
+#include <QPointer>
 
 namespace msc {
 
-class GripPointsHandler;
 class HighlightRectItem;
 class InteractiveObject : public QGraphicsObject
 {
@@ -48,8 +49,7 @@ protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
-    GripPointsHandler *m_gripPoints = nullptr;
-    HighlightRectItem *m_highlighter = nullptr;
+    QPointer<GripPointsHandler> m_gripPoints = nullptr;
     QRectF m_boundingRect;
     bool m_hovered = false;
     qreal m_storedZ = 0.;
@@ -67,6 +67,11 @@ protected:
     virtual void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
 
     virtual void updateGripPoints();
+
+    virtual void prepareHoverMark();
+
+    HighlightRectItem *createHighlighter();
+    void doHighlighting(const QColor &color);
 };
 
 } // namespace msc

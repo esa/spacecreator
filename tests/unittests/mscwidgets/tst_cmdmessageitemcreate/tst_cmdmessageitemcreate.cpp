@@ -74,11 +74,11 @@ void tst_CmdMessageItemCreate::testCreate()
 
     QCOMPARE(sceneItemsCount(), 0);
 
-    for (int j = 0; j < CommandsCount; ++j) {
+    for (int i = 0; i < CommandsCount; ++i) {
         cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                  { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
                                    QVariant::fromValue<ChartViewModel *>(&m_chartModel),
-                                   QPointF(j, 0) });
+                                   QPointF(i, 0) });
     }
 
     QCOMPARE(sceneItemsCount(), CommandsCount);
@@ -121,7 +121,10 @@ void tst_CmdMessageItemCreate::testCreateUndoRedo()
 void tst_CmdMessageItemCreate::testPerformance()
 {
     if (SkipBenchmark)
-        return;
+        QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 CreateMessage commands (create, undo, redo).\n"
+                                 "It's intended for manual testing, so skipped here.")
+                                 .arg(CommandsCount)));
+
     m_chartModel.clearScene();
     cmd::CommandsStack::current()->clear();
 
@@ -135,9 +138,7 @@ void tst_CmdMessageItemCreate::testPerformance()
             cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                      { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
                                        QVariant::fromValue<ChartViewModel *>(&m_chartModel),
-                                       QPointF(i + 0, 0),
-                                       QPointF(i + 2, 0),
-                                       QPointF(i + 1, 0) });
+                                       QPointF(i, 0) });
         }
 
         // undo:
@@ -158,8 +159,8 @@ void tst_CmdMessageItemCreate::testPerformance()
 
 int tst_CmdMessageItemCreate::sceneItemsCount()
 {
-    // one MessageItem = 16 QGraphicItems in the items list
-    return m_chartModel.graphicsScene()->items().size() / 16;
+    // one MessageItem = 4 QGraphicItems in the items list
+    return m_chartModel.graphicsScene()->items().size() / 4;
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)

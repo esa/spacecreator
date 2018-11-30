@@ -38,6 +38,9 @@ public:
 
     void highlight();
 
+Q_SIGNALS:
+    void highlighted() const;
+
 private:
     QGraphicsRectItem *m_rectItem;
 };
