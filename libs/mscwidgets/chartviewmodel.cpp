@@ -26,6 +26,7 @@
 
 #include <QGraphicsScene>
 #include <QVector>
+#include <QPointer>
 
 namespace msc {
 
@@ -35,16 +36,21 @@ namespace msc {
  */
 
 struct ChartViewModelPrivate {
+    ChartViewModelPrivate(ChartViewModel *parent)
+        : m_currentChart(new msc::MscChart(parent))
+    {
+    }
+
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
-    msc::MscChart *m_currentChart = nullptr;
+    QPointer<msc::MscChart> m_currentChart = nullptr;
     qreal m_instanceAxisHeight = 0.;
 };
 
 ChartViewModel::ChartViewModel(QObject *parent)
     : QObject(parent)
-    , d(new ChartViewModelPrivate)
+    , d(new ChartViewModelPrivate(this))
 {
 }
 
