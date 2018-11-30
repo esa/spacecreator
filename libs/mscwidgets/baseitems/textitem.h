@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QGraphicsTextItem>
+#include <QLinearGradient>
 
 namespace msc {
 
@@ -27,8 +28,9 @@ class TextItem : public QGraphicsTextItem
 public:
     TextItem(QGraphicsItem *parent = nullptr);
 
-    QColor backgroundColor() const;
+    QBrush background() const;
     void setBackgroundColor(const QColor &color);
+    void setBackgroundGradient(const QLinearGradient &color);
 
     QColor frameColor() const;
     void setFrameColor(const QColor &color);
@@ -46,9 +48,11 @@ public:
 
 private:
     QColor m_bgrColor = Qt::white;
+    QLinearGradient m_gradient;
     QColor m_frameColor = Qt::black;
     qreal m_frameWidth = 0.5;
     bool m_showFrame = false;
+    bool m_gradientUsed = false;
 };
 
 } // ns msc

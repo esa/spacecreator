@@ -78,7 +78,8 @@ private:
     qreal m_axisHeight = 150.0;
     bool m_layoutDirty = false;
 
-    static QLinearGradient createGradientFor(const QGraphicsItem *target);
+    static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
+    static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
 };
 
 } // namespace msc

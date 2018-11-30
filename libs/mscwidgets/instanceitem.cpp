@@ -41,10 +41,10 @@ static const double SYMBOLS_WIDTH = 60.0;
 static const double START_SYMBOL_HEIGHT = 20.0;
 static const double END_SYMBOL_HEIGHT = 15.0;
 
-QLinearGradient InstanceItem::createGradientFor(const QGraphicsItem *target)
+QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
     static QLinearGradient prototype;
-    if (!target)
+    if (!itemKind)
         return prototype;
 
     static bool prototypeFilled(false);
@@ -58,9 +58,32 @@ QLinearGradient InstanceItem::createGradientFor(const QGraphicsItem *target)
     }
 
     QLinearGradient gradient(prototype);
-    const QRectF &bounds = target->boundingRect();
+    const QRectF &bounds = itemKind->boundingRect();
     gradient.setStart(bounds.topLeft());
     gradient.setFinalStop(bounds.bottomRight());
+    return gradient;
+}
+
+QLinearGradient InstanceItem::createGradientForName(const QGraphicsItem *itemName)
+{
+    static QLinearGradient prototype;
+    if (!itemName)
+        return prototype;
+
+    static bool prototypeFilled(false);
+
+    if (!prototypeFilled) {
+        const QColor &whiteTransparent(QColor::fromRgbF(1., 1., 1., 0.25));
+        prototype.setColorAt(0.0, whiteTransparent);
+        prototype.setColorAt(0.5, Qt::white);
+        prototype.setColorAt(1.0, whiteTransparent);
+        prototypeFilled = true;
+    }
+
+    QLinearGradient gradient(prototype);
+    const QRectF &bounds = itemName->boundingRect();
+    gradient.setStart(bounds.topLeft());
+    gradient.setFinalStop(bounds.topRight());
     return gradient;
 }
 
@@ -215,7 +238,8 @@ void InstanceItem::buildLayout()
         }
 
     // update head gradient:
-    m_headSymbol->setBrush(createGradientFor(m_headSymbol));
+    m_nameItem->setBackgroundGradient(createGradientForName(m_nameItem));
+    m_headSymbol->setBrush(createGradientForKind(m_headSymbol));
 
     m_layoutDirty = false;
 }

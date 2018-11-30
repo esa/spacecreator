@@ -37,8 +37,15 @@ TextItem::TextItem(QGraphicsItem *parent)
     setTextAllignment(Qt::AlignCenter);
 }
 
-QColor TextItem::backgroundColor() const
+QBrush TextItem::background() const
 {
+    if (m_gradientUsed) {
+        const QRectF &bounds = boundingRect();
+        QLinearGradient gradient(m_gradient);
+        gradient.setStart(bounds.topLeft());
+        gradient.setFinalStop(bounds.bottomRight());
+        return m_gradient;
+    }
     return m_bgrColor;
 }
 
@@ -47,7 +54,20 @@ void TextItem::setBackgroundColor(const QColor &color)
     if (m_bgrColor == color)
         return;
 
+    m_gradientUsed = false;
+
     m_bgrColor = color;
+    update();
+}
+
+void TextItem::setBackgroundGradient(const QLinearGradient &gradient)
+{
+    if (gradient == m_gradient)
+        return;
+
+    m_gradientUsed = true;
+
+    m_gradient = gradient;
     update();
 }
 
@@ -118,7 +138,7 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     const qreal shift = painter->pen().widthF();
     const QRectF body = boundingRect().adjusted(shift, shift, -shift, -shift);
 
-    painter->fillRect(body, backgroundColor());
+    painter->fillRect(body, background());
 
     if (framed())
         painter->drawRect(body);
