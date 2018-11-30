@@ -73,6 +73,8 @@ protected:
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void updateGripPoints() override;
 
+    void prepareHoverMark() override;
+
 private Q_SLOTS:
     void rebuildLayout();
     void commitGeometryChange();

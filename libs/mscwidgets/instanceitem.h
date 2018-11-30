@@ -65,6 +65,8 @@ protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
+    void prepareHoverMark() override;
+
 private:
     msc::MscInstance *m_instance = nullptr;
     QGraphicsRectItem *m_headSymbol = nullptr;

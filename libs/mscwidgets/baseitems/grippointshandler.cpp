@@ -171,7 +171,7 @@ void GripPointsHandler::hideAnimated()
     changeVisibilityAnimated(false);
 }
 
-void GripPointsHandler::onVisibilityFinished()
+void GripPointsHandler::onOpacityAnimationFinished()
 {
     if (!m_visible)
         setVisible(false);
@@ -189,7 +189,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
                 utils::createLinearAnimation(this, "opacity", from, to, duration)) {
         if (m_visible)
             connect(anim, &QPropertyAnimation::finished, this,
-                    &GripPointsHandler::onVisibilityFinished);
+                    &GripPointsHandler::onOpacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 }

@@ -19,6 +19,7 @@
 #include <baseitems/grippoint.h>
 #include <baseitems/grippointshandler.h>
 #include <baseitems/common/utils.h>
+#include "tst_common.h"
 
 #include <QTest>
 #include <QGraphicsScene>
@@ -41,6 +42,9 @@ public:
 
     GripPoint *gripPoint(GripPoint::Location location)
     {
+        if (!m_gripPoints)
+            return nullptr;
+
         return m_gripPoints->usedPoints().contains(location)
                 ? m_gripPoints->gripPoint(location)
                 : nullptr;
@@ -121,57 +125,15 @@ private:
     QPointer<QGraphicsView> m_view = nullptr;
     QPointer<InteractiveObjectImpl> m_item = nullptr;
 
-    static constexpr int EventsDelayMs = 100;
     // EventsDelayMs - In my local environment 20ms is enough, but I'm not sure
     // about CI, so here is some extra time span.
     // The difference in total test duration (20ms per event vs 100ms) is about 3s.
     static constexpr QPoint MoveDistance = { 10, 10 };
 
-    // QGraphicsScene does not accept QTest's mouse press event,
-    // so we have to synthesize them:
-    static void sendMousePress(QWidget *widget,
-                               const QPoint &point,
-                               Qt::MouseButton button = Qt::LeftButton,
-                               int delay = EventsDelayMs);
-    static void sendMouseMove(QWidget *widget,
-                              const QPoint &point,
-                              Qt::MouseButton button = Qt::NoButton,
-                              Qt::MouseButtons buttons = Qt::NoButton,
-                              int delay = EventsDelayMs);
-    static void sendMouseRelease(QWidget *widget,
-                                 const QPoint &point,
-                                 Qt::MouseButton button = Qt::LeftButton,
-                                 int delay = EventsDelayMs);
+    static constexpr bool IsLocalBuild = false; // show the view and process events after each action to see the result
 };
 
-constexpr int tst_InteractiveObject::EventsDelayMs;
 constexpr QPoint tst_InteractiveObject::MoveDistance;
-
-void tst_InteractiveObject::sendMousePress(QWidget *widget, const QPoint &point, Qt::MouseButton button, int delay)
-{
-    QMouseEvent event(QEvent::MouseButtonPress, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
-    QApplication::sendEvent(widget, &event);
-    if (delay > 0)
-        QTest::qWait(delay);
-}
-
-void tst_InteractiveObject::sendMouseMove(QWidget *widget, const QPoint &point, Qt::MouseButton button, Qt::MouseButtons buttons, int delay)
-{
-    QTest::mouseMove(widget, point);
-    QMouseEvent event(QEvent::MouseMove, point, button, buttons, Qt::NoModifier);
-    QApplication::sendEvent(widget, &event);
-    QApplication::processEvents();
-    if (delay > 0)
-        QTest::qWait(delay);
-}
-
-void tst_InteractiveObject::sendMouseRelease(QWidget *widget, const QPoint &point, Qt::MouseButton button, int delay)
-{
-    QMouseEvent event(QEvent::MouseButtonRelease, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
-    QApplication::sendEvent(widget, &event);
-    if (delay > 0)
-        QTest::qWait(delay);
-}
 
 void tst_InteractiveObject::initTestCase()
 {
@@ -183,7 +145,8 @@ void tst_InteractiveObject::initTestCase()
 
     // This could be usefull during local development,
     // but fails the test in CI environment:
-    //    m_view->show();
+    if (IsLocalBuild)
+        m_view->show();
 }
 
 void tst_InteractiveObject::cleanupTestCase()
@@ -219,16 +182,18 @@ void tst_InteractiveObject::testMove()
     const QPointF &prevPos(m_item->pos());
     QVERIFY(prevPos.isNull());
 
+    msc::test::ui::sendMouseMove(m_view->viewport(), m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
+
     if (GripPoint *gp = m_item->gripPoint(GripPoint::Center)) {
         const QPointF &gpScene = gp->mapToScene(gp->boundingRect().center());
         const QPoint &pntFrom = m_view->mapFromScene(gpScene);
         const QPoint &pntTo(pntFrom + MoveDistance);
 
-        sendMouseMove(m_view->viewport(), pntFrom, Qt::NoButton, Qt::NoButton);
-        sendMousePress(m_view->viewport(), pntFrom, Qt::LeftButton);
+        msc::test::ui::sendMouseMove(m_view->viewport(), pntFrom, Qt::NoButton, Qt::NoButton);
+        msc::test::ui::sendMousePress(m_view->viewport(), pntFrom, Qt::LeftButton);
 
-        sendMouseMove(m_view->viewport(), pntTo, Qt::LeftButton, Qt::LeftButton);
-        sendMouseRelease(m_view->viewport(), pntTo, Qt::LeftButton);
+        msc::test::ui::sendMouseMove(m_view->viewport(), pntTo, Qt::LeftButton, Qt::LeftButton);
+        msc::test::ui::sendMouseRelease(m_view->viewport(), pntTo, Qt::LeftButton);
     }
 
     QCOMPARE(m_item->pos(), prevPos + MoveDistance);
@@ -241,7 +206,7 @@ void tst_InteractiveObject::testResize()
     QVERIFY(m_item);
 
     // place mouse pointer over item to activate its grippointshandler:
-    sendMouseMove(m_view->viewport(), QPoint(), Qt::NoButton, Qt::NoButton);
+    msc::test::ui::sendMouseMove(m_view->viewport(), QPoint(), Qt::NoButton, Qt::NoButton);
 
     const QMetaEnum &e = QMetaEnum::fromType<msc::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
@@ -258,11 +223,11 @@ void tst_InteractiveObject::testResize()
             const QPoint &pntFrom = m_view->viewport()->mapFromGlobal(m_view->mapToGlobal(gpView));
             const QPoint &pntTo(pntFrom + MoveDistance);
 
-            sendMouseMove(m_view->viewport(), pntFrom, Qt::NoButton, Qt::NoButton);
-            sendMousePress(m_view->viewport(), pntFrom, Qt::LeftButton);
+            msc::test::ui::sendMouseMove(m_view->viewport(), pntFrom, Qt::NoButton, Qt::NoButton);
+            msc::test::ui::sendMousePress(m_view->viewport(), pntFrom, Qt::LeftButton);
 
-            sendMouseMove(m_view->viewport(), pntTo, Qt::LeftButton, Qt::LeftButton);
-            sendMouseRelease(m_view->viewport(), pntTo, Qt::LeftButton);
+            msc::test::ui::sendMouseMove(m_view->viewport(), pntTo, Qt::LeftButton, Qt::LeftButton);
+            msc::test::ui::sendMouseRelease(m_view->viewport(), pntTo, Qt::LeftButton);
 
             QVERIFY(m_item->boundingRect() != prevRect);
         }

@@ -11,5 +11,5 @@ SUBDIRS = \
     tst_cmdmessageitemcreate \
     tst_grippoint \
     tst_grippointshandler \
-    tst_interactiveobject
-
+    tst_interactiveobject \
+    tst_100messages
