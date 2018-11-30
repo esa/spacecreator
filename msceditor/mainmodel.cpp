@@ -35,11 +35,13 @@ using namespace msc;
 
 struct MainModelPrivate {
     explicit MainModelPrivate(MainModel *q)
-        : m_documentItemModel(new DocumentItemModel(q))
+        : m_mscModel(new MscModel())
+        , m_documentItemModel(new DocumentItemModel(q))
     {
     }
     ~MainModelPrivate()
     {
+        delete m_mscModel;
         delete m_documentItemModel;
     }
 
