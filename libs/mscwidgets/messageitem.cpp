@@ -47,6 +47,8 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     connectObjects(source, target, y);
+
+    m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
 }
 
 MscMessage *MessageItem::modelItem() const

@@ -45,6 +45,7 @@ public:
     bool updateTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     void updatePoints(const QPointF &source, const QPointF &target);
 
+    void setColor(const QColor &color);
 Q_SIGNALS:
     void layoutChanged() const;
 
