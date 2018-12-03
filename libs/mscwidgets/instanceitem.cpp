@@ -115,6 +115,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     QPen axisPen(Qt::darkGray);
     axisPen.setWidthF(3.);
     m_axisSymbol->setPen(axisPen);
+
+    m_nameItem->setEditable(true);
+    m_kindItem->setEditable(true);
+    connect(m_nameItem, &TextItem::edited, this, &InstanceItem::onNameEdited, Qt::QueuedConnection);
+    connect(m_kindItem, &TextItem::edited, this, &InstanceItem::onKindEdited, Qt::QueuedConnection);
 }
 
 void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -166,24 +171,32 @@ void InstanceItem::updateLayout()
 
 void InstanceItem::setName(const QString &name)
 {
-    if (this->name() == name)
+    if (this->name() == name && m_instance->name() == name)
         return;
 
-    m_nameItem->setPlainText(name);
-    m_nameItem->adjustSize();
     m_instance->setName(name);
-    updateLayout();
+    updateText(m_nameItem, name);
 }
 
 void InstanceItem::setKind(const QString &kind)
 {
-    if (this->kind() == kind)
+    if (this->kind() == kind && m_instance->kind() == kind)
         return;
 
-    m_kindItem->setPlainText(kind);
-    m_kindItem->adjustSize();
     m_instance->setKind(kind);
+    updateText(m_kindItem, kind);
+}
+
+void InstanceItem::updateText(TextItem *holder, const QString &text)
+{
+    if (!holder)
+        return;
+
+    holder->setPlainText(text);
+    holder->adjustSize();
     updateLayout();
+
+    Q_EMIT needRelayout();
 }
 
 void InstanceItem::rebuildLayout()
@@ -219,6 +232,9 @@ void InstanceItem::buildLayout()
     kindR.moveTop(m_nameItem->boundingRect().bottom());
     kindR.setWidth(m_boundingRect.width());
     m_kindItem->setPos(m_nameItem->boundingRect().translated(m_nameItem->pos()).bottomLeft());
+    m_kindItem->setTextWidth(m_boundingRect.width());
+    m_nameItem->setTextWidth(m_boundingRect.width());
+
     QRectF headRect = m_kindItem->boundingRect().translated(m_kindItem->pos());
     headRect.setWidth(m_boundingRect.width());
     m_headSymbol->setRect(headRect);
@@ -231,11 +247,6 @@ void InstanceItem::buildLayout()
     const QPointF p1(headRect.center().x(), headRect.bottom());
     const QPointF p2(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
-
-    for (QGraphicsItem *ci : childItems())
-        if (QGraphicsTextItem *ti = dynamic_cast<QGraphicsTextItem *>(ci)) {
-            ti->setTextWidth(m_boundingRect.width());
-        }
 
     // update head gradient:
     m_nameItem->setBackgroundGradient(createGradientForName(m_nameItem));
@@ -325,6 +336,26 @@ void InstanceItem::prepareHoverMark()
     m_kindItem->setZValue(m_gripPoints->zValue() - 1);
     m_axisSymbol->setZValue(m_gripPoints->zValue() - 1);
     m_endSymbol->setZValue(m_gripPoints->zValue() - 1);
+}
+
+void InstanceItem::onNameEdited(const QString &newName)
+{
+    if (newName.isEmpty()) {
+        m_nameItem->setPlainText(m_instance->name());
+        return;
+    }
+
+    setName(newName);
+}
+
+void InstanceItem::onKindEdited(const QString &newKind)
+{
+    if (newKind.isEmpty()) {
+        m_kindItem->setPlainText(m_instance->kind());
+        return;
+    }
+
+    setKind(newKind);
 }
 
 } // namespace msc

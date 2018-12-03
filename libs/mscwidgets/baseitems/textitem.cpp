@@ -20,6 +20,10 @@
 
 #include <QPainter>
 #include <QTextDocument>
+#include <QTextCursor>
+#include <QKeyEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 
 namespace msc {
 
@@ -35,6 +39,7 @@ TextItem::TextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
 {
     setTextAllignment(Qt::AlignCenter);
+    setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
 QBrush TextItem::background() const
@@ -146,6 +151,78 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->restore();
 
     QGraphicsTextItem::paint(painter, option, widget);
+}
+
+bool TextItem::isEditable() const
+{
+    return m_editable;
+}
+
+void TextItem::setEditable(bool editable)
+{
+    if (editable == m_editable)
+        return;
+
+    m_editable = editable;
+
+    if (m_editable)
+        setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
+    else
+        setTextInteractionFlags(Qt::NoTextInteraction);
+}
+
+void TextItem::focusOutEvent(QFocusEvent *event)
+{
+    QGraphicsTextItem::focusOutEvent(event);
+
+    if (!isEditable())
+        return;
+
+    const QString newText(toPlainText());
+    if (m_prevText != newText) {
+        Q_EMIT edited(newText);
+    }
+
+    m_prevText.clear();
+}
+
+void TextItem::keyPressEvent(QKeyEvent *event)
+{
+    if (isEditable()) {
+        switch (event->key()) {
+        case Qt::Key_Escape: {
+            setPlainText(m_prevText);
+            clearFocus();
+            return;
+        }
+        case Qt::Key_Return:
+        case Qt::Key_Enter: {
+            if (event->modifiers() == Qt::NoModifier) {
+                clearFocus();
+                return;
+            }
+            break;
+        }
+        }
+    }
+
+    QGraphicsTextItem::keyPressEvent(event);
+}
+
+void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsTextItem::mouseReleaseEvent(event);
+
+    if (!isEditable())
+        return;
+
+    if (m_prevText.isEmpty()) {
+        m_prevText = toPlainText();
+
+        QTextCursor txtCursor = textCursor();
+        txtCursor.select(QTextCursor::Document);
+        setTextCursor(txtCursor);
+    }
 }
 
 } // namespace msc

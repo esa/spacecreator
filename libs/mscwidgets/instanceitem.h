@@ -56,6 +56,9 @@ public:
 
     static InstanceItem *createDefaultItem(MscInstance *instance, const QPointF &pos);
 
+Q_SIGNALS:
+    void needRelayout() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
@@ -80,6 +83,12 @@ private:
 
     static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
+
+    void updateText(TextItem *holder, const QString &text);
+
+private Q_SLOTS:
+    void onNameEdited(const QString &newName);
+    void onKindEdited(const QString &newKind);
 };
 
 } // namespace msc

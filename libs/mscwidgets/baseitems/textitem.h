@@ -25,6 +25,7 @@ namespace msc {
 
 class TextItem : public QGraphicsTextItem
 {
+    Q_OBJECT
 public:
     TextItem(QGraphicsItem *parent = nullptr);
 
@@ -46,6 +47,17 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    bool isEditable() const;
+    void setEditable(bool editable);
+
+Q_SIGNALS:
+    void edited(const QString &newText);
+
+protected:
+    void focusOutEvent(QFocusEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
 private:
     QColor m_bgrColor = Qt::white;
     QLinearGradient m_gradient;
@@ -53,6 +65,8 @@ private:
     qreal m_frameWidth = 0.5;
     bool m_showFrame = false;
     bool m_gradientUsed = false;
+    bool m_editable = false;
+    QString m_prevText;
 };
 
 } // ns msc
