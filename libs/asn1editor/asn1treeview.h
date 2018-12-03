@@ -37,7 +37,7 @@ public:
 
     void setAsn1Model(const QVariantMap &asn1Item, int row = 0);
     void setAsn1Value(const QVariantMap &asn1Value);
-    QString getAsn1Value();
+    QString getAsn1Value() const;
 
 private Q_SLOTS:
     void onSequenceOfSizeChanged(const QModelIndex &index, const QVariant value, const QVariant maxRange);
@@ -64,10 +64,10 @@ private:
     void setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize = -1, int choiceRow = -1);
     void setChildRowValue(const QStandardItem *rootItem, int childIndex, const QVariant &asn1Value);
 
-    QVariantMap findValue(const QString &name, const QVariantMap &asn1Value);
-    int itemChoiceIndex(const QStandardItem *item, const QString &name);
+    QVariantMap findValue(const QString &name, const QVariantMap &asn1Value) const;
+    int itemChoiceIndex(const QStandardItem *item, const QString &name) const;
 
-    QString getItemValue(const QStandardItem *item, const QString &separator = "");
+    QString getItemValue(const QStandardItem *item, const QString &separator = "") const;
 
 private:
     Asn1ItemDelegate *m_itemDelegate;

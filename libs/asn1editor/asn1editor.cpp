@@ -36,8 +36,6 @@ Asn1Editor::Asn1Editor(QWidget *parent)
 
     ui->verticalLayout->insertWidget(1, m_asn1TreeView);
 
-    //    ui->btnFrame->setVisible(false);
-
     connect(ui->openBtn, &QPushButton::clicked, this, &Asn1Editor::openFile);
     connect(ui->typesCB, &QComboBox::currentTextChanged, this, &Asn1Editor::showAsn1Type);
     connect(ui->valueBtn, &QPushButton::clicked, this, &Asn1Editor::setAsn1Value);

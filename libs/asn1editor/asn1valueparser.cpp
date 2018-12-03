@@ -26,7 +26,7 @@ Asn1ValueParser::Asn1ValueParser(QObject *parent)
 {
 }
 
-QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value)
+QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const
 {
     QVariantMap valueMap;
     bool ok = true;
@@ -78,20 +78,20 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
 
     if (!ok) {
         valueMap.clear();
-        Q_EMIT parseError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
+        emitError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
     }
 
     return valueMap;
 }
 
-bool Asn1ValueParser::checkFormat(const QString &asn1Value)
+bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
 {
     return asn1Value.startsWith("{") && asn1Value.endsWith("}");
 }
 
 bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type,
                                          const QString &asn1Value,
-                                         QVariantMap &valueMap)
+                                         QVariantMap &valueMap) const
 {
     /*
 { intVal 5,
@@ -110,7 +110,7 @@ bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type,
     QString value = asn1Value.trimmed();
 
     if (!checkFormat(value)) {
-        Q_EMIT parseError(tr("Incorrect format for ASN.1 sequence value"));
+        emitError(tr("Incorrect format for ASN.1 sequence value"));
         return false;
     }
 
@@ -159,7 +159,7 @@ bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type,
 
 bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type,
                                            const QString &asn1Value,
-                                           QVariantMap &valueMap)
+                                           QVariantMap &valueMap) const
 {
     /*
 {enum1, enum3}
@@ -170,7 +170,7 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type,
     QString value = asn1Value.trimmed();
 
     if (!checkFormat(value)) {
-        Q_EMIT parseError(tr("Incorrect format for ASN.1 sequence value"));
+        emitError(tr("Incorrect format for ASN.1 sequence value"));
         return false;
     }
 
@@ -202,7 +202,7 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type,
 
 bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type,
                                        const QString &asn1Value,
-                                       QVariantMap &valueMap)
+                                       QVariantMap &valueMap) const
 {
     /*
  choiceReal : 10.5
@@ -220,7 +220,7 @@ bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type,
     return false;
 }
 
-QVariantMap Asn1ValueParser::getType(const QString &name, const QVariantMap &asn1Type)
+QVariantMap Asn1ValueParser::getType(const QString &name, const QVariantMap &asn1Type) const
 {
     QVariantMap result;
 
@@ -246,7 +246,7 @@ QVariantMap Asn1ValueParser::getType(const QString &name, const QVariantMap &asn
     return result;
 }
 
-bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &value)
+bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &value) const
 {
     if (asn1Type.contains("min") && value < asn1Type["min"])
         return false;
@@ -256,7 +256,7 @@ bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &va
     return true;
 }
 
-int Asn1ValueParser::nextIndex(const QString &value)
+int Asn1ValueParser::nextIndex(const QString &value) const
 {
     int index;
 
@@ -285,6 +285,11 @@ int Asn1ValueParser::nextIndex(const QString &value)
     }
 
     return index;
+}
+
+void Asn1ValueParser::emitError(const QString &error) const
+{
+    const_cast<Asn1ValueParser *>(this)->emit parseError(error);
 }
 
 } // namespace asn1

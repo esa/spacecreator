@@ -30,12 +30,18 @@ private Q_SLOTS:
     void init();
     void cleanup();
 
-    void testIntRealValues();
-    void testIntRealValuesFormatError();
-    void testIntRealValuesWithRange();
-    void testIntRealValuesWithRangeError();
-    void testBoolEnumValues();
-    void testBoolEnumValuesError();
+    void testIntValues();
+    void testRealValues();
+    void testIntValuesFormatError();
+    void testRealValuesFormatError();
+    void testIntValuesWithRange();
+    void testRealValuesWithRange();
+    void testIntValuesWithRangeError();
+    void testRealValuesWithRangeError();
+    void testBoolValues();
+    void testEnumValues();
+    void testBoolValuesError();
+    void testEnumValuesError();
     void testChoiceValue();
     void testChoiceValueError();
     void testSequenceValue();
@@ -56,7 +62,7 @@ void tst_Asn1ValueParser::cleanup()
     valueParser = nullptr;
 }
 
-void tst_Asn1ValueParser::testIntRealValues()
+void tst_Asn1ValueParser::testIntValues()
 {
     auto valueMap = valueParser->parseAsn1Value({ { "name", "MyInt" },
                                                   { "type", "integer" } },
@@ -65,17 +71,20 @@ void tst_Asn1ValueParser::testIntRealValues()
 
     QCOMPARE(valueMap["name"].toString(), QString("MyInt"));
     QCOMPARE(valueMap["value"].toInt(), 3107);
+}
 
-    valueMap = valueParser->parseAsn1Value({ { "name", "MyDouble" },
-                                             { "type", "double" } },
-                                           "31.07");
+void tst_Asn1ValueParser::testRealValues()
+{
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyDouble" },
+                                                  { "type", "double" } },
+                                                "31.07");
     QCOMPARE(valueMap.size(), 2);
 
     QCOMPARE(valueMap["name"].toString(), QString("MyDouble"));
     QCOMPARE(valueMap["value"].toDouble(), 31.07);
 }
 
-void tst_Asn1ValueParser::testIntRealValuesFormatError()
+void tst_Asn1ValueParser::testIntValuesFormatError()
 {
     QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
 
@@ -85,11 +94,25 @@ void tst_Asn1ValueParser::testIntRealValuesFormatError()
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
-    QList<QVariant> arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyInt"));
 }
 
-void tst_Asn1ValueParser::testIntRealValuesWithRange()
+void tst_Asn1ValueParser::testRealValuesFormatError()
+{
+    QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
+
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyDouble" },
+                                                  { "type", "double" } },
+                                                "31.o7");
+    QCOMPARE(valueMap.size(), 0);
+    QCOMPARE(spy.count(), 1);
+
+    auto arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyDouble"));
+}
+
+void tst_Asn1ValueParser::testIntValuesWithRange()
 {
     auto valueMap = valueParser->parseAsn1Value({ { "name", "MyInt" },
                                                   { "type", "integer" },
@@ -100,19 +123,38 @@ void tst_Asn1ValueParser::testIntRealValuesWithRange()
 
     QCOMPARE(valueMap["name"].toString(), QString("MyInt"));
     QCOMPARE(valueMap["value"].toInt(), 13);
+}
 
-    valueMap = valueParser->parseAsn1Value({ { "name", "MyDouble" },
-                                             { "type", "double" },
-                                             { "min", 10.0 },
-                                             { "max", 50.0 } },
-                                           "31.07");
+void tst_Asn1ValueParser::testRealValuesWithRange()
+{
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyDouble" },
+                                                  { "type", "double" },
+                                                  { "min", 10.0 },
+                                                  { "max", 50.0 } },
+                                                "31.07");
     QCOMPARE(valueMap.size(), 2);
 
     QCOMPARE(valueMap["name"].toString(), QString("MyDouble"));
     QCOMPARE(valueMap["value"].toDouble(), 31.07);
 }
 
-void tst_Asn1ValueParser::testIntRealValuesWithRangeError()
+void tst_Asn1ValueParser::testIntValuesWithRangeError()
+{
+    QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
+
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyInt" },
+                                                  { "type", "integer" },
+                                                  { "min", 1 },
+                                                  { "max", 10 } },
+                                                "13");
+    QCOMPARE(valueMap.size(), 0);
+    QCOMPARE(spy.count(), 1);
+
+    auto arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyInt"));
+}
+
+void tst_Asn1ValueParser::testRealValuesWithRangeError()
 {
     QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
 
@@ -124,11 +166,11 @@ void tst_Asn1ValueParser::testIntRealValuesWithRangeError()
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
-    QList<QVariant> arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyDouble"));
 }
 
-void tst_Asn1ValueParser::testBoolEnumValues()
+void tst_Asn1ValueParser::testBoolValues()
 {
     auto valueMap = valueParser->parseAsn1Value({ { "name", "MyBool" },
                                                   { "type", "bool" } },
@@ -137,12 +179,15 @@ void tst_Asn1ValueParser::testBoolEnumValues()
 
     QCOMPARE(valueMap["name"].toString(), QString("MyBool"));
     QVERIFY(valueMap["value"].toBool() == true);
+}
 
+void tst_Asn1ValueParser::testEnumValues()
+{
     QVariantList enumValues = { "enum1", "enum2", "enum3" };
-    valueMap = valueParser->parseAsn1Value({ { "name", "MyEnum" },
-                                             { "type", "enumerated" },
-                                             { "values", enumValues } },
-                                           "enum2");
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyEnum" },
+                                                  { "type", "enumerated" },
+                                                  { "values", enumValues } },
+                                                "enum2");
 
     QCOMPARE(valueMap.size(), 2);
 
@@ -150,7 +195,7 @@ void tst_Asn1ValueParser::testBoolEnumValues()
     QCOMPARE(valueMap["value"].toString(), QString("enum2"));
 }
 
-void tst_Asn1ValueParser::testBoolEnumValuesError()
+void tst_Asn1ValueParser::testBoolValuesError()
 {
     QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
 
@@ -160,19 +205,24 @@ void tst_Asn1ValueParser::testBoolEnumValuesError()
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
-    QList<QVariant> arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyBool"));
+}
+
+void tst_Asn1ValueParser::testEnumValuesError()
+{
+    QSignalSpy spy(valueParser, SIGNAL(parseError(const QString &)));
 
     QVariantList enumValues = { "enum1", "enum2", "enum3" };
-    valueMap = valueParser->parseAsn1Value({ { "name", "MyEnum" },
-                                             { "type", "enumerated" },
-                                             { "values", enumValues } },
-                                           "enum");
+    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyEnum" },
+                                                  { "type", "enumerated" },
+                                                  { "values", enumValues } },
+                                                "enum");
 
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
-    arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyEnum"));
 }
 
@@ -221,7 +271,7 @@ void tst_Asn1ValueParser::testChoiceValueError()
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
-    QList<QVariant> arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for MyChoice"));
 }
 
@@ -279,7 +329,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 2);
 
-    QList<QVariant> arguments = spy.takeFirst();
+    auto arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(), tr("Incorrect value for intVal"));
 
     arguments = spy.takeFirst();

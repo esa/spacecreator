@@ -103,7 +103,7 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
     expandAll();
 }
 
-QString Asn1TreeView::getAsn1Value()
+QString Asn1TreeView::getAsn1Value() const
 {
     return getItemValue(m_nameItem.data());
 }
@@ -424,7 +424,7 @@ void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &
     }
 }
 
-QVariantMap Asn1TreeView::findValue(const QString &name, const QVariantMap &asn1Value)
+QVariantMap Asn1TreeView::findValue(const QString &name, const QVariantMap &asn1Value) const
 {
     QVariantMap result;
 
@@ -445,7 +445,7 @@ QVariantMap Asn1TreeView::findValue(const QString &name, const QVariantMap &asn1
     return result;
 }
 
-int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name)
+int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name) const
 {
     int choiceIndex = 0;
 
@@ -456,7 +456,7 @@ int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name
     return choiceIndex;
 }
 
-QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &separator)
+QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &separator) const
 {
     QString itemValue = "";
 
