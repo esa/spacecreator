@@ -33,7 +33,7 @@
 #include <QGraphicsTextItem>
 #include <QPainter>
 #include <QApplication>
-#include <QTextDocument>
+#include <QLinearGradient>
 
 namespace msc {
 
@@ -41,13 +41,59 @@ static const double SYMBOLS_WIDTH = 60.0;
 static const double START_SYMBOL_HEIGHT = 20.0;
 static const double END_SYMBOL_HEIGHT = 15.0;
 
+QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
+{
+    static QLinearGradient prototype;
+    if (!itemKind)
+        return prototype;
+
+    static bool prototypeFilled(false);
+
+    if (!prototypeFilled) {
+        // colors were colorpicked from https://git.vikingsoftware.com/esa/msceditor/issues/30
+        prototype.setColorAt(0.0, QColor("#fefef9"));
+        prototype.setColorAt(0.5, QColor("#fefeca"));
+        prototype.setColorAt(1.0, QColor("#dedbb4"));
+        prototypeFilled = true;
+    }
+
+    QLinearGradient gradient(prototype);
+    const QRectF &bounds = itemKind->boundingRect();
+    gradient.setStart(bounds.topLeft());
+    gradient.setFinalStop(bounds.bottomRight());
+    return gradient;
+}
+
+QLinearGradient InstanceItem::createGradientForName(const QGraphicsItem *itemName)
+{
+    static QLinearGradient prototype;
+    if (!itemName)
+        return prototype;
+
+    static bool prototypeFilled(false);
+
+    if (!prototypeFilled) {
+        const QColor &whiteTransparent(QColor::fromRgbF(1., 1., 1., 0.25));
+        prototype.setColorAt(0.0, whiteTransparent);
+        prototype.setColorAt(0.5, Qt::white);
+        prototype.setColorAt(1.0, whiteTransparent);
+        prototypeFilled = true;
+    }
+
+    QLinearGradient gradient(prototype);
+    const QRectF &bounds = itemName->boundingRect();
+    gradient.setStart(bounds.topLeft());
+    gradient.setFinalStop(bounds.topRight());
+    return gradient;
+}
+
 InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     : InteractiveObject(parent)
     , m_instance(instance)
+    , m_axisSymbol(new QGraphicsLineItem(this))
     , m_headSymbol(new QGraphicsRectItem(this))
     , m_nameItem(new TextItem(this))
     , m_kindItem(new TextItem(this))
-    , m_axisSymbol(new QGraphicsLineItem(this))
     , m_endSymbol(new QGraphicsRectItem(this))
 {
     Q_ASSERT(m_instance != nullptr);
@@ -62,6 +108,13 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     updateLayout();
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges);
+
+    m_kindItem->setBackgroundColor(Qt::transparent);
+
+    // values are based on screenshot from https://git.vikingsoftware.com/esa/msceditor/issues/30
+    QPen axisPen(Qt::darkGray);
+    axisPen.setWidthF(3.);
+    m_axisSymbol->setPen(axisPen);
 }
 
 void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -183,6 +236,10 @@ void InstanceItem::buildLayout()
         if (QGraphicsTextItem *ti = dynamic_cast<QGraphicsTextItem *>(ci)) {
             ti->setTextWidth(m_boundingRect.width());
         }
+
+    // update head gradient:
+    m_nameItem->setBackgroundGradient(createGradientForName(m_nameItem));
+    m_headSymbol->setBrush(createGradientForKind(m_headSymbol));
 
     m_layoutDirty = false;
 }

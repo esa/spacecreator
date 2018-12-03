@@ -98,6 +98,16 @@ void LabeledArrowItem::updatePoints(const QPointF &source, const QPointF &target
     updateLayout();
 }
 
+void LabeledArrowItem::setColor(const QColor &color)
+{
+    m_itemArrow->setBodyPen(color);
+    m_itemArrow->setBodyBrush(color);
+    m_itemArrow->setSourcePen(color);
+    m_itemArrow->setSourceBrush(color);
+    m_itemArrow->setTargetPen(color);
+    m_itemArrow->setTargetBrush(color);
+}
+
 void LabeledArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(painter);
