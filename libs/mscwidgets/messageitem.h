@@ -78,6 +78,7 @@ protected:
 private Q_SLOTS:
     void rebuildLayout();
     void commitGeometryChange();
+    void onRenamed(const QString &title);
 
 private:
     QPointer<msc::MscMessage> m_message = nullptr;
