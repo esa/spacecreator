@@ -37,25 +37,13 @@ namespace msc {
 
 InteractiveObject::InteractiveObject(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , m_gripPoints(new GripPointsHandler(this))
-    , m_highlighter(new HighlightRectItem(this))
-
 {
-    m_highlighter->setVisible(false);
-
-    connect(m_gripPoints, &GripPointsHandler::rectChanged, this,
-            &InteractiveObject::gripPointMoved);
 
     setAcceptHoverEvents(true);
-
-    m_gripPoints->setZValue(0);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     setCursor(Qt::ArrowCursor);
-
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
-        gp->setGripType(GripPoint::GripType::Mover);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -73,8 +61,9 @@ QRectF InteractiveObject::boundingRect() const
 void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
                                        const QPointF &from, const QPointF &to)
 {
-    if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos))
-        handleGripPointMovement(gripPnt, from, to);
+    if (m_gripPoints)
+        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos))
+            handleGripPointMovement(gripPnt, from, to);
 }
 
 void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
@@ -91,9 +80,8 @@ void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     m_storedZ = zValue();
     setZValue(m_storedZ + 1.);
 
+    prepareHoverMark();
     updateGripPoints();
-
-    m_gripPoints->showAnimated();
     QGraphicsObject::hoverEnterEvent(event);
 }
 
@@ -101,12 +89,17 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     m_hovered = false;
     setZValue(m_storedZ);
-    m_gripPoints->hideAnimated();
+
+    if (m_gripPoints)
+        m_gripPoints->hideAnimated();
+
     QGraphicsObject::hoverLeaveEvent(event);
 }
 
 void InteractiveObject::updateGripPoints()
 {
+    if (m_gripPoints)
+        m_gripPoints->updateLayout();
 }
 
 QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -130,33 +123,60 @@ bool InteractiveObject::isHovered() const
     if (!isUnderMouse())
         return false;
 
-    return m_gripPoints->isVisible();
+    return m_gripPoints && m_gripPoints->isVisible();
+}
+
+HighlightRectItem *InteractiveObject::createHighlighter()
+{
+    HighlightRectItem *highlighter(new HighlightRectItem(this));
+    connect(highlighter, &HighlightRectItem::highlighted, highlighter, &QObject::deleteLater);
+
+    highlighter->setRect(m_boundingRect);
+
+    return highlighter;
+}
+
+void InteractiveObject::doHighlighting(const QColor &color)
+{
+    if (HighlightRectItem *highlighter = createHighlighter()) {
+        QColor targetColor(color);
+        QPen p(targetColor);
+        p.setWidthF(3.);
+        highlighter->setPen(p);
+        targetColor.setAlphaF(0.25);
+        highlighter->setBrush(targetColor);
+
+        highlighter->highlight();
+    }
 }
 
 void InteractiveObject::highlightConnected()
 {
-    m_highlighter->setRect(m_boundingRect);
-    QColor color(Qt::green);
-    QPen p(color);
-    p.setWidthF(3.);
-    m_highlighter->setPen(p);
-    color.setAlphaF(0.25);
-    m_highlighter->setBrush(color);
-
-    m_highlighter->highlight();
+    doHighlighting(Qt::green);
 }
 
 void InteractiveObject::highlightDisconnected()
 {
-    m_highlighter->setRect(m_boundingRect);
-    QColor color(Qt::red);
-    QPen p(color);
-    p.setWidthF(3.);
-    m_highlighter->setPen(p);
-    color.setAlphaF(0.25);
-    m_highlighter->setBrush(color);
+    doHighlighting(Qt::red);
+}
 
-    m_highlighter->highlight();
+void InteractiveObject::prepareHoverMark()
+{
+    if (!m_gripPoints) {
+        m_gripPoints = new GripPointsHandler(this);
+        m_gripPoints->setZValue(0);
+
+        connect(m_gripPoints, &GripPointsHandler::rectChanged, this,
+                &InteractiveObject::gripPointMoved);
+        connect(m_gripPoints, &GripPointsHandler::visibleChanged, [this]() {
+            if (m_gripPoints && !m_gripPoints->isVisible())
+                delete m_gripPoints; // it's not a thing directly added to the scene, so just delete is enough
+        });
+        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
+            gp->setGripType(GripPoint::GripType::Mover);
+    }
+
+    m_gripPoints->showAnimated();
 }
 
 } // namespace msc

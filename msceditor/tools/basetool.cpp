@@ -35,7 +35,6 @@ BaseTool::BaseTool(QGraphicsView *view, QObject *parent)
 BaseTool::~BaseTool()
 {
     setActive(false); // uninstall view's eventFilter
-    removePreviewItem();
 }
 
 bool BaseTool::isActive() const

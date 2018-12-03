@@ -61,12 +61,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
 
     updateLayout();
 
-    m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
-    m_nameItem->setZValue(m_gripPoints->zValue() - 1);
-    m_kindItem->setZValue(m_gripPoints->zValue() - 1);
-    m_axisSymbol->setZValue(m_gripPoints->zValue() - 1);
-    m_endSymbol->setZValue(m_gripPoints->zValue() - 1);
-
     setFlags(QGraphicsItem::ItemSendsGeometryChanges);
 }
 
@@ -147,6 +141,8 @@ void InstanceItem::rebuildLayout()
 
 void InstanceItem::buildLayout()
 {
+    prepareGeometryChange();
+
     QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
     const QRectF kindRect(m_kindItem->boundingRect());
     QRectF kindR(nameRect.bottomLeft(),
@@ -157,6 +153,7 @@ void InstanceItem::buildLayout()
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
         m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + END_SYMBOL_HEIGHT);
+        updateGripPoints();
     }
 
     // move name to the top:
@@ -249,7 +246,8 @@ void InstanceItem::setBoundingRect(const QRectF &geometry)
 
     prepareGeometryChange();
     m_boundingRect = geometry;
-    m_gripPoints->updateLayout();
+    if (m_gripPoints)
+        m_gripPoints->updateLayout();
     updateLayout();
 }
 
@@ -259,6 +257,17 @@ InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPoin
     messageItem->setPos(pos);
 
     return messageItem;
+}
+
+void InstanceItem::prepareHoverMark()
+{
+    InteractiveObject::prepareHoverMark();
+
+    m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
+    m_nameItem->setZValue(m_gripPoints->zValue() - 1);
+    m_kindItem->setZValue(m_gripPoints->zValue() - 1);
+    m_axisSymbol->setZValue(m_gripPoints->zValue() - 1);
+    m_endSymbol->setZValue(m_gripPoints->zValue() - 1);
 }
 
 } // namespace msc

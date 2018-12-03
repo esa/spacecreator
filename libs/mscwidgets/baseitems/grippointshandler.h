@@ -49,12 +49,14 @@ public:
     void setUsedPoints(GripPoint::Locations points);
     GripPoint::Locations usedPoints() const;
 
+    void setGripPointPos(GripPoint::Location location, const QPointF &pos);
+
 public Q_SLOTS:
     void showAnimated();
     void hideAnimated();
 
 protected Q_SLOTS:
-    void onVisibilityFinished();
+    void onOpacityAnimationFinished();
 
 Q_SIGNALS:
     void rectChanged(GripPoint::Location pos, const QPointF &from, const QPointF &to);
@@ -71,6 +73,19 @@ protected:
     QBrush m_bodyBrush = QBrush(QColor::fromRgbF(0., 0., 0., 0.25), Qt::Dense4Pattern);
 
     GripPoint::Locations m_usedPoints;
+
+    /*
+     * To keep the selection frame and its grippoints unscaled,
+     * the QGraphicsItem::ItemIgnoresTransformations flag is used.
+     * That means own bounding box and child positions should be managed
+     * manually to reflect current view's scale.
+     *
+     * The result routine is too fragile, though: it depends on scene()->views(),
+     * plus the scale factor could be obtained from QTransform only in case
+     * there were no additional transformations performed (no translate nor rotate).
+     * For now it seems enough, but it might need refactoring afterwhile.
+    */
+    QPointF viewScale() const;
 };
 
 } // namespace msc

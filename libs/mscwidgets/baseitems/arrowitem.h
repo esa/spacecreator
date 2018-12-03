@@ -29,9 +29,7 @@ class ArrowItem : public ObjectsLinkItem
 public:
     static constexpr qreal DEFAULT_WIDTH = 100.0;
 
-    ArrowItem(QGraphicsItem *parent);
-    void buildLayout() override;
-    QPainterPath bodyPath() const override;
+    ArrowItem(QGraphicsItem *parent = nullptr);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -42,8 +40,6 @@ public:
     QPointF makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint,
                       InteractiveObject *target, const QPointF &targetAnchorPoint);
 
-    void updateLine(const QLineF &to);
-
     bool updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 
@@ -53,6 +49,10 @@ protected:
 
     void drawStartSign(QPainter *painter) override;
     void drawEndSign(QPainter *painter) override;
+
+    QPainterPath bodyPath() const override;
+    void buildLayout() override;
+    void updateLine(const QLineF &to);
 
 private:
     QPointF pathPoint(int num) const;

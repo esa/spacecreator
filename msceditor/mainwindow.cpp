@@ -94,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     initConnections();
 
+    selectCurrentChart();
 #ifdef DEVELOPER_AUTO_OPEN_MSC
     doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("dengof.sample2.local.msc"));
 #endif //DEVELOPER_AUTO_OPEN_MSC

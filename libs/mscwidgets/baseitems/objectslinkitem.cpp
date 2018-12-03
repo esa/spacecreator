@@ -174,15 +174,6 @@ QPointF ObjectsLinkItem::anchorPointTarget() const
     return m_link->target()->point();
 }
 
-QPointF ObjectsLinkItem::anchorPointSourceLocal() const
-{
-    return mapFromScene(anchorPointSource());
-}
-QPointF ObjectsLinkItem::anchorPointTargetLocal() const
-{
-    return mapFromScene(anchorPointTarget());
-}
-
 void ObjectsLinkItem::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget)

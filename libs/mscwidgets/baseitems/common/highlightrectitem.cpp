@@ -77,6 +77,7 @@ void HighlightRectItem::highlight()
         anim->setLoopCount(1);
         connect(anim, &QPropertyAnimation::finished, [this]() {
             hide();
+            Q_EMIT highlighted();
         });
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
