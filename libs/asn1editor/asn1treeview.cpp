@@ -463,11 +463,11 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
 
     QModelIndex itemIndex = model->indexFromItem(item);
-    QModelIndex modelIndex = itemIndex.siblingAtColumn(MODEL_TYPE_INDEX);
+    QModelIndex modelIndex = itemIndex.sibling(item->row(), MODEL_TYPE_INDEX);
     QString asnType = model->itemFromIndex(modelIndex)->text();
 
     QString asnValue;
-    modelIndex = itemIndex.siblingAtColumn(MODEL_VALUE_INDEX);
+    modelIndex = itemIndex.sibling(item->row(), MODEL_VALUE_INDEX);
     if (modelIndex.isValid())
         asnValue = model->itemFromIndex(modelIndex)->text();
 
