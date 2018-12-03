@@ -45,7 +45,15 @@ struct ChartViewModelPrivate {
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::MessageItem *> m_messageItems;
     QPointer<msc::MscChart> m_currentChart = nullptr;
-    qreal m_instanceAxisHeight = 0.;
+    static constexpr qreal InterMessageSpan = 40.;
+    static constexpr qreal InterInstanceSpan = 100.;
+
+    qreal instanceAxisHeight() const
+    {
+        static constexpr qreal oneMessageHeight = 50.;
+        const qreal messagesCount = m_currentChart ? qMax(1, m_currentChart->messages().size()) : 1.;
+        return messagesCount * (oneMessageHeight + InterMessageSpan);
+    }
 };
 
 ChartViewModel::ChartViewModel(QObject *parent)
@@ -85,6 +93,7 @@ void ChartViewModel::fillView(MscChart *chart)
     }
 
     d->m_currentChart = chart;
+
     clearScene();
 
     if (d->m_currentChart == nullptr) {
@@ -92,23 +101,33 @@ void ChartViewModel::fillView(MscChart *chart)
         return;
     }
 
-    static qreal constexpr InterInstanceSpan(100.);
+    const qreal axisHeight = d->instanceAxisHeight();
     double x = .0;
+    qreal bottom = 0.;
+
     for (MscInstance *instance : d->m_currentChart->instances()) {
         auto *item = new InstanceItem(instance);
         item->setKind(instance->kind());
         item->setX(x);
 
         item->buildLayout(); // messages layout calculation is based on
+        item->setAxisHeight(axisHeight);
+
+        connect(item, &InstanceItem::needRelayout, this, &ChartViewModel::onRelayoutRequested);
 
         d->m_scene.addItem(item);
         d->m_instanceItems.append(item);
 
-        x += InterInstanceSpan + item->boundingRect().width();
+        x += d->InterInstanceSpan + item->boundingRect().width();
+
+        // align instances bottoms:
+        QRectF bounds = item->boundingRect().translated(item->pos());
+        bounds.moveBottom(bottom);
+        item->setY(bounds.top());
+        bottom = bounds.bottom();
     }
 
-    static qreal constexpr InterMessageSpan(40);
-    d->m_instanceAxisHeight = InterMessageSpan;
+    qreal y(d->InterMessageSpan);
     for (MscMessage *message : d->m_currentChart->messages()) {
         InstanceItem *sourceInstance(nullptr);
         qreal instanceVertiacalOffset(0);
@@ -125,36 +144,20 @@ void ChartViewModel::fillView(MscChart *chart)
 
         auto *item = new MessageItem(message);
         d->m_scene.addItem(item);
-        const qreal y(d->m_instanceAxisHeight + instanceVertiacalOffset);
-        item->connectObjects(sourceInstance, targetInstance, y);
+        item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
 
         d->m_messageItems.append(item);
-        d->m_instanceAxisHeight += item->boundingRect().height() + InterMessageSpan;
+        y += item->boundingRect().height() + d->InterMessageSpan;
     }
 
     Q_EMIT currentChartChagend(d->m_currentChart);
-    layoutItems();
-}
-
-void ChartViewModel::layoutItems()
-{
-    qreal x = 0., bottom = 0.;
-
-    // align instances bottoms:
-    for (InstanceItem *item : d->m_instanceItems) {
-        QRectF bounds = item->boundingRect().translated(item->pos());
-
-        item->setAxisHeight(d->m_instanceAxisHeight);
-        x += bounds.width();
-
-        bounds.moveBottom(bottom);
-        item->setY(bounds.top());
-        bottom = bounds.bottom();
-    }
 
     // actualize scene's rect to avoid flickering on first show:
     QRectF r;
     for (QGraphicsItem *gi : d->m_scene.items()) {
+        if (gi->parentItem())
+            continue;
+
         const QRectF itemRect = gi->boundingRect().translated(gi->pos());
         if (r.isEmpty())
             r = itemRect;
@@ -165,6 +168,13 @@ void ChartViewModel::layoutItems()
     static constexpr qreal margin(50.);
     r.adjust(-margin, -margin, margin, margin);
     d->m_scene.setSceneRect(r);
+}
+
+void ChartViewModel::onRelayoutRequested()
+{
+    QPointer<msc::MscChart> chart = d->m_currentChart;
+    d->m_currentChart = nullptr;
+    fillView(chart);
 }
 
 InstanceItem *ChartViewModel::instanceItem(const QString &name) const
@@ -189,8 +199,8 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         }
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
-        if (!qFuzzyIsNull(d->m_instanceAxisHeight))
-            instanceItem->setAxisHeight(d->m_instanceAxisHeight);
+        if (!qFuzzyIsNull(d->instanceAxisHeight()))
+            instanceItem->setAxisHeight(d->instanceAxisHeight());
         return instanceItem;
     }
     return nullptr;

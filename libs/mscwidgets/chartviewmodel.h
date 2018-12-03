@@ -60,7 +60,7 @@ Q_SIGNALS:
     void currentChartChagend(msc::MscChart *chart);
 
 private Q_SLOTS:
-    void layoutItems();
+    void onRelayoutRequested();
 
 private:
     msc::InstanceItem *instanceItem(const QString &name) const;
