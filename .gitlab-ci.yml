@@ -27,7 +27,7 @@ build_linux_clang:
   stage: build
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
   script: 
     - mkdir -p build_clang
     - cd build_clang
@@ -113,7 +113,7 @@ cppcheck:
   stage: checks
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
   script:
     - scripts/cppcheck_run.sh
 
@@ -121,11 +121,11 @@ clang_analyze:
   stage: checks
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
   script:
     - mkdir -p build_clang_analyze; cd build_clang_analyze
     - qmake ..
-    - /usr/share/clang/scan-build-6.0/bin/scan-build --status-bugs -o ../clang-analyze make -j8
+    - /usr/share/clang/scan-build-7/bin/scan-build --status-bugs -o ../clang-analyze make -j8
   artifacts:
     paths:
       - clang-analyze
