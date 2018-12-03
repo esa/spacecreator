@@ -37,12 +37,15 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     , m_itemText(new TextItem(this))
     , m_itemArrow(new ArrowItem(this))
 {
-    m_itemText->setFramed(true);
+    m_itemText->setFramed(false);
+    m_itemText->setBackgroundColor(Qt::transparent);
+    m_itemText->setEditable(true);
     m_itemArrow->setStartSignShown(false);
     m_itemArrow->setEndSignShown(true);
     updateLayout();
 
     connect(m_itemArrow, &ArrowItem::geometryChanged, this, &LabeledArrowItem::updateLayout);
+    connect(m_itemText, &TextItem::edited, this, &LabeledArrowItem::onTextEdited);
 }
 
 void LabeledArrowItem::setText(const QString &text)
@@ -52,9 +55,7 @@ void LabeledArrowItem::setText(const QString &text)
         return;
 
     m_itemText->setPlainText(text);
-    m_itemText->adjustSize();
-
-    updateLayout();
+    onTextEdited(text);
 }
 
 QString LabeledArrowItem::text() const
@@ -142,18 +143,24 @@ void LabeledArrowItem::updateLayout()
     textRect.moveCenter(utils::lineCenter(axis));
 
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
-    const qreal textWidth = textRect.width();
-    const qreal lineWidth = arrowRect.width() + 2 * ArrowSign::ARROW_WIDTH - 2 * utils::LineHoverTolerance;
-    if (textWidth >= lineWidth) {
-        textRect.moveBottom(arrowRect.top() - Span);
-        m_itemText->setZValue(m_itemArrow->zValue() - 2);
-    }
+
+    const QPointF &arrowCenter(arrowRect.center());
+    static constexpr qreal extraSpan = 5;
+    textRect.moveBottom(arrowCenter.y() - ArrowSign::ARROW_HEIGHT / 2 - extraSpan);
 
     const QPointF delta = textRect.center() - textRectCurrent.center();
     m_itemText->moveBy(delta.x(), delta.y());
     prepareGeometryChange();
 
     Q_EMIT layoutChanged();
+}
+
+void LabeledArrowItem::onTextEdited(const QString &text)
+{
+    m_itemText->adjustSize();
+    updateLayout();
+
+    emit textEdited(text);
 }
 
 } // ns msc

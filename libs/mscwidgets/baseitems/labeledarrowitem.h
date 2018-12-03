@@ -46,18 +46,19 @@ public:
     void updatePoints(const QPointF &source, const QPointF &target);
 
     void setColor(const QColor &color);
+
 Q_SIGNALS:
     void layoutChanged() const;
+    void textEdited(const QString &text);
 
 public Q_SLOTS:
     void setText(const QString &text);
+    void onTextEdited(const QString &text);
 
 protected Q_SLOTS:
     void updateLayout();
 
 private:
-    static qreal constexpr Span = 2.5;
-
     TextItem *m_itemText;
     ArrowItem *m_itemArrow;
     QPainterPath m_shape;

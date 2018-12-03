@@ -43,6 +43,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     setName(m_message->name());
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
+    connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
@@ -426,6 +427,21 @@ void MessageItem::prepareHoverMark()
                                   GripPoint::Location::Right });
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
+}
+
+void MessageItem::onRenamed(const QString &title)
+{
+    if (title.isEmpty()) {
+        m_arrowItem->setText(m_message->name());
+        return;
+    }
+
+    if (m_message->name() == title)
+        return;
+
+    m_message->setName(title);
+
+    updateLayout();
 }
 
 } // namespace msc
