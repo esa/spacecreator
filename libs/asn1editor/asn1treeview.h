@@ -35,11 +35,13 @@ class Asn1TreeView : public QTreeView
 public:
     Asn1TreeView(QWidget *parent = nullptr);
 
-    void setAsn1Model(QVariantMap asn1Item, int row = 0);
+    void setAsn1Model(const QVariantMap &asn1Item, int row = 0);
+    void setAsn1Value(const QVariantMap &asn1Value);
+    QString getAsn1Value() const;
 
 private Q_SLOTS:
-    void onSequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange);
-    void onChoiceFieldChanged(const QModelIndex &index, QVariant length, QVariant currentIndex);
+    void onSequenceOfSizeChanged(const QModelIndex &index, const QVariant value, const QVariant maxRange);
+    void onChoiceFieldChanged(const QModelIndex &index, const QVariant length, const QVariant currentIndex);
 
 private:
     using ItemPtr = QSharedPointer<QStandardItem>;
@@ -58,6 +60,14 @@ private:
     QStandardItem *createPresentItem(QVariantMap asn1Item);
 
     void hideExtraFields(const QStandardItem *item, bool hide = false, int row = 0);
+
+    void setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize = -1, int choiceRow = -1);
+    void setChildRowValue(const QStandardItem *rootItem, int childIndex, const QVariant &asn1Value);
+
+    QVariantMap findValue(const QString &name, const QVariantMap &asn1Value) const;
+    int itemChoiceIndex(const QStandardItem *item, const QString &name) const;
+
+    QString getItemValue(const QStandardItem *item, const QString &separator = "") const;
 
 private:
     Asn1ItemDelegate *m_itemDelegate;

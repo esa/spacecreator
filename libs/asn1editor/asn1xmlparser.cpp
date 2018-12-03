@@ -109,6 +109,8 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
 
     // find type node for ReferenceType
     while (typeName == "ReferenceType") {
+        parseRange<int>(typeElem, typeData);
+
         for (const QDomNodeList &typeAssignment : typeAssignments) {
             for (int x = 0; x < typeAssignment.size(); ++x) {
                 QDomElement elem = typeAssignment.at(x).toElement();
@@ -127,12 +129,10 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
 
     if (typeName == "IntegerType") {
         typeData["type"] = "integer";
-        typeData["min"] = typeElem.attribute("Min").toInt();
-        typeData["max"] = typeElem.attribute("Max").toInt();
+        parseRange<int>(typeElem, typeData);
     } else if (typeName == "RealType") {
         typeData["type"] = "double";
-        typeData["min"] = typeElem.attribute("Min").toDouble();
-        typeData["max"] = typeElem.attribute("Max").toDouble();
+        parseRange<double>(typeElem, typeData);
     } else if (typeName == "BooleanType") {
         typeData["type"] = "bool";
         typeData["default"] = false;
@@ -141,9 +141,8 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
         parseSequenceType(typeAssignments, typeElem, typeData);
     } else if (typeName == "SequenceOfType") {
         typeData["type"] = "sequenceOf";
-        typeData["min"] = typeElem.attribute("Min").toInt();
-        typeData["max"] = typeElem.attribute("Max").toInt();
         typeData["seqoftype"] = parseType(typeAssignments, typeElem.firstChild().toElement());
+        parseRange<int>(typeElem, typeData);
     } else if (typeName == "EnumeratedType") {
         typeData["type"] = "enumerated";
         parseEnumeratedType(typeElem, typeData);
@@ -152,8 +151,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
         parseChoiceType(typeAssignments, typeElem, typeData);
     } else if (typeName.endsWith("StringType")) {
         typeData["type"] = "string";
-        typeData["min"] = typeElem.attribute("Min").toInt();
-        typeData["max"] = typeElem.attribute("Max").toInt();
+        parseRange<int>(typeElem, typeData);
     }
 
     return typeData;
@@ -251,6 +249,24 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
 
     result["choices"] = choices;
     result["choiceIdx"] = choiceIdx;
+}
+
+template<typename T>
+void Asn1XMLParser::parseRange(const QDomElement &type, QVariantMap &result)
+{
+    bool ok;
+    double value;
+
+    auto parseAttribute = [&](const QString &attrName, const QString &mapName) {
+        if (type.hasAttribute(attrName)) {
+            value = type.attribute(attrName).toDouble(&ok);
+            if (ok && !result.contains(mapName))
+                result[mapName] = static_cast<T>(value);
+        }
+    };
+
+    parseAttribute("Min", "min");
+    parseAttribute("Max", "max");
 }
 
 } // namespace asn1

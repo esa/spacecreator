@@ -41,13 +41,15 @@ private Q_SLOTS:
     void openFile();
     void showParseError(const QString &error);
     void showAsn1Type(const QString &text);
+    void setAsn1Value();
+    void getAsn1Value();
 
 private:
     void loadFile(const QString &file);
 
 private:
     Ui::Asn1Editor *ui;
-    Asn1TreeView *m_ans1TreeView;
+    Asn1TreeView *m_asn1TreeView;
     QVariantList m_asn1Types;
 };
 
