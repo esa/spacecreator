@@ -32,15 +32,16 @@ Asn1Editor::Asn1Editor(QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_ans1TreeView = new Asn1TreeView(this);
+    m_asn1TreeView = new Asn1TreeView(this);
 
-    ui->verticalLayout->insertWidget(1, m_ans1TreeView);
+    ui->verticalLayout->insertWidget(1, m_asn1TreeView);
 
-    ui->btnFrame->setVisible(false);
+    //    ui->btnFrame->setVisible(false);
 
     connect(ui->openBtn, &QPushButton::clicked, this, &Asn1Editor::openFile);
     connect(ui->typesCB, &QComboBox::currentTextChanged, this, &Asn1Editor::showAsn1Type);
     connect(ui->valueBtn, &QPushButton::clicked, this, &Asn1Editor::setAsn1Value);
+    connect(ui->okBtn, &QPushButton::clicked, this, &Asn1Editor::getAsn1Value);
 }
 
 Asn1Editor::~Asn1Editor()
@@ -70,7 +71,7 @@ void Asn1Editor::showAsn1Type(const QString &text)
     });
 
     if (find != m_asn1Types.end())
-        m_ans1TreeView->setAsn1Model((*find).toMap());
+        m_asn1TreeView->setAsn1Model((*find).toMap());
 }
 
 void Asn1Editor::setAsn1Value()
@@ -82,7 +83,12 @@ void Asn1Editor::setAsn1Value()
         return value.toMap()["name"] == ui->typesCB->currentText();
     });
 
-    m_ans1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
+    m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
+}
+
+void Asn1Editor::getAsn1Value()
+{
+    ui->valueEdit->setPlainText(m_asn1TreeView->getAsn1Value());
 }
 
 void Asn1Editor::loadFile(const QString &file)

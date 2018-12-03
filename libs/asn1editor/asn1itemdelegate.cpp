@@ -91,6 +91,7 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
         for (const auto &val : enumVals)
             comboBox->addItem(val.toString());
 
+        comboBox->setCurrentIndex(0);
         editor = comboBox;
     } else if (asnType == "string") {
         editor = new QTextEdit(parent);

@@ -20,6 +20,8 @@
 
 #include <QObject>
 
+namespace asn1 {
+
 class Asn1ValueParser : public QObject
 {
     Q_OBJECT
@@ -34,18 +36,22 @@ Q_SIGNALS:
 private:
     bool checkFormat(const QString &asn1Value);
 
-    void parseSequenceValue(const QVariantMap &asn1Type,
+    bool parseSequenceValue(const QVariantMap &asn1Type,
                             const QString &asn1Value,
                             QVariantMap &valueMap);
-    void parseSequenceOfValue(const QVariantMap &asn1Type,
+    bool parseSequenceOfValue(const QVariantMap &asn1Type,
                               const QString &asn1Value,
                               QVariantMap &valueMap);
-    void parseChoiceValue(const QVariantMap &asn1Type,
+    bool parseChoiceValue(const QVariantMap &asn1Type,
                           const QString &asn1Value,
                           QVariantMap &valueMap);
 
-    QVariantMap findType(const QString &name, const QVariantMap &asn1Type);
+    QVariantMap getType(const QString &name, const QVariantMap &asn1Type);
     bool checkRange(const QVariantMap &asn1Type, const QVariant &value);
+
+    int nextIndex(const QString &value);
 };
+
+} // namespace asn1
 
 #endif // ASN1VALUEPARSER_H
