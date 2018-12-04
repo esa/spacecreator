@@ -18,6 +18,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "commandlineparser.h"
+
 #include <QMainWindow>
 #include <QModelIndex>
 
@@ -43,8 +45,10 @@ public:
 
     QGraphicsView *currentView() const;
 
+    bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
+
 public Q_SLOTS:
-    void openFile();
+    void selectAndOpenFile();
     void selectCurrentChart();
     void openAsn1Editor();
 
@@ -52,6 +56,8 @@ Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
 private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    bool openFileMsc(const QString &file);
+    bool openFileAsn(const QString &file);
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;
@@ -63,8 +69,6 @@ private:
     void initMenuHelp();
     void initTools();
     void initConnections();
-
-    bool doOpenFile(const QString &file);
 };
 
 #endif // MAINWINDOW_H

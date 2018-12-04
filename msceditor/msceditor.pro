@@ -13,7 +13,8 @@ SOURCES += \
     tools/pointertool.cpp \
     tools/instancecreatortool.cpp \
     tools/messagecreatortool.cpp \
-    tools/basecreatortool.cpp
+    tools/basecreatortool.cpp \
+    commandlineparser.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -23,7 +24,8 @@ HEADERS += \
     tools/pointertool.h \
     tools/instancecreatortool.h \
     tools/messagecreatortool.h \
-    tools/basecreatortool.h
+    tools/basecreatortool.h \
+    commandlineparser.h
 
 FORMS += \
     mainwindow.ui
@@ -83,7 +85,3 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
-
-CONFIG(debug, debug|release) {
-    DEFINES += DEVELOPER_AUTO_OPEN_MSC=\\\"$${_PRO_FILE_PWD_}/../examples/\\\"
-}
