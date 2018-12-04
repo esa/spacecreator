@@ -48,9 +48,11 @@ public:
 
     void clearScene();
 
-    msc::InstanceItem *createDefaultInstanceItem(msc::MscInstance *orphanInstance = nullptr, const QPointF &pos = QPointF());
+    msc::InstanceItem *createDefaultInstanceItem(msc::MscInstance *orphanInstance = nullptr,
+                                                 const QPointF &pos = QPointF());
     bool removeInstanceItem(msc::InstanceItem *item);
-    msc::MessageItem *createDefaultMessageItem(msc::MscMessage *orphanMessage = nullptr, const QPointF &pos = QPointF());
+    msc::MessageItem *createDefaultMessageItem(msc::MscMessage *orphanMessage = nullptr,
+                                               const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
 public Q_SLOTS:
@@ -63,7 +65,7 @@ private Q_SLOTS:
     void onRelayoutRequested();
 
 private:
-    msc::InstanceItem *instanceItem(const QString &name) const;
+    msc::InstanceItem *instanceItem(msc::MscInstance *instance) const;
 
     std::unique_ptr<ChartViewModelPrivate> const d;
 };
