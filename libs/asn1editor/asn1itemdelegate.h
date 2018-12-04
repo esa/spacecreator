@@ -22,14 +22,6 @@
 
 namespace asn1 {
 
-const int ASN1TYPE = Qt::UserRole;
-const int MIN_RANGE = Qt::UserRole + 1;
-const int MAX_RANGE = Qt::UserRole + 2;
-const int CHOICE_LIST = Qt::UserRole + 3;
-const int INTMAP = Qt::UserRole + 4;
-const int PLOTTERS = Qt::UserRole + 5;
-const int OPTIONAL = Qt::UserRole + 6;
-
 class Asn1ItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT

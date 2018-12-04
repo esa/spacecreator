@@ -21,12 +21,12 @@
 #include <QMap>
 #include <QTreeView>
 
-class QStandardItemModel;
 class QStandardItem;
 
 namespace asn1 {
 
 class Asn1ItemDelegate;
+class Asn1ItemModel;
 
 class Asn1TreeView : public QTreeView
 {
@@ -44,21 +44,6 @@ private Q_SLOTS:
     void onChoiceFieldChanged(const QModelIndex &index, const QVariant length, const QVariant currentIndex);
 
 private:
-    using ItemPtr = QSharedPointer<QStandardItem>;
-    using ItemMap = QMap<QString, QStandardItem *>;
-
-    ItemMap createModelItems(QVariantMap asn1Item);
-
-    QStandardItem *createNumberItem(QVariantMap asn1Item);
-    QStandardItem *createBoolItem(QVariantMap asn1Item);
-    QStandardItem *createSequenceItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createEnumeratedItem(QVariantMap asn1Item);
-    QStandardItem *createChoiceItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createStringItem(QVariantMap asn1Item);
-
-    QStandardItem *createPresentItem(QVariantMap asn1Item);
-
     void hideExtraFields(const QStandardItem *item, bool hide = false, int row = 0);
 
     void setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize = -1, int choiceRow = -1);
@@ -70,10 +55,10 @@ private:
     QString getItemValue(const QStandardItem *item, const QString &separator = "") const;
 
 private:
+    using ItemModelPtr = QSharedPointer<Asn1ItemModel>;
+
     Asn1ItemDelegate *m_itemDelegate;
-    ItemPtr m_nameItem;
-    ItemPtr m_typeItem;
-    ItemPtr m_valueItem;
+    ItemModelPtr m_ItemModel;
 };
 
 } // namespace asn1

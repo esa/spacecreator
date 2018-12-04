@@ -12,14 +12,17 @@ HEADERS += \
     asn1itemdelegate.h \
     asn1treeview.h \
     asn1xmlparser.h \
-    asn1valueparser.h
+    asn1valueparser.h \
+    asn1itemmodel.h \
+    asn1const.h
 
 SOURCES += \
     asn1editor.cpp \
     asn1itemdelegate.cpp \
     asn1treeview.cpp \
     asn1xmlparser.cpp \
-    asn1valueparser.cpp
+    asn1valueparser.cpp \
+    asn1itemmodel.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {
