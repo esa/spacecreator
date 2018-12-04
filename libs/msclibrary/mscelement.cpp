@@ -26,12 +26,14 @@ namespace msc {
 
 MscElement::MscElement(QObject *parent)
     : QObject(parent)
+    , m_id(QUuid::createUuid())
 {
 }
 
 MscElement::MscElement(const QString &name, QObject *parent)
     : QObject(parent)
     , m_name(name)
+    , m_id(QUuid::createUuid())
 {
 }
 
@@ -48,6 +50,11 @@ void MscElement::setName(const QString &name)
 
     m_name = name;
     Q_EMIT nameChanged(m_name);
+}
+
+QUuid MscElement::internalId() const
+{
+    return m_id;
 }
 
 } // namespace msc

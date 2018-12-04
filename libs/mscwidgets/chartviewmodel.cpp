@@ -132,12 +132,12 @@ void ChartViewModel::fillView(MscChart *chart)
         InstanceItem *sourceInstance(nullptr);
         qreal instanceVertiacalOffset(0);
         if (message->sourceInstance()) {
-            sourceInstance = instanceItem(message->sourceInstance()->name());
+            sourceInstance = instanceItem(message->sourceInstance());
             instanceVertiacalOffset = sourceInstance->axis().p1().y();
         }
         InstanceItem *targetInstance(nullptr);
         if (message->targetInstance()) {
-            targetInstance = instanceItem(message->targetInstance()->name());
+            targetInstance = instanceItem(message->targetInstance());
             if (qFuzzyIsNull(instanceVertiacalOffset))
                 instanceVertiacalOffset = targetInstance->axis().p1().y();
         }
@@ -177,13 +177,15 @@ void ChartViewModel::onRelayoutRequested()
     fillView(chart);
 }
 
-InstanceItem *ChartViewModel::instanceItem(const QString &name) const
+InstanceItem *ChartViewModel::instanceItem(msc::MscInstance *instance) const
 {
-    if (!name.isEmpty())
+    if (instance)
         for (QGraphicsItem *item : d->m_scene.items()) {
-            if (InstanceItem *instance = dynamic_cast<InstanceItem *>(item)) {
-                if (instance->name() == name) {
-                    return instance;
+            if (item->parentItem())
+                continue;
+            if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(item)) {
+                if (instanceItem->modelItem()->internalId() == instance->internalId()) {
+                    return instanceItem;
                 }
             }
         }

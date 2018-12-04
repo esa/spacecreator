@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QUuid>
 
 namespace msc {
 
@@ -33,11 +34,14 @@ public:
     const QString &name() const;
     void setName(const QString &name);
 
+    QUuid internalId() const;
+
 Q_SIGNALS:
     void nameChanged(const QString &name);
 
 private:
     QString m_name = tr("Untitled");
+    const QUuid m_id;
 };
 
 } // namespace msc
