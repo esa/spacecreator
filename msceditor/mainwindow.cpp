@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "mainmodel.h"
+#include "commandlineparser.h"
 
 #include <documentitemmodel.h>
 #include <mscchart.h>
@@ -42,6 +43,8 @@
 #include <QUndoStack>
 #include <QToolBar>
 #include <QActionGroup>
+#include <QMessageBox>
+#include <QDebug>
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -95,9 +98,6 @@ MainWindow::MainWindow(QWidget *parent)
     initConnections();
 
     selectCurrentChart();
-#ifdef DEVELOPER_AUTO_OPEN_MSC
-    doOpenFile(QString(DEVELOPER_AUTO_OPEN_MSC).append("dengof.sample2.local.msc"));
-#endif //DEVELOPER_AUTO_OPEN_MSC
 }
 
 QGraphicsView *MainWindow::currentView() const
@@ -110,14 +110,21 @@ MainWindow::~MainWindow()
     disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
 }
 
-void MainWindow::openFile()
+void MainWindow::selectAndOpenFile()
 {
-    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), QString("*.msc"));
-    if (!filename.isEmpty())
-        doOpenFile(filename);
+    static const QLatin1String suffixMsc(".msc");
+    static const QLatin1String suffixAsn(".asn");
+    static const QStringList suffixes = { "*" + suffixMsc, "*" + suffixAsn };
+    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), suffixes.join(" "));
+    if (!filename.isEmpty()) {
+        if (filename.endsWith(suffixMsc))
+            openFileMsc(filename);
+        else if (filename.endsWith(suffixAsn))
+            openFileAsn(filename);
+    }
 }
 
-bool MainWindow::doOpenFile(const QString &file)
+bool MainWindow::openFileMsc(const QString &file)
 {
     d->ui->errorTextEdit->setPlainText(tr("Opening file: %1").arg(file));
 
@@ -138,6 +145,12 @@ bool MainWindow::doOpenFile(const QString &file)
     d->ui->errorTextEdit->appendPlainText(tr("Model loading: %1").arg(ok ? tr("success") : tr("failed")));
 
     return ok;
+}
+
+bool MainWindow::openFileAsn(const QString &file)
+{
+    QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
+    return false;
 }
 
 void MainWindow::selectCurrentChart()
@@ -226,7 +239,7 @@ void MainWindow::initMenus()
 void MainWindow::initMenuFile()
 {
     d->m_menuFile = menuBar()->addMenu(tr("File"));
-    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this, &MainWindow::openFile, QKeySequence::Open);
+    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this, &MainWindow::selectAndOpenFile, QKeySequence::Open);
     d->ui->mainToolBar->addAction(d->m_actOpenFile);
     d->m_menuFile->addSeparator();
     d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), qApp, &QApplication::quit, QKeySequence::Quit);
@@ -286,4 +299,20 @@ void MainWindow::initConnections()
                                          .arg(item.x())
                                          .arg(item.y()));
     });
+}
+
+bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
+{
+    switch (arg) {
+    case CommandLineParser::Positional::OpenFileMsc: {
+        return openFileMsc(value);
+    }
+    case CommandLineParser::Positional::OpenFileAsn: {
+        return openFileAsn(value);
+    }
+    default:
+        qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
+        break;
+    }
+    return false;
 }

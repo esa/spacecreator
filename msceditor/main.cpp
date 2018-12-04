@@ -16,8 +16,10 @@
 */
 
 #include "mainwindow.h"
+#include "commandlineparser.h"
 
 #include <QApplication>
+#include <QMetaEnum>
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +27,22 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));
+    a.setApplicationVersion("0.0.1");
+
+    CommandLineParser cmdParser;
+    cmdParser.process(a.arguments());
+
     MainWindow w;
+
+    const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
+    for (int i = 0; i < e.keyCount(); ++i) {
+        const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
+
+        if (CommandLineParser::Positional::Unknown != posArgType)
+            if (cmdParser.isSet(posArgType))
+                w.processCommandLineArg(posArgType, cmdParser.value(posArgType));
+    }
+
     w.show();
 
     return a.exec();
