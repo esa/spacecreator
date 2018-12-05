@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/icn/toolbar">
+        <file>icons/toolbar/pointer.png</file>
+        <file>icons/toolbar/instance.png</file>
+        <file>icons/toolbar/message.png</file>
+    </qresource>
+</RCC>

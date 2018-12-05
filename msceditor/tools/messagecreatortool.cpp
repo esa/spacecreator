@@ -19,6 +19,7 @@
 
 #include <baseitems/arrowitem.h>
 #include <commands/common/commandsstack.h>
+#include <mscchart.h>
 
 #include <QDebug>
 
@@ -29,6 +30,7 @@ MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *vie
 {
     m_title = tr("Message");
     m_description = tr("Create new Message item");
+    m_icon = QPixmap(":/icn/toolbar/icons/toolbar/message.png");
 }
 
 ToolType MessageCreatorTool::toolType() const
@@ -45,6 +47,7 @@ void MessageCreatorTool::createPreviewItem()
 
     MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
     messageItem->setAutoResizable(false);
+    messageItem->performSnap();
 
     m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
@@ -59,7 +62,9 @@ void MessageCreatorTool::commitPreviewItem()
                                       QVariant::fromValue<ChartViewModel *>(m_model),
                                       m_previewItem->pos() };
 
+    removePreviewItem();
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+    createPreviewItem();
 }
 
 void MessageCreatorTool::removePreviewItem()
@@ -67,7 +72,8 @@ void MessageCreatorTool::removePreviewItem()
     if (!m_previewItem)
         return;
 
-    if (m_model->removeMessageItem(static_cast<MessageItem *>(m_previewItem)))
+    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
+    if (m_model->removeMessageItem(messageItem))
         m_previewItem = nullptr;
 }
 

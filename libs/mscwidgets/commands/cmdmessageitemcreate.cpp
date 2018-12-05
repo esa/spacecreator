@@ -54,6 +54,7 @@ void CmdMessageItemCreate::redo()
     m_messageItem = m_model->createDefaultMessageItem(nullptr, m_pos);
     m_scene->addItem(m_messageItem);
     m_messageItem->performSnap();
+    m_model->relayout();
 }
 
 void CmdMessageItemCreate::undo()

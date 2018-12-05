@@ -183,6 +183,8 @@ void TextItem::focusOutEvent(QFocusEvent *event)
         Q_EMIT edited(newText);
     }
 
+    selectText(false);
+
     m_prevText.clear();
 }
 
@@ -218,11 +220,18 @@ void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     if (m_prevText.isEmpty()) {
         m_prevText = toPlainText();
-
-        QTextCursor txtCursor = textCursor();
-        txtCursor.select(QTextCursor::Document);
-        setTextCursor(txtCursor);
+        selectText(true);
     }
+}
+
+void TextItem::selectText(bool select)
+{
+    QTextCursor txtCursor = textCursor();
+    if (select)
+        txtCursor.select(QTextCursor::Document);
+    else if (txtCursor.hasSelection())
+        txtCursor.clearSelection();
+    setTextCursor(txtCursor);
 }
 
 } // namespace msc

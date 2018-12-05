@@ -18,6 +18,7 @@
 #include <commands/common/commandsfactory.h>
 #include <commands/cmdmessageitemcreate.h>
 #include <commands/common/commandsstack.h>
+#include <baseitems/common/utils.h>
 
 #include <chartviewmodel.h>
 #include <mscmessage.h>
@@ -45,7 +46,6 @@ private Q_SLOTS:
     void testCreate();
     void testUndo();
     void testRedo();
-    void testCreateUndoRedo();
     void testPerformance();
 
 private:
@@ -110,14 +110,6 @@ void tst_CmdMessageItemCreate::testRedo()
     QCOMPARE(redone, CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::testCreateUndoRedo()
-{
-    m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount, 2. * CommandsCount);
-    testCreate();
-    testUndo();
-    testRedo();
-}
-
 void tst_CmdMessageItemCreate::testPerformance()
 {
     if (SkipBenchmark)
@@ -159,8 +151,7 @@ void tst_CmdMessageItemCreate::testPerformance()
 
 int tst_CmdMessageItemCreate::sceneItemsCount()
 {
-    // one MessageItem = 4 QGraphicItems in the items list
-    return m_chartModel.graphicsScene()->items().size() / 4;
+    return msc::utils::toplevelItems(m_chartModel.graphicsScene()).size();
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)

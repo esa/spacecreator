@@ -194,7 +194,7 @@ void InstanceItem::updateText(TextItem *holder, const QString &text)
 
     holder->setPlainText(text);
     holder->adjustSize();
-    updateLayout();
+    rebuildLayout();
 
     Q_EMIT needRelayout();
 }

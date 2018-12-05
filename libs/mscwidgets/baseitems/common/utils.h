@@ -37,9 +37,13 @@ template<class T>
 T *instanceByPos(QGraphicsScene *scene, const QPointF &scenePos)
 {
     if (scene)
-        for (QGraphicsItem *item : scene->items(scenePos))
+        for (QGraphicsItem *item : scene->items(scenePos)) {
+            if (item->parentItem())
+                continue;
+
             if (T *instance = dynamic_cast<T *>(item))
                 return instance;
+        }
     return nullptr;
 }
 
@@ -53,6 +57,6 @@ QPropertyAnimation *createLinearAnimation(QObject *target,
                                           const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool removeSceneItem(QGraphicsItem *item);
-
+QList<QGraphicsItem *> toplevelItems(QGraphicsScene *scene);
 } // ns utils
 } // ns msc

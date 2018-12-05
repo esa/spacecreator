@@ -316,3 +316,18 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     }
     return false;
 }
+
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+    QMainWindow::keyPressEvent(e);
+
+    switch (e->key()) {
+    case Qt::Key_Escape: {
+        if (!e->isAutoRepeat())
+            if (QAction *pointerToolAction = d->m_toolBar->actions().first())
+                if (!pointerToolAction->isChecked())
+                    pointerToolAction->setChecked(true);
+        break;
+    }
+    }
+}
