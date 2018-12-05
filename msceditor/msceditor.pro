@@ -85,3 +85,6 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
+
+RESOURCES += \
+    resources/rsc.qrc

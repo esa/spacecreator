@@ -55,18 +55,17 @@ public:
                                                const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
+    msc::InstanceItem *itemForInstance(msc::MscInstance *instance) const;
+    msc::MessageItem *itemForMessage(msc::MscMessage *message) const;
+
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);
+    void relayout();
 
 Q_SIGNALS:
     void currentChartChagend(msc::MscChart *chart);
 
-private Q_SLOTS:
-    void onRelayoutRequested();
-
 private:
-    msc::InstanceItem *instanceItem(msc::MscInstance *instance) const;
-
     std::unique_ptr<ChartViewModelPrivate> const d;
 };
 

@@ -18,6 +18,8 @@
 #include "instancecreatortool.h"
 
 #include <commands/common/commandsstack.h>
+#include <instanceitem.h>
+#include <mscchart.h>
 
 #include <QDebug>
 
@@ -28,6 +30,7 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
 {
     m_title = tr("Instance");
     m_description = tr("Create new Instance item");
+    m_icon = QPixmap(":/icn/toolbar/icons/toolbar/instance.png");
 }
 
 ToolType InstanceCreatorTool::toolType() const
@@ -55,6 +58,9 @@ void InstanceCreatorTool::commitPreviewItem()
                                       m_previewItem->pos() };
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
+
+    InstanceItem *instanceItem = static_cast<InstanceItem *>(m_previewItem);
+    instanceItem->setName(tr("Instance #%1").arg(m_model->currentChart()->instances().size()));
 }
 
 void InstanceCreatorTool::removePreviewItem()

@@ -67,6 +67,8 @@ private:
     bool m_gradientUsed = false;
     bool m_editable = false;
     QString m_prevText;
+
+    void selectText(bool select);
 };
 
 } // ns msc

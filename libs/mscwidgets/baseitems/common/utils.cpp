@@ -128,5 +128,16 @@ bool removeSceneItem(QGraphicsItem *item)
     return true;
 }
 
+QList<QGraphicsItem *> toplevelItems(QGraphicsScene *scene)
+{
+    QList<QGraphicsItem *> items;
+    if (scene) {
+        for (QGraphicsItem *item : scene->items())
+            if (!item->parentItem())
+                items.append(item);
+    }
+    return items;
+}
+
 } // ns utils
 } // ns msc

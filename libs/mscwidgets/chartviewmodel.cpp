@@ -27,6 +27,7 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <QPointer>
+#include <QDebug>
 
 namespace msc {
 
@@ -96,27 +97,32 @@ void ChartViewModel::fillView(MscChart *chart)
 
     clearScene();
 
-    if (d->m_currentChart == nullptr) {
-        Q_EMIT currentChartChagend(d->m_currentChart);
-        return;
-    }
+    if (d->m_currentChart)
+        relayout();
 
+    Q_EMIT currentChartChagend(d->m_currentChart);
+}
+
+void ChartViewModel::relayout()
+{
     const qreal axisHeight = d->instanceAxisHeight();
     double x = .0;
     qreal bottom = 0.;
 
+    QRectF totalRect;
     for (MscInstance *instance : d->m_currentChart->instances()) {
-        auto *item = new InstanceItem(instance);
+        InstanceItem *item = itemForInstance(instance);
+        if (!item) {
+            item = new InstanceItem(instance);
+            connect(item, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
+            d->m_scene.addItem(item);
+            d->m_instanceItems.append(item);
+        }
+
         item->setKind(instance->kind());
-        item->setX(x);
-
-        item->buildLayout(); // messages layout calculation is based on
         item->setAxisHeight(axisHeight);
-
-        connect(item, &InstanceItem::needRelayout, this, &ChartViewModel::onRelayoutRequested);
-
-        d->m_scene.addItem(item);
-        d->m_instanceItems.append(item);
+        item->setX(x);
+        item->buildLayout(); // messages layout calculation is based on
 
         x += d->InterInstanceSpan + item->boundingRect().width();
 
@@ -125,6 +131,8 @@ void ChartViewModel::fillView(MscChart *chart)
         bounds.moveBottom(bottom);
         item->setY(bounds.top());
         bottom = bounds.bottom();
+
+        totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
     }
 
     qreal y(d->InterMessageSpan);
@@ -132,63 +140,52 @@ void ChartViewModel::fillView(MscChart *chart)
         InstanceItem *sourceInstance(nullptr);
         qreal instanceVertiacalOffset(0);
         if (message->sourceInstance()) {
-            sourceInstance = instanceItem(message->sourceInstance());
+            sourceInstance = itemForInstance(message->sourceInstance());
             instanceVertiacalOffset = sourceInstance->axis().p1().y();
         }
         InstanceItem *targetInstance(nullptr);
         if (message->targetInstance()) {
-            targetInstance = instanceItem(message->targetInstance());
+            targetInstance = itemForInstance(message->targetInstance());
             if (qFuzzyIsNull(instanceVertiacalOffset))
                 instanceVertiacalOffset = targetInstance->axis().p1().y();
         }
 
-        auto *item = new MessageItem(message);
-        d->m_scene.addItem(item);
+        MessageItem *item = itemForMessage(message);
+        if (!item) {
+            item = new MessageItem(message);
+
+            d->m_scene.addItem(item);
+            d->m_messageItems.append(item);
+        }
         item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
-
-        d->m_messageItems.append(item);
         y += item->boundingRect().height() + d->InterMessageSpan;
-    }
 
-    Q_EMIT currentChartChagend(d->m_currentChart);
+        totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+    }
 
     // actualize scene's rect to avoid flickering on first show:
-    QRectF r;
-    for (QGraphicsItem *gi : d->m_scene.items()) {
-        if (gi->parentItem())
-            continue;
-
-        const QRectF itemRect = gi->boundingRect().translated(gi->pos());
-        if (r.isEmpty())
-            r = itemRect;
-        else
-            r = r.united(itemRect);
-    }
-
     static constexpr qreal margin(50.);
-    r.adjust(-margin, -margin, margin, margin);
-    d->m_scene.setSceneRect(r);
+    totalRect.adjust(-margin, -margin, margin, margin);
+    d->m_scene.setSceneRect(totalRect);
 }
 
-void ChartViewModel::onRelayoutRequested()
-{
-    QPointer<msc::MscChart> chart = d->m_currentChart;
-    d->m_currentChart = nullptr;
-    fillView(chart);
-}
-
-InstanceItem *ChartViewModel::instanceItem(msc::MscInstance *instance) const
+InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {
     if (instance)
-        for (QGraphicsItem *item : d->m_scene.items()) {
-            if (item->parentItem())
-                continue;
-            if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(item)) {
-                if (instanceItem->modelItem()->internalId() == instance->internalId()) {
+        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
+            if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(item))
+                if (instanceItem->modelItem()->internalId() == instance->internalId())
                     return instanceItem;
-                }
-            }
-        }
+    return nullptr;
+}
+
+msc::MessageItem *ChartViewModel::itemForMessage(msc::MscMessage *message) const
+{
+    if (message)
+        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
+            if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item))
+                if (messageItem->modelItem()->internalId() == message->internalId())
+                    return messageItem;
     return nullptr;
 }
 

@@ -249,17 +249,26 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     const bool targetFound(!prevTarget && m_targetInstance);
 
     if (sourceFound) {
-        const QPointF instanceCenter(m_sourceInstance->boundingRect().center());
-        const QPointF instanceCenterScene(m_sourceInstance->mapToScene(instanceCenter));
+        const QPointF &instanceCenter(m_sourceInstance->boundingRect().center());
+        const QPointF &instanceCenterScene(m_sourceInstance->mapToScene(instanceCenter));
         const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
-        updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+        const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->source()->point());
+
+        const bool updated = updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+
+        if (updated && !m_targetInstance && !delta.isNull())
+            updateTarget(m_arrowItem->arrow()->link()->target()->point() + delta, ObjectAnchor::Snap::NoSnap);
     }
     if (targetFound) {
-        const QPointF instanceCenter(m_targetInstance->boundingRect().center());
-        const QPointF instanceCenterScene(m_targetInstance->mapToScene(instanceCenter));
+        const QPointF &instanceCenter(m_targetInstance->boundingRect().center());
+        const QPointF &instanceCenterScene(m_targetInstance->mapToScene(instanceCenter));
         const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
+        const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->target()->point());
 
-        updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+        const bool updated = updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+
+        if (updated && !m_sourceInstance && !delta.isNull())
+            updateSource(m_arrowItem->arrow()->link()->source()->point() + delta, ObjectAnchor::Snap::NoSnap);
     }
 
     return res;
@@ -271,7 +280,7 @@ bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
 
     setSourceInstanceItem(hoveredInstance);
     const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
-
+    updateGripPoints();
     commitGeometryChange();
     return res;
 }
@@ -281,7 +290,7 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
     InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
     setTargetInstanceItem(hoveredInstance);
     const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
-
+    updateGripPoints();
     commitGeometryChange();
     return res;
 }

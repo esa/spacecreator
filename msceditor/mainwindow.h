@@ -69,6 +69,8 @@ private:
     void initMenuHelp();
     void initTools();
     void initConnections();
+
+    void keyPressEvent(QKeyEvent *e) override;
 };
 
 #endif // MAINWINDOW_H
