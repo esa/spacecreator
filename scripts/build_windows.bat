@@ -1,6 +1,6 @@
 @echo off
 
-REM build MSC editor using VisualStudio 2017 and Qt 5.11.2
+REM build MSC editor using VisualStudio 2017 and Qt 5.11.3
 
 set PROGFILES=%ProgramFiles%
 if not "%ProgramFiles(x86)%" == "" set PROGFILES=%ProgramFiles(x86)%
@@ -19,7 +19,7 @@ if exist %MSVCDIR% (
 )
 
 REM Check if Visual Studio 2017 is installed
-set QMAKE="C:\Qt\5.11.2\msvc2017_64\bin\qmake.exe"
+set QMAKE="C:\Qt\5.11.3\msvc2017_64\bin\qmake.exe"
 if exist %QMAKE% (
   echo "Using qmake %QMAKE%"
 ) else (
