@@ -85,6 +85,7 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
+win32: QMAKE_LFLAGS += /LTCG
 
 RESOURCES += \
     resources/rsc.qrc
