@@ -20,6 +20,7 @@
 #include <QSpinBox>
 #include <QTextEdit>
 
+#include "asn1const.h"
 #include "asn1itemdelegate.h"
 
 namespace asn1 {
