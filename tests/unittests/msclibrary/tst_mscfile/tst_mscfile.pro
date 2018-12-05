@@ -14,3 +14,5 @@ SOURCES +=  tst_mscfile.cpp
 
 DISTFILES += \
     syntax_error.msc
+
+win32: QMAKE_LFLAGS += /LTCG

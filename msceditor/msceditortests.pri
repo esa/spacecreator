@@ -82,7 +82,6 @@ win32 {
         -L$$OUT_PWD/../../../../libs/msclibrary/ -lmsclibrary \
         -L$$OUT_PWD/../../../../libs/mscwidgets/ -lmscwidgets
 
-message($$OUT_PWD)
     DEFINES += EXAMPLES_STORAGE_PATH=\\\"$$_PRO_FILE_PWD_/../../../../examples/\\\"
 }
 

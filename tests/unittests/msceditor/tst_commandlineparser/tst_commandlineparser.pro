@@ -8,3 +8,5 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += tst_commandlineparser.cpp
+
+win32: QMAKE_LFLAGS += /LTCG
