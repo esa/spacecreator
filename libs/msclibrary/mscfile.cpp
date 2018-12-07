@@ -25,16 +25,7 @@
 #include "parser/MscParser.h"
 #include "parser/MscBaseVisitor.h"
 
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(push)
-    #pragma warning(disable:4251)
-#endif // SUPPRESz_ANTLR_WRNS_WINDOWS
-
 #include <antlr4-runtime.h>
-
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(pop)
-#endif // SUPPRESz_ANTLR_WRNS_WINDOWS
 
 #include <QFileInfo>
 #include <QObject>
@@ -84,7 +75,6 @@ MscModel *MscFile::parseText(const QString &text, QStringList *errorMessages)
     ANTLRInputStream input(text.toStdString());
     return parse(input, errorMessages);
 }
-
 
 MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
