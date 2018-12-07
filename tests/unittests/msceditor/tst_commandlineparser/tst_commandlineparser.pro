@@ -9,4 +9,4 @@ TEMPLATE = app
 
 SOURCES += tst_commandlineparser.cpp
 
-win32: QMAKE_LFLAGS += /LTCG
+win32: QMAKE_LFLAGS_RELEASE += /LTCG

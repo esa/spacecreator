@@ -1,3 +1,5 @@
+include(suppress_antlr_wrn.pri)
+
 BuildType = Release
 CONFIG(debug, debug|release) {
     BuildType = Debug
