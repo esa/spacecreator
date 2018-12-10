@@ -160,7 +160,7 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
         }
         m_messages.append(message);
 
-        m_currentInstance->addEvent(MscInstance::MscMessagePtr(message->clone()));
+        m_currentInstance->addMessage(message->clone());
     }
     return visitChildren(context);
 }

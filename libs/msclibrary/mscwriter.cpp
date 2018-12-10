@@ -45,8 +45,9 @@ void MscWriter::saveModel(const MscModel *model, const QString &fileName)
 
     QTextStream out(&mscFile);
 
+    int tabCount = 0;
     for (const auto *doc : model->documents())
-        out << serialize(doc);
+        out << serialize(doc, tabCount++);
 
     for (const auto *chart : model->charts())
         out << serialize(chart);
@@ -54,45 +55,48 @@ void MscWriter::saveModel(const MscModel *model, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance)
+QString MscWriter::serialize(const MscInstance *instance, int tabsSize)
 {
     if (instance == nullptr)
         return "";
 
     QString events;
-    QString header = QString("instance %1").arg(instance->name());
+
+    QString tabString = tabs(tabsSize);
+    QString header = QString("%1instance %2").arg(tabString, instance->name());
+    QString footer = tabString + "endinstance;\n";
 
     if (!instance->kind().isEmpty()) {
         header += QString(": %1 %2;\n").arg(instance->kind(), instance->inheritance());
     } else
         header += ";\n";
 
-    for (const auto &event : instance->events())
-        events += serialize(event, instance);
+    for (const auto &event : instance->messages())
+        events += serialize(event, instance, tabsSize + 1);
 
-    return header + events + "endinstance;\n";
+    return header + events + footer;
 }
 
-QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance)
+QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
 {
     if (message == nullptr)
         return "";
 
-    QString direction;
+    QString direction = tabs(tabsSize);
     QString instanceName;
 
     if (message->sourceInstance() == instance) {
-        direction = "out %1 to %2;\n";
+        direction += "out %1 to %2;\n";
         instanceName = message->targetInstance() != nullptr ? message->targetInstance()->name() : "env";
     } else {
-        direction = "in %1 from %2;\n";
+        direction += "in %1 from %2;\n";
         instanceName = message->sourceInstance() != nullptr ? message->sourceInstance()->name() : "env";
     }
 
     return QString(direction).arg(message->name(), instanceName);
 }
 
-QString MscWriter::serialize(const MscChart *chart)
+QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 {
     if (chart == nullptr)
         return "";
@@ -100,25 +104,40 @@ QString MscWriter::serialize(const MscChart *chart)
     QString instances;
 
     for (const auto *instance : chart->instances())
-        instances += serialize(instance);
+        instances += serialize(instance, tabsSize + 1);
 
-    return QString("msc %1;\n %2 endmsc;\n").arg(chart->name(), instances);
+    QString tabString = tabs(tabsSize);
+    return QString("%1msc %2;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances);
 }
 
-QString MscWriter::serialize(const MscDocument *document)
+QString MscWriter::serialize(const MscDocument *document, int tabsSize)
 {
     if (document == nullptr)
         return "";
 
     QString instances;
 
+    int tabCount = tabsSize + 1;
     for (const auto *doc : document->documents())
-        instances += serialize(doc);
+        instances += serialize(doc, tabCount++);
 
     for (const auto *chart : document->charts())
-        instances += serialize(chart);
+        instances += serialize(chart, tabsSize + 1);
 
-    return QString("mscdocument %1;\n %2 endmscdocument;\n").arg(document->name(), instances);
+    QString tabString = tabs(tabsSize);
+    return QString("%1mscdocument %2;\n%3%1endmscdocument;\n").arg(tabString, document->name(), instances);
+}
+
+QString MscWriter::tabs(int tabsSize)
+{
+    const static QString TABS = "   ";
+
+    QString tabsString;
+
+    for (int x = 0; x < tabsSize; ++x)
+        tabsString += TABS;
+
+    return tabsString;
 }
 
 } // namespace msc

@@ -29,6 +29,12 @@ MscInstance::MscInstance(const QString &name, QObject *parent)
 {
 }
 
+MscInstance::~MscInstance()
+{
+    qDeleteAll(m_messages);
+    m_messages.clear();
+}
+
 const QString &MscInstance::kind() const
 {
     return m_kind;
@@ -59,14 +65,14 @@ void MscInstance::setInheritance(const QString &inheritance)
     Q_EMIT inheritanceChanged(m_inheritance);
 }
 
-const MscInstance::Events &MscInstance::events() const
+const MscInstance::Messages &MscInstance::messages() const
 {
-    return m_events;
+    return m_messages;
 }
 
-void MscInstance::addEvent(MscMessagePtr event)
+void MscInstance::addMessage(MscMessage *event)
 {
-    m_events.append(event);
+    m_messages.append(event);
 }
 
 } // namespace msc

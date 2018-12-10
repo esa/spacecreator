@@ -37,11 +37,14 @@ public:
 
     void saveModel(const MscModel *model, const QString &fileName);
 
+protected:
+    QString serialize(const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscChart *chart, int tabsSize = 0);
+    QString serialize(const MscDocument *document, int tabsSize = 0);
+
 private:
-    QString serialize(const MscInstance *instance);
-    QString serialize(const MscMessage *message, const MscInstance *instance);
-    QString serialize(const MscChart *chart);
-    QString serialize(const MscDocument *document);
+    QString tabs(int tabsSize);
 };
 
 } // namespace msc
