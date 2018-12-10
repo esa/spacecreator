@@ -32,7 +32,7 @@ mscDefinition
     ;
 
 messageSequenceChart
-    : MSC NAME SEMI mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    : MSC NAME SEMI (gateDeclaration)? mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
     ;
 
 mscBody
@@ -59,8 +59,12 @@ instanceDeclStatement
 instance
     : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
+        |       gateDeclaration
         |       INST NAME (COLON instanceKind)? SEMI
+    ;
+
+gateDeclaration
+    : GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
     ;
 
 instanceHeadStatement

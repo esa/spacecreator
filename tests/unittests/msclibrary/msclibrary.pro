@@ -6,4 +6,5 @@ SUBDIRS = \
     tst_mscdocument \
     tst_mscelement \
     tst_mscfile \
-    tst_mscmodel
+    tst_mscmodel \
+    tst_mscgate

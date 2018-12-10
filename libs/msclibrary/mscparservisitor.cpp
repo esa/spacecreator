@@ -103,7 +103,7 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
         return visitChildren(context);
     }
 
-    const QString name = QString::fromStdString(context->NAME(0)->getText());
+    const QString name = QString::fromStdString(context->NAME()->getText());
     m_currentInstance = m_currentChart->instanceByName(name);
     auto result = visitChildren(context);
 
@@ -155,14 +155,19 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     return visitChildren(context);
 }
 
+antlrcpp::Any MscParserVisitor::visitGateDeclaration(MscParser::GateDeclarationContext *context)
+{
+    return visitChildren(context);
+}
+
 void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
 {
     Q_ASSERT(m_currentChart != nullptr);
-    if (context->GATE()) {
+    if (context->gateDeclaration()) {
         return;
     }
 
-    const QString name = QString::fromStdString(context->NAME(0)->getText());
+    const QString name = QString::fromStdString(context->NAME()->getText());
 
     MscInstance *instance = m_currentChart->instanceByName(name);
     if (!instance) {
