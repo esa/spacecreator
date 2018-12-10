@@ -60,14 +60,4 @@ void MscMessage::setTargetInstance(MscInstance *target)
     Q_EMIT targetChanged(m_target);
 }
 
-MscMessage *MscMessage::clone()
-{
-    MscMessage *message = new MscMessage(name());
-
-    message->setSourceInstance(sourceInstance());
-    message->setTargetInstance(targetInstance());
-
-    return message;
-}
-
 } // namespace msc

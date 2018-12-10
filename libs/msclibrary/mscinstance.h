@@ -35,20 +35,14 @@ class MscInstance : public MscElement
     Q_OBJECT
 
 public:
-    using Messages = QVector<msc::MscMessage *>;
-
     explicit MscInstance(QObject *parent = nullptr);
     MscInstance(const QString &name, QObject *parent = nullptr);
-    ~MscInstance();
 
     const QString &kind() const;
     void setKind(const QString &kind);
 
     const QString &inheritance() const;
     void setInheritance(const QString &inheritance);
-
-    const Messages &messages() const;
-    void addMessage(MscMessage *event);
 
 Q_SIGNALS:
     void kindChanged(const QString &kind);
@@ -57,7 +51,6 @@ Q_SIGNALS:
 private:
     QString m_kind;
     QString m_inheritance;
-    Messages m_messages;
 };
 
 } // namespace msc

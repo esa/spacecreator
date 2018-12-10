@@ -55,7 +55,25 @@ void MscWriter::saveModel(const MscModel *model, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance, int tabsSize)
+void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
+{
+    QString mscText;
+
+    if (chart == nullptr || fileName.isEmpty())
+        return;
+
+    QFile mscFile(fileName);
+    if (!mscFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&mscFile);
+
+    out << serialize(chart);
+
+    mscFile.close();
+}
+
+QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -71,8 +89,10 @@ QString MscWriter::serialize(const MscInstance *instance, int tabsSize)
     } else
         header += ";\n";
 
-    for (const auto &event : instance->messages())
-        events += serialize(event, instance, tabsSize + 1);
+    for (const auto &message : messages) {
+        if (message->sourceInstance() == instance || message->targetInstance() == instance)
+            events += serialize(message, instance, tabsSize + 1);
+    }
 
     return header + events + footer;
 }
@@ -104,7 +124,7 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
     QString instances;
 
     for (const auto *instance : chart->instances())
-        instances += serialize(instance, tabsSize + 1);
+        instances += serialize(instance, chart->messages(), tabsSize + 1);
 
     QString tabString = tabs(tabsSize);
     return QString("%1msc %2;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances);

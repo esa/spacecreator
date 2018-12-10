@@ -60,7 +60,7 @@ void InstanceCreatorTool::commitPreviewItem()
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 
     InstanceItem *instanceItem = static_cast<InstanceItem *>(m_previewItem);
-    instanceItem->setName(tr("Instance #%1").arg(m_model->currentChart()->instances().size()));
+    instanceItem->setName(tr("Instance_%1").arg(m_model->currentChart()->instances().size()));
 }
 
 void InstanceCreatorTool::removePreviewItem()

@@ -193,7 +193,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
 {
     if (currentChart()) {
         if (!orphanInstance) {
-            orphanInstance = new MscInstance(tr("Instance #%1").arg(currentChart()->instances().size()));
+            orphanInstance = new MscInstance(tr("Instance_%1").arg(currentChart()->instances().size()));
             currentChart()->addInstance(orphanInstance);
         }
 
@@ -224,7 +224,7 @@ msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orph
 {
     if (currentChart()) {
         if (!orphanMessage) {
-            orphanMessage = new MscMessage(tr("Message #%1").arg(currentChart()->messages().size()));
+            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->messages().size()));
             currentChart()->addMessage(orphanMessage);
         }
 

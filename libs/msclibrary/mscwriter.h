@@ -36,9 +36,10 @@ public:
     MscWriter(QObject *parent = nullptr);
 
     void saveModel(const MscModel *model, const QString &fileName);
+    void saveChart(const MscChart *chart, const QString &fileName);
 
 protected:
-    QString serialize(const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);

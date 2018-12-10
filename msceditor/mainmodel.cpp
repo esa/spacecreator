@@ -116,7 +116,11 @@ bool MainModel::loadFile(const QString &filename)
 void MainModel::saveMsc(const QString &fileName)
 {
     msc::MscWriter mscWriter;
-    mscWriter.saveModel(d->m_mscModel, fileName);
+
+    if (d->m_mscModel && (d->m_mscModel->documents().size() || d->m_mscModel->charts().size()))
+        mscWriter.saveModel(d->m_mscModel, fileName);
+    else
+        mscWriter.saveChart(d->m_chartModel.currentChart(), fileName);
 }
 
 MscChart *MainModel::firstChart() const

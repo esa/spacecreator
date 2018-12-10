@@ -57,7 +57,7 @@ void tst_MscWriter::testSerializeMscInstance()
 {
     MscInstance instance("Inst_1");
 
-    QCOMPARE(this->serialize(&instance), QString("instance Inst_1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>()), QString("instance Inst_1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceKind()
@@ -66,7 +66,7 @@ void tst_MscWriter::testSerializeMscInstanceKind()
     instance.setKind("process");
     instance.setInheritance("P1");
 
-    QCOMPARE(this->serialize(&instance), QString("instance Inst_1: process P1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>()), QString("instance Inst_1: process P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
@@ -83,10 +83,11 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     message2->setSourceInstance(&instance);
     message2->setTargetInstance(&instance2);
 
-    instance.addMessage(message);
-    instance.addMessage(message2);
+    QVector<MscMessage *> messages;
+    messages.append(message);
+    messages.append(message2);
 
-    QStringList serializeList = this->serialize(&instance).split("\n");
+    QStringList serializeList = this->serialize(&instance, messages).split("\n");
 
     QVERIFY(serializeList.size() >= 4);
 
@@ -118,15 +119,15 @@ void tst_MscWriter::testSerializeMscChartInstance()
     message2->setSourceInstance(instance);
     message2->setTargetInstance(instance2);
 
-    instance->addMessage(message);
-    instance->addMessage(message2);
+    chart.addMessage(message);
+    chart.addMessage(message2);
 
     chart.addInstance(instance);
     chart.addInstance(instance2);
 
     QStringList serializeList = this->serialize(&chart).split("\n");
 
-    QVERIFY(serializeList.size() >= 8);
+    QVERIFY(serializeList.size() >= 10);
 
     QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
 
@@ -136,9 +137,11 @@ void tst_MscWriter::testSerializeMscChartInstance()
     QCOMPARE(serializeList.at(4), QString("   endinstance;"));
 
     QCOMPARE(serializeList.at(5), QString("   instance Inst_2;"));
-    QCOMPARE(serializeList.at(6), QString("   endinstance;"));
+    QCOMPARE(serializeList.at(6), QString("      out Msg_1 to Inst_1;"));
+    QCOMPARE(serializeList.at(7), QString("      in Msg_2 from Inst_1;"));
+    QCOMPARE(serializeList.at(8), QString("   endinstance;"));
 
-    QCOMPARE(serializeList.at(7), QString("endmsc;"));
+    QCOMPARE(serializeList.at(9), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeMscDocument()
