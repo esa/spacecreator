@@ -15,51 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCINSTANCE_H
-#define MSCINSTANCE_H
-
-#include "mscelement.h"
+#ifndef MSCWRITER_H
+#define MSCWRITER_H
 
 #include <QObject>
-#include <QPointer>
-#include <QString>
-#include <QStringList>
-#include <QVector>
 
 namespace msc {
 
+class MscModel;
+class MscInstance;
 class MscMessage;
+class MscChart;
+class MscDocument;
 
-class MscInstance : public MscElement
+class MscWriter : public QObject
 {
     Q_OBJECT
 
 public:
-    using MscMessagePtr = QPointer<MscMessage>;
-    using Events = QVector<MscMessagePtr>;
+    MscWriter(QObject *parent = nullptr);
 
-    explicit MscInstance(QObject *parent = nullptr);
-    MscInstance(const QString &name, QObject *parent = nullptr);
-
-    const QString &kind() const;
-    void setKind(const QString &kind);
-
-    const QString &inheritance() const;
-    void setInheritance(const QString &inheritance);
-
-    const Events &events() const;
-    void addEvent(MscMessagePtr event);
-
-Q_SIGNALS:
-    void kindChanged(const QString &kind);
-    void inheritanceChanged(const QString &inheritance);
+    void saveModel(const MscModel *model, const QString &fileName);
 
 private:
-    QString m_kind;
-    QString m_inheritance;
-    Events m_events;
+    QString serialize(const MscInstance *instance);
+    QString serialize(const MscMessage *message, const MscInstance *instance);
+    QString serialize(const MscChart *chart);
+    QString serialize(const MscDocument *document);
 };
 
 } // namespace msc
 
-#endif // MSCINSTANCE_H
+#endif // MSCWRITER_H

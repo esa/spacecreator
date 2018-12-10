@@ -59,4 +59,14 @@ void MscInstance::setInheritance(const QString &inheritance)
     Q_EMIT inheritanceChanged(m_inheritance);
 }
 
+const MscInstance::Events &MscInstance::events() const
+{
+    return m_events;
+}
+
+void MscInstance::addEvent(MscMessagePtr event)
+{
+    m_events.append(event);
+}
+
 } // namespace msc

@@ -39,6 +39,8 @@ public:
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
 
+    MscMessage *clone();
+
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);

@@ -72,6 +72,7 @@ struct MainWindowPrivate {
 
     QMenu *m_menuFile = nullptr;
     QAction *m_actOpenFile = nullptr;
+    QAction *m_actSaveFile = nullptr;
     QAction *m_actQuit = nullptr;
 
     QMenu *m_menuEdit = nullptr;
@@ -151,6 +152,15 @@ bool MainWindow::openFileAsn(const QString &file)
 {
     QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
     return false;
+}
+
+void MainWindow::saveMsc()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("MSC"),
+                                                    "",
+                                                    tr("MSC files (*.msc);;All files (*.*)"));
+    d->m_model->saveMsc(fileName);
 }
 
 void MainWindow::selectCurrentChart()
@@ -239,9 +249,15 @@ void MainWindow::initMenus()
 void MainWindow::initMenuFile()
 {
     d->m_menuFile = menuBar()->addMenu(tr("File"));
+
     d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this, &MainWindow::selectAndOpenFile, QKeySequence::Open);
     d->ui->mainToolBar->addAction(d->m_actOpenFile);
+
+    d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this, &MainWindow::saveMsc, QKeySequence::Save);
+    d->ui->mainToolBar->addAction(d->m_actSaveFile);
+
     d->m_menuFile->addSeparator();
+
     d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), qApp, &QApplication::quit, QKeySequence::Quit);
 }
 

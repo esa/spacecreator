@@ -16,6 +16,7 @@
 */
 
 #include "mscmessage.h"
+#include "mscinstance.h"
 
 namespace msc {
 
@@ -57,6 +58,16 @@ void MscMessage::setTargetInstance(MscInstance *target)
 
     m_target = target;
     Q_EMIT targetChanged(m_target);
+}
+
+MscMessage *MscMessage::clone()
+{
+    MscMessage *message = new MscMessage(name());
+
+    message->setSourceInstance(sourceInstance());
+    message->setTargetInstance(targetInstance());
+
+    return message;
 }
 
 } // namespace msc
