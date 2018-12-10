@@ -103,7 +103,15 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
         return visitChildren(context);
     }
 
+    if (!context->NAME()) {
+        return visitChildren(context);
+    }
+
     const QString name = QString::fromStdString(context->NAME()->getText());
+    if (name.isEmpty()) {
+        return visitChildren(context);
+    }
+
     m_currentInstance = m_currentChart->instanceByName(name);
     auto result = visitChildren(context);
 
