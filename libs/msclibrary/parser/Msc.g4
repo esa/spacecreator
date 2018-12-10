@@ -1,66 +1,6 @@
 // Define a grammar called Msc
 grammar Msc;
 
-// TODO: It would be good
-// a) to activate the named actions below only on Windows;
-// b) to incorparate a single action for all names to reduce copy-n-paste here.
-
-// Parser
-
-@parser::preinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(push)
-    #pragma warning(disable:4251)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-@parser::postinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(pop)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-
-// BaseVisitor
-
-@parser::basevisitorpreinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(push)
-    #pragma warning(disable:4251)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-@parser::basevisitorpostinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(pop)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-
-// Visitor
-
-@parser::visitorpreinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(push)
-    #pragma warning(disable:4251)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-@parser::visitorpostinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(pop)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-
-// Lexer
-
-@lexer::preinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(push)
-    #pragma warning(disable:4251)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-@lexer::postinclude{
-#ifdef SUPPRESS_ANTLR_WRNS_WINDOWS
-    #pragma warning(pop)
-#endif // SUPPRESS_ANTLR_WRNS_WINDOWS
-}
-
 tokens {
     NAMEORENV,
     MSCFILE
@@ -92,7 +32,7 @@ mscDefinition
     ;
 
 messageSequenceChart
-    : MSC NAME SEMI mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    : MSC NAME SEMI (gateDeclaration)? mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
     ;
 
 mscBody
@@ -119,8 +59,12 @@ instanceDeclStatement
 instance
     : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
+        |       gateDeclaration
         |       INST NAME (COLON instanceKind)? SEMI
+    ;
+
+gateDeclaration
+    : GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
     ;
 
 instanceHeadStatement

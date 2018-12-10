@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = msceditor
 
 include(../esa.pri)
+include(../suppress_antlr_wrn.pri)
 
 QT += core gui widgets xml
 
@@ -71,6 +72,8 @@ win32 {
         -L$$OUT_PWD/../libs/asn1editor/$$BuildTypeLower/ -lasn1editor \
         -L$$OUT_PWD/../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets \
         -L$$OUT_PWD/../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
+
+    QMAKE_LFLAGS_RELEASE += /LTCG
 } else:unix {
     PRE_TARGETDEPS += \
         $$OUT_PWD/../libs/asn1editor/$${LibPrefix}asn1editor.$$LibSuffix \
@@ -85,7 +88,6 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
-win32: QMAKE_LFLAGS += /LTCG
 
 RESOURCES += \
     resources/rsc.qrc
