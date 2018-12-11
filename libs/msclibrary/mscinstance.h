@@ -20,15 +20,7 @@
 
 #include "mscelement.h"
 
-#include <QObject>
-#include <QPointer>
-#include <QString>
-#include <QStringList>
-#include <QVector>
-
 namespace msc {
-
-class MscMessage;
 
 class MscInstance : public MscElement
 {
