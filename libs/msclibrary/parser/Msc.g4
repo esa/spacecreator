@@ -370,6 +370,6 @@ FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
 COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
-COMMENTLOST : '/*' .*? '*/' -> skip;
+COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : ('/\r'|'/\n') ->skip; // linebreak
