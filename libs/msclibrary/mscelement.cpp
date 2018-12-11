@@ -24,6 +24,8 @@ namespace msc {
    \brief base class for all MSC elements
  */
 
+const QString MscElement::DefaultName = QObject::tr("Untitled");
+
 MscElement::MscElement(QObject *parent)
     : QObject(parent)
     , m_id(QUuid::createUuid())

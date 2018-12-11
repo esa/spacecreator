@@ -60,4 +60,9 @@ void MscMessage::setTargetInstance(MscInstance *target)
     Q_EMIT targetChanged(m_target);
 }
 
+chart::Element MscMessage::elementType() const
+{
+    return chart::Element::Message;
+}
+
 } // namespace msc

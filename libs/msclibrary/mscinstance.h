@@ -36,6 +36,8 @@ public:
     const QString &inheritance() const;
     void setInheritance(const QString &inheritance);
 
+    chart::Element elementType() const override;
+
 Q_SIGNALS:
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);

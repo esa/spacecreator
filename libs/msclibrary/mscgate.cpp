@@ -24,8 +24,79 @@ MscGate::MscGate(QObject *parent)
 {
 }
 
-MscGate::~MscGate()
+MscGate::MscGate(const QString &name, QObject *parent)
+    : MscElement(name, parent)
 {
+}
+
+MscGate::Direction MscGate::direction() const
+{
+    return m_direction;
+}
+
+void MscGate::setDirection(MscGate::Direction dir)
+{
+    if (dir == m_direction)
+        return;
+
+    m_direction = dir;
+}
+
+MscInstance *MscGate::instance() const
+{
+    return m_instance;
+}
+
+QString MscGate::instanceName() const
+{
+    return m_instanceName;
+}
+
+void MscGate::setInstance(MscInstance *instance)
+{
+    if (instance == m_instance)
+        return;
+
+    m_instance = instance;
+}
+
+void MscGate::setInstanceName(const QString &instanceName)
+{
+    if (instanceName == m_instanceName)
+        return;
+
+    m_instanceName = instanceName;
+}
+
+QString MscGate::paramName() const
+{
+    return m_paramName;
+}
+
+void MscGate::setParamName(const QString &name)
+{
+    if (m_paramName == name)
+        return;
+
+    m_paramName = name;
+}
+
+QVariantList MscGate::params() const
+{
+    return m_params;
+}
+
+void MscGate::setParams(const QVariantList &params)
+{
+    if (params == m_params)
+        return;
+
+    m_params = params;
+}
+
+chart::Element MscGate::elementType() const
+{
+    return chart::Element::Gate;
 }
 
 } // ns msc

@@ -18,15 +18,51 @@
 #pragma once
 
 #include "mscelement.h"
+#include <mscinstance.h>
+
+#include <QPointer>
+#include <QVariantList>
 
 namespace msc {
 
 class MscGate : public MscElement
 {
     Q_OBJECT
-public:
-    explicit MscGate(QObject *parent = nullptr);
-    ~MscGate();
-};
+    Q_PROPERTY(MscGate::Direction direction READ direction WRITE setDirection)
+    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance)
+    Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
+    Q_PROPERTY(QString paramName READ paramName WRITE setParamName)
+    Q_PROPERTY(QVariantList params READ params WRITE setParams)
 
+public:
+    enum class Direction {
+        In = 0,
+        Out
+    };
+
+    explicit MscGate(QObject *parent = nullptr);
+    MscGate(const QString &name, QObject *parent = nullptr);
+
+    MscGate::Direction direction() const;
+    MscInstance *instance() const;
+    QString instanceName() const;
+    QString paramName() const;
+    QVariantList params() const;
+
+    chart::Element elementType() const override;
+
+public Q_SLOTS:
+    void setDirection(MscGate::Direction dir);
+    void setInstance(MscInstance *instance);
+    void setInstanceName(const QString &instanceName);
+    void setParamName(const QString &name);
+    void setParams(const QVariantList &params);
+
+private:
+    Direction m_direction = MscGate::Direction::In;
+    QPointer<MscInstance> m_instance = nullptr;
+    QString m_instanceName;
+    QString m_paramName;
+    QVariantList m_params;
+};
 } // ns name

@@ -22,6 +22,26 @@
 
 using namespace msc;
 
+class MscElementImpl : public MscElement
+{
+    Q_OBJECT
+public:
+    explicit MscElementImpl(QObject *parent = nullptr)
+        : MscElement(parent)
+    {
+    }
+
+    MscElementImpl(const QString &name, QObject *parent = nullptr)
+        : MscElement(name, parent)
+    {
+    }
+
+    chart::Element elementType() const override
+    {
+        return chart::Element::Chart; // doesn't matter here
+    }
+};
+
 class tst_MscElement : public QObject
 {
     Q_OBJECT
@@ -30,28 +50,31 @@ private Q_SLOTS:
     void testDefaultName();
     void testConstructorName();
     void testSetName();
+
+private:
+    static const QString TestElementName;
 };
+
+const QString tst_MscElement::TestElementName = QString("Roselileo:)");
 
 void tst_MscElement::testDefaultName()
 {
-    MscElement element;
-    QCOMPARE(element.name(), QString("Untitled"));
+    MscElementImpl element;
+    QCOMPARE(element.name(), MscElement::DefaultName);
 }
 
 void tst_MscElement::testConstructorName()
 {
-    const QString elementName("Rosetta");
-    MscElement element(elementName);
-    QCOMPARE(element.name(), elementName);
+    MscElementImpl element(TestElementName);
+    QCOMPARE(element.name(), TestElementName);
 }
 
 void tst_MscElement::testSetName()
 {
-    MscElement element;
-    const QString elementName("Galileo");
+    MscElementImpl element;
     QSignalSpy spy(&element, &MscElement::nameChanged);
-    element.setName(elementName);
-    QCOMPARE(element.name(), elementName);
+    element.setName(TestElementName);
+    QCOMPARE(element.name(), TestElementName);
     QCOMPARE(spy.count(), 1);
 }
 

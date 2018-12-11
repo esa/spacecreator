@@ -59,4 +59,9 @@ void MscInstance::setInheritance(const QString &inheritance)
     Q_EMIT inheritanceChanged(m_inheritance);
 }
 
+chart::Element MscInstance::elementType() const
+{
+    return chart::Element::Instance;
+}
+
 } // namespace msc

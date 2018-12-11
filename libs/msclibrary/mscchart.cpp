@@ -19,6 +19,7 @@
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscgate.h"
 
 namespace msc {
 
@@ -39,6 +40,9 @@ MscChart::~MscChart()
 
     qDeleteAll(m_messages);
     m_messages.clear();
+
+    qDeleteAll(m_gates);
+    m_gates.clear();
 }
 
 const QVector<MscInstance *> &MscChart::instances() const
@@ -68,8 +72,8 @@ void MscChart::removeInstance(MscInstance *instance)
         return;
     }
 
-    m_instances.removeAll(instance);
-    Q_EMIT instanceRemoved(instance);
+    if (m_instances.removeAll(instance))
+        Q_EMIT instanceRemoved(instance);
 }
 
 MscInstance *MscChart::instanceByName(const QString &name) const
@@ -109,8 +113,8 @@ void MscChart::removeMessage(MscMessage *message)
         return;
     }
 
-    m_messages.removeAll(message);
-    Q_EMIT messageRemoved(message);
+    if (m_messages.removeAll(message))
+        Q_EMIT messageRemoved(message);
 }
 
 MscMessage *MscChart::messageByName(const QString &name) const
@@ -123,6 +127,34 @@ MscMessage *MscChart::messageByName(const QString &name) const
     return nullptr;
 }
 
+const QVector<MscGate *> &MscChart::gates() const
+{
+    return m_gates;
+}
+
+void MscChart::addGate(MscGate *gate)
+{
+    if (!gate)
+        return;
+
+    if (gates().contains(gate))
+        return;
+
+    m_gates.append(gate);
+    Q_EMIT gateAdded(gate);
+}
+
+void MscChart::removeGate(MscGate *gate)
+{
+    if (!gate)
+        return;
+    if (!m_gates.contains(gate))
+        return;
+
+    if (m_gates.removeAll(gate))
+        Q_EMIT gateRemoved(gate);
+}
+
 /*!
   \brief MscChart::parentDocument
   \return The document that this chart is included in. Returns a nullptr if this chart is at the root
@@ -131,6 +163,11 @@ MscMessage *MscChart::messageByName(const QString &name) const
 MscDocument *MscChart::parentDocument() const
 {
     return dynamic_cast<MscDocument *>(parent());
+}
+
+chart::Element MscChart::elementType() const
+{
+    return chart::Element::Chart;
 }
 
 } // namespace msc

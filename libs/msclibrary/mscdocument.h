@@ -45,6 +45,8 @@ public:
 
     MscDocument *parentDocument() const;
 
+    chart::Element elementType() const override;
+
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);

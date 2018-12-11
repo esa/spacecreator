@@ -15,41 +15,29 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCELEMENT_H
-#define MSCELEMENT_H
-
-#include "mschartelements.h"
+#pragma once
 
 #include <QObject>
-#include <QString>
-#include <QUuid>
 
 namespace msc {
+namespace chart {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+Q_NAMESPACE
+#endif // Qt >= 5.8.0
 
-class MscElement : public QObject
-{
-    Q_OBJECT
-public:
-    explicit MscElement(QObject *parent = nullptr);
-    MscElement(const QString &name, QObject *parent = nullptr);
+enum class Element {
+    Chart = 0,
+    Document,
+    Instance,
+    Message,
+    Gate,
 
-    const QString &name() const;
-    void setName(const QString &name);
-
-    QUuid internalId() const;
-
-    static const QString DefaultName;
-
-    virtual msc::chart::Element elementType() const = 0;
-
-Q_SIGNALS:
-    void nameChanged(const QString &name);
-
-private:
-    QString m_name = MscElement::DefaultName;
-    const QUuid m_id;
+    ElementsCount
 };
 
-} // namespace msc
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+Q_ENUM_NS(Element)
+#endif // Qt >= 5.8.0
 
-#endif // MSCELEMENT_H
+} // ns chart
+} // ns msc

@@ -39,6 +39,8 @@ public:
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
 
+    chart::Element elementType() const override;
+
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
