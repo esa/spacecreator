@@ -31,9 +31,19 @@ class MscDocument : public MscEntity
 {
     Q_OBJECT
 public:
+    enum HierarchyType {
+        HierarchyLeaf,
+        HierarchyIs,
+        HierarchyAnd,
+        HierarchyOr,
+        HierarchyParallel,
+        HierarchyRepeat,
+        HierarchyException
+    };
+
     explicit MscDocument(QObject *parent = nullptr);
     MscDocument(const QString &name, QObject *parent = nullptr);
-    ~MscDocument();
+    ~MscDocument() override;
 
     const QVector<MscDocument *> &documents() const;
     void addDocument(MscDocument *document);
@@ -47,14 +57,20 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    HierarchyType hierarchyType() const;
+    void setHierarchyType(HierarchyType type);
+
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);
     void cleared();
+    void hierarchyTypeChanged(HierarchyType type);
 
 private:
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
+
+    HierarchyType m_hierarchyType = HierarchyLeaf;
 };
 
 } // namespace msc

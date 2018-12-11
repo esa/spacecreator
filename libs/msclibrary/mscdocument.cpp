@@ -98,4 +98,17 @@ MscEntity::EntityType MscDocument::entityType() const
     return MscEntity::EntityType::Document;
 }
 
-} // namespace msc
+MscDocument::HierarchyType MscDocument::hierarchyType() const
+{
+    return m_hierarchyType;
+}
+
+void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
+{
+    if (type != m_hierarchyType) {
+        m_hierarchyType = type;
+        Q_EMIT hierarchyTypeChanged(type);
+    }
+}
+
+}
