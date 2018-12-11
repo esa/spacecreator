@@ -93,4 +93,17 @@ MscDocument *MscDocument::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
+MscDocument::HierarchyType MscDocument::hierarchyType() const
+{
+    return m_hierarchyType;
+}
+
+void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
+{
+    if (type != m_hierarchyType) {
+        m_hierarchyType = type;
+        Q_EMIT hierarchyTypeChanged(type);
+    }
+}
+
 } // namespace msc
