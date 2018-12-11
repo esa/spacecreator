@@ -64,17 +64,36 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     auto docName = QString::fromStdString(context->NAME()->getText());
     doc->setName(docName);
 
+    auto handleComment = [=](antlr4::Token* token) {
+        if (token->getChannel() == 2) {
+            // Handle this token
+            auto line = QString::fromStdString(token->getText()).trimmed();
+            if (line.startsWith("/*")) {
+                line = line.mid(2);
+            }
+            if (line.endsWith("*/")) {
+                line.chop(2);
+            }
+            line = line.trimmed();
+
+            if (line.startsWith("CIF")) {
+                // Handle CIF here
+                //qDebug() << "CIF comment on" << docName << ":" << line;
+            } else if (line.startsWith("MSC")) {
+                // Handle MSC here
+                //qDebug() << "MSC comment on" << docName << ":" << line;
+            }
+        }
+    };
+
+    // Get the comments on the document and handle them
     auto cifComments = m_tokens->getHiddenTokensToLeft(context->start->getTokenIndex());
     for (auto token : cifComments) {
-        if (token->getChannel() == 2) {
-            doc->handleComment(QString::fromStdString(token->getText()));
-        }
+        handleComment(token);
     }
     auto mscComments = m_tokens->getHiddenTokensToRight(context->start->getTokenIndex() + 1);
     for (auto token : mscComments ) {
-        if (token->getChannel() == 2) {
-            doc->handleComment(QString::fromStdString(token->getText()));
-        }
+        handleComment(token);
     }
 
     m_currentDocument = doc;

@@ -45,8 +45,6 @@ public:
 
     MscDocument *parentDocument() const;
 
-    void handleComment(const QString& comment);
-
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);

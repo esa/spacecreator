@@ -33,7 +33,7 @@ class MscModel;
 class MscParserVisitor : public MscBaseVisitor
 {
 public:
-    MscParserVisitor(antlr4::CommonTokenStream* tokens = nullptr);
+    explicit MscParserVisitor(antlr4::CommonTokenStream* tokens = nullptr);
     ~MscParserVisitor() override;
 
     // Returns the model that is built up during parsing
@@ -65,7 +65,7 @@ private:
     Messages m_messages;
     MessagesList m_messagesList;
 
-    antlr4::CommonTokenStream* m_tokens;
+    antlr4::CommonTokenStream* m_tokens = nullptr;
 };
 
 #endif // MSCPARSERVISITOR_H
