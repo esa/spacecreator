@@ -28,6 +28,7 @@ namespace msc {
 class MscDocument;
 class MscInstance;
 class MscMessage;
+class MscGate;
 
 class MscChart : public MscElement
 {
@@ -46,20 +47,28 @@ public:
     const QVector<MscMessage *> &messages() const;
     void addMessage(MscMessage *message);
     void removeMessage(MscMessage *message);
-
     MscMessage *messageByName(const QString &name) const;
 
+    const QVector<MscGate *> &gates() const;
+    void addGate(MscGate *gate);
+    void removeGate(MscGate *gate);
+
     MscDocument *parentDocument() const;
+
+    chart::Element elementType() const override;
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void instanceRemoved(MscInstance *instance);
     void messageAdded(MscMessage *message);
     void messageRemoved(MscMessage *message);
+    void gateAdded(MscGate *gate);
+    void gateRemoved(MscGate *gate);
 
 private:
     QVector<MscInstance *> m_instances;
     QVector<MscMessage *> m_messages;
+    QVector<MscGate *> m_gates;
 };
 
 } // namespace msc

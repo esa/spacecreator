@@ -24,6 +24,7 @@ HEADERS += \
     mscerrorlistener.h \
     mscelement.h \
     mscgate.h \
+    mschartelements.h \
     mscwriter.h
 
 SOURCES += \

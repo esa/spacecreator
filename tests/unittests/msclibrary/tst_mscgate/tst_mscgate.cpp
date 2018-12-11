@@ -18,20 +18,112 @@
 #include <QtTest>
 
 #include <mscgate.h>
+#include <mscinstance.h>
+
+#include <QMetaObject>
+
+using namespace msc;
 
 class tst_MscGate : public QObject
 {
     Q_OBJECT
+    static const QByteArray TestPropertyMethodNameMarker;
+    static const QString TestGateName;
 
 private slots:
-    void test_stub();
+    void testConstructor();
+    void testPropertyDirection();
+    void testPropertyInstance();
+    void testPropertyInstanceName();
+    void testPropertyParamName();
+    void testPropertyParams();
+
+    void testPropertiesCoverage();
 };
 
-void tst_MscGate::test_stub()
+const QByteArray tst_MscGate::TestPropertyMethodNameMarker = "testProperty";
+const QString tst_MscGate::TestGateName = "TestGate";
+
+void tst_MscGate::testConstructor()
 {
-    QSKIP(qPrintable(QString(
-            "\n\tThis is just an initial stub for Gate testing,"
-            "\n\twill be populated afterwhile.")));
+    MscGate gateDefault;
+    QCOMPARE(gateDefault.name(), MscElement::DefaultName);
+
+    MscGate gateNamed(TestGateName, this);
+    QCOMPARE(gateNamed.name(), TestGateName);
+}
+
+void tst_MscGate::testPropertyDirection()
+{
+    MscGate gate(TestGateName, this);
+    QCOMPARE(gate.direction(), MscGate::Direction::In); // the default one
+
+    for (const MscGate::Direction dir : { MscGate::Direction::In,
+                                          MscGate::Direction::Out }) {
+        gate.setDirection(dir);
+        QCOMPARE(gate.direction(), dir);
+    }
+}
+
+void tst_MscGate::testPropertyInstance()
+{
+    MscGate gate(TestGateName, this);
+    QCOMPARE(gate.instance(), static_cast<MscInstance *>(nullptr));
+
+    static const QString testInstanceName("TestInstance");
+    MscInstance mscInstance(testInstanceName);
+    gate.setInstance(&mscInstance);
+    QCOMPARE(gate.instance(), &mscInstance);
+    QCOMPARE(gate.instance()->name(), testInstanceName);
+
+    gate.setInstance(nullptr);
+    QCOMPARE(gate.instance(), static_cast<MscInstance *>(nullptr));
+}
+
+void tst_MscGate::testPropertyInstanceName()
+{
+    MscGate gate(TestGateName, this);
+    QCOMPARE(gate.instanceName(), QString());
+
+    static const QString testInstanceName("TestInstance");
+    gate.setInstanceName(testInstanceName);
+    QCOMPARE(gate.instanceName(), testInstanceName);
+    gate.setInstanceName(QString());
+    QCOMPARE(gate.instanceName(), QString());
+}
+
+void tst_MscGate::testPropertyParamName()
+{
+    MscGate gate;
+    QCOMPARE(gate.paramName(), QString());
+
+    static const QString testParamName("testParamName");
+    gate.setParamName(testParamName);
+    QCOMPARE(gate.paramName(), testParamName);
+}
+
+void tst_MscGate::testPropertyParams()
+{
+    MscGate gate;
+    QCOMPARE(gate.params(), QVariantList());
+
+    static const QVariantList testParams = { "A", 1, true };
+    gate.setParams(testParams);
+    QCOMPARE(gate.params(), testParams);
+}
+
+void tst_MscGate::testPropertiesCoverage()
+{
+    MscGate gate;
+    static const int gateCustomPropsCount(gate.metaObject()->propertyCount() - 1); // exclude QObject's name
+
+    int testedPropsCount(0);
+    const QMetaObject *myMeta(metaObject());
+    for (int i = 0; i < myMeta->methodCount(); ++i)
+        if (myMeta->method(i).name().startsWith(TestPropertyMethodNameMarker))
+            ++testedPropsCount;
+
+    QCOMPARE(testedPropsCount, gateCustomPropsCount);
 }
 
 QTEST_APPLESS_MAIN(tst_MscGate)

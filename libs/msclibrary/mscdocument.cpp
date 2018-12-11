@@ -93,4 +93,9 @@ MscDocument *MscDocument::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
+chart::Element MscDocument::elementType() const
+{
+    return chart::Element::Document;
+}
+
 } // namespace msc

@@ -19,6 +19,7 @@
 #include <mscchart.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
+#include <mscgate.h>
 
 #include <QtTest>
 
@@ -31,6 +32,7 @@ class tst_MscChart : public QObject
 private Q_SLOTS:
     void init();
     void cleanup();
+    void testDestructor();
     void testAddInstance();
     void testRemoveInstance();
     void testNoDuplicateInstance();
@@ -41,6 +43,8 @@ private Q_SLOTS:
     void testNoDuplicateMessage();
     void testNoNullPtrMessage();
     void testMessageByName();
+    void testAddGate();
+    void testRemoveGate();
 
 private:
     MscChart *m_chart = nullptr;
@@ -60,6 +64,55 @@ void tst_MscChart::cleanup()
 
     delete m_chart;
     m_chart = nullptr;
+}
+
+void tst_MscChart::testDestructor()
+{
+    QVector<QPointer<MscElement>> chartElements;
+    MscChart *chart = new MscChart;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+    const QMetaEnum &chartElementsMeta = QMetaEnum::fromType<chart::Element>();
+    for (int i = 0; i < chartElementsMeta.keyCount(); ++i) {
+        const chart::Element elType = static_cast<chart::Element>(chartElementsMeta.value(i));
+#else
+    for (int i = int(chart::Element::Chart); i < int(chart::Element::ElementsCount); ++i) {
+        const chart::Element elType = static_cast<chart::Element>(i);
+#endif // Qt >= 5.8.0
+        if (elType == chart::Element::ElementsCount)
+            continue;
+        switch (elType) {
+        case chart::Element::Chart:
+        case chart::Element::Document:
+            break;
+        case chart::Element::Instance:
+            chart->addInstance(new MscInstance());
+            chartElements.append(chart->instances().first());
+            QCOMPARE(chart->instances().size(), 1);
+            break;
+        case chart::Element::Message:
+            chart->addMessage(new MscMessage());
+            chartElements.append(chart->messages().first());
+            QCOMPARE(chart->messages().size(), 1);
+            break;
+        case chart::Element::Gate:
+            chart->addGate(new MscGate());
+            chartElements.append(chart->gates().first());
+            QCOMPARE(chart->gates().size(), 1);
+            break;
+        case chart::Element::ElementsCount:
+            Q_UNREACHABLE();
+        default:
+            QFAIL("It seems a new chart::Element has been introduced,\n"
+                  "but it's not covered here.\n"
+                  "Please add it to process or ignore explicitly.");
+            break;
+        }
+    }
+
+    delete chart;
+
+    for (const QPointer<MscElement> &chartElement : chartElements)
+        QCOMPARE(chartElement, QPointer<MscElement>(nullptr));
 }
 
 void tst_MscChart::testAddInstance()
@@ -160,6 +213,31 @@ void tst_MscChart::testMessageByName()
     m_chart->addMessage(message);
     QCOMPARE(m_chart->messageByName("IN"), message);
     QCOMPARE(m_chart->messageByName("OUT"), static_cast<MscMessage *>(nullptr));
+}
+
+void tst_MscChart::testAddGate()
+{
+    auto gate = new MscGate("testGateName", m_chart);
+    m_chart->addGate(gate);
+    QCOMPARE(m_chart->gates().size(), 1);
+    m_chart->addGate(gate);
+    QCOMPARE(m_chart->gates().size(), 1);
+    m_chart->addGate(nullptr);
+    QCOMPARE(m_chart->gates().size(), 1);
+}
+
+void tst_MscChart::testRemoveGate()
+{
+    m_chart->addGate(new MscGate("A"));
+    m_chart->addGate(new MscGate("B"));
+    QCOMPARE(m_chart->gates().size(), 2);
+    m_chart->removeGate(nullptr);
+    QCOMPARE(m_chart->gates().size(), 2);
+    auto gateOne = m_chart->gates().first();
+    m_chart->removeGate(gateOne);
+    QCOMPARE(m_chart->gates().size(), 1);
+    m_chart->removeGate(gateOne);
+    QCOMPARE(m_chart->gates().size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)
