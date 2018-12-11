@@ -18,6 +18,8 @@
 #include "mscdocument.h"
 #include "mscchart.h"
 
+#include <QDebug>
+
 namespace msc {
 
 MscDocument::MscDocument(QObject *parent)
@@ -91,6 +93,13 @@ void MscDocument::clear()
 MscDocument *MscDocument::parentDocument() const
 {
     return dynamic_cast<MscDocument *>(parent());
+}
+
+void MscDocument::handleComment(const QString &comment)
+{
+    Q_UNUSED(comment)
+    // Here you can parse the comments for CIF or MSC on the document
+//    qDebug() << "Comment on" << name() << ":" << comment;
 }
 
 } // namespace msc

@@ -88,7 +88,7 @@ MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
     MscErrorListener errorListener;
     parser.addErrorListener(&errorListener);
 
-    MscParserVisitor visitor;
+    MscParserVisitor visitor(&tokens);
     visitor.visit(parser.file());
 
     if (errorMessages != nullptr) {

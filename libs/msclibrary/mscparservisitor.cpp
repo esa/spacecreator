@@ -28,8 +28,8 @@
 
 using namespace msc;
 
-MscParserVisitor::MscParserVisitor()
-    : m_model(new MscModel)
+MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream* tokens)
+    : m_model(new MscModel), m_tokens(tokens)
 {
 }
 
@@ -61,8 +61,21 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    const std::string docName = context->NAME()->getText();
-    doc->setName(QString::fromStdString(docName));
+    auto docName = QString::fromStdString(context->NAME()->getText());
+    doc->setName(docName);
+
+    auto cifComments = m_tokens->getHiddenTokensToLeft(context->start->getTokenIndex());
+    for (auto token : cifComments) {
+        if (token->getChannel() == 2) {
+            doc->handleComment(QString::fromStdString(token->getText()));
+        }
+    }
+    auto mscComments = m_tokens->getHiddenTokensToRight(context->start->getTokenIndex() + 1);
+    for (auto token : mscComments ) {
+        if (token->getChannel() == 2) {
+            doc->handleComment(QString::fromStdString(token->getText()));
+        }
+    }
 
     m_currentDocument = doc;
     auto ret = visitChildren(context);
