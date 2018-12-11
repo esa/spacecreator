@@ -15,36 +15,39 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCINSTANCE_H
-#define MSCINSTANCE_H
+#ifndef MSCWRITER_H
+#define MSCWRITER_H
 
-#include "mscelement.h"
+#include <QObject>
 
 namespace msc {
 
-class MscInstance : public MscElement
+class MscModel;
+class MscInstance;
+class MscMessage;
+class MscChart;
+class MscDocument;
+
+class MscWriter : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit MscInstance(QObject *parent = nullptr);
-    MscInstance(const QString &name, QObject *parent = nullptr);
+    MscWriter(QObject *parent = nullptr);
 
-    const QString &kind() const;
-    void setKind(const QString &kind);
+    void saveModel(const MscModel *model, const QString &fileName);
+    void saveChart(const MscChart *chart, const QString &fileName);
 
-    const QString &inheritance() const;
-    void setInheritance(const QString &inheritance);
-
-Q_SIGNALS:
-    void kindChanged(const QString &kind);
-    void inheritanceChanged(const QString &inheritance);
+protected:
+    QString serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize = 0);
+    QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscChart *chart, int tabsSize = 0);
+    QString serialize(const MscDocument *document, int tabsSize = 0);
 
 private:
-    QString m_kind;
-    QString m_inheritance;
+    QString tabs(int tabsSize);
 };
 
 } // namespace msc
 
-#endif // MSCINSTANCE_H
+#endif // MSCWRITER_H

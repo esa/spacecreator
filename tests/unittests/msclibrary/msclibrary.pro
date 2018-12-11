@@ -7,4 +7,5 @@ SUBDIRS = \
     tst_mscelement \
     tst_mscfile \
     tst_mscmodel \
-    tst_mscgate
+    tst_mscgate \
+    tst_mscwriter

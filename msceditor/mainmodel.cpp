@@ -23,6 +23,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscwriter.h"
 
 #include "chartviewmodel.h"
 #include "instanceitem.h"
@@ -110,6 +111,16 @@ bool MainModel::loadFile(const QString &filename)
 
     showFirstChart();
     return true;
+}
+
+void MainModel::saveMsc(const QString &fileName)
+{
+    msc::MscWriter mscWriter;
+
+    if (d->m_mscModel && (d->m_mscModel->documents().size() || d->m_mscModel->charts().size()))
+        mscWriter.saveModel(d->m_mscModel, fileName);
+    else
+        mscWriter.saveChart(d->m_chartModel.currentChart(), fileName);
 }
 
 MscChart *MainModel::firstChart() const

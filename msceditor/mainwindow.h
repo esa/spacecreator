@@ -54,10 +54,12 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
+
 private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     bool openFileMsc(const QString &file);
     bool openFileAsn(const QString &file);
+    void saveMsc();
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;

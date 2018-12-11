@@ -56,6 +56,7 @@ public:
 public Q_SLOTS:
     void showFirstChart();
     bool loadFile(const QString &filename);
+    void saveMsc(const QString &fileName);
 
 private:
     msc::MscChart *firstChart() const;
