@@ -31,7 +31,9 @@ HEADERS += \
     commands/cmdmessageitemmove.h \
     commands/cmdmessageitemresize.h \
     chartviewmodel.h \
+    documentitem.h \
     graphicsview.h \
+    hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
     commands/cmdmessageitemcreate.h \
@@ -59,7 +61,9 @@ SOURCES += \
     commands/cmdmessageitemmove.cpp \
     commands/cmdmessageitemresize.cpp \
     chartviewmodel.cpp \
+    documentitem.cpp \
     graphicsview.cpp \
+    hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
     commands/cmdmessageitemcreate.cpp \

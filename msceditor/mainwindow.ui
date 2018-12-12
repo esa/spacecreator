@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>861</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,19 +34,25 @@
      <number>5</number>
     </property>
     <item row="0" column="0">
-     <widget class="msc::GraphicsView" name="graphicsView">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QStackedWidget" name="centerView">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>200</width>
-        <height>0</height>
-       </size>
-      </property>
+      <widget class="msc::GraphicsView" name="graphicsView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="hierarchyView"/>
      </widget>
     </item>
    </layout>
@@ -56,8 +62,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
-     <height>21</height>
+     <width>861</width>
+     <height>24</height>
     </rect>
    </property>
   </widget>

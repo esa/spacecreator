@@ -26,6 +26,7 @@
 #include "mscwriter.h"
 
 #include "chartviewmodel.h"
+#include "hierarchyviewmodel.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 
@@ -48,6 +49,7 @@ struct MainModelPrivate {
 
     MscModel *m_mscModel = nullptr;
     ChartViewModel m_chartModel;
+    HierarchyViewModel m_hierarchyModel;
     DocumentItemModel *m_documentItemModel = nullptr;
     QStringList m_errorMessages;
     qreal m_instanceAxisHeight = 0.;
@@ -67,6 +69,11 @@ MainModel::~MainModel()
 QGraphicsScene *MainModel::graphicsScene() const
 {
     return d->m_chartModel.graphicsScene();
+}
+
+QGraphicsScene *MainModel::hierarchyScene() const
+{
+    return d->m_hierarchyModel.graphicsScene();
 }
 
 msc::DocumentItemModel *MainModel::documentItemModel() const
@@ -110,6 +117,8 @@ bool MainModel::loadFile(const QString &filename)
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
 
     showFirstChart();
+    d->m_hierarchyModel.setModel(d->m_mscModel);
+
     return true;
 }
 
