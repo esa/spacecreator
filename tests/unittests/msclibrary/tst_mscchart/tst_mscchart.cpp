@@ -68,39 +68,30 @@ void tst_MscChart::cleanup()
 
 void tst_MscChart::testDestructor()
 {
-    QVector<QPointer<MscElement>> chartElements;
+    QVector<QPointer<MscEntity>> chartEntities;
     MscChart *chart = new MscChart;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-    const QMetaEnum &chartElementsMeta = QMetaEnum::fromType<chart::Element>();
-    for (int i = 0; i < chartElementsMeta.keyCount(); ++i) {
-        const chart::Element elType = static_cast<chart::Element>(chartElementsMeta.value(i));
-#else
-    for (int i = int(chart::Element::Chart); i < int(chart::Element::ElementsCount); ++i) {
-        const chart::Element elType = static_cast<chart::Element>(i);
-#endif // Qt >= 5.8.0
-        if (elType == chart::Element::ElementsCount)
-            continue;
-        switch (elType) {
-        case chart::Element::Chart:
-        case chart::Element::Document:
+    const QMetaEnum &chartEntitiesMeta = QMetaEnum::fromType<MscEntity::EntityType>();
+    for (int i = 0; i < chartEntitiesMeta.keyCount(); ++i) {
+        const MscEntity::EntityType entityType = static_cast<MscEntity::EntityType>(chartEntitiesMeta.value(i));
+        switch (entityType) {
+        case MscEntity::EntityType::Chart:
+        case MscEntity::EntityType::Document:
             break;
-        case chart::Element::Instance:
+        case MscEntity::EntityType::Instance:
             chart->addInstance(new MscInstance());
-            chartElements.append(chart->instances().first());
+            chartEntities.append(chart->instances().first());
             QCOMPARE(chart->instances().size(), 1);
             break;
-        case chart::Element::Message:
+        case MscEntity::EntityType::Message:
             chart->addMessage(new MscMessage());
-            chartElements.append(chart->messages().first());
+            chartEntities.append(chart->messages().first());
             QCOMPARE(chart->messages().size(), 1);
             break;
-        case chart::Element::Gate:
+        case MscEntity::EntityType::Gate:
             chart->addGate(new MscGate());
-            chartElements.append(chart->gates().first());
+            chartEntities.append(chart->gates().first());
             QCOMPARE(chart->gates().size(), 1);
             break;
-        case chart::Element::ElementsCount:
-            Q_UNREACHABLE();
         default:
             QFAIL("It seems a new chart::Element has been introduced,\n"
                   "but it's not covered here.\n"
@@ -111,8 +102,8 @@ void tst_MscChart::testDestructor()
 
     delete chart;
 
-    for (const QPointer<MscElement> &chartElement : chartElements)
-        QCOMPARE(chartElement, QPointer<MscElement>(nullptr));
+    for (const QPointer<MscEntity> &chartElement : chartEntities)
+        QCOMPARE(chartElement, QPointer<MscEntity>(nullptr));
 }
 
 void tst_MscChart::testAddInstance()

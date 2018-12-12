@@ -8,6 +8,7 @@ CONFIG += qt console warn_on depend_includepath testcase
 CONFIG -= app_bundle
 
 TEMPLATE = app
-TARGET = tst_mscelement
+TARGET = tst_mscentity
 
-SOURCES += tst_mscelement.cpp
+SOURCES += \
+    tst_mscentity.cpp

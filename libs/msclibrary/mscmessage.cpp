@@ -21,12 +21,12 @@
 namespace msc {
 
 MscMessage::MscMessage(QObject *parent)
-    : MscElement(parent)
+    : MscEntity(parent)
 {
 }
 
 MscMessage::MscMessage(const QString &name, QObject *parent)
-    : MscElement(name, parent)
+    : MscEntity(name, parent)
 {
 }
 
@@ -60,9 +60,9 @@ void MscMessage::setTargetInstance(MscInstance *target)
     Q_EMIT targetChanged(m_target);
 }
 
-chart::Element MscMessage::elementType() const
+MscEntity::EntityType MscMessage::elementType() const
 {
-    return chart::Element::Message;
+    return MscEntity::EntityType::Message;
 }
 
 } // namespace msc

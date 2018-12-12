@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "mscelement.h"
+#include "mscentity.h"
 #include <mscinstance.h>
 
 #include <QPointer>
@@ -25,7 +25,7 @@
 
 namespace msc {
 
-class MscGate : public MscElement
+class MscGate : public MscEntity
 {
     Q_OBJECT
     Q_PROPERTY(MscGate::Direction direction READ direction WRITE setDirection)
@@ -49,7 +49,7 @@ public:
     QString paramName() const;
     QVariantList params() const;
 
-    chart::Element elementType() const override;
+    MscEntity::EntityType elementType() const override;
 
 public Q_SLOTS:
     void setDirection(MscGate::Direction dir);

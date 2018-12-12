@@ -15,34 +15,34 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <mscelement.h>
+#include <mscentity.h>
 
 #include <QtTest>
 #include <QSignalSpy>
 
 using namespace msc;
 
-class MscElementImpl : public MscElement
+class MscEntitytImpl : public MscEntity
 {
     Q_OBJECT
 public:
-    explicit MscElementImpl(QObject *parent = nullptr)
-        : MscElement(parent)
+    explicit MscEntitytImpl(QObject *parent = nullptr)
+        : MscEntity(parent)
     {
     }
 
-    MscElementImpl(const QString &name, QObject *parent = nullptr)
-        : MscElement(name, parent)
+    MscEntitytImpl(const QString &name, QObject *parent = nullptr)
+        : MscEntity(name, parent)
     {
     }
 
-    chart::Element elementType() const override
+    MscEntity::EntityType elementType() const override
     {
-        return chart::Element::Chart; // doesn't matter here
+        return MscEntity::EntityType::Chart; // doesn't matter here
     }
 };
 
-class tst_MscElement : public QObject
+class tst_MscEntity : public QObject
 {
     Q_OBJECT
 
@@ -52,32 +52,32 @@ private Q_SLOTS:
     void testSetName();
 
 private:
-    static const QString TestElementName;
+    static const QString TestEntityName;
 };
 
-const QString tst_MscElement::TestElementName = QString("Roselileo:)");
+const QString tst_MscEntity::TestEntityName = QString("Roselileo:)");
 
-void tst_MscElement::testDefaultName()
+void tst_MscEntity::testDefaultName()
 {
-    MscElementImpl element;
-    QCOMPARE(element.name(), MscElement::DefaultName);
+    MscEntitytImpl element;
+    QCOMPARE(element.name(), MscEntity::DefaultName);
 }
 
-void tst_MscElement::testConstructorName()
+void tst_MscEntity::testConstructorName()
 {
-    MscElementImpl element(TestElementName);
-    QCOMPARE(element.name(), TestElementName);
+    MscEntitytImpl element(TestEntityName);
+    QCOMPARE(element.name(), TestEntityName);
 }
 
-void tst_MscElement::testSetName()
+void tst_MscEntity::testSetName()
 {
-    MscElementImpl element;
-    QSignalSpy spy(&element, &MscElement::nameChanged);
-    element.setName(TestElementName);
-    QCOMPARE(element.name(), TestElementName);
+    MscEntitytImpl element;
+    QSignalSpy spy(&element, &MscEntity::nameChanged);
+    element.setName(TestEntityName);
+    QCOMPARE(element.name(), TestEntityName);
     QCOMPARE(spy.count(), 1);
 }
 
-QTEST_APPLESS_MAIN(tst_MscElement)
+QTEST_APPLESS_MAIN(tst_MscEntity)
 
-#include "tst_mscelement.moc"
+#include "tst_mscentity.moc"

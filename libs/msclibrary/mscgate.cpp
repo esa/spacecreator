@@ -20,12 +20,12 @@
 namespace msc {
 
 MscGate::MscGate(QObject *parent)
-    : MscElement(parent)
+    : MscEntity(parent)
 {
 }
 
 MscGate::MscGate(const QString &name, QObject *parent)
-    : MscElement(name, parent)
+    : MscEntity(name, parent)
 {
 }
 
@@ -94,9 +94,9 @@ void MscGate::setParams(const QVariantList &params)
     m_params = params;
 }
 
-chart::Element MscGate::elementType() const
+MscEntity::EntityType MscGate::elementType() const
 {
-    return chart::Element::Gate;
+    return MscEntity::EntityType::Gate;
 }
 
 } // ns msc

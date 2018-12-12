@@ -15,41 +15,48 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCELEMENT_H
-#define MSCELEMENT_H
-
-#include "mschartelements.h"
-
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "mscentity.h"
 
 namespace msc {
 
-class MscElement : public QObject
+/*!
+   \class msc::MscEntity
+   \brief base class for all MSC elements
+ */
+
+const QString MscEntity::DefaultName = QObject::tr("Untitled");
+
+MscEntity::MscEntity(QObject *parent)
+    : QObject(parent)
+    , m_id(QUuid::createUuid())
 {
-    Q_OBJECT
-public:
-    explicit MscElement(QObject *parent = nullptr);
-    MscElement(const QString &name, QObject *parent = nullptr);
+}
 
-    const QString &name() const;
-    void setName(const QString &name);
+MscEntity::MscEntity(const QString &name, QObject *parent)
+    : QObject(parent)
+    , m_name(name)
+    , m_id(QUuid::createUuid())
+{
+}
 
-    QUuid internalId() const;
+const QString &MscEntity::name() const
+{
+    return m_name;
+}
 
-    static const QString DefaultName;
+void MscEntity::setName(const QString &name)
+{
+    if (name == m_name) {
+        return;
+    }
 
-    virtual msc::chart::Element elementType() const = 0;
+    m_name = name;
+    Q_EMIT nameChanged(m_name);
+}
 
-Q_SIGNALS:
-    void nameChanged(const QString &name);
-
-private:
-    QString m_name = MscElement::DefaultName;
-    const QUuid m_id;
-};
+QUuid MscEntity::internalId() const
+{
+    return m_id;
+}
 
 } // namespace msc
-
-#endif // MSCELEMENT_H

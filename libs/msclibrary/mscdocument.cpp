@@ -21,12 +21,12 @@
 namespace msc {
 
 MscDocument::MscDocument(QObject *parent)
-    : MscElement(parent)
+    : MscEntity(parent)
 {
 }
 
 MscDocument::MscDocument(const QString &name, QObject *parent)
-    : MscElement(name, parent)
+    : MscEntity(name, parent)
 {
 }
 
@@ -93,9 +93,9 @@ MscDocument *MscDocument::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
-chart::Element MscDocument::elementType() const
+MscEntity::EntityType MscDocument::elementType() const
 {
-    return chart::Element::Document;
+    return MscEntity::EntityType::Document;
 }
 
 } // namespace msc

@@ -18,26 +18,42 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
+#include <QUuid>
 
 namespace msc {
-namespace chart {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-Q_NAMESPACE
-#endif // Qt >= 5.8.0
 
-enum class Element {
-    Chart = 0,
-    Document,
-    Instance,
-    Message,
-    Gate,
+class MscEntity : public QObject
+{
+    Q_OBJECT
+public:
+    enum class EntityType {
+        Document = 0,
+        Chart,
+        Instance,
+        Message,
+        Gate,
+    };
+    Q_ENUM(EntityType)
 
-    ElementsCount
+    explicit MscEntity(QObject *parent = nullptr);
+    MscEntity(const QString &name, QObject *parent = nullptr);
+
+    const QString &name() const;
+    void setName(const QString &name);
+
+    QUuid internalId() const;
+
+    static const QString DefaultName;
+
+    virtual MscEntity::EntityType elementType() const = 0;
+
+Q_SIGNALS:
+    void nameChanged(const QString &name);
+
+private:
+    QString m_name = MscEntity::DefaultName;
+    const QUuid m_id;
 };
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-Q_ENUM_NS(Element)
-#endif // Qt >= 5.8.0
-
-} // ns chart
-} // ns msc
+} // namespace msc
