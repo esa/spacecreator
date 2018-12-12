@@ -65,4 +65,14 @@ MscEntity::EntityType MscMessage::entityType() const
     return MscEntity::EntityType::Message;
 }
 
+const MscMessage::Parameters &MscMessage::parameters() const
+{
+    return m_parameters;
+}
+
+void MscMessage::setParameters(const MscMessage::Parameters &parameters)
+{
+    m_parameters = parameters;
+}
+
 } // namespace msc
