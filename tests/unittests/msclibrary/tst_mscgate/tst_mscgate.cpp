@@ -47,7 +47,7 @@ const QString tst_MscGate::TestGateName = "TestGate";
 void tst_MscGate::testConstructor()
 {
     MscGate gateDefault;
-    QCOMPARE(gateDefault.name(), MscElement::DefaultName);
+    QCOMPARE(gateDefault.name(), MscEntity::DefaultName);
 
     MscGate gateNamed(TestGateName, this);
     QCOMPARE(gateNamed.name(), TestGateName);

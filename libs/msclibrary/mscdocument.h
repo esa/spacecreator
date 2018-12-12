@@ -18,7 +18,7 @@
 #ifndef MSCDOCUMENT_H
 #define MSCDOCUMENT_H
 
-#include "mscelement.h"
+#include "mscentity.h"
 
 #include <QObject>
 #include <QString>
@@ -27,7 +27,7 @@
 namespace msc {
 class MscChart;
 
-class MscDocument : public MscElement
+class MscDocument : public MscEntity
 {
     Q_OBJECT
 public:
@@ -45,7 +45,7 @@ public:
 
     MscDocument *parentDocument() const;
 
-    chart::Element elementType() const override;
+    MscEntity::EntityType elementType() const override;
 
 Q_SIGNALS:
     void documentAdded(MscDocument *document);

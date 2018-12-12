@@ -18,11 +18,11 @@
 #ifndef MSCINSTANCE_H
 #define MSCINSTANCE_H
 
-#include "mscelement.h"
+#include "mscentity.h"
 
 namespace msc {
 
-class MscInstance : public MscElement
+class MscInstance : public MscEntity
 {
     Q_OBJECT
 
@@ -36,7 +36,7 @@ public:
     const QString &inheritance() const;
     void setInheritance(const QString &inheritance);
 
-    chart::Element elementType() const override;
+    MscEntity::EntityType elementType() const override;
 
 Q_SIGNALS:
     void kindChanged(const QString &kind);

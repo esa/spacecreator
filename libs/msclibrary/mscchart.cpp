@@ -24,12 +24,12 @@
 namespace msc {
 
 MscChart::MscChart(QObject *parent)
-    : MscElement(parent)
+    : MscEntity(parent)
 {
 }
 
 MscChart::MscChart(const QString &name, QObject *parent)
-    : MscElement(name, parent)
+    : MscEntity(name, parent)
 {
 }
 
@@ -165,9 +165,9 @@ MscDocument *MscChart::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
-chart::Element MscChart::elementType() const
+MscEntity::EntityType MscChart::elementType() const
 {
-    return chart::Element::Chart;
+    return MscEntity::EntityType::Chart;
 }
 
 } // namespace msc

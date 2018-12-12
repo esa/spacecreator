@@ -18,7 +18,7 @@
 #ifndef MSCCHART_H
 #define MSCCHART_H
 
-#include "mscelement.h"
+#include "mscentity.h"
 
 #include <QObject>
 #include <QString>
@@ -30,7 +30,7 @@ class MscInstance;
 class MscMessage;
 class MscGate;
 
-class MscChart : public MscElement
+class MscChart : public MscEntity
 {
     Q_OBJECT
 public:
@@ -55,7 +55,7 @@ public:
 
     MscDocument *parentDocument() const;
 
-    chart::Element elementType() const override;
+    MscEntity::EntityType elementType() const override;
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);

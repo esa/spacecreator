@@ -20,12 +20,12 @@
 namespace msc {
 
 MscInstance::MscInstance(QObject *parent)
-    : MscElement(parent)
+    : MscEntity(parent)
 {
 }
 
 MscInstance::MscInstance(const QString &name, QObject *parent)
-    : MscElement(name, parent)
+    : MscEntity(name, parent)
 {
 }
 
@@ -59,9 +59,9 @@ void MscInstance::setInheritance(const QString &inheritance)
     Q_EMIT inheritanceChanged(m_inheritance);
 }
 
-chart::Element MscInstance::elementType() const
+MscEntity::EntityType MscInstance::elementType() const
 {
-    return chart::Element::Instance;
+    return MscEntity::EntityType::Instance;
 }
 
 } // namespace msc

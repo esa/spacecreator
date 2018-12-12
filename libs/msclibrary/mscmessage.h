@@ -18,7 +18,7 @@
 #ifndef MSCMESSAGE_H
 #define MSCMESSAGE_H
 
-#include "mscelement.h"
+#include "mscentity.h"
 
 #include <QObject>
 #include <QString>
@@ -26,7 +26,7 @@
 namespace msc {
 class MscInstance;
 
-class MscMessage : public MscElement
+class MscMessage : public MscEntity
 {
     Q_OBJECT
 public:
@@ -39,7 +39,7 @@ public:
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
 
-    chart::Element elementType() const override;
+    MscEntity::EntityType elementType() const override;
 
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
