@@ -21,6 +21,7 @@
 #include "mscmodel.h"
 
 #include <QDebug>
+#include <QPixmap>
 
 namespace msc {
 
@@ -226,17 +227,48 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (role != Qt::DisplayRole) {
-        return QVariant();
+    if (role == Qt::DecorationRole) {
+        auto document = static_cast<MscDocument *>(index.internalPointer());
+        if (document) {
+            QPixmap icon;
+            switch (document->hierarchyType()) {
+            case msc::MscDocument::HierarchyLeaf:
+                icon = QPixmap(":/mscresources/resources/document_leaf.png");
+                break;
+            case msc::MscDocument::HierarchyIs:
+                icon = QPixmap(":/mscresources/resources/document_is_scenario.png");
+                break;
+            case msc::MscDocument::HierarchyAnd:
+                icon = QPixmap(":/mscresources/resources/document_and.png");
+                break;
+            case msc::MscDocument::HierarchyOr:
+                icon = QPixmap(":/mscresources/resources/document_or.png");
+                break;
+            case msc::MscDocument::HierarchyParallel:
+                icon = QPixmap(":/mscresources/resources/document_parallel.png");
+                break;
+            case msc::MscDocument::HierarchyRepeat:
+                icon = QPixmap(":/mscresources/resources/document_repeat.png");
+                break;
+            case msc::MscDocument::HierarchyException:
+                icon = QPixmap(":/mscresources/resources/document_exception.png");
+                break;
+            }
+            return QVariant(icon);
+        } else {
+            return QVariant();
+        }
     }
 
-    auto document = static_cast<MscDocument *>(index.internalPointer());
-    if (document) {
-        return QVariant(document->name());
-    }
-    auto chart = static_cast<MscChart *>(index.internalPointer());
-    if (chart) {
-        return QVariant(chart->name());
+    if (role == Qt::DisplayRole) {
+        auto document = static_cast<MscDocument *>(index.internalPointer());
+        if (document) {
+            return QVariant(document->name());
+        }
+        auto chart = static_cast<MscChart *>(index.internalPointer());
+        if (chart) {
+            return QVariant(chart->name());
+        }
     }
 
     return QVariant();

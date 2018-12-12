@@ -7,6 +7,8 @@ include(../../suppress_antlr_wrn.pri)
 CONFIG += static
 CONFIG += no_keywords
 
+QT += core gui
+
 HEADERS += \
     mscfile.h \
     parser/MscBaseVisitor.h \
@@ -44,6 +46,9 @@ SOURCES += \
     mscgate.cpp \
     mscwriter.cpp \
     mscentity.cpp
+
+RESOURCES += \
+    mscresources.qrc
 
 antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")

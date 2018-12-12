@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include <memory>
+
 class QGraphicsScene;
 
 namespace msc {
@@ -16,9 +18,9 @@ public:
     explicit HierarchyViewModel(QObject *parent = nullptr);
     ~HierarchyViewModel() override;
 
-    QGraphicsScene* graphicsScene() const;
+    QGraphicsScene *graphicsScene() const;
 
-    void setModel(MscModel* model);
+    void setModel(MscModel *model);
 
 private Q_SLOTS:
     void modelDeleted();
