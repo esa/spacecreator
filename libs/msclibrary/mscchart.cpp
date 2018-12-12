@@ -165,7 +165,7 @@ MscDocument *MscChart::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
-MscEntity::EntityType MscChart::elementType() const
+MscEntity::EntityType MscChart::entityType() const
 {
     return MscEntity::EntityType::Chart;
 }

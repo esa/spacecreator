@@ -93,7 +93,7 @@ void tst_MscChart::testDestructor()
             QCOMPARE(chart->gates().size(), 1);
             break;
         default:
-            QFAIL("It seems a new chart::Element has been introduced,\n"
+            QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
                   "but it's not covered here.\n"
                   "Please add it to process or ignore explicitly.");
             break;
@@ -102,8 +102,8 @@ void tst_MscChart::testDestructor()
 
     delete chart;
 
-    for (const QPointer<MscEntity> &chartElement : chartEntities)
-        QCOMPARE(chartElement, QPointer<MscEntity>(nullptr));
+    for (const QPointer<MscEntity> &chartEntity : chartEntities)
+        QCOMPARE(chartEntity, QPointer<MscEntity>(nullptr));
 }
 
 void tst_MscChart::testAddInstance()

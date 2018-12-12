@@ -36,7 +36,7 @@ public:
     const QString &inheritance() const;
     void setInheritance(const QString &inheritance);
 
-    MscEntity::EntityType elementType() const override;
+    MscEntity::EntityType entityType() const override;
 
 Q_SIGNALS:
     void kindChanged(const QString &kind);

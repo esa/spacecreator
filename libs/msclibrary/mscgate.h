@@ -49,7 +49,7 @@ public:
     QString paramName() const;
     QVariantList params() const;
 
-    MscEntity::EntityType elementType() const override;
+    MscEntity::EntityType entityType() const override;
 
 public Q_SLOTS:
     void setDirection(MscGate::Direction dir);

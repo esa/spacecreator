@@ -45,7 +45,7 @@ public:
 
     MscDocument *parentDocument() const;
 
-    MscEntity::EntityType elementType() const override;
+    MscEntity::EntityType entityType() const override;
 
 Q_SIGNALS:
     void documentAdded(MscDocument *document);

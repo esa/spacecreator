@@ -59,7 +59,7 @@ void MscInstance::setInheritance(const QString &inheritance)
     Q_EMIT inheritanceChanged(m_inheritance);
 }
 
-MscEntity::EntityType MscInstance::elementType() const
+MscEntity::EntityType MscInstance::entityType() const
 {
     return MscEntity::EntityType::Instance;
 }
