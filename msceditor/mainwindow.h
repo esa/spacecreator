@@ -60,6 +60,8 @@ private Q_SLOTS:
     bool openFileMsc(const QString &file);
     bool openFileAsn(const QString &file);
     void saveMsc();
+    void showDocumentView(bool show);
+    void showHierarchyView(bool show);
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;
@@ -68,6 +70,7 @@ private:
     void initMenus();
     void initMenuFile();
     void initMenuEdit();
+    void initMenuView();
     void initMenuHelp();
     void initTools();
     void initConnections();

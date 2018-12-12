@@ -79,6 +79,10 @@ struct MainWindowPrivate {
     QAction *m_actUndo = nullptr;
     QAction *m_actRedo = nullptr;
 
+    QMenu *m_menuView = nullptr;
+    QAction *m_actShowDocument = nullptr;
+    QAction *m_actShowHierarchy = nullptr;
+
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
 
@@ -163,6 +167,20 @@ void MainWindow::saveMsc()
     d->m_model->saveMsc(fileName);
 }
 
+void MainWindow::showDocumentView(bool show)
+{
+    if (show) {
+        d->ui->centerView->setCurrentWidget(d->ui->graphicsView);
+    }
+}
+
+void MainWindow::showHierarchyView(bool show)
+{
+    if (show) {
+        d->ui->centerView->setCurrentWidget(d->ui->hierarchyView);
+    }
+}
+
 void MainWindow::selectCurrentChart()
 {
     msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
@@ -212,6 +230,9 @@ void MainWindow::setupUi()
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
 
+    d->ui->hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
+    d->ui->hierarchyView->setScene(d->m_model->hierarchyScene());
+
     initMenus();
     initTools();
 
@@ -243,6 +264,7 @@ void MainWindow::initMenus()
 {
     initMenuFile();
     initMenuEdit();
+    initMenuView();
     initMenuHelp();
 }
 
@@ -273,6 +295,20 @@ void MainWindow::initMenuEdit()
     d->m_menuEdit->addAction(d->m_actUndo);
     d->m_menuEdit->addAction(d->m_actRedo);
     d->m_menuEdit->addSeparator();
+}
+
+void MainWindow::initMenuView()
+{
+    d->m_menuView = menuBar()->addMenu(tr("&View"));
+    d->m_actShowDocument = d->m_menuView->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
+    d->m_actShowHierarchy = d->m_menuView->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
+
+    d->m_actShowDocument->setCheckable(true);
+    d->m_actShowHierarchy->setCheckable(true);
+    auto group = new QActionGroup(d->m_menuView);
+    group->addAction(d->m_actShowDocument);
+    group->addAction(d->m_actShowHierarchy);
+    d->m_actShowDocument->setChecked(true);
 }
 
 void MainWindow::initMenuHelp()

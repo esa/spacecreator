@@ -46,6 +46,7 @@ public:
     ~MainModel();
 
     QGraphicsScene *graphicsScene() const;
+    QGraphicsScene *hierarchyScene() const;
 
     msc::DocumentItemModel *documentItemModel() const;
 
