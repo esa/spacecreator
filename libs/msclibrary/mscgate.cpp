@@ -94,7 +94,7 @@ void MscGate::setParams(const QVariantList &params)
     m_params = params;
 }
 
-MscEntity::EntityType MscGate::elementType() const
+MscEntity::EntityType MscGate::entityType() const
 {
     return MscEntity::EntityType::Gate;
 }

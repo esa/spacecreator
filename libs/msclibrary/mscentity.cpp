@@ -21,7 +21,7 @@ namespace msc {
 
 /*!
    \class msc::MscEntity
-   \brief base class for all MSC elements
+   \brief base class for all MSC entities
  */
 
 const QString MscEntity::DefaultName = QObject::tr("Untitled");

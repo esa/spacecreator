@@ -36,7 +36,7 @@ public:
     {
     }
 
-    MscEntity::EntityType elementType() const override
+    MscEntity::EntityType entityType() const override
     {
         return MscEntity::EntityType::Chart; // doesn't matter here
     }
@@ -59,22 +59,22 @@ const QString tst_MscEntity::TestEntityName = QString("Roselileo:)");
 
 void tst_MscEntity::testDefaultName()
 {
-    MscEntitytImpl element;
-    QCOMPARE(element.name(), MscEntity::DefaultName);
+    MscEntitytImpl entity;
+    QCOMPARE(entity.name(), MscEntity::DefaultName);
 }
 
 void tst_MscEntity::testConstructorName()
 {
-    MscEntitytImpl element(TestEntityName);
-    QCOMPARE(element.name(), TestEntityName);
+    MscEntitytImpl entity(TestEntityName);
+    QCOMPARE(entity.name(), TestEntityName);
 }
 
 void tst_MscEntity::testSetName()
 {
-    MscEntitytImpl element;
-    QSignalSpy spy(&element, &MscEntity::nameChanged);
-    element.setName(TestEntityName);
-    QCOMPARE(element.name(), TestEntityName);
+    MscEntitytImpl entity;
+    QSignalSpy spy(&entity, &MscEntity::nameChanged);
+    entity.setName(TestEntityName);
+    QCOMPARE(entity.name(), TestEntityName);
     QCOMPARE(spy.count(), 1);
 }
 

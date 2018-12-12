@@ -39,7 +39,7 @@ public:
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
 
-    MscEntity::EntityType elementType() const override;
+    MscEntity::EntityType entityType() const override;
 
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);

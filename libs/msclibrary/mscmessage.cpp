@@ -60,7 +60,7 @@ void MscMessage::setTargetInstance(MscInstance *target)
     Q_EMIT targetChanged(m_target);
 }
 
-MscEntity::EntityType MscMessage::elementType() const
+MscEntity::EntityType MscMessage::entityType() const
 {
     return MscEntity::EntityType::Message;
 }

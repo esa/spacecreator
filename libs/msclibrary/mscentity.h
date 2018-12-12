@@ -46,7 +46,7 @@ public:
 
     static const QString DefaultName;
 
-    virtual MscEntity::EntityType elementType() const = 0;
+    virtual MscEntity::EntityType entityType() const = 0;
 
 Q_SIGNALS:
     void nameChanged(const QString &name);

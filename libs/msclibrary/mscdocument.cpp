@@ -93,7 +93,7 @@ MscDocument *MscDocument::parentDocument() const
     return dynamic_cast<MscDocument *>(parent());
 }
 
-MscEntity::EntityType MscDocument::elementType() const
+MscEntity::EntityType MscDocument::entityType() const
 {
     return MscEntity::EntityType::Document;
 }
