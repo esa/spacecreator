@@ -50,11 +50,11 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
 
         // Set the box size to be slightly larger than the necessary text size
         const qreal margin = maxSize.height();
-        const QSizeF boxSize(maxSize.width() + margin, maxSize.height());
+        const QSizeF boxSize(maxSize.width() + margin, maxSize.height() + margin);
 
         // Now layout the items with child sizes
         const qreal boxSpacingX = maxSize.width() / 3;
-        const qreal boxSpacingY = maxSize.height();
+        const qreal boxSpacingY = margin * 1.5;
         layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
     }
 
@@ -99,6 +99,8 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
             // Position of the next box
             x += boundingRect.width() + spaceX;
 
+            // Add some extra width on the bounding box for drawing outside the box
+            boundingRect.setWidth(boundingRect.width() + boxSize.height());
             item->setBoundingRect(boundingRect);
         }
 
