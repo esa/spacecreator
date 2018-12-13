@@ -15,56 +15,38 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MAINMODEL_H
-#define MAINMODEL_H
+#ifndef HIERARCHYVIEWMODEL_H
+#define HIERARCHYVIEWMODEL_H
 
 #include <QObject>
-#include <QString>
-#include <QVector>
 
 #include <memory>
 
-namespace msc {
-class ChartViewModel;
-class DocumentItemModel;
-class MscChart;
-class MscDocument;
-
-class InstanceItem;
-}
-
 class QGraphicsScene;
 
-struct MainModelPrivate;
+namespace msc {
 
-class MainModel : public QObject
+class MscModel;
+
+class HierarchyViewModel : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainModel(QObject *parent = nullptr);
-    ~MainModel();
+    explicit HierarchyViewModel(QObject *parent = nullptr);
+    ~HierarchyViewModel() override;
 
     QGraphicsScene *graphicsScene() const;
-    QGraphicsScene *hierarchyScene() const;
 
-    msc::DocumentItemModel *documentItemModel() const;
+    void setModel(MscModel *model);
 
-    QStringList errorMessages() const;
-
-    msc::ChartViewModel &chartViewModel() const;
-
-public Q_SLOTS:
-    void showFirstChart();
-    bool loadFile(const QString &filename);
-    void saveMsc(const QString &fileName);
+private Q_SLOTS:
+    void modelDeleted();
 
 private:
-    msc::MscChart *firstChart() const;
-    msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
-    void clearMscModel();
-
-    std::unique_ptr<MainModelPrivate> const d;
+    struct HierarchyViewModelPrivate;
+    std::unique_ptr<HierarchyViewModelPrivate> const d;
 };
 
-#endif // MAINMODEL_H
+}
+
+#endif // HIERARCHYVIEWMODEL_H

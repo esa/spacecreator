@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/mscresources">
+        <file>resources/document_leaf.png</file>
+        <file>resources/document_and.png</file>
+        <file>resources/document_exception.png</file>
+        <file>resources/document_is_scenario.png</file>
+        <file>resources/document_or.png</file>
+        <file>resources/document_parallel.png</file>
+        <file>resources/document_repeat.png</file>
+    </qresource>
+</RCC>

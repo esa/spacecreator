@@ -82,7 +82,24 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
                 //qDebug() << "CIF comment on" << docName << ":" << line;
             } else if (line.startsWith("MSC")) {
                 // Handle MSC here
-                //qDebug() << "MSC comment on" << docName << ":" << line;
+                // This is really simple first version of an MSC hierarchy parser
+                // For something more complete, we might need to really parse this
+                line = line.toLower();
+                if (line.contains("goal") || line.contains("time")) {
+                    // Not supported
+                } else if (line.contains("exception")) {
+                    doc->setHierarchyType(MscDocument::HierarchyException);
+                } else if (line.contains("parallel")) {
+                    doc->setHierarchyType(MscDocument::HierarchyParallel);
+                } else if (line.contains("repeat")) {
+                    doc->setHierarchyType(MscDocument::HierarchyRepeat);
+                } else if (line.contains("is")) {
+                    doc->setHierarchyType(MscDocument::HierarchyIs);
+                } else if (line.contains("and")) {
+                    doc->setHierarchyType(MscDocument::HierarchyAnd);
+                } else if (line.contains("or")) {
+                    doc->setHierarchyType(MscDocument::HierarchyOr);
+                }
             }
         }
     };
