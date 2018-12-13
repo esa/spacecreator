@@ -45,6 +45,7 @@ private Q_SLOTS:
     void testInstanceWithInheritance();
     void testMessage();
     void testSameMessageInTwoInstances();
+    void testMessageWithParameters();
     void testGateMessage();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
@@ -207,6 +208,33 @@ void tst_MscFile::testSameMessageInTwoInstances()
     delete model;
 }
 
+void tst_MscFile::testMessageWithParameters()
+{
+    QString msc = { "MSC msc1; \
+                     INSTANCE Initiator; \
+                        in gui_send_tm,a(longitude:-174.0) from env; \
+                        out gui_int_send_tm(12) to env; \
+                     ENDINSTANCE; \
+                     ENDMSC;" };
+
+    MscModel *model = file->parseText(msc);
+
+    QVERIFY(model->charts().size() == 1);
+    MscChart *chart = model->charts().at(0);
+
+    QVERIFY(chart->messages().size() == 2);
+
+    auto *message = chart->messages().at(0);
+    QCOMPARE(message->parameters().name, QString("a"));
+    QCOMPARE(message->parameters().expression, QString("longitude:-174.0"));
+
+    message = chart->messages().at(1);
+    QVERIFY(message->parameters().name.isEmpty());
+    QCOMPARE(message->parameters().pattern, QString("12"));
+
+    delete model;
+}
+
 void tst_MscFile::testGateMessage()
 {
     QString msc = { "MSC msc1; \
@@ -321,8 +349,7 @@ void tst_MscFile::testSortedMessageTwoCharts()
     MscDocument *document = model->documents().at(0);
     QCOMPARE(document->charts().size(), 2);
 
-    for (int x = 0; x < document->charts().size(); ++x)
-    {
+    for (int x = 0; x < document->charts().size(); ++x) {
         MscChart *chart = document->charts().at(x);
         QCOMPARE(chart->instances().size(), 2);
 

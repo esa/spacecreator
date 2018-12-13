@@ -31,6 +31,7 @@ class tst_MscWriter : public MscWriter
 
 private Q_SLOTS:
     void testSerializeMscMessage();
+    void testSerializeMscMessageParameters();
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
@@ -51,6 +52,20 @@ void tst_MscWriter::testSerializeMscMessage()
 
     QCOMPARE(this->serialize(&message, &source), QString("out Msg_1 to Inst_2;\n"));
     QCOMPARE(this->serialize(&message, &target), QString("in Msg_1 from Inst_1;\n"));
+}
+
+void tst_MscWriter::testSerializeMscMessageParameters()
+{
+    MscMessage message("Msg_1");
+    message.setParameters({ "a", "longitude:-174.0", "" });
+
+    MscInstance source("Inst_1");
+    MscInstance target("Inst_2");
+
+    message.setSourceInstance(&source);
+    message.setTargetInstance(&target);
+
+    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstance()

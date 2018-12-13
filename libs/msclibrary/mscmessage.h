@@ -30,6 +30,12 @@ class MscMessage : public MscEntity
 {
     Q_OBJECT
 public:
+    struct Parameters {
+        QString name;
+        QString expression;
+        QString pattern;
+    };
+
     explicit MscMessage(QObject *parent = nullptr);
     MscMessage(const QString &name, QObject *parent = nullptr);
 
@@ -41,6 +47,9 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    const Parameters &parameters() const;
+    void setParameters(const Parameters &parameters);
+
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
@@ -48,6 +57,7 @@ Q_SIGNALS:
 private:
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
+    Parameters m_parameters;
 };
 
 } // namespace msc

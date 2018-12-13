@@ -103,6 +103,7 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         return "";
 
     QString direction = tabs(tabsSize);
+    QString name = message->name();
     QString instanceName;
 
     if (message->sourceInstance() == instance) {
@@ -113,7 +114,13 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         instanceName = message->sourceInstance() != nullptr ? message->sourceInstance()->name() : "env";
     }
 
-    return QString(direction).arg(message->name(), instanceName);
+    if (!message->parameters().name.isEmpty())
+        name += QString(",%1").arg(message->parameters().name);
+
+    if (!message->parameters().expression.isEmpty() || !message->parameters().pattern.isEmpty())
+        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().pattern);
+
+    return QString(direction).arg(name, instanceName);
 }
 
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)

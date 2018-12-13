@@ -29,7 +29,7 @@
 
 using namespace msc;
 
-MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream* tokens)
+MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens)
     : m_model(new MscModel), m_tokens(tokens)
 {
 }
@@ -65,7 +65,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     auto docName = QString::fromStdString(context->NAME()->getText());
     doc->setName(docName);
 
-    auto handleComment = [=](antlr4::Token* token) {
+    auto handleComment = [=](antlr4::Token *token) {
         if (token->getChannel() == 2) {
             // Handle this token
             auto line = QString::fromStdString(token->getText()).trimmed();
@@ -93,7 +93,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
         handleComment(token);
     }
     auto mscComments = m_tokens->getHiddenTokensToRight(context->start->getTokenIndex() + 1);
-    for (auto token : mscComments ) {
+    for (auto token : mscComments) {
         handleComment(token);
     }
 
@@ -160,15 +160,32 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     }
 
     QString name;
+    MscMessage::Parameters parameters;
+
     if (context->NAME()) {
         name = QString::fromStdString(context->NAME()->getText());
     }
     if (context->messageIdentification()) {
         name = QString::fromStdString(context->messageIdentification()->NAME(0)->getText());
     }
+    if (context->messageIdentification()->NAME(1))
+        parameters.name = QString::fromStdString(context->messageIdentification()->NAME(1)->getText());
+
+    auto *parameterList = context->messageIdentification()->parameterList();
+    if (parameterList && parameterList->paramaterDefn()) {
+        auto *paramaterDefn = parameterList->paramaterDefn();
+
+        if (paramaterDefn->expression())
+            parameters.expression = QString::fromStdString(paramaterDefn->expression()->getText());
+
+        if (paramaterDefn->pattern())
+            parameters.pattern = QString::fromStdString(paramaterDefn->pattern()->getText());
+    }
 
     if (m_currentChart->messageByName(name) == nullptr) {
         auto message = new MscMessage(name);
+        message->setParameters(parameters);
+
         if (context->IN()) {
             // is an input event
             if (context->outputAddress()) {
