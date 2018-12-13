@@ -1,3 +1,20 @@
+/*
+   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #include "documentitem.h"
 
 #include "mscdocument.h"
@@ -11,11 +28,11 @@ namespace msc {
 struct DocumentItem::DocumentItemPrivate {
     QPointer<msc::MscDocument> document;
     QSizeF boxSize;
-    QVector<DocumentItem*> childDocuments;
+    QVector<DocumentItem *> childDocuments;
     QRectF boundingRect;
 };
 
-DocumentItem::DocumentItem(MscDocument* document, QGraphicsItem *parent)
+DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
     : QGraphicsObject(parent), d(new DocumentItemPrivate)
 {
     d->document = document;
@@ -55,7 +72,7 @@ QString DocumentItem::documentName() const
     return d->document->name();
 }
 
-void DocumentItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
+void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     if (d->document.isNull()) {
         // Can't paint without a valid document
@@ -89,7 +106,7 @@ const QVector<DocumentItem *> &DocumentItem::childDocuments() const
     return d->childDocuments;
 }
 
-void DocumentItem::setBoxSize(const QSizeF& size)
+void DocumentItem::setBoxSize(const QSizeF &size)
 {
     d->boxSize = size;
     Q_EMIT boxSizeChanged(size);
