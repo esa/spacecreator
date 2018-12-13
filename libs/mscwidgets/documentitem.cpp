@@ -80,15 +80,125 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     }
 
     // Calculate the size and position of the boxes
-    QRectF boxRect;
+    QRectF boxRect, relationRect;
     boxRect.setX((boundingRect().width() - boxSize().width()) / 2);
     boxRect.setSize(boxSize());
+    qreal relationHeight = boxRect.height() / 5;
+    qreal relationWidth = relationHeight * 3;
+    relationRect.setX(boxRect.center().x() - relationWidth / 2);
+    relationRect.setHeight(relationHeight);
+    relationRect.setWidth(relationWidth);
+    relationRect.moveBottom(boxRect.bottom());
+    qDebug() << d->document->name() << relationRect;
+    boxRect.setHeight(boxRect.height() - relationHeight);
+
+    // This is for the connecting lines below. Can be changed for non-leaf relations
+    int startLineY = qRound(boxRect.bottom());
 
     QPen pen(Qt::black);
+    painter->setBrush(Qt::white);
     painter->setPen(pen);
-    painter->fillRect(boxRect, Qt::white);
     painter->drawRect(boxRect);
     painter->drawText(boxRect, Qt::AlignCenter, d->document->name());
+    if (d->document->hierarchyType() != MscDocument::HierarchyLeaf) {
+        startLineY = qRound(relationRect.bottom());
+
+        painter->drawRect(relationRect);
+
+        painter->setRenderHint(QPainter::Antialiasing);
+        const qreal xCenter = relationRect.center().x();
+        const qreal yCenter = relationRect.center().y();
+        const qreal diff = (yCenter - relationRect.top()) / 2;
+        qreal x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, y1 = 0, y2 = 0;
+        switch (d->document->hierarchyType()) {
+        case MscDocument::HierarchyLeaf:
+            // Handled in a separate else below, because this should not have a box
+            break;
+        case MscDocument::HierarchyIs:
+            x1 = xCenter - diff;
+            x2 = xCenter + diff;
+            y1 = yCenter - diff / 2;
+            y2 = yCenter + diff / 2;
+            painter->drawLine(QPointF(x1, y1), QPointF(x2, y1));
+            painter->drawLine(QPointF(x1, y2), QPointF(x2, y2));
+            break;
+        case MscDocument::HierarchyAnd:
+            x1 = xCenter - diff;
+            x2 = xCenter + diff;
+            painter->drawLine(QPointF(x1, yCenter), QPointF(x2, yCenter));
+            break;
+        case MscDocument::HierarchyOr:
+            x1 = xCenter - diff;
+            x2 = xCenter + diff;
+            y1 = yCenter - diff;
+            y2 = yCenter + diff;
+            painter->drawLine(QPointF(xCenter, y1), QPointF(xCenter, y2));
+            painter->drawLine(QPointF(x1, yCenter), QPointF(x2, yCenter));
+            break;
+        case MscDocument::HierarchyParallel:
+            x1 = xCenter - diff;
+            x2 = xCenter + diff;
+            y1 = yCenter - diff;
+            y2 = yCenter + diff;
+            painter->drawLine(QPointF(x1, y1), QPointF(x1, y2));
+            painter->drawLine(QPointF(x2, y1), QPointF(x2, y2));
+            break;
+        case MscDocument::HierarchyRepeat:
+            x1 = boxRect.right();
+            x5 = relationHeight * 0.7;
+            painter->drawEllipse(QPointF(x1, boxRect.center().y()), x5, x5);
+            break;
+        case MscDocument::HierarchyException:
+            x1 = xCenter - diff;
+            x2 = xCenter - diff / 2;
+            x3 = xCenter;
+            x4 = xCenter + diff / 2;
+            x5 = xCenter + diff;
+            y1 = yCenter - diff;
+            y2 = yCenter + diff;
+            painter->drawLine(QPointF(x1, y1), QPointF(x2, y2));
+            painter->drawLine(QPointF(x2, y2), QPointF(x3, y1));
+            painter->drawLine(QPointF(x3, y1), QPointF(x4, y2));
+            painter->drawLine(QPointF(x4, y2), QPointF(x5, y1));
+            break;
+        }
+        painter->setRenderHint(QPainter::Antialiasing, false);
+    } else {
+        // Paint the leaf diagonal line
+        painter->drawLine(QPointF(boxRect.x() + 1, boxRect.center().y()),
+                          QPointF(boxRect.x() + (boxRect.center().y() - boxRect.y()) + 1, boxRect.bottom()));
+    }
+
+    // Now draw the connections
+    if (!d->childDocuments.isEmpty()) {
+        const int startLineX = qRound(boxRect.center().x());
+        const int endLineY = qRound(d->childDocuments.at(0)->y());
+
+        if (d->childDocuments.count() == 1) {
+            painter->drawLine(startLineX, startLineY, startLineX, endLineY);
+        } else {
+            const int midLineY = qRound(boxRect.bottom() + (endLineY - boxRect.bottom()) / 2);
+
+            // Paint the line down to the horizontal line
+            painter->drawLine(startLineX, startLineY, startLineX, midLineY);
+
+            auto boxX = [=](int boxIndex) {
+                auto item = d->childDocuments.at(boxIndex);
+                // The position of the child box is at the center of it's bounding rect
+                return qRound(item->boundingRect().center().x() + item->x());
+            };
+
+            // Paint the horizontal line
+            const int lastIndex = d->childDocuments.count() - 1;
+            painter->drawLine(boxX(0), midLineY, boxX(lastIndex), midLineY);
+
+            // Paint the lines from the horizontal line to the child boxes
+            for (int i = 0; i<=lastIndex; ++i) {
+                const int x = boxX(i);
+                painter->drawLine(x, midLineY, x, endLineY);
+            }
+        }
+    }
 }
 
 QSizeF DocumentItem::boxSize() const
