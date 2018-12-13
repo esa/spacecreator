@@ -144,8 +144,33 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     for (const auto *chart : document->charts())
         instances += serialize(chart, tabsSize + 1);
 
+    QString relation;
+    switch (document->hierarchyType()) {
+    case MscDocument::HierarchyLeaf:
+        // Nothing to add
+        break;
+    case MscDocument::HierarchyIs:
+        relation = " /* MSC IS */";
+        break;
+    case MscDocument::HierarchyAnd:
+        relation = " /* MSC AND */";
+        break;
+    case MscDocument::HierarchyOr:
+        relation = " /* MSC OR */";
+        break;
+    case MscDocument::HierarchyParallel:
+        relation = " /* MSC PARALLEL */";
+        break;
+    case MscDocument::HierarchyRepeat:
+        relation = " /* MSC REPEAT */";
+        break;
+    case MscDocument::HierarchyException:
+        relation = " /* MSC EXCEPTION */";
+        break;
+    }
+
     QString tabString = tabs(tabsSize);
-    return QString("%1mscdocument %2;\n%3%1endmscdocument;\n").arg(tabString, document->name(), instances);
+    return QString("%1mscdocument %2%4;\n%3%1endmscdocument;\n").arg(tabString, document->name(), instances, relation);
 }
 
 QString MscWriter::tabs(int tabsSize)
