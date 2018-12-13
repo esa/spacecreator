@@ -117,8 +117,8 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     if (!message->parameters().name.isEmpty())
         name += QString(",%1").arg(message->parameters().name);
 
-    if (!message->parameters().expression.isEmpty() || !message->parameters().patern.isEmpty())
-        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().patern);
+    if (!message->parameters().expression.isEmpty() || !message->parameters().pattern.isEmpty())
+        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().pattern);
 
     return QString(direction).arg(name, instanceName);
 }

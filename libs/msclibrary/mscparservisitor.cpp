@@ -179,7 +179,7 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
             parameters.expression = QString::fromStdString(paramaterDefn->expression()->getText());
 
         if (paramaterDefn->pattern())
-            parameters.patern = QString::fromStdString(paramaterDefn->pattern()->getText());
+            parameters.pattern = QString::fromStdString(paramaterDefn->pattern()->getText());
     }
 
     if (m_currentChart->messageByName(name) == nullptr) {

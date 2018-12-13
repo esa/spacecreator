@@ -33,7 +33,7 @@ public:
     struct Parameters {
         QString name;
         QString expression;
-        QString patern;
+        QString pattern;
     };
 
     explicit MscMessage(QObject *parent = nullptr);

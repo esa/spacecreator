@@ -230,7 +230,7 @@ void tst_MscFile::testMessageWithParameters()
 
     message = chart->messages().at(1);
     QVERIFY(message->parameters().name.isEmpty());
-    QCOMPARE(message->parameters().patern, QString("12"));
+    QCOMPARE(message->parameters().pattern, QString("12"));
 
     delete model;
 }
