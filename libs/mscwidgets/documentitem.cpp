@@ -89,7 +89,6 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     relationRect.setHeight(relationHeight);
     relationRect.setWidth(relationWidth);
     relationRect.moveBottom(boxRect.bottom());
-    qDebug() << d->document->name() << relationRect;
     boxRect.setHeight(boxRect.height() - relationHeight);
 
     // This is for the connecting lines below. Can be changed for non-leaf relations
@@ -193,7 +192,7 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
             painter->drawLine(boxX(0), midLineY, boxX(lastIndex), midLineY);
 
             // Paint the lines from the horizontal line to the child boxes
-            for (int i = 0; i<=lastIndex; ++i) {
+            for (int i = 0; i <= lastIndex; ++i) {
                 const int x = boxX(i);
                 painter->drawLine(x, midLineY, x, endLineY);
             }
