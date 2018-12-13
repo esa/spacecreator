@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testGateMessage();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
+    void testHierarchy();
 
 private:
     MscFile *file = nullptr;
@@ -321,8 +322,7 @@ void tst_MscFile::testSortedMessageTwoCharts()
     MscDocument *document = model->documents().at(0);
     QCOMPARE(document->charts().size(), 2);
 
-    for (int x = 0; x < document->charts().size(); ++x)
-    {
+    for (int x = 0; x < document->charts().size(); ++x) {
         MscChart *chart = document->charts().at(x);
         QCOMPARE(chart->instances().size(), 2);
 
@@ -361,6 +361,69 @@ void tst_MscFile::testSortedMessageTwoCharts()
         QCOMPARE(message->sourceInstance(), initiator);
         QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
     }
+
+    delete model;
+}
+
+void tst_MscFile::testHierarchy()
+{
+    QString msc = "\
+        mscdocument test_is /* MSC IS */; \
+            /* MSC AND */ \
+            mscdocument test_and; \
+                /* MSC OR */ \
+                MSCDOCUMENT test_or; \
+                    MSC connection; \
+                    ENDMSC; \
+                endmscdocument; \
+                /* MSC PARALLEL */ \
+                MSCDOCUMENT test_parallel; \
+                    MSC connection; \
+                    ENDMSC; \
+                endmscdocument; \
+                /* MSC REPEAT */ \
+                MSCDOCUMENT test_repeat; \
+                    MSC connection; \
+                    ENDMSC; \
+                endmscdocument; \
+                MSCDOCUMENT test_exception /* MSC EXCEPTION */; \
+                    MSCDOCUMENT test_leaf; \
+                        MSC connection; \
+                        ENDMSC; \
+                    endmscdocument; \
+                endmscdocument; \
+            endmscdocument; \
+        endmscdocument;";
+
+    auto model = file->parseText(msc);
+    QCOMPARE(model->documents().size(), 1);
+
+    auto documentIs = model->documents().at(0);
+    QCOMPARE(documentIs->hierarchyType(), MscDocument::HierarchyIs);
+    QCOMPARE(documentIs->documents().size(), 1);
+
+    auto documentAnd = documentIs->documents().at(0);
+    QCOMPARE(documentAnd->hierarchyType(), MscDocument::HierarchyAnd);
+    QCOMPARE(documentAnd->documents().size(), 4);
+
+    auto documentOr = documentAnd->documents().at(0);
+    QCOMPARE(documentOr->hierarchyType(), MscDocument::HierarchyOr);
+    QCOMPARE(documentOr->documents().size(), 0);
+
+    auto documentParallel = documentAnd->documents().at(1);
+    QCOMPARE(documentParallel->hierarchyType(), MscDocument::HierarchyParallel);
+    QCOMPARE(documentParallel->documents().size(), 0);
+
+    auto documentRepeat = documentAnd->documents().at(2);
+    QCOMPARE(documentRepeat->hierarchyType(), MscDocument::HierarchyRepeat);
+    QCOMPARE(documentRepeat->documents().size(), 0);
+
+    auto documentException = documentAnd->documents().at(3);
+    QCOMPARE(documentException->hierarchyType(), MscDocument::HierarchyException);
+    QCOMPARE(documentException->documents().size(), 1);
+
+    auto documentLeaf = documentException->documents().at(0);
+    QCOMPARE(documentLeaf->hierarchyType(), MscDocument::HierarchyLeaf);
 
     delete model;
 }
