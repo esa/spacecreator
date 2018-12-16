@@ -16,6 +16,7 @@
 */
 
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -43,6 +44,9 @@ MscChart::~MscChart()
 
     qDeleteAll(m_gates);
     m_gates.clear();
+
+    qDeleteAll(m_conditions);
+    m_conditions.clear();
 }
 
 const QVector<MscInstance *> &MscChart::instances() const
@@ -153,6 +157,36 @@ void MscChart::removeGate(MscGate *gate)
 
     if (m_gates.removeAll(gate))
         Q_EMIT gateRemoved(gate);
+}
+
+const QVector<MscCondition *> &MscChart::conditions() const
+{
+    return m_conditions;
+}
+
+void MscChart::addCondition(MscCondition *condition)
+{
+    if (!condition)
+        return;
+
+    if (conditions().contains(condition))
+        return;
+
+    m_conditions.append(condition);
+
+    Q_EMIT conditionAdded(condition);
+}
+
+void MscChart::removeCondition(MscCondition *condition)
+{
+    if (!condition)
+        return;
+
+    if (!m_conditions.contains(condition))
+        return;
+
+    if (m_conditions.removeAll(condition))
+        Q_EMIT conditionRemoved(condition);
 }
 
 /*!

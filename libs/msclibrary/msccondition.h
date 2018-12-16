@@ -15,46 +15,42 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef MSCCONDITION_H
+#define MSCCONDITION_H
 
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "mscentity.h"
 
 namespace msc {
 
-class MscEntity : public QObject
+class MscInstance;
+
+class MscCondition : public MscEntity
 {
     Q_OBJECT
+
 public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Gate,
-        Condition
-    };
-    Q_ENUM(EntityType)
+    explicit MscCondition(QObject *parent = nullptr);
+    MscCondition(const QString &name, QObject *parent = nullptr);
 
-    explicit MscEntity(QObject *parent = nullptr);
-    MscEntity(const QString &name, QObject *parent = nullptr);
+    QString messageName() const;
+    void setMessageName(const QString &messageName);
 
-    const QString &name() const;
-    void setName(const QString &name);
+    bool shared() const;
+    void setShared(bool shared);
 
-    QUuid internalId() const;
+    MscInstance *instance() const;
+    void setInstance(MscInstance *instance);
 
-    static const QString DefaultName;
-
-    virtual MscEntity::EntityType entityType() const = 0;
-
-Q_SIGNALS:
-    void nameChanged(const QString &name);
+    MscEntity::EntityType entityType() const override;
 
 private:
-    QString m_name = MscEntity::DefaultName;
-    const QUuid m_id;
+    MscInstance *m_instance;
+    // message name that precedes the condition
+    QString m_messageName;
+
+    bool m_shared = false;
 };
 
 } // namespace msc
+
+#endif // MSCCONDITION_H

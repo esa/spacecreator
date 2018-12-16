@@ -17,6 +17,7 @@
 
 #include <exceptions.h>
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
 #include <mscgate.h>
@@ -45,6 +46,8 @@ private Q_SLOTS:
     void testMessageByName();
     void testAddGate();
     void testRemoveGate();
+    void testAddCondition();
+    void testRemoveCondition();
 
 private:
     MscChart *m_chart = nullptr;
@@ -91,6 +94,11 @@ void tst_MscChart::testDestructor()
             chart->addGate(new MscGate());
             chartEntities.append(chart->gates().first());
             QCOMPARE(chart->gates().size(), 1);
+            break;
+        case MscEntity::EntityType::Condition:
+            chart->addCondition(new MscCondition());
+            chartEntities.append(chart->conditions().first());
+            QCOMPARE(chart->conditions().size(), 1);
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
@@ -229,6 +237,38 @@ void tst_MscChart::testRemoveGate()
     QCOMPARE(m_chart->gates().size(), 1);
     m_chart->removeGate(gateOne);
     QCOMPARE(m_chart->gates().size(), 1);
+}
+
+void tst_MscChart::testAddCondition()
+{
+    auto condition = new MscCondition("Condition_1", m_chart);
+
+    m_chart->addCondition(condition);
+    QCOMPARE(m_chart->conditions().size(), 1);
+
+    m_chart->addCondition(condition);
+    QCOMPARE(m_chart->conditions().size(), 1);
+
+    m_chart->addCondition(nullptr);
+    QCOMPARE(m_chart->conditions().size(), 1);
+}
+
+void tst_MscChart::testRemoveCondition()
+{
+    m_chart->addCondition(new MscCondition("Condition_1"));
+    m_chart->addCondition(new MscCondition("Condition_2"));
+
+    QCOMPARE(m_chart->conditions().size(), 2);
+
+    m_chart->removeCondition(nullptr);
+    QCOMPARE(m_chart->conditions().size(), 2);
+
+    auto condition = m_chart->conditions().first();
+    m_chart->removeCondition(condition);
+    QCOMPARE(m_chart->conditions().size(), 1);
+
+    m_chart->removeCondition(condition);
+    QCOMPARE(m_chart->conditions().size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

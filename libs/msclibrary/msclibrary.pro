@@ -26,7 +26,8 @@ HEADERS += \
     mscerrorlistener.h \
     mscgate.h \
     mscwriter.h \
-    mscentity.h
+    mscentity.h \
+    msccondition.h
 
 SOURCES += \
     mscfile.cpp \
@@ -45,7 +46,8 @@ SOURCES += \
     mscerrorlistener.cpp \
     mscgate.cpp \
     mscwriter.cpp \
-    mscentity.cpp
+    mscentity.cpp \
+    msccondition.cpp
 
 RESOURCES += \
     mscresources.qrc

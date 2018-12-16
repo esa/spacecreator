@@ -19,6 +19,7 @@
 #include <QTextStream>
 
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -73,7 +74,10 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize)
+QString MscWriter::serialize(const MscInstance *instance,
+                             const QVector<MscMessage *> &messages,
+                             const QVector<MscCondition *> &conditions,
+                             int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -89,9 +93,23 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessa
     } else
         header += ";\n";
 
+    auto addCondition = [&](const QString &messageName, int tabsSize) {
+        std::for_each(conditions.begin(),
+                      conditions.end(),
+                      [&](const MscCondition *condition) {
+                          if (condition->instance() == instance && condition->messageName() == messageName)
+                              events += serialize(condition, tabsSize);
+                      });
+    };
+
+    // serialize conditions with empty messageName
+    addCondition("", tabsSize + 1);
+
     for (const auto &message : messages) {
         if (message->sourceInstance() == instance || message->targetInstance() == instance)
             events += serialize(message, instance, tabsSize + 1);
+
+        addCondition(message->name(), tabsSize + 1);
     }
 
     return header + events + footer;
@@ -123,6 +141,14 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     return QString(direction).arg(name, instanceName);
 }
 
+QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
+{
+    if (condition == nullptr)
+        return "";
+
+    return QString("%1condition %2%3;\n").arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
+}
+
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 {
     if (chart == nullptr)
@@ -131,7 +157,7 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
     QString instances;
 
     for (const auto *instance : chart->instances())
-        instances += serialize(instance, chart->messages(), tabsSize + 1);
+        instances += serialize(instance, chart->messages(), chart->conditions(), tabsSize + 1);
 
     QString tabString = tabs(tabsSize);
     return QString("%1msc %2;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances);

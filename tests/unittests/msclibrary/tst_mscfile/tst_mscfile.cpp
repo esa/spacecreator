@@ -17,6 +17,7 @@
 
 #include <exceptions.h>
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscdocument.h>
 #include <mscfile.h>
 #include <mscinstance.h>
@@ -50,6 +51,7 @@ private Q_SLOTS:
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testHierarchy();
+    void testCondition();
 
 private:
     MscFile *file = nullptr;
@@ -452,6 +454,38 @@ void tst_MscFile::testHierarchy()
 
     auto documentLeaf = documentException->documents().at(0);
     QCOMPARE(documentLeaf->hierarchyType(), MscDocument::HierarchyLeaf);
+
+    delete model;
+}
+
+void tst_MscFile::testCondition()
+{
+    QString msc = { "MSC msc1; \
+                        INSTANCE Inst_1; \
+                           condition Con_1 shared all; \
+                           in Msg_4 from env; \
+                           condition Con_2; \
+                           out Msg_3 to Inst_2; \
+                         ENDINSTANCE; \
+                     ENDMSC;" };
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->messages().size(), 2);
+    QCOMPARE(chart->conditions().size(), 2);
+
+    auto *condition = chart->conditions().at(0);
+    QCOMPARE(condition->name(), QString("Con_1"));
+    QVERIFY(condition->messageName().isEmpty());
+    QCOMPARE(condition->shared(), true);
+
+    condition = chart->conditions().at(1);
+    QCOMPARE(condition->name(), QString("Con_2"));
+    QCOMPARE(condition->messageName(), QString("Msg_4"));
+    QCOMPARE(condition->shared(), false);
 
     delete model;
 }

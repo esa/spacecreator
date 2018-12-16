@@ -15,46 +15,53 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "msccondition.h"
 
 namespace msc {
 
-class MscEntity : public QObject
+MscCondition::MscCondition(QObject *parent)
+    : MscEntity(parent)
 {
-    Q_OBJECT
-public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Gate,
-        Condition
-    };
-    Q_ENUM(EntityType)
+}
 
-    explicit MscEntity(QObject *parent = nullptr);
-    MscEntity(const QString &name, QObject *parent = nullptr);
+MscCondition::MscCondition(const QString &name, QObject *parent)
+    : MscEntity(name, parent)
+{
+}
 
-    const QString &name() const;
-    void setName(const QString &name);
+QString MscCondition::messageName() const
+{
+    return m_messageName;
+}
 
-    QUuid internalId() const;
+void MscCondition::setMessageName(const QString &messageName)
+{
+    m_messageName = messageName;
+}
 
-    static const QString DefaultName;
+bool MscCondition::shared() const
+{
+    return m_shared;
+}
 
-    virtual MscEntity::EntityType entityType() const = 0;
+void MscCondition::setShared(bool shared)
+{
+    m_shared = shared;
+}
 
-Q_SIGNALS:
-    void nameChanged(const QString &name);
+MscInstance *MscCondition::instance() const
+{
+    return m_instance;
+}
 
-private:
-    QString m_name = MscEntity::DefaultName;
-    const QUuid m_id;
-};
+void MscCondition::setInstance(MscInstance *instance)
+{
+    m_instance = instance;
+}
+
+MscEntity::EntityType MscCondition::entityType() const
+{
+    return MscEntity::EntityType::Condition;
+}
 
 } // namespace msc

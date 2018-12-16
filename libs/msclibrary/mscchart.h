@@ -25,6 +25,8 @@
 #include <QVector>
 
 namespace msc {
+
+class MscCondition;
 class MscDocument;
 class MscInstance;
 class MscMessage;
@@ -53,6 +55,10 @@ public:
     void addGate(MscGate *gate);
     void removeGate(MscGate *gate);
 
+    const QVector<MscCondition *> &conditions() const;
+    void addCondition(MscCondition *condition);
+    void removeCondition(MscCondition *condition);
+
     MscDocument *parentDocument() const;
 
     MscEntity::EntityType entityType() const override;
@@ -64,11 +70,14 @@ Q_SIGNALS:
     void messageRemoved(MscMessage *message);
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
+    void conditionAdded(MscCondition *condition);
+    void conditionRemoved(MscCondition *condition);
 
 private:
     QVector<MscInstance *> m_instances;
     QVector<MscMessage *> m_messages;
     QVector<MscGate *> m_gates;
+    QVector<MscCondition *> m_conditions;
 };
 
 } // namespace msc

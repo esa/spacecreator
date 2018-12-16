@@ -22,11 +22,12 @@
 
 namespace msc {
 
-class MscModel;
+class MscChart;
+class MscCondition;
+class MscDocument;
 class MscInstance;
 class MscMessage;
-class MscChart;
-class MscDocument;
+class MscModel;
 
 class MscWriter : public QObject
 {
@@ -39,8 +40,12 @@ public:
     void saveChart(const MscChart *chart, const QString &fileName);
 
 protected:
-    QString serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize = 0);
+    QString serialize(const MscInstance *instance,
+                      const QVector<MscMessage *> &messages,
+                      const QVector<MscCondition *> &conditions,
+                      int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscCondition *condition, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 
