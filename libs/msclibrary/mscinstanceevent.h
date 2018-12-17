@@ -15,43 +15,24 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCCONDITION_H
-#define MSCCONDITION_H
+#ifndef MSCEVENT_H
+#define MSCEVENT_H
 
-#include "mscinstanceevent.h"
+#include "mscentity.h"
 
 namespace msc {
 
-class MscInstance;
-
-class MscCondition : public MscInstanceEvent
+// This is the base class for conditions, messages and timers. In the grammar this is called InstanceEvent
+class MscInstanceEvent : public MscEntity
 {
     Q_OBJECT
 
 public:
-    explicit MscCondition(QObject *parent = nullptr);
-    MscCondition(const QString &name, QObject *parent = nullptr);
-
-    QString messageName() const;
-    void setMessageName(const QString &messageName);
-
-    bool shared() const;
-    void setShared(bool shared);
-
-    MscInstance *instance() const;
-    void setInstance(MscInstance *instance);
-
-    MscEntity::EntityType entityType() const override;
-
-private:
-    MscInstance *m_instance = nullptr;
-
-    // message name that precedes the condition
-    QString m_messageName;
-
-    bool m_shared = false;
+    explicit MscInstanceEvent(QObject *parent = nullptr);
+    explicit MscInstanceEvent(const QString &name, QObject *parent = nullptr);
+    ~MscInstanceEvent() override;
 };
 
-} // namespace msc
+}
 
-#endif // MSCCONDITION_H
+#endif // MSCEVENT_H

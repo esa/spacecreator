@@ -20,12 +20,12 @@
 namespace msc {
 
 MscCondition::MscCondition(QObject *parent)
-    : MscEntity(parent)
+    : MscInstanceEvent(parent)
 {
 }
 
 MscCondition::MscCondition(const QString &name, QObject *parent)
-    : MscEntity(name, parent)
+    : MscInstanceEvent(name, parent)
 {
 }
 

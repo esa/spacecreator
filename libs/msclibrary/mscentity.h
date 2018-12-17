@@ -32,13 +32,14 @@ public:
         Chart,
         Instance,
         Message,
+        Timer,
         Gate,
         Condition
     };
     Q_ENUM(EntityType)
 
     explicit MscEntity(QObject *parent = nullptr);
-    MscEntity(const QString &name, QObject *parent = nullptr);
+    explicit MscEntity(const QString &name, QObject *parent = nullptr);
 
     const QString &name() const;
     void setName(const QString &name);

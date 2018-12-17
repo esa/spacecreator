@@ -45,6 +45,7 @@ public:
     antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
+    antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
 
 private:

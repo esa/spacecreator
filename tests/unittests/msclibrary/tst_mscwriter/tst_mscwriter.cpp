@@ -23,6 +23,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscwriter.h"
+#include "msctimer.h"
 
 using namespace msc;
 
@@ -33,6 +34,7 @@ class tst_MscWriter : public MscWriter
 private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
+    void testSerializeMscTimer();
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
@@ -70,12 +72,23 @@ void tst_MscWriter::testSerializeMscMessageParameters()
     QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
 }
 
+void tst_MscWriter::testSerializeMscTimer()
+{
+    MscTimer timer1("T1", MscTimer::TimerType::Start);
+    QCOMPARE(this->serialize(&timer1), QString("starttimer T1;\n"));
+
+    MscTimer timer2("T2", MscTimer::TimerType::Stop);
+    QCOMPARE(this->serialize(&timer2), QString("stoptimer T2;\n"));
+
+    MscTimer timer3("T3", MscTimer::TimerType::Timeout);
+    QCOMPARE(this->serialize(&timer3), QString("timeout T3;\n"));
+}
+
 void tst_MscWriter::testSerializeMscInstance()
 {
     MscInstance instance("Inst_1");
 
-    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>(), QVector<MscCondition *>()),
-             QString("instance Inst_1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceKind()
@@ -84,8 +97,7 @@ void tst_MscWriter::testSerializeMscInstanceKind()
     instance.setKind("process");
     instance.setInheritance("P1");
 
-    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>(), QVector<MscCondition *>()),
-             QString("instance Inst_1: process P1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1: process P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
@@ -102,18 +114,31 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     message2->setSourceInstance(&instance);
     message2->setTargetInstance(&instance2);
 
-    QVector<MscMessage *> messages;
+    QVector<MscInstanceEvent *> messages;
     messages.append(message);
     messages.append(message2);
 
-    QStringList serializeList = this->serialize(&instance, messages, QVector<MscCondition *>()).split("\n");
-
-    QVERIFY(serializeList.size() >= 4);
-
+    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 4);
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
     QCOMPARE(serializeList.at(1), QString("   in Msg_1 from Inst_2;"));
     QCOMPARE(serializeList.at(2), QString("   out Msg_2 to Inst_2;"));
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
+
+    // Add some timers and test again
+    messages.insert(1, new MscTimer("T_start", MscTimer::TimerType::Start));
+    messages.append(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
+    messages.append(new MscTimer("T_stop", MscTimer::TimerType::Stop));
+
+    serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 7);
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(2), QString("   starttimer T_start;"));
+    QCOMPARE(serializeList.at(3), QString("   out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(4), QString("   timeout T_fire;"));
+    QCOMPARE(serializeList.at(5), QString("   stoptimer T_stop;"));
+    QCOMPARE(serializeList.at(6), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscConditions()
@@ -123,22 +148,21 @@ void tst_MscWriter::testSerializeMscConditions()
     MscMessage *message = new MscMessage("Msg_1");
     message->setTargetInstance(&instance);
 
-    QVector<MscMessage *> messages;
+    QVector<MscInstanceEvent *> messages;
     messages.append(message);
 
     MscCondition *condition = new MscCondition("Con_1");
     condition->setInstance(&instance);
 
-    QVector<MscCondition *> conditions;
-    conditions.append(condition);
+    messages.append(condition);
 
-    QStringList serializeList = this->serialize(&instance, messages, conditions).split("\n");
+    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
 
     QVERIFY(serializeList.size() >= 4);
 
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
     QCOMPARE(serializeList.at(1), QString("   condition Con_1;"));
-    QCOMPARE(serializeList.at(2), QString("   in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
 }
 
@@ -164,6 +188,9 @@ void tst_MscWriter::testSerializeMscChartInstance()
     message2->setSourceInstance(instance);
     message2->setTargetInstance(instance2);
 
+    chart.addInstanceEvent(message);
+    chart.addInstanceEvent(message2);
+
     MscCondition *condition = new MscCondition("Con_1");
     condition->setShared(true);
     condition->setInstance(instance);
@@ -172,14 +199,11 @@ void tst_MscWriter::testSerializeMscChartInstance()
     condition2->setInstance(instance2);
     condition2->setMessageName("Msg_1");
 
-    chart.addMessage(message);
-    chart.addMessage(message2);
+    chart.addInstanceEvent(condition);
+    chart.addInstanceEvent(condition2);
 
     chart.addInstance(instance);
     chart.addInstance(instance2);
-
-    chart.addCondition(condition);
-    chart.addCondition(condition2);
 
     QStringList serializeList = this->serialize(&chart).split("\n");
 

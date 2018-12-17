@@ -21,6 +21,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscgate.h"
+#include "msctimer.h"
 
 namespace msc {
 
@@ -39,14 +40,11 @@ MscChart::~MscChart()
     qDeleteAll(m_instances);
     m_instances.clear();
 
-    qDeleteAll(m_messages);
-    m_messages.clear();
+    qDeleteAll(m_instanceEvents);
+    m_instanceEvents.clear();
 
     qDeleteAll(m_gates);
     m_gates.clear();
-
-    qDeleteAll(m_conditions);
-    m_conditions.clear();
 }
 
 const QVector<MscInstance *> &MscChart::instances() const
@@ -90,42 +88,42 @@ MscInstance *MscChart::instanceByName(const QString &name) const
     return nullptr;
 }
 
-const QVector<MscMessage *> &MscChart::messages() const
+const QVector<MscInstanceEvent *> &MscChart::instanceEvents() const
 {
-    return m_messages;
+    return m_instanceEvents;
 }
 
-void MscChart::addMessage(MscMessage *message)
+void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
 {
-    if (message == nullptr) {
+    if (instanceEvent == nullptr) {
         return;
     }
-    if (m_messages.contains(message)) {
+    if (m_instanceEvents.contains(instanceEvent)) {
         return;
     }
 
-    m_messages.append(message);
-    Q_EMIT messageAdded(message);
+    m_instanceEvents.append(instanceEvent);
+    Q_EMIT instanceEventAdded(instanceEvent);
 }
 
-void MscChart::removeMessage(MscMessage *message)
+void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
 {
-    if (message == nullptr) {
+    if (instanceEvent == nullptr) {
         return;
     }
-    if (!m_messages.contains(message)) {
+    if (!m_instanceEvents.contains(instanceEvent)) {
         return;
     }
 
-    if (m_messages.removeAll(message))
-        Q_EMIT messageRemoved(message);
+    if (m_instanceEvents.removeAll(instanceEvent))
+        Q_EMIT instanceEventRemoved(instanceEvent);
 }
 
 MscMessage *MscChart::messageByName(const QString &name) const
 {
-    for (MscMessage *message : m_messages) {
-        if (message->name() == name) {
-            return message;
+    for (MscInstanceEvent *message : m_instanceEvents) {
+        if (message->entityType() == MscEntity::EntityType::Message && message->name() == name) {
+            return static_cast<MscMessage *>(message);
         }
     }
     return nullptr;
@@ -157,36 +155,6 @@ void MscChart::removeGate(MscGate *gate)
 
     if (m_gates.removeAll(gate))
         Q_EMIT gateRemoved(gate);
-}
-
-const QVector<MscCondition *> &MscChart::conditions() const
-{
-    return m_conditions;
-}
-
-void MscChart::addCondition(MscCondition *condition)
-{
-    if (!condition)
-        return;
-
-    if (conditions().contains(condition))
-        return;
-
-    m_conditions.append(condition);
-
-    Q_EMIT conditionAdded(condition);
-}
-
-void MscChart::removeCondition(MscCondition *condition)
-{
-    if (!condition)
-        return;
-
-    if (!m_conditions.contains(condition))
-        return;
-
-    if (m_conditions.removeAll(condition))
-        Q_EMIT conditionRemoved(condition);
 }
 
 /*!

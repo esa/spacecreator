@@ -184,13 +184,15 @@ void tst_MscFile::testMessage()
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->messages().size(), 2);
-    MscMessage *message1 = chart->messages().at(0);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+    MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
     QCOMPARE(message1->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message1->targetInstance(), instance);
 
-    MscMessage *message2 = chart->messages().at(1);
+    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message2 != nullptr);
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), instance);
     QCOMPARE(message2->targetInstance(), static_cast<MscInstance *>(nullptr));
@@ -207,7 +209,7 @@ void tst_MscFile::testSameMessageInTwoInstances()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->messages().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 1);
     delete model;
 }
 
@@ -225,17 +227,21 @@ void tst_MscFile::testMessageWithParameters()
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
 
-    QVERIFY(chart->messages().size() == 2);
+    QVERIFY(chart->instanceEvents().size() == 2);
 
-    auto *message = chart->messages().at(0);
+    auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().name, QString("a"));
     QCOMPARE(message->parameters().expression, QString("longitude:-174.0"));
 
-    message = chart->messages().at(1);
+#ifndef __clang_analyzer__
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message != nullptr);
     QVERIFY(message->parameters().name.isEmpty());
     QCOMPARE(message->parameters().pattern, QString("12"));
 
     delete model;
+#endif
 }
 
 void tst_MscFile::testGateMessage()
@@ -249,7 +255,7 @@ void tst_MscFile::testGateMessage()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->messages().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 2);
     delete model;
 }
 
@@ -278,34 +284,40 @@ void tst_MscFile::testSortedMessage()
     MscInstance *initiator = chart->instances().at(0);
     MscInstance *responder = chart->instances().at(1);
 
-    QCOMPARE(chart->messages().size(), 6);
+    QCOMPARE(chart->instanceEvents().size(), 6);
 
-    MscMessage *message = chart->messages().at(0);
+    MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONreq"));
     QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message->targetInstance(), initiator);
 
-    message = chart->messages().at(1);
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICON"));
     QCOMPARE(message->sourceInstance(), initiator);
     QCOMPARE(message->targetInstance(), responder);
 
-    message = chart->messages().at(2);
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONind"));
     QCOMPARE(message->sourceInstance(), responder);
     QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
 
-    message = chart->messages().at(3);
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(3));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONresp"));
     QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message->targetInstance(), responder);
 
-    message = chart->messages().at(4);
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(4));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONF"));
     QCOMPARE(message->sourceInstance(), responder);
     QCOMPARE(message->targetInstance(), initiator);
 
-    message = chart->messages().at(5);
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(5));
+    QVERIFY(message != nullptr);
     QCOMPARE(message->name(), QString("ICONconf"));
     QCOMPARE(message->sourceInstance(), initiator);
     QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
@@ -359,34 +371,40 @@ void tst_MscFile::testSortedMessageTwoCharts()
         MscInstance *initiator = chart->instances().at(0);
         MscInstance *responder = chart->instances().at(1);
 
-        QCOMPARE(chart->messages().size(), 6);
+        QCOMPARE(chart->instanceEvents().size(), 6);
 
-        MscMessage *message = chart->messages().at(0);
+        MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICONreq%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
         QCOMPARE(message->targetInstance(), initiator);
 
-        message = chart->messages().at(1);
+        message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICON%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), initiator);
         QCOMPARE(message->targetInstance(), responder);
 
-        message = chart->messages().at(2);
+        message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICONind%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), responder);
         QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
 
-        message = chart->messages().at(3);
+        message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(3));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICONresp%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
         QCOMPARE(message->targetInstance(), responder);
 
-        message = chart->messages().at(4);
+        message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(4));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICONF%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), responder);
         QCOMPARE(message->targetInstance(), initiator);
 
-        message = chart->messages().at(5);
+        message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(5));
+        QVERIFY(message != nullptr);
         QCOMPARE(message->name(), QString("ICONconf%1").arg(x + 1));
         QCOMPARE(message->sourceInstance(), initiator);
         QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
@@ -463,9 +481,7 @@ void tst_MscFile::testCondition()
     QString msc = { "MSC msc1; \
                         INSTANCE Inst_1; \
                            condition Con_1 shared all; \
-                           in Msg_4 from env; \
                            condition Con_2; \
-                           out Msg_3 to Inst_2; \
                          ENDINSTANCE; \
                      ENDMSC;" };
 
@@ -474,17 +490,16 @@ void tst_MscFile::testCondition()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->messages().size(), 2);
-    QCOMPARE(chart->conditions().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 2);
 
-    auto *condition = chart->conditions().at(0);
+    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
     QCOMPARE(condition->name(), QString("Con_1"));
     QVERIFY(condition->messageName().isEmpty());
     QCOMPARE(condition->shared(), true);
 
-    condition = chart->conditions().at(1);
+    condition = static_cast<MscCondition *>(chart->instanceEvents().at(1));
     QCOMPARE(condition->name(), QString("Con_2"));
-    QCOMPARE(condition->messageName(), QString("Msg_4"));
+    QVERIFY(condition->messageName().isEmpty());
     QCOMPARE(condition->shared(), false);
 
     delete model;

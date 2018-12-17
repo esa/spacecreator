@@ -10,43 +10,47 @@ CONFIG += no_keywords
 QT += core gui
 
 HEADERS += \
-    mscfile.h \
     parser/MscBaseVisitor.h \
     parser/MscLexer.h \
     parser/MscParser.h \
     parser/MscVisitor.h \
-    mscparservisitor.h \
+    documentitemmodel.h \
     exceptions.h \
-    mscdocument.h \
-    mscmodel.h \
     mscchart.h \
+    mscdocument.h \
+    mscentity.h \
+    mscerrorlistener.h \
+    mscfile.h \
+    mscgate.h \
+    mscmodel.h \
     mscinstance.h \
     mscmessage.h \
-    documentitemmodel.h \
-    mscerrorlistener.h \
-    mscgate.h \
+    mscparservisitor.h \
+    msctimer.h \
     mscwriter.h \
-    mscentity.h \
+    mscinstanceevent.h \
     msccondition.h
 
 SOURCES += \
-    mscfile.cpp \
     parser/MscBaseVisitor.cpp \
     parser/MscLexer.cpp \
     parser/MscParser.cpp \
     parser/MscVisitor.cpp \
-    mscparservisitor.cpp \
+    documentitemmodel.cpp \
     exceptions.cpp \
-    mscdocument.cpp \
-    mscmodel.cpp \
     mscchart.cpp \
+    mscdocument.cpp \
+    mscentity.cpp \
+    mscerrorlistener.cpp \
+    mscfile.cpp \
+    mscgate.cpp \
     mscinstance.cpp \
     mscmessage.cpp \
-    documentitemmodel.cpp \
-    mscerrorlistener.cpp \
-    mscgate.cpp \
+    mscmodel.cpp \
+    mscparservisitor.cpp \
+    msctimer.cpp \
     mscwriter.cpp \
-    mscentity.cpp \
+    mscinstanceevent.cpp \
     msccondition.cpp
 
 RESOURCES += \

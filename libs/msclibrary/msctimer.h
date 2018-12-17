@@ -15,43 +15,39 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCCONDITION_H
-#define MSCCONDITION_H
+#ifndef MSCTIMER_H
+#define MSCTIMER_H
 
 #include "mscinstanceevent.h"
 
 namespace msc {
 
-class MscInstance;
-
-class MscCondition : public MscInstanceEvent
+class MscTimer : public MscInstanceEvent
 {
     Q_OBJECT
 
 public:
-    explicit MscCondition(QObject *parent = nullptr);
-    MscCondition(const QString &name, QObject *parent = nullptr);
+    enum class TimerType { Start,
+                           Stop,
+                           Timeout,
+                           Unknown };
 
-    QString messageName() const;
-    void setMessageName(const QString &messageName);
+    explicit MscTimer(QObject *parent = nullptr);
+    explicit MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);
 
-    bool shared() const;
-    void setShared(bool shared);
+    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Timer; }
 
-    MscInstance *instance() const;
-    void setInstance(MscInstance *instance);
+    void setTimerType(TimerType type) { m_timerType = type; }
+    TimerType timerType() const { return m_timerType; }
 
-    MscEntity::EntityType entityType() const override;
+    void setInstanceName(QString name) { m_instanceName = name; }
+    QString instanceName() const { return m_instanceName; }
 
 private:
-    MscInstance *m_instance = nullptr;
-
-    // message name that precedes the condition
-    QString m_messageName;
-
-    bool m_shared = false;
+    TimerType m_timerType = TimerType::Unknown;
+    QString m_instanceName;
 };
 
-} // namespace msc
+}
 
-#endif // MSCCONDITION_H
+#endif // MSCTIMER_H
