@@ -86,7 +86,7 @@ void tst_MscChart::testDestructor()
         case MscEntity::EntityType::Timer:
             chart->addInstanceEvent(new MscTimer);
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 1);
+            QCOMPARE(chart->instanceEvents().size(), 2);
             break;
         case MscEntity::EntityType::Gate:
             chart->addGate(new MscGate());
