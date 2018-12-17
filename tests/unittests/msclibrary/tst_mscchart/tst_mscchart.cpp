@@ -99,7 +99,7 @@ void tst_MscChart::testDestructor()
         case MscEntity::EntityType::Condition:
             chart->addInstanceEvent(new MscCondition());
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 1);
+            QCOMPARE(chart->instanceEvents().size(), 3);
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
