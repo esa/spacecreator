@@ -20,6 +20,7 @@
 #include <mscinstance.h>
 #include <mscmessage.h>
 #include <mscgate.h>
+#include <msctimer.h>
 
 #include <QtTest>
 
@@ -58,8 +59,8 @@ void tst_MscChart::init()
 void tst_MscChart::cleanup()
 {
     if (m_chart) {
-        while (!m_chart->messages().isEmpty())
-            m_chart->removeMessage(m_chart->messages().first());
+        while (!m_chart->instanceEvents().isEmpty())
+            m_chart->removeInstanceEvent(m_chart->instanceEvents().first());
     }
 
     delete m_chart;
@@ -83,9 +84,14 @@ void tst_MscChart::testDestructor()
             QCOMPARE(chart->instances().size(), 1);
             break;
         case MscEntity::EntityType::Message:
-            chart->addMessage(new MscMessage());
-            chartEntities.append(chart->messages().first());
-            QCOMPARE(chart->messages().size(), 1);
+            chart->addInstanceEvent(new MscMessage());
+            chartEntities.append(chart->instanceEvents().first());
+            QCOMPARE(chart->instanceEvents().size(), 1);
+            break;
+        case MscEntity::EntityType::Timer:
+            chart->addInstanceEvent(new MscTimer);
+            chartEntities.append(chart->instanceEvents().first());
+            QCOMPARE(chart->instanceEvents().size(), 1);
             break;
         case MscEntity::EntityType::Gate:
             chart->addGate(new MscGate());
@@ -158,50 +164,50 @@ void tst_MscChart::testInstanceByName()
 
 void tst_MscChart::testAddMessage()
 {
-    QCOMPARE(m_chart->messages().size(), 0);
+    QCOMPARE(m_chart->instanceEvents().size(), 0);
 
     auto message1 = new MscMessage("IN", m_chart);
-    m_chart->addMessage(message1);
+    m_chart->addInstanceEvent(message1);
     auto message2 = new MscMessage("OUT", m_chart);
-    m_chart->addMessage(message2);
-    QCOMPARE(m_chart->messages().size(), 2);
+    m_chart->addInstanceEvent(message2);
+    QCOMPARE(m_chart->instanceEvents().size(), 2);
 }
 
 void tst_MscChart::testRemoveMessage()
 {
-    QCOMPARE(m_chart->messages().size(), 0);
+    QCOMPARE(m_chart->instanceEvents().size(), 0);
 
     QScopedPointer<MscMessage> message1(new MscMessage("IN", m_chart));
     QScopedPointer<MscMessage> message2(new MscMessage("OUT", m_chart));
 
-    m_chart->addMessage(message1.data());
-    m_chart->addMessage(message2.data());
-    QCOMPARE(m_chart->messages().size(), 2);
+    m_chart->addInstanceEvent(message1.data());
+    m_chart->addInstanceEvent(message2.data());
+    QCOMPARE(m_chart->instanceEvents().size(), 2);
 
-    m_chart->removeMessage(message1.data());
-    QCOMPARE(m_chart->messages().size(), 1);
-    m_chart->removeMessage(message2.data());
-    QCOMPARE(m_chart->messages().size(), 0);
+    m_chart->removeInstanceEvent(message1.data());
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+    m_chart->removeInstanceEvent(message2.data());
+    QCOMPARE(m_chart->instanceEvents().size(), 0);
 }
 
 void tst_MscChart::testNoDuplicateMessage()
 {
     auto message = new MscMessage("IN", m_chart);
-    m_chart->addMessage(message);
-    m_chart->addMessage(message);
-    QCOMPARE(m_chart->messages().size(), 1);
+    m_chart->addInstanceEvent(message);
+    m_chart->addInstanceEvent(message);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
 }
 
 void tst_MscChart::testNoNullPtrMessage()
 {
-    m_chart->addMessage(nullptr);
-    QCOMPARE(m_chart->messages().size(), 0);
+    m_chart->addInstanceEvent(nullptr);
+    QCOMPARE(m_chart->instanceEvents().size(), 0);
 }
 
 void tst_MscChart::testMessageByName()
 {
     auto message = new MscMessage("IN", m_chart);
-    m_chart->addMessage(message);
+    m_chart->addInstanceEvent(message);
     QCOMPARE(m_chart->messageByName("IN"), message);
     QCOMPARE(m_chart->messageByName("OUT"), static_cast<MscMessage *>(nullptr));
 }

@@ -33,7 +33,7 @@ class MscModel;
 class MscParserVisitor : public MscBaseVisitor
 {
 public:
-    explicit MscParserVisitor(antlr4::CommonTokenStream* tokens = nullptr);
+    explicit MscParserVisitor(antlr4::CommonTokenStream *tokens = nullptr);
     ~MscParserVisitor() override;
 
     // Returns the model that is built up during parsing
@@ -45,6 +45,7 @@ public:
     antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
+    antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
 
 private:
@@ -65,7 +66,7 @@ private:
     Messages m_messages;
     MessagesList m_messagesList;
 
-    antlr4::CommonTokenStream* m_tokens = nullptr;
+    antlr4::CommonTokenStream *m_tokens = nullptr;
 };
 
 #endif // MSCPARSERVISITOR_H

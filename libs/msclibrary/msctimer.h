@@ -15,40 +15,39 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCWRITER_H
-#define MSCWRITER_H
+#ifndef MSCTIMER_H
+#define MSCTIMER_H
 
-#include <QObject>
+#include "mscinstanceevent.h"
 
 namespace msc {
 
-class MscModel;
-class MscInstance;
-class MscInstanceEvent;
-class MscMessage;
-class MscChart;
-class MscDocument;
-
-class MscWriter : public QObject
+class MscTimer : public MscInstanceEvent
 {
     Q_OBJECT
 
 public:
-    MscWriter(QObject *parent = nullptr);
+    enum class TimerType { Start,
+                           Stop,
+                           Timeout,
+                           Unknown };
 
-    void saveModel(const MscModel *model, const QString &fileName);
-    void saveChart(const MscChart *chart, const QString &fileName);
+    explicit MscTimer(QObject *parent = nullptr);
+    explicit MscTimer(const QString &name, QObject *parent = nullptr);
 
-protected:
-    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &messages, int tabsSize = 0);
-    QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
-    QString serialize(const MscChart *chart, int tabsSize = 0);
-    QString serialize(const MscDocument *document, int tabsSize = 0);
+    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Timer; }
+
+    void setTimerType(TimerType type) { m_timerType = type; }
+    TimerType timerType() const { return m_timerType; }
+
+    void setInstanceName(QString name) { m_instanceName = name; }
+    QString instanceName() const { return m_instanceName; }
 
 private:
-    QString tabs(int tabsSize);
+    TimerType m_timerType = TimerType::Unknown;
+    QString m_instanceName;
 };
 
-} // namespace msc
+}
 
-#endif // MSCWRITER_H
+#endif // MSCTIMER_H

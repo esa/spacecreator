@@ -52,7 +52,7 @@ struct ChartViewModelPrivate {
     qreal instanceAxisHeight() const
     {
         static constexpr qreal oneMessageHeight = 50.;
-        const qreal messagesCount = m_currentChart ? qMax(1, m_currentChart->messages().size()) : 1.;
+        const qreal messagesCount = m_currentChart ? qMax(1, m_currentChart->instanceEvents().size()) : 1.;
         return messagesCount * (oneMessageHeight + InterMessageSpan);
     }
 };
@@ -136,31 +136,36 @@ void ChartViewModel::relayout()
     }
 
     qreal y(d->InterMessageSpan);
-    for (MscMessage *message : d->m_currentChart->messages()) {
-        InstanceItem *sourceInstance(nullptr);
-        qreal instanceVertiacalOffset(0);
-        if (message->sourceInstance()) {
-            sourceInstance = itemForInstance(message->sourceInstance());
-            instanceVertiacalOffset = sourceInstance->axis().p1().y();
-        }
-        InstanceItem *targetInstance(nullptr);
-        if (message->targetInstance()) {
-            targetInstance = itemForInstance(message->targetInstance());
-            if (qFuzzyIsNull(instanceVertiacalOffset))
-                instanceVertiacalOffset = targetInstance->axis().p1().y();
-        }
+    for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
+        // TODO: Handle timers and conditions
+        if (instanceEvent->entityType() == MscEntity::EntityType::Message) {
+            auto message = static_cast<MscMessage *>(instanceEvent);
 
-        MessageItem *item = itemForMessage(message);
-        if (!item) {
-            item = new MessageItem(message);
+            InstanceItem *sourceInstance(nullptr);
+            qreal instanceVertiacalOffset(0);
+            if (message->sourceInstance()) {
+                sourceInstance = itemForInstance(message->sourceInstance());
+                instanceVertiacalOffset = sourceInstance->axis().p1().y();
+            }
+            InstanceItem *targetInstance(nullptr);
+            if (message->targetInstance()) {
+                targetInstance = itemForInstance(message->targetInstance());
+                if (qFuzzyIsNull(instanceVertiacalOffset))
+                    instanceVertiacalOffset = targetInstance->axis().p1().y();
+            }
 
-            d->m_scene.addItem(item);
-            d->m_messageItems.append(item);
+            MessageItem *item = itemForMessage(message);
+            if (!item) {
+                item = new MessageItem(message);
+
+                d->m_scene.addItem(item);
+                d->m_messageItems.append(item);
+            }
+            item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
+            y += item->boundingRect().height() + d->InterMessageSpan;
+
+            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
         }
-        item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
-        y += item->boundingRect().height() + d->InterMessageSpan;
-
-        totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
     }
 
     // actualize scene's rect to avoid flickering on first show:
@@ -224,8 +229,8 @@ msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orph
 {
     if (currentChart()) {
         if (!orphanMessage) {
-            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->messages().size()));
-            currentChart()->addMessage(orphanMessage);
+            orphanMessage = new MscMessage(tr("Message_%1").arg(currentChart()->instanceEvents().size()));
+            currentChart()->addInstanceEvent(orphanMessage);
         }
 
         return MessageItem::createDefaultItem(orphanMessage, pos);
@@ -237,7 +242,7 @@ bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
 {
     if (item && utils::removeSceneItem(item)) {
         if (MscMessage *message = item->modelItem()) {
-            currentChart()->removeMessage(message);
+            currentChart()->removeInstanceEvent(message);
             delete message;
         }
         delete item;

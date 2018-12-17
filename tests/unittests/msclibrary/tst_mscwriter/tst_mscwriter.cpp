@@ -72,7 +72,7 @@ void tst_MscWriter::testSerializeMscInstance()
 {
     MscInstance instance("Inst_1");
 
-    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>()), QString("instance Inst_1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceKind()
@@ -81,7 +81,7 @@ void tst_MscWriter::testSerializeMscInstanceKind()
     instance.setKind("process");
     instance.setInheritance("P1");
 
-    QCOMPARE(this->serialize(&instance, QVector<MscMessage *>()), QString("instance Inst_1: process P1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1: process P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
@@ -98,7 +98,7 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     message2->setSourceInstance(&instance);
     message2->setTargetInstance(&instance2);
 
-    QVector<MscMessage *> messages;
+    QVector<MscInstanceEvent *> messages;
     messages.append(message);
     messages.append(message2);
 
@@ -134,8 +134,8 @@ void tst_MscWriter::testSerializeMscChartInstance()
     message2->setSourceInstance(instance);
     message2->setTargetInstance(instance2);
 
-    chart.addMessage(message);
-    chart.addMessage(message2);
+    chart.addInstanceEvent(message);
+    chart.addInstanceEvent(message2);
 
     chart.addInstance(instance);
     chart.addInstance(instance2);

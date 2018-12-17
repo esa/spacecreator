@@ -22,10 +22,19 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscgate.h"
+#include "msctimer.h"
 
 #include <QDebug>
 
 #include <string>
+
+static QString treeNodeToString(antlr4::tree::TerminalNode *node)
+{
+    if (node != nullptr) {
+        return QString::fromStdString(node->getText());
+    }
+    return QString();
+};
 
 using namespace msc;
 
@@ -62,7 +71,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    auto docName = QString::fromStdString(context->NAME()->getText());
+    auto docName = ::treeNodeToString(context->NAME());
     doc->setName(docName);
 
     auto handleComment = [=](antlr4::Token *token) {
@@ -278,6 +287,32 @@ antlrcpp::Any MscParserVisitor::visitGateDeclaration(MscParser::GateDeclarationC
     return visitChildren(context);
 }
 
+antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    QScopedPointer<MscTimer> timer(new MscTimer());
+    if (MscParser::StartTimerContext *startTimer = context->startTimer()) {
+        timer->setTimerType(MscTimer::TimerType::Start);
+        timer->setName(::treeNodeToString(startTimer->NAME(0)));
+        timer->setInstanceName(::treeNodeToString(startTimer->NAME(1)));
+    } else if (MscParser::StopTimerContext *stopTimer = context->stopTimer()) {
+        timer->setTimerType(MscTimer::TimerType::Stop);
+        timer->setName(::treeNodeToString(stopTimer->NAME(0)));
+        timer->setInstanceName(::treeNodeToString(stopTimer->NAME(1)));
+    } else if (MscParser::TimeoutContext *timeout = context->timeout()) {
+        timer->setTimerType(MscTimer::TimerType::Timeout);
+        timer->setName(::treeNodeToString(timeout->NAME(0)));
+        timer->setInstanceName(::treeNodeToString(timeout->NAME(1)));
+    } else {
+        qWarning() << Q_FUNC_INFO << "Bad timer declaration";
+    }
+
+    return visitChildren(context);
+}
+
 void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
 {
     Q_ASSERT(m_currentChart != nullptr);
@@ -343,7 +378,7 @@ void MscParserVisitor::orderMessages()
 
             if (found || !inOther) {
                 m_messagesList[i].removeFirst();
-                m_currentChart->addMessage(firstMessage);
+                m_currentChart->addInstanceEvent(firstMessage);
 
                 if (m_messagesList[i].size() == 0) {
                     m_messagesList.remove(i);

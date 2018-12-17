@@ -15,46 +15,24 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef MSCEVENT_H
+#define MSCEVENT_H
 
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "mscentity.h"
 
 namespace msc {
 
-class MscEntity : public QObject
+// This is the base class for conditions, messages and timers. In the grammar this is called InstanceEvent
+class MscInstanceEvent : public MscEntity
 {
     Q_OBJECT
+
 public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Timer,
-        Gate,
-    };
-    Q_ENUM(EntityType)
-
-    explicit MscEntity(QObject *parent = nullptr);
-    explicit MscEntity(const QString &name, QObject *parent = nullptr);
-
-    const QString &name() const;
-    void setName(const QString &name);
-
-    QUuid internalId() const;
-
-    static const QString DefaultName;
-
-    virtual MscEntity::EntityType entityType() const = 0;
-
-Q_SIGNALS:
-    void nameChanged(const QString &name);
-
-private:
-    QString m_name = MscEntity::DefaultName;
-    const QUuid m_id;
+    explicit MscInstanceEvent(QObject *parent = nullptr);
+    explicit MscInstanceEvent(const QString &name, QObject *parent = nullptr);
+    ~MscInstanceEvent() override;
 };
 
-} // namespace msc
+}
+
+#endif // MSCEVENT_H
