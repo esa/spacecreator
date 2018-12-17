@@ -15,15 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QFile>
-#include <QTextStream>
-
+#include "mscwriter.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "mscwriter.h"
+#include "msctimer.h"
+
+#include <QFile>
+#include <QTextStream>
 
 namespace msc {
 
@@ -94,6 +95,9 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         case MscEntity::EntityType::Message:
             events += serialize(static_cast<MscMessage *>(message), instance, tabsSize + 1);
             break;
+        case MscEntity::EntityType::Timer:
+            events += serialize(static_cast<MscTimer *>(message), tabsSize + 1);
+            break;
         default:
             break;
         }
@@ -126,6 +130,31 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().pattern);
 
     return QString(direction).arg(name, instanceName);
+}
+
+QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
+{
+    if (timer == nullptr) {
+        return QString();
+    }
+
+    QString timerType;
+    switch (timer->timerType()) {
+    case MscTimer::TimerType::Start:
+        timerType = "starttimer";
+        break;
+    case MscTimer::TimerType::Stop:
+        timerType = "stoptimer";
+        break;
+    case MscTimer::TimerType::Timeout:
+        timerType = "timeout";
+        break;
+    default:
+        // Not good
+        return QString();
+    }
+
+    return tabs(tabsSize) + timerType + " " + timer->name() + ";\n";
 }
 
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)

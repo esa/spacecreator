@@ -22,6 +22,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscwriter.h"
+#include "msctimer.h"
 
 using namespace msc;
 
@@ -32,6 +33,7 @@ class tst_MscWriter : public MscWriter
 private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
+    void testSerializeMscTimer();
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
@@ -68,6 +70,18 @@ void tst_MscWriter::testSerializeMscMessageParameters()
     QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
 }
 
+void tst_MscWriter::testSerializeMscTimer()
+{
+    MscTimer timer1("T1", MscTimer::TimerType::Start);
+    QCOMPARE(this->serialize(&timer1), QString("starttimer T1;"));
+
+    MscTimer timer2("T2", MscTimer::TimerType::Stop);
+    QCOMPARE(this->serialize(&timer2), QString("stoptimer T2;"));
+
+    MscTimer timer3("T3", MscTimer::TimerType::Timeout);
+    QCOMPARE(this->serialize(&timer3), QString("timeout T3;"));
+}
+
 void tst_MscWriter::testSerializeMscInstance()
 {
     MscInstance instance("Inst_1");
@@ -102,14 +116,27 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     messages.append(message);
     messages.append(message2);
 
-    QStringList serializeList = this->serialize(&instance, messages).split("\n");
-
-    QVERIFY(serializeList.size() >= 4);
-
+    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 4);
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
     QCOMPARE(serializeList.at(1), QString("   in Msg_1 from Inst_2;"));
     QCOMPARE(serializeList.at(2), QString("   out Msg_2 to Inst_2;"));
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
+
+    // Add some timers and test again
+    messages.insert(1, new MscTimer("T_start", MscTimer::TimerType::Start));
+    messages.append(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
+    messages.append(new MscTimer("T_stop", MscTimer::TimerType::Stop));
+
+    serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 7);
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(2), QString("   starttimer T_start;"));
+    QCOMPARE(serializeList.at(3), QString("   out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(4), QString("   timeout T_fire;"));
+    QCOMPARE(serializeList.at(5), QString("   stoptimer T_stop;"));
+    QCOMPARE(serializeList.at(6), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscChart()
