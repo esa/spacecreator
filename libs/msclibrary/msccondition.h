@@ -44,7 +44,8 @@ public:
     MscEntity::EntityType entityType() const override;
 
 private:
-    MscInstance *m_instance;
+    MscInstance *m_instance = nullptr;
+
     // message name that precedes the condition
     QString m_messageName;
 

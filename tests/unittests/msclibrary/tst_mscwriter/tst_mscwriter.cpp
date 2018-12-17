@@ -36,6 +36,7 @@ private Q_SLOTS:
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
+    void testSerializeMscConditions();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
@@ -105,6 +106,26 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     messages.append(message);
     messages.append(message2);
 
+    QStringList serializeList = this->serialize(&instance, messages, QVector<MscCondition *>()).split("\n");
+
+    QVERIFY(serializeList.size() >= 4);
+
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(2), QString("   out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(3), QString("endinstance;"));
+}
+
+void tst_MscWriter::testSerializeMscConditions()
+{
+    MscInstance instance("Inst_1");
+
+    MscMessage *message = new MscMessage("Msg_1");
+    message->setTargetInstance(&instance);
+
+    QVector<MscMessage *> messages;
+    messages.append(message);
+
     MscCondition *condition = new MscCondition("Con_1");
     condition->setInstance(&instance);
 
@@ -113,13 +134,12 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
 
     QStringList serializeList = this->serialize(&instance, messages, conditions).split("\n");
 
-    QVERIFY(serializeList.size() >= 5);
+    QVERIFY(serializeList.size() >= 4);
 
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
     QCOMPARE(serializeList.at(1), QString("   condition Con_1;"));
     QCOMPARE(serializeList.at(2), QString("   in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(3), QString("   out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(4), QString("endinstance;"));
+    QCOMPARE(serializeList.at(3), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscChart()
