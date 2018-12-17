@@ -21,12 +21,12 @@
 namespace msc {
 
 MscMessage::MscMessage(QObject *parent)
-    : MscEntity(parent)
+    : MscInstanceEvent(parent)
 {
 }
 
 MscMessage::MscMessage(const QString &name, QObject *parent)
-    : MscEntity(name, parent)
+    : MscInstanceEvent(name, parent)
 {
 }
 

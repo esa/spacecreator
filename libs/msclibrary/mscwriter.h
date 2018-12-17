@@ -24,7 +24,9 @@ namespace msc {
 
 class MscModel;
 class MscInstance;
+class MscInstanceEvent;
 class MscMessage;
+class MscTimer;
 class MscChart;
 class MscDocument;
 
@@ -39,8 +41,9 @@ public:
     void saveChart(const MscChart *chart, const QString &fileName);
 
 protected:
-    QString serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize = 0);
+    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &messages, int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
+    QString serialize(const MscTimer *timer, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 

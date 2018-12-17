@@ -15,15 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QFile>
-#include <QTextStream>
-
+#include "mscwriter.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "mscwriter.h"
+#include "msctimer.h"
+
+#include <QFile>
+#include <QTextStream>
 
 namespace msc {
 
@@ -73,7 +74,7 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessage *> &messages, int tabsSize)
+QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &messages, int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -90,8 +91,16 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessa
         header += ";\n";
 
     for (const auto &message : messages) {
-        if (message->sourceInstance() == instance || message->targetInstance() == instance)
-            events += serialize(message, instance, tabsSize + 1);
+        switch (message->entityType()) {
+        case MscEntity::EntityType::Message:
+            events += serialize(static_cast<MscMessage *>(message), instance, tabsSize + 1);
+            break;
+        case MscEntity::EntityType::Timer:
+            events += serialize(static_cast<MscTimer *>(message), tabsSize + 1);
+            break;
+        default:
+            break;
+        }
     }
 
     return header + events + footer;
@@ -99,8 +108,8 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscMessa
 
 QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
 {
-    if (message == nullptr)
-        return "";
+    if (message == nullptr || !(message->sourceInstance() == instance || message->targetInstance() == instance))
+        return QString();
 
     QString direction = tabs(tabsSize);
     QString name = message->name();
@@ -123,15 +132,40 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     return QString(direction).arg(name, instanceName);
 }
 
+QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
+{
+    if (timer == nullptr) {
+        return QString();
+    }
+
+    QString timerType;
+    switch (timer->timerType()) {
+    case MscTimer::TimerType::Start:
+        timerType = "starttimer";
+        break;
+    case MscTimer::TimerType::Stop:
+        timerType = "stoptimer";
+        break;
+    case MscTimer::TimerType::Timeout:
+        timerType = "timeout";
+        break;
+    default:
+        // Not good
+        return QString();
+    }
+
+    return tabs(tabsSize) + timerType + " " + timer->name() + ";\n";
+}
+
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 {
     if (chart == nullptr)
-        return "";
+        return QString();
 
     QString instances;
 
     for (const auto *instance : chart->instances())
-        instances += serialize(instance, chart->messages(), tabsSize + 1);
+        instances += serialize(instance, chart->instanceEvents(), tabsSize + 1);
 
     QString tabString = tabs(tabsSize);
     return QString("%1msc %2;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances);
@@ -140,7 +174,7 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 QString MscWriter::serialize(const MscDocument *document, int tabsSize)
 {
     if (document == nullptr)
-        return "";
+        return QString();
 
     QString instances;
 

@@ -27,6 +27,7 @@
 namespace msc {
 class MscDocument;
 class MscInstance;
+class MscInstanceEvent;
 class MscMessage;
 class MscGate;
 
@@ -35,8 +36,8 @@ class MscChart : public MscEntity
     Q_OBJECT
 public:
     explicit MscChart(QObject *parent = nullptr);
-    MscChart(const QString &name, QObject *parent = nullptr);
-    ~MscChart();
+    explicit MscChart(const QString &name, QObject *parent = nullptr);
+    ~MscChart() override;
 
     const QVector<MscInstance *> &instances() const;
     void addInstance(MscInstance *instance);
@@ -44,9 +45,9 @@ public:
 
     MscInstance *instanceByName(const QString &name) const;
 
-    const QVector<MscMessage *> &messages() const;
-    void addMessage(MscMessage *message);
-    void removeMessage(MscMessage *message);
+    const QVector<MscInstanceEvent *> &instanceEvents() const;
+    void addInstanceEvent(MscInstanceEvent *instanceEvent);
+    void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     MscMessage *messageByName(const QString &name) const;
 
     const QVector<MscGate *> &gates() const;
@@ -60,14 +61,14 @@ public:
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void instanceRemoved(MscInstance *instance);
-    void messageAdded(MscMessage *message);
-    void messageRemoved(MscMessage *message);
+    void instanceEventAdded(MscInstanceEvent *message);
+    void instanceEventRemoved(MscInstanceEvent *message);
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
 
 private:
     QVector<MscInstance *> m_instances;
-    QVector<MscMessage *> m_messages;
+    QVector<MscInstanceEvent *> m_instanceEvents;
     QVector<MscGate *> m_gates;
 };
 

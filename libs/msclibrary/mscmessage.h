@@ -18,7 +18,7 @@
 #ifndef MSCMESSAGE_H
 #define MSCMESSAGE_H
 
-#include "mscentity.h"
+#include "mscinstanceevent.h"
 
 #include <QObject>
 #include <QString>
@@ -26,7 +26,7 @@
 namespace msc {
 class MscInstance;
 
-class MscMessage : public MscEntity
+class MscMessage : public MscInstanceEvent
 {
     Q_OBJECT
 public:
@@ -37,7 +37,7 @@ public:
     };
 
     explicit MscMessage(QObject *parent = nullptr);
-    MscMessage(const QString &name, QObject *parent = nullptr);
+    explicit MscMessage(const QString &name, QObject *parent = nullptr);
 
     MscInstance *sourceInstance() const;
     void setSourceInstance(MscInstance *source);
@@ -60,6 +60,6 @@ private:
     Parameters m_parameters;
 };
 
-} // namespace msc
+}
 
 #endif // MSCMESSAGE_H
