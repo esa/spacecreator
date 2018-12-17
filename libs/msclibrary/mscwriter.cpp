@@ -17,6 +17,7 @@
 
 #include "mscwriter.h"
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -90,10 +91,24 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     } else
         header += ";\n";
 
+    auto addCondition = [&](const QString &messageName, int tabsSize) {
+        std::for_each(messages.begin(),
+                      messages.end(),
+                      [&](MscInstanceEvent *event) {
+                          auto *condition = static_cast<MscCondition *>(event);
+                          if (condition->instance() == instance && condition->messageName() == messageName)
+                              events += serialize(condition, tabsSize);
+                      });
+    };
+
+    // serialize conditions with empty messageName
+    addCondition("", tabsSize + 1);
+
     for (const auto &message : messages) {
         switch (message->entityType()) {
         case MscEntity::EntityType::Message:
             events += serialize(static_cast<MscMessage *>(message), instance, tabsSize + 1);
+            addCondition(message->name(), tabsSize + 1);
             break;
         case MscEntity::EntityType::Timer:
             events += serialize(static_cast<MscTimer *>(message), tabsSize + 1);
@@ -130,6 +145,14 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().pattern);
 
     return QString(direction).arg(name, instanceName);
+}
+
+QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
+{
+    if (condition == nullptr)
+        return "";
+
+    return QString("%1condition %2%3;\n").arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
 }
 
 QString MscWriter::serialize(const MscTimer *timer, int tabsSize)

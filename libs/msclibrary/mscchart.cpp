@@ -16,6 +16,7 @@
 */
 
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"

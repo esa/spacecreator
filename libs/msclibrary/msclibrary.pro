@@ -28,7 +28,8 @@ HEADERS += \
     mscparservisitor.h \
     msctimer.h \
     mscwriter.h \
-    mscinstanceevent.h
+    mscinstanceevent.h \
+    msccondition.h
 
 SOURCES += \
     parser/MscBaseVisitor.cpp \
@@ -49,7 +50,8 @@ SOURCES += \
     mscparservisitor.cpp \
     msctimer.cpp \
     mscwriter.cpp \
-    mscinstanceevent.cpp
+    mscinstanceevent.cpp \
+    msccondition.cpp
 
 RESOURCES += \
     mscresources.qrc

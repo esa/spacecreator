@@ -17,6 +17,7 @@
 
 #include <exceptions.h>
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
 #include <mscgate.h>
@@ -46,6 +47,8 @@ private Q_SLOTS:
     void testMessageByName();
     void testAddGate();
     void testRemoveGate();
+    void testAddCondition();
+    void testRemoveCondition();
 
 private:
     MscChart *m_chart = nullptr;
@@ -92,6 +95,11 @@ void tst_MscChart::testDestructor()
             chart->addGate(new MscGate());
             chartEntities.append(chart->gates().first());
             QCOMPARE(chart->gates().size(), 1);
+            break;
+        case MscEntity::EntityType::Condition:
+            chart->addInstanceEvent(new MscCondition());
+            chartEntities.append(chart->instanceEvents().first());
+            QCOMPARE(chart->instanceEvents().size(), 3);
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
@@ -230,6 +238,38 @@ void tst_MscChart::testRemoveGate()
     QCOMPARE(m_chart->gates().size(), 1);
     m_chart->removeGate(gateOne);
     QCOMPARE(m_chart->gates().size(), 1);
+}
+
+void tst_MscChart::testAddCondition()
+{
+    auto condition = new MscCondition("Condition_1", m_chart);
+
+    m_chart->addInstanceEvent(condition);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+
+    m_chart->addInstanceEvent(condition);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+
+    m_chart->addInstanceEvent(nullptr);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+}
+
+void tst_MscChart::testRemoveCondition()
+{
+    m_chart->addInstanceEvent(new MscCondition("Condition_1"));
+    m_chart->addInstanceEvent(new MscCondition("Condition_2"));
+
+    QCOMPARE(m_chart->instanceEvents().size(), 2);
+
+    m_chart->removeInstanceEvent(nullptr);
+    QCOMPARE(m_chart->instanceEvents().size(), 2);
+
+    auto condition = m_chart->instanceEvents().first();
+    m_chart->removeInstanceEvent(condition);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+
+    m_chart->removeInstanceEvent(condition);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

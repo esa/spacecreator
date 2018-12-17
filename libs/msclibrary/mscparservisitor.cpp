@@ -18,6 +18,7 @@
 #include "mscparservisitor.h"
 #include "mscmodel.h"
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -144,8 +145,10 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 
     m_currentChart = chart;
     // add all instances first, so messages can reference them
-    for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
-        addInstance(instanceDeclCtx->instance());
+    if (context->mscBody()) {
+        for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
+            addInstance(instanceDeclCtx->instance());
+        }
     }
 
     auto result = visitChildren(context);
@@ -172,6 +175,8 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
     }
 
     m_currentInstance = m_currentChart->instanceByName(name);
+    m_currentMessage = nullptr;
+
     auto result = visitChildren(context);
 
     resetMessages();
@@ -191,26 +196,37 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     if (context->NAME()) {
         name = QString::fromStdString(context->NAME()->getText());
     }
+
     if (context->messageIdentification()) {
         name = QString::fromStdString(context->messageIdentification()->NAME(0)->getText());
+
+        if (context->messageIdentification()->NAME(1))
+            parameters.name = QString::fromStdString(context->messageIdentification()->NAME(1)->getText());
+
+        auto *parameterList = context->messageIdentification()->parameterList();
+        if (parameterList && parameterList->paramaterDefn()) {
+            auto *paramaterDefn = parameterList->paramaterDefn();
+
+            if (paramaterDefn->expression())
+                parameters.expression = QString::fromStdString(paramaterDefn->expression()->getText());
+
+            if (paramaterDefn->pattern())
+                parameters.pattern = QString::fromStdString(paramaterDefn->pattern()->getText());
+        }
     }
-    if (context->messageIdentification()->NAME(1))
-        parameters.name = QString::fromStdString(context->messageIdentification()->NAME(1)->getText());
 
-    auto *parameterList = context->messageIdentification()->parameterList();
-    if (parameterList && parameterList->paramaterDefn()) {
-        auto *paramaterDefn = parameterList->paramaterDefn();
+    if (context->CONDITION()) {
+        auto *condition = new MscCondition(name);
+        condition->setShared(context->SHARED() && context->ALL());
+        condition->setInstance(m_currentInstance);
 
-        if (paramaterDefn->expression())
-            parameters.expression = QString::fromStdString(paramaterDefn->expression()->getText());
+        if (m_currentMessage)
+            condition->setMessageName(m_currentMessage->name());
 
-        if (paramaterDefn->pattern())
-            parameters.pattern = QString::fromStdString(paramaterDefn->pattern()->getText());
-    }
-
-    if (m_currentChart->messageByName(name) == nullptr) {
-        auto message = new MscMessage(name);
-        message->setParameters(parameters);
+        m_currentChart->addInstanceEvent(condition);
+    } else if (m_currentChart->messageByName(name) == nullptr) {
+        m_currentMessage = new MscMessage(name);
+        m_currentMessage->setParameters(parameters);
 
         if (context->IN()) {
             // is an input event
@@ -218,24 +234,27 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
                 MscParser::OutputAddressContext *outputAddress = context->outputAddress();
                 if (outputAddress->instanceName) {
                     const QString source = QString::fromStdString(outputAddress->instanceName->getText());
-                    message->setSourceInstance(m_currentChart->instanceByName(source));
+                    m_currentMessage->setSourceInstance(m_currentChart->instanceByName(source));
                 }
             }
-            message->setTargetInstance(m_currentInstance);
+            m_currentMessage->setTargetInstance(m_currentInstance);
         }
+
         if (context->OUT()) {
             // is an output event
             if (context->inputAddress()) {
                 MscParser::InputAddressContext *inputAddress = context->inputAddress();
                 if (inputAddress->instanceName) {
                     const QString target = QString::fromStdString(inputAddress->instanceName->getText());
-                    message->setTargetInstance(m_currentChart->instanceByName(target));
+                    m_currentMessage->setTargetInstance(m_currentChart->instanceByName(target));
                 }
-                message->setSourceInstance(m_currentInstance);
+                m_currentMessage->setSourceInstance(m_currentInstance);
             }
         }
-        m_messages.append(message);
+
+        m_messages.append(m_currentMessage);
     }
+
     return visitChildren(context);
 }
 

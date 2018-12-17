@@ -62,6 +62,7 @@ private:
     msc::MscDocument *m_currentDocument = nullptr;
     msc::MscChart *m_currentChart = nullptr;
     msc::MscInstance *m_currentInstance = nullptr;
+    msc::MscMessage *m_currentMessage = nullptr;
 
     Messages m_messages;
     MessagesList m_messagesList;

@@ -18,6 +18,7 @@
 #include <QtTest>
 
 #include "mscchart.h"
+#include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -37,6 +38,7 @@ private Q_SLOTS:
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
+    void testSerializeMscConditions();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
@@ -139,6 +141,31 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     QCOMPARE(serializeList.at(6), QString("endinstance;"));
 }
 
+void tst_MscWriter::testSerializeMscConditions()
+{
+    MscInstance instance("Inst_1");
+
+    MscMessage *message = new MscMessage("Msg_1");
+    message->setTargetInstance(&instance);
+
+    QVector<MscInstanceEvent *> messages;
+    messages.append(message);
+
+    MscCondition *condition = new MscCondition("Con_1");
+    condition->setInstance(&instance);
+
+    messages.append(condition);
+
+    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+
+    QVERIFY(serializeList.size() >= 4);
+
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   condition Con_1;"));
+    QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
+    QCOMPARE(serializeList.at(3), QString("endinstance;"));
+}
+
 void tst_MscWriter::testSerializeMscChart()
 {
     MscChart chart("Chart_1");
@@ -164,26 +191,39 @@ void tst_MscWriter::testSerializeMscChartInstance()
     chart.addInstanceEvent(message);
     chart.addInstanceEvent(message2);
 
+    MscCondition *condition = new MscCondition("Con_1");
+    condition->setShared(true);
+    condition->setInstance(instance);
+
+    MscCondition *condition2 = new MscCondition("Con_2");
+    condition2->setInstance(instance2);
+    condition2->setMessageName("Msg_1");
+
+    chart.addInstanceEvent(condition);
+    chart.addInstanceEvent(condition2);
+
     chart.addInstance(instance);
     chart.addInstance(instance2);
 
     QStringList serializeList = this->serialize(&chart).split("\n");
 
-    QVERIFY(serializeList.size() >= 10);
+    QVERIFY(serializeList.size() >= 12);
 
     QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
 
     QCOMPARE(serializeList.at(1), QString("   instance Inst_1;"));
-    QCOMPARE(serializeList.at(2), QString("      in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(3), QString("      out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(4), QString("   endinstance;"));
+    QCOMPARE(serializeList.at(2), QString("      condition Con_1 shared all;"));
+    QCOMPARE(serializeList.at(3), QString("      in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(4), QString("      out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(5), QString("   endinstance;"));
 
-    QCOMPARE(serializeList.at(5), QString("   instance Inst_2;"));
-    QCOMPARE(serializeList.at(6), QString("      out Msg_1 to Inst_1;"));
-    QCOMPARE(serializeList.at(7), QString("      in Msg_2 from Inst_1;"));
-    QCOMPARE(serializeList.at(8), QString("   endinstance;"));
+    QCOMPARE(serializeList.at(6), QString("   instance Inst_2;"));
+    QCOMPARE(serializeList.at(7), QString("      out Msg_1 to Inst_1;"));
+    QCOMPARE(serializeList.at(8), QString("      condition Con_2;"));
+    QCOMPARE(serializeList.at(9), QString("      in Msg_2 from Inst_1;"));
+    QCOMPARE(serializeList.at(10), QString("   endinstance;"));
 
-    QCOMPARE(serializeList.at(9), QString("endmsc;"));
+    QCOMPARE(serializeList.at(11), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeMscDocument()

@@ -25,6 +25,8 @@
 #include <QVector>
 
 namespace msc {
+
+class MscCondition;
 class MscDocument;
 class MscInstance;
 class MscInstanceEvent;
