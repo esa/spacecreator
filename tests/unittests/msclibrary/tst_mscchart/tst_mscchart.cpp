@@ -58,11 +58,6 @@ void tst_MscChart::init()
 
 void tst_MscChart::cleanup()
 {
-    if (m_chart) {
-        while (!m_chart->instanceEvents().isEmpty())
-            m_chart->removeInstanceEvent(m_chart->instanceEvents().first());
-    }
-
     delete m_chart;
     m_chart = nullptr;
 }
