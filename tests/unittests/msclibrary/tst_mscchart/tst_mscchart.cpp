@@ -237,8 +237,8 @@ void tst_MscChart::testAddGate()
 
 void tst_MscChart::testRemoveGate()
 {
-    m_chart->addGate(new MscGate("A"));
-    m_chart->addGate(new MscGate("B"));
+    m_chart->addGate(new MscGate("A", m_chart));
+    m_chart->addGate(new MscGate("B", m_chart));
     QCOMPARE(m_chart->gates().size(), 2);
     m_chart->removeGate(nullptr);
     QCOMPARE(m_chart->gates().size(), 2);
@@ -265,8 +265,8 @@ void tst_MscChart::testAddCondition()
 
 void tst_MscChart::testRemoveCondition()
 {
-    m_chart->addInstanceEvent(new MscCondition("Condition_1"));
-    m_chart->addInstanceEvent(new MscCondition("Condition_2"));
+    m_chart->addInstanceEvent(new MscCondition("Condition_1", m_chart));
+    m_chart->addInstanceEvent(new MscCondition("Condition_2", m_chart));
 
     QCOMPARE(m_chart->instanceEvents().size(), 2);
 

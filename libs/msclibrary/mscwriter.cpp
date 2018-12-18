@@ -101,8 +101,8 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         std::for_each(instanceEvents.begin(),
                       instanceEvents.end(),
                       [&](MscInstanceEvent *event) {
-                          auto *condition = static_cast<MscCondition *>(event);
-                          if (condition->instance() == instance && condition->messageName() == messageName)
+                          auto *condition = dynamic_cast<MscCondition *>(event);
+                          if (condition && condition->instance() == instance && condition->messageName() == messageName)
                               events += serialize(condition, tabsSize);
                       });
     };

@@ -394,6 +394,8 @@ void tst_MscFile::testAction()
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Formal);
     QCOMPARE(action->dataStatements().size(), 2);
+
+    delete model;
 }
 
 void tst_MscFile::testSortedMessage()
