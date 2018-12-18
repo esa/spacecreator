@@ -16,6 +16,7 @@
 */
 
 #include "mscparservisitor.h"
+#include "mscaction.h"
 #include "mscmodel.h"
 #include "mscchart.h"
 #include "msccondition.h"
@@ -303,6 +304,57 @@ antlrcpp::Any MscParserVisitor::visitGateDeclaration(MscParser::GateDeclarationC
     gate->setDirection(direction);
 
     m_currentChart->addGate(gate.take());
+    return visitChildren(context);
+}
+
+void appendDataStatement(MscAction *action, MscParser::DataStatementListContext *statementList)
+{
+    if (statementList == nullptr) {
+        return;
+    }
+    MscParser::DataStatementContext *statementCtx = statementList->dataStatement();
+    if (statementCtx == nullptr) {
+        return;
+    }
+
+    MscAction::DataStatement statement;
+    if (statementCtx->defineStatement()) {
+        statement.m_type = MscAction::DataStatement::StatementType::Define;
+        statement.m_variableString = ::treeNodeToString(statementCtx->defineStatement()->variableString()->STRING());
+        action->addDataStatement(statement);
+    }
+    if (statementCtx->undefineStatement()) {
+        statement.m_type = MscAction::DataStatement::StatementType::UnDefine;
+        statement.m_variableString = ::treeNodeToString(statementCtx->undefineStatement()->variableString()->STRING());
+        action->addDataStatement(statement);
+    }
+    if (statementCtx->binding()) {
+        qWarning() << "Formal binding action types is not suported";
+    }
+
+    appendDataStatement(action, statementList->dataStatementList());
+}
+
+antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    auto action = new MscAction;
+    if (context->informalAction()) {
+        action->setActionType(MscAction::ActionType::Informal);
+        QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
+        // remove the isngle quotes
+        informalAction = informalAction.mid(1, informalAction.size() - 2);
+        action->setInformalAction(informalAction);
+    } else {
+        action->setActionType(MscAction::ActionType::Formal);
+        appendDataStatement(action, context->dataStatementList());
+    }
+
+    m_instanceEvents.append(action);
+
     return visitChildren(context);
 }
 

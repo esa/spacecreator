@@ -23,7 +23,9 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
+#include "mscaction.h"
 
+#include <QDebug>
 #include <QFile>
 #include <QTextStream>
 
@@ -113,6 +115,9 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         case MscEntity::EntityType::Timer:
             events += serialize(static_cast<MscTimer *>(message), tabsSize + 1);
             break;
+        case MscEntity::EntityType::Action:
+            events += serialize(static_cast<MscAction *>(message), tabsSize + 1);
+            break;
         default:
             break;
         }
@@ -178,6 +183,39 @@ QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
     }
 
     return tabs(tabsSize) + timerType + " " + timer->name() + ";\n";
+}
+
+QString MscWriter::serialize(const MscAction *action, int tabsSize)
+{
+    if (action == nullptr) {
+        return QString();
+    }
+
+    if (action->actionType() == MscAction::ActionType::Informal) {
+        return tabs(tabsSize) + "action '" + action->informalAction() + "';\n";
+    } else {
+        QString actionText = tabs(tabsSize) + "action ";
+        bool first = true;
+        for (const auto &statement : action->dataStatements()) {
+            if (!first) {
+                actionText += ", ";
+            }
+            switch (statement.m_type) {
+            case MscAction::DataStatement::StatementType::Define:
+                actionText += "define " + statement.m_variableString;
+                break;
+            case MscAction::DataStatement::StatementType::UnDefine:
+                actionText += "undefine " + statement.m_variableString;
+                break;
+            case MscAction::DataStatement::StatementType::Binding:
+                qWarning() << "Writing of formal binding actions is not yet supported";
+                continue;
+            }
+            first = false;
+        }
+        actionText += ";\n";
+        return actionText;
+    }
 }
 
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)

@@ -16,6 +16,7 @@
 */
 
 #include <exceptions.h>
+#include <mscaction.h>
 #include <mscchart.h>
 #include <msccondition.h>
 #include <mscinstance.h>
@@ -79,27 +80,26 @@ void tst_MscChart::testDestructor()
         case MscEntity::EntityType::Instance:
             chart->addInstance(new MscInstance());
             chartEntities.append(chart->instances().first());
-            QCOMPARE(chart->instances().size(), 1);
             break;
         case MscEntity::EntityType::Message:
             chart->addInstanceEvent(new MscMessage());
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 1);
             break;
         case MscEntity::EntityType::Timer:
             chart->addInstanceEvent(new MscTimer);
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 2);
             break;
         case MscEntity::EntityType::Gate:
             chart->addGate(new MscGate());
             chartEntities.append(chart->gates().first());
-            QCOMPARE(chart->gates().size(), 1);
             break;
         case MscEntity::EntityType::Condition:
             chart->addInstanceEvent(new MscCondition());
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 3);
+            break;
+        case MscEntity::EntityType::Action:
+            chart->addInstanceEvent(new MscAction);
+            chartEntities.append(chart->instanceEvents().first());
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
@@ -108,6 +108,10 @@ void tst_MscChart::testDestructor()
             break;
         }
     }
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 4);
+    QCOMPARE(chart->gates().size(), 1);
 
     delete chart;
 

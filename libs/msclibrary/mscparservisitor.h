@@ -48,6 +48,7 @@ public:
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
     antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
+    antlrcpp::Any visitActionStatement(MscParser::ActionStatementContext *context) override;
 
 private:
     void addInstance(MscParser::InstanceContext *context);
