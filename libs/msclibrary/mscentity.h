@@ -34,7 +34,8 @@ public:
         Message,
         Timer,
         Gate,
-        Condition
+        Condition,
+        Coregion
     };
     Q_ENUM(EntityType)
 
