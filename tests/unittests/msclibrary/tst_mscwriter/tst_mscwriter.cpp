@@ -122,19 +122,19 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
 {
     MscInstance instance("Inst_1");
 
-    MscMessage *message = new MscMessage("Msg_1");
+    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
     MscInstance instance2("Inst_2");
 
     message->setSourceInstance(&instance2);
     message->setTargetInstance(&instance);
 
-    MscMessage *message2 = new MscMessage("Msg_2");
+    QScopedPointer<MscMessage> message2(new MscMessage("Msg_2"));
     message2->setSourceInstance(&instance);
     message2->setTargetInstance(&instance2);
 
     QVector<MscInstanceEvent *> messages;
-    messages.append(message);
-    messages.append(message2);
+    messages.append(message.data());
+    messages.append(message2.data());
 
     QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 4);
@@ -163,16 +163,16 @@ void tst_MscWriter::testSerializeMscConditions()
 {
     MscInstance instance("Inst_1");
 
-    MscMessage *message = new MscMessage("Msg_1");
+    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
     message->setTargetInstance(&instance);
 
     QVector<MscInstanceEvent *> messages;
-    messages.append(message);
+    messages.append(message.data());
 
-    MscCondition *condition = new MscCondition("Con_1");
+    QScopedPointer<MscCondition> condition(new MscCondition("Con_1"));
     condition->setInstance(&instance);
 
-    messages.append(condition);
+    messages.append(condition.data());
 
     QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
 
@@ -188,12 +188,12 @@ void tst_MscWriter::testSerializeMscActionsInformal()
 {
     MscInstance instance("Inst_1");
 
-    auto action = new MscAction();
+    QScopedPointer<MscAction> action(new MscAction());
     action->setActionType(MscAction::ActionType::Informal);
     action->setInformalAction("informal_stop");
 
     QVector<MscInstanceEvent *> events;
-    events.append(action);
+    events.append(action.data());
 
     QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 3);
@@ -206,7 +206,7 @@ void tst_MscWriter::testSerializeMscActionsFormal()
 {
     MscInstance instance("Inst_1");
 
-    auto action = new MscAction();
+    QScopedPointer<MscAction> action(new MscAction());
     action->setActionType(MscAction::ActionType::Formal);
     MscAction::DataStatement statement;
     statement.m_type = MscAction::DataStatement::StatementType::Define;
@@ -218,7 +218,7 @@ void tst_MscWriter::testSerializeMscActionsFormal()
     action->addDataStatement(statement);
 
     QVector<MscInstanceEvent *> events;
-    events.append(action);
+    events.append(action.data());
 
     QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 3);

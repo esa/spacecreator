@@ -42,6 +42,7 @@ class tst_CmdMessageItemCreate : public QObject
 
 private Q_SLOTS:
     void initTestCase();
+    void cleanupTestCase();
 
     void testCreate();
     void testUndo();
@@ -52,6 +53,7 @@ private:
     ChartViewModel m_chartModel;
     static constexpr int CommandsCount = 10;
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
+    msc::MscChart *m_chart = nullptr;
 
     int sceneItemsCount();
 };
@@ -62,9 +64,15 @@ constexpr bool tst_CmdMessageItemCreate::SkipBenchmark;
 
 void tst_CmdMessageItemCreate::initTestCase()
 {
-    m_chartModel.fillView(new msc::MscChart());
+    m_chart = new msc::MscChart();
+    m_chartModel.fillView(m_chart);
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
+}
+
+void tst_CmdMessageItemCreate::cleanupTestCase()
+{
+    delete m_chart;
 }
 
 void tst_CmdMessageItemCreate::testCreate()

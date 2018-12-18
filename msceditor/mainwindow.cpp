@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi();
 
     // TODO: just for test Asn1Editor
-    QAction *actionAsn1Editor = new QAction("ASN.1 Editor");
+    QAction *actionAsn1Editor = new QAction("ASN.1 Editor", d->ui->mainToolBar);
     d->ui->mainToolBar->addAction(actionAsn1Editor);
     connect(actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 
