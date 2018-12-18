@@ -105,7 +105,6 @@ void tst_MscChart::testDestructor()
         case MscEntity::EntityType::Coregion:
             chart->addInstanceEvent(new MscCoregion());
             chartEntities.append(chart->instanceEvents().first());
-            QCOMPARE(chart->instanceEvents().size(), 4);
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
@@ -116,7 +115,7 @@ void tst_MscChart::testDestructor()
     }
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 4);
+    QCOMPARE(chart->instanceEvents().size(), 5);
     QCOMPARE(chart->gates().size(), 1);
 
     delete chart;
