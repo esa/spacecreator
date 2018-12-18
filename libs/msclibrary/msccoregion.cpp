@@ -15,17 +15,17 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "msctimer.h"
+#include "msccoregion.h"
 
 namespace msc {
 
-MscTimer::MscTimer(QObject *parent)
-    : MscInstanceEvent(parent)
+MscCoregion::MscCoregion(QObject *parent)
+    : MscInstanceEvent(parent), m_type(Type::Begin)
 {
 }
 
-MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
-    : MscInstanceEvent(name, parent), m_timerType(type)
+MscCoregion::MscCoregion(Type type, QObject *parent)
+    : MscInstanceEvent(parent), m_type(type)
 {
 }
 

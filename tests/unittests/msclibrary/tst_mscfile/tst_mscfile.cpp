@@ -24,6 +24,7 @@
 #include <mscmessage.h>
 #include <mscmodel.h>
 #include <msctimer.h>
+#include <msccoregion.h>
 
 #include <QtTest>
 #include <mscaction.h>
@@ -51,6 +52,7 @@ private Q_SLOTS:
     void testMessageWithParameters();
     void testGateMessage();
     void testCondition();
+    void testCoregion();
     void testTimer();
     void testAction();
     void testSortedMessage();
@@ -289,6 +291,42 @@ void tst_MscFile::testCondition()
     QCOMPARE(condition->name(), QString("Con_2"));
     QVERIFY(condition->messageName().isEmpty());
     QCOMPARE(condition->shared(), false);
+
+    delete model;
+}
+
+void tst_MscFile::testCoregion()
+{
+    QString msc = "msc connection; \
+                      instance Initiator; \
+                          concurrent; \
+                          starttimer T1; \
+                          in ICONreq from env; \
+                          endconcurrent; \
+                      endinstance; \
+                  endmsc;";
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 4);
+
+    auto event = chart->instanceEvents().at(0);
+    QCOMPARE(event->entityType(), MscEntity::EntityType::Coregion);
+    auto coregion = static_cast<MscCoregion *>(event);
+    QCOMPARE(coregion->type(), MscCoregion::Type::Begin);
+
+    event = chart->instanceEvents().at(1);
+    QCOMPARE(event->entityType(), MscEntity::EntityType::Timer);
+    event = chart->instanceEvents().at(2);
+    QCOMPARE(event->entityType(), MscEntity::EntityType::Message);
+
+    event = chart->instanceEvents().at(3);
+    QCOMPARE(event->entityType(), MscEntity::EntityType::Coregion);
+    coregion = static_cast<MscCoregion *>(event);
+    QCOMPARE(coregion->type(), MscCoregion::Type::End);
 
     delete model;
 }

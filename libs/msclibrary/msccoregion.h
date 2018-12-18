@@ -15,49 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef MSCCOREGION_H
+#define MSCCOREGION_H
 
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "mscinstanceevent.h"
 
 namespace msc {
 
-class MscEntity : public QObject
+class MscCoregion : public MscInstanceEvent
 {
     Q_OBJECT
+
 public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Timer,
-        Gate,
-        Condition,
-        Action,
-        Coregion
-    };
-    Q_ENUM(EntityType)
+    enum class Type { Begin,
+                      End };
 
-    explicit MscEntity(QObject *parent = nullptr);
-    explicit MscEntity(const QString &name, QObject *parent = nullptr);
+    explicit MscCoregion(QObject *parent = nullptr);
+    explicit MscCoregion(Type type, QObject *parent = nullptr);
 
-    const QString &name() const;
-    void setName(const QString &name);
+    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Coregion; }
 
-    QUuid internalId() const;
-
-    static const QString DefaultName;
-
-    virtual MscEntity::EntityType entityType() const = 0;
-
-Q_SIGNALS:
-    void nameChanged(const QString &name);
+    void setType(Type type) { m_type = type; }
+    Type type() const { return m_type; }
 
 private:
-    QString m_name = MscEntity::DefaultName;
-    const QUuid m_id;
+    Type m_type;
 };
 
-} // namespace msc
+}
+
+#endif // MSCCOREGION_H
