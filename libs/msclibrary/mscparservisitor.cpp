@@ -153,7 +153,7 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 
     auto result = visitChildren(context);
 
-    orderMessages();
+    orderInstanceEvents();
 
     m_currentChart = nullptr;
     return result;
@@ -179,7 +179,7 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
 
     auto result = visitChildren(context);
 
-    resetMessages();
+    resetInstanceEvents();
 
     return result;
 }
@@ -252,7 +252,7 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
             }
         }
 
-        m_messages.append(m_currentMessage);
+        m_instanceEvents.append(m_currentMessage);
     }
 
     return visitChildren(context);
@@ -329,6 +329,8 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
     }
 
+    m_instanceEvents << timer.take();
+
     return visitChildren(context);
 }
 
@@ -356,36 +358,52 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
     m_currentChart->addInstance(instance);
 }
 
-void MscParserVisitor::resetMessages()
+void MscParserVisitor::resetInstanceEvents()
 {
-    if (!m_messages.isEmpty()) {
-        m_messagesList.append(m_messages);
-        m_messages.clear();
+    if (!m_instanceEvents.isEmpty()) {
+        m_instanceEventsList.append(m_instanceEvents);
+        m_instanceEvents.clear();
     }
 }
 
-void MscParserVisitor::orderMessages()
+void MscParserVisitor::orderInstanceEvents()
 {
     bool found;
 
-    while (m_messagesList.size()) {
+    while (!m_instanceEventsList.isEmpty()) {
         found = false;
 
-        for (int i = 0; i < m_messagesList.size(); ++i) {
+        for (int i = 0; i < m_instanceEventsList.size(); ++i) {
+            // First, go through all the stacks and take away non-messages. This has to be done for every loop
+            for (int j = 0; j < m_instanceEventsList.size(); ++j) {
+                while (!m_instanceEventsList.at(j).isEmpty()
+                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message) {
+                    // This is not a message, move it to the chart
+                    m_currentChart->addInstanceEvent(m_instanceEventsList[j].takeFirst());
+                }
+            }
+
+            if (m_instanceEventsList.at(i).isEmpty()) {
+                continue;
+            }
+
             bool inOther = false;
 
             // annotate the first element of the list
-            auto firstMessage = m_messagesList[i][0];
+            auto firstMessage = m_instanceEventsList[i][0];
+
+            auto checkMessage = [&](MscInstanceEvent *event) {
+                if (event->entityType() != MscEntity::EntityType::Message) {
+                    return false;
+                }
+                return static_cast<MscMessage *>(event)->name() == firstMessage->name();
+            };
 
             // look first elements of others list
-            for (int j = i + 1; j < m_messagesList.size(); ++j) {
-                if (std::count_if(m_messagesList[j].begin(), m_messagesList[j].end(), [&](MscMessage *m) { return m->name() == firstMessage->name(); })) {
-                    if (m_messagesList[j][0]->name() == firstMessage->name()) {
-                        delete m_messagesList[j].takeFirst();
-
-                        if (m_messagesList[j].size() == 0) {
-                            m_messagesList.remove(j);
-                        }
+            for (int j = i + 1; j < m_instanceEventsList.size(); ++j) {
+                if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkMessage)) {
+                    if (m_instanceEventsList[j][0]->name() == firstMessage->name()) {
+                        delete m_instanceEventsList[j].takeFirst();
 
                         found = true;
                         break;
@@ -396,21 +414,24 @@ void MscParserVisitor::orderMessages()
             }
 
             if (found || !inOther) {
-                m_messagesList[i].removeFirst();
+                m_instanceEventsList[i].removeFirst();
                 m_currentChart->addInstanceEvent(firstMessage);
-
-                if (m_messagesList[i].size() == 0) {
-                    m_messagesList.remove(i);
-                }
 
                 break;
             }
 
             if (found && inOther) {
-                delete m_messagesList[i].takeFirst();
+                delete m_instanceEventsList[i].takeFirst();
+            }
+        }
+
+        // Remove all empty stacks
+        for (int i = m_instanceEventsList.size() - 1; i >= 0; --i) {
+            if (m_instanceEventsList[i].isEmpty()) {
+                m_instanceEventsList.remove(i);
             }
         }
     }
 
-    m_messagesList.clear();
+    m_instanceEventsList.clear();
 }
