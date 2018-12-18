@@ -35,7 +35,8 @@ public:
         Timer,
         Gate,
         Condition,
-        Action
+        Action,
+        Coregion
     };
     Q_ENUM(EntityType)
 

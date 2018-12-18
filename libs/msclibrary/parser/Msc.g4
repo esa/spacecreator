@@ -85,8 +85,14 @@ instanceKind
     : NAME (NAME)*
     ;
 
+// This does not prevet recursive coregion statements
 instanceEvent
     : (mscEvent | timerStatement | action) SEMI
+    | coregion
+    ;
+
+coregion
+    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
     ;
 
 // 4.3 Message

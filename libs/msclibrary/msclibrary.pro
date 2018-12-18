@@ -16,21 +16,22 @@ HEADERS += \
     parser/MscVisitor.h \
     documentitemmodel.h \
     exceptions.h \
+    mscaction.h \
     mscchart.h \
     mscdocument.h \
     mscentity.h \
     mscerrorlistener.h \
+    msccondition.h \
+    msccoregion.h \
     mscfile.h \
     mscgate.h \
-    mscmodel.h \
     mscinstance.h \
+    mscinstanceevent.h \
+    mscmodel.h \
     mscmessage.h \
     mscparservisitor.h \
     msctimer.h \
-    mscwriter.h \
-    mscinstanceevent.h \
-    msccondition.h \
-    mscaction.h
+    mscwriter.h
 
 SOURCES += \
     parser/MscBaseVisitor.cpp \
@@ -39,21 +40,22 @@ SOURCES += \
     parser/MscVisitor.cpp \
     documentitemmodel.cpp \
     exceptions.cpp \
+    mscaction.cpp \
     mscchart.cpp \
     mscdocument.cpp \
     mscentity.cpp \
     mscerrorlistener.cpp \
+    msccondition.cpp \
+    msccoregion.cpp \
     mscfile.cpp \
     mscgate.cpp \
     mscinstance.cpp \
+    mscinstanceevent.cpp \
     mscmessage.cpp \
     mscmodel.cpp \
     mscparservisitor.cpp \
     msctimer.cpp \
-    mscwriter.cpp \
-    mscinstanceevent.cpp \
-    msccondition.cpp \
-    mscaction.cpp
+    mscwriter.cpp
 
 RESOURCES += \
     mscresources.qrc

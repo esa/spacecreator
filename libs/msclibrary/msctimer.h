@@ -33,7 +33,7 @@ public:
                            Unknown };
 
     explicit MscTimer(QObject *parent = nullptr);
-    explicit MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);
+    MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);
 
     MscEntity::EntityType entityType() const { return MscEntity::EntityType::Timer; }
 

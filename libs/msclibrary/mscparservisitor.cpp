@@ -25,12 +25,14 @@
 #include "mscmessage.h"
 #include "mscgate.h"
 #include "msctimer.h"
+#include "msccoregion.h"
 
 #include <QDebug>
 
 #include <string>
 
-static QString treeNodeToString(antlr4::tree::TerminalNode *node)
+template<typename T>
+static QString treeNodeToString(T *node)
 {
     if (node != nullptr) {
         return QString::fromStdString(node->getText());
@@ -133,15 +135,11 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    auto chart = new MscChart();
+    auto chart = new MscChart(::treeNodeToString(context->NAME()));
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
         m_currentDocument->addChart(chart);
-    }
-    if (context->NAME()) {
-        const std::string mscName = context->NAME()->getText();
-        chart->setName(QString::fromStdString(mscName));
     }
 
     m_currentChart = chart;
@@ -166,11 +164,7 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
         return visitChildren(context);
     }
 
-    if (!context->NAME()) {
-        return visitChildren(context);
-    }
-
-    const QString name = QString::fromStdString(context->NAME()->getText());
+    const QString name = ::treeNodeToString(context->NAME());
     if (name.isEmpty()) {
         return visitChildren(context);
     }
@@ -185,34 +179,38 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
     return result;
 }
 
+antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    // TODO: Add these to the stack
+    //new MscCoregion(MscCoregion::Type::Begin);
+    auto rc = visitChildren(context);
+    //new MscCoregion(MscCoregion::Type::End);
+
+    return rc;
+}
+
 antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
 {
     if (!m_currentChart) {
         return visitChildren(context);
     }
 
-    QString name;
     MscMessage::Parameters parameters;
-
-    if (context->NAME()) {
-        name = QString::fromStdString(context->NAME()->getText());
-    }
+    QString name = ::treeNodeToString(context->NAME());
 
     if (context->messageIdentification()) {
-        name = QString::fromStdString(context->messageIdentification()->NAME(0)->getText());
-
-        if (context->messageIdentification()->NAME(1))
-            parameters.name = QString::fromStdString(context->messageIdentification()->NAME(1)->getText());
+        name = ::treeNodeToString(context->messageIdentification()->NAME(0));
+        parameters.name = ::treeNodeToString(context->messageIdentification()->NAME(1));
 
         auto *parameterList = context->messageIdentification()->parameterList();
         if (parameterList && parameterList->paramaterDefn()) {
             auto *paramaterDefn = parameterList->paramaterDefn();
-
-            if (paramaterDefn->expression())
-                parameters.expression = QString::fromStdString(paramaterDefn->expression()->getText());
-
-            if (paramaterDefn->pattern())
-                parameters.pattern = QString::fromStdString(paramaterDefn->pattern()->getText());
+            parameters.expression = ::treeNodeToString(paramaterDefn->expression());
+            parameters.pattern = ::treeNodeToString(paramaterDefn->pattern());
         }
     }
 
@@ -393,14 +391,14 @@ void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
         return;
     }
 
-    const QString name = QString::fromStdString(context->NAME()->getText());
+    const QString name = ::treeNodeToString(context->NAME());
 
     MscInstance *instance = m_currentChart->instanceByName(name);
     if (!instance) {
         instance = new MscInstance(name);
     }
     if (context->instanceKind() != nullptr) {
-        QString kind = QString::fromStdString(context->instanceKind()->NAME(0)->getText());
+        QString kind = ::treeNodeToString(context->instanceKind()->NAME(0));
         instance->setKind(kind);
 
         if (context->instanceKind()->NAME(1) != nullptr) {
