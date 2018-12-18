@@ -23,6 +23,7 @@
 #include <mscinstance.h>
 #include <mscmessage.h>
 #include <mscmodel.h>
+#include <msctimer.h>
 
 #include <QtTest>
 
@@ -48,10 +49,12 @@ private Q_SLOTS:
     void testSameMessageInTwoInstances();
     void testMessageWithParameters();
     void testGateMessage();
+    void testCondition();
+    void testTimer();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
+    void testSortedInstanceEvents();
     void testHierarchy();
-    void testCondition();
 
 private:
     MscFile *file = nullptr;
@@ -201,10 +204,10 @@ void tst_MscFile::testMessage()
 
 void tst_MscFile::testSameMessageInTwoInstances()
 {
-    QString msc = { "MSC msc1; \
-                    INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
-                    INSTANCE Responder;out ICON to Initiator;ENDINSTANCE; \
-                    ENDMSC;" };
+    QString msc = "MSC msc1; \
+                  INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
+                  INSTANCE Responder;out ICON to Initiator;ENDINSTANCE; \
+                  ENDMSC;";
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -215,12 +218,12 @@ void tst_MscFile::testSameMessageInTwoInstances()
 
 void tst_MscFile::testMessageWithParameters()
 {
-    QString msc = { "MSC msc1; \
-                     INSTANCE Initiator; \
-                        in gui_send_tm,a(longitude:-174.0) from env; \
-                        out gui_int_send_tm(12) to env; \
-                     ENDINSTANCE; \
-                     ENDMSC;" };
+    QString msc = "MSC msc1; \
+                   INSTANCE Initiator; \
+                      in gui_send_tm,a(longitude:-174.0) from env; \
+                      out gui_int_send_tm(12) to env; \
+                   ENDINSTANCE; \
+                   ENDMSC;";
 
     MscModel *model = file->parseText(msc);
 
@@ -246,11 +249,11 @@ void tst_MscFile::testMessageWithParameters()
 
 void tst_MscFile::testGateMessage()
 {
-    QString msc = { "MSC msc1; \
-                     gate out Msg_4 to Inst_1; \
-                     INSTANCE Inst_1;in Msg_4 from env;out Msg_3 to Inst_2;ENDINSTANCE; \
-                     INSTANCE Inst_2;in Msg_3 from Inst_1;ENDINSTANCE; \
-                     ENDMSC;" };
+    QString msc = "MSC msc1; \
+                   gate out Msg_4 to Inst_1; \
+                   INSTANCE Inst_1;in Msg_4 from env;out Msg_3 to Inst_2;ENDINSTANCE; \
+                   INSTANCE Inst_2;in Msg_3 from Inst_1;ENDINSTANCE; \
+                   ENDMSC;";
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -259,22 +262,89 @@ void tst_MscFile::testGateMessage()
     delete model;
 }
 
+void tst_MscFile::testCondition()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         condition Con_1 shared all; \
+                         condition Con_2; \
+                       ENDINSTANCE; \
+                   ENDMSC;";
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+
+    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
+    QCOMPARE(condition->name(), QString("Con_1"));
+    QVERIFY(condition->messageName().isEmpty());
+    QCOMPARE(condition->shared(), true);
+
+    condition = static_cast<MscCondition *>(chart->instanceEvents().at(1));
+    QCOMPARE(condition->name(), QString("Con_2"));
+    QVERIFY(condition->messageName().isEmpty());
+    QCOMPARE(condition->shared(), false);
+
+    delete model;
+}
+
+void tst_MscFile::testTimer()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         starttimer T1; \
+                         stoptimer T2; \
+                         timeout T3; \
+                       ENDINSTANCE; \
+                   ENDMSC;";
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 3);
+
+    auto event = chart->instanceEvents().at(0);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    auto timer = static_cast<MscTimer *>(event);
+    QCOMPARE(timer->name(), QString("T1"));
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
+
+    event = chart->instanceEvents().at(1);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    timer = static_cast<MscTimer *>(event);
+    QCOMPARE(timer->name(), QString("T2"));
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Stop);
+
+    event = chart->instanceEvents().at(2);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    timer = static_cast<MscTimer *>(event);
+    QCOMPARE(timer->name(), QString("T3"));
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
+
+    delete model;
+}
+
 void tst_MscFile::testSortedMessage()
 {
-    QString msc = { "msc connection; \
-                        instance Initiator; \
-                            in ICONreq from env; \
-                            out ICON to Responder; \
-                            in ICONF from Responder; \
-                            out ICONconf to env; \
-                        endinstance; \
-                        instance Responder; \
-                            in ICON from Initiator; \
-                            out ICONind to env; \
-                            in ICONresp from env; \
-                            out ICONF to Initiator; \
-                        endinstance; \
-                    endmsc;" };
+    QString msc = "msc connection; \
+                      instance Initiator; \
+                          in ICONreq from env; \
+                          out ICON to Responder; \
+                          in ICONF from Responder; \
+                          out ICONconf to env; \
+                      endinstance; \
+                      instance Responder; \
+                          in ICON from Initiator; \
+                          out ICONind to env; \
+                          in ICONresp from env; \
+                          out ICONF to Initiator; \
+                      endinstance; \
+                  endmsc;";
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
@@ -327,36 +397,36 @@ void tst_MscFile::testSortedMessage()
 
 void tst_MscFile::testSortedMessageTwoCharts()
 {
-    QString msc = { "mscdocument doc1; \
-                        msc connection1; \
-                            instance Initiator1; \
-                                in ICONreq1 from env; \
-                                out ICON1 to Responder1; \
-                                in ICONF1 from Responder1; \
-                                out ICONconf1 to env; \
-                            endinstance; \
-                            instance Responder1; \
-                                in ICON1 from Initiator1; \
-                                out ICONind1 to env; \
-                                in ICONresp1 from env; \
-                                out ICONF1 to Initiator1; \
-                            endinstance; \
-                        endmsc; \
-                        msc connection2; \
-                            instance Initiator2; \
-                                in ICONreq2 from env; \
-                                out ICON2 to Responder2; \
-                                in ICONF2 from Responder2; \
-                                out ICONconf2 to env; \
-                            endinstance; \
-                            instance Responder2; \
-                                in ICON2 from Initiator2; \
-                                out ICONind2 to env; \
-                                in ICONresp2 from env; \
-                                out ICONF2 to Initiator2; \
-                            endinstance; \
-                        endmsc; \
-                    endmscdocument;" };
+    QString msc = "mscdocument doc1; \
+                      msc connection1; \
+                          instance Initiator1; \
+                              in ICONreq1 from env; \
+                              out ICON1 to Responder1; \
+                              in ICONF1 from Responder1; \
+                              out ICONconf1 to env; \
+                          endinstance; \
+                          instance Responder1; \
+                              in ICON1 from Initiator1; \
+                              out ICONind1 to env; \
+                              in ICONresp1 from env; \
+                              out ICONF1 to Initiator1; \
+                          endinstance; \
+                      endmsc; \
+                      msc connection2; \
+                          instance Initiator2; \
+                              in ICONreq2 from env; \
+                              out ICON2 to Responder2; \
+                              in ICONF2 from Responder2; \
+                              out ICONconf2 to env; \
+                          endinstance; \
+                          instance Responder2; \
+                              in ICON2 from Initiator2; \
+                              out ICONind2 to env; \
+                              in ICONresp2 from env; \
+                              out ICONF2 to Initiator2; \
+                          endinstance; \
+                      endmsc; \
+                  endmscdocument;";
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->documents().size(), 1);
@@ -409,6 +479,98 @@ void tst_MscFile::testSortedMessageTwoCharts()
         QCOMPARE(message->sourceInstance(), initiator);
         QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
     }
+
+    delete model;
+}
+
+void tst_MscFile::testSortedInstanceEvents()
+{
+    QString msc = "msc connection; \
+                      instance Initiator; \
+                          starttimer T1; \
+                          in ICONreq from env; \
+                          out ICON to Responder; \
+                          stoptimer T1; \
+                          in ICONF from Responder; \
+                          out ICONconf to env; \
+                          timeout T1; \
+                      endinstance; \
+                      instance Responder; \
+                          in ICON from Initiator; \
+                          out ICONind to env; \
+                          starttimer T2; \
+                          in ICONresp from env; \
+                          out ICONF to Initiator; \
+                      endinstance; \
+                  endmsc;";
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 2);
+    MscInstance *initiator = chart->instances().at(0);
+    MscInstance *responder = chart->instances().at(1);
+
+    QCOMPARE(chart->instanceEvents().size(), 10);
+
+    int eventNr = -1;
+
+    MscTimer *timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(timer != nullptr);
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
+    QCOMPARE(timer->name(), QString("T1"));
+
+    MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONreq"));
+    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(message->targetInstance(), initiator);
+
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICON"));
+    QCOMPARE(message->sourceInstance(), initiator);
+    QCOMPARE(message->targetInstance(), responder);
+
+    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(timer != nullptr);
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Stop);
+    QCOMPARE(timer->name(), QString("T1"));
+
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONind"));
+    QCOMPARE(message->sourceInstance(), responder);
+    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+
+    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(timer != nullptr);
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
+    QCOMPARE(timer->name(), QString("T2"));
+
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONresp"));
+    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(message->targetInstance(), responder);
+
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONF"));
+    QCOMPARE(message->sourceInstance(), responder);
+    QCOMPARE(message->targetInstance(), initiator);
+
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONconf"));
+    QCOMPARE(message->sourceInstance(), initiator);
+    QCOMPARE(message->targetInstance(), static_cast<MscInstance *>(nullptr));
+
+    timer = dynamic_cast<MscTimer *>(chart->instanceEvents().at(++eventNr));
+    QVERIFY(timer != nullptr);
+    QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
+    QCOMPARE(timer->name(), QString("T1"));
 
     delete model;
 }
@@ -472,35 +634,6 @@ void tst_MscFile::testHierarchy()
 
     auto documentLeaf = documentException->documents().at(0);
     QCOMPARE(documentLeaf->hierarchyType(), MscDocument::HierarchyLeaf);
-
-    delete model;
-}
-
-void tst_MscFile::testCondition()
-{
-    QString msc = { "MSC msc1; \
-                        INSTANCE Inst_1; \
-                           condition Con_1 shared all; \
-                           condition Con_2; \
-                         ENDINSTANCE; \
-                     ENDMSC;" };
-
-    MscModel *model = file->parseText(msc);
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
-
-    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
-    QCOMPARE(condition->name(), QString("Con_1"));
-    QVERIFY(condition->messageName().isEmpty());
-    QCOMPARE(condition->shared(), true);
-
-    condition = static_cast<MscCondition *>(chart->instanceEvents().at(1));
-    QCOMPARE(condition->name(), QString("Con_2"));
-    QVERIFY(condition->messageName().isEmpty());
-    QCOMPARE(condition->shared(), false);
 
     delete model;
 }

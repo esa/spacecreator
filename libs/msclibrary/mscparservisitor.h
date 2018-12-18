@@ -26,6 +26,7 @@ namespace msc {
 class MscChart;
 class MscDocument;
 class MscInstance;
+class MscInstanceEvent;
 class MscMessage;
 class MscModel;
 }
@@ -49,13 +50,10 @@ public:
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
 
 private:
-    using Messages = QVector<msc::MscMessage *>;
-    using MessagesList = QVector<Messages>;
-
     void addInstance(MscParser::InstanceContext *context);
 
-    void resetMessages();
-    void orderMessages();
+    void resetInstanceEvents();
+    void orderInstanceEvents();
 
     msc::MscModel *m_model = nullptr;
 
@@ -64,8 +62,8 @@ private:
     msc::MscInstance *m_currentInstance = nullptr;
     msc::MscMessage *m_currentMessage = nullptr;
 
-    Messages m_messages;
-    MessagesList m_messagesList;
+    QVector<msc::MscInstanceEvent *> m_instanceEvents;
+    QVector<QVector<msc::MscInstanceEvent *>> m_instanceEventsList;
 
     antlr4::CommonTokenStream *m_tokens = nullptr;
 };
