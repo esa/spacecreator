@@ -26,6 +26,7 @@
 #include <msctimer.h>
 
 #include <QtTest>
+#include <mscaction.h>
 
 using namespace msc;
 
@@ -51,6 +52,7 @@ private Q_SLOTS:
     void testGateMessage();
     void testCondition();
     void testTimer();
+    void testAction();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
@@ -327,6 +329,33 @@ void tst_MscFile::testTimer()
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
 
     delete model;
+}
+
+void tst_MscFile::testAction()
+{
+    QString msc = { "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         action 'Stop'; \
+                         ACTION def \"digit1\", def \"digit2\"; \
+                       ENDINSTANCE; \
+                   ENDMSC;" };
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+
+    auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
+    QVERIFY(action != nullptr);
+    QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
+    QCOMPARE(action->informalAction(), QString("Stop"));
+
+    action = static_cast<MscAction *>(chart->instanceEvents().at(1));
+    QVERIFY(action != nullptr);
+    QCOMPARE(action->actionType(), MscAction::ActionType::Formal);
+    QCOMPARE(action->dataStatements().size(), 2);
 }
 
 void tst_MscFile::testSortedMessage()

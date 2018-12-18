@@ -34,7 +34,8 @@ public:
         Message,
         Timer,
         Gate,
-        Condition
+        Condition,
+        Action
     };
     Q_ENUM(EntityType)
 

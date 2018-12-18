@@ -12,6 +12,8 @@ textDefinition
     : ('text' | 'TEXT') STRING SEMI
     ;
 
+// 3 Message Sequence Chart document
+
 mscDocument
     : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition | instance)* ENDMSCDOCUMENT SEMI definingMscReference*
     ;
@@ -30,6 +32,8 @@ mscDefinition
         |       DATA NAME SEMI
         |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
     ;
+
+// 4.1 Message sequence chart
 
 messageSequenceChart
     : MSC NAME SEMI (gateDeclaration)? mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
@@ -56,6 +60,8 @@ instanceDeclStatement
     : instance
     ;
 
+//
+
 instance
     : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
@@ -80,8 +86,10 @@ instanceKind
     ;
 
 instanceEvent
-    : (mscEvent | timerStatement) SEMI
+    : (mscEvent | timerStatement | action) SEMI
     ;
+
+// 4.3 Message
 
 mscEvent
     : CONDITION NAME (SHARED ALL)?
@@ -100,6 +108,8 @@ outputAddress
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
     ;
+
+// 4.8 TIMER
 
 timerStatement
     : startTimer | stopTimer | timeout
@@ -126,6 +136,22 @@ timeout
     : TIMEOUT NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
+// 4.9 ACTION
+
+action
+    : ACTION actionStatement
+    ;
+
+actionStatement
+    : informalAction | dataStatementList
+    ;
+
+informalAction
+    : CHARACTERSTRING
+    ;
+
+//
+
 parameterList
     : paramaterDefn (',' parameterList)?
     ;
@@ -133,6 +159,8 @@ parameterList
 paramaterDefn
     : binding | expression | pattern
     ;
+
+// 5.7 Bindings
 
 binding
     : leftBinding | rightBinding
@@ -150,20 +178,22 @@ expression
     : expressionString
     ;
 
-expressionString
-    : NAME COLON NAME // TODO not correct ?
-    ;
-
 pattern
     : variableString | wildcard
     ;
+
+wildcard
+    : NAME // TODO not correct ?
+    ;
+
+//
 
 variableString
     : STRING // TODO not correct ?
     ;
 
-wildcard
-    : NAME // TODO not correct ?
+expressionString
+    : NAME COLON NAME // TODO not correct ?
     ;
 
 variableValue
@@ -176,6 +206,21 @@ decomposition
 
 substructureReference
     : AS NAME
+    ;
+
+// 5.10 DATA IN ACTION boxes
+
+dataStatementList
+    : dataStatement (COMMA dataStatementList)?
+    ;
+dataStatement
+    : defineStatement | undefineStatement | binding
+    ;
+defineStatement
+    : DEF variableString
+    ;
+undefineStatement
+    : UNDEF variableString
     ;
 
 /*Keywords*/

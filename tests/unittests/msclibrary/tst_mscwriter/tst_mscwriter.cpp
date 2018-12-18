@@ -16,6 +16,7 @@
 */
 
 #include <QtTest>
+#include <mscaction.h>
 
 #include "mscchart.h"
 #include "msccondition.h"
@@ -39,6 +40,8 @@ private Q_SLOTS:
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
     void testSerializeMscConditions();
+    void testSerializeMscActionsInformal();
+    void testSerializeMscActionsFormal();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
@@ -164,6 +167,49 @@ void tst_MscWriter::testSerializeMscConditions()
     QCOMPARE(serializeList.at(1), QString("   condition Con_1;"));
     QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
+}
+
+void tst_MscWriter::testSerializeMscActionsInformal()
+{
+    MscInstance instance("Inst_1");
+
+    auto action = new MscAction();
+    action->setActionType(MscAction::ActionType::Informal);
+    action->setInformalAction("informal_stop");
+
+    QVector<MscInstanceEvent *> events;
+    events.append(action);
+
+    QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 3);
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   action 'informal_stop';"));
+    QCOMPARE(serializeList.at(2), QString("endinstance;"));
+}
+
+void tst_MscWriter::testSerializeMscActionsFormal()
+{
+    MscInstance instance("Inst_1");
+
+    auto action = new MscAction();
+    action->setActionType(MscAction::ActionType::Formal);
+    MscAction::DataStatement statement;
+    statement.m_type = MscAction::DataStatement::StatementType::Define;
+    statement.m_variableString = "digit1";
+    action->addDataStatement(statement);
+
+    statement.m_type = MscAction::DataStatement::StatementType::UnDefine;
+    statement.m_variableString = "digit2";
+    action->addDataStatement(statement);
+
+    QVector<MscInstanceEvent *> events;
+    events.append(action);
+
+    QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 3);
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   action define digit1, undefine digit2;"));
+    QCOMPARE(serializeList.at(2), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscChart()
