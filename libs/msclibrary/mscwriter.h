@@ -26,6 +26,7 @@ class MscInstanceEvent;
 class MscTimer;
 class MscChart;
 class MscCondition;
+class MscCoregion;
 class MscDocument;
 class MscInstance;
 class MscMessage;
@@ -42,10 +43,11 @@ public:
     void saveChart(const MscChart *chart, const QString &fileName);
 
 protected:
-    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &messages, int tabsSize = 0);
+    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents, int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCondition *condition, int tabsSize = 0);
     QString serialize(const MscTimer *timer, int tabsSize = 0);
+    QString serialize(const MscCoregion *region, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 

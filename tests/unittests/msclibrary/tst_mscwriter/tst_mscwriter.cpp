@@ -24,6 +24,7 @@
 #include "mscmessage.h"
 #include "mscwriter.h"
 #include "msctimer.h"
+#include "msccoregion.h"
 
 using namespace msc;
 
@@ -35,6 +36,7 @@ private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
     void testSerializeMscTimer();
+    void testSerializeMscCoregion();
     void testSerializeMscInstance();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
@@ -76,12 +78,25 @@ void tst_MscWriter::testSerializeMscTimer()
 {
     MscTimer timer1("T1", MscTimer::TimerType::Start);
     QCOMPARE(this->serialize(&timer1), QString("starttimer T1;\n"));
+    QCOMPARE(this->serialize(&timer1, 1), QString("   starttimer T1;\n"));
+    QCOMPARE(this->serialize(&timer1, 2), QString("      starttimer T1;\n"));
 
     MscTimer timer2("T2", MscTimer::TimerType::Stop);
     QCOMPARE(this->serialize(&timer2), QString("stoptimer T2;\n"));
 
     MscTimer timer3("T3", MscTimer::TimerType::Timeout);
     QCOMPARE(this->serialize(&timer3), QString("timeout T3;\n"));
+}
+
+void tst_MscWriter::testSerializeMscCoregion()
+{
+    MscCoregion region1(MscCoregion::Type::Begin);
+    QCOMPARE(this->serialize(&region1), QString("concurrent;\n"));
+    QCOMPARE(this->serialize(&region1, 1), QString("   concurrent;\n"));
+    QCOMPARE(this->serialize(&region1, 2), QString("      concurrent;\n"));
+
+    MscCoregion region2(MscCoregion::Type::End);
+    QCOMPARE(this->serialize(&region2), QString("endconcurrent;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstance()

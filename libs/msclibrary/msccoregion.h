@@ -16,7 +16,7 @@ public:
     explicit MscCoregion(QObject *parent = nullptr);
     explicit MscCoregion(Type type, QObject *parent = nullptr);
 
-    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Timer; }
+    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Coregion; }
 
     void setType(Type type) { m_type = type; }
     Type type() const { return m_type; }

@@ -22,6 +22,7 @@
 #include <mscmessage.h>
 #include <mscgate.h>
 #include <msctimer.h>
+#include <msccoregion.h>
 
 #include <QtTest>
 
@@ -100,6 +101,11 @@ void tst_MscChart::testDestructor()
             chart->addInstanceEvent(new MscCondition());
             chartEntities.append(chart->instanceEvents().first());
             QCOMPARE(chart->instanceEvents().size(), 3);
+            break;
+        case MscEntity::EntityType::Coregion:
+            chart->addInstanceEvent(new MscCoregion());
+            chartEntities.append(chart->instanceEvents().first());
+            QCOMPARE(chart->instanceEvents().size(), 4);
             break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
