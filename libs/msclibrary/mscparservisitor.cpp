@@ -179,20 +179,6 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
     return result;
 }
 
-antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *context)
-{
-    if (!m_currentChart) {
-        return visitChildren(context);
-    }
-
-    // TODO: Add these to the stack
-    //new MscCoregion(MscCoregion::Type::Begin);
-    auto rc = visitChildren(context);
-    //new MscCoregion(MscCoregion::Type::End);
-
-    return rc;
-}
-
 antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
 {
     if (!m_currentChart) {
@@ -379,9 +365,22 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
     }
 
-    m_instanceEvents << timer.take();
+    m_instanceEvents.append(timer.take());
 
     return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
+    auto rc = visitChildren(context);
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
+
+    return rc;
 }
 
 void MscParserVisitor::addInstance(MscParser::InstanceContext *context)

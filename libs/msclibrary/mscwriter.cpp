@@ -24,6 +24,7 @@
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "mscaction.h"
+#include "msccoregion.h"
 
 #include <QDebug>
 #include <QFile>
@@ -77,7 +78,7 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &messages, int tabsSize)
+QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents, int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -94,8 +95,8 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         header += ";\n";
 
     auto addCondition = [&](const QString &messageName, int tabsSize) {
-        std::for_each(messages.begin(),
-                      messages.end(),
+        std::for_each(instanceEvents.begin(),
+                      instanceEvents.end(),
                       [&](MscInstanceEvent *event) {
                           auto *condition = static_cast<MscCondition *>(event);
                           if (condition->instance() == instance && condition->messageName() == messageName)
@@ -106,14 +107,17 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     // serialize conditions with empty messageName
     addCondition("", tabsSize + 1);
 
-    for (const auto &message : messages) {
-        switch (message->entityType()) {
+    for (const auto &instanceEvent : instanceEvents) {
+        switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message:
-            events += serialize(static_cast<MscMessage *>(message), instance, tabsSize + 1);
-            addCondition(message->name(), tabsSize + 1);
+            events += serialize(static_cast<MscMessage *>(instanceEvent), instance, tabsSize + 1);
+            addCondition(instanceEvent->name(), tabsSize + 1);
             break;
         case MscEntity::EntityType::Timer:
-            events += serialize(static_cast<MscTimer *>(message), tabsSize + 1);
+            events += serialize(static_cast<MscTimer *>(instanceEvent), tabsSize + 1);
+            break;
+        case MscEntity::EntityType::Coregion:
+            events += serialize(static_cast<MscCoregion *>(instanceEvent), tabsSize + 1);
             break;
         case MscEntity::EntityType::Action:
             events += serialize(static_cast<MscAction *>(message), tabsSize + 1);
@@ -216,6 +220,12 @@ QString MscWriter::serialize(const MscAction *action, int tabsSize)
         actionText += ";\n";
         return actionText;
     }
+}
+
+QString MscWriter::serialize(const MscCoregion *region, int tabsSize)
+{
+    const char *type = region->type() == MscCoregion::Type::Begin ? "concurrent" : "endconcurrent";
+    return QString("%1%2;\n").arg(tabs(tabsSize), type);
 }
 
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)
