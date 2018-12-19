@@ -342,6 +342,26 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     return visitChildren(context);
 }
 
+antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionContext *ctx)
+{
+    if (!m_currentChart) {
+        return visitChildren(ctx);
+    }
+
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
+    return visitChildren(ctx);
+}
+
+antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *ctx)
+{
+    if (!m_currentChart) {
+        return visitChildren(ctx);
+    }
+
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
+    return visitChildren(ctx);
+}
+
 antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementContext *context)
 {
     if (!m_currentChart) {

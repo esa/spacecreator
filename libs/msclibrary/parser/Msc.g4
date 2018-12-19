@@ -110,8 +110,8 @@ eventDefinition
 
 instanceEventList
     : startMethod instanceEvent* endMethod
-//    | startSuspension instanceEvent* endSuspension
-//    | startCoregion instanceEvent* endCoregion
+    | startSuspension instanceEvent* endSuspension
+    | startCoregion instanceEvent* endCoregion
     | instanceHeadStatement instanceEvent* (instanceEndStatement | stop)
     ;
 
@@ -158,10 +158,6 @@ instanceKind
 instanceEvent
     : (mscEvent | timerStatement | action) SEMI
     | coregion
-    ;
-
-coregion
-    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
     ;
 
 // 4.3 Message
@@ -439,6 +435,18 @@ defineStatement
     ;
 undefineStatement
     : UNDEF variableString
+    ;
+
+// 7.1 Coregion
+
+startCoregion
+    : CONCURRENT SEMI
+    ;
+endCoregion
+    : ENDCONCURRENT SEMI
+    ;
+coregion // this is not as expected in the standard
+    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
     ;
 
 /*Keywords*/
