@@ -188,11 +188,11 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     MscMessage::Parameters parameters;
     QString name = ::treeNodeToString(context->NAME());
 
-    if (context->messageIdentification()) {
-        name = ::treeNodeToString(context->messageIdentification()->NAME(0));
-        parameters.name = ::treeNodeToString(context->messageIdentification()->NAME(1));
+    if (context->msgIdentification()) {
+        name = ::treeNodeToString(context->msgIdentification()->NAME(0));
+        parameters.name = ::treeNodeToString(context->msgIdentification()->NAME(1));
 
-        auto *parameterList = context->messageIdentification()->parameterList();
+        auto *parameterList = context->msgIdentification()->parameterList();
         if (parameterList && parameterList->paramaterDefn()) {
             auto *paramaterDefn = parameterList->paramaterDefn();
             parameters.expression = ::treeNodeToString(paramaterDefn->expression());

@@ -1,4 +1,7 @@
 // Define a grammar called Msc
+// Specs from
+// https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-Z.120-201102-I!!PDF-E&type=items
+
 grammar Msc;
 
 tokens {
@@ -106,9 +109,11 @@ eventDefinition
     ;
 
 instanceEventList
-    : METHOD instanceEvent* ENDMETHOD
+    : startMethod instanceEvent* endMethod
+//    | startSuspension instanceEvent* endSuspension
+//    | startCoregion instanceEvent* endCoregion
     | instanceHeadStatement instanceEvent* (instanceEndStatement | stop)
-    ; // TODO add suspension, ...
+    ;
 
 instanceDeclStatement
     : instance
@@ -163,11 +168,11 @@ coregion
 
 mscEvent
     : CONDITION NAME (SHARED ALL)?
-    | IN messageIdentification (FROM outputAddress)?
-    | OUT messageIdentification (TO inputAddress)?
+    | IN msgIdentification (FROM outputAddress)?
+    | OUT msgIdentification (TO inputAddress)?
     ;
 
-messageIdentification
+msgIdentification
     : NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
@@ -177,6 +182,51 @@ outputAddress
 
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    ;
+
+// 4.4 Control Flow
+
+methodCallEvent
+    : callOut | callIn |replyOut | replyIn
+    ;
+callOut
+    : CALL msgIdentification TO inputAddress
+    ;
+callIn
+    : RECEIVE msgIdentification FROM outputAddress
+    ;
+replyOut
+    : REPLYOUT msgIdentification TO inputAddress
+    ;
+replyIn
+    : REPLYIN msgIdentification FROM outputAddress
+    ;
+incompleteMethodCallEvent
+    : incompleteCallOut | incompleteCallIn | incompleteReplyOut | incompleteReplyIn
+    ;
+incompleteCallOut
+    : CALL msgIdentification TO LOST (inputAddress)?
+    ;
+incompleteCallIn
+    : RECEIVE msgIdentification FROM FOUND (outputAddress)?
+    ;
+incompleteReplyOut
+    : REPLYOUT msgIdentification TO LOST (inputAddress)?
+    ;
+incompleteReplyIn
+    : REPLYIN msgIdentification FROM FOUND (outputAddress)?
+    ;
+startMethod
+    : METHOD SEMI
+    ;
+endMethod
+    : ENDMETHOD SEMI
+    ;
+startSuspension
+    : SUSPENSION SEMI
+    ;
+endSuspension
+    : ENDSUSPENSION SEMI
     ;
 
 // 4.7 Condition
