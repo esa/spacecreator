@@ -28,8 +28,10 @@ class QGraphicsScene;
 namespace msc {
 
 class MscChart;
+class ConditionItem;
 class InstanceItem;
 class MessageItem;
+class MscCondition;
 class MscInstance;
 class MscMessage;
 
@@ -55,8 +57,9 @@ public:
                                                const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
-    msc::InstanceItem *itemForInstance(msc::MscInstance *instance) const;
-    msc::MessageItem *itemForMessage(msc::MscMessage *message) const;
+    InstanceItem *itemForInstance(msc::MscInstance *instance) const;
+    MessageItem *itemForMessage(MscMessage *message) const;
+    ConditionItem *itemForCondition(MscCondition *condition) const;
 
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);

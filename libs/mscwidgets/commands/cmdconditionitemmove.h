@@ -17,20 +17,30 @@
 
 #pragma once
 
+#include "basecommand.h"
+
+#include <QPointF>
+
 namespace msc {
+
+class ConditionItem;
+
 namespace cmd {
 
-enum Id {
-    MoveMessage = 0,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    MoveCondition,
-    ResizeCondition,
+class CmdConditionItemMove : public BaseCommand
+{
+public:
+    CmdConditionItemMove(ConditionItem *conditionItem, const QPointF &destination);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointF m_posFrom;
+    QPointF m_posTo;
 };
+
 } // ns cmd
 } // ns msc

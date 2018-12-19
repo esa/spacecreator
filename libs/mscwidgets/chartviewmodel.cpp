@@ -16,11 +16,13 @@
 */
 
 #include "chartviewmodel.h"
+#include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "baseitems/common/utils.h"
 
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
 
@@ -30,6 +32,18 @@
 #include <QDebug>
 
 namespace msc {
+
+template<typename ItemType, typename MscEntityType>
+ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
+{
+    if (event)
+        for (QGraphicsItem *item : utils::toplevelItems(scene))
+            if (ItemType *messageItem = dynamic_cast<ItemType *>(item))
+                if (messageItem && messageItem->modelItem()->internalId() == event->internalId())
+                    return messageItem;
+
+    return nullptr;
+}
 
 /*!
    \class  ChartViewModel is the model containing the scene graph of the currently selected/visible
@@ -44,7 +58,7 @@ struct ChartViewModelPrivate {
 
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
-    QVector<msc::MessageItem *> m_messageItems;
+    QVector<msc::InteractiveObject *> m_instanceEventItems;
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 40.;
     static constexpr qreal InterInstanceSpan = 100.;
@@ -80,10 +94,12 @@ MscChart *ChartViewModel::currentChart() const
 
 void ChartViewModel::clearScene()
 {
-    qDeleteAll(d->m_messageItems);
-    d->m_messageItems.clear();
+    qDeleteAll(d->m_instanceEventItems);
+    d->m_instanceEventItems.clear();
+
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
+
     d->m_scene.clear();
 }
 
@@ -159,9 +175,32 @@ void ChartViewModel::relayout()
                 item = new MessageItem(message);
 
                 d->m_scene.addItem(item);
-                d->m_messageItems.append(item);
+                d->m_instanceEventItems.append(item);
             }
             item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
+            y += item->boundingRect().height() + d->InterMessageSpan;
+
+            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+        }
+
+        if (instanceEvent->entityType() == MscEntity::EntityType::Condition) {
+            auto *condition = static_cast<MscCondition *>(instanceEvent);
+
+            ConditionItem *item = itemForCondition(condition);
+            if (!item) {
+                item = new ConditionItem(condition);
+
+                d->m_scene.addItem(item);
+                d->m_instanceEventItems.append(item);
+            }
+
+            InstanceItem *instance = itemForInstance(condition->instance());
+            item->buildLayout();
+
+            // TODO: set correct position
+            item->setPos(instance->x(), y + instance->axis().p1().y());
+
+            // TODO: set correct y
             y += item->boundingRect().height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
@@ -176,22 +215,17 @@ void ChartViewModel::relayout()
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {
-    if (instance)
-        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
-            if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(item))
-                if (instanceItem->modelItem()->internalId() == instance->internalId())
-                    return instanceItem;
-    return nullptr;
+    return itemForEntity<InstanceItem, MscInstance>(instance, &d->m_scene);
 }
 
-msc::MessageItem *ChartViewModel::itemForMessage(msc::MscMessage *message) const
+MessageItem *ChartViewModel::itemForMessage(MscMessage *message) const
 {
-    if (message)
-        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
-            if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item))
-                if (messageItem->modelItem()->internalId() == message->internalId())
-                    return messageItem;
-    return nullptr;
+    return itemForEntity<MessageItem, MscMessage>(message, &d->m_scene);
+}
+
+ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
+{
+    return itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
 }
 
 InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)

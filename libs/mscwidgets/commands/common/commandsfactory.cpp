@@ -18,15 +18,20 @@
 #include "commandsstack.h"
 #include "chartviewmodel.h"
 
-#include "commands/cmdmessageitemmove.h"
-#include "commands/cmdmessageitemresize.h"
-#include "commands/cmdmessageitemcreate.h"
+#include "commands/cmdconditionitemmove.h"
+#include "commands/cmdconditionitemresize.h"
+
+#include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstanceitemresize.h"
-#include "commands/cmdinstanceitemcreate.h"
 
-#include "messageitem.h"
+#include "commands/cmdmessageitemcreate.h"
+#include "commands/cmdmessageitemmove.h"
+#include "commands/cmdmessageitemresize.h"
+
+#include "conditionitem.h"
 #include "instanceitem.h"
+#include "messageitem.h"
 
 #include <QGraphicsItem>
 #include <QPointF>
@@ -109,6 +114,32 @@ QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &para
             const QPointF &pos(params.at(2).toPointF());
             return new CmdInstanceItemCreate(scene, model, pos);
         }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (ConditionItem *item = params.first().value<ConditionItem *>()) {
+        const QPointF &destination = params.last().toPointF();
+        if (item->pos() != destination)
+            return new CmdConditionItemMove(item, destination);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createConditionItemResize(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (ConditionItem *item = params.first().value<ConditionItem *>()) {
+        const QRectF &newGeometry = params.last().toRectF();
+        if (item->boundingRect() != newGeometry)
+            return new CmdConditionItemResize(item, newGeometry);
+    }
 
     return nullptr;
 }
