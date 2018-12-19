@@ -140,7 +140,11 @@ void tst_CommandLineParser::testCoverage()
     }
 
     const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
-    QCOMPARE(testMethods.size(), e.keyCount() - 1); // ignore CommandLineParser::PositionalArg::Unknown
+    int ignoredCommands(0);
+    ++ignoredCommands; // CommandLineParser::PositionalArg::Unknown
+    ++ignoredCommands; // CommandLineParser::PositionalArg::DbgOpenMscExamplesChain
+
+    QCOMPARE(testMethods.size(), e.keyCount() - ignoredCommands);
 }
 
 QTEST_MAIN(tst_CommandLineParser)

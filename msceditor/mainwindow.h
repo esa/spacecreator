@@ -62,6 +62,7 @@ private Q_SLOTS:
     void saveMsc();
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
+    bool openMscChain(const QString &dirPath);
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;

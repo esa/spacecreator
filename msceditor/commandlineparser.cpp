@@ -59,6 +59,11 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                                   QCoreApplication::translate("CommandLineParser", "Open the ASN <file> on startup."),
                                   QCoreApplication::translate("CommandLineParser", "file"));
     }
+    case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
+        return QCommandLineOption({ "e", "examples-chain" },
+                                  QCoreApplication::translate("CommandLineParser", "Open all MSC files in the <dir> one-by-one"),
+                                  QCoreApplication::translate("CommandLineParser", "dir"));
+    }
     default: {
         Q_UNREACHABLE();
         break;
