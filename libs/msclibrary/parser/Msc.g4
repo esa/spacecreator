@@ -107,7 +107,7 @@ eventDefinition
 
 instanceEventList
     : METHOD instanceEvent* ENDMETHOD
-    | instanceHeadStatement instanceEvent* instanceEndStatement
+    | instanceHeadStatement instanceEvent* (instanceEndStatement | stop)
     ; // TODO add suspension, ...
 
 instanceDeclStatement
@@ -242,6 +242,18 @@ actionStatement
 
 informalAction
     : CHARACTERSTRING
+    ;
+
+// 4.10 Instance creation
+
+create
+    : CREATE NAME (LEFTOPEN parameterList RIGHTOPEN)?
+    ;
+
+// 4.11 Instance stop
+
+stop
+    : STOP SEMI
     ;
 
 // 5.2 Syntax interface to external data languages
