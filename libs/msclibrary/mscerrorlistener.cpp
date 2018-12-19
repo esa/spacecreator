@@ -17,23 +17,38 @@
 
 #include "mscerrorlistener.h"
 
+#include <Token.h>
+#include <Parser.h>
+
 namespace msc {
 
-void MscErrorListener::syntaxError(antlr4::Recognizer * /*recognizer*/,
-                                   antlr4::Token * /*offendingSymbol*/,
+void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer,
+                                   antlr4::Token *offendingSymbol,
                                    size_t line,
                                    size_t charPositionInLine,
                                    const std::string &msg,
                                    std::exception_ptr /*e*/)
 {
-    m_errorMessages.append(QString("line %1:%2 %3").arg(QString::number(line),
-                                                        QString::number(charPositionInLine),
-                                                        QString::fromStdString(msg)));
+    antlr4::Parser *parser = static_cast<antlr4::Parser *>(recognizer);
+    QString stack;
+    if (parser) {
+        QStringList strList;
+        for (const std::string &str : parser->getRuleInvocationStack())
+            strList.prepend(QString::fromStdString(str));
+        stack = stack.append(strList.join("->"));
+    }
+
+    m_errorMessages.append(QString("@%1:%2: <b>'%3' - %4</b>; Rules stack:<br>[%5]<br>")
+                                   .arg(
+                                           QString::number(line),
+                                           QString::number(charPositionInLine),
+                                           QString::fromStdString(offendingSymbol->getText()),
+                                           QString::fromStdString(msg),
+                                           stack));
 }
 
 QStringList MscErrorListener::getErrorMessages() const
 {
     return m_errorMessages;
 }
-
 }

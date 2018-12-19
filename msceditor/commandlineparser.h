@@ -29,6 +29,9 @@ public:
     enum class Positional {
         OpenFileMsc = 0,
         OpenFileAsn,
+
+        DbgOpenMscExamplesChain,
+
         Unknown
     };
     Q_ENUM(Positional)

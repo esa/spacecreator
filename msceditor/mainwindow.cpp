@@ -120,8 +120,17 @@ void MainWindow::selectAndOpenFile()
     static const QLatin1String suffixMsc(".msc");
     static const QLatin1String suffixAsn(".asn");
     static const QStringList suffixes = { "*" + suffixMsc, "*" + suffixAsn };
-    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), QString("../../msceditor/examples"), suffixes.join(" "));
+
+    const QString path =
+#if defined(QT_DEBUG) && defined(Q_OS_WIN)
+            QDir(QDir::current().path() + QString("/../../esa/examples")).path();
+#else
+            "../../msceditor/examples";
+#endif // QT_DEBUG and Q_OS_WIN
+
+    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(" "));
     if (!filename.isEmpty()) {
+        d->ui->errorTextEdit->clear();
         if (filename.endsWith(suffixMsc))
             openFileMsc(filename);
         else if (filename.endsWith(suffixAsn))
@@ -131,7 +140,7 @@ void MainWindow::selectAndOpenFile()
 
 bool MainWindow::openFileMsc(const QString &file)
 {
-    d->ui->errorTextEdit->setPlainText(tr("Opening file: %1").arg(file));
+    d->ui->errorTextEdit->appendPlainText(tr("Opening file: %1").arg(file));
 
     if (!QFileInfo::exists(file)) {
         d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
@@ -146,10 +155,27 @@ bool MainWindow::openFileMsc(const QString &file)
         d->ui->graphicsView->centerOn(d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
     }
 
-    d->ui->errorTextEdit->appendPlainText(d->m_model->errorMessages().join("\n"));
-    d->ui->errorTextEdit->appendPlainText(tr("Model loading: %1").arg(ok ? tr("success") : tr("failed")));
+    d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
+    d->ui->errorTextEdit->appendHtml(tr("Model loading: <b><font color=%2>%1</font></b><br>")
+                                             .arg(ok ? tr("success") : tr("failed"),
+                                                  ok ? "black" : "red"));
 
     return ok;
+}
+
+bool MainWindow::openMscChain(const QString &dirPath)
+{
+    if (dirPath.isEmpty())
+        return false;
+
+    QDir dir(dirPath);
+    if (!dir.exists() || !dir.isReadable())
+        return false;
+
+    for (const QFileInfo &file : dir.entryInfoList({ "*.msc" })) {
+        openFileMsc(file.absoluteFilePath());
+    }
+    return true;
 }
 
 bool MainWindow::openFileAsn(const QString &file)
@@ -361,6 +387,9 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     }
     case CommandLineParser::Positional::OpenFileAsn: {
         return openFileAsn(value);
+    }
+    case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
+        return openMscChain(value);
     }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
