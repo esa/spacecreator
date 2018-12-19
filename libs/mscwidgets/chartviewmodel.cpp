@@ -33,6 +33,18 @@
 
 namespace msc {
 
+template<typename ItemType, typename MscEntityType>
+ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
+{
+    if (event)
+        for (QGraphicsItem *item : utils::toplevelItems(scene))
+            if (ItemType *messageItem = dynamic_cast<ItemType *>(item))
+                if (messageItem && messageItem->modelItem()->internalId() == event->internalId())
+                    return messageItem;
+
+    return nullptr;
+}
+
 /*!
    \class  ChartViewModel is the model containing the scene graph of the currently selected/visible
    MSC chart (showing instances, messages, ...)
@@ -158,7 +170,7 @@ void ChartViewModel::relayout()
                     instanceVertiacalOffset = targetInstance->axis().p1().y();
             }
 
-            MessageItem *item = itemForInstanceEvents<MessageItem, MscMessage>(message);
+            MessageItem *item = itemForMessage(message);
             if (!item) {
                 item = new MessageItem(message);
 
@@ -174,7 +186,7 @@ void ChartViewModel::relayout()
         if (instanceEvent->entityType() == MscEntity::EntityType::Condition) {
             auto *condition = static_cast<MscCondition *>(instanceEvent);
 
-            ConditionItem *item = itemForInstanceEvents<ConditionItem, MscCondition>(condition);
+            ConditionItem *item = itemForCondition(condition);
             if (!item) {
                 item = new ConditionItem(condition);
 
@@ -186,7 +198,7 @@ void ChartViewModel::relayout()
             item->buildLayout();
 
             // TODO: set correct position
-            item->setPos(instance->x(), instance->axis().p1().y());
+            item->setPos(instance->x(), y + instance->axis().p1().y());
 
             // TODO: set correct y
             y += item->boundingRect().height() + d->InterMessageSpan;
@@ -203,24 +215,17 @@ void ChartViewModel::relayout()
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {
-    if (instance)
-        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
-            if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(item))
-                if (instanceItem->modelItem()->internalId() == instance->internalId())
-                    return instanceItem;
-    return nullptr;
+    return itemForEntity<InstanceItem, MscInstance>(instance, &d->m_scene);
 }
 
-template<typename T, typename T1>
-T *ChartViewModel::itemForInstanceEvents(T1 *event) const
+MessageItem *ChartViewModel::itemForMessage(MscMessage *message) const
 {
-    if (event)
-        for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
-            if (T *messageItem = dynamic_cast<T *>(item))
-                if (messageItem && messageItem->modelItem()->internalId() == event->internalId())
-                    return messageItem;
+    return itemForEntity<MessageItem, MscMessage>(message, &d->m_scene);
+}
 
-    return nullptr;
+ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
+{
+    return itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
 }
 
 InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)

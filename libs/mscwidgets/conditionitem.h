@@ -59,7 +59,6 @@ protected:
 
 private:
     MscCondition *m_condition = nullptr;
-    //    msc::MscInstance *m_instance = nullptr;
 
     QGraphicsPolygonItem *m_polygonItem = nullptr;
     TextItem *m_nameItem = nullptr;

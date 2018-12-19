@@ -107,8 +107,6 @@ void ConditionItem::setName(const QString &name)
 
     m_boundingRect = QRectF();
     buildLayout();
-
-    //    Q_EMIT needRelayout();
 }
 
 void ConditionItem::buildLayout()
