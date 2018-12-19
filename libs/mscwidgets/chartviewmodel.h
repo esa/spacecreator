@@ -56,7 +56,8 @@ public:
     bool removeMessageItem(msc::MessageItem *item);
 
     msc::InstanceItem *itemForInstance(msc::MscInstance *instance) const;
-    msc::MessageItem *itemForMessage(msc::MscMessage *message) const;
+    template<typename T, typename T1>
+    T *itemForInstanceEvents(T1 *event) const;
 
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);

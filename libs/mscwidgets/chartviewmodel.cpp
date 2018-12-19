@@ -16,11 +16,13 @@
 */
 
 #include "chartviewmodel.h"
+#include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "baseitems/common/utils.h"
 
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
 
@@ -44,7 +46,7 @@ struct ChartViewModelPrivate {
 
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
-    QVector<msc::MessageItem *> m_messageItems;
+    QVector<msc::InteractiveObject *> m_instanceEventItems;
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 40.;
     static constexpr qreal InterInstanceSpan = 100.;
@@ -80,10 +82,12 @@ MscChart *ChartViewModel::currentChart() const
 
 void ChartViewModel::clearScene()
 {
-    qDeleteAll(d->m_messageItems);
-    d->m_messageItems.clear();
+    qDeleteAll(d->m_instanceEventItems);
+    d->m_instanceEventItems.clear();
+
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
+
     d->m_scene.clear();
 }
 
@@ -154,14 +158,37 @@ void ChartViewModel::relayout()
                     instanceVertiacalOffset = targetInstance->axis().p1().y();
             }
 
-            MessageItem *item = itemForMessage(message);
+            MessageItem *item = itemForInstanceEvents<MessageItem, MscMessage>(message);
             if (!item) {
                 item = new MessageItem(message);
 
                 d->m_scene.addItem(item);
-                d->m_messageItems.append(item);
+                d->m_instanceEventItems.append(item);
             }
             item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
+            y += item->boundingRect().height() + d->InterMessageSpan;
+
+            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+        }
+
+        if (instanceEvent->entityType() == MscEntity::EntityType::Condition) {
+            auto *condition = static_cast<MscCondition *>(instanceEvent);
+
+            ConditionItem *item = itemForInstanceEvents<ConditionItem, MscCondition>(condition);
+            if (!item) {
+                item = new ConditionItem(condition);
+
+                d->m_scene.addItem(item);
+                d->m_instanceEventItems.append(item);
+            }
+
+            InstanceItem *instance = itemForInstance(condition->instance());
+            item->buildLayout();
+
+            // TODO: set correct position
+            item->setPos(instance->x(), instance->axis().p1().y());
+
+            // TODO: set correct y
             y += item->boundingRect().height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
@@ -184,13 +211,15 @@ InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
     return nullptr;
 }
 
-msc::MessageItem *ChartViewModel::itemForMessage(msc::MscMessage *message) const
+template<typename T, typename T1>
+T *ChartViewModel::itemForInstanceEvents(T1 *event) const
 {
-    if (message)
+    if (event)
         for (QGraphicsItem *item : utils::toplevelItems(&d->m_scene))
-            if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item))
-                if (messageItem->modelItem()->internalId() == message->internalId())
+            if (T *messageItem = dynamic_cast<T *>(item))
+                if (messageItem && messageItem->modelItem()->internalId() == event->internalId())
                     return messageItem;
+
     return nullptr;
 }
 

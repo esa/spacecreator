@@ -36,6 +36,8 @@ public:
     static QUndoCommand *createInstanceItemMove(const QVariantList &params);
     static QUndoCommand *createInstanceItemResize(const QVariantList &params);
     static QUndoCommand *createInstanceItemCreate(const QVariantList &params);
+    static QUndoCommand *createConditionItemMove(const QVariantList &params);
+    static QUndoCommand *createConditionItemResize(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

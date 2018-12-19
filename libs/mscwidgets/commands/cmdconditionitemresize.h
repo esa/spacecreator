@@ -17,20 +17,32 @@
 
 #pragma once
 
+#include "basecommand.h"
+
+#include <QRectF>
+
 namespace msc {
+
+class ConditionItem;
+
 namespace cmd {
 
-enum Id {
-    MoveMessage = 0,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    MoveCondition,
-    ResizeCondition,
+class CmdConditionItemResize : public BaseCommand
+{
+public:
+    CmdConditionItemResize(ConditionItem *conditionItem, const QRectF &destination);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    ConditionItem *m_conditionItem = nullptr;
+
+    QRectF m_newGeometry;
+    QRectF m_oldGeometry;
 };
+
 } // ns cmd
 } // ns msc
