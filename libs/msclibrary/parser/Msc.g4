@@ -26,6 +26,16 @@ virtuality
     : VIRTUAL | REDEFINED | FINALIZED
     ;
 
+containingClause
+    : INST instanceItem (INST instanceItem)*
+    ;
+instanceItem
+    : NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
+    ;
+inheritance
+    : INHERITS instanceKind
+    ;
+
 mscDefinition
     : messageSequenceChart
         |       LANGUAGE NAME SEMI
@@ -36,7 +46,49 @@ mscDefinition
 // 4.1 Message sequence chart
 
 messageSequenceChart
-    : MSC NAME SEMI (gateDeclaration)? mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    : virtuality? MSC mscHead mscBody ENDMSC SEMI // TODO add hmsc
+    ;
+
+mscHead
+    : NAME (mscParameterDecl)? SEMI (mscInstInterface)? // TODO add time offset, gate interface
+    ;
+
+mscParameterDecl
+    : LEFTOPEN mscParmDeclList RIGHTOPEN
+    ;
+mscParmDeclList
+    : mscParmDeclBlock (SEMI mscParameterDecl)?
+    ;
+mscParmDeclBlock
+    : dataParameterDecl
+    | instanceParameterDecl
+    | messageParameterDecl
+    | timerParameterDecl
+    ;
+
+instanceParameterDecl
+    : INST instanceParmDeclList
+    ;
+instanceParmDeclList
+    : NAME (COLON instanceKind)? (COMMA instanceParmDeclList)
+    ;
+
+messageParameterDecl
+    : MSG messageParmDeclList
+    ;
+messageParmDeclList
+    : messageDeclList
+    ;
+
+timerParameterDecl
+    : TIMER timerParmDeclList
+    ;
+timerParmDeclList
+    : timerDeclList
+    ;
+
+mscInstInterface
+    : containingClause
     ;
 
 mscBody
@@ -170,6 +222,30 @@ dataDefinitionString
 
 // 5.4 Declaring DATA
 
+messageDeclList
+    : messageDecl (SEMI messageDeclList)?
+    ;
+messageDecl
+    : messageNameList (COLON LEFTOPEN typeRefList RIGHTOPEN)?
+    ;
+messageNameList
+    : NAME (COMMA messageNameList)?
+    ;
+timerDeclList
+    : timerDecl (SEMI timerDeclList)?
+    ;
+timerDecl
+    : timerNameList (duration)? (COLON LEFTOPEN typeRefList RIGHTOPEN)?
+    ;
+timerNameList
+    : NAME (COMMA timerNameList)?
+    ;
+typeRefList
+    : STRING (COMMA typeRefList)?
+    ;
+dynamicDeclList
+    : VARIABLES variableDeclList SEMI
+    ;
 variableDeclList
     : variableDeclItem (SEMI variableDeclList)?
     ;

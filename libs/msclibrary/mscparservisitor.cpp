@@ -135,7 +135,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    auto chart = new MscChart(::treeNodeToString(context->NAME()));
+    auto chart = new MscChart(::treeNodeToString(context->mscHead()->NAME()));
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
