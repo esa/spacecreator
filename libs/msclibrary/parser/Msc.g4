@@ -8,6 +8,8 @@ tokens {
 
 file : mscDocument | mscDefinition;
 
+// 2.3 Comment
+
 textDefinition
     : ('text' | 'TEXT') STRING SEMI
     ;
@@ -27,7 +29,7 @@ virtuality
     ;
 
 containingClause
-    : INST instanceItem (INST instanceItem)*
+    : (INST instanceItem)+
     ;
 instanceItem
     : NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
@@ -100,7 +102,7 @@ mscStatement
     ;
 
 eventDefinition
-    : (NAME COLON instanceEventList) // TODO add "| (instanceNameList COLON multiInstanceEventList)"
+    : (NAME COLON instanceEventList) | (instanceNameList COLON multiInstanceEventList)
     ;
 
 instanceEventList
@@ -110,6 +112,16 @@ instanceEventList
 
 instanceDeclStatement
     : instance
+    ;
+
+instanceNameList
+    : (NAME (COMMA NAME)*) | ALL
+    ;
+multiInstanceEventList
+    : multiInstanceEvent +
+    ;
+multiInstanceEvent
+    : condition // TODO add | mscReference | inlineExpr
     ;
 
 //
@@ -165,6 +177,30 @@ outputAddress
 
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    ;
+
+// 4.7 Condition
+
+sharedCondition
+    : (shared)?  conditionIdentification shared SEMI
+    ;
+conditionIdentification
+    : CONDITION conditionText
+    ;
+conditionText
+    : conditionNameList
+| WHEN (conditionNameList | LEFTOPEN expression RIGHTOPEN) | OTHERWISE
+    ;
+conditionNameList
+    : NAME (COMMA NAME) *
+    ;
+shared
+    : SHARED ( (sharedInstanceList)?  | ALL) ;
+sharedInstanceList
+    : NAME (COMMA sharedInstanceList)?
+    ;
+condition
+    : (shared)?  conditionIdentification SEMI
     ;
 
 // 4.8 TIMER
