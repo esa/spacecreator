@@ -156,14 +156,46 @@ informalAction
     : CHARACTERSTRING
     ;
 
-//
+// 5.2 Syntax interface to external data languages
 
-parameterList
-    : paramaterDefn (',' parameterList)?
+variableString
+    : STRING // TODO not correct ?
+    ;
+typeRefString
+    : STRING
+    ;
+dataDefinitionString
+    : STRING
     ;
 
-paramaterDefn
-    : binding | expression | pattern
+// 5.4 Declaring DATA
+
+variableDeclList
+    : variableDeclItem (SEMI variableDeclList)?
+    ;
+variableDeclItem
+    : variableList COLON STRING
+    ;
+variableList
+    : variableString (COMMA variableList)?
+    ;
+dataDefinition
+    : (LANGUAGE NAME SEMI)? (wildcardDecl)? (DATA STRING SEMI)?
+    ;
+wildcardDecl
+    : WILDCARDS variableDeclList SEMI
+    ;
+
+// 5.5 Static DATA
+
+dataParameterDecl
+    : (VARIABLES)?  variableDeclList
+    ;
+actualDataParameters
+    : (VARIABLES)?  actualDataParameterList
+    ;
+actualDataParameterList
+    : expressionString (COMMA actualDataParameterList)?
     ;
 
 // 5.7 Bindings
@@ -192,11 +224,17 @@ wildcard
     : NAME // TODO not correct ?
     ;
 
-//
+// 5.8 Data in message and timer parameters
 
-variableString
-    : STRING // TODO not correct ?
+parameterList
+    : paramaterDefn (COMMA parameterList)?
     ;
+
+paramaterDefn
+    : binding | expression | pattern
+    ;
+
+//
 
 expressionString
     : NAME COLON NAME // TODO not correct ?
