@@ -18,6 +18,8 @@
 #pragma once
 
 #include <QGraphicsObject>
+#include <QPropertyAnimation>
+#include <QPointer>
 
 class QGraphicsRectItem;
 
@@ -28,6 +30,8 @@ class HighlightRectItem : public QGraphicsObject
     Q_OBJECT
 public:
     HighlightRectItem(QGraphicsItem *parent);
+    ~HighlightRectItem();
+
     // QGraphicsItem interface
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
@@ -42,7 +46,10 @@ Q_SIGNALS:
     void highlighted() const;
 
 private:
-    QGraphicsRectItem *m_rectItem;
+    QGraphicsRectItem *m_rectItem = new QGraphicsRectItem(this);
+    QPointer<QPropertyAnimation> m_lastAnimation = nullptr;
+
+    void clearAnimation();
 };
 
 } // ns msc
