@@ -43,8 +43,10 @@ public:
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
+    antlrcpp::Any visitInstanceItem(MscParser::InstanceItemContext *context) override;
     antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
     antlrcpp::Any visitInstance(MscParser::InstanceContext *context) override;
+    antlrcpp::Any visitInstanceKind(MscParser::InstanceKindContext *context) override;
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
     antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
@@ -54,7 +56,7 @@ public:
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;
 
 private:
-    void addInstance(MscParser::InstanceContext *context);
+    void addInstance(const QString &name);
 
     void resetInstanceEvents();
     void orderInstanceEvents();

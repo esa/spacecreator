@@ -133,6 +133,15 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     return ret;
 }
 
+antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext *context)
+{
+    const QString name = ::treeNodeToString(context->instanceName);
+    m_currentInstance = m_currentChart->instanceByName(name);
+    auto result = visitChildren(context);
+    m_currentInstance = nullptr;
+    return result;
+}
+
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
     QString mscName;
@@ -148,9 +157,17 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 
     m_currentChart = chart;
     // add all instances first, so messages can reference them
+    if (context->mscHead() && context->mscHead()->mscInstInterface()) {
+        auto clause = context->mscHead()->mscInstInterface()->containingClause();
+        for (auto instanceItem : clause->instanceItem()) {
+            addInstance(::treeNodeToString(instanceItem->instanceName));
+        }
+    }
     if (context->mscBody()) {
         for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
-            addInstance(instanceDeclCtx->instance());
+            if (instanceDeclCtx->instance() && instanceDeclCtx->instance()->instanceName) {
+                addInstance(::treeNodeToString(instanceDeclCtx->instance()->instanceName));
+            }
         }
     }
 
@@ -168,19 +185,34 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
         return visitChildren(context);
     }
 
-    const QString name = ::treeNodeToString(context->NAME());
+    const QString name = ::treeNodeToString(context->instanceName);
     if (name.isEmpty()) {
         return visitChildren(context);
     }
 
     m_currentInstance = m_currentChart->instanceByName(name);
+    if (!m_currentInstance) {
+        qWarning() << "Instance" << name << "has not been created before as expected";
+    }
     m_currentMessage = nullptr;
 
     auto result = visitChildren(context);
 
     resetInstanceEvents();
 
+    m_currentInstance = nullptr;
     return result;
+}
+
+antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext *context)
+{
+    if (m_currentInstance) {
+        QString kind = ::treeNodeToString(context->NAME(0));
+        m_currentInstance->setKind(kind);
+        m_currentInstance->setInheritance(::treeNodeToString(context->NAME(1)));
+    }
+
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
@@ -411,27 +443,13 @@ antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *contex
     return rc;
 }
 
-void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
+void MscParserVisitor::addInstance(const QString &name)
 {
-    Q_ASSERT(m_currentChart != nullptr);
-    if (context->gateDeclaration()) {
-        return;
-    }
-
-    const QString name = ::treeNodeToString(context->NAME());
-
     MscInstance *instance = m_currentChart->instanceByName(name);
     if (!instance) {
         instance = new MscInstance(name);
     }
-    if (context->instanceKind() != nullptr) {
-        QString kind = ::treeNodeToString(context->instanceKind()->NAME(0));
-        instance->setKind(kind);
 
-        if (context->instanceKind()->NAME(1) != nullptr) {
-            instance->setInheritance(QString::fromStdString(context->instanceKind()->NAME(1)->getText()));
-        }
-    }
     m_currentChart->addInstance(instance);
 }
 

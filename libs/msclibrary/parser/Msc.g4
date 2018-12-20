@@ -35,7 +35,7 @@ containingClause
     : (INST instanceItem)+
     ;
 instanceItem
-    : NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
+    : instanceName=NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
     ;
 inheritance
     : INHERITS instanceKind
@@ -132,10 +132,10 @@ multiInstanceEvent
 //
 
 instance
-    : INSTANCE NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
+    : INSTANCE instanceName=NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
+        |       instanceName=NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
         |       gateDeclaration
-        |       INST NAME (COLON instanceKind)? SEMI
+        |       INST instanceName=NAME (COLON instanceKind)? SEMI
     ;
 
 gateDeclaration
