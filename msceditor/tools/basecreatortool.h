@@ -20,8 +20,14 @@
 #include "basetool.h"
 
 #include <chartviewmodel.h>
+#include <mscentity.h>
+#include <mscchart.h>
+
+#include <QPointer>
 
 namespace msc {
+
+class MscChart;
 
 class BaseCreatorTool : public BaseTool
 {
@@ -31,8 +37,13 @@ public:
 public slots:
     void setModel(ChartViewModel *model);
 
+protected Q_SLOTS:
+    virtual void onCurrentChartChagend(msc::MscChart *);
+
 protected:
     QPointer<ChartViewModel> m_model = nullptr;
+    QPointer<MscEntity> m_previewEntity = nullptr;
+    QPointer<MscChart> m_activeChart = nullptr;
 };
 
 } // ns msc

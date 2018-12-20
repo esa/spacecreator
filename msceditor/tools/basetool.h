@@ -24,7 +24,7 @@
 #include <QPixmap>
 #include <QGraphicsView>
 #include <QGraphicsScene>
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 
 class QMouseEvent;
 
@@ -61,7 +61,7 @@ protected:
     QPixmap m_icon;
     QString m_title = tr("Untitled");
     QString m_description = tr("Unimplemented tool");
-    QGraphicsItem *m_previewItem = nullptr;
+    QPointer<QGraphicsObject> m_previewItem = nullptr;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 

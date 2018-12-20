@@ -31,6 +31,9 @@ public:
     MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
     virtual ToolType toolType() const override;
 
+protected Q_SLOTS:
+    void onCurrentChartChagend(msc::MscChart *) override;
+
 protected:
     void createPreviewItem() override;
     void commitPreviewItem() override;

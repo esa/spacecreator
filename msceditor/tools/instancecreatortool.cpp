@@ -20,6 +20,7 @@
 #include <commands/common/commandsstack.h>
 #include <instanceitem.h>
 #include <mscchart.h>
+#include <mscinstance.h>
 
 #include <QDebug>
 
@@ -43,7 +44,10 @@ void InstanceCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem)
         return;
 
-    m_previewItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
+    m_previewItem = instanceItem;
+    m_previewEntity = instanceItem->modelItem();
+
     m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
 }
@@ -58,9 +62,8 @@ void InstanceCreatorTool::commitPreviewItem()
                                       m_previewItem->pos() };
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
-
-    InstanceItem *instanceItem = static_cast<InstanceItem *>(m_previewItem);
-    instanceItem->setName(tr("Instance_%1").arg(m_model->currentChart()->instances().size()));
+    if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_previewItem.data()))
+        instanceItem->setName(tr("Instance_%1").arg(m_model->currentChart()->instances().size()));
 }
 
 void InstanceCreatorTool::removePreviewItem()
@@ -68,8 +71,19 @@ void InstanceCreatorTool::removePreviewItem()
     if (!m_previewItem)
         return;
 
-    if (m_model->removeInstanceItem(static_cast<InstanceItem *>(m_previewItem)))
+    if (m_model->removeInstanceItem(dynamic_cast<InstanceItem *>(m_previewItem.data())))
         m_previewItem = nullptr;
+}
+
+void InstanceCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
+{
+    if (m_previewEntity && m_activeChart)
+        if (MscInstance *instance = dynamic_cast<MscInstance *>(m_previewEntity.data())) {
+            m_activeChart->removeInstance(instance);
+            delete m_previewEntity;
+        }
+
+    BaseCreatorTool::onCurrentChartChagend(chart);
 }
 
 } // ns msc
