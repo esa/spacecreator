@@ -33,8 +33,6 @@ HEADERS += \
     msctimer.h \
     mscwriter.h
 
-message($BUILDTOOL)
-message($$BUILDTOOL)
 equals(BUILDTOOL, "analyzer") {
 } else {
 SOURCES += \
