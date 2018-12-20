@@ -49,7 +49,8 @@ public:
     antlrcpp::Any visitInstanceKind(MscParser::InstanceKindContext *context) override;
     antlrcpp::Any visitMscEvent(MscParser::MscEventContext *context) override;
     antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
-    antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
+    antlrcpp::Any visitDefInGate(MscParser::DefInGateContext *context) override;
+    antlrcpp::Any visitDefOutGate(MscParser::DefOutGateContext *context) override;
     antlrcpp::Any visitActionStatement(MscParser::ActionStatementContext *context) override;
     antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;
     antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;

@@ -283,51 +283,59 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitGateDeclaration(MscParser::GateDeclarationContext *context)
+void applyGateDetails(MscGate *gate, MscParser::MsgIdentificationContext *msgCtx)
 {
-    QScopedPointer<MscGate> gate(new MscGate());
-    if (!m_currentChart) {
-        return visitChildren(context);
+    if (msgCtx->messageInstanceName && msgCtx->parameterList()) {
+        gate->setParamName(::treeNodeToString(msgCtx->messageInstanceName));
+    } else {
+        gate->setParamName(::treeNodeToString(msgCtx->messageName));
     }
-
-    const bool isIN(context->IN() || context->FROM());
-    const bool isOUT(context->OUT() || context->TO());
-    if (!isIN && !isOUT) {
-        qWarning() << Q_FUNC_INFO << "A gate with no IN/FROM nor OUT/TO direction, ignored.";
-        return visitChildren(context);
-    }
-
-    static constexpr size_t messageNameId = 0;
-    const size_t paramNameId = context->COMMA() && context->parameterList() ? messageNameId + 1 : 0;
-    const size_t instanceNameId = paramNameId + 1;
-
-    auto readNAME = [&context](size_t id) {
-        if (antlr4::tree::TerminalNode *node = context->NAME(id))
-            return QString::fromStdString(node->getText());
-        return QString();
-    };
-
-    const QString messageName(readNAME(messageNameId));
-    const QString paramName(paramNameId ? readNAME(paramNameId) : QString());
-    const QString instanceName(readNAME(instanceNameId));
-
-    const MscGate::Direction direction = isIN ? MscGate::Direction::In : MscGate::Direction::Out;
-
     QVariantList params;
-    if (MscParser::ParameterListContext *paramList = context->parameterList()) {
+    if (MscParser::ParameterListContext *paramList = msgCtx->parameterList()) {
         while (paramList) {
             params << QString::fromStdString(paramList->getText());
             paramList = paramList->parameterList();
         }
     }
-
-    gate->setName(messageName);
-    gate->setInstanceName(instanceName);
-    gate->setParamName(paramName);
     gate->setParams(params);
-    gate->setDirection(direction);
+}
 
-    m_currentChart->addGate(gate.take());
+antlrcpp::Any MscParserVisitor::visitDefInGate(MscParser::DefInGateContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    MscGate *gate = new MscGate;
+    gate->setName(::treeNodeToString(context->gateName));
+    gate->setDirection(MscGate::Direction::In);
+
+    if (context->inputDest()->inputAddress()) {
+        gate->setInstanceName(::treeNodeToString(context->inputDest()->inputAddress()->instanceName));
+    }
+
+    applyGateDetails(gate, context->msgIdentification());
+
+    m_currentChart->addGate(gate);
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitDefOutGate(MscParser::DefOutGateContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    MscGate *gate = new MscGate;
+    gate->setName(::treeNodeToString(context->gateName));
+    gate->setDirection(MscGate::Direction::Out);
+    if (context->outputDest()->outputAddress()) {
+        gate->setInstanceName(::treeNodeToString(context->outputDest()->outputAddress()->instanceName));
+    }
+
+    applyGateDetails(gate, context->msgIdentification());
+
+    m_currentChart->addGate(gate);
     return visitChildren(context);
 }
 

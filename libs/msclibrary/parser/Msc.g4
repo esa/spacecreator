@@ -55,7 +55,7 @@ messageSequenceChart
     ;
 
 mscHead
-    : NAME (mscParameterDecl)? SEMI (mscInstInterface)? // TODO add time offset, gate interface
+    : NAME (mscParameterDecl)? SEMI (mscInstInterface)? mscGateInterface
     ;
 
 mscParameterDecl
@@ -96,6 +96,16 @@ mscInstInterface
     : containingClause
     ;
 
+mscGateInterface
+    : mscGateDef*
+    ;
+mscGateDef
+    : GATE msgGate SEMI // TODO (| methodCallGate | replyGate| createGate | orderGate) SEMI
+    ;
+msgGate
+    : defInGate | defOutGate
+    ;
+
 mscBody
     : mscStatement* | instanceDeclStatement*
     ;
@@ -134,12 +144,7 @@ multiInstanceEvent
 instance
     : INSTANCE instanceName=NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
         |       instanceName=NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       gateDeclaration
         |       INST instanceName=NAME (COLON instanceKind)? SEMI
-    ;
-
-gateDeclaration
-    : GATE (IN|OUT) NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)? (TO|FROM) NAME SEMI
     ;
 
 instanceHeadStatement
@@ -169,7 +174,7 @@ mscEvent
     ;
 
 msgIdentification
-    : NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
 outputAddress
@@ -223,6 +228,21 @@ startSuspension
     ;
 endSuspension
     : ENDSUSPENSION SEMI
+    ;
+
+// 4.5 Environment and gates
+
+inputDest
+    : (LOST (inputAddress)?) | inputAddress
+    ;
+outputDest
+    : (FOUND (outputAddress)?) | outputAddress
+    ;
+defInGate
+    : (gateName=NAME)?  OUT msgIdentification TO inputDest
+    ;
+defOutGate
+    : (gateName=NAME)?  IN msgIdentification FROM outputDest
     ;
 
 // 4.7 Condition
