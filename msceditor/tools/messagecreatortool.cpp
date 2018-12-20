@@ -20,6 +20,7 @@
 #include <baseitems/arrowitem.h>
 #include <commands/common/commandsstack.h>
 #include <mscchart.h>
+#include <mscmessage.h>
 
 #include <QDebug>
 
@@ -43,9 +44,10 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem)
         return;
 
-    m_previewItem = m_model->createDefaultMessageItem(nullptr, scenePos());
+    MessageItem *messageItem = m_model->createDefaultMessageItem(nullptr, scenePos());
+    m_previewItem = messageItem;
+    m_previewEntity = messageItem->modelItem();
 
-    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
     messageItem->setAutoResizable(false);
     messageItem->performSnap();
 
@@ -72,9 +74,21 @@ void MessageCreatorTool::removePreviewItem()
     if (!m_previewItem)
         return;
 
-    MessageItem *messageItem = static_cast<MessageItem *>(m_previewItem);
-    if (m_model->removeMessageItem(messageItem))
-        m_previewItem = nullptr;
+    if (MessageItem *messageItem = dynamic_cast<MessageItem *>(m_previewItem.data())) {
+        if (m_model->removeMessageItem(messageItem))
+            m_previewItem = nullptr;
+    }
+}
+
+void MessageCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
+{
+    if (m_previewEntity && m_activeChart)
+        if (MscMessage *message = dynamic_cast<MscMessage *>(m_previewEntity.data())) {
+            m_activeChart->removeInstanceEvent(message);
+            delete m_previewEntity;
+        }
+
+    BaseCreatorTool::onCurrentChartChagend(chart);
 }
 
 } // ns msc

@@ -16,18 +16,30 @@
 */
 
 #include "basecreatortool.h"
+#include "mscchart.h"
 
 namespace msc {
 
 BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseTool(view, parent)
     , m_model(model)
+    , m_activeChart(m_model->currentChart())
+
 {
+    connect(model, &ChartViewModel::currentChartChagend, this, &BaseCreatorTool::onCurrentChartChagend);
 }
 
 void BaseCreatorTool::setModel(ChartViewModel *model)
 {
     m_model = model;
+}
+
+void BaseCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
+{
+    m_activeChart = chart;
+    if (isActive()) {
+        createPreviewItem();
+    }
 }
 
 } // ns msc
