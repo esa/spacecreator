@@ -72,6 +72,7 @@ private:
     void initMenuFile();
     void initMenuEdit();
     void initMenuView();
+    void initMenuViewWindows();
     void initMenuHelp();
     void initTools();
     void initConnections();
