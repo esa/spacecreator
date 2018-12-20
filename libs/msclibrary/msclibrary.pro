@@ -33,11 +33,17 @@ HEADERS += \
     msctimer.h \
     mscwriter.h
 
+message($BUILDTOOL)
+message($$BUILDTOOL)
+equals(BUILDTOOL, "analyzer") {
+} else {
 SOURCES += \
     parser/MscBaseVisitor.cpp \
     parser/MscLexer.cpp \
     parser/MscParser.cpp \
-    parser/MscVisitor.cpp \
+    parser/MscVisitor.cpp
+}
+SOURCES += \
     documentitemmodel.cpp \
     exceptions.cpp \
     mscaction.cpp \

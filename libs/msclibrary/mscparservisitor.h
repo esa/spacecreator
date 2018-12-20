@@ -49,6 +49,8 @@ public:
     antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
     antlrcpp::Any visitGateDeclaration(MscParser::GateDeclarationContext *context) override;
     antlrcpp::Any visitActionStatement(MscParser::ActionStatementContext *context) override;
+    antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;
+    antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;
 
 private:

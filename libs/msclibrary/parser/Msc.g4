@@ -1,4 +1,7 @@
 // Define a grammar called Msc
+// Specs from
+// https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-Z.120-201102-I!!PDF-E&type=items
+
 grammar Msc;
 
 tokens {
@@ -7,6 +10,8 @@ tokens {
 }
 
 file : mscDocument | mscDefinition;
+
+// 2.3 Comment
 
 textDefinition
     : ('text' | 'TEXT') STRING SEMI
@@ -26,6 +31,16 @@ virtuality
     : VIRTUAL | REDEFINED | FINALIZED
     ;
 
+containingClause
+    : (INST instanceItem)+
+    ;
+instanceItem
+    : NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
+    ;
+inheritance
+    : INHERITS instanceKind
+    ;
+
 mscDefinition
     : messageSequenceChart
         |       LANGUAGE NAME SEMI
@@ -36,7 +51,49 @@ mscDefinition
 // 4.1 Message sequence chart
 
 messageSequenceChart
-    : MSC NAME SEMI (gateDeclaration)? mscBody ENDMSC SEMI // TODO add head, virtuality and hmsc
+    : virtuality? MSC mscHead mscBody ENDMSC SEMI // TODO add hmsc
+    ;
+
+mscHead
+    : NAME (mscParameterDecl)? SEMI (mscInstInterface)? // TODO add time offset, gate interface
+    ;
+
+mscParameterDecl
+    : LEFTOPEN mscParmDeclList RIGHTOPEN
+    ;
+mscParmDeclList
+    : mscParmDeclBlock (SEMI mscParameterDecl)?
+    ;
+mscParmDeclBlock
+    : dataParameterDecl
+    | instanceParameterDecl
+    | messageParameterDecl
+    | timerParameterDecl
+    ;
+
+instanceParameterDecl
+    : INST instanceParmDeclList
+    ;
+instanceParmDeclList
+    : NAME (COLON instanceKind)? (COMMA instanceParmDeclList)?
+    ;
+
+messageParameterDecl
+    : MSG messageParmDeclList
+    ;
+messageParmDeclList
+    : messageDeclList
+    ;
+
+timerParameterDecl
+    : TIMER timerParmDeclList
+    ;
+timerParmDeclList
+    : timerDeclList
+    ;
+
+mscInstInterface
+    : containingClause
     ;
 
 mscBody
@@ -48,16 +105,28 @@ mscStatement
     ;
 
 eventDefinition
-    : (NAME COLON instanceEventList) // TODO add "| (instanceNameList COLON multiInstanceEventList)"
+    : (NAME COLON instanceEventList) | (instanceNameList COLON multiInstanceEventList)
     ;
 
 instanceEventList
-    : METHOD instanceEvent* ENDMETHOD
-    | instanceHeadStatement instanceEvent* instanceEndStatement
-    ; // TODO add suspension, ...
+    : (startMethod instanceEvent* endMethod)
+    | (startSuspension instanceEvent* endSuspension)
+    | (startCoregion instanceEvent* endCoregion)
+    | (instanceHeadStatement instanceEvent* (instanceEndStatement | stop))
+    ;
 
 instanceDeclStatement
     : instance
+    ;
+
+instanceNameList
+    : (NAME (COMMA NAME)*) | ALL
+    ;
+multiInstanceEventList
+    : multiInstanceEvent +
+    ;
+multiInstanceEvent
+    : condition // TODO add | mscReference | inlineExpr
     ;
 
 //
@@ -91,19 +160,15 @@ instanceEvent
     | coregion
     ;
 
-coregion
-    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
-    ;
-
 // 4.3 Message
 
 mscEvent
     : CONDITION NAME (SHARED ALL)?
-    | IN messageIdentification (FROM outputAddress)?
-    | OUT messageIdentification (TO inputAddress)?
+    | IN msgIdentification (FROM outputAddress)?
+    | OUT msgIdentification (TO inputAddress)?
     ;
 
-messageIdentification
+msgIdentification
     : NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
@@ -113,6 +178,75 @@ outputAddress
 
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    ;
+
+// 4.4 Control Flow
+
+methodCallEvent
+    : callOut | callIn |replyOut | replyIn
+    ;
+callOut
+    : CALL msgIdentification TO inputAddress
+    ;
+callIn
+    : RECEIVE msgIdentification FROM outputAddress
+    ;
+replyOut
+    : REPLYOUT msgIdentification TO inputAddress
+    ;
+replyIn
+    : REPLYIN msgIdentification FROM outputAddress
+    ;
+incompleteMethodCallEvent
+    : incompleteCallOut | incompleteCallIn | incompleteReplyOut | incompleteReplyIn
+    ;
+incompleteCallOut
+    : CALL msgIdentification TO LOST (inputAddress)?
+    ;
+incompleteCallIn
+    : RECEIVE msgIdentification FROM FOUND (outputAddress)?
+    ;
+incompleteReplyOut
+    : REPLYOUT msgIdentification TO LOST (inputAddress)?
+    ;
+incompleteReplyIn
+    : REPLYIN msgIdentification FROM FOUND (outputAddress)?
+    ;
+startMethod
+    : METHOD SEMI
+    ;
+endMethod
+    : ENDMETHOD SEMI
+    ;
+startSuspension
+    : SUSPENSION SEMI
+    ;
+endSuspension
+    : ENDSUSPENSION SEMI
+    ;
+
+// 4.7 Condition
+
+sharedCondition
+    : (shared)?  conditionIdentification shared SEMI
+    ;
+conditionIdentification
+    : CONDITION conditionText
+    ;
+conditionText
+    : conditionNameList
+| WHEN (conditionNameList | LEFTOPEN expression RIGHTOPEN) | OTHERWISE
+    ;
+conditionNameList
+    : NAME (COMMA NAME) *
+    ;
+shared
+    : SHARED ( (sharedInstanceList)?  | ALL) ;
+sharedInstanceList
+    : NAME (COMMA sharedInstanceList)?
+    ;
+condition
+    : (shared)?  conditionIdentification SEMI
     ;
 
 // 4.8 TIMER
@@ -156,14 +290,82 @@ informalAction
     : CHARACTERSTRING
     ;
 
-//
+// 4.10 Instance creation
 
-parameterList
-    : paramaterDefn (',' parameterList)?
+create
+    : CREATE NAME (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
-paramaterDefn
-    : binding | expression | pattern
+// 4.11 Instance stop
+
+stop
+    : STOP SEMI
+    ;
+
+// 5.2 Syntax interface to external data languages
+
+variableString
+    : STRING // TODO not correct ?
+    ;
+typeRefString
+    : STRING
+    ;
+dataDefinitionString
+    : STRING
+    ;
+
+// 5.4 Declaring DATA
+
+messageDeclList
+    : messageDecl (SEMI messageDeclList)?
+    ;
+messageDecl
+    : messageNameList (COLON LEFTOPEN typeRefList RIGHTOPEN)?
+    ;
+messageNameList
+    : NAME (COMMA messageNameList)?
+    ;
+timerDeclList
+    : timerDecl (SEMI timerDeclList)?
+    ;
+timerDecl
+    : timerNameList (duration)? (COLON LEFTOPEN typeRefList RIGHTOPEN)?
+    ;
+timerNameList
+    : NAME (COMMA timerNameList)?
+    ;
+typeRefList
+    : STRING (COMMA typeRefList)?
+    ;
+dynamicDeclList
+    : VARIABLES variableDeclList SEMI
+    ;
+variableDeclList
+    : variableDeclItem (SEMI variableDeclList)?
+    ;
+variableDeclItem
+    : variableList COLON STRING
+    ;
+variableList
+    : variableString (COMMA variableList)?
+    ;
+dataDefinition
+    : (LANGUAGE NAME SEMI)? (wildcardDecl)? (DATA STRING SEMI)?
+    ;
+wildcardDecl
+    : WILDCARDS variableDeclList SEMI
+    ;
+
+// 5.5 Static DATA
+
+dataParameterDecl
+    : (VARIABLES)?  variableDeclList
+    ;
+actualDataParameters
+    : (VARIABLES)?  actualDataParameterList
+    ;
+actualDataParameterList
+    : expressionString (COMMA actualDataParameterList)?
     ;
 
 // 5.7 Bindings
@@ -192,11 +394,17 @@ wildcard
     : NAME // TODO not correct ?
     ;
 
-//
+// 5.8 Data in message and timer parameters
 
-variableString
-    : STRING // TODO not correct ?
+parameterList
+    : paramaterDefn (COMMA parameterList)?
     ;
+
+paramaterDefn
+    : binding | expression | pattern
+    ;
+
+//
 
 expressionString
     : NAME COLON NAME // TODO not correct ?
@@ -227,6 +435,18 @@ defineStatement
     ;
 undefineStatement
     : UNDEF variableString
+    ;
+
+// 7.1 Coregion
+
+startCoregion
+    : CONCURRENT SEMI
+    ;
+endCoregion
+    : ENDCONCURRENT SEMI
+    ;
+coregion // this is not as expected in the standard
+    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
     ;
 
 /*Keywords*/

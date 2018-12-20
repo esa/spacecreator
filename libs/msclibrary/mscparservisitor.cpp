@@ -135,7 +135,11 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    auto chart = new MscChart(::treeNodeToString(context->NAME()));
+    QString mscName;
+    if (context->mscHead()) {
+        mscName = ::treeNodeToString(context->mscHead()->NAME());
+    }
+    auto chart = new MscChart(mscName);
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
@@ -188,11 +192,15 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     MscMessage::Parameters parameters;
     QString name = ::treeNodeToString(context->NAME());
 
-    if (context->messageIdentification()) {
-        name = ::treeNodeToString(context->messageIdentification()->NAME(0));
-        parameters.name = ::treeNodeToString(context->messageIdentification()->NAME(1));
+    if (context->msgIdentification()) {
+        if (context->msgIdentification()->NAME().size() > 0) {
+            name = ::treeNodeToString(context->msgIdentification()->NAME(0));
+        }
+        if (context->msgIdentification()->NAME().size() > 1) {
+            parameters.name = ::treeNodeToString(context->msgIdentification()->NAME(1));
+        }
 
-        auto *parameterList = context->messageIdentification()->parameterList();
+        auto *parameterList = context->msgIdentification()->parameterList();
         if (parameterList && parameterList->paramaterDefn()) {
             auto *paramaterDefn = parameterList->paramaterDefn();
             parameters.expression = ::treeNodeToString(paramaterDefn->expression());
@@ -340,6 +348,26 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     m_instanceEvents.append(action);
 
     return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionContext *ctx)
+{
+    if (!m_currentChart) {
+        return visitChildren(ctx);
+    }
+
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
+    return visitChildren(ctx);
+}
+
+antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *ctx)
+{
+    if (!m_currentChart) {
+        return visitChildren(ctx);
+    }
+
+    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
+    return visitChildren(ctx);
 }
 
 antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementContext *context)
