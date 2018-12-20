@@ -133,6 +133,15 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     return ret;
 }
 
+antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext *context)
+{
+    const QString name = ::treeNodeToString(context->instanceName);
+    m_currentInstance = m_currentChart->instanceByName(name);
+    auto result = visitChildren(context);
+    m_currentInstance = nullptr;
+    return result;
+}
+
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
     QString mscName;
@@ -148,9 +157,17 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 
     m_currentChart = chart;
     // add all instances first, so messages can reference them
+    if (context->mscHead() && context->mscHead()->mscInstInterface()) {
+        auto clause = context->mscHead()->mscInstInterface()->containingClause();
+        for (auto instanceItem : clause->instanceItem()) {
+            addInstance(::treeNodeToString(instanceItem->instanceName));
+        }
+    }
     if (context->mscBody()) {
         for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
-            addInstance(instanceDeclCtx->instance());
+            if (instanceDeclCtx->instance() && instanceDeclCtx->instance()->instanceName) {
+                addInstance(::treeNodeToString(instanceDeclCtx->instance()->instanceName));
+            }
         }
     }
 
@@ -168,19 +185,34 @@ antlrcpp::Any MscParserVisitor::visitInstance(MscParser::InstanceContext *contex
         return visitChildren(context);
     }
 
-    const QString name = ::treeNodeToString(context->NAME());
+    const QString name = ::treeNodeToString(context->instanceName);
     if (name.isEmpty()) {
         return visitChildren(context);
     }
 
     m_currentInstance = m_currentChart->instanceByName(name);
+    if (!m_currentInstance) {
+        qWarning() << "Instance" << name << "has not been created before as expected";
+    }
     m_currentMessage = nullptr;
 
     auto result = visitChildren(context);
 
     resetInstanceEvents();
 
+    m_currentInstance = nullptr;
     return result;
+}
+
+antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext *context)
+{
+    if (m_currentInstance) {
+        QString kind = ::treeNodeToString(context->NAME(0));
+        m_currentInstance->setKind(kind);
+        m_currentInstance->setInheritance(::treeNodeToString(context->NAME(1)));
+    }
+
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *context)
@@ -251,51 +283,59 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitGateDeclaration(MscParser::GateDeclarationContext *context)
+void applyGateDetails(MscGate *gate, MscParser::MsgIdentificationContext *msgCtx)
 {
-    QScopedPointer<MscGate> gate(new MscGate());
-    if (!m_currentChart) {
-        return visitChildren(context);
+    if (msgCtx->messageInstanceName && msgCtx->parameterList()) {
+        gate->setParamName(::treeNodeToString(msgCtx->messageInstanceName));
+    } else {
+        gate->setParamName(::treeNodeToString(msgCtx->messageName));
     }
-
-    const bool isIN(context->IN() || context->FROM());
-    const bool isOUT(context->OUT() || context->TO());
-    if (!isIN && !isOUT) {
-        qWarning() << Q_FUNC_INFO << "A gate with no IN/FROM nor OUT/TO direction, ignored.";
-        return visitChildren(context);
-    }
-
-    static constexpr size_t messageNameId = 0;
-    const size_t paramNameId = context->COMMA() && context->parameterList() ? messageNameId + 1 : 0;
-    const size_t instanceNameId = paramNameId + 1;
-
-    auto readNAME = [&context](size_t id) {
-        if (antlr4::tree::TerminalNode *node = context->NAME(id))
-            return QString::fromStdString(node->getText());
-        return QString();
-    };
-
-    const QString messageName(readNAME(messageNameId));
-    const QString paramName(paramNameId ? readNAME(paramNameId) : QString());
-    const QString instanceName(readNAME(instanceNameId));
-
-    const MscGate::Direction direction = isIN ? MscGate::Direction::In : MscGate::Direction::Out;
-
     QVariantList params;
-    if (MscParser::ParameterListContext *paramList = context->parameterList()) {
+    if (MscParser::ParameterListContext *paramList = msgCtx->parameterList()) {
         while (paramList) {
             params << QString::fromStdString(paramList->getText());
             paramList = paramList->parameterList();
         }
     }
-
-    gate->setName(messageName);
-    gate->setInstanceName(instanceName);
-    gate->setParamName(paramName);
     gate->setParams(params);
-    gate->setDirection(direction);
+}
 
-    m_currentChart->addGate(gate.take());
+antlrcpp::Any MscParserVisitor::visitDefInGate(MscParser::DefInGateContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    MscGate *gate = new MscGate;
+    gate->setName(::treeNodeToString(context->gateName));
+    gate->setDirection(MscGate::Direction::In);
+
+    if (context->inputDest()->inputAddress()) {
+        gate->setInstanceName(::treeNodeToString(context->inputDest()->inputAddress()->instanceName));
+    }
+
+    applyGateDetails(gate, context->msgIdentification());
+
+    m_currentChart->addGate(gate);
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitDefOutGate(MscParser::DefOutGateContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    MscGate *gate = new MscGate;
+    gate->setName(::treeNodeToString(context->gateName));
+    gate->setDirection(MscGate::Direction::Out);
+    if (context->outputDest()->outputAddress()) {
+        gate->setInstanceName(::treeNodeToString(context->outputDest()->outputAddress()->instanceName));
+    }
+
+    applyGateDetails(gate, context->msgIdentification());
+
+    m_currentChart->addGate(gate);
     return visitChildren(context);
 }
 
@@ -411,27 +451,13 @@ antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *contex
     return rc;
 }
 
-void MscParserVisitor::addInstance(MscParser::InstanceContext *context)
+void MscParserVisitor::addInstance(const QString &name)
 {
-    Q_ASSERT(m_currentChart != nullptr);
-    if (context->gateDeclaration()) {
-        return;
-    }
-
-    const QString name = ::treeNodeToString(context->NAME());
-
     MscInstance *instance = m_currentChart->instanceByName(name);
     if (!instance) {
         instance = new MscInstance(name);
     }
-    if (context->instanceKind() != nullptr) {
-        QString kind = ::treeNodeToString(context->instanceKind()->NAME(0));
-        instance->setKind(kind);
 
-        if (context->instanceKind()->NAME(1) != nullptr) {
-            instance->setInheritance(QString::fromStdString(context->instanceKind()->NAME(1)->getText()));
-        }
-    }
     m_currentChart->addInstance(instance);
 }
 
