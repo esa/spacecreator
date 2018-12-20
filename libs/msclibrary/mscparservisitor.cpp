@@ -135,7 +135,11 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    auto chart = new MscChart(::treeNodeToString(context->mscHead()->NAME()));
+    QString mscName;
+    if (context->mscHead()) {
+        mscName = ::treeNodeToString(context->mscHead()->NAME());
+    }
+    auto chart = new MscChart(mscName);
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
     } else {
@@ -189,8 +193,12 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     QString name = ::treeNodeToString(context->NAME());
 
     if (context->msgIdentification()) {
-        name = ::treeNodeToString(context->msgIdentification()->NAME(0));
-        parameters.name = ::treeNodeToString(context->msgIdentification()->NAME(1));
+        if (context->msgIdentification()->NAME().size() > 0) {
+            name = ::treeNodeToString(context->msgIdentification()->NAME(0));
+        }
+        if (context->msgIdentification()->NAME().size() > 1) {
+            parameters.name = ::treeNodeToString(context->msgIdentification()->NAME(1));
+        }
 
         auto *parameterList = context->msgIdentification()->parameterList();
         if (parameterList && parameterList->paramaterDefn()) {
