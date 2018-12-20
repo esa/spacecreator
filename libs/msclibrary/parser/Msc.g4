@@ -75,7 +75,7 @@ instanceParameterDecl
     : INST instanceParmDeclList
     ;
 instanceParmDeclList
-    : NAME (COLON instanceKind)? (COMMA instanceParmDeclList)
+    : NAME (COLON instanceKind)? (COMMA instanceParmDeclList)?
     ;
 
 messageParameterDecl
@@ -109,10 +109,10 @@ eventDefinition
     ;
 
 instanceEventList
-    : startMethod instanceEvent* endMethod
-    | startSuspension instanceEvent* endSuspension
-    | startCoregion instanceEvent* endCoregion
-    | instanceHeadStatement instanceEvent* (instanceEndStatement | stop)
+    : (startMethod instanceEvent* endMethod)
+    | (startSuspension instanceEvent* endSuspension)
+    | (startCoregion instanceEvent* endCoregion)
+    | (instanceHeadStatement instanceEvent* (instanceEndStatement | stop))
     ;
 
 instanceDeclStatement
