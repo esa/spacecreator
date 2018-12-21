@@ -222,7 +222,7 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
     }
 
     MscMessage::Parameters parameters;
-    QString name = ::treeNodeToString(context->NAME());
+    QString name;
 
     if (context->msgIdentification()) {
         if (context->msgIdentification()->NAME().size() > 0) {
@@ -240,16 +240,7 @@ antlrcpp::Any MscParserVisitor::visitMscEvent(MscParser::MscEventContext *contex
         }
     }
 
-    if (context->CONDITION()) {
-        auto *condition = new MscCondition(name);
-        condition->setShared(context->SHARED() && context->ALL());
-        condition->setInstance(m_currentInstance);
-
-        if (m_currentMessage)
-            condition->setMessageName(m_currentMessage->name());
-
-        m_currentChart->addInstanceEvent(condition);
-    } else if (m_currentChart->messageByName(name) == nullptr) {
+    if (m_currentChart->messageByName(name) == nullptr) {
         m_currentMessage = new MscMessage(name);
         m_currentMessage->setParameters(parameters);
 
@@ -336,6 +327,34 @@ antlrcpp::Any MscParserVisitor::visitDefOutGate(MscParser::DefOutGateContext *co
     applyGateDetails(gate, context->msgIdentification());
 
     m_currentChart->addGate(gate);
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitSharedCondition(MscParser::SharedConditionContext *context)
+{
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    MscParser::ConditionTextContext *conditionText = context->conditionIdentification()->conditionText();
+
+    QString name;
+    if (conditionText->conditionNameList()) {
+        name = ::treeNodeToString(conditionText->conditionNameList()->NAME(0));
+    }
+    auto *condition = new MscCondition(name);
+
+    if (!context->shared().empty()) {
+        MscParser::SharedContext *shared = context->shared().at(0);
+        condition->setShared(shared->SHARED() && shared->ALL());
+    }
+    condition->setInstance(m_currentInstance);
+
+    if (m_currentMessage)
+        condition->setMessageName(m_currentMessage->name());
+
+    m_currentChart->addInstanceEvent(condition);
+
     return visitChildren(context);
 }
 

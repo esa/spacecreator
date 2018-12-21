@@ -162,14 +162,20 @@ instanceKind
 // This does not prevet recursive coregion statements
 instanceEvent
     : (mscEvent | timerStatement | action) SEMI
-    | coregion
+    | nonOrderableEvent
+    | coregion // not like in the standard
+    ;
+
+nonOrderableEvent
+    : sharedCondition
+//    | sharedMscReference
+//    | sharedInlineExpr
     ;
 
 // 4.3 Message
 
 mscEvent
-    : CONDITION NAME (SHARED ALL)?
-    | IN msgIdentification (FROM outputAddress)?
+    : IN msgIdentification (FROM outputAddress)?
     | OUT msgIdentification (TO inputAddress)?
     ;
 
@@ -248,7 +254,7 @@ defOutGate
 // 4.7 Condition
 
 sharedCondition
-    : (shared)?  conditionIdentification shared SEMI
+    : (shared)? conditionIdentification (shared)? SEMI // TODO second shared should be mandatory by spec?
     ;
 conditionIdentification
     : CONDITION conditionText
