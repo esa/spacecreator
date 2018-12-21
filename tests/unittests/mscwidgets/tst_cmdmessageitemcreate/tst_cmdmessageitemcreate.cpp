@@ -159,7 +159,7 @@ void tst_CmdMessageItemCreate::testPerformance()
 
 int tst_CmdMessageItemCreate::sceneItemsCount()
 {
-    return msc::utils::toplevelItems(m_chartModel.graphicsScene()).size();
+    return msc::utils::toplevelItems<MessageItem>(m_chartModel.graphicsScene()).size();
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)

@@ -172,4 +172,18 @@ MscEntity::EntityType MscChart::entityType() const
     return MscEntity::EntityType::Chart;
 }
 
+void MscChart::updateInstancePos(MscInstance *instance, int pos)
+{
+    Q_ASSERT(instance);
+
+    const int currPos = m_instances.indexOf(instance);
+    Q_ASSERT(currPos != -1);
+
+    if (currPos == pos)
+        return;
+
+    m_instances.takeAt(currPos);
+    m_instances.insert(pos, instance);
+}
+
 } // namespace msc

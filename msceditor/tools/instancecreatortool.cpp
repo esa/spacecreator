@@ -61,9 +61,11 @@ void InstanceCreatorTool::commitPreviewItem()
                                       QVariant::fromValue<ChartViewModel *>(m_model),
                                       m_previewItem->pos() };
 
+    removePreviewItem(); // free the space to avoid overlapping
+
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
-    if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_previewItem.data()))
-        instanceItem->setName(tr("Instance_%1").arg(m_model->currentChart()->instances().size()));
+
+    createPreviewItem();
 }
 
 void InstanceCreatorTool::removePreviewItem()

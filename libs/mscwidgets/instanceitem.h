@@ -58,12 +58,14 @@ public:
 
 Q_SIGNALS:
     void needRelayout() const;
+    void needRearrange() const;
 
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
     void buildLayout();
     void rebuildLayout();
+    void ensureNotOverlapped();
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -85,7 +87,6 @@ private:
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
 
     void updateText(TextItem *holder, const QString &text);
-    void ensureNotOverlapped();
 
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
