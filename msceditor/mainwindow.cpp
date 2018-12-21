@@ -83,6 +83,10 @@ struct MainWindowPrivate {
     QAction *m_actShowDocument = nullptr;
     QAction *m_actShowHierarchy = nullptr;
 
+    QMenu *m_menuViewWindows = nullptr;
+    QAction *m_actToggleErrorView = nullptr;
+    QAction *m_actToggleHierarchyView = nullptr;
+
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
 
@@ -335,6 +339,20 @@ void MainWindow::initMenuView()
     group->addAction(d->m_actShowDocument);
     group->addAction(d->m_actShowHierarchy);
     d->m_actShowDocument->setChecked(true);
+
+    initMenuViewWindows();
+}
+
+void MainWindow::initMenuViewWindows()
+{
+    d->m_menuView->addSeparator();
+    d->m_menuViewWindows = d->m_menuView->addMenu("Windows");
+
+    d->m_actToggleErrorView = d->ui->dockWidgetErrors->toggleViewAction();
+    d->m_menuViewWindows->addAction(d->m_actToggleErrorView);
+
+    d->m_actToggleHierarchyView = d->ui->dockWidgetHierarchy->toggleViewAction();
+    d->m_menuViewWindows->addAction(d->m_actToggleHierarchyView);
 }
 
 void MainWindow::initMenuHelp()

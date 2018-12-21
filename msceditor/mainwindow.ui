@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>861</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -79,7 +79,7 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dockWidget">
+  <widget class="QDockWidget" name="dockWidgetHierarchy">
    <property name="minimumSize">
     <size>
      <width>200</width>
@@ -98,7 +98,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="dockWidgetHierarchyContents">
     <layout class="QGridLayout" name="gridLayout">
      <property name="leftMargin">
       <number>5</number>
@@ -139,14 +139,14 @@
         <enum>QAbstractScrollArea::AdjustToContents</enum>
        </property>
        <attribute name="headerVisible">
-        <bool>true</bool>
+        <bool>false</bool>
        </attribute>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
+  <widget class="QDockWidget" name="dockWidgetErrors">
    <property name="floating">
     <bool>false</bool>
    </property>
@@ -156,7 +156,7 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
+   <widget class="QWidget" name="dockWidgetErrorsContents">
     <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
      <property name="spacing">
       <number>5</number>
