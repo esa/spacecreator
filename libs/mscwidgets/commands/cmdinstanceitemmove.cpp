@@ -39,8 +39,11 @@ void CmdInstanceItemMove::redo()
 
 void CmdInstanceItemMove::undo()
 {
-    if (m_graphicsItem)
+    if (m_graphicsItem) {
         m_graphicsItem->setPos(m_posFrom);
+        if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_graphicsItem))
+            instanceItem->ensureNotOverlapped();
+    }
 }
 
 bool CmdInstanceItemMove::mergeWith(const QUndoCommand *command)

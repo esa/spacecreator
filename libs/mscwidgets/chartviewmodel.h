@@ -64,6 +64,7 @@ public:
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);
     void relayout();
+    void rearrangeInstances();
 
 Q_SIGNALS:
     void currentChartChagend(msc::MscChart *chart);

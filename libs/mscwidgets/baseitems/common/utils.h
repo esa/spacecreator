@@ -48,6 +48,19 @@ QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &sc
     return items;
 }
 
+template<class ItemType>
+QList<ItemType *> toplevelItems(QGraphicsScene *scene)
+{
+    QList<ItemType *> items;
+    if (scene) {
+        for (QGraphicsItem *item : scene->items())
+            if (!item->parentItem())
+                if (ItemType *casted = dynamic_cast<ItemType *>(item))
+                    items.append(casted);
+    }
+    return items;
+}
+
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
 QPointF pointFromPath(const QPainterPath &path, int num);
@@ -58,6 +71,6 @@ QPropertyAnimation *createLinearAnimation(QObject *target,
                                           const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool removeSceneItem(QGraphicsItem *item);
-QList<QGraphicsItem *> toplevelItems(QGraphicsScene *scene);
+
 } // ns utils
 } // ns msc

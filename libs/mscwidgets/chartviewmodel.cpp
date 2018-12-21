@@ -37,10 +37,9 @@ template<typename ItemType, typename MscEntityType>
 ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
 {
     if (event)
-        for (QGraphicsItem *item : utils::toplevelItems(scene))
-            if (ItemType *messageItem = dynamic_cast<ItemType *>(item))
-                if (messageItem && messageItem->modelItem()->internalId() == event->internalId())
-                    return messageItem;
+        for (ItemType *item : utils::toplevelItems<ItemType>(scene))
+            if (item && item->modelItem()->internalId() == event->internalId())
+                return item;
 
     return nullptr;
 }
@@ -129,15 +128,14 @@ void ChartViewModel::relayout()
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
-            item = new InstanceItem(instance);
-            connect(item, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
+            item = createDefaultInstanceItem(instance, QPointF());
             d->m_scene.addItem(item);
             d->m_instanceItems.append(item);
+            item->setX(x);
         }
 
         item->setKind(instance->kind());
         item->setAxisHeight(axisHeight);
-        item->setX(x);
         item->buildLayout(); // messages layout calculation is based on
 
         x += d->InterInstanceSpan + item->boundingRect().width();
@@ -237,6 +235,9 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         }
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
+        connect(instanceItem, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
+        connect(instanceItem, &InstanceItem::needRearrange, this, &ChartViewModel::rearrangeInstances);
+
         if (!qFuzzyIsNull(d->instanceAxisHeight()))
             instanceItem->setAxisHeight(d->instanceAxisHeight());
         return instanceItem;
@@ -285,6 +286,22 @@ bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
     }
 
     return false;
+}
+
+void ChartViewModel::rearrangeInstances()
+{
+    QVector<InstanceItem *> instanceItems =
+            { utils::toplevelItems<InstanceItem>(graphicsScene()).toVector() };
+
+    std::sort(instanceItems.begin(), instanceItems.end(),
+              [](const InstanceItem *const a, const InstanceItem *const b) {
+                  return a->pos().x() < b->pos().x();
+              });
+
+    for (int i = 0; i < instanceItems.size(); ++i)
+        currentChart()->updateInstancePos(instanceItems.at(i)->modelItem(), i);
+
+    relayout();
 }
 
 } // namespace msc

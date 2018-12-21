@@ -50,6 +50,7 @@ void CmdInstanceItemCreate::redo()
 
     m_instanceItem = m_model->createDefaultInstanceItem(nullptr, m_pos);
     m_scene->addItem(m_instanceItem);
+    m_instanceItem->ensureNotOverlapped();
 }
 
 void CmdInstanceItemCreate::undo()

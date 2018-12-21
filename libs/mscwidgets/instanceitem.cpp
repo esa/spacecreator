@@ -259,8 +259,9 @@ void InstanceItem::buildLayout()
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    const QPointF &delta = { (to - from).x(), 0. };
     if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance, { QVariant::fromValue<InstanceItem *>(this), pos() + (to - from) });
+        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance, { QVariant::fromValue<InstanceItem *>(this), pos() + delta });
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -333,9 +334,12 @@ InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPoin
 void InstanceItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
+                                  GripPoint::Location::Left,
+                                  GripPoint::Location::Right });
 
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish,
-            this, &InstanceItem::ensureNotOverlapped);
+            this, &InstanceItem::onManualGeometryChangeFinished);
 
     m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
     m_nameItem->setZValue(m_gripPoints->zValue() - 1);
@@ -392,5 +396,6 @@ void InstanceItem::ensureNotOverlapped()
             return;
         }
     }
+    Q_EMIT needRearrange();
 }
 } // namespace msc

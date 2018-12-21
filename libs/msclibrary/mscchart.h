@@ -60,6 +60,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    void updateInstancePos(MscInstance *instance, int pos);
+
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void instanceRemoved(MscInstance *instance);
