@@ -39,7 +39,9 @@ Asn1Editor::Asn1Editor(QWidget *parent)
     connect(ui->openBtn, &QPushButton::clicked, this, &Asn1Editor::openFile);
     connect(ui->typesCB, &QComboBox::currentTextChanged, this, &Asn1Editor::showAsn1Type);
     connect(ui->valueBtn, &QPushButton::clicked, this, &Asn1Editor::setAsn1Value);
-    connect(ui->okBtn, &QPushButton::clicked, this, &Asn1Editor::getAsn1Value);
+
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &Asn1Editor::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
 Asn1Editor::~Asn1Editor()
@@ -105,4 +107,9 @@ void Asn1Editor::loadFile(const QString &file)
     ui->typesCB->addItems(typeNames);
 }
 
+void Asn1Editor::accept()
+{
+    getAsn1Value();
+    //    QDialog::accept();
+}
 } // namespace asn1
