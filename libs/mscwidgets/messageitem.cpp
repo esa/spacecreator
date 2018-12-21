@@ -276,9 +276,7 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 
 bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
 {
-    InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
-
-    setSourceInstanceItem(hoveredInstance);
+    setSourceInstanceItem(hoveredItem(to));
     const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
     updateGripPoints();
     commitGeometryChange();
@@ -287,12 +285,17 @@ bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
 
 bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
 {
-    InstanceItem *hoveredInstance = utils::instanceByPos<InstanceItem>(scene(), to);
-    setTargetInstanceItem(hoveredInstance);
+    setTargetInstanceItem(hoveredItem(to));
     const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
     updateGripPoints();
     commitGeometryChange();
     return res;
+}
+
+InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
+{
+    const QVector<InstanceItem *> &others = utils::itemByPos<InstanceItem, QPointF>(scene(), hoverPoint);
+    return others.isEmpty() ? nullptr : others.first();
 }
 
 void MessageItem::commitGeometryChange()

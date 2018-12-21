@@ -155,10 +155,22 @@ void GripPointsHandler::paint(QPainter *painter,
     painter->strokePath(m_borderPath, m_highlighter.borderColor());
 }
 
+void GripPointsHandler::handleGripPointPress(GripPoint *handle,
+                                             const QPointF &from, const QPointF &to)
+{
+    Q_EMIT manualGeometryChangeStart(handle->location(), from, to);
+}
+
 void GripPointsHandler::handleGripPointMove(GripPoint *handle,
                                             const QPointF &from, const QPointF &to)
 {
-    Q_EMIT rectChanged(handle->location(), from, to);
+    Q_EMIT manualGeometryChangeProgress(handle->location(), from, to);
+}
+
+void GripPointsHandler::handleGripPointRelease(GripPoint *handle,
+                                               const QPointF &from, const QPointF &to)
+{
+    Q_EMIT manualGeometryChangeFinish(handle->location(), from, to);
 }
 
 void GripPointsHandler::showAnimated()

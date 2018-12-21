@@ -33,18 +33,19 @@ namespace utils {
 
 static constexpr qreal LineHoverTolerance = 10;
 
-template<class T>
-T *instanceByPos(QGraphicsScene *scene, const QPointF &scenePos)
+template<class ItemType, class TargetPositioning>
+QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &scenePos)
 {
+    QVector<ItemType *> items;
     if (scene)
         for (QGraphicsItem *item : scene->items(scenePos)) {
             if (item->parentItem())
                 continue;
 
-            if (T *instance = dynamic_cast<T *>(item))
-                return instance;
+            if (ItemType *instance = dynamic_cast<ItemType *>(item))
+                items << instance;
         }
-    return nullptr;
+    return items;
 }
 
 QPainterPath lineShape(const QLineF &line, qreal span);

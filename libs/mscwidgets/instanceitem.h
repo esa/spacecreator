@@ -85,10 +85,12 @@ private:
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
 
     void updateText(TextItem *holder, const QString &text);
+    void ensureNotOverlapped();
 
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
+    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 };
 
 } // namespace msc

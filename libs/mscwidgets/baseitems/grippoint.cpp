@@ -201,4 +201,16 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         m_listener->handleGripPointMove(this, event->lastScenePos(), event->scenePos());
 }
 
+void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_listener)
+        m_listener->handleGripPointPress(this, event->lastScenePos(), event->scenePos());
+}
+
+void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_listener)
+        m_listener->handleGripPointRelease(this, event->lastScenePos(), event->scenePos());
+}
+
 } // namespace msc

@@ -99,6 +99,8 @@ private:
     bool ignorePositionChange() const;
     bool proceedPositionChange() const;
     void setPositionChangeIgnored(bool ignored);
+
+    InstanceItem *hoveredItem(const QPointF &hoverPoint) const;
 };
 
 } // namespace mas

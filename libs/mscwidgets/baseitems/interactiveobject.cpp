@@ -166,7 +166,7 @@ void InteractiveObject::prepareHoverMark()
         m_gripPoints = new GripPointsHandler(this);
         m_gripPoints->setZValue(0);
 
-        connect(m_gripPoints, &GripPointsHandler::rectChanged, this,
+        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
                 &InteractiveObject::gripPointMoved);
         connect(m_gripPoints, &GripPointsHandler::visibleChanged, [this]() {
             if (m_gripPoints && !m_gripPoints->isVisible())
