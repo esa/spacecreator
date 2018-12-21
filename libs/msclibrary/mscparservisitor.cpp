@@ -346,7 +346,7 @@ antlrcpp::Any MscParserVisitor::visitSharedCondition(MscParser::SharedConditionC
 
     if (!context->shared().empty()) {
         MscParser::SharedContext *shared = context->shared().at(0);
-        condition->setShared(shared->SHARED() && shared->ALL());
+        condition->setShared(shared->ALL());
     }
     condition->setInstance(m_currentInstance);
 

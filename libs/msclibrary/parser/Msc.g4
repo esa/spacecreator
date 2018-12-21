@@ -268,7 +268,7 @@ conditionNameList
     : NAME (COMMA NAME) *
     ;
 shared
-    : SHARED ( (sharedInstanceList)?  | ALL)
+    : SHARED (sharedInstanceList | ALL)
     ;
 sharedInstanceList
     : NAME (COMMA sharedInstanceList)?
