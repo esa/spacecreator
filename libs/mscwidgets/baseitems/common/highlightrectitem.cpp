@@ -33,8 +33,12 @@ namespace msc {
 
 HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , m_rectItem(new QGraphicsRectItem(this))
 {
+}
+
+HighlightRectItem::~HighlightRectItem()
+{
+    clearAnimation();
 }
 
 void HighlightRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -72,14 +76,21 @@ void HighlightRectItem::highlight()
 
     show();
 
-    if (QPropertyAnimation *anim =
-                utils::createLinearAnimation(this, "opacity", from, to, duration)) {
-        anim->setLoopCount(1);
-        connect(anim, &QPropertyAnimation::finished, [this]() {
-            hide();
-            Q_EMIT highlighted();
-        });
-        anim->start(QAbstractAnimation::DeleteWhenStopped);
+    clearAnimation();
+
+    m_lastAnimation = utils::createLinearAnimation(this, "opacity", from, to, duration);
+    connect(m_lastAnimation, &QPropertyAnimation::finished, [this]() {
+        hide();
+        Q_EMIT highlighted();
+    });
+    m_lastAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void HighlightRectItem::clearAnimation()
+{
+    if (m_lastAnimation) {
+        m_lastAnimation->stop();
+        delete m_lastAnimation;
     }
 }
 
