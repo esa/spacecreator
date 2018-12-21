@@ -255,13 +255,15 @@ conditionIdentification
     ;
 conditionText
     : conditionNameList
-| WHEN (conditionNameList | LEFTOPEN expression RIGHTOPEN) | OTHERWISE
+    | (WHEN (conditionNameList | LEFTOPEN expression RIGHTOPEN))
+    | OTHERWISE
     ;
 conditionNameList
     : NAME (COMMA NAME) *
     ;
 shared
-    : SHARED ( (sharedInstanceList)?  | ALL) ;
+    : SHARED ( (sharedInstanceList)?  | ALL)
+    ;
 sharedInstanceList
     : NAME (COMMA sharedInstanceList)?
     ;
