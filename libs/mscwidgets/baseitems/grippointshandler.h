@@ -34,7 +34,9 @@ class GripPointsHandler : public QGraphicsObject,
 public:
     GripPointsHandler(QGraphicsItem *parent = nullptr);
 
+    void handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to) override;
     void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) override;
+    void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) override;
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -59,7 +61,9 @@ protected Q_SLOTS:
     void onOpacityAnimationFinished();
 
 Q_SIGNALS:
-    void rectChanged(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeStart(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeProgress(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeFinish(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
     void changeVisibilityAnimated(bool appear);
@@ -77,8 +81,8 @@ protected:
     /*
      * To keep the selection frame and its grippoints unscaled,
      * the QGraphicsItem::ItemIgnoresTransformations flag is used.
-     * That means own bounding box and child positions should be managed
-     * manually to reflect current view's scale.
+     * That means that the own bounding box and/or child positions should be managed
+     * manually to reflect the current view scale.
      *
      * The result routine is too fragile, though: it depends on scene()->views(),
      * plus the scale factor could be obtained from QTransform only in case

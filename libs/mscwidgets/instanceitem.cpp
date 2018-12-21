@@ -37,9 +37,9 @@
 
 namespace msc {
 
-static const double SYMBOLS_WIDTH = 60.0;
-static const double START_SYMBOL_HEIGHT = 20.0;
-static const double END_SYMBOL_HEIGHT = 15.0;
+static constexpr double SymbolWidth = { 60.0 };
+static constexpr double StartSymbolHeight = { 20.0 };
+static constexpr double EndSymbolHeight = { 15.0 };
 
 QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
@@ -196,6 +196,8 @@ void InstanceItem::updateText(TextItem *holder, const QString &text)
     holder->adjustSize();
     rebuildLayout();
 
+    ensureNotOverlapped();
+
     Q_EMIT needRelayout();
 }
 
@@ -212,13 +214,13 @@ void InstanceItem::buildLayout()
     QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
     const QRectF kindRect(m_kindItem->boundingRect());
     QRectF kindR(nameRect.bottomLeft(),
-                 QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SYMBOLS_WIDTH)), qMax(kindRect.height(), START_SYMBOL_HEIGHT)));
+                 QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)), qMax(kindRect.height(), StartSymbolHeight)));
 
     // precalculate own default size:
     if (m_boundingRect.isEmpty()) {
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
-        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + END_SYMBOL_HEIGHT);
+        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + EndSymbolHeight);
         updateGripPoints();
     }
 
@@ -240,7 +242,7 @@ void InstanceItem::buildLayout()
     m_headSymbol->setRect(headRect);
 
     // move end symb to the bottom:
-    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - END_SYMBOL_HEIGHT, m_boundingRect.width(), END_SYMBOL_HEIGHT);
+    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - EndSymbolHeight, m_boundingRect.width(), EndSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -293,7 +295,8 @@ void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const Q
         return;
     }
 
-    msc::cmd::CommandsStack::push(cmd::Id::ResizeInstance, { QVariant::fromValue<InstanceItem *>(this), newRect });
+    if (newRect.width() >= SymbolWidth)
+        msc::cmd::CommandsStack::push(cmd::Id::ResizeInstance, { QVariant::fromValue<InstanceItem *>(this), newRect });
 }
 
 QPainterPath InstanceItem::shape() const
@@ -331,6 +334,9 @@ void InstanceItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
 
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish,
+            this, &InstanceItem::ensureNotOverlapped);
+
     m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
     m_nameItem->setZValue(m_gripPoints->zValue() - 1);
     m_kindItem->setZValue(m_gripPoints->zValue() - 1);
@@ -358,4 +364,33 @@ void InstanceItem::onKindEdited(const QString &newKind)
     setKind(newKind);
 }
 
+void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
+{
+    ensureNotOverlapped();
+}
+
+void InstanceItem::ensureNotOverlapped()
+{
+    static constexpr qreal paddingPixels = { 40 };
+
+    if (!scene())
+        return;
+
+    const QRectF &mySceneRect(sceneBoundingRect());
+    for (const InstanceItem *const other : utils::itemByPos<InstanceItem, QRectF>(scene(), mySceneRect)) {
+        if (other == this)
+            continue;
+        const QRectF &intersection(other->sceneBoundingRect().intersected(mySceneRect));
+        if (!intersection.isEmpty()) {
+            QRectF mySceneRectValid(mySceneRect);
+            mySceneRectValid.moveRight(intersection.left() - paddingPixels);
+
+            const QPointF &delta(mySceneRectValid.center() - mySceneRect.center());
+            moveBy(delta.x(), 0.); // TODO: use the CmdInstanceItemMove instead?
+
+            ensureNotOverlapped();
+            return;
+        }
+    }
+}
 } // namespace msc
