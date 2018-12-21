@@ -20,7 +20,7 @@ textDefinition
 // 3 Message Sequence Chart document
 
 mscDocument
-    : MSCDOCUMENT NAME SEMI (mscDocument | mscDefinition | instance)* ENDMSCDOCUMENT SEMI definingMscReference*
+    : MSCDOCUMENT NAME SEMI (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT SEMI definingMscReference*
     ;
 
 definingMscReference
@@ -39,6 +39,9 @@ instanceItem
     ;
 inheritance
     : INHERITS instanceKind
+    ;
+messageDeclClause
+    : (MSG messageDecl SEMI)*
     ;
 
 mscDefinition
@@ -95,6 +98,9 @@ timerParmDeclList
 mscInstInterface
     : containingClause
     ;
+instanceKind
+    : NAME (NAME)*
+    ;
 
 mscGateInterface
     : mscGateDef*
@@ -109,7 +115,6 @@ msgGate
 mscBody
     : mscStatement* | instanceDeclStatement*
     ;
-
 mscStatement
     : textDefinition | eventDefinition
     ;
@@ -124,46 +129,22 @@ instanceEventList
     | (startCoregion instanceEvent* endCoregion)
     | (instanceHeadStatement instanceEvent* (instanceEndStatement | stop))
     ;
-
 instanceDeclStatement
-    : instance
+    : instanceHeadStatement (orderableEvent | nonOrderableEvent)* (instanceEndStatement | stop)
     ;
-
-instanceNameList
-    : (NAME (COMMA NAME)*) | ALL
-    ;
-multiInstanceEventList
-    : multiInstanceEvent +
-    ;
-multiInstanceEvent
-    : condition // TODO add | mscReference | inlineExpr
-    ;
-
-//
-
-instance
-    : INSTANCE instanceName=NAME (COLON instanceKind)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       instanceName=NAME COLON INSTANCE instanceKind? SEMI instanceEvent* ENDINSTANCE SEMI
-        |       INST instanceName=NAME (COLON instanceKind)? SEMI
-    ;
-
-instanceHeadStatement
-    : INSTANCE instanceKind decomposition? SEMI
-    ;
-
-instanceEndStatement
-    : ENDINSTANCE SEMI
-    ;
-
-instanceKind
-    : NAME (NAME)*
-    ;
-
-// This does not prevet recursive coregion statements
 instanceEvent
-    : (mscEvent | timerStatement | action) SEMI
+    : orderableEvent
     | nonOrderableEvent
-    | coregion // not like in the standard
+    ;
+
+orderableEvent
+    : (LABEL eventName=NAME SEMI)? (messageEvent
+//    | incompleteMessageEvent
+    | create | timerStatement | action
+    | coregion) // Not like in the standard and this does not prevet recursive coregion statements
+//    | methodCallEvent | incompleteMethodCallEvent | create | timerStatement | action)
+//        (BEFORE orderDestList)? (AFTER orderDestList)?  SEMI (TIME timeDestList end)?
+    SEMI
     ;
 
 nonOrderableEvent
@@ -172,21 +153,53 @@ nonOrderableEvent
 //    | sharedInlineExpr
     ;
 
-// 4.3 Message
-
-mscEvent
-    : IN msgIdentification (FROM outputAddress)?
-    | OUT msgIdentification (TO inputAddress)?
+instanceNameList
+    : (NAME (COMMA NAME)*) | ALL
     ;
 
+multiInstanceEventList
+    : multiInstanceEvent +
+    ;
+multiInstanceEvent
+    : condition // TODO add | mscReference | inlineExpr
+    ;
+
+// 4.2 Instance
+
+instanceHeadStatement
+    : INSTANCE instanceName=NAME (COLON instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI
+    // "(LEFTOPEN parameterList RIGHTOPEN)?" is not in the spec
+    ;
+instanceEndStatement
+    : ENDINSTANCE SEMI
+    ;
+
+// 4.3 Message
+
+messageEvent
+    : messageOutput | messageInput
+    ;
+messageOutput
+    : OUT msgIdentification (TO inputAddress)? // should not be optional accortdint to spec
+    ;
+messageInput
+    : IN msgIdentification (FROM outputAddress)? // should not be optional accortdint to spec
+    ;
+incompleteMessageEvent
+    : incompleteMessageOutput | incompleteMessageInput
+    ;
+incompleteMessageOutput
+    : OUT msgIdentification TO LOST (inputAddress)?
+    ;
+incompleteMessageInput
+    : IN msgIdentification FROM FOUND (outputAddress)?
+    ;
 msgIdentification
     : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
-
 outputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
     ;
-
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
     ;
@@ -474,7 +487,7 @@ endCoregion
     : ENDCONCURRENT SEMI
     ;
 coregion // this is not as expected in the standard
-    : CONCURRENT SEMI instanceEvent* ENDCONCURRENT SEMI
+    : CONCURRENT | ENDCONCURRENT
     ;
 
 /*Keywords*/
