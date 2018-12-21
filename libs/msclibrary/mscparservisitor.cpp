@@ -137,7 +137,6 @@ antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext
 {
     if (!m_currentChart) {
         return visitChildren(context);
-        ;
     }
 
     const QString name = ::treeNodeToString(context->instanceName);
@@ -185,9 +184,11 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext *context)
 {
     if (m_currentInstance) {
-        QString kind = ::treeNodeToString(context->NAME(0));
+        const QString kind = ::treeNodeToString(context->NAME(0));
         m_currentInstance->setKind(kind);
-        m_currentInstance->setInheritance(::treeNodeToString(context->NAME(1)));
+        if (context->NAME().size() > 1) {
+            m_currentInstance->setInheritance(::treeNodeToString(context->NAME(1)));
+        }
     }
 
     return visitChildren(context);
@@ -226,19 +227,20 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
         return visitChildren(context);
     }
 
-    QString name = ::treeNodeToString(context->msgIdentification()->messageName);
+    const QString name = ::treeNodeToString(context->msgIdentification()->messageName);
     m_currentMessage = m_currentChart->messageByName(name);
     if (m_currentMessage == nullptr) {
         m_currentMessage = new MscMessage(name);
-
-        MscParser::InputAddressContext *inputAddress = context->inputAddress();
-        if (inputAddress && inputAddress->instanceName) {
-            const QString target = QString::fromStdString(inputAddress->instanceName->getText());
-            m_currentMessage->setTargetInstance(m_currentChart->instanceByName(target));
-        }
-        m_currentMessage->setSourceInstance(m_currentInstance);
         m_instanceEvents.append(m_currentMessage);
     }
+
+    MscParser::InputAddressContext *inputAddress = context->inputAddress();
+    if (inputAddress && inputAddress->instanceName) {
+        const QString target = QString::fromStdString(inputAddress->instanceName->getText());
+        m_currentMessage->setTargetInstance(m_currentChart->instanceByName(target));
+    }
+    m_currentMessage->setSourceInstance(m_currentInstance);
+
     return visitChildren(context);
 }
 
@@ -248,21 +250,20 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
         return visitChildren(context);
     }
 
-    QString name = ::treeNodeToString(context->msgIdentification()->messageName);
+    const QString name = ::treeNodeToString(context->msgIdentification()->messageName);
     m_currentMessage = m_currentChart->messageByName(name);
     if (m_currentMessage == nullptr) {
         m_currentMessage = new MscMessage(name);
-
-        MscParser::OutputAddressContext *outputAddress = context->outputAddress();
-        if (outputAddress && outputAddress->instanceName) {
-            const QString source = ::treeNodeToString(outputAddress->instanceName);
-            m_currentMessage->setSourceInstance(m_currentChart->instanceByName(source));
-        }
-        m_currentMessage->setTargetInstance(m_currentInstance);
         m_instanceEvents.append(m_currentMessage);
     }
-    auto result = visitChildren(context);
-    return result;
+
+    MscParser::OutputAddressContext *outputAddress = context->outputAddress();
+    if (outputAddress && outputAddress->instanceName) {
+        const QString source = ::treeNodeToString(outputAddress->instanceName);
+        m_currentMessage->setSourceInstance(m_currentChart->instanceByName(source));
+    }
+    m_currentMessage->setTargetInstance(m_currentInstance);
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMsgIdentification(MscParser::MsgIdentificationContext *context)
