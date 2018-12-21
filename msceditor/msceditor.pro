@@ -15,7 +15,9 @@ SOURCES += \
     tools/instancecreatortool.cpp \
     tools/messagecreatortool.cpp \
     tools/basecreatortool.cpp \
-    commandlineparser.cpp
+    commandlineparser.cpp \
+    settings/settingsmanager.cpp \
+    settings/appoptions.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -26,7 +28,9 @@ HEADERS += \
     tools/instancecreatortool.h \
     tools/messagecreatortool.h \
     tools/basecreatortool.h \
-    commandlineparser.h
+    commandlineparser.h \
+    settings/settingsmanager.h \
+    settings/appoptions.h
 
 FORMS += \
     mainwindow.ui

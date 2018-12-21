@@ -67,15 +67,21 @@ private Q_SLOTS:
 private:
     std::unique_ptr<MainWindowPrivate> const d;
 
+    void loadSettings();
+    void saveSettings();
+
     void setupUi();
     void initMenus();
     void initMenuFile();
     void initMenuEdit();
     void initMenuView();
     void initMenuViewWindows();
+    void initMenuViewToolbars();
     void initMenuHelp();
     void initTools();
     void initConnections();
+
+    void closeEvent(QCloseEvent *e) override;
 
     void keyPressEvent(QKeyEvent *e) override;
 };

@@ -20,6 +20,7 @@
 #include "ui_mainwindow.h"
 #include "mainmodel.h"
 #include "commandlineparser.h"
+#include "settings/appoptions.h"
 
 #include <documentitemmodel.h>
 #include <mscchart.h>
@@ -50,12 +51,13 @@ struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
         , m_model(new MainModel(mainWindow))
-        , m_toolBar(new QToolBar(QObject::tr("Tools"), mainWindow))
+        , m_toolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
         , m_tools({ new msc::PointerTool(nullptr, mainWindow),
                     new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow),
                     new msc::MessageCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow) })
     {
+        m_toolBar->setObjectName("mscTools");
         m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
         mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
     }
@@ -87,6 +89,10 @@ struct MainWindowPrivate {
     QAction *m_actToggleErrorView = nullptr;
     QAction *m_actToggleHierarchyView = nullptr;
 
+    QMenu *m_menuViewTools = nullptr;
+    QAction *m_actToggleToolbarMsc = nullptr;
+    QAction *m_actToggleToolbarMain = nullptr;
+
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
 
@@ -107,6 +113,8 @@ MainWindow::MainWindow(QWidget *parent)
     initConnections();
 
     selectCurrentChart();
+
+    loadSettings();
 }
 
 QGraphicsView *MainWindow::currentView() const
@@ -341,6 +349,7 @@ void MainWindow::initMenuView()
     d->m_actShowDocument->setChecked(true);
 
     initMenuViewWindows();
+    initMenuViewToolbars();
 }
 
 void MainWindow::initMenuViewWindows()
@@ -351,8 +360,20 @@ void MainWindow::initMenuViewWindows()
     d->m_actToggleErrorView = d->ui->dockWidgetErrors->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleErrorView);
 
-    d->m_actToggleHierarchyView = d->ui->dockWidgetHierarchy->toggleViewAction();
+    d->m_actToggleHierarchyView = d->ui->dockWidgetDocument->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleHierarchyView);
+}
+
+void MainWindow::initMenuViewToolbars()
+{
+    d->m_menuView->addSeparator();
+    d->m_menuViewTools = d->m_menuView->addMenu("Tools");
+
+    d->m_actToggleToolbarMsc = d->m_toolBar->toggleViewAction();
+    d->m_menuViewTools->addAction(d->m_actToggleToolbarMsc);
+
+    d->m_actToggleToolbarMain = d->ui->mainToolBar->toggleViewAction();
+    d->m_menuViewTools->addAction(d->m_actToggleToolbarMain);
 }
 
 void MainWindow::initMenuHelp()
@@ -429,4 +450,22 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         break;
     }
     }
+}
+
+void MainWindow::loadSettings()
+{
+    restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
+    restoreState(AppOptions::MainWindow.State->read().toByteArray());
+}
+
+void MainWindow::saveSettings()
+{
+    AppOptions::MainWindow.Geometry->write(saveGeometry());
+    AppOptions::MainWindow.State->write(saveState());
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    saveSettings();
+    QMainWindow::closeEvent(e);
 }
