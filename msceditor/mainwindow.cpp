@@ -96,6 +96,8 @@ struct MainWindowPrivate {
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
 
+    QAction *m_actAsnEditor = nullptr;
+
     const QVector<msc::BaseTool *> m_tools;
 };
 
@@ -104,11 +106,6 @@ MainWindow::MainWindow(QWidget *parent)
     , d(new MainWindowPrivate(this))
 {
     setupUi();
-
-    // TODO: just for test Asn1Editor
-    QAction *actionAsn1Editor = new QAction("ASN.1 Editor", d->ui->mainToolBar);
-    d->ui->mainToolBar->addAction(actionAsn1Editor);
-    connect(actionAsn1Editor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 
     initConnections();
 
@@ -398,6 +395,11 @@ void MainWindow::initTools()
     }
 
     toolsActions->actions().first()->setChecked(true);
+
+    // TODO: just for test Asn1Editor
+    d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);
+    d->ui->mainToolBar->addAction(d->m_actAsnEditor);
+    connect(d->m_actAsnEditor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 }
 
 void MainWindow::initConnections()

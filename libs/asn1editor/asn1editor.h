@@ -37,6 +37,9 @@ public:
     Asn1Editor(QWidget *parent = nullptr);
     ~Asn1Editor();
 
+public Q_SLOTS:
+    void accept() override;
+
 private Q_SLOTS:
     void openFile();
     void showParseError(const QString &error);
