@@ -109,18 +109,22 @@ void ConditionItem::setName(const QString &name)
     buildLayout();
 }
 
-void ConditionItem::buildLayout()
+void ConditionItem::buildLayout(double width)
 {
     prepareGeometryChange();
 
     // set default size:
+    QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
     if (m_boundingRect.isEmpty()) {
-        QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
-
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(nameRect.width() + CONDITION_MARGIN);
-        m_boundingRect.setHeight(CONDITION_HEIGHT);
+        m_boundingRect.setHeight(qMax(nameRect.height(), CONDITION_HEIGHT));
 
+        updateGripPoints();
+    }
+
+    if (width > 0) {
+        m_boundingRect.setWidth(qMax(width, nameRect.width() + CONDITION_MARGIN));
         updateGripPoints();
     }
 
@@ -133,7 +137,7 @@ void ConditionItem::buildLayout()
     points.append(m_boundingRect.topLeft() + QPointF(0, (m_boundingRect.bottom() - m_boundingRect.top()) / 2));
     m_polygonItem->setPolygon(points);
 
-    m_boundingRect = m_polygonItem->boundingRect();
+    //    m_boundingRect = m_polygonItem->boundingRect();
 
     // name in the middle of polygon
     const QPointF nameDelta = m_boundingRect.center() - m_nameItem->boundingRect().center();
