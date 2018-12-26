@@ -25,8 +25,8 @@
 
 namespace msc {
 
-static const double CONDITION_HEIGHT = 20.0;
-static const double CONDITION_MARGIN = 10.0;
+static const qreal CONDITION_HEIGHT = 20.0;
+static const qreal CONDITION_MARGIN = 10.0;
 
 ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(parent)
@@ -114,17 +114,17 @@ void ConditionItem::buildLayout(qreal width)
     prepareGeometryChange();
 
     // set default size:
-    QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
+    QSizeF nameSize(m_nameItem->boundingRect().size());
     if (m_boundingRect.isEmpty()) {
-        m_boundingRect.setTopLeft(nameRect.topLeft());
-        m_boundingRect.setWidth(nameRect.width() + CONDITION_MARGIN);
-        m_boundingRect.setHeight(qMax(nameRect.height(), CONDITION_HEIGHT));
+        m_boundingRect.setTopLeft({ 0.0, 0.0 });
+        m_boundingRect.setWidth(nameSize.width() + CONDITION_MARGIN);
+        m_boundingRect.setHeight(qMax(nameSize.height(), CONDITION_HEIGHT));
 
         updateGripPoints();
     }
 
     if (!qFuzzyIsNull(width)) {
-        m_boundingRect.setWidth(qMax(width, nameRect.width() + CONDITION_MARGIN));
+        m_boundingRect.setWidth(qMax(width, nameSize.width() + CONDITION_MARGIN));
         updateGripPoints();
     }
 
