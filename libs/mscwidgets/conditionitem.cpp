@@ -109,7 +109,7 @@ void ConditionItem::setName(const QString &name)
     buildLayout();
 }
 
-void ConditionItem::buildLayout(double width)
+void ConditionItem::buildLayout(qreal width)
 {
     prepareGeometryChange();
 
@@ -123,7 +123,7 @@ void ConditionItem::buildLayout(double width)
         updateGripPoints();
     }
 
-    if (width > 0) {
+    if (!qFuzzyIsNull(width)) {
         m_boundingRect.setWidth(qMax(width, nameRect.width() + CONDITION_MARGIN));
         updateGripPoints();
     }
@@ -137,12 +137,9 @@ void ConditionItem::buildLayout(double width)
     points.append(m_boundingRect.topLeft() + QPointF(0, (m_boundingRect.bottom() - m_boundingRect.top()) / 2));
     m_polygonItem->setPolygon(points);
 
-    //    m_boundingRect = m_polygonItem->boundingRect();
-
     // name in the middle of polygon
     const QPointF nameDelta = m_boundingRect.center() - m_nameItem->boundingRect().center();
-    m_nameItem->setPos({ 0., 0. });
-    m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
+    m_nameItem->setPos(-m_nameItem->pos() + nameDelta);
 }
 
 void ConditionItem::onNameEdited(const QString &name)

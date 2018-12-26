@@ -153,9 +153,8 @@ void ChartViewModel::relayout()
     double instancesWidth(x - d->InterInstanceSpan);
 
     auto relayoutCondition = [&](const QString &messageName) {
-        ConditionItem *item = nullptr;
-        MscInstance *prevInstance = nullptr;
-        ConditionItem *prevItem = nullptr;
+        QPointer<ConditionItem> item = nullptr;
+        QPointer<ConditionItem> prevItem = nullptr;
 
         for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
             MscCondition *condition = nullptr;
@@ -173,7 +172,7 @@ void ChartViewModel::relayout()
                 InstanceItem *instance = itemForInstance(condition->instance());
                 item->buildLayout(condition->shared() ? instancesWidth : instance->boundingRect().width());
 
-                if (prevItem && prevInstance == condition->instance())
+                if (prevItem && prevItem->modelItem()->instance() == condition->instance())
                     y += prevItem->boundingRect().height() + d->InterMessageSpan;
 
                 item->setPos(condition->shared() ? 0 : instance->x(), y + instance->axis().p1().y());
@@ -182,7 +181,6 @@ void ChartViewModel::relayout()
                     y += item->boundingRect().height() + d->InterMessageSpan;
 
                 prevItem = item;
-                prevInstance = condition->instance();
             }
         }
 
