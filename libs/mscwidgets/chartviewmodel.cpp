@@ -150,6 +150,47 @@ void ChartViewModel::relayout()
     }
 
     qreal y(d->InterMessageSpan);
+    double instancesWidth(x - d->InterInstanceSpan);
+
+    auto relayoutCondition = [&](const QString &messageName) {
+        QPointer<ConditionItem> item = nullptr;
+        QPointer<ConditionItem> prevItem = nullptr;
+
+        for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
+            MscCondition *condition = nullptr;
+
+            if (instanceEvent->entityType() == MscEntity::EntityType::Condition && (condition = dynamic_cast<MscCondition *>(instanceEvent)) && condition->messageName() == messageName) {
+                item = itemForCondition(condition);
+
+                if (!item) {
+                    item = new ConditionItem(condition);
+
+                    d->m_scene.addItem(item);
+                    d->m_instanceEventItems.append(item);
+                }
+
+                InstanceItem *instance = itemForInstance(condition->instance());
+                item->buildLayout(condition->shared() ? instancesWidth : instance->boundingRect().width());
+
+                if (prevItem && prevItem->modelItem()->instance() == condition->instance())
+                    y += prevItem->boundingRect().height() + d->InterMessageSpan;
+
+                item->setPos(condition->shared() ? 0 : instance->x(), y + instance->axis().p1().y());
+
+                if (condition->shared())
+                    y += item->boundingRect().height() + d->InterMessageSpan;
+
+                prevItem = item;
+            }
+        }
+
+        if (item)
+            y += item->boundingRect().height() + d->InterMessageSpan;
+    };
+
+    // conditions with empty messageName
+    relayoutCondition("");
+
     for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
         // TODO: Handle timers and conditions
         if (instanceEvent->entityType() == MscEntity::EntityType::Message) {
@@ -179,29 +220,9 @@ void ChartViewModel::relayout()
             y += item->boundingRect().height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
-        }
 
-        if (instanceEvent->entityType() == MscEntity::EntityType::Condition) {
-            auto *condition = static_cast<MscCondition *>(instanceEvent);
-
-            ConditionItem *item = itemForCondition(condition);
-            if (!item) {
-                item = new ConditionItem(condition);
-
-                d->m_scene.addItem(item);
-                d->m_instanceEventItems.append(item);
-            }
-
-            InstanceItem *instance = itemForInstance(condition->instance());
-            item->buildLayout();
-
-            // TODO: set correct position
-            item->setPos(instance->x(), y + instance->axis().p1().y());
-
-            // TODO: set correct y
-            y += item->boundingRect().height() + d->InterMessageSpan;
-
-            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+            // condition after message
+            relayoutCondition(item->name());
         }
     }
 
@@ -290,8 +311,7 @@ bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
 
 void ChartViewModel::rearrangeInstances()
 {
-    QVector<InstanceItem *> instanceItems =
-            { utils::toplevelItems<InstanceItem>(graphicsScene()).toVector() };
+    QVector<InstanceItem *> instanceItems = { utils::toplevelItems<InstanceItem>(graphicsScene()).toVector() };
 
     std::sort(instanceItems.begin(), instanceItems.end(),
               [](const InstanceItem *const a, const InstanceItem *const b) {

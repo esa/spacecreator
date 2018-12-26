@@ -25,8 +25,8 @@
 
 namespace msc {
 
-static const double CONDITION_HEIGHT = 20.0;
-static const double CONDITION_MARGIN = 10.0;
+static const qreal CONDITION_HEIGHT = 20.0;
+static const qreal CONDITION_MARGIN = 10.0;
 
 ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(parent)
@@ -109,18 +109,22 @@ void ConditionItem::setName(const QString &name)
     buildLayout();
 }
 
-void ConditionItem::buildLayout()
+void ConditionItem::buildLayout(qreal width)
 {
     prepareGeometryChange();
 
     // set default size:
+    QSizeF nameSize(m_nameItem->boundingRect().size());
     if (m_boundingRect.isEmpty()) {
-        QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
+        m_boundingRect.setTopLeft({ 0.0, 0.0 });
+        m_boundingRect.setWidth(nameSize.width() + CONDITION_MARGIN);
+        m_boundingRect.setHeight(qMax(nameSize.height(), CONDITION_HEIGHT));
 
-        m_boundingRect.setTopLeft(nameRect.topLeft());
-        m_boundingRect.setWidth(nameRect.width() + CONDITION_MARGIN);
-        m_boundingRect.setHeight(CONDITION_HEIGHT);
+        updateGripPoints();
+    }
 
+    if (!qFuzzyIsNull(width)) {
+        m_boundingRect.setWidth(qMax(width, nameSize.width() + CONDITION_MARGIN));
         updateGripPoints();
     }
 
@@ -133,12 +137,9 @@ void ConditionItem::buildLayout()
     points.append(m_boundingRect.topLeft() + QPointF(0, (m_boundingRect.bottom() - m_boundingRect.top()) / 2));
     m_polygonItem->setPolygon(points);
 
-    m_boundingRect = m_polygonItem->boundingRect();
-
     // name in the middle of polygon
     const QPointF nameDelta = m_boundingRect.center() - m_nameItem->boundingRect().center();
-    m_nameItem->setPos({ 0., 0. });
-    m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
+    m_nameItem->setPos(-m_nameItem->pos() + nameDelta);
 }
 
 void ConditionItem::onNameEdited(const QString &name)

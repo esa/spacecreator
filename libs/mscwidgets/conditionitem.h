@@ -48,7 +48,7 @@ public:
 
 public Q_SLOTS:
     void setName(const QString &name);
-    void buildLayout();
+    void buildLayout(qreal width = 0.0);
 
 private Q_SLOTS:
     void onNameEdited(const QString &name);
