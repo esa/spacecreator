@@ -87,7 +87,7 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
 
 QString Asn1TreeView::getAsn1Value() const
 {
-    return getItemValue(m_ItemModel->item(0, 0));
+    return m_ItemModel ? getItemValue(m_ItemModel->item(0, 0)) : QString();
 }
 
 void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index,

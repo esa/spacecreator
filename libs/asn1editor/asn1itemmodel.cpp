@@ -42,14 +42,14 @@ void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
 {
     clear();
 
-    ItemMap itemMap = createModelItems(asn1Item);
+    ItemMap itemMap = createModelItems(asn1Item, false);
 
     setItem(0, MODEL_NAME_INDEX, itemMap["item"]);
     setItem(0, MODEL_TYPE_INDEX, itemMap["type"]);
     setItem(0, MODEL_VALUE_INDEX, itemMap["value"]);
 }
 
-Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1Item)
+Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1Item, bool isPresentItem)
 {
     ItemMap itemMap;
     QString typeLimit;
@@ -99,7 +99,9 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     itemMap["item"] = nameItem;
     itemMap["type"] = typeItem;
     itemMap["value"] = valueItem;
-    itemMap["present"] = createPresentItem(asn1Item);
+
+    if (isPresentItem)
+        itemMap["present"] = createPresentItem(asn1Item);
 
     return itemMap;
 }
