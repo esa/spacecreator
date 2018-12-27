@@ -110,6 +110,5 @@ void Asn1Editor::loadFile(const QString &file)
 void Asn1Editor::accept()
 {
     getAsn1Value();
-    //    QDialog::accept();
 }
 } // namespace asn1
