@@ -38,6 +38,12 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    bool explicitCreate() const;
+    void setExplicitCreate(bool create);
+
+    bool explicitStop() const;
+    void setExplicitStop(bool stop);
+
 Q_SIGNALS:
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);
@@ -45,6 +51,8 @@ Q_SIGNALS:
 private:
     QString m_kind;
     QString m_inheritance;
+    bool m_explicitStart = false;
+    bool m_explicitStop = false;
 };
 
 } // namespace msc

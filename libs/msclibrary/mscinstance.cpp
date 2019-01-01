@@ -64,4 +64,27 @@ MscEntity::EntityType MscInstance::entityType() const
     return MscEntity::EntityType::Instance;
 }
 
+bool MscInstance::explicitCreate() const
+{
+    return m_explicitStart;
+}
+void MscInstance::setExplicitCreate(bool create)
+{
+    if (m_explicitStart == create)
+        return;
+
+    m_explicitStart = create;
+}
+
+bool MscInstance::explicitStop() const
+{
+    return m_explicitStop;
+}
+void MscInstance::setExplicitStop(bool stop)
+{
+    if (m_explicitStop == stop)
+        return;
+    m_explicitStop = stop;
+}
+
 } // namespace msc

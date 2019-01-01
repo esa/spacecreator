@@ -24,6 +24,7 @@
 #include <memory>
 
 class QGraphicsScene;
+class QGraphicsObject;
 
 namespace msc {
 
@@ -36,7 +37,6 @@ class MscInstance;
 class MscMessage;
 
 struct ChartViewModelPrivate;
-
 class ChartViewModel : public QObject
 {
     Q_OBJECT
@@ -71,6 +71,12 @@ Q_SIGNALS:
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
+
+    QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
+
+    void actualizeInstancesHeights() const;
+    void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
+    void updateCreatedInstanceHeight(InstanceItem *instanceItem) const;
 };
 
 } // namespace msc

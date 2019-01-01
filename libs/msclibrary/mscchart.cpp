@@ -23,6 +23,8 @@
 #include "mscgate.h"
 #include "msctimer.h"
 
+#include <QDebug>
+
 namespace msc {
 
 MscChart::MscChart(QObject *parent)
@@ -91,6 +93,44 @@ MscInstance *MscChart::instanceByName(const QString &name) const
 const QVector<MscInstanceEvent *> &MscChart::instanceEvents() const
 {
     return m_instanceEvents;
+}
+
+QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) const
+{
+    QVector<MscInstanceEvent *> events;
+    if (instance)
+        for (MscInstanceEvent *instanceEvent : instanceEvents()) {
+            switch (instanceEvent->entityType()) {
+            case MscEntity::EntityType::Document:
+            case MscEntity::EntityType::Chart:
+            case MscEntity::EntityType::Instance:
+                continue;
+            case MscEntity::EntityType::Message: {
+                auto message = static_cast<MscMessage *>(instanceEvent);
+                if (message->sourceInstance() == instance || message->targetInstance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
+            case MscEntity::EntityType::Condition: {
+                auto condition = static_cast<MscCondition *>(instanceEvent);
+                if (condition->instance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
+            case MscEntity::EntityType::Gate: {
+                auto gate = static_cast<MscGate *>(instanceEvent);
+                if (gate->instance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
+            default: {
+                qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
+                break;
+            }
+            }
+        }
+
+    return events;
 }
 
 void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)

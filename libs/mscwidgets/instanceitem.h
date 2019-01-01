@@ -20,16 +20,15 @@
 
 #include "baseitems/interactiveobject.h"
 
-namespace msc {
-class MscInstance;
-class MessageItem;
-class TextItem;
-}
-
 class QGraphicsRectItem;
 class QGraphicsTextItem;
 
 namespace msc {
+
+class MscInstance;
+class MessageItem;
+class TextItem;
+class InstanceEndItem;
 
 class InstanceItem : public InteractiveObject
 {
@@ -43,7 +42,8 @@ public:
     QString name() const;
     QString kind() const;
 
-    void setAxisHeight(double height);
+    void setAxisHeight(qreal height);
+    qreal axisHeight() const;
     QLineF axis() const;
 
     void updateLayout();
@@ -79,7 +79,7 @@ private:
     QGraphicsRectItem *m_headSymbol = nullptr;
     TextItem *m_nameItem = nullptr;
     TextItem *m_kindItem = nullptr;
-    QGraphicsRectItem *m_endSymbol = nullptr;
+    InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
     bool m_layoutDirty = false;
 

@@ -48,6 +48,7 @@ public:
     MscInstance *instanceByName(const QString &name) const;
 
     const QVector<MscInstanceEvent *> &instanceEvents() const;
+    QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
     void addInstanceEvent(MscInstanceEvent *instanceEvent);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     MscMessage *messageByName(const QString &name) const;

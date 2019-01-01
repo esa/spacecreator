@@ -424,6 +424,9 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
 
 antlrcpp::Any MscParserVisitor::visitStop(MscParser::StopContext *context)
 {
+    if (m_currentInstance)
+        m_currentInstance->setExplicitStop(true);
+
     resetInstanceEvents();
     m_currentInstance = nullptr;
     return visitChildren(context);

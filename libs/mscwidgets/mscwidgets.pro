@@ -40,7 +40,8 @@ HEADERS += \
     commands/cmdinstanceitemcreate.h \
     conditionitem.h \
     commands/cmdconditionitemmove.h \
-    commands/cmdconditionitemresize.h
+    commands/cmdconditionitemresize.h \
+    baseitems/instanceenditem.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -73,7 +74,8 @@ SOURCES += \
     commands/cmdinstanceitemcreate.cpp \
     conditionitem.cpp \
     commands/cmdconditionitemmove.cpp \
-    commands/cmdconditionitemresize.cpp
+    commands/cmdconditionitemresize.cpp \
+    baseitems/instanceenditem.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {
