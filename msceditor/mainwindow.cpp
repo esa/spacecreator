@@ -75,6 +75,7 @@ struct MainWindowPrivate {
     QMenu *m_menuFile = nullptr;
     QAction *m_actOpenFile = nullptr;
     QAction *m_actSaveFile = nullptr;
+    QAction *m_actSaveFileAs = nullptr;
     QAction *m_actQuit = nullptr;
 
     QMenu *m_menuEdit = nullptr;
@@ -158,10 +159,11 @@ bool MainWindow::openFileMsc(const QString &file)
 
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
-        static const QString title = tr("%1 [%2]");
-        setWindowTitle(title.arg(qApp->applicationName()).arg(file));
+        m_mscFileName = file;
         d->ui->documentTreeView->expandAll();
         d->ui->graphicsView->centerOn(d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
+    } else {
+        m_mscFileName.clear();
     }
 
     d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
@@ -169,7 +171,22 @@ bool MainWindow::openFileMsc(const QString &file)
                                              .arg(ok ? tr("success") : tr("failed"),
                                                   ok ? "black" : "red"));
 
+    updateTitles();
+
     return ok;
+}
+
+void MainWindow::updateTitles()
+{
+    static const QString title = tr("%1 [%2]");
+
+    const QString mscFileName(m_mscFileName.isEmpty()
+                                      ? tr("Untitled")
+                                      : QFileInfo(m_mscFileName).fileName());
+    setWindowTitle(title.arg(qApp->applicationName()).arg(mscFileName));
+
+    d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
+    d->m_actSaveFileAs->setText(tr("Save \"%1\" As...").arg(mscFileName));
 }
 
 bool MainWindow::openMscChain(const QString &dirPath)
@@ -195,11 +212,24 @@ bool MainWindow::openFileAsn(const QString &file)
 
 void MainWindow::saveMsc()
 {
+    if (m_mscFileName.isEmpty()) {
+        saveAsMsc();
+    } else {
+        d->m_model->saveMsc(m_mscFileName);
+        updateTitles();
+    }
+}
+
+void MainWindow::saveAsMsc()
+{
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("MSC"),
-                                                    "",
+                                                    tr("Save as..."),
+                                                    QFileInfo(m_mscFileName).path(),
                                                     tr("MSC files (*.msc);;All files (*.*)"));
-    d->m_model->saveMsc(fileName);
+    if (!fileName.isEmpty()) {
+        m_mscFileName = fileName;
+        saveMsc();
+    }
 }
 
 void MainWindow::showDocumentView(bool show)
@@ -312,6 +342,9 @@ void MainWindow::initMenuFile()
 
     d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this, &MainWindow::saveMsc, QKeySequence::Save);
     d->ui->mainToolBar->addAction(d->m_actSaveFile);
+
+    d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
+                                                  this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
 
     d->m_menuFile->addSeparator();
 

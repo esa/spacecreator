@@ -60,12 +60,14 @@ private Q_SLOTS:
     bool openFileMsc(const QString &file);
     bool openFileAsn(const QString &file);
     void saveMsc();
+    void saveAsMsc();
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     bool openMscChain(const QString &dirPath);
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;
+    QString m_mscFileName;
 
     void loadSettings();
     void saveSettings();
@@ -84,6 +86,8 @@ private:
     void closeEvent(QCloseEvent *e) override;
 
     void keyPressEvent(QKeyEvent *e) override;
+
+    void updateTitles();
 };
 
 #endif // MAINWINDOW_H
