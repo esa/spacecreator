@@ -20,12 +20,12 @@
 namespace msc {
 
 MscGate::MscGate(QObject *parent)
-    : MscEntity(parent)
+    : MscInstanceEvent(parent)
 {
 }
 
 MscGate::MscGate(const QString &name, QObject *parent)
-    : MscEntity(name, parent)
+    : MscInstanceEvent(name, parent)
 {
 }
 

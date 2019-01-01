@@ -62,11 +62,11 @@ struct ChartViewModelPrivate {
     static constexpr qreal InterMessageSpan = 40.;
     static constexpr qreal InterInstanceSpan = 100.;
 
-    qreal instanceAxisHeight() const
+    qreal calcInstanceAxisHeight() const
     {
         static constexpr qreal oneMessageHeight = 50.;
-        const qreal messagesCount = m_currentChart ? qMax(1, m_currentChart->instanceEvents().size()) : 1.;
-        return messagesCount * (oneMessageHeight + InterMessageSpan);
+        const int eventsCount = qMax(1, m_currentChart->instanceEvents().size());
+        return eventsCount * (oneMessageHeight + ChartViewModelPrivate::InterMessageSpan);
     }
 };
 
@@ -120,9 +120,8 @@ void ChartViewModel::fillView(MscChart *chart)
 
 void ChartViewModel::relayout()
 {
-    const qreal axisHeight = d->instanceAxisHeight();
+    const qreal axisHeight = d->calcInstanceAxisHeight();
     double x = .0;
-    qreal bottom = 0.;
 
     QRectF totalRect;
     for (MscInstance *instance : d->m_currentChart->instances()) {
@@ -140,11 +139,11 @@ void ChartViewModel::relayout()
 
         x += d->InterInstanceSpan + item->boundingRect().width();
 
-        // align instances bottoms:
-        QRectF bounds = item->boundingRect().translated(item->pos());
-        bounds.moveBottom(bottom);
-        item->setY(bounds.top());
-        bottom = bounds.bottom();
+        if (!instance->explicitCreate()) {
+            // move axis start to the scene's Y0:
+            const QLineF &axisLine(item->axis());
+            item->moveBy(0., -qMin(axisLine.y1(), axisLine.y2()));
+        }
 
         totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
     }
@@ -226,10 +225,51 @@ void ChartViewModel::relayout()
         }
     }
 
+    actualizeInstancesHeights();
+
     // actualize scene's rect to avoid flickering on first show:
     static constexpr qreal margin(50.);
     totalRect.adjust(-margin, -margin, margin, margin);
     d->m_scene.setSceneRect(totalRect);
+}
+
+void ChartViewModel::actualizeInstancesHeights() const
+{
+    for (MscInstance *instance : d->m_currentChart->instances()) {
+        if (InstanceItem *instanceItem = itemForInstance(instance)) {
+
+            if (instance->explicitCreate()) {
+                updateCreatedInstanceHeight(instanceItem);
+            }
+
+            if (instance->explicitStop()) {
+                updateStoppedInstanceHeight(instanceItem);
+            }
+        }
+    }
+}
+
+void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) const
+{
+    // update instance's end Y-postion to the last message
+    QVector<QGraphicsObject *> events(instanceEventItems(instanceItem->modelItem()));
+    if (!events.isEmpty()) {
+        std::sort(events.begin(), events.end(),
+                  [](const QGraphicsObject *const a, const QGraphicsObject *const b) {
+                      return a->pos().y() < b->pos().y();
+                  });
+
+        if (QGraphicsObject *bottomostEvent = events.last()) {
+            const qreal bottomY = bottomostEvent->boundingRect().translated(bottomostEvent->pos()).bottom();
+            QLineF axisLine(instanceItem->axis());
+            axisLine.setP2({ axisLine.x2(), bottomY });
+            instanceItem->setAxisHeight(axisLine.length());
+        }
+    }
+}
+
+void ChartViewModel::updateCreatedInstanceHeight(InstanceItem * /*instanceItem*/) const
+{
 }
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
@@ -247,6 +287,33 @@ ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
     return itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
 }
 
+QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *instance) const
+{
+    QVector<QGraphicsObject *> res;
+
+    const QVector<MscInstanceEvent *> &events = currentChart()->eventsForInstance(instance);
+    for (MscInstanceEvent *event : events) {
+        switch (event->entityType()) {
+        case MscEntity::EntityType::Message: {
+            if (MessageItem *item = itemForMessage(static_cast<MscMessage *>(event)))
+                res.append(item);
+            break;
+        }
+        case MscEntity::EntityType::Condition: {
+            if (ConditionItem *item = itemForCondition(static_cast<MscCondition *>(event)))
+                res.append(item);
+            break;
+        }
+        default: {
+            qDebug() << Q_FUNC_INFO << "ignored entity of type:" << event->entityType();
+            break;
+        }
+        }
+    }
+
+    return res;
+}
+
 InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)
 {
     if (currentChart()) {
@@ -259,8 +326,9 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         connect(instanceItem, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
         connect(instanceItem, &InstanceItem::needRearrange, this, &ChartViewModel::rearrangeInstances);
 
-        if (!qFuzzyIsNull(d->instanceAxisHeight()))
-            instanceItem->setAxisHeight(d->instanceAxisHeight());
+        const qreal axisHeight = d->calcInstanceAxisHeight();
+        if (!qFuzzyIsNull(axisHeight))
+            instanceItem->setAxisHeight(axisHeight);
         return instanceItem;
     }
     return nullptr;

@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "mscentity.h"
-#include <mscinstance.h>
+#include "mscinstance.h"
+#include "mscinstanceevent.h"
 
 #include <QPointer>
 #include <QVariantList>
 
 namespace msc {
 
-class MscGate : public MscEntity
+class MscGate : public MscInstanceEvent
 {
     Q_OBJECT
     Q_PROPERTY(MscGate::Direction direction READ direction WRITE setDirection)

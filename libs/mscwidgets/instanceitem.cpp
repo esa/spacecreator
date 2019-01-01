@@ -22,6 +22,7 @@
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/common/utils.h"
+#include "baseitems/instanceenditem.h"
 #include "commands/common/commandsstack.h"
 
 #include <mscinstance.h>
@@ -39,7 +40,6 @@ namespace msc {
 
 static constexpr double SymbolWidth = { 60.0 };
 static constexpr double StartSymbolHeight = { 20.0 };
-static constexpr double EndSymbolHeight = { 15.0 };
 
 QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
@@ -94,10 +94,9 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     , m_headSymbol(new QGraphicsRectItem(this))
     , m_nameItem(new TextItem(this))
     , m_kindItem(new TextItem(this))
-    , m_endSymbol(new QGraphicsRectItem(this))
+    , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
 {
     Q_ASSERT(m_instance != nullptr);
-    m_endSymbol->setBrush(QBrush(Qt::black));
 
     setName(m_instance->name());
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
@@ -145,13 +144,18 @@ QString InstanceItem::kind() const
     return m_kindItem->toPlainText();
 }
 
-void InstanceItem::setAxisHeight(double height)
+void InstanceItem::setAxisHeight(qreal height)
 {
     if (qFuzzyCompare(m_axisHeight, height)) {
         return;
     }
     m_axisHeight = height;
     rebuildLayout();
+}
+
+qreal InstanceItem::axisHeight() const
+{
+    return m_axisHeight;
 }
 
 QLineF InstanceItem::axis() const
@@ -216,11 +220,12 @@ void InstanceItem::buildLayout()
     QRectF kindR(nameRect.bottomLeft(),
                  QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)), qMax(kindRect.height(), StartSymbolHeight)));
 
+    const qreal &endSymbolHeight = m_endSymbol->boundingRect().height();
     // precalculate own default size:
     if (m_boundingRect.isEmpty()) {
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
-        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + EndSymbolHeight);
+        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + endSymbolHeight);
         updateGripPoints();
     }
 
@@ -242,7 +247,8 @@ void InstanceItem::buildLayout()
     m_headSymbol->setRect(headRect);
 
     // move end symb to the bottom:
-    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - EndSymbolHeight, m_boundingRect.width(), EndSymbolHeight);
+    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight,
+                      m_boundingRect.width(), endSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -259,7 +265,7 @@ void InstanceItem::buildLayout()
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    const QPointF &delta = { (to - from).x(), 0. };
+    const QPointF &delta = to - from; //{ (to - from).x(), 0. };
     if (gp->location() == GripPoint::Location::Center)
         msc::cmd::CommandsStack::push(cmd::Id::MoveInstance, { QVariant::fromValue<InstanceItem *>(this), pos() + delta });
 }
