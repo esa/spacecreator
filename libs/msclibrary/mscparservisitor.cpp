@@ -409,7 +409,7 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     if (context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
         QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
-        // remove the isngle quotes
+        // remove the single quotes
         informalAction = informalAction.mid(1, informalAction.size() - 2);
         action->setInformalAction(informalAction);
     } else {

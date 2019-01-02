@@ -650,8 +650,7 @@ RIGHTANGULARBRACKET : '>';
 fragment
 APOSTROPHE : '\'';
 
-LEFTBINDSYMBOL : ':' '='?; // ':=' TODO should be ':=' only
-
+LEFTBINDSYMBOL : ':=';
 RIGHTBINDSYMBOL : '=:';
 
 CHARACTERSTRING :
