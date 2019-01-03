@@ -26,6 +26,22 @@ cd ..
 cd libs\msclibrary\parser
 echo %cd%
 
-%JAVA% org.antlr.v4.Tool -Dlanguage=Cpp -no-listener -visitor Msc.g4
+@echo on
+
+if not exist MscParser.cpp (
+    echo "Generating parser from grammar"
+    %JAVA% org.antlr.v4.Tool -Dlanguage=Cpp -no-listener -visitor Msc.g4
+    exit /b
+)
+
+For /F "Delims=" %%I In ('dir /b /OD Msc.g4 MscParser.cpp ^| more +1') Do Set _Newer=%%I
+echo %_Newer%
+if %_Newer%==Msc.g4 (
+    echo "Updateing parser from grammar"
+    %JAVA% org.antlr.v4.Tool -Dlanguage=Cpp -no-listener -visitor Msc.g4
+    exit /b
+)
+
+echo "No need to generate the parser. It's up to date"
 
 exit /b
