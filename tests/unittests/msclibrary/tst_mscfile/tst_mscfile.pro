@@ -12,6 +12,8 @@ TARGET = tst_mscfile
 
 SOURCES +=  tst_mscfile.cpp
 
+DEFINES += EXAMPLES_DIR='\'"../../../../examples/"\''
+
 DISTFILES += \
     syntax_error.msc
 

@@ -40,6 +40,8 @@ private Q_SLOTS:
     void cleanup();
     void testFileOpenError();
     void testSyntaxError();
+    void testExampleFilesParsing_data();
+    void testExampleFilesParsing();
     void testEmptyDocument();
     void testComments();
     void testNestedDocuments();
@@ -84,6 +86,33 @@ void tst_MscFile::testSyntaxError()
 {
     QString fileName = QFINDTESTDATA("syntax_error.msc");
     QVERIFY_EXCEPTION_THROWN(file->parseFile(fileName), ParserException);
+}
+
+void tst_MscFile::testExampleFilesParsing_data()
+{
+    QTest::addColumn<QString>("filename");
+
+    QString fileName = QFINDTESTDATA(EXAMPLES_DIR "test1.msc");
+    QFileInfo fileInfo(fileName);
+    QDir exampleDir = fileInfo.dir();
+    QStringList fileList = exampleDir.entryList(QDir::Files);
+    for (const QString &file : fileList) {
+        if (file.endsWith(".msc", Qt::CaseInsensitive) && file != "example02.msc") {
+            QTest::newRow(file.toStdString().c_str()) << exampleDir.absolutePath() + "/" + file;
+        }
+    }
+}
+
+// test if the files from the example dir can be opened without an exception
+void tst_MscFile::testExampleFilesParsing()
+{
+    QFETCH(QString, filename);
+    try {
+        QScopedPointer<MscModel> model(file->parseFile(filename));
+    } catch (...) {
+        filename = "Failed to open file " + filename;
+        QFAIL(filename.toStdString().c_str());
+    }
 }
 
 void tst_MscFile::testEmptyDocument()
