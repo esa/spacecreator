@@ -42,10 +42,7 @@ static QString treeNodeToString(T *node)
 
 using namespace msc;
 
-MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens)
-    : m_model(new MscModel), m_tokens(tokens)
-{
-}
+MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens) : m_model(new MscModel), m_tokens(tokens) {}
 
 MscParserVisitor::~MscParserVisitor()
 {
@@ -92,7 +89,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
             if (line.startsWith("CIF")) {
                 // Handle CIF here
-                //qDebug() << "CIF comment on" << docName << ":" << line;
+                // qDebug() << "CIF comment on" << docName << ":" << line;
             } else if (line.startsWith("MSC")) {
                 // Handle MSC here
                 // This is really simple first version of an MSC hierarchy parser
@@ -169,7 +166,19 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
     }
     if (context->mscBody()) {
         for (auto instanceDeclCtx : context->mscBody()->instanceDeclStatement()) {
-            addInstance(::treeNodeToString(instanceDeclCtx->instanceHeadStatement()->instanceName));
+            auto headCtx = instanceDeclCtx->instanceHeadStatement();
+            if (headCtx->instanceName) {
+                addInstance(::treeNodeToString(headCtx->instanceName));
+            }
+        }
+        for (auto mscStatementCtx : context->mscBody()->mscStatement()) {
+            auto eventDefCtx = mscStatementCtx->eventDefinition();
+            if (eventDefCtx) {
+                auto eventListCtx = eventDefCtx->instanceEventList();
+                if (eventListCtx) {
+                    addInstance(::treeNodeToString(eventDefCtx->NAME()));
+                }
+            }
         }
     }
 
@@ -185,13 +194,31 @@ antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext
 {
     if (m_currentInstance) {
         const QString kind = ::treeNodeToString(context->NAME(0));
-        m_currentInstance->setKind(kind);
-        if (context->NAME().size() > 1) {
-            m_currentInstance->setInheritance(::treeNodeToString(context->NAME(1)));
+        if (kind.compare("system", Qt::CaseInsensitive) == 0 || kind.compare("block", Qt::CaseInsensitive) == 0
+            || kind.compare("process", Qt::CaseInsensitive) == 0 || kind.compare("service", Qt::CaseInsensitive) == 0) {
+            m_currentInstance->setDenominator(kind);
+            if (context->NAME().size() > 1) {
+                m_currentInstance->setKind(::treeNodeToString(context->NAME(1)));
+            }
+        } else {
+            m_currentInstance->setKind(kind);
         }
     }
 
     return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitEventDefinition(MscParser::EventDefinitionContext *context)
+{
+    const QString name = ::treeNodeToString(context->instanceName);
+    if (name.isEmpty()) {
+        return visitChildren(context);
+    }
+
+    m_currentInstance = m_currentChart->instanceByName(name);
+    auto ret = visitChildren(context);
+    m_currentInstance = nullptr;
+    return ret;
 }
 
 antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHeadStatementContext *context)
@@ -200,16 +227,32 @@ antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHe
         return visitChildren(context);
     }
 
-    const QString name = ::treeNodeToString(context->instanceName);
-    if (name.isEmpty()) {
-        return visitChildren(context);
-    }
-
-    m_currentInstance = m_currentChart->instanceByName(name);
     if (!m_currentInstance) {
-        qWarning() << "Instance" << name << "has not been created before as expected";
+        QString name;
+        if (context->instanceName) {
+            name = ::treeNodeToString(context->instanceName);
+        } else {
+            auto kindCtx = context->instanceKind();
+            if (kindCtx) {
+                name = ::treeNodeToString(kindCtx->NAME(0));
+            }
+        }
+
+        if (name.isEmpty()) {
+            qWarning() << "No name for the instance";
+            return visitChildren(context);
+        }
+
+        m_currentInstance = m_currentChart->instanceByName(name);
+        if (!m_currentInstance) {
+            qWarning() << "Instance" << name << "has not been created before as expected";
+        }
+        m_currentMessage = nullptr;
+    } else {
+        if (context->instanceName) {
+            m_currentInstance->setDenominator(treeNodeToString(context->instanceName));
+        }
     }
-    m_currentMessage = nullptr;
 
     return visitChildren(context);
 }
@@ -500,10 +543,9 @@ void MscParserVisitor::addInstance(const QString &name)
 {
     MscInstance *instance = m_currentChart->instanceByName(name);
     if (!instance) {
-        instance = new MscInstance(name);
+        instance = new MscInstance(name, m_currentChart);
+        m_currentChart->addInstance(instance);
     }
-
-    m_currentChart->addInstance(instance);
 }
 
 void MscParserVisitor::resetInstanceEvents()
@@ -582,4 +624,17 @@ void MscParserVisitor::orderInstanceEvents()
     }
 
     m_instanceEventsList.clear();
+}
+
+/*!
+   Returns thestring, if it is a denominator keyword match
+ */
+QString MscParserVisitor::denominatorString(const QString &name) const
+{
+    if (name.compare("system", Qt::CaseInsensitive) == 0 || name.compare("block", Qt::CaseInsensitive) == 0
+        || name.compare("process", Qt::CaseInsensitive) == 0 || name.compare("service", Qt::CaseInsensitive) == 0) {
+        return name;
+    }
+
+    return {};
 }

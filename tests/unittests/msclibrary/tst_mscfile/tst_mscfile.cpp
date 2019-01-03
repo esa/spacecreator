@@ -46,7 +46,6 @@ private Q_SLOTS:
     void testMscInDocument();
     void testInstance();
     void testInstanceWithKind();
-    void testInstanceWithInheritance();
     void testMessage();
     void testSameMessageInTwoInstances();
     void testMessageWithParameters();
@@ -126,7 +125,8 @@ void tst_MscFile::testNestedDocuments()
     delete model;
 
     // documents in parallel
-    model = file->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
+    model = file->parseText(
+            "MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
     mainDocuments = model->documents();
     QCOMPARE(mainDocuments.size(), 1);
     QCOMPARE(mainDocuments.at(0)->documents().size(), 2);
@@ -140,7 +140,7 @@ void tst_MscFile::testMscInDocument()
     QCOMPARE(model->charts().at(0)->name(), QString("msc1"));
     delete model;
 
-    model = file->parseText("MSCDOCUMENT doc1; MSC msc1;ENDMSC; \nENDMSCDOCUMENT;");
+    model = file->parseText("MSCDOCUMENT doc1; MSC msc1;ENDMSC; ENDMSCDOCUMENT;");
     QCOMPARE(model->documents().size(), 1);
     auto mainDocument = model->documents().at(0);
     QCOMPARE(mainDocument->charts().size(), 1);
@@ -150,7 +150,7 @@ void tst_MscFile::testMscInDocument()
 
 void tst_MscFile::testInstance()
 {
-    MscModel *model = file->parseText("MSC msc1;\nINSTANCE inst1;ENDINSTANCE;ENDMSC;");
+    MscModel *model = file->parseText("MSC msc1; INSTANCE inst1; ENDINSTANCE; ENDMSC;");
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
@@ -160,32 +160,29 @@ void tst_MscFile::testInstance()
 
 void tst_MscFile::testInstanceWithKind()
 {
-    MscModel *model = file->parseText("MSC msc1;INSTANCE foo : Process;ENDINSTANCE;ENDMSC;");
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
+    QScopedPointer<MscModel> model(file->parseText(" \
+        mscdocument automade; \
+            inst mygui_GUI : process; \
+            msc recorded; \
+                mygui_GUI : instance process foo; \
+                endinstance; \
+            endmsc; \
+        endmscdocument; \
+    "));
+    QCOMPARE(model->documents().size(), 1);
+    QCOMPARE(model->documents().at(0)->charts().size(), 1);
+    MscChart *chart = model->documents().at(0)->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
-    QCOMPARE(instance->name(), QString("foo"));
-    QCOMPARE(instance->kind(), QString("Process"));
-    delete model;
-}
-
-void tst_MscFile::testInstanceWithInheritance()
-{
-    MscModel *model = file->parseText("MSC msc1;INSTANCE foo : PROCESS satellite;ENDINSTANCE;ENDMSC;");
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-    QCOMPARE(chart->instances().size(), 1);
-    MscInstance *instance = chart->instances().at(0);
-    QCOMPARE(instance->name(), QString("foo"));
-    QCOMPARE(instance->kind(), QString("PROCESS"));
-    QCOMPARE(instance->inheritance(), QString("satellite"));
-    delete model;
+    QCOMPARE(instance->name(), QString("mygui_GUI"));
+    QCOMPARE(instance->kind(), QString("foo"));
+    QCOMPARE(instance->denominator(), QString("process"));
 }
 
 void tst_MscFile::testMessage()
 {
-    MscModel *model = file->parseText("MSC msc1;\nINSTANCE inst1;in ICONreq from env;out ICON to Responder;ENDINSTANCE;ENDMSC;");
+    MscModel *model =
+            file->parseText("MSC msc1;\nINSTANCE inst1;in ICONreq from env;out ICON to Responder;ENDINSTANCE;ENDMSC;");
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);

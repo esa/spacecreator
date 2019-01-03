@@ -46,6 +46,7 @@ public:
     antlrcpp::Any visitInstanceItem(MscParser::InstanceItemContext *context) override;
     antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
     antlrcpp::Any visitInstanceKind(MscParser::InstanceKindContext *context) override;
+    antlrcpp::Any visitEventDefinition(MscParser::EventDefinitionContext *context) override;
     antlrcpp::Any visitInstanceHeadStatement(MscParser::InstanceHeadStatementContext *context) override;
     antlrcpp::Any visitInstanceEndStatement(MscParser::InstanceEndStatementContext *context) override;
     antlrcpp::Any visitMessageOutput(MscParser::MessageOutputContext *context) override;
@@ -66,6 +67,8 @@ private:
 
     void resetInstanceEvents();
     void orderInstanceEvents();
+
+    QString denominatorString(const QString &name) const;
 
     msc::MscModel *m_model = nullptr;
 

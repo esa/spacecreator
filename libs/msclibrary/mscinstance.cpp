@@ -29,6 +29,21 @@ MscInstance::MscInstance(const QString &name, QObject *parent)
 {
 }
 
+const QString &MscInstance::denominator() const
+{
+    return m_denominator;
+}
+
+void MscInstance::setDenominator(const QString &denominator)
+{
+    if (denominator == m_denominator) {
+        return;
+    }
+
+    m_denominator = denominator;
+    Q_EMIT denominatorChanged(m_denominator);
+}
+
 const QString &MscInstance::kind() const
 {
     return m_kind;

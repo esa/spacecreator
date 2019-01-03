@@ -30,6 +30,9 @@ public:
     explicit MscInstance(QObject *parent = nullptr);
     MscInstance(const QString &name, QObject *parent = nullptr);
 
+    const QString &denominator() const;
+    void setDenominator(const QString &denominator);
+
     const QString &kind() const;
     void setKind(const QString &kind);
 
@@ -45,10 +48,12 @@ public:
     void setExplicitStop(bool stop);
 
 Q_SIGNALS:
+    void denominatorChanged(const QString &denominator);
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);
 
 private:
+    QString m_denominator;
     QString m_kind;
     QString m_inheritance;
     bool m_explicitStart = false;
