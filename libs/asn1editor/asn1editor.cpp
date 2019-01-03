@@ -83,7 +83,8 @@ void Asn1Editor::setAsn1Value()
         return value.toMap()["name"] == ui->typesCB->currentText();
     });
 
-    m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
+    if (find != m_asn1Types.end())
+        m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
 }
 
 void Asn1Editor::getAsn1Value()
