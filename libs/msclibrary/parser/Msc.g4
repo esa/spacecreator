@@ -51,6 +51,10 @@ mscDefinition
         |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
     ;
 
+identifier
+    : (QUALIFIER)? NAME
+    ;
+
 // 4.1 Message sequence chart
 
 messageSequenceChart
@@ -120,7 +124,7 @@ mscStatement
     ;
 
 eventDefinition
-    : (NAME COLON instanceEventList) | (instanceNameList COLON multiInstanceEventList)
+    : (instanceName=NAME COLON instanceEventList) | (instanceNameList COLON multiInstanceEventList)
     ;
 
 instanceEventList
@@ -167,8 +171,9 @@ multiInstanceEvent
 // 4.2 Instance
 
 instanceHeadStatement
-    : INSTANCE instanceName=NAME (COLON instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI
-    // "(LEFTOPEN parameterList RIGHTOPEN)?" is not in the spec
+    // older standard
+    : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI
+    | INSTANCE (instanceKind)? (decomposition)? SEMI
     ;
 instanceEndStatement
     : ENDINSTANCE SEMI
@@ -455,14 +460,6 @@ variableValue
     : LEFTOPEN NAME RIGHTOPEN
     ;
 
-decomposition
-    : DECOMPOSED substructureReference
-    ;
-
-substructureReference
-    : AS NAME
-    ;
-
 // 5.10 DATA IN ACTION boxes
 
 dataStatementList
@@ -489,6 +486,17 @@ endCoregion
 coregion // this is not as expected in the standard
     : CONCURRENT | ENDCONCURRENT
     ;
+
+// 7.4 Instance decomposition
+
+decomposition
+    : DECOMPOSED substructureReference
+    ;
+
+substructureReference
+    : AS NAME
+    ;
+
 
 /*Keywords*/
 
