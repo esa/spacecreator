@@ -52,12 +52,13 @@ public:
     antlrcpp::Any visitMessageOutput(MscParser::MessageOutputContext *context) override;
     antlrcpp::Any visitMessageInput(MscParser::MessageInputContext *context) override;
     antlrcpp::Any visitMsgIdentification(MscParser::MsgIdentificationContext *context) override;
-    antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *ctx) override;
+    antlrcpp::Any visitTimerStatement(MscParser::TimerStatementContext *context) override;
     antlrcpp::Any visitDefInGate(MscParser::DefInGateContext *context) override;
     antlrcpp::Any visitDefOutGate(MscParser::DefOutGateContext *context) override;
     antlrcpp::Any visitSharedCondition(MscParser::SharedConditionContext *context) override;
     antlrcpp::Any visitActionStatement(MscParser::ActionStatementContext *context) override;
     antlrcpp::Any visitStop(MscParser::StopContext *context) override;
+    antlrcpp::Any visitDataDefinition(MscParser::DataDefinitionContext *context) override;
     antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;
     antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;

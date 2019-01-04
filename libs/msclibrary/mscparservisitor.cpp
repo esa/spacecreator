@@ -72,7 +72,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    auto docName = ::treeNodeToString(context->NAME());
+    const auto docName = ::treeNodeToString(context->documentHead()->NAME());
     doc->setName(docName);
 
     auto handleComment = [=](antlr4::Token *token) {
@@ -472,6 +472,17 @@ antlrcpp::Any MscParserVisitor::visitStop(MscParser::StopContext *context)
 
     resetInstanceEvents();
     m_currentInstance = nullptr;
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitDataDefinition(MscParser::DataDefinitionContext *context)
+{
+    if (context->LANGUAGE()) {
+        m_model->setDataLanguage(::treeNodeToString(context->dataLanguageName));
+    }
+    if (context->DATA()) {
+        m_model->setDataDefinitionString(::treeNodeToString(context->dataDefString));
+    }
     return visitChildren(context);
 }
 

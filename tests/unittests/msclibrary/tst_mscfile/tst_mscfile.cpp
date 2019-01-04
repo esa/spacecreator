@@ -60,6 +60,8 @@ private Q_SLOTS:
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
     void testHierarchy();
+    void testDataDefinitionLanguage();
+    void testDataDefinitionData();
 
 private:
     MscFile *file = nullptr;
@@ -731,6 +733,20 @@ void tst_MscFile::testHierarchy()
     QCOMPARE(documentLeaf->hierarchyType(), MscDocument::HierarchyLeaf);
 
     delete model;
+}
+
+void tst_MscFile::testDataDefinitionLanguage()
+{
+    QString msc = "mscdocument automade; language ASN.1; endmscdocument;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->dataLanguage(), "ASN.1");
+}
+
+void tst_MscFile::testDataDefinitionData()
+{
+    QString msc = "mscdocument automade; data TPos.asn; endmscdocument;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->dataDefinitionString(), "TPos.asn");
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)
