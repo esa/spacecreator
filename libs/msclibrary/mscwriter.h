@@ -44,7 +44,8 @@ public:
     void saveChart(const MscChart *chart, const QString &fileName);
 
 protected:
-    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents, int tabsSize = 0);
+    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,
+                      int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCondition *condition, int tabsSize = 0);
     QString serialize(const MscTimer *timer, int tabsSize = 0);
@@ -53,8 +54,13 @@ protected:
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 
+    void setModel(const MscModel *model);
+
 private:
-    QString tabs(int tabsSize);
+    QString tabs(int tabsSize) const;
+    QString dataDefinition() const;
+
+    const MscModel *m_model = nullptr;
 };
 
 } // namespace msc
