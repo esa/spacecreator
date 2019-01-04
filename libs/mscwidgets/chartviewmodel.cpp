@@ -115,7 +115,7 @@ void ChartViewModel::fillView(MscChart *chart)
     if (d->m_currentChart)
         relayout();
 
-    Q_EMIT currentChartChagend(d->m_currentChart);
+    Q_EMIT currentChartChanged(d->m_currentChart);
 }
 
 void ChartViewModel::relayout()

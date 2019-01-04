@@ -26,6 +26,7 @@ class QGraphicsScene;
 
 namespace msc {
 
+class MscDocument;
 class MscModel;
 
 class HierarchyViewModel : public QObject
@@ -38,6 +39,9 @@ public:
     QGraphicsScene *graphicsScene() const;
 
     void setModel(MscModel *model);
+
+Q_SIGNALS:
+    void documentDoubleClicked(msc::MscDocument *document);
 
 private Q_SLOTS:
     void modelDeleted();
