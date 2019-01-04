@@ -56,6 +56,8 @@ private Q_SLOTS:
     void testCoregion();
     void testTimer();
     void testAction();
+    void testInstanceStop_data();
+    void testInstanceStop();
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
@@ -422,6 +424,39 @@ void tst_MscFile::testAction()
     QCOMPARE(action->dataStatements().size(), 2);
 
     delete model;
+}
+
+void tst_MscFile::testInstanceStop_data()
+{
+    QTest::addColumn<QString>("mscContent");
+
+    QString msc = "msc process_stop; inst subscriber; \
+            instance subscriber; \
+                in terminate from env; \
+                stop; \
+        endmsc;";
+    QTest::newRow("Spec conform (no endinstance;)") << msc;
+
+    msc = "msc process_stop; inst subscriber; \
+            instance subscriber; \
+                in terminate from env; \
+                stop; \
+            endinstance; \
+        endmsc;";
+    QTest::newRow("Example conform (with endinstance;)") << msc;
+}
+
+void tst_MscFile::testInstanceStop()
+{
+    QFETCH(QString, mscContent);
+
+    QScopedPointer<MscModel> model(file->parseText(mscContent));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->explicitStop(), true);
 }
 
 void tst_MscFile::testSortedMessage()
