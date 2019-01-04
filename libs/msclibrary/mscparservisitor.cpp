@@ -194,14 +194,14 @@ antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext
 {
     if (m_currentInstance) {
         const QString kind = ::treeNodeToString(context->NAME(0));
-        if (kind.compare("system", Qt::CaseInsensitive) == 0 || kind.compare("block", Qt::CaseInsensitive) == 0
-            || kind.compare("process", Qt::CaseInsensitive) == 0 || kind.compare("service", Qt::CaseInsensitive) == 0) {
-            m_currentInstance->setDenominator(kind);
+        const QString denominator = denominatorString(kind);
+        if (denominator.isEmpty()) {
+            m_currentInstance->setKind(kind);
+        } else {
+            m_currentInstance->setDenominator(denominator);
             if (context->NAME().size() > 1) {
                 m_currentInstance->setKind(::treeNodeToString(context->NAME(1)));
             }
-        } else {
-            m_currentInstance->setKind(kind);
         }
     }
 
@@ -250,7 +250,7 @@ antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHe
         m_currentMessage = nullptr;
     } else {
         if (context->instanceName) {
-            m_currentInstance->setDenominator(treeNodeToString(context->instanceName));
+            m_currentInstance->setDenominator(denominatorString(treeNodeToString(context->instanceName)));
         }
     }
 
