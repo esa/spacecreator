@@ -739,14 +739,14 @@ void tst_MscFile::testDataDefinitionLanguage()
 {
     QString msc = "mscdocument automade; language ASN.1; endmscdocument;";
     QScopedPointer<MscModel> model(file->parseText(msc));
-    QCOMPARE(model->dataLanguage(), "ASN.1");
+    QCOMPARE(model->dataLanguage(), QString("ASN.1"));
 }
 
 void tst_MscFile::testDataDefinitionData()
 {
     QString msc = "mscdocument automade; data TPos.asn; endmscdocument;";
     QScopedPointer<MscModel> model(file->parseText(msc));
-    QCOMPARE(model->dataDefinitionString(), "TPos.asn");
+    QCOMPARE(model->dataDefinitionString(), QString("TPos.asn"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)
