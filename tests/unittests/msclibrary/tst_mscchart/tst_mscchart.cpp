@@ -19,6 +19,7 @@
 #include <mscaction.h>
 #include <mscchart.h>
 #include <msccondition.h>
+#include <msccreate.h>
 #include <mscinstance.h>
 #include <mscmessage.h>
 #include <mscgate.h>
@@ -106,6 +107,10 @@ void tst_MscChart::testDestructor()
             chart->addInstanceEvent(new MscCoregion());
             chartEntities.append(chart->instanceEvents().first());
             break;
+        case MscEntity::EntityType::Create:
+            chart->addInstanceEvent(new MscCreate());
+            chartEntities.append(chart->instanceEvents().first());
+            break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
                   "but it's not covered here.\n"
@@ -115,7 +120,7 @@ void tst_MscChart::testDestructor()
     }
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 5);
+    QCOMPARE(chart->instanceEvents().size(), 6);
     QCOMPARE(chart->gates().size(), 1);
 
     delete chart;
