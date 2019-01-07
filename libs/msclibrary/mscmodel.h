@@ -38,16 +38,26 @@ public:
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
 
+    const QString &dataLanguage() const;
+    void setDataLanguage(const QString &language);
+
+    const QString &dataDefinitionString() const;
+    void setDataDefinitionString(const QString &dataString);
+
     void clear();
 
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);
     void cleared();
+    void dataLanguageChanged(const QString &dataLanguage);
+    void dataDefinitionStringChanged(const QString &dataString);
 
 private:
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
+    QString m_dataLanguage;
+    QString m_dataDefinitionString;
 };
 
 } // namespace msc

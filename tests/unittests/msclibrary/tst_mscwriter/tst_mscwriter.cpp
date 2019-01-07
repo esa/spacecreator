@@ -17,6 +17,7 @@
 
 #include <QtTest>
 #include <mscaction.h>
+#include <mscmodel.h>
 
 #include "mscchart.h"
 #include "msccondition.h"
@@ -48,6 +49,7 @@ private Q_SLOTS:
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
     void testSerializeMscDocumentChart();
+    void testSerializeDataDefinition();
 };
 
 void tst_MscWriter::testSerializeMscMessage()
@@ -115,7 +117,8 @@ void tst_MscWriter::testSerializeMscInstanceKind()
     instance.setKind("process");
     instance.setInheritance("P1");
 
-    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1: process P1;\nendinstance;\n"));
+    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()),
+             QString("instance Inst_1: process P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
@@ -328,6 +331,23 @@ void tst_MscWriter::testSerializeMscDocumentChart()
     QCOMPARE(serializeList.at(10), QString("   endmsc;"));
 
     QCOMPARE(serializeList.at(11), QString("endmscdocument;"));
+}
+
+void tst_MscWriter::testSerializeDataDefinition()
+{
+    MscModel model;
+    model.addDocument(new MscDocument("automade", &model));
+    model.setDataLanguage("ASN.1");
+    model.setDataDefinitionString("TPos.asn");
+
+    setModel(&model);
+
+    QStringList serializeList = serialize(model.documents().at(0)).split("\n");
+    QCOMPARE(serializeList.size(), 5);
+    QCOMPARE(serializeList.at(0), QString("mscdocument automade;"));
+    QCOMPARE(serializeList.at(1), QString("   language ASN.1;"));
+    QCOMPARE(serializeList.at(2), QString("   data TPos.asn;"));
+    QCOMPARE(serializeList.at(3), QString("endmscdocument;"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscWriter)

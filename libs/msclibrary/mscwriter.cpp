@@ -32,15 +32,10 @@
 
 namespace msc {
 
-MscWriter::MscWriter(QObject *parent)
-    : QObject(parent)
-{
-}
+MscWriter::MscWriter(QObject *parent) : QObject(parent) {}
 
 void MscWriter::saveModel(const MscModel *model, const QString &fileName)
 {
-    QString mscText;
-
     if (model == nullptr || fileName.isEmpty())
         return;
 
@@ -50,6 +45,8 @@ void MscWriter::saveModel(const MscModel *model, const QString &fileName)
 
     QTextStream out(&mscFile);
 
+    setModel(model);
+
     int tabCount = 0;
     for (const auto *doc : model->documents())
         out << serialize(doc, tabCount++);
@@ -58,12 +55,12 @@ void MscWriter::saveModel(const MscModel *model, const QString &fileName)
         out << serialize(chart);
 
     mscFile.close();
+
+    setModel(nullptr);
 }
 
 void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
 {
-    QString mscText;
-
     if (chart == nullptr || fileName.isEmpty())
         return;
 
@@ -78,7 +75,8 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents, int tabsSize)
+QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents,
+                             int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -98,13 +96,11 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         header += ";\n";
 
     auto addCondition = [&](const QString &messageName) {
-        std::for_each(instanceEvents.begin(),
-                      instanceEvents.end(),
-                      [&](MscInstanceEvent *event) {
-                          auto *condition = dynamic_cast<MscCondition *>(event);
-                          if (condition && condition->instance() == instance && condition->messageName() == messageName)
-                              events += serialize(condition, tabsSize);
-                      });
+        std::for_each(instanceEvents.begin(), instanceEvents.end(), [&](MscInstanceEvent *event) {
+            auto *condition = dynamic_cast<MscCondition *>(event);
+            if (condition && condition->instance() == instance && condition->messageName() == messageName)
+                events += serialize(condition, tabsSize);
+        });
     };
 
     // serialize conditions with empty messageName
@@ -154,7 +150,8 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         name += QString(",%1").arg(message->parameters().name);
 
     if (!message->parameters().expression.isEmpty() || !message->parameters().pattern.isEmpty())
-        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression : message->parameters().pattern);
+        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression
+                                                                                : message->parameters().pattern);
 
     return QString(direction).arg(name, instanceName);
 }
@@ -164,7 +161,8 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
     if (condition == nullptr)
         return "";
 
-    return QString("%1condition %2%3;\n").arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
+    return QString("%1condition %2%3;\n")
+            .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
 }
 
 QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
@@ -250,14 +248,16 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     if (document == nullptr)
         return QString();
 
-    QString instances;
+    const QString dataDef = tabsSize == 0 ? dataDefinition() : "";
+
+    QString documentBody;
 
     int tabCount = tabsSize + 1;
     for (const auto *doc : document->documents())
-        instances += serialize(doc, tabCount++);
+        documentBody += serialize(doc, tabCount++);
 
     for (const auto *chart : document->charts())
-        instances += serialize(chart, tabsSize + 1);
+        documentBody += serialize(chart, tabsSize + 1);
 
     QString relation;
     switch (document->hierarchyType()) {
@@ -285,10 +285,16 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     }
 
     QString tabString = tabs(tabsSize);
-    return QString("%1mscdocument %2%4;\n%3%1endmscdocument;\n").arg(tabString, document->name(), instances, relation);
+    return QString("%1mscdocument %2%4;%5\n%3%1endmscdocument;\n")
+            .arg(tabString, document->name(), documentBody, relation, dataDef);
 }
 
-QString MscWriter::tabs(int tabsSize)
+void MscWriter::setModel(const MscModel *model)
+{
+    m_model = model;
+}
+
+QString MscWriter::tabs(int tabsSize) const
 {
     const static QString TABS = "   ";
 
@@ -298,6 +304,23 @@ QString MscWriter::tabs(int tabsSize)
         tabsString += TABS;
 
     return tabsString;
+}
+
+QString MscWriter::dataDefinition() const
+{
+    if (!m_model) {
+        return {};
+    }
+
+    QString data;
+    if (!m_model->dataLanguage().isEmpty()) {
+        data = QString("\n%1language %2;").arg(tabs(1), m_model->dataLanguage());
+    }
+    if (!m_model->dataDefinitionString().isEmpty()) {
+        data += QString("\n%1data %2;").arg(tabs(1), m_model->dataDefinitionString());
+    }
+
+    return data;
 }
 
 } // namespace msc

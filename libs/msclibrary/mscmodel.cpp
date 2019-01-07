@@ -21,10 +21,7 @@
 
 namespace msc {
 
-MscModel::MscModel(QObject *parent)
-    : QObject(parent)
-{
-}
+MscModel::MscModel(QObject *parent) : QObject(parent) {}
 
 MscModel::~MscModel()
 {
@@ -69,6 +66,36 @@ void MscModel::addChart(MscChart *chart)
     Q_EMIT chartAdded(chart);
 }
 
+const QString &MscModel::dataLanguage() const
+{
+    return m_dataLanguage;
+}
+
+void MscModel::setDataLanguage(const QString &language)
+{
+    if (language == m_dataLanguage) {
+        return;
+    }
+
+    m_dataLanguage = language;
+    Q_EMIT dataLanguageChanged(m_dataLanguage);
+}
+
+const QString &MscModel::dataDefinitionString() const
+{
+    return m_dataDefinitionString;
+}
+
+void MscModel::setDataDefinitionString(const QString &dataString)
+{
+    if (dataString == m_dataDefinitionString) {
+        return;
+    }
+
+    m_dataDefinitionString = dataString;
+    Q_EMIT dataDefinitionStringChanged(m_dataDefinitionString);
+}
+
 void MscModel::clear()
 {
     qDeleteAll(m_documents);
@@ -76,6 +103,8 @@ void MscModel::clear()
 
     qDeleteAll(m_charts);
     m_charts.clear();
+
+    setDataLanguage("");
 
     Q_EMIT cleared();
 }

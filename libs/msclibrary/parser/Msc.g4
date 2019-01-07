@@ -20,7 +20,11 @@ textDefinition
 // 3 Message Sequence Chart document
 
 mscDocument
-    : MSCDOCUMENT NAME SEMI (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT SEMI definingMscReference*
+    : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT SEMI definingMscReference*
+    ;
+
+documentHead
+    : MSCDOCUMENT NAME SEMI dataDefinition
     ;
 
 definingMscReference
@@ -46,9 +50,7 @@ messageDeclClause
 
 mscDefinition
     : messageSequenceChart
-        |       LANGUAGE NAME SEMI
-        |       DATA NAME SEMI
-        |       MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
+        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
     ;
 
 identifier
@@ -357,7 +359,7 @@ typeRefString
     : STRING
     ;
 dataDefinitionString
-    : STRING
+    : NAME
     ;
 
 // 5.4 Declaring DATA
@@ -396,7 +398,7 @@ variableList
     : variableString (COMMA variableList)?
     ;
 dataDefinition
-    : (LANGUAGE NAME SEMI)? (wildcardDecl)? (DATA STRING SEMI)?
+    : (LANGUAGE dataLanguageName=NAME SEMI)? (wildcardDecl)? (DATA dataDefString=NAME SEMI)?
     ;
 wildcardDecl
     : WILDCARDS variableDeclList SEMI
