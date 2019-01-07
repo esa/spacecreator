@@ -133,10 +133,10 @@ instanceEventList
     : (startMethod instanceEvent* endMethod)
     | (startSuspension instanceEvent* endSuspension)
     | (startCoregion instanceEvent* endCoregion)
-    | (instanceHeadStatement instanceEvent* (instanceEndStatement | stop))
+    | (instanceHeadStatement instanceEvent* (instanceEndStatement | stop | (stop instanceEndStatement)))
     ;
 instanceDeclStatement
-    : instanceHeadStatement (orderableEvent | nonOrderableEvent)* (instanceEndStatement | stop)
+    : instanceHeadStatement (orderableEvent | nonOrderableEvent)* (instanceEndStatement | stop | (stop instanceEndStatement))
     ;
 instanceEvent
     : orderableEvent
