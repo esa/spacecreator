@@ -18,6 +18,7 @@
 #include <exceptions.h>
 #include <mscchart.h>
 #include <msccondition.h>
+#include <msccreate.h>
 #include <mscdocument.h>
 #include <mscfile.h>
 #include <mscinstance.h>
@@ -64,6 +65,7 @@ private Q_SLOTS:
     void testHierarchy();
     void testDataDefinitionLanguage();
     void testDataDefinitionData();
+    void testInstanceCreate();
 
 private:
     MscFile *file = nullptr;
@@ -782,6 +784,29 @@ void tst_MscFile::testDataDefinitionData()
     QString msc = "mscdocument automade; data TPos.asn; endmscdocument;";
     QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->dataDefinitionString(), QString("TPos.asn"));
+}
+
+void tst_MscFile::testInstanceCreate()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         in ICONreq from env; \
+                         create subscriber(data1); \
+                       ENDINSTANCE; \
+                   ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+
+    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    QCOMPARE(create->name(), QString("data1"));
+    QCOMPARE(create->instanceName(), QString("subscriber"));
+    QCOMPARE(create->messageName(), QString("ICONreq"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

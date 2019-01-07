@@ -20,6 +20,7 @@
 #include "mscmodel.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -461,6 +462,28 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     }
 
     m_instanceEvents.append(action);
+
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
+{
+    if (context->CREATE()) {
+        QString name;
+
+        if (context->parameterList())
+            name = ::treeNodeToString(context->parameterList());
+
+        auto *create = new MscCreate(name);
+        create->setInstanceName(::treeNodeToString(context->NAME()));
+
+        create->setInstance(m_currentInstance);
+
+        if (m_currentMessage)
+            create->setMessageName(m_currentMessage->name());
+
+        m_currentChart->addInstanceEvent(create);
+    }
 
     return visitChildren(context);
 }
