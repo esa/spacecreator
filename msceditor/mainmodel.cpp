@@ -36,9 +36,7 @@
 using namespace msc;
 
 struct MainModelPrivate {
-    explicit MainModelPrivate(MainModel *q)
-        : m_mscModel(new MscModel())
-        , m_documentItemModel(new DocumentItemModel(q))
+    explicit MainModelPrivate(MainModel *q) : m_mscModel(new MscModel()), m_documentItemModel(new DocumentItemModel(q))
     {
     }
     ~MainModelPrivate()
@@ -55,10 +53,9 @@ struct MainModelPrivate {
     qreal m_instanceAxisHeight = 0.;
 };
 
-MainModel::MainModel(QObject *parent)
-    : QObject(parent)
-    , d(new MainModelPrivate(this))
+MainModel::MainModel(QObject *parent) : QObject(parent), d(new MainModelPrivate(this))
 {
+    connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
 }
 
 MainModel::~MainModel()
@@ -106,7 +103,7 @@ bool MainModel::loadFile(const QString &filename)
         d->m_errorMessages.clear();
         d->m_mscModel = file.parseFile(filename, &d->m_errorMessages);
     } catch (...) {
-        //print error message
+        // print error message
         return false;
     }
 
@@ -130,6 +127,16 @@ void MainModel::saveMsc(const QString &fileName)
         mscWriter.saveModel(d->m_mscModel, fileName);
     else
         mscWriter.saveChart(d->m_chartModel.currentChart(), fileName);
+}
+
+void MainModel::showChartFromDocument(MscDocument *document)
+{
+    if (document->charts().isEmpty()) {
+        return;
+    }
+
+    d->m_chartModel.fillView(document->charts().at(0));
+    showChartVew();
 }
 
 MscChart *MainModel::firstChart() const

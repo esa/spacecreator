@@ -54,10 +54,16 @@ public:
 
     msc::ChartViewModel &chartViewModel() const;
 
+Q_SIGNALS:
+    void showChartVew();
+
 public Q_SLOTS:
     void showFirstChart();
     bool loadFile(const QString &filename);
     void saveMsc(const QString &fileName);
+
+private Q_SLOTS:
+    void showChartFromDocument(msc::MscDocument *document);
 
 private:
     msc::MscChart *firstChart() const;

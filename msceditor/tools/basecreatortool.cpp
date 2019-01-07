@@ -26,7 +26,7 @@ BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QOb
     , m_activeChart(m_model->currentChart())
 
 {
-    connect(model, &ChartViewModel::currentChartChagend, this, &BaseCreatorTool::onCurrentChartChagend);
+    connect(model, &ChartViewModel::currentChartChanged, this, &BaseCreatorTool::onCurrentChartChagend);
 }
 
 void BaseCreatorTool::setModel(ChartViewModel *model)

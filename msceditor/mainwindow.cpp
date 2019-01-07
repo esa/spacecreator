@@ -62,10 +62,7 @@ struct MainWindowPrivate {
         mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
     }
 
-    ~MainWindowPrivate()
-    {
-        delete ui;
-    }
+    ~MainWindowPrivate() { delete ui; }
 
     Ui::MainWindow *ui = nullptr;
     MainModel *m_model = nullptr;
@@ -102,9 +99,7 @@ struct MainWindowPrivate {
     const QVector<msc::BaseTool *> m_tools;
 };
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , d(new MainWindowPrivate(this))
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), d(new MainWindowPrivate(this))
 {
     setupUi();
 
@@ -161,15 +156,15 @@ bool MainWindow::openFileMsc(const QString &file)
     if (ok) {
         m_mscFileName = file;
         d->ui->documentTreeView->expandAll();
-        d->ui->graphicsView->centerOn(d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
+        d->ui->graphicsView->centerOn(
+                d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
     } else {
         m_mscFileName.clear();
     }
 
     d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
     d->ui->errorTextEdit->appendHtml(tr("Model loading: <b><font color=%2>%1</font></b><br>")
-                                             .arg(ok ? tr("success") : tr("failed"),
-                                                  ok ? "black" : "red"));
+                                             .arg(ok ? tr("success") : tr("failed"), ok ? "black" : "red"));
 
     updateTitles();
 
@@ -180,9 +175,7 @@ void MainWindow::updateTitles()
 {
     static const QString title = tr("%1 [%2]");
 
-    const QString mscFileName(m_mscFileName.isEmpty()
-                                      ? tr("Untitled")
-                                      : QFileInfo(m_mscFileName).fileName());
+    const QString mscFileName(m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(m_mscFileName).fileName());
     setWindowTitle(title.arg(qApp->applicationName()).arg(mscFileName));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
@@ -222,9 +215,7 @@ void MainWindow::saveMsc()
 
 void MainWindow::saveAsMsc()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save as..."),
-                                                    QFileInfo(m_mscFileName).path(),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(m_mscFileName).path(),
                                                     tr("MSC files (*.msc);;All files (*.*)"));
     if (!fileName.isEmpty()) {
         m_mscFileName = fileName;
@@ -286,6 +277,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
     if (chart) {
         d->m_model->chartViewModel().fillView(chart);
+        showDocumentView(true);
     }
 }
 
@@ -337,10 +329,12 @@ void MainWindow::initMenuFile()
 {
     d->m_menuFile = menuBar()->addMenu(tr("File"));
 
-    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this, &MainWindow::selectAndOpenFile, QKeySequence::Open);
+    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this,
+                                                &MainWindow::selectAndOpenFile, QKeySequence::Open);
     d->ui->mainToolBar->addAction(d->m_actOpenFile);
 
-    d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this, &MainWindow::saveMsc, QKeySequence::Save);
+    d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this,
+                                                &MainWindow::saveMsc, QKeySequence::Save);
     d->ui->mainToolBar->addAction(d->m_actSaveFile);
 
     d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
@@ -368,8 +362,10 @@ void MainWindow::initMenuEdit()
 void MainWindow::initMenuView()
 {
     d->m_menuView = menuBar()->addMenu(tr("&View"));
-    d->m_actShowDocument = d->m_menuView->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
-    d->m_actShowHierarchy = d->m_menuView->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
+    d->m_actShowDocument =
+            d->m_menuView->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
+    d->m_actShowHierarchy =
+            d->m_menuView->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
 
     d->m_actShowDocument->setCheckable(true);
     d->m_actShowHierarchy->setCheckable(true);
@@ -437,20 +433,24 @@ void MainWindow::initTools()
 
 void MainWindow::initConnections()
 {
-    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &MainWindow::showSelection);
+    connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &MainWindow::showSelection);
 
-    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChagend, this, &MainWindow::selectCurrentChart);
+    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChanged, this,
+            &MainWindow::selectCurrentChart);
 
-    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
-        statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
-                                         .arg(screen.x())
-                                         .arg(screen.y())
-                                         .arg(scene.x())
-                                         .arg(scene.y())
-                                         .arg(item.x())
-                                         .arg(item.y()));
-    });
+    connect(d->m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });
+
+    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved,
+            [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
+                statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
+                                                 .arg(screen.x())
+                                                 .arg(screen.y())
+                                                 .arg(scene.x())
+                                                 .arg(scene.y())
+                                                 .arg(item.x())
+                                                 .arg(item.y()));
+            });
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)

@@ -22,6 +22,7 @@
 #include <QPointer>
 #include <QPainter>
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 
 namespace msc {
 
@@ -40,9 +41,7 @@ DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
     d->boxSize.setHeight(50);
 }
 
-DocumentItem::~DocumentItem()
-{
-}
+DocumentItem::~DocumentItem() {}
 
 QRectF DocumentItem::boundingRect() const
 {
@@ -221,4 +220,10 @@ void DocumentItem::setBoxSize(const QSizeF &size)
     Q_EMIT boxSizeChanged(size);
 }
 
+}
+
+void msc::DocumentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept();
+    Q_EMIT doubleClicked(d->document.data());
 }

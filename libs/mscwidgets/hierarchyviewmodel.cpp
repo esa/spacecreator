@@ -75,20 +75,23 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
     }
 
     // The posY is 0 for the toplevel items and boxSize height + spaceY for all others
-    QSizeF layoutItemsHelper(const QVector<DocumentItem *> &items, qreal spaceX, qreal spaceY, qreal posY, const QSizeF &boxSize) const
+    QSizeF layoutItemsHelper(const QVector<DocumentItem *> &items, qreal spaceX, qreal spaceY, qreal posY,
+                             const QSizeF &boxSize) const
     {
         qreal x = 0;
         qreal height = 0;
         qreal width = 0;
         for (auto item : items) {
             // First, layout the children and get the size of those
-            const QSizeF childrensRect = layoutItemsHelper(item->childDocuments(), spaceX, spaceY, spaceY + boxSize.height(), boxSize);
+            const QSizeF childrensRect =
+                    layoutItemsHelper(item->childDocuments(), spaceX, spaceY, spaceY + boxSize.height(), boxSize);
 
             item->setX(x);
             item->setY(posY);
             item->setBoxSize(boxSize);
 
-            QRectF boundingRect(0, 0, qMax(boxSize.width(), childrensRect.width()), qMax(posY + boxSize.height(), childrensRect.height()));
+            QRectF boundingRect(0, 0, qMax(boxSize.width(), childrensRect.width()),
+                                qMax(posY + boxSize.height(), childrensRect.height()));
 
             if (boundingRect.height() > height) {
                 height = boundingRect.height();
@@ -121,14 +124,9 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
     QVector<DocumentItem *> topLevelDocumentItems;
 };
 
-HierarchyViewModel::HierarchyViewModel(QObject *parent)
-    : QObject(parent), d(new HierarchyViewModelPrivate)
-{
-}
+HierarchyViewModel::HierarchyViewModel(QObject *parent) : QObject(parent), d(new HierarchyViewModelPrivate) {}
 
-HierarchyViewModel::~HierarchyViewModel()
-{
-}
+HierarchyViewModel::~HierarchyViewModel() {}
 
 QGraphicsScene *HierarchyViewModel::graphicsScene() const
 {
@@ -150,6 +148,11 @@ void HierarchyViewModel::setModel(MscModel *model)
 
         d->addDocuments(model->documents(), nullptr);
         d->layoutItems();
+
+        for (msc::DocumentItem *item : d->documentItems) {
+            QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
+                             &msc::HierarchyViewModel::documentDoubleClicked);
+        }
     }
 }
 

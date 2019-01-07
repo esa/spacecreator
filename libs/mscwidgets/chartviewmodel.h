@@ -67,7 +67,7 @@ public Q_SLOTS:
     void rearrangeInstances();
 
 Q_SIGNALS:
-    void currentChartChagend(msc::MscChart *chart);
+    void currentChartChanged(msc::MscChart *chart);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
