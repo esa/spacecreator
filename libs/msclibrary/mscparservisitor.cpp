@@ -469,13 +469,13 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
 antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
 {
     if (context->CREATE()) {
-        QString name;
+        auto *create = new MscCreate(::treeNodeToString(context->NAME()));
 
-        if (context->parameterList())
-            name = ::treeNodeToString(context->parameterList());
-
-        auto *create = new MscCreate(name);
-        create->setInstanceName(::treeNodeToString(context->NAME()));
+        auto *parameterList = context->parameterList();
+        while (parameterList) {
+            create->addParameter(::treeNodeToString(parameterList->paramaterDefn()));
+            parameterList = parameterList->parameterList();
+        }
 
         create->setInstance(m_currentInstance);
 

@@ -32,8 +32,8 @@ public:
     explicit MscCreate(QObject *parent = nullptr);
     MscCreate(const QString &name, QObject *parent = nullptr);
 
-    QString instanceName() const;
-    void setInstanceName(const QString &instanceName);
+    const QStringList &parameters() const;
+    void addParameter(const QString &parameter);
 
     QString messageName() const;
     void setMessageName(const QString &messageName);
@@ -46,11 +46,10 @@ public:
 private:
     MscInstance *m_instance = nullptr;
 
-    // instance name that have to create
-    QString m_instanceName;
-
     // message name that precedes the create
     QString m_messageName;
+
+    QStringList m_parameters;
 };
 
 } // namespace msc

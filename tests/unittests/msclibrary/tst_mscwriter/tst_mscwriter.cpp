@@ -356,8 +356,9 @@ void tst_MscWriter::testSerializeCreate()
 {
     MscInstance instance("Inst_1");
 
-    QScopedPointer<MscCreate> create(new MscCreate("data1"));
-    create->setInstanceName("subscriber");
+    QScopedPointer<MscCreate> create(new MscCreate("subscriber"));
+    create->addParameter("data1");
+    create->addParameter("data2");
     create->setInstance(&instance);
 
     QVector<MscInstanceEvent *> messages;
@@ -367,8 +368,7 @@ void tst_MscWriter::testSerializeCreate()
     message->setTargetInstance(&instance);
     messages.append(message.data());
 
-    QScopedPointer<MscCreate> create2(new MscCreate(""));
-    create2->setInstanceName("subscriber2");
+    QScopedPointer<MscCreate> create2(new MscCreate("subscriber2"));
     create2->setInstance(&instance);
     create2->setMessageName("Msg_1");
     messages.append(create2.data());
@@ -378,7 +378,7 @@ void tst_MscWriter::testSerializeCreate()
     QVERIFY(serializeList.size() >= 5);
 
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), QString("   create subscriber(data1);"));
+    QCOMPARE(serializeList.at(1), QString("   create subscriber(data1, data2);"));
     QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
     QCOMPARE(serializeList.at(3), QString("   create subscriber2;"));
     QCOMPARE(serializeList.at(4), QString("endinstance;"));

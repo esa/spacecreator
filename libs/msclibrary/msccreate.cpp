@@ -29,14 +29,14 @@ MscCreate::MscCreate(const QString &name, QObject *parent)
 {
 }
 
-QString MscCreate::instanceName() const
+const QStringList &MscCreate::parameters() const
 {
-    return m_instanceName;
+    return m_parameters;
 }
 
-void MscCreate::setInstanceName(const QString &instanceName)
+void MscCreate::addParameter(const QString &parameter)
 {
-    m_instanceName = instanceName;
+    m_parameters.append(parameter);
 }
 
 QString MscCreate::messageName() const

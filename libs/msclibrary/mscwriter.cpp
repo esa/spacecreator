@@ -183,8 +183,10 @@ QString MscWriter::serialize(const MscCreate *create, int tabsSize)
     if (create == nullptr)
         return "";
 
-    return QString("%1create %2%3;\n")
-            .arg(tabs(tabsSize), create->instanceName(), create->name().isEmpty() ? "" : QString("(%1)").arg(create->name()));
+    const QString parameters =
+            create->parameters().isEmpty() ? "" : QString("(%1)").arg(create->parameters().join(", "));
+
+    return QString("%1create %2%3;\n").arg(tabs(tabsSize), create->name(), parameters);
 }
 
 QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
