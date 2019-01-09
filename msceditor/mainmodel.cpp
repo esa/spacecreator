@@ -136,7 +136,7 @@ void MainModel::showChartFromDocument(MscDocument *document)
     }
 
     d->m_chartModel.fillView(document->charts().at(0));
-    showChartVew();
+    Q_EMIT showChartVew();
 }
 
 MscChart *MainModel::firstChart() const

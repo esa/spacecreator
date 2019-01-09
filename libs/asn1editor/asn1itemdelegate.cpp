@@ -25,14 +25,9 @@
 
 namespace asn1 {
 
-Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
-{
-}
+Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 
-void Asn1ItemDelegate::paint(QPainter *painter,
-                             const QStyleOptionViewItem &option,
-                             const QModelIndex &index) const
+void Asn1ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyledItemDelegate::paint(painter, option, index);
 
@@ -58,9 +53,7 @@ QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
     return QStyledItemDelegate::sizeHint(option, index) + QSize(3, 3);
 }
 
-QWidget *Asn1ItemDelegate::createEditor(QWidget *parent,
-                                        const QStyleOptionViewItem &,
-                                        const QModelIndex &index) const
+QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *editor = nullptr;
     QString asnType = index.data(ASN1TYPE).toString();
@@ -115,9 +108,7 @@ void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
         qobject_cast<QTextEdit *>(editor)->setText(index.data().toString());
 }
 
-void Asn1ItemDelegate::setModelData(QWidget *editor,
-                                    QAbstractItemModel *model,
-                                    const QModelIndex &index) const
+void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     QString asnType = index.data(ASN1TYPE).toString();
     QVariant value;
@@ -134,26 +125,23 @@ void Asn1ItemDelegate::setModelData(QWidget *editor,
     model->setData(index, value);
 
     if (asnType == "sequenceOf")
-        const_cast<Asn1ItemDelegate *>(this)->emit sequenceOfSizeChanged(index.sibling(index.row(), 0),
-                                                                         value,
+        emit const_cast<Asn1ItemDelegate *>(this)->sequenceOfSizeChanged(index.sibling(index.row(), 0), value,
                                                                          index.data(MAX_RANGE));
 
     if (asnType == "choice")
-        const_cast<Asn1ItemDelegate *>(this)->emit choiceFieldChanged(index.sibling(index.row(), 0),
-                                                                      index.data(CHOICE_LIST).toList().size(),
-                                                                      qobject_cast<QComboBox *>(editor)->currentIndex());
+        emit const_cast<Asn1ItemDelegate *>(this)->choiceFieldChanged(
+                index.sibling(index.row(), 0), index.data(CHOICE_LIST).toList().size(),
+                qobject_cast<QComboBox *>(editor)->currentIndex());
 }
 
-void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor,
-                                            const QStyleOptionViewItem &option,
+void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                             const QModelIndex &index) const
 {
     QRect editorRect;
 
     QString asnType = index.data(ASN1TYPE).toString();
     if (asnType == "string")
-        editorRect = QRect(option.rect.x(), option.rect.y(),
-                           option.rect.width(), qMax(option.rect.height(), 100));
+        editorRect = QRect(option.rect.x(), option.rect.y(), option.rect.width(), qMax(option.rect.height(), 100));
     else
         editorRect = option.rect;
 

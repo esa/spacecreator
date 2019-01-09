@@ -35,8 +35,7 @@ namespace msc {
 
 */
 
-InteractiveObject::InteractiveObject(QGraphicsItem *parent)
-    : QGraphicsObject(parent)
+InteractiveObject::InteractiveObject(QGraphicsItem *parent) : QGraphicsObject(parent)
 {
 
     setAcceptHoverEvents(true);
@@ -58,8 +57,7 @@ QRectF InteractiveObject::boundingRect() const
     return m_boundingRect;
 }
 
-void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
-                                       const QPointF &from, const QPointF &to)
+void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPointF &from, const QPointF &to)
 {
     if (m_gripPoints)
         if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos))
@@ -168,7 +166,7 @@ void InteractiveObject::prepareHoverMark()
 
         connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
                 &InteractiveObject::gripPointMoved);
-        connect(m_gripPoints, &GripPointsHandler::visibleChanged, [this]() {
+        connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
             if (m_gripPoints && !m_gripPoints->isVisible())
                 delete m_gripPoints; // it's not a thing directly added to the scene, so just delete is enough
         });
