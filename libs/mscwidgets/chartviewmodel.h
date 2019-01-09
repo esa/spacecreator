@@ -29,9 +29,11 @@ class QGraphicsObject;
 namespace msc {
 
 class MscChart;
+class ActionItem;
 class ConditionItem;
 class InstanceItem;
 class MessageItem;
+class MscAction;
 class MscCondition;
 class MscInstance;
 class MscMessage;
@@ -60,6 +62,7 @@ public:
     InstanceItem *itemForInstance(msc::MscInstance *instance) const;
     MessageItem *itemForMessage(MscMessage *message) const;
     ConditionItem *itemForCondition(MscCondition *condition) const;
+    ActionItem *itemForAction(MscAction *action) const;
 
 public Q_SLOTS:
     void fillView(msc::MscChart *chart);
