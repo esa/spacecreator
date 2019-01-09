@@ -88,6 +88,7 @@ private:
     void keyPressEvent(QKeyEvent *e) override;
 
     void updateTitles();
+    void clearUndoStacks();
 };
 
 #endif // MAINWINDOW_H
