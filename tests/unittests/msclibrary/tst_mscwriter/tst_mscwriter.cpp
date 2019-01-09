@@ -370,7 +370,6 @@ void tst_MscWriter::testSerializeCreate()
 
     QScopedPointer<MscCreate> create2(new MscCreate("subscriber2"));
     create2->setInstance(&instance);
-    create2->setMessageName("Msg_1");
     messages.append(create2.data());
 
     QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);

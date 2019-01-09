@@ -469,7 +469,30 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
 antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
 {
     if (context->CREATE()) {
-        auto *create = new MscCreate(::treeNodeToString(context->NAME()));
+        QString name = ::treeNodeToString(context->NAME());
+
+        // find dublicate create name
+        auto find = std::find_if(m_currentChart->instanceEvents().begin(), m_currentChart->instanceEvents().end(),
+                                 [&](const MscInstanceEvent *event) {
+            return event->entityType() == MscEntity::EntityType::Create && event->name() == name;
+        });
+
+        if (find != m_currentChart->instanceEvents().end()) {
+            qWarning() << "Incorrect(dublicate) create name" << name;
+
+            return visitChildren(context);
+        }
+
+        auto *createInstance = m_currentChart->instanceByName(name);
+        if (!createInstance) {
+            qWarning() << "Incorrect instance name" << name;
+
+            return visitChildren(context);
+        }
+
+        createInstance->setExplicitCreate(true);
+
+        auto *create = new MscCreate(name);
 
         auto *parameterList = context->parameterList();
         while (parameterList) {
@@ -478,9 +501,6 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         }
 
         create->setInstance(m_currentInstance);
-
-        if (m_currentMessage)
-            create->setMessageName(m_currentMessage->name());
 
         m_currentChart->addInstanceEvent(create);
     }

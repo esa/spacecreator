@@ -39,16 +39,6 @@ void MscCreate::addParameter(const QString &parameter)
     m_parameters.append(parameter);
 }
 
-QString MscCreate::messageName() const
-{
-    return m_messageName;
-}
-
-void MscCreate::setMessageName(const QString &messageName)
-{
-    m_messageName = messageName;
-}
-
 MscInstance *MscCreate::instance() const
 {
     return m_instance;

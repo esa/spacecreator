@@ -68,6 +68,8 @@ private Q_SLOTS:
     void testInstanceCreate();
     void testInstanceCreateNoParameter();
     void testInstanceCreateMultiParameter();
+    void testInstanceCreateNoInstance();
+    void testInstanceCreateDublicate();
 
 private:
     MscFile *file = nullptr;
@@ -794,7 +796,9 @@ void tst_MscFile::testInstanceCreate()
                       INSTANCE Inst_1; \
                          in ICONreq from env; \
                          create subscriber(data1); \
-                       ENDINSTANCE; \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                      ENDINSTANCE; \
                    ENDMSC;";
 
     QScopedPointer<MscModel> model(file->parseText(msc));
@@ -802,12 +806,11 @@ void tst_MscFile::testInstanceCreate()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
-    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 2);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(create->name(), QString("subscriber"));
-    QCOMPARE(create->messageName(), QString("ICONreq"));
 
     QCOMPARE(create->parameters().size(), 1);
     QCOMPARE(create->parameters()[0], QString("data1"));
@@ -818,7 +821,9 @@ void tst_MscFile::testInstanceCreateNoParameter()
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
                          create subscriber; \
-                       ENDINSTANCE; \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                      ENDINSTANCE; \
                    ENDMSC;";
 
     QScopedPointer<MscModel> model(file->parseText(msc));
@@ -826,12 +831,11 @@ void tst_MscFile::testInstanceCreateNoParameter()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
-    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 1);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(create->name(), QString("subscriber"));
-    QVERIFY(create->messageName().isEmpty());
     QVERIFY(create->parameters().isEmpty());
 }
 
@@ -840,7 +844,9 @@ void tst_MscFile::testInstanceCreateMultiParameter()
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
                          create subscriber(data1, data2, data3); \
-                       ENDINSTANCE; \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                      ENDINSTANCE; \
                    ENDMSC;";
 
     QScopedPointer<MscModel> model(file->parseText(msc));
@@ -848,17 +854,61 @@ void tst_MscFile::testInstanceCreateMultiParameter()
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
-    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 1);
 
     auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(create->name(), QString("subscriber"));
-    QVERIFY(create->messageName().isEmpty());
 
     QCOMPARE(create->parameters().size(), 3);
     QCOMPARE(create->parameters()[0], QString("data1"));
     QCOMPARE(create->parameters()[1], QString("data2"));
     QCOMPARE(create->parameters()[2], QString("data3"));
+}
+
+void tst_MscFile::testInstanceCreateNoInstance()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         create subscriber2(data1); \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QVERIFY(chart->instanceEvents().isEmpty());
+}
+
+void tst_MscFile::testInstanceCreateDublicate()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         create subscriber(data1); \
+                         create subscriber(data2); \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+
+    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    QCOMPARE(create->name(), QString("subscriber"));
+
+    QCOMPARE(create->parameters().size(), 1);
+    QCOMPARE(create->parameters()[0], QString("data1"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

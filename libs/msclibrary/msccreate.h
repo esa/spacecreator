@@ -35,9 +35,6 @@ public:
     const QStringList &parameters() const;
     void addParameter(const QString &parameter);
 
-    QString messageName() const;
-    void setMessageName(const QString &messageName);
-
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
 
@@ -45,10 +42,6 @@ public:
 
 private:
     MscInstance *m_instance = nullptr;
-
-    // message name that precedes the create
-    QString m_messageName;
-
     QStringList m_parameters;
 };
 

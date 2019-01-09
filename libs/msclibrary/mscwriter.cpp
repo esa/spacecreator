@@ -104,26 +104,14 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         });
     };
 
-    // TODO: fixed order conditions and creates
-    auto addCreate = [&](const QString &messageName) {
-        std::for_each(instanceEvents.begin(), instanceEvents.end(), [&](MscInstanceEvent *event) {
-            auto *create = dynamic_cast<MscCreate *>(event);
-            if (create && create->instance() == instance && create->messageName() == messageName)
-                events += serialize(create, tabsSize);
-        });
-    };
-
     // serialize conditions with empty messageName
     addCondition("");
-    // serialize create with empty messageName
-    addCreate("");
 
     for (const auto &instanceEvent : instanceEvents) {
         switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message:
             events += serialize(static_cast<MscMessage *>(instanceEvent), instance, tabsSize);
             addCondition(instanceEvent->name());
-            addCreate(instanceEvent->name());
             break;
         case MscEntity::EntityType::Timer:
             events += serialize(static_cast<MscTimer *>(instanceEvent), tabsSize);
@@ -133,6 +121,9 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
             break;
         case MscEntity::EntityType::Action:
             events += serialize(static_cast<MscAction *>(instanceEvent), tabsSize);
+            break;
+        case MscEntity::EntityType::Create:
+            events += serialize(static_cast<MscCreate *>(instanceEvent), tabsSize);
             break;
         default:
             break;
