@@ -35,8 +35,7 @@ namespace msc {
 
 */
 
-InteractiveObject::InteractiveObject(QGraphicsItem *parent)
-    : QGraphicsObject(parent)
+InteractiveObject::InteractiveObject(QGraphicsItem *parent) : QGraphicsObject(parent)
 {
 
     setAcceptHoverEvents(true);
@@ -58,8 +57,7 @@ QRectF InteractiveObject::boundingRect() const
     return m_boundingRect;
 }
 
-void InteractiveObject::gripPointMoved(GripPoint::Location gripPos,
-                                       const QPointF &from, const QPointF &to)
+void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPointF &from, const QPointF &to)
 {
     if (m_gripPoints)
         if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos))
@@ -158,6 +156,21 @@ void InteractiveObject::highlightConnected()
 void InteractiveObject::highlightDisconnected()
 {
     doHighlighting(Qt::red);
+}
+
+QPointF InteractiveObject::centerInScene() const
+{
+    return mapToScene(boundingRect().center());
+}
+
+void InteractiveObject::updateLayout()
+{
+    if (m_layoutDirty) {
+        return;
+    }
+
+    m_layoutDirty = true;
+    QMetaObject::invokeMethod(this, "rebuildLayout", Qt::QueuedConnection);
 }
 
 void InteractiveObject::prepareHoverMark()

@@ -121,8 +121,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     connect(m_kindItem, &TextItem::edited, this, &InstanceItem::onKindEdited, Qt::QueuedConnection);
 }
 
-void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                         QWidget *widget)
+void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(painter);
     Q_UNUSED(option);
@@ -161,16 +160,6 @@ qreal InstanceItem::axisHeight() const
 QLineF InstanceItem::axis() const
 {
     return m_axisSymbol->line().translated(pos());
-}
-
-void InstanceItem::updateLayout()
-{
-    if (m_layoutDirty) {
-        return;
-    }
-
-    m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "buildLayout", Qt::QueuedConnection);
 }
 
 void InstanceItem::setName(const QString &name)
@@ -218,7 +207,8 @@ void InstanceItem::buildLayout()
     QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
     const QRectF kindRect(m_kindItem->boundingRect());
     QRectF kindR(nameRect.bottomLeft(),
-                 QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)), qMax(kindRect.height(), StartSymbolHeight)));
+                 QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)),
+                        qMax(kindRect.height(), StartSymbolHeight)));
 
     const qreal &endSymbolHeight = m_endSymbol->boundingRect().height();
     // precalculate own default size:
@@ -247,8 +237,8 @@ void InstanceItem::buildLayout()
     m_headSymbol->setRect(headRect);
 
     // move end symb to the bottom:
-    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight,
-                      m_boundingRect.width(), endSymbolHeight);
+    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
+                      endSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -267,7 +257,8 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
 {
     const QPointF &delta = to - from; //{ (to - from).x(), 0. };
     if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance, { QVariant::fromValue<InstanceItem *>(this), pos() + delta });
+        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance,
+                                      { QVariant::fromValue<InstanceItem *>(this), pos() + delta });
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -291,8 +282,7 @@ void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const Q
     case GripPoint::Location::TopRight:
     case GripPoint::Location::BottomLeft:
     case GripPoint::Location::BottomRight: {
-        if (gp->location() == GripPoint::Location::Left
-            || gp->location() == GripPoint::Location::TopLeft
+        if (gp->location() == GripPoint::Location::Left || gp->location() == GripPoint::Location::TopLeft
             || gp->location() == GripPoint::Location::BottomLeft)
             delta.rx() *= -1;
         newRect.adjust(-delta.x(), -delta.y(), delta.x(), delta.y());
@@ -340,12 +330,10 @@ InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPoin
 void InstanceItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
-                                  GripPoint::Location::Left,
-                                  GripPoint::Location::Right });
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
 
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish,
-            this, &InstanceItem::onManualGeometryChangeFinished);
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &InstanceItem::onManualGeometryChangeFinished);
 
     m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
     m_nameItem->setZValue(m_gripPoints->zValue() - 1);

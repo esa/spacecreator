@@ -46,11 +46,8 @@ public:
     qreal axisHeight() const;
     QLineF axis() const;
 
-    void updateLayout();
-
     QPainterPath shape() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setBoundingRect(const QRectF &geometry);
 
@@ -64,7 +61,7 @@ public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
     void buildLayout();
-    void rebuildLayout();
+    void rebuildLayout() override;
     void ensureNotOverlapped();
 
 protected:
@@ -81,7 +78,6 @@ private:
     TextItem *m_kindItem = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
-    bool m_layoutDirty = false;
 
     static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
