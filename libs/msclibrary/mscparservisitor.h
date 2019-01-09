@@ -57,6 +57,7 @@ public:
     antlrcpp::Any visitDefOutGate(MscParser::DefOutGateContext *context) override;
     antlrcpp::Any visitSharedCondition(MscParser::SharedConditionContext *context) override;
     antlrcpp::Any visitActionStatement(MscParser::ActionStatementContext *context) override;
+    antlrcpp::Any visitCreate(MscParser::CreateContext *context) override;
     antlrcpp::Any visitStop(MscParser::StopContext *context) override;
     antlrcpp::Any visitDataDefinition(MscParser::DataDefinitionContext *context) override;
     antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;

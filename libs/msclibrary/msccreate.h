@@ -15,50 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef MSCCREATE_H
+#define MSCCREATE_H
 
-#include <QObject>
-#include <QString>
-#include <QUuid>
+#include "mscinstanceevent.h"
 
 namespace msc {
 
-class MscEntity : public QObject
+class MscInstance;
+
+class MscCreate : public MscInstanceEvent
 {
     Q_OBJECT
+
 public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Timer,
-        Gate,
-        Condition,
-        Action,
-        Coregion,
-        Create
-    };
-    Q_ENUM(EntityType)
+    explicit MscCreate(QObject *parent = nullptr);
+    MscCreate(const QString &name, QObject *parent = nullptr);
 
-    explicit MscEntity(QObject *parent = nullptr);
-    explicit MscEntity(const QString &name, QObject *parent = nullptr);
+    const QStringList &parameters() const;
+    void addParameter(const QString &parameter);
 
-    const QString &name() const;
-    void setName(const QString &name);
+    MscInstance *instance() const;
+    void setInstance(MscInstance *instance);
 
-    QUuid internalId() const;
-
-    static const QString DefaultName;
-
-    virtual MscEntity::EntityType entityType() const = 0;
-
-Q_SIGNALS:
-    void nameChanged(const QString &name);
+    MscEntity::EntityType entityType() const override;
 
 private:
-    QString m_name = MscEntity::DefaultName;
-    const QUuid m_id;
+    MscInstance *m_instance = nullptr;
+    QStringList m_parameters;
 };
 
 } // namespace msc
+
+#endif // MSCCREATE_H

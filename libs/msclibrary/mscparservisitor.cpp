@@ -20,6 +20,7 @@
 #include "mscmodel.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -461,6 +462,48 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     }
 
     m_instanceEvents.append(action);
+
+    return visitChildren(context);
+}
+
+antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
+{
+    if (context->CREATE()) {
+        QString name = ::treeNodeToString(context->NAME());
+
+        // find dublicate create name
+        auto find = std::find_if(m_currentChart->instanceEvents().begin(), m_currentChart->instanceEvents().end(),
+                                 [&](const MscInstanceEvent *event) {
+            return event->entityType() == MscEntity::EntityType::Create && event->name() == name;
+        });
+
+        if (find != m_currentChart->instanceEvents().end()) {
+            qWarning() << "Incorrect(dublicate) create name" << name;
+
+            return visitChildren(context);
+        }
+
+        auto *createInstance = m_currentChart->instanceByName(name);
+        if (!createInstance) {
+            qWarning() << "Incorrect instance name" << name;
+
+            return visitChildren(context);
+        }
+
+        createInstance->setExplicitCreate(true);
+
+        auto *create = new MscCreate(name);
+
+        auto *parameterList = context->parameterList();
+        while (parameterList) {
+            create->addParameter(::treeNodeToString(parameterList->paramaterDefn()));
+            parameterList = parameterList->parameterList();
+        }
+
+        create->setInstance(m_currentInstance);
+
+        m_currentChart->addInstanceEvent(create);
+    }
 
     return visitChildren(context);
 }

@@ -21,6 +21,7 @@
 
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -50,6 +51,7 @@ private Q_SLOTS:
     void testSerializeMscDocument();
     void testSerializeMscDocumentChart();
     void testSerializeDataDefinition();
+    void testSerializeCreate();
 };
 
 void tst_MscWriter::testSerializeMscMessage()
@@ -348,6 +350,37 @@ void tst_MscWriter::testSerializeDataDefinition()
     QCOMPARE(serializeList.at(1), QString("   language ASN.1;"));
     QCOMPARE(serializeList.at(2), QString("   data TPos.asn;"));
     QCOMPARE(serializeList.at(3), QString("endmscdocument;"));
+}
+
+void tst_MscWriter::testSerializeCreate()
+{
+    MscInstance instance("Inst_1");
+
+    QScopedPointer<MscCreate> create(new MscCreate("subscriber"));
+    create->addParameter("data1");
+    create->addParameter("data2");
+    create->setInstance(&instance);
+
+    QVector<MscInstanceEvent *> messages;
+    messages.append(create.data());
+
+    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
+    message->setTargetInstance(&instance);
+    messages.append(message.data());
+
+    QScopedPointer<MscCreate> create2(new MscCreate("subscriber2"));
+    create2->setInstance(&instance);
+    messages.append(create2.data());
+
+    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+
+    QVERIFY(serializeList.size() >= 5);
+
+    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
+    QCOMPARE(serializeList.at(1), QString("   create subscriber(data1, data2);"));
+    QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
+    QCOMPARE(serializeList.at(3), QString("   create subscriber2;"));
+    QCOMPARE(serializeList.at(4), QString("endinstance;"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscWriter)

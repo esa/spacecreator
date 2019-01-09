@@ -18,6 +18,7 @@
 #include "mscwriter.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -121,6 +122,9 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         case MscEntity::EntityType::Action:
             events += serialize(static_cast<MscAction *>(instanceEvent), tabsSize);
             break;
+        case MscEntity::EntityType::Create:
+            events += serialize(static_cast<MscCreate *>(instanceEvent), tabsSize);
+            break;
         default:
             break;
         }
@@ -163,6 +167,17 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
 
     return QString("%1condition %2%3;\n")
             .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
+}
+
+QString MscWriter::serialize(const MscCreate *create, int tabsSize)
+{
+    if (create == nullptr)
+        return "";
+
+    const QString parameters =
+            create->parameters().isEmpty() ? "" : QString("(%1)").arg(create->parameters().join(", "));
+
+    return QString("%1create %2%3;\n").arg(tabs(tabsSize), create->name(), parameters);
 }
 
 QString MscWriter::serialize(const MscTimer *timer, int tabsSize)

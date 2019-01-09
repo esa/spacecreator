@@ -31,7 +31,8 @@ HEADERS += \
     mscmessage.h \
     mscparservisitor.h \
     msctimer.h \
-    mscwriter.h
+    mscwriter.h \
+    msccreate.h
 
 equals(BUILDTOOL, "analyzer") {
 } else {
@@ -59,7 +60,8 @@ SOURCES += \
     mscmodel.cpp \
     mscparservisitor.cpp \
     msctimer.cpp \
-    mscwriter.cpp
+    mscwriter.cpp \
+    msccreate.cpp
 
 RESOURCES += \
     mscresources.qrc
