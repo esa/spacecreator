@@ -31,10 +31,7 @@ namespace msc {
 
 */
 
-HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
-    : QGraphicsObject(parent)
-{
-}
+HighlightRectItem::HighlightRectItem(QGraphicsItem *parent) : QGraphicsObject(parent) {}
 
 HighlightRectItem::~HighlightRectItem()
 {
@@ -72,7 +69,7 @@ void HighlightRectItem::highlight()
 {
     static constexpr qreal from = 1.;
     static constexpr qreal to = 0.;
-    static constexpr int duration = 400;
+    static constexpr int duration = 100;
 
     show();
 
