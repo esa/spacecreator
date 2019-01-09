@@ -445,11 +445,12 @@ void appendDataStatement(MscAction *action, MscParser::DataStatementListContext 
 
 antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementContext *context)
 {
-    if (!m_currentChart) {
+    if (!m_currentChart || !m_currentInstance) {
         return visitChildren(context);
     }
 
     auto action = new MscAction;
+    action->setInstance(m_currentInstance);
     if (context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
         QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
@@ -472,10 +473,11 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         QString name = ::treeNodeToString(context->NAME());
 
         // find dublicate create name
-        auto find = std::find_if(m_currentChart->instanceEvents().begin(), m_currentChart->instanceEvents().end(),
-                                 [&](const MscInstanceEvent *event) {
-            return event->entityType() == MscEntity::EntityType::Create && event->name() == name;
-        });
+        auto find =
+                std::find_if(m_currentChart->instanceEvents().begin(), m_currentChart->instanceEvents().end(),
+                             [&](const MscInstanceEvent *event) {
+                                 return event->entityType() == MscEntity::EntityType::Create && event->name() == name;
+                             });
 
         if (find != m_currentChart->instanceEvents().end()) {
             qWarning() << "Incorrect(dublicate) create name" << name;

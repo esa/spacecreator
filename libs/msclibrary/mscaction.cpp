@@ -21,10 +21,7 @@
 
 namespace msc {
 
-MscAction::MscAction(QObject *parent)
-    : MscInstanceEvent(parent)
-{
-}
+MscAction::MscAction(QObject *parent) : MscInstanceEvent(parent) {}
 
 void MscAction::addDataStatement(const MscAction::DataStatement &statement)
 {
@@ -34,6 +31,16 @@ void MscAction::addDataStatement(const MscAction::DataStatement &statement)
     }
 
     m_dataStatementList.append(statement);
+}
+
+MscInstance *MscAction::instance() const
+{
+    return m_instance;
+}
+
+void MscAction::setInstance(MscInstance *instance)
+{
+    m_instance = instance;
 }
 
 }

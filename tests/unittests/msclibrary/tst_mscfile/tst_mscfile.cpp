@@ -425,11 +425,13 @@ void tst_MscFile::testAction()
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
     QCOMPARE(action->informalAction(), QString("Stop"));
+    QCOMPARE(action->instance(), chart->instances().at(0));
 
     action = static_cast<MscAction *>(chart->instanceEvents().at(1));
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Formal);
     QCOMPARE(action->dataStatements().size(), 2);
+    QCOMPARE(action->instance(), chart->instances().at(0));
 
     delete model;
 }

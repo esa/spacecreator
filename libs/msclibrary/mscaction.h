@@ -24,20 +24,15 @@
 
 namespace msc {
 
+class MscInstance;
+
 class MscAction : public MscInstanceEvent
 {
 public:
-    enum class ActionType {
-        Informal,
-        Formal
-    };
+    enum class ActionType { Informal, Formal };
 
     struct DataStatement {
-        enum class StatementType {
-            Define,
-            UnDefine,
-            Binding
-        };
+        enum class StatementType { Define, UnDefine, Binding };
 
         StatementType m_type = StatementType::Define;
         QString m_variableString;
@@ -45,7 +40,7 @@ public:
 
     explicit MscAction(QObject *parent = nullptr);
 
-    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Action; }
+    MscEntity::EntityType entityType() const override { return MscEntity::EntityType::Action; }
 
     void setActionType(ActionType type) { m_actionType = type; }
     ActionType actionType() const { return m_actionType; }
@@ -56,10 +51,14 @@ public:
     void addDataStatement(const DataStatement &statement);
     QVector<DataStatement> dataStatements() const { return m_dataStatementList; }
 
+    MscInstance *instance() const;
+    void setInstance(MscInstance *instance);
+
 private:
     ActionType m_actionType = ActionType::Informal;
     QString m_informalAction;
     QVector<DataStatement> m_dataStatementList;
+    MscInstance *m_instance = nullptr;
 };
 
 }
