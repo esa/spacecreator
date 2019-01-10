@@ -41,7 +41,7 @@ ToolType InstanceCreatorTool::toolType() const
 
 void InstanceCreatorTool::createPreviewItem()
 {
-    if (!m_scene || m_previewItem)
+    if (!m_scene || m_previewItem || !m_active)
         return;
 
     InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
@@ -58,14 +58,13 @@ void InstanceCreatorTool::commitPreviewItem()
         return;
 
     const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
-                                      QVariant::fromValue<ChartViewModel *>(m_model),
-                                      m_previewItem->pos() };
+                                      QVariant::fromValue<ChartViewModel *>(m_model), m_previewItem->pos() };
 
     removePreviewItem(); // free the space to avoid overlapping
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 
-    createPreviewItem();
+    Q_EMIT created();
 }
 
 void InstanceCreatorTool::removePreviewItem()
@@ -73,8 +72,7 @@ void InstanceCreatorTool::removePreviewItem()
     if (!m_previewItem)
         return;
 
-    if (m_model->removeInstanceItem(dynamic_cast<InstanceItem *>(m_previewItem.data())))
-        m_previewItem = nullptr;
+    m_model->removeInstanceItem(dynamic_cast<InstanceItem *>(m_previewItem.data()));
 }
 
 void InstanceCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
