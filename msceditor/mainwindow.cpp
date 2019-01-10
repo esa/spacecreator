@@ -285,6 +285,8 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     if (chart) {
         d->m_model->chartViewModel().fillView(chart);
         showDocumentView(true);
+    } else {
+        showHierarchyView(true);
     }
 }
 
