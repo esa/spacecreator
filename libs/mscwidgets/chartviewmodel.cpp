@@ -115,7 +115,6 @@ void ChartViewModel::fillView(MscChart *chart)
 
 void ChartViewModel::relayout()
 {
-    const qreal axisHeight = d->calcInstanceAxisHeight();
     double x = .0;
 
     QRectF totalRect;
@@ -129,8 +128,6 @@ void ChartViewModel::relayout()
         }
 
         item->setKind(instance->kind());
-        item->setAxisHeight(axisHeight);
-        item->buildLayout(); // messages layout calculation is based on
 
         x += d->InterInstanceSpan + item->boundingRect().width();
 
@@ -249,7 +246,7 @@ void ChartViewModel::relayout()
         }
     }
 
-    actualizeInstancesHeights();
+    actualizeInstancesHeights(y);
 
     // actualize scene's rect to avoid flickering on first show:
     static constexpr qreal margin(50.);
@@ -257,7 +254,7 @@ void ChartViewModel::relayout()
     d->m_scene.setSceneRect(totalRect);
 }
 
-void ChartViewModel::actualizeInstancesHeights() const
+void ChartViewModel::actualizeInstancesHeights(qreal height) const
 {
     for (MscInstance *instance : d->m_currentChart->instances()) {
         if (InstanceItem *instanceItem = itemForInstance(instance)) {
@@ -268,6 +265,8 @@ void ChartViewModel::actualizeInstancesHeights() const
 
             if (instance->explicitStop()) {
                 updateStoppedInstanceHeight(instanceItem);
+            } else {
+                instanceItem->setAxisHeight(height);
             }
         }
     }
