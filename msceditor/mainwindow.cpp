@@ -176,7 +176,7 @@ void MainWindow::updateTitles()
     static const QString title = tr("%1 [%2]");
 
     const QString mscFileName(m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(m_mscFileName).fileName());
-    setWindowTitle(title.arg(qApp->applicationName()).arg(mscFileName));
+    setWindowTitle(title.arg(qApp->applicationName(), mscFileName));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
     d->m_actSaveFileAs->setText(tr("Save \"%1\" As...").arg(mscFileName));
@@ -441,7 +441,7 @@ void MainWindow::initConnections()
 
     connect(d->m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 
-    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved,
+    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, this,
             [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
                 statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
                                                  .arg(screen.x())

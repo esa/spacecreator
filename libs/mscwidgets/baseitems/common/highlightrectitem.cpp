@@ -76,7 +76,7 @@ void HighlightRectItem::highlight()
     clearAnimation();
 
     m_lastAnimation = utils::createLinearAnimation(this, "opacity", from, to, duration);
-    connect(m_lastAnimation, &QPropertyAnimation::finished, [this]() {
+    connect(m_lastAnimation, &QPropertyAnimation::finished, this, [this]() {
         hide();
         Q_EMIT highlighted();
     });

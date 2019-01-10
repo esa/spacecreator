@@ -181,7 +181,7 @@ void InteractiveObject::prepareHoverMark()
 
         connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
                 &InteractiveObject::gripPointMoved);
-        connect(m_gripPoints, &GripPointsHandler::visibleChanged, [this]() {
+        connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
             if (m_gripPoints && !m_gripPoints->isVisible())
                 delete m_gripPoints; // it's not a thing directly added to the scene, so just delete is enough
         });

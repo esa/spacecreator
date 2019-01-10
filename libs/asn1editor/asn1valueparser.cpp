@@ -21,10 +21,7 @@
 
 namespace asn1 {
 
-Asn1ValueParser::Asn1ValueParser(QObject *parent)
-    : QObject(parent)
-{
-}
+Asn1ValueParser::Asn1ValueParser(QObject *parent) : QObject(parent) {}
 
 QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const
 {
@@ -55,7 +52,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
     } else if (valueType == "sequence") {
         ok = parseSequenceValue(asn1Type, value, valueMap);
     } else if (valueType == "sequenceOf") {
-        ok = parseSequenceOfValue(asn1Type, value, valueMap) && checkRange(asn1Type, valueMap["seqofvalue"].toList().count());
+        ok = parseSequenceOfValue(asn1Type, value, valueMap)
+                && checkRange(asn1Type, valueMap["seqofvalue"].toList().count());
     } else if (valueType == "enumerated") {
         QVariantList values = asn1Type["values"].toList();
 
@@ -89,8 +87,7 @@ bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
     return asn1Value.startsWith("{") && asn1Value.endsWith("}");
 }
 
-bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type,
-                                         const QString &asn1Value,
+bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type, const QString &asn1Value,
                                          QVariantMap &valueMap) const
 {
     /*
@@ -157,8 +154,7 @@ bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type,
     return true;
 }
 
-bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type,
-                                           const QString &asn1Value,
+bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type, const QString &asn1Value,
                                            QVariantMap &valueMap) const
 {
     /*
@@ -200,8 +196,7 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type,
     return true;
 }
 
-bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type,
-                                       const QString &asn1Value,
+bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type, const QString &asn1Value,
                                        QVariantMap &valueMap) const
 {
     /*
@@ -289,7 +284,7 @@ int Asn1ValueParser::nextIndex(const QString &value) const
 
 void Asn1ValueParser::emitError(const QString &error) const
 {
-    const_cast<Asn1ValueParser *>(this)->emit parseError(error);
+    emit const_cast<Asn1ValueParser *>(this)->parseError(error);
 }
 
 } // namespace asn1

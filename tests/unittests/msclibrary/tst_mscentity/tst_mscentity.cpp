@@ -24,17 +24,10 @@ using namespace msc;
 
 class MscEntitytImpl : public MscEntity
 {
-    Q_OBJECT
 public:
-    explicit MscEntitytImpl(QObject *parent = nullptr)
-        : MscEntity(parent)
-    {
-    }
+    explicit MscEntitytImpl(QObject *parent = nullptr) : MscEntity(parent) {}
 
-    MscEntitytImpl(const QString &name, QObject *parent = nullptr)
-        : MscEntity(name, parent)
-    {
-    }
+    MscEntitytImpl(const QString &name, QObject *parent = nullptr) : MscEntity(name, parent) {}
 
     MscEntity::EntityType entityType() const override
     {
