@@ -77,7 +77,7 @@ private:
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
-    void actualizeInstancesHeights() const;
+    void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem) const;
 };
