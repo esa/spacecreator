@@ -53,9 +53,6 @@ struct MainWindowPrivate {
         , m_model(new MainModel(mainWindow))
         , m_toolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
-        , m_tools({ new msc::PointerTool(nullptr, mainWindow),
-                    new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow),
-                    new msc::MessageCreatorTool(&(m_model->chartViewModel()), nullptr, mainWindow) })
     {
         m_toolBar->setObjectName("mscTools");
         m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -96,7 +93,8 @@ struct MainWindowPrivate {
 
     QAction *m_actAsnEditor = nullptr;
 
-    const QVector<msc::BaseTool *> m_tools;
+    QVector<msc::BaseTool *> m_tools;
+    QAction *m_defaultToolAction = nullptr;
 };
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), d(new MainWindowPrivate(this))
@@ -203,6 +201,12 @@ bool MainWindow::openMscChain(const QString &dirPath)
         openFileMsc(file.absoluteFilePath());
     }
     return true;
+}
+
+void MainWindow::enableDefaultTool()
+{
+    Q_ASSERT(d->m_defaultToolAction);
+    d->m_defaultToolAction->setChecked(true);
 }
 
 bool MainWindow::openFileAsn(const QString &file)
@@ -417,6 +421,17 @@ void MainWindow::initMenuHelp()
 
 void MainWindow::initTools()
 {
+    auto pointerTool = new msc::PointerTool(nullptr, this);
+    d->m_tools.append(pointerTool);
+
+    auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    connect(instanceCreateTool, &msc::InstanceCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(instanceCreateTool);
+
+    auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(messageCreateTool);
+
     QActionGroup *toolsActions = new QActionGroup(this);
     for (msc::BaseTool *tool : d->m_tools) {
         QAction *toolAction = d->m_toolBar->addAction(tool->title());
@@ -430,7 +445,8 @@ void MainWindow::initTools()
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
     }
 
-    toolsActions->actions().first()->setChecked(true);
+    d->m_defaultToolAction = toolsActions->actions().first();
+    enableDefaultTool();
 
     // TODO: just for test Asn1Editor
     d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);

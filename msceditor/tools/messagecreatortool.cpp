@@ -41,7 +41,7 @@ ToolType MessageCreatorTool::toolType() const
 
 void MessageCreatorTool::createPreviewItem()
 {
-    if (!m_scene || m_previewItem)
+    if (!m_scene || m_previewItem || !m_active)
         return;
 
     MessageItem *messageItem = m_model->createDefaultMessageItem(nullptr, scenePos());
@@ -61,12 +61,12 @@ void MessageCreatorTool::commitPreviewItem()
         return;
 
     const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
-                                      QVariant::fromValue<ChartViewModel *>(m_model),
-                                      m_previewItem->pos() };
+                                      QVariant::fromValue<ChartViewModel *>(m_model), m_previewItem->pos() };
 
     removePreviewItem();
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
-    createPreviewItem();
+
+    Q_EMIT created();
 }
 
 void MessageCreatorTool::removePreviewItem()
@@ -74,10 +74,7 @@ void MessageCreatorTool::removePreviewItem()
     if (!m_previewItem)
         return;
 
-    if (MessageItem *messageItem = dynamic_cast<MessageItem *>(m_previewItem.data())) {
-        if (m_model->removeMessageItem(messageItem))
-            m_previewItem = nullptr;
-    }
+    m_model->removeMessageItem(dynamic_cast<MessageItem *>(m_previewItem.data()));
 }
 
 void MessageCreatorTool::onCurrentChartChagend(msc::MscChart *chart)

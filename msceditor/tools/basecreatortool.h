@@ -34,8 +34,12 @@ class BaseCreatorTool : public BaseTool
     Q_OBJECT
 public:
     BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
-public slots:
+
+public Q_SLOTS:
     void setModel(ChartViewModel *model);
+
+Q_SIGNALS:
+    void created();
 
 protected Q_SLOTS:
     virtual void onCurrentChartChagend(msc::MscChart *);
