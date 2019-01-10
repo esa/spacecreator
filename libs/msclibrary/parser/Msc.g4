@@ -13,18 +13,26 @@ file : mscDocument | mscDefinition;
 
 // 2.3 Comment
 
+end
+    : (comment)? SEMI
+    ;
+
+comment
+    : COMMENT CHARACTERSTRING
+    ;
+
 textDefinition
-    : ('text' | 'TEXT') STRING SEMI
+    : ('text' | 'TEXT') STRING end
     ;
 
 // 3 Message Sequence Chart document
 
 mscDocument
-    : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT SEMI definingMscReference*
+    : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
     ;
 
 documentHead
-    : MSCDOCUMENT NAME SEMI dataDefinition
+    : MSCDOCUMENT NAME end dataDefinition
     ;
 
 definingMscReference
@@ -39,18 +47,18 @@ containingClause
     : (INST instanceItem)+
     ;
 instanceItem
-    : instanceName=NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | SEMI)
+    : instanceName=NAME (COLON instanceKind)? (inheritance)? (decomposition)? (dynamicDeclList | end)
     ;
 inheritance
     : INHERITS instanceKind
     ;
 messageDeclClause
-    : (MSG messageDecl SEMI)*
+    : (MSG messageDecl end)*
     ;
 
 mscDefinition
     : messageSequenceChart
-        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? SEMI
+        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? end
     ;
 
 identifier
@@ -60,18 +68,18 @@ identifier
 // 4.1 Message sequence chart
 
 messageSequenceChart
-    : virtuality? MSC mscHead mscBody ENDMSC SEMI // TODO add hmsc
+    : virtuality? MSC mscHead mscBody ENDMSC end // TODO add hmsc
     ;
 
 mscHead
-    : NAME (mscParameterDecl)? SEMI (mscInstInterface)? mscGateInterface
+    : NAME (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
     ;
 
 mscParameterDecl
     : LEFTOPEN mscParmDeclList RIGHTOPEN
     ;
 mscParmDeclList
-    : mscParmDeclBlock (SEMI mscParameterDecl)?
+    : mscParmDeclBlock (end mscParameterDecl)?
     ;
 mscParmDeclBlock
     : dataParameterDecl
@@ -112,7 +120,7 @@ mscGateInterface
     : mscGateDef*
     ;
 mscGateDef
-    : GATE msgGate SEMI // TODO (| methodCallGate | replyGate| createGate | orderGate) SEMI
+    : GATE msgGate end // TODO (| methodCallGate | replyGate| createGate | orderGate) end
     ;
 msgGate
     : defInGate | defOutGate
@@ -144,13 +152,13 @@ instanceEvent
     ;
 
 orderableEvent
-    : (LABEL eventName=NAME SEMI)? (messageEvent
+    : (LABEL eventName=NAME end)? (messageEvent
 //    | incompleteMessageEvent
     | create | timerStatement | action
     | coregion) // Not like in the standard and this does not prevet recursive coregion statements
 //    | methodCallEvent | incompleteMethodCallEvent | create | timerStatement | action)
-//        (BEFORE orderDestList)? (AFTER orderDestList)?  SEMI (TIME timeDestList end)?
-    SEMI
+//        (BEFORE orderDestList)? (AFTER orderDestList)?  end (TIME timeDestList end)?
+    end
     ;
 
 nonOrderableEvent
@@ -174,11 +182,11 @@ multiInstanceEvent
 
 instanceHeadStatement
     // older standard
-    : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? SEMI
-    | INSTANCE (instanceKind)? (decomposition)? SEMI
+    : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? end
+    | INSTANCE (instanceKind)? (decomposition)? end
     ;
 instanceEndStatement
-    : ENDINSTANCE SEMI
+    : ENDINSTANCE end
     ;
 
 // 4.3 Message
@@ -244,16 +252,16 @@ incompleteReplyIn
     : REPLYIN msgIdentification FROM FOUND (outputAddress)?
     ;
 startMethod
-    : METHOD SEMI
+    : METHOD end
     ;
 endMethod
-    : ENDMETHOD SEMI
+    : ENDMETHOD end
     ;
 startSuspension
-    : SUSPENSION SEMI
+    : SUSPENSION end
     ;
 endSuspension
-    : ENDSUSPENSION SEMI
+    : ENDSUSPENSION end
     ;
 
 // 4.5 Environment and gates
@@ -274,7 +282,7 @@ defOutGate
 // 4.7 Condition
 
 sharedCondition
-    : (shared)? conditionIdentification (shared)? SEMI // TODO second shared should be mandatory by spec?
+    : (shared)? conditionIdentification (shared)? end // TODO second shared should be mandatory by spec?
     ;
 conditionIdentification
     : CONDITION conditionText
@@ -294,7 +302,7 @@ sharedInstanceList
     : NAME (COMMA sharedInstanceList)?
     ;
 condition
-    : (shared)?  conditionIdentification SEMI
+    : (shared)?  conditionIdentification end
     ;
 
 // 4.8 TIMER
@@ -347,7 +355,7 @@ create
 // 4.11 Instance stop
 
 stop
-    : STOP SEMI
+    : STOP end
     ;
 
 // 5.2 Syntax interface to external data languages
@@ -365,7 +373,7 @@ dataDefinitionString
 // 5.4 Declaring DATA
 
 messageDeclList
-    : messageDecl (SEMI messageDeclList)?
+    : messageDecl (end messageDeclList)?
     ;
 messageDecl
     : messageNameList (COLON LEFTOPEN typeRefList RIGHTOPEN)?
@@ -374,7 +382,7 @@ messageNameList
     : NAME (COMMA messageNameList)?
     ;
 timerDeclList
-    : timerDecl (SEMI timerDeclList)?
+    : timerDecl (end timerDeclList)?
     ;
 timerDecl
     : timerNameList (duration)? (COLON LEFTOPEN typeRefList RIGHTOPEN)?
@@ -386,10 +394,10 @@ typeRefList
     : STRING (COMMA typeRefList)?
     ;
 dynamicDeclList
-    : VARIABLES variableDeclList SEMI
+    : VARIABLES variableDeclList end
     ;
 variableDeclList
-    : variableDeclItem (SEMI variableDeclList)?
+    : variableDeclItem (end variableDeclList)?
     ;
 variableDeclItem
     : variableList COLON STRING
@@ -398,10 +406,10 @@ variableList
     : variableString (COMMA variableList)?
     ;
 dataDefinition
-    : (LANGUAGE dataLanguageName=NAME SEMI)? (wildcardDecl)? (DATA dataDefString=NAME SEMI)?
+    : (LANGUAGE dataLanguageName=NAME end)? (wildcardDecl)? (DATA dataDefString=NAME end)?
     ;
 wildcardDecl
-    : WILDCARDS variableDeclList SEMI
+    : WILDCARDS variableDeclList end
     ;
 
 // 5.5 Static DATA
@@ -480,10 +488,10 @@ undefineStatement
 // 7.1 Coregion
 
 startCoregion
-    : CONCURRENT SEMI
+    : CONCURRENT end
     ;
 endCoregion
-    : ENDCONCURRENT SEMI
+    : ENDCONCURRENT end
     ;
 coregion // this is not as expected in the standard
     : CONCURRENT | ENDCONCURRENT
@@ -664,7 +672,7 @@ LEFTBINDSYMBOL : ':=';
 RIGHTBINDSYMBOL : '=:';
 
 CHARACTERSTRING :
-    APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
+    APOSTROPHE ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | [\r] | [\n] | (APOSTROPHE APOSTROPHE) )* APOSTROPHE ;
 
 fragment
 TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | APOSTROPHE )*;
@@ -673,7 +681,7 @@ MISC : OTHERCHARACTER | APOSTROPHE;
 
 OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '='; // exclude '/' as it's used for linebreaks
 
-SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA; //  ';' and ':' were here (ttsiod)
+SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA | SEMI | COLON;
 
 COMPOSITESPECIAL : QUALIFIERLEFT | QUALIFIERRIGHT;
 
@@ -690,7 +698,6 @@ FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
-COMMENTSKIPED: ('comment \''|'COMMENT \'') TEXT '\'' -> skip;
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 LB : ('/\r'|'/\n') ->skip; // linebreak
