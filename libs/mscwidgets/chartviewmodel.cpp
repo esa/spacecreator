@@ -16,11 +16,13 @@
 */
 
 #include "chartviewmodel.h"
+#include "actionitem.h"
 #include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "baseitems/common/utils.h"
 
+#include <mscaction.h>
 #include <mscchart.h>
 #include <msccondition.h>
 #include <mscinstance.h>
@@ -50,16 +52,13 @@ ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
  */
 
 struct ChartViewModelPrivate {
-    ChartViewModelPrivate(ChartViewModel *parent)
-        : m_currentChart(new msc::MscChart(parent))
-    {
-    }
+    ChartViewModelPrivate(ChartViewModel *parent) : m_currentChart(new msc::MscChart(parent)) {}
 
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::InteractiveObject *> m_instanceEventItems;
     QPointer<msc::MscChart> m_currentChart = nullptr;
-    static constexpr qreal InterMessageSpan = 40.;
+    static constexpr qreal InterMessageSpan = 20.;
     static constexpr qreal InterInstanceSpan = 100.;
 
     qreal calcInstanceAxisHeight() const
@@ -70,11 +69,7 @@ struct ChartViewModelPrivate {
     }
 };
 
-ChartViewModel::ChartViewModel(QObject *parent)
-    : QObject(parent)
-    , d(new ChartViewModelPrivate(this))
-{
-}
+ChartViewModel::ChartViewModel(QObject *parent) : QObject(parent), d(new ChartViewModelPrivate(this)) {}
 
 ChartViewModel::~ChartViewModel()
 {
@@ -158,7 +153,9 @@ void ChartViewModel::relayout()
         for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
             MscCondition *condition = nullptr;
 
-            if (instanceEvent->entityType() == MscEntity::EntityType::Condition && (condition = dynamic_cast<MscCondition *>(instanceEvent)) && condition->messageName() == messageName) {
+            if (instanceEvent->entityType() == MscEntity::EntityType::Condition
+                && (condition = dynamic_cast<MscCondition *>(instanceEvent))
+                && condition->messageName() == messageName) {
                 item = itemForCondition(condition);
 
                 if (!item) {
@@ -215,13 +212,40 @@ void ChartViewModel::relayout()
                 d->m_scene.addItem(item);
                 d->m_instanceEventItems.append(item);
             }
+            const QRectF boundingRect = item->boundingRect();
+            y += -boundingRect.y();
             item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
-            y += item->boundingRect().height() + d->InterMessageSpan;
+            y += boundingRect.height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
 
             // condition after message
             relayoutCondition(item->name());
+        }
+        if (instanceEvent->entityType() == MscEntity::EntityType::Action) {
+            auto action = static_cast<MscAction *>(instanceEvent);
+
+            InstanceItem *instance(nullptr);
+            qreal instanceVertiacalOffset(0);
+            if (action->instance()) {
+                instance = itemForInstance(action->instance());
+                instanceVertiacalOffset = instance->axis().p1().y();
+            }
+
+            ActionItem *item = itemForAction(action);
+            if (!item) {
+                item = new ActionItem(action);
+
+                d->m_scene.addItem(item);
+                d->m_instanceEventItems.append(item);
+            }
+            item->connectObjects(instance, y + instanceVertiacalOffset);
+            y += item->boundingRect().height() + d->InterMessageSpan;
+
+            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+
+            // condition after message
+            //            relayoutCondition(item->name());
         }
     }
 
@@ -254,10 +278,9 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
     // update instance's end Y-postion to the last message
     QVector<QGraphicsObject *> events(instanceEventItems(instanceItem->modelItem()));
     if (!events.isEmpty()) {
-        std::sort(events.begin(), events.end(),
-                  [](const QGraphicsObject *const a, const QGraphicsObject *const b) {
-                      return a->pos().y() < b->pos().y();
-                  });
+        std::sort(events.begin(), events.end(), [](const QGraphicsObject *const a, const QGraphicsObject *const b) {
+            return a->pos().y() < b->pos().y();
+        });
 
         if (QGraphicsObject *bottomostEvent = events.last()) {
             const qreal bottomY = bottomostEvent->boundingRect().translated(bottomostEvent->pos()).bottom();
@@ -268,9 +291,7 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
     }
 }
 
-void ChartViewModel::updateCreatedInstanceHeight(InstanceItem * /*instanceItem*/) const
-{
-}
+void ChartViewModel::updateCreatedInstanceHeight(InstanceItem * /*instanceItem*/) const {}
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {
@@ -285,6 +306,11 @@ MessageItem *ChartViewModel::itemForMessage(MscMessage *message) const
 ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
 {
     return itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
+}
+
+ActionItem *ChartViewModel::itemForAction(MscAction *action) const
+{
+    return itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
 }
 
 QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *instance) const
@@ -382,9 +408,7 @@ void ChartViewModel::rearrangeInstances()
     QVector<InstanceItem *> instanceItems = { utils::toplevelItems<InstanceItem>(graphicsScene()).toVector() };
 
     std::sort(instanceItems.begin(), instanceItems.end(),
-              [](const InstanceItem *const a, const InstanceItem *const b) {
-                  return a->pos().x() < b->pos().x();
-              });
+              [](const InstanceItem *const a, const InstanceItem *const b) { return a->pos().x() < b->pos().x(); });
 
     for (int i = 0; i < instanceItems.size(); ++i)
         currentChart()->updateInstancePos(instanceItems.at(i)->modelItem(), i);

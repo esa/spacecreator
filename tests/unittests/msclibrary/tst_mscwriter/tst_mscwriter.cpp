@@ -196,6 +196,7 @@ void tst_MscWriter::testSerializeMscActionsInformal()
     QScopedPointer<MscAction> action(new MscAction());
     action->setActionType(MscAction::ActionType::Informal);
     action->setInformalAction("informal_stop");
+    action->setInstance(&instance);
 
     QVector<MscInstanceEvent *> events;
     events.append(action.data());
@@ -221,6 +222,8 @@ void tst_MscWriter::testSerializeMscActionsFormal()
     statement.m_type = MscAction::DataStatement::StatementType::UnDefine;
     statement.m_variableString = "digit2";
     action->addDataStatement(statement);
+
+    action->setInstance(&instance);
 
     QVector<MscInstanceEvent *> events;
     events.append(action.data());

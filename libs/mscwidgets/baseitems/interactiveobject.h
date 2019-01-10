@@ -42,11 +42,17 @@ public:
     void highlightConnected();
     void highlightDisconnected();
 
+    QPointF centerInScene() const;
+
+public Q_SLOTS:
+    void updateLayout();
+
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    virtual void rebuildLayout() {}
 
 protected:
     QPointer<GripPointsHandler> m_gripPoints = nullptr;
@@ -54,9 +60,9 @@ protected:
     bool m_hovered = false;
     qreal m_storedZ = 0.;
     QPointF m_prevPos;
+    bool m_layoutDirty = false;
 
-    QVariant itemChange(GraphicsItemChange change,
-                        const QVariant &value) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     virtual void handleGripPointMovement(GripPoint *gp, const QPointF &from, const QPointF &to);
 

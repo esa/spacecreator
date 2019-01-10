@@ -32,8 +32,8 @@ class MessageItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr,
-                         InstanceItem *target = nullptr, qreal y = 0., QGraphicsItem *parent = nullptr);
+    explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr, InstanceItem *target = nullptr,
+                         qreal y = 0., QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
 
@@ -65,7 +65,6 @@ public:
     void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
 
 public Q_SLOTS:
-    void updateLayout();
     void setName(const QString &name);
 
 protected:
@@ -76,7 +75,7 @@ protected:
     void prepareHoverMark() override;
 
 private Q_SLOTS:
-    void rebuildLayout();
+    void rebuildLayout() override;
     void commitGeometryChange();
     void onRenamed(const QString &title);
 
@@ -85,7 +84,6 @@ private:
     LabeledArrowItem *m_arrowItem = nullptr;
     QPointer<InstanceItem> m_sourceInstance = nullptr;
     QPointer<InstanceItem> m_targetInstance = nullptr;
-    bool m_layoutDirty = false;
     bool m_posChangeIgnored = false;
     bool m_autoResize = true;
 

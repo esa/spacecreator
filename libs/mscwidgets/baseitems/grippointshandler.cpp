@@ -118,18 +118,13 @@ QRectF GripPointsHandler::boundingRect() const
         bounds = parent->boundingRect();
 
         const QPointF &scaleFactor(viewScale());
-        bounds = {
-            bounds.topLeft().x() * scaleFactor.x(),
-            bounds.topLeft().y() * scaleFactor.y(),
-            bounds.width() * scaleFactor.x(),
-            bounds.height() * scaleFactor.y()
-        };
+        bounds = { bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(),
+                   bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y() };
     }
     return bounds;
 }
 
-QVariant GripPointsHandler::itemChange(GraphicsItemChange change,
-                                       const QVariant &value)
+QVariant GripPointsHandler::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case ItemVisibleChange: {
@@ -143,9 +138,7 @@ QVariant GripPointsHandler::itemChange(GraphicsItemChange change,
     return QGraphicsItem::itemChange(change, value);
 }
 
-void GripPointsHandler::paint(QPainter *painter,
-                              const QStyleOptionGraphicsItem *option,
-                              QWidget *widget)
+void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -155,20 +148,17 @@ void GripPointsHandler::paint(QPainter *painter,
     painter->strokePath(m_borderPath, m_highlighter.borderColor());
 }
 
-void GripPointsHandler::handleGripPointPress(GripPoint *handle,
-                                             const QPointF &from, const QPointF &to)
+void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to)
 {
     Q_EMIT manualGeometryChangeStart(handle->location(), from, to);
 }
 
-void GripPointsHandler::handleGripPointMove(GripPoint *handle,
-                                            const QPointF &from, const QPointF &to)
+void GripPointsHandler::handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to)
 {
     Q_EMIT manualGeometryChangeProgress(handle->location(), from, to);
 }
 
-void GripPointsHandler::handleGripPointRelease(GripPoint *handle,
-                                               const QPointF &from, const QPointF &to)
+void GripPointsHandler::handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to)
 {
     Q_EMIT manualGeometryChangeFinish(handle->location(), from, to);
 }
@@ -194,14 +184,12 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     m_visible = appear;
     const qreal from = m_visible ? 0. : 1.;
     const qreal to = m_visible ? 1. : 0.;
-    const int duration = m_visible ? 250. : 750.;
+    const int duration = m_visible ? 100. : 150.;
     setVisible(true);
 
-    if (QPropertyAnimation *anim =
-                utils::createLinearAnimation(this, "opacity", from, to, duration)) {
+    if (QPropertyAnimation *anim = utils::createLinearAnimation(this, "opacity", from, to, duration)) {
         if (m_visible)
-            connect(anim, &QPropertyAnimation::finished, this,
-                    &GripPointsHandler::onOpacityAnimationFinished);
+            connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::onOpacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 }

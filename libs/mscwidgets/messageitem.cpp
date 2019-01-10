@@ -33,10 +33,9 @@
 
 namespace msc {
 
-MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y, QGraphicsItem *parent)
-    : InteractiveObject(parent)
-    , m_message(message)
-    , m_arrowItem(new LabeledArrowItem(this))
+MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y,
+                         QGraphicsItem *parent)
+    : InteractiveObject(parent), m_message(message), m_arrowItem(new LabeledArrowItem(this))
 {
     Q_ASSERT(m_message != nullptr);
     connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
@@ -89,7 +88,8 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 
     m_sourceInstance = sourceInstance;
     if (m_sourceInstance) {
-        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved, Qt::DirectConnection);
+        connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved,
+                Qt::DirectConnection);
         m_message->setSourceInstance(m_sourceInstance->modelItem());
     } else
         m_message->setSourceInstance(nullptr);
@@ -109,7 +109,8 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 
     m_targetInstance = targetInstance;
     if (m_targetInstance) {
-        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved, Qt::DirectConnection);
+        connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved,
+                Qt::DirectConnection);
         m_message->setTargetInstance(m_targetInstance->modelItem());
     } else
         m_message->setTargetInstance(nullptr);
@@ -121,24 +122,13 @@ void MessageItem::updateTooltip()
 {
     const QString env(tr("Env"));
     setToolTip(tr("%1: %2→%3")
-                       .arg(name(),
-                            m_sourceInstance ? m_sourceInstance->name() : env,
+                       .arg(name(), m_sourceInstance ? m_sourceInstance->name() : env,
                             m_targetInstance ? m_targetInstance->name() : env));
 }
 
 QString MessageItem::name() const
 {
     return m_arrowItem->text();
-}
-
-void MessageItem::updateLayout()
-{
-    if (m_layoutDirty) {
-        return;
-    }
-
-    m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "rebuildLayout", Qt::QueuedConnection);
 }
 
 void MessageItem::setName(const QString &name)
@@ -178,8 +168,8 @@ void MessageItem::rebuildLayout()
         pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
     }
 
-    const QPointF &linkCenterInScene = m_arrowItem->arrow()->makeArrow(
-            m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+    const QPointF &linkCenterInScene =
+            m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
     setPos(linkCenterInScene);
 
     m_layoutDirty = false;
@@ -214,8 +204,7 @@ void MessageItem::updateGripPoints()
     }
 }
 
-QVariant MessageItem::itemChange(GraphicsItemChange change,
-                                 const QVariant &value)
+QVariant MessageItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case ItemPositionHasChanged: {
@@ -254,7 +243,8 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
         const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
         const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->source()->point());
 
-        const bool updated = updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+        const bool updated =
+                updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
 
         if (updated && !m_targetInstance && !delta.isNull())
             updateTarget(m_arrowItem->arrow()->link()->target()->point() + delta, ObjectAnchor::Snap::NoSnap);
@@ -265,7 +255,8 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
         const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
         const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->target()->point());
 
-        const bool updated = updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
+        const bool updated =
+                updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
 
         if (updated && !m_sourceInstance && !delta.isNull())
             updateSource(m_arrowItem->arrow()->link()->source()->point() + delta, ObjectAnchor::Snap::NoSnap);
@@ -434,9 +425,7 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
 void MessageItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center,
-                                  GripPoint::Location::Left,
-                                  GripPoint::Location::Right });
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }
