@@ -344,6 +344,7 @@ actionStatement
 
 informalAction
     : CHARACTERSTRING
+    | NAME+ // this is not according to the standard
     ;
 
 // 4.10 Instance creation
