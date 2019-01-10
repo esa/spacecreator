@@ -19,6 +19,7 @@
 
 #include "basecommand.h"
 
+#include <QPointer>
 #include <QRectF>
 
 namespace msc {
@@ -38,7 +39,7 @@ public:
     int id() const override;
 
 private:
-    InstanceItem *m_instanceItem = nullptr;
+    QPointer<InstanceItem> m_instanceItem;
 
     QRectF m_newGeometry;
     QRectF m_oldGeometry;

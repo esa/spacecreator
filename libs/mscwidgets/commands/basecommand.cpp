@@ -17,18 +17,15 @@
 
 #include "basecommand.h"
 
+#include <QGraphicsObject>
+
 namespace msc {
 namespace cmd {
 
-BaseCommand::BaseCommand(QGraphicsItem *item, QUndoCommand *parent)
-    : QUndoCommand(parent)
-    , m_graphicsItem(item)
-{
-}
+BaseCommand::BaseCommand(QGraphicsObject *item, QUndoCommand *parent) : QUndoCommand(parent), m_graphicsItem(item) {}
 
-BaseCommand::BaseCommand(QGraphicsItem *item, const QString &text, QUndoCommand *parent)
-    : QUndoCommand(text, parent)
-    , m_graphicsItem(item)
+BaseCommand::BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent)
+    : QUndoCommand(text, parent), m_graphicsItem(item)
 {
 }
 

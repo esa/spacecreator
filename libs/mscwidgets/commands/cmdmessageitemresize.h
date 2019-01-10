@@ -19,6 +19,7 @@
 
 #include "basecommand.h"
 
+#include <QPointer>
 #include <QPointF>
 
 namespace msc {
@@ -38,7 +39,7 @@ public:
     int id() const override;
 
 private:
-    MessageItem *m_messageItem = nullptr;
+    QPointer<MessageItem> m_messageItem;
 
     QPointF m_newHead;
     QPointF m_newTail;

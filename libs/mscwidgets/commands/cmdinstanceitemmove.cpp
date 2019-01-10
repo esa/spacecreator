@@ -22,11 +22,8 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemMove::CmdInstanceItemMove(InstanceItem *instanceItem,
-                                         const QPointF &destination)
-    : BaseCommand(instanceItem)
-    , m_posFrom(instanceItem ? instanceItem->pos() : QPointF())
-    , m_posTo(destination)
+CmdInstanceItemMove::CmdInstanceItemMove(InstanceItem *instanceItem, const QPointF &destination)
+    : BaseCommand(instanceItem), m_posFrom(instanceItem ? instanceItem->pos() : QPointF()), m_posTo(destination)
 {
     setText(QObject::tr("Move instance"));
 }
@@ -41,7 +38,7 @@ void CmdInstanceItemMove::undo()
 {
     if (m_graphicsItem) {
         m_graphicsItem->setPos(m_posFrom);
-        if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_graphicsItem))
+        if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_graphicsItem.data()))
             instanceItem->ensureNotOverlapped();
     }
 }

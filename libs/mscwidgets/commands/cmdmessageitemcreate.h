@@ -22,8 +22,8 @@
 #include "messageitem.h"
 #include <mscmessage.h>
 
-#include <QPointF>
 #include <QPointer>
+#include <QPointF>
 
 #include <QGraphicsScene>
 

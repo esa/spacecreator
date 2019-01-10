@@ -162,6 +162,8 @@ bool MainWindow::openFileMsc(const QString &file)
         m_mscFileName.clear();
     }
 
+    clearUndoStacks();
+
     d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
     d->ui->errorTextEdit->appendHtml(tr("Model loading: <b><font color=%2>%1</font></b><br>")
                                              .arg(ok ? tr("success") : tr("failed"), ok ? "black" : "red"));
@@ -180,6 +182,12 @@ void MainWindow::updateTitles()
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
     d->m_actSaveFileAs->setText(tr("Save \"%1\" As...").arg(mscFileName));
+}
+
+void MainWindow::clearUndoStacks()
+{
+    QUndoStack *undoStack = d->ui->graphicsView->undoStack();
+    undoStack->clear();
 }
 
 bool MainWindow::openMscChain(const QString &dirPath)
@@ -254,7 +262,6 @@ void MainWindow::selectCurrentChart()
         }
         msc::cmd::CommandsStack::setCurrent(d->m_undoGroup->activeStack());
 
-        // TODO: add routine to clear a stack on file close
         // TODO: add support for dedicated stacks for each tab
     }
 }

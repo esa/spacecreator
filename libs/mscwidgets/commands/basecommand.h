@@ -17,11 +17,12 @@
 
 #pragma once
 
-#include <QUndoCommand>
-
 #include "common/commandids.h"
 
-class QGraphicsItem;
+#include <QPointer>
+#include <QUndoCommand>
+
+class QGraphicsObject;
 
 namespace msc {
 namespace cmd {
@@ -29,11 +30,11 @@ namespace cmd {
 class BaseCommand : public QUndoCommand
 {
 public:
-    explicit BaseCommand(QGraphicsItem *item, QUndoCommand *parent = nullptr);
-    explicit BaseCommand(QGraphicsItem *item, const QString &text, QUndoCommand *parent = nullptr);
+    explicit BaseCommand(QGraphicsObject *item, QUndoCommand *parent = nullptr);
+    explicit BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent = nullptr);
 
 protected:
-    QGraphicsItem *m_graphicsItem;
+    QPointer<QGraphicsObject> m_graphicsItem;
 
     bool canMergeWith(const BaseCommand *cmd) const;
 };
