@@ -17,20 +17,27 @@
 
 #include "mscerrorlistener.h"
 
-#include <Token.h>
+#include <Lexer.h>
 #include <Parser.h>
+#include <Token.h>
 
 namespace msc {
 
-void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer,
-                                   antlr4::Token *offendingSymbol,
-                                   size_t line,
-                                   size_t charPositionInLine,
-                                   const std::string &msg,
-                                   std::exception_ptr /*e*/)
+void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token *offendingSymbol, size_t line,
+                                   size_t charPositionInLine, const std::string &msg, std::exception_ptr /*e*/)
 {
-    antlr4::Parser *parser = static_cast<antlr4::Parser *>(recognizer);
+    const QString lineOfError = QString::number(line);
+    const QString positionInLine = QString::number(charPositionInLine);
+    const QString errorMessage = QString::fromStdString(msg);
+
+    antlr4::Lexer *lexer = dynamic_cast<antlr4::Lexer *>(recognizer);
+    if (lexer) {
+        m_errorMessages.append(QString("line %1:%2: <b>%3</b><br>").arg(lineOfError, positionInLine, errorMessage));
+        return;
+    }
+
     QString stack;
+    antlr4::Parser *parser = dynamic_cast<antlr4::Parser *>(recognizer);
     if (parser) {
         QStringList strList;
         for (const std::string &str : parser->getRuleInvocationStack())
@@ -38,13 +45,14 @@ void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer,
         stack = stack.append(strList.join("->"));
     }
 
-    m_errorMessages.append(QString("@%1:%2: <b>'%3' - %4</b>; Rules stack:<br>[%5]<br>")
-                                   .arg(
-                                           QString::number(line),
-                                           QString::number(charPositionInLine),
-                                           QString::fromStdString(offendingSymbol->getText()),
-                                           QString::fromStdString(msg),
-                                           stack));
+    if (offendingSymbol) {
+        m_errorMessages.append(QString("@%1:%2: <b>'%3' - %4</b>; Rules stack:<br>[%5]<br>")
+                                       .arg(lineOfError, positionInLine,
+                                            QString::fromStdString(offendingSymbol->getText()), errorMessage, stack));
+    } else {
+        m_errorMessages.append(QString("@%1:%2: <b>%3</b>; Rules stack:<br>[%4]<br>")
+                                       .arg(lineOfError, positionInLine, errorMessage, stack));
+    }
 }
 
 QStringList MscErrorListener::getErrorMessages() const

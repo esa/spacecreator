@@ -45,9 +45,7 @@ namespace msc {
 /*!
   \brief MscFile::MscFile
 */
-MscFile::MscFile()
-{
-}
+MscFile::MscFile() {}
 
 /*!
   \fn MscFile::parseFile(const QString &filename)
@@ -78,14 +76,15 @@ MscModel *MscFile::parseText(const QString &text, QStringList *errorMessages)
 
 MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
-    MscLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
+    MscErrorListener errorListener;
 
+    MscLexer lexer(&input);
+    lexer.addErrorListener(&errorListener);
+
+    CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     MscParser parser(&tokens);
-
-    MscErrorListener errorListener;
     parser.addErrorListener(&errorListener);
 
     MscParserVisitor visitor(&tokens);
@@ -96,10 +95,10 @@ MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
     }
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {
-        throw ParserException(QObject::tr("Syntax error"));
+        throw ParserException(QObject::tr("Lexer syntax error"));
     }
     if (parser.getNumberOfSyntaxErrors() > 0) {
-        throw ParserException(QObject::tr("Syntax error"));
+        throw ParserException(QObject::tr("Parser syntax error"));
     }
 
     return visitor.detachModel();
