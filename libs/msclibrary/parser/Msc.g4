@@ -11,6 +11,12 @@ tokens {
 
 file : mscDocument | mscDefinition;
 
+// 2.1
+name
+    // : NAME
+    : NAME+ // name in the 1993 spec is more relaxed
+    ;
+
 // 2.3 Comment
 
 end
@@ -293,7 +299,8 @@ conditionText
     | OTHERWISE
     ;
 conditionNameList
-    : NAME (COMMA NAME) *
+//    : NAME (COMMA NAME)*
+    : name (COMMA conditionNameList)* // to support old spec names as well
     ;
 shared
     : SHARED (sharedInstanceList | ALL)
@@ -302,7 +309,7 @@ sharedInstanceList
     : NAME (COMMA sharedInstanceList)?
     ;
 condition
-    : (shared)?  conditionIdentification end
+    : (shared)? conditionIdentification end
     ;
 
 // 4.8 TIMER
