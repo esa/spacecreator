@@ -448,7 +448,7 @@ pattern
     ;
 
 wildcard
-    : NAME // TODO not correct ?
+    : . // TODO not correct ?
     ;
 
 // 5.8 Data in message and timer parameters
