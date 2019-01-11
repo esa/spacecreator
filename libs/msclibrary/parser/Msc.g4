@@ -455,7 +455,7 @@ pattern
     ;
 
 wildcard
-    : name | CHARACTERSTRING // TODO not correct ?
+    : . | CHARACTERSTRING // TODO not correct ?
     ;
 
 // 5.8 Data in message and timer parameters
