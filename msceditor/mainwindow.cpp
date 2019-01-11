@@ -310,7 +310,8 @@ void MainWindow::setupUi()
 
     // status bar
     m_zoomBox = new QComboBox(d->ui->statusBar);
-    for (auto x = msc::GraphicsView::MinZoom; x <= msc::GraphicsView::MaxZoom; x += msc::GraphicsView::ZoomStep)
+    for (auto x = d->ui->graphicsView->minZoomPercent(); x <= d->ui->graphicsView->maxZoomPercent();
+         x += d->ui->graphicsView->zoomStepPercent())
         m_zoomBox->addItem(QString("%1 %").arg(x), x);
 
     m_zoomBox->setCurrentIndex(m_zoomBox->findData(100));
