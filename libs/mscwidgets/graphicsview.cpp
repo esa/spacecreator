@@ -35,17 +35,23 @@ namespace msc {
 /*!
   Constructs a MSV view object with the parent \a parent.
 */
-GraphicsView::GraphicsView(QWidget *parent)
-    : QGraphicsView(parent)
-    , m_undoStack(new QUndoStack(this))
+GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent), m_undoStack(new QUndoStack(this))
 {
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
+
+    setTransformationAnchor(QGraphicsView::NoAnchor);
+    setResizeAnchor(QGraphicsView::NoAnchor);
 }
 
 void GraphicsView::setZoom(double percent)
 {
+    if (percent < minZoomPercent() || percent > maxZoomPercent())
+        return;
+
+    m_zoomPercent = percent;
+
     resetTransform();
-    scale(percent / 100.0, percent / 100.0);
+    scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
@@ -62,9 +68,67 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     QGraphicsView::mouseMoveEvent(event);
 }
 
+void GraphicsView::wheelEvent(QWheelEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier) {
+        QPointF oldPos = mapToScene(event->pos());
+
+        setZoom(m_zoomPercent + (event->delta() > 0 ? zoomStepPercent() : -zoomStepPercent()));
+
+        QPointF newPos = mapToScene(event->pos());
+        QPointF delta = newPos - oldPos;
+
+        translate(delta.x(), delta.y());
+
+        Q_EMIT zoomChanged(m_zoomPercent);
+    } else {
+        QGraphicsView::wheelEvent(event);
+    }
+}
+
+void GraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
+        setZoom(m_zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
+        Q_EMIT zoomChanged(m_zoomPercent);
+    } else {
+        QGraphicsView::keyPressEvent(event);
+    }
+}
+
 QUndoStack *GraphicsView::undoStack() const
 {
     return m_undoStack;
+}
+
+qreal GraphicsView::minZoomPercent() const
+{
+    return m_minZoomPercent;
+}
+
+void GraphicsView::setMinZoomPercent(qreal percent)
+{
+    m_minZoomPercent = percent;
+}
+
+qreal GraphicsView::maxZoomPercent() const
+{
+    return m_maxZoomPercent;
+}
+
+void GraphicsView::setMaxZoomPercent(qreal percent)
+{
+    m_maxZoomPercent = percent;
+}
+
+qreal GraphicsView::zoomStepPercent() const
+{
+    return m_zoomStepPercent;
+}
+
+void GraphicsView::setZoomStepPercent(qreal percent)
+{
+    m_zoomStepPercent = percent;
 }
 
 } // namespace msc

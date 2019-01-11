@@ -26,6 +26,11 @@ namespace msc {
 class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
+
+    Q_PROPERTY(qreal minZoomPercent READ minZoomPercent WRITE setMinZoomPercent)
+    Q_PROPERTY(qreal maxZoomPercent READ maxZoomPercent WRITE setMaxZoomPercent)
+    Q_PROPERTY(qreal zoomStepPercent READ zoomStepPercent WRITE setZoomStepPercent)
+
 public:
     explicit GraphicsView(QWidget *parent = nullptr);
 
@@ -35,11 +40,31 @@ public:
 
 Q_SIGNALS:
     void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    void zoomChanged(qreal percent);
+
+public Q_SLOTS:
+    qreal minZoomPercent() const;
+    void setMinZoomPercent(qreal percent);
+
+    qreal maxZoomPercent() const;
+    void setMaxZoomPercent(qreal percent);
+
+    qreal zoomStepPercent() const;
+    void setZoomStepPercent(qreal percent);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
     QUndoStack *m_undoStack = nullptr;
+
+private:
+    qreal m_zoomPercent = 100.0;
+
+    qreal m_minZoomPercent = 50.0;
+    qreal m_zoomStepPercent = 25.0;
+    qreal m_maxZoomPercent = 400.0;
 };
 
 } // namespace msc

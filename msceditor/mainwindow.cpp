@@ -156,6 +156,8 @@ bool MainWindow::openFileMsc(const QString &file)
         d->ui->documentTreeView->expandAll();
         d->ui->graphicsView->centerOn(
                 d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
+
+        d->ui->graphicsView->setZoom(100);
     } else {
         m_mscFileName.clear();
     }
@@ -307,26 +309,21 @@ void MainWindow::setupUi()
     initTools();
 
     // status bar
-    auto zoomBox = new QComboBox(d->ui->statusBar);
-    zoomBox->addItem(" 50 %");
-    zoomBox->addItem("100 %");
-    zoomBox->addItem("200 %");
-    zoomBox->addItem("400 %");
-    zoomBox->setCurrentIndex(1);
-    connect(zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
-        double percent = 100.0;
-        if (index == 0) {
-            percent = 50.0;
-        }
-        if (index == 2) {
-            percent = 200.0;
-        }
-        if (index == 3) {
-            percent = 400.0;
-        }
-        d->ui->graphicsView->setZoom(percent);
+    m_zoomBox = new QComboBox(d->ui->statusBar);
+    for (auto x = d->ui->graphicsView->minZoomPercent(); x <= d->ui->graphicsView->maxZoomPercent();
+         x += d->ui->graphicsView->zoomStepPercent())
+        m_zoomBox->addItem(QString("%1 %").arg(x), x);
+
+    m_zoomBox->setCurrentIndex(m_zoomBox->findData(100));
+
+    connect(m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
+        d->ui->graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
     });
-    statusBar()->addPermanentWidget(zoomBox);
+
+    connect(d->ui->graphicsView, QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+            [&](qreal percent) { m_zoomBox->setCurrentIndex(m_zoomBox->findData(percent)); });
+
+    statusBar()->addPermanentWidget(m_zoomBox);
     statusBar()->show();
 }
 
