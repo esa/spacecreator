@@ -411,16 +411,15 @@ void tst_MscFile::testAction()
                       INSTANCE Inst_1; \
                          action 'Stop'; \
                          ACTION def \"digit1\", def \"digit2\"; \
-                         ACTION Enter Password ; \
                        ENDINSTANCE; \
                    ENDMSC;" };
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->instanceEvents().size(), 2);
 
     auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
     QVERIFY(action != nullptr);
@@ -434,11 +433,7 @@ void tst_MscFile::testAction()
     QCOMPARE(action->dataStatements().size(), 2);
     QCOMPARE(action->instance(), chart->instances().at(0));
 
-    action = static_cast<MscAction *>(chart->instanceEvents().at(2));
-    QVERIFY(action != nullptr);
-    QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
-    QCOMPARE(action->informalAction(), QString("Enter Password"));
-    QCOMPARE(action->instance(), chart->instances().at(0));
+    delete model;
 }
 
 void tst_MscFile::testInstanceStop_data()
@@ -802,7 +797,7 @@ void tst_MscFile::testInstanceCreate()
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
                          in ICONreq from env; \
-                         create subscriber(data1); \
+                         create subscriber(data); \
                       ENDINSTANCE; \
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
@@ -820,7 +815,7 @@ void tst_MscFile::testInstanceCreate()
     QCOMPARE(create->name(), QString("subscriber"));
 
     QCOMPARE(create->parameters().size(), 1);
-    QCOMPARE(create->parameters()[0], QString("data1"));
+    QCOMPARE(create->parameters()[0], QString("data"));
 }
 
 void tst_MscFile::testInstanceCreateNoParameter()
