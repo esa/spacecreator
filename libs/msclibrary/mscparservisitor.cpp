@@ -27,6 +27,7 @@
 #include "mscgate.h"
 #include "msctimer.h"
 #include "msccoregion.h"
+#include "exceptions.h"
 
 #include <QDebug>
 
@@ -83,6 +84,10 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
         // ignore referenced documents (spec extension) for now
         qDebug() << "Referenced documents re not supported";
         return visitChildren(context);
+    }
+
+    if (!context->documentHead()) {
+        throw ParserException("No document head node in the MscDocument");
     }
 
     MscDocument *parent = m_currentDocument;
