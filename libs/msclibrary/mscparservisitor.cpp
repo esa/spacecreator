@@ -41,6 +41,20 @@ static QString treeNodeToString(T *node)
     return QString();
 };
 
+static QString nameToString(MscParser::NameContext *nameNode)
+{
+    QString name;
+    if (nameNode) {
+        for (auto nameToken : nameNode->NAME()) {
+            if (!name.isEmpty()) {
+                name += " ";
+            }
+            name += ::treeNodeToString(nameToken);
+        }
+    }
+    return name;
+}
+
 using namespace msc;
 
 MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens) : m_model(new MscModel), m_tokens(tokens) {}
@@ -397,7 +411,7 @@ antlrcpp::Any MscParserVisitor::visitSharedCondition(MscParser::SharedConditionC
 
     QString name;
     if (conditionText->conditionNameList()) {
-        name = ::treeNodeToString(conditionText->conditionNameList()->NAME(0));
+        name = nameToString(conditionText->conditionNameList()->name());
     }
     auto *condition = new MscCondition(name);
 
@@ -459,13 +473,7 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
             informalAction = informalAction.mid(1, informalAction.size() - 2);
             action->setInformalAction(informalAction);
         } else {
-            QString informalAction;
-            for (auto name : context->informalAction()->NAME()) {
-                if (!informalAction.isEmpty()) {
-                    informalAction += " ";
-                }
-                informalAction += ::treeNodeToString(name);
-            }
+            QString informalAction = nameToString(context->informalAction()->name());
             action->setInformalAction(informalAction);
         }
     } else {
