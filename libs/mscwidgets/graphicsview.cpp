@@ -19,6 +19,7 @@
 
 #include <QMouseEvent>
 #include <QGraphicsItem>
+#include <QTimeLine>
 #include <QUndoStack>
 
 namespace msc {
@@ -35,11 +36,12 @@ namespace msc {
 /*!
   Constructs a MSV view object with the parent \a parent.
 */
-GraphicsView::GraphicsView(QWidget *parent)
-    : QGraphicsView(parent)
-    , m_undoStack(new QUndoStack(this))
+GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent), m_undoStack(new QUndoStack(this))
 {
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
+
+    setTransformationAnchor(QGraphicsView::NoAnchor);
+    setResizeAnchor(QGraphicsView::NoAnchor);
 }
 
 void GraphicsView::setZoom(double percent)
@@ -60,6 +62,47 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     Q_EMIT mouseMoved(screenPos, scenePos, itemPos);
 
     QGraphicsView::mouseMoveEvent(event);
+}
+
+void GraphicsView::wheelEvent(QWheelEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier) {
+        m_wheelEventPos = event->pos();
+
+        int numDegrees = event->delta() / 8;
+        int numSteps = numDegrees / 15;
+
+        m_scheduledScalings += numSteps;
+        if (m_scheduledScalings * numSteps < 0)
+            m_scheduledScalings = numSteps;
+
+        QTimeLine *timeLine = new QTimeLine(350, this);
+        timeLine->setUpdateInterval(20);
+
+        connect(timeLine, &QTimeLine::valueChanged, this, &GraphicsView::scalingTime);
+        connect(timeLine, &QTimeLine::finished, this, &GraphicsView::scalingFinished);
+        timeLine->start();
+    } else {
+        QGraphicsView::wheelEvent(event);
+    }
+}
+
+void GraphicsView::scalingTime(qreal)
+{
+    QPointF oldPos = mapToScene(m_wheelEventPos);
+
+    qreal factor = 1.0 + qreal(m_scheduledScalings) / 300.0;
+    scale(factor, factor);
+
+    QPointF newPos = mapToScene(m_wheelEventPos);
+    QPointF delta = newPos - oldPos;
+
+    translate(delta.x(), delta.y());
+}
+
+void GraphicsView::scalingFinished()
+{
+    m_scheduledScalings > 0 ? m_scheduledScalings-- : m_scheduledScalings++;
 }
 
 QUndoStack *GraphicsView::undoStack() const

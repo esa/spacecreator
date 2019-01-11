@@ -38,8 +38,17 @@ Q_SIGNALS:
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
     QUndoStack *m_undoStack = nullptr;
+
+private Q_SLOTS:
+    void scalingTime(qreal x);
+    void scalingFinished();
+
+private:
+    qreal m_scheduledScalings = 0;
+    QPoint m_wheelEventPos;
 };
 
 } // namespace msc
