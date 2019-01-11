@@ -473,13 +473,7 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
             informalAction = informalAction.mid(1, informalAction.size() - 2);
             action->setInformalAction(informalAction);
         } else {
-            QString informalAction;
-            for (auto name : context->informalAction()->NAME()) {
-                if (!informalAction.isEmpty()) {
-                    informalAction += " ";
-                }
-                informalAction += ::treeNodeToString(name);
-            }
+            QString informalAction = nameToString(context->informalAction()->name());
             action->setInformalAction(informalAction);
         }
     } else {

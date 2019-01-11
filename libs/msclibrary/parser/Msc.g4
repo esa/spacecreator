@@ -351,7 +351,7 @@ actionStatement
 
 informalAction
     : CHARACTERSTRING
-    | NAME+ // this is not according to the standard
+    | name
     ;
 
 // 4.10 Instance creation
@@ -455,7 +455,7 @@ pattern
     ;
 
 wildcard
-    : NAME // TODO not correct ?
+    : name | CHARACTERSTRING // TODO not correct ?
     ;
 
 // 5.8 Data in message and timer parameters
@@ -541,7 +541,7 @@ ENDCONCURRENT:'endconcurrent'|'ENDCONCURRENT';
 ENDEXPR:'endexpr'|'ENDEXPR';
 ENDINSTANCE:'endinstance'|'ENDINSTANCE';
 ENDMETHOD:'endmethod'|'ENDMETHOD';
-ENDMSC:'endmsc'|'ENDMSC';
+ENDMSC:'endmsc'|'ENDMSC'|'endsubmsc'|'ENDSUBMSC';
 ENDMSCDOCUMENT:'endmscdocument'|'ENDMSCDOCUMENT';
 ENDSUSPENSION:'endsuspension'|'ENDSUSPENSION';
 ENV:'env'|'ENV';
@@ -567,7 +567,7 @@ LANGUAGE:'language'|'LANGUAGE';
 LOOP:'loop'|'LOOP';
 LOST:'lost'|'LOST';
 METHOD:'method'|'METHOD';
-MSC:'msc'|'MSC';
+MSC:'msc'|'MSC'|'submsc'|'SUBMSC';
 MSCDOCUMENT:'mscdocument'|'MSCDOCUMENT';
 MSG:'msg'|'MSG';
 NESTABLE:'nestable'|'NESTABLE';
@@ -700,7 +700,10 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
+//NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
+
+// '`' is not as from the spec
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
