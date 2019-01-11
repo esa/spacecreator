@@ -466,7 +466,7 @@ parameterList
     ;
 
 paramaterDefn
-    : binding | expression | pattern
+    : SEQUENCEOF | binding | expression | pattern
     ;
 
 //
@@ -615,6 +615,8 @@ LEFTOPEN : '(';
 RIGHTOPEN : ')';
 LEFTSQUAREBRACKET : '[' ;
 RIGHTSQUAREBRACKET : ']' ;
+LEFTCURLYBRACKET : '{';
+RIGHTCURLYBRACKET : '}';
 
 // Extra keywords from the old spec
 REFERENCED:'referenced'|'REFERENCED';
@@ -631,12 +633,6 @@ NATIONAL : LEFTCURLYBRACKET | VERTICALLINE | RIGHTCURLYBRACKET | OVERLINE | UPWA
 
 fragment
 ALPHANUMERIC : LETTER | DECIMALDIGIT | NATIONAL;
-
-fragment
-LEFTCURLYBRACKET : '{' ;
-
-fragment
-RIGHTCURLYBRACKET : '}' ;
 
 fragment
 VERTICALLINE : '|';
@@ -712,6 +708,13 @@ NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' )+ ;
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
+
+
+SEQUENCEOF // custom
+//    : LEFTCURLYBRACKET ALPHANUMERIC+ (COMMA ALPHANUMERIC)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)+ RIGHTCURLYBRACKET
+    ;
+
 
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
