@@ -24,6 +24,10 @@
 
 namespace msc {
 
+qreal GraphicsView::MinZoom = 50.0;
+qreal GraphicsView::ZoomStep = 25.0;
+qreal GraphicsView::MaxZoom = 400.0;
+
 /*!
   \class msc::GraphicsView
   \brief Basic view for an MSC diagram
@@ -46,8 +50,13 @@ GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent), m_undoStack
 
 void GraphicsView::setZoom(double percent)
 {
+    if (percent < GraphicsView::MinZoom || percent > GraphicsView::MaxZoom)
+        return;
+
+    m_zoomPercent = percent;
+
     resetTransform();
-    scale(percent / 100.0, percent / 100.0);
+    scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
@@ -67,21 +76,16 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 void GraphicsView::wheelEvent(QWheelEvent *event)
 {
     if (event->modifiers() & Qt::ControlModifier) {
-        m_wheelEventPos = event->pos();
+        QPointF oldPos = mapToScene(event->pos());
 
-        int numDegrees = event->delta() / 8;
-        int numSteps = numDegrees / 15;
+        setZoom(m_zoomPercent + (event->delta() > 0 ? ZoomStep : -ZoomStep));
 
-        m_scheduledScalings += numSteps;
-        if (m_scheduledScalings * numSteps < 0)
-            m_scheduledScalings = numSteps;
+        QPointF newPos = mapToScene(event->pos());
+        QPointF delta = newPos - oldPos;
 
-        QTimeLine *timeLine = new QTimeLine(350, this);
-        timeLine->setUpdateInterval(20);
+        translate(delta.x(), delta.y());
 
-        connect(timeLine, &QTimeLine::valueChanged, this, &GraphicsView::scalingTime);
-        connect(timeLine, &QTimeLine::finished, this, &GraphicsView::scalingFinished);
-        timeLine->start();
+        Q_EMIT zoomChanged(m_zoomPercent);
     } else {
         QGraphicsView::wheelEvent(event);
     }
@@ -90,29 +94,11 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
 void GraphicsView::keyPressEvent(QKeyEvent *event)
 {
     if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
-        auto zoomFactor = event->key() == Qt::Key_Plus ? 1.1 : 0.9;
-        scale(zoomFactor, zoomFactor);
+        setZoom(m_zoomPercent + (event->key() == Qt::Key_Plus ? ZoomStep : -ZoomStep));
+        Q_EMIT zoomChanged(m_zoomPercent);
     } else {
         QGraphicsView::keyPressEvent(event);
     }
-}
-
-void GraphicsView::scalingTime(qreal)
-{
-    QPointF oldPos = mapToScene(m_wheelEventPos);
-
-    qreal factor = 1.0 + qreal(m_scheduledScalings) / 300.0;
-    scale(factor, factor);
-
-    QPointF newPos = mapToScene(m_wheelEventPos);
-    QPointF delta = newPos - oldPos;
-
-    translate(delta.x(), delta.y());
-}
-
-void GraphicsView::scalingFinished()
-{
-    m_scheduledScalings > 0 ? m_scheduledScalings-- : m_scheduledScalings++;
 }
 
 QUndoStack *GraphicsView::undoStack() const

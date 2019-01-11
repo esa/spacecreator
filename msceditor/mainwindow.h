@@ -30,6 +30,7 @@ class MainWindow;
 }
 
 class MainModel;
+class QComboBox;
 class QUndoGroup;
 class QGraphicsView;
 
@@ -69,6 +70,7 @@ private Q_SLOTS:
 private:
     std::unique_ptr<MainWindowPrivate> const d;
     QString m_mscFileName;
+    QComboBox *m_zoomBox;
 
     void loadSettings();
     void saveSettings();

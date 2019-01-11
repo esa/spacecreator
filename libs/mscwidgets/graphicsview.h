@@ -33,8 +33,13 @@ public:
 
     QUndoStack *undoStack() const;
 
+    static qreal MinZoom;
+    static qreal ZoomStep;
+    static qreal MaxZoom;
+
 Q_SIGNALS:
     void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    void zoomChanged(qreal percent);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -43,13 +48,8 @@ protected:
 
     QUndoStack *m_undoStack = nullptr;
 
-private Q_SLOTS:
-    void scalingTime(qreal x);
-    void scalingFinished();
-
 private:
-    qreal m_scheduledScalings = 0;
-    QPoint m_wheelEventPos;
+    qreal m_zoomPercent = 100.0;
 };
 
 } // namespace msc
