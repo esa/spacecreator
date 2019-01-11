@@ -35,6 +35,7 @@ textDefinition
 
 mscDocument
     : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
+    | MSCDOCUMENT NAME REFERENCED end // not in the spec
     ;
 
 documentHead
@@ -614,6 +615,9 @@ LEFTOPEN : '(';
 RIGHTOPEN : ')';
 LEFTSQUAREBRACKET : '[' ;
 RIGHTSQUAREBRACKET : ']' ;
+
+// Extra keywords from the old spec
+REFERENCED:'referenced'|'REFERENCED';
 
 
 fragment
