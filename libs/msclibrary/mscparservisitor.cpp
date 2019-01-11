@@ -453,10 +453,21 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     action->setInstance(m_currentInstance);
     if (context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
-        QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
-        // remove the single quotes
-        informalAction = informalAction.mid(1, informalAction.size() - 2);
-        action->setInformalAction(informalAction);
+        if (context->informalAction()->CHARACTERSTRING()) {
+            QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
+            // remove the single quotes
+            informalAction = informalAction.mid(1, informalAction.size() - 2);
+            action->setInformalAction(informalAction);
+        } else {
+            QString informalAction;
+            for (auto name : context->informalAction()->NAME()) {
+                if (!informalAction.isEmpty()) {
+                    informalAction += " ";
+                }
+                informalAction += ::treeNodeToString(name);
+            }
+            action->setInformalAction(informalAction);
+        }
     } else {
         action->setActionType(MscAction::ActionType::Formal);
         appendDataStatement(action, context->dataStatementList());

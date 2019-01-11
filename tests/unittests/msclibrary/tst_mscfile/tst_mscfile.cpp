@@ -411,15 +411,16 @@ void tst_MscFile::testAction()
                       INSTANCE Inst_1; \
                          action 'Stop'; \
                          ACTION def \"digit1\", def \"digit2\"; \
+                         ACTION Enter Password ; \
                        ENDINSTANCE; \
                    ENDMSC;" };
 
-    MscModel *model = file->parseText(msc);
+    QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
 
     auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
     QVERIFY(action != nullptr);
@@ -433,7 +434,11 @@ void tst_MscFile::testAction()
     QCOMPARE(action->dataStatements().size(), 2);
     QCOMPARE(action->instance(), chart->instances().at(0));
 
-    delete model;
+    action = static_cast<MscAction *>(chart->instanceEvents().at(2));
+    QVERIFY(action != nullptr);
+    QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
+    QCOMPARE(action->informalAction(), QString("Enter Password"));
+    QCOMPARE(action->instance(), chart->instances().at(0));
 }
 
 void tst_MscFile::testInstanceStop_data()
