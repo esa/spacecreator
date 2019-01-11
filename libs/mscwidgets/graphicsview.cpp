@@ -87,6 +87,16 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
     }
 }
 
+void GraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
+        auto zoomFactor = event->key() == Qt::Key_Plus ? 1.1 : 0.9;
+        scale(zoomFactor, zoomFactor);
+    } else {
+        QGraphicsView::keyPressEvent(event);
+    }
+}
+
 void GraphicsView::scalingTime(qreal)
 {
     QPointF oldPos = mapToScene(m_wheelEventPos);
