@@ -687,7 +687,7 @@ TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | 
 
 MISC : OTHERCHARACTER | APOSTROPHE;
 
-OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '='; // exclude '/' as it's used for linebreaks
+OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '=' | '/';
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA | SEMI | COLON;
 
@@ -711,4 +711,4 @@ STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
-LB : ('/\r'|'/\n') ->skip; // linebreak
+LB : '/' ('\r' | '\n')+ ->skip; // linebreak
