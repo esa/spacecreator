@@ -164,15 +164,15 @@ void ChartViewModel::relayout()
                     connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
                 }
 
-                InstanceItem *instance = itemForInstance(condition->instance());
-                item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
-
                 if (prevItem
                     && (prevItem->modelItem()->instance() == condition->instance()
                         || prevItem->modelItem()->shared())) {
                     y += -prevItem->boundingRect().y();
                     y += prevItem->boundingRect().height() + d->InterMessageSpan;
                 }
+
+                InstanceItem *instance = itemForInstance(condition->instance());
+                item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
 
                 prevItem = item;
             }

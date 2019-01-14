@@ -59,7 +59,6 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onNameEdited(const QString &name);
-    void onInstanceMoved(const QPointF &from, const QPointF &to);
     void rebuildLayout() override;
 
 protected:
