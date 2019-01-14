@@ -14,7 +14,7 @@ file : mscDocument | mscDefinition;
 // 2.1
 name
     // : NAME
-    : NAME+ // name in the 1993 spec is more relaxed
+    : . | (NAME)+ // name in the 1993 spec is more relaxed
     ;
 
 // 2.3 Comment
@@ -39,7 +39,7 @@ mscDocument
     ;
 
 documentHead
-    : MSCDOCUMENT NAME end dataDefinition
+    : MSCDOCUMENT name end dataDefinition
     ;
 
 definingMscReference
@@ -79,7 +79,7 @@ messageSequenceChart
     ;
 
 mscHead
-    : NAME (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
+    : name (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
     ;
 
 mscParameterDecl

@@ -70,6 +70,7 @@ private Q_SLOTS:
     void testInstanceCreateMultiParameter();
     void testInstanceCreateNoInstance();
     void testInstanceCreateDublicate();
+    void testKeywordAsName();
     void testNonStandardVia();
     void testNonStandardInstance();
 
@@ -128,21 +129,22 @@ void tst_MscFile::testExampleFilesParsing()
 
 void tst_MscFile::testEmptyDocument()
 {
-    MscModel *model = file->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;");
+    QScopedPointer<MscModel> model(file->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("CU_level"));
-    delete model;
 
-    model = file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;");
+    model.reset(file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("inst_1_cu_nominal.cu_controller"));
-    delete model;
 
-    model = file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  ");
+    model.reset(file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  "));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("ABC"));
+
+    model.reset(file->parseText("MSCDOCUMENT error1; MSCDOCUMENT seq; ENDMSCDOCUMENT; ENDMSCDOCUMENT;"));
+    QCOMPARE(model->documents().size(), 1);
+    //    QCOMPARE(model->documents().at(0)->documents().size(), 1);
     // no exception thrown
-    delete model;
 }
 
 void tst_MscFile::testComments()
@@ -918,6 +920,23 @@ void tst_MscFile::testInstanceCreateDublicate()
 
     QCOMPARE(create->parameters().size(), 1);
     QCOMPARE(create->parameters()[0], QString("data1"));
+}
+
+void tst_MscFile::testKeywordAsName()
+{
+    QString msc = "MSCDOCUMENT timer;\
+                MSC action;\
+                ENDMSC; \
+            ENDMSCDOCUMENT;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->name(), QString("timer"));
+
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = doc->charts().at(0);
+    QCOMPARE(chart->name(), QString("action"));
 }
 
 void tst_MscFile::testNonStandardVia()

@@ -46,11 +46,15 @@ static QString nameToString(MscParser::NameContext *nameNode)
 {
     QString name;
     if (nameNode) {
-        for (auto nameToken : nameNode->NAME()) {
-            if (!name.isEmpty()) {
-                name += " ";
+        if (nameNode->NAME().empty()) {
+            name = ::treeNodeToString(nameNode);
+        } else {
+            for (auto nameToken : nameNode->NAME()) {
+                if (!name.isEmpty()) {
+                    name += " ";
+                }
+                name += ::treeNodeToString(nameToken);
             }
-            name += ::treeNodeToString(nameToken);
         }
     }
     return name;
@@ -98,7 +102,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    const auto docName = ::treeNodeToString(context->documentHead()->NAME());
+    const auto docName = ::nameToString(context->documentHead()->name());
     doc->setName(docName);
 
     auto handleComment = [=](antlr4::Token *token) {
@@ -173,7 +177,7 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 {
     QString mscName;
     if (context->mscHead()) {
-        mscName = ::treeNodeToString(context->mscHead()->NAME());
+        mscName = ::nameToString(context->mscHead()->name());
     }
     auto chart = new MscChart(mscName);
     if (m_currentDocument == nullptr) {
@@ -646,10 +650,8 @@ void MscParserVisitor::resetInstanceEvents()
 
 void MscParserVisitor::orderInstanceEvents()
 {
-    bool found;
-
     while (!m_instanceEventsList.isEmpty()) {
-        found = false;
+        bool found = false;
 
         for (int i = 0; i < m_instanceEventsList.size(); ++i) {
             // First, go through all the stacks and take away non-messages. This has to be done for every loop
