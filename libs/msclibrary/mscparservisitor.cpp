@@ -195,6 +195,8 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
             auto headCtx = instanceDeclCtx->instanceHeadStatement();
             if (headCtx->instanceName) {
                 addInstance(::treeNodeToString(headCtx->instanceName));
+            } else {
+                addInstance(::nameToString(headCtx->name()));
             }
         }
         for (auto mscStatementCtx : context->mscBody()->mscStatement()) {

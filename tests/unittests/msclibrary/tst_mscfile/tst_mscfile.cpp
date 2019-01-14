@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testInstanceCreateNoInstance();
     void testInstanceCreateDublicate();
     void testNonStandardVia();
+    void testNonStandardInstance();
 
 private:
     MscFile *file = nullptr;
@@ -935,6 +936,23 @@ void tst_MscFile::testNonStandardVia()
 
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->instanceEvents().size(), 2);
+}
+
+void tst_MscFile::testNonStandardInstance()
+{
+    // Using INSTANCE that way is not really in line with the standard
+    QString msc = "MSC msc1; \
+                      INSTANCE : FAB 1; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("FAB 1"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

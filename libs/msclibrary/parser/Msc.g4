@@ -191,6 +191,7 @@ instanceHeadStatement
     // older standard
     : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? end
     | INSTANCE (instanceKind)? (decomposition)? end
+    | INSTANCE COLON name end // not according ot the spec
     ;
 instanceEndStatement
     : ENDINSTANCE end
@@ -218,15 +219,15 @@ incompleteMessageInput
     ;
 msgIdentification
     : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
-    (VIA gateName=NAME)? // the via is not accordint ot the spec
+    (VIA gateName=NAME)? // the via is not according ot the spec
     ;
 outputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
-    | VIA gateName=NAME // the via is not accordint ot the spec
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
-    | VIA gateName=NAME // the via is not accordint ot the spec
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 
 // 4.4 Control Flow
