@@ -229,6 +229,9 @@ void tst_MscFile::testMessage()
             in ICONreq from env; \
             in ICONreq2 from ; \
             out ICON to Responder; \
+            OUT req(data:'Hello' ) TO A2B; \
+            IN userpidgot(pid(connhandler(1))) FROM inst_1_switchctrl; \
+            OUT msg('Sorry, wrong id, try again') TO ENV; \
         ENDINSTANCE; \
     ENDMSC;";
     QScopedPointer<MscModel> model(file->parseText(msc));
@@ -237,7 +240,7 @@ void tst_MscFile::testMessage()
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->instanceEvents().size(), 6);
     MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
