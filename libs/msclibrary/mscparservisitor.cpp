@@ -82,7 +82,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 {
     if (context->REFERENCED()) {
         // ignore referenced documents (spec extension) for now
-        qDebug() << "Referenced documents re not supported";
+        qDebug() << "Referenced documents are not supported";
         return visitChildren(context);
     }
 
