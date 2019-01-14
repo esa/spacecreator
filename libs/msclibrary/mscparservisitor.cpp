@@ -55,6 +55,28 @@ static QString nameToString(MscParser::NameContext *nameNode)
     return name;
 }
 
+static QString characterToString(antlr4::tree::TerminalNode *characterString)
+{
+    QString string = treeNodeToString(characterString);
+
+    // remove the single quotes
+    if (string.size() > 1) {
+        string = string.mid(1, string.size() - 2);
+    }
+    return string;
+}
+
+static void parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
+{
+    if (!entity || !end) {
+        return;
+    }
+
+    if (end->comment()) {
+        entity->setComment(characterToString(end->comment()->CHARACTERSTRING()));
+    }
+}
+
 using namespace msc;
 
 MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens) : m_model(new MscModel), m_tokens(tokens) {}
@@ -145,6 +167,15 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     return ret;
 }
 
+antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext *context)
+{
+    if (m_currentDocument) {
+        parseComment(m_currentDocument, context->end());
+    }
+
+    return visitChildren(context);
+}
+
 antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext *context)
 {
     if (!m_currentChart) {
@@ -205,6 +236,12 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
     return result;
 }
 
+antlrcpp::Any MscParserVisitor::visitMscHead(MscParser::MscHeadContext *context)
+{
+    parseComment(m_currentChart, context->end());
+    return visitChildren(context);
+}
+
 antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext *context)
 {
     if (m_currentInstance) {
@@ -233,6 +270,22 @@ antlrcpp::Any MscParserVisitor::visitEventDefinition(MscParser::EventDefinitionC
     m_currentInstance = m_currentChart->instanceByName(name);
     auto ret = visitChildren(context);
     m_currentInstance = nullptr;
+    return ret;
+}
+
+antlrcpp::Any MscParserVisitor::visitInstanceEvent(MscParser::InstanceEventContext *context)
+{
+    auto ret = visitChildren(context);
+    m_currentEvent = nullptr;
+    return ret;
+}
+
+antlrcpp::Any MscParserVisitor::visitOrderableEvent(MscParser::OrderableEventContext *context)
+{
+    auto ret = visitChildren(context);
+    if (!context->end().empty()) {
+        parseComment(m_currentEvent, context->end().back());
+    }
     return ret;
 }
 
@@ -269,6 +322,8 @@ antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHe
         }
     }
 
+    parseComment(m_currentInstance, context->end());
+
     return visitChildren(context);
 }
 
@@ -291,6 +346,7 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
         m_currentMessage = new MscMessage(name);
         m_instanceEvents.append(m_currentMessage);
     }
+    m_currentEvent = m_currentMessage;
 
     MscParser::InputAddressContext *inputAddress = context->inputAddress();
     if (inputAddress && inputAddress->instanceName) {
@@ -314,6 +370,7 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
         m_currentMessage = new MscMessage(name);
         m_instanceEvents.append(m_currentMessage);
     }
+    m_currentEvent = m_currentMessage;
 
     MscParser::OutputAddressContext *outputAddress = context->outputAddress();
     if (outputAddress && outputAddress->instanceName) {
@@ -321,6 +378,7 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
         m_currentMessage->setSourceInstance(m_currentChart->instanceByName(source));
     }
     m_currentMessage->setTargetInstance(m_currentInstance);
+
     return visitChildren(context);
 }
 
@@ -414,6 +472,7 @@ antlrcpp::Any MscParserVisitor::visitSharedCondition(MscParser::SharedConditionC
         name = nameToString(conditionText->conditionNameList()->name());
     }
     auto *condition = new MscCondition(name);
+    m_currentEvent = condition;
 
     if (!context->shared().empty()) {
         MscParser::SharedContext *shared = context->shared().at(0);
@@ -464,14 +523,12 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     }
 
     auto action = new MscAction;
+    m_currentEvent = action;
     action->setInstance(m_currentInstance);
     if (context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
         if (context->informalAction()->CHARACTERSTRING()) {
-            QString informalAction = ::treeNodeToString(context->informalAction()->CHARACTERSTRING());
-            // remove the single quotes
-            informalAction = informalAction.mid(1, informalAction.size() - 2);
-            action->setInformalAction(informalAction);
+            action->setInformalAction(characterToString(context->informalAction()->CHARACTERSTRING()));
         } else {
             QString informalAction = nameToString(context->informalAction()->name());
             action->setInformalAction(informalAction);
@@ -514,6 +571,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         createInstance->setExplicitCreate(true);
 
         auto *create = new MscCreate(name);
+        m_currentEvent = create;
 
         auto *parameterList = context->parameterList();
         while (parameterList) {
@@ -576,7 +634,8 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         return visitChildren(context);
     }
 
-    QScopedPointer<MscTimer> timer(new MscTimer());
+    MscTimer *timer = new MscTimer();
+    m_currentEvent = timer;
     if (MscParser::StartTimerContext *startTimer = context->startTimer()) {
         timer->setTimerType(MscTimer::TimerType::Start);
         timer->setName(::treeNodeToString(startTimer->NAME(0)));
@@ -593,7 +652,7 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
     }
 
-    m_instanceEvents.append(timer.take());
+    m_instanceEvents.append(timer);
 
     return visitChildren(context);
 }

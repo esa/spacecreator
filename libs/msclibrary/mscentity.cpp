@@ -26,18 +26,9 @@ namespace msc {
 
 const QString MscEntity::DefaultName = QObject::tr("Untitled");
 
-MscEntity::MscEntity(QObject *parent)
-    : QObject(parent)
-    , m_id(QUuid::createUuid())
-{
-}
+MscEntity::MscEntity(QObject *parent) : QObject(parent), m_id(QUuid::createUuid()) {}
 
-MscEntity::MscEntity(const QString &name, QObject *parent)
-    : QObject(parent)
-    , m_name(name)
-    , m_id(QUuid::createUuid())
-{
-}
+MscEntity::MscEntity(const QString &name, QObject *parent) : QObject(parent), m_name(name), m_id(QUuid::createUuid()) {}
 
 const QString &MscEntity::name() const
 {
@@ -57,6 +48,21 @@ void MscEntity::setName(const QString &name)
 QUuid MscEntity::internalId() const
 {
     return m_id;
+}
+
+const QString &MscEntity::comment() const
+{
+    return m_comment;
+}
+
+void MscEntity::setComment(const QString &comment)
+{
+    if (comment == m_comment) {
+        return;
+    }
+
+    m_comment = comment;
+    Q_EMIT commentChanged(m_comment);
 }
 
 } // namespace msc

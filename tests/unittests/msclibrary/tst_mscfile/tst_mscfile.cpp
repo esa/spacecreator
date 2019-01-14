@@ -45,6 +45,7 @@ private Q_SLOTS:
     void testExampleFilesParsing();
     void testEmptyDocument();
     void testComments();
+    void testEntityComments();
     void testNestedDocuments();
     void testMscInDocument();
     void testInstance();
@@ -153,6 +154,35 @@ void tst_MscFile::testComments()
     model = file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;");
     // no exception thrown
     delete model;
+}
+
+void tst_MscFile::testEntityComments()
+{
+    QScopedPointer<MscModel> model(file->parseText(" \
+        mscdocument automade COMMENT 'doc comment'; \
+            inst mygui_GUI : process; \
+            msc recorded comment 'chart comment'; \
+                mygui_GUI : instance process foo COMMENT 'instance comment'; \
+                    in request from env comment 'msg comment'; \
+                endinstance; \
+            endmsc; \
+        endmscdocument; \
+    "));
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->comment(), QString("doc comment"));
+
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = model->documents().at(0)->charts().at(0);
+    QCOMPARE(chart->comment(), QString("chart comment"));
+
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->comment(), QString("instance comment"));
+
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    MscInstanceEvent *event = chart->instanceEvents().at(0);
+    QCOMPARE(event->comment(), QString("msg comment"));
 }
 
 void tst_MscFile::testNestedDocuments()

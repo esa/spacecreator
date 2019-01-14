@@ -27,18 +27,7 @@ class MscEntity : public QObject
 {
     Q_OBJECT
 public:
-    enum class EntityType {
-        Document = 0,
-        Chart,
-        Instance,
-        Message,
-        Timer,
-        Gate,
-        Condition,
-        Action,
-        Coregion,
-        Create
-    };
+    enum class EntityType { Document = 0, Chart, Instance, Message, Timer, Gate, Condition, Action, Coregion, Create };
     Q_ENUM(EntityType)
 
     explicit MscEntity(QObject *parent = nullptr);
@@ -51,14 +40,19 @@ public:
 
     static const QString DefaultName;
 
+    const QString &comment() const;
+    void setComment(const QString &comment);
+
     virtual MscEntity::EntityType entityType() const = 0;
 
 Q_SIGNALS:
     void nameChanged(const QString &name);
+    void commentChanged(const QString &name);
 
 private:
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
+    QString m_comment;
 };
 
 } // namespace msc
