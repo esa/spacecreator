@@ -35,6 +35,7 @@ textDefinition
 
 mscDocument
     : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
+    | MSCDOCUMENT NAME REFERENCED end // not in the spec
     ;
 
 documentHead
@@ -465,7 +466,7 @@ parameterList
     ;
 
 paramaterDefn
-    : binding | expression | pattern
+    : SEQUENCEOF | binding | expression | pattern
     ;
 
 //
@@ -614,6 +615,11 @@ LEFTOPEN : '(';
 RIGHTOPEN : ')';
 LEFTSQUAREBRACKET : '[' ;
 RIGHTSQUAREBRACKET : ']' ;
+LEFTCURLYBRACKET : '{';
+RIGHTCURLYBRACKET : '}';
+
+// Extra keywords from the old spec
+REFERENCED:'referenced'|'REFERENCED';
 
 
 fragment
@@ -627,12 +633,6 @@ NATIONAL : LEFTCURLYBRACKET | VERTICALLINE | RIGHTCURLYBRACKET | OVERLINE | UPWA
 
 fragment
 ALPHANUMERIC : LETTER | DECIMALDIGIT | NATIONAL;
-
-fragment
-LEFTCURLYBRACKET : '{' ;
-
-fragment
-RIGHTCURLYBRACKET : '}' ;
 
 fragment
 VERTICALLINE : '|';
@@ -687,7 +687,7 @@ TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | 
 
 MISC : OTHERCHARACTER | APOSTROPHE;
 
-OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '='; // exclude '/' as it's used for linebreaks
+OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '=' | '/';
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA | SEMI | COLON;
 
@@ -702,13 +702,20 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
 
-// '`' is not as from the spec
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' )+ ;
+// '`', '/' are not as from the spec
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
+
+SEQUENCEOF // custom
+//    : LEFTCURLYBRACKET ALPHANUMERIC+ (COMMA ALPHANUMERIC)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)+ RIGHTCURLYBRACKET
+    ;
+
+
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
-LB : ('/\r'|'/\n') ->skip; // linebreak
+LB : '/' ('\r' | '\n')+ ->skip; // linebreak
