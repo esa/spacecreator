@@ -356,7 +356,8 @@ actionStatement
 
 informalAction
     : CHARACTERSTRING
-    | name
+    | name // not like in the spec
+    | name (LEFTOPEN (name (COMMA name)*)? RIGHTOPEN)? '=' name // not like in the spec
     ;
 
 // 4.10 Instance creation

@@ -490,8 +490,12 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
             informalAction = informalAction.mid(1, informalAction.size() - 2);
             action->setInformalAction(informalAction);
         } else {
-            QString informalAction = nameToString(context->informalAction()->name());
-            action->setInformalAction(informalAction);
+            if (context->informalAction()->name().size() == 1) {
+                QString informalAction = nameToString(context->informalAction()->name(0));
+                action->setInformalAction(informalAction);
+            } else {
+                action->setInformalAction(::treeNodeToString(context->informalAction()));
+            }
         }
     } else {
         action->setActionType(MscAction::ActionType::Formal);
