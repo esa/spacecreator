@@ -218,12 +218,15 @@ incompleteMessageInput
     ;
 msgIdentification
     : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    (VIA gateName=NAME)? // the via is not accordint ot the spec
     ;
 outputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not accordint ot the spec
     ;
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not accordint ot the spec
     ;
 
 // 4.4 Control Flow

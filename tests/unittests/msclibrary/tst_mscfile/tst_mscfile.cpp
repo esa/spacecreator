@@ -70,6 +70,7 @@ private Q_SLOTS:
     void testInstanceCreateMultiParameter();
     void testInstanceCreateNoInstance();
     void testInstanceCreateDublicate();
+    void testNonStandardVia();
 
 private:
     MscFile *file = nullptr;
@@ -911,6 +912,24 @@ void tst_MscFile::testInstanceCreateDublicate()
 
     QCOMPARE(create->parameters().size(), 1);
     QCOMPARE(create->parameters()[0], QString("data1"));
+}
+
+void tst_MscFile::testNonStandardVia()
+{
+    // Using via that way is not really in line with the standard
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         OUT check1 ( pin ) VIA gtX; \
+                         OUT check2(1) TO  VIA gtY; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)
