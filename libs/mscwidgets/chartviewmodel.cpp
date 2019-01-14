@@ -165,20 +165,24 @@ void ChartViewModel::relayout()
                 InstanceItem *instance = itemForInstance(condition->instance());
                 item->buildLayout(condition->shared() ? instancesWidth : instance->boundingRect().width());
 
-                if (prevItem && prevItem->modelItem()->instance() == condition->instance())
+                if (prevItem
+                    && (prevItem->modelItem()->instance() == condition->instance()
+                        || prevItem->modelItem()->shared())) {
+                    y += -prevItem->boundingRect().y();
                     y += prevItem->boundingRect().height() + d->InterMessageSpan;
+                }
 
-                item->setPos(condition->shared() ? 0 : instance->x(), y + instance->axis().p1().y());
-
-                if (condition->shared())
-                    y += item->boundingRect().height() + d->InterMessageSpan;
+                item->setPos(condition->shared() ? 0 : (instance->axis().p1().x() - item->boundingRect().width() / 2),
+                             y + instance->axis().p1().y());
 
                 prevItem = item;
             }
         }
 
-        if (item)
+        if (item) {
+            y += -item->boundingRect().y();
             y += item->boundingRect().height() + d->InterMessageSpan;
+        }
     };
 
     // conditions with empty messageName
