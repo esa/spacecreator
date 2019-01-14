@@ -14,7 +14,7 @@ file : mscDocument | mscDefinition;
 // 2.1
 name
     // : NAME
-    : NAME+ // name in the 1993 spec is more relaxed
+    : . | (NAME)+ // name in the 1993 spec is more relaxed
     ;
 
 // 2.3 Comment
@@ -39,7 +39,7 @@ mscDocument
     ;
 
 documentHead
-    : MSCDOCUMENT NAME end dataDefinition
+    : MSCDOCUMENT name end dataDefinition
     ;
 
 definingMscReference
@@ -79,7 +79,7 @@ messageSequenceChart
     ;
 
 mscHead
-    : NAME (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
+    : name (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
     ;
 
 mscParameterDecl
@@ -191,6 +191,7 @@ instanceHeadStatement
     // older standard
     : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? end
     | INSTANCE (instanceKind)? (decomposition)? end
+    | INSTANCE COLON name end // not according ot the spec
     ;
 instanceEndStatement
     : ENDINSTANCE end
@@ -202,10 +203,10 @@ messageEvent
     : messageOutput | messageInput
     ;
 messageOutput
-    : OUT msgIdentification (TO inputAddress)? // should not be optional accortdint to spec
+    : OUT msgIdentification (TO)? (inputAddress)? // should not be optional according to spec
     ;
 messageInput
-    : IN msgIdentification (FROM outputAddress)? // should not be optional accortdint to spec
+    : IN msgIdentification (FROM)? (outputAddress)? // should not be optional according to spec
     ;
 incompleteMessageEvent
     : incompleteMessageOutput | incompleteMessageInput
@@ -218,12 +219,15 @@ incompleteMessageInput
     ;
 msgIdentification
     : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    (VIA gateName=NAME)? // the via is not according ot the spec
     ;
 outputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 
 // 4.4 Control Flow
