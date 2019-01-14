@@ -420,6 +420,7 @@ void tst_MscFile::testAction()
                       INSTANCE Inst_1; \
                          action 'Stop'; \
                          ACTION def \"digit1\", def \"digit2\"; \
+                         ACTION DSPinit(1,4)=10; \
                        ENDINSTANCE; \
                    ENDMSC;" };
 
@@ -428,7 +429,7 @@ void tst_MscFile::testAction()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
 
     auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
     QVERIFY(action != nullptr);
