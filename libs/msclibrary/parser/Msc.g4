@@ -202,10 +202,10 @@ messageEvent
     : messageOutput | messageInput
     ;
 messageOutput
-    : OUT msgIdentification (TO inputAddress)? // should not be optional accortdint to spec
+    : OUT msgIdentification (TO)? (inputAddress)? // should not be optional according to spec
     ;
 messageInput
-    : IN msgIdentification (FROM outputAddress)? // should not be optional accortdint to spec
+    : IN msgIdentification (FROM)? (outputAddress)? // should not be optional according to spec
     ;
 incompleteMessageEvent
     : incompleteMessageOutput | incompleteMessageInput

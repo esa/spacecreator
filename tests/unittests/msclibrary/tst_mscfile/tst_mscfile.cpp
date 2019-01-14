@@ -221,26 +221,31 @@ void tst_MscFile::testInstanceWithKind()
 
 void tst_MscFile::testMessage()
 {
-    MscModel *model =
-            file->parseText("MSC msc1;\nINSTANCE inst1;in ICONreq from env;out ICON to Responder;ENDINSTANCE;ENDMSC;");
+    QString msc = "MSC msc1; \
+        INSTANCE inst1; \
+            in ICONreq from env; \
+            in ICONreq2 from ; \
+            out ICON to Responder; \
+        ENDINSTANCE; \
+    ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
     MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
     QCOMPARE(message1->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message1->targetInstance(), instance);
 
-    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
     QVERIFY(message2 != nullptr);
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), instance);
     QCOMPARE(message2->targetInstance(), static_cast<MscInstance *>(nullptr));
-    delete model;
 }
 
 void tst_MscFile::testSameMessageInTwoInstances()
