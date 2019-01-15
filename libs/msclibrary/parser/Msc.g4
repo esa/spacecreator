@@ -218,7 +218,7 @@ incompleteMessageInput
     : IN msgIdentification FROM FOUND (outputAddress)?
     ;
 msgIdentification
-    : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    : messageName=name (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     (VIA gateName=NAME)? // the via is not according ot the spec
     ;
 outputAddress
@@ -462,6 +462,7 @@ pattern
 
 wildcard
     : . | CHARACTERSTRING // TODO not correct ?
+    | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
     ;
 
 // 5.8 Data in message and timer parameters
@@ -477,7 +478,8 @@ paramaterDefn
 //
 
 expressionString
-    : NAME COLON NAME // TODO not correct ?
+    : name COLON NAME // TODO not correct ?
+    | name COLON CHARACTERSTRING // extending the spec here ?
     ;
 
 variableValue

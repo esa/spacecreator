@@ -306,7 +306,7 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
         return visitChildren(context);
     }
 
-    const QString name = ::treeNodeToString(context->msgIdentification()->messageName);
+    const QString name = ::nameToString(context->msgIdentification()->messageName);
     m_currentMessage = m_currentChart->messageByName(name);
     if (m_currentMessage == nullptr) {
         m_currentMessage = new MscMessage(name);
@@ -352,8 +352,8 @@ antlrcpp::Any MscParserVisitor::visitMsgIdentification(MscParser::MsgIdentificat
     }
 
     MscMessage::Parameters parameters;
-    if (context->NAME().size() > 1) {
-        parameters.name = ::treeNodeToString(context->NAME(1));
+    if (context->messageInstanceName) {
+        parameters.name = ::treeNodeToString(context->messageInstanceName);
     }
 
     auto *parameterList = context->parameterList();
