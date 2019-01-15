@@ -25,10 +25,7 @@ namespace asn1 {
 Asn1ItemModel::Asn1ItemModel(QObject *parent)
     : QStandardItemModel(1, 4, parent)
 {
-    QStringList headers = QStringList() << tr("Field")
-                                        << tr("Type")
-                                        << tr("Value")
-                                        << tr("Optional");
+    QStringList headers = QStringList() << tr("Field") << tr("Type") << tr("Value") << tr("Optional");
     setHorizontalHeaderLabels(headers);
 }
 

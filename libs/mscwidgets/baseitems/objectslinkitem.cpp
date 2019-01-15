@@ -174,9 +174,7 @@ QPointF ObjectsLinkItem::anchorPointTarget() const
     return m_link->target()->point();
 }
 
-void ObjectsLinkItem::paint(QPainter *painter,
-                            const QStyleOptionGraphicsItem *option,
-                            QWidget *widget)
+void ObjectsLinkItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -231,8 +229,7 @@ void ObjectsLinkItem::drawEndSign(QPainter *painter)
     drawPath(painter, m_itemsBrush.Target, m_itemsPen.Target, m_symbols.Target);
 }
 
-void ObjectsLinkItem::drawPath(QPainter *painter, const QBrush &brush,
-                               const QPen &pen, const QPainterPath &path)
+void ObjectsLinkItem::drawPath(QPainter *painter, const QBrush &brush, const QPen &pen, const QPainterPath &path)
 {
     painter->save();
 

@@ -36,7 +36,9 @@
 using namespace msc;
 
 struct MainModelPrivate {
-    explicit MainModelPrivate(MainModel *q) : m_mscModel(new MscModel()), m_documentItemModel(new DocumentItemModel(q))
+    explicit MainModelPrivate(MainModel *q)
+        : m_mscModel(new MscModel())
+        , m_documentItemModel(new DocumentItemModel(q))
     {
     }
     ~MainModelPrivate()
@@ -53,7 +55,9 @@ struct MainModelPrivate {
     qreal m_instanceAxisHeight = 0.;
 };
 
-MainModel::MainModel(QObject *parent) : QObject(parent), d(new MainModelPrivate(this))
+MainModel::MainModel(QObject *parent)
+    : QObject(parent)
+    , d(new MainModelPrivate(this))
 {
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
 }

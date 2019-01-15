@@ -63,8 +63,7 @@ public:
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget = nullptr) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
 Q_SIGNALS:
     void geometryChanged(const QRectF &geom);
@@ -73,7 +72,10 @@ protected:
     template<class T>
     struct PairOf {
         PairOf(const T &a, const T &b)
-            : Source(a), Target(b) {}
+            : Source(a)
+            , Target(b)
+        {
+        }
 
         T Source, Target;
     };
@@ -91,8 +93,7 @@ protected:
     virtual void drawBody(QPainter *painter);
     virtual void drawStartSign(QPainter *painter);
     virtual void drawEndSign(QPainter *painter);
-    void drawPath(QPainter *painter, const QBrush &brush, const QPen &pen,
-                  const QPainterPath &path);
+    void drawPath(QPainter *painter, const QBrush &brush, const QPen &pen, const QPainterPath &path);
 
 public Q_SLOTS:
     virtual void updateLayout();

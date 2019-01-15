@@ -23,7 +23,9 @@ namespace msc {
 namespace cmd {
 
 CmdInstanceItemMove::CmdInstanceItemMove(InstanceItem *instanceItem, const QPointF &destination)
-    : BaseCommand(instanceItem), m_posFrom(instanceItem ? instanceItem->pos() : QPointF()), m_posTo(destination)
+    : BaseCommand(instanceItem)
+    , m_posFrom(instanceItem ? instanceItem->pos() : QPointF())
+    , m_posTo(destination)
 {
     setText(QObject::tr("Move instance"));
 }

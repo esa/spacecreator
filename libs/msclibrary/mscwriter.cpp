@@ -33,7 +33,10 @@
 
 namespace msc {
 
-MscWriter::MscWriter(QObject *parent) : QObject(parent) {}
+MscWriter::MscWriter(QObject *parent)
+    : QObject(parent)
+{
+}
 
 void MscWriter::saveModel(const MscModel *model, const QString &fileName)
 {

@@ -25,7 +25,8 @@ MscTimer::MscTimer(QObject *parent)
 }
 
 MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
-    : MscInstanceEvent(name, parent), m_timerType(type)
+    : MscInstanceEvent(name, parent)
+    , m_timerType(type)
 {
 }
 

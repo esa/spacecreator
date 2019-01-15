@@ -58,8 +58,7 @@ void tst_MscGate::testPropertyDirection()
     MscGate gate(TestGateName, this);
     QCOMPARE(gate.direction(), MscGate::Direction::In); // the default one
 
-    for (const MscGate::Direction dir : { MscGate::Direction::In,
-                                          MscGate::Direction::Out }) {
+    for (const MscGate::Direction dir : { MscGate::Direction::In, MscGate::Direction::Out }) {
         gate.setDirection(dir);
         QCOMPARE(gate.direction(), dir);
     }

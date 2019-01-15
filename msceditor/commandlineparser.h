@@ -26,7 +26,8 @@ class CommandLineParser : public QCommandLineParser
 public:
     CommandLineParser();
 
-    enum class Positional {
+    enum class Positional
+    {
         OpenFileMsc = 0,
         OpenFileAsn,
 

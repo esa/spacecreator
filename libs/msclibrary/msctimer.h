@@ -27,10 +27,13 @@ class MscTimer : public MscInstanceEvent
     Q_OBJECT
 
 public:
-    enum class TimerType { Start,
-                           Stop,
-                           Timeout,
-                           Unknown };
+    enum class TimerType
+    {
+        Start,
+        Stop,
+        Timeout,
+        Unknown
+    };
 
     explicit MscTimer(QObject *parent = nullptr);
     MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);

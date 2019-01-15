@@ -36,15 +36,9 @@ Q_SIGNALS:
 private:
     bool checkFormat(const QString &asn1Value) const;
 
-    bool parseSequenceValue(const QVariantMap &asn1Type,
-                            const QString &asn1Value,
-                            QVariantMap &valueMap) const;
-    bool parseSequenceOfValue(const QVariantMap &asn1Type,
-                              const QString &asn1Value,
-                              QVariantMap &valueMap) const;
-    bool parseChoiceValue(const QVariantMap &asn1Type,
-                          const QString &asn1Value,
-                          QVariantMap &valueMap) const;
+    bool parseSequenceValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
+    bool parseSequenceOfValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
+    bool parseChoiceValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
 
     QVariantMap getType(const QString &name, const QVariantMap &asn1Type) const;
     bool checkRange(const QVariantMap &asn1Type, const QVariant &value) const;

@@ -104,7 +104,7 @@ void tst_ObjectAnchor::testObject()
         QVERIFY(m_instanceItemA->flags() == anchorA.object()->flags());
     }
 
-    //ensure flags are restored
+    // ensure flags are restored
     QVERIFY(m_instanceItemA->flags() == originalFlags);
 }
 
@@ -119,15 +119,13 @@ void tst_ObjectAnchor::testReplaceNoSnap()
 {
     ObjectAnchor anchor;
 
-    QCOMPARE(anchor.object(), static_cast<InstanceItem*>(nullptr));
+    QCOMPARE(anchor.object(), static_cast<InstanceItem *>(nullptr));
     QCOMPARE(anchor.point(), QPointF());
 
     const QPointF pnt10(10., 10.);
     bool notificationCatched(false);
     connect(&anchor, &ObjectAnchor::anchorChanged, this,
-            [&notificationCatched](InteractiveObject *, const QPointF &) {
-                notificationCatched = true;
-            },
+            [&notificationCatched](InteractiveObject *, const QPointF &) { notificationCatched = true; },
             Qt::DirectConnection);
 
     anchor.replace(m_instanceItemA, pnt10, ObjectAnchor::Snap::NoSnap);
@@ -152,9 +150,7 @@ void tst_ObjectAnchor::testReplaceSnap()
 
     bool notificationCatched(false);
     connect(&anchor, &ObjectAnchor::anchorChanged, this,
-            [&notificationCatched](InteractiveObject *, const QPointF &) {
-                notificationCatched = true;
-            },
+            [&notificationCatched](InteractiveObject *, const QPointF &) { notificationCatched = true; },
             Qt::DirectConnection);
 
     anchor.replace(m_instanceItemA, anchorPointA + shift1, ObjectAnchor::Snap::SnapTo);

@@ -26,8 +26,7 @@
 
 namespace msc {
 
-class GripPointsHandler : public QGraphicsObject,
-                          public AbstractInteractiveObject
+class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObject
 {
     Q_OBJECT
 
@@ -39,8 +38,7 @@ public:
     void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) override;
 
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QVector<GripPoint *> gripPoints() const;
     GripPoint *gripPoint(GripPoint::Location pnt) const;
@@ -67,8 +65,7 @@ Q_SIGNALS:
 
 protected:
     void changeVisibilityAnimated(bool appear);
-    QVariant itemChange(GraphicsItemChange change,
-                        const QVariant &value) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     const QMap<GripPoint::Location, GripPoint *> m_gripPoints;
     DrawRectInfo m_highlighter;
@@ -88,7 +85,7 @@ protected:
      * plus the scale factor could be obtained from QTransform only in case
      * there were no additional transformations performed (no translate nor rotate).
      * For now it seems enough, but it might need refactoring afterwhile.
-    */
+     */
     QPointF viewScale() const;
 };
 

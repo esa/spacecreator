@@ -168,8 +168,8 @@ void tst_MscFile::testNestedDocuments()
     delete model;
 
     // documents in parallel
-    model = file->parseText(
-            "MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
+    model = file->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT "
+                            "l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
     mainDocuments = model->documents();
     QCOMPARE(mainDocuments.size(), 1);
     QCOMPARE(mainDocuments.at(0)->documents().size(), 2);

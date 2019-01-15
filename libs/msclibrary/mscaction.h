@@ -29,10 +29,19 @@ class MscInstance;
 class MscAction : public MscInstanceEvent
 {
 public:
-    enum class ActionType { Informal, Formal };
+    enum class ActionType
+    {
+        Informal,
+        Formal
+    };
 
     struct DataStatement {
-        enum class StatementType { Define, UnDefine, Binding };
+        enum class StatementType
+        {
+            Define,
+            UnDefine,
+            Binding
+        };
 
         StatementType m_type = StatementType::Define;
         QString m_variableString;

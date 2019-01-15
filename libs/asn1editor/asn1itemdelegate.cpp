@@ -25,7 +25,10 @@
 
 namespace asn1 {
 
-Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
+Asn1ItemDelegate::Asn1ItemDelegate(QObject *parent)
+    : QStyledItemDelegate(parent)
+{
+}
 
 void Asn1ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {

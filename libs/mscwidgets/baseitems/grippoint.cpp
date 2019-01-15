@@ -82,7 +82,8 @@ GripPoint::GripPoint(Location pos, GripPointsHandler *parent, GripPoint::GripTyp
     , m_listener(parent)
     , m_location(pos)
     , m_type(gpType)
-    , m_boundRect(QPointF(-m_uiDescr.rectSize().width() / 2., -m_uiDescr.rectSize().height() / 2.), m_uiDescr.rectSize())
+    , m_boundRect(QPointF(-m_uiDescr.rectSize().width() / 2., -m_uiDescr.rectSize().height() / 2.),
+                  m_uiDescr.rectSize())
 {
     setFlags(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
@@ -185,8 +186,7 @@ void GripPoint::setIsUsed(bool used)
         setVisible(false);
 }
 
-void GripPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                      QWidget *widget)
+void GripPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

@@ -12,8 +12,6 @@ MscInstanceEvent::MscInstanceEvent(const QString &name, QObject *parent)
 {
 }
 
-MscInstanceEvent::~MscInstanceEvent()
-{
-}
+MscInstanceEvent::~MscInstanceEvent() {}
 
 }

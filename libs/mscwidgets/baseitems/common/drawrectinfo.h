@@ -27,8 +27,7 @@ class DrawRectInfo
 public:
     DrawRectInfo();
 
-    DrawRectInfo(const QSizeF &rectSize, qreal borderWidth,
-                 const QColor &borderColor, const QColor &bodyColor);
+    DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor);
     QSizeF rectSize() const;
     void setRectSize(const QSizeF &sz);
 

@@ -21,7 +21,10 @@
 
 namespace msc {
 
-MscModel::MscModel(QObject *parent) : QObject(parent) {}
+MscModel::MscModel(QObject *parent)
+    : QObject(parent)
+{
+}
 
 MscModel::~MscModel()
 {

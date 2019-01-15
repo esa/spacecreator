@@ -28,7 +28,8 @@
 namespace asn1 {
 
 Asn1Editor::Asn1Editor(QWidget *parent)
-    : QDialog(parent), ui(new Ui::Asn1Editor)
+    : QDialog(parent)
+    , ui(new Ui::Asn1Editor)
 {
     ui->setupUi(this);
 
@@ -51,10 +52,8 @@ Asn1Editor::~Asn1Editor()
 
 void Asn1Editor::openFile()
 {
-    const QString filename = QFileDialog::getOpenFileName(this,
-                                                          tr("ASN1"),
-                                                          QString(""),
-                                                          tr("XML files (*.xml);;All files (*.*)"));
+    const QString filename =
+            QFileDialog::getOpenFileName(this, tr("ASN1"), QString(""), tr("XML files (*.xml);;All files (*.*)"));
     if (!filename.isEmpty())
         loadFile(filename);
 }
@@ -66,9 +65,8 @@ void Asn1Editor::showParseError(const QString &error)
 
 void Asn1Editor::showAsn1Type(const QString &text)
 {
-    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
-        return value.toMap()["name"] == text;
-    });
+    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(),
+                             [&](const QVariant &value) { return value.toMap()["name"] == text; });
 
     if (find != m_asn1Types.end())
         m_asn1TreeView->setAsn1Model((*find).toMap());

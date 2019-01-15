@@ -40,8 +40,7 @@ private:
 class OptionsGroup
 {
 public:
-    OptionsGroup(const QString &name, const QVector<AppOption *> &options,
-                 const QVector<OptionsGroup *> &subroups);
+    OptionsGroup(const QString &name, const QVector<AppOption *> &options, const QVector<OptionsGroup *> &subroups);
 
     const QString Name;
     const QVector<AppOption *> Options;

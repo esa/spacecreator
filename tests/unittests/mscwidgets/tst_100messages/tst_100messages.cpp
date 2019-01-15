@@ -89,7 +89,8 @@ void tst100messages::testPerformance()
                                  "- Create %1 MessageItems connected to a single InstanceItem;\n\t"
                                  "- Move that InstanceItem by mouse;\n\t"
                                  "- Undo messages creation.\n"
-                                 "Coudl be used to test the general smoothness of processes where the user interaction is involved.\n"
+                                 "Coudl be used to test the general smoothness of processes where "
+                                 "the user interaction is involved.\n"
                                  "It's intended for manual testing, so skipped here.")
                                  .arg(CommandsCount)));
     QBENCHMARK {
@@ -97,8 +98,7 @@ void tst100messages::testPerformance()
         const QPointF &messagePos = { instacneCenter.x() - ArrowItem::DEFAULT_WIDTH / 2, instacneCenter.y() };
 
         QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()),
-                                QVariant::fromValue<ChartViewModel *>(&m_model),
-                                QPointF() };
+                                QVariant::fromValue<ChartViewModel *>(&m_model), QPointF() };
 
         for (int j = 0; j < CommandsCount / 2; ++j) {
 
@@ -123,8 +123,7 @@ void tst100messages::testPerformance()
 void tst100messages::moveInstance(const QPoint &pntMove)
 {
     const QVector<QPoint> path = {
-        pntMove,
-        pntMove + QPoint(CommandsCount, 0), // move right
+        pntMove, pntMove + QPoint(CommandsCount, 0), // move right
         pntMove + QPoint(CommandsCount, CommandsCount), // then down
         pntMove + QPoint(0, CommandsCount), // then left
         pntMove // and up (back to initial pos)
