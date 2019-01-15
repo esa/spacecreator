@@ -16,9 +16,9 @@
 */
 
 #include <QtTest>
-#include <mscaction.h>
 #include <mscmodel.h>
 
+#include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "msccreate.h"
@@ -36,6 +36,8 @@ class tst_MscWriter : public MscWriter
     Q_OBJECT
 
 private Q_SLOTS:
+    void cleanup();
+
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
     void testSerializeMscTimer();
@@ -52,7 +54,13 @@ private Q_SLOTS:
     void testSerializeMscDocumentChart();
     void testSerializeDataDefinition();
     void testSerializeCreate();
+    void testSerializeComments();
 };
+
+void tst_MscWriter::cleanup()
+{
+    setModel(nullptr);
+}
 
 void tst_MscWriter::testSerializeMscMessage()
 {
@@ -384,6 +392,43 @@ void tst_MscWriter::testSerializeCreate()
     QCOMPARE(serializeList.at(2), QString("   in Msg_1 from env;"));
     QCOMPARE(serializeList.at(3), QString("   create subscriber2;"));
     QCOMPARE(serializeList.at(4), QString("endinstance;"));
+}
+
+void tst_MscWriter::testSerializeComments()
+{
+    MscDocument document("Doc_1");
+    document.setComment("Doc1 comment");
+
+    MscChart *chart = new MscChart("Chart_1");
+    chart->setComment("Chart1 comment");
+    document.addChart(chart);
+
+    MscInstance *instance1 = new MscInstance("Inst_1");
+    instance1->setComment("Inst1 comment");
+    chart->addInstance(instance1);
+
+    MscMessage *message = new MscMessage("Msg_1");
+    message->setComment("Msg1 comment");
+    message->setTargetInstance(instance1);
+    chart->addInstanceEvent(message);
+
+    MscAction *action = new MscAction();
+    action->setInformalAction("Stop");
+    action->setComment("Action1 comment");
+    action->setInstance(instance1);
+    chart->addInstanceEvent(action);
+
+    QStringList serializeList = this->serialize(&document).split("\n");
+
+    QVERIFY(serializeList.size() >= 8);
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 comment 'Doc1 comment';"));
+    QCOMPARE(serializeList.at(1), QString("   msc Chart_1 comment 'Chart1 comment';"));
+    QCOMPARE(serializeList.at(2), QString("      instance Inst_1 comment 'Inst1 comment';"));
+    QCOMPARE(serializeList.at(3), QString("         in Msg_1 from env comment 'Msg1 comment';"));
+    QCOMPARE(serializeList.at(4), QString("         action 'Stop' comment 'Action1 comment';"));
+    QCOMPARE(serializeList.at(5), QString("      endinstance;"));
+    QCOMPARE(serializeList.at(6), QString("   endmsc;"));
+    QCOMPARE(serializeList.at(7), QString("endmscdocument;"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscWriter)

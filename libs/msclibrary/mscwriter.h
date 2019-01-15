@@ -30,6 +30,7 @@ class MscCondition;
 class MscCoregion;
 class MscCreate;
 class MscDocument;
+class MscEntity;
 class MscInstance;
 class MscMessage;
 class MscModel;
@@ -61,6 +62,7 @@ protected:
 private:
     QString tabs(int tabsSize) const;
     QString dataDefinition() const;
+    QString serializeComment(const msc::MscEntity *entity) const;
 
     const MscModel *m_model = nullptr;
 };

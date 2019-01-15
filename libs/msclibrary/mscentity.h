@@ -52,14 +52,19 @@ public:
 
     static const QString DefaultName;
 
+    const QString &comment() const;
+    void setComment(const QString &comment);
+
     virtual MscEntity::EntityType entityType() const = 0;
 
 Q_SIGNALS:
     void nameChanged(const QString &name);
+    void commentChanged(const QString &name);
 
 private:
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
+    QString m_comment;
 };
 
 } // namespace msc

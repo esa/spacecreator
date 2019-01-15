@@ -94,10 +94,11 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     // The rest is the internal part of this which should be indented
     ++tabsSize;
 
+    QString comment = serializeComment(instance);
     if (!instance->kind().isEmpty()) {
-        header += QString(": %1 %2;\n").arg(instance->kind(), instance->inheritance());
+        header += QString(": %1 %2%3;\n").arg(instance->kind(), instance->inheritance(), comment);
     } else
-        header += ";\n";
+        header += comment + ";\n";
 
     auto addCondition = [&](const QString &messageName) {
         std::for_each(instanceEvents.begin(), instanceEvents.end(), [&](MscInstanceEvent *event) {
@@ -141,15 +142,17 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     if (message == nullptr || !(message->sourceInstance() == instance || message->targetInstance() == instance))
         return QString();
 
+    const QString comment = serializeComment(message);
+
     QString direction = tabs(tabsSize);
     QString name = message->name();
     QString instanceName;
 
     if (message->sourceInstance() == instance) {
-        direction += "out %1 to %2;\n";
+        direction += "out %1 to %2%3;\n";
         instanceName = message->targetInstance() != nullptr ? message->targetInstance()->name() : "env";
     } else {
-        direction += "in %1 from %2;\n";
+        direction += "in %1 from %2%3;\n";
         instanceName = message->sourceInstance() != nullptr ? message->sourceInstance()->name() : "env";
     }
 
@@ -160,7 +163,7 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression
                                                                                 : message->parameters().pattern);
 
-    return QString(direction).arg(name, instanceName);
+    return QString(direction).arg(name, instanceName, comment);
 }
 
 QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
@@ -214,10 +217,13 @@ QString MscWriter::serialize(const MscAction *action, int tabsSize)
         return QString();
     }
 
+    const QString tabString = tabs(tabsSize);
+    const QString comment = serializeComment(action);
+
     if (action->actionType() == MscAction::ActionType::Informal) {
-        return tabs(tabsSize) + "action '" + action->informalAction() + "';\n";
+        return QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment);
     } else {
-        QString actionText = tabs(tabsSize) + "action ";
+        QString actionText = tabString + "action ";
         bool first = true;
         for (const auto &statement : action->dataStatements()) {
             if (!first) {
@@ -236,7 +242,7 @@ QString MscWriter::serialize(const MscAction *action, int tabsSize)
             }
             first = false;
         }
-        actionText += ";\n";
+        actionText += comment + ";\n";
         return actionText;
     }
 }
@@ -258,7 +264,7 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
         instances += serialize(instance, chart->instanceEvents(), tabsSize + 1);
 
     QString tabString = tabs(tabsSize);
-    return QString("%1msc %2;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances);
+    return QString("%1msc %2%4;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances, serializeComment(chart));
 }
 
 QString MscWriter::serialize(const MscDocument *document, int tabsSize)
@@ -303,8 +309,8 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     }
 
     QString tabString = tabs(tabsSize);
-    return QString("%1mscdocument %2%4;%5\n%3%1endmscdocument;\n")
-            .arg(tabString, document->name(), documentBody, relation, dataDef);
+    return QString("%1mscdocument %2%4%6;%5\n%3%1endmscdocument;\n")
+            .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document));
 }
 
 void MscWriter::setModel(const MscModel *model)
@@ -339,6 +345,15 @@ QString MscWriter::dataDefinition() const
     }
 
     return data;
+}
+
+QString MscWriter::serializeComment(const msc::MscEntity *entity) const
+{
+    if (!entity || entity->comment().isEmpty()) {
+        return {};
+    }
+
+    return QString(" comment '%1'").arg(entity->comment());
 }
 
 } // namespace msc

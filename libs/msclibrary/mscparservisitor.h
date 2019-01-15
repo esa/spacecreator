@@ -43,10 +43,14 @@ public:
 
     antlrcpp::Any visitFile(MscParser::FileContext *context) override;
     antlrcpp::Any visitMscDocument(MscParser::MscDocumentContext *context) override;
+    antlrcpp::Any visitDocumentHead(MscParser::DocumentHeadContext *context) override;
     antlrcpp::Any visitInstanceItem(MscParser::InstanceItemContext *context) override;
     antlrcpp::Any visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context) override;
+    antlrcpp::Any visitMscHead(MscParser::MscHeadContext *context) override;
     antlrcpp::Any visitInstanceKind(MscParser::InstanceKindContext *context) override;
     antlrcpp::Any visitEventDefinition(MscParser::EventDefinitionContext *context) override;
+    antlrcpp::Any visitInstanceEvent(MscParser::InstanceEventContext *context) override;
+    antlrcpp::Any visitOrderableEvent(MscParser::OrderableEventContext *context) override;
     antlrcpp::Any visitInstanceHeadStatement(MscParser::InstanceHeadStatementContext *context) override;
     antlrcpp::Any visitInstanceEndStatement(MscParser::InstanceEndStatementContext *context) override;
     antlrcpp::Any visitMessageOutput(MscParser::MessageOutputContext *context) override;
@@ -78,6 +82,7 @@ private:
     msc::MscChart *m_currentChart = nullptr;
     msc::MscInstance *m_currentInstance = nullptr;
     msc::MscMessage *m_currentMessage = nullptr;
+    msc::MscInstanceEvent *m_currentEvent = nullptr;
 
     QVector<msc::MscInstanceEvent *> m_instanceEvents;
     QVector<QVector<msc::MscInstanceEvent *>> m_instanceEventsList;
