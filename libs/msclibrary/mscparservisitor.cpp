@@ -55,13 +55,19 @@ static QString nameToString(MscParser::NameContext *nameNode)
     return name;
 }
 
-static QString characterToString(antlr4::tree::TerminalNode *characterString)
+/*!
+   Helper function to store a MSC CHARACTERSTRING in a QString
+ */
+static QString charactersToString(antlr4::tree::TerminalNode *characterString)
 {
     QString string = treeNodeToString(characterString);
 
     // remove the single quotes
-    if (string.size() > 1) {
-        string = string.mid(1, string.size() - 2);
+    if (string.startsWith("'")) {
+        string.remove(0, 1);
+    }
+    if (string.endsWith("'")) {
+        string.remove(string.size() - 1, 1);
     }
     return string;
 }
@@ -73,7 +79,7 @@ static void parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
     }
 
     if (end->comment()) {
-        entity->setComment(characterToString(end->comment()->CHARACTERSTRING()));
+        entity->setComment(charactersToString(end->comment()->CHARACTERSTRING()));
     }
 }
 
@@ -528,7 +534,7 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     if (context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
         if (context->informalAction()->CHARACTERSTRING()) {
-            action->setInformalAction(characterToString(context->informalAction()->CHARACTERSTRING()));
+            action->setInformalAction(charactersToString(context->informalAction()->CHARACTERSTRING()));
         } else {
             QString informalAction = nameToString(context->informalAction()->name());
             action->setInformalAction(informalAction);
