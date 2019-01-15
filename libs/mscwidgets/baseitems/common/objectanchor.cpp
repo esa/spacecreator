@@ -67,8 +67,7 @@ QGraphicsItem::GraphicsItemFlags ObjectAnchor::originalFlags() const
 
 bool ObjectAnchor::operator==(const ObjectAnchor &other) const
 {
-    return m_anchorObject == other.m_anchorObject
-            && m_scenePoint == other.m_scenePoint
+    return m_anchorObject == other.m_anchorObject && m_scenePoint == other.m_scenePoint
             && m_storedFlags == other.m_storedFlags;
 }
 
@@ -137,7 +136,8 @@ void ObjectAnchor::connectObject()
 {
     if (m_anchorObject) {
         m_storedFlags = m_anchorObject->flags();
-        m_anchorObject->setFlags(m_storedFlags | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+        m_anchorObject->setFlags(m_storedFlags | QGraphicsItem::ItemSendsGeometryChanges
+                                 | QGraphicsItem::ItemSendsScenePositionChanges);
         m_anchorObject->highlightConnected();
     }
 }

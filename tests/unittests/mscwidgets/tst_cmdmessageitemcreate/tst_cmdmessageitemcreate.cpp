@@ -85,8 +85,7 @@ void tst_CmdMessageItemCreate::testCreate()
     for (int i = 0; i < CommandsCount; ++i) {
         cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                  { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
-                                   QVariant::fromValue<ChartViewModel *>(&m_chartModel),
-                                   QPointF(i, 0) });
+                                   QVariant::fromValue<ChartViewModel *>(&m_chartModel), QPointF(i, 0) });
     }
 
     QCOMPARE(sceneItemsCount(), CommandsCount);
@@ -121,7 +120,8 @@ void tst_CmdMessageItemCreate::testRedo()
 void tst_CmdMessageItemCreate::testPerformance()
 {
     if (SkipBenchmark)
-        QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 CreateMessage commands (create, undo, redo).\n"
+        QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 "
+                                 "CreateMessage commands (create, undo, redo).\n"
                                  "It's intended for manual testing, so skipped here.")
                                  .arg(CommandsCount)));
 
@@ -131,14 +131,14 @@ void tst_CmdMessageItemCreate::testPerformance()
     QCOMPARE(sceneItemsCount(), 0);
 
     QBENCHMARK {
-        m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount, 2. * CommandsCount);
+        m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount,
+                                                   2. * CommandsCount);
 
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
             cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                      { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
-                                       QVariant::fromValue<ChartViewModel *>(&m_chartModel),
-                                       QPointF(i, 0) });
+                                       QVariant::fromValue<ChartViewModel *>(&m_chartModel), QPointF(i, 0) });
         }
 
         // undo:

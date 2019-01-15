@@ -42,7 +42,8 @@ public:
     static ArrowSign createArrowRight();
 
 private:
-    enum class Flow {
+    enum class Flow
+    {
         LeftToRight = 0,
         RightToLeft
     };

@@ -45,9 +45,7 @@ public:
         if (!m_gripPoints)
             return nullptr;
 
-        return m_gripPoints->usedPoints().contains(location)
-                ? m_gripPoints->gripPoint(location)
-                : nullptr;
+        return m_gripPoints->usedPoints().contains(location) ? m_gripPoints->gripPoint(location) : nullptr;
     }
 
 protected:
@@ -182,7 +180,8 @@ void tst_InteractiveObject::testMove()
     const QPointF &prevPos(m_item->pos());
     QVERIFY(prevPos.isNull());
 
-    msc::test::ui::sendMouseMove(m_view->viewport(), m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
+    msc::test::ui::sendMouseMove(m_view->viewport(),
+                                 m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
 
     if (GripPoint *gp = m_item->gripPoint(GripPoint::Center)) {
         const QPointF &gpScene = gp->mapToScene(gp->boundingRect().center());

@@ -27,7 +27,8 @@ class MscEntity : public QObject
 {
     Q_OBJECT
 public:
-    enum class EntityType {
+    enum class EntityType
+    {
         Document = 0,
         Chart,
         Instance,

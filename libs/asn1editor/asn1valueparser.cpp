@@ -21,7 +21,10 @@
 
 namespace asn1 {
 
-Asn1ValueParser::Asn1ValueParser(QObject *parent) : QObject(parent) {}
+Asn1ValueParser::Asn1ValueParser(QObject *parent)
+    : QObject(parent)
+{
+}
 
 QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const
 {

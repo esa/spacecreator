@@ -97,7 +97,9 @@ struct MainWindowPrivate {
     QAction *m_defaultToolAction = nullptr;
 };
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), d(new MainWindowPrivate(this))
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , d(new MainWindowPrivate(this))
 {
     setupUi();
 

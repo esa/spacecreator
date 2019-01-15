@@ -36,8 +36,8 @@ CmdInstanceItemCreate::CmdInstanceItemCreate(QGraphicsScene *scene, ChartViewMod
 bool CmdInstanceItemCreate::validateStorages(const char *caller) const
 {
     if (!m_model || !m_model->currentChart() || !m_scene) {
-        qWarning() << caller << "Model, chart or scene is null, aborting."
-                   << m_model << (m_model ? m_model->currentChart() : nullptr) << m_scene;
+        qWarning() << caller << "Model, chart or scene is null, aborting." << m_model
+                   << (m_model ? m_model->currentChart() : nullptr) << m_scene;
         return false;
     }
     return true;

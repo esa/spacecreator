@@ -62,7 +62,11 @@ static QString nameToString(MscParser::NameContext *nameNode)
 
 using namespace msc;
 
-MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens) : m_model(new MscModel), m_tokens(tokens) {}
+MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens)
+    : m_model(new MscModel)
+    , m_tokens(tokens)
+{
+}
 
 MscParserVisitor::~MscParserVisitor()
 {
@@ -658,7 +662,8 @@ void MscParserVisitor::orderInstanceEvents()
         bool found = false;
 
         for (int i = 0; i < m_instanceEventsList.size(); ++i) {
-            // First, go through all the stacks and take away non-messages. This has to be done for every loop
+            // First, go through all the stacks and take away non-messages. This has to be done for
+            // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
                 while (!m_instanceEventsList.at(j).isEmpty()
                        && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message) {

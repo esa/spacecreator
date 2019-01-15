@@ -27,8 +27,11 @@ class MscCoregion : public MscInstanceEvent
     Q_OBJECT
 
 public:
-    enum class Type { Begin,
-                      End };
+    enum class Type
+    {
+        Begin,
+        End
+    };
 
     explicit MscCoregion(QObject *parent = nullptr);
     explicit MscCoregion(Type type, QObject *parent = nullptr);

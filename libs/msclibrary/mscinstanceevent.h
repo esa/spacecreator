@@ -22,7 +22,8 @@
 
 namespace msc {
 
-// This is the base class for conditions, messages and timers. In the grammar this is called InstanceEvent
+// This is the base class for conditions, messages and timers. In the grammar this is called
+// InstanceEvent
 class MscInstanceEvent : public MscEntity
 {
     Q_OBJECT

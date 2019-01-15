@@ -29,14 +29,14 @@ class tst_CommandLineParser : public QObject
 public:
 private slots:
     /*
-      * A test slot name for each option must contain "testCmdArgument" -
-      * it's used in the tst_CommandLineParser::testCoverage
-      * to detected missed (untested) options.
-      * For now it's possible to test all (both) options just by iterating
-      * the CommandLineParser::Positional enum,
-      * but I'm afraid some options will need some extra config,
-      * so lets keep to this way - one option, one dedicated test slot.
-      */
+     * A test slot name for each option must contain "testCmdArgument" -
+     * it's used in the tst_CommandLineParser::testCoverage
+     * to detected missed (untested) options.
+     * For now it's possible to test all (both) options just by iterating
+     * the CommandLineParser::Positional enum,
+     * but I'm afraid some options will need some extra config,
+     * so lets keep to this way - one option, one dedicated test slot.
+     */
     void testCmdArgumentOpenMsc();
     void testCmdArgumentOpenAsn();
 
@@ -61,9 +61,7 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
     QCOMPARE(argFromParser1, FileName);
 
     MainWindow w;
-    const bool processed =
-            w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc,
-                                    argFromParser1);
+    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc, argFromParser1);
     QCOMPARE(processed, true);
 
     parser.process({ QApplication::instance()->applicationFilePath(),
@@ -72,15 +70,14 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
     const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenFileMsc));
     QCOMPARE(argFromParser2, NoFileName);
 
-    const bool notProcessed =
-            w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc,
-                                    argFromParser2);
+    const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc, argFromParser2);
     QCOMPARE(notProcessed, false);
 }
 
 void tst_CommandLineParser::testCmdArgumentOpenAsn()
 {
-#ifndef __clang_analyzer__ // Currently clang's scan-build on build server complains on the QTimer by some reason
+#ifndef __clang_analyzer__ // Currently clang's scan-build on build server complains on the QTimer
+                           // by some reason
 
     // While ASN support is not implemented yet,
     // attempt to open a file will raise a message box.
@@ -110,8 +107,7 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
     MainWindow w;
 
     scheduleMBCloser(1000);
-    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn,
-                                                   argFromParser1);
+    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser1);
     QEXPECT_FAIL("", "ASN support is not implemented yet", Continue);
     QCOMPARE(processed, true);
 
@@ -123,8 +119,7 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
     QCOMPARE(argFromParser2, NoFileName);
 
     scheduleMBCloser(1000);
-    const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn,
-                                                      argFromParser2);
+    const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser2);
     QCOMPARE(notProcessed, false);
 #endif // __clang_analyzer__
 }

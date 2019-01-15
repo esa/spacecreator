@@ -37,8 +37,8 @@ public:
     QPointF startSignLocal() const;
     QPointF endSignLocal() const;
 
-    QPointF makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint,
-                      InteractiveObject *target, const QPointF &targetAnchorPoint);
+    QPointF makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
+                      const QPointF &targetAnchorPoint);
 
     bool updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
@@ -56,8 +56,8 @@ protected:
 
 private:
     QPointF pathPoint(int num) const;
-    bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject,
-                      const QPointF &anchorPoint, ObjectAnchor::Snap snap);
+    bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint,
+                      ObjectAnchor::Snap snap);
 };
 
 } // ns msc

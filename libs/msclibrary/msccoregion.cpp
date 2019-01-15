@@ -20,12 +20,14 @@
 namespace msc {
 
 MscCoregion::MscCoregion(QObject *parent)
-    : MscInstanceEvent(parent), m_type(Type::Begin)
+    : MscInstanceEvent(parent)
+    , m_type(Type::Begin)
 {
 }
 
 MscCoregion::MscCoregion(Type type, QObject *parent)
-    : MscInstanceEvent(parent), m_type(type)
+    : MscInstanceEvent(parent)
+    , m_type(type)
 {
 }
 

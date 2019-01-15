@@ -36,9 +36,7 @@ ObjectsLink::ObjectsLink(QObject *parent)
 {
 }
 
-ObjectsLink::~ObjectsLink()
-{
-}
+ObjectsLink::~ObjectsLink() {}
 
 ObjectAnchor *ObjectsLink::source() const
 {
@@ -55,9 +53,7 @@ QPointF ObjectsLink::linkCenter() const
     return utils::lineCenter({ m_anchorStart->point(), m_anchorEnd->point() });
 }
 
-QPointF ObjectsLink::makeLink(InteractiveObject *source,
-                              const QPointF &sourceAnchorPoint,
-                              InteractiveObject *target,
+QPointF ObjectsLink::makeLink(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
                               const QPointF &targetAnchorPoint)
 {
     bool sourceChanged(false), targetChanged(false);
@@ -75,20 +71,18 @@ QPointF ObjectsLink::makeLink(InteractiveObject *source,
     return linkCenter();
 }
 
-bool ObjectsLink::replaceSource(InteractiveObject *source,
-                                const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+bool ObjectsLink::replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
 {
     return replaceObj(m_anchorStart, source, anchorPoint, snap);
 }
 
-bool ObjectsLink::replaceTarget(InteractiveObject *target,
-                                const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+bool ObjectsLink::replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
 {
     return replaceObj(m_anchorEnd, target, anchorPoint, snap);
 }
 
-bool ObjectsLink::replaceObj(ObjectAnchor *anchor, InteractiveObject *toObject,
-                             const QPointF &toPoint, ObjectAnchor::Snap snap)
+bool ObjectsLink::replaceObj(ObjectAnchor *anchor, InteractiveObject *toObject, const QPointF &toPoint,
+                             ObjectAnchor::Snap snap)
 {
     return anchor->replace(toObject, toPoint, snap);
 }

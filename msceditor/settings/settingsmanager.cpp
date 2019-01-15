@@ -24,9 +24,9 @@ SettingsManager *SettingsManager::m_instance = nullptr;
 
 SettingsManager::SettingsManager(QObject *parent)
     : QObject(parent)
-    , m_settings(new QSettings(QString("%1/settings.conf")
-                                       .arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
-                               QSettings::IniFormat, this))
+    , m_settings(new QSettings(
+              QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
+              QSettings::IniFormat, this))
 {
     qDebug() << "Config:" << m_settings->fileName();
 }

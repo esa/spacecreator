@@ -22,8 +22,7 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(ConditionItem *conditionItem,
-                                           const QPointF &destination)
+CmdConditionItemMove::CmdConditionItemMove(ConditionItem *conditionItem, const QPointF &destination)
     : BaseCommand(conditionItem)
     , m_posFrom(conditionItem ? conditionItem->pos() : QPointF())
     , m_posTo(destination)

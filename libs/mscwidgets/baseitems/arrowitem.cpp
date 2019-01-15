@@ -85,8 +85,8 @@ bool ArrowItem::updateEnd(InteractiveObject *target, const QPointF &anchorPoint,
     return updateAnchor(link()->target(), target, anchorPoint, snap);
 }
 
-bool ArrowItem::updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject,
-                             const QPointF &anchorPoint, ObjectAnchor::Snap snap)
+bool ArrowItem::updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint,
+                             ObjectAnchor::Snap snap)
 {
     // keep silent to avoid rebuilding the layout,
     // otherwise it will recenter the new line to (0,0)
@@ -153,8 +153,8 @@ QPointF ArrowItem::endSignLocal() const
     return pathPoint(m_bodyPath.elementCount() - 1);
 }
 
-QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint,
-                             InteractiveObject *target, const QPointF &targetAnchorPoint)
+QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
+                             const QPointF &targetAnchorPoint)
 {
     const QPointF result(link()->makeLink(source, sourceAnchorPoint, target, targetAnchorPoint));
     rebuildLayout();

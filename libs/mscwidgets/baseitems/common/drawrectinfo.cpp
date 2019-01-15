@@ -27,14 +27,13 @@ namespace msc {
 */
 
 DrawRectInfo::DrawRectInfo()
-    : DrawRectInfo(QSizeF(12., 12.), 0.5, Qt::red,
-                   { QColor::fromRgbF(0, 0, 0.5, 0.75) })
+    : DrawRectInfo(QSizeF(12., 12.), 0.5, Qt::red, { QColor::fromRgbF(0, 0, 0.5, 0.75) })
 {
     update();
 }
 
-DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth,
-                           const QColor &borderColor, const QColor &bodyColor)
+DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor,
+                           const QColor &bodyColor)
     : m_rectSize(rectSize)
     , m_borderWidth(borderWidth)
     , m_borderColor(borderColor)
@@ -48,11 +47,8 @@ DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth,
 
 bool DrawRectInfo::operator==(const DrawRectInfo &other) const
 {
-    return m_rectSize == other.m_rectSize
-            && qFuzzyCompare(m_borderWidth + 1., other.m_borderWidth + 1)
-            && m_borderColor == other.m_borderColor
-            && m_bodyColor == other.m_bodyColor
-            && m_border == other.m_border
+    return m_rectSize == other.m_rectSize && qFuzzyCompare(m_borderWidth + 1., other.m_borderWidth + 1)
+            && m_borderColor == other.m_borderColor && m_bodyColor == other.m_bodyColor && m_border == other.m_border
             && m_body == other.m_body;
 }
 

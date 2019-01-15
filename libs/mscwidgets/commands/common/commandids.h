@@ -20,7 +20,8 @@
 namespace msc {
 namespace cmd {
 
-enum Id {
+enum Id
+{
     MoveMessage = 0,
     RetargetMessage,
     CreateMessage,

@@ -52,12 +52,8 @@ bool PointerTool::onMouseMove(QMouseEvent *e)
     return false;
 }
 
-void PointerTool::createPreviewItem()
-{
-}
+void PointerTool::createPreviewItem() {}
 
-void PointerTool::commitPreviewItem()
-{
-}
+void PointerTool::commitPreviewItem() {}
 
 } // ns msc
