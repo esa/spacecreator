@@ -171,7 +171,7 @@ void ConditionItem::buildLayout()
     double x = 0;
     if (modelItem()->shared()) {
         if (m_InstancesRect.isValid()) {
-            x = m_InstancesRect.x() - (m_InstancesRect.width() - m_boundingRect.width()) / 2;
+            x = m_InstancesRect.x() - qAbs((m_InstancesRect.width() - m_boundingRect.width()) / 2);
         }
     } else if (m_instance) {
         x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
