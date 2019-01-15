@@ -35,7 +35,8 @@ class GripPoint : public QGraphicsItem
 {
     Q_GADGET
 public:
-    enum Location {
+    enum Location
+    {
         Top,
         Left,
         Bottom,
@@ -49,7 +50,8 @@ public:
     Q_ENUM(Location)
     typedef QSet<GripPoint::Location> Locations;
 
-    enum class GripType {
+    enum class GripType
+    {
         Mover,
         Resizer
     };
@@ -58,8 +60,7 @@ public:
               GripPoint::GripType gpType = GripPoint::GripType::Resizer);
 
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     static void setSideSize(qreal sz);
     static qreal sideSize();

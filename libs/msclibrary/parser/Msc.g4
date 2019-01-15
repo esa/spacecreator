@@ -14,7 +14,7 @@ file : mscDocument | mscDefinition;
 // 2.1
 name
     // : NAME
-    : NAME+ // name in the 1993 spec is more relaxed
+    : . | (NAME)+ // name in the 1993 spec is more relaxed
     ;
 
 // 2.3 Comment
@@ -35,10 +35,11 @@ textDefinition
 
 mscDocument
     : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
+    | MSCDOCUMENT NAME REFERENCED end // not in the spec
     ;
 
 documentHead
-    : MSCDOCUMENT NAME end dataDefinition
+    : MSCDOCUMENT name end dataDefinition
     ;
 
 definingMscReference
@@ -78,7 +79,7 @@ messageSequenceChart
     ;
 
 mscHead
-    : NAME (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
+    : name (mscParameterDecl)? end (mscInstInterface)? mscGateInterface
     ;
 
 mscParameterDecl
@@ -190,6 +191,7 @@ instanceHeadStatement
     // older standard
     : INSTANCE instanceName=NAME ((COLON)? instanceKind)? (decomposition)? (LEFTOPEN parameterList RIGHTOPEN)? end
     | INSTANCE (instanceKind)? (decomposition)? end
+    | INSTANCE COLON name end // not according ot the spec
     ;
 instanceEndStatement
     : ENDINSTANCE end
@@ -201,10 +203,10 @@ messageEvent
     : messageOutput | messageInput
     ;
 messageOutput
-    : OUT msgIdentification (TO inputAddress)? // should not be optional accortdint to spec
+    : OUT msgIdentification (TO)? (inputAddress)? // should not be optional according to spec
     ;
 messageInput
-    : IN msgIdentification (FROM outputAddress)? // should not be optional accortdint to spec
+    : IN msgIdentification (FROM)? (outputAddress)? // should not be optional according to spec
     ;
 incompleteMessageEvent
     : incompleteMessageOutput | incompleteMessageInput
@@ -217,12 +219,15 @@ incompleteMessageInput
     ;
 msgIdentification
     : messageName=NAME (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    (VIA gateName=NAME)? // the via is not according ot the spec
     ;
 outputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 inputAddress
     : (instanceName=NAME | ENV) (VIA gateName=NAME)?
+    | VIA gateName=NAME // the via is not according ot the spec
     ;
 
 // 4.4 Control Flow
@@ -351,7 +356,8 @@ actionStatement
 
 informalAction
     : CHARACTERSTRING
-    | name
+    | name // not like in the spec
+    | name (LEFTOPEN (name (COMMA name)*)? RIGHTOPEN)? '=' name // not like in the spec
     ;
 
 // 4.10 Instance creation
@@ -465,7 +471,7 @@ parameterList
     ;
 
 paramaterDefn
-    : binding | expression | pattern
+    : SEQUENCEOF | binding | expression | pattern
     ;
 
 //
@@ -614,6 +620,11 @@ LEFTOPEN : '(';
 RIGHTOPEN : ')';
 LEFTSQUAREBRACKET : '[' ;
 RIGHTSQUAREBRACKET : ']' ;
+LEFTCURLYBRACKET : '{';
+RIGHTCURLYBRACKET : '}';
+
+// Extra keywords from the old spec
+REFERENCED:'referenced'|'REFERENCED';
 
 
 fragment
@@ -627,12 +638,6 @@ NATIONAL : LEFTCURLYBRACKET | VERTICALLINE | RIGHTCURLYBRACKET | OVERLINE | UPWA
 
 fragment
 ALPHANUMERIC : LETTER | DECIMALDIGIT | NATIONAL;
-
-fragment
-LEFTCURLYBRACKET : '{' ;
-
-fragment
-RIGHTCURLYBRACKET : '}' ;
 
 fragment
 VERTICALLINE : '|';
@@ -687,7 +692,7 @@ TEXT : ( ALPHANUMERIC | OTHERCHARACTER | SPECIAL | FULLSTOP | UNDERLINE | ' ' | 
 
 MISC : OTHERCHARACTER | APOSTROPHE;
 
-OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '='; // exclude '/' as it's used for linebreaks
+OTHERCHARACTER : '?' | '%' | '+' | '-' | '!' | '*' | '"' | '=' | '/';
 
 SPECIAL : ABSTIMEMARK | RELTIMEMARK | LEFTOPEN | RIGHTOPEN | LEFTCLOSED | RIGHTCLOSED | LEFTANGULARBRACKET | RIGHTANGULARBRACKET | '#' | COMMA | SEMI | COLON;
 
@@ -702,13 +707,20 @@ QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 //{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
 //NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
 
-// '`' is not as from the spec
-NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' )+ ;
+// '`', '/' are not as from the spec
+NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
+
+SEQUENCEOF // custom
+//    : LEFTCURLYBRACKET ALPHANUMERIC+ (COMMA ALPHANUMERIC)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)+ RIGHTCURLYBRACKET
+    ;
+
+
 COMMENTLOST : '/*' .*? '*/' -> channel(2);
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
-LB : ('/\r'|'/\n') ->skip; // linebreak
+LB : '/' ('\r' | '\n')+ ->skip; // linebreak

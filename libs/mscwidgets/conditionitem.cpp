@@ -155,7 +155,8 @@ void ConditionItem::onNameEdited(const QString &name)
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(cmd::Id::MoveCondition, { QVariant::fromValue<ConditionItem *>(this), pos() + (to - from) });
+        msc::cmd::CommandsStack::push(cmd::Id::MoveCondition,
+                                      { QVariant::fromValue<ConditionItem *>(this), pos() + (to - from) });
 }
 
 void ConditionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -180,8 +181,7 @@ void ConditionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const 
     case GripPoint::Location::TopRight:
     case GripPoint::Location::BottomLeft:
     case GripPoint::Location::BottomRight: {
-        if (gp->location() == GripPoint::Location::Left
-            || gp->location() == GripPoint::Location::TopLeft
+        if (gp->location() == GripPoint::Location::Left || gp->location() == GripPoint::Location::TopLeft
             || gp->location() == GripPoint::Location::BottomLeft)
             delta.rx() *= -1;
         newRect.adjust(-delta.x(), -delta.y(), delta.x(), delta.y());

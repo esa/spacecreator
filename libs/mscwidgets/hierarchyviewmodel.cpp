@@ -124,7 +124,11 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
     QVector<DocumentItem *> topLevelDocumentItems;
 };
 
-HierarchyViewModel::HierarchyViewModel(QObject *parent) : QObject(parent), d(new HierarchyViewModelPrivate) {}
+HierarchyViewModel::HierarchyViewModel(QObject *parent)
+    : QObject(parent)
+    , d(new HierarchyViewModelPrivate)
+{
+}
 
 HierarchyViewModel::~HierarchyViewModel() {}
 

@@ -19,7 +19,8 @@
 
 namespace msc {
 
-enum class ToolType {
+enum class ToolType
+{
     Pointer = 0,
     InstanceCreator,
     MessageCreator

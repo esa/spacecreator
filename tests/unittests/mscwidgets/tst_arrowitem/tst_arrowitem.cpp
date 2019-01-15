@@ -185,8 +185,8 @@ void tst_ArrowItem::testSignLocals()
 void tst_ArrowItem::testObjectsLinkItem()
 {
     // TODO: Use the Qt::QRandomGenerator after switching to the Qt 5.10:
-    std::default_random_engine generator(static_cast<unsigned>(
-            std::chrono::system_clock::now().time_since_epoch().count()));
+    std::default_random_engine generator(
+            static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()));
     std::uniform_real_distribution<double> doubler(0., 1.);
     std::uniform_int_distribution<int> penStyler(Qt::SolidLine, Qt::DashDotDotLine);
     std::uniform_int_distribution<int> brushStyler(Qt::SolidPattern, Qt::ConicalGradientPattern);
@@ -202,7 +202,8 @@ void tst_ArrowItem::testObjectsLinkItem()
 
     auto generateBrush = [&doubler, &brushStyler, &generator]() {
         QBrush brush;
-        brush.setColor(QColor::fromRgbF(doubler(generator), doubler(generator), doubler(generator), doubler(generator)));
+        brush.setColor(
+                QColor::fromRgbF(doubler(generator), doubler(generator), doubler(generator), doubler(generator)));
         brush.setStyle(Qt::BrushStyle(brushStyler(generator)));
 
         return brush;

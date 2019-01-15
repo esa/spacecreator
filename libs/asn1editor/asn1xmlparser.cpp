@@ -78,25 +78,21 @@ QVariantList Asn1XMLParser::parseXml(const QString &content)
         QDomElement asn1Module = asn1Modules.at(x).toElement();
 
         // store all TypeAssignment nodes
-        typeAssignments.append(asn1Module.firstChildElement("TypeAssignments")
-                                       .elementsByTagName("TypeAssignment"));
+        typeAssignments.append(asn1Module.firstChildElement("TypeAssignments").elementsByTagName("TypeAssignment"));
     }
 
     for (const QDomNodeList &typeAssignment : typeAssignments) {
         for (int x = 0; x < typeAssignment.size(); ++x) {
             QDomElement elem = typeAssignment.at(x).toElement();
 
-            asn1TypesData.append(parseType(typeAssignments,
-                                           elem.firstChildElement("Type"),
-                                           elem.attribute("Name")));
+            asn1TypesData.append(parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("Name")));
         }
     }
 
     return asn1TypesData;
 }
 
-QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
-                                     const QDomElement &type,
+QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
                                      const QString &name)
 {
     QVariantMap typeData;
@@ -157,8 +153,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     return typeData;
 }
 
-void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments,
-                                      const QDomElement &type,
+void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
                                       QVariantMap &result)
 {
     /*
@@ -178,9 +173,7 @@ void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments
     for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
-        QVariantMap childType = parseType(typeAssignments,
-                                          elem.firstChildElement("Type"),
-                                          elem.attribute("VarName"));
+        QVariantMap childType = parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName"));
 
         childType["isOptional"] = elem.attribute("Optional") == "True";
 
@@ -218,8 +211,7 @@ void Asn1XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &re
     result["valuesInt"] = valuesInt;
 }
 
-void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
-                                    const QDomElement &type,
+void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
                                     QVariantMap &result)
 {
     /*
@@ -241,9 +233,7 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments,
     for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
-        choices.append(parseType(typeAssignments,
-                                 elem.firstChildElement("Type"),
-                                 elem.attribute("VarName")));
+        choices.append(parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName")));
         choiceIdx.append(elem.attribute("EnumID"));
     }
 

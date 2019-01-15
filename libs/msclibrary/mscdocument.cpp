@@ -86,7 +86,8 @@ void MscDocument::clear()
 
 /*!
   \brief MscDocument::parentDocument
-  \return The document that this one is included in. Returns a nullptr if this document is at the root
+  \return The document that this one is included in. Returns a nullptr if this document is at the
+  root
 */
 MscDocument *MscDocument::parentDocument() const
 {

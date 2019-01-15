@@ -35,7 +35,8 @@ class MscGate : public MscInstanceEvent
     Q_PROPERTY(QVariantList params READ params WRITE setParams)
 
 public:
-    enum class Direction {
+    enum class Direction
+    {
         In = 0,
         Out
     };

@@ -71,6 +71,9 @@ private Q_SLOTS:
     void testInstanceCreateMultiParameter();
     void testInstanceCreateNoInstance();
     void testInstanceCreateDublicate();
+    void testKeywordAsName();
+    void testNonStandardVia();
+    void testNonStandardInstance();
 
 private:
     MscFile *file = nullptr;
@@ -127,21 +130,22 @@ void tst_MscFile::testExampleFilesParsing()
 
 void tst_MscFile::testEmptyDocument()
 {
-    MscModel *model = file->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;");
+    QScopedPointer<MscModel> model(file->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("CU_level"));
-    delete model;
 
-    model = file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;");
+    model.reset(file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("inst_1_cu_nominal.cu_controller"));
-    delete model;
 
-    model = file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  ");
+    model.reset(file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  "));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("ABC"));
+
+    model.reset(file->parseText("MSCDOCUMENT error1; MSCDOCUMENT seq; ENDMSCDOCUMENT; ENDMSCDOCUMENT;"));
+    QCOMPARE(model->documents().size(), 1);
+    //    QCOMPARE(model->documents().at(0)->documents().size(), 1);
     // no exception thrown
-    delete model;
 }
 
 void tst_MscFile::testComments()
@@ -194,8 +198,8 @@ void tst_MscFile::testNestedDocuments()
     delete model;
 
     // documents in parallel
-    model = file->parseText(
-            "MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
+    model = file->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT "
+                            "l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
     mainDocuments = model->documents();
     QCOMPARE(mainDocuments.size(), 1);
     QCOMPARE(mainDocuments.at(0)->documents().size(), 2);
@@ -250,26 +254,31 @@ void tst_MscFile::testInstanceWithKind()
 
 void tst_MscFile::testMessage()
 {
-    MscModel *model =
-            file->parseText("MSC msc1;\nINSTANCE inst1;in ICONreq from env;out ICON to Responder;ENDINSTANCE;ENDMSC;");
+    QString msc = "MSC msc1; \
+        INSTANCE inst1; \
+            in ICONreq from env; \
+            in ICONreq2 from ; \
+            out ICON to Responder; \
+        ENDINSTANCE; \
+    ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
     MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
     QCOMPARE(message1->sourceInstance(), static_cast<MscInstance *>(nullptr));
     QCOMPARE(message1->targetInstance(), instance);
 
-    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    MscMessage *message2 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(2));
     QVERIFY(message2 != nullptr);
     QCOMPARE(message2->name(), QString("ICON"));
     QCOMPARE(message2->sourceInstance(), instance);
     QCOMPARE(message2->targetInstance(), static_cast<MscInstance *>(nullptr));
-    delete model;
 }
 
 void tst_MscFile::testSameMessageInTwoInstances()
@@ -441,6 +450,7 @@ void tst_MscFile::testAction()
                       INSTANCE Inst_1; \
                          action 'Stop'; \
                          ACTION def \"digit1\", def \"digit2\"; \
+                         ACTION DSPinit(1,4)=10; \
                        ENDINSTANCE; \
                    ENDMSC;" };
 
@@ -449,7 +459,7 @@ void tst_MscFile::testAction()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
 
     auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
     QVERIFY(action != nullptr);
@@ -941,6 +951,58 @@ void tst_MscFile::testInstanceCreateDublicate()
 
     QCOMPARE(create->parameters().size(), 1);
     QCOMPARE(create->parameters()[0], QString("data1"));
+}
+
+void tst_MscFile::testKeywordAsName()
+{
+    QString msc = "MSCDOCUMENT timer;\
+                MSC action;\
+                ENDMSC; \
+            ENDMSCDOCUMENT;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->name(), QString("timer"));
+
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = doc->charts().at(0);
+    QCOMPARE(chart->name(), QString("action"));
+}
+
+void tst_MscFile::testNonStandardVia()
+{
+    // Using via that way is not really in line with the standard
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         OUT check1 ( pin ) VIA gtX; \
+                         OUT check2(1) TO  VIA gtY; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+}
+
+void tst_MscFile::testNonStandardInstance()
+{
+    // Using INSTANCE that way is not really in line with the standard
+    QString msc = "MSC msc1; \
+                      INSTANCE : FAB 1; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    MscInstance *instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("FAB 1"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

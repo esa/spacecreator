@@ -27,6 +27,7 @@
 #include "mscgate.h"
 #include "msctimer.h"
 #include "msccoregion.h"
+#include "exceptions.h"
 
 #include <QDebug>
 
@@ -45,11 +46,15 @@ static QString nameToString(MscParser::NameContext *nameNode)
 {
     QString name;
     if (nameNode) {
-        for (auto nameToken : nameNode->NAME()) {
-            if (!name.isEmpty()) {
-                name += " ";
+        if (nameNode->NAME().empty()) {
+            name = ::treeNodeToString(nameNode);
+        } else {
+            for (auto nameToken : nameNode->NAME()) {
+                if (!name.isEmpty()) {
+                    name += " ";
+                }
+                name += ::treeNodeToString(nameToken);
             }
-            name += ::treeNodeToString(nameToken);
         }
     }
     return name;
@@ -85,7 +90,11 @@ static void parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
 
 using namespace msc;
 
-MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens) : m_model(new MscModel), m_tokens(tokens) {}
+MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens)
+    : m_model(new MscModel)
+    , m_tokens(tokens)
+{
+}
 
 MscParserVisitor::~MscParserVisitor()
 {
@@ -107,6 +116,16 @@ antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 
 antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
 {
+    if (context->REFERENCED()) {
+        // ignore referenced documents (spec extension) for now
+        qDebug() << "Referenced documents are not supported";
+        return visitChildren(context);
+    }
+
+    if (!context->documentHead()) {
+        throw ParserException("No document head node in the MscDocument");
+    }
+
     MscDocument *parent = m_currentDocument;
 
     auto doc = new MscDocument();
@@ -115,7 +134,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     } else {
         m_currentDocument->addDocument(doc);
     }
-    const auto docName = ::treeNodeToString(context->documentHead()->NAME());
+    const auto docName = ::nameToString(context->documentHead()->name());
     doc->setName(docName);
 
     auto handleComment = [=](antlr4::Token *token) {
@@ -199,7 +218,7 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 {
     QString mscName;
     if (context->mscHead()) {
-        mscName = ::treeNodeToString(context->mscHead()->NAME());
+        mscName = ::nameToString(context->mscHead()->name());
     }
     auto chart = new MscChart(mscName);
     if (m_currentDocument == nullptr) {
@@ -221,6 +240,8 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
             auto headCtx = instanceDeclCtx->instanceHeadStatement();
             if (headCtx->instanceName) {
                 addInstance(::treeNodeToString(headCtx->instanceName));
+            } else {
+                addInstance(::nameToString(headCtx->name()));
             }
         }
         for (auto mscStatementCtx : context->mscBody()->mscStatement()) {
@@ -536,8 +557,12 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
         if (context->informalAction()->CHARACTERSTRING()) {
             action->setInformalAction(charactersToString(context->informalAction()->CHARACTERSTRING()));
         } else {
-            QString informalAction = nameToString(context->informalAction()->name());
-            action->setInformalAction(informalAction);
+            if (context->informalAction()->name().size() == 1) {
+                QString informalAction = nameToString(context->informalAction()->name(0));
+                action->setInformalAction(informalAction);
+            } else {
+                action->setInformalAction(::treeNodeToString(context->informalAction()));
+            }
         }
     } else {
         action->setActionType(MscAction::ActionType::Formal);
@@ -698,13 +723,12 @@ void MscParserVisitor::resetInstanceEvents()
 
 void MscParserVisitor::orderInstanceEvents()
 {
-    bool found;
-
     while (!m_instanceEventsList.isEmpty()) {
-        found = false;
+        bool found = false;
 
         for (int i = 0; i < m_instanceEventsList.size(); ++i) {
-            // First, go through all the stacks and take away non-messages. This has to be done for every loop
+            // First, go through all the stacks and take away non-messages. This has to be done for
+            // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
                 while (!m_instanceEventsList.at(j).isEmpty()
                        && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message) {

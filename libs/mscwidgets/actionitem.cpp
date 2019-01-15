@@ -28,7 +28,9 @@
 namespace msc {
 
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
-    : InteractiveObject(parent), m_action(action), m_symbol(new TextItem(this))
+    : InteractiveObject(parent)
+    , m_action(action)
+    , m_symbol(new TextItem(this))
 {
     Q_ASSERT(m_action != nullptr);
 

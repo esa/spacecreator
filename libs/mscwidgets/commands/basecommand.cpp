@@ -22,10 +22,15 @@
 namespace msc {
 namespace cmd {
 
-BaseCommand::BaseCommand(QGraphicsObject *item, QUndoCommand *parent) : QUndoCommand(parent), m_graphicsItem(item) {}
+BaseCommand::BaseCommand(QGraphicsObject *item, QUndoCommand *parent)
+    : QUndoCommand(parent)
+    , m_graphicsItem(item)
+{
+}
 
 BaseCommand::BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent)
-    : QUndoCommand(text, parent), m_graphicsItem(item)
+    : QUndoCommand(text, parent)
+    , m_graphicsItem(item)
 {
 }
 

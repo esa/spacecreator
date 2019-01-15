@@ -31,7 +31,8 @@ class MscDocument : public MscEntity
 {
     Q_OBJECT
 public:
-    enum HierarchyType {
+    enum HierarchyType
+    {
         HierarchyLeaf,
         HierarchyIs,
         HierarchyAnd,

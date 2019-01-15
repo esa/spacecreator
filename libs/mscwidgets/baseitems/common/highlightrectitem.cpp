@@ -31,7 +31,10 @@ namespace msc {
 
 */
 
-HighlightRectItem::HighlightRectItem(QGraphicsItem *parent) : QGraphicsObject(parent) {}
+HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
+    : QGraphicsObject(parent)
+{
+}
 
 HighlightRectItem::~HighlightRectItem()
 {

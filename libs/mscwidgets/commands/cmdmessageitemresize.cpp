@@ -21,8 +21,7 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem,
-                                           const QPointF &head, const QPointF &tail)
+CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail)
     : BaseCommand(messageItem)
     , m_messageItem(messageItem)
     , m_newHead(head)

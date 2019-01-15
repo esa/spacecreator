@@ -27,7 +27,19 @@ class MscEntity : public QObject
 {
     Q_OBJECT
 public:
-    enum class EntityType { Document = 0, Chart, Instance, Message, Timer, Gate, Condition, Action, Coregion, Create };
+    enum class EntityType
+    {
+        Document = 0,
+        Chart,
+        Instance,
+        Message,
+        Timer,
+        Gate,
+        Condition,
+        Action,
+        Coregion,
+        Create
+    };
     Q_ENUM(EntityType)
 
     explicit MscEntity(QObject *parent = nullptr);

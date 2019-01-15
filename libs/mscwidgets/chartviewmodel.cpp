@@ -52,7 +52,10 @@ ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
  */
 
 struct ChartViewModelPrivate {
-    ChartViewModelPrivate(ChartViewModel *parent) : m_currentChart(new msc::MscChart(parent)) {}
+    ChartViewModelPrivate(ChartViewModel *parent)
+        : m_currentChart(new msc::MscChart(parent))
+    {
+    }
 
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
@@ -69,7 +72,11 @@ struct ChartViewModelPrivate {
     }
 };
 
-ChartViewModel::ChartViewModel(QObject *parent) : QObject(parent), d(new ChartViewModelPrivate(this)) {}
+ChartViewModel::ChartViewModel(QObject *parent)
+    : QObject(parent)
+    , d(new ChartViewModelPrivate(this))
+{
+}
 
 ChartViewModel::~ChartViewModel()
 {

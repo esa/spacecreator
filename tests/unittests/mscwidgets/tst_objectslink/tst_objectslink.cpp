@@ -115,9 +115,7 @@ void tst_ObjectsLink::testReplaceSourceNoSnap()
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
     bool notifiyed(false);
-    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) {
-        notifiyed = true;
-    },
+    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) { notifiyed = true; },
             Qt::DirectConnection);
 
     link.replaceSource(m_itemC, centerCShifted, ObjectAnchor::Snap::NoSnap);
@@ -131,9 +129,7 @@ void tst_ObjectsLink::testReplaceSourceSnap()
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
     bool notifiyed(false);
-    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) {
-        notifiyed = true;
-    },
+    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) { notifiyed = true; },
             Qt::DirectConnection);
 
     link.replaceSource(m_itemC, centerCShifted, ObjectAnchor::Snap::SnapTo);
@@ -147,9 +143,7 @@ void tst_ObjectsLink::testReplaceTargetNoSnap()
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
     bool notifiyed(false);
-    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) {
-        notifiyed = true;
-    },
+    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) { notifiyed = true; },
             Qt::DirectConnection);
 
     link.replaceTarget(m_itemC, centerCShifted, ObjectAnchor::Snap::NoSnap);
@@ -163,9 +157,7 @@ void tst_ObjectsLink::testReplaceTargetSnap()
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
     bool notifiyed(false);
-    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) {
-        notifiyed = true;
-    },
+    connect(&link, &ObjectsLink::sourceAnchorChanged, this, [&notifiyed](const QPointF &) { notifiyed = true; },
             Qt::DirectConnection);
 
     link.replaceTarget(m_itemC, centerCShifted, ObjectAnchor::Snap::SnapTo);

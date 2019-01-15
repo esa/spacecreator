@@ -32,8 +32,8 @@ public:
     ObjectsLink(QObject *parent = nullptr);
     virtual ~ObjectsLink();
 
-    QPointF makeLink(InteractiveObject *source, const QPointF &sourceAnchorPoint,
-                     InteractiveObject *target, const QPointF &targetAnchorPoint);
+    QPointF makeLink(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
+                     const QPointF &targetAnchorPoint);
     bool replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 
@@ -49,8 +49,7 @@ Q_SIGNALS:
 protected:
     ObjectAnchor *m_anchorStart, *m_anchorEnd;
 
-    bool replaceObj(ObjectAnchor *anchor, InteractiveObject *toObject,
-                    const QPointF &toPoint, ObjectAnchor::Snap snap);
+    bool replaceObj(ObjectAnchor *anchor, InteractiveObject *toObject, const QPointF &toPoint, ObjectAnchor::Snap snap);
 
     void notifyChanged(ObjectAnchor *anchor) const;
 };

@@ -34,7 +34,8 @@ struct DocumentItem::DocumentItemPrivate {
 };
 
 DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
-    : QGraphicsObject(parent), d(new DocumentItemPrivate)
+    : QGraphicsObject(parent)
+    , d(new DocumentItemPrivate)
 {
     d->document = document;
     d->boxSize.setWidth(100);

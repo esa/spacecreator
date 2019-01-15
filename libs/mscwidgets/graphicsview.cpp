@@ -35,7 +35,9 @@ namespace msc {
 /*!
   Constructs a MSV view object with the parent \a parent.
 */
-GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent), m_undoStack(new QUndoStack(this))
+GraphicsView::GraphicsView(QWidget *parent)
+    : QGraphicsView(parent)
+    , m_undoStack(new QUndoStack(this))
 {
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
 

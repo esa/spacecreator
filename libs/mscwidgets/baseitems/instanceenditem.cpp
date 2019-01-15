@@ -62,8 +62,8 @@ void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         const qreal lineWidth = pen.widthF() * 1.5;
         const qreal adjustment = lineWidth;
         const QRectF &bounds = rect().adjusted(adjustment, adjustment, -adjustment, -adjustment);
-        const QVector<QPointF> linesHeads = { bounds.topLeft(), bounds.bottomRight(),
-                                              bounds.bottomLeft(), bounds.topRight() };
+        const QVector<QPointF> linesHeads = { bounds.topLeft(), bounds.bottomRight(), bounds.bottomLeft(),
+                                              bounds.topRight() };
 
         pen.setColor(Qt::black);
         pen.setCapStyle(Qt::RoundCap);
