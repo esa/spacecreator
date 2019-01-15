@@ -19,6 +19,9 @@
 #define CONDITIONITEM_H
 
 #include "baseitems/interactiveobject.h"
+#include "instanceitem.h"
+
+#include <QPointer>
 
 class QGraphicsPolygonItem;
 
@@ -43,24 +46,36 @@ public:
 
     void setBoundingRect(const QRectF &geometry);
 
+    void connectObjects(InstanceItem *instance, qreal y, QRectF instancesRect);
+
     static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
+
+Q_SIGNALS:
+    void needRelayout() const;
 
 public Q_SLOTS:
     void setName(const QString &name);
-    void buildLayout(qreal width = 0.0);
+    void buildLayout();
 
 private Q_SLOTS:
     void onNameEdited(const QString &name);
+    void rebuildLayout() override;
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
+    void setInstance(InstanceItem *instance);
+
+private:
     MscCondition *m_condition = nullptr;
 
     QGraphicsPolygonItem *m_polygonItem = nullptr;
     TextItem *m_nameItem = nullptr;
+    QPointer<InstanceItem> m_instance = nullptr;
+
+    QRectF m_InstancesRect = QRectF();
 };
 
 } // namespace msc

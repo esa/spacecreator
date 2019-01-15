@@ -148,7 +148,7 @@ void ChartViewModel::relayout()
     }
 
     qreal y(d->InterMessageSpan);
-    double instancesWidth(x - d->InterInstanceSpan);
+    auto instancesRect(totalRect);
 
     auto relayoutCondition = [&](const QString &messageName) {
         QPointer<ConditionItem> item = nullptr;
@@ -167,10 +167,9 @@ void ChartViewModel::relayout()
 
                     d->m_scene.addItem(item);
                     d->m_instanceEventItems.append(item);
-                }
 
-                InstanceItem *instance = itemForInstance(condition->instance());
-                item->buildLayout(condition->shared() ? instancesWidth : instance->boundingRect().width());
+                    connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
+                }
 
                 if (prevItem
                     && (prevItem->modelItem()->instance() == condition->instance()
@@ -179,8 +178,8 @@ void ChartViewModel::relayout()
                     y += prevItem->boundingRect().height() + d->InterMessageSpan;
                 }
 
-                item->setPos(condition->shared() ? 0 : (instance->axis().p1().x() - item->boundingRect().width() / 2),
-                             y + instance->axis().p1().y());
+                InstanceItem *instance = itemForInstance(condition->instance());
+                item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
 
                 prevItem = item;
             }

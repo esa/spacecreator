@@ -25,6 +25,7 @@
 
 namespace msc {
 
+static const qreal CONDITION_WIDTH = 50.0;
 static const qreal CONDITION_HEIGHT = 20.0;
 static const qreal CONDITION_MARGIN = 10.0;
 
@@ -37,15 +38,15 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     setName(m_condition->name());
     connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);
 
-    buildLayout();
-
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     m_nameItem->setEditable(true);
     m_nameItem->setBackgroundColor(Qt::transparent);
     connect(m_nameItem, &TextItem::edited, this, &ConditionItem::onNameEdited, Qt::QueuedConnection);
 
     m_polygonItem->setBrush(Qt::white);
+
+    buildLayout();
 }
 
 MscCondition *ConditionItem::modelItem() const
@@ -87,6 +88,29 @@ void ConditionItem::setBoundingRect(const QRectF &geometry)
     buildLayout();
 }
 
+void ConditionItem::connectObjects(InstanceItem *instance, qreal y, QRectF instancesRect)
+{
+    m_InstancesRect = instancesRect;
+
+    setY(y);
+    setInstance(instance);
+
+    rebuildLayout();
+}
+
+void ConditionItem::setInstance(InstanceItem *instance)
+{
+    if (instance == m_instance) {
+        return;
+    }
+
+    if (m_instance) {
+        disconnect(m_instance, nullptr, this, nullptr);
+    }
+
+    m_instance = instance;
+}
+
 ConditionItem *ConditionItem::createDefaultItem(MscCondition *condition, const QPointF &pos)
 {
     ConditionItem *item = new ConditionItem(condition);
@@ -105,26 +129,28 @@ void ConditionItem::setName(const QString &name)
     m_nameItem->setPlainText(name);
     m_nameItem->adjustSize();
 
-    m_boundingRect = QRectF();
-    buildLayout();
+    rebuildLayout();
+
+    Q_EMIT needRelayout();
 }
 
-void ConditionItem::buildLayout(qreal width)
+void ConditionItem::buildLayout()
 {
     prepareGeometryChange();
 
     // set default size:
     QSizeF nameSize(m_nameItem->boundingRect().size());
+
     if (m_boundingRect.isEmpty()) {
         m_boundingRect.setTopLeft({ 0.0, 0.0 });
-        m_boundingRect.setWidth(nameSize.width() + CONDITION_MARGIN);
+        m_boundingRect.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, CONDITION_WIDTH));
         m_boundingRect.setHeight(qMax(nameSize.height(), CONDITION_HEIGHT));
 
         updateGripPoints();
     }
 
-    if (!qFuzzyIsNull(width)) {
-        m_boundingRect.setWidth(qMax(width, nameSize.width() + CONDITION_MARGIN));
+    if (modelItem()->shared() && m_InstancesRect.isValid()) {
+        m_boundingRect.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, m_InstancesRect.width()));
         updateGripPoints();
     }
 
@@ -139,7 +165,19 @@ void ConditionItem::buildLayout(qreal width)
 
     // name in the middle of polygon
     const QPointF nameDelta = m_boundingRect.center() - m_nameItem->boundingRect().center();
-    m_nameItem->setPos(-m_nameItem->pos() + nameDelta);
+    m_nameItem->setPos({ 0., 0. });
+    m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
+
+    double x = 0;
+    if (modelItem()->shared()) {
+        if (m_InstancesRect.isValid()) {
+            x = m_InstancesRect.x() - qAbs((m_InstancesRect.width() - m_boundingRect.width()) / 2);
+        }
+    } else if (m_instance) {
+        x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
+    }
+
+    setX(x);
 }
 
 void ConditionItem::onNameEdited(const QString &name)
@@ -150,6 +188,12 @@ void ConditionItem::onNameEdited(const QString &name)
     }
 
     setName(name);
+}
+
+void ConditionItem::rebuildLayout()
+{
+    m_boundingRect = QRectF();
+    buildLayout();
 }
 
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
