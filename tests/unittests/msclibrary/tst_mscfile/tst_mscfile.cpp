@@ -259,9 +259,6 @@ void tst_MscFile::testMessage()
             in ICONreq from env; \
             in ICONreq2 from ; \
             out ICON to Responder; \
-            OUT req(data:'Hello' ) TO A2B; \
-            IN userpidgot(pid(connhandler(1))) FROM inst_1_switchctrl; \
-            OUT msg('Sorry, wrong id, try again') TO ENV; \
         ENDINSTANCE; \
     ENDMSC;";
     QScopedPointer<MscModel> model(file->parseText(msc));
@@ -270,7 +267,7 @@ void tst_MscFile::testMessage()
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
 
-    QCOMPARE(chart->instanceEvents().size(), 6);
+    QCOMPARE(chart->instanceEvents().size(), 3);
     MscMessage *message1 = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message1 != nullptr);
     QCOMPARE(message1->name(), QString("ICONreq"));
@@ -304,6 +301,12 @@ void tst_MscFile::testMessageWithParameters()
                    INSTANCE Initiator; \
                       in gui_send_tm,a(longitude:-174.0) from env; \
                       out gui_int_send_tm(12) to env; \
+                      OUT req(data:'Hello' ) TO A2B; \
+                      IN userpidgot(pid(connhandler(1))) FROM inst_1_switchctrl; \
+                      OUT msg('Sorry, wrong id, try again') TO ENV; \
+                      IN pixelrow ( mkpixrow_t( (. 0,0,0 .),(. 128,128,128 .) ) ) FROM inst_1_adconverter; \
+                      IN card ( (. 1002,9999,'1701' .) ) FROM inst_1_ui.ui; \
+                      OUT q_accept( { cardData (. 1002,9999,'1701' .),amount '400' } ) TO ENV VIA co_tr; \
                    ENDINSTANCE; \
                    ENDMSC;";
 
@@ -312,7 +315,7 @@ void tst_MscFile::testMessageWithParameters()
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
 
-    QVERIFY(chart->instanceEvents().size() == 2);
+    QVERIFY(chart->instanceEvents().size() == 8);
 
     auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
@@ -450,19 +453,21 @@ void tst_MscFile::testTimer()
 void tst_MscFile::testAction()
 {
     QString msc = { "MSC msc1; \
-                      INSTANCE Inst_1; \
-                         action 'Stop'; \
-                         ACTION def \"digit1\", def \"digit2\"; \
-                         ACTION DSPinit(1,4)=10; \
-                       ENDINSTANCE; \
-                   ENDMSC;" };
+            INSTANCE Inst_1; \
+               action 'Stop'; \
+               ACTION def \"digit1\", def \"digit2\"; \
+               ACTION DSPinit(1,4)=10; \
+               ACTION filter(mkpixrow_t((. 0,0,0 .), (. 128,128,128 .)))=mkpixrow_t((. 4,0,0 .),(. 132,128,128 .)); \
+               ACTION convert(400)= (. 0,0,0 .); \
+            ENDINSTANCE; \
+         ENDMSC;" };
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 3);
+    QCOMPARE(chart->instanceEvents().size(), 5);
 
     auto action = static_cast<MscAction *>(chart->instanceEvents().at(0));
     QVERIFY(action != nullptr);

@@ -557,8 +557,8 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
         if (context->informalAction()->CHARACTERSTRING()) {
             action->setInformalAction(charactersToString(context->informalAction()->CHARACTERSTRING()));
         } else {
-            if (context->informalAction()->name().size() == 1) {
-                QString informalAction = nameToString(context->informalAction()->name(0));
+            if (context->informalAction()->functionText().empty()) {
+                QString informalAction = nameToString(context->informalAction()->name());
                 action->setInformalAction(informalAction);
             } else {
                 action->setInformalAction(::treeNodeToString(context->informalAction()));
