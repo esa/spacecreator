@@ -357,7 +357,9 @@ actionStatement
 informalAction
     : CHARACTERSTRING
     | name // not like in the spec
-    | name (LEFTOPEN (name (COMMA name)*)? RIGHTOPEN)? '=' name // not like in the spec
+    | functionText '=' name // not like in the spec
+    | functionText '=' functionText // not like in the spec
+    | functionText '=' sdlText // not like in the spec
     ;
 
 // 4.10 Instance creation
@@ -463,6 +465,8 @@ pattern
 wildcard
     : . | CHARACTERSTRING // TODO not correct ?
     | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
+    | functionText // extending the spec
+    | LEFTCURLYBRACKET (name | sdlText)+ (COMMA (name | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
     ;
 
 // 5.8 Data in message and timer parameters
@@ -472,7 +476,7 @@ parameterList
     ;
 
 paramaterDefn
-    : SEQUENCEOF | binding | expression | pattern
+    : SEQUENCEOF | sdlText | binding | expression | pattern // SEQUENCEOF and sdlText are not in the spec
     ;
 
 //
@@ -521,6 +525,17 @@ decomposition
 
 substructureReference
     : AS NAME
+    ;
+
+
+// Not in the spec
+functionText
+    : name LEFTOPEN sdlText (COMMA sdlText)* RIGHTOPEN
+    | name LEFTOPEN (name (COMMA name)*)? RIGHTOPEN
+    | name LEFTOPEN functionText RIGHTOPEN
+    ;
+sdlText
+    : LEFTOPEN '.' (name (COMMA name)*) '.' RIGHTOPEN
     ;
 
 
