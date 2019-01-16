@@ -29,16 +29,6 @@ MscCondition::MscCondition(const QString &name, QObject *parent)
 {
 }
 
-QString MscCondition::messageName() const
-{
-    return m_messageName;
-}
-
-void MscCondition::setMessageName(const QString &messageName)
-{
-    m_messageName = messageName;
-}
-
 bool MscCondition::shared() const
 {
     return m_shared;

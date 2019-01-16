@@ -115,6 +115,14 @@ void TextItem::setTextAllignment(Qt::Alignment alignment)
     document()->setDefaultTextOption(txtOpt);
 }
 
+void TextItem::setTextWrapMode(QTextOption::WrapMode wrapMode)
+{
+    QTextOption txtOpt = document()->defaultTextOption();
+
+    txtOpt.setWrapMode(wrapMode);
+    document()->setDefaultTextOption(txtOpt);
+}
+
 bool TextItem::framed() const
 {
     return m_showFrame;
@@ -195,7 +203,7 @@ void TextItem::keyPressEvent(QKeyEvent *event)
         case Qt::Key_Escape: {
             setPlainText(m_prevText);
             clearFocus();
-            return;
+            break;
         }
         case Qt::Key_Return:
         case Qt::Key_Enter: {
@@ -206,6 +214,9 @@ void TextItem::keyPressEvent(QKeyEvent *event)
             break;
         }
         }
+
+        adjustSize();
+        emit keyPressed();
     }
 
     QGraphicsTextItem::keyPressEvent(event);

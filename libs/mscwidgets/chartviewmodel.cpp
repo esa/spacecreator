@@ -149,50 +149,7 @@ void ChartViewModel::relayout()
 
     qreal y(d->InterMessageSpan);
     auto instancesRect(totalRect);
-
-    auto relayoutCondition = [&](const QString &messageName) {
-        QPointer<ConditionItem> item = nullptr;
-        QPointer<ConditionItem> prevItem = nullptr;
-
-        for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
-            MscCondition *condition = nullptr;
-
-            if (instanceEvent->entityType() == MscEntity::EntityType::Condition
-                && (condition = dynamic_cast<MscCondition *>(instanceEvent))
-                && condition->messageName() == messageName) {
-                item = itemForCondition(condition);
-
-                if (!item) {
-                    item = new ConditionItem(condition);
-
-                    d->m_scene.addItem(item);
-                    d->m_instanceEventItems.append(item);
-
-                    connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
-                }
-
-                if (prevItem
-                    && (prevItem->modelItem()->instance() == condition->instance()
-                        || prevItem->modelItem()->shared())) {
-                    y += -prevItem->boundingRect().y();
-                    y += prevItem->boundingRect().height() + d->InterMessageSpan;
-                }
-
-                InstanceItem *instance = itemForInstance(condition->instance());
-                item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
-
-                prevItem = item;
-            }
-        }
-
-        if (item) {
-            y += -item->boundingRect().y();
-            y += item->boundingRect().height() + d->InterMessageSpan;
-        }
-    };
-
-    // conditions with empty messageName
-    relayoutCondition("");
+    QPointer<ConditionItem> prevItem = nullptr;
 
     for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
         // TODO: Handle timers and conditions
@@ -218,16 +175,16 @@ void ChartViewModel::relayout()
 
                 d->m_scene.addItem(item);
                 d->m_instanceEventItems.append(item);
+
+                connect(item, &MessageItem::needRelayout, this, &ChartViewModel::relayout);
             }
+
             const QRectF boundingRect = item->boundingRect();
             y += -boundingRect.y();
             item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
             y += boundingRect.height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
-
-            // condition after message
-            relayoutCondition(item->name());
         }
         if (instanceEvent->entityType() == MscEntity::EntityType::Action) {
             auto action = static_cast<MscAction *>(instanceEvent);
@@ -250,9 +207,35 @@ void ChartViewModel::relayout()
             y += item->boundingRect().height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+        }
+        if (instanceEvent->entityType() == MscEntity::EntityType::Condition) {
+            auto *condition = static_cast<MscCondition *>(instanceEvent);
 
-            // condition after message
-            //            relayoutCondition(item->name());
+            auto *item = itemForCondition(condition);
+            if (!item) {
+                item = new ConditionItem(condition);
+
+                d->m_scene.addItem(item);
+                d->m_instanceEventItems.append(item);
+
+                connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
+            }
+
+            if (prevItem
+                && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
+                y += prevItem->boundingRect().height() + d->InterMessageSpan;
+            }
+
+            InstanceItem *instance = itemForInstance(condition->instance());
+            item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
+
+            prevItem = item;
+
+            y += item->boundingRect().height() + d->InterMessageSpan;
+
+            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+        } else {
+            prevItem = nullptr;
         }
     }
 

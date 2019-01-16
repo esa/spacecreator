@@ -507,10 +507,7 @@ antlrcpp::Any MscParserVisitor::visitSharedCondition(MscParser::SharedConditionC
     }
     condition->setInstance(m_currentInstance);
 
-    if (m_currentMessage)
-        condition->setMessageName(m_currentMessage->name());
-
-    m_currentChart->addInstanceEvent(condition);
+    m_instanceEvents.append(condition);
 
     return visitChildren(context);
 }
