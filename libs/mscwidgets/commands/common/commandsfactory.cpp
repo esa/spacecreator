@@ -33,12 +33,40 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 
+#include <QDebug>
 #include <QGraphicsItem>
 #include <QPointF>
 #include <QRectF>
 
 namespace msc {
 namespace cmd {
+
+QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
+{
+    switch (id) {
+    case cmd::MoveMessage:
+        return cmd::CommandsFactory::createMessageItemMove(params);
+    case cmd::RetargetMessage:
+        return cmd::CommandsFactory::createMessageItemResize(params);
+    case cmd::CreateMessage:
+        return cmd::CommandsFactory::createMessageItemCreate(params);
+    case cmd::MoveInstance:
+        return cmd::CommandsFactory::createInstanceItemMove(params);
+    case cmd::ResizeInstance:
+        return cmd::CommandsFactory::createInstanceItemResize(params);
+    case cmd::CreateInstance:
+        return cmd::CommandsFactory::createInstanceItemCreate(params);
+    case cmd::MoveCondition:
+        return cmd::CommandsFactory::createConditionItemMove(params);
+    case cmd::ResizeCondition:
+        return cmd::CommandsFactory::createConditionItemResize(params);
+    default:
+        qWarning() << "CommandsStack::push - command ignored" << id;
+        break;
+    }
+
+    return nullptr;
+}
 
 QUndoCommand *CommandsFactory::createMessageItemMove(const QVariantList &params)
 {
