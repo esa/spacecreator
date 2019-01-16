@@ -17,13 +17,6 @@
 #include "commandsstack.h"
 #include "commandsfactory.h"
 
-#include "commands/cmdmessageitemmove.h"
-#include "commands/cmdmessageitemresize.h"
-#include "commands/cmdinstanceitemmove.h"
-#include "commands/cmdinstanceitemresize.h"
-
-#include <QDebug>
-
 namespace msc {
 namespace cmd {
 
@@ -49,37 +42,7 @@ QUndoStack *CommandsStack::current()
 
 bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
 {
-    QUndoCommand *command(nullptr);
-
-    switch (id) {
-    case cmd::MoveMessage:
-        command = cmd::CommandsFactory::createMessageItemMove(params);
-        break;
-    case cmd::RetargetMessage:
-        command = cmd::CommandsFactory::createMessageItemResize(params);
-        break;
-    case cmd::CreateMessage:
-        command = cmd::CommandsFactory::createMessageItemCreate(params);
-        break;
-    case cmd::MoveInstance:
-        command = cmd::CommandsFactory::createInstanceItemMove(params);
-        break;
-    case cmd::ResizeInstance:
-        command = cmd::CommandsFactory::createInstanceItemResize(params);
-        break;
-    case cmd::CreateInstance:
-        command = cmd::CommandsFactory::createInstanceItemCreate(params);
-        break;
-    case cmd::MoveCondition:
-        command = cmd::CommandsFactory::createConditionItemMove(params);
-        break;
-    case cmd::ResizeCondition:
-        command = cmd::CommandsFactory::createConditionItemResize(params);
-        break;
-    default:
-        qWarning() << "CommandsStack::push - command ignored" << id;
-        break;
-    }
+    QUndoCommand *command = cmd::CommandsFactory::create(id, params);
 
     if (command) {
         CommandsStack::current()->push(command);
