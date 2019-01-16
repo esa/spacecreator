@@ -20,6 +20,7 @@
 
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
+#include <QTextOption>
 
 namespace msc {
 
@@ -42,6 +43,8 @@ public:
     Qt::Alignment textAlignment() const;
     void setTextAllignment(Qt::Alignment alignment);
 
+    void setTextWrapMode(QTextOption::WrapMode wrapMode);
+
     bool framed() const;
     void setFramed(bool to);
 
@@ -52,6 +55,7 @@ public:
 
 Q_SIGNALS:
     void edited(const QString &newText);
+    void keyPressed();
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;

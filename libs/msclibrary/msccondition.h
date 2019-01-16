@@ -32,9 +32,6 @@ public:
     explicit MscCondition(QObject *parent = nullptr);
     MscCondition(const QString &name, QObject *parent = nullptr);
 
-    QString messageName() const;
-    void setMessageName(const QString &messageName);
-
     bool shared() const;
     void setShared(bool shared);
 

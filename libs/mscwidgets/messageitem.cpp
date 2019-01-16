@@ -445,6 +445,8 @@ void MessageItem::onRenamed(const QString &title)
     m_message->setName(title);
 
     updateLayout();
+
+    Q_EMIT needRelayout();
 }
 
 } // namespace msc

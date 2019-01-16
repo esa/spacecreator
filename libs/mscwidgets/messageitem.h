@@ -64,6 +64,9 @@ public:
     void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
     void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
 
+Q_SIGNALS:
+    void needRelayout() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
 

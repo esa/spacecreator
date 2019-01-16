@@ -26,8 +26,9 @@
 namespace msc {
 
 static const qreal CONDITION_WIDTH = 50.0;
-static const qreal CONDITION_HEIGHT = 20.0;
+static const qreal CONDITION_HEIGHT = 25.0;
 static const qreal CONDITION_MARGIN = 10.0;
+static const qreal MAX_TEXT_WIDTH = 150.0;
 
 ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(parent)
@@ -42,7 +43,9 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
 
     m_nameItem->setEditable(true);
     m_nameItem->setBackgroundColor(Qt::transparent);
+
     connect(m_nameItem, &TextItem::edited, this, &ConditionItem::onNameEdited, Qt::QueuedConnection);
+    connect(m_nameItem, &TextItem::keyPressed, this, &ConditionItem::rebuildLayout);
 
     m_polygonItem->setBrush(Qt::white);
 
@@ -138,8 +141,17 @@ void ConditionItem::buildLayout()
 {
     prepareGeometryChange();
 
+    m_nameItem->setTextWrapMode(QTextOption::NoWrap);
+
     // set default size:
     QSizeF nameSize(m_nameItem->boundingRect().size());
+
+    if (nameSize.width() > MAX_TEXT_WIDTH) {
+        m_nameItem->setTextWrapMode(QTextOption::WrapAnywhere);
+        m_nameItem->adjustSize();
+
+        nameSize = m_nameItem->boundingRect().size();
+    }
 
     if (m_boundingRect.isEmpty()) {
         m_boundingRect.setTopLeft({ 0.0, 0.0 });

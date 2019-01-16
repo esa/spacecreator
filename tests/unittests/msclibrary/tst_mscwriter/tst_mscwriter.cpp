@@ -179,13 +179,12 @@ void tst_MscWriter::testSerializeMscConditions()
     QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
     message->setTargetInstance(&instance);
 
-    QVector<MscInstanceEvent *> messages;
-    messages.append(message.data());
-
     QScopedPointer<MscCondition> condition(new MscCondition("Con_1"));
     condition->setInstance(&instance);
 
+    QVector<MscInstanceEvent *> messages;
     messages.append(condition.data());
+    messages.append(message.data());
 
     QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
 
@@ -265,19 +264,17 @@ void tst_MscWriter::testSerializeMscChartInstance()
     message2->setSourceInstance(instance);
     message2->setTargetInstance(instance2);
 
-    chart.addInstanceEvent(message);
-    chart.addInstanceEvent(message2);
-
     MscCondition *condition = new MscCondition("Con_1");
     condition->setShared(true);
     condition->setInstance(instance);
 
     MscCondition *condition2 = new MscCondition("Con_2");
     condition2->setInstance(instance2);
-    condition2->setMessageName("Msg_1");
 
     chart.addInstanceEvent(condition);
+    chart.addInstanceEvent(message);
     chart.addInstanceEvent(condition2);
+    chart.addInstanceEvent(message2);
 
     chart.addInstance(instance);
     chart.addInstance(instance2);

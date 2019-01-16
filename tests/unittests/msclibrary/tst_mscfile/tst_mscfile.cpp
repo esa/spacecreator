@@ -365,12 +365,10 @@ void tst_MscFile::testCondition()
 
     auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
     QCOMPARE(condition->name(), QString("Con_1"));
-    QVERIFY(condition->messageName().isEmpty());
     QCOMPARE(condition->shared(), true);
 
     condition = static_cast<MscCondition *>(chart->instanceEvents().at(1));
     QCOMPARE(condition->name(), QString("Con_2"));
-    QVERIFY(condition->messageName().isEmpty());
     QCOMPARE(condition->shared(), false);
 
     delete model;
