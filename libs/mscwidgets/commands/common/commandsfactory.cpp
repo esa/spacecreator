@@ -18,6 +18,8 @@
 #include "commandsstack.h"
 #include "chartviewmodel.h"
 
+#include "commands/cmdactionitemmove.h"
+
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdconditionitemresize.h"
 
@@ -29,6 +31,7 @@
 #include "commands/cmdmessageitemmove.h"
 #include "commands/cmdmessageitemresize.h"
 
+#include "actionitem.h"
 #include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -60,6 +63,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createConditionItemMove(params);
     case cmd::ResizeCondition:
         return cmd::CommandsFactory::createConditionItemResize(params);
+    case cmd::MoveAction:
+        return cmd::CommandsFactory::createActionItemMove(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -167,6 +172,19 @@ QUndoCommand *CommandsFactory::createConditionItemResize(const QVariantList &par
         const QRectF &newGeometry = params.last().toRectF();
         if (item->boundingRect() != newGeometry)
             return new CmdConditionItemResize(item, newGeometry);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createActionItemMove(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (ActionItem *item = params.first().value<ActionItem *>()) {
+        const QPointF &destination = params.last().toPointF();
+        if (item->pos() != destination)
+            return new CmdActionItemMove(item, destination);
     }
 
     return nullptr;

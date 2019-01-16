@@ -19,17 +19,18 @@
 #define ACTIONITEM_H
 
 #include <baseitems/interactiveobject.h>
+#include "instanceitem.h"
 
 #include <QPointer>
 
 namespace msc {
 
-class InstanceItem;
 class MscAction;
 class TextItem;
 
 class ActionItem : public InteractiveObject
 {
+    Q_OBJECT
 public:
     explicit ActionItem(msc::MscAction *action, QGraphicsItem *parent = nullptr);
 
@@ -46,7 +47,7 @@ protected:
     void prepareHoverMark() override;
 
 private Q_SLOTS:
-    void rebuildLayout();
+    void rebuildLayout() override;
     void onInstanceMoved(const QPointF &from, const QPointF &to);
 
 private:
