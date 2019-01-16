@@ -21,6 +21,7 @@
 #include <mscaction.h>
 
 #include <baseitems/textitem.h>
+#include "commands/common/commandsstack.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -89,6 +90,11 @@ void ActionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    if (gp->location() == GripPoint::Location::Center) {
+        msc::cmd::CommandsStack::push(cmd::Id::MoveAction,
+                                      { QVariant::fromValue<ActionItem *>(this), pos() + (to - from) });
+    }
+
     Q_UNUSED(gp);
     Q_UNUSED(from);
     Q_UNUSED(to);
@@ -104,8 +110,7 @@ void ActionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPo
 void ActionItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    //    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
-    m_gripPoints->setUsedPoints({});
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 }
 
 void ActionItem::rebuildLayout()

@@ -15,24 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDACTIONITEMMOVE_H
+#define CMDACTIONITEMMOVE_H
+
+#include "basecommand.h"
+
+#include <QPointF>
 
 namespace msc {
+
+class ActionItem;
+
 namespace cmd {
 
-enum Id
+class CmdActionItemMove : public BaseCommand
 {
-    MoveMessage = 0,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    MoveCondition,
-    ResizeCondition,
-    MoveAction,
+public:
+    CmdActionItemMove(ActionItem *actionItem, const QPointF &destination);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointF m_posFrom;
+    QPointF m_posTo;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDACTIONITEMMOVE_H
