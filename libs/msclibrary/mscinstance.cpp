@@ -42,6 +42,7 @@ void MscInstance::setDenominator(const QString &denominator)
 
     m_denominator = denominator;
     Q_EMIT denominatorChanged(m_denominator);
+    Q_EMIT dataChanged();
 }
 
 const QString &MscInstance::kind() const
@@ -57,6 +58,7 @@ void MscInstance::setKind(const QString &kind)
 
     m_kind = kind;
     Q_EMIT kindChanged(m_kind);
+    Q_EMIT dataChanged();
 }
 
 const QString &MscInstance::inheritance() const
@@ -72,6 +74,7 @@ void MscInstance::setInheritance(const QString &inheritance)
 
     m_inheritance = inheritance;
     Q_EMIT inheritanceChanged(m_inheritance);
+    Q_EMIT dataChanged();
 }
 
 MscEntity::EntityType MscInstance::entityType() const
@@ -89,6 +92,7 @@ void MscInstance::setExplicitCreate(bool create)
         return;
 
     m_explicitStart = create;
+    Q_EMIT dataChanged();
 }
 
 bool MscInstance::explicitStop() const
@@ -99,7 +103,9 @@ void MscInstance::setExplicitStop(bool stop)
 {
     if (m_explicitStop == stop)
         return;
+
     m_explicitStop = stop;
+    Q_EMIT dataChanged();
 }
 
 } // namespace msc

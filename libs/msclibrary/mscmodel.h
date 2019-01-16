@@ -47,6 +47,7 @@ public:
     void clear();
 
 Q_SIGNALS:
+    void dataChanged();
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);
     void cleared();

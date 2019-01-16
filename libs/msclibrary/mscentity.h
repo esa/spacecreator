@@ -58,6 +58,7 @@ public:
     virtual MscEntity::EntityType entityType() const = 0;
 
 Q_SIGNALS:
+    void dataChanged();
     void nameChanged(const QString &name);
     void commentChanged(const QString &name);
 

@@ -79,6 +79,25 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
+QString MscWriter::modelText(const MscModel *model)
+{
+    setModel(model);
+
+    QString text;
+    QTextStream out(&text);
+
+    int tabCount = 0;
+    for (const auto *doc : model->documents())
+        out << serialize(doc, tabCount++);
+
+    for (const auto *chart : model->charts())
+        out << serialize(chart);
+
+    setModel(nullptr);
+
+    return text;
+}
+
 QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents,
                              int tabsSize)
 {

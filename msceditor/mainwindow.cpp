@@ -46,6 +46,7 @@
 #include <QActionGroup>
 #include <QMessageBox>
 #include <QDebug>
+#include <mscwriter.h>
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -83,6 +84,7 @@ struct MainWindowPrivate {
     QMenu *m_menuViewWindows = nullptr;
     QAction *m_actToggleErrorView = nullptr;
     QAction *m_actToggleHierarchyView = nullptr;
+    QAction *m_actToggleMscTextView = nullptr;
 
     QMenu *m_menuViewTools = nullptr;
     QAction *m_actToggleToolbarMsc = nullptr;
@@ -211,6 +213,15 @@ void MainWindow::enableDefaultTool()
 {
     Q_ASSERT(d->m_defaultToolAction);
     d->m_defaultToolAction->setChecked(true);
+}
+
+void MainWindow::updateTextView()
+{
+    if (!d->ui->dockWidgetMscText->isVisible()) {
+        return;
+    }
+    msc::MscWriter writer;
+    d->ui->mscTextBrowser->setText(d->m_model->modelText());
 }
 
 bool MainWindow::openFileAsn(const QString &file)
@@ -400,6 +411,9 @@ void MainWindow::initMenuViewWindows()
 
     d->m_actToggleHierarchyView = d->ui->dockWidgetDocument->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleHierarchyView);
+
+    d->m_actToggleMscTextView = d->ui->dockWidgetMscText->toggleViewAction();
+    d->m_menuViewWindows->addAction(d->m_actToggleMscTextView);
 }
 
 void MainWindow::initMenuViewToolbars()
@@ -475,6 +489,13 @@ void MainWindow::initConnections()
                                                  .arg(item.x())
                                                  .arg(item.y()));
             });
+
+    connect(d->m_model, &MainModel::modelDataChanged, this, &MainWindow::updateTextView);
+    connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
+        if (on) {
+            QMetaObject::invokeMethod(this, "updateTextView", Qt::QueuedConnection);
+        }
+    });
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
@@ -513,6 +534,9 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::loadSettings()
 {
+    // as default hide the msc text view
+    d->ui->dockWidgetMscText->setVisible(false);
+
     restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
 }

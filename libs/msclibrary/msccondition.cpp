@@ -36,7 +36,11 @@ bool MscCondition::shared() const
 
 void MscCondition::setShared(bool shared)
 {
+    if (shared == m_shared) {
+        return;
+    }
     m_shared = shared;
+    Q_EMIT dataChanged();
 }
 
 MscInstance *MscCondition::instance() const
@@ -46,7 +50,11 @@ MscInstance *MscCondition::instance() const
 
 void MscCondition::setInstance(MscInstance *instance)
 {
+    if (instance == m_instance) {
+        return;
+    }
     m_instance = instance;
+    Q_EMIT dataChanged();
 }
 
 MscEntity::EntityType MscCondition::entityType() const

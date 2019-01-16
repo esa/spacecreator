@@ -51,7 +51,9 @@ void MscDocument::addDocument(MscDocument *document)
 
     document->setParent(this);
     m_documents.append(document);
+    connect(document, &MscDocument::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT documentAdded(document);
+    Q_EMIT dataChanged();
 }
 
 const QVector<MscChart *> &MscDocument::charts() const
@@ -70,7 +72,9 @@ void MscDocument::addChart(MscChart *chart)
 
     chart->setParent(this);
     m_charts.append(chart);
+    connect(chart, &MscChart::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT chartAdded(chart);
+    Q_EMIT dataChanged();
 }
 
 void MscDocument::clear()
@@ -82,6 +86,7 @@ void MscDocument::clear()
     m_charts.clear();
 
     Q_EMIT cleared();
+    Q_EMIT dataChanged();
 }
 
 /*!

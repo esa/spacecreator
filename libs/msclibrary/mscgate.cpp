@@ -40,6 +40,7 @@ void MscGate::setDirection(MscGate::Direction dir)
         return;
 
     m_direction = dir;
+    Q_EMIT dataChanged();
 }
 
 MscInstance *MscGate::instance() const
@@ -58,6 +59,7 @@ void MscGate::setInstance(MscInstance *instance)
         return;
 
     m_instance = instance;
+    Q_EMIT dataChanged();
 }
 
 void MscGate::setInstanceName(const QString &instanceName)
@@ -66,6 +68,7 @@ void MscGate::setInstanceName(const QString &instanceName)
         return;
 
     m_instanceName = instanceName;
+    Q_EMIT dataChanged();
 }
 
 QString MscGate::paramName() const
@@ -79,6 +82,7 @@ void MscGate::setParamName(const QString &name)
         return;
 
     m_paramName = name;
+    Q_EMIT dataChanged();
 }
 
 QVariantList MscGate::params() const
@@ -92,6 +96,7 @@ void MscGate::setParams(const QVariantList &params)
         return;
 
     m_params = params;
+    Q_EMIT dataChanged();
 }
 
 MscEntity::EntityType MscGate::entityType() const

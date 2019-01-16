@@ -34,6 +34,7 @@ void MscAction::addDataStatement(const MscAction::DataStatement &statement)
     }
 
     m_dataStatementList.append(statement);
+    Q_EMIT dataChanged();
 }
 
 MscInstance *MscAction::instance() const
@@ -44,6 +45,7 @@ MscInstance *MscAction::instance() const
 void MscAction::setInstance(MscInstance *instance)
 {
     m_instance = instance;
+    Q_EMIT dataChanged();
 }
 
 }
