@@ -41,12 +41,16 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+public Q_SLOTS:
+    void setActionText(const QString &text);
+
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;
 
 private Q_SLOTS:
+    void onTextEdited(const QString &text);
     void rebuildLayout() override;
     void onInstanceMoved(const QPointF &from, const QPointF &to);
 
@@ -54,7 +58,7 @@ private:
     QString actionText() const;
 
     QPointer<msc::MscAction> m_action;
-    TextItem *m_symbol = nullptr;
+    TextItem *m_textItem = nullptr;
     QPointer<InstanceItem> m_instance = nullptr;
 };
 

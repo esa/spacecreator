@@ -15,27 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDACTIONINFORMALTEXT_H
+#define CMDACTIONINFORMALTEXT_H
+
+#include "basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
+
+class MscAction;
+
 namespace cmd {
 
-enum Id
+class CmdActionInformalText : public BaseCommand
 {
-    RenameEntity = 0,
-    MoveMessage,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    ResizeCondition,
-    MoveAction,
-    InformatActionText,
+public:
+    CmdActionInformalText(MscAction *action, const QString &newText);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<MscAction> m_action;
+    QString m_oldText;
+    QString m_newText;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace msc
+} // namespace cms
+
+#endif // CMDACTIONINFORMALTEXT_H
