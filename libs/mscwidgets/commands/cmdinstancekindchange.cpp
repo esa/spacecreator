@@ -1,0 +1,64 @@
+/*
+   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
+#include "cmdinstancekindchange.h"
+
+#include <mscinstance.h>
+
+namespace msc {
+namespace cmd {
+
+CmdInstanceKindChange::CmdInstanceKindChange(MscInstance *item, const QString &newKind)
+    : BaseCommand(item)
+    , m_instance(item)
+    , m_oldKind(item->kind())
+    , m_newKind(newKind)
+{
+}
+
+void CmdInstanceKindChange::redo()
+{
+    if (m_instance) {
+        m_instance->setKind(m_newKind);
+    }
+}
+
+void CmdInstanceKindChange::undo()
+{
+    if (m_instance) {
+        m_instance->setKind(m_oldKind);
+    }
+}
+
+bool CmdInstanceKindChange::mergeWith(const QUndoCommand *command)
+{
+    auto other = dynamic_cast<const CmdInstanceKindChange *>(command);
+    if (canMergeWith(other)) {
+        m_newKind = other->m_newKind;
+        return true;
+    }
+
+    return false;
+}
+
+int CmdInstanceKindChange::id() const
+{
+    return msc::cmd::Id::RenameInstanceKind;
+}
+
+} // namespace cmd
+} // namespace msc

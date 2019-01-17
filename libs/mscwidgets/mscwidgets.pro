@@ -44,7 +44,8 @@ HEADERS += \
     baseitems/instanceenditem.h \
     actionitem.h \
     commands/cmdactionitemmove.h \
-    commands/cmdentitynamechange.h
+    commands/cmdentitynamechange.h \
+    commands/cmdinstancekindchange.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -81,7 +82,8 @@ SOURCES += \
     baseitems/instanceenditem.cpp \
     actionitem.cpp \
     commands/cmdactionitemmove.cpp \
-    commands/cmdentitynamechange.cpp
+    commands/cmdentitynamechange.cpp \
+    commands/cmdinstancekindchange.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {
