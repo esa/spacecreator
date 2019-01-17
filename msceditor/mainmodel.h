@@ -54,8 +54,11 @@ public:
 
     msc::ChartViewModel &chartViewModel() const;
 
+    QString modelText() const;
+
 Q_SIGNALS:
     void showChartVew();
+    void modelDataChanged();
 
 public Q_SLOTS:
     void showFirstChart();

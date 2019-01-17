@@ -64,7 +64,9 @@ void MscChart::addInstance(MscInstance *instance)
     }
 
     m_instances.append(instance);
+    connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceAdded(instance);
+    Q_EMIT dataChanged();
 }
 
 void MscChart::removeInstance(MscInstance *instance)
@@ -76,8 +78,10 @@ void MscChart::removeInstance(MscInstance *instance)
         return;
     }
 
-    if (m_instances.removeAll(instance))
+    if (m_instances.removeAll(instance)) {
         Q_EMIT instanceRemoved(instance);
+        Q_EMIT dataChanged();
+    }
 }
 
 MscInstance *MscChart::instanceByName(const QString &name) const
@@ -143,7 +147,9 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
     }
 
     m_instanceEvents.append(instanceEvent);
+    connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceEventAdded(instanceEvent);
+    Q_EMIT dataChanged();
 }
 
 void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
@@ -155,8 +161,10 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         return;
     }
 
-    if (m_instanceEvents.removeAll(instanceEvent))
+    if (m_instanceEvents.removeAll(instanceEvent)) {
         Q_EMIT instanceEventRemoved(instanceEvent);
+        Q_EMIT dataChanged();
+    }
 }
 
 MscMessage *MscChart::messageByName(const QString &name) const
@@ -183,7 +191,9 @@ void MscChart::addGate(MscGate *gate)
         return;
 
     m_gates.append(gate);
+    connect(gate, &MscGate::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT gateAdded(gate);
+    Q_EMIT dataChanged();
 }
 
 void MscChart::removeGate(MscGate *gate)
@@ -193,8 +203,10 @@ void MscChart::removeGate(MscGate *gate)
     if (!m_gates.contains(gate))
         return;
 
-    if (m_gates.removeAll(gate))
+    if (m_gates.removeAll(gate)) {
         Q_EMIT gateRemoved(gate);
+        Q_EMIT dataChanged();
+    }
 }
 
 /*!

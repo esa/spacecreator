@@ -37,6 +37,7 @@ const QStringList &MscCreate::parameters() const
 void MscCreate::addParameter(const QString &parameter)
 {
     m_parameters.append(parameter);
+    Q_EMIT dataChanged();
 }
 
 MscInstance *MscCreate::instance() const
@@ -46,7 +47,11 @@ MscInstance *MscCreate::instance() const
 
 void MscCreate::setInstance(MscInstance *instance)
 {
+    if (instance == m_instance) {
+        return;
+    }
     m_instance = instance;
+    Q_EMIT dataChanged();
 }
 
 MscEntity::EntityType MscCreate::entityType() const

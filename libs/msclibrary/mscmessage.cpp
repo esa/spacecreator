@@ -43,6 +43,7 @@ void MscMessage::setSourceInstance(MscInstance *source)
 
     m_source = source;
     Q_EMIT sourceChanged(m_source);
+    Q_EMIT dataChanged();
 }
 
 MscInstance *MscMessage::targetInstance() const
@@ -58,6 +59,7 @@ void MscMessage::setTargetInstance(MscInstance *target)
 
     m_target = target;
     Q_EMIT targetChanged(m_target);
+    Q_EMIT dataChanged();
 }
 
 MscEntity::EntityType MscMessage::entityType() const
@@ -73,6 +75,7 @@ const MscMessage::Parameters &MscMessage::parameters() const
 void MscMessage::setParameters(const MscMessage::Parameters &parameters)
 {
     m_parameters = parameters;
+    Q_EMIT dataChanged();
 }
 
 } // namespace msc

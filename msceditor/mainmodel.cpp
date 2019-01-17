@@ -60,6 +60,7 @@ MainModel::MainModel(QObject *parent)
     , d(new MainModelPrivate(this))
 {
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
+    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
 }
 
 MainModel::~MainModel()
@@ -92,6 +93,12 @@ ChartViewModel &MainModel::chartViewModel() const
     return d->m_chartModel;
 }
 
+QString MainModel::modelText() const
+{
+    msc::MscWriter mscWriter;
+    return mscWriter.modelText(d->m_mscModel);
+}
+
 void MainModel::showFirstChart()
 {
     d->m_chartModel.fillView(firstChart());
@@ -116,9 +123,12 @@ bool MainModel::loadFile(const QString &filename)
     connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
 
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
+
+    Q_EMIT modelDataChanged();
 
     return true;
 }

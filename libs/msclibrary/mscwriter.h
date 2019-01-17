@@ -44,6 +44,7 @@ public:
 
     void saveModel(const MscModel *model, const QString &fileName);
     void saveChart(const MscChart *chart, const QString &fileName);
+    QString modelText(const MscModel *model);
 
 protected:
     QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,

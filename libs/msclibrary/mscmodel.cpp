@@ -47,7 +47,9 @@ void MscModel::addDocument(MscDocument *document)
 
     document->setParent(this);
     m_documents.append(document);
+    connect(document, &MscDocument::dataChanged, this, &MscModel::dataChanged);
     Q_EMIT documentAdded(document);
+    Q_EMIT dataChanged();
 }
 
 const QVector<MscChart *> &MscModel::charts() const
@@ -66,7 +68,9 @@ void MscModel::addChart(MscChart *chart)
 
     chart->setParent(this);
     m_charts.append(chart);
+    connect(chart, &MscChart::dataChanged, this, &MscModel::dataChanged);
     Q_EMIT chartAdded(chart);
+    Q_EMIT dataChanged();
 }
 
 const QString &MscModel::dataLanguage() const
@@ -82,6 +86,7 @@ void MscModel::setDataLanguage(const QString &language)
 
     m_dataLanguage = language;
     Q_EMIT dataLanguageChanged(m_dataLanguage);
+    Q_EMIT dataChanged();
 }
 
 const QString &MscModel::dataDefinitionString() const
@@ -97,6 +102,7 @@ void MscModel::setDataDefinitionString(const QString &dataString)
 
     m_dataDefinitionString = dataString;
     Q_EMIT dataDefinitionStringChanged(m_dataDefinitionString);
+    Q_EMIT dataChanged();
 }
 
 void MscModel::clear()
@@ -110,6 +116,7 @@ void MscModel::clear()
     setDataLanguage("");
 
     Q_EMIT cleared();
+    Q_EMIT dataChanged();
 }
 
 } // namespace msc
