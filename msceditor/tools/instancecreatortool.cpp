@@ -45,6 +45,10 @@ void InstanceCreatorTool::createPreviewItem()
         return;
 
     InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
+    if (!instanceItem) {
+        return;
+    }
+
     m_previewItem = instanceItem;
     m_previewEntity = instanceItem->modelItem();
 
