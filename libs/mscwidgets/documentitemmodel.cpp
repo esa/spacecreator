@@ -16,6 +16,7 @@
 */
 
 #include "documentitemmodel.h"
+#include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
@@ -43,12 +44,15 @@ DocumentItemModel::DocumentItemModel(QObject *parent)
 */
 void DocumentItemModel::setMscModel(msc::MscModel *model)
 {
-    if (model == m_mscModel) {
+    if (model == m_mscModel.data()) {
         return;
     }
 
     beginResetModel();
-    if (m_mscModel) {
+    if (!m_mscModel.isNull()) {
+        for (auto doc : m_mscModel->documents()) {
+            connectDocument(doc);
+        }
         disconnect(m_mscModel, nullptr, this, nullptr);
     }
     m_mscModel = model;
@@ -62,13 +66,17 @@ void DocumentItemModel::setMscModel(msc::MscModel *model)
             beginResetModel();
             endResetModel();
         });
+
+        for (auto doc : m_mscModel->documents()) {
+            connectDocument(doc);
+        }
     }
     endResetModel();
 }
 
 MscModel *DocumentItemModel::mscModel() const
 {
-    return m_mscModel;
+    return m_mscModel.data();
 }
 
 /*!
@@ -76,7 +84,7 @@ MscModel *DocumentItemModel::mscModel() const
  */
 QModelIndex DocumentItemModel::index(MscChart *chart) const
 {
-    if (!chart || !m_mscModel) {
+    if (!chart || m_mscModel.isNull()) {
         return QModelIndex();
     }
 
@@ -87,9 +95,27 @@ QModelIndex DocumentItemModel::index(MscChart *chart) const
     }
 }
 
+QModelIndex DocumentItemModel::index(MscDocument *document) const
+{
+    if (!document || m_mscModel.isNull()) {
+        return QModelIndex();
+    }
+
+    if (document->parentDocument()) {
+        return createIndex(document->parentDocument()->documents().indexOf(document), 0, document);
+    } else {
+        return createIndex(m_mscModel->documents().indexOf(document), 0, document);
+    }
+}
+
+Qt::ItemFlags DocumentItemModel::flags(const QModelIndex &index) const
+{
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
 QModelIndex DocumentItemModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (column != 0 || !m_mscModel) {
+    if (column != 0 || m_mscModel.isNull()) {
         return QModelIndex();
     }
 
@@ -138,7 +164,7 @@ QModelIndex DocumentItemModel::index(int row, int column, const QModelIndex &par
 
 QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
 {
-    if (!child.isValid() || !m_mscModel || child.internalPointer() == nullptr) {
+    if (!child.isValid() || m_mscModel.isNull() || child.internalPointer() == nullptr) {
         return QModelIndex();
     }
 
@@ -186,7 +212,7 @@ QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
 
 int DocumentItemModel::rowCount(const QModelIndex &parent) const
 {
-    if (!m_mscModel) {
+    if (m_mscModel.isNull()) {
         return 0;
     }
 
@@ -260,7 +286,7 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
         }
     }
 
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
         auto document = static_cast<MscDocument *>(index.internalPointer());
         if (document) {
             return QVariant(document->name());
@@ -282,6 +308,91 @@ QVariant DocumentItemModel::headerData(int section, Qt::Orientation orientation,
     }
 
     return QVariant();
+}
+
+bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role != Qt::EditRole) {
+        return false;
+    }
+
+    QVariant item;
+    auto document = static_cast<MscDocument *>(index.internalPointer());
+    if (document) {
+        item = QVariant::fromValue(document);
+    } else {
+        auto chart = static_cast<MscChart *>(index.internalPointer());
+        if (!chart) {
+            return false;
+        }
+
+        item = QVariant::fromValue(chart);
+    }
+
+    cmd::CommandsStack::push(cmd::RenameEntity, { item, value });
+
+    return true;
+}
+
+void DocumentItemModel::onNameChanged(const QString &name)
+{
+    Q_UNUSED(name);
+
+    auto chart = qobject_cast<msc::MscChart *>(sender());
+    if (chart) {
+        QModelIndex idx = index(chart);
+        if (idx.isValid()) {
+            Q_EMIT dataChanged(idx, idx);
+        }
+    }
+
+    auto doc = qobject_cast<msc::MscDocument *>(sender());
+    if (doc) {
+        QModelIndex idx = index(doc);
+        if (idx.isValid()) {
+            Q_EMIT dataChanged(idx, idx);
+        }
+    }
+}
+
+void DocumentItemModel::connectDocument(MscDocument *document)
+{
+    connect(document, &msc::MscDocument::documentAdded, this,
+            [&]() {
+                beginResetModel();
+                endResetModel();
+            },
+            Qt::UniqueConnection);
+    connect(document, &msc::MscDocument::chartAdded, this,
+            [&]() {
+                beginResetModel();
+                endResetModel();
+            },
+            Qt::UniqueConnection);
+
+    connect(document, &msc::MscDocument::nameChanged, this, &msc::DocumentItemModel::onNameChanged,
+            Qt::UniqueConnection);
+
+    for (auto doc : document->documents()) {
+        connectDocument(doc);
+    }
+
+    for (auto chart : document->charts()) {
+        connect(chart, &msc::MscChart::nameChanged, this, &msc::DocumentItemModel::onNameChanged, Qt::UniqueConnection);
+    }
+}
+
+void DocumentItemModel::disconnectDocument(MscDocument *document)
+{
+    disconnect(document, nullptr, this, nullptr);
+
+    for (auto doc : document->documents()) {
+        disconnectDocument(doc);
+    }
+
+    for (auto chart : document->charts()) {
+        disconnect(chart, nullptr, this, nullptr);
+    }
 }
 
 } // namespace msc

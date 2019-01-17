@@ -40,6 +40,9 @@ DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
     d->document = document;
     d->boxSize.setWidth(100);
     d->boxSize.setHeight(50);
+
+    connect(document, &msc::MscDocument::nameChanged, this, [&]() { update(); });
+    connect(document, &msc::MscDocument::nameChanged, this, &DocumentItem::preferredSizeChanged);
 }
 
 DocumentItem::~DocumentItem() {}
