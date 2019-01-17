@@ -34,6 +34,7 @@ class CommandsFactory
 public:
     static QUndoCommand *create(msc::cmd::Id id, const QVariantList &params);
 
+    static QUndoCommand *createRenameEntity(const QVariantList &params);
     static QUndoCommand *createMessageItemMove(const QVariantList &params);
     static QUndoCommand *createMessageItemResize(const QVariantList &params);
     static QUndoCommand *createMessageItemCreate(const QVariantList &params);

@@ -15,54 +15,49 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "basecommand.h"
+#include "cmdentitynamechange.h"
 
 #include <mscentity.h>
-
-#include <QGraphicsObject>
 
 namespace msc {
 namespace cmd {
 
-BaseCommand::BaseCommand()
-    : QUndoCommand(nullptr)
+CmdEntityNameChange::CmdEntityNameChange(MscEntity *item, const QString &newName)
+    : BaseCommand(item)
+    , m_oldName(item->name())
+    , m_newName(newName)
 {
 }
 
-BaseCommand::BaseCommand(QGraphicsObject *item, QUndoCommand *parent)
-    : QUndoCommand(parent)
-    , m_graphicsItem(item)
+void CmdEntityNameChange::redo()
 {
-}
-
-BaseCommand::BaseCommand(MscEntity *item, QUndoCommand *parent)
-    : QUndoCommand(parent)
-    , m_modelItem(item)
-{
-}
-
-BaseCommand::BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent)
-    : QUndoCommand(text, parent)
-    , m_graphicsItem(item)
-{
-}
-
-bool BaseCommand::canMergeWith(const BaseCommand *cmd) const
-{
-    if (!cmd || cmd->id() != id()) {
-        return false;
+    if (m_modelItem) {
+        m_modelItem->setName(m_newName);
     }
+}
 
-    if (!m_graphicsItem.isNull()) {
-        return cmd->m_graphicsItem == m_graphicsItem;
+void CmdEntityNameChange::undo()
+{
+    if (m_modelItem) {
+        m_modelItem->setName(m_oldName);
     }
+}
 
-    if (!m_modelItem.isNull()) {
-        return cmd->m_modelItem == m_modelItem;
+bool CmdEntityNameChange::mergeWith(const QUndoCommand *command)
+{
+    auto other = dynamic_cast<const CmdEntityNameChange *>(command);
+    if (canMergeWith(other)) {
+        m_newName = other->m_newName;
+        return true;
     }
 
     return false;
 }
 
-} // ns cmd
-} // ns msc
+int CmdEntityNameChange::id() const
+{
+    return msc::cmd::Id::RenameEntity;
+}
+
+} // namespace cmd
+} // namespace msc

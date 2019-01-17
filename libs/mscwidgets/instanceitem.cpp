@@ -345,11 +345,11 @@ void InstanceItem::prepareHoverMark()
 void InstanceItem::onNameEdited(const QString &newName)
 {
     if (newName.isEmpty()) {
-        m_nameItem->setPlainText(m_instance->name());
         return;
     }
 
-    setName(newName);
+    using namespace msc::cmd;
+    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
 }
 
 void InstanceItem::onKindEdited(const QString &newKind)

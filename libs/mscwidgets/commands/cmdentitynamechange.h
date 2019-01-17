@@ -15,25 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDENTITYNAMECHANGE_H
+#define CMDENTITYNAMECHANGE_H
+
+#include "basecommand.h"
 
 namespace msc {
+
+class MscEntity;
+
 namespace cmd {
 
-enum Id
+class CmdEntityNameChange : public BaseCommand
 {
-    RenameEntity = 0,
-    MoveMessage,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    MoveCondition,
-    ResizeCondition,
-    MoveAction,
+public:
+    CmdEntityNameChange(MscEntity *item, const QString &newName);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QString m_oldName;
+    QString m_newName;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDENTITYNAMECHANGE_H

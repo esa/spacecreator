@@ -29,7 +29,7 @@ namespace msc {
 namespace cmd {
 
 CmdMessageItemCreate::CmdMessageItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos)
-    : BaseCommand(nullptr)
+    : BaseCommand()
     , m_scene(scene)
     , m_model(model)
     , m_pos(pos)

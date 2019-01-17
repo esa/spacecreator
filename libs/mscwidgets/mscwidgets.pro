@@ -43,7 +43,8 @@ HEADERS += \
     commands/cmdconditionitemresize.h \
     baseitems/instanceenditem.h \
     actionitem.h \
-    commands/cmdactionitemmove.h
+    commands/cmdactionitemmove.h \
+    commands/cmdentitynamechange.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -79,7 +80,8 @@ SOURCES += \
     commands/cmdconditionitemresize.cpp \
     baseitems/instanceenditem.cpp \
     actionitem.cpp \
-    commands/cmdactionitemmove.cpp
+    commands/cmdactionitemmove.cpp \
+    commands/cmdentitynamechange.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {
