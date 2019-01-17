@@ -61,6 +61,9 @@ MainModel::MainModel(QObject *parent)
 {
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
     connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+
+    initialModel();
+    showFirstChart();
 }
 
 MainModel::~MainModel()
@@ -106,17 +109,19 @@ void MainModel::showFirstChart()
 
 bool MainModel::loadFile(const QString &filename)
 {
-    clearMscModel();
-
     msc::MscFile file;
+    msc::MscModel *model = nullptr;
 
     try {
         d->m_errorMessages.clear();
-        d->m_mscModel = file.parseFile(filename, &d->m_errorMessages);
+        model = file.parseFile(filename, &d->m_errorMessages);
     } catch (...) {
         // print error message
         return false;
     }
+
+    clearMscModel();
+    d->m_mscModel = model;
 
     d->m_documentItemModel->setMscModel(d->m_mscModel);
 
@@ -188,4 +193,19 @@ void MainModel::clearMscModel()
         d->m_mscModel = nullptr;
     }
     d->m_chartModel.clearScene();
+    d->m_documentItemModel->setMscModel(nullptr);
+}
+
+void MainModel::initialModel()
+{
+    clearMscModel();
+
+    d->m_mscModel = new MscModel();
+    auto doc = new MscDocument(tr("Untitled Document"));
+    auto chart = new MscChart(tr("Untitled MSC"));
+    doc->addChart(chart);
+    d->m_mscModel->addDocument(doc);
+    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+
+    d->m_documentItemModel->setMscModel(d->m_mscModel);
 }

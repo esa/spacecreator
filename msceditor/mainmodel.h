@@ -72,6 +72,7 @@ private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
     void clearMscModel();
+    void initialModel();
 
     std::unique_ptr<MainModelPrivate> const d;
 };

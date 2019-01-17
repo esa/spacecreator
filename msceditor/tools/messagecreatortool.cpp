@@ -45,6 +45,11 @@ void MessageCreatorTool::createPreviewItem()
         return;
 
     MessageItem *messageItem = m_model->createDefaultMessageItem(nullptr, scenePos());
+
+    if (!messageItem) {
+        return;
+    }
+
     m_previewItem = messageItem;
     m_previewEntity = messageItem->modelItem();
 

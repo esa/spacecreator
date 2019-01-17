@@ -110,6 +110,8 @@ MainWindow::MainWindow(QWidget *parent)
     selectCurrentChart();
 
     loadSettings();
+
+    d->ui->documentTreeView->expandAll();
 }
 
 QGraphicsView *MainWindow::currentView() const
