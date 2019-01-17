@@ -28,6 +28,7 @@ class MscInstance;
 
 class MscAction : public MscInstanceEvent
 {
+    Q_OBJECT
 public:
     enum class ActionType
     {
@@ -51,17 +52,23 @@ public:
 
     MscEntity::EntityType entityType() const override { return MscEntity::EntityType::Action; }
 
-    void setActionType(ActionType type) { m_actionType = type; }
-    ActionType actionType() const { return m_actionType; }
+    void setActionType(ActionType type);
+    ActionType actionType() const;
 
-    void setInformalAction(QString action) { m_informalAction = action; }
-    QString informalAction() const { return m_informalAction; }
+    void setInformalAction(QString action);
+    QString informalAction() const;
 
     void addDataStatement(const DataStatement &statement);
-    QVector<DataStatement> dataStatements() const { return m_dataStatementList; }
+    QVector<DataStatement> dataStatements() const;
 
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
+
+Q_SIGNALS:
+    void actionTypeChanged();
+    void informalActionChanged(const QString &text);
+    void dataStatementsChanged();
+    void instanceChanged();
 
 private:
     ActionType m_actionType = ActionType::Informal;

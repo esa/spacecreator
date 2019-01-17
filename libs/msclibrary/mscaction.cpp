@@ -26,6 +26,38 @@ MscAction::MscAction(QObject *parent)
 {
 }
 
+void MscAction::setActionType(MscAction::ActionType type)
+{
+    if (type == m_actionType) {
+        return;
+    }
+
+    m_actionType = type;
+    Q_EMIT actionTypeChanged();
+    Q_EMIT dataChanged();
+}
+
+MscAction::ActionType MscAction::actionType() const
+{
+    return m_actionType;
+}
+
+void MscAction::setInformalAction(QString action)
+{
+    if (action == m_informalAction) {
+        return;
+    }
+
+    m_informalAction = action;
+    Q_EMIT informalActionChanged(m_informalAction);
+    Q_EMIT dataChanged();
+}
+
+QString MscAction::informalAction() const
+{
+    return m_informalAction;
+}
+
 void MscAction::addDataStatement(const MscAction::DataStatement &statement)
 {
     if (statement.m_type == DataStatement::StatementType::Binding) {
@@ -34,7 +66,13 @@ void MscAction::addDataStatement(const MscAction::DataStatement &statement)
     }
 
     m_dataStatementList.append(statement);
+    Q_EMIT dataStatementsChanged();
     Q_EMIT dataChanged();
+}
+
+QVector<MscAction::DataStatement> MscAction::dataStatements() const
+{
+    return m_dataStatementList;
 }
 
 MscInstance *MscAction::instance() const
@@ -44,7 +82,12 @@ MscInstance *MscAction::instance() const
 
 void MscAction::setInstance(MscInstance *instance)
 {
+    if (instance == m_instance) {
+        return;
+    }
+
     m_instance = instance;
+    Q_EMIT instanceChanged();
     Q_EMIT dataChanged();
 }
 
