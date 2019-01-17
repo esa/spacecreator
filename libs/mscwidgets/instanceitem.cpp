@@ -354,12 +354,8 @@ void InstanceItem::onNameEdited(const QString &newName)
 
 void InstanceItem::onKindEdited(const QString &newKind)
 {
-    if (newKind.isEmpty()) {
-        m_kindItem->setPlainText(m_instance->kind());
-        return;
-    }
-
-    setKind(newKind);
+    using namespace msc::cmd;
+    CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
 }
 
 void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)

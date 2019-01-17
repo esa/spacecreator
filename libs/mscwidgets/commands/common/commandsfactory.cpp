@@ -28,6 +28,7 @@
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstanceitemresize.h"
+#include "commands/cmdinstancekindchange.h"
 
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemmove.h"
@@ -63,6 +64,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createInstanceItemResize(params);
     case cmd::CreateInstance:
         return cmd::CommandsFactory::createInstanceItemCreate(params);
+    case cmd::RenameInstanceKind:
+        return cmd::CommandsFactory::createInstanceKindChange(params);
     case cmd::MoveCondition:
         return cmd::CommandsFactory::createConditionItemMove(params);
     case cmd::ResizeCondition:
@@ -164,6 +167,19 @@ QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &para
             const QPointF &pos(params.at(2).toPointF());
             return new CmdInstanceItemCreate(scene, model, pos);
         }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createInstanceKindChange(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscInstance *item = params.first().value<MscInstance *>()) {
+        const QString &name = params.last().toString();
+        if (item->kind() != name)
+            return new CmdInstanceKindChange(item, name);
+    }
 
     return nullptr;
 }

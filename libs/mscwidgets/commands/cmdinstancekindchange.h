@@ -15,26 +15,34 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDINSTANCEKINDCHANGE_H
+#define CMDINSTANCEKINDCHANGE_H
+
+#include "basecommand.h"
 
 namespace msc {
+
+class MscInstance;
+
 namespace cmd {
 
-enum Id
+class CmdInstanceKindChange : public BaseCommand
 {
-    RenameEntity = 0,
-    MoveMessage,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    ResizeInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    ResizeCondition,
-    MoveAction,
+public:
+    CmdInstanceKindChange(MscInstance *item, const QString &newKind);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<MscInstance> m_instance;
+    QString m_oldKind;
+    QString m_newKind;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDINSTANCEKINDCHANGE_H
