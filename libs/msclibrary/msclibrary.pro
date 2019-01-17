@@ -61,9 +61,6 @@ SOURCES += \
     mscwriter.cpp \
     msccreate.cpp
 
-RESOURCES += \
-    mscresources.qrc
-
 antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")
 

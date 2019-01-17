@@ -259,25 +259,25 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
             QPixmap icon;
             switch (document->hierarchyType()) {
             case msc::MscDocument::HierarchyLeaf:
-                icon = QPixmap(":/mscresources/resources/document_leaf.png");
+                icon = QPixmap(":/icons/document_leaf.png");
                 break;
             case msc::MscDocument::HierarchyIs:
-                icon = QPixmap(":/mscresources/resources/document_is_scenario.png");
+                icon = QPixmap(":/icons/document_is_scenario.png");
                 break;
             case msc::MscDocument::HierarchyAnd:
-                icon = QPixmap(":/mscresources/resources/document_and.png");
+                icon = QPixmap(":/icons/document_and.png");
                 break;
             case msc::MscDocument::HierarchyOr:
-                icon = QPixmap(":/mscresources/resources/document_or.png");
+                icon = QPixmap(":/icons/document_or.png");
                 break;
             case msc::MscDocument::HierarchyParallel:
-                icon = QPixmap(":/mscresources/resources/document_parallel.png");
+                icon = QPixmap(":/icons/document_parallel.png");
                 break;
             case msc::MscDocument::HierarchyRepeat:
-                icon = QPixmap(":/mscresources/resources/document_repeat.png");
+                icon = QPixmap(":/icons/document_repeat.png");
                 break;
             case msc::MscDocument::HierarchyException:
-                icon = QPixmap(":/mscresources/resources/document_exception.png");
+                icon = QPixmap(":/icons/document_exception.png");
                 break;
             }
             return QVariant(icon);
