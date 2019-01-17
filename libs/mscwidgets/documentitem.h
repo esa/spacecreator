@@ -58,6 +58,7 @@ public Q_SLOTS:
     void setBoxSize(const QSizeF &size);
 
 Q_SIGNALS:
+    void preferredSizeChanged();
     void boxSizeChanged(QSizeF size);
     void doubleClicked(msc::MscDocument *document);
 
