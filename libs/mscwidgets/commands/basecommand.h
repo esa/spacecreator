@@ -25,18 +25,24 @@
 class QGraphicsObject;
 
 namespace msc {
+
+class MscEntity;
+
 namespace cmd {
 
 class BaseCommand : public QUndoCommand
 {
 public:
+    BaseCommand();
     explicit BaseCommand(QGraphicsObject *item, QUndoCommand *parent = nullptr);
+    explicit BaseCommand(MscEntity *item, QUndoCommand *parent = nullptr);
     explicit BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent = nullptr);
 
 protected:
     QPointer<QGraphicsObject> m_graphicsItem;
+    QPointer<MscEntity> m_modelItem;
 
-    bool canMergeWith(const BaseCommand *cmd) const;
+    virtual bool canMergeWith(const BaseCommand *cmd) const;
 };
 
 } // ns cmd

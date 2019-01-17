@@ -124,16 +124,12 @@ ConditionItem *ConditionItem::createDefaultItem(MscCondition *condition, const Q
 
 void ConditionItem::setName(const QString &name)
 {
-    if (this->name() == name && m_condition->name() == name)
-        return;
-
     m_condition->setName(name);
 
     m_nameItem->setPlainText(name);
     m_nameItem->adjustSize();
 
-    rebuildLayout();
-
+    updateLayout();
     Q_EMIT needRelayout();
 }
 
@@ -195,11 +191,11 @@ void ConditionItem::buildLayout()
 void ConditionItem::onNameEdited(const QString &name)
 {
     if (name.isEmpty()) {
-        m_nameItem->setPlainText(m_condition->name());
         return;
     }
 
-    setName(name);
+    using namespace msc::cmd;
+    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), name });
 }
 
 void ConditionItem::rebuildLayout()

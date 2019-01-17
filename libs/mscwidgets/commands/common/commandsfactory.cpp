@@ -23,6 +23,8 @@
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdconditionitemresize.h"
 
+#include "commands/cmdentitynamechange.h"
+
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstanceitemresize.h"
@@ -47,6 +49,8 @@ namespace cmd {
 QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 {
     switch (id) {
+    case cmd::RenameEntity:
+        return cmd::CommandsFactory::createRenameEntity(params);
     case cmd::MoveMessage:
         return cmd::CommandsFactory::createMessageItemMove(params);
     case cmd::RetargetMessage:
@@ -68,6 +72,19 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscEntity *item = params.first().value<MscEntity *>()) {
+        const QString &name = params.last().toString();
+        if (item->name() != name)
+            return new CmdEntityNameChange(item, name);
     }
 
     return nullptr;

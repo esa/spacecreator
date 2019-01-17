@@ -137,6 +137,9 @@ void MessageItem::setName(const QString &name)
 {
     m_message->setName(name);
     m_arrowItem->setText(m_message->name());
+
+    updateLayout();
+    Q_EMIT needRelayout();
 }
 
 QRectF MessageItem::boundingRect() const
@@ -435,18 +438,11 @@ void MessageItem::prepareHoverMark()
 void MessageItem::onRenamed(const QString &title)
 {
     if (title.isEmpty()) {
-        m_arrowItem->setText(m_message->name());
         return;
     }
 
-    if (m_message->name() == title)
-        return;
-
-    m_message->setName(title);
-
-    updateLayout();
-
-    Q_EMIT needRelayout();
+    using namespace msc::cmd;
+    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), title });
 }
 
 } // namespace msc
