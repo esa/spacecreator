@@ -32,6 +32,7 @@ HEADERS += \
     commands/cmdmessageitemresize.h \
     chartviewmodel.h \
     documentitem.h \
+    documentitemmodel.h \
     graphicsview.h \
     hierarchyviewmodel.h \
     instanceitem.h \
@@ -70,6 +71,7 @@ SOURCES += \
     commands/cmdmessageitemresize.cpp \
     chartviewmodel.cpp \
     documentitem.cpp \
+    documentitemmodel.cpp \
     graphicsview.cpp \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \

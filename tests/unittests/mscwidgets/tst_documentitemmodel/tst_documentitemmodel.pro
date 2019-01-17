@@ -1,5 +1,5 @@
 include(../../../../esa.pri)
-include(../msclibrarytests.pri)
+include(../mscwidgetstests.pri)
 
 QT += testlib
 
