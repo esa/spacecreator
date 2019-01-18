@@ -16,7 +16,9 @@ SOURCES += \
     $$_PRO_FILE_PWD_/../../../../msceditor/tools/basecreatortool.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/commandlineparser.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/settingsmanager.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.cpp
+    $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.cpp \
+    $$_PRO_FILE_PWD_/../../../../msceditor/tools/hierarchycreatortool.cpp
+
 
 HEADERS += \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainwindow.h \
@@ -29,7 +31,8 @@ HEADERS += \
     $$_PRO_FILE_PWD_/../../../../msceditor/tools/basecreatortool.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/commandlineparser.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/settingsmanager.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.h
+    $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.h \
+    $$_PRO_FILE_PWD_/../../../../msceditor/tools/hierarchycreatortool.h
 
 FORMS += \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainwindow.ui

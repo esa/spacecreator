@@ -17,7 +17,8 @@ SOURCES += \
     tools/basecreatortool.cpp \
     commandlineparser.cpp \
     settings/settingsmanager.cpp \
-    settings/appoptions.cpp
+    settings/appoptions.cpp \
+    tools/hierarchycreatortool.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -30,7 +31,8 @@ HEADERS += \
     tools/basecreatortool.h \
     commandlineparser.h \
     settings/settingsmanager.h \
-    settings/appoptions.h
+    settings/appoptions.h \
+    tools/hierarchycreatortool.h
 
 FORMS += \
     mainwindow.ui

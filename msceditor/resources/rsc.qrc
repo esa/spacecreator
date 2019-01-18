@@ -3,5 +3,12 @@
         <file>icons/toolbar/pointer.png</file>
         <file>icons/toolbar/instance.png</file>
         <file>icons/toolbar/message.png</file>
+        <file>icons/toolbar/document_and.png</file>
+        <file>icons/toolbar/document_exception.png</file>
+        <file>icons/toolbar/document_is_scenario.png</file>
+        <file>icons/toolbar/document_leaf.png</file>
+        <file>icons/toolbar/document_or.png</file>
+        <file>icons/toolbar/document_parallel.png</file>
+        <file>icons/toolbar/document_repeat.png</file>
     </qresource>
 </RCC>

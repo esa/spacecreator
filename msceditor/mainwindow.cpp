@@ -28,9 +28,10 @@
 
 #include <commands/common/commandsstack.h>
 
-#include <tools/pointertool.h>
+#include <tools/hierarchycreatortool.h>
 #include <tools/instancecreatortool.h>
 #include <tools/messagecreatortool.h>
+#include <tools/pointertool.h>
 
 #include <QApplication>
 #include <QComboBox>
@@ -53,11 +54,16 @@ struct MainWindowPrivate {
         : ui(new Ui::MainWindow)
         , m_model(new MainModel(mainWindow))
         , m_toolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
+        , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
     {
         m_toolBar->setObjectName("mscTools");
         m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
         mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
+
+        m_hierarchyToolBar->setObjectName("hierarchyTools");
+        m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+        mainWindow->addToolBar(Qt::LeftToolBarArea, m_hierarchyToolBar);
     }
 
     ~MainWindowPrivate() { delete ui; }
@@ -65,6 +71,7 @@ struct MainWindowPrivate {
     Ui::MainWindow *ui = nullptr;
     MainModel *m_model = nullptr;
     QToolBar *m_toolBar = nullptr;
+    QToolBar *m_hierarchyToolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
     QMenu *m_menuFile = nullptr;
@@ -256,6 +263,9 @@ void MainWindow::showDocumentView(bool show)
 {
     if (show) {
         d->ui->centerView->setCurrentWidget(d->ui->graphicsView);
+
+        d->m_hierarchyToolBar->hide();
+        d->m_toolBar->show();
     }
 }
 
@@ -263,6 +273,9 @@ void MainWindow::showHierarchyView(bool show)
 {
     if (show) {
         d->ui->centerView->setCurrentWidget(d->ui->hierarchyView);
+
+        d->m_hierarchyToolBar->show();
+        d->m_toolBar->hide();
     }
 }
 
@@ -426,6 +439,8 @@ void MainWindow::initMenuViewToolbars()
     d->m_actToggleToolbarMsc = d->m_toolBar->toggleViewAction();
     d->m_menuViewTools->addAction(d->m_actToggleToolbarMsc);
 
+    d->m_menuViewTools->addAction(d->m_hierarchyToolBar->toggleViewAction());
+
     d->m_actToggleToolbarMain = d->ui->mainToolBar->toggleViewAction();
     d->m_menuViewTools->addAction(d->m_actToggleToolbarMain);
 }
@@ -464,6 +479,20 @@ void MainWindow::initTools()
 
     d->m_defaultToolAction = toolsActions->actions().first();
     enableDefaultTool();
+
+    for (int toolType = static_cast<int>(msc::ToolType::HierarchyAndCreator);
+         toolType <= static_cast<int>(msc::ToolType::HierarchyRepeatCreator); ++toolType) {
+        auto tool = new msc::HierarchyCreatorTool(static_cast<msc::ToolType>(toolType), &(d->m_model->chartViewModel()),
+                                                  nullptr, this);
+
+        d->m_tools.append(tool);
+
+        auto toolAction = d->m_hierarchyToolBar->addAction(tool->title());
+        toolAction->setCheckable(true);
+        toolAction->setIcon(tool->icon());
+        toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        tool->setView(currentView());
+    }
 
     // TODO: just for test Asn1Editor
     d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);

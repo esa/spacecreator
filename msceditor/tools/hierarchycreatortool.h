@@ -15,22 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef HIERARCHYCREATORTOOL_H
+#define HIERARCHYCREATORTOOL_H
+
+#include "basecreatortool.h"
 
 namespace msc {
 
-enum class ToolType
+class HierarchyCreatorTool : public BaseCreatorTool
 {
-    Pointer = 0,
-    InstanceCreator,
-    MessageCreator,
-    HierarchyAndCreator,
-    HierarchyExceptionCreator,
-    HierarchyIsCreator,
-    HierarchyLeafCreator,
-    HierarchyOrCreator,
-    HierarchyParallelCreator,
-    HierarchyRepeatCreator
+    Q_OBJECT
+
+public:
+    HierarchyCreatorTool(ToolType type, ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+
+    virtual ToolType toolType() const override;
+
+protected:
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
+
+private:
+    void initTool();
+
+private:
+    ToolType m_toolType;
 };
 
 } // ns msc
+
+#endif // HIERARCHYCREATORTOOL_H
