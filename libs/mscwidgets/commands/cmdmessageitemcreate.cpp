@@ -35,6 +35,7 @@ CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscCha
 
 CmdMessageItemCreate::~CmdMessageItemCreate()
 {
+    // Delete the message item if we are the owner
     if (m_message && m_message->parent() != nullptr) {
         delete m_message;
         m_message = nullptr;
@@ -59,6 +60,8 @@ void CmdMessageItemCreate::undo()
 {
     Q_ASSERT(m_chart.data());
     m_chart->removeInstanceEvent(m_message);
+
+    // Having to parent means, this command takes over ownership
     m_message->setParent(nullptr);
 }
 
