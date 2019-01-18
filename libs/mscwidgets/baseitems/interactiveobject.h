@@ -27,11 +27,13 @@
 namespace msc {
 
 class HighlightRectItem;
+class MscEntity;
+
 class InteractiveObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    InteractiveObject(QGraphicsItem *parent = nullptr);
+    InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent = nullptr);
 
     // QGraphicsItem interface
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -44,6 +46,8 @@ public:
 
     QPointF centerInScene() const;
 
+    msc::MscEntity *modelEntity() const;
+
 public Q_SLOTS:
     void updateLayout();
 
@@ -55,6 +59,7 @@ protected Q_SLOTS:
     virtual void rebuildLayout() {}
 
 protected:
+    QPointer<msc::MscEntity> m_entity;
     QPointer<GripPointsHandler> m_gripPoints = nullptr;
     QRectF m_boundingRect;
     bool m_hovered = false;

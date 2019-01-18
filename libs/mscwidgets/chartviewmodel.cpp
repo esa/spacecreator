@@ -60,6 +60,7 @@ struct ChartViewModelPrivate {
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 20.;
     static constexpr qreal InterInstanceSpan = 100.;
+    bool m_layoutDirty = false;
 
     qreal calcInstanceAxisHeight() const
     {
@@ -107,12 +108,19 @@ void ChartViewModel::fillView(MscChart *chart)
         return;
     }
 
+    if (d->m_currentChart) {
+        disconnect(d->m_currentChart, nullptr, this, nullptr);
+    }
+
     d->m_currentChart = chart;
 
     clearScene();
 
     if (d->m_currentChart)
         relayout();
+
+    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
+    connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
@@ -242,6 +250,8 @@ void ChartViewModel::relayout()
     static constexpr qreal margin(50.);
     totalRect.adjust(-margin, -margin, margin, margin);
     d->m_scene.setSceneRect(totalRect);
+
+    d->m_layoutDirty = false;
 }
 
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
@@ -300,6 +310,16 @@ ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
 ActionItem *ChartViewModel::itemForAction(MscAction *action) const
 {
     return itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
+}
+
+void ChartViewModel::updateLayout()
+{
+    if (d->m_layoutDirty) {
+        return;
+    }
+
+    d->m_layoutDirty = true;
+    QMetaObject::invokeMethod(this, "relayout", Qt::QueuedConnection);
 }
 
 QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *instance) const
@@ -380,12 +400,7 @@ msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orph
 bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
 {
     if (item && utils::removeSceneItem(item)) {
-        if (MscMessage *message = item->modelItem()) {
-            currentChart()->removeInstanceEvent(message);
-            delete message;
-        }
         delete item;
-
         return true;
     }
 
@@ -403,6 +418,26 @@ void ChartViewModel::rearrangeInstances()
         currentChart()->updateInstancePos(instanceItems.at(i)->modelItem(), i);
 
     relayout();
+}
+
+void ChartViewModel::removeEventItem(MscInstanceEvent *event)
+{
+    msc::InteractiveObject *item = nullptr;
+    int idx = 0;
+    for (msc::InteractiveObject *eitem : d->m_instanceEventItems) {
+        if (eitem->modelEntity() == event) {
+            item = eitem;
+            break;
+        }
+        ++idx;
+    }
+
+    if (item) {
+        d->m_scene.removeItem(item);
+        d->m_instanceEventItems.remove(idx);
+        delete item;
+        updateLayout();
+    }
 }
 
 } // namespace msc

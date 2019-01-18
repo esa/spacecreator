@@ -41,6 +41,7 @@
 #include "messageitem.h"
 
 #include <mscaction.h>
+#include <mscchart.h>
 
 #include <QDebug>
 #include <QGraphicsItem>
@@ -126,13 +127,12 @@ QUndoCommand *CommandsFactory::createMessageItemResize(const QVariantList &param
 
 QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 2);
 
-    if (QGraphicsScene *scene = params.at(0).value<QGraphicsScene *>())
-        if (ChartViewModel *model = params.at(1).value<ChartViewModel *>()) {
-            const QPointF &pos(params.at(2).toPointF());
-            return new CmdMessageItemCreate(scene, model, pos);
-        }
+    msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
+    if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
+        return new CmdMessageItemCreate(message, chart);
+    }
 
     return nullptr;
 }

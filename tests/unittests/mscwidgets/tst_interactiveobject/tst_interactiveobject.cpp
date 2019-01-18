@@ -33,7 +33,7 @@ class InteractiveObjectImpl : public InteractiveObject
     Q_OBJECT
 public:
     InteractiveObjectImpl(QGraphicsItem *parent = nullptr)
-        : InteractiveObject(parent)
+        : InteractiveObject(nullptr, parent)
     {
         prepareGeometryChange();
         m_boundingRect = QRectF(-50., -50., 100., 100.);

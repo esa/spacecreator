@@ -16,54 +16,55 @@
 */
 
 #include "cmdmessageitemcreate.h"
-#include "chartviewmodel.h"
-#include "baseitems/common/utils.h"
-#include "baseitems/arrowitem.h"
 
 #include <mscchart.h>
-
-#include <QGraphicsScene>
-#include <QDebug>
+#include <mscmessage.h>
 
 namespace msc {
 namespace cmd {
 
-CmdMessageItemCreate::CmdMessageItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos)
-    : BaseCommand()
-    , m_scene(scene)
-    , m_model(model)
-    , m_pos(pos)
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart)
+    : BaseCommand(message)
+    , m_message(message)
+    , m_chart(chart)
 {
+    Q_ASSERT(m_chart.data());
+
+    setText(QObject::tr("Add message"));
 }
 
-bool CmdMessageItemCreate::validateStorages(const char *caller) const
+CmdMessageItemCreate::~CmdMessageItemCreate()
 {
-    if (!m_model || !m_model->currentChart() || !m_scene) {
-        qWarning() << caller << "Model, chart or scene is null, aborting." << m_model
-                   << (m_model ? m_model->currentChart() : nullptr) << m_scene;
-        return false;
+    // Delete the message item if we are the owner
+    if (m_message && m_message->parent() != nullptr) {
+        delete m_message;
+        m_message = nullptr;
     }
-    return true;
 }
 
 void CmdMessageItemCreate::redo()
 {
-    if (!validateStorages(Q_FUNC_INFO))
-        return;
+    Q_ASSERT(m_chart.data());
 
-    m_messageItem = m_model->createDefaultMessageItem(nullptr, m_pos);
-    m_scene->addItem(m_messageItem);
-    m_messageItem->performSnap();
-    m_model->relayout();
+    if (!m_message) {
+        m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
+        m_modelItem = m_message;
+    }
+    if (!m_message->sourceInstance() && !m_message->targetInstance() && !m_chart->instances().empty()) {
+        m_message->setSourceInstance(m_chart->instances().at(0));
+    }
+
+    // The chart takes over parent-/owner-ship
+    m_chart->addInstanceEvent(m_message);
 }
 
 void CmdMessageItemCreate::undo()
 {
-    if (!validateStorages(Q_FUNC_INFO))
-        return;
+    Q_ASSERT(m_chart.data());
+    m_chart->removeInstanceEvent(m_message);
 
-    if (m_model->removeMessageItem(m_messageItem))
-        m_messageItem = nullptr;
+    // Having to parent means, this command takes over ownership
+    m_message->setParent(nullptr);
 }
 
 bool CmdMessageItemCreate::mergeWith(const QUndoCommand *command)

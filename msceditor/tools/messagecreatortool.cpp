@@ -44,9 +44,11 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MessageItem *messageItem = m_model->createDefaultMessageItem(nullptr, scenePos());
+    MscMessage *orphanMessage = new MscMessage(tr("Message"));
+    MessageItem *messageItem = m_model->createDefaultMessageItem(orphanMessage, scenePos());
 
     if (!messageItem) {
+        delete orphanMessage;
         return;
     }
 
@@ -62,11 +64,12 @@ void MessageCreatorTool::createPreviewItem()
 
 void MessageCreatorTool::commitPreviewItem()
 {
-    if (!m_previewItem || !m_scene)
+    if (!m_previewEntity || !m_activeChart)
         return;
 
-    const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
-                                      QVariant::fromValue<ChartViewModel *>(m_model), m_previewItem->pos() };
+    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
+                                      QVariant::fromValue<msc::MscChart *>(m_activeChart) };
 
     removePreviewItem();
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);

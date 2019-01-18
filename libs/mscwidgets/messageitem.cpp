@@ -35,13 +35,13 @@ namespace msc {
 
 MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y,
                          QGraphicsItem *parent)
-    : InteractiveObject(parent)
+    : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
 {
     Q_ASSERT(m_message != nullptr);
     connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
-    setName(m_message->name());
+    m_arrowItem->setText(m_message->name());
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);

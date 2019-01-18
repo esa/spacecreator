@@ -63,6 +63,7 @@ void MscChart::addInstance(MscInstance *instance)
         return;
     }
 
+    instance->setParent(this);
     m_instances.append(instance);
     connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceAdded(instance);
@@ -146,6 +147,7 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
         return;
     }
 
+    instanceEvent->setParent(this);
     m_instanceEvents.append(instanceEvent);
     connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceEventAdded(instanceEvent);

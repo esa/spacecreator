@@ -31,6 +31,7 @@ namespace msc {
 class MscChart;
 class ActionItem;
 class ConditionItem;
+class MscInstanceEvent;
 class InstanceItem;
 class MessageItem;
 class MscAction;
@@ -65,12 +66,16 @@ public:
     ActionItem *itemForAction(MscAction *action) const;
 
 public Q_SLOTS:
+    void updateLayout();
     void fillView(msc::MscChart *chart);
     void relayout();
     void rearrangeInstances();
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
+
+private Q_SLOTS:
+    void removeEventItem(msc::MscInstanceEvent *event);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
