@@ -40,6 +40,9 @@ const QVector<MscDocument *> &MscDocument::documents() const
     return m_documents;
 }
 
+/*!
+   Adds a document event and takes over parentship.
+ */
 void MscDocument::addDocument(MscDocument *document)
 {
     if (document == nullptr) {
@@ -61,6 +64,9 @@ const QVector<MscChart *> &MscDocument::charts() const
     return m_charts;
 }
 
+/*!
+   Adds a chart and takes over parentship.
+ */
 void MscDocument::addChart(MscChart *chart)
 {
     if (chart == nullptr) {

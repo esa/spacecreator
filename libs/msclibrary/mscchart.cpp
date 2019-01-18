@@ -54,6 +54,9 @@ const QVector<MscInstance *> &MscChart::instances() const
     return m_instances;
 }
 
+/*!
+   Adds an instance, and takes over parentship.
+ */
 void MscChart::addInstance(MscInstance *instance)
 {
     if (instance == nullptr) {
@@ -70,6 +73,10 @@ void MscChart::addInstance(MscInstance *instance)
     Q_EMIT dataChanged();
 }
 
+/*!
+   Removes the instance, but does not delete it.
+   Removes the parentship of this chart.
+ */
 void MscChart::removeInstance(MscInstance *instance)
 {
     if (instance == nullptr) {
@@ -80,6 +87,9 @@ void MscChart::removeInstance(MscInstance *instance)
     }
 
     if (m_instances.removeAll(instance)) {
+        if (instance->parent() == this) {
+            instance->setParent(nullptr);
+        }
         Q_EMIT instanceRemoved(instance);
         Q_EMIT dataChanged();
     }
@@ -138,6 +148,9 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
     return events;
 }
 
+/*!
+   Adds an instance event, and takes over parentship.
+ */
 void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
 {
     if (instanceEvent == nullptr) {
@@ -154,6 +167,10 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
     Q_EMIT dataChanged();
 }
 
+/*!
+   Removes the instance event, but does not delete it.
+   Removes the parentship of this chart.
+ */
 void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
 {
     if (instanceEvent == nullptr) {
@@ -164,6 +181,9 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
     }
 
     if (m_instanceEvents.removeAll(instanceEvent)) {
+        if (instanceEvent->parent() == this) {
+            instanceEvent->setParent(nullptr);
+        }
         Q_EMIT instanceEventRemoved(instanceEvent);
         Q_EMIT dataChanged();
     }
