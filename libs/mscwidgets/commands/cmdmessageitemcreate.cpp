@@ -53,6 +53,8 @@ void CmdMessageItemCreate::redo()
     if (!m_message->sourceInstance() && !m_message->targetInstance() && !m_chart->instances().empty()) {
         m_message->setSourceInstance(m_chart->instances().at(0));
     }
+
+    // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_message);
 }
 
