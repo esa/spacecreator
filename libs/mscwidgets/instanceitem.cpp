@@ -88,7 +88,7 @@ QLinearGradient InstanceItem::createGradientForName(const QGraphicsItem *itemNam
 }
 
 InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
-    : InteractiveObject(parent)
+    : InteractiveObject(instance, parent)
     , m_instance(instance)
     , m_axisSymbol(new QGraphicsLineItem(this))
     , m_headSymbol(new QGraphicsRectItem(this))

@@ -29,7 +29,7 @@
 namespace msc {
 
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
-    : InteractiveObject(parent)
+    : InteractiveObject(action, parent)
     , m_action(action)
     , m_symbol(new TextItem(this))
 {

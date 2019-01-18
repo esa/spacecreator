@@ -35,7 +35,7 @@ namespace msc {
 
 MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y,
                          QGraphicsItem *parent)
-    : InteractiveObject(parent)
+    : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
 {

@@ -20,6 +20,8 @@
 #include "grippointshandler.h"
 #include "common/highlightrectitem.h"
 
+#include <mscentity.h>
+
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPen>
@@ -35,10 +37,10 @@ namespace msc {
 
 */
 
-InteractiveObject::InteractiveObject(QGraphicsItem *parent)
+InteractiveObject::InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
+    , m_entity(entity)
 {
-
     setAcceptHoverEvents(true);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
@@ -162,6 +164,11 @@ void InteractiveObject::highlightDisconnected()
 QPointF InteractiveObject::centerInScene() const
 {
     return mapToScene(boundingRect().center());
+}
+
+MscEntity *InteractiveObject::modelEntity() const
+{
+    return m_entity.data();
 }
 
 void InteractiveObject::updateLayout()

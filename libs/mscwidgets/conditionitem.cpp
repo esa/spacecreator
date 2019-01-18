@@ -31,7 +31,7 @@ static const qreal CONDITION_MARGIN = 10.0;
 static const qreal MAX_TEXT_WIDTH = 150.0;
 
 ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
-    : InteractiveObject(parent)
+    : InteractiveObject(condition, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
     , m_nameItem(new TextItem(this))
