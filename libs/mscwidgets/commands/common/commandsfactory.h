@@ -45,6 +45,7 @@ public:
     static QUndoCommand *createConditionItemMove(const QVariantList &params);
     static QUndoCommand *createConditionItemResize(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);
+    static QUndoCommand *createActionInformalText(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

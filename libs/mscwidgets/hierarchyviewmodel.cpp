@@ -26,7 +26,13 @@
 
 namespace msc {
 
-struct HierarchyViewModel::HierarchyViewModelPrivate {
+class HierarchyViewModel::HierarchyViewModelPrivate : public QObject
+{
+public:
+    HierarchyViewModelPrivate(HierarchyViewModel *parent)
+        : QObject(parent)
+    {
+    }
     void addDocuments(const QVector<MscDocument *> &documents, DocumentItem *parentItem)
     {
         for (MscDocument *document : documents) {
@@ -38,6 +44,7 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
             } else {
                 parentItem->addChildDocument(item);
             }
+            connect(item, &DocumentItem::preferredSizeChanged, this, &HierarchyViewModelPrivate::layoutItems);
 
             addDocuments(document->documents(), item);
         }
@@ -56,6 +63,8 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
         const qreal boxSpacingX = maxSize.width() / 3;
         const qreal boxSpacingY = margin * 1.5;
         layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
+
+        scene.update();
     }
 
     QSizeF maxDocumentsTextSize() const
@@ -126,7 +135,7 @@ struct HierarchyViewModel::HierarchyViewModelPrivate {
 
 HierarchyViewModel::HierarchyViewModel(QObject *parent)
     : QObject(parent)
-    , d(new HierarchyViewModelPrivate)
+    , d(new HierarchyViewModelPrivate(this))
 {
 }
 

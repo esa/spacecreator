@@ -159,7 +159,8 @@ void tst_DocumentItemModel::testIndexForModel()
     QModelIndex chart2Index = m_document->index(chart2);
     QCOMPARE(chart2Index, idx22);
 
-    QModelIndex index = m_document->index(nullptr);
+    MscChart *chart = nullptr;
+    QModelIndex index = m_document->index(chart);
     QCOMPARE(index.isValid(), false);
 }
 

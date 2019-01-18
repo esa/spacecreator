@@ -19,6 +19,7 @@
 #include "chartviewmodel.h"
 
 #include "commands/cmdactionitemmove.h"
+#include "commands/cmdactioninformaltext.h"
 
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdconditionitemresize.h"
@@ -39,6 +40,7 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 
+#include <mscaction.h>
 #include <mscchart.h>
 
 #include <QDebug>
@@ -74,6 +76,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createConditionItemResize(params);
     case cmd::MoveAction:
         return cmd::CommandsFactory::createActionItemMove(params);
+    case cmd::InformatActionText:
+        return cmd::CommandsFactory::createActionInformalText(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -219,6 +223,19 @@ QUndoCommand *CommandsFactory::createActionItemMove(const QVariantList &params)
         const QPointF &destination = params.last().toPointF();
         if (item->pos() != destination)
             return new CmdActionItemMove(item, destination);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createActionInformalText(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscAction *item = params.first().value<MscAction *>()) {
+        const QString &text = params.last().toString();
+        if (item->informalAction() != text)
+            return new CmdActionInformalText(item, text);
     }
 
     return nullptr;

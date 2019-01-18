@@ -31,15 +31,22 @@ namespace msc {
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     : InteractiveObject(action, parent)
     , m_action(action)
-    , m_symbol(new TextItem(this))
+    , m_textItem(new TextItem(this))
 {
     Q_ASSERT(m_action != nullptr);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
-    m_symbol->setFramed(true);
-    m_symbol->setHtml(actionText());
-    m_boundingRect = m_symbol->boundingRect();
+    m_textItem->setFramed(true);
+    m_textItem->setEditable(true);
+    m_textItem->setHtml(actionText());
+
+    connect(m_action, &msc::MscAction::informalActionChanged, this, &msc::ActionItem::setActionText);
+
+    connect(m_textItem, &TextItem::edited, this, &ActionItem::onTextEdited, Qt::QueuedConnection);
+    connect(m_textItem, &TextItem::keyPressed, this, &ActionItem::updateLayout);
+
+    m_boundingRect = m_textItem->boundingRect();
     updateLayout();
 }
 
@@ -88,6 +95,18 @@ void ActionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     //    painter->restore();
 }
 
+void ActionItem::setActionText(const QString &text)
+{
+    if (!m_action) {
+        return;
+    }
+
+    m_action->setInformalAction(text);
+    m_textItem->setHtml(actionText());
+
+    updateLayout();
+}
+
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
@@ -113,13 +132,23 @@ void ActionItem::prepareHoverMark()
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 }
 
+void ActionItem::onTextEdited(const QString &text)
+{
+    if (text.isEmpty()) {
+        return;
+    }
+
+    using namespace msc::cmd;
+    CommandsStack::push(InformatActionText, { QVariant::fromValue<MscEntity *>(this->modelItem()), text });
+}
+
 void ActionItem::rebuildLayout()
 {
     if (!m_instance) {
         return;
     }
 
-    m_boundingRect = m_symbol->boundingRect();
+    m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
     setX(x);
 

@@ -14,7 +14,6 @@ HEADERS += \
     parser/MscLexer.h \
     parser/MscParser.h \
     parser/MscVisitor.h \
-    documentitemmodel.h \
     exceptions.h \
     mscaction.h \
     mscchart.h \
@@ -43,7 +42,6 @@ SOURCES += \
     parser/MscVisitor.cpp
 }
 SOURCES += \
-    documentitemmodel.cpp \
     exceptions.cpp \
     mscaction.cpp \
     mscchart.cpp \
