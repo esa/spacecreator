@@ -136,6 +136,7 @@ QString MessageItem::name() const
 void MessageItem::setName(const QString &name)
 {
     m_message->setName(name);
+    m_arrowItem->setText(m_message->name());
 
     updateLayout();
     Q_EMIT needRelayout();
