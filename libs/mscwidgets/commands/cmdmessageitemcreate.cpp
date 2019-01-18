@@ -49,7 +49,7 @@ void CmdMessageItemCreate::redo()
         m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
         m_modelItem = m_message;
     }
-    if (!m_message->sourceInstance() && !m_message->targetInstance()) {
+    if (!m_message->sourceInstance() && !m_message->targetInstance() && !m_chart->instances().empty()) {
         m_message->setSourceInstance(m_chart->instances().at(0));
     }
     m_chart->addInstanceEvent(m_message);

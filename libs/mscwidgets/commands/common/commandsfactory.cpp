@@ -129,10 +129,10 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
 {
     Q_ASSERT(params.size() == 2);
 
-    if (msc::MscMessage *message = params.at(0).value<msc::MscMessage *>())
-        if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-            return new CmdMessageItemCreate(message, chart);
-        }
+    msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
+    if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
+        return new CmdMessageItemCreate(message, chart);
+    }
 
     return nullptr;
 }

@@ -55,7 +55,7 @@ private:
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
 
-    int sceneItemsCount();
+    int itemsCount();
 };
 
 // make cpp11 happy for ODR-use:
@@ -80,15 +80,15 @@ void tst_CmdMessageItemCreate::testCreate()
     m_chartModel.clearScene();
     cmd::CommandsStack::current()->clear();
 
-    QCOMPARE(sceneItemsCount(), 0);
+    QCOMPARE(itemsCount(), 0);
 
     for (int i = 0; i < CommandsCount; ++i) {
-        cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                 { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
-                                   QVariant::fromValue<ChartViewModel *>(&m_chartModel), QPointF(i, 0) });
+        cmd::CommandsStack::push(
+                cmd::Id::CreateMessage,
+                { QVariant::fromValue<msc::MscMessage *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart) });
     }
 
-    QCOMPARE(sceneItemsCount(), CommandsCount);
+    QCOMPARE(itemsCount(), CommandsCount);
 }
 
 void tst_CmdMessageItemCreate::testUndo()
@@ -100,7 +100,7 @@ void tst_CmdMessageItemCreate::testUndo()
         ++undone;
     }
 
-    QCOMPARE(sceneItemsCount(), 0);
+    QCOMPARE(itemsCount(), 0);
     QCOMPARE(undone, CommandsCount);
 }
 
@@ -113,7 +113,7 @@ void tst_CmdMessageItemCreate::testRedo()
         ++redone;
     }
 
-    QCOMPARE(sceneItemsCount(), CommandsCount);
+    QCOMPARE(itemsCount(), CommandsCount);
     QCOMPARE(redone, CommandsCount);
 }
 
@@ -128,7 +128,7 @@ void tst_CmdMessageItemCreate::testPerformance()
     m_chartModel.clearScene();
     cmd::CommandsStack::current()->clear();
 
-    QCOMPARE(sceneItemsCount(), 0);
+    QCOMPARE(itemsCount(), 0);
 
     QBENCHMARK {
         m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount,
@@ -157,9 +157,9 @@ void tst_CmdMessageItemCreate::testPerformance()
     }
 }
 
-int tst_CmdMessageItemCreate::sceneItemsCount()
+int tst_CmdMessageItemCreate::itemsCount()
 {
-    return msc::utils::toplevelItems<MessageItem>(m_chartModel.graphicsScene()).size();
+    return m_chart->instanceEvents().size();
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)
