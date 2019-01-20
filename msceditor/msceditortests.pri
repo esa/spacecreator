@@ -9,30 +9,17 @@ QT += core gui widgets xml
 SOURCES += \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainwindow.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainmodel.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/basetool.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/pointertool.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/instancecreatortool.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/messagecreatortool.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/basecreatortool.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/commandlineparser.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/settingsmanager.cpp \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.cpp \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/hierarchycreatortool.cpp
 
 
 HEADERS += \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainwindow.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainmodel.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/basetool.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/tooltypes.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/pointertool.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/instancecreatortool.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/messagecreatortool.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/basecreatortool.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/commandlineparser.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/settingsmanager.h \
     $$_PRO_FILE_PWD_/../../../../msceditor/settings/appoptions.h \
-    $$_PRO_FILE_PWD_/../../../../msceditor/tools/hierarchycreatortool.h
 
 FORMS += \
     $$_PRO_FILE_PWD_/../../../../msceditor/mainwindow.ui

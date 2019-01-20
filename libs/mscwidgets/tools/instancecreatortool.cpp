@@ -31,7 +31,7 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
 {
     m_title = tr("Instance");
     m_description = tr("Create new Instance item");
-    m_icon = QPixmap(":/icn/toolbar/icons/toolbar/instance.png");
+    m_icon = QPixmap(":/icons/toolbar/instance.png");
 }
 
 ToolType InstanceCreatorTool::toolType() const

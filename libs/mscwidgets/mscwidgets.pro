@@ -18,6 +18,7 @@ HEADERS += \
     baseitems/arrowitem.h \
     baseitems/grippoint.h \
     baseitems/grippointshandler.h \
+    baseitems/instanceenditem.h \
     baseitems/interactiveobject.h \
     baseitems/labeledarrowitem.h \
     baseitems/objectslinkitem.h \
@@ -26,28 +27,34 @@ HEADERS += \
     commands/common/commandsfactory.h \
     commands/common/commandsstack.h \
     commands/basecommand.h \
+    commands/cmdactioninformaltext.h \
+    commands/cmdactionitemmove.h \
+    commands/cmdconditionitemmove.h \
+    commands/cmdconditionitemresize.h \
+    commands/cmdentitynamechange.h \
+    commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
     commands/cmdinstanceitemresize.h \
+    commands/cmdinstancekindchange.h \
     commands/cmdmessageitemmove.h \
+    commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
+    tools/basecreatortool.h \
+    tools/basetool.h \
+    tools/hierarchycreatortool.h \
+    tools/instancecreatortool.h \
+    tools/messagecreatortool.h \
+    tools/pointertool.h \
+    tools/tooltypes.h \
+    actionitem.h \
     chartviewmodel.h \
+    conditionitem.h \
     documentitem.h \
     documentitemmodel.h \
     graphicsview.h \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
-    commands/cmdmessageitemcreate.h \
-    commands/cmdinstanceitemcreate.h \
-    conditionitem.h \
-    commands/cmdconditionitemmove.h \
-    commands/cmdconditionitemresize.h \
-    baseitems/instanceenditem.h \
-    actionitem.h \
-    commands/cmdactionitemmove.h \
-    commands/cmdentitynamechange.h \
-    commands/cmdinstancekindchange.h \
-    commands/cmdactioninformaltext.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -59,6 +66,7 @@ SOURCES += \
     baseitems/arrowitem.cpp \
     baseitems/grippoint.cpp \
     baseitems/grippointshandler.cpp \
+    baseitems/instanceenditem.cpp \
     baseitems/interactiveobject.cpp \
     baseitems/labeledarrowitem.cpp \
     baseitems/objectslinkitem.cpp \
@@ -66,28 +74,33 @@ SOURCES += \
     commands/common/commandsfactory.cpp \
     commands/common/commandsstack.cpp \
     commands/basecommand.cpp \
+    commands/cmdactioninformaltext.cpp \
+    commands/cmdactionitemmove.cpp \
+    commands/cmdconditionitemmove.cpp \
+    commands/cmdconditionitemresize.cpp \
+    commands/cmdentitynamechange.cpp \
+    commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
     commands/cmdinstanceitemresize.cpp \
+    commands/cmdinstancekindchange.cpp \
+    commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemmove.cpp \
     commands/cmdmessageitemresize.cpp \
+    tools/basecreatortool.cpp \
+    tools/basetool.cpp \
+    tools/instancecreatortool.cpp \
+    tools/hierarchycreatortool.cpp \
+    tools/messagecreatortool.cpp \
+    tools/pointertool.cpp \
     chartviewmodel.cpp \
+    actionitem.cpp \
+    conditionitem.cpp \
     documentitem.cpp \
     documentitemmodel.cpp \
     graphicsview.cpp \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    commands/cmdmessageitemcreate.cpp \
-    commands/cmdinstanceitemcreate.cpp \
-    conditionitem.cpp \
-    commands/cmdconditionitemmove.cpp \
-    commands/cmdconditionitemresize.cpp \
-    baseitems/instanceenditem.cpp \
-    actionitem.cpp \
-    commands/cmdactionitemmove.cpp \
-    commands/cmdentitynamechange.cpp \
-    commands/cmdinstancekindchange.cpp \
-    commands/cmdactioninformaltext.cpp
 
 BuildType =release
 CONFIG(debug, debug|release) {

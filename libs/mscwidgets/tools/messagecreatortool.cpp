@@ -31,7 +31,7 @@ MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *vie
 {
     m_title = tr("Message");
     m_description = tr("Create new Message item");
-    m_icon = QPixmap(":/icn/toolbar/icons/toolbar/message.png");
+    m_icon = QPixmap(":/icons/toolbar/message.png");
 }
 
 ToolType MessageCreatorTool::toolType() const

@@ -10,29 +10,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mainmodel.cpp \
-    tools/basetool.cpp \
-    tools/pointertool.cpp \
-    tools/instancecreatortool.cpp \
-    tools/messagecreatortool.cpp \
-    tools/basecreatortool.cpp \
     commandlineparser.cpp \
     settings/settingsmanager.cpp \
     settings/appoptions.cpp \
-    tools/hierarchycreatortool.cpp
 
 HEADERS += \
     mainwindow.h \
     mainmodel.h \
-    tools/basetool.h \
-    tools/tooltypes.h \
-    tools/pointertool.h \
-    tools/instancecreatortool.h \
-    tools/messagecreatortool.h \
-    tools/basecreatortool.h \
     commandlineparser.h \
     settings/settingsmanager.h \
     settings/appoptions.h \
-    tools/hierarchycreatortool.h
 
 FORMS += \
     mainwindow.ui
@@ -94,6 +81,3 @@ win32 {
 
 # Add ANTLR runtime
 include("../link_antlr_rt.pri")
-
-RESOURCES += \
-    resources/rsc.qrc

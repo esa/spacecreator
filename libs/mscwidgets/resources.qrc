@@ -10,5 +10,8 @@
         <file alias="document_or.png">resources/document_or.png</file>
         <file alias="document_parallel.png">resources/document_parallel.png</file>
         <file alias="document_repeat.png">resources/document_repeat.png</file>
+        <file alias="toolbar/pointer.png">resources/icons/toolbar/pointer.png</file>
+        <file alias="toolbar/instance.png">resources/icons/toolbar/instance.png</file>
+        <file alias="toolbar/message.png">resources/icons/toolbar/message.png</file>
     </qresource>
 </RCC>
