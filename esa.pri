@@ -13,3 +13,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 win32: QMAKE_LFLAGS += /ignore:4049
+
+linux {
+    # Use the faster gold linker
+    QMAKE_LFLAGS += -fuse-ld=gold
+}

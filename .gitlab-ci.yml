@@ -13,37 +13,67 @@ build_linux_gcc:
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.11.1_cpp:latest
+  before_script:
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache 
+    - export CCACHE_COMPILERCHECK=content
+    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
   script:
     - mkdir -p build; cd build
-    - qmake -recursive ..
+    - qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
     - make -j 8
   artifacts:
     paths:
       - build
       - libs/msclibrary/parser
     expire_in: 1 day
+  cache:
+    paths:
+      - ccache/
 
 build_linux_clang:
   stage: build
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
-  script: 
+  before_script:
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache 
+    - export CCACHE_COMPILERCHECK=content
+    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
+  script:
     - mkdir -p build_clang
     - cd build_clang
-    - qmake QMAKE_CC=clang QMAKE_CXX=clang++ -recursive ..
+    - qmake QMAKE_CC="ccache clang" QMAKE_CXX="ccache clang++" -recursive ..
     - make -j 8
+  cache:
+    paths:
+      - ccache/
 
 build_debian9_gcc:
   stage: build
   tags:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/debian_9_cpp:latest
+  before_script:
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache 
+    - export CCACHE_COMPILERCHECK=content
+    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
   script:
     - scripts/build_antlr.sh
     - mkdir -p build; cd build
-    - qmake -recursive ..
+    - qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
     - make -j 8
+  cache:
+    paths:
+      - ccache/
 
 # MacOS Shell (because of tag macOS - see CI runners tags)
 build_MacOS:
@@ -55,6 +85,8 @@ build_MacOS:
     - cd build_macos
     - qmake ..
     - make -j 8
+  only:
+    - master
 
 build_Windows:
   stage: build
@@ -69,6 +101,8 @@ build_Windows:
     paths:
       - 3rdparty/antlr/cpp_runtime/runtime/bin
       - 3rdparty/antlr/cpp_runtime/runtime/obj
+  only:
+    - master
 
 ##################
 # TEST
