@@ -204,6 +204,9 @@ const QVector<MscGate *> &MscChart::gates() const
     return m_gates;
 }
 
+/*!
+   Adds a gate, and takes over parentship.
+ */
 void MscChart::addGate(MscGate *gate)
 {
     if (!gate)
@@ -212,12 +215,17 @@ void MscChart::addGate(MscGate *gate)
     if (gates().contains(gate))
         return;
 
+    gate->setParent(this);
     m_gates.append(gate);
     connect(gate, &MscGate::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT gateAdded(gate);
     Q_EMIT dataChanged();
 }
 
+/*!
+   Removes the gate, but does not delete it.
+   Removes the parentship of this chart.
+ */
 void MscChart::removeGate(MscGate *gate)
 {
     if (!gate)
@@ -226,6 +234,9 @@ void MscChart::removeGate(MscGate *gate)
         return;
 
     if (m_gates.removeAll(gate)) {
+        if (gate->parent() == this) {
+            gate->setParent(nullptr);
+        }
         Q_EMIT gateRemoved(gate);
         Q_EMIT dataChanged();
     }
