@@ -63,6 +63,7 @@ public:
 
     void onSourceInstanceMoved(const QPointF &from, const QPointF &to);
     void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
+    bool isCreator() const;
 
 Q_SIGNALS:
     void needRelayout() const;

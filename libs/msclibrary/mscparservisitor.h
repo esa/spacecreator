@@ -84,8 +84,10 @@ private:
     msc::MscMessage *m_currentMessage = nullptr;
     msc::MscInstanceEvent *m_currentEvent = nullptr;
 
-    QVector<msc::MscInstanceEvent *> m_instanceEvents;
-    QVector<QVector<msc::MscInstanceEvent *>> m_instanceEventsList;
+    typedef QVector<msc::MscInstanceEvent *> InstanceEvents;
+
+    InstanceEvents m_instanceEvents;
+    QVector<InstanceEvents> m_instanceEventsList;
 
     antlr4::CommonTokenStream *m_tokens = nullptr;
 };

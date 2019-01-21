@@ -25,6 +25,8 @@
 
 namespace msc {
 
+const qreal InstanceEndItem::EndSymbolHeight = 15.;
+
 InstanceEndItem::InstanceEndItem(bool stop, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
@@ -83,7 +85,7 @@ void InstanceEndItem::setRect(const QRectF &r)
     QRectF newRect(r);
     if (isStop()) {
         // make square
-        const qreal side = qMin(r.width(), boundingRect().height());
+        const qreal side = qMin(r.width(), EndSymbolHeight);
         newRect.setWidth(side);
         newRect.setHeight(side);
         newRect.moveCenter(r.center());

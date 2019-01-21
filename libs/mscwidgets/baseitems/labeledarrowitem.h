@@ -47,6 +47,8 @@ public:
 
     void setColor(const QColor &color);
 
+    void setDashed(bool dashed);
+
 Q_SIGNALS:
     void layoutChanged() const;
     void textEdited(const QString &text);

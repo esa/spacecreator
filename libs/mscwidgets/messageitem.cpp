@@ -51,6 +51,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connectObjects(source, target, y);
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
+    m_arrowItem->setDashed(isCreator());
 }
 
 MscMessage *MessageItem::modelItem() const
@@ -162,13 +163,22 @@ void MessageItem::rebuildLayout()
     const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
     QPointF pntFrom, pntTo;
-    if (m_sourceInstance && m_targetInstance) {
+    if (isCreator() && m_targetInstance) {
+        // make the CREATE message point to the correct instance's "edge" and not its center
+        pntFrom = fromC;
+        pntTo.ry() = toC.y();
+        const QRectF &targetR = m_targetInstance->boundingRect().translated(m_targetInstance->pos());
+        pntTo.rx() = toC.x() > fromC.x() ? targetR.left() : targetR.right();
+    } else if (m_sourceInstance && m_targetInstance) {
+        // connect two centers (y)
         pntFrom = fromC;
         pntTo = toC;
     } else if (m_sourceInstance) {
+        // instance to external
         pntFrom = fromC;
         pntTo = pntFrom - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
     } else if (m_targetInstance) {
+        // external to instance
         pntTo = toC;
         pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
     }
@@ -375,6 +385,9 @@ void MessageItem::setAutoResizable(bool resizable)
 
 void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    if (isCreator())
+        return;
+
     if (gp->location() == GripPoint::Location::Center)
         msc::cmd::CommandsStack::push(msc::cmd::Id::MoveMessage,
                                       { QVariant::fromValue<MessageItem *>(this), pos() + (to - from) });
@@ -382,6 +395,9 @@ void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    if (isCreator())
+        return;
+
     const QPointF &shift(to - from);
     if (gp->location() == GripPoint::Left) {
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
@@ -427,10 +443,20 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
     m_posChangeIgnored = ignored;
 }
 
+bool MessageItem::isCreator() const
+{
+    return m_message && m_message->messageType() == MscMessage::MessageType::Create;
+}
+
 void MessageItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
+
+    if (isCreator())
+        m_gripPoints->setUsedPoints(GripPoint::Locations());
+    else
+        m_gripPoints->setUsedPoints(
+                { GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }

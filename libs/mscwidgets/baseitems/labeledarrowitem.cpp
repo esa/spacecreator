@@ -163,4 +163,11 @@ void LabeledArrowItem::onTextEdited(const QString &text)
     emit textEdited(text);
 }
 
+void LabeledArrowItem::setDashed(bool dashed)
+{
+    QPen linePen = m_itemArrow->bodyPen();
+    linePen.setStyle(dashed ? Qt::DashLine : Qt::SolidLine);
+    m_itemArrow->setBodyPen(linePen);
+}
+
 } // ns msc

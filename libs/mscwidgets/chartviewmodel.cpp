@@ -125,6 +125,40 @@ void ChartViewModel::fillView(MscChart *chart)
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
 
+MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem,
+                                             qreal newY)
+{
+    MessageItem *item = itemForMessage(message);
+    if (!item) {
+        item = new MessageItem(message);
+
+        if (item->isCreator() && targetItem && targetItem->modelItem() == message->targetInstance()) {
+            QLineF axisLine(targetItem->axis());
+            axisLine.setP1({ axisLine.x1(), newY + InstanceItem::StartSymbolHeight / 2. });
+            const qreal deltaY = targetItem->axis().length() - axisLine.length();
+
+            targetItem->setAxisHeight(axisLine.length());
+            targetItem->moveBy(0., deltaY - InstanceItem::StartSymbolHeight * 2.);
+            newY -= 2. * InstanceItem::StartSymbolHeight;
+        } else if (targetItem && targetItem->modelItem()->explicitCreate()) {
+            newY -= targetItem->axis().y1();
+        } else if (sourceItem && sourceItem->modelItem()->explicitCreate()) {
+            newY -= sourceItem->axis().y1();
+        } else {
+        }
+
+        d->m_scene.addItem(item);
+        d->m_instanceEventItems.append(item);
+
+        item->connectObjects(sourceItem, targetItem, newY);
+
+    } else {
+        qDebug() << Q_FUNC_INFO << "The layout update is broken (not implemented yet) here :(";
+    }
+
+    return item;
+}
+
 void ChartViewModel::relayout()
 {
     double x = .0;
@@ -165,31 +199,23 @@ void ChartViewModel::relayout()
             qreal instanceVertiacalOffset(0);
             if (message->sourceInstance()) {
                 sourceInstance = itemForInstance(message->sourceInstance());
-                instanceVertiacalOffset = sourceInstance->axis().p1().y();
+                if (sourceInstance->modelItem()->explicitCreate())
+                    instanceVertiacalOffset += sourceInstance->axis().p1().y();
             }
             InstanceItem *targetInstance(nullptr);
             if (message->targetInstance()) {
                 targetInstance = itemForInstance(message->targetInstance());
-                if (qFuzzyIsNull(instanceVertiacalOffset))
-                    instanceVertiacalOffset = targetInstance->axis().p1().y();
+                if (targetInstance->modelItem()->explicitCreate())
+                    instanceVertiacalOffset += targetInstance->axis().p1().y();
             }
 
-            MessageItem *item = itemForMessage(message);
-            if (!item) {
-                item = new MessageItem(message);
+            if (MessageItem *item =
+                        fillMessageItem(message, sourceInstance, targetInstance, y + instanceVertiacalOffset)) {
 
-                d->m_scene.addItem(item);
-                d->m_instanceEventItems.append(item);
+                y += item->boundingRect().height() + d->InterMessageSpan;
 
-                connect(item, &MessageItem::needRelayout, this, &ChartViewModel::relayout);
+                totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
             }
-
-            const QRectF boundingRect = item->boundingRect();
-            y += -boundingRect.y();
-            item->connectObjects(sourceInstance, targetInstance, y + instanceVertiacalOffset);
-            y += boundingRect.height() + d->InterMessageSpan;
-
-            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
         }
         if (instanceEvent->entityType() == MscEntity::EntityType::Action) {
             auto action = static_cast<MscAction *>(instanceEvent);
@@ -281,8 +307,8 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
             return a->pos().y() < b->pos().y();
         });
 
-        if (QGraphicsObject *bottomostEvent = events.last()) {
-            const qreal bottomY = bottomostEvent->boundingRect().translated(bottomostEvent->pos()).bottom();
+        if (QGraphicsObject *bottommostEvent = events.last()) {
+            const qreal bottomY = bottommostEvent->boundingRect().translated(bottommostEvent->pos()).bottom();
             QLineF axisLine(instanceItem->axis());
             axisLine.setP2({ axisLine.x2(), bottomY });
             instanceItem->setAxisHeight(axisLine.length());
@@ -290,7 +316,7 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
     }
 }
 
-void ChartViewModel::updateCreatedInstanceHeight(InstanceItem * /*instanceItem*/) const {}
+void ChartViewModel::updateCreatedInstanceHeight(InstanceItem *) const {}
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {

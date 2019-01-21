@@ -35,6 +35,8 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
+    static const qreal StartSymbolHeight;
+
     explicit InstanceItem(MscInstance *instance, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;

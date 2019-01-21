@@ -106,9 +106,10 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
 
     QString events;
 
-    QString tabString = tabs(tabsSize);
+    const QString end = QString("%1;\n").arg(instance->explicitStop() ? "stop" : "endinstance");
+    const QString tabString = tabs(tabsSize);
     QString header = QString("%1instance %2").arg(tabString, instance->name());
-    QString footer = tabString + "endinstance;\n";
+    const QString footer = tabString + end;
 
     // The rest is the internal part of this which should be indented
     ++tabsSize;
@@ -161,6 +162,19 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     const QString comment = serializeComment(message);
 
     QString direction = tabs(tabsSize);
+
+    if (message->messageType() == MscMessage::MessageType::Create) {
+        if (instance == message->sourceInstance()) {
+            QString res = direction + QString("create %1").arg(message->targetInstance()->name());
+            const MscMessage::Parameters &params = message->parameters();
+            const QString &param = params.pattern.isEmpty() ? params.expression : params.pattern;
+            if (!param.isEmpty())
+                res = res.append(" (%1)").arg(param);
+            return res.append(";\n");
+        }
+        return QString();
+    }
+
     QString name = message->name();
     QString instanceName;
 
@@ -336,14 +350,8 @@ void MscWriter::setModel(const MscModel *model)
 
 QString MscWriter::tabs(int tabsSize) const
 {
-    const static QString TABS = "   ";
-
-    QString tabsString;
-
-    for (int x = 0; x < tabsSize; ++x)
-        tabsString += TABS;
-
-    return tabsString;
+    static constexpr int spaces(4);
+    return QString().fill(' ', spaces * tabsSize);
 }
 
 QString MscWriter::dataDefinition() const

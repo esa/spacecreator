@@ -24,6 +24,8 @@ namespace msc {
 class InstanceEndItem : public QGraphicsRectItem
 {
 public:
+    static const qreal EndSymbolHeight;
+
     InstanceEndItem(bool stop = false, QGraphicsItem *parent = nullptr);
 
     bool isStop() const;

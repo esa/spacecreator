@@ -36,6 +36,13 @@ public:
         QString pattern;
     };
 
+    enum class MessageType {
+        Message = 0,
+        Create
+
+        // TODO: add call/reply/method/etc?
+    };
+
     explicit MscMessage(QObject *parent = nullptr);
     explicit MscMessage(const QString &name, QObject *parent = nullptr);
 
@@ -50,6 +57,9 @@ public:
     const Parameters &parameters() const;
     void setParameters(const Parameters &parameters);
 
+    MscMessage::MessageType messageType() const;
+    void setMessageType(MscMessage::MessageType t);
+
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
@@ -58,8 +68,8 @@ private:
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
     Parameters m_parameters;
+    MscMessage::MessageType m_msgType = MscMessage::MessageType::Message;
 };
-
 }
 
 #endif // MSCMESSAGE_H

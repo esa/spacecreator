@@ -32,6 +32,7 @@
 #include <QDebug>
 
 #include <string>
+#include <QScopedPointer>
 
 template<typename T>
 static QString treeNodeToString(T *node)
@@ -207,7 +208,7 @@ antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext
         return visitChildren(context);
     }
 
-    const QString name = ::treeNodeToString(context->instanceName);
+    const QString &name = ::treeNodeToString(context->instanceName);
     m_currentInstance = m_currentChart->instanceByName(name);
     auto result = visitChildren(context);
     m_currentInstance = nullptr;
@@ -289,7 +290,11 @@ antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext
 
 antlrcpp::Any MscParserVisitor::visitEventDefinition(MscParser::EventDefinitionContext *context)
 {
-    const QString name = ::treeNodeToString(context->instanceName);
+    if (!m_currentChart) {
+        return visitChildren(context);
+    }
+
+    const QString &name = ::treeNodeToString(context->instanceName);
     if (name.isEmpty()) {
         return visitChildren(context);
     }
@@ -744,10 +749,7 @@ void MscParserVisitor::orderInstanceEvents()
             auto firstMessage = m_instanceEventsList[i][0];
 
             auto checkMessage = [&](MscInstanceEvent *event) {
-                if (event->entityType() != MscEntity::EntityType::Message) {
-                    return false;
-                }
-                return static_cast<MscMessage *>(event)->name() == firstMessage->name();
+                return event->entityType() == MscEntity::EntityType::Message && event->name() == firstMessage->name();
             };
 
             // look first elements of others list

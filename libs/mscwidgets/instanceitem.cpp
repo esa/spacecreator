@@ -38,8 +38,8 @@
 
 namespace msc {
 
-static constexpr double SymbolWidth = { 60.0 };
-static constexpr double StartSymbolHeight = { 20.0 };
+static constexpr qreal SymbolWidth = { 60.0 };
+const qreal InstanceItem::StartSymbolHeight = 20.;
 
 QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
@@ -210,12 +210,11 @@ void InstanceItem::buildLayout()
                  QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)),
                         qMax(kindRect.height(), StartSymbolHeight)));
 
-    const qreal &endSymbolHeight = m_endSymbol->boundingRect().height();
     // precalculate own default size:
     if (m_boundingRect.isEmpty()) {
         m_boundingRect.setTopLeft(nameRect.topLeft());
         m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
-        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + endSymbolHeight);
+        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + InstanceEndItem::EndSymbolHeight);
         updateGripPoints();
     }
 
@@ -237,8 +236,8 @@ void InstanceItem::buildLayout()
     m_headSymbol->setRect(headRect);
 
     // move end symb to the bottom:
-    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
-                      endSymbolHeight);
+    QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - InstanceEndItem::EndSymbolHeight,
+                      m_boundingRect.width(), InstanceEndItem::EndSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -255,7 +254,7 @@ void InstanceItem::buildLayout()
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    const QPointF &delta = to - from; //{ (to - from).x(), 0. };
+    const QPointF &delta = { (to - from).x(), 0. };
     if (gp->location() == GripPoint::Location::Center)
         msc::cmd::CommandsStack::push(cmd::Id::MoveInstance,
                                       { QVariant::fromValue<InstanceItem *>(this), pos() + delta });

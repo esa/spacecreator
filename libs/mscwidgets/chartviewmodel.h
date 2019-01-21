@@ -85,6 +85,7 @@ private:
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem) const;
+    MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
 };
 
 } // namespace msc

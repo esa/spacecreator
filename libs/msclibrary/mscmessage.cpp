@@ -78,4 +78,13 @@ void MscMessage::setParameters(const MscMessage::Parameters &parameters)
     Q_EMIT dataChanged();
 }
 
+MscMessage::MessageType MscMessage::messageType() const
+{
+    return m_msgType;
+}
+void MscMessage::setMessageType(MscMessage::MessageType t)
+{
+    m_msgType = t;
+}
+
 } // namespace msc
