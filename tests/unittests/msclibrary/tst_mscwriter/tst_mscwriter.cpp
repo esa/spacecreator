@@ -207,9 +207,12 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
 
     // Add some timers and test again
-    messages.insert(1, new MscTimer("T_start", MscTimer::TimerType::Start));
-    messages.append(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
-    messages.append(new MscTimer("T_stop", MscTimer::TimerType::Stop));
+    QScopedPointer<MscTimer> timer1(new MscTimer("T_start", MscTimer::TimerType::Start));
+    messages.insert(1, timer1.data());
+    QScopedPointer<MscTimer> timer2(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
+    messages.append(timer2.data());
+    QScopedPointer<MscTimer> timer3(new MscTimer("T_stop", MscTimer::TimerType::Stop));
+    messages.append(timer3.data());
 
     serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 7);

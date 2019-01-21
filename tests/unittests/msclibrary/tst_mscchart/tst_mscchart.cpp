@@ -242,8 +242,10 @@ void tst_MscChart::testAddGate()
 
 void tst_MscChart::testRemoveGate()
 {
-    m_chart->addGate(new MscGate("A", m_chart));
-    m_chart->addGate(new MscGate("B", m_chart));
+    QScopedPointer<MscGate> gate1(new MscGate("A", m_chart));
+    m_chart->addGate(gate1.data());
+    MscGate *gate2 = new MscGate("B", m_chart);
+    m_chart->addGate(gate2);
     QCOMPARE(m_chart->gates().size(), 2);
     m_chart->removeGate(nullptr);
     QCOMPARE(m_chart->gates().size(), 2);
@@ -270,8 +272,10 @@ void tst_MscChart::testAddCondition()
 
 void tst_MscChart::testRemoveCondition()
 {
-    m_chart->addInstanceEvent(new MscCondition("Condition_1", m_chart));
-    m_chart->addInstanceEvent(new MscCondition("Condition_2", m_chart));
+    QScopedPointer<MscCondition> condition1(new MscCondition("Condition_1", m_chart));
+    m_chart->addInstanceEvent(condition1.data());
+    MscCondition *condition2 = new MscCondition("Condition_2", m_chart);
+    m_chart->addInstanceEvent(condition2);
 
     QCOMPARE(m_chart->instanceEvents().size(), 2);
 

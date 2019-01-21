@@ -47,8 +47,9 @@ private Q_SLOTS:
     void testObjectsLinkItem();
 
 private:
-    QPointer<ChartViewModel> m_model;
-    QPointer<QGraphicsScene> m_scene;
+    QScopedPointer<ChartViewModel> m_model;
+    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<msc::MscChart> m_chart;
     QPointer<InstanceItem> m_item1;
     QPointer<InstanceItem> m_item2;
 
@@ -58,9 +59,10 @@ private:
 
 void tst_ArrowItem::initTestCase()
 {
-    m_model = new ChartViewModel;
-    m_model->fillView(new msc::MscChart());
-    m_scene = new QGraphicsScene;
+    m_model.reset(new ChartViewModel);
+    m_chart.reset(new msc::MscChart);
+    m_model->fillView(m_chart.data());
+    m_scene.reset(new QGraphicsScene);
     m_item1 = m_model->createDefaultInstanceItem();
     m_item2 = m_model->createDefaultInstanceItem();
 
@@ -77,9 +79,6 @@ void tst_ArrowItem::cleanupTestCase()
         delete m_item2;
     if (utils::removeSceneItem(m_item1))
         delete m_item1;
-
-    delete m_scene;
-    delete m_model;
 }
 
 int tst_ArrowItem::scenePopulation() const
