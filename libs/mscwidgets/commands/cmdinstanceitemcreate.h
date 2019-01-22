@@ -18,22 +18,20 @@
 #pragma once
 
 #include "commands/basecommand.h"
-#include "chartviewmodel.h"
-#include "instanceitem.h"
-#include <mscinstance.h>
 
-#include <QPointF>
 #include <QPointer>
 
-#include <QGraphicsScene>
-
 namespace msc {
+
+class MscChart;
+class MscInstance;
+
 namespace cmd {
 
 class CmdInstanceItemCreate : public BaseCommand
 {
 public:
-    CmdInstanceItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos);
+    CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -41,12 +39,8 @@ public:
     int id() const override;
 
 private:
-    QPointer<QGraphicsScene> m_scene;
-    QPointer<ChartViewModel> m_model;
-    QPointer<InstanceItem> m_instanceItem;
-    QPointF m_pos;
-
-    bool validateStorages(const char *caller) const;
+    MscInstance *m_instance = nullptr;
+    QPointer<MscChart> m_chart;
 };
 
 } // ns cmd

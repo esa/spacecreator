@@ -119,6 +119,9 @@ void ChartViewModel::fillView(MscChart *chart)
     if (d->m_currentChart)
         relayout();
 
+    connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
+    connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
+            QOverload<msc::MscInstance *>::of(&ChartViewModel::removeInstanceItem));
     connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
 
@@ -398,12 +401,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
 bool ChartViewModel::removeInstanceItem(msc::InstanceItem *item)
 {
     if (item && utils::removeSceneItem(item)) {
-        if (MscInstance *instance = item->modelItem()) {
-            currentChart()->removeInstance(instance);
-            delete instance;
-        }
         delete item;
-
         return true;
     }
 
@@ -446,6 +444,18 @@ void ChartViewModel::rearrangeInstances()
     relayout();
 }
 
+void ChartViewModel::removeInstanceItem(MscInstance *instance)
+{
+    msc::InstanceItem *item = itemForInstance(instance);
+    if (item) {
+        const int idx = d->m_instanceItems.indexOf(item);
+        utils::removeSceneItem(item);
+        d->m_instanceItems.remove(idx);
+        delete item;
+        updateLayout();
+    }
+}
+
 void ChartViewModel::removeEventItem(MscInstanceEvent *event)
 {
     msc::InteractiveObject *item = nullptr;
@@ -459,7 +469,7 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
     }
 
     if (item) {
-        d->m_scene.removeItem(item);
+        utils::removeSceneItem(item);
         d->m_instanceEventItems.remove(idx);
         delete item;
         updateLayout();

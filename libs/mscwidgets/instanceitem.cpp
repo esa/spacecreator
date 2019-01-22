@@ -98,10 +98,10 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
 {
     Q_ASSERT(m_instance != nullptr);
 
-    setName(m_instance->name());
+    updateText(m_nameItem, m_instance->name());
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
 
-    setKind(m_instance->kind());
+    updateText(m_kindItem, m_instance->kind());
     connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
 
     updateLayout();

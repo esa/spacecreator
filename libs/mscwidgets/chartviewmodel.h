@@ -75,6 +75,7 @@ Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
 
 private Q_SLOTS:
+    void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
 
 private:

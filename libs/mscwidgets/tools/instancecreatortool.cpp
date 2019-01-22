@@ -44,8 +44,11 @@ void InstanceCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, scenePos());
+    MscInstance *orphaninstance = new MscInstance(tr("Instance"));
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, scenePos());
+
     if (!instanceItem) {
+        delete orphaninstance;
         return;
     }
 
@@ -58,11 +61,12 @@ void InstanceCreatorTool::createPreviewItem()
 
 void InstanceCreatorTool::commitPreviewItem()
 {
-    if (!m_previewItem || !m_scene)
+    if (!m_previewEntity || !m_activeChart)
         return;
 
-    const QVariantList &cmdParams = { QVariant::fromValue<QGraphicsScene *>(m_scene),
-                                      QVariant::fromValue<ChartViewModel *>(m_model), m_previewItem->pos() };
+    auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity);
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
+                                      QVariant::fromValue<msc::MscChart *>(m_activeChart) };
 
     removePreviewItem(); // free the space to avoid overlapping
 

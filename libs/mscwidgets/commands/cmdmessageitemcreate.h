@@ -32,7 +32,6 @@ class CmdMessageItemCreate : public BaseCommand
 {
 public:
     CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart);
-    ~CmdMessageItemCreate() override;
 
     void redo() override;
     void undo() override;

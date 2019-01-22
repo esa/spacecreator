@@ -16,50 +16,43 @@
 */
 
 #include "cmdinstanceitemcreate.h"
-#include "chartviewmodel.h"
-#include "baseitems/common/utils.h"
 
-#include <QGraphicsScene>
-#include <QDebug>
+#include <mscchart.h>
+#include <mscinstance.h>
 
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemCreate::CmdInstanceItemCreate(QGraphicsScene *scene, ChartViewModel *model, const QPointF &pos)
-    : BaseCommand()
-    , m_scene(scene)
-    , m_model(model)
-    , m_pos(pos)
+CmdInstanceItemCreate::CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart)
+    : BaseCommand(instance)
+    , m_instance(instance)
+    , m_chart(chart)
 {
-}
+    Q_ASSERT(m_chart.data());
 
-bool CmdInstanceItemCreate::validateStorages(const char *caller) const
-{
-    if (!m_model || !m_model->currentChart() || !m_scene) {
-        qWarning() << caller << "Model, chart or scene is null, aborting." << m_model
-                   << (m_model ? m_model->currentChart() : nullptr) << m_scene;
-        return false;
-    }
-    return true;
+    setText(tr("Add instance"));
 }
 
 void CmdInstanceItemCreate::redo()
 {
-    if (!validateStorages(Q_FUNC_INFO))
-        return;
+    Q_ASSERT(m_chart.data());
 
-    m_instanceItem = m_model->createDefaultInstanceItem(nullptr, m_pos);
-    m_scene->addItem(m_instanceItem);
-    m_instanceItem->ensureNotOverlapped();
+    if (!m_instance) {
+        m_instance = new MscInstance(QObject::tr("Instance_%1").arg(m_chart->instances().size()));
+        m_modelItem = m_instance;
+    }
+
+    // The chart takes over parent-/owner-ship
+    m_chart->addInstance(m_instance);
 }
 
 void CmdInstanceItemCreate::undo()
 {
-    if (!validateStorages(Q_FUNC_INFO))
-        return;
+    Q_ASSERT(m_chart.data());
+    m_chart->removeInstance(m_instance);
 
-    if (m_model->removeInstanceItem(m_instanceItem))
-        m_instanceItem = nullptr;
+    // this command takes over ownership
+    m_instance->setParent(this);
 }
 
 bool CmdInstanceItemCreate::mergeWith(const QUndoCommand *command)

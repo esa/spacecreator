@@ -30,7 +30,7 @@ class MscEntity;
 
 namespace cmd {
 
-class BaseCommand : public QUndoCommand
+class BaseCommand : public QObject, public QUndoCommand
 {
 public:
     BaseCommand();
