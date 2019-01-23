@@ -262,37 +262,9 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    QPointF delta(to - from);
-    QRectF newRect(m_boundingRect);
-    switch (gp->location()) {
-    case GripPoint::Location::Left:
-    case GripPoint::Location::Right: {
-        if (gp->location() == GripPoint::Location::Left)
-            delta.rx() *= -1;
-        newRect.adjust(-delta.x(), 0., delta.x(), 0.);
-        break;
-    }
-    case GripPoint::Location::Top:
-    case GripPoint::Location::Bottom: {
-        newRect.adjust(0., -delta.y(), 0., delta.y());
-        break;
-    }
-    case GripPoint::Location::TopLeft:
-    case GripPoint::Location::TopRight:
-    case GripPoint::Location::BottomLeft:
-    case GripPoint::Location::BottomRight: {
-        if (gp->location() == GripPoint::Location::Left || gp->location() == GripPoint::Location::TopLeft
-            || gp->location() == GripPoint::Location::BottomLeft)
-            delta.rx() *= -1;
-        newRect.adjust(-delta.x(), -delta.y(), delta.x(), delta.y());
-        break;
-    }
-    default:
-        return;
-    }
-
-    if (newRect.width() >= SymbolWidth)
-        msc::cmd::CommandsStack::push(cmd::Id::ResizeInstance, { QVariant::fromValue<InstanceItem *>(this), newRect });
+    Q_UNUSED(gp);
+    Q_UNUSED(from);
+    Q_UNUSED(to);
 }
 
 QPainterPath InstanceItem::shape() const
@@ -329,7 +301,7 @@ InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPoin
 void InstanceItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
             &InstanceItem::onManualGeometryChangeFinished);

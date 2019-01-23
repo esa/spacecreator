@@ -34,7 +34,6 @@ HEADERS += \
     commands/cmdentitynamechange.h \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
-    commands/cmdinstanceitemresize.h \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemmove.h \
     commands/cmdmessageitemcreate.h \
@@ -81,7 +80,6 @@ SOURCES += \
     commands/cmdentitynamechange.cpp \
     commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
-    commands/cmdinstanceitemresize.cpp \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemmove.cpp \

@@ -27,7 +27,6 @@ enum Id
     RetargetMessage,
     CreateMessage,
     MoveInstance,
-    ResizeInstance,
     CreateInstance,
     RenameInstanceKind,
     MoveCondition,
