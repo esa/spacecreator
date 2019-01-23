@@ -923,14 +923,7 @@ void tst_MscFile::testInstanceCreateNoInstance()
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
                    ENDMSC;";
-
-    QScopedPointer<MscModel> model(file->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QVERIFY(chart->instanceEvents().isEmpty());
+    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
 }
 
 void tst_MscFile::testInstanceCreateDublicate()
@@ -943,20 +936,7 @@ void tst_MscFile::testInstanceCreateDublicate()
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
                    ENDMSC;";
-
-    QScopedPointer<MscModel> model(file->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
-
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
-    QCOMPARE(create->name(), QString("subscriber"));
-
-    QCOMPARE(create->parameters().size(), 1);
-    QCOMPARE(create->parameters()[0], QString("data1"));
+    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
 }
 
 void tst_MscFile::testKeywordAsName()

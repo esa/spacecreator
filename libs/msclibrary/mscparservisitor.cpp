@@ -589,16 +589,12 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
                              });
 
         if (find != m_currentChart->instanceEvents().end()) {
-            qWarning() << "Incorrect(dublicate) create name" << name;
-
-            return visitChildren(context);
+            throw ParserException("Incorrect(dublicate) create name '" + name + "'");
         }
 
         auto *createInstance = m_currentChart->instanceByName(name);
         if (!createInstance) {
-            qWarning() << "Incorrect instance name" << name;
-
-            return visitChildren(context);
+            throw ParserException("Incorrect(unknown) create name '" + name + "'");
         }
 
         createInstance->setExplicitCreate(true);
@@ -683,6 +679,7 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         timer->setInstanceName(::treeNodeToString(timeout->NAME(1)));
     } else {
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
+        throw ParserException("Bad timer declaration" + ::treeNodeToString(context));
     }
 
     m_instanceEvents.append(timer);

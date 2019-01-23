@@ -17,6 +17,7 @@
 
 #include "mainmodel.h"
 
+#include "exceptions.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscfile.h"
@@ -115,6 +116,9 @@ bool MainModel::loadFile(const QString &filename)
     try {
         d->m_errorMessages.clear();
         model = file.parseFile(filename, &d->m_errorMessages);
+    } catch (const msc::ParserException &e) {
+        d->m_errorMessages.append(e.errorMessage());
+        return false;
     } catch (...) {
         // print error message
         return false;
