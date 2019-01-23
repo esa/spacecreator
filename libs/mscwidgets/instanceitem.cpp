@@ -254,10 +254,10 @@ void InstanceItem::buildLayout()
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    const QPointF &delta = { (to - from).x(), 0. };
-    if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(cmd::Id::MoveInstance,
-                                      { QVariant::fromValue<InstanceItem *>(this), pos() + delta });
+    if (gp->location() == GripPoint::Location::Center) {
+        const QPointF &delta = { (to - from).x(), 0. };
+        setPos(pos() + delta);
+    }
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -329,9 +329,11 @@ void InstanceItem::onKindEdited(const QString &newKind)
     CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
 }
 
-void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
+void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
 {
-    ensureNotOverlapped();
+    if (pos == GripPoint::Location::Center) {
+        Q_EMIT moved(this);
+    }
 }
 
 void InstanceItem::ensureNotOverlapped()

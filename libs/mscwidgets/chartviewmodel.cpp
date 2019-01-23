@@ -21,6 +21,7 @@
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "baseitems/common/utils.h"
+#include "commands/common/commandsstack.h"
 
 #include <mscaction.h>
 #include <mscchart.h>
@@ -122,6 +123,11 @@ void ChartViewModel::fillView(MscChart *chart)
     connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
             QOverload<msc::MscInstance *>::of(&ChartViewModel::removeInstanceItem));
+    connect(d->m_currentChart, &msc::MscChart::instanceMoved, this, [&]() {
+        this->clearScene();
+        this->updateLayout();
+    });
+
     connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
 
@@ -171,6 +177,7 @@ void ChartViewModel::relayout()
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
             item = createDefaultInstanceItem(instance, QPointF());
+            connect(item, &InstanceItem::moved, this, &ChartViewModel::onInstanceItemMoved, Qt::UniqueConnection);
             d->m_scene.addItem(item);
             d->m_instanceItems.append(item);
             item->setX(x);
@@ -473,6 +480,27 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
         d->m_instanceEventItems.remove(idx);
         delete item;
         updateLayout();
+    }
+}
+
+void ChartViewModel::onInstanceItemMoved(InstanceItem *instanceItem)
+{
+    const int currentIdx = d->m_currentChart->instances().indexOf(instanceItem->modelItem());
+    Q_ASSERT(currentIdx >= 0);
+
+    int nextIdx = 0;
+    for (auto inst : d->m_instanceItems) {
+        if (inst != instanceItem) {
+            if (instanceItem->x() > inst->x()) {
+                ++nextIdx;
+            }
+        }
+    }
+
+    if (currentIdx != nextIdx) {
+        msc::cmd::CommandsStack::push(msc::cmd::MoveInstance,
+                                      { QVariant::fromValue<MscInstance *>(instanceItem->modelItem()), nextIdx,
+                                        QVariant::fromValue<MscChart *>(d->m_currentChart) });
     }
 }
 

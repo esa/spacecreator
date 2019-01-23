@@ -134,12 +134,13 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
 
 QUndoCommand *CommandsFactory::createInstanceItemMove(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
 
-    if (InstanceItem *item = params.first().value<InstanceItem *>()) {
-        const QPointF &destination = params.last().toPointF();
-        if (item->pos() != destination)
-            return new CmdInstanceItemMove(item, destination);
+    if (MscInstance *item = params.first().value<MscInstance *>()) {
+        const int &toIdx = params.at(1).toInt();
+        if (msc::MscChart *chart = params.at(2).value<msc::MscChart *>()) {
+            return new CmdInstanceItemMove(item, toIdx, chart);
+        }
     }
 
     return nullptr;

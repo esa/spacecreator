@@ -17,32 +17,33 @@
 */
 
 #include "cmdinstanceitemmove.h"
-#include "instanceitem.h"
+
+#include <mscchart.h>
+#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemMove::CmdInstanceItemMove(InstanceItem *instanceItem, const QPointF &destination)
-    : BaseCommand(instanceItem)
-    , m_posFrom(instanceItem ? instanceItem->pos() : QPointF())
-    , m_posTo(destination)
+CmdInstanceItemMove::CmdInstanceItemMove(msc::MscInstance *instance, int pos, MscChart *chart)
+    : BaseCommand(instance)
+    , m_instance(instance)
+    , m_chart(chart)
+    , m_posFrom(chart->instances().indexOf(m_instance))
+    , m_posTo(pos)
 {
     setText(QObject::tr("Move instance"));
 }
 
 void CmdInstanceItemMove::redo()
 {
-    if (m_graphicsItem)
-        m_graphicsItem->setPos(m_posTo);
+    if (m_chart && m_instance)
+        m_chart->updateInstancePos(m_instance, m_posTo);
 }
 
 void CmdInstanceItemMove::undo()
 {
-    if (m_graphicsItem) {
-        m_graphicsItem->setPos(m_posFrom);
-        if (InstanceItem *instanceItem = dynamic_cast<InstanceItem *>(m_graphicsItem.data()))
-            instanceItem->ensureNotOverlapped();
-    }
+    if (m_chart && m_instance)
+        m_chart->updateInstancePos(m_instance, m_posFrom);
 }
 
 bool CmdInstanceItemMove::mergeWith(const QUndoCommand *command)

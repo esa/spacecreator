@@ -77,6 +77,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
+    void onInstanceItemMoved(InstanceItem *instanceItem);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;

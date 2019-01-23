@@ -26,9 +26,10 @@ class QGraphicsTextItem;
 namespace msc {
 
 class MscInstance;
+
+class InstanceEndItem;
 class MessageItem;
 class TextItem;
-class InstanceEndItem;
 
 class InstanceItem : public InteractiveObject
 {
@@ -58,6 +59,7 @@ public:
 Q_SIGNALS:
     void needRelayout() const;
     void needRearrange() const;
+    void moved(InstanceItem *);
 
 public Q_SLOTS:
     void setName(const QString &name);

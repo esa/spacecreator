@@ -66,6 +66,7 @@ public:
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void instanceRemoved(MscInstance *instance);
+    void instanceMoved(MscInstance *instance, int from, int to);
     void instanceEventAdded(MscInstanceEvent *message);
     void instanceEventRemoved(MscInstanceEvent *message);
     void gateAdded(MscGate *gate);

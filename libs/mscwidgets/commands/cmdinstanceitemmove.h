@@ -19,18 +19,19 @@
 
 #include "basecommand.h"
 
-#include <QPointF>
+#include <QPointer>
 
 namespace msc {
 
-class InstanceItem;
+class MscChart;
+class MscInstance;
 
 namespace cmd {
 
 class CmdInstanceItemMove : public BaseCommand
 {
 public:
-    CmdInstanceItemMove(InstanceItem *instanceItem, const QPointF &destination);
+    CmdInstanceItemMove(msc::MscInstance *instance, int pos, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -38,8 +39,10 @@ public:
     int id() const override;
 
 private:
-    QPointF m_posFrom;
-    QPointF m_posTo;
+    QPointer<msc::MscInstance> m_instance;
+    QPointer<msc::MscChart> m_chart;
+    int m_posFrom;
+    int m_posTo;
 };
 
 } // ns cmd
