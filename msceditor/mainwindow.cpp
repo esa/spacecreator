@@ -174,7 +174,7 @@ bool MainWindow::openFileMsc(const QString &file)
 
         d->ui->graphicsView->setZoom(100);
     } else {
-        m_mscFileName.clear();
+        showErrorView();
     }
 
     clearUndoStacks();
@@ -278,6 +278,13 @@ void MainWindow::showHierarchyView(bool show)
 
         d->m_hierarchyToolBar->show();
         d->m_toolBar->hide();
+    }
+}
+
+void MainWindow::showErrorView()
+{
+    if (!d->ui->dockWidgetErrors->isVisible()) {
+        d->m_actToggleErrorView->trigger();
     }
 }
 
