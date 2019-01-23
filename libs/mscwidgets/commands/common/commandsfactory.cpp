@@ -22,7 +22,6 @@
 #include "commands/cmdactioninformaltext.h"
 
 #include "commands/cmdconditionitemmove.h"
-#include "commands/cmdconditionitemresize.h"
 
 #include "commands/cmdentitynamechange.h"
 
@@ -70,8 +69,6 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createInstanceKindChange(params);
     case cmd::MoveCondition:
         return cmd::CommandsFactory::createConditionItemMove(params);
-    case cmd::ResizeCondition:
-        return cmd::CommandsFactory::createConditionItemResize(params);
     case cmd::MoveAction:
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
@@ -181,19 +178,6 @@ QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &param
         const QPointF &destination = params.last().toPointF();
         if (item->pos() != destination)
             return new CmdConditionItemMove(item, destination);
-    }
-
-    return nullptr;
-}
-
-QUndoCommand *CommandsFactory::createConditionItemResize(const QVariantList &params)
-{
-    Q_ASSERT(params.size() == 2);
-
-    if (ConditionItem *item = params.first().value<ConditionItem *>()) {
-        const QRectF &newGeometry = params.last().toRectF();
-        if (item->boundingRect() != newGeometry)
-            return new CmdConditionItemResize(item, newGeometry);
     }
 
     return nullptr;

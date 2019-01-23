@@ -42,7 +42,6 @@ public:
     static QUndoCommand *createInstanceItemCreate(const QVariantList &params);
     static QUndoCommand *createInstanceKindChange(const QVariantList &params);
     static QUndoCommand *createConditionItemMove(const QVariantList &params);
-    static QUndoCommand *createConditionItemResize(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);
     static QUndoCommand *createActionInformalText(const QVariantList &params);
 

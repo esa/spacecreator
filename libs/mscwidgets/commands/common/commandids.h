@@ -30,7 +30,6 @@ enum Id
     CreateInstance,
     RenameInstanceKind,
     MoveCondition,
-    ResizeCondition,
     MoveAction,
     InformatActionText,
 

@@ -64,6 +64,7 @@ private Q_SLOTS:
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void prepareHoverMark() override;
 
 private:
     void setInstance(InstanceItem *instance);

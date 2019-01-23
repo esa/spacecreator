@@ -30,7 +30,6 @@ HEADERS += \
     commands/cmdactioninformaltext.h \
     commands/cmdactionitemmove.h \
     commands/cmdconditionitemmove.h \
-    commands/cmdconditionitemresize.h \
     commands/cmdentitynamechange.h \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
@@ -76,7 +75,6 @@ SOURCES += \
     commands/cmdactioninformaltext.cpp \
     commands/cmdactionitemmove.cpp \
     commands/cmdconditionitemmove.cpp \
-    commands/cmdconditionitemresize.cpp \
     commands/cmdentitynamechange.cpp \
     commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
