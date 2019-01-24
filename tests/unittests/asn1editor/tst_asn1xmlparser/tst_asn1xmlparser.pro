@@ -1,5 +1,5 @@
 include(../../../../esa.pri)
-include(../asn1librarytests.pri)
+include(../../../../depend_asn1library.pri)
 
 QT += xml testlib
 QT -= gui

@@ -1,4 +1,3 @@
-include(../../../../esa.pri)
 include(../mscwidgetstests.pri)
 
 QT += widgets testlib

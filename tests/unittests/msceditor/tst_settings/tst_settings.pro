@@ -1,5 +1,4 @@
-include(../../../../esa.pri)
-include(../../../../msceditor/msceditortests.pri)
+include(../msceditortests.pri)
 
 QT += testlib gui
 CONFIG += qt warn_on depend_includepath testcase
