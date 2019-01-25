@@ -16,11 +16,10 @@ DEPENDPATH += \
     $$PWD/../../libs/msclibrary
 
 
-BuildType = Release
+BuildType = release
 CONFIG(debug, debug|release) {
-    BuildType = Debug
+    BuildType = debug
 } # Profiling, etc (if any) are defaulted to Release
-BuildTypeLower = $$lower($$BuildType)
 
 LibSuffix = a
 LibPrefix = lib
@@ -32,14 +31,14 @@ win32:!win32-g++ {
 
 win32 {
     PRE_TARGETDEPS += \
-        $$OUT_PWD/../../libs/asn1editor/$$BuildTypeLower/$${LibPrefix}asn1editor.$$LibSuffix \
-        $$OUT_PWD/../../libs/mscwidgets/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix \
-        $$OUT_PWD/../../libs/msclibrary/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
+        $$OUT_PWD/../../libs/asn1editor/$$BuildType/$${LibPrefix}asn1editor.$$LibSuffix \
+        $$OUT_PWD/../../libs/mscwidgets/$$BuildType/$${LibPrefix}mscwidgets.$$LibSuffix \
+        $$OUT_PWD/../../libs/msclibrary/$$BuildType/$${LibPrefix}msclibrary.$$LibSuffix
 
     LIBS += \
-        -L$$OUT_PWD/../../libs/asn1editor/$$BuildTypeLower/ -lasn1editor \
-        -L$$OUT_PWD/../../libs/mscwidgets/$$BuildTypeLower/ -lmscwidgets \
-        -L$$OUT_PWD/../../libs/msclibrary/$$BuildTypeLower/ -lmsclibrary
+        -L$$OUT_PWD/../../libs/asn1editor/$$BuildType/ -lasn1editor \
+        -L$$OUT_PWD/../../libs/mscwidgets/$$BuildType/ -lmscwidgets \
+        -L$$OUT_PWD/../../libs/msclibrary/$$BuildType/ -lmsclibrary
 
     QMAKE_LFLAGS_RELEASE += /LTCG
 } else:unix {

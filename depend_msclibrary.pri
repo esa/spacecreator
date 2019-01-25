@@ -6,14 +6,13 @@ sub_dir ~= s,^$$re_escape($$PWD),,
 BUILD_TREE = $$clean_path($$OUT_PWD)
 BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 
-BuildType = Release
+BuildType = release
 CONFIG(debug, debug|release) {
-    BuildType = Debug
+    BuildType = debug
 } # Profiling, etc (if any) are defaulted to Release
-BuildTypeLower = $$lower($$BuildType)
 
 OUT_PWD_BASE = $$BUILD_TREE/libs/msclibrary
-win32: LIBS += -L$$clean_path($$OUT_PWD_BASE/$$BuildTypeLower/) -lmsclibrary
+win32: LIBS += -L$$clean_path($$OUT_PWD_BASE/$$BuildType/) -lmsclibrary
 else:unix: LIBS += -L$$clean_path($$OUT_PWD_BASE/) -lmsclibrary
 
 INCLUDEPATH += $$PWD/libs/msclibrary
@@ -27,7 +26,7 @@ win32:!win32-g++ {
     LibPrefix = ""
 }
 
-win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildTypeLower/$${LibPrefix}msclibrary.$$LibSuffix
+win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildType/$${LibPrefix}msclibrary.$$LibSuffix
 else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$${LibPrefix}msclibrary.$$LibSuffix
 
 # Add ANTLR runtime

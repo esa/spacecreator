@@ -6,14 +6,13 @@ sub_dir ~= s,^$$re_escape($$PWD),,
 BUILD_TREE = $$clean_path($$OUT_PWD)
 BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 
-BuildType = Release
+BuildType = release
 CONFIG(debug, debug|release) {
-    BuildType = Debug
+    BuildType = debug
 } # Profiling, etc (if any) are defaulted to Release
-BuildTypeLower = $$lower($$BuildType)
 
 OUT_PWD_BASE = $$BUILD_TREE/libs/mscwidgets
-win32: LIBS += -L$$clean_path($$OUT_PWD_BASE/$$BuildTypeLower/) -lmscwidgets
+win32: LIBS += -L$$clean_path($$OUT_PWD_BASE/$$BuildType/) -lmscwidgets
 else:unix: LIBS += -L$$clean_path($$OUT_PWD_BASE/) -lmscwidgets
 
 INCLUDEPATH += $$PWD/libs/mscwidgets
@@ -27,5 +26,5 @@ win32:!win32-g++ {
     LibPrefix = ""
 }
 
-win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildTypeLower/$${LibPrefix}mscwidgets.$$LibSuffix
+win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildType/$${LibPrefix}mscwidgets.$$LibSuffix
 else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$${LibPrefix}mscwidgets.$$LibSuffix
