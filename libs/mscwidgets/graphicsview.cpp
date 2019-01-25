@@ -43,6 +43,8 @@ GraphicsView::GraphicsView(QWidget *parent)
 
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
+
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
 void GraphicsView::setZoom(double percent)

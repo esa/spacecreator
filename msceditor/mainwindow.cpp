@@ -111,6 +111,8 @@ MainWindow::MainWindow(QWidget *parent)
     , d(new MainWindowPrivate(this))
 {
     setupUi();
+    d->ui->hierarchyView->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
+                                         | QPainter::SmoothPixmapTransform);
 
     initConnections();
 
