@@ -1,62 +1,8 @@
 include(../../esa.pri)
-#include(../../depend_asn1library.pri)
-#include(../../depend_mscwidgets.pri)
-#include(../../depend_msclibrary.pri)
-
-
-INCLUDEPATH += \
-    $$PWD/../../libs/asn1editor \
-    $$PWD/../../libs/mscwidgets \
-    $$PWD/../../libs/msclibrary
-
-
-DEPENDPATH += \
-    $$PWD/../../libs/asn1editor \
-    $$PWD/../../libs/mscwidgets \
-    $$PWD/../../libs/msclibrary
-
-
-BuildType = release
-CONFIG(debug, debug|release) {
-    BuildType = debug
-} # Profiling, etc (if any) are defaulted to Release
-
-LibSuffix = a
-LibPrefix = lib
-
-win32:!win32-g++ {
-    LibSuffix = lib
-    LibPrefix = ""
-}
-
-win32 {
-    PRE_TARGETDEPS += \
-        $$OUT_PWD/../../libs/asn1editor/$$BuildType/$${LibPrefix}asn1editor.$$LibSuffix \
-        $$OUT_PWD/../../libs/mscwidgets/$$BuildType/$${LibPrefix}mscwidgets.$$LibSuffix \
-        $$OUT_PWD/../../libs/msclibrary/$$BuildType/$${LibPrefix}msclibrary.$$LibSuffix
-
-    LIBS += \
-        -L$$OUT_PWD/../../libs/asn1editor/$$BuildType/ -lasn1editor \
-        -L$$OUT_PWD/../../libs/mscwidgets/$$BuildType/ -lmscwidgets \
-        -L$$OUT_PWD/../../libs/msclibrary/$$BuildType/ -lmsclibrary
-
-    QMAKE_LFLAGS_RELEASE += /LTCG
-} else:unix {
-    PRE_TARGETDEPS += \
-        $$OUT_PWD/../../libs/asn1editor/$${LibPrefix}asn1editor.$$LibSuffix \
-        $$OUT_PWD/../../libs/mscwidgets/$${LibPrefix}mscwidgets.$$LibSuffix \
-        $$OUT_PWD/../../libs/msclibrary/$${LibPrefix}msclibrary.$$LibSuffix
-
-    LIBS += \
-        -L$$OUT_PWD/../../libs/asn1editor/ -lasn1editor \
-        -L$$OUT_PWD/../../libs/msclibrary/ -lmsclibrary \
-        -L$$OUT_PWD/../../libs/mscwidgets/ -lmscwidgets
-}
-
-# Add ANTLR runtime
-include("../../link_antlr_rt.pri")
-
-
+include(../../depend_asn1library.pri)
+include(../../depend_mscwidgets.pri)
+include(../../depend_msclibrary.pri)
+include(../../link_antlr_rt.pri)
 
 DEFINES += MSCPLUGIN_LIBRARY
 

@@ -24,9 +24,4 @@ SOURCES += \
     asn1valueparser.cpp \
     asn1itemmodel.cpp
 
-BuildType =release
-CONFIG(debug, debug|release) {
-    BuildType =debug
-} # Profiling, etc (if any) are defaulted to Release
-
 FORMS += asn1editor.ui
