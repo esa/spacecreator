@@ -7,6 +7,7 @@ SUBDIRS += \
     doc \
     libs \
     msceditor \
+    qtcreator \
     tests
 
 CONFIG += ordered

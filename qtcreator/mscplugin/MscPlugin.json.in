@@ -1,0 +1,23 @@
+{
+    \"Name\" : \"MscPlugin\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"ESA\",
+    \"Copyright\" : \"(C) 2019 European Space Agency\",
+    \"License\" : \"LGPL 2.1\",
+    \"Category\" : \"Modeling\",
+    \"Description\" : \"Graphics model of MSC diagrams (message sequence diagram)\",
+    \"Url\" : \"https://gitrepos.estec.esa.int/taste/MSC-NG\",
+    $$dependencyList,
+
+    \"Mimetypes\" : [
+        \"<?xml version=\'1.0\' encoding=\'UTF-8\'?>\",
+        \"<mime-info xmlns=\'http://www.freedesktop.org/standards/shared-mime-info\'>\",
+        \"    <mime-type type=\'text/vnd.msc\'>\",
+        \"        <sub-class-of type=\'text/msc\'/>\",
+        \"        <comment>Qt Creator Model File</comment>\",
+        \"        <glob pattern=\'*.msc\'/>\",
+        \"    </mime-type>\",
+        \"</mime-info>\"
+    ]
+}
