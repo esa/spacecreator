@@ -32,6 +32,7 @@ class MscChart;
 class ActionItem;
 class ConditionItem;
 class MscInstanceEvent;
+class InteractiveObject;
 class InstanceItem;
 class MessageItem;
 class MscAction;
@@ -78,6 +79,7 @@ private Q_SLOTS:
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
     void onInstanceItemMoved(InstanceItem *instanceItem);
+    void onInstanceEventItemMoved(InteractiveObject *item);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
@@ -88,6 +90,8 @@ private:
     void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem) const;
     MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
+    msc::MscInstance *nearestInstance(double x);
+    int eventIndex(double y);
 };
 
 } // namespace msc

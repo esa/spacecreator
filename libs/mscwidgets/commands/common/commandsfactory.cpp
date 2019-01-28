@@ -186,12 +186,15 @@ QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &param
 
 QUndoCommand *CommandsFactory::createActionItemMove(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 4);
 
-    if (ActionItem *item = params.first().value<ActionItem *>()) {
-        const QPointF &destination = params.last().toPointF();
-        if (item->pos() != destination)
-            return new CmdActionItemMove(item, destination);
+    if (msc::MscAction *item = params.at(0).value<msc::MscAction *>()) {
+        int newPos = params.at(1).toInt();
+        if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
+            if (msc::MscChart *chart = params.at(3).value<msc::MscChart *>()) {
+                return new CmdActionItemMove(item, newPos, newInstance, chart);
+            }
+        }
     }
 
     return nullptr;

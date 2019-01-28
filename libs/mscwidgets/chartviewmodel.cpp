@@ -34,6 +34,9 @@
 #include <QPointer>
 #include <QDebug>
 
+#include <cmath>
+#include <limits>
+
 namespace msc {
 
 template<typename ItemType, typename MscEntityType>
@@ -130,6 +133,7 @@ void ChartViewModel::fillView(MscChart *chart)
 
     connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
+    connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartViewModel::updateLayout);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
@@ -166,6 +170,31 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
     }
 
     return item;
+}
+
+MscInstance *ChartViewModel::nearestInstance(double x)
+{
+    double distance = std::numeric_limits<int>::max();
+    MscInstance *instance = nullptr;
+    for (auto item : d->m_instanceItems) {
+        double dist = std::abs(item->x() - x);
+        if (dist < distance) {
+            distance = dist;
+            instance = item->modelItem();
+        }
+    }
+    return instance;
+}
+
+int ChartViewModel::eventIndex(double y)
+{
+    int idx = 0;
+    for (auto item : d->m_instanceEventItems) {
+        if (item->y() < y) {
+            ++idx;
+        }
+    }
+    return idx;
 }
 
 void ChartViewModel::relayout()
@@ -240,11 +269,14 @@ void ChartViewModel::relayout()
             ActionItem *item = itemForAction(action);
             if (!item) {
                 item = new ActionItem(action);
+                connect(item, &ActionItem::moved, this, &ChartViewModel::onInstanceEventItemMoved,
+                        Qt::UniqueConnection);
 
                 d->m_scene.addItem(item);
                 d->m_instanceEventItems.append(item);
             }
             item->connectObjects(instance, y + instanceVertiacalOffset);
+            item->updateLayout();
             y += item->boundingRect().height() + d->InterMessageSpan;
 
             totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
@@ -501,6 +533,24 @@ void ChartViewModel::onInstanceItemMoved(InstanceItem *instanceItem)
         msc::cmd::CommandsStack::push(msc::cmd::MoveInstance,
                                       { QVariant::fromValue<MscInstance *>(instanceItem->modelItem()), nextIdx,
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });
+    }
+}
+
+void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
+{
+    auto actionItem = qobject_cast<ActionItem *>(item);
+    if (actionItem) {
+        MscInstance *newInstance = nearestInstance(actionItem->x());
+        const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
+        const int newIdx = eventIndex(item->y());
+        if (newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
+            msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
+                                          { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
+                                            QVariant::fromValue<MscInstance *>(newInstance),
+                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+        } else {
+            updateLayout();
+        }
     }
 }
 

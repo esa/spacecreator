@@ -53,6 +53,7 @@ private Q_SLOTS:
     void onTextEdited(const QString &text);
     void rebuildLayout() override;
     void onInstanceMoved(const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 private:
     QString actionText() const;

@@ -22,6 +22,7 @@
 #include "mscmessage.h"
 #include "mscgate.h"
 #include "msctimer.h"
+#include "mscaction.h"
 
 #include <QDebug>
 
@@ -272,6 +273,30 @@ void MscChart::updateInstancePos(MscInstance *instance, int pos)
 
     Q_EMIT instanceMoved(instance, currPos, pos);
     Q_EMIT dataChanged();
+}
+
+void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
+{
+    Q_ASSERT(action);
+    Q_ASSERT(newInstance);
+
+    bool changed = false;
+    if (action->instance() != newInstance) {
+        action->setInstance(newInstance);
+        changed = true;
+    }
+
+    const int currentPos = m_instanceEvents.indexOf(action);
+    if (eventPos != currentPos) {
+        m_instanceEvents.takeAt(currentPos);
+        m_instanceEvents.insert(eventPos, action);
+        changed = true;
+    }
+
+    if (changed) {
+        Q_EMIT eventMoved();
+        Q_EMIT dataChanged();
+    }
 }
 
 } // namespace msc

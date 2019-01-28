@@ -26,6 +26,7 @@
 
 namespace msc {
 
+class MscAction;
 class MscCondition;
 class MscDocument;
 class MscInstance;
@@ -62,6 +63,7 @@ public:
     MscEntity::EntityType entityType() const override;
 
     void updateInstancePos(MscInstance *instance, int pos);
+    void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
@@ -69,6 +71,7 @@ Q_SIGNALS:
     void instanceMoved(MscInstance *instance, int from, int to);
     void instanceEventAdded(MscInstanceEvent *message);
     void instanceEventRemoved(MscInstanceEvent *message);
+    void eventMoved();
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
 

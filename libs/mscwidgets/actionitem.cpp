@@ -87,12 +87,6 @@ void ActionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    // enable for debugging
-    //    painter->save();
-    //    QPen pen(Qt::green, 3);
-    //    painter->setPen(pen);
-    //    painter->drawRect(boundingRect());
-    //    painter->restore();
 }
 
 void ActionItem::setActionText(const QString &text)
@@ -110,8 +104,8 @@ void ActionItem::setActionText(const QString &text)
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
-        msc::cmd::CommandsStack::push(cmd::Id::MoveAction,
-                                      { QVariant::fromValue<ActionItem *>(this), pos() + (to - from) });
+        const QPointF &delta = to - from;
+        setPos(pos() + delta);
     }
 
     Q_UNUSED(gp);
@@ -130,6 +124,9 @@ void ActionItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &ActionItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 void ActionItem::onTextEdited(const QString &text)
@@ -160,6 +157,13 @@ void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
     Q_UNUSED(from);
     Q_UNUSED(to);
     updateLayout();
+}
+
+void ActionItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
+{
+    if (pos == GripPoint::Location::Center) {
+        Q_EMIT moved(this);
+    }
 }
 
 QString ActionItem::actionText() const

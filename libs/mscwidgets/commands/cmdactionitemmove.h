@@ -20,18 +20,21 @@
 
 #include "basecommand.h"
 
-#include <QPointF>
+#include <QPointer>
 
 namespace msc {
 
 class ActionItem;
+class MscAction;
+class MscChart;
+class MscInstance;
 
 namespace cmd {
 
 class CmdActionItemMove : public BaseCommand
 {
 public:
-    CmdActionItemMove(ActionItem *actionItem, const QPointF &destination);
+    CmdActionItemMove(msc::MscAction *action, int newPos, msc::MscInstance *newInsance, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -39,8 +42,12 @@ public:
     int id() const override;
 
 private:
-    QPointF m_posFrom;
-    QPointF m_posTo;
+    QPointer<msc::MscAction> m_action;
+    int m_oldIndex = -1;
+    int m_newIndex = -1;
+    QPointer<msc::MscInstance> m_oldInstance;
+    QPointer<msc::MscInstance> m_newInstance;
+    QPointer<msc::MscChart> m_chart;
 };
 
 } // namespace cmd

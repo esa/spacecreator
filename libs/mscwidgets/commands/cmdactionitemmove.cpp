@@ -17,36 +17,44 @@
 */
 
 #include "cmdactionitemmove.h"
-#include "actionitem.h"
+
+#include <mscaction.h>
+#include <mscchart.h>
+#include <mscinstance.h>
 
 namespace msc {
 namespace cmd {
 
-CmdActionItemMove::CmdActionItemMove(ActionItem *actionItem, const QPointF &destination)
-    : BaseCommand(actionItem)
-    , m_posFrom(actionItem ? actionItem->pos() : QPointF())
-    , m_posTo(destination)
+CmdActionItemMove::CmdActionItemMove(MscAction *action, int newPos, MscInstance *newInsance, MscChart *chart)
+    : BaseCommand(action)
+    , m_action(action)
+    , m_oldIndex(chart->instanceEvents().indexOf(action))
+    , m_newIndex(newPos)
+    , m_oldInstance(action->instance())
+    , m_newInstance(newInsance)
+    , m_chart(chart)
 {
     setText(QObject::tr("Move action"));
 }
 
 void CmdActionItemMove::redo()
 {
-    if (m_graphicsItem)
-        m_graphicsItem->setPos(m_posTo);
+    if (m_action && m_chart && m_newInstance) {
+        m_chart->updateActionPos(m_action, m_newInstance, m_newIndex);
+    }
 }
 
 void CmdActionItemMove::undo()
 {
-    if (m_graphicsItem)
-        m_graphicsItem->setPos(m_posFrom);
+    if (m_action && m_chart && m_oldInstance) {
+        m_chart->updateActionPos(m_action, m_oldInstance, m_oldIndex);
+    }
 }
 
 bool CmdActionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdActionItemMove *other = dynamic_cast<const CmdActionItemMove *>(command);
     if (canMergeWith(other)) {
-        m_posTo = other->m_posTo;
         return true;
     }
 

@@ -53,6 +53,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
+    void moved(InteractiveObject *item);
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
