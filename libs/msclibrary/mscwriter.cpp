@@ -132,7 +132,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
             events += serialize(static_cast<MscCoregion *>(instanceEvent), tabsSize);
             break;
         case MscEntity::EntityType::Action:
-            events += serialize(static_cast<MscAction *>(instanceEvent), tabsSize);
+            events += serialize(static_cast<MscAction *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Create:
             events += serialize(static_cast<MscCreate *>(instanceEvent), tabsSize);
@@ -241,10 +241,14 @@ QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
     return tabs(tabsSize) + timerType + " " + timer->name() + ";\n";
 }
 
-QString MscWriter::serialize(const MscAction *action, int tabsSize)
+QString MscWriter::serialize(const MscAction *action, const MscInstance *instance, int tabsSize)
 {
     if (action == nullptr) {
-        return QString();
+        return {};
+    }
+
+    if (action->instance() != instance) {
+        return {};
     }
 
     const QString tabString = tabs(tabsSize);
@@ -261,10 +265,10 @@ QString MscWriter::serialize(const MscAction *action, int tabsSize)
             }
             switch (statement.m_type) {
             case MscAction::DataStatement::StatementType::Define:
-                actionText += "define " + statement.m_variableString;
+                actionText += "def " + statement.m_variableString;
                 break;
             case MscAction::DataStatement::StatementType::UnDefine:
-                actionText += "undefine " + statement.m_variableString;
+                actionText += "undef " + statement.m_variableString;
                 break;
             case MscAction::DataStatement::StatementType::Binding:
                 qWarning() << "Writing of formal binding actions is not yet supported";

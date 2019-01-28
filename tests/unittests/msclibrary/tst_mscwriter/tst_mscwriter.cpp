@@ -266,6 +266,12 @@ void tst_MscWriter::testSerializeMscActionsInformal()
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
     QCOMPARE(serializeList.at(1), tab1("action 'informal_stop';"));
     QCOMPARE(serializeList.at(2), QString("endinstance;"));
+
+    MscInstance instance2("Inst_2");
+    serializeList = this->serialize(&instance2, events).split("\n", QString::SkipEmptyParts);
+    QCOMPARE(serializeList.size(), 2);
+    QCOMPARE(serializeList.at(0), QString("instance Inst_2;"));
+    QCOMPARE(serializeList.at(1), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscActionsFormal()
@@ -291,7 +297,7 @@ void tst_MscWriter::testSerializeMscActionsFormal()
     QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 3);
     QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("action define digit1, undefine digit2;"));
+    QCOMPARE(serializeList.at(1), tab1("action def digit1, undef digit2;"));
     QCOMPARE(serializeList.at(2), QString("endinstance;"));
 }
 
