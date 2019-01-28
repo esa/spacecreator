@@ -385,12 +385,9 @@ void MessageItem::setAutoResizable(bool resizable)
 
 void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (isCreator())
-        return;
-
-    if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(msc::cmd::Id::MoveMessage,
-                                      { QVariant::fromValue<MessageItem *>(this), pos() + (to - from) });
+    Q_UNUSED(gp);
+    Q_UNUSED(from);
+    Q_UNUSED(to);
 }
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -455,8 +452,7 @@ void MessageItem::prepareHoverMark()
     if (isCreator())
         m_gripPoints->setUsedPoints(GripPoint::Locations());
     else
-        m_gripPoints->setUsedPoints(
-                { GripPoint::Location::Center, GripPoint::Location::Left, GripPoint::Location::Right });
+        m_gripPoints->setUsedPoints({ GripPoint::Location::Left, GripPoint::Location::Right });
 
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }

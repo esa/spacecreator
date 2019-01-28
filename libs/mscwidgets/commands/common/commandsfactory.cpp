@@ -30,7 +30,6 @@
 #include "commands/cmdinstancekindchange.h"
 
 #include "commands/cmdmessageitemcreate.h"
-#include "commands/cmdmessageitemmove.h"
 #include "commands/cmdmessageitemresize.h"
 
 #include "actionitem.h"
@@ -55,8 +54,6 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     switch (id) {
     case cmd::RenameEntity:
         return cmd::CommandsFactory::createRenameEntity(params);
-    case cmd::MoveMessage:
-        return cmd::CommandsFactory::createMessageItemMove(params);
     case cmd::RetargetMessage:
         return cmd::CommandsFactory::createMessageItemResize(params);
     case cmd::CreateMessage:
@@ -89,19 +86,6 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
         const QString &name = params.last().toString();
         if (item->name() != name)
             return new CmdEntityNameChange(item, name);
-    }
-
-    return nullptr;
-}
-
-QUndoCommand *CommandsFactory::createMessageItemMove(const QVariantList &params)
-{
-    Q_ASSERT(params.size() == 2);
-
-    if (MessageItem *item = params.first().value<MessageItem *>()) {
-        const QPointF &destination = params.last().toPointF();
-        if (item->pos() != destination)
-            return new CmdMessageItemMove(item, destination);
     }
 
     return nullptr;

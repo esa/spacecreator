@@ -23,7 +23,6 @@ namespace cmd {
 enum Id
 {
     RenameEntity = 0,
-    MoveMessage,
     RetargetMessage,
     CreateMessage,
     MoveInstance,

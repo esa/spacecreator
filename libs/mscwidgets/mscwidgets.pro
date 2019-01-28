@@ -35,7 +35,6 @@ HEADERS += \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
     commands/cmdinstancekindchange.h \
-    commands/cmdmessageitemmove.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
     tools/basecreatortool.h \
@@ -81,7 +80,6 @@ SOURCES += \
     commands/cmdinstanceitemmove.cpp \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
-    commands/cmdmessageitemmove.cpp \
     commands/cmdmessageitemresize.cpp \
     tools/basecreatortool.cpp \
     tools/basetool.cpp \
