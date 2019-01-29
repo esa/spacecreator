@@ -204,11 +204,19 @@ void ConditionItem::rebuildLayout()
     buildLayout();
 }
 
+void ConditionItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
+{
+    if (pos == GripPoint::Location::Center) {
+        Q_EMIT moved(this);
+    }
+}
+
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() == GripPoint::Location::Center)
-        msc::cmd::CommandsStack::push(cmd::Id::MoveCondition,
-                                      { QVariant::fromValue<ConditionItem *>(this), pos() + (to - from) });
+    if (gp->location() == GripPoint::Location::Center) {
+        const QPointF &delta = to - from;
+        setPos(pos() + delta);
+    }
 }
 
 void ConditionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -222,6 +230,8 @@ void ConditionItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &ConditionItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 } // namespace msc

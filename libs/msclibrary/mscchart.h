@@ -64,6 +64,7 @@ public:
 
     void updateInstancePos(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
+    void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
@@ -76,6 +77,8 @@ Q_SIGNALS:
     void gateRemoved(MscGate *gate);
 
 private:
+    bool moveEvent(MscInstanceEvent *event, int newIndex);
+
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;
     QVector<MscGate *> m_gates;

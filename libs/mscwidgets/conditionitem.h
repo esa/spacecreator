@@ -60,6 +60,7 @@ public Q_SLOTS:
 private Q_SLOTS:
     void onNameEdited(const QString &name);
     void rebuildLayout() override;
+    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;

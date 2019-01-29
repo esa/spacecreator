@@ -39,6 +39,7 @@
 
 #include <mscaction.h>
 #include <mscchart.h>
+#include <msccondition.h>
 #include <mscinstance.h>
 
 #include <QDebug>
@@ -157,12 +158,15 @@ QUndoCommand *CommandsFactory::createInstanceKindChange(const QVariantList &para
 
 QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 4);
 
-    if (ConditionItem *item = params.first().value<ConditionItem *>()) {
-        const QPointF &destination = params.last().toPointF();
-        if (item->pos() != destination)
-            return new CmdConditionItemMove(item, destination);
+    if (msc::MscCondition *item = params.at(0).value<msc::MscCondition *>()) {
+        int newPos = params.at(1).toInt();
+        if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
+            if (msc::MscChart *chart = params.at(3).value<msc::MscChart *>()) {
+                return new CmdConditionItemMove(item, newPos, newInstance, chart);
+            }
+        }
     }
 
     return nullptr;

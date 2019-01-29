@@ -19,18 +19,21 @@
 
 #include "basecommand.h"
 
-#include <QPointF>
+#include <QPointer>
 
 namespace msc {
 
 class ConditionItem;
+class MscChart;
+class MscCondition;
+class MscInstance;
 
 namespace cmd {
 
 class CmdConditionItemMove : public BaseCommand
 {
 public:
-    CmdConditionItemMove(ConditionItem *conditionItem, const QPointF &destination);
+    CmdConditionItemMove(MscCondition *condition, int newPos, msc::MscInstance *newInsance, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -38,8 +41,12 @@ public:
     int id() const override;
 
 private:
-    QPointF m_posFrom;
-    QPointF m_posTo;
+    QPointer<msc::MscCondition> m_condition;
+    int m_oldIndex = -1;
+    int m_newIndex = -1;
+    QPointer<msc::MscInstance> m_oldInstance;
+    QPointer<msc::MscInstance> m_newInstance;
+    QPointer<msc::MscChart> m_chart;
 };
 
 } // ns cmd

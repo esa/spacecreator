@@ -16,13 +16,13 @@
 */
 
 #include "mscchart.h"
+#include "mscaction.h"
 #include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscgate.h"
 #include "msctimer.h"
-#include "mscaction.h"
 
 #include <QDebug>
 
@@ -275,28 +275,53 @@ void MscChart::updateInstancePos(MscInstance *instance, int pos)
     Q_EMIT dataChanged();
 }
 
+template<class T>
+bool setEventInstance(T *event, MscInstance *newInstance)
+{
+    Q_ASSERT(event);
+    Q_ASSERT(newInstance);
+    if (event->instance() != newInstance) {
+        event->setInstance(newInstance);
+        return true;
+    }
+    return false;
+}
+
 void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
 {
-    Q_ASSERT(action);
-    Q_ASSERT(newInstance);
-
-    bool changed = false;
-    if (action->instance() != newInstance) {
-        action->setInstance(newInstance);
-        changed = true;
-    }
-
-    const int currentPos = m_instanceEvents.indexOf(action);
-    if (eventPos != currentPos) {
-        m_instanceEvents.takeAt(currentPos);
-        m_instanceEvents.insert(eventPos, action);
-        changed = true;
-    }
+    bool changed = setEventInstance(action, newInstance);
+    changed &= moveEvent(action, eventPos);
 
     if (changed) {
         Q_EMIT eventMoved();
         Q_EMIT dataChanged();
     }
+}
+
+void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos)
+{
+    bool changed = setEventInstance(condition, newInstance);
+    changed &= moveEvent(condition, eventPos);
+
+    if (changed) {
+        Q_EMIT eventMoved();
+        Q_EMIT dataChanged();
+    }
+}
+
+/*!
+   Move the given event vertically to the given position in the event sequence.
+   Return true, if the event was moved.
+ */
+bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
+{
+    const int currentPos = m_instanceEvents.indexOf(event);
+    if (newIndex != currentPos && currentPos >= 0 && newIndex >= 0 && newIndex < m_instanceEvents.size()) {
+        m_instanceEvents.takeAt(currentPos);
+        m_instanceEvents.insert(newIndex, event);
+        return true;
+    }
+    return false;
 }
 
 } // namespace msc

@@ -55,6 +55,8 @@ bool CmdActionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdActionItemMove *other = dynamic_cast<const CmdActionItemMove *>(command);
     if (canMergeWith(other)) {
+        m_newIndex = other->m_newIndex;
+        m_newInstance = other->m_newInstance;
         return true;
     }
 

@@ -287,6 +287,8 @@ void ChartViewModel::relayout()
             auto *item = itemForCondition(condition);
             if (!item) {
                 item = new ConditionItem(condition);
+                connect(item, &ConditionItem::moved, this, &ChartViewModel::onInstanceEventItemMoved,
+                        Qt::UniqueConnection);
 
                 d->m_scene.addItem(item);
                 d->m_instanceEventItems.append(item);
@@ -301,6 +303,7 @@ void ChartViewModel::relayout()
 
             InstanceItem *instance = itemForInstance(condition->instance());
             item->connectObjects(instance, y + instance->axis().p1().y(), instancesRect);
+            item->updateLayout();
 
             prevItem = item;
 
@@ -546,6 +549,21 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
         if (newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
                                           { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
+                                            QVariant::fromValue<MscInstance *>(newInstance),
+                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+        } else {
+            updateLayout();
+        }
+    }
+
+    auto conditionItem = qobject_cast<ConditionItem *>(item);
+    if (conditionItem) {
+        MscInstance *newInstance = nearestInstance(conditionItem->x());
+        const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
+        const int newIdx = eventIndex(item->y());
+        if (newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
+            msc::cmd::CommandsStack::push(msc::cmd::MoveCondition,
+                                          { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
                                             QVariant::fromValue<MscInstance *>(newInstance),
                                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
         } else {

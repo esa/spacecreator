@@ -18,35 +18,47 @@
 
 #include "cmdconditionitemmove.h"
 #include "conditionitem.h"
+#include <msccondition.h>
+#include <mscchart.h>
+#include <mscinstance.h>
 
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(ConditionItem *conditionItem, const QPointF &destination)
-    : BaseCommand(conditionItem)
-    , m_posFrom(conditionItem ? conditionItem->pos() : QPointF())
-    , m_posTo(destination)
+CmdConditionItemMove::CmdConditionItemMove(MscCondition *condition, int newPos, MscInstance *newInsance,
+                                           MscChart *chart)
+    : BaseCommand(condition)
+    , m_condition(condition)
+    , m_oldIndex(chart->instanceEvents().indexOf(condition))
+    , m_newIndex(newPos)
+    , m_oldInstance(condition->instance())
+    , m_newInstance(newInsance)
+    , m_chart(chart)
+
 {
     setText(QObject::tr("Move condition"));
 }
 
 void CmdConditionItemMove::redo()
 {
-    if (m_graphicsItem)
-        m_graphicsItem->setPos(m_posTo);
+    if (m_condition && m_chart && m_newInstance) {
+        m_chart->updateConditionPos(m_condition, m_newInstance, m_newIndex);
+    }
 }
 
 void CmdConditionItemMove::undo()
 {
-    if (m_graphicsItem)
-        m_graphicsItem->setPos(m_posFrom);
+    if (m_condition && m_chart && m_newInstance) {
+        m_chart->updateConditionPos(m_condition, m_oldInstance, m_oldIndex);
+    }
 }
 
 bool CmdConditionItemMove::mergeWith(const QUndoCommand *command)
 {
     const CmdConditionItemMove *other = static_cast<const CmdConditionItemMove *>(command);
     if (canMergeWith(other)) {
-        m_posTo = other->m_posTo;
+        m_newIndex = other->m_newIndex;
+        m_newInstance = other->m_newInstance;
         return true;
     }
 
