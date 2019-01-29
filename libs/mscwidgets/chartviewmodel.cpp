@@ -630,6 +630,8 @@ void ChartViewModel::onInstanceItemMoved(InstanceItem *instanceItem)
                                       { QVariant::fromValue<MscInstance *>(instanceItem->modelItem()), nextIdx,
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });
     }
+
+    updateContentBounds();
 }
 
 void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)

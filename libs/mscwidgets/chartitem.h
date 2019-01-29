@@ -37,9 +37,6 @@ public:
 
     QRectF boundingRect() const override;
 
-    // Get the size of the written text with this font
-    QSizeF textSize(const QFont &font) const;
-
     QString chartName() const;
     QString chartNameGuiText() const;
 

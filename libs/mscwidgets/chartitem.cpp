@@ -25,7 +25,6 @@
 #include <QGraphicsRectItem>
 
 #include <QDebug>
-#define LOG qDebug()
 
 namespace msc {
 
@@ -49,16 +48,6 @@ ChartItem::~ChartItem() {}
 QRectF ChartItem::boundingRect() const
 {
     return m_rectItem->boundingRect();
-}
-
-QSizeF ChartItem::textSize(const QFont &font) const
-{
-    QSizeF size;
-    if (m_chart) {
-        QFontMetricsF fm(font);
-        size = fm.size(0, m_chart->name());
-    }
-    return size;
 }
 
 QString ChartItem::chartName() const
