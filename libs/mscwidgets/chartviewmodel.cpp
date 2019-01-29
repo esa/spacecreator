@@ -233,6 +233,8 @@ void ChartViewModel::relayout()
             item->setX(d->m_layoutInfo.m_pos.x());
         }
 
+        item->setHighlightable(false);
+
         item->setKind(instance->kind());
 
         d->m_layoutInfo.m_pos.rx() += d->InterInstanceSpan + item->boundingRect().width();
@@ -283,6 +285,13 @@ void ChartViewModel::relayout()
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.ry());
 
     updateContentBounds();
+
+    // restore instance's ability to be highlighted on message (dis-)connection
+    for (MscInstance *instance : d->m_currentChart->instances()) {
+        if (InstanceItem *item = itemForInstance(instance)) {
+            item->setHighlightable(true);
+        }
+    }
 
     d->m_layoutDirty = false;
 }

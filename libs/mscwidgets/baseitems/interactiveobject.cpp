@@ -137,8 +137,22 @@ HighlightRectItem *InteractiveObject::createHighlighter()
     return highlighter;
 }
 
+bool InteractiveObject::isHighlightable() const
+{
+    return m_highlightable;
+}
+
+void InteractiveObject::setHighlightable(bool highlightable)
+{
+    m_highlightable = highlightable;
+}
+
 void InteractiveObject::doHighlighting(const QColor &color)
 {
+    if (!m_highlightable) {
+        return;
+    }
+
     if (HighlightRectItem *highlighter = createHighlighter()) {
         QColor targetColor(color);
         QPen p(targetColor);

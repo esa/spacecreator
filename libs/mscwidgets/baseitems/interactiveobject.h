@@ -48,6 +48,9 @@ public:
 
     msc::MscEntity *modelEntity() const;
 
+    bool isHighlightable() const;
+    void setHighlightable(bool highlightable);
+
 public Q_SLOTS:
     void updateLayout();
 
@@ -67,6 +70,8 @@ protected:
     qreal m_storedZ = 0.;
     QPointF m_prevPos;
     bool m_layoutDirty = false;
+
+    bool m_highlightable = false;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
