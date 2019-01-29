@@ -16,23 +16,23 @@
 */
 
 #include "mscparservisitor.h"
+
+#include "exceptions.h"
 #include "mscaction.h"
-#include "mscmodel.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccoregion.h"
 #include "msccreate.h"
 #include "mscdocument.h"
+#include "mscgate.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
-#include "mscgate.h"
+#include "mscmodel.h"
 #include "msctimer.h"
-#include "msccoregion.h"
-#include "exceptions.h"
 
 #include <QDebug>
-
-#include <string>
 #include <QScopedPointer>
+#include <string>
 
 template<typename T>
 static QString treeNodeToString(T *node)

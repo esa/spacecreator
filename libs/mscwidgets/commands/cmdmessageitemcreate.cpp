@@ -17,8 +17,8 @@
 
 #include "cmdmessageitemcreate.h"
 
-#include <mscchart.h>
-#include <mscmessage.h>
+#include "mscchart.h"
+#include "mscmessage.h"
 
 namespace msc {
 namespace cmd {

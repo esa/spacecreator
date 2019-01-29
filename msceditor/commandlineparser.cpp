@@ -17,8 +17,8 @@
 
 #include "commandlineparser.h"
 
-#include <QMetaEnum>
 #include <QDebug>
+#include <QMetaEnum>
 
 CommandLineParser::CommandLineParser()
     : QCommandLineParser()

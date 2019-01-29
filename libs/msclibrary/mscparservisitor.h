@@ -18,9 +18,9 @@
 #ifndef MSCPARSERVISITOR_H
 #define MSCPARSERVISITOR_H
 
-#include <QVector>
-
 #include "parser/MscBaseVisitor.h"
+
+#include <QVector>
 
 namespace msc {
 class MscChart;

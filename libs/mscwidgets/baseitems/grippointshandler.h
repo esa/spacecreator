@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "grippoint.h"
 #include "common/abstractinteractiveobject.h"
+#include "grippoint.h"
 
 #include <QGraphicsObject>
 #include <QSet>

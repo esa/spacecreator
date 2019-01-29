@@ -17,7 +17,11 @@
 
 #include "mainmodel.h"
 
+#include "chartviewmodel.h"
 #include "exceptions.h"
+#include "hierarchyviewmodel.h"
+#include "instanceitem.h"
+#include "messageitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscfile.h"
@@ -25,11 +29,6 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscwriter.h"
-
-#include "chartviewmodel.h"
-#include "hierarchyviewmodel.h"
-#include "instanceitem.h"
-#include "messageitem.h"
 
 #include <QGraphicsScene>
 #include <documentitemmodel.h>

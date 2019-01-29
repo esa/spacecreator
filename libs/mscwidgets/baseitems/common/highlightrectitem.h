@@ -18,8 +18,8 @@
 #pragma once
 
 #include <QGraphicsObject>
-#include <QPropertyAnimation>
 #include <QPointer>
+#include <QPropertyAnimation>
 
 class QGraphicsRectItem;
 

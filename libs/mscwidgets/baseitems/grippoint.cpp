@@ -17,13 +17,14 @@
 */
 
 #include "grippoint.h"
-#include "interactiveobject.h"
+
 #include "grippointshandler.h"
+#include "interactiveobject.h"
 
 #include <QColor>
 #include <QCursor>
-#include <QPainter>
 #include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 
 namespace msc {
 

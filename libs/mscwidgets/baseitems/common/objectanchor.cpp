@@ -15,8 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "objectanchor.h"
-#include "baseitems/interactiveobject.h"
+
 #include "baseitems/common/utils.h"
+#include "baseitems/interactiveobject.h"
 
 namespace msc {
 

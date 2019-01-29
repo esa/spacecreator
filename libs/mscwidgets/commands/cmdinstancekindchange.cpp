@@ -17,7 +17,7 @@
 
 #include "cmdinstancekindchange.h"
 
-#include <mscinstance.h>
+#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {

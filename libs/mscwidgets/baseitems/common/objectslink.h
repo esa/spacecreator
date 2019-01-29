@@ -19,8 +19,8 @@
 
 #include "objectanchor.h"
 
-#include <QPointF>
 #include <QGraphicsItem>
+#include <QPointF>
 
 namespace msc {
 

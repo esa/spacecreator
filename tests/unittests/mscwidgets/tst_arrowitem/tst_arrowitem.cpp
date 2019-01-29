@@ -15,19 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <chartviewmodel.h>
-#include <baseitems/arrowitem.h>
-#include <baseitems/common/utils.h>
+#include "baseitems/arrowitem.h"
 #include "baseitems/common/objectslink.h"
-#include <instanceitem.h>
-#include <mscchart.h>
-#include <mscinstance.h>
+#include "baseitems/common/utils.h"
+#include "chartviewmodel.h"
+#include "instanceitem.h"
+#include "mscchart.h"
+#include "mscinstance.h"
 
+#include <QGraphicsScene>
+#include <QtTest>
 #include <chrono>
 #include <random>
-
-#include <QtTest>
-#include <QGraphicsScene>
 
 using namespace msc;
 

@@ -17,10 +17,10 @@
 
 #include "instancecreatortool.h"
 
-#include <commands/common/commandsstack.h>
-#include <instanceitem.h>
-#include <mscchart.h>
-#include <mscinstance.h>
+#include "commands/common/commandsstack.h"
+#include "instanceitem.h"
+#include "mscchart.h"
+#include "mscinstance.h"
 
 #include <QDebug>
 

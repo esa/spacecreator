@@ -16,6 +16,7 @@
 */
 
 #include "mscdocument.h"
+
 #include "mscchart.h"
 
 namespace msc {

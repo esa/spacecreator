@@ -15,20 +15,20 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <exceptions.h>
-#include <mscchart.h>
-#include <msccondition.h>
-#include <msccreate.h>
-#include <mscdocument.h>
-#include <mscfile.h>
-#include <mscinstance.h>
-#include <mscmessage.h>
-#include <mscmodel.h>
-#include <msctimer.h>
-#include <msccoregion.h>
+#include "exceptions.h"
+#include "mscaction.h"
+#include "mscchart.h"
+#include "msccondition.h"
+#include "msccoregion.h"
+#include "msccreate.h"
+#include "mscdocument.h"
+#include "mscfile.h"
+#include "mscinstance.h"
+#include "mscmessage.h"
+#include "mscmodel.h"
+#include "msctimer.h"
 
 #include <QtTest>
-#include <mscaction.h>
 
 using namespace msc;
 

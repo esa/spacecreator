@@ -18,9 +18,8 @@
 #pragma once
 
 #include "basecreatortool.h"
-
-#include <instanceitem.h>
-#include <mscinstance.h>
+#include "instanceitem.h"
+#include "mscinstance.h"
 
 namespace msc {
 

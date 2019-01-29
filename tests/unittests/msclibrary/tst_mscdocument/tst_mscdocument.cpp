@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <exceptions.h>
-#include <mscchart.h>
-#include <mscdocument.h>
+#include "exceptions.h"
+#include "mscchart.h"
+#include "mscdocument.h"
 
 #include <QtTest>
 

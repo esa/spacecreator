@@ -16,6 +16,7 @@
 */
 
 #include "basecreatortool.h"
+
 #include "mscchart.h"
 
 namespace msc {

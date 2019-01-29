@@ -16,6 +16,7 @@
 */
 
 #include "documentitemmodel.h"
+
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "mscdocument.h"

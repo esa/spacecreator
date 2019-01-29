@@ -15,11 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "utils.h"
+
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
 
-#include <QtGlobal>
 #include <QPropertyAnimation>
+#include <QtGlobal>
 
 namespace msc {
 namespace utils {

@@ -16,16 +16,17 @@
 */
 
 #include "mscwriter.h"
+
+#include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccoregion.h"
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
-#include "mscaction.h"
-#include "msccoregion.h"
 
 #include <QDebug>
 #include <QFile>

@@ -18,7 +18,7 @@
 
 #include "cmdinstanceitemmove.h"
 
-#include <mscchart.h>
+#include "mscchart.h"
 #include "mscinstance.h"
 
 namespace msc {

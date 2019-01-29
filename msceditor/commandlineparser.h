@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <QObject>
 #include <QCommandLineParser>
+#include <QObject>
 
 class CommandLineParser : public QCommandLineParser
 {

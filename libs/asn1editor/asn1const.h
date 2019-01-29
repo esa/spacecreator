@@ -18,6 +18,8 @@
 #ifndef ASN1CONST_H
 #define ASN1CONST_H
 
+#include <Qt>
+
 namespace asn1 {
 
 const int ASN1TYPE = Qt::UserRole;

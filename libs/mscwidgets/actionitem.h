@@ -18,7 +18,7 @@
 #ifndef ACTIONITEM_H
 #define ACTIONITEM_H
 
-#include <baseitems/interactiveobject.h>
+#include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
 
 #include <QPointer>

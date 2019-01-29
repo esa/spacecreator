@@ -17,8 +17,8 @@
 
 #include "graphicsview.h"
 
-#include <QMouseEvent>
 #include <QGraphicsItem>
+#include <QMouseEvent>
 #include <QUndoStack>
 
 namespace msc {

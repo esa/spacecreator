@@ -16,6 +16,7 @@
 */
 
 #include "appoptions.h"
+
 #include "settingsmanager.h"
 
 AppOption::AppOption(const QString &name, const QVariant &defaultValue)

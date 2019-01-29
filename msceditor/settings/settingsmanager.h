@@ -18,9 +18,9 @@
 #pragma once
 
 #include <QObject>
+#include <QRect>
 #include <QSettings>
 #include <QVector>
-#include <QRect>
 
 class SettingsManager : public QObject
 {

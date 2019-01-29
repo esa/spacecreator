@@ -15,13 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1itemdelegate.h"
+
+#include "asn1const.h"
+
 #include <QComboBox>
 #include <QPainter>
 #include <QSpinBox>
 #include <QTextEdit>
-
-#include "asn1const.h"
-#include "asn1itemdelegate.h"
 
 namespace asn1 {
 

@@ -19,7 +19,6 @@
 #define DOCUMENTITEM_H
 
 #include <QGraphicsObject>
-
 #include <memory>
 
 namespace msc {

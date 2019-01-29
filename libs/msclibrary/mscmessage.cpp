@@ -16,6 +16,7 @@
 */
 
 #include "mscmessage.h"
+
 #include "mscinstance.h"
 
 namespace msc {

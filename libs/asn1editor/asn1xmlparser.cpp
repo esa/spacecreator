@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1xmlparser.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFileInfo>
 #include <QVariantMap>
-
-#include "asn1xmlparser.h"
 
 namespace asn1 {
 

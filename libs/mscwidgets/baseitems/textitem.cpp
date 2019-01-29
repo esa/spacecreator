@@ -18,12 +18,12 @@
 
 #include "textitem.h"
 
-#include <QPainter>
-#include <QTextDocument>
-#include <QTextCursor>
-#include <QKeyEvent>
-#include <QGraphicsSceneMouseEvent>
 #include <QApplication>
+#include <QGraphicsSceneMouseEvent>
+#include <QKeyEvent>
+#include <QPainter>
+#include <QTextCursor>
+#include <QTextDocument>
 
 namespace msc {
 

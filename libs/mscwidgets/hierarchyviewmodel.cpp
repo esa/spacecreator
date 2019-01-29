@@ -17,12 +17,12 @@
 
 #include "hierarchyviewmodel.h"
 
-#include "mscmodel.h"
-#include "mscdocument.h"
 #include "documentitem.h"
+#include "mscdocument.h"
+#include "mscmodel.h"
 
-#include <QGraphicsScene>
 #include <QDebug>
+#include <QGraphicsScene>
 
 namespace msc {
 

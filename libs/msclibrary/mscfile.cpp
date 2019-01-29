@@ -16,20 +16,18 @@
 */
 
 #include "mscfile.h"
-#include "exceptions.h"
-#include "mscmodel.h"
 
-#include "mscparservisitor.h"
+#include "exceptions.h"
 #include "mscerrorlistener.h"
+#include "mscmodel.h"
+#include "mscparservisitor.h"
+#include "parser/MscBaseVisitor.h"
 #include "parser/MscLexer.h"
 #include "parser/MscParser.h"
-#include "parser/MscBaseVisitor.h"
-
-#include <antlr4-runtime.h>
 
 #include <QFileInfo>
 #include <QObject>
-
+#include <antlr4-runtime.h>
 #include <fstream>
 
 /*!

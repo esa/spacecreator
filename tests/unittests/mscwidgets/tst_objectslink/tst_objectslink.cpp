@@ -15,14 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <baseitems/common/objectslink.h>
-#include <baseitems/common/objectanchor.h>
-#include <baseitems/common/utils.h>
+#include "baseitems/common/objectanchor.h"
+#include "baseitems/common/objectslink.h"
+#include "baseitems/common/utils.h"
+#include "instanceitem.h"
+#include "mscinstance.h"
 
-#include <instanceitem.h>
-#include <mscinstance.h>
 #include <QGraphicsScene>
-
 #include <QtTest>
 
 using namespace msc;

@@ -15,16 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <baseitems/interactiveobject.h>
-#include <baseitems/grippoint.h>
-#include <baseitems/grippointshandler.h>
-#include <baseitems/common/utils.h>
+#include "baseitems/common/utils.h"
+#include "baseitems/grippoint.h"
+#include "baseitems/grippointshandler.h"
+#include "baseitems/interactiveobject.h"
 #include "tst_common.h"
 
-#include <QTest>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPointer>
+#include <QTest>
 
 using namespace msc;
 

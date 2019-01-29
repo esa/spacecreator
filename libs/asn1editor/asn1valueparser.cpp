@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QVariant>
-
 #include "asn1valueparser.h"
+
+#include <QVariant>
 
 namespace asn1 {
 

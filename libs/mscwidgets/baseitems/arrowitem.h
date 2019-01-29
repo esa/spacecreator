@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "objectslinkitem.h"
 #include "common/arrowsign.h"
 #include "common/objectanchor.h"
+#include "objectslinkitem.h"
 
 namespace msc {
 

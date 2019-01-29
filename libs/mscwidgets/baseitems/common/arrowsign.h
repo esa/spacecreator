@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <QPointF>
 #include <QPainterPath>
+#include <QPointF>
 
 namespace msc {
 

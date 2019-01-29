@@ -15,10 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QStandardItem>
+#include "asn1itemmodel.h"
 
 #include "asn1const.h"
-#include "asn1itemmodel.h"
+
+#include <QStandardItem>
 
 namespace asn1 {
 

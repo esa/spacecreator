@@ -16,25 +16,24 @@
 */
 
 #include "chartviewmodel.h"
+
 #include "actionitem.h"
+#include "baseitems/common/utils.h"
+#include "chartitem.h"
+#include "commands/common/commandsstack.h"
 #include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
-#include "chartitem.h"
-#include "baseitems/common/utils.h"
-#include "commands/common/commandsstack.h"
+#include "mscaction.h"
+#include "mscchart.h"
+#include "msccondition.h"
+#include "mscinstance.h"
 
-#include <mscaction.h>
-#include <mscchart.h>
-#include <msccondition.h>
-#include <mscinstance.h>
-
-#include <QGraphicsScene>
-#include <QVector>
-#include <QPointer>
 #include <QDebug>
+#include <QGraphicsScene>
 #include <QMap>
-
+#include <QPointer>
+#include <QVector>
 #include <cmath>
 #include <limits>
 

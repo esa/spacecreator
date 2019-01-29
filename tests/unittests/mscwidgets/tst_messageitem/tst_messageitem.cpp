@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <exceptions.h>
-#include <messageitem.h>
-#include <mscmessage.h>
+#include "exceptions.h"
+#include "messageitem.h"
+#include "mscmessage.h"
 
 #include <QtTest>
 

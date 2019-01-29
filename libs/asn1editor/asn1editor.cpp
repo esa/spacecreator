@@ -15,15 +15,15 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QFileDialog>
-#include <QMessageBox>
-
 #include "asn1editor.h"
+
 #include "asn1treeview.h"
 #include "asn1valueparser.h"
 #include "asn1xmlparser.h"
-
 #include "ui_asn1editor.h"
+
+#include <QFileDialog>
+#include <QMessageBox>
 
 namespace asn1 {
 

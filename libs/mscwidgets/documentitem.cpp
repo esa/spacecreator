@@ -19,10 +19,10 @@
 
 #include "mscdocument.h"
 
-#include <QPointer>
-#include <QPainter>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <QPointer>
 
 namespace msc {
 

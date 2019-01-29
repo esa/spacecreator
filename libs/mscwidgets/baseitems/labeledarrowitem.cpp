@@ -15,10 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "labeledarrowitem.h"
-#include "textitem.h"
+
 #include "arrowitem.h"
 #include "common/objectslink.h"
 #include "common/utils.h"
+#include "textitem.h"
 
 #include <QPainter>
 

@@ -15,7 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <baseitems/grippoint.h>
+#include "baseitems/grippoint.h"
+
 #include <QtTest>
 
 using namespace msc;

@@ -17,7 +17,6 @@
 
 #pragma once
 #include <QGraphicsObject>
-
 #include <memory>
 
 class QGraphicsRectItem;

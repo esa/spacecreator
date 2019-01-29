@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QGraphicsPolygonItem>
-
 #include "conditionitem.h"
-#include "msccondition.h"
 
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
+#include "msccondition.h"
+
+#include <QGraphicsPolygonItem>
 
 namespace msc {
 

@@ -15,25 +15,22 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <commands/common/commandsfactory.h>
-#include <commands/cmdmessageitemcreate.h>
-#include <commands/common/commandsstack.h>
-
-#include <chartviewmodel.h>
-#include <mscmessage.h>
-#include <messageitem.h>
-#include <mscinstance.h>
-#include <instanceitem.h>
-#include <mscchart.h>
-#include <baseitems/arrowitem.h>
-
+#include "baseitems/arrowitem.h"
+#include "chartviewmodel.h"
+#include "commands/cmdmessageitemcreate.h"
+#include "commands/common/commandsfactory.h"
+#include "commands/common/commandsstack.h"
+#include "instanceitem.h"
+#include "messageitem.h"
+#include "mscchart.h"
+#include "mscinstance.h"
+#include "mscmessage.h"
 #include "tst_common.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QPointer>
 #include <QPainterPath>
-
+#include <QPointer>
 #include <QtTest>
 
 using namespace msc;

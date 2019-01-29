@@ -19,7 +19,6 @@
 #define HIERARCHYVIEWMODEL_H
 
 #include <QObject>
-
 #include <memory>
 
 class QGraphicsScene;

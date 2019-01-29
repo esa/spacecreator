@@ -16,26 +16,20 @@
 */
 #include "commandsfactory.h"
 
-#include "commands/cmdactionitemmove.h"
 #include "commands/cmdactioninformaltext.h"
-
+#include "commands/cmdactionitemmove.h"
 #include "commands/cmdconditionitemmove.h"
-
 #include "commands/cmdentitynamechange.h"
-
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstancekindchange.h"
-
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
-
 #include "messageitem.h"
-
-#include <mscaction.h>
-#include <mscchart.h>
-#include <msccondition.h>
-#include <mscinstance.h>
+#include "mscaction.h"
+#include "mscchart.h"
+#include "msccondition.h"
+#include "mscinstance.h"
 
 #include <QDebug>
 #include <QPointF>

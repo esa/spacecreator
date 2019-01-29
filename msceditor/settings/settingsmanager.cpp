@@ -17,8 +17,8 @@
 
 #include "settingsmanager.h"
 
-#include <QStandardPaths>
 #include <QDebug>
+#include <QStandardPaths>
 
 SettingsManager *SettingsManager::m_instance = nullptr;
 

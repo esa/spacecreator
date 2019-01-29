@@ -16,12 +16,11 @@
 */
 
 #include "actionitem.h"
-#include "instanceitem.h"
 
-#include <mscaction.h>
-
-#include <baseitems/textitem.h>
+#include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
+#include "instanceitem.h"
+#include "mscaction.h"
 
 #include <QDebug>
 #include <QPainter>

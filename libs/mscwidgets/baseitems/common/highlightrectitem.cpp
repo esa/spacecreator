@@ -16,6 +16,7 @@
 */
 
 #include "highlightrectitem.h"
+
 #include "utils.h"
 
 #include <QGraphicsRectItem>

@@ -16,11 +16,12 @@
 */
 
 #include "mscchart.h"
+
 #include "mscaction.h"
 #include "msccondition.h"
 #include "mscdocument.h"
-#include "mscinstance.h"
 #include "mscgate.h"
+#include "mscinstance.h"
 #include "msctimer.h"
 
 #include <QDebug>

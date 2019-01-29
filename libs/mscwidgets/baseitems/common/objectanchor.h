@@ -19,9 +19,9 @@
 
 #include "baseitems/interactiveobject.h"
 
+#include <QGraphicsItem>
 #include <QObject>
 #include <QPointF>
-#include <QGraphicsItem>
 #include <QPointer>
 
 namespace msc {

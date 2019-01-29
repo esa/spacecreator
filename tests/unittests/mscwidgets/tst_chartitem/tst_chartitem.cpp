@@ -15,12 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QtTest>
-
-#include <mscchart.h>
-#include <chartitem.h>
+#include "chartitem.h"
+#include "mscchart.h"
 
 #include <QScopedPointer>
+#include <QtTest>
 
 // add necessary includes here
 

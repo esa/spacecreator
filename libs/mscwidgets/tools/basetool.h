@@ -19,12 +19,12 @@
 
 #include "tooltypes.h"
 
-#include <QObject>
-#include <QPointer>
-#include <QPixmap>
-#include <QGraphicsView>
-#include <QGraphicsScene>
 #include <QGraphicsObject>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QObject>
+#include <QPixmap>
+#include <QPointer>
 
 class QMouseEvent;
 

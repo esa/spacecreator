@@ -17,7 +17,7 @@
 
 #include "basecommand.h"
 
-#include <mscentity.h>
+#include "mscentity.h"
 
 namespace msc {
 namespace cmd {

@@ -22,7 +22,6 @@
 
 #include <QMainWindow>
 #include <QModelIndex>
-
 #include <memory>
 
 namespace Ui {

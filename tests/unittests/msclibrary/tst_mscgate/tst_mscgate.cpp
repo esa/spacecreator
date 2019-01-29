@@ -15,12 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QtTest>
-
-#include <mscgate.h>
-#include <mscinstance.h>
+#include "mscgate.h"
+#include "mscinstance.h"
 
 #include <QMetaObject>
+#include <QtTest>
 
 using namespace msc;
 

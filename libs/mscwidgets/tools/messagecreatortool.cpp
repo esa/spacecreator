@@ -17,10 +17,10 @@
 
 #include "messagecreatortool.h"
 
-#include <baseitems/arrowitem.h>
-#include <commands/common/commandsstack.h>
-#include <mscchart.h>
-#include <mscmessage.h>
+#include "baseitems/arrowitem.h"
+#include "commands/common/commandsstack.h"
+#include "mscchart.h"
+#include "mscmessage.h"
 
 #include <QDebug>
 

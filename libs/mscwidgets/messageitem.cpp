@@ -16,20 +16,21 @@
 */
 
 #include "messageitem.h"
-#include "baseitems/labeledarrowitem.h"
+
 #include "baseitems/arrowitem.h"
-#include "baseitems/grippointshandler.h"
-#include "baseitems/common/utils.h"
 #include "baseitems/common/objectslink.h"
+#include "baseitems/common/utils.h"
+#include "baseitems/grippointshandler.h"
+#include "baseitems/labeledarrowitem.h"
 #include "commands/common/commandsstack.h"
 
 #include <QBrush>
+#include <QDebug>
 #include <QGraphicsLineItem>
 #include <QGraphicsPolygonItem>
-#include <QPolygonF>
-#include <QPainter>
 #include <QGraphicsScene>
-#include <QDebug>
+#include <QPainter>
+#include <QPolygonF>
 
 namespace msc {
 

@@ -20,10 +20,10 @@
 
 #include "common/drawrectinfo.h"
 
-#include <QObject>
 #include <QBrush>
 #include <QCursor>
 #include <QGraphicsItem>
+#include <QObject>
 #include <QPainterPath>
 #include <QPen>
 

@@ -20,8 +20,8 @@
 
 #include "interactiveobject.h"
 
-#include <QGraphicsItem>
 #include <QBrush>
+#include <QGraphicsItem>
 #include <QPen>
 
 namespace msc {

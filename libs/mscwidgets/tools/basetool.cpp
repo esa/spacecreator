@@ -17,11 +17,11 @@
 
 #include "basetool.h"
 
-#include <baseitems/common/utils.h>
+#include "baseitems/common/utils.h"
 
+#include <QDebug>
 #include <QGraphicsView>
 #include <QMouseEvent>
-#include <QDebug>
 
 namespace msc {
 

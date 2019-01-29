@@ -15,39 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "asn1editor.h"
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "mainmodel.h"
+
+#include "asn1editor.h"
+#include "chartviewmodel.h"
 #include "commandlineparser.h"
+#include "commands/common/commandsstack.h"
+#include "documentitemmodel.h"
+#include "mainmodel.h"
+#include "mscchart.h"
+#include "mscwriter.h"
 #include "settings/appoptions.h"
+#include "tools/hierarchycreatortool.h"
+#include "tools/instancecreatortool.h"
+#include "tools/messagecreatortool.h"
+#include "tools/pointertool.h"
+#include "ui_mainwindow.h"
 
-#include <documentitemmodel.h>
-#include <mscchart.h>
-#include <chartviewmodel.h>
-
-#include <commands/common/commandsstack.h>
-
-#include <tools/hierarchycreatortool.h>
-#include <tools/instancecreatortool.h>
-#include <tools/messagecreatortool.h>
-#include <tools/pointertool.h>
-
+#include <QActionGroup>
 #include <QApplication>
 #include <QComboBox>
+#include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QItemSelectionModel>
-#include <QTreeView>
 #include <QKeySequence>
-#include <QApplication>
+#include <QMessageBox>
+#include <QToolBar>
+#include <QTreeView>
 #include <QUndoGroup>
 #include <QUndoStack>
-#include <QToolBar>
-#include <QActionGroup>
-#include <QMessageBox>
-#include <QDebug>
-#include <mscwriter.h>
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)

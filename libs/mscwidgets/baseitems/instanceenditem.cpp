@@ -17,11 +17,10 @@
 
 #include "instanceenditem.h"
 
-#include <QPainter>
 #include <QBrush>
-#include <QPen>
-
 #include <QDebug>
+#include <QPainter>
+#include <QPen>
 
 namespace msc {
 

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "basecommand.h"
-#include <mscmessage.h>
+#include "mscmessage.h"
 
 #include <QPointer>
 

@@ -18,11 +18,10 @@
 #ifndef CHARTVIEWMODEL_H
 #define CHARTVIEWMODEL_H
 
-#include <mscmessage.h>
+#include "mscmessage.h"
 
 #include <QObject>
 #include <QPointF>
-
 #include <memory>
 
 class QGraphicsScene;

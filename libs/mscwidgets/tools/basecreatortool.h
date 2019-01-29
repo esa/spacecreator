@@ -18,10 +18,9 @@
 #pragma once
 
 #include "basetool.h"
-
-#include <chartviewmodel.h>
-#include <mscentity.h>
-#include <mscchart.h>
+#include "chartviewmodel.h"
+#include "mscchart.h"
+#include "mscentity.h"
 
 #include <QPointer>
 

@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QtTest>
+#include "settings/appoptions.h"
+
+#include <QAction>
 #include <QCoreApplication>
 #include <QDockWidget>
-#include <QAction>
-
-#include "settings/appoptions.h"
+#include <QtTest>
 
 class tst_Settings : public QObject
 {

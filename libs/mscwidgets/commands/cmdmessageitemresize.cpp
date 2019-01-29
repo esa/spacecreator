@@ -17,8 +17,8 @@
 
 #include "cmdmessageitemresize.h"
 
-#include <mscchart.h>
-#include <mscinstance.h>
+#include "mscchart.h"
+#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {

@@ -16,15 +16,15 @@
 */
 
 #include "chartitem.h"
-#include "mscchart.h"
-#include "baseitems/textitem.h"
 
-#include <QPointer>
-#include <QPainter>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsRectItem>
+#include "baseitems/textitem.h"
+#include "mscchart.h"
 
 #include <QDebug>
+#include <QGraphicsRectItem>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <QPointer>
 
 namespace msc {
 

@@ -18,10 +18,10 @@
 #ifndef MESSAGEITEM_H
 #define MESSAGEITEM_H
 
-#include "baseitems/interactiveobject.h"
 #include "baseitems/common/objectanchor.h"
-#include <instanceitem.h>
-#include <mscmessage.h>
+#include "baseitems/interactiveobject.h"
+#include "instanceitem.h"
+#include "mscmessage.h"
 
 #include <QPointer>
 

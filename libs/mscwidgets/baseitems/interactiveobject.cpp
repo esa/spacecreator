@@ -17,15 +17,15 @@
 */
 
 #include "interactiveobject.h"
-#include "grippointshandler.h"
+
 #include "common/highlightrectitem.h"
+#include "grippointshandler.h"
+#include "mscentity.h"
 
-#include <mscentity.h>
-
+#include <QBrush>
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPen>
-#include <QBrush>
 
 namespace msc {
 

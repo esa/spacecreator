@@ -17,8 +17,9 @@
 */
 
 #include "objectslinkitem.h"
-#include "common/objectslink.h"
+
 #include "common/objectanchor.h"
+#include "common/objectslink.h"
 #include "common/utils.h"
 
 #include <QEvent>

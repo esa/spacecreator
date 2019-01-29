@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <commandlineparser.h>
-#include <mainwindow.h>
+#include "commandlineparser.h"
+#include "mainwindow.h"
 
-#include <QtTest>
-#include <QTimer>
 #include <QMessageBox>
+#include <QTimer>
+#include <QtTest>
 
 class tst_CommandLineParser : public QObject
 {

@@ -15,16 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <exceptions.h>
-#include <mscaction.h>
-#include <mscchart.h>
-#include <msccondition.h>
-#include <msccreate.h>
-#include <mscinstance.h>
-#include <mscmessage.h>
-#include <mscgate.h>
-#include <msctimer.h>
-#include <msccoregion.h>
+#include "exceptions.h"
+#include "mscaction.h"
+#include "mscchart.h"
+#include "msccondition.h"
+#include "msccoregion.h"
+#include "msccreate.h"
+#include "mscgate.h"
+#include "mscinstance.h"
+#include "mscmessage.h"
+#include "msctimer.h"
 
 #include <QtTest>
 

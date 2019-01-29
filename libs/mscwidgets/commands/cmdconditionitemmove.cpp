@@ -17,10 +17,11 @@
 */
 
 #include "cmdconditionitemmove.h"
+
 #include "conditionitem.h"
-#include <msccondition.h>
-#include <mscchart.h>
-#include <mscinstance.h>
+#include "mscchart.h"
+#include "msccondition.h"
+#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {

@@ -17,7 +17,7 @@
 
 #include "cmdentitynamechange.h"
 
-#include <mscentity.h>
+#include "mscentity.h"
 
 namespace msc {
 namespace cmd {

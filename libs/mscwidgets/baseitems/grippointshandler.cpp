@@ -17,13 +17,14 @@
 */
 
 #include "grippointshandler.h"
+
 #include "common/utils.h"
 
-#include <QPainter>
-#include <QPropertyAnimation>
-#include <QMetaEnum>
 #include <QDebug>
 #include <QGraphicsView>
+#include <QMetaEnum>
+#include <QPainter>
+#include <QPropertyAnimation>
 
 namespace msc {
 

@@ -15,10 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1valueparser.h"
+
 #include <QSignalSpy>
 #include <QtTest>
-
-#include "asn1valueparser.h"
 
 using namespace asn1;
 

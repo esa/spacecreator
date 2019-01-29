@@ -18,9 +18,9 @@
 #ifndef MCSERRORLISTENER_H
 #define MCSERRORLISTENER_H
 
-#include <QStringList>
-
 #include "BaseErrorListener.h"
+
+#include <QStringList>
 
 namespace msc {
 

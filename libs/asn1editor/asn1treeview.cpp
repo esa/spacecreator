@@ -15,14 +15,15 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QHeaderView>
-#include <QStandardItem>
-#include <QStandardItemModel>
+#include "asn1treeview.h"
 
 #include "asn1const.h"
 #include "asn1itemdelegate.h"
 #include "asn1itemmodel.h"
-#include "asn1treeview.h"
+
+#include <QHeaderView>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 namespace asn1 {
 

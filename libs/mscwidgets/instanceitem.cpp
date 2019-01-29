@@ -16,25 +16,25 @@
 */
 
 #include "instanceitem.h"
-#include "messageitem.h"
-#include "baseitems/textitem.h"
-#include "baseitems/objectslinkitem.h"
+
+#include "baseitems/common/utils.h"
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
-#include "baseitems/common/utils.h"
 #include "baseitems/instanceenditem.h"
+#include "baseitems/objectslinkitem.h"
+#include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
+#include "messageitem.h"
+#include "mscinstance.h"
 
-#include <mscinstance.h>
-
+#include <QApplication>
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
-#include <QPainter>
-#include <QApplication>
 #include <QLinearGradient>
+#include <QPainter>
 
 namespace msc {
 
