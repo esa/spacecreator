@@ -41,6 +41,7 @@ class MscInstance;
 class MscMessage;
 
 struct ChartViewModelPrivate;
+struct ChartViewLayoutInfo;
 class ChartViewModel : public QObject
 {
     Q_OBJECT
@@ -88,8 +89,14 @@ private:
 
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
-    void updateCreatedInstanceHeight(InstanceItem *instanceItem) const;
+    void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
+    qreal ensureInstanceCreationAdded(MscInstance *dynamicInstance);
+
+    MessageItem *addMessageItem(MscMessage *message);
+    ActionItem *addActionItem(MscAction *action);
+    ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
+
     msc::MscInstance *nearestInstance(double x);
     int eventIndex(double y);
 };

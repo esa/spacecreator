@@ -597,7 +597,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
             throw ParserException("Incorrect(unknown) create name '" + name + "'");
         }
 
-        createInstance->setExplicitCreate(true);
+        createInstance->setExplicitCreator(m_currentInstance);
 
         auto *create = new MscCreate(name);
         m_currentEvent = create;

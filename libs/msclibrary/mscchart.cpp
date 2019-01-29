@@ -120,6 +120,7 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
             case MscEntity::EntityType::Document:
             case MscEntity::EntityType::Chart:
             case MscEntity::EntityType::Instance:
+            case MscEntity::EntityType::Create: // A synthetic MscMessage is used instead
                 continue;
             case MscEntity::EntityType::Message: {
                 auto message = static_cast<MscMessage *>(instanceEvent);

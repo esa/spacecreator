@@ -41,8 +41,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    bool explicitCreate() const;
-    void setExplicitCreate(bool create);
+    MscInstance *explicitCreator() const;
+    void setExplicitCreator(MscInstance *creator);
 
     bool explicitStop() const;
     void setExplicitStop(bool stop);
@@ -56,7 +56,7 @@ private:
     QString m_denominator;
     QString m_kind;
     QString m_inheritance;
-    bool m_explicitStart = false;
+    MscInstance *m_explicitCreator = nullptr;
     bool m_explicitStop = false;
 };
 

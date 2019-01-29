@@ -82,16 +82,16 @@ MscEntity::EntityType MscInstance::entityType() const
     return MscEntity::EntityType::Instance;
 }
 
-bool MscInstance::explicitCreate() const
+MscInstance *MscInstance::explicitCreator() const
 {
-    return m_explicitStart;
+    return m_explicitCreator;
 }
-void MscInstance::setExplicitCreate(bool create)
+void MscInstance::setExplicitCreator(MscInstance *creator)
 {
-    if (m_explicitStart == create)
+    if (m_explicitCreator == creator)
         return;
 
-    m_explicitStart = create;
+    m_explicitCreator = creator;
     Q_EMIT dataChanged();
 }
 
