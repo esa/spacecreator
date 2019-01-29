@@ -19,6 +19,7 @@
 #define MSCCHART_H
 
 #include "mscentity.h"
+#include "mscmessage.h"
 
 #include <QObject>
 #include <QString>
@@ -31,7 +32,6 @@ class MscCondition;
 class MscDocument;
 class MscInstance;
 class MscInstanceEvent;
-class MscMessage;
 class MscGate;
 
 class MscChart : public MscEntity
@@ -65,6 +65,8 @@ public:
     void updateInstancePos(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
     void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
+    void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
+                             msc::MscMessage::EndType endType);
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
@@ -73,6 +75,7 @@ Q_SIGNALS:
     void instanceEventAdded(MscInstanceEvent *message);
     void instanceEventRemoved(MscInstanceEvent *message);
     void eventMoved();
+    void messageRetargeted();
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
 

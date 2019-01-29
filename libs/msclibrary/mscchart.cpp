@@ -20,7 +20,6 @@
 #include "msccondition.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
-#include "mscmessage.h"
 #include "mscgate.h"
 #include "msctimer.h"
 
@@ -291,7 +290,7 @@ bool setEventInstance(T *event, MscInstance *newInstance)
 void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos)
 {
     bool changed = setEventInstance(action, newInstance);
-    changed &= moveEvent(action, eventPos);
+    changed |= moveEvent(action, eventPos);
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -302,7 +301,7 @@ void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int 
 void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos)
 {
     bool changed = setEventInstance(condition, newInstance);
-    changed &= moveEvent(condition, eventPos);
+    changed |= moveEvent(condition, eventPos);
 
     if (changed) {
         Q_EMIT eventMoved();
@@ -323,6 +322,32 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
         return true;
     }
     return false;
+}
+
+void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
+                                   msc::MscMessage::EndType endType)
+{
+    Q_ASSERT(message);
+
+    bool changed = false;
+    if (endType == msc::MscMessage::EndType::SOURCE_TAIL) {
+        if (message->sourceInstance() != newInstance) {
+            message->setSourceInstance(newInstance);
+            changed = true;
+        }
+    } else {
+        if (message->targetInstance() != newInstance) {
+            message->setTargetInstance(newInstance);
+            changed = true;
+        }
+    }
+
+    changed |= moveEvent(message, eventPos);
+
+    if (changed) {
+        Q_EMIT messageRetargeted();
+        Q_EMIT dataChanged();
+    }
 }
 
 } // namespace msc

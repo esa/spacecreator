@@ -24,7 +24,6 @@
 
 namespace msc {
 
-class ActionItem;
 class MscAction;
 class MscChart;
 class MscInstance;

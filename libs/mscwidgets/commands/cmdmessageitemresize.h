@@ -18,20 +18,22 @@
 #pragma once
 
 #include "basecommand.h"
+#include <mscmessage.h>
 
 #include <QPointer>
-#include <QPointF>
 
 namespace msc {
 
-class MessageItem;
+class MscChart;
+class MscInstance;
 
 namespace cmd {
 
 class CmdMessageItemResize : public BaseCommand
 {
 public:
-    CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail);
+    CmdMessageItemResize(MscMessage *message, int newPos, msc::MscInstance *newInsance,
+                         msc::MscMessage::EndType endType, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -39,12 +41,13 @@ public:
     int id() const override;
 
 private:
-    QPointer<MessageItem> m_messageItem;
-
-    QPointF m_newHead;
-    QPointF m_newTail;
-    QPointF m_oldHead;
-    QPointF m_oldTail;
+    QPointer<MscMessage> m_message;
+    int m_oldIndex = -1;
+    int m_newIndex = -1;
+    QPointer<msc::MscInstance> m_oldInstance;
+    QPointer<msc::MscInstance> m_newInstance;
+    msc::MscMessage::EndType m_endType = msc::MscMessage::EndType::SOURCE_TAIL;
+    QPointer<msc::MscChart> m_chart;
 };
 
 } // ns cmd

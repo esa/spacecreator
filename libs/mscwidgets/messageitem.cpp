@@ -215,7 +215,6 @@ void MessageItem::updateGripPoints()
 
         m_gripPoints->setGripPointPos(GripPoint::Left, start);
         m_gripPoints->setGripPointPos(GripPoint::Right, end);
-        m_gripPoints->setGripPointPos(GripPoint::Center, utils::lineCenter(QLineF(start, end)));
     }
 }
 
@@ -392,16 +391,21 @@ void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    Q_UNUSED(from);
     if (isCreator())
         return;
 
-    const QPointF &shift(to - from);
+    //    const QPointF shift(to - from);
     if (gp->location() == GripPoint::Left) {
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MessageItem *>(this), head(), tail() + shift });
+        //        setTail(tail() + shift, ObjectAnchor::Snap::NoSnap);
+        //        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+        //                                      { QVariant::fromValue<MessageItem *>(this), head(), tail() + shift });
+        m_arrowItem->updateSource(m_sourceInstance, to, ObjectAnchor::Snap::NoSnap);
     } else if (gp->location() == GripPoint::Right) {
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
+        //        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+        //                                      { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
+        //        setHead(head() + shift, ObjectAnchor::Snap::NoSnap);
+        m_arrowItem->updateTarget(m_targetInstance, to, ObjectAnchor::Snap::NoSnap);
     }
     updateGripPoints();
 }
@@ -454,6 +458,9 @@ void MessageItem::prepareHoverMark()
     else
         m_gripPoints->setUsedPoints({ GripPoint::Location::Left, GripPoint::Location::Right });
 
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &MessageItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
+
     m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
 }
 
@@ -465,6 +472,15 @@ void MessageItem::onRenamed(const QString &title)
 
     using namespace msc::cmd;
     CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), title });
+}
+
+void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
+{
+    if (pos == GripPoint::Left) {
+        Q_EMIT retargeted(this, to, msc::MscMessage::EndType::SOURCE_TAIL);
+    } else if (pos == GripPoint::Right) {
+        Q_EMIT retargeted(this, to, msc::MscMessage::EndType::TARGET_HEAD);
+    }
 }
 
 } // namespace msc

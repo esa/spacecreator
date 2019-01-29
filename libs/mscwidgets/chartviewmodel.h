@@ -18,6 +18,8 @@
 #ifndef CHARTVIEWMODEL_H
 #define CHARTVIEWMODEL_H
 
+#include <mscmessage.h>
+
 #include <QObject>
 #include <QPointF>
 
@@ -38,7 +40,6 @@ class MessageItem;
 class MscAction;
 class MscCondition;
 class MscInstance;
-class MscMessage;
 
 struct ChartViewModelPrivate;
 struct ChartViewLayoutInfo;
@@ -81,6 +82,7 @@ private Q_SLOTS:
     void removeEventItem(msc::MscInstanceEvent *event);
     void onInstanceItemMoved(InstanceItem *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
+    void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;

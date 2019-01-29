@@ -67,6 +67,7 @@ public:
 
 Q_SIGNALS:
     void needRelayout() const;
+    void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
 public Q_SLOTS:
     void setName(const QString &name);
@@ -82,6 +83,7 @@ private Q_SLOTS:
     void rebuildLayout() override;
     void commitGeometryChange();
     void onRenamed(const QString &title);
+    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 private:
     QPointer<msc::MscMessage> m_message = nullptr;

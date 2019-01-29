@@ -49,7 +49,7 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     case cmd::RenameEntity:
         return cmd::CommandsFactory::createRenameEntity(params);
     case cmd::RetargetMessage:
-        return cmd::CommandsFactory::createMessageItemResize(params);
+        return cmd::CommandsFactory::createMessageItemRetarget(params);
     case cmd::CreateMessage:
         return cmd::CommandsFactory::createMessageItemCreate(params);
     case cmd::MoveInstance:
@@ -85,14 +85,18 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::createMessageItemResize(const QVariantList &params)
+QUndoCommand *CommandsFactory::createMessageItemRetarget(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 5);
 
-    if (MessageItem *pItem = params.at(0).value<MessageItem *>()) {
-        const QPointF &head(params.at(1).toPointF());
-        const QPointF &tail(params.at(2).toPointF());
-        return new CmdMessageItemResize(pItem, head, tail);
+    if (msc::MscMessage *item = params.at(0).value<msc::MscMessage *>()) {
+        int newPos = params.at(1).toInt();
+        if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
+            msc::MscMessage::EndType endtype = params.at(3).value<msc::MscMessage::EndType>();
+            if (msc::MscChart *chart = params.at(4).value<msc::MscChart *>()) {
+                return new CmdMessageItemResize(item, newPos, newInstance, endtype, chart);
+            }
+        }
     }
 
     return nullptr;

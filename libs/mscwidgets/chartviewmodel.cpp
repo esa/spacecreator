@@ -27,7 +27,6 @@
 #include <mscchart.h>
 #include <msccondition.h>
 #include <mscinstance.h>
-#include <mscmessage.h>
 
 #include <QGraphicsScene>
 #include <QVector>
@@ -159,6 +158,10 @@ void ChartViewModel::fillView(MscChart *chart)
     connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
     connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartViewModel::updateLayout);
+    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, [&]() {
+        this->clearScene();
+        this->updateLayout();
+    });
 
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
@@ -169,6 +172,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
     MessageItem *item = itemForMessage(message);
     if (!item) {
         item = new MessageItem(message);
+        connect(item, &MessageItem::retargeted, this, &ChartViewModel::onMessageRetargeted, Qt::UniqueConnection);
 
         const bool isCreateMsg =
                 item->isCreator() && targetItem && targetItem->modelItem() == message->targetInstance();
@@ -658,6 +662,29 @@ int ChartViewModel::eventIndex(double y)
             ++idx;
         }
     }
-    return idx;
+    return std::min(idx, d->m_instanceEventItems.size() - 1);
 }
+
+void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)
+{
+    Q_ASSERT(item);
+    Q_ASSERT(item->modelItem());
+
+    MscInstance *newInstance = nearestInstance(pos.x());
+    MscInstance *currentInstance = endType == MscMessage::EndType::SOURCE_TAIL ? item->modelItem()->sourceInstance()
+                                                                               : item->modelItem()->targetInstance();
+    const int currentIdx = d->m_currentChart->instanceEvents().indexOf(item->modelItem());
+    const int newIdx = eventIndex(pos.y());
+    if (newInstance != currentInstance || newIdx != currentIdx) {
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+                                      { QVariant::fromValue<MscMessage *>(item->modelItem()), newIdx,
+                                        QVariant::fromValue<MscInstance *>(newInstance),
+                                        QVariant::fromValue<MscMessage::EndType>(endType),
+                                        QVariant::fromValue<MscChart *>(d->m_currentChart) });
+    } else {
+        clearScene();
+        updateLayout();
+    }
+}
+
 } // namespace msc

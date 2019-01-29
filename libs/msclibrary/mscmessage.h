@@ -36,12 +36,20 @@ public:
         QString pattern;
     };
 
-    enum class MessageType {
+    enum class MessageType
+    {
         Message = 0,
         Create
 
         // TODO: add call/reply/method/etc?
     };
+
+    enum class EndType
+    {
+        SOURCE_TAIL,
+        TARGET_HEAD
+    };
+    Q_ENUM(EndType)
 
     explicit MscMessage(QObject *parent = nullptr);
     explicit MscMessage(const QString &name, QObject *parent = nullptr);

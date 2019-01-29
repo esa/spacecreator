@@ -16,36 +16,40 @@
 */
 
 #include "cmdmessageitemresize.h"
-#include "messageitem.h"
+
+#include <mscchart.h>
+#include <mscinstance.h>
 
 namespace msc {
 namespace cmd {
 
-CmdMessageItemResize::CmdMessageItemResize(MessageItem *messageItem, const QPointF &head, const QPointF &tail)
-    : BaseCommand(messageItem->modelItem())
-    , m_messageItem(messageItem)
-    , m_newHead(head)
-    , m_newTail(tail)
-    , m_oldHead(messageItem ? messageItem->head() : QPointF())
-    , m_oldTail(messageItem ? messageItem->tail() : QPointF())
+CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscInstance *newInsance,
+                                           MscMessage::EndType endType, MscChart *chart)
+    : BaseCommand(message)
+    , m_message(message)
+    , m_oldIndex(chart->instanceEvents().indexOf(message))
+    , m_newIndex(newPos)
+    , m_oldInstance(endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance()
+                                                                     : message->targetInstance())
+    , m_newInstance(newInsance)
+    , m_endType(endType)
+    , m_chart(chart)
 
 {
-    setText(QObject::tr("Resize message"));
+    setText(QObject::tr("ReTarget message"));
 }
 
 void CmdMessageItemResize::redo()
 {
-    if (m_messageItem) {
-        m_messageItem->setHead(m_newHead, ObjectAnchor::Snap::SnapTo);
-        m_messageItem->setTail(m_newTail, ObjectAnchor::Snap::SnapTo);
+    if (m_message && m_chart && m_newInstance) {
+        m_chart->updateMessageTarget(m_message, m_newInstance, m_newIndex, m_endType);
     }
 }
 
 void CmdMessageItemResize::undo()
 {
-    if (m_messageItem) {
-        m_messageItem->setHead(m_oldHead, ObjectAnchor::Snap::SnapTo);
-        m_messageItem->setTail(m_oldTail, ObjectAnchor::Snap::SnapTo);
+    if (m_message && m_chart && m_newInstance) {
+        m_chart->updateMessageTarget(m_message, m_oldInstance, m_oldIndex, m_endType);
     }
 }
 
@@ -53,8 +57,11 @@ bool CmdMessageItemResize::mergeWith(const QUndoCommand *command)
 {
     const CmdMessageItemResize *other = static_cast<const CmdMessageItemResize *>(command);
     if (canMergeWith(other)) {
-        m_newHead = other->m_newHead;
-        m_newTail = other->m_newTail;
+        if (m_endType != other->m_endType) {
+            return false;
+        }
+        m_newIndex = other->m_newIndex;
+        m_newInstance = other->m_newInstance;
         return true;
     }
 
