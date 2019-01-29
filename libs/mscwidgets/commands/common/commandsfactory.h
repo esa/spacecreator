@@ -19,11 +19,8 @@
 
 #include "commandids.h"
 
-#include <QVariant>
+#include <QVariantList>
 
-class QGraphicsItem;
-class QPointF;
-class QRectF;
 class QUndoCommand;
 
 namespace msc {

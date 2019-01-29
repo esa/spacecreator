@@ -22,8 +22,6 @@
 #include <QPointer>
 #include <QUndoCommand>
 
-class QGraphicsObject;
-
 namespace msc {
 
 class MscEntity;
@@ -34,12 +32,9 @@ class BaseCommand : public QObject, public QUndoCommand
 {
 public:
     BaseCommand();
-    explicit BaseCommand(QGraphicsObject *item, QUndoCommand *parent = nullptr);
     explicit BaseCommand(MscEntity *item, QUndoCommand *parent = nullptr);
-    explicit BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent = nullptr);
 
 protected:
-    QPointer<QGraphicsObject> m_graphicsItem;
     QPointer<MscEntity> m_modelItem;
 
     virtual bool canMergeWith(const BaseCommand *cmd) const;

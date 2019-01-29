@@ -19,19 +19,11 @@
 
 #include <mscentity.h>
 
-#include <QGraphicsObject>
-
 namespace msc {
 namespace cmd {
 
 BaseCommand::BaseCommand()
     : QUndoCommand(nullptr)
-{
-}
-
-BaseCommand::BaseCommand(QGraphicsObject *item, QUndoCommand *parent)
-    : QUndoCommand(parent)
-    , m_graphicsItem(item)
 {
 }
 
@@ -41,20 +33,10 @@ BaseCommand::BaseCommand(MscEntity *item, QUndoCommand *parent)
 {
 }
 
-BaseCommand::BaseCommand(QGraphicsObject *item, const QString &text, QUndoCommand *parent)
-    : QUndoCommand(text, parent)
-    , m_graphicsItem(item)
-{
-}
-
 bool BaseCommand::canMergeWith(const BaseCommand *cmd) const
 {
     if (!cmd || cmd->id() != id()) {
         return false;
-    }
-
-    if (!m_graphicsItem.isNull()) {
-        return cmd->m_graphicsItem == m_graphicsItem;
     }
 
     if (!m_modelItem.isNull()) {

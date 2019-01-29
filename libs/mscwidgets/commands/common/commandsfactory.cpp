@@ -15,8 +15,6 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 #include "commandsfactory.h"
-#include "commandsstack.h"
-#include "chartviewmodel.h"
 
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdactioninformaltext.h"
@@ -32,9 +30,6 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
 
-#include "actionitem.h"
-#include "conditionitem.h"
-#include "instanceitem.h"
 #include "messageitem.h"
 
 #include <mscaction.h>
@@ -43,9 +38,7 @@
 #include <mscinstance.h>
 
 #include <QDebug>
-#include <QGraphicsItem>
 #include <QPointF>
-#include <QRectF>
 
 namespace msc {
 namespace cmd {
