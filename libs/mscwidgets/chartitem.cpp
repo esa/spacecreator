@@ -46,18 +46,6 @@ ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
 
 ChartItem::~ChartItem() {}
 
-void ChartItem::setName(const QString &name)
-{
-    const QString newName = QString("<b>msc</b> %1").arg(name);
-    if (m_textItem->toHtml() == newName)
-        return;
-
-    m_textItem->setHtml(newName);
-    m_textItem->adjustSize();
-
-    updateBox();
-}
-
 QRectF ChartItem::boundingRect() const
 {
     return m_rectItem->boundingRect();
@@ -78,7 +66,30 @@ QString ChartItem::chartName() const
     return m_chart ? m_chart->name() : QString();
 }
 
-void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {}
+QString ChartItem::chartNameGuiText() const
+{
+    return m_textItem->toPlainText();
+}
+
+void ChartItem::setName(const QString &name)
+{
+    QString nameValidated(name.trimmed());
+    if (nameValidated.isEmpty())
+        nameValidated = MscEntity::DefaultName;
+
+    const QString newName = QString("<b>msc</b> %1").arg(nameValidated);
+
+    if (m_textItem->toHtml() != newName || m_chart->name() != nameValidated) {
+        m_chart->setName(nameValidated);
+
+        m_textItem->setHtml(newName);
+        m_textItem->adjustSize();
+
+        updateBox();
+    }
+}
+
+void ChartItem::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {}
 
 QRectF ChartItem::box() const
 {

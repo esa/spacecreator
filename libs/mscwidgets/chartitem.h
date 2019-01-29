@@ -41,6 +41,7 @@ public:
     QSizeF textSize(const QFont &font) const;
 
     QString chartName() const;
+    QString chartNameGuiText() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 

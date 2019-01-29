@@ -13,4 +13,5 @@ SUBDIRS = \
     tst_interactiveobject \
     tst_messageitem \
     tst_objectanchor \
-    tst_objectslink
+    tst_objectslink \
+    tst_chartitem
