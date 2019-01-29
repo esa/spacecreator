@@ -53,6 +53,7 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
+    chartitem.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -96,6 +97,7 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
+    chartitem.cpp
 
 RESOURCES += \
     resources.qrc

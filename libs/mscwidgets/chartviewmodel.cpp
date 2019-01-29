@@ -20,6 +20,7 @@
 #include "conditionitem.h"
 #include "instanceitem.h"
 #include "messageitem.h"
+#include "chartitem.h"
 #include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
 
@@ -66,6 +67,11 @@ struct ChartViewLayoutInfo {
         m_dynamicInstances.clear();
         m_pos = { 0., 0. };
         m_perimeter = QRectF();
+
+        if (m_chartItem) {
+            utils::removeSceneItem(m_chartItem);
+            delete m_chartItem;
+        }
     }
 
     QMap<MscInstance *, MessageItem *> m_dynamicInstances;
@@ -73,6 +79,8 @@ struct ChartViewLayoutInfo {
     QRectF m_perimeter;
 
     QPointF m_pos;
+
+    QPointer<ChartItem> m_chartItem = nullptr;
 };
 
 struct ChartViewModelPrivate {
@@ -125,9 +133,9 @@ void ChartViewModel::clearScene()
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
 
-    d->m_scene.clear();
-
     d->m_layoutInfo.clear();
+
+    d->m_scene.clear();
 }
 
 void ChartViewModel::fillView(MscChart *chart)
@@ -212,6 +220,7 @@ void ChartViewModel::relayout()
 {
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
+
     QRectF totalRect;
 
     for (MscInstance *instance : d->m_currentChart->instances()) {
@@ -273,14 +282,30 @@ void ChartViewModel::relayout()
 
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.ry());
 
-    // actualize scene's rect to avoid flickering on first show:
-    static constexpr qreal margin(50.);
-    totalRect.adjust(-margin, -margin, margin, margin);
-
-    d->m_layoutInfo.m_perimeter = d->m_layoutInfo.m_perimeter.united(totalRect).normalized();
-    d->m_scene.setSceneRect(d->m_layoutInfo.m_perimeter);
+    updateContentBounds();
 
     d->m_layoutDirty = false;
+}
+
+void ChartViewModel::updateContentBounds()
+{
+    if (!d->m_layoutInfo.m_chartItem) {
+        d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
+        d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
+    }
+
+    d->m_layoutInfo.m_chartItem->setZValue(-d->m_scene.items().size());
+
+    QRectF totalRect;
+    d->m_layoutInfo.m_chartItem->setBox(totalRect);
+    for (QGraphicsItem *gi : utils::toplevelItems<QGraphicsItem>(graphicsScene())) {
+        totalRect = totalRect.united(gi->boundingRect().translated(gi->pos()));
+    }
+    d->m_layoutInfo.m_chartItem->setBox(totalRect);
+
+    d->m_layoutInfo.m_perimeter =
+            d->m_layoutInfo.m_perimeter.united(d->m_layoutInfo.m_chartItem->boundingRect()).normalized();
+    d->m_scene.setSceneRect(d->m_layoutInfo.m_perimeter);
 }
 
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
