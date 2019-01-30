@@ -136,7 +136,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
             events += serialize(static_cast<MscAction *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Create:
-            events += serialize(static_cast<MscCreate *>(instanceEvent), tabsSize);
+            events += serialize(static_cast<MscCreate *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Condition: {
             auto condition = static_cast<MscCondition *>(instanceEvent);
@@ -206,10 +206,10 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
             .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
 }
 
-QString MscWriter::serialize(const MscCreate *create, int tabsSize)
+QString MscWriter::serialize(const MscCreate *create, const MscInstance *instance, int tabsSize)
 {
-    if (create == nullptr)
-        return "";
+    if (create == nullptr || create->instance() != instance)
+        return {};
 
     const QString parameters =
             create->parameters().isEmpty() ? "" : QString("(%1)").arg(create->parameters().join(", "));

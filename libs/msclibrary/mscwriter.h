@@ -51,7 +51,7 @@ protected:
                       int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCondition *condition, int tabsSize = 0);
-    QString serialize(const MscCreate *create, int tabsSize = 0);
+    QString serialize(const MscCreate *create, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscTimer *timer, int tabsSize = 0);
     QString serialize(const MscAction *action, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCoregion *region, int tabsSize = 0);

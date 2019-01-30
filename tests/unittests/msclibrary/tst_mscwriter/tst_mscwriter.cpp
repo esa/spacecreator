@@ -56,6 +56,7 @@ private Q_SLOTS:
     void testSerializeMscDocumentChart();
     void testSerializeDataDefinition();
     void testSerializeCreate();
+    void testSerializeChartWithCreate();
     void testSerializeComments();
 
 private:
@@ -460,6 +461,32 @@ void tst_MscWriter::testSerializeCreate()
     QCOMPARE(serializeList.at(2), tab1("in Msg_1 from env;"));
     QCOMPARE(serializeList.at(3), tab1("create subscriber2;"));
     QCOMPARE(serializeList.at(4), QString("endinstance;"));
+}
+
+void tst_MscWriter::testSerializeChartWithCreate()
+{
+    MscChart chart("Chart01");
+    auto instance1 = new MscInstance("Instance01");
+    chart.addInstance(instance1);
+    auto instance2 = new MscInstance("Instance02");
+    chart.addInstance(instance2);
+    chart.addInstance(new MscInstance("Instance03"));
+
+    auto create = new MscCreate("Instance02");
+    create->setInstance(instance1);
+    chart.addInstanceEvent(create);
+
+    QStringList serializeList = this->serialize(&chart).split("\n", QString::SkipEmptyParts);
+    QVERIFY(serializeList.size() >= 9);
+    QCOMPARE(serializeList.at(0), QString("msc Chart01;"));
+    QCOMPARE(serializeList.at(1), tab1("instance Instance01;"));
+    QCOMPARE(serializeList.at(2), tab2("create Instance02;"));
+    QCOMPARE(serializeList.at(3), tab1("endinstance;"));
+    QCOMPARE(serializeList.at(4), tab1("instance Instance02;"));
+    QCOMPARE(serializeList.at(5), tab1("endinstance;"));
+    QCOMPARE(serializeList.at(6), tab1("instance Instance03;"));
+    QCOMPARE(serializeList.at(7), tab1("endinstance;"));
+    QCOMPARE(serializeList.at(8), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeComments()
