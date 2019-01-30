@@ -304,7 +304,7 @@ void InstanceItem::prepareHoverMark()
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &InstanceItem::onManualGeometryChangeFinished);
+            &InstanceItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 
     m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
     m_nameItem->setZValue(m_gripPoints->zValue() - 1);
