@@ -363,6 +363,18 @@ void tst_MscWriter::testSerializeMscDocument()
 {
     MscDocument document("Doc_1");
     QCOMPARE(this->serialize(&document), QString("mscdocument Doc_1;\nendmscdocument;\n"));
+
+    // check hierarchy
+    document.addDocument(new MscDocument("Doc_2"));
+    document.addDocument(new MscDocument("Doc_3"));
+    QStringList serializeList = this->serialize(&document).split("\n");
+    QVERIFY(serializeList.size() >= 6);
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1;"));
+    QCOMPARE(serializeList.at(1), tab1("mscdocument Doc_2;"));
+    QCOMPARE(serializeList.at(2), tab1("endmscdocument;"));
+    QCOMPARE(serializeList.at(3), tab1("mscdocument Doc_3;"));
+    QCOMPARE(serializeList.at(4), tab1("endmscdocument;"));
+    QCOMPARE(serializeList.at(5), QString("endmscdocument;"));
 }
 
 void tst_MscWriter::testSerializeMscDocumentChart()

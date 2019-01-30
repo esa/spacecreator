@@ -311,12 +311,12 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
 
     QString documentBody;
 
-    int tabCount = tabsSize + 1;
+    const int tabCount = tabsSize + 1;
     for (const auto *doc : document->documents())
-        documentBody += serialize(doc, tabCount++);
+        documentBody += serialize(doc, tabCount);
 
     for (const auto *chart : document->charts())
-        documentBody += serialize(chart, tabsSize + 1);
+        documentBody += serialize(chart, tabCount);
 
     QString relation;
     switch (document->hierarchyType()) {
