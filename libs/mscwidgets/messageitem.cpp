@@ -163,6 +163,17 @@ void MessageItem::rebuildLayout()
     const QPointF fromC(itemCenterScene(m_sourceInstance).x(), y());
     const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
+    const QRectF boxRect = scene()->sceneRect(); // TODO: use the actual MSC's box instead
+    auto extendToNearestEdge = [&boxRect](const QPointF &target) {
+        const QLineF left({ boxRect.left(), target.y() }, target);
+        const QLineF right({ boxRect.right(), target.y() }, target);
+
+        if (left.length() <= right.length())
+            return QPointF(boxRect.left(), target.y());
+        else
+            return QPointF(boxRect.right(), target.y());
+    };
+
     QPointF pntFrom, pntTo;
     if (isCreator() && m_targetInstance) {
         // make the CREATE message point to the correct instance's "edge" and not its center
@@ -177,19 +188,22 @@ void MessageItem::rebuildLayout()
     } else if (m_sourceInstance) {
         // instance to external
         pntFrom = fromC;
-        pntTo = pntFrom - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
+        pntTo = extendToNearestEdge(pntFrom);
     } else if (m_targetInstance) {
         // external to instance
         pntTo = toC;
-        pntFrom = pntTo - QPointF(ArrowItem::DEFAULT_WIDTH, 0.);
+        pntFrom = extendToNearestEdge(pntTo);
     }
 
     const QPointF &linkCenterInScene =
             m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+    setPositionChangeIgnored(true);
     setPos(linkCenterInScene);
+    setPositionChangeIgnored(false);
 
     m_layoutDirty = false;
     commitGeometryChange();
+    update();
 }
 
 void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -325,6 +339,8 @@ void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 
     m_arrowItem->updatePoints(srcPoint, dstPoint);
     setPositionChangeIgnored(false);
+
+    updateLayout();
 }
 
 void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
@@ -342,6 +358,8 @@ void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 
     m_arrowItem->updatePoints(srcPoint, dstPoint);
     setPositionChangeIgnored(false);
+
+    updateLayout();
 }
 
 QPointF MessageItem::head() const

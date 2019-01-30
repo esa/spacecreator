@@ -314,6 +314,27 @@ void ChartViewModel::updateContentBounds()
     d->m_layoutInfo.m_perimeter =
             d->m_layoutInfo.m_perimeter.united(d->m_layoutInfo.m_chartItem->boundingRect()).normalized();
     d->m_scene.setSceneRect(d->m_layoutInfo.m_perimeter);
+
+    // polish events
+    for (MscInstanceEvent *event : d->m_currentChart->instanceEvents()) {
+        switch (event->entityType()) {
+        case MscEntity::EntityType::Message: {
+            MscMessage *message = static_cast<MscMessage *>(event);
+            if (message->messageType() == MscMessage::MessageType::Message) {
+                if (!message->sourceInstance() || !message->targetInstance()) {
+                    if (MessageItem *item = itemForMessage(message)) {
+                        // place regular messages which are to/from Env on the correct box edge:
+                        item->updateLayout();
+                    }
+                }
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
 }
 
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
