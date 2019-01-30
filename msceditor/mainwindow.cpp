@@ -24,8 +24,8 @@
 #include "documentitemmodel.h"
 #include "mainmodel.h"
 #include "mscchart.h"
-#include "mscwriter.h"
 #include "settings/appoptions.h"
+#include "textview.h"
 #include "tools/actioncreatortool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
@@ -229,8 +229,7 @@ void MainWindow::updateTextView()
     if (!d->ui->dockWidgetMscText->isVisible()) {
         return;
     }
-    msc::MscWriter writer;
-    d->ui->mscTextBrowser->setText(d->m_model->modelText());
+    d->ui->mscTextBrowser->updateView();
 }
 
 bool MainWindow::openFileAsn(const QString &file)
@@ -339,6 +338,8 @@ void MainWindow::setupUi()
 
     d->ui->hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
     d->ui->hierarchyView->setScene(d->m_model->hierarchyScene());
+
+    d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
 
     initMenus();
     initTools();
@@ -532,10 +533,13 @@ void MainWindow::initConnections()
                                                  .arg(item.y()));
             });
 
-    connect(d->m_model, &MainModel::modelDataChanged, this, &MainWindow::updateTextView);
+    connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
+        d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
+        d->ui->mscTextBrowser->updateView();
+    });
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
-            QMetaObject::invokeMethod(this, "updateTextView", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
         }
     });
 }

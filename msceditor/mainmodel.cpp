@@ -102,6 +102,11 @@ QString MainModel::modelText() const
     return mscWriter.modelText(d->m_mscModel);
 }
 
+MscModel *MainModel::mscModel() const
+{
+    return d->m_mscModel;
+}
+
 void MainModel::showFirstChart()
 {
     d->m_chartModel.fillView(firstChart());

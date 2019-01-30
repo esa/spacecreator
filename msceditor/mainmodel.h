@@ -28,6 +28,7 @@ class ChartViewModel;
 class DocumentItemModel;
 class MscChart;
 class MscDocument;
+class MscModel;
 
 class InstanceItem;
 }
@@ -54,6 +55,7 @@ public:
     msc::ChartViewModel &chartViewModel() const;
 
     QString modelText() const;
+    msc::MscModel *mscModel() const;
 
 Q_SIGNALS:
     void showChartVew();

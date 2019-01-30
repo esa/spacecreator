@@ -55,7 +55,8 @@ HEADERS += \
     messageitem.h \
     chartitem.h \
     tools/actioncreatortool.h \
-    commands/cmdactionitemcreate.h
+    commands/cmdactionitemcreate.h \
+    textview.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -101,7 +102,8 @@ SOURCES += \
     messageitem.cpp \
     chartitem.cpp \
     tools/actioncreatortool.cpp \
-    commands/cmdactionitemcreate.cpp
+    commands/cmdactionitemcreate.cpp \
+    textview.cpp
 
 RESOURCES += \
     resources.qrc
