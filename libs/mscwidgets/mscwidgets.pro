@@ -53,7 +53,9 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
-    chartitem.h
+    chartitem.h \
+    tools/actioncreatortool.h \
+    commands/cmdactionitemcreate.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -97,7 +99,9 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    chartitem.cpp
+    chartitem.cpp \
+    tools/actioncreatortool.cpp \
+    commands/cmdactionitemcreate.cpp
 
 RESOURCES += \
     resources.qrc

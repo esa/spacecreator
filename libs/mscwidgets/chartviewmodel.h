@@ -67,19 +67,22 @@ public:
     ConditionItem *itemForCondition(MscCondition *condition) const;
     ActionItem *itemForAction(MscAction *action) const;
 
+    msc::MscInstance *nearestInstance(qreal x);
+    int eventIndex(qreal y);
+
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
     void relayout();
     void rearrangeInstances();
     void updateContentBounds();
+    void removeInstanceItem(msc::MscInstance *instance);
+    void removeEventItem(msc::MscInstanceEvent *event);
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
 
 private Q_SLOTS:
-    void removeInstanceItem(msc::MscInstance *instance);
-    void removeEventItem(msc::MscInstanceEvent *event);
     void onInstanceItemMoved(InstanceItem *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
@@ -98,9 +101,6 @@ private:
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
-
-    msc::MscInstance *nearestInstance(double x);
-    int eventIndex(double y);
 };
 
 } // namespace msc

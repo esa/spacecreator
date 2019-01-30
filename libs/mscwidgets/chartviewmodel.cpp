@@ -385,6 +385,31 @@ ActionItem *ChartViewModel::itemForAction(MscAction *action) const
     return itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
 }
 
+MscInstance *ChartViewModel::nearestInstance(qreal x)
+{
+    qreal distance = std::numeric_limits<int>::max();
+    MscInstance *instance = nullptr;
+    for (auto item : d->m_instanceItems) {
+        qreal dist = std::abs(item->x() - x);
+        if (dist < distance) {
+            distance = dist;
+            instance = item->modelItem();
+        }
+    }
+    return instance;
+}
+
+int ChartViewModel::eventIndex(qreal y)
+{
+    int idx = 0;
+    for (auto item : d->m_instanceEventItems) {
+        if (item->y() < y) {
+            ++idx;
+        }
+    }
+    return idx;
+}
+
 void ChartViewModel::updateLayout()
 {
     if (d->m_layoutDirty) {
@@ -503,18 +528,20 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
 void ChartViewModel::removeEventItem(MscInstanceEvent *event)
 {
     msc::InteractiveObject *item = nullptr;
-    int idx = 0;
+    int idx = -1;
     for (msc::InteractiveObject *eitem : d->m_instanceEventItems) {
+        ++idx;
         if (eitem->modelEntity() == event) {
             item = eitem;
             break;
         }
-        ++idx;
     }
 
     if (item) {
         utils::removeSceneItem(item);
-        d->m_instanceEventItems.remove(idx);
+        if (idx >= 0) {
+            d->m_instanceEventItems.remove(idx);
+        }
         delete item;
         updateLayout();
     }
@@ -673,31 +700,6 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
             updateLayout();
         }
     }
-}
-
-MscInstance *ChartViewModel::nearestInstance(double x)
-{
-    double distance = std::numeric_limits<int>::max();
-    MscInstance *instance = nullptr;
-    for (auto item : d->m_instanceItems) {
-        double dist = std::abs(item->x() - x);
-        if (dist < distance) {
-            distance = dist;
-            instance = item->modelItem();
-        }
-    }
-    return instance;
-}
-
-int ChartViewModel::eventIndex(double y)
-{
-    int idx = 0;
-    for (auto item : d->m_instanceEventItems) {
-        if (item->y() < y) {
-            ++idx;
-        }
-    }
-    return std::min(idx, d->m_instanceEventItems.size() - 1);
 }
 
 void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)

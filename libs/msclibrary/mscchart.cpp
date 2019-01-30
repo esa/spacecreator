@@ -152,8 +152,9 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
 
 /*!
    Adds an instance event, and takes over parentship.
+   @param eventIdex is the vertical position of the new event. If it tis < 0, then the new event is appended.
  */
-void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
+void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 {
     if (instanceEvent == nullptr) {
         return;
@@ -163,7 +164,11 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent)
     }
 
     instanceEvent->setParent(this);
-    m_instanceEvents.append(instanceEvent);
+    if (eventIndex < 0 || eventIndex >= m_instanceEvents.size()) {
+        m_instanceEvents.append(instanceEvent);
+    } else {
+        m_instanceEvents.insert(eventIndex, instanceEvent);
+    }
     connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceEventAdded(instanceEvent);
     Q_EMIT dataChanged();

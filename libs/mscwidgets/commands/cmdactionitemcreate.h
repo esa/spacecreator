@@ -15,25 +15,39 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDACTIONITEMCREATE_H
+#define CMDACTIONITEMCREATE_H
+
+#include "commands/basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
+
+class MscAction;
+class MscChart;
+class MscInstance;
+
 namespace cmd {
 
-enum Id
+class CmdActionItemCreate : public BaseCommand
 {
-    RenameEntity = 0,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
+public:
+    CmdActionItemCreate(msc::MscAction *action, msc::MscChart *chart, msc::MscInstance *instance, int eventIndex);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    MscAction *m_action = nullptr;
+    QPointer<MscChart> m_chart;
+    QPointer<MscInstance> m_instance;
+    int m_eventIndex = -1;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDACTIONITEMCREATE_H

@@ -19,5 +19,6 @@
         <file alias="toolbar/starttimer.svg">resources/icons/toolbar/starttimer.svg</file>
         <file alias="toolbar/stoptimer.svg">resources/icons/toolbar/stoptimer.svg</file>
         <file alias="toolbar/timeouttimer.svg">resources/icons/toolbar/timeouttimer.svg</file>
+        <file alias="toolbar/action.svg">resources/icons/toolbar/action.svg</file>
     </qresource>
 </RCC>

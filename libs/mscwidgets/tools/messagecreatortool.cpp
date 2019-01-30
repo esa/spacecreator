@@ -19,6 +19,7 @@
 
 #include "baseitems/arrowitem.h"
 #include "commands/common/commandsstack.h"
+#include "messageitem.h"
 #include "mscchart.h"
 #include "mscmessage.h"
 

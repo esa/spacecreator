@@ -26,6 +26,7 @@
 #include "mscchart.h"
 #include "mscwriter.h"
 #include "settings/appoptions.h"
+#include "tools/actioncreatortool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
 #include "tools/messagecreatortool.h"
@@ -469,6 +470,10 @@ void MainWindow::initTools()
     auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
     d->m_tools.append(messageCreateTool);
+
+    auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(actionCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
     for (msc::BaseTool *tool : d->m_tools) {

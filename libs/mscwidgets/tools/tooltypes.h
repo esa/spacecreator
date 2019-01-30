@@ -22,6 +22,7 @@ namespace msc {
 enum class ToolType
 {
     Pointer = 0,
+    ActionCreator,
     InstanceCreator,
     MessageCreator,
     HierarchyAndCreator,

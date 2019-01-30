@@ -15,25 +15,29 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef ACTIONCREATORTOOL_H
+#define ACTIONCREATORTOOL_H
+
+#include "basecreatortool.h"
 
 namespace msc {
-namespace cmd {
 
-enum Id
+class ActionCreatorTool : public BaseCreatorTool
 {
-    RenameEntity = 0,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
+    Q_OBJECT
+public:
+    ActionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ToolType toolType() const override;
 
-    LastId
+protected Q_SLOTS:
+    void onCurrentChartChagend(msc::MscChart *chart) override;
+
+protected:
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
+    void removePreviewItem() override;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace msc
+
+#endif // ACTIONCREATORTOOL_H

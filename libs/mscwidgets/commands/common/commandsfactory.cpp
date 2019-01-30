@@ -17,6 +17,7 @@
 #include "commandsfactory.h"
 
 #include "commands/cmdactioninformaltext.h"
+#include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdentitynamechange.h"
@@ -54,6 +55,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createInstanceKindChange(params);
     case cmd::MoveCondition:
         return cmd::CommandsFactory::createConditionItemMove(params);
+    case cmd::CreateAction:
+        return cmd::CommandsFactory::createActionItemCreate(params);
     case cmd::MoveAction:
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
@@ -158,6 +161,20 @@ QUndoCommand *CommandsFactory::createConditionItemMove(const QVariantList &param
                 return new CmdConditionItemMove(item, newPos, newInstance, chart);
             }
         }
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createActionItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 4);
+
+    auto action = params.at(0).value<msc::MscAction *>();
+    if (auto chart = params.at(1).value<msc::MscChart *>()) {
+        auto instance = params.at(2).value<msc::MscInstance *>();
+        int eventIndex = params.at(3).toInt();
+        return new CmdActionItemCreate(action, chart, instance, eventIndex);
     }
 
     return nullptr;
