@@ -13,5 +13,11 @@
         <file alias="toolbar/pointer.png">resources/icons/toolbar/pointer.png</file>
         <file alias="toolbar/instance.png">resources/icons/toolbar/instance.png</file>
         <file alias="toolbar/message.png">resources/icons/toolbar/message.png</file>
+        <file alias="toolbar/comment.svg">resources/icons/toolbar/comment.svg</file>
+        <file alias="toolbar/delete.svg">resources/icons/toolbar/delete.svg</file>
+        <file alias="toolbar/document-icon.svg">resources/icons/toolbar/document-icon.svg</file>
+        <file alias="toolbar/starttimer.svg">resources/icons/toolbar/starttimer.svg</file>
+        <file alias="toolbar/stoptimer.svg">resources/icons/toolbar/stoptimer.svg</file>
+        <file alias="toolbar/timeouttimer.svg">resources/icons/toolbar/timeouttimer.svg</file>
     </qresource>
 </RCC>
