@@ -18,6 +18,7 @@
 #include "chartitem.h"
 
 #include "baseitems/textitem.h"
+#include "commands/common/commandsstack.h"
 #include "mscchart.h"
 
 #include <QDebug>
@@ -31,16 +32,32 @@ namespace msc {
 ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_rectItem(new QGraphicsRectItem(this))
-    , m_textItem(new TextItem(this))
+    , m_textItemMarker(new TextItem(this))
+    , m_textItemName(new TextItem(this))
     , m_chart(chart)
 {
     m_rectItem->setPen(QColor(Qt::black));
     m_rectItem->setBrush(Qt::white);
 
+    connect(m_chart, &msc::MscChart::nameChanged, this, &ChartItem::setName);
+
+    m_textItemMarker->setHtml("<b>msc</b>");
+
+    m_textItemName->setEditable(true);
+    m_textItemName->setTextWrapMode(QTextOption::NoWrap);
+    connect(m_textItemName, &TextItem::edited, this, &ChartItem::onNameEdited);
+
     if (m_chart)
         setName(m_chart->name());
+}
 
-    connect(m_chart, &msc::MscChart::nameChanged, this, &ChartItem::setName);
+void ChartItem::onNameEdited(const QString &text)
+{
+    if (!m_chart)
+        return;
+
+    cmd::CommandsStack::push(cmd::RenameEntity, { QVariant::fromValue(m_chart), text });
+    QMetaObject::invokeMethod(this, "updateBox", Qt::QueuedConnection);
 }
 
 ChartItem::~ChartItem() {}
@@ -57,7 +74,7 @@ QString ChartItem::chartName() const
 
 QString ChartItem::chartNameGuiText() const
 {
-    return m_textItem->toPlainText();
+    return m_textItemName->toPlainText();
 }
 
 void ChartItem::setName(const QString &name)
@@ -66,11 +83,11 @@ void ChartItem::setName(const QString &name)
     if (nameValidated.isEmpty())
         nameValidated = MscEntity::DefaultName;
 
-    if (chartNameGuiText() != QString("msc %1").arg(nameValidated) || m_chart->name() != nameValidated) {
+    if (chartNameGuiText() != nameValidated || m_chart->name() != nameValidated) {
         m_chart->setName(nameValidated);
 
-        m_textItem->setHtml(QString("<b>msc</b> %1").arg(nameValidated));
-        m_textItem->adjustSize();
+        m_textItemName->setPlainText(nameValidated);
+        m_textItemName->adjustSize();
 
         updateBox();
     }
@@ -98,15 +115,18 @@ void ChartItem::setBox(const QRectF &r)
 
 void ChartItem::updateBox()
 {
-    static constexpr qreal paddingHalth = 10.;
+    static constexpr qreal paddingHalf = 10.;
 
-    const QRectF txtRect = m_textItem->boundingRect().translated(m_textItem->pos());
-    const QRectF newRect =
-            m_box.adjusted(-paddingHalth, -(2 * paddingHalth + txtRect.height()), paddingHalth, paddingHalth);
+    const QRectF txtRect = m_textItemMarker->boundingRect().translated(m_textItemMarker->pos());
+    const QRectF newRect = m_box.adjusted(-paddingHalf, -txtRect.height(), paddingHalf, paddingHalf);
 
-    m_rectItem->setRect(newRect);
-    m_textItem->setPos(newRect.topLeft() + QPointF(paddingHalth, paddingHalth));
+    m_textItemMarker->setPos(newRect.topLeft());
+    m_textItemName->setPos(m_textItemMarker->boundingRect().translated(m_textItemMarker->pos()).topRight());
 
+    QRectF updatedBox = m_textItemMarker->boundingRect().translated(m_textItemMarker->pos());
+    updatedBox = updatedBox.united(m_textItemName->boundingRect().translated(m_textItemName->pos()));
+    updatedBox = updatedBox.united(newRect);
+    m_rectItem->setRect(updatedBox);
     update();
 }
 

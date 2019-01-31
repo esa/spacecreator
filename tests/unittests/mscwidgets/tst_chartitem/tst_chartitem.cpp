@@ -41,20 +41,21 @@ void tst_ChartItem::testChartName()
     QScopedPointer<MscChart> chart(new MscChart());
     QScopedPointer<ChartItem> chartItem(new ChartItem(chart.data()));
 
+    QCOMPARE(chart->name(), MscEntity::DefaultName);
     QCOMPARE(chartItem->chartName(), chart->name());
-    QCOMPARE(chartItem->chartNameGuiText(), QString("msc %1").arg(chart->name()));
+    QCOMPARE(chartItem->chartNameGuiText(), chart->name());
 
     chart->setName(name1);
 
     QCOMPARE(chartItem->chartName(), name1);
     QCOMPARE(chartItem->chartName(), chart->name());
-    QCOMPARE(chartItem->chartNameGuiText(), QString("msc %1").arg(chart->name()));
+    QCOMPARE(chartItem->chartNameGuiText(), chart->name());
 
     chartItem->setName(name2);
 
     QCOMPARE(chartItem->chartName(), name2);
     QCOMPARE(chartItem->chartName(), chart->name());
-    QCOMPARE(chartItem->chartNameGuiText(), QString("msc %1").arg(chart->name()));
+    QCOMPARE(chartItem->chartNameGuiText(), chart->name());
 }
 
 QTEST_MAIN(tst_ChartItem)

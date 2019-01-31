@@ -47,13 +47,16 @@ public:
 public Q_SLOTS:
     void setName(const QString &name);
 
+private Q_SLOTS:
+    void onNameEdited(const QString &text);
+    void updateBox();
+
 private:
     QGraphicsRectItem *m_rectItem = nullptr;
-    TextItem *m_textItem = nullptr;
+    TextItem *m_textItemMarker = nullptr;
+    TextItem *m_textItemName = nullptr;
     MscChart *m_chart = nullptr;
     QRectF m_box;
-
-    void updateBox();
 };
 
 } // ns msc

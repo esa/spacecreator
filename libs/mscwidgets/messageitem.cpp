@@ -432,9 +432,9 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
 {
     MessageItem *messageItem = new MessageItem(message, nullptr, nullptr, pos.y());
-    static constexpr qreal halthLength(ArrowItem::DEFAULT_WIDTH / 2.);
-    const QPointF head(halthLength, pos.y());
-    const QPointF tail(-halthLength, pos.y());
+    static constexpr qreal halfLength(ArrowItem::DEFAULT_WIDTH / 2.);
+    const QPointF head(halfLength, pos.y());
+    const QPointF tail(-halfLength, pos.y());
     messageItem->setHead(head, ObjectAnchor::Snap::NoSnap);
     messageItem->setTail(tail, ObjectAnchor::Snap::NoSnap);
     messageItem->setPos(pos);
