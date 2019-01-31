@@ -27,7 +27,11 @@
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QScopedPointer>
+#include <QVector>
 #include <QtTest>
+
+using namespace msc;
 
 class tst_ChartViewModel : public QObject
 {
@@ -36,13 +40,55 @@ class tst_ChartViewModel : public QObject
 public:
     tst_ChartViewModel();
 
+private:
+    void parseMsc(const QString &mscText);
+
 private slots:
+    void init();
+    void cleanup();
     void testNearestInstanceSimple();
+    void testNearestInstanceCreate();
+
+private:
+    QScopedPointer<ChartViewModel> m_chartModel;
+    QScopedPointer<MscModel> m_mscModel;
+    QPointer<MscChart> m_chart;
+    QVector<MscInstance *> m_instances;
+    QVector<InstanceItem *> m_instanceItems;
+    QVector<QRectF> m_instanceRects;
 };
 
-using namespace msc;
-
 tst_ChartViewModel::tst_ChartViewModel() {}
+
+void tst_ChartViewModel::parseMsc(const QString &mscText)
+{
+    MscFile mscFile;
+    m_mscModel.reset(mscFile.parseText(mscText));
+    m_chart = m_mscModel->charts().at(0);
+    m_chartModel->fillView(m_chart);
+    QApplication::processEvents();
+
+    for (MscInstance *instance : m_chart->instances()) {
+        InstanceItem *instanceItem = m_chartModel->itemForInstance(instance);
+        QVERIFY(instanceItem != nullptr);
+
+        m_instances.append(instance);
+        m_instanceItems.append(instanceItem);
+        m_instanceRects.append(instanceItem->sceneBoundingRect());
+    }
+}
+
+void tst_ChartViewModel::init()
+{
+    m_chartModel.reset(new ChartViewModel);
+}
+
+void tst_ChartViewModel::cleanup()
+{
+    m_instances.clear();
+    m_instanceItems.clear();
+    m_instanceRects.clear();
+}
 
 void tst_ChartViewModel::testNearestInstanceSimple()
 {
@@ -54,40 +100,48 @@ void tst_ChartViewModel::testNearestInstanceSimple()
                               IN Msg01 FROM inst1; \
                           ENDINSTANCE; \
                        ENDMSC;";
-    MscFile mscFile;
-    QScopedPointer<MscModel> model(mscFile.parseText(mscText));
-
-    MscChart *chart = model->charts().at(0);
-    ChartViewModel chartModel;
-    chartModel.fillView(chart);
-    QApplication::processEvents();
-
-    MscInstance *instance1 = chart->instances().at(0);
-    InstanceItem *instance1Item = chartModel.itemForInstance(instance1);
-    QVERIFY(instance1Item != nullptr);
-    MscInstance *instance2 = chart->instances().at(1);
-    InstanceItem *instance2Item = chartModel.itemForInstance(instance2);
-    QVERIFY(instance2Item != nullptr);
-
-    QRectF instance1Rect = instance1Item->sceneBoundingRect();
-    QRectF instance2Rect = instance2Item->sceneBoundingRect();
+    parseMsc(mscText);
 
     // point on the left
-    MscInstance *inst = chartModel.nearestInstance({ instance1Rect.x() - 10., 50. });
-    QCOMPARE(inst, instance1);
+    MscInstance *inst = m_chartModel->nearestInstance({ m_instanceRects[0].left() - 10., 50. });
+    QCOMPARE(inst, m_instances[0]);
     // point on the left
-    inst = chartModel.nearestInstance({ instance2Rect.x() + 10., 50. });
-    QCOMPARE(inst, instance2);
+    inst = m_chartModel->nearestInstance({ m_instanceRects[1].left() + 10., 50. });
+    QCOMPARE(inst, m_instances[1]);
     // point between itens, but closer to left
-    qreal middle = instance1Rect.right() + 20.;
-    inst = chartModel.nearestInstance({ middle, 50. });
-    QCOMPARE(inst, instance1);
+    qreal middle = m_instanceRects[0].right() + 20.;
+    inst = m_chartModel->nearestInstance({ middle, 50. });
+    QCOMPARE(inst, m_instances[0]);
 
     // point too far on the left
-    inst = chartModel.nearestInstance({ instance1Rect.x() - 100., 50. });
+    inst = m_chartModel->nearestInstance({ m_instanceRects[0].left() - 100., 50. });
     QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
     // point too far on the left
-    inst = chartModel.nearestInstance({ instance2Rect.x() + 100., 50. });
+    inst = m_chartModel->nearestInstance({ m_instanceRects[1].right() + 100., 50. });
+    QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
+}
+
+void tst_ChartViewModel::testNearestInstanceCreate()
+{
+    QString mscText = "MSC msc1; \
+                          INSTANCE Instance_A; \
+                              ACTION 'Boot'; \
+                              CREATE New_Instance1; \
+                              IN Msg01 FROM New_Instance1; \
+                          ENDINSTANCE; \
+                          INSTANCE New_Instance1; \
+                              OUT Mgs01 TO Instance_A; \
+                          ENDINSTANCE; \
+                       ENDMSC;";
+    parseMsc(mscText);
+    QCOMPARE(m_instanceItems.size(), 2);
+
+    // point on the left
+    MscInstance *inst = m_chartModel->nearestInstance(m_instanceRects[1].center());
+    QCOMPARE(inst, m_instances[1]);
+
+    // point above the create instance (but on height of first instance)
+    inst = m_chartModel->nearestInstance({ m_instanceRects[1].center().x(), m_instanceRects[0].top() });
     QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
 }
 
