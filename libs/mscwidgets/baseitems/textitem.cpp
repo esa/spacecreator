@@ -172,11 +172,16 @@ void TextItem::setEditable(bool editable)
         return;
 
     m_editable = editable;
+}
 
-    if (m_editable)
-        setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
-    else
-        setTextInteractionFlags(Qt::NoTextInteraction);
+void TextItem::enableEditMode()
+{
+    if (!m_editable) {
+        return;
+    }
+
+    setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
+    setFocus();
 }
 
 void TextItem::focusOutEvent(QFocusEvent *event)
@@ -194,11 +199,13 @@ void TextItem::focusOutEvent(QFocusEvent *event)
     selectText(false);
 
     m_prevText.clear();
+
+    setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
 void TextItem::keyPressEvent(QKeyEvent *event)
 {
-    if (isEditable()) {
+    if (isEditable() && hasFocus()) {
         switch (event->key()) {
         case Qt::Key_Escape: {
             setPlainText(m_prevText);
@@ -233,6 +240,12 @@ void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_prevText = toPlainText();
         selectText(true);
     }
+}
+
+void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    enableEditMode();
+    QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
 void TextItem::selectText(bool select)

@@ -53,6 +53,8 @@ public:
     bool isEditable() const;
     void setEditable(bool editable);
 
+    void enableEditMode();
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();
@@ -61,6 +63,7 @@ protected:
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QColor m_bgrColor = Qt::white;
