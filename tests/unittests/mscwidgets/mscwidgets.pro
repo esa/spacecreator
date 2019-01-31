@@ -14,4 +14,5 @@ SUBDIRS = \
     tst_messageitem \
     tst_objectanchor \
     tst_objectslink \
-    tst_chartitem
+    tst_chartitem \
+    tst_chartviewmodel

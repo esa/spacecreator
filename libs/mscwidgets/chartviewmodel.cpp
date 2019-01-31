@@ -44,17 +44,6 @@ namespace msc {
    MSC chart (showing instances, messages, ...)
  */
 
-template<typename ItemType, typename MscEntityType>
-ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
-{
-    if (event)
-        for (ItemType *item : utils::toplevelItems<ItemType>(scene))
-            if (item && item->modelItem()->internalId() == event->internalId())
-                return item;
-
-    return nullptr;
-}
-
 struct ChartViewLayoutInfo {
     ChartViewLayoutInfo() {}
 
@@ -388,30 +377,42 @@ void ChartViewModel::updateCreatedInstanceHeight(InstanceItem *instanceItem, qre
 
 InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 {
-    return itemForEntity<InstanceItem, MscInstance>(instance, &d->m_scene);
+    return utils::itemForEntity<InstanceItem, MscInstance>(instance, &d->m_scene);
 }
 
 MessageItem *ChartViewModel::itemForMessage(MscMessage *message) const
 {
-    return itemForEntity<MessageItem, MscMessage>(message, &d->m_scene);
+    return utils::itemForEntity<MessageItem, MscMessage>(message, &d->m_scene);
 }
 
 ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
 {
-    return itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
+    return utils::itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
 }
 
 ActionItem *ChartViewModel::itemForAction(MscAction *action) const
 {
-    return itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
+    return utils::itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
 }
 
-MscInstance *ChartViewModel::nearestInstance(qreal x)
+/*!
+   \brief ChartViewModel::nearestInstance
+   Returns the instance that is close enough to be used by an event.
+   \param pos
+ */
+MscInstance *ChartViewModel::nearestInstance(const QPointF &pos)
 {
+    static const qreal add_space = 30;
+    static const QMarginsF extra_margin = QMarginsF(add_space, add_space, add_space, add_space);
+
     qreal distance = std::numeric_limits<int>::max();
     MscInstance *instance = nullptr;
     for (auto item : d->m_instanceItems) {
-        qreal dist = std::abs(item->x() - x);
+        const QRectF itemRect = item->sceneBoundingRect().marginsAdded(extra_margin);
+        if (!itemRect.contains(pos)) {
+            continue;
+        }
+        qreal dist = std::abs(itemRect.center().x() - pos.x());
         if (dist < distance) {
             distance = dist;
             instance = item->modelItem();
@@ -694,7 +695,7 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
 {
     auto actionItem = qobject_cast<ActionItem *>(item);
     if (actionItem) {
-        MscInstance *newInstance = nearestInstance(actionItem->x());
+        MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
@@ -709,7 +710,7 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
 
     auto conditionItem = qobject_cast<ConditionItem *>(item);
     if (conditionItem) {
-        MscInstance *newInstance = nearestInstance(conditionItem->x());
+        MscInstance *newInstance = nearestInstance(conditionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
@@ -728,12 +729,14 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
     Q_ASSERT(item);
     Q_ASSERT(item->modelItem());
 
-    MscInstance *newInstance = nearestInstance(pos.x());
+    MscInstance *newInstance = nearestInstance(pos);
     MscInstance *currentInstance = endType == MscMessage::EndType::SOURCE_TAIL ? item->modelItem()->sourceInstance()
                                                                                : item->modelItem()->targetInstance();
+    MscInstance *otherInstance = endType == MscMessage::EndType::SOURCE_TAIL ? item->modelItem()->targetInstance()
+                                                                             : item->modelItem()->sourceInstance();
     const int currentIdx = d->m_currentChart->instanceEvents().indexOf(item->modelItem());
     const int newIdx = eventIndex(pos.y());
-    if (newInstance != currentInstance || newIdx != currentIdx) {
+    if ((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx) {
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                                       { QVariant::fromValue<MscMessage *>(item->modelItem()), newIdx,
                                         QVariant::fromValue<MscInstance *>(newInstance),

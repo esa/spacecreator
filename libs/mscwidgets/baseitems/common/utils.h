@@ -61,6 +61,20 @@ QList<ItemType *> toplevelItems(QGraphicsScene *scene)
     return items;
 }
 
+/*!
+  Returns the item of a specific entity in the given scene;
+ */
+template<typename ItemType, typename MscEntityType>
+ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
+{
+    if (event)
+        for (ItemType *item : utils::toplevelItems<ItemType>(scene))
+            if (item && item->modelItem()->internalId() == event->internalId())
+                return item;
+
+    return nullptr;
+}
+
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
 QPointF pointFromPath(const QPainterPath &path, int num);

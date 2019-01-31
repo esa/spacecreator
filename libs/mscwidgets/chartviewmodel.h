@@ -67,7 +67,7 @@ public:
     ConditionItem *itemForCondition(MscCondition *condition) const;
     ActionItem *itemForAction(MscAction *action) const;
 
-    msc::MscInstance *nearestInstance(qreal x);
+    msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
 
 public Q_SLOTS:

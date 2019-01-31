@@ -74,7 +74,7 @@ void ActionCreatorTool::commitPreviewItem()
     }
 
     auto action = qobject_cast<msc::MscAction *>(m_previewEntity);
-    auto instance = m_model->nearestInstance(m_previewItem->x());
+    auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(action),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart),

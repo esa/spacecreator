@@ -336,16 +336,13 @@ void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance
     Q_ASSERT(message);
 
     bool changed = false;
-    if (endType == msc::MscMessage::EndType::SOURCE_TAIL) {
-        if (message->sourceInstance() != newInstance) {
+    if (message->sourceInstance() != newInstance && message->targetInstance() != newInstance) {
+        if (endType == msc::MscMessage::EndType::SOURCE_TAIL) {
             message->setSourceInstance(newInstance);
-            changed = true;
-        }
-    } else {
-        if (message->targetInstance() != newInstance) {
+        } else {
             message->setTargetInstance(newInstance);
-            changed = true;
         }
+        changed = true;
     }
 
     changed |= moveEvent(message, eventPos);

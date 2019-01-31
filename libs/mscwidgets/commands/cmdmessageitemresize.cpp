@@ -41,14 +41,14 @@ CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscI
 
 void CmdMessageItemResize::redo()
 {
-    if (m_message && m_chart && m_newInstance) {
+    if (m_message && m_chart) {
         m_chart->updateMessageTarget(m_message, m_newInstance, m_newIndex, m_endType);
     }
 }
 
 void CmdMessageItemResize::undo()
 {
-    if (m_message && m_chart && m_newInstance) {
+    if (m_message && m_chart) {
         m_chart->updateMessageTarget(m_message, m_oldInstance, m_oldIndex, m_endType);
     }
 }

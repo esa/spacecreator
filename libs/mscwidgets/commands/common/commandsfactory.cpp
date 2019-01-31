@@ -88,11 +88,10 @@ QUndoCommand *CommandsFactory::createMessageItemRetarget(const QVariantList &par
 
     if (msc::MscMessage *item = params.at(0).value<msc::MscMessage *>()) {
         int newPos = params.at(1).toInt();
-        if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
-            msc::MscMessage::EndType endtype = params.at(3).value<msc::MscMessage::EndType>();
-            if (msc::MscChart *chart = params.at(4).value<msc::MscChart *>()) {
-                return new CmdMessageItemResize(item, newPos, newInstance, endtype, chart);
-            }
+        msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>();
+        msc::MscMessage::EndType endtype = params.at(3).value<msc::MscMessage::EndType>();
+        if (msc::MscChart *chart = params.at(4).value<msc::MscChart *>()) {
+            return new CmdMessageItemResize(item, newPos, newInstance, endtype, chart);
         }
     }
 
