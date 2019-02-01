@@ -27,6 +27,7 @@
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
+#include "tools/entitydeletetool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
 #include "tools/messagecreatortool.h"
@@ -102,6 +103,7 @@ struct MainWindowPrivate {
 
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
+    msc::EntityDeleteTool *m_deleteTool = nullptr;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -304,6 +306,10 @@ void MainWindow::selectCurrentChart()
 
         // TODO: add support for dedicated stacks for each tab
     }
+
+    if (d->m_deleteTool) {
+        d->m_deleteTool->setCurrentChart(chart);
+    }
 }
 
 void MainWindow::openAsn1Editor()
@@ -491,6 +497,10 @@ void MainWindow::initTools()
 
     d->m_defaultToolAction = toolsActions->actions().first();
     enableDefaultTool();
+
+    d->m_deleteTool = new msc::EntityDeleteTool(d->ui->graphicsView, this);
+    d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
+    d->m_toolBar->addAction(d->m_deleteTool->action());
 
     for (int toolType = static_cast<int>(msc::ToolType::HierarchyAndCreator);
          toolType <= static_cast<int>(msc::ToolType::HierarchyRepeatCreator); ++toolType) {

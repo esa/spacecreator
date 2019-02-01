@@ -32,6 +32,7 @@ public:
     static QUndoCommand *create(msc::cmd::Id id, const QVariantList &params);
 
     static QUndoCommand *createRenameEntity(const QVariantList &params);
+    static QUndoCommand *createDeleteEntity(const QVariantList &params);
     static QUndoCommand *createMessageItemRetarget(const QVariantList &params);
     static QUndoCommand *createMessageItemCreate(const QVariantList &params);
     static QUndoCommand *createInstanceItemMove(const QVariantList &params);

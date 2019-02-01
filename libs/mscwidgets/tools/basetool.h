@@ -49,7 +49,7 @@ public:
 
 public Q_SLOTS:
     void setActive(bool active);
-    void setView(QGraphicsView *view);
+    virtual void setView(QGraphicsView *view);
 
 Q_SIGNALS:
     void activeChanged(bool to);

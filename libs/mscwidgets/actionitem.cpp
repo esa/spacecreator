@@ -34,7 +34,7 @@ ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
 {
     Q_ASSERT(m_action != nullptr);
 
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
     m_textItem->setFramed(true);
     m_textItem->setEditable(true);
@@ -83,9 +83,27 @@ void ActionItem::setInstance(InstanceItem *instance)
 
 void ActionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
+
+    if (isSelected()) {
+        painter->save();
+        QPen selectionPen(Qt::black, 3);
+        painter->setPen(selectionPen);
+        painter->drawRect(m_boundingRect);
+        painter->restore();
+    }
+}
+
+QRectF ActionItem::boundingRect() const
+{
+    static const QMarginsF selectionMargins(1, 1, 1, 1);
+
+    if (isSelected()) {
+        return m_boundingRect.marginsAdded(selectionMargins);
+    }
+
+    return m_boundingRect;
 }
 
 void ActionItem::setActionText(const QString &text)
@@ -143,6 +161,8 @@ void ActionItem::rebuildLayout()
     if (!m_instance) {
         return;
     }
+
+    prepareGeometryChange();
 
     m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;

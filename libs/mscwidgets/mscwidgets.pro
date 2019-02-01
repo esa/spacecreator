@@ -29,22 +29,27 @@ HEADERS += \
     commands/common/commandsstack.h \
     commands/basecommand.h \
     commands/cmdactioninformaltext.h \
+    commands/cmdactionitemcreate.h \
     commands/cmdactionitemmove.h \
     commands/cmdconditionitemmove.h \
+    commands/cmddeleteentity.h \
     commands/cmdentitynamechange.h \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
+    tools/actioncreatortool.h \
     tools/basecreatortool.h \
     tools/basetool.h \
+    tools/entitydeletetool.h \
     tools/hierarchycreatortool.h \
     tools/instancecreatortool.h \
     tools/messagecreatortool.h \
     tools/pointertool.h \
     tools/tooltypes.h \
     actionitem.h \
+    chartitem.h \
     chartviewmodel.h \
     conditionitem.h \
     documentitem.h \
@@ -53,10 +58,7 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
-    chartitem.h \
-    tools/actioncreatortool.h \
-    commands/cmdactionitemcreate.h \
-    textview.h
+    textview.h \
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -76,21 +78,26 @@ SOURCES += \
     commands/common/commandsfactory.cpp \
     commands/common/commandsstack.cpp \
     commands/basecommand.cpp \
+    commands/cmdactionitemcreate.cpp \
     commands/cmdactioninformaltext.cpp \
     commands/cmdactionitemmove.cpp \
     commands/cmdconditionitemmove.cpp \
+    commands/cmddeleteentity.cpp \
     commands/cmdentitynamechange.cpp \
     commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemresize.cpp \
+    tools/actioncreatortool.cpp \
     tools/basecreatortool.cpp \
     tools/basetool.cpp \
+    tools/entitydeletetool.cpp \
     tools/instancecreatortool.cpp \
     tools/hierarchycreatortool.cpp \
     tools/messagecreatortool.cpp \
     tools/pointertool.cpp \
+    chartitem.cpp \
     chartviewmodel.cpp \
     actionitem.cpp \
     conditionitem.cpp \
@@ -100,10 +107,7 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    chartitem.cpp \
-    tools/actioncreatortool.cpp \
-    commands/cmdactionitemcreate.cpp \
-    textview.cpp
+    textview.cpp \
 
 RESOURCES += \
     resources.qrc

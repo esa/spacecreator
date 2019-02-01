@@ -40,6 +40,7 @@ public:
     void setInstance(InstanceItem *instance);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QRectF boundingRect() const override;
 
 public Q_SLOTS:
     void setActionText(const QString &text);

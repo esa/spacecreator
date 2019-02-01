@@ -15,26 +15,38 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDDELETEENTITY_H
+#define CMDDELETEENTITY_H
+
+#include <QMap>
+#include <QPointer>
+#include <QUndoCommand>
+#include <QVector>
 
 namespace msc {
+
+class MscChart;
+class MscEntity;
+class MscInstanceEvent;
+
 namespace cmd {
 
-enum Id
+class CmdDeleteEntity : public QUndoCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
+public:
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscChart *chart);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<MscChart> m_chart;
+    QMap<int, MscInstanceEvent *> m_items;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDDELETEENTITY_H

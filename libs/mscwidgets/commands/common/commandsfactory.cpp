@@ -20,6 +20,7 @@
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdconditionitemmove.h"
+#include "commands/cmddeleteentity.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
@@ -34,6 +35,7 @@
 
 #include <QDebug>
 #include <QPointF>
+#include <QVector>
 
 namespace msc {
 namespace cmd {
@@ -43,6 +45,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     switch (id) {
     case cmd::RenameEntity:
         return cmd::CommandsFactory::createRenameEntity(params);
+    case cmd::DeleteEntity:
+        return cmd::CommandsFactory::createDeleteEntity(params);
     case cmd::RetargetMessage:
         return cmd::CommandsFactory::createMessageItemRetarget(params);
     case cmd::CreateMessage:
@@ -77,6 +81,20 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
         const QString &name = params.last().toString();
         if (item->name() != name)
             return new CmdEntityNameChange(item, name);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createDeleteEntity(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    QVector<MscEntity *> items = params.at(0).value<QVector<MscEntity *>>();
+    if (!items.isEmpty()) {
+        if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
+            return new CmdDeleteEntity(items, chart);
+        }
     }
 
     return nullptr;

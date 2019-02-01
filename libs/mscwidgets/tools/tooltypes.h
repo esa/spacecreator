@@ -25,6 +25,7 @@ enum class ToolType
     ActionCreator,
     InstanceCreator,
     MessageCreator,
+    EntityDeleter,
     HierarchyAndCreator,
     HierarchyExceptionCreator,
     HierarchyIsCreator,
