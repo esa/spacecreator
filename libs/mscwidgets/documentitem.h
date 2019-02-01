@@ -65,7 +65,6 @@ private:
     struct DocumentItemPrivate;
     std::unique_ptr<DocumentItemPrivate> const d;
 };
-
 }
 
 #endif // DOCUMENTITEM_H

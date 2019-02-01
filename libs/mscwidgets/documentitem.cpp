@@ -43,6 +43,8 @@ DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
 
     connect(document, &msc::MscDocument::nameChanged, this, [&]() { update(); });
     connect(document, &msc::MscDocument::nameChanged, this, &DocumentItem::preferredSizeChanged);
+
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
 DocumentItem::~DocumentItem() {}
@@ -98,9 +100,19 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     int startLineY = qRound(boxRect.bottom());
 
     QPen pen(Qt::black);
+
+    if (isSelected()) {
+        pen.setWidth(3);
+    }
+
     painter->setBrush(Qt::white);
     painter->setPen(pen);
     painter->drawRect(boxRect);
+
+    if (isSelected()) {
+        painter->setPen(QPen(Qt::black));
+    }
+
     painter->drawText(boxRect, Qt::AlignCenter, d->document->name());
     if (d->document->hierarchyType() != MscDocument::HierarchyLeaf) {
         startLineY = qRound(relationRect.bottom());
@@ -223,7 +235,6 @@ void DocumentItem::setBoxSize(const QSizeF &size)
     d->boxSize = size;
     Q_EMIT boxSizeChanged(size);
 }
-
 }
 
 void msc::DocumentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
