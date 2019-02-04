@@ -42,6 +42,7 @@ public:
     static QUndoCommand *createActionItemCreate(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);
     static QUndoCommand *createActionInformalText(const QVariantList &params);
+    static QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

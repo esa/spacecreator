@@ -22,6 +22,7 @@
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmdentitynamechange.h"
+#include "commands/cmdhierarchytypechange.h"
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstancekindchange.h"
@@ -65,6 +66,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
         return cmd::CommandsFactory::createActionInformalText(params);
+    case cmd::HierarchyType:
+        return cmd::CommandsFactory::createHierarchyTypeChange(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -221,6 +224,19 @@ QUndoCommand *CommandsFactory::createActionInformalText(const QVariantList &para
         const QString &text = params.last().toString();
         if (item->informalAction() != text)
             return new CmdActionInformalText(item, text);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createHierarchyTypeChange(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscDocument *item = params.first().value<MscDocument *>()) {
+        const MscDocument::HierarchyType type = static_cast<MscDocument::HierarchyType>(params.last().toInt());
+        if (item->hierarchyType() != type)
+            return new CmdHierarchyTypeChange(item, type);
     }
 
     return nullptr;

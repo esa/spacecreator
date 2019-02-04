@@ -1,3 +1,4 @@
+
 /*
    Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
 
@@ -15,27 +16,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDHIERARCHYTYPECHANGE_H
+#define CMDHIERARCHYTYPECHANGE_H
+
+#include "basecommand.h"
+#include "mscdocument.h"
 
 namespace msc {
+
 namespace cmd {
 
-enum Id
+class CmdHierarchyTypeChange : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    HierarchyType,
+public:
+    CmdHierarchyTypeChange(MscDocument *document, const MscDocument::HierarchyType newType);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<MscDocument> m_document;
+    MscDocument::HierarchyType m_oldType;
+    MscDocument::HierarchyType m_newType;
 };
-} // ns cmd
-} // ns msc
+
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDHIERARCHYTYPECHANGE_H

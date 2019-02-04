@@ -34,6 +34,7 @@ HEADERS += \
     commands/cmdconditionitemmove.h \
     commands/cmddeleteentity.h \
     commands/cmdentitynamechange.h \
+    commands/cmdhierarchytypechange.h \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
     commands/cmdinstancekindchange.h \
@@ -58,7 +59,7 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
-    textview.h \
+    textview.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -84,6 +85,7 @@ SOURCES += \
     commands/cmdconditionitemmove.cpp \
     commands/cmddeleteentity.cpp \
     commands/cmdentitynamechange.cpp \
+    commands/cmdhierarchytypechange.cpp \
     commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
     commands/cmdinstancekindchange.cpp \
@@ -107,7 +109,7 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    textview.cpp \
+    textview.cpp
 
 RESOURCES += \
     resources.qrc
