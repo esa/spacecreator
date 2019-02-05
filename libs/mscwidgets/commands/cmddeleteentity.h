@@ -27,6 +27,7 @@ namespace msc {
 
 class MscChart;
 class MscEntity;
+class MscInstance;
 class MscInstanceEvent;
 
 namespace cmd {
@@ -43,7 +44,8 @@ public:
 
 private:
     QPointer<MscChart> m_chart;
-    QMap<int, MscInstanceEvent *> m_items;
+    QMap<int, MscInstanceEvent *> m_events;
+    QMap<int, MscInstance *> m_instances;
 };
 
 } // namespace cmd

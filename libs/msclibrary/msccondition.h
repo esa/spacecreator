@@ -40,6 +40,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    bool dependsOnInstance(MscInstance *instance) const override;
+
 private:
     MscInstance *m_instance = nullptr;
 

@@ -17,6 +17,8 @@
 
 #include "msccreate.h"
 
+#include "mscinstance.h"
+
 namespace msc {
 
 MscCreate::MscCreate(QObject *parent)
@@ -57,6 +59,11 @@ void MscCreate::setInstance(MscInstance *instance)
 MscEntity::EntityType MscCreate::entityType() const
 {
     return MscEntity::EntityType::Create;
+}
+
+bool MscCreate::dependsOnInstance(MscInstance *instance) const
+{
+    return m_instance == instance;
 }
 
 } // namespace msc

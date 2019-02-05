@@ -2,6 +2,12 @@
 
 namespace msc {
 
+/*!
+    \class msc::MscInstanceEvent
+    This is the base class for conditions, messages and timers. In the grammar this is called
+    InstanceEvent
+ */
+
 MscInstanceEvent::MscInstanceEvent(QObject *parent)
     : MscEntity(parent)
 {

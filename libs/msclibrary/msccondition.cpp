@@ -17,6 +17,8 @@
 
 #include "msccondition.h"
 
+#include "mscinstance.h"
+
 namespace msc {
 
 MscCondition::MscCondition(QObject *parent)
@@ -60,6 +62,11 @@ void MscCondition::setInstance(MscInstance *instance)
 MscEntity::EntityType MscCondition::entityType() const
 {
     return MscEntity::EntityType::Condition;
+}
+
+bool MscCondition::dependsOnInstance(MscInstance *instance) const
+{
+    return m_instance == instance;
 }
 
 } // namespace msc

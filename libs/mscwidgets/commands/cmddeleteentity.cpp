@@ -20,6 +20,7 @@
 #include "common/commandids.h"
 #include "mscchart.h"
 #include "mscentity.h"
+#include "mscinstance.h"
 #include "mscinstanceevent.h"
 
 namespace msc {
@@ -37,7 +38,23 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
         auto event = dynamic_cast<MscInstanceEvent *>(item);
         if (event) {
             const int idx = m_chart->instanceEvents().indexOf(event);
-            m_items[idx] = event;
+            m_events[idx] = event;
+        }
+        auto instance = dynamic_cast<MscInstance *>(item);
+        if (instance) {
+            const int idx = m_chart->instances().indexOf(instance);
+            m_instances[idx] = instance;
+        }
+    }
+
+    // now add all events that depend on instances that are deleted
+    for (auto instance : m_instances) {
+        m_chart->removeInstance(instance);
+        for (auto event : m_chart->instanceEvents()) {
+            if (event->dependsOnInstance(instance)) {
+                const int idx = m_chart->instanceEvents().indexOf(event);
+                m_events[idx] = event;
+            }
         }
     }
 }
@@ -45,15 +62,27 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
 void CmdDeleteEntity::redo()
 {
     Q_ASSERT(m_chart);
-    for (auto event : m_items) {
+
+    for (auto event : m_events) {
         m_chart->removeInstanceEvent(event);
+    }
+
+    for (auto instance : m_instances) {
+        m_chart->removeInstance(instance);
     }
 }
 
 void CmdDeleteEntity::undo()
 {
     Q_ASSERT(m_chart);
-    for (auto it = m_items.begin(); it != m_items.end(); ++it) {
+
+    for (auto it = m_instances.begin(); it != m_instances.end(); ++it) {
+        const int idx = it.key();
+        MscInstance *instance = it.value();
+        m_chart->addInstance(instance, idx);
+    }
+
+    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
         const int idx = it.key();
         MscInstanceEvent *event = it.value();
         m_chart->addInstanceEvent(event, idx);

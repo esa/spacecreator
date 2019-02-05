@@ -46,6 +46,8 @@ public:
     void setInstanceName(QString name) { m_instanceName = name; }
     QString instanceName() const { return m_instanceName; }
 
+    bool dependsOnInstance(MscInstance *instance) const override;
+
 private:
     TimerType m_timerType = TimerType::Unknown;
     QString m_instanceName;

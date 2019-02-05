@@ -22,8 +22,8 @@
 
 namespace msc {
 
-// This is the base class for conditions, messages and timers. In the grammar this is called
-// InstanceEvent
+class MscInstance;
+
 class MscInstanceEvent : public MscEntity
 {
     Q_OBJECT
@@ -32,6 +32,8 @@ public:
     explicit MscInstanceEvent(QObject *parent = nullptr);
     explicit MscInstanceEvent(const QString &name, QObject *parent = nullptr);
     ~MscInstanceEvent() override;
+
+    virtual bool dependsOnInstance(MscInstance *instance) const = 0;
 };
 
 }

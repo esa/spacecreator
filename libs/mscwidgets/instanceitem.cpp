@@ -106,7 +106,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
 
     updateLayout();
 
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges);
+    setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
 
     m_kindItem->setBackgroundColor(Qt::transparent);
 

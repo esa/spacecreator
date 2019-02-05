@@ -17,6 +17,8 @@
 
 #include "mscgate.h"
 
+#include "mscinstance.h"
+
 namespace msc {
 
 MscGate::MscGate(QObject *parent)
@@ -102,6 +104,11 @@ void MscGate::setParams(const QVariantList &params)
 MscEntity::EntityType MscGate::entityType() const
 {
     return MscEntity::EntityType::Gate;
+}
+
+bool MscGate::dependsOnInstance(MscInstance *instance) const
+{
+    return m_instance == instance;
 }
 
 } // ns msc

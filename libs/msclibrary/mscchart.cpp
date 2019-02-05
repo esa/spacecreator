@@ -58,7 +58,7 @@ const QVector<MscInstance *> &MscChart::instances() const
 /*!
    Adds an instance, and takes over parentship.
  */
-void MscChart::addInstance(MscInstance *instance)
+void MscChart::addInstance(MscInstance *instance, int index)
 {
     if (instance == nullptr) {
         return;
@@ -68,7 +68,11 @@ void MscChart::addInstance(MscInstance *instance)
     }
 
     instance->setParent(this);
-    m_instances.append(instance);
+    if (index < 0 || index >= m_instances.size()) {
+        m_instances.append(instance);
+    } else {
+        m_instances.insert(index, instance);
+    }
     connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceAdded(instance);
     Q_EMIT dataChanged();

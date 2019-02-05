@@ -17,6 +17,8 @@
 
 #include "msccoregion.h"
 
+#include "mscinstance.h"
+
 namespace msc {
 
 MscCoregion::MscCoregion(QObject *parent)
@@ -29,6 +31,11 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
     : MscInstanceEvent(parent)
     , m_type(type)
 {
+}
+
+bool MscCoregion::dependsOnInstance(MscInstance *instance) const
+{
+    return false;
 }
 
 }

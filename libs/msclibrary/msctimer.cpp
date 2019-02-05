@@ -17,6 +17,8 @@
 
 #include "msctimer.h"
 
+#include "mscinstance.h"
+
 namespace msc {
 
 MscTimer::MscTimer(QObject *parent)
@@ -28,6 +30,12 @@ MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
     : MscInstanceEvent(name, parent)
     , m_timerType(type)
 {
+}
+
+bool MscTimer::dependsOnInstance(MscInstance *instance) const
+{
+    //    return m_instance == instance;
+    return instance && instance->name() == m_instanceName;
 }
 
 }

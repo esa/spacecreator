@@ -88,4 +88,9 @@ void MscMessage::setMessageType(MscMessage::MessageType t)
     m_msgType = t;
 }
 
+bool MscMessage::dependsOnInstance(MscInstance *instance) const
+{
+    return m_source == instance || m_target == instance;
+}
+
 } // namespace msc

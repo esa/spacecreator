@@ -17,6 +17,8 @@
 
 #include "mscaction.h"
 
+#include "mscinstance.h"
+
 #include <QDebug>
 
 namespace msc {
@@ -89,6 +91,11 @@ void MscAction::setInstance(MscInstance *instance)
     m_instance = instance;
     Q_EMIT instanceChanged();
     Q_EMIT dataChanged();
+}
+
+bool MscAction::dependsOnInstance(MscInstance *instance) const
+{
+    return m_instance == instance;
 }
 
 }
