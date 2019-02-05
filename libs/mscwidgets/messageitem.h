@@ -45,7 +45,6 @@ public:
 
     QString name() const;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
 

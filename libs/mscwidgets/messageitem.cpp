@@ -47,7 +47,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
 
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
     connectObjects(source, target, y);
 
@@ -204,13 +204,6 @@ void MessageItem::rebuildLayout()
     m_layoutDirty = false;
     commitGeometryChange();
     update();
-}
-
-void MessageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
 }
 
 QPainterPath MessageItem::shape() const

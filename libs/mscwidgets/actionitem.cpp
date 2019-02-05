@@ -81,31 +81,6 @@ void ActionItem::setInstance(InstanceItem *instance)
     updateLayout();
 }
 
-void ActionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    if (isSelected()) {
-        painter->save();
-        QPen selectionPen(Qt::black, 3);
-        painter->setPen(selectionPen);
-        painter->drawRect(m_boundingRect);
-        painter->restore();
-    }
-}
-
-QRectF ActionItem::boundingRect() const
-{
-    static const QMarginsF selectionMargins(1, 1, 1, 1);
-
-    if (isSelected()) {
-        return m_boundingRect.marginsAdded(selectionMargins);
-    }
-
-    return m_boundingRect;
-}
-
 void ActionItem::setActionText(const QString &text)
 {
     if (!m_action) {
