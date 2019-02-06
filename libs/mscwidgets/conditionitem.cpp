@@ -39,7 +39,7 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     setName(m_condition->name());
     connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);
 
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
     m_nameItem->setEditable(true);
     m_nameItem->setBackgroundColor(Qt::transparent);
@@ -68,13 +68,6 @@ QPainterPath ConditionItem::shape() const
     result.addRect(m_polygonItem->boundingRect());
     result.addRect(m_nameItem->boundingRect());
     return result;
-}
-
-void ConditionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
 }
 
 void ConditionItem::setBoundingRect(const QRectF &geometry)
