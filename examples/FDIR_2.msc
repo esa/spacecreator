@@ -79,13 +79,13 @@ MSCDOCUMENT CU_level
       /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
       /* CIF TextMode 0 */
       /* CIF Modified */
-      MSCDOCUMENT run_software /* MSC EXCEPTION */;
+      MSCDOCUMENT run_software /* MSC AND */;
 
 
         /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
         /* CIF TextMode 0 */
         /* CIF Modified */
-        MSCDOCUMENT wait_refresh /* MSC EXCEPTION */;
+        MSCDOCUMENT wait_refresh /* MSC OR */;
 
 
           /* CIF MSCDOCUMENT (20, 20), (1500, 1090) */

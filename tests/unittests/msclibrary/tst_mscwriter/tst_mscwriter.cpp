@@ -363,17 +363,17 @@ void tst_MscWriter::testSerializeMscChartInstance()
 void tst_MscWriter::testSerializeMscDocument()
 {
     MscDocument document("Doc_1");
-    QCOMPARE(this->serialize(&document), QString("mscdocument Doc_1;\nendmscdocument;\n"));
+    QCOMPARE(this->serialize(&document), QString("mscdocument Doc_1 /* MSC AND */;\nendmscdocument;\n"));
 
     // check hierarchy
     document.addDocument(new MscDocument("Doc_2"));
     document.addDocument(new MscDocument("Doc_3"));
     QStringList serializeList = this->serialize(&document).split("\n");
     QVERIFY(serializeList.size() >= 6);
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1;"));
-    QCOMPARE(serializeList.at(1), tab1("mscdocument Doc_2;"));
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
+    QCOMPARE(serializeList.at(1), tab1("mscdocument Doc_2 /* MSC AND */;"));
     QCOMPARE(serializeList.at(2), tab1("endmscdocument;"));
-    QCOMPARE(serializeList.at(3), tab1("mscdocument Doc_3;"));
+    QCOMPARE(serializeList.at(3), tab1("mscdocument Doc_3 /* MSC AND */;"));
     QCOMPARE(serializeList.at(4), tab1("endmscdocument;"));
     QCOMPARE(serializeList.at(5), QString("endmscdocument;"));
 }
@@ -398,7 +398,7 @@ void tst_MscWriter::testSerializeMscDocumentChart()
 
     QVERIFY(serializeList.size() >= 12);
 
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1;"));
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
 
     QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
     QCOMPARE(serializeList.at(2), tab2("instance Inst_1;"));
@@ -426,7 +426,7 @@ void tst_MscWriter::testSerializeDataDefinition()
 
     QStringList serializeList = serialize(model.documents().at(0)).split("\n");
     QCOMPARE(serializeList.size(), 5);
-    QCOMPARE(serializeList.at(0), QString("mscdocument automade;"));
+    QCOMPARE(serializeList.at(0), QString("mscdocument automade /* MSC AND */;"));
     QCOMPARE(serializeList.at(1), tab1("language ASN.1;"));
     QCOMPARE(serializeList.at(2), tab1("data TPos.asn;"));
     QCOMPARE(serializeList.at(3), QString("endmscdocument;"));
@@ -522,7 +522,7 @@ void tst_MscWriter::testSerializeComments()
     QStringList serializeList = this->serialize(&document).split("\n");
 
     QVERIFY(serializeList.size() >= 8);
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 comment 'Doc1 comment';"));
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 comment 'Doc1 comment' /* MSC AND */;"));
     QCOMPARE(serializeList.at(1), tab1("msc Chart_1 comment 'Chart1 comment';"));
     QCOMPARE(serializeList.at(2), tab2("instance Inst_1 comment 'Inst1 comment';"));
     QCOMPARE(serializeList.at(3), tab3("in Msg_1 from env comment 'Msg1 comment';"));

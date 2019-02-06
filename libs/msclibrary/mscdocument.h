@@ -47,7 +47,7 @@ public:
     ~MscDocument() override;
 
     const QVector<MscDocument *> &documents() const;
-    void addDocument(MscDocument *document);
+    bool addDocument(MscDocument *document);
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
@@ -61,6 +61,8 @@ public:
     HierarchyType hierarchyType() const;
     void setHierarchyType(HierarchyType type);
 
+    bool isSingleChildDocument() const;
+
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void chartAdded(MscChart *chart);
@@ -71,7 +73,7 @@ private:
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
 
-    HierarchyType m_hierarchyType = HierarchyLeaf;
+    HierarchyType m_hierarchyType = HierarchyAnd;
 };
 
 } // namespace msc

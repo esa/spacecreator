@@ -310,7 +310,7 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     QString relation;
     switch (document->hierarchyType()) {
     case MscDocument::HierarchyLeaf:
-        // Nothing to add
+        relation = " /* MSC LEAF */";
         break;
     case MscDocument::HierarchyIs:
         relation = " /* MSC IS */";
@@ -333,7 +333,7 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     }
 
     QString tabString = tabs(tabsSize);
-    return QString("%1mscdocument %2%4%6;%5\n%3%1endmscdocument;\n")
+    return QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
             .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document));
 }
 

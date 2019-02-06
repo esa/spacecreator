@@ -33,7 +33,7 @@ public:
     ~MscModel();
 
     const QVector<MscDocument *> &documents() const;
-    void addDocument(MscDocument *document);
+    bool addDocument(MscDocument *document);
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);

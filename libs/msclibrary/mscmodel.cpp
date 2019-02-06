@@ -37,13 +37,13 @@ const QVector<MscDocument *> &MscModel::documents() const
     return m_documents;
 }
 
-void MscModel::addDocument(MscDocument *document)
+bool MscModel::addDocument(MscDocument *document)
 {
     if (document == nullptr) {
-        return;
+        return false;
     }
     if (m_documents.contains(document)) {
-        return;
+        return false;
     }
 
     document->setParent(this);
@@ -51,6 +51,8 @@ void MscModel::addDocument(MscDocument *document)
     connect(document, &MscDocument::dataChanged, this, &MscModel::dataChanged);
     Q_EMIT documentAdded(document);
     Q_EMIT dataChanged();
+
+    return true;
 }
 
 const QVector<MscChart *> &MscModel::charts() const

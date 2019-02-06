@@ -62,6 +62,8 @@ private Q_SLOTS:
     void testKeywordAsName();
     void testNonStandardVia();
     void testNonStandardInstance();
+    void testDocumentsType_data();
+    void testDocumentsType();
 
     // for message-related tests see the tst_MscEventsParsing
 
@@ -447,7 +449,7 @@ void tst_MscFile::testHierarchy()
                     ENDMSC; \
                 endmscdocument; \
                 MSCDOCUMENT test_exception /* MSC EXCEPTION */; \
-                    MSCDOCUMENT test_leaf; \
+                    MSCDOCUMENT test_leaf /* MSC LEAF */; \
                         MSC connection; \
                         ENDMSC; \
                     endmscdocument; \
@@ -552,6 +554,52 @@ void tst_MscFile::testNonStandardInstance()
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
     QCOMPARE(instance->name(), QString("FAB 1"));
+}
+
+void tst_MscFile::testDocumentsType_data()
+{
+    QTest::addColumn<QString>("mscContent");
+
+    QString msc = "MSCDOCUMENT root_doc /* MSC LEAF */; \
+                  MSCDOCUMENT doc1; \
+                  ENDMSCDOCUMENT; \
+              ENDMSCDOCUMENT;";
+    QTest::newRow("Leaf type docs have no child doc") << msc;
+    msc = "MSCDOCUMENT root_doc /* MSC REPEAT */; \
+                  MSCDOCUMENT doc1; \
+                  ENDMSCDOCUMENT; \
+                  MSCDOCUMENT doc1; \
+                  ENDMSCDOCUMENT; \
+              ENDMSCDOCUMENT;";
+    QTest::newRow("Repeat type docs have only one child doc") << msc;
+    msc = "MSCDOCUMENT root_doc /* MSC PARALLEL */; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                ENDMSCDOCUMENT;";
+    QTest::newRow("Parallel type docs have only one child doc") << msc;
+    msc = "MSCDOCUMENT root_doc /* MSC EXCEPTION */; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                ENDMSCDOCUMENT;";
+    QTest::newRow("Exception type docs have only one child doc") << msc;
+    msc = "MSCDOCUMENT root_doc /* MSC IS */; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                    MSCDOCUMENT doc1; \
+                    ENDMSCDOCUMENT; \
+                ENDMSCDOCUMENT;";
+    QTest::newRow("Is type docs have only one child doc") << msc;
+}
+
+void tst_MscFile::testDocumentsType()
+{
+    QFETCH(QString, mscContent);
+
+    QVERIFY_EXCEPTION_THROWN(file->parseText(mscContent), ParserException);
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

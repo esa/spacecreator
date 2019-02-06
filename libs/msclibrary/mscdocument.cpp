@@ -44,13 +44,21 @@ const QVector<MscDocument *> &MscDocument::documents() const
 /*!
    Adds a document event and takes over parentship.
  */
-void MscDocument::addDocument(MscDocument *document)
+bool MscDocument::addDocument(MscDocument *document)
 {
     if (document == nullptr) {
-        return;
+        return false;
     }
     if (m_documents.contains(document)) {
-        return;
+        return false;
+    }
+
+    if (isSingleChildDocument() && m_documents.size() >= 1) {
+        return false;
+    }
+
+    if (m_hierarchyType == HierarchyLeaf) {
+        return false;
     }
 
     document->setParent(this);
@@ -58,6 +66,8 @@ void MscDocument::addDocument(MscDocument *document)
     connect(document, &MscDocument::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT documentAdded(document);
     Q_EMIT dataChanged();
+
+    return true;
 }
 
 const QVector<MscChart *> &MscDocument::charts() const
@@ -122,6 +132,16 @@ void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
         m_hierarchyType = type;
         Q_EMIT hierarchyTypeChanged(type);
     }
+}
+
+/*!
+   \brief MscDocument::isSingleChildDocument
+   \return Returns if this document should only have one single child (dependent on the hierarchy type)
+ */
+bool MscDocument::isSingleChildDocument() const
+{
+    return m_hierarchyType == HierarchyIs || m_hierarchyType == HierarchyParallel || m_hierarchyType == HierarchyRepeat
+            || m_hierarchyType == HierarchyException;
 }
 
 }

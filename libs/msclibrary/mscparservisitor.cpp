@@ -130,13 +130,17 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     MscDocument *parent = m_currentDocument;
 
     auto doc = new MscDocument();
-    if (m_currentDocument == nullptr) {
-        m_model->addDocument(doc);
-    } else {
-        m_currentDocument->addDocument(doc);
-    }
     const auto docName = ::nameToString(context->documentHead()->name());
     doc->setName(docName);
+
+    if (parent == nullptr) {
+        m_model->addDocument(doc);
+    } else {
+        bool ok = parent->addDocument(doc);
+        if (!ok) {
+            throw ParserException(QString("Unable to add document %1 to %2").arg(docName, parent->name()));
+        }
+    }
 
     auto handleComment = [=](antlr4::Token *token) {
         if (token->getChannel() == 2) {
@@ -159,6 +163,8 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
                 line = line.toLower();
                 if (line.contains("goal") || line.contains("time")) {
                     // Not supported
+                } else if (line.contains("leaf")) {
+                    doc->setHierarchyType(MscDocument::HierarchyLeaf);
                 } else if (line.contains("exception")) {
                     doc->setHierarchyType(MscDocument::HierarchyException);
                 } else if (line.contains("parallel")) {
