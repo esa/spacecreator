@@ -40,6 +40,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QIcon>
 #include <QItemSelectionModel>
 #include <QKeySequence>
 #include <QMessageBox>
@@ -52,13 +53,13 @@ struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
         , m_model(new MainModel(mainWindow))
-        , m_toolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
+        , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
     {
-        m_toolBar->setObjectName("mscTools");
-        m_toolBar->setAllowedAreas(Qt::AllToolBarAreas);
-        mainWindow->addToolBar(Qt::LeftToolBarArea, m_toolBar);
+        m_mscToolBar->setObjectName("mscTools");
+        m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+        mainWindow->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
 
         m_hierarchyToolBar->setObjectName("hierarchyTools");
         m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -73,7 +74,7 @@ struct MainWindowPrivate {
 
     QString m_mscFileName;
     MainModel *m_model = nullptr;
-    QToolBar *m_toolBar = nullptr;
+    QToolBar *m_mscToolBar = nullptr;
     QToolBar *m_hierarchyToolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
@@ -96,10 +97,6 @@ struct MainWindowPrivate {
     QAction *m_actToggleErrorView = nullptr;
     QAction *m_actToggleHierarchyView = nullptr;
     QAction *m_actToggleMscTextView = nullptr;
-
-    QMenu *m_menuViewTools = nullptr;
-    QAction *m_actToggleToolbarMsc = nullptr;
-    QAction *m_actToggleToolbarMain = nullptr;
 
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
@@ -125,6 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadSettings();
 
+    d->m_mscToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
+    d->m_hierarchyToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
     d->ui->documentTreeView->expandAll();
 }
 
@@ -285,7 +284,7 @@ void MainWindow::showDocumentView(bool show)
         d->ui->centerView->setCurrentWidget(d->ui->graphicsView);
 
         d->m_hierarchyToolBar->hide();
-        d->m_toolBar->show();
+        d->m_mscToolBar->show();
     }
 }
 
@@ -295,7 +294,7 @@ void MainWindow::showHierarchyView(bool show)
         d->ui->centerView->setCurrentWidget(d->ui->hierarchyView);
 
         d->m_hierarchyToolBar->show();
-        d->m_toolBar->hide();
+        d->m_mscToolBar->hide();
     }
 }
 
@@ -366,8 +365,10 @@ void MainWindow::setupUi()
 
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
 
+    initActions();
     initMenus();
     initTools();
+    initMainToolbar();
 
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
@@ -388,6 +389,23 @@ void MainWindow::setupUi()
     statusBar()->show();
 }
 
+void MainWindow::initActions()
+{
+    d->m_actUndo = d->m_undoGroup->createUndoAction(this, tr("Undo:"));
+    d->m_actUndo->setShortcut(QKeySequence::Undo);
+    d->m_actUndo->setIcon(QIcon::fromTheme("edit-undo", QIcon(":/icons/toolbar/undo.svg")));
+
+    d->m_actRedo = d->m_undoGroup->createRedoAction(this, tr("Redo:"));
+    d->m_actRedo->setShortcut(QKeySequence::Redo);
+    d->m_actRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(":/icons/toolbar/redo.svg")));
+
+    d->m_deleteTool = new msc::EntityDeleteTool(d->ui->graphicsView, this);
+    d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
+
+    d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);
+    connect(d->m_actAsnEditor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
+}
+
 void MainWindow::initMenus()
 {
     initMenuFile();
@@ -402,15 +420,12 @@ void MainWindow::initMenuFile()
 
     d->m_actNewFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_FileIcon), tr("New File"), this,
                                                &MainWindow::createNewDocument, QKeySequence::New);
-    d->ui->mainToolBar->addAction(d->m_actNewFile);
 
     d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this,
                                                 &MainWindow::selectAndOpenFile, QKeySequence::Open);
-    d->ui->mainToolBar->addAction(d->m_actOpenFile);
 
     d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this,
                                                 &MainWindow::saveMsc, QKeySequence::Save);
-    d->ui->mainToolBar->addAction(d->m_actSaveFile);
 
     d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
                                                   this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
@@ -422,16 +437,11 @@ void MainWindow::initMenuFile()
 
 void MainWindow::initMenuEdit()
 {
-    d->m_actUndo = d->m_undoGroup->createUndoAction(this, tr("Undo:"));
-    d->m_actUndo->setShortcut(QKeySequence::Undo);
-
-    d->m_actRedo = d->m_undoGroup->createRedoAction(this, tr("Redo:"));
-    d->m_actRedo->setShortcut(QKeySequence::Redo);
-
     d->m_menuEdit = menuBar()->addMenu(tr("Edit"));
     d->m_menuEdit->addAction(d->m_actUndo);
     d->m_menuEdit->addAction(d->m_actRedo);
     d->m_menuEdit->addSeparator();
+    d->m_menuEdit->addAction(d->m_deleteTool->action());
 }
 
 void MainWindow::initMenuView()
@@ -450,7 +460,6 @@ void MainWindow::initMenuView()
     d->m_actShowDocument->setChecked(true);
 
     initMenuViewWindows();
-    initMenuViewToolbars();
 }
 
 void MainWindow::initMenuViewWindows()
@@ -466,20 +475,6 @@ void MainWindow::initMenuViewWindows()
 
     d->m_actToggleMscTextView = d->ui->dockWidgetMscText->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleMscTextView);
-}
-
-void MainWindow::initMenuViewToolbars()
-{
-    d->m_menuView->addSeparator();
-    d->m_menuViewTools = d->m_menuView->addMenu("Tools");
-
-    d->m_actToggleToolbarMsc = d->m_toolBar->toggleViewAction();
-    d->m_menuViewTools->addAction(d->m_actToggleToolbarMsc);
-
-    d->m_menuViewTools->addAction(d->m_hierarchyToolBar->toggleViewAction());
-
-    d->m_actToggleToolbarMain = d->ui->mainToolBar->toggleViewAction();
-    d->m_menuViewTools->addAction(d->m_actToggleToolbarMain);
 }
 
 void MainWindow::initMenuHelp()
@@ -507,7 +502,7 @@ void MainWindow::initTools()
 
     QActionGroup *toolsActions = new QActionGroup(this);
     for (msc::BaseTool *tool : d->m_tools) {
-        QAction *toolAction = d->m_toolBar->addAction(tool->title());
+        QAction *toolAction = d->m_mscToolBar->addAction(tool->title());
         toolAction->setCheckable(true);
         toolAction->setIcon(tool->icon());
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
@@ -520,10 +515,6 @@ void MainWindow::initTools()
 
     d->m_defaultToolAction = toolsActions->actions().first();
     enableDefaultTool();
-
-    d->m_deleteTool = new msc::EntityDeleteTool(d->ui->graphicsView, this);
-    d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
-    d->m_toolBar->addAction(d->m_deleteTool->action());
 
     for (int toolType = static_cast<int>(msc::ToolType::HierarchyAndCreator);
          toolType <= static_cast<int>(msc::ToolType::HierarchyRepeatCreator); ++toolType) {
@@ -538,11 +529,24 @@ void MainWindow::initTools()
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         tool->setView(currentView());
     }
+}
+
+void MainWindow::initMainToolbar()
+{
+    d->ui->mainToolBar->addAction(d->m_actNewFile);
+    d->ui->mainToolBar->addAction(d->m_actOpenFile);
+    d->ui->mainToolBar->addAction(d->m_actSaveFile);
+
+    d->ui->mainToolBar->addSeparator();
+    d->ui->mainToolBar->addAction(d->m_actUndo);
+    d->ui->mainToolBar->addAction(d->m_actRedo);
+
+    d->ui->mainToolBar->addSeparator();
+    d->ui->mainToolBar->addAction(d->m_deleteTool->action());
 
     // TODO: just for test Asn1Editor
-    d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);
+    d->ui->mainToolBar->addSeparator();
     d->ui->mainToolBar->addAction(d->m_actAsnEditor);
-    connect(d->m_actAsnEditor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 }
 
 void MainWindow::initConnections()
@@ -603,7 +607,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Escape: {
         if (!e->isAutoRepeat())
-            if (QAction *pointerToolAction = d->m_toolBar->actions().first())
+            if (QAction *pointerToolAction = d->m_mscToolBar->actions().first())
                 if (!pointerToolAction->isChecked())
                     pointerToolAction->setChecked(true);
         break;

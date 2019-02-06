@@ -20,5 +20,7 @@
         <file alias="toolbar/stoptimer.svg">resources/icons/toolbar/stoptimer.svg</file>
         <file alias="toolbar/timeouttimer.svg">resources/icons/toolbar/timeouttimer.svg</file>
         <file alias="toolbar/action.svg">resources/icons/toolbar/action.svg</file>
+        <file alias="toolbar/redo.svg">resources/icons/toolbar/redo.svg</file>
+        <file alias="toolbar/undo.svg">resources/icons/toolbar/undo.svg</file>
     </qresource>
 </RCC>

@@ -75,14 +75,15 @@ private:
     void saveSettings();
 
     void setupUi();
+    void initActions();
     void initMenus();
     void initMenuFile();
     void initMenuEdit();
     void initMenuView();
     void initMenuViewWindows();
-    void initMenuViewToolbars();
     void initMenuHelp();
     void initTools();
+    void initMainToolbar();
     void initConnections();
 
     void closeEvent(QCloseEvent *e) override;
