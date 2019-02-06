@@ -64,7 +64,7 @@ MscEntity::EntityType MscCondition::entityType() const
     return MscEntity::EntityType::Condition;
 }
 
-bool MscCondition::dependsOnInstance(MscInstance *instance) const
+bool MscCondition::relatesTo(MscInstance *instance) const
 {
     return m_instance == instance;
 }

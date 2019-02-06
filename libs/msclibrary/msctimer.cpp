@@ -32,7 +32,7 @@ MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
 {
 }
 
-bool MscTimer::dependsOnInstance(MscInstance *instance) const
+bool MscTimer::relatesTo(MscInstance *instance) const
 {
     //    return m_instance == instance;
     return instance && instance->name() == m_instanceName;

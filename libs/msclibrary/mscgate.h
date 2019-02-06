@@ -52,7 +52,7 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    bool dependsOnInstance(MscInstance *instance) const override;
+    bool relatesTo(MscInstance *instance) const override;
 
 public Q_SLOTS:
     void setDirection(MscGate::Direction dir);

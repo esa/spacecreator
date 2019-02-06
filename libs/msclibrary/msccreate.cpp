@@ -61,7 +61,7 @@ MscEntity::EntityType MscCreate::entityType() const
     return MscEntity::EntityType::Create;
 }
 
-bool MscCreate::dependsOnInstance(MscInstance *instance) const
+bool MscCreate::relatesTo(MscInstance *instance) const
 {
     return m_instance == instance;
 }

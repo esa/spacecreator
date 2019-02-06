@@ -41,7 +41,7 @@ public:
     void setType(Type type) { m_type = type; }
     Type type() const { return m_type; }
 
-    bool dependsOnInstance(MscInstance *instance) const override;
+    bool relatesTo(MscInstance *instance) const override;
 
 private:
     Type m_type;

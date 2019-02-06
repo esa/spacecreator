@@ -106,7 +106,7 @@ MscEntity::EntityType MscGate::entityType() const
     return MscEntity::EntityType::Gate;
 }
 
-bool MscGate::dependsOnInstance(MscInstance *instance) const
+bool MscGate::relatesTo(MscInstance *instance) const
 {
     return m_instance == instance;
 }

@@ -93,7 +93,7 @@ void MscAction::setInstance(MscInstance *instance)
     Q_EMIT dataChanged();
 }
 
-bool MscAction::dependsOnInstance(MscInstance *instance) const
+bool MscAction::relatesTo(MscInstance *instance) const
 {
     return m_instance == instance;
 }

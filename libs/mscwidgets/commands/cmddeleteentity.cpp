@@ -51,7 +51,7 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
     for (auto instance : m_instances) {
         m_chart->removeInstance(instance);
         for (auto event : m_chart->instanceEvents()) {
-            if (event->dependsOnInstance(instance)) {
+            if (event->relatesTo(instance)) {
                 const int idx = m_chart->instanceEvents().indexOf(event);
                 m_events[idx] = event;
             }
@@ -76,13 +76,13 @@ void CmdDeleteEntity::undo()
 {
     Q_ASSERT(m_chart);
 
-    for (auto it = m_instances.begin(); it != m_instances.end(); ++it) {
+    for (auto it = m_instances.cbegin(); it != m_instances.cend(); ++it) {
         const int idx = it.key();
         MscInstance *instance = it.value();
         m_chart->addInstance(instance, idx);
     }
 
-    for (auto it = m_events.begin(); it != m_events.end(); ++it) {
+    for (auto it = m_events.cbegin(); it != m_events.cend(); ++it) {
         const int idx = it.key();
         MscInstanceEvent *event = it.value();
         m_chart->addInstanceEvent(event, idx);

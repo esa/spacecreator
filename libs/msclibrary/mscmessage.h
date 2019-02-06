@@ -68,7 +68,7 @@ public:
     MscMessage::MessageType messageType() const;
     void setMessageType(MscMessage::MessageType t);
 
-    bool dependsOnInstance(MscInstance *instance) const override;
+    bool relatesTo(MscInstance *instance) const override;
 
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);

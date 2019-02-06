@@ -64,7 +64,7 @@ public:
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
 
-    bool dependsOnInstance(MscInstance *instance) const override;
+    bool relatesTo(MscInstance *instance) const override;
 
 Q_SIGNALS:
     void actionTypeChanged();

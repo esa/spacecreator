@@ -33,7 +33,7 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
 {
 }
 
-bool MscCoregion::dependsOnInstance(MscInstance *instance) const
+bool MscCoregion::relatesTo(MscInstance *instance) const
 {
     return false;
 }
