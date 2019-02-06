@@ -121,13 +121,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     connect(m_kindItem, &TextItem::edited, this, &InstanceItem::onKindEdited, Qt::QueuedConnection);
 }
 
-void InstanceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-}
-
 MscInstance *InstanceItem::modelItem() const
 {
     return m_instance;
