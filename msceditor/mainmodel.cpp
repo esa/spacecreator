@@ -71,6 +71,17 @@ MainModel::~MainModel()
     clearMscModel();
 }
 
+void MainModel::initialModel()
+{
+    auto model = new MscModel();
+    auto doc = new MscDocument(tr("Untitled_Document"));
+    auto chart = new MscChart(tr("Untitled_MSC"));
+    doc->addChart(chart);
+    model->addDocument(doc);
+
+    setNewModel(model);
+}
+
 QGraphicsScene *MainModel::graphicsScene() const
 {
     return d->m_chartModel.graphicsScene();
@@ -128,20 +139,7 @@ bool MainModel::loadFile(const QString &filename)
         return false;
     }
 
-    clearMscModel();
-    d->m_mscModel = model;
-
-    d->m_documentItemModel->setMscModel(d->m_mscModel);
-
-    connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::showFirstChart);
-    connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
-    connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
-    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
-
-    showFirstChart();
-    d->m_hierarchyModel.setModel(d->m_mscModel);
-
-    Q_EMIT modelDataChanged();
+    setNewModel(model);
 
     return true;
 }
@@ -204,16 +202,22 @@ void MainModel::clearMscModel()
     d->m_documentItemModel->setMscModel(nullptr);
 }
 
-void MainModel::initialModel()
+void MainModel::setNewModel(MscModel *model)
 {
-    clearMscModel();
+    Q_ASSERT(model != nullptr);
 
-    d->m_mscModel = new MscModel();
-    auto doc = new MscDocument(tr("Untitled Document"));
-    auto chart = new MscChart(tr("Untitled MSC"));
-    doc->addChart(chart);
-    d->m_mscModel->addDocument(doc);
-    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    clearMscModel();
+    d->m_mscModel = model;
 
     d->m_documentItemModel->setMscModel(d->m_mscModel);
+
+    connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
+    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+
+    showFirstChart();
+    d->m_hierarchyModel.setModel(d->m_mscModel);
+
+    Q_EMIT modelDataChanged();
 }

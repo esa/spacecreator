@@ -45,6 +45,8 @@ public:
     explicit MainModel(QObject *parent = nullptr);
     ~MainModel();
 
+    void initialModel();
+
     QGraphicsScene *graphicsScene() const;
     QGraphicsScene *hierarchyScene() const;
 
@@ -73,7 +75,7 @@ private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
     void clearMscModel();
-    void initialModel();
+    void setNewModel(msc::MscModel *model);
 
     std::unique_ptr<MainModelPrivate> const d;
 };

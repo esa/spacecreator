@@ -29,7 +29,6 @@ class MainWindow;
 }
 
 class MainModel;
-class QComboBox;
 class QUndoGroup;
 class QGraphicsView;
 
@@ -48,6 +47,7 @@ public:
     bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
 
 public Q_SLOTS:
+    void createNewDocument();
     void selectAndOpenFile();
     void selectCurrentChart();
     void openAsn1Editor();
@@ -70,8 +70,6 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;
-    QString m_mscFileName;
-    QComboBox *m_zoomBox;
 
     void loadSettings();
     void saveSettings();

@@ -68,12 +68,17 @@ struct MainWindowPrivate {
     ~MainWindowPrivate() { delete ui; }
 
     Ui::MainWindow *ui = nullptr;
+
+    QComboBox *m_zoomBox = nullptr;
+
+    QString m_mscFileName;
     MainModel *m_model = nullptr;
     QToolBar *m_toolBar = nullptr;
     QToolBar *m_hierarchyToolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 
     QMenu *m_menuFile = nullptr;
+    QAction *m_actNewFile = nullptr;
     QAction *m_actOpenFile = nullptr;
     QAction *m_actSaveFile = nullptr;
     QAction *m_actSaveFileAs = nullptr;
@@ -133,6 +138,21 @@ MainWindow::~MainWindow()
     disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
 }
 
+void MainWindow::createNewDocument()
+{
+    d->m_model->initialModel();
+    d->ui->documentTreeView->expandAll();
+    d->m_mscFileName.clear();
+    clearUndoStacks();
+
+    d->ui->graphicsView->centerOn(
+            d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
+
+    d->ui->graphicsView->setZoom(100);
+
+    updateTitles();
+}
+
 void MainWindow::selectAndOpenFile()
 {
     static const QLatin1String suffixMsc(".msc");
@@ -167,7 +187,7 @@ bool MainWindow::openFileMsc(const QString &file)
 
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
-        m_mscFileName = file;
+        d->m_mscFileName = file;
         d->ui->documentTreeView->expandAll();
         d->ui->graphicsView->centerOn(
                 d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
@@ -192,11 +212,10 @@ void MainWindow::updateTitles()
 {
     static const QString title = tr("%1 [%2]");
 
-    const QString mscFileName(m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(m_mscFileName).fileName());
+    const QString mscFileName(d->m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(d->m_mscFileName).fileName());
     setWindowTitle(title.arg(qApp->applicationName(), mscFileName));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
-    d->m_actSaveFileAs->setText(tr("Save \"%1\" As...").arg(mscFileName));
 }
 
 void MainWindow::clearUndoStacks()
@@ -242,20 +261,20 @@ bool MainWindow::openFileAsn(const QString &file)
 
 void MainWindow::saveMsc()
 {
-    if (m_mscFileName.isEmpty()) {
+    if (d->m_mscFileName.isEmpty()) {
         saveAsMsc();
     } else {
-        d->m_model->saveMsc(m_mscFileName);
+        d->m_model->saveMsc(d->m_mscFileName);
         updateTitles();
     }
 }
 
 void MainWindow::saveAsMsc()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(m_mscFileName).path(),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
                                                     tr("MSC files (*.msc);;All files (*.*)"));
     if (!fileName.isEmpty()) {
-        m_mscFileName = fileName;
+        d->m_mscFileName = fileName;
         saveMsc();
     }
 }
@@ -351,21 +370,21 @@ void MainWindow::setupUi()
     initTools();
 
     // status bar
-    m_zoomBox = new QComboBox(d->ui->statusBar);
+    d->m_zoomBox = new QComboBox(d->ui->statusBar);
     for (auto x = d->ui->graphicsView->minZoomPercent(); x <= d->ui->graphicsView->maxZoomPercent();
          x += d->ui->graphicsView->zoomStepPercent())
-        m_zoomBox->addItem(QString("%1 %").arg(x), x);
+        d->m_zoomBox->addItem(QString("%1 %").arg(x), x);
 
-    m_zoomBox->setCurrentIndex(m_zoomBox->findData(100));
+    d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(100));
 
-    connect(m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
+    connect(d->m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
         d->ui->graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
     });
 
     connect(d->ui->graphicsView, QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
-            [&](qreal percent) { m_zoomBox->setCurrentIndex(m_zoomBox->findData(percent)); });
+            [&](qreal percent) { d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(percent)); });
 
-    statusBar()->addPermanentWidget(m_zoomBox);
+    statusBar()->addPermanentWidget(d->m_zoomBox);
     statusBar()->show();
 }
 
@@ -380,6 +399,10 @@ void MainWindow::initMenus()
 void MainWindow::initMenuFile()
 {
     d->m_menuFile = menuBar()->addMenu(tr("File"));
+
+    d->m_actNewFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_FileIcon), tr("New File"), this,
+                                               &MainWindow::createNewDocument, QKeySequence::New);
+    d->ui->mainToolBar->addAction(d->m_actNewFile);
 
     d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this,
                                                 &MainWindow::selectAndOpenFile, QKeySequence::Open);
