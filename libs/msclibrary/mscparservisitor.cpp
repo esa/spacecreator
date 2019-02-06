@@ -124,7 +124,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     }
 
     if (!context->documentHead()) {
-        throw ParserException("No document head node in the MscDocument");
+        throw ParserException(QObject::tr("No document head node in the MscDocument"));
     }
 
     MscDocument *parent = m_currentDocument;
@@ -427,8 +427,11 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
         m_currentMessage->setTargetInstance(instance);
         m_currentMessage->m_descrOut.to = instance;
     }
-    m_currentMessage->m_descrOut.from = m_currentInstance;
     m_currentMessage->setSourceInstance(m_currentInstance);
+
+    m_currentMessage->m_descrOut.from = m_currentInstance;
+    m_currentMessage->m_descrOut.m_sourceLineInfo.m_line = context->start->getLine();
+    m_currentMessage->m_descrOut.m_sourceLineInfo.m_pos = context->start->getCharPositionInLine();
 
     return visitChildren(context);
 }
@@ -456,7 +459,10 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
         m_currentMessage->m_descrIn.from = instance;
     }
     m_currentMessage->setTargetInstance(m_currentInstance);
+
     m_currentMessage->m_descrIn.to = m_currentInstance;
+    m_currentMessage->m_descrIn.m_sourceLineInfo.m_line = context->start->getLine();
+    m_currentMessage->m_descrIn.m_sourceLineInfo.m_pos = context->start->getCharPositionInLine();
 
     return visitChildren(context);
 }
@@ -641,7 +647,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         auto checkForDuplicates = [&name, &isDuplicate](const InstanceEvents &instanceEvents) {
             auto find = std::find_if(instanceEvents.cbegin(), instanceEvents.cend(), isDuplicate);
             if (find != instanceEvents.cend()) {
-                throw ParserException("Incorrect (dublicate) create name '" + name + "'");
+                throw ParserException(QObject::tr("Incorrect (dublicate) create name '%1'").arg(name));
             }
         };
 
@@ -651,7 +657,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
 
         auto *createInstance = m_currentChart->instanceByName(name);
         if (!createInstance) {
-            throw ParserException("Incorrect (unknown) create name '" + name + "'");
+            throw ParserException(QObject::tr("Incorrect (unknown) create name '%1'").arg(name));
         }
 
         createInstance->setExplicitCreator(m_currentInstance);
@@ -745,7 +751,7 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
         timer->setInstanceName(::treeNodeToString(timeout->NAME(1)));
     } else {
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
-        throw ParserException("Bad timer declaration" + ::treeNodeToString(context));
+        throw ParserException(QObject::tr("Bad timer declaration '%1'").arg(::treeNodeToString(context)));
     }
 
     m_instanceEvents.append(timer);
@@ -850,6 +856,48 @@ void MscParserVisitor::orderInstanceEvents()
     }
 
     m_instanceEventsList.clear();
+
+    checkMessagesDoubleNotation();
+}
+
+void MscParserVisitor::checkMessagesDoubleNotation() const
+{
+    auto instanceName = [](const MscInstance *instance) {
+        return instance ? instance->name() : QObject::tr("[Unknown]");
+    };
+
+    auto prepareErrorMessage = [&instanceName](const MscMessage *message, const MscMessage::Flow &foundFlow) {
+        const bool missedIn = foundFlow == message->m_descrOut;
+
+        const QString missedLine =
+                QString("%1 %2 %3 %4;")
+                        .arg(QLatin1String(missedIn ? "in" : "out"), message->name(),
+                             QLatin1String(missedIn ? "from" : "to"),
+                             instanceName(missedIn ? message->sourceInstance() : message->targetInstance()));
+
+        return QObject::tr("@%1:%2 A missed reference to this message is required ('%3' in %4).")
+                .arg(QString::number(foundFlow.m_sourceLineInfo.m_line),
+                     QString::number(foundFlow.m_sourceLineInfo.m_pos), missedLine,
+                     instanceName(missedIn ? message->targetInstance() : message->sourceInstance()));
+    };
+
+    for (const MscInstanceEvent *event : m_currentChart->instanceEvents()) {
+        if (event->entityType() == MscEntity::EntityType::Message) {
+            const MscMessage *message = static_cast<const MscMessage *>(event);
+            if (message->sourceInstance() && message->targetInstance()) { // Ignore messages to/from Env
+                QString errorMessage;
+                if (!message->m_descrIn.isComplete()) {
+                    errorMessage = prepareErrorMessage(message, message->m_descrOut);
+                }
+                if (!message->m_descrOut.isComplete()) {
+                    errorMessage = prepareErrorMessage(message, message->m_descrIn);
+                }
+
+                if (!errorMessage.isEmpty())
+                    throw ParserException(errorMessage);
+            }
+        }
+    }
 }
 
 /*!

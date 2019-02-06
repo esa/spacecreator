@@ -93,6 +93,8 @@ private:
 
     msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
     msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);
+
+    void checkMessagesDoubleNotation() const;
 };
 
 #endif // MSCPARSERVISITOR_H

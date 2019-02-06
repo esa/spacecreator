@@ -74,6 +74,12 @@ public:
         MscInstance *to = nullptr;
 
         bool isComplete() const { return from && to; }
+        bool operator==(const Flow &other) const { return from == other.from && to == other.to; }
+
+        struct SourceLineInfo {
+            size_t m_line = 0;
+            size_t m_pos = 0;
+        } m_sourceLineInfo;
     };
 
     Flow m_descrIn, m_descrOut;

@@ -130,7 +130,7 @@ void tst_ChartViewModel::testNearestInstanceCreate()
                               IN Msg01 FROM New_Instance1; \
                           ENDINSTANCE; \
                           INSTANCE New_Instance1; \
-                              OUT Mgs01 TO Instance_A; \
+                              OUT Msg01 TO Instance_A; \
                           ENDINSTANCE; \
                        ENDMSC;";
     parseMsc(mscText);

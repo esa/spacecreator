@@ -59,7 +59,7 @@ void TextView::refillView()
     }
 
     msc::MscWriter mscWriter;
-    QString mscText = mscWriter.modelText(m_model);
+    const QString &mscText = mscWriter.modelText(m_model);
     setTextColor(Qt::black);
     try {
         msc::MscFile file;

@@ -35,6 +35,7 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
 
 bool MscCoregion::relatesTo(MscInstance *instance) const
 {
+    Q_UNUSED(instance);
     return false;
 }
 

@@ -57,6 +57,9 @@ private Q_SLOTS:
 
     void testMessageCreateInstance();
 
+    void testIncompleteMessageIn();
+    void testIncompleteMessageOut();
+
 private:
     MscFile *file = nullptr;
 };
@@ -243,32 +246,33 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
 
 void tst_MscEventsParsing::testInstanceCreateNoInstance()
 {
-    QString msc = "MSC msc1; \
+    static const QLatin1String msc("MSC msc1; \
                       INSTANCE Inst_1; \
                          create subscriber2(data1); \
                       ENDINSTANCE; \
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
-                   ENDMSC;";
+                   ENDMSC;");
+
     QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testInstanceCreateDublicate()
 {
-    QString msc = "MSC msc1; \
+    static const QLatin1String msc("MSC msc1; \
                       INSTANCE Inst_1; \
                          create subscriber(data1); \
                          create subscriber(data2); \
                       ENDINSTANCE; \
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
-                   ENDMSC;";
+                   ENDMSC;");
     QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testSortedMessage()
 {
-    QString msc = "msc connection; \
+    static const QLatin1String msc("msc connection; \
                       instance Initiator; \
                           in ICONreq from env; \
                           out ICON to Responder; \
@@ -281,7 +285,7 @@ void tst_MscEventsParsing::testSortedMessage()
                           in ICONresp from env; \
                           out ICONF to Initiator; \
                       endinstance; \
-                  endmsc;";
+                  endmsc;");
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
@@ -334,7 +338,7 @@ void tst_MscEventsParsing::testSortedMessage()
 
 void tst_MscEventsParsing::testSortedMessageTwoCharts()
 {
-    QString msc = "mscdocument doc1; \
+    static const QLatin1String msc("mscdocument doc1; \
                       msc connection1; \
                           instance Initiator1; \
                               in ICONreq1 from env; \
@@ -363,7 +367,7 @@ void tst_MscEventsParsing::testSortedMessageTwoCharts()
                               out ICONF2 to Initiator2; \
                           endinstance; \
                       endmsc; \
-                  endmscdocument;";
+                  endmscdocument;");
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->documents().size(), 1);
@@ -422,7 +426,7 @@ void tst_MscEventsParsing::testSortedMessageTwoCharts()
 
 void tst_MscEventsParsing::testSortedInstanceEvents()
 {
-    QString msc = "msc connection; \
+    static const QLatin1String msc("msc connection; \
                       instance Initiator; \
                           starttimer T1; \
                           in ICONreq from env; \
@@ -439,7 +443,7 @@ void tst_MscEventsParsing::testSortedInstanceEvents()
                           in ICONresp from env; \
                           out ICONF to Initiator; \
                       endinstance; \
-                  endmsc;";
+                  endmsc;");
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
@@ -564,6 +568,44 @@ void tst_MscEventsParsing::testMessageCreateInstance()
             QCOMPARE(message->messageType(), expectedType);
         }
     }
+}
+
+void tst_MscEventsParsing::testIncompleteMessageIn()
+{
+    static const QLatin1String msc("mscdocument TestDoc; \
+                                     msc msc3; \
+                                         instance A; \
+                                             out A_to_Env to Env; \
+                                             in Env_to_A from Env; \
+                                             out A_to_B to B; \
+                                         endinstance; \
+                                         instance B; \
+                                             in A_to_B from A; \
+                                             in NO_A_to_B from A; \
+                                         endinstance; \
+                                     endmsc; \
+                                 endmscdocument;");
+
+    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+}
+
+void tst_MscEventsParsing::testIncompleteMessageOut()
+{
+    static const QLatin1String msc("mscdocument TestDoc; \
+                                     msc msc3; \
+                                         instance A; \
+                                             out A_to_Env to Env; \
+                                             in Env_to_A from Env; \
+                                             out A_to_B to B; \
+                                         endinstance; \
+                                         instance B; \
+                                             in A_to_B from A; \
+                                             out NO_B_to_A to A; \
+                                         endinstance; \
+                                     endmsc; \
+                                 endmscdocument;");
+
+    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
 }
 
 QTEST_APPLESS_MAIN(tst_MscEventsParsing)
