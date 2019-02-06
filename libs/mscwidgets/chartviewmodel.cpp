@@ -27,6 +27,7 @@
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccreate.h"
 #include "mscinstance.h"
 
 #include <QDebug>
@@ -253,6 +254,12 @@ void ChartViewModel::relayout()
             newItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
             break;
         }
+        case MscEntity::EntityType::Create: {
+            // TODO: rm MscCreate wrapper and use the MscMessage directly?
+            newItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
+            break;
+        }
+
         case MscEntity::EntityType::Action: {
             newItem = addActionItem(static_cast<MscAction *>(instanceEvent));
             break;
@@ -569,18 +576,13 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
     }
 }
 
-qreal ChartViewModel::ensureInstanceCreationAdded(MscInstance *dynamicInstance)
+void ChartViewModel::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance)
 {
     if (!d->m_layoutInfo.m_dynamicInstances.contains(dynamicInstance)) {
-        MscMessage *msgCreate = new MscMessage(QString()); // rm "Untitled"
-        msgCreate->setMessageType(MscMessage::MessageType::Create);
-        msgCreate->setTargetInstance(dynamicInstance);
-
-        if (MessageItem *item = fillMessageItem(msgCreate, itemForInstance(dynamicInstance->explicitCreator()),
+        MscInstance *creatorInstance = dynamicInstance->explicitCreator();
+        if (MessageItem *item = fillMessageItem(msgCreate, itemForInstance(creatorInstance),
                                                 itemForInstance(dynamicInstance), d->m_layoutInfo.m_pos.y())) {
             d->m_layoutInfo.m_dynamicInstances.insert(dynamicInstance, item);
-
-            msgCreate->setParent(item); // to be removed on clearScene(), etc
         }
     }
 
@@ -588,23 +590,20 @@ qreal ChartViewModel::ensureInstanceCreationAdded(MscInstance *dynamicInstance)
         && !d->m_layoutInfo.m_dynamicInstanceMarkers.contains(dynamicInstance)) {
         if (MessageItem *item = d->m_layoutInfo.m_dynamicInstances.value(dynamicInstance)) {
             d->m_layoutInfo.m_dynamicInstanceMarkers.insert(dynamicInstance, item);
-            return d->m_layoutInfo.m_pos.y() + item->boundingRect().height() + d->InterMessageSpan;
         }
     }
-
-    return d->m_layoutInfo.m_pos.y();
 };
 
 MessageItem *ChartViewModel::addMessageItem(MscMessage *message)
 {
     qreal instanceVertiacalOffset(0);
-    auto findInstanceItem = [this, &instanceVertiacalOffset](MscInstance *instance) {
+    auto findInstanceItem = [&](MscInstance *instance) {
         InstanceItem *res(nullptr);
 
         if (instance) {
             res = itemForInstance(instance);
             if (res->modelItem()->explicitCreator()) {
-                d->m_layoutInfo.m_pos.ry() = ensureInstanceCreationAdded(res->modelItem());
+                ensureInstanceCreationAdded(message, res->modelItem());
                 instanceVertiacalOffset += res->axis().p1().y();
             }
         }

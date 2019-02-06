@@ -90,6 +90,9 @@ private:
     QVector<InstanceEvents> m_instanceEventsList;
 
     antlr4::CommonTokenStream *m_tokens = nullptr;
+
+    msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
+    msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);
 };
 
 #endif // MSCPARSERVISITOR_H

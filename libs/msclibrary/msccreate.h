@@ -18,33 +18,20 @@
 #ifndef MSCCREATE_H
 #define MSCCREATE_H
 
-#include "mscinstanceevent.h"
+#include "mscmessage.h"
 
 namespace msc {
 
 class MscInstance;
 
-class MscCreate : public MscInstanceEvent
+class MscCreate : public MscMessage
 {
     Q_OBJECT
 
 public:
     explicit MscCreate(QObject *parent = nullptr);
-    MscCreate(const QString &name, QObject *parent = nullptr);
-
-    const QStringList &parameters() const;
-    void addParameter(const QString &parameter);
-
-    MscInstance *instance() const;
-    void setInstance(MscInstance *instance);
 
     MscEntity::EntityType entityType() const override;
-
-    bool relatesTo(MscInstance *instance) const override;
-
-private:
-    MscInstance *m_instance = nullptr;
-    QStringList m_parameters;
 };
 
 } // namespace msc

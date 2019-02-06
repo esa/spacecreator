@@ -119,7 +119,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 {
     if (context->REFERENCED()) {
         // ignore referenced documents (spec extension) for now
-        qDebug() << "Referenced documents are not supported";
+        qWarning() << "Referenced documents are not supported";
         return visitChildren(context);
     }
 
@@ -152,7 +152,6 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 
             if (line.startsWith("CIF")) {
                 // Handle CIF here
-                // qDebug() << "CIF comment on" << docName << ":" << line;
             } else if (line.startsWith("MSC")) {
                 // Handle MSC here
                 // This is really simple first version of an MSC hierarchy parser
@@ -221,6 +220,7 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
     if (context->mscHead()) {
         mscName = ::nameToString(context->mscHead()->name());
     }
+
     auto chart = new MscChart(mscName);
     if (m_currentDocument == nullptr) {
         m_model->addChart(chart);
@@ -366,6 +366,39 @@ antlrcpp::Any MscParserVisitor::visitInstanceEndStatement(MscParser::InstanceEnd
     return visitChildren(context);
 }
 
+MscMessage *MscParserVisitor::lookupMessageIn(const QString &name, MscInstance *to)
+{
+    for (int i = 0; i < m_instanceEventsList.size(); ++i)
+        for (int j = 0; j < m_instanceEventsList.at(i).size(); ++j) {
+            MscInstanceEvent *event = m_instanceEventsList.at(i).at(j);
+            if (event->entityType() != MscEntity::EntityType::Message || event->name() != name)
+                continue;
+
+            MscMessage *message = static_cast<MscMessage *>(event);
+            if (message->m_descrIn.from == to && !message->m_descrOut.isComplete()) {
+                return message;
+            }
+        }
+    return nullptr;
+}
+
+MscMessage *MscParserVisitor::lookupMessageOut(const QString &name, MscInstance *to)
+{
+    for (int i = 0; i < m_instanceEventsList.size(); ++i)
+        for (int j = 0; j < m_instanceEventsList.at(i).size(); ++j) {
+            MscInstanceEvent *event = m_instanceEventsList.at(i).at(j);
+            if (event->entityType() != MscEntity::EntityType::Message || event->name() != name)
+                continue;
+
+            MscMessage *message = static_cast<MscMessage *>(event);
+
+            if (message->m_descrOut.to == to && !message->m_descrIn.isComplete()) {
+                return message;
+            }
+        }
+    return nullptr;
+}
+
 antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputContext *context)
 {
     if (!m_currentChart) {
@@ -373,18 +406,22 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
     }
 
     const QString name = ::nameToString(context->msgIdentification()->messageName);
-    m_currentMessage = m_currentChart->messageByName(name);
+    m_currentMessage = lookupMessageIn(name, m_currentInstance); // TODO: params also should be compared
     if (m_currentMessage == nullptr) {
         m_currentMessage = new MscMessage(name);
-        m_instanceEvents.append(m_currentMessage);
     }
+
     m_currentEvent = m_currentMessage;
+    m_instanceEvents.append(m_currentEvent);
 
     MscParser::InputAddressContext *inputAddress = context->inputAddress();
     if (inputAddress && inputAddress->instanceName) {
         const QString target = QString::fromStdString(inputAddress->instanceName->getText());
-        m_currentMessage->setTargetInstance(m_currentChart->instanceByName(target));
+        auto *instance = m_currentChart->instanceByName(target);
+        m_currentMessage->setTargetInstance(instance);
+        m_currentMessage->m_descrOut.to = instance;
     }
+    m_currentMessage->m_descrOut.from = m_currentInstance;
     m_currentMessage->setSourceInstance(m_currentInstance);
 
     return visitChildren(context);
@@ -397,19 +434,23 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
     }
 
     const QString name = ::treeNodeToString(context->msgIdentification()->messageName);
-    m_currentMessage = m_currentChart->messageByName(name);
+    m_currentMessage = lookupMessageOut(name, m_currentInstance);
     if (m_currentMessage == nullptr) {
         m_currentMessage = new MscMessage(name);
-        m_instanceEvents.append(m_currentMessage);
     }
+
     m_currentEvent = m_currentMessage;
+    m_instanceEvents.append(m_currentEvent);
 
     MscParser::OutputAddressContext *outputAddress = context->outputAddress();
     if (outputAddress && outputAddress->instanceName) {
         const QString source = ::treeNodeToString(outputAddress->instanceName);
-        m_currentMessage->setSourceInstance(m_currentChart->instanceByName(source));
+        auto *instance = m_currentChart->instanceByName(source);
+        m_currentMessage->setSourceInstance(instance);
+        m_currentMessage->m_descrIn.from = instance;
     }
     m_currentMessage->setTargetInstance(m_currentInstance);
+    m_currentMessage->m_descrIn.to = m_currentInstance;
 
     return visitChildren(context);
 }
@@ -582,35 +623,54 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         QString name = ::treeNodeToString(context->NAME());
 
         // find dublicate create name
-        auto find =
-                std::find_if(m_currentChart->instanceEvents().begin(), m_currentChart->instanceEvents().end(),
-                             [&](const MscInstanceEvent *event) {
-                                 return event->entityType() == MscEntity::EntityType::Create && event->name() == name;
-                             });
+        auto isDuplicate = [&](const MscInstanceEvent *event) {
+            if (event->entityType() == MscEntity::EntityType::Create) {
+                const MscCreate *message = static_cast<const MscCreate *>(event);
+                return message->messageType() == MscMessage::MessageType::Create
+                        && message->targetInstance()->name() == name;
+            }
+            return false;
+        };
 
-        if (find != m_currentChart->instanceEvents().end()) {
-            throw ParserException("Incorrect(dublicate) create name '" + name + "'");
-        }
+        auto checkForDuplicates = [&name, &isDuplicate](const InstanceEvents &instanceEvents) {
+            auto find = std::find_if(instanceEvents.cbegin(), instanceEvents.cend(), isDuplicate);
+            if (find != instanceEvents.cend()) {
+                throw ParserException("Incorrect (dublicate) create name '" + name + "'");
+            }
+        };
+
+        for (int i = 0; i < m_instanceEventsList.size(); ++i)
+            checkForDuplicates(m_instanceEventsList.at(i));
+        checkForDuplicates(m_instanceEvents);
 
         auto *createInstance = m_currentChart->instanceByName(name);
         if (!createInstance) {
-            throw ParserException("Incorrect(unknown) create name '" + name + "'");
+            throw ParserException("Incorrect (unknown) create name '" + name + "'");
         }
 
         createInstance->setExplicitCreator(m_currentInstance);
 
-        auto *create = new MscCreate(name);
-        m_currentEvent = create;
+        m_currentMessage = new MscCreate();
+        m_currentEvent = m_currentMessage;
+        m_currentMessage->setSourceInstance(m_currentInstance);
+        m_currentMessage->setTargetInstance(createInstance);
+        m_currentMessage->m_descrOut.to = createInstance;
+        m_currentMessage->m_descrOut.from = m_currentInstance;
+        m_currentMessage->m_descrIn.to = m_currentInstance;
+        m_currentMessage->m_descrIn.from = createInstance;
+
+        MscMessage::Parameters parameters;
+        parameters.name = name; // TODO: use the createInstance's name instead?
 
         auto *parameterList = context->parameterList();
-        while (parameterList) {
-            create->addParameter(::treeNodeToString(parameterList->paramaterDefn()));
-            parameterList = parameterList->parameterList();
+        if (parameterList && parameterList->paramaterDefn()) {
+            auto *paramaterDefn = parameterList->paramaterDefn();
+            parameters.expression = ::treeNodeToString(paramaterDefn->expression());
+            parameters.pattern = ::treeNodeToString(paramaterDefn->pattern());
+            m_currentMessage->setParameters(parameters);
         }
 
-        create->setInstance(m_currentInstance);
-
-        m_currentChart->addInstanceEvent(create);
+        m_instanceEvents.append(m_currentMessage);
     }
 
     return visitChildren(context);
@@ -753,7 +813,7 @@ void MscParserVisitor::orderInstanceEvents()
             for (int j = i + 1; j < m_instanceEventsList.size(); ++j) {
                 if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkMessage)) {
                     if (m_instanceEventsList[j][0]->name() == firstMessage->name()) {
-                        delete m_instanceEventsList[j].takeFirst();
+                        m_instanceEventsList[j].removeFirst();
 
                         found = true;
                         break;
@@ -771,7 +831,7 @@ void MscParserVisitor::orderInstanceEvents()
             }
 
             if (found && inOther) {
-                delete m_instanceEventsList[i].takeFirst();
+                m_instanceEventsList[i].removeFirst();
             }
         }
 

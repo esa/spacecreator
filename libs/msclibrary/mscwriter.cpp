@@ -163,19 +163,6 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     const QString comment = serializeComment(message);
 
     QString direction = tabs(tabsSize);
-
-    if (message->messageType() == MscMessage::MessageType::Create) {
-        if (instance == message->sourceInstance()) {
-            QString res = direction + QString("create %1").arg(message->targetInstance()->name());
-            const MscMessage::Parameters &params = message->parameters();
-            const QString &param = params.pattern.isEmpty() ? params.expression : params.pattern;
-            if (!param.isEmpty())
-                res = res.append(" (%1)").arg(param);
-            return res.append(";\n");
-        }
-        return QString();
-    }
-
     QString name = message->name();
     QString instanceName;
 
@@ -208,13 +195,15 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
 
 QString MscWriter::serialize(const MscCreate *create, const MscInstance *instance, int tabsSize)
 {
-    if (create == nullptr || create->instance() != instance)
-        return {};
-
-    const QString parameters =
-            create->parameters().isEmpty() ? "" : QString("(%1)").arg(create->parameters().join(", "));
-
-    return QString("%1create %2%3;\n").arg(tabs(tabsSize), create->name(), parameters);
+    if (create && instance == create->sourceInstance()) {
+        QString res = tabs(tabsSize) + QString("create %1").arg(create->targetInstance()->name());
+        const MscMessage::Parameters &params = create->parameters();
+        const QString &param = params.pattern.isEmpty() ? params.expression : params.pattern;
+        if (!param.isEmpty())
+            res = res.append("(%1)").arg(param);
+        return res.append(";\n");
+    }
+    return {};
 }
 
 QString MscWriter::serialize(const MscTimer *timer, int tabsSize)

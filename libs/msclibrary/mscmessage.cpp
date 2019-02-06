@@ -83,10 +83,6 @@ MscMessage::MessageType MscMessage::messageType() const
 {
     return m_msgType;
 }
-void MscMessage::setMessageType(MscMessage::MessageType t)
-{
-    m_msgType = t;
-}
 
 bool MscMessage::relatesTo(MscInstance *instance) const
 {

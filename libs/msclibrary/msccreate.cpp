@@ -22,48 +22,14 @@
 namespace msc {
 
 MscCreate::MscCreate(QObject *parent)
-    : MscInstanceEvent(parent)
+    : MscMessage(QString(), parent) // rename from default one (which is MscEntity::DefaultName - "Untitled")
 {
-}
-
-MscCreate::MscCreate(const QString &name, QObject *parent)
-    : MscInstanceEvent(name, parent)
-{
-}
-
-const QStringList &MscCreate::parameters() const
-{
-    return m_parameters;
-}
-
-void MscCreate::addParameter(const QString &parameter)
-{
-    m_parameters.append(parameter);
-    Q_EMIT dataChanged();
-}
-
-MscInstance *MscCreate::instance() const
-{
-    return m_instance;
-}
-
-void MscCreate::setInstance(MscInstance *instance)
-{
-    if (instance == m_instance) {
-        return;
-    }
-    m_instance = instance;
-    Q_EMIT dataChanged();
+    m_msgType = MscMessage::MessageType::Create;
 }
 
 MscEntity::EntityType MscCreate::entityType() const
 {
     return MscEntity::EntityType::Create;
-}
-
-bool MscCreate::relatesTo(MscInstance *instance) const
-{
-    return m_instance == instance;
 }
 
 } // namespace msc

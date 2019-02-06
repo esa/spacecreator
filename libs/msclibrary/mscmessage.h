@@ -66,19 +66,29 @@ public:
     void setParameters(const Parameters &parameters);
 
     MscMessage::MessageType messageType() const;
-    void setMessageType(MscMessage::MessageType t);
 
     bool relatesTo(MscInstance *instance) const override;
+
+    struct Flow {
+        MscInstance *from = nullptr;
+        MscInstance *to = nullptr;
+
+        bool isComplete() const { return from && to; }
+    };
+
+    Flow m_descrIn, m_descrOut;
 
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
 
+protected:
+    MscMessage::MessageType m_msgType = MscMessage::MessageType::Message;
+
 private:
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
     Parameters m_parameters;
-    MscMessage::MessageType m_msgType = MscMessage::MessageType::Message;
 };
 }
 

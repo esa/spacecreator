@@ -434,25 +434,30 @@ void tst_MscWriter::testSerializeDataDefinition()
 
 void tst_MscWriter::testSerializeCreate()
 {
-    MscInstance instance("Inst_1");
-
-    QScopedPointer<MscCreate> create(new MscCreate("subscriber"));
-    create->addParameter("data1");
-    create->addParameter("data2");
-    create->setInstance(&instance);
-
+    MscInstance instanceSource("Inst_1");
+    MscInstance instanceSubscriber("subscriber");
+    MscInstance instanceSubscriber2("subscriber2");
     QVector<MscInstanceEvent *> messages;
-    messages.append(create.data());
+
+    QScopedPointer<MscCreate> createSubscriber(new MscCreate());
+    createSubscriber->setSourceInstance(&instanceSource);
+    createSubscriber->setTargetInstance(&instanceSubscriber);
+    MscMessage::Parameters parameters;
+    parameters.expression = "data1, data2";
+    createSubscriber->setParameters(parameters);
+
+    messages.append(createSubscriber.data());
 
     QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
-    message->setTargetInstance(&instance);
+    message->setTargetInstance(&instanceSource);
     messages.append(message.data());
 
-    QScopedPointer<MscCreate> create2(new MscCreate("subscriber2"));
-    create2->setInstance(&instance);
-    messages.append(create2.data());
+    QScopedPointer<MscCreate> createSubscriber2(new MscCreate());
+    createSubscriber2->setSourceInstance(&instanceSource);
+    createSubscriber2->setTargetInstance(&instanceSubscriber2);
+    messages.append(createSubscriber2.data());
 
-    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
+    const QStringList &serializeList = this->serialize(&instanceSource, messages).split("\n", QString::SkipEmptyParts);
 
     QVERIFY(serializeList.size() >= 5);
 
@@ -472,8 +477,9 @@ void tst_MscWriter::testSerializeChartWithCreate()
     chart.addInstance(instance2);
     chart.addInstance(new MscInstance("Instance03"));
 
-    auto create = new MscCreate("Instance02");
-    create->setInstance(instance1);
+    auto create = new MscCreate();
+    create->setSourceInstance(instance1);
+    create->setTargetInstance(instance2);
     chart.addInstanceEvent(create);
 
     QStringList serializeList = this->serialize(&chart).split("\n", QString::SkipEmptyParts);

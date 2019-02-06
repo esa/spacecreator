@@ -96,7 +96,7 @@ private:
     void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
-    qreal ensureInstanceCreationAdded(MscInstance *dynamicInstance);
+    void ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance);
 
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
