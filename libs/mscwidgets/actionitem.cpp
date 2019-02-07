@@ -99,10 +99,6 @@ void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoin
         const QPointF &delta = to - from;
         setPos(pos() + delta);
     }
-
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
 }
 
 void ActionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

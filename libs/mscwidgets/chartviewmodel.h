@@ -29,16 +29,19 @@ class QGraphicsObject;
 
 namespace msc {
 
-class MscChart;
 class ActionItem;
 class ConditionItem;
-class MscInstanceEvent;
 class InteractiveObject;
 class InstanceItem;
 class MessageItem;
+class TimerItem;
+
 class MscAction;
+class MscChart;
 class MscCondition;
 class MscInstance;
+class MscInstanceEvent;
+class MscTimer;
 
 struct ChartViewModelPrivate;
 struct ChartViewLayoutInfo;
@@ -66,6 +69,7 @@ public:
     MessageItem *itemForMessage(MscMessage *message) const;
     ConditionItem *itemForCondition(MscCondition *condition) const;
     ActionItem *itemForAction(MscAction *action) const;
+    TimerItem *itemForTimer(MscTimer *timer) const;
 
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
@@ -101,6 +105,7 @@ private:
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
+    TimerItem *addTimerItem(MscTimer *timer);
 };
 
 } // namespace msc

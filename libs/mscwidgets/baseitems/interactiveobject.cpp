@@ -198,6 +198,12 @@ MscEntity *InteractiveObject::modelEntity() const
     return m_entity.data();
 }
 
+/*!
+   \brief InteractiveObject::updateLayout
+   Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
+   it's data.
+   The actual update is done in the virtual function \see InteractiveObject::rebuildLayout
+ */
 void InteractiveObject::updateLayout()
 {
     if (m_layoutDirty) {

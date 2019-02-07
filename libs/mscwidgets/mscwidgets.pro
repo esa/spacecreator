@@ -59,7 +59,8 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messageitem.h \
-    textview.h
+    textview.h \
+    timeritem.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -109,7 +110,8 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messageitem.cpp \
-    textview.cpp
+    textview.cpp \
+    timeritem.cpp
 
 RESOURCES += \
     resources.qrc

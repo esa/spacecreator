@@ -29,6 +29,8 @@
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscinstance.h"
+#include "msctimer.h"
+#include "timeritem.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -269,6 +271,10 @@ void ChartViewModel::relayout()
             newItem = addConditionItem(static_cast<MscCondition *>(instanceEvent), prevItem, instancesRect);
             break;
         }
+        case MscEntity::EntityType::Timer: {
+            newItem = addTimerItem(static_cast<MscTimer *>(instanceEvent));
+            break;
+        }
         default: {
             newItem = nullptr;
             break;
@@ -400,6 +406,11 @@ ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
 ActionItem *ChartViewModel::itemForAction(MscAction *action) const
 {
     return utils::itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
+}
+
+TimerItem *ChartViewModel::itemForTimer(MscTimer *timer) const
+{
+    return utils::itemForEntity<TimerItem, MscTimer>(timer, &d->m_scene);
 }
 
 /*!
@@ -663,6 +674,29 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
     item->updateLayout();
 
     d->m_layoutInfo.m_pos.ry() += item->boundingRect().height() + d->InterMessageSpan;
+
+    return item;
+}
+
+TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
+{
+    InstanceItem *instance(nullptr);
+    qreal instanceVertiacalOffset(0);
+    if (timer->instance()) {
+        instance = itemForInstance(timer->instance());
+        instanceVertiacalOffset = instance->axis().p1().y();
+    }
+
+    TimerItem *item = itemForTimer(timer);
+    if (!item) {
+        item = new TimerItem(timer);
+        connect(item, &TimerItem::moved, this, &ChartViewModel::onInstanceEventItemMoved, Qt::UniqueConnection);
+
+        d->m_scene.addItem(item);
+        d->m_instanceEventItems.append(item);
+    }
+    item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+    item->updateLayout();
 
     return item;
 }
