@@ -109,6 +109,18 @@ QModelIndex DocumentItemModel::index(MscDocument *document) const
     }
 }
 
+void DocumentItemModel::updateHierarchyType(const QModelIndex &index, const QVariant &hierarchyType)
+{
+    if (!index.isValid() || index.internalPointer() == nullptr) {
+        return;
+    }
+
+    auto obj = static_cast<QObject *>(index.internalPointer());
+    if (auto document = dynamic_cast<MscDocument *>(obj)) {
+        cmd::CommandsStack::push(cmd::HierarchyType, { QVariant::fromValue(document), hierarchyType });
+    }
+}
+
 Qt::ItemFlags DocumentItemModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
@@ -365,6 +377,13 @@ void DocumentItemModel::connectDocument(MscDocument *document)
             },
             Qt::UniqueConnection);
     connect(document, &msc::MscDocument::chartAdded, this,
+            [&]() {
+                beginResetModel();
+                endResetModel();
+            },
+            Qt::UniqueConnection);
+
+    connect(document, &msc::MscDocument::hierarchyTypeChanged, this,
             [&]() {
                 beginResetModel();
                 endResetModel();

@@ -24,6 +24,8 @@
 #include "documentitemmodel.h"
 #include "mainmodel.h"
 #include "mscchart.h"
+#include "mscdocument.h"
+#include "mscmodel.h"
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
@@ -48,6 +50,8 @@
 #include <QTreeView>
 #include <QUndoGroup>
 #include <QUndoStack>
+
+const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -106,6 +110,10 @@ struct MainWindowPrivate {
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
+
+    QMenu *m_hierarchyTypeMenu = nullptr;
+
+    QModelIndex m_modelIndex;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -252,6 +260,51 @@ void MainWindow::updateTextView()
     d->ui->mscTextBrowser->updateView();
 }
 
+void MainWindow::showHierarchyTypeMenu(const QPoint &point)
+{
+    QModelIndex index = d->ui->documentTreeView->indexAt(point);
+
+    if (d->m_hierarchyTypeMenu && index.isValid()) {
+        auto *obj = static_cast<QObject *>(index.internalPointer());
+
+        if (dynamic_cast<msc::MscDocument *>(obj)) {
+            d->m_hierarchyTypeMenu->exec(d->ui->documentTreeView->viewport()->mapToGlobal(point));
+        }
+    }
+}
+
+void MainWindow::changHeierarchyType()
+{
+    static_cast<msc::DocumentItemModel *>(d->ui->documentTreeView->model())
+            ->updateHierarchyType(d->ui->documentTreeView->currentIndex(), sender()->property(HIERARCHY_TYPE_TAG));
+}
+
+void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
+{
+    if (document == nullptr)
+        return;
+
+    auto model = d->ui->documentTreeView->model();
+
+    std::function<void(int, const QModelIndex &)> findDocument;
+
+    findDocument = [&](int row, const QModelIndex &parent) -> void {
+        QModelIndex index = model->index(row, 0, parent);
+
+        if (index.internalPointer() == document) {
+            d->ui->documentTreeView->setCurrentIndex(index);
+        }
+
+        for (int x = 0; x < model->rowCount(index); ++x) {
+            findDocument(x, index);
+        }
+    };
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        findDocument(row, QModelIndex());
+    }
+}
+
 bool MainWindow::openFileAsn(const QString &file)
 {
     QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
@@ -351,12 +404,35 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
         showDocumentView(true);
     } else {
         showHierarchyView(true);
+
+        if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
+            for (auto action : d->m_hierarchyTypeMenu->actions()) {
+                auto actionType =
+                        static_cast<msc::MscDocument::HierarchyType>(action->property(HIERARCHY_TYPE_TAG).toInt());
+
+                action->setEnabled(actionType != document->hierarchyType());
+
+                // constraint for "repeat", "leaf", "is" and "exception" - possible if only one child
+                if (document->documents().size() > 1
+                    && (actionType == msc::MscDocument::HierarchyType::HierarchyRepeat
+                        || actionType == msc::MscDocument::HierarchyType::HierarchyLeaf
+                        || actionType == msc::MscDocument::HierarchyType::HierarchyIs
+                        || actionType == msc::MscDocument::HierarchyType::HierarchyException)) {
+                    action->setEnabled(false);
+                }
+            }
+
+            Q_EMIT selectionChanged(document);
+        }
     }
 }
 
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
+
+    d->ui->documentTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
 
@@ -369,6 +445,7 @@ void MainWindow::setupUi()
     initMenus();
     initTools();
     initMainToolbar();
+    initHierarchyTypeActions();
 
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
@@ -462,6 +539,29 @@ void MainWindow::initMenuView()
     initMenuViewWindows();
 }
 
+void MainWindow::initHierarchyTypeActions()
+{
+    d->m_hierarchyTypeMenu = new QMenu(this);
+
+    auto addAction = [&](const QString &icon, const QString &text, QVariant type) {
+        auto action = new QAction(QIcon(icon), text, this);
+        action->setProperty(HIERARCHY_TYPE_TAG, type);
+
+        connect(action, &QAction::triggered, this, &MainWindow::changHeierarchyType);
+
+        d->m_hierarchyTypeMenu->addAction(action);
+        d->m_hierarchyToolBar->addAction(action);
+    };
+
+    addAction(":/icons/document_and.png", tr("Hierarchy And"), msc::MscDocument::HierarchyAnd);
+    addAction(":/icons/document_or.png", tr("Hierarchy Or"), msc::MscDocument::HierarchyOr);
+    addAction(":/icons/document_parallel.png", tr("Hierarchy Parallel"), msc::MscDocument::HierarchyParallel);
+    addAction(":/icons/document_is_scenario.png", tr("Hierarchy Is"), msc::MscDocument::HierarchyIs);
+    addAction(":/icons/document_repeat.png", tr("Hierarchy Repeat"), msc::MscDocument::HierarchyRepeat);
+    addAction(":/icons/document_exception.png", tr("Hierarchy Exception"), msc::MscDocument::HierarchyException);
+    addAction(":/icons/document_leaf.png", tr("Hierarchy Leaf"), msc::MscDocument::HierarchyLeaf);
+}
+
 void MainWindow::initMenuViewWindows()
 {
     d->m_menuView->addSeparator();
@@ -515,20 +615,6 @@ void MainWindow::initTools()
 
     d->m_defaultToolAction = toolsActions->actions().first();
     enableDefaultTool();
-
-    for (int toolType = static_cast<int>(msc::ToolType::HierarchyAndCreator);
-         toolType <= static_cast<int>(msc::ToolType::HierarchyRepeatCreator); ++toolType) {
-        auto tool = new msc::HierarchyCreatorTool(static_cast<msc::ToolType>(toolType), &(d->m_model->chartViewModel()),
-                                                  nullptr, this);
-
-        d->m_tools.append(tool);
-
-        auto toolAction = d->m_hierarchyToolBar->addAction(tool->title());
-        toolAction->setCheckable(true);
-        toolAction->setIcon(tool->icon());
-        toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
-        tool->setView(currentView());
-    }
 }
 
 void MainWindow::initMainToolbar()
@@ -558,6 +644,9 @@ void MainWindow::initConnections()
             &MainWindow::selectCurrentChart);
 
     connect(d->m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });
+    connect(d->m_model, &MainModel::documentClicked, this, &MainWindow::updateTreeViewItem);
+
+    connect(this, &MainWindow::selectionChanged, d->m_model, &MainModel::selectionChanged);
 
     connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, this,
             [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
@@ -578,6 +667,15 @@ void MainWindow::initConnections()
         if (on) {
             QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
         }
+    });
+
+    connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
+
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelAboutToBeReset, this,
+            [this]() { d->m_modelIndex = d->ui->documentTreeView->currentIndex(); });
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this, [this]() {
+        d->ui->documentTreeView->expandAll();
+        d->ui->documentTreeView->setCurrentIndex(d->m_modelIndex);
     });
 }
 

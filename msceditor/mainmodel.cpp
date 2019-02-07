@@ -60,6 +60,9 @@ MainModel::MainModel(QObject *parent)
     , d(new MainModelPrivate(this))
 {
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
+    connect(&d->m_hierarchyModel, &HierarchyViewModel::documentClicked, this, &MainModel::documentClicked);
+    connect(this, &MainModel::selectionChanged, &d->m_hierarchyModel, &HierarchyViewModel::selectionChanged);
+
     connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
 
     initialModel();

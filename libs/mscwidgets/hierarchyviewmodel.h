@@ -41,6 +41,10 @@ public:
 
 Q_SIGNALS:
     void documentDoubleClicked(msc::MscDocument *document);
+    void documentClicked(const msc::MscDocument *document);
+
+public Q_SLOTS:
+    void selectionChanged(const msc::MscDocument *document);
 
 private Q_SLOTS:
     void modelDeleted();
@@ -49,7 +53,6 @@ private:
     struct HierarchyViewModelPrivate;
     std::unique_ptr<HierarchyViewModelPrivate> const d;
 };
-
 }
 
 #endif // HIERARCHYVIEWMODEL_H

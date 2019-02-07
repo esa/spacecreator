@@ -230,6 +230,11 @@ const QVector<DocumentItem *> &DocumentItem::childDocuments() const
     return d->childDocuments;
 }
 
+msc::MscDocument *DocumentItem::document() const
+{
+    return d->document.data();
+}
+
 void DocumentItem::setBoxSize(const QSizeF &size)
 {
     d->boxSize = size;
@@ -241,4 +246,10 @@ void msc::DocumentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     event->accept();
     Q_EMIT doubleClicked(d->document.data());
+}
+
+void msc::DocumentItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept();
+    Q_EMIT clicked(d->document.data());
 }

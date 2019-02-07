@@ -62,6 +62,8 @@ public:
 Q_SIGNALS:
     void showChartVew();
     void modelDataChanged();
+    void documentClicked(const msc::MscDocument *document);
+    void selectionChanged(const msc::MscDocument *document);
 
 public Q_SLOTS:
     void showFirstChart();

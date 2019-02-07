@@ -50,8 +50,11 @@ public:
     void addChildDocument(DocumentItem *item);
     const QVector<DocumentItem *> &childDocuments() const;
 
+    msc::MscDocument *document() const;
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 public Q_SLOTS:
     void setBoxSize(const QSizeF &size);
@@ -60,6 +63,7 @@ Q_SIGNALS:
     void preferredSizeChanged();
     void boxSizeChanged(QSizeF size);
     void doubleClicked(msc::MscDocument *document);
+    void clicked(msc::MscDocument *document);
 
 private:
     struct DocumentItemPrivate;

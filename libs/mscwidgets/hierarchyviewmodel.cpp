@@ -45,6 +45,7 @@ public:
                 parentItem->addChildDocument(item);
             }
             connect(item, &DocumentItem::preferredSizeChanged, this, &HierarchyViewModelPrivate::layoutItems);
+            connect(document, &MscDocument::hierarchyTypeChanged, this, &HierarchyViewModelPrivate::layoutItems);
 
             addDocuments(document->documents(), item);
         }
@@ -165,7 +166,15 @@ void HierarchyViewModel::setModel(MscModel *model)
         for (msc::DocumentItem *item : d->documentItems) {
             QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
                              &msc::HierarchyViewModel::documentDoubleClicked);
+            QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::documentClicked);
         }
+    }
+}
+
+void HierarchyViewModel::selectionChanged(const MscDocument *document)
+{
+    for (msc::DocumentItem *item : d->documentItems) {
+        item->setSelected(item->document() == document);
     }
 }
 
@@ -174,5 +183,4 @@ void HierarchyViewModel::modelDeleted()
     d->clearScene();
     d->model = nullptr;
 }
-
 }

@@ -38,6 +38,8 @@ public:
     QModelIndex index(MscChart *chart) const;
     QModelIndex index(MscDocument *document) const;
 
+    void updateHierarchyType(const QModelIndex &index, const QVariant &hierarchyType);
+
     // QAbstractItemModel interface
 public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;

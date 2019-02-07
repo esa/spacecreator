@@ -28,6 +28,10 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace msc {
+class MscDocument;
+}
+
 class MainModel;
 class QUndoGroup;
 class QGraphicsView;
@@ -54,6 +58,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
+    void selectionChanged(const msc::MscDocument *document);
 
 private Q_SLOTS:
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
@@ -67,6 +72,9 @@ private Q_SLOTS:
     bool openMscChain(const QString &dirPath);
     void enableDefaultTool();
     void updateTextView();
+    void showHierarchyTypeMenu(const QPoint &point);
+    void changHeierarchyType();
+    void updateTreeViewItem(const msc::MscDocument *document);
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;
@@ -80,6 +88,7 @@ private:
     void initMenuFile();
     void initMenuEdit();
     void initMenuView();
+    void initHierarchyTypeActions();
     void initMenuViewWindows();
     void initMenuHelp();
     void initTools();
