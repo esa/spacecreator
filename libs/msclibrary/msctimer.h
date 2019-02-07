@@ -22,6 +22,8 @@
 
 namespace msc {
 
+class MscInstance;
+
 class MscTimer : public MscInstanceEvent
 {
     Q_OBJECT
@@ -38,19 +40,23 @@ public:
     explicit MscTimer(QObject *parent = nullptr);
     MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);
 
-    MscEntity::EntityType entityType() const { return MscEntity::EntityType::Timer; }
+    MscEntity::EntityType entityType() const override;
 
-    void setTimerType(TimerType type) { m_timerType = type; }
-    TimerType timerType() const { return m_timerType; }
+    void setTimerType(TimerType type);
+    TimerType timerType() const;
 
-    void setInstanceName(QString name) { m_instanceName = name; }
-    QString instanceName() const { return m_instanceName; }
+    void setInstance(msc::MscInstance *instance);
+    msc::MscInstance *instance() const;
 
     bool relatesTo(MscInstance *instance) const override;
 
+Q_SIGNALS:
+    void timerTypeChanged();
+    void instanceChanged();
+
 private:
     TimerType m_timerType = TimerType::Unknown;
-    QString m_instanceName;
+    MscInstance *m_instance = nullptr;
 };
 
 }

@@ -731,24 +731,22 @@ antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *
 
 antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementContext *context)
 {
-    if (!m_currentChart) {
+    if (!m_currentChart || !m_currentInstance) {
         return visitChildren(context);
     }
 
     MscTimer *timer = new MscTimer();
     m_currentEvent = timer;
+    timer->setInstance(m_currentInstance);
     if (MscParser::StartTimerContext *startTimer = context->startTimer()) {
         timer->setTimerType(MscTimer::TimerType::Start);
         timer->setName(::treeNodeToString(startTimer->NAME(0)));
-        timer->setInstanceName(::treeNodeToString(startTimer->NAME(1)));
     } else if (MscParser::StopTimerContext *stopTimer = context->stopTimer()) {
         timer->setTimerType(MscTimer::TimerType::Stop);
         timer->setName(::treeNodeToString(stopTimer->NAME(0)));
-        timer->setInstanceName(::treeNodeToString(stopTimer->NAME(1)));
     } else if (MscParser::TimeoutContext *timeout = context->timeout()) {
         timer->setTimerType(MscTimer::TimerType::Timeout);
         timer->setName(::treeNodeToString(timeout->NAME(0)));
-        timer->setInstanceName(::treeNodeToString(timeout->NAME(1)));
     } else {
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
         throw ParserException(QObject::tr("Bad timer declaration '%1'").arg(::treeNodeToString(context)));

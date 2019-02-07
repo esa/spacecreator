@@ -32,10 +32,46 @@ MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
 {
 }
 
+MscEntity::EntityType MscTimer::entityType() const
+{
+    return MscEntity::EntityType::Timer;
+}
+
+void MscTimer::setTimerType(MscTimer::TimerType type)
+{
+    if (type == m_timerType) {
+        return;
+    }
+    m_timerType = type;
+
+    Q_EMIT timerTypeChanged();
+    Q_EMIT dataChanged();
+}
+
+MscTimer::TimerType MscTimer::timerType() const
+{
+    return m_timerType;
+}
+
+void MscTimer::setInstance(MscInstance *instance)
+{
+    if (instance == m_instance) {
+        return;
+    }
+
+    m_instance = instance;
+    Q_EMIT instanceChanged();
+    Q_EMIT dataChanged();
+}
+
+MscInstance *MscTimer::instance() const
+{
+    return m_instance;
+}
+
 bool MscTimer::relatesTo(MscInstance *instance) const
 {
-    //    return m_instance == instance;
-    return instance && instance->name() == m_instanceName;
+    return m_instance == instance;
 }
 
 }
