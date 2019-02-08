@@ -50,6 +50,7 @@
 #include <QTreeView>
 #include <QUndoGroup>
 #include <QUndoStack>
+#include <functional>
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
