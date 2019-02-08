@@ -201,9 +201,7 @@ void MessageItem::rebuildLayout()
     setPos(linkCenterInScene);
     setPositionChangeIgnored(false);
 
-    m_layoutDirty = false;
     commitGeometryChange();
-    update();
 }
 
 QPainterPath MessageItem::shape() const

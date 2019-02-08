@@ -80,6 +80,13 @@ void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPoint
             handleGripPointMovement(gripPnt, from, to);
 }
 
+/*!
+   \brief InteractiveObject::rebuildLayout
+   In this function updates to the geometry, content etc. is done
+   This is usually triggered by the funtion \see InteractiveObject::updateLayout
+ */
+void InteractiveObject::rebuildLayout() {}
+
 void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     if (grip->isMover())
@@ -202,7 +209,7 @@ MscEntity *InteractiveObject::modelEntity() const
    \brief InteractiveObject::updateLayout
    Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
    it's data.
-   The actual update is done in the virtual function \see InteractiveObject::rebuildLayout
+   The actual update is done in the derived itmes in the virtual function \see InteractiveObject::rebuildLayout
  */
 void InteractiveObject::updateLayout()
 {
@@ -211,7 +218,7 @@ void InteractiveObject::updateLayout()
     }
 
     m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "rebuildLayout", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "doRebuildLayout", Qt::QueuedConnection);
 }
 
 void InteractiveObject::prepareHoverMark()
@@ -232,6 +239,13 @@ void InteractiveObject::prepareHoverMark()
     }
 
     m_gripPoints->showAnimated();
+}
+
+void InteractiveObject::doRebuildLayout()
+{
+    rebuildLayout();
+    m_layoutDirty = false;
+    update();
 }
 
 } // namespace msc

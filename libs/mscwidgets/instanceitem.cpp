@@ -243,8 +243,6 @@ void InstanceItem::buildLayout()
     // update head gradient:
     m_nameItem->setBackgroundGradient(createGradientForName(m_nameItem));
     m_headSymbol->setBrush(createGradientForKind(m_headSymbol));
-
-    m_layoutDirty = false;
 }
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

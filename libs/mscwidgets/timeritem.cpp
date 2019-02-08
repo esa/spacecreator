@@ -180,8 +180,6 @@ void TimerItem::rebuildLayout()
     m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
     const double x = m_instance->centerInScene().x();
     setX(x);
-
-    m_layoutDirty = false;
 }
 
 void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)

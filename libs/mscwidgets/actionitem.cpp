@@ -138,8 +138,6 @@ void ActionItem::rebuildLayout()
     m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
     setX(x);
-
-    m_layoutDirty = false;
 }
 
 void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)

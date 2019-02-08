@@ -60,7 +60,8 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
-    virtual void rebuildLayout() {}
+    virtual void rebuildLayout();
+    void doRebuildLayout();
 
 protected:
     QPointer<msc::MscEntity> m_entity;
