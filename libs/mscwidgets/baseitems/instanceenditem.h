@@ -24,7 +24,8 @@ namespace msc {
 class InstanceEndItem : public QGraphicsRectItem
 {
 public:
-    static const qreal EndSymbolHeight;
+    static constexpr qreal EndSymbolHeight = 15.;
+    static constexpr qreal StopSymbolHeight = 25.;
 
     InstanceEndItem(bool stop = false, QGraphicsItem *parent = nullptr);
 
@@ -35,7 +36,7 @@ public:
 
     void setRect(const QRectF &r);
 
-    QRectF boundingRect() const override;
+    qreal height() const;
 
 private:
     bool m_stop = false;

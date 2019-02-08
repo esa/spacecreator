@@ -24,8 +24,6 @@
 
 namespace msc {
 
-const qreal InstanceEndItem::EndSymbolHeight = 15.;
-
 InstanceEndItem::InstanceEndItem(bool stop, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
@@ -56,16 +54,14 @@ void InstanceEndItem::setStopImpl(bool stop)
 
 void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QGraphicsRectItem::paint(painter, option, widget);
 
     if (isStop()) {
-        QPen pen(this->pen());
-        const qreal lineWidth = pen.widthF() * 1.5;
-        const qreal adjustment = lineWidth;
-        const QRectF &bounds = rect().adjusted(adjustment, adjustment, -adjustment, -adjustment);
+        const QRectF &bounds = rect();
         const QVector<QPointF> linesHeads = { bounds.topLeft(), bounds.bottomRight(), bounds.bottomLeft(),
                                               bounds.topRight() };
 
+        QPen pen(this->pen());
+        pen.setWidthF(1.5);
         pen.setColor(Qt::black);
         pen.setCapStyle(Qt::RoundCap);
 
@@ -76,6 +72,8 @@ void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->drawLines(linesHeads);
 
         painter->restore();
+    } else {
+        QGraphicsRectItem::paint(painter, option, widget);
     }
 }
 
@@ -84,7 +82,7 @@ void InstanceEndItem::setRect(const QRectF &r)
     QRectF newRect(r);
     if (isStop()) {
         // make square
-        const qreal side = qMin(r.width(), EndSymbolHeight);
+        const qreal side = qMin(r.width(), height());
         newRect.setWidth(side);
         newRect.setHeight(side);
         newRect.moveCenter(r.center());
@@ -93,11 +91,9 @@ void InstanceEndItem::setRect(const QRectF &r)
     QGraphicsRectItem::setRect(newRect);
 }
 
-QRectF InstanceEndItem::boundingRect() const
+qreal InstanceEndItem::height() const
 {
-    static constexpr qreal fixedHeight = { 15.0 };
-    QRectF res(QGraphicsRectItem::boundingRect());
-    res.setHeight(fixedHeight);
-    return res;
+    return isStop() ? StopSymbolHeight : EndSymbolHeight;
 }
+
 } // ns msc

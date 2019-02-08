@@ -31,7 +31,7 @@ class InstanceItem;
 
 namespace utils {
 
-static constexpr qreal LineHoverTolerance = 10;
+static constexpr qreal LineHoverTolerance = 10.;
 
 template<class ItemType, class TargetPositioning>
 QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &scenePos)
