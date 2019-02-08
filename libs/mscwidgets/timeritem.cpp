@@ -43,6 +43,7 @@ TimerItem::TimerItem(msc::MscTimer *timer, QGraphicsItem *parent)
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    m_textItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     m_textItem->setEditable(true);
     m_textItem->setPlainText(m_timer->name());
 
@@ -50,6 +51,9 @@ TimerItem::TimerItem(msc::MscTimer *timer, QGraphicsItem *parent)
 
     connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::updateLayout);
+
+    m_boundingRect = symbolSize;
+    m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
 }
 
 MscTimer *TimerItem::modelItem() const
@@ -173,6 +177,7 @@ void TimerItem::rebuildLayout()
     m_textItem->setY((symbolSize.height() - m_textItem->boundingRect().height()) / 2);
 
     m_boundingRect = symbolSize;
+    m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
     const double x = m_instance->centerInScene().x();
     setX(x);
 
