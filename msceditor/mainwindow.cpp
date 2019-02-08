@@ -717,6 +717,14 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
                     pointerToolAction->setChecked(true);
         break;
     }
+#ifdef QT_DEBUG
+    case Qt::Key_R: {
+        if (!e->isAutoRepeat() && (e->modifiers() == Qt::ControlModifier)) {
+            openFileMsc(d->m_currentFilePath);
+        }
+        break;
+    }
+#endif
     }
 }
 
