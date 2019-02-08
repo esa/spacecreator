@@ -29,6 +29,9 @@ class MscInstance;
 class MscMessage : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(MscInstance *sourceInstance READ sourceInstance WRITE setSourceInstance NOTIFY sourceChanged)
+    Q_PROPERTY(MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
+
 public:
     struct Parameters {
         QString name;

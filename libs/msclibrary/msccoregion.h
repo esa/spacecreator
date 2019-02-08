@@ -25,6 +25,7 @@ namespace msc {
 class MscCoregion : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(MscCoregion::Type type READ type WRITE setType NOTIFY typeChanged)
 
 public:
     enum class Type
@@ -38,10 +39,13 @@ public:
 
     MscEntity::EntityType entityType() const { return MscEntity::EntityType::Coregion; }
 
-    void setType(Type type) { m_type = type; }
+    void setType(Type type);
     Type type() const { return m_type; }
 
     bool relatesTo(MscInstance *instance) const override;
+
+Q_SIGNALS:
+    void typeChanged();
 
 private:
     Type m_type;

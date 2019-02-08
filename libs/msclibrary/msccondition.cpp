@@ -42,6 +42,7 @@ void MscCondition::setShared(bool shared)
         return;
     }
     m_shared = shared;
+    Q_EMIT sharedChanged();
     Q_EMIT dataChanged();
 }
 

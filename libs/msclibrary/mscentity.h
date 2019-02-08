@@ -26,6 +26,9 @@ namespace msc {
 class MscEntity : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+
 public:
     enum class EntityType
     {

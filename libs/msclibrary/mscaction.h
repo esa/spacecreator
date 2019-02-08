@@ -29,6 +29,10 @@ class MscInstance;
 class MscAction : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(MscAction::ActionType actionType READ actionType WRITE setActionType NOTIFY actionTypeChanged)
+    Q_PROPERTY(QString informalAction READ informalAction WRITE setInformalAction NOTIFY informalActionChanged)
+    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+
 public:
     enum class ActionType
     {

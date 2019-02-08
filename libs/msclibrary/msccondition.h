@@ -27,6 +27,8 @@ class MscInstance;
 class MscCondition : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(bool shared READ shared WRITE setShared NOTIFY sharedChanged)
 
 public:
     explicit MscCondition(QObject *parent = nullptr);
@@ -42,12 +44,12 @@ public:
 
     bool relatesTo(MscInstance *instance) const override;
 
+Q_SIGNALS:
+    void instanceChanged();
+    void sharedChanged();
+
 private:
     MscInstance *m_instance = nullptr;
-
-    // message name that precedes the condition
-    QString m_messageName;
-
     bool m_shared = false;
 };
 

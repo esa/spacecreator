@@ -33,6 +33,16 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
 {
 }
 
+void MscCoregion::setType(MscCoregion::Type type)
+{
+    if (type == m_type) {
+        return;
+    }
+    m_type = type;
+    Q_EMIT typeChanged();
+    Q_EMIT dataChanged();
+}
+
 bool MscCoregion::relatesTo(MscInstance *instance) const
 {
     Q_UNUSED(instance);

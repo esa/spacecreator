@@ -25,6 +25,10 @@ namespace msc {
 class MscInstance : public MscEntity
 {
     Q_OBJECT
+    Q_PROPERTY(QString denominator READ denominator WRITE setDenominator NOTIFY denominatorChanged)
+    Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindChanged)
+    Q_PROPERTY(QString inheritance READ inheritance WRITE setInheritance NOTIFY inheritanceChanged)
+    Q_PROPERTY(MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY explicitCreatorChanged)
 
 public:
     explicit MscInstance(QObject *parent = nullptr);
@@ -51,6 +55,7 @@ Q_SIGNALS:
     void denominatorChanged(const QString &denominator);
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);
+    void explicitCreatorChanged(MscInstance *creator);
 
 private:
     QString m_denominator;

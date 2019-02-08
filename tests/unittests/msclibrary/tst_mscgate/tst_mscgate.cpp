@@ -113,13 +113,14 @@ void tst_MscGate::testPropertyParams()
 void tst_MscGate::testPropertiesCoverage()
 {
     MscGate gate;
-    static const int gateCustomPropsCount(gate.metaObject()->propertyCount() - 1); // exclude QObject's name
+    static const int gateCustomPropsCount(gate.metaObject()->propertyCount() - 3); // exclude objectName, name, comment
 
     int testedPropsCount(0);
     const QMetaObject *myMeta(metaObject());
-    for (int i = 0; i < myMeta->methodCount(); ++i)
+    for (int i = 0; i < myMeta->methodCount(); ++i) {
         if (myMeta->method(i).name().startsWith(TestPropertyMethodNameMarker))
             ++testedPropsCount;
+    }
 
     QCOMPARE(testedPropsCount, gateCustomPropsCount);
 }
