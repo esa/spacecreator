@@ -161,7 +161,7 @@ clang_analyze:
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
   script:
     - mkdir -p build_clang_analyze; cd build_clang_analyze
-    - qmake BUILDTOOL="analyzer" ..
+    - qmake ..
     - /usr/share/clang/scan-build-7/bin/scan-build --status-bugs -o ../clang-analyze make -j8
   artifacts:
     paths:

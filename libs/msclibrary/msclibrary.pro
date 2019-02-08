@@ -33,15 +33,11 @@ HEADERS += \
     mscwriter.h \
     msccreate.h
 
-equals(BUILDTOOL, "analyzer") {
-} else {
 SOURCES += \
     parser/MscBaseVisitor.cpp \
     parser/MscLexer.cpp \
     parser/MscParser.cpp \
-    parser/MscVisitor.cpp
-}
-SOURCES += \
+    parser/MscVisitor.cpp \
     exceptions.cpp \
     mscaction.cpp \
     mscchart.cpp \

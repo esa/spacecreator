@@ -50,7 +50,7 @@ private Q_SLOTS:
     void modelDeleted();
 
 private:
-    struct HierarchyViewModelPrivate;
+    class HierarchyViewModelPrivate;
     std::unique_ptr<HierarchyViewModelPrivate> const d;
 };
 }

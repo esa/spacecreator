@@ -179,7 +179,7 @@ instanceNameList
     ;
 
 multiInstanceEventList
-    : multiInstanceEvent +
+    : multiInstanceEvent (multiInstanceEvent)*
     ;
 multiInstanceEvent
     : condition // TODO add | mscReference | inlineExpr
