@@ -220,7 +220,7 @@ void ChartViewModel::relayout()
     d->m_layoutInfo.m_pos = { 0., 0. };
     d->m_layoutInfo.m_instancesRect = QRectF();
 
-    // The calls order bolow DOES matter
+    // The calls order below DOES matter
     addInstanceItems(); // which are not highlightable now to avoid flickering
     addInstanceEventItems();
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->InterMessageSpan);

@@ -56,6 +56,13 @@ const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
+        , m_currentFilePath(
+#if defined(QT_DEBUG) && defined(Q_OS_WIN)
+                  QDir(QDir::current().path() + QString("/../../esa/examples")).path()
+#else
+                  "../../msceditor/examples"
+#endif // QT_DEBUG and Q_OS_WIN
+                          )
         , m_model(new MainModel(mainWindow))
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
@@ -73,6 +80,7 @@ struct MainWindowPrivate {
     ~MainWindowPrivate() { delete ui; }
 
     Ui::MainWindow *ui = nullptr;
+    QString m_currentFilePath;
 
     QComboBox *m_zoomBox = nullptr;
 
@@ -166,12 +174,7 @@ void MainWindow::selectAndOpenFile()
     static const QLatin1String suffixAsn(".asn");
     static const QStringList suffixes = { "*" + suffixMsc, "*" + suffixAsn };
 
-    const QString path =
-#if defined(QT_DEBUG) && defined(Q_OS_WIN)
-            QDir(QDir::current().path() + QString("/../../esa/examples")).path();
-#else
-            "../../msceditor/examples";
-#endif // QT_DEBUG and Q_OS_WIN
+    const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
 
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(" "));
     if (!filename.isEmpty()) {
@@ -211,6 +214,10 @@ bool MainWindow::openFileMsc(const QString &file)
                                              .arg(ok ? tr("success") : tr("failed"), ok ? "black" : "red"));
 
     updateTitles();
+
+    if (ok) {
+        d->m_currentFilePath = file;
+    }
 
     return ok;
 }
@@ -720,12 +727,14 @@ void MainWindow::loadSettings()
 
     restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
+    d->m_currentFilePath = AppOptions::MainWindow.LastFilePath->read().toString();
 }
 
 void MainWindow::saveSettings()
 {
     AppOptions::MainWindow.Geometry->write(saveGeometry());
     AppOptions::MainWindow.State->write(saveState());
+    AppOptions::MainWindow.LastFilePath->write(d->m_currentFilePath);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

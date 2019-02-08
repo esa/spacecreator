@@ -57,6 +57,7 @@ GroupMainWindow::GroupMainWindow()
                    {
                            new AppOption(QString("%1/Geometry").arg(localName())),
                            new AppOption(QString("%1/State").arg(localName())),
+                           new AppOption(QString("%1/LastFilePath").arg(localName())),
                    },
                    {})
 {
