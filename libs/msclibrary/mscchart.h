@@ -33,6 +33,7 @@ class MscDocument;
 class MscInstance;
 class MscInstanceEvent;
 class MscGate;
+class MscTimer;
 
 class MscChart : public MscEntity
 {
@@ -65,6 +66,7 @@ public:
     void updateInstancePos(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
     void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
+    void updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos);
     void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
                              msc::MscMessage::EndType endType);
 

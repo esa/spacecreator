@@ -15,29 +15,41 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDTIMERITEMMOVE_H
+#define CMDTIMERITEMMOVE_H
+
+#include "basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
+
+class MscTimer;
+class MscChart;
+class MscInstance;
+
 namespace cmd {
 
-enum Id
+class CmdTimerItemMove : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    MoveTimer,
-    HierarchyType,
+public:
+    CmdTimerItemMove(msc::MscTimer *timer, int newPos, msc::MscInstance *newInsance, MscChart *chart);
 
-    LastId
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<msc::MscTimer> m_timer;
+    int m_oldIndex = -1;
+    int m_newIndex = -1;
+    QPointer<msc::MscInstance> m_oldInstance;
+    QPointer<msc::MscInstance> m_newInstance;
+    QPointer<msc::MscChart> m_chart;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDTIMERITEMMOVE_H

@@ -319,6 +319,17 @@ void MscChart::updateConditionPos(MscCondition *condition, MscInstance *newInsta
     }
 }
 
+void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos)
+{
+    bool changed = setEventInstance(timer, newInstance);
+    changed |= moveEvent(timer, eventPos);
+
+    if (changed) {
+        Q_EMIT eventMoved();
+        Q_EMIT dataChanged();
+    }
+}
+
 /*!
    Move the given event vertically to the given position in the event sequence.
    Return true, if the event was moved.

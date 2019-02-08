@@ -812,6 +812,21 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
             updateLayout();
         }
     }
+
+    auto timerItem = qobject_cast<TimerItem *>(item);
+    if (timerItem) {
+        MscInstance *newInstance = nearestInstance(timerItem->sceneBoundingRect().center());
+        const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
+        const int newIdx = eventIndex(item->y());
+        if (newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
+            msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
+                                          { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
+                                            QVariant::fromValue<MscInstance *>(newInstance),
+                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+        } else {
+            updateLayout();
+        }
+    }
 }
 
 void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)

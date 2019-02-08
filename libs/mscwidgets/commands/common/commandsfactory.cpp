@@ -28,11 +28,13 @@
 #include "commands/cmdinstancekindchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdtimeritemmove.h"
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscinstance.h"
+#include "msctimer.h"
 
 #include <QDebug>
 #include <QPointF>
@@ -66,6 +68,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
         return cmd::CommandsFactory::createActionInformalText(params);
+    case cmd::MoveTimer:
+        return cmd::CommandsFactory::createTimerItemMove(params);
     case cmd::HierarchyType:
         return cmd::CommandsFactory::createHierarchyTypeChange(params);
     default:
@@ -224,6 +228,22 @@ QUndoCommand *CommandsFactory::createActionInformalText(const QVariantList &para
         const QString &text = params.last().toString();
         if (item->informalAction() != text)
             return new CmdActionInformalText(item, text);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createTimerItemMove(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 4);
+
+    if (msc::MscTimer *item = params.at(0).value<msc::MscTimer *>()) {
+        int newPos = params.at(1).toInt();
+        if (msc::MscInstance *newInstance = params.at(2).value<msc::MscInstance *>()) {
+            if (msc::MscChart *chart = params.at(3).value<msc::MscChart *>()) {
+                return new CmdTimerItemMove(item, newPos, newInstance, chart);
+            }
+        }
     }
 
     return nullptr;

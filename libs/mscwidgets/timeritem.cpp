@@ -110,9 +110,10 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    if (gp->location() == GripPoint::Location::Center) {
+        const QPointF &delta = to - from;
+        setPos(pos() + delta);
+    }
 }
 
 void TimerItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -125,7 +126,10 @@ void TimerItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPoi
 void TimerItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({});
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &TimerItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 void TimerItem::rebuildLayout()
@@ -152,6 +156,15 @@ void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)
     Q_UNUSED(from);
     Q_UNUSED(to);
     updateLayout();
+}
+
+void TimerItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(from);
+    Q_UNUSED(to);
+    if (pos == GripPoint::Location::Center) {
+        Q_EMIT moved(this);
+    }
 }
 
 void TimerItem::drawStartSymbol(QPainter *painter, const QRectF &rect)
