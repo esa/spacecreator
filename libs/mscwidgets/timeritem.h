@@ -43,12 +43,16 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
+public Q_SLOTS:
+    void setName(const QString &text);
+
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;
 
 private Q_SLOTS:
+    void onTextEdited(const QString &text);
     void rebuildLayout() override;
     void onInstanceMoved(const QPointF &from, const QPointF &to);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);

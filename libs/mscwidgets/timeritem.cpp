@@ -18,10 +18,11 @@
 #include "timeritem.h"
 
 #include "baseitems/textitem.h"
+#include "commands/common/commandsstack.h"
 #include "instanceitem.h"
+#include "msctimer.h"
 
 #include <QPainter>
-#include <msctimer.h>
 
 namespace msc {
 
@@ -42,7 +43,13 @@ TimerItem::TimerItem(msc::MscTimer *timer, QGraphicsItem *parent)
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    m_textItem->setEditable(true);
     m_textItem->setPlainText(m_timer->name());
+
+    connect(m_timer, &msc::MscTimer::nameChanged, this, &msc::TimerItem::setName);
+
+    connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
+    connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::updateLayout);
 }
 
 MscTimer *TimerItem::modelItem() const
@@ -108,6 +115,18 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     InteractiveObject::paint(painter, option, widget);
 }
 
+void TimerItem::setName(const QString &text)
+{
+    if (!m_timer) {
+        return;
+    }
+
+    m_timer->setName(text);
+    m_textItem->setPlainText(text);
+
+    updateLayout();
+}
+
 void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
@@ -132,6 +151,16 @@ void TimerItem::prepareHoverMark()
             &TimerItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
+void TimerItem::onTextEdited(const QString &text)
+{
+    if (text.isEmpty()) {
+        return;
+    }
+
+    using namespace msc::cmd;
+    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), text });
+}
+
 void TimerItem::rebuildLayout()
 {
     if (!m_instance) {
@@ -140,7 +169,6 @@ void TimerItem::rebuildLayout()
 
     prepareGeometryChange();
 
-    m_textItem->setPlainText(m_timer->name());
     m_textItem->setX(symbolSize.right());
     m_textItem->setY((symbolSize.height() - m_textItem->boundingRect().height()) / 2);
 
