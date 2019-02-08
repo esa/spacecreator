@@ -70,6 +70,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void setName(const QString &name);
+    void setPositionChangeIgnored(bool ignored);
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -101,7 +102,6 @@ private:
 
     bool ignorePositionChange() const;
     bool proceedPositionChange() const;
-    void setPositionChangeIgnored(bool ignored);
 
     InstanceItem *hoveredItem(const QPointF &hoverPoint) const;
 };

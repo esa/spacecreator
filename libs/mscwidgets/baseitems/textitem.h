@@ -55,6 +55,9 @@ public:
 
     void enableEditMode();
 
+    void setTextMargin(qreal margin);
+    qreal textMargin() const;
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();

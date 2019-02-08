@@ -41,6 +41,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     m_itemText->setFramed(false);
     m_itemText->setBackgroundColor(Qt::transparent);
     m_itemText->setEditable(true);
+    m_itemText->setTextMargin(TextMargin);
     m_itemArrow->setStartSignShown(false);
     m_itemArrow->setEndSignShown(true);
     updateLayout();
@@ -146,8 +147,7 @@ void LabeledArrowItem::updateLayout()
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
 
     const QPointF &arrowCenter(arrowRect.center());
-    static constexpr qreal extraSpan = 5;
-    textRect.moveBottom(arrowCenter.y() - ArrowSign::ARROW_HEIGHT / 2 - extraSpan);
+    textRect.moveBottom(arrowCenter.y() - ArrowSign::ARROW_HEIGHT / 2 - TextMargin);
 
     const QPointF delta = textRect.center() - textRectCurrent.center();
     m_itemText->moveBy(delta.x(), delta.y());

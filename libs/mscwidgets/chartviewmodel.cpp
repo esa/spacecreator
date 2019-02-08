@@ -58,6 +58,7 @@ struct ChartViewLayoutInfo {
         m_dynamicInstances.clear();
         m_pos = { 0., 0. };
         m_perimeter = QRectF();
+        m_instancesRect = QRectF();
 
         if (m_chartItem) {
             utils::removeSceneItem(m_chartItem);
@@ -68,6 +69,7 @@ struct ChartViewLayoutInfo {
     QMap<MscInstance *, MessageItem *> m_dynamicInstances;
     QMap<MscInstance *, MessageItem *> m_dynamicInstanceMarkers;
     QRectF m_perimeter;
+    QRectF m_instancesRect;
 
     QPointF m_pos;
 
@@ -166,7 +168,7 @@ void ChartViewModel::fillView(MscChart *chart)
 }
 
 MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem,
-                                             qreal newY)
+                                             qreal verticalOffset)
 {
     MessageItem *item = itemForMessage(message);
     if (!item) {
@@ -175,6 +177,8 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         const bool isCreateMsg =
                 item->isCreator() && targetItem && targetItem->modelItem() == message->targetInstance();
+
+        qreal newY = d->m_layoutInfo.m_pos.y() + verticalOffset;
 
         if (!isCreateMsg) {
             if (targetItem && targetItem->modelItem()->explicitCreator()) {
@@ -204,6 +208,9 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         item->connectObjects(sourceItem, targetItem, newY);
     }
 
+    if (item)
+        item->updateLayout();
+
     return item;
 }
 
@@ -211,9 +218,24 @@ void ChartViewModel::relayout()
 {
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
+    d->m_layoutInfo.m_instancesRect = QRectF();
 
-    QRectF totalRect;
+    // The calls order bolow DOES matter
+    addInstanceItems(); // which are not highlightable now to avoid flickering
+    addInstanceEventItems();
+    actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->InterMessageSpan);
+    updateContentBounds();
 
+    // make instance items be highlightable on message (dis-)connection
+    for (MscInstance *instance : d->m_currentChart->instances())
+        if (InstanceItem *item = itemForInstance(instance))
+            item->setHighlightable(true);
+
+    d->m_layoutDirty = false;
+}
+
+void ChartViewModel::addInstanceItems()
+{
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
@@ -225,7 +247,6 @@ void ChartViewModel::relayout()
         }
 
         item->setHighlightable(false);
-
         item->setKind(instance->kind());
 
         d->m_layoutInfo.m_pos.rx() += d->InterInstanceSpan + item->boundingRect().width();
@@ -236,81 +257,119 @@ void ChartViewModel::relayout()
             item->moveBy(0., -qMin(axisLine.y1(), axisLine.y2()));
         }
 
-        totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
+        d->m_layoutInfo.m_instancesRect = d->m_layoutInfo.m_instancesRect.united(item->sceneBoundingRect());
     }
+}
 
-    d->m_layoutInfo.m_pos.ry() = d->InterMessageSpan;
-    auto instancesRect(totalRect);
-
-    auto postprocessNewEventItem = [this, &totalRect](QGraphicsObject *item) {
-        if (item) {
-            d->m_layoutInfo.m_pos.ry() += item->boundingRect().height() + d->InterMessageSpan;
-            totalRect = totalRect.united(item->boundingRect().translated(item->pos()));
-        }
-    };
-
-    QGraphicsObject *newItem(nullptr);
+void ChartViewModel::addInstanceEventItems()
+{
+    QGraphicsObject *instanceEventItem(nullptr);
     for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
         switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message: {
-            newItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
+            instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
             break;
         }
         case MscEntity::EntityType::Create: {
             // TODO: rm MscCreate wrapper and use the MscMessage directly?
-            newItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
+            instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
             break;
         }
-
         case MscEntity::EntityType::Action: {
-            newItem = addActionItem(static_cast<MscAction *>(instanceEvent));
+            instanceEventItem = addActionItem(static_cast<MscAction *>(instanceEvent));
             break;
         }
         case MscEntity::EntityType::Condition: {
-            ConditionItem *prevItem = qobject_cast<ConditionItem *>(newItem);
-            newItem = addConditionItem(static_cast<MscCondition *>(instanceEvent), prevItem, instancesRect);
+            ConditionItem *prevItem = qobject_cast<ConditionItem *>(instanceEventItem);
+            instanceEventItem = addConditionItem(static_cast<MscCondition *>(instanceEvent), prevItem,
+                                                 d->m_layoutInfo.m_instancesRect);
             break;
         }
         case MscEntity::EntityType::Timer: {
-            newItem = addTimerItem(static_cast<MscTimer *>(instanceEvent));
+            instanceEventItem = addTimerItem(static_cast<MscTimer *>(instanceEvent));
             break;
         }
         default: {
-            newItem = nullptr;
+            instanceEventItem = nullptr;
             break;
         }
         }
-        postprocessNewEventItem(newItem);
+
+        if (instanceEventItem)
+            polishAddedEventItem(instanceEvent, instanceEventItem);
     }
+}
 
-    actualizeInstancesHeights(d->m_layoutInfo.m_pos.ry());
+void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item)
+{
+    auto moveNewItem = [&]() {
+        qreal deltaY = 0.;
 
-    updateContentBounds();
-
-    // restore instance's ability to be highlighted on message (dis-)connection
-    for (MscInstance *instance : d->m_currentChart->instances()) {
-        if (InstanceItem *item = itemForInstance(instance)) {
-            item->setHighlightable(true);
+        const QRectF srcRect = item->sceneBoundingRect();
+        const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
+        if (!qFuzzyCompare(srcRect.top() + 1., targetTop + 1.)) {
+            deltaY = targetTop - srcRect.top();
+            item->moveBy(0., deltaY);
         }
-    }
 
-    d->m_layoutDirty = false;
+        d->m_layoutInfo.m_pos.ry() = targetTop + srcRect.height();
+
+        return deltaY;
+    };
+
+    switch (event->entityType()) {
+    case MscEntity::EntityType::Message:
+    case MscEntity::EntityType::Create: {
+        MessageItem *messageItem = dynamic_cast<MessageItem *>(item);
+        MscMessage *message = static_cast<MscMessage *>(event);
+
+        const bool relatedToDynamicInstance =
+                (message->sourceInstance() && message->sourceInstance()->explicitCreator())
+                || (message->targetInstance() && message->targetInstance()->explicitCreator());
+        if (relatedToDynamicInstance)
+            messageItem->setPositionChangeIgnored(true);
+
+        const qreal deltaY = moveNewItem();
+        if (!qFuzzyIsNull(deltaY) && relatedToDynamicInstance) {
+            // After a message has been moved its connection (an arrow to an instance) is broken
+            InstanceItem *creatorInstanceItem = itemForInstance(message->sourceInstance());
+            InstanceItem *createdInstanceItem = itemForInstance(message->targetInstance());
+            if (createdInstanceItem && creatorInstanceItem && messageItem) {
+                if (event->entityType() == MscEntity::EntityType::Create) {
+                    createdInstanceItem->moveBy(0., deltaY);
+                }
+                messageItem->connectObjects(creatorInstanceItem, createdInstanceItem, messageItem->y());
+            }
+        }
+
+        if (relatedToDynamicInstance)
+            messageItem->setPositionChangeIgnored(false);
+
+        break;
+    }
+    default: {
+        moveNewItem();
+        break;
+    }
+    }
 }
 
 void ChartViewModel::updateContentBounds()
 {
+    QRectF totalRect;
+    const QList<QGraphicsItem *> &toplevelItems = utils::toplevelItems<QGraphicsItem>(graphicsScene());
+    const int toplevelItemsCount = toplevelItems.size();
+    for (int i = 0; i < toplevelItemsCount; ++i) {
+        if (QGraphicsItem *gi = toplevelItems.at(i))
+            totalRect = totalRect.united(gi->sceneBoundingRect());
+    }
+
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 
-    d->m_layoutInfo.m_chartItem->setZValue(-d->m_scene.items().size());
-
-    QRectF totalRect;
-    d->m_layoutInfo.m_chartItem->setBox(totalRect);
-    for (QGraphicsItem *gi : utils::toplevelItems<QGraphicsItem>(graphicsScene())) {
-        totalRect = totalRect.united(gi->boundingRect().translated(gi->pos()));
-    }
+    d->m_layoutInfo.m_chartItem->setZValue(-toplevelItemsCount);
     d->m_layoutInfo.m_chartItem->setBox(totalRect);
 
     d->m_layoutInfo.m_perimeter =
@@ -372,7 +431,7 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
         });
 
         if (QGraphicsObject *bottommostEvent = events.last()) {
-            const qreal bottomY = bottommostEvent->boundingRect().translated(bottommostEvent->pos()).bottom();
+            const qreal bottomY = bottommostEvent->sceneBoundingRect().bottom();
             QLineF axisLine(instanceItem->axis());
             axisLine.setP2({ axisLine.x2(), bottomY });
             instanceItem->setAxisHeight(axisLine.length());
@@ -592,7 +651,7 @@ void ChartViewModel::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInsta
     if (!d->m_layoutInfo.m_dynamicInstances.contains(dynamicInstance)) {
         MscInstance *creatorInstance = dynamicInstance->explicitCreator();
         if (MessageItem *item = fillMessageItem(msgCreate, itemForInstance(creatorInstance),
-                                                itemForInstance(dynamicInstance), d->m_layoutInfo.m_pos.y())) {
+                                                itemForInstance(dynamicInstance), 0.)) {
             d->m_layoutInfo.m_dynamicInstances.insert(dynamicInstance, item);
         }
     }
@@ -625,8 +684,7 @@ MessageItem *ChartViewModel::addMessageItem(MscMessage *message)
     InstanceItem *sourceInstance(findInstanceItem(message->sourceInstance()));
     InstanceItem *targetInstance(findInstanceItem(message->targetInstance()));
 
-    return fillMessageItem(message, sourceInstance, targetInstance,
-                           d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+    return fillMessageItem(message, sourceInstance, targetInstance, instanceVertiacalOffset);
 }
 
 ActionItem *ChartViewModel::addActionItem(MscAction *action)
@@ -646,7 +704,7 @@ ActionItem *ChartViewModel::addActionItem(MscAction *action)
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
     }
-    item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+    item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVertiacalOffset);
     item->updateLayout();
 
     return item;
@@ -665,15 +723,14 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
         connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
     }
 
+    InstanceItem *instance = itemForInstance(condition->instance());
+    qreal verticalOffset = instance->axis().p1().y();
     if (prevItem && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
-        d->m_layoutInfo.m_pos.ry() += prevItem->boundingRect().height() + d->InterMessageSpan;
+        verticalOffset += prevItem->boundingRect().height() + d->InterMessageSpan;
     }
 
-    InstanceItem *instance = itemForInstance(condition->instance());
-    item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instance->axis().p1().y(), instancesRect);
+    item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + verticalOffset, instancesRect);
     item->updateLayout();
-
-    d->m_layoutInfo.m_pos.ry() += item->boundingRect().height() + d->InterMessageSpan;
 
     return item;
 }

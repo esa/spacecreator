@@ -258,4 +258,13 @@ void TextItem::selectText(bool select)
     setTextCursor(txtCursor);
 }
 
+void TextItem::setTextMargin(qreal margin)
+{
+    document()->setDocumentMargin(margin);
+}
+qreal TextItem::textMargin() const
+{
+    return document()->documentMargin();
+}
+
 } // namespace msc

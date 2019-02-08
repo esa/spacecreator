@@ -106,6 +106,11 @@ private:
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
+
+    void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
+
+    void addInstanceItems();
+    void addInstanceEventItems();
 };
 
 } // namespace msc

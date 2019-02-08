@@ -64,6 +64,8 @@ private:
     TextItem *m_itemText;
     ArrowItem *m_itemArrow;
     QPainterPath m_shape;
+
+    static constexpr qreal TextMargin = 1.;
 };
 
 } // ns msc
