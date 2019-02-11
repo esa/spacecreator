@@ -59,6 +59,8 @@ public:
     void setTextMargin(qreal margin);
     qreal textMargin() const;
 
+    void selectText(bool select);
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();
@@ -78,8 +80,6 @@ private:
     bool m_gradientUsed = false;
     bool m_editable = false;
     QString m_prevText;
-
-    void selectText(bool select);
 };
 
 } // ns msc

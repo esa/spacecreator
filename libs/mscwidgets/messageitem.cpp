@@ -454,6 +454,12 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
     m_posChangeIgnored = ignored;
 }
 
+void MessageItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mouseDoubleClickEvent(event);
+    m_arrowItem->enableEditMode();
+}
+
 bool MessageItem::isCreator() const
 {
     return m_message && m_message->messageType() == MscMessage::MessageType::Create;

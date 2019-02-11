@@ -62,6 +62,8 @@ private Q_SLOTS:
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
 
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;

@@ -253,6 +253,10 @@ void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
+/*!
+   \brief TextItem::selectText
+   \param select if true, the entire text will be selected. If false, the the selection will be cleared
+ */
 void TextItem::selectText(bool select)
 {
     QTextCursor txtCursor = textCursor();

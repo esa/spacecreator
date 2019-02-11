@@ -43,6 +43,8 @@ public Q_SLOTS:
     void setActionText(const QString &text);
 
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;

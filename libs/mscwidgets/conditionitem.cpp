@@ -204,6 +204,13 @@ void ConditionItem::onManualGeometryChangeFinished(GripPoint::Location pos, cons
     }
 }
 
+void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mouseDoubleClickEvent(event);
+    m_nameItem->enableEditMode();
+    m_nameItem->selectText(true);
+}
+
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {

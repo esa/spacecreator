@@ -49,6 +49,8 @@ public:
 
     void setDashed(bool dashed);
 
+    void enableEditMode();
+
 Q_SIGNALS:
     void layoutChanged() const;
     void textEdited(const QString &text);

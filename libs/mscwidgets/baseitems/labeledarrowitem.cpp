@@ -171,4 +171,10 @@ void LabeledArrowItem::setDashed(bool dashed)
     m_itemArrow->setBodyPen(linePen);
 }
 
+void LabeledArrowItem::enableEditMode()
+{
+    m_itemText->enableEditMode();
+    m_itemText->selectText(true);
+}
+
 } // ns msc
