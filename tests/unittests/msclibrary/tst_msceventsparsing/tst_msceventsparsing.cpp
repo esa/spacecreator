@@ -17,6 +17,7 @@
 
 #include "exceptions.h"
 #include "mscchart.h"
+#include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscfile.h"
@@ -59,6 +60,8 @@ private Q_SLOTS:
 
     void testIncompleteMessageIn();
     void testIncompleteMessageOut();
+
+    void testConditionDublicate();
 
 private:
     MscFile *file = nullptr;
@@ -606,6 +609,57 @@ void tst_MscEventsParsing::testIncompleteMessageOut()
                                  endmscdocument;");
 
     QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+}
+
+void tst_MscEventsParsing::testConditionDublicate()
+{
+    static const QLatin1String msc("msc connection; \
+                    instance Initiator; \
+                        condition Disconnected shared all; \
+                        in ICONreq from env; \
+                        condition Wait_forResp shared all; \
+                    endinstance; \
+                    instance Responder; \
+                        condition Disconnected shared all; \
+                        condition Wait_forResp; \
+                    endinstance;\
+                endmsc;");
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 2);
+    MscInstance *initiator = chart->instances().at(0);
+    MscInstance *responder = chart->instances().at(1);
+
+    QCOMPARE(chart->instanceEvents().size(), 4);
+
+    auto event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(0));
+    QVERIFY(event != nullptr);
+    QCOMPARE(event->name(), QString("Disconnected"));
+    QVERIFY(event->shared());
+    QCOMPARE(event->instance(), initiator);
+
+    auto message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->name(), QString("ICONreq"));
+    QCOMPARE(message->sourceInstance(), static_cast<MscInstance *>(nullptr));
+    QCOMPARE(message->targetInstance(), initiator);
+
+    event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(2));
+    QVERIFY(event != nullptr);
+    QCOMPARE(event->name(), QString("Wait_forResp"));
+    QVERIFY(event->shared());
+    QCOMPARE(event->instance(), initiator);
+
+    event = dynamic_cast<MscCondition *>(chart->instanceEvents().at(3));
+    QVERIFY(event != nullptr);
+    QCOMPARE(event->name(), QString("Wait_forResp"));
+    QVERIFY(event->shared() == false);
+    QCOMPARE(event->instance(), responder);
+
+    delete model;
 }
 
 QTEST_APPLESS_MAIN(tst_MscEventsParsing)

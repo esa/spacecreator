@@ -800,8 +800,9 @@ void MscParserVisitor::orderInstanceEvents()
             // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
                 while (!m_instanceEventsList.at(j).isEmpty()
-                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message) {
-                    // This is not a message, move it to the chart
+                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message
+                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Condition) {
+                    // This is not a message, condition and timer move it to the chart
                     m_currentChart->addInstanceEvent(m_instanceEventsList[j].takeFirst());
                 }
             }
@@ -813,16 +814,19 @@ void MscParserVisitor::orderInstanceEvents()
             bool inOther = false;
 
             // annotate the first element of the list
-            auto firstMessage = m_instanceEventsList[i][0];
+            auto firstEvent = m_instanceEventsList[i][0];
 
-            auto checkMessage = [&](MscInstanceEvent *event) {
-                return event->entityType() == MscEntity::EntityType::Message && event->name() == firstMessage->name();
+            auto checkEvent = [&](MscInstanceEvent *event) {
+                return (event->entityType() == MscEntity::EntityType::Message && event->name() == firstEvent->name())
+                        || (event->entityType() == MscEntity::EntityType::Condition
+                            && event->name() == firstEvent->name() && static_cast<MscCondition *>(firstEvent)->shared()
+                            && static_cast<MscCondition *>(event)->shared());
             };
 
             // look first elements of others list
             for (int j = i + 1; j < m_instanceEventsList.size(); ++j) {
-                if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkMessage)) {
-                    if (m_instanceEventsList[j][0]->name() == firstMessage->name()) {
+                if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkEvent)) {
+                    if (m_instanceEventsList[j][0]->name() == firstEvent->name()) {
                         m_instanceEventsList[j].removeFirst();
 
                         found = true;
@@ -835,7 +839,7 @@ void MscParserVisitor::orderInstanceEvents()
 
             if (found || !inOther) {
                 m_instanceEventsList[i].removeFirst();
-                m_currentChart->addInstanceEvent(firstMessage);
+                m_currentChart->addInstanceEvent(firstEvent);
 
                 break;
             }
