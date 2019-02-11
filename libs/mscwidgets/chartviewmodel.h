@@ -78,7 +78,6 @@ public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
     void relayout();
-    void rearrangeInstances();
     void updateContentBounds();
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);

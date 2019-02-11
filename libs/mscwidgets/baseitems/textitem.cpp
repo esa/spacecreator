@@ -166,6 +166,11 @@ bool TextItem::isEditable() const
     return m_editable;
 }
 
+bool TextItem::isEditing() const
+{
+    return isEditable() && textInteractionFlags() != Qt::NoTextInteraction;
+}
+
 void TextItem::setEditable(bool editable)
 {
     if (editable == m_editable)

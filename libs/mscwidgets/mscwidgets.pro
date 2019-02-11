@@ -20,6 +20,7 @@ HEADERS += \
     baseitems/grippoint.h \
     baseitems/grippointshandler.h \
     baseitems/instanceenditem.h \
+    baseitems/instanceheaditem.h \
     baseitems/interactiveobject.h \
     baseitems/labeledarrowitem.h \
     baseitems/objectslinkitem.h \
@@ -78,6 +79,7 @@ SOURCES += \
     baseitems/grippoint.cpp \
     baseitems/grippointshandler.cpp \
     baseitems/instanceenditem.cpp \
+    baseitems/instanceheaditem.cpp \
     baseitems/interactiveobject.cpp \
     baseitems/labeledarrowitem.cpp \
     baseitems/objectslinkitem.cpp \

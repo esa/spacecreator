@@ -19,10 +19,10 @@
 
 #include "actionitem.h"
 #include "baseitems/common/utils.h"
+#include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
 #include "conditionitem.h"
-#include "instanceitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -193,7 +193,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         if (isCreateMsg) {
             QLineF axisLine(targetItem->axis());
-            axisLine.setP1({ axisLine.x1(), newY + InstanceItem::StartSymbolHeight / 2. });
+            axisLine.setP1({ axisLine.x1(), newY + InstanceHeadItem::StartSymbolHeight / 2. });
 
             const qreal deltaY = targetItem->axis().length() - axisLine.length();
 
@@ -537,7 +537,7 @@ QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *insta
             break;
         }
         default: {
-            qDebug() << Q_FUNC_INFO << "ignored entity of type:" << event->entityType();
+            qWarning() << Q_FUNC_INFO << "ignored entity of type:" << event->entityType();
             break;
         }
         }
@@ -556,7 +556,6 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
         connect(instanceItem, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
-        connect(instanceItem, &InstanceItem::needRearrange, this, &ChartViewModel::rearrangeInstances);
 
         const qreal axisHeight = d->calcInstanceAxisHeight();
         if (!qFuzzyIsNull(axisHeight))
@@ -597,19 +596,6 @@ bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
     }
 
     return false;
-}
-
-void ChartViewModel::rearrangeInstances()
-{
-    QVector<InstanceItem *> instanceItems = { utils::toplevelItems<InstanceItem>(graphicsScene()).toVector() };
-
-    std::sort(instanceItems.begin(), instanceItems.end(),
-              [](const InstanceItem *const a, const InstanceItem *const b) { return a->pos().x() < b->pos().x(); });
-
-    for (int i = 0; i < instanceItems.size(); ++i)
-        currentChart()->updateInstancePos(instanceItems.at(i)->modelItem(), i);
-
-    relayout();
 }
 
 void ChartViewModel::removeInstanceItem(MscInstance *instance)

@@ -50,6 +50,7 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    bool isEditing() const;
     bool isEditable() const;
     void setEditable(bool editable);
 
