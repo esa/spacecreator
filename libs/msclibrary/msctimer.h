@@ -38,6 +38,7 @@ public:
         Timeout,
         Unknown
     };
+    Q_ENUM(TimerType)
 
     explicit MscTimer(QObject *parent = nullptr);
     MscTimer(const QString &name, TimerType type, QObject *parent = nullptr);

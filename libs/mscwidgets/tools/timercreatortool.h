@@ -15,31 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef TIMERCREATORTOOL_H
+#define TIMERCREATORTOOL_H
+
+#include "basecreatortool.h"
+#include "msctimer.h"
 
 namespace msc {
-namespace cmd {
 
-enum Id
+class TimerCreatorTool : public BaseCreatorTool
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
+    Q_OBJECT
+public:
+    TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ToolType toolType() const override;
 
-    LastId
+    void setTimerType(MscTimer::TimerType type);
+
+protected Q_SLOTS:
+    void onCurrentChartChagend(msc::MscChart *chart) override;
+
+protected:
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
+    void removePreviewItem() override;
+
+private:
+    MscTimer::TimerType m_timerType = MscTimer::TimerType::Start;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace msc
+
+#endif // TIMERCREATORTOOL_H

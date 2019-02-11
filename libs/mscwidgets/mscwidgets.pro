@@ -40,6 +40,7 @@ HEADERS += \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
+    commands/cmdtimeritemcreate.h \
     commands/cmdtimeritemmove.h \
     tools/actioncreatortool.h \
     tools/basecreatortool.h \
@@ -49,6 +50,7 @@ HEADERS += \
     tools/instancecreatortool.h \
     tools/messagecreatortool.h \
     tools/pointertool.h \
+    tools/timercreatortool.h \
     tools/tooltypes.h \
     actionitem.h \
     chartitem.h \
@@ -95,6 +97,7 @@ SOURCES += \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemresize.cpp \
+    commands/cmdtimeritemcreate.cpp \
     commands/cmdtimeritemmove.cpp \
     tools/actioncreatortool.cpp \
     tools/basecreatortool.cpp \
@@ -103,6 +106,7 @@ SOURCES += \
     tools/instancecreatortool.cpp \
     tools/hierarchycreatortool.cpp \
     tools/messagecreatortool.cpp \
+    tools/timercreatortool.cpp \
     tools/pointertool.cpp \
     chartitem.cpp \
     chartviewmodel.cpp \

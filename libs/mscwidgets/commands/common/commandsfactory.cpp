@@ -29,6 +29,7 @@
 #include "commands/cmdinstancekindchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdtimeritemcreate.h"
 #include "commands/cmdtimeritemmove.h"
 #include "messageitem.h"
 #include "mscaction.h"
@@ -71,6 +72,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
         return cmd::CommandsFactory::createActionInformalText(params);
+    case cmd::CreateTimer:
+        return cmd::CommandsFactory::createTimerItemCreate(params);
     case cmd::MoveTimer:
         return cmd::CommandsFactory::createTimerItemMove(params);
     case cmd::HierarchyType:
@@ -245,6 +248,21 @@ QUndoCommand *CommandsFactory::createActionInformalText(const QVariantList &para
         const QString &text = params.last().toString();
         if (item->informalAction() != text)
             return new CmdActionInformalText(item, text);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createTimerItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 5);
+
+    auto timer = params.at(0).value<msc::MscTimer *>();
+    auto timerType = params.at(1).value<msc::MscTimer::TimerType>();
+    if (auto chart = params.at(2).value<msc::MscChart *>()) {
+        auto instance = params.at(3).value<msc::MscInstance *>();
+        int eventIndex = params.at(4).toInt();
+        return new CmdTimerItemCreate(timer, timerType, chart, instance, eventIndex);
     }
 
     return nullptr;

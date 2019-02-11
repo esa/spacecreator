@@ -43,6 +43,7 @@ public:
     static QUndoCommand *createActionItemCreate(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);
     static QUndoCommand *createActionInformalText(const QVariantList &params);
+    static QUndoCommand *createTimerItemCreate(const QVariantList &params);
     static QUndoCommand *createTimerItemMove(const QVariantList &params);
     static QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
 

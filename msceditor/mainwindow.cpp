@@ -26,6 +26,7 @@
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
+#include "msctimer.h"
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
@@ -35,6 +36,7 @@
 #include "tools/instancecreatortool.h"
 #include "tools/messagecreatortool.h"
 #include "tools/pointertool.h"
+#include "tools/timercreatortool.h"
 #include "ui_mainwindow.h"
 
 #include <QActionGroup>
@@ -612,6 +614,21 @@ void MainWindow::initTools()
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::enableDefaultTool);
     d->m_tools.append(conditionCreateTool);
+
+    auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
+    connect(startTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(startTimerCreateTool);
+
+    auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
+    connect(stopTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(stopTimerCreateTool);
+
+    auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
+    connect(timeoutCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
     for (msc::BaseTool *tool : d->m_tools) {
