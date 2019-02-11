@@ -15,25 +15,40 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDCONDITIONITEMCREATE_H
+#define CMDCONDITIONITEMCREATE_H
+
+#include "commands/basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
 
-enum class ToolType
+class MscCondition;
+class MscChart;
+class MscInstance;
+
+namespace cmd {
+
+class CmdConditionItemCreate : public BaseCommand
 {
-    Pointer = 0,
-    ActionCreator,
-    ConditionCreator,
-    InstanceCreator,
-    MessageCreator,
-    EntityDeleter,
-    HierarchyAndCreator,
-    HierarchyExceptionCreator,
-    HierarchyIsCreator,
-    HierarchyLeafCreator,
-    HierarchyOrCreator,
-    HierarchyParallelCreator,
-    HierarchyRepeatCreator
+public:
+    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscChart *chart, msc::MscInstance *instance,
+                           int eventIndex);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    MscCondition *m_condition = nullptr;
+    QPointer<MscChart> m_chart;
+    QPointer<MscInstance> m_instance;
+    int m_eventIndex = -1;
 };
 
-} // ns msc
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDCONDITIONITEMCREATE_H

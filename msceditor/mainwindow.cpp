@@ -29,6 +29,7 @@
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
+#include "tools/conditioncreatortool.h"
 #include "tools/entitydeletetool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
@@ -607,6 +608,10 @@ void MainWindow::initTools()
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::enableDefaultTool);
     d->m_tools.append(actionCreateTool);
+
+    auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(conditionCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
     for (msc::BaseTool *tool : d->m_tools) {

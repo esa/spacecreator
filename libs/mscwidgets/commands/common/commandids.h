@@ -29,6 +29,7 @@ enum Id
     MoveInstance,
     CreateInstance,
     RenameInstanceKind,
+    CreateCondition,
     MoveCondition,
     CreateAction,
     MoveAction,

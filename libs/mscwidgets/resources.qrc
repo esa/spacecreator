@@ -22,5 +22,6 @@
         <file alias="toolbar/action.svg">resources/icons/toolbar/action.svg</file>
         <file alias="toolbar/redo.svg">resources/icons/toolbar/redo.svg</file>
         <file alias="toolbar/undo.svg">resources/icons/toolbar/undo.svg</file>
+        <file alias="toolbar/condition.svg">resources/icons/toolbar/condition.svg</file>
     </qresource>
 </RCC>

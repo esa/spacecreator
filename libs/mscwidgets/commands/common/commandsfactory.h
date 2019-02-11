@@ -38,6 +38,7 @@ public:
     static QUndoCommand *createInstanceItemMove(const QVariantList &params);
     static QUndoCommand *createInstanceItemCreate(const QVariantList &params);
     static QUndoCommand *createInstanceKindChange(const QVariantList &params);
+    static QUndoCommand *createConditionItemCreate(const QVariantList &params);
     static QUndoCommand *createConditionItemMove(const QVariantList &params);
     static QUndoCommand *createActionItemCreate(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);

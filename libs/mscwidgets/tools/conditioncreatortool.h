@@ -15,25 +15,30 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CONDITIONCREATORTOOL_H
+#define CONDITIONCREATORTOOL_H
+
+#include "basecreatortool.h"
 
 namespace msc {
 
-enum class ToolType
+class ConditionCreatorTool : public BaseCreatorTool
 {
-    Pointer = 0,
-    ActionCreator,
-    ConditionCreator,
-    InstanceCreator,
-    MessageCreator,
-    EntityDeleter,
-    HierarchyAndCreator,
-    HierarchyExceptionCreator,
-    HierarchyIsCreator,
-    HierarchyLeafCreator,
-    HierarchyOrCreator,
-    HierarchyParallelCreator,
-    HierarchyRepeatCreator
+    Q_OBJECT
+
+public:
+    ConditionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ToolType toolType() const override;
+
+protected Q_SLOTS:
+    void onCurrentChartChagend(msc::MscChart *chart) override;
+
+protected:
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
+    void removePreviewItem() override;
 };
 
-} // ns msc
+} // namespace msc
+
+#endif // CONDITIONCREATORTOOL_H

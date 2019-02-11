@@ -61,7 +61,9 @@ HEADERS += \
     instanceitem.h \
     messageitem.h \
     textview.h \
-    timeritem.h
+    timeritem.h \
+    tools/conditioncreatortool.h \
+    commands/cmdconditionitemcreate.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -113,7 +115,9 @@ SOURCES += \
     instanceitem.cpp \
     messageitem.cpp \
     textview.cpp \
-    timeritem.cpp
+    timeritem.cpp \
+    tools/conditioncreatortool.cpp \
+    commands/cmdconditionitemcreate.cpp
 
 RESOURCES += \
     resources.qrc
