@@ -77,7 +77,7 @@ void TimerCreatorTool::createPreviewItem()
     }
 
     auto orphantimer = new MscTimer(this);
-    orphantimer->setName(tr("New timer"));
+    orphantimer->setName(tr("New_timer"));
     orphantimer->setTimerType(m_timerType);
     auto timerItem = new TimerItem(orphantimer);
 
