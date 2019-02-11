@@ -135,15 +135,15 @@ void tst_MscWriter::testSerializeMscMessageParameters()
 void tst_MscWriter::testSerializeMscTimer()
 {
     MscTimer timer1("T1", MscTimer::TimerType::Start);
-    QCOMPARE(this->serialize(&timer1), QString("starttimer T1;\n"));
-    QCOMPARE(this->serialize(&timer1, 1), tab1("starttimer T1;\n"));
-    QCOMPARE(this->serialize(&timer1, 2), tab2("starttimer T1;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1;\n"));
 
     MscTimer timer2("T2", MscTimer::TimerType::Stop);
-    QCOMPARE(this->serialize(&timer2), QString("stoptimer T2;\n"));
+    QCOMPARE(this->serialize(&timer2, nullptr), QString("stoptimer T2;\n"));
 
     MscTimer timer3("T3", MscTimer::TimerType::Timeout);
-    QCOMPARE(this->serialize(&timer3), QString("timeout T3;\n"));
+    QCOMPARE(this->serialize(&timer3, nullptr), QString("timeout T3;\n"));
 }
 
 void tst_MscWriter::testSerializeMscCoregion()
@@ -209,11 +209,14 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
 
     // Add some timers and test again
     QScopedPointer<MscTimer> timer1(new MscTimer("T_start", MscTimer::TimerType::Start));
+    timer1->setInstance(&instance);
     messages.insert(1, timer1.data());
     QScopedPointer<MscTimer> timer2(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
+    timer2->setInstance(&instance);
     messages.append(timer2.data());
     QScopedPointer<MscTimer> timer3(new MscTimer("T_stop", MscTimer::TimerType::Stop));
     messages.append(timer3.data());
+    timer3->setInstance(&instance);
 
     serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
     QCOMPARE(serializeList.size(), 7);
@@ -331,33 +334,43 @@ void tst_MscWriter::testSerializeMscChartInstance()
     MscCondition *condition2 = new MscCondition("Con_2");
     condition2->setInstance(instance2);
 
+    MscTimer *timer1 = new MscTimer("T_1", MscTimer::TimerType::Start);
+    timer1->setInstance(instance);
+
+    MscTimer *timer2 = new MscTimer("T_2", MscTimer::TimerType::Stop);
+    timer2->setInstance(instance2);
+
     chart.addInstanceEvent(condition);
+    chart.addInstanceEvent(timer1);
     chart.addInstanceEvent(message);
     chart.addInstanceEvent(condition2);
     chart.addInstanceEvent(message2);
+    chart.addInstanceEvent(timer2);
 
     chart.addInstance(instance);
     chart.addInstance(instance2);
 
     QStringList serializeList = this->serialize(&chart).split("\n");
 
-    QVERIFY(serializeList.size() >= 12);
+    QVERIFY(serializeList.size() >= 14);
 
     QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
 
     QCOMPARE(serializeList.at(1), tab1("instance Inst_1;"));
     QCOMPARE(serializeList.at(2), tab2("condition Con_1 shared all;"));
-    QCOMPARE(serializeList.at(3), tab2("in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(4), tab2("out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(5), tab1("endinstance;"));
+    QCOMPARE(serializeList.at(3), tab2("starttimer T_1;"));
+    QCOMPARE(serializeList.at(4), tab2("in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(5), tab2("out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(6), tab1("endinstance;"));
 
-    QCOMPARE(serializeList.at(6), tab1("instance Inst_2;"));
-    QCOMPARE(serializeList.at(7), tab2("out Msg_1 to Inst_1;"));
-    QCOMPARE(serializeList.at(8), tab2("condition Con_2;"));
-    QCOMPARE(serializeList.at(9), tab2("in Msg_2 from Inst_1;"));
-    QCOMPARE(serializeList.at(10), tab1("endinstance;"));
+    QCOMPARE(serializeList.at(7), tab1("instance Inst_2;"));
+    QCOMPARE(serializeList.at(8), tab2("out Msg_1 to Inst_1;"));
+    QCOMPARE(serializeList.at(9), tab2("condition Con_2;"));
+    QCOMPARE(serializeList.at(10), tab2("in Msg_2 from Inst_1;"));
+    QCOMPARE(serializeList.at(11), tab2("stoptimer T_2;"));
+    QCOMPARE(serializeList.at(12), tab1("endinstance;"));
 
-    QCOMPARE(serializeList.at(11), QString("endmsc;"));
+    QCOMPARE(serializeList.at(13), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeMscDocument()
