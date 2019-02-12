@@ -61,6 +61,8 @@ public:
 
     void selectText(bool select);
 
+    qreal idealWidth() const;
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();

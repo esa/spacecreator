@@ -282,4 +282,9 @@ qreal TextItem::textMargin() const
     return document()->documentMargin();
 }
 
+qreal TextItem::idealWidth() const
+{
+    return document()->idealWidth();
+}
+
 } // namespace msc

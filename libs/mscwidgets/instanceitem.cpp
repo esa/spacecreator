@@ -144,6 +144,7 @@ void InstanceItem::buildLayout()
 {
     prepareGeometryChange();
 
+    const QPointF &prevP1 = m_axisSymbol->line().p1();
     QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
 
@@ -164,6 +165,19 @@ void InstanceItem::buildLayout()
     const QPointF p1(headRect.center().x(), headRect.bottom());
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
+
+    if (prevP1 != p1) {
+        // local geometry changed due the text layout change, compensate it:
+        const QPointF &shift = prevP1 - p1;
+        if (!shift.isNull()) {
+            // Related messages to/from Env will be moved all together,
+            // To avoid it block the InteractiveObject::relocated
+            // (fired in InteractiveObject::itemChange)
+            QSignalBlocker dontMoveEnvMessages(this);
+
+            moveBy(shift.x(), shift.y());
+        }
+    }
 }
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -232,12 +246,26 @@ void InstanceItem::onNameEdited(const QString &newName)
 
     using namespace msc::cmd;
     CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
+    QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
 
 void InstanceItem::onKindEdited(const QString &newKind)
 {
     using namespace msc::cmd;
     CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
+    QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
+}
+
+void InstanceItem::reflectTextLayoutChange()
+{
+    if (QGraphicsScene *scene = this->scene()) {
+        const QRectF &myRect = sceneBoundingRect();
+        const QRectF &sceneRect = scene->sceneRect();
+        if (!myRect.intersected(sceneRect).isEmpty()) {
+            if (!moveLeftIfOverlaps())
+                Q_EMIT needRelayout();
+        }
+    }
 }
 
 void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)

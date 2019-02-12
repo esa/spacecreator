@@ -143,7 +143,10 @@ void InstanceHeadItem::updateLayout()
     QRectF kindRect = m_textItemKind->boundingRect();
 
     // prepare symbol's rect:
-    const qreal width = qMax(SymbolWidth, qMax(nameRect.width(), kindRect.width()));
+    const qreal width = qMax(SymbolWidth, qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
+    m_textItemName->setTextWidth(width);
+    m_textItemKind->setTextWidth(width);
+
     QRectF symbolRect(0., 0., width, qMax(kindRect.height(), StartSymbolHeight));
 
     static const qreal padding = 5.;
@@ -202,7 +205,6 @@ void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 
     if (QGraphicsItem *parent = parentItem()) {
-
         if (event->modifiers() == Qt::NoModifier)
             scene()->clearSelection();
 

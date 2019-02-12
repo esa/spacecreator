@@ -78,6 +78,8 @@ private:
     InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
 
+    Q_INVOKABLE void reflectTextLayoutChange();
+
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
