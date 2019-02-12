@@ -87,6 +87,8 @@ public:
 
     Flow m_descrIn, m_descrOut;
 
+    bool isGlobal() const;
+
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);

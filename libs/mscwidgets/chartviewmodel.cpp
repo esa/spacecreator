@@ -357,11 +357,17 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
 void ChartViewModel::updateContentBounds()
 {
     QRectF totalRect;
-    const QList<QGraphicsItem *> &toplevelItems = utils::toplevelItems<QGraphicsItem>(graphicsScene());
+    const QList<InteractiveObject *> &toplevelItems = utils::toplevelItems<InteractiveObject>(graphicsScene());
     const int toplevelItemsCount = toplevelItems.size();
     for (int i = 0; i < toplevelItemsCount; ++i) {
-        if (QGraphicsItem *gi = toplevelItems.at(i))
+        if (InteractiveObject *gi = toplevelItems.at(i)) {
+            if (gi->modelEntity()->entityType() == MscEntity::EntityType::Message) {
+                MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
+                if (message->isGlobal()) // ignore, it will be connected to the ChartItem edge lately
+                    continue;
+            }
             totalRect = totalRect.united(gi->sceneBoundingRect());
+        }
     }
 
     if (!d->m_layoutInfo.m_chartItem) {
@@ -381,12 +387,9 @@ void ChartViewModel::updateContentBounds()
         switch (event->entityType()) {
         case MscEntity::EntityType::Message: {
             MscMessage *message = static_cast<MscMessage *>(event);
-            if (message->messageType() == MscMessage::MessageType::Message) {
-                if (!message->sourceInstance() || !message->targetInstance()) {
-                    if (MessageItem *item = itemForMessage(message)) {
-                        // place regular messages which are to/from Env on the correct box edge:
-                        item->updateLayout();
-                    }
+            if (message->isGlobal()) {
+                if (MessageItem *item = itemForMessage(message)) {
+                    item->updateLayout(); // place it on the correct box edge
                 }
             }
             break;

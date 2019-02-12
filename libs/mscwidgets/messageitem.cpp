@@ -22,6 +22,7 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/labeledarrowitem.h"
+#include "chartitem.h"
 #include "commands/common/commandsstack.h"
 
 #include <QBrush>
@@ -163,7 +164,13 @@ void MessageItem::rebuildLayout()
     const QPointF fromC(itemCenterScene(m_sourceInstance).x(), y());
     const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
-    const QRectF boxRect = scene()->sceneRect(); // TODO: use the actual MSC's box instead
+    auto getChartBox = [this]() {
+        // TODO: store the ChartItem* instance somewhere to avoid lookup whithin each MessageItem
+        const QList<ChartItem *> boxes = utils::toplevelItems<ChartItem>(scene());
+        return boxes.size() == 1 ? boxes.first()->sceneBoundingRect() : scene()->sceneRect();
+    };
+
+    const QRectF boxRect = getChartBox();
     auto extendToNearestEdge = [&boxRect](const QPointF &target) {
         const QLineF left({ boxRect.left(), target.y() }, target);
         const QLineF right({ boxRect.right(), target.y() }, target);
