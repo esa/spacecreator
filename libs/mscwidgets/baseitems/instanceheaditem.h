@@ -48,11 +48,13 @@ Q_SIGNALS:
     void kindEdited(const QString &kind);
     void manualMoveRequested(const QPointF &sceneFrom, const QPointF &sceneTo);
     void manualMoveFinished();
+    void layoutUpdated();
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     TextItem *m_textItemName;
@@ -63,6 +65,7 @@ private:
     static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
 
+protected Q_SLOTS:
     void updateLayout();
 };
 

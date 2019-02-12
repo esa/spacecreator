@@ -21,6 +21,7 @@
 
 #include <QCursor>
 #include <QDebug>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
@@ -85,8 +86,18 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
     m_textItemKind->setEditable(true);
     m_textItemName->setEditable(true);
 
-    connect(m_textItemName, &TextItem::edited, this, &InstanceHeadItem::nameEdited, Qt::QueuedConnection);
-    connect(m_textItemKind, &TextItem::edited, this, &InstanceHeadItem::kindEdited, Qt::QueuedConnection);
+    connect(m_textItemName, &TextItem::edited, this, [this](const QString &txt) {
+        updateLayout();
+        Q_EMIT nameEdited(txt);
+    });
+
+    connect(m_textItemName, &TextItem::keyPressed, this, [this]() { updateLayout(); });
+
+    connect(m_textItemKind, &TextItem::edited, this, [this](const QString &txt) {
+        updateLayout();
+        Q_EMIT kindEdited(txt);
+    });
+    connect(m_textItemKind, &TextItem::keyPressed, this, [this]() { updateLayout(); });
 
     m_rectItem->setCursor(Qt::SizeAllCursor);
     m_textItemKind->setCursor(Qt::SizeAllCursor); // TODO: restore regular cursor for editing
@@ -126,6 +137,8 @@ void InstanceHeadItem::setKind(const QString &kind)
 
 void InstanceHeadItem::updateLayout()
 {
+    prepareGeometryChange();
+
     QRectF nameRect = m_textItemName->boundingRect();
     QRectF kindRect = m_textItemKind->boundingRect();
 
@@ -163,6 +176,8 @@ void InstanceHeadItem::updateLayout()
     // update head gradient:
     m_textItemName->setBackgroundGradient(createGradientForName(m_textItemName));
     m_rectItem->setBrush(createGradientForKind(m_rectItem));
+
+    Q_EMIT layoutUpdated();
 }
 
 QRectF InstanceHeadItem::boundingRect() const
@@ -183,6 +198,13 @@ void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
             (!m_textItemKind->isEditing() && m_rectItem->contains(event->pos())) ? event->pos() : QPointF();
 
     m_manualMovementTo = m_manualMovementFrom;
+
+    event->accept();
+
+    if (QGraphicsItem *parent = parentItem()) {
+        scene()->clearSelection();
+        parent->setSelected(!parent->isSelected());
+    }
 }
 
 void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -193,6 +215,21 @@ void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     m_manualMovementFrom = m_manualMovementTo = QPointF();
+}
+
+void InstanceHeadItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    auto activateTextEdit = [](TextItem *textItem, const QPointF &scenePos) {
+        if (textItem->contains(textItem->mapFromScene(scenePos))) {
+            textItem->enableEditMode();
+            return true;
+        }
+        return false;
+    };
+
+    if (activateTextEdit(m_textItemKind, event->scenePos()) || activateTextEdit(m_textItemName, event->scenePos())) {
+        m_manualMovementFrom = m_manualMovementTo = QPointF();
+    }
 }
 
 void InstanceHeadItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

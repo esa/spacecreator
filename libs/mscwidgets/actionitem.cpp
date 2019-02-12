@@ -97,7 +97,6 @@ void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
     m_textItem->enableEditMode();
-    m_textItem->selectText(true);
 }
 
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

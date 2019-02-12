@@ -63,17 +63,17 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     axisPen.setWidthF(3.);
     m_axisSymbol->setPen(axisPen);
 
-    connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited, Qt::QueuedConnection);
-    connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited, Qt::QueuedConnection);
-    connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this,
-            [this](const QPointF &from, const QPointF &to) {
-                if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center)) {
-                    onMoveRequested(gp, from, to);
-                }
-            },
-            Qt::QueuedConnection);
-    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, &InstanceItem::moveLeftIfOverlaps,
-            Qt::QueuedConnection);
+    connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
+    connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this, [this](const QPointF &from, const QPointF &to) {
+        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center)) {
+            onMoveRequested(gp, from, to);
+        }
+    });
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, &InstanceItem::moveLeftIfOverlaps);
+    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::updateLayout);
+
+    void();
 }
 
 MscInstance *InstanceItem::modelItem() const

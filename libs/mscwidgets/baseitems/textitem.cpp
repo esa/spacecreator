@@ -185,6 +185,12 @@ void TextItem::enableEditMode()
         return;
     }
 
+    if (m_prevText.isEmpty()) {
+        m_prevText = toPlainText();
+    }
+
+    selectText(true);
+
     setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
     setFocus();
 }
