@@ -174,6 +174,15 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
         m_instanceEvents.insert(eventIndex, instanceEvent);
     }
     connect(instanceEvent, &MscInstanceEvent::dataChanged, this, &MscChart::dataChanged);
+
+    if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
+        MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
+        connect(timer, &MscInstanceEvent::nameChanged, this, &MscChart::checkTimerRelations);
+        connect(timer, &MscTimer::instanceChanged, this, &MscChart::checkTimerRelations);
+    }
+
+    checkTimerRelations();
+
     Q_EMIT instanceEventAdded(instanceEvent);
     Q_EMIT dataChanged();
 }
@@ -195,6 +204,8 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         if (instanceEvent->parent() == this) {
             instanceEvent->setParent(nullptr);
         }
+        disconnect(instanceEvent, nullptr, this, nullptr);
+
         Q_EMIT instanceEventRemoved(instanceEvent);
         Q_EMIT dataChanged();
     }
@@ -365,6 +376,40 @@ void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance
     if (changed) {
         Q_EMIT messageRetargeted();
         Q_EMIT dataChanged();
+    }
+}
+
+void MscChart::checkTimerRelations()
+{
+    QVector<MscTimer *> timers;
+    for (MscInstanceEvent *event : instanceEvents()) {
+        if (event->entityType() == MscEntity::EntityType::Timer) {
+            auto timer = static_cast<MscTimer *>(event);
+            timers.append(timer);
+        }
+    }
+
+    for (auto it = timers.begin(); it != timers.end(); ++it) {
+        Q_ASSERT(*it != nullptr);
+        const QString &name = (*it)->name();
+        auto it2 = it;
+        ++it2;
+        while (it2 != timers.end()) {
+            if ((*it2)->name() == name && (*it2)->instance() == (*it)->instance()) {
+                (*it)->setFollowingTimer(*it2);
+                (*it2)->setPrecedingTimer(*it);
+                break;
+            }
+            ++it2;
+        }
+        if (it2 == timers.end()) {
+            (*it)->setFollowingTimer(nullptr);
+        }
+        if (MscTimer *oldPre = (*it)->precedingTimer()) {
+            if (oldPre->name() != name || oldPre->instance() != (*it)->instance()) {
+                (*it)->setPrecedingTimer(nullptr);
+            }
+        }
     }
 }
 

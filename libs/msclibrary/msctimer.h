@@ -20,6 +20,8 @@
 
 #include "mscinstanceevent.h"
 
+#include <QPointer>
+
 namespace msc {
 
 class MscInstance;
@@ -53,13 +55,23 @@ public:
 
     bool relatesTo(MscInstance *instance) const override;
 
+    void setPrecedingTimer(MscTimer *timer);
+    MscTimer *precedingTimer() const;
+
+    void setFollowingTimer(MscTimer *timer);
+    MscTimer *followingTimer() const;
+
 Q_SIGNALS:
     void timerTypeChanged();
     void instanceChanged();
+    void precedingTimerChanged();
+    void followingTimerChanged();
 
 private:
     TimerType m_timerType = TimerType::Unknown;
     MscInstance *m_instance = nullptr;
+    QPointer<MscTimer> m_precedingTimer;
+    QPointer<MscTimer> m_followingTimer;
 };
 
 }
