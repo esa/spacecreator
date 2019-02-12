@@ -202,7 +202,10 @@ void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 
     if (QGraphicsItem *parent = parentItem()) {
-        scene()->clearSelection();
+
+        if (event->modifiers() == Qt::NoModifier)
+            scene()->clearSelection();
+
         parent->setSelected(!parent->isSelected());
     }
 }
