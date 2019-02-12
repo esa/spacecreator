@@ -112,26 +112,34 @@ QLineF InstanceItem::axis() const
 
 void InstanceItem::setName(const QString &name)
 {
-    if (this->name() == name && m_instance->name() == name)
-        return;
-
-    m_instance->setName(name);
-    m_headSymbol->setName(name);
-
-    if (!moveLeftIfOverlaps())
-        Q_EMIT needRelayout();
+    updatePropertyString(QLatin1String("name"), name);
 }
 
 void InstanceItem::setKind(const QString &kind)
 {
-    if (this->kind() == kind && m_instance->kind() == kind)
+    updatePropertyString(QLatin1String("kind"), kind);
+}
+
+void InstanceItem::updatePropertyString(const QLatin1String &property, const QString &value)
+{
+    if (property.size() == 0) // QLatin1String::isEmpty was introduced in Qt 5.10
         return;
 
-    m_instance->setKind(kind);
-    m_headSymbol->setKind(kind);
+    static const QLatin1String scheduledMethod("reflectTextLayoutChange");
 
-    if (!moveLeftIfOverlaps())
-        Q_EMIT needRelayout();
+    const char *propertyName = property.data();
+    if (this->property(propertyName).toString() == value && m_instance->property(propertyName) == value) {
+        // If renaming has been performed via redo command,
+        // both the instance and the UI text are actualized for now,
+        // but the scene layout update is still necessary:
+        QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
+        return;
+    }
+
+    m_instance->setProperty(propertyName, value);
+    m_headSymbol->setProperty(propertyName, value);
+
+    QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
 }
 
 void InstanceItem::rebuildLayout()
@@ -246,14 +254,12 @@ void InstanceItem::onNameEdited(const QString &newName)
 
     using namespace msc::cmd;
     CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
-    QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
 
 void InstanceItem::onKindEdited(const QString &newKind)
 {
     using namespace msc::cmd;
     CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
-    QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
 
 void InstanceItem::reflectTextLayoutChange()

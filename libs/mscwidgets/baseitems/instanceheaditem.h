@@ -27,6 +27,9 @@ class InstanceHeadItem : public QGraphicsObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameEdited)
+    Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindEdited)
+
 public:
     static const qreal StartSymbolHeight;
 

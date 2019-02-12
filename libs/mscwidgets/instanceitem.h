@@ -80,6 +80,8 @@ private:
 
     Q_INVOKABLE void reflectTextLayoutChange();
 
+    void updatePropertyString(const QLatin1String &property, const QString &value);
+
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
