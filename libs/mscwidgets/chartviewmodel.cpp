@@ -57,7 +57,6 @@ struct ChartViewLayoutInfo {
         m_dynamicInstanceMarkers.clear();
         m_dynamicInstances.clear();
         m_pos = { 0., 0. };
-        m_perimeter = QRectF();
         m_instancesRect = QRectF();
 
         if (m_chartItem) {
@@ -68,12 +67,13 @@ struct ChartViewLayoutInfo {
 
     QMap<MscInstance *, MessageItem *> m_dynamicInstances;
     QMap<MscInstance *, MessageItem *> m_dynamicInstanceMarkers;
-    QRectF m_perimeter;
     QRectF m_instancesRect;
-
+    QSizeF m_preferredBox;
     QPointF m_pos;
 
     QPointer<ChartItem> m_chartItem = nullptr;
+
+private:
 };
 
 struct ChartViewModelPrivate {
@@ -370,6 +370,17 @@ void ChartViewModel::updateContentBounds()
         }
     }
 
+    const QSizeF &preferredSize = preferredChartBoxSize();
+    if (!preferredSize.isEmpty()) {
+        const qreal widthShiftHalf =
+                totalRect.width() <= preferredSize.width() ? (preferredSize.width() - totalRect.width()) / 2. : 0.;
+        const qreal heightShiftHalf =
+                totalRect.height() <= preferredSize.height() ? (preferredSize.height() - totalRect.height()) / 2. : 0.;
+        if (!qFuzzyIsNull(widthShiftHalf) || !qFuzzyIsNull(heightShiftHalf)) {
+            totalRect.adjust(-widthShiftHalf, -heightShiftHalf, widthShiftHalf, heightShiftHalf);
+        }
+    }
+
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
@@ -378,9 +389,7 @@ void ChartViewModel::updateContentBounds()
     d->m_layoutInfo.m_chartItem->setZValue(-toplevelItemsCount);
     d->m_layoutInfo.m_chartItem->setBox(totalRect);
 
-    d->m_layoutInfo.m_perimeter =
-            d->m_layoutInfo.m_perimeter.united(d->m_layoutInfo.m_chartItem->boundingRect()).normalized();
-    d->m_scene.setSceneRect(d->m_layoutInfo.m_perimeter);
+    d->m_scene.setSceneRect(d->m_layoutInfo.m_chartItem->sceneBoundingRect());
 
     // polish events
     for (MscInstanceEvent *event : d->m_currentChart->instanceEvents()) {
@@ -840,6 +849,16 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
         clearScene();
         updateLayout();
     }
+}
+
+QSizeF ChartViewModel::preferredChartBoxSize() const
+{
+    return d->m_layoutInfo.m_preferredBox;
+}
+
+void ChartViewModel::setPreferredChartBoxSize(const QSizeF &size)
+{
+    d->m_layoutInfo.m_preferredBox = size;
 }
 
 } // namespace msc

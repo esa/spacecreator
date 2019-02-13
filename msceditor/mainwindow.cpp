@@ -45,10 +45,12 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QIcon>
 #include <QItemSelectionModel>
 #include <QKeySequence>
 #include <QMessageBox>
+#include <QScreen>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUndoGroup>
@@ -57,6 +59,12 @@
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
+QSizeF prepareDefaultSceneBoxSize()
+{
+    QSizeF desktopSize(QGuiApplication::primaryScreen()->availableSize());
+    desktopSize -= QSizeF(desktopSize.width() * 0.1, desktopSize.height() * 0.2);
+    return desktopSize;
+}
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
@@ -67,6 +75,7 @@ struct MainWindowPrivate {
                   "../../msceditor/examples"
 #endif // QT_DEBUG and Q_OS_WIN
                           )
+        , m_defaultSceneBox(prepareDefaultSceneBoxSize())
         , m_model(new MainModel(mainWindow))
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
@@ -85,6 +94,7 @@ struct MainWindowPrivate {
 
     Ui::MainWindow *ui = nullptr;
     QString m_currentFilePath;
+    const QSizeF m_defaultSceneBox;
 
     QComboBox *m_zoomBox = nullptr;
 
@@ -159,6 +169,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createNewDocument()
 {
+    d->m_model->chartViewModel().setPreferredChartBoxSize(d->m_defaultSceneBox);
     d->m_model->initialModel();
     d->ui->documentTreeView->expandAll();
     d->m_mscFileName.clear();
@@ -198,6 +209,8 @@ bool MainWindow::openFileMsc(const QString &file)
         d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
         return false;
     }
+
+    d->m_model->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
