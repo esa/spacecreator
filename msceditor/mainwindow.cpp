@@ -134,8 +134,6 @@ struct MainWindowPrivate {
     msc::EntityDeleteTool *m_deleteTool = nullptr;
 
     QMenu *m_hierarchyTypeMenu = nullptr;
-
-    QModelIndex m_modelIndex;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -421,6 +419,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
+    if (obj == nullptr) {
+        return;
+    }
     auto chart = dynamic_cast<msc::MscChart *>(obj);
 
     if (chart) {
@@ -714,12 +715,8 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
 
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelAboutToBeReset, this,
-            [this]() { d->m_modelIndex = d->ui->documentTreeView->currentIndex(); });
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this, [this]() {
-        d->ui->documentTreeView->expandAll();
-        d->ui->documentTreeView->setCurrentIndex(d->m_modelIndex);
-    });
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this,
+            [this]() { d->ui->documentTreeView->expandAll(); });
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)

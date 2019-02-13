@@ -52,7 +52,7 @@ void DocumentItemModel::setMscModel(msc::MscModel *model)
     beginResetModel();
     if (!m_mscModel.isNull()) {
         for (auto doc : m_mscModel->documents()) {
-            connectDocument(doc);
+            disconnectDocument(doc);
         }
         disconnect(m_mscModel, nullptr, this, nullptr);
     }
@@ -347,10 +347,8 @@ bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
-void DocumentItemModel::onNameChanged(const QString &name)
+void DocumentItemModel::onEntityDataChanged()
 {
-    Q_UNUSED(name);
-
     auto chart = qobject_cast<msc::MscChart *>(sender());
     if (chart) {
         QModelIndex idx = index(chart);
@@ -383,14 +381,10 @@ void DocumentItemModel::connectDocument(MscDocument *document)
             },
             Qt::UniqueConnection);
 
-    connect(document, &msc::MscDocument::hierarchyTypeChanged, this,
-            [&]() {
-                beginResetModel();
-                endResetModel();
-            },
+    connect(document, &msc::MscDocument::hierarchyTypeChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
             Qt::UniqueConnection);
 
-    connect(document, &msc::MscDocument::nameChanged, this, &msc::DocumentItemModel::onNameChanged,
+    connect(document, &msc::MscDocument::nameChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
             Qt::UniqueConnection);
 
     for (auto doc : document->documents()) {
@@ -398,7 +392,8 @@ void DocumentItemModel::connectDocument(MscDocument *document)
     }
 
     for (auto chart : document->charts()) {
-        connect(chart, &msc::MscChart::nameChanged, this, &msc::DocumentItemModel::onNameChanged, Qt::UniqueConnection);
+        connect(chart, &msc::MscChart::nameChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
+                Qt::UniqueConnection);
     }
 }
 

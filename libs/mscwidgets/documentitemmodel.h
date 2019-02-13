@@ -52,7 +52,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
 private Q_SLOTS:
-    void onNameChanged(const QString &name);
+    void onEntityDataChanged();
 
 private:
     void connectDocument(msc::MscDocument *document);
