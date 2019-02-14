@@ -320,15 +320,14 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
     switch (event->entityType()) {
     case MscEntity::EntityType::Message:
     case MscEntity::EntityType::Create: {
-        MessageItem *messageItem = dynamic_cast<MessageItem *>(item);
         MscMessage *message = static_cast<MscMessage *>(event);
+        MessageItem *messageItem = dynamic_cast<MessageItem *>(item);
+        Q_ASSERT(messageItem != nullptr);
+        messageItem->setPositionChangeIgnored(true);
 
         const bool relatedToDynamicInstance =
                 (message->sourceInstance() && message->sourceInstance()->explicitCreator())
                 || (message->targetInstance() && message->targetInstance()->explicitCreator());
-        if (relatedToDynamicInstance)
-            messageItem->setPositionChangeIgnored(true);
-
         const qreal deltaY = moveNewItem();
         if (!qFuzzyIsNull(deltaY) && relatedToDynamicInstance) {
             // After a message has been moved its connection (an arrow to an instance) is broken
@@ -342,8 +341,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
             }
         }
 
-        if (relatedToDynamicInstance)
-            messageItem->setPositionChangeIgnored(false);
+        messageItem->setPositionChangeIgnored(false);
 
         break;
     }
