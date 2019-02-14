@@ -45,12 +45,10 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QGuiApplication>
 #include <QIcon>
 #include <QItemSelectionModel>
 #include <QKeySequence>
 #include <QMessageBox>
-#include <QScreen>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUndoGroup>
@@ -59,12 +57,6 @@
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
-QSizeF prepareDefaultSceneBoxSize()
-{
-    QSizeF desktopSize(QGuiApplication::primaryScreen()->availableSize());
-    desktopSize -= QSizeF(desktopSize.width() * 0.1, desktopSize.height() * 0.2);
-    return desktopSize;
-}
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
@@ -75,7 +67,6 @@ struct MainWindowPrivate {
                   "../../msceditor/examples"
 #endif // QT_DEBUG and Q_OS_WIN
                           )
-        , m_defaultSceneBox(prepareDefaultSceneBoxSize())
         , m_model(new MainModel(mainWindow))
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
@@ -94,7 +85,6 @@ struct MainWindowPrivate {
 
     Ui::MainWindow *ui = nullptr;
     QString m_currentFilePath;
-    const QSizeF m_defaultSceneBox;
 
     QComboBox *m_zoomBox = nullptr;
 
@@ -167,7 +157,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createNewDocument()
 {
-    d->m_model->chartViewModel().setPreferredChartBoxSize(d->m_defaultSceneBox);
+    d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
     d->ui->documentTreeView->expandAll();
     d->m_mscFileName.clear();
@@ -782,4 +772,49 @@ void MainWindow::closeEvent(QCloseEvent *e)
 {
     saveSettings();
     QMainWindow::closeEvent(e);
+}
+
+void MainWindow::changeEvent(QEvent *e)
+{
+    QMainWindow::changeEvent(e);
+
+    if (e->type() == QEvent::ActivationChange) {
+
+        // In order to automatically create on startup a default doc with a ChartItem
+        // box sized accordingly to this->centralWidget(), we have to wait while
+        // processing of restoreState(...) & restoreGeometry(...) will be finished.
+        // The final geometry (which is stored in a QByteArray and not in a QRect)
+        // is applyed after QEvent::Show, so QEvent::Resize handler seems to be
+        // a proper entry point, but actually it's not:
+        // in case the saved window state is "normal", the resizeEvent(...) will
+        // be called once, but for "maximized" there would be one more call, and
+        // there is no easy way to detect without additional routines is it necessary
+        // to wait for the second call or not.
+        // That's why it's performed here and in such way.
+        // (But now I suspect writing those additional routines would take about
+        // same time as writing this comment did)
+
+        static bool isFirstCall(true);
+        if (isFirstCall) {
+            isFirstCall = false;
+            onGeometryRestored();
+        }
+    }
+}
+
+void MainWindow::onGeometryRestored()
+{
+    // A new document should be created only if no files were opened by command line args
+    if (d->m_mscFileName.isEmpty()) {
+        QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
+    }
+}
+
+QSizeF MainWindow::prepareChartBoxSize() const
+{
+    static constexpr qreal padding = 100.;
+    if (centralWidget()) {
+        return centralWidget()->geometry().size() - QSizeF(padding, padding);
+    }
+    return QSizeF();
 }

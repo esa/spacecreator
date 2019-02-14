@@ -101,6 +101,10 @@ private:
 
     void updateTitles();
     void clearUndoStacks();
+
+    void changeEvent(QEvent *event) override;
+    void onGeometryRestored();
+    QSizeF prepareChartBoxSize() const;
 };
 
 #endif // MAINWINDOW_H
