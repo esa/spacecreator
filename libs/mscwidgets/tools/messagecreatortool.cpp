@@ -18,12 +18,14 @@
 #include "messagecreatortool.h"
 
 #include "baseitems/arrowitem.h"
+#include "baseitems/common/objectanchor.h"
+#include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
-#include "messageitem.h"
 #include "mscchart.h"
 #include "mscmessage.h"
 
 #include <QDebug>
+#include <QMouseEvent>
 
 namespace msc {
 
@@ -45,37 +47,41 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage = new MscMessage(tr("Message"));
-    MessageItem *messageItem = m_model->createDefaultMessageItem(orphanMessage, scenePos());
+    MscMessage *orphanMessage = new MscMessage(tr("Drag to the target\n"));
+    m_messageItem = m_model->createDefaultMessageItem(orphanMessage, scenePos());
 
-    if (!messageItem) {
+    if (!m_messageItem) {
         delete orphanMessage;
         return;
     }
 
-    m_previewItem = messageItem;
-    m_previewEntity = messageItem->modelItem();
+    m_previewItem = m_messageItem;
+    m_previewEntity = m_messageItem->modelItem();
 
-    messageItem->setAutoResizable(false);
-    messageItem->performSnap();
+    m_messageItem->setAutoResizable(false);
 
     m_scene->addItem(m_previewItem);
-    m_previewItem->setOpacity(0.5);
+
+    m_view->setCursor(Qt::CrossCursor);
 }
 
 void MessageCreatorTool::commitPreviewItem()
 {
-    if (!m_previewEntity || !m_activeChart)
-        return;
+    // TODO: Currently the BaseCreatorTool::created signal is emitted only if
+    // a message has been added successfuly - it allows to keep the toolbar's
+    // item (this tool) active during a set of "create message" actions performed
+    // in a row on an empty (without instances) scene.
+    // While the result version is supposed to disalow adding messages to an empty
+    // scene, the way how an orphan message is processed should be discussed.
 
-    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
-    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart) };
-
+    if (m_previewEntity && m_activeChart) {
+        const QVariantList &cmdParams = prepareMessage();
+        if (!cmdParams.isEmpty()) {
+            msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+            Q_EMIT created(); // to deactivate toobar's item
+        }
+    }
     removePreviewItem();
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
-
-    Q_EMIT created();
 }
 
 void MessageCreatorTool::removePreviewItem()
@@ -97,4 +103,67 @@ void MessageCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
     BaseCreatorTool::onCurrentChartChagend(chart);
 }
 
+bool MessageCreatorTool::onMousePress(QMouseEvent *e)
+{
+    if (m_messageItem && m_currStep == Step::ChooseSource) {
+        m_messageItem->setTail(scenePos(e->globalPos()), ObjectAnchor::Snap::NoSnap);
+        m_currStep = Step::ChooseTarget;
+    }
+    return true;
+}
+
+bool MessageCreatorTool::onMouseRelease(QMouseEvent *e)
+{
+    if (m_currStep == Step::ChooseTarget) {
+        commitPreviewItem();
+        m_currStep = Step::ChooseSource;
+        createPreviewItem();
+
+        if (m_messageItem) {
+            const QPointF &scenePos = this->scenePos(e->globalPos());
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setPos(scenePos);
+        }
+    }
+
+    return true;
+}
+
+bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
+{
+    if (m_messageItem) {
+        const QPointF &scenePos = this->scenePos(e->globalPos());
+        switch (m_currStep) {
+        case Step::ChooseSource: {
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setPos(scenePos);
+            break;
+        }
+        case Step::ChooseTarget: {
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            break;
+        }
+        }
+    }
+
+    return true;
+}
+
+QVariantList MessageCreatorTool::prepareMessage()
+{
+    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
+
+    if (!message->sourceInstance() && !message->targetInstance()) {
+        if (m_activeChart && !m_activeChart->instances().isEmpty())
+            message->setSourceInstance(m_activeChart->instances().first());
+        else
+            return {};
+    }
+
+    message->setName(tr("Message"));
+
+    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::MscChart *>(m_activeChart) };
+}
 } // ns msc

@@ -62,6 +62,7 @@ protected:
     QString m_title = tr("Untitled");
     QString m_description = tr("Unimplemented tool");
     QPointer<QGraphicsObject> m_previewItem = nullptr;
+    QCursor m_srcCursor;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -77,6 +78,8 @@ protected:
 
     QPointF scenePos() const;
     QPointF scenePos(const QPoint &screenPos) const;
+
+    void restoreCursor();
 };
 
 } // ns msc

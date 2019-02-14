@@ -29,6 +29,7 @@ BaseTool::BaseTool(QGraphicsView *view, QObject *parent)
     : QObject(parent)
     , m_view(view)
     , m_scene(m_view ? m_view->scene() : nullptr)
+    , m_srcCursor(m_view ? m_view->cursor() : QCursor())
 {
 }
 
@@ -68,6 +69,7 @@ void BaseTool::setView(QGraphicsView *view)
 
     m_view = view;
     m_scene = m_view ? m_view->scene() : nullptr;
+    m_srcCursor = m_view ? m_view->cursor() : QCursor();
 
     if (wasActive)
         setActive(true);
@@ -78,8 +80,10 @@ void BaseTool::setActive(bool active)
     if (active == m_active)
         return;
 
-    if (m_active)
+    if (m_active) {
         removePreviewItem();
+        restoreCursor();
+    }
 
     m_active = active;
     if (m_view) {
@@ -113,8 +117,7 @@ bool BaseTool::onMouseRelease(QMouseEvent *e)
 bool BaseTool::onMouseMove(QMouseEvent *e)
 {
     if (m_view)
-        movePreviewItem(m_view->mapToScene(m_view->mapFromGlobal(e->globalPos())));
-
+        movePreviewItem(scenePos(e->globalPos()));
     return true;
 }
 
@@ -161,6 +164,12 @@ QPointF BaseTool::scenePos(const QPoint &globalPos) const
         sceneCoordinates = m_view->mapToScene(viewCoordinates);
     }
     return sceneCoordinates;
+}
+
+void BaseTool::restoreCursor()
+{
+    if (m_view)
+        m_view->setCursor(m_srcCursor);
 }
 
 } // ns msc

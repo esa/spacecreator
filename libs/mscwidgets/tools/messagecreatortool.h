@@ -18,6 +18,7 @@
 #pragma once
 
 #include "basecreatortool.h"
+#include "messageitem.h"
 
 namespace msc {
 
@@ -32,9 +33,24 @@ protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *) override;
 
 protected:
+    enum class Step
+    {
+        ChooseSource,
+        ChooseTarget,
+    };
+
+    Step m_currStep = Step::ChooseSource;
+
+    QPointer<MessageItem> m_messageItem = nullptr;
     void createPreviewItem() override;
     void commitPreviewItem() override;
     void removePreviewItem() override;
+
+    virtual bool onMousePress(QMouseEvent *e) override;
+    virtual bool onMouseRelease(QMouseEvent *e) override;
+    virtual bool onMouseMove(QMouseEvent *e) override;
+
+    QVariantList prepareMessage();
 };
 
 } // ns msc
