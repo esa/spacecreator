@@ -48,8 +48,6 @@ public:
     qreal axisHeight() const;
     QLineF axis() const;
 
-    QPainterPath shape() const override;
-
     void setBoundingRect(const QRectF &geometry);
 
     static InstanceItem *createDefaultItem(MscInstance *instance, const QPointF &pos);
