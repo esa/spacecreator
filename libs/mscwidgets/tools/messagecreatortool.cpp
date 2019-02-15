@@ -147,7 +147,11 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            QPointF head(scenePos);
+            if (e->modifiers() == Qt::ControlModifier) {
+                head.ry() = m_messageItem->tail().y();
+            }
+            m_messageItem->setHead(head, ObjectAnchor::Snap::NoSnap);
             break;
         }
         }
