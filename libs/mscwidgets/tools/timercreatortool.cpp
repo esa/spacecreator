@@ -34,9 +34,9 @@ TimerCreatorTool::TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, Q
     m_icon = QPixmap(":/icons/toolbar/starttimer.svg");
 }
 
-ToolType TimerCreatorTool::toolType() const
+BaseTool::ToolType TimerCreatorTool::toolType() const
 {
-    return ToolType::TimerCreator;
+    return BaseTool::ToolType::TimerCreator;
 }
 
 void TimerCreatorTool::setTimerType(MscTimer::TimerType type)

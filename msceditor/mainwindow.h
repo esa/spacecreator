@@ -70,7 +70,7 @@ private Q_SLOTS:
     void showHierarchyView(bool show);
     void showErrorView();
     bool openMscChain(const QString &dirPath);
-    void enableDefaultTool();
+    void activateDefaultTool();
     void updateTextView();
     void showHierarchyTypeMenu(const QPoint &point);
     void changHeierarchyType();
@@ -105,6 +105,9 @@ private:
     void changeEvent(QEvent *event) override;
     void onGeometryRestored();
     QSizeF prepareChartBoxSize() const;
+
+    void updateMscToolbarActionsEnablement();
+    void updateMscToolbarActionsChecked();
 };
 
 #endif // MAINWINDOW_H

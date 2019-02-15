@@ -258,7 +258,7 @@ bool MainWindow::openMscChain(const QString &dirPath)
     return true;
 }
 
-void MainWindow::enableDefaultTool()
+void MainWindow::activateDefaultTool()
 {
     Q_ASSERT(d->m_defaultToolAction);
     d->m_defaultToolAction->setChecked(true);
@@ -604,55 +604,59 @@ void MainWindow::initTools()
     d->m_tools.append(pointerTool);
 
     auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(instanceCreateTool, &msc::InstanceCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(instanceCreateTool, &msc::InstanceCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(instanceCreateTool);
 
     auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(messageCreateTool);
 
     auto messageCreateTool2 = new msc::MessageCreatorTool2(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(messageCreateTool2, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(messageCreateTool2, &msc::MessageCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(messageCreateTool2);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(actionCreateTool);
 
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(conditionCreateTool);
 
     auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
-    connect(startTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(startTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(startTimerCreateTool);
 
     auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
-    connect(stopTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(stopTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(stopTimerCreateTool);
 
     auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
-    connect(timeoutCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    connect(timeoutCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
     d->m_tools.append(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
+    toolsActions->setExclusive(false);
     for (msc::BaseTool *tool : d->m_tools) {
         QAction *toolAction = d->m_mscToolBar->addAction(tool->title());
         toolAction->setCheckable(true);
         toolAction->setIcon(tool->icon());
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
 
         toolsActions->addAction(toolAction);
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
+        connect(toolAction, &QAction::toggled, this, &MainWindow::updateMscToolbarActionsChecked);
     }
 
     d->m_defaultToolAction = toolsActions->actions().first();
-    enableDefaultTool();
+    d->m_defaultToolAction->setVisible(false);
+    activateDefaultTool();
 }
 
 void MainWindow::initMainToolbar()
@@ -700,6 +704,7 @@ void MainWindow::initConnections()
     connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
         d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
         d->ui->mscTextBrowser->updateView();
+        updateMscToolbarActionsEnablement();
     });
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
@@ -821,4 +826,45 @@ QSizeF MainWindow::prepareChartBoxSize() const
         return centralWidget()->geometry().size() - QSizeF(padding, padding);
     }
     return QSizeF();
+}
+
+void MainWindow::updateMscToolbarActionsEnablement()
+{
+    auto chart = d->m_model->chartViewModel().currentChart();
+    const bool hasInstance = chart && !chart->instances().isEmpty();
+
+    bool forceDefault(false);
+    for (QAction *act : d->m_mscToolBar->actions()) {
+        const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
+        switch (toolType) {
+        case msc::BaseTool::ToolType::ActionCreator:
+        case msc::BaseTool::ToolType::ConditionCreator:
+        case msc::BaseTool::ToolType::MessageCreator:
+        case msc::BaseTool::ToolType::EntityDeleter:
+        case msc::BaseTool::ToolType::TimerCreator: {
+            const bool changed = act->isEnabled() && !hasInstance;
+            forceDefault = forceDefault || changed;
+            act->setEnabled(hasInstance);
+            break;
+        }
+        case msc::BaseTool::ToolType::Pointer:
+        case msc::BaseTool::ToolType::InstanceCreator:
+        default: {
+            act->setEnabled(true);
+            break;
+        }
+        }
+    }
+
+    if (forceDefault)
+        activateDefaultTool();
+}
+
+void MainWindow::updateMscToolbarActionsChecked()
+{
+    if (QAction *senderAction = qobject_cast<QAction *>(sender()))
+        if (senderAction->isChecked())
+            for (QAction *action : d->m_mscToolBar->actions())
+                if (action != senderAction)
+                    action->setChecked(false);
 }

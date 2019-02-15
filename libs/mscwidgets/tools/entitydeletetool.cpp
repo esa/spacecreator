@@ -46,9 +46,9 @@ EntityDeleteTool::EntityDeleteTool(QGraphicsView *view, QObject *parent)
     updateEnabledState();
 }
 
-ToolType EntityDeleteTool::toolType() const
+BaseTool::ToolType EntityDeleteTool::toolType() const
 {
-    return ToolType::EntityDeleter;
+    return BaseTool::ToolType::EntityDeleter;
 }
 
 void EntityDeleteTool::setView(QGraphicsView *view)

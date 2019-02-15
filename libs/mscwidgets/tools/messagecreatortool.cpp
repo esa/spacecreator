@@ -36,9 +36,9 @@ MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *vie
     m_icon = QPixmap(":/icons/toolbar/message.png");
 }
 
-ToolType MessageCreatorTool::toolType() const
+BaseTool::ToolType MessageCreatorTool::toolType() const
 {
-    return msc::ToolType::MessageCreator;
+    return BaseTool::ToolType::MessageCreator;
 }
 
 void MessageCreatorTool::createPreviewItem()

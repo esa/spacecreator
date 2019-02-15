@@ -52,7 +52,6 @@ HEADERS += \
     tools/messagecreatortool.h \
     tools/pointertool.h \
     tools/timercreatortool.h \
-    tools/tooltypes.h \
     actionitem.h \
     chartitem.h \
     chartviewmodel.h \

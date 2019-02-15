@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "tooltypes.h"
-
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -39,7 +37,26 @@ public:
     BaseTool(QGraphicsView *view, QObject *parent = nullptr);
     ~BaseTool();
 
-    virtual ToolType toolType() const = 0;
+    enum class ToolType
+    {
+        Pointer = 0,
+        ActionCreator,
+        ConditionCreator,
+        InstanceCreator,
+        MessageCreator,
+        EntityDeleter,
+        TimerCreator,
+        HierarchyAndCreator,
+        HierarchyExceptionCreator,
+        HierarchyIsCreator,
+        HierarchyLeafCreator,
+        HierarchyOrCreator,
+        HierarchyParallelCreator,
+        HierarchyRepeatCreator
+    };
+    Q_ENUM(ToolType)
+
+    virtual BaseTool::ToolType toolType() const = 0;
 
     bool isActive() const;
 

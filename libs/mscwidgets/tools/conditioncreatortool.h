@@ -28,7 +28,7 @@ class ConditionCreatorTool : public BaseCreatorTool
 
 public:
     ConditionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
-    ToolType toolType() const override;
+    BaseTool::ToolType toolType() const override;
 
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *chart) override;

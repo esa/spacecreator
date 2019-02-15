@@ -34,9 +34,9 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
     m_icon = QPixmap(":/icons/toolbar/instance.png");
 }
 
-ToolType InstanceCreatorTool::toolType() const
+BaseTool::ToolType InstanceCreatorTool::toolType() const
 {
-    return msc::ToolType::InstanceCreator;
+    return BaseTool::ToolType::InstanceCreator;
 }
 
 void InstanceCreatorTool::createPreviewItem()

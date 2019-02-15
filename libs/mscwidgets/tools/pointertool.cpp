@@ -29,9 +29,9 @@ PointerTool::PointerTool(QGraphicsView *view, QObject *parent)
     m_icon = QPixmap(":/icons/toolbar/pointer.png");
 }
 
-ToolType PointerTool::toolType() const
+BaseTool::ToolType PointerTool::toolType() const
 {
-    return msc::ToolType::Pointer;
+    return BaseTool::ToolType::Pointer;
 }
 
 bool PointerTool::onMousePress(QMouseEvent *e)

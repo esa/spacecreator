@@ -19,14 +19,15 @@
 
 namespace msc {
 
-HierarchyCreatorTool::HierarchyCreatorTool(ToolType type, ChartViewModel *model, QGraphicsView *view, QObject *parent)
+HierarchyCreatorTool::HierarchyCreatorTool(BaseTool::ToolType type, ChartViewModel *model, QGraphicsView *view,
+                                           QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_toolType(type)
 {
     initTool();
 }
 
-ToolType HierarchyCreatorTool::toolType() const
+BaseTool::ToolType HierarchyCreatorTool::toolType() const
 {
     return m_toolType;
 }

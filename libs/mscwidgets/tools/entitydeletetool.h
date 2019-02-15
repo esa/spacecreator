@@ -31,7 +31,7 @@ class EntityDeleteTool : public BaseTool
 public:
     EntityDeleteTool(QGraphicsView *view, QObject *parent = nullptr);
 
-    ToolType toolType() const override;
+    BaseTool::ToolType toolType() const override;
     void setView(QGraphicsView *view) override;
 
     QAction *action() const;

@@ -28,7 +28,7 @@ class TimerCreatorTool : public BaseCreatorTool
     Q_OBJECT
 public:
     TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
-    ToolType toolType() const override;
+    BaseTool::ToolType toolType() const override;
 
     void setTimerType(MscTimer::TimerType type);
 
