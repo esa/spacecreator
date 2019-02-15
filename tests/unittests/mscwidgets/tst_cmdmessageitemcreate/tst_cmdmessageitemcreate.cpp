@@ -46,6 +46,7 @@ private Q_SLOTS:
     void testUndo();
     void testRedo();
     void testPerformance();
+    void testInsertingOrder();
 
 private:
     ChartViewModel m_chartModel;
@@ -83,7 +84,7 @@ void tst_CmdMessageItemCreate::testCreate()
     for (int i = 0; i < CommandsCount; ++i) {
         cmd::CommandsStack::push(
                 cmd::Id::CreateMessage,
-                { QVariant::fromValue<msc::MscMessage *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart) });
+                { QVariant::fromValue<msc::MscMessage *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -135,8 +136,8 @@ void tst_CmdMessageItemCreate::testPerformance()
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
             cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                     { QVariant::fromValue<QGraphicsScene *>(m_chartModel.graphicsScene()),
-                                       QVariant::fromValue<ChartViewModel *>(&m_chartModel), QPointF(i, 0) });
+                                     { QVariant::fromValue<msc::MscMessage *>(nullptr),
+                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
         }
 
         // undo:
@@ -158,6 +159,30 @@ void tst_CmdMessageItemCreate::testPerformance()
 int tst_CmdMessageItemCreate::itemsCount()
 {
     return m_chart->instanceEvents().size();
+}
+
+void tst_CmdMessageItemCreate::testInsertingOrder()
+{
+    static const QStringList names = { "A", "B", "C", "D" };
+
+    while (cmd::CommandsStack::current()->canUndo())
+        cmd::CommandsStack::current()->undo();
+    m_chartModel.clearScene();
+    cmd::CommandsStack::current()->clear();
+
+    QCOMPARE(itemsCount(), 0);
+
+    for (const QString &name : names) {
+        cmd::CommandsStack::push(cmd::Id::CreateMessage,
+                                 { QVariant::fromValue<msc::MscMessage *>(new msc::MscMessage(name)),
+                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends message
+    }
+
+    QCOMPARE(m_chart->instanceEvents().size(), names.size());
+
+    int i = names.size() - 1;
+    for (msc::MscInstanceEvent *event : m_chart->instanceEvents())
+        QCOMPARE(event->name(), names.at(i--));
 }
 
 QTEST_MAIN(tst_CmdMessageItemCreate)

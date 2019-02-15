@@ -80,9 +80,13 @@ void MessageCreatorTool::commitPreviewItem()
             msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
             Q_EMIT created(); // to deactivate toobar's item
+            removePreviewItem();
+            return;
         }
     }
+
     removePreviewItem();
+    delete m_previewEntity.data();
 }
 
 void MessageCreatorTool::removePreviewItem()
@@ -154,18 +158,22 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
 
 QVariantList MessageCreatorTool::prepareMessage()
 {
+    QVariantList args;
+
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
 
-    if (!message->sourceInstance() && !message->targetInstance()) {
+    if (!message->sourceInstance() && !message->targetInstance())
         if (m_activeChart && !m_activeChart->instances().isEmpty())
             message->setSourceInstance(m_activeChart->instances().first());
-        else
-            return {};
+
+    if (message->sourceInstance() || message->targetInstance()) {
+        message->setName(tr("Message"));
+        const int eventIndex = m_model->eventIndex(m_previewItem->y());
+        args = { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::MscChart *>(m_activeChart),
+                 eventIndex };
     }
 
-    message->setName(tr("Message"));
-
-    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::MscChart *>(m_activeChart) };
+    return args;
 }
 
 } // ns msc
