@@ -18,6 +18,7 @@
 
 #include "interactiveobject.h"
 
+#include "baseitems/textitem.h"
 #include "common/highlightrectitem.h"
 #include "grippointshandler.h"
 #include "mscentity.h"
@@ -26,6 +27,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPen>
+#include <functional>
 
 namespace msc {
 
@@ -246,6 +248,34 @@ void InteractiveObject::doRebuildLayout()
     rebuildLayout();
     m_layoutDirty = false;
     update();
+}
+
+/*!
+  \brief InteractiveObject::postCreatePolishing
+  Entry point for new (manually added) item fine customization - show configuration dialog.
+  Designed to be called from a class derived from BaseCreatorTool.
+  Default implementation tries to found a TextItem child. If found, current item
+  set to be the only selected item, input focus forced to its first text field
+  (to edit default name, etc).
+*/
+void InteractiveObject::postCreatePolishing()
+{
+    std::function<bool(QGraphicsItem *)> findTextItem;
+    findTextItem = [&](QGraphicsItem *where) {
+        for (QGraphicsItem *child : where->childItems()) {
+            if (TextItem *textItem = dynamic_cast<TextItem *>(child)) {
+                scene()->clearSelection();
+                setSelected(true);
+                textItem->enableEditMode();
+                return true;
+            } else if (findTextItem(child)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    findTextItem(this);
 }
 
 } // namespace msc

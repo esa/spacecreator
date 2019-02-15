@@ -70,6 +70,7 @@ void InstanceCreatorTool::commitPreviewItem()
 
     removePreviewItem(); // free the space to avoid overlapping
 
+    startWaitForModelLayoutComplete(instance);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 
     Q_EMIT created();

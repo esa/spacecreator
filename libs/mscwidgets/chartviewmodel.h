@@ -88,6 +88,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
+    void layoutComplete();
 
 private Q_SLOTS:
     void onInstanceItemMoved(InstanceItem *instanceItem);

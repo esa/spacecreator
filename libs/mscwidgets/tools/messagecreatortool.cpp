@@ -19,7 +19,6 @@
 
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/objectanchor.h"
-#include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "mscmessage.h"
@@ -77,7 +76,9 @@ void MessageCreatorTool::commitPreviewItem()
     if (m_previewEntity && m_activeChart) {
         const QVariantList &cmdParams = prepareMessage();
         if (!cmdParams.isEmpty()) {
+            startWaitForModelLayoutComplete(qobject_cast<msc::MscMessage *>(m_previewEntity));
             msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+
             Q_EMIT created(); // to deactivate toobar's item
         }
     }
@@ -166,4 +167,5 @@ QVariantList MessageCreatorTool::prepareMessage()
 
     return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::MscChart *>(m_activeChart) };
 }
+
 } // ns msc

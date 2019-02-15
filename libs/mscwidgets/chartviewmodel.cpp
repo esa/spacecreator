@@ -232,6 +232,8 @@ void ChartViewModel::relayout()
             item->setHighlightable(true);
 
     d->m_layoutDirty = false;
+
+    Q_EMIT layoutComplete();
 }
 
 void ChartViewModel::addInstanceItems()

@@ -81,6 +81,8 @@ void ConditionCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(condition);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
 
     Q_EMIT created();

@@ -82,6 +82,8 @@ void ActionCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(action);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
 
     Q_EMIT created();

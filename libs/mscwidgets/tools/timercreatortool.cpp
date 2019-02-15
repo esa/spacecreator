@@ -104,6 +104,8 @@ void TimerCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(timer);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
 
     Q_EMIT created();
