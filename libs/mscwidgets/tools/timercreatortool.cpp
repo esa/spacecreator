@@ -79,7 +79,7 @@ void TimerCreatorTool::createPreviewItem()
     auto orphantimer = new MscTimer(this);
     orphantimer->setName(tr("New_timer"));
     orphantimer->setTimerType(m_timerType);
-    auto timerItem = new TimerItem(orphantimer);
+    auto timerItem = new TimerItem(orphantimer, m_model);
 
     m_previewItem = timerItem;
     m_previewEntity = timerItem->modelItem();

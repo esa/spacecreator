@@ -744,7 +744,7 @@ TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
 
     TimerItem *item = itemForTimer(timer);
     if (!item) {
-        item = new TimerItem(timer);
+        item = new TimerItem(timer, this);
         connect(item, &TimerItem::moved, this, &ChartViewModel::onInstanceEventItemMoved, Qt::UniqueConnection);
 
         d->m_scene.addItem(item);

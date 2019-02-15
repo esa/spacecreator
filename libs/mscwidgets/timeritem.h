@@ -24,8 +24,11 @@
 #include <QPointer>
 #include <QRectF>
 
+class QGraphicsLineItem;
+
 namespace msc {
 
+class ChartViewModel;
 class InstanceItem;
 class MscTimer;
 class TextItem;
@@ -34,7 +37,7 @@ class TimerItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit TimerItem(msc::MscTimer *timer, QGraphicsItem *parent = nullptr);
+    explicit TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem *parent = nullptr);
 
     MscTimer *modelItem() const;
 
@@ -47,6 +50,8 @@ public Q_SLOTS:
     void setName(const QString &text);
 
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;
@@ -61,10 +66,13 @@ private:
     void drawStartSymbol(QPainter *painter, const QRectF &rect);
     void drawStopSymbol(QPainter *painter, const QRectF &rect);
     void drawTimeoutArrow(QPainter *painter, const QPointF &pt);
+    QRectF symbolBox() const;
 
     QPointer<msc::MscTimer> m_timer;
     QPointer<InstanceItem> m_instance;
+    QPointer<ChartViewModel> m_model;
     TextItem *m_textItem = nullptr;
+    QGraphicsLineItem *m_timerConnector = nullptr;
 };
 
 } // namespace msc
