@@ -70,7 +70,7 @@ public:
 
     MscMessage::MessageType messageType() const;
 
-    bool relatesTo(MscInstance *instance) const override;
+    bool relatesTo(const MscInstance *instance) const override;
 
     struct Flow {
         MscInstance *from = nullptr;
@@ -88,6 +88,7 @@ public:
     Flow m_descrIn, m_descrOut;
 
     bool isGlobal() const;
+    bool isOrphan() const;
 
 Q_SIGNALS:
     void sourceChanged(MscInstance *source);

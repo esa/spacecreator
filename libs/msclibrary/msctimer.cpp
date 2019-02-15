@@ -69,7 +69,7 @@ MscInstance *MscTimer::instance() const
     return m_instance;
 }
 
-bool MscTimer::relatesTo(MscInstance *instance) const
+bool MscTimer::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;
 }
@@ -105,5 +105,4 @@ MscTimer *MscTimer::followingTimer() const
 {
     return m_followingTimer;
 }
-
 }

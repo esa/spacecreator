@@ -111,7 +111,7 @@ MscEntity::EntityType MscGate::entityType() const
     return MscEntity::EntityType::Gate;
 }
 
-bool MscGate::relatesTo(MscInstance *instance) const
+bool MscGate::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;
 }

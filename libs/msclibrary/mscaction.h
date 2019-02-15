@@ -68,7 +68,7 @@ public:
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
 
-    bool relatesTo(MscInstance *instance) const override;
+    bool relatesTo(const MscInstance *instance) const override;
 
 Q_SIGNALS:
     void actionTypeChanged();
@@ -82,7 +82,6 @@ private:
     QVector<DataStatement> m_dataStatementList;
     MscInstance *m_instance = nullptr;
 };
-
 }
 
 #endif // MSCACTION_H

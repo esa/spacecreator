@@ -42,7 +42,7 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    bool relatesTo(MscInstance *instance) const override;
+    bool relatesTo(const MscInstance *instance) const override;
 
 Q_SIGNALS:
     void instanceChanged();

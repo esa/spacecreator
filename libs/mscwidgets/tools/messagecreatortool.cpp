@@ -166,12 +166,15 @@ QVariantList MessageCreatorTool::prepareMessage()
 
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
 
-    if (!message->sourceInstance() && !message->targetInstance())
+    if (message->isOrphan())
         if (m_activeChart && !m_activeChart->instances().isEmpty())
             message->setSourceInstance(m_activeChart->instances().first());
 
-    if (message->sourceInstance() || message->targetInstance()) {
+    if (!message->isOrphan()) {
         message->setName(tr("Message"));
+
+        if (message->sourceInstance() == message->targetInstance())
+            message->setTargetInstance(nullptr);
         const int eventIndex = m_model->eventIndex(m_previewItem->y());
         args = { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::MscChart *>(m_activeChart),
                  eventIndex };

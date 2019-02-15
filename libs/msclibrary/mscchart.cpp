@@ -128,7 +128,7 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
                 continue;
             case MscEntity::EntityType::Message: {
                 auto message = static_cast<MscMessage *>(instanceEvent);
-                if (message->sourceInstance() == instance || message->targetInstance() == instance)
+                if (message->relatesTo(instance))
                     events.append(instanceEvent);
                 break;
             }
@@ -362,7 +362,7 @@ void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance
     Q_ASSERT(message);
 
     bool changed = false;
-    if (message->sourceInstance() != newInstance && message->targetInstance() != newInstance) {
+    if (!message->relatesTo(newInstance)) {
         if (endType == msc::MscMessage::EndType::SOURCE_TAIL) {
             message->setSourceInstance(newInstance);
         } else {

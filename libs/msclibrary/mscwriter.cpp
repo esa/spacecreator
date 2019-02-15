@@ -157,7 +157,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
 
 QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
 {
-    if (message == nullptr || !(message->sourceInstance() == instance || message->targetInstance() == instance))
+    if (message == nullptr || !(message->relatesTo(instance)))
         return QString();
 
     const QString comment = serializeComment(message);

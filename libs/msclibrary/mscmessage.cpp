@@ -84,7 +84,7 @@ MscMessage::MessageType MscMessage::messageType() const
     return m_msgType;
 }
 
-bool MscMessage::relatesTo(MscInstance *instance) const
+bool MscMessage::relatesTo(const MscInstance *instance) const
 {
     return m_source == instance || m_target == instance;
 }
@@ -99,6 +99,15 @@ bool MscMessage::isGlobal() const
     const bool onlySource = m_source && !m_target;
     const bool onlyTarget = !m_source && m_target;
     return isRegular && (onlySource || onlyTarget);
+}
+
+/*!
+   \brief MscMessage::isOrphan
+   \return true if the message is not connected to any instance
+ */
+bool MscMessage::isOrphan() const
+{
+    return !(m_source || m_target);
 }
 
 } // namespace msc

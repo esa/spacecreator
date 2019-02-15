@@ -42,7 +42,7 @@ public:
     void setType(Type type);
     Type type() const { return m_type; }
 
-    bool relatesTo(MscInstance *instance) const override;
+    bool relatesTo(const MscInstance *instance) const override;
 
 Q_SIGNALS:
     void typeChanged();
@@ -50,7 +50,6 @@ Q_SIGNALS:
 private:
     Type m_type;
 };
-
 }
 
 #endif // MSCCOREGION_H

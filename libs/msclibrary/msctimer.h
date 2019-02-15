@@ -53,7 +53,7 @@ public:
     void setInstance(msc::MscInstance *instance);
     msc::MscInstance *instance() const;
 
-    bool relatesTo(MscInstance *instance) const override;
+    bool relatesTo(const MscInstance *instance) const override;
 
     void setPrecedingTimer(MscTimer *timer);
     MscTimer *precedingTimer() const;
@@ -73,7 +73,6 @@ private:
     QPointer<MscTimer> m_precedingTimer;
     QPointer<MscTimer> m_followingTimer;
 };
-
 }
 
 #endif // MSCTIMER_H

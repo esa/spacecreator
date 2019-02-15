@@ -43,10 +43,9 @@ void MscCoregion::setType(MscCoregion::Type type)
     Q_EMIT dataChanged();
 }
 
-bool MscCoregion::relatesTo(MscInstance *instance) const
+bool MscCoregion::relatesTo(const MscInstance *instance) const
 {
     Q_UNUSED(instance);
     return false;
 }
-
 }
