@@ -31,7 +31,7 @@ namespace msc {
 MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
 {
-    m_title = tr("Message");
+    m_title = tr("Message (Drag)");
     m_description = tr("Create new Message item");
     m_icon = QPixmap(":/icons/toolbar/message.png");
 }
@@ -178,6 +178,72 @@ QVariantList MessageCreatorTool::prepareMessage()
     }
 
     return args;
+}
+
+MessageCreatorTool2::MessageCreatorTool2(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : MessageCreatorTool(model, view, parent)
+{
+    m_title = tr("Message (Click)");
+}
+
+void MessageCreatorTool2::createPreviewItem()
+{
+    MessageCreatorTool::createPreviewItem();
+    if (m_messageItem)
+        m_messageItem->setName(tr("Click to choose points"));
+}
+
+bool MessageCreatorTool2::onMousePress(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return true;
+}
+
+bool MessageCreatorTool2::onMouseRelease(QMouseEvent *e)
+{
+    switch (m_currStep) {
+    case Step::ChooseSource: {
+        m_messageItem->setTail(scenePos(e->globalPos()), ObjectAnchor::Snap::NoSnap);
+        m_currStep = Step::ChooseTarget;
+        break;
+    }
+    case Step::ChooseTarget: {
+        commitPreviewItem();
+        m_currStep = Step::ChooseSource;
+        createPreviewItem();
+
+        if (m_messageItem) {
+            const QPointF &scenePos = this->scenePos(e->globalPos());
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setPos(scenePos);
+        }
+        break;
+    }
+    }
+
+    return true;
+}
+
+bool MessageCreatorTool2::onMouseMove(QMouseEvent *e)
+{
+    if (m_messageItem) {
+        const QPointF &scenePos = this->scenePos(e->globalPos());
+        switch (m_currStep) {
+        case Step::ChooseSource: {
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setPos(scenePos);
+            break;
+        }
+        case Step::ChooseTarget: {
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            break;
+        }
+        }
+    }
+
+    return true;
 }
 
 } // ns msc

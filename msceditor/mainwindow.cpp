@@ -611,6 +611,10 @@ void MainWindow::initTools()
     connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
     d->m_tools.append(messageCreateTool);
 
+    auto messageCreateTool2 = new msc::MessageCreatorTool2(&(d->m_model->chartViewModel()), nullptr, this);
+    connect(messageCreateTool2, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
+    d->m_tools.append(messageCreateTool2);
+
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::enableDefaultTool);
     d->m_tools.append(actionCreateTool);

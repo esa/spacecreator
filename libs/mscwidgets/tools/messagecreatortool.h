@@ -53,4 +53,18 @@ protected:
     QVariantList prepareMessage();
 };
 
+class MessageCreatorTool2 : public MessageCreatorTool
+{
+    Q_OBJECT
+public:
+    MessageCreatorTool2(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+
+protected:
+    void createPreviewItem();
+
+    virtual bool onMousePress(QMouseEvent *e) override;
+    virtual bool onMouseRelease(QMouseEvent *e) override;
+    virtual bool onMouseMove(QMouseEvent *e) override;
+};
+
 } // ns msc
