@@ -51,6 +51,8 @@ protected:
     virtual bool onMouseMove(QMouseEvent *e) override;
 
     QVariantList prepareMessage();
+
+    void movePreviewItemTo(const QPointF &newScenePos);
 };
 
 class MessageCreatorTool2 : public MessageCreatorTool
@@ -60,7 +62,7 @@ public:
     MessageCreatorTool2(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
 
 protected:
-    void createPreviewItem();
+    void createPreviewItem() override;
 
     virtual bool onMousePress(QMouseEvent *e) override;
     virtual bool onMouseRelease(QMouseEvent *e) override;

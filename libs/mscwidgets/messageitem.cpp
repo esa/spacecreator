@@ -202,11 +202,14 @@ void MessageItem::rebuildLayout()
         pntFrom = extendToNearestEdge(pntTo);
     }
 
-    const QPointF &linkCenterInScene =
-            m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
-    setPositionChangeIgnored(true);
-    setPos(linkCenterInScene);
-    setPositionChangeIgnored(false);
+    const bool bothAreNulls = pntFrom.isNull() && pntTo.isNull();
+    if (!bothAreNulls) {
+        const QPointF &linkCenterInScene =
+                m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+        setPositionChangeIgnored(true);
+        setPos(linkCenterInScene);
+        setPositionChangeIgnored(false);
+    }
 
     commitGeometryChange();
 }

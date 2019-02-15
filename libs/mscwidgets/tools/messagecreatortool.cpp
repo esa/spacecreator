@@ -34,6 +34,7 @@ MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *vie
     m_title = tr("Message (Drag)");
     m_description = tr("Create new Message item");
     m_icon = QPixmap(":/icons/toolbar/message.png");
+    m_cursor = QCursor(Qt::CrossCursor);
 }
 
 BaseTool::ToolType MessageCreatorTool::toolType() const
@@ -48,6 +49,8 @@ void MessageCreatorTool::createPreviewItem()
 
     MscMessage *orphanMessage = new MscMessage(tr("Drag to the target\n"));
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, scenePos());
+
+    movePreviewItemTo(scenePos());
 
     if (!m_messageItem) {
         delete orphanMessage;
@@ -126,9 +129,7 @@ bool MessageCreatorTool::onMouseRelease(QMouseEvent *e)
 
         if (m_messageItem) {
             const QPointF &scenePos = this->scenePos(e->globalPos());
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setPos(scenePos);
+            movePreviewItemTo(scenePos);
         }
     }
 
@@ -141,9 +142,7 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
         const QPointF &scenePos = this->scenePos(e->globalPos());
         switch (m_currStep) {
         case Step::ChooseSource: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setPos(scenePos);
+            movePreviewItemTo(scenePos);
             break;
         }
         case Step::ChooseTarget: {
@@ -166,10 +165,6 @@ QVariantList MessageCreatorTool::prepareMessage()
 
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
 
-    if (message->isOrphan())
-        if (m_activeChart && !m_activeChart->instances().isEmpty())
-            message->setSourceInstance(m_activeChart->instances().first());
-
     if (!message->isOrphan()) {
         message->setName(tr("Message"));
 
@@ -181,6 +176,13 @@ QVariantList MessageCreatorTool::prepareMessage()
     }
 
     return args;
+}
+
+void MessageCreatorTool::movePreviewItemTo(const QPointF &newScenePos)
+{
+    m_messageItem->setHead(newScenePos, ObjectAnchor::Snap::NoSnap);
+    m_messageItem->setTail(newScenePos, ObjectAnchor::Snap::NoSnap);
+    m_messageItem->setPos(newScenePos);
 }
 
 MessageCreatorTool2::MessageCreatorTool2(ChartViewModel *model, QGraphicsView *view, QObject *parent)
@@ -217,9 +219,7 @@ bool MessageCreatorTool2::onMouseRelease(QMouseEvent *e)
 
         if (m_messageItem) {
             const QPointF &scenePos = this->scenePos(e->globalPos());
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setPos(scenePos);
+            movePreviewItemTo(scenePos);
         }
         break;
     }
@@ -234,9 +234,7 @@ bool MessageCreatorTool2::onMouseMove(QMouseEvent *e)
         const QPointF &scenePos = this->scenePos(e->globalPos());
         switch (m_currStep) {
         case Step::ChooseSource: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
-            m_messageItem->setPos(scenePos);
+            movePreviewItemTo(scenePos);
             break;
         }
         case Step::ChooseTarget: {
