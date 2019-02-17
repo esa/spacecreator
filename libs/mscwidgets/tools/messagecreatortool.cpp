@@ -63,8 +63,6 @@ void MessageCreatorTool::createPreviewItem()
     m_messageItem->setAutoResizable(false);
 
     m_scene->addItem(m_previewItem);
-
-    m_view->setCursor(Qt::CrossCursor);
 }
 
 void MessageCreatorTool::commitPreviewItem()
@@ -195,7 +193,7 @@ void MessageCreatorTool2::createPreviewItem()
 {
     MessageCreatorTool::createPreviewItem();
     if (m_messageItem)
-        m_messageItem->setName(tr("Click to choose points"));
+        m_messageItem->setName(tr("Click to choose points\n"));
 }
 
 bool MessageCreatorTool2::onMousePress(QMouseEvent *e)
@@ -238,7 +236,12 @@ bool MessageCreatorTool2::onMouseMove(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            QPointF head(scenePos);
+            if (e->modifiers() == Qt::ControlModifier) {
+                head.ry() = m_messageItem->tail().y();
+            }
+
+            m_messageItem->setHead(head, ObjectAnchor::Snap::NoSnap);
             break;
         }
         }

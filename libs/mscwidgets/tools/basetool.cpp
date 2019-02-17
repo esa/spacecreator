@@ -88,7 +88,7 @@ void BaseTool::setActive(bool active)
         if (m_active) {
             m_view->viewport()->installEventFilter(this);
             createPreviewItem();
-            m_view->setCursor(m_cursor);
+            m_view->viewport()->setCursor(m_cursor);
         } else {
             m_view->viewport()->removeEventFilter(this);
         }
