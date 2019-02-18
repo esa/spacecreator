@@ -245,9 +245,9 @@ void ChartViewModel::addInstanceItems()
             connect(item, &InstanceItem::moved, this, &ChartViewModel::onInstanceItemMoved, Qt::UniqueConnection);
             d->m_scene.addItem(item);
             d->m_instanceItems.append(item);
-            item->setX(d->m_layoutInfo.m_pos.x());
         }
 
+        item->setX(d->m_layoutInfo.m_pos.x());
         item->setHighlightable(false);
         item->setKind(instance->kind());
 
@@ -859,6 +859,28 @@ QSizeF ChartViewModel::preferredChartBoxSize() const
 void ChartViewModel::setPreferredChartBoxSize(const QSizeF &size)
 {
     d->m_layoutInfo.m_preferredBox = size;
+}
+
+int ChartViewModel::instanceOrderFromPos(const QPointF &scenePos)
+{
+    if (d->m_instanceItems.isEmpty())
+        return -1;
+
+    QMap<qreal, QPair<QLineF, InstanceItem *>> instanceByDistance;
+    for (InstanceItem *instanceItem : d->m_instanceItems) {
+        const QRectF &currInstanceRect = instanceItem->sceneBoundingRect();
+        const QLineF line(currInstanceRect.center(), scenePos);
+        instanceByDistance.insert(line.length(), qMakePair(line, instanceItem));
+    }
+
+    const QPair<QLineF, InstanceItem *> &nearestPair = instanceByDistance.first();
+
+    const QLineF distance = nearestPair.first;
+    const int existentId = currentChart()->instances().indexOf(nearestPair.second->modelItem());
+    if (-1 == existentId)
+        return -1; // otherwise it could be prepended
+
+    return existentId + (distance.dx() <= 0. ? 0 : 1);
 }
 
 } // namespace msc

@@ -23,10 +23,11 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemCreate::CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart)
+CmdInstanceItemCreate::CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart, int orderId)
     : BaseCommand(instance)
     , m_instance(instance)
     , m_chart(chart)
+    , m_instanceOrderNum(orderId)
 {
     Q_ASSERT(m_chart.data());
 
@@ -43,7 +44,7 @@ void CmdInstanceItemCreate::redo()
     }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstance(m_instance);
+    m_chart->addInstance(m_instance, m_instanceOrderNum);
 }
 
 void CmdInstanceItemCreate::undo()

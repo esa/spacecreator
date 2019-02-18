@@ -65,8 +65,9 @@ void InstanceCreatorTool::commitPreviewItem()
         return;
 
     auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity);
+    const int pos = m_model->instanceOrderFromPos(scenePos());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart) };
+                                      QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
 
     removePreviewItem(); // free the space to avoid overlapping
 

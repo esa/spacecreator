@@ -78,6 +78,8 @@ public:
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);
 
+    int instanceOrderFromPos(const QPointF &scenePos);
+
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
