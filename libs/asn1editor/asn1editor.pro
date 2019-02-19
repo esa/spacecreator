@@ -5,6 +5,7 @@ include(../../esa.pri)
 include(../../suppress_antlr_wrn.pri)
 
 CONFIG += static
+CONFIG += no_keywords
 
 QT += core gui widgets xml
 
@@ -20,7 +21,8 @@ HEADERS += \
     asn1xmlparser.h \
     asn1valueparser.h \
     asn1itemmodel.h \
-    asn1const.h
+    asn1const.h \
+    asn1parservisitor.h
 
 SOURCES += \
     parser/ASNBaseVisitor.cpp \
@@ -33,7 +35,8 @@ SOURCES += \
     asn1treeview.cpp \
     asn1xmlparser.cpp \
     asn1valueparser.cpp \
-    asn1itemmodel.cpp
+    asn1itemmodel.cpp \
+    asn1parservisitor.cpp
 
 FORMS += asn1editor.ui
 

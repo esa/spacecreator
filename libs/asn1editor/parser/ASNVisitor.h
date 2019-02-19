@@ -229,6 +229,8 @@ public:
 
     virtual antlrcpp::Any visitIntegerValue(ASNParser::IntegerValueContext *context) = 0;
 
+    virtual antlrcpp::Any visitRealValue(ASNParser::RealValueContext *context) = 0;
+
     virtual antlrcpp::Any visitChoiceValue(ASNParser::ChoiceValueContext *context) = 0;
 
     virtual antlrcpp::Any visitEnumeratedValue(ASNParser::EnumeratedValueContext *context) = 0;
@@ -265,6 +267,8 @@ public:
 
     virtual antlrcpp::Any visitNamedNumber(ASNParser::NamedNumberContext *context) = 0;
 
+    virtual antlrcpp::Any visitNamedRealNumber(ASNParser::NamedRealNumberContext *context) = 0;
+
     virtual antlrcpp::Any visitDefinedValue(ASNParser::DefinedValueContext *context) = 0;
 
     virtual antlrcpp::Any visitParameterizedValue(ASNParser::ParameterizedValueContext *context) = 0;
@@ -283,7 +287,13 @@ public:
 
     virtual antlrcpp::Any visitIntegerType(ASNParser::IntegerTypeContext *context) = 0;
 
+    virtual antlrcpp::Any visitRealType(ASNParser::RealTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitBooleanType(ASNParser::BooleanTypeContext *context) = 0;
+
     virtual antlrcpp::Any visitNamedNumberList(ASNParser::NamedNumberListContext *context) = 0;
+
+    virtual antlrcpp::Any visitNamedRealNumberList(ASNParser::NamedRealNumberListContext *context) = 0;
 
     virtual antlrcpp::Any visitObjectidentifiertype(ASNParser::ObjectidentifiertypeContext *context) = 0;
 

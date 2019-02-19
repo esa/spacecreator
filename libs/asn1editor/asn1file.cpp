@@ -15,22 +15,22 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QFileInfo>
-#include <QObject>
-//#include <antlr4-runtime.h>
-#include <fstream>
-
 #include "asn1file.h"
 
 #include "asn1itemmodel.h"
-
-#include "parser/ASNLexer.h"
+#include "asn1parservisitor.h"
 #include "parser/ASNBaseVisitor.h"
+#include "parser/ASNLexer.h"
 #include "parser/ASNParser.h"
+
+#include <QFileInfo>
+//#include <QObject>
+//#include <antlr4-runtime.h>
+//#include <fstream>
 
 using namespace antlr4;
 
-namespace msc {
+namespace asn1 {
 
 Asn1File::Asn1File() {}
 
@@ -56,34 +56,34 @@ Asn1ItemModel *Asn1File::parseText(const QString &text, QStringList *errorMessag
     return parse(input, errorMessages);
 }
 
-Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessages)
+Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList * /*errorMessages*/)
 {
     //    MscErrorListener errorListener;
 
     ASNLexer lexer(&input);
     //    lexer.addErrorListener(&errorListener);
 
-    CommonTokenStream tokens(dynamic_cast<TokenSource*>(&lexer));
+    CommonTokenStream tokens(&lexer);
     tokens.fill();
 
-//    ASNParser parser(&tokens);
+    ASNParser parser(&tokens);
     //    parser.addErrorListener(&errorListener);
 
-    //    MscParserVisitor visitor(&tokens);
-    //    visitor.visit(parser.file());
+    Asn1ParserVisitor visitor; //(&tokens);
+    visitor.visitModuleDefinition(parser.moduleDefinition());
 
     //    if (errorMessages != nullptr) {
     //        *errorMessages = errorListener.getErrorMessages();
     //    }
 
-    //    if (lexer.getNumberOfSyntaxErrors() > 0) {
-    //        throw QObject::tr("Lexer syntax error");
-    //    }
-//    if (parser.getNumberOfSyntaxErrors() > 0) {
-//        throw QObject::tr("Parser syntax error");
-//    }
+    if (lexer.getNumberOfSyntaxErrors() > 0) {
+        throw QObject::tr("Lexer syntax error");
+    }
+    if (parser.getNumberOfSyntaxErrors() > 0) {
+        throw QObject::tr("Parser syntax error");
+    }
 
     return nullptr; // visitor.detachModel();
 }
 
-} // namespace msc
+} // namespace asn1

@@ -435,6 +435,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitRealValue(ASNParser::RealValueContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitChoiceValue(ASNParser::ChoiceValueContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -507,6 +511,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitNamedRealNumber(ASNParser::NamedRealNumberContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitDefinedValue(ASNParser::DefinedValueContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -543,7 +551,19 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitRealType(ASNParser::RealTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitBooleanType(ASNParser::BooleanTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitNamedNumberList(ASNParser::NamedNumberListContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitNamedRealNumberList(ASNParser::NamedRealNumberListContext *ctx) override {
     return visitChildren(ctx);
   }
 

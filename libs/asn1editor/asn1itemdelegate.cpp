@@ -129,11 +129,11 @@ void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
     model->setData(index, value);
 
     if (asnType == "sequenceOf")
-        emit const_cast<Asn1ItemDelegate *>(this)->sequenceOfSizeChanged(index.sibling(index.row(), 0), value,
+        Q_EMIT const_cast<Asn1ItemDelegate *>(this)->sequenceOfSizeChanged(index.sibling(index.row(), 0), value,
                                                                          index.data(MAX_RANGE));
 
     if (asnType == "choice")
-        emit const_cast<Asn1ItemDelegate *>(this)->choiceFieldChanged(
+        Q_EMIT const_cast<Asn1ItemDelegate *>(this)->choiceFieldChanged(
                 index.sibling(index.row(), 0), index.data(CHOICE_LIST).toList().size(),
                 qobject_cast<QComboBox *>(editor)->currentIndex());
 }

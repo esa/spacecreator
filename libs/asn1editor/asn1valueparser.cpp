@@ -287,7 +287,7 @@ int Asn1ValueParser::nextIndex(const QString &value) const
 
 void Asn1ValueParser::emitError(const QString &error) const
 {
-    emit const_cast<Asn1ValueParser *>(this)->parseError(error);
+    Q_EMIT const_cast<Asn1ValueParser *>(this)->parseError(error);
 }
 
 } // namespace asn1
