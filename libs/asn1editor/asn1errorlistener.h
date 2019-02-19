@@ -15,33 +15,28 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef ASN1FILE_H
-#define ASN1ILE_H
+#ifndef ASN1ERRORLISTENER_H
+#define ASN1ERRORLISTENER_H
 
-#include <QString>
+#include "BaseErrorListener.h"
 
-namespace antlr4 {
-class ANTLRInputStream;
-}
+#include <QStringList>
 
 namespace asn1 {
 
-class Asn1ItemModel;
-
-class Asn1File
+class Asn1ErrorListener : public antlr4::BaseErrorListener
 {
 public:
-    Asn1File();
-
-    Asn1ItemModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
-    Asn1ItemModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
-
     QStringList getErrorMessages() const;
 
 private:
-    Asn1ItemModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
+    virtual void syntaxError(antlr4::Recognizer *recognizer, antlr4::Token *offendingSymbol, size_t line,
+                             size_t charPositionInLine, const std::string &msg, std::exception_ptr e) override;
+
+private:
+    QStringList m_errorMessages;
 };
 
 } // namespace asn1
 
-#endif // ASN1FILE_H
+#endif // ASN1ERRORLISTENER_H

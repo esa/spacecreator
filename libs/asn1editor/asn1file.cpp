@@ -17,6 +17,7 @@
 
 #include "asn1file.h"
 
+#include "asn1errorlistener.h"
 #include "asn1itemmodel.h"
 #include "asn1parservisitor.h"
 #include "parser/ASNBaseVisitor.h"
@@ -56,25 +57,25 @@ Asn1ItemModel *Asn1File::parseText(const QString &text, QStringList *errorMessag
     return parse(input, errorMessages);
 }
 
-Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList * /*errorMessages*/)
+Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
-    //    MscErrorListener errorListener;
+    Asn1ErrorListener errorListener;
 
     ASNLexer lexer(&input);
-    //    lexer.addErrorListener(&errorListener);
+    lexer.addErrorListener(&errorListener);
 
     CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     ASNParser parser(&tokens);
-    //    parser.addErrorListener(&errorListener);
+    parser.addErrorListener(&errorListener);
 
     Asn1ParserVisitor visitor; //(&tokens);
     visitor.visitModuleDefinition(parser.moduleDefinition());
 
-    //    if (errorMessages != nullptr) {
-    //        *errorMessages = errorListener.getErrorMessages();
-    //    }
+    if (errorMessages != nullptr) {
+        *errorMessages = errorListener.getErrorMessages();
+    }
 
     if (lexer.getNumberOfSyntaxErrors() > 0) {
         throw QObject::tr("Lexer syntax error");

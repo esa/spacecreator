@@ -38,7 +38,7 @@ public:
     CHARACTER_LITERAL = 90, CONSTRAINED_LITERAL = 91, BY_LITERAL = 92, A_ROND_DOT = 93, 
     ENCODED_LITERAL = 94, COMMENT = 95, UNRESTRICTEDCHARACTERSTRINGTYPE = 96, 
     EXTENSTIONENDMARKER = 97, NUMBER = 98, WS = 99, LINE_COMMENT = 100, 
-    BSTRING = 101, HSTRING = 102, CSTRING = 103, IDENTIFIER = 104, Exponent = 105
+    BSTRING = 101, HSTRING = 102, CSTRING = 103, IDENTIFIER = 104
   };
 
   enum {
@@ -1799,7 +1799,7 @@ public:
     SignedNumberContext *signedNumber();
     antlr4::tree::TerminalNode *DOT();
     antlr4::tree::TerminalNode *NUMBER();
-    antlr4::tree::TerminalNode *Exponent();
+    antlr4::tree::TerminalNode *IDENTIFIER();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    

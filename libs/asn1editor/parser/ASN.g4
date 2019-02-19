@@ -414,7 +414,7 @@ objIdComponents  :
 integerValue :  signedNumber | IDENTIFIER
 ;
 
-realValue : signedNumber DOT (NUMBER) | IDENTIFIER
+realValue : signedNumber (DOT NUMBER)? | IDENTIFIER
 ;
 
 choiceValue  :    IDENTIFIER COLON value
@@ -1006,5 +1006,5 @@ JavaIDDigit
 //	: UPPER (UPPER | LOWER | '-')
 //	;
 IDENTIFIER
-    :   LETTER (LETTER|JavaIDDigit)*
+    :   ('a'..'z'|'A'..'Z') (LETTER|JavaIDDigit)*
     ;
