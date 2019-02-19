@@ -59,6 +59,15 @@ antlrcpp::Any Asn1ParserVisitor::visitConstraint(ASNParser::ConstraintContext *c
     return visitChildren(context);
 }
 
+antlrcpp::Any Asn1ParserVisitor::visitSubtypeElements(ASNParser::SubtypeElementsContext *context)
+{
+    if (context) {
+        qDebug() << "visitSubtypeElements: " << QString::fromStdString(context->getText()) << context->value().size();
+    }
+
+    return visitChildren(context);
+}
+
 antlrcpp::Any Asn1ParserVisitor::visitSequenceType(ASNParser::SequenceTypeContext *context)
 {
     if (context) {

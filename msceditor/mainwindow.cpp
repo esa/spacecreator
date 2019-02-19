@@ -327,17 +327,21 @@ void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
 bool MainWindow::openFileAsn(const QString &file)
 {
     asn1::Asn1File f;
+    QStringList errorMessages;
 
     try {
-        f.parseFile(file);
+        f.parseFile(file, &errorMessages);
     } catch (...) {
         // print error message
-        return false;
+    }
+
+    if (errorMessages.size()) {
+        showErrorView();
+
+        d->ui->errorTextEdit->appendHtml(errorMessages.join("\n"));
     }
 
     return true;
-    //    QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
-    //    return false;
 }
 
 void MainWindow::saveMsc()

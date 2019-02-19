@@ -22,7 +22,8 @@ HEADERS += \
     asn1valueparser.h \
     asn1itemmodel.h \
     asn1const.h \
-    asn1parservisitor.h
+    asn1parservisitor.h \
+    asn1errorlistener.h
 
 SOURCES += \
     parser/ASNBaseVisitor.cpp \
@@ -36,7 +37,8 @@ SOURCES += \
     asn1xmlparser.cpp \
     asn1valueparser.cpp \
     asn1itemmodel.cpp \
-    asn1parservisitor.cpp
+    asn1parservisitor.cpp \
+    asn1errorlistener.cpp
 
 FORMS += asn1editor.ui
 

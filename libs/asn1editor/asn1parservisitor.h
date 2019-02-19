@@ -32,6 +32,7 @@ public:
     antlrcpp::Any visitReferencedType(ASNParser::ReferencedTypeContext *context) override;
 
     antlrcpp::Any visitConstraint(ASNParser::ConstraintContext *context) override;
+    antlrcpp::Any visitSubtypeElements(ASNParser::SubtypeElementsContext *context) override;
 
     antlrcpp::Any visitSequenceType(ASNParser::SequenceTypeContext *context) override;
     antlrcpp::Any visitComponentType(ASNParser::ComponentTypeContext *context) override;
