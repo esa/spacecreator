@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 
 #include "asn1editor.h"
+#include "asn1file.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
@@ -318,8 +319,18 @@ void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
 
 bool MainWindow::openFileAsn(const QString &file)
 {
-    QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
-    return false;
+    asn1::Asn1File f;
+
+    try {
+        f.parseFile(file);
+    } catch (...) {
+        // print error message
+        return false;
+    }
+
+    return true;
+    //    QMessageBox::information(this, "Not implemented yet", QString("Opening the ASN file:\n%1").arg(file));
+    //    return false;
 }
 
 void MainWindow::saveMsc()

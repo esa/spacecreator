@@ -316,6 +316,8 @@ builtinType :
  | choiceType
  | enumeratedType
  | integerType
+ | realType
+ | booleanType
  | sequenceType
  | sequenceOfType
  | setType
@@ -393,6 +395,7 @@ builtinValue :
     |	choiceValue
     |	objectIdentifierValue
     |	booleanValue
+    |   realValue
     |   CSTRING
  ;
 
@@ -409,6 +412,9 @@ objIdComponents  :
 
 
 integerValue :  signedNumber | IDENTIFIER
+;
+
+realValue : signedNumber DOT (NUMBER) | IDENTIFIER
 ;
 
 choiceValue  :    IDENTIFIER COLON value
@@ -448,8 +454,12 @@ enumeration : enumerationItem ( COMMA enumerationItem)*
 ;
 enumerationItem : IDENTIFIER | namedNumber | value
 ;
-namedNumber :   IDENTIFIER L_PARAN (signedNumber | definedValue) R_PARAN
+namedNumber : IDENTIFIER L_PARAN (signedNumber | definedValue) R_PARAN
 ;
+
+namedRealNumber : IDENTIFIER L_PARAN (realValue | definedValue) R_PARAN
+;
+
 definedValue :
  // externalValueReference
  //| valuereference
@@ -474,8 +484,17 @@ additionalEnumeration : enumeration
 ;
 integerType:INTEGER_LITERAL  (L_BRACE namedNumberList R_BRACE)?
 ;
+realType:REAL_LITERAL  (L_BRACE namedRealNumberList R_BRACE)?
+;
+booleanType:BOOLEAN_LITERAL
+;
+
 namedNumberList : (namedNumber) (COMMA namedNumber)*
 ;
+
+namedRealNumberList: (namedRealNumber) (COMMA namedRealNumber)*
+;
+
 objectidentifiertype  :  OBJECT_LITERAL IDENTIFIER_LITERAL
 ;
 componentRelationConstraint : L_BRACE (IDENTIFIER (DOT IDENTIFIER)?) R_BRACE

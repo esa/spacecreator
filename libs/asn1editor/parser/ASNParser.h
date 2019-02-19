@@ -38,7 +38,7 @@ public:
     CHARACTER_LITERAL = 90, CONSTRAINED_LITERAL = 91, BY_LITERAL = 92, A_ROND_DOT = 93, 
     ENCODED_LITERAL = 94, COMMENT = 95, UNRESTRICTEDCHARACTERSTRINGTYPE = 96, 
     EXTENSTIONENDMARKER = 97, NUMBER = 98, WS = 99, LINE_COMMENT = 100, 
-    BSTRING = 101, HSTRING = 102, CSTRING = 103, IDENTIFIER = 104
+    BSTRING = 101, HSTRING = 102, CSTRING = 103, IDENTIFIER = 104, Exponent = 105
   };
 
   enum {
@@ -75,20 +75,22 @@ public:
     RuleTableConstraint = 95, RuleSimpleTableConstraint = 96, RuleContentsConstraint = 97, 
     RuleSubtypeConstraint = 98, RuleValue = 99, RuleBuiltinValue = 100, 
     RuleObjectIdentifierValue = 101, RuleObjIdComponentsList = 102, RuleObjIdComponents = 103, 
-    RuleIntegerValue = 104, RuleChoiceValue = 105, RuleEnumeratedValue = 106, 
-    RuleSignedNumber = 107, RuleChoiceType = 108, RuleAlternativeTypeLists = 109, 
-    RuleExtensionAdditionAlternatives = 110, RuleExtensionAdditionAlternativesList = 111, 
-    RuleExtensionAdditionAlternative = 112, RuleExtensionAdditionAlternativesGroup = 113, 
-    RuleRootAlternativeTypeList = 114, RuleAlternativeTypeList = 115, RuleNamedType = 116, 
-    RuleEnumeratedType = 117, RuleEnumerations = 118, RuleRootEnumeration = 119, 
-    RuleEnumeration = 120, RuleEnumerationItem = 121, RuleNamedNumber = 122, 
-    RuleDefinedValue = 123, RuleParameterizedValue = 124, RuleSimpleDefinedValue = 125, 
-    RuleActualParameterList = 126, RuleActualParameter = 127, RuleExceptionSpec = 128, 
-    RuleExceptionIdentification = 129, RuleAdditionalEnumeration = 130, 
-    RuleIntegerType = 131, RuleNamedNumberList = 132, RuleObjectidentifiertype = 133, 
-    RuleComponentRelationConstraint = 134, RuleAtNotation = 135, RuleLevel = 136, 
-    RuleComponentIdList = 137, RuleOctetStringType = 138, RuleBitStringType = 139, 
-    RuleNamedBitList = 140, RuleNamedBit = 141, RuleBooleanValue = 142
+    RuleIntegerValue = 104, RuleRealValue = 105, RuleChoiceValue = 106, 
+    RuleEnumeratedValue = 107, RuleSignedNumber = 108, RuleChoiceType = 109, 
+    RuleAlternativeTypeLists = 110, RuleExtensionAdditionAlternatives = 111, 
+    RuleExtensionAdditionAlternativesList = 112, RuleExtensionAdditionAlternative = 113, 
+    RuleExtensionAdditionAlternativesGroup = 114, RuleRootAlternativeTypeList = 115, 
+    RuleAlternativeTypeList = 116, RuleNamedType = 117, RuleEnumeratedType = 118, 
+    RuleEnumerations = 119, RuleRootEnumeration = 120, RuleEnumeration = 121, 
+    RuleEnumerationItem = 122, RuleNamedNumber = 123, RuleNamedRealNumber = 124, 
+    RuleDefinedValue = 125, RuleParameterizedValue = 126, RuleSimpleDefinedValue = 127, 
+    RuleActualParameterList = 128, RuleActualParameter = 129, RuleExceptionSpec = 130, 
+    RuleExceptionIdentification = 131, RuleAdditionalEnumeration = 132, 
+    RuleIntegerType = 133, RuleRealType = 134, RuleBooleanType = 135, RuleNamedNumberList = 136, 
+    RuleNamedRealNumberList = 137, RuleObjectidentifiertype = 138, RuleComponentRelationConstraint = 139, 
+    RuleAtNotation = 140, RuleLevel = 141, RuleComponentIdList = 142, RuleOctetStringType = 143, 
+    RuleBitStringType = 144, RuleNamedBitList = 145, RuleNamedBit = 146, 
+    RuleBooleanValue = 147
   };
 
   ASNParser(antlr4::TokenStream *input);
@@ -206,6 +208,7 @@ public:
   class ObjIdComponentsListContext;
   class ObjIdComponentsContext;
   class IntegerValueContext;
+  class RealValueContext;
   class ChoiceValueContext;
   class EnumeratedValueContext;
   class SignedNumberContext;
@@ -224,6 +227,7 @@ public:
   class EnumerationContext;
   class EnumerationItemContext;
   class NamedNumberContext;
+  class NamedRealNumberContext;
   class DefinedValueContext;
   class ParameterizedValueContext;
   class SimpleDefinedValueContext;
@@ -233,7 +237,10 @@ public:
   class ExceptionIdentificationContext;
   class AdditionalEnumerationContext;
   class IntegerTypeContext;
+  class RealTypeContext;
+  class BooleanTypeContext;
   class NamedNumberListContext;
+  class NamedRealNumberListContext;
   class ObjectidentifiertypeContext;
   class ComponentRelationConstraintContext;
   class AtNotationContext;
@@ -1479,6 +1486,8 @@ public:
     ChoiceTypeContext *choiceType();
     EnumeratedTypeContext *enumeratedType();
     IntegerTypeContext *integerType();
+    RealTypeContext *realType();
+    BooleanTypeContext *booleanType();
     SequenceTypeContext *sequenceType();
     SequenceOfTypeContext *sequenceOfType();
     SetTypeContext *setType();
@@ -1718,6 +1727,7 @@ public:
     ChoiceValueContext *choiceValue();
     ObjectIdentifierValueContext *objectIdentifierValue();
     BooleanValueContext *booleanValue();
+    RealValueContext *realValue();
     antlr4::tree::TerminalNode *CSTRING();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -1781,6 +1791,21 @@ public:
   };
 
   IntegerValueContext* integerValue();
+
+  class  RealValueContext : public antlr4::ParserRuleContext {
+  public:
+    RealValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    SignedNumberContext *signedNumber();
+    antlr4::tree::TerminalNode *DOT();
+    antlr4::tree::TerminalNode *NUMBER();
+    antlr4::tree::TerminalNode *Exponent();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  RealValueContext* realValue();
 
   class  ChoiceValueContext : public antlr4::ParserRuleContext {
   public:
@@ -2037,6 +2062,22 @@ public:
 
   NamedNumberContext* namedNumber();
 
+  class  NamedRealNumberContext : public antlr4::ParserRuleContext {
+  public:
+    NamedRealNumberContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *L_PARAN();
+    antlr4::tree::TerminalNode *R_PARAN();
+    RealValueContext *realValue();
+    DefinedValueContext *definedValue();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  NamedRealNumberContext* namedRealNumber();
+
   class  DefinedValueContext : public antlr4::ParserRuleContext {
   public:
     DefinedValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -2162,6 +2203,33 @@ public:
 
   IntegerTypeContext* integerType();
 
+  class  RealTypeContext : public antlr4::ParserRuleContext {
+  public:
+    RealTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *REAL_LITERAL();
+    antlr4::tree::TerminalNode *L_BRACE();
+    NamedRealNumberListContext *namedRealNumberList();
+    antlr4::tree::TerminalNode *R_BRACE();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  RealTypeContext* realType();
+
+  class  BooleanTypeContext : public antlr4::ParserRuleContext {
+  public:
+    BooleanTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *BOOLEAN_LITERAL();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  BooleanTypeContext* booleanType();
+
   class  NamedNumberListContext : public antlr4::ParserRuleContext {
   public:
     NamedNumberListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -2176,6 +2244,21 @@ public:
   };
 
   NamedNumberListContext* namedNumberList();
+
+  class  NamedRealNumberListContext : public antlr4::ParserRuleContext {
+  public:
+    NamedRealNumberListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<NamedRealNumberContext *> namedRealNumber();
+    NamedRealNumberContext* namedRealNumber(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  NamedRealNumberListContext* namedRealNumberList();
 
   class  ObjectidentifiertypeContext : public antlr4::ParserRuleContext {
   public:

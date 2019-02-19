@@ -24,7 +24,7 @@ namespace antlr4 {
 class ANTLRInputStream;
 }
 
-namespace msc {
+namespace asn1 {
 class Asn1ItemModel;
 
 class Asn1File
@@ -41,6 +41,6 @@ private:
     Asn1ItemModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
 };
 
-} // namespace msc
+} // namespace asn1
 
 #endif // ASN1FILE_H
