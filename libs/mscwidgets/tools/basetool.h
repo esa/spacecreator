@@ -90,11 +90,11 @@ protected:
     virtual void createPreviewItem() = 0;
     virtual void commitPreviewItem() = 0;
 
-    virtual void movePreviewItem(const QPointF &scenePos);
+    virtual void movePreviewItem(const QPointF &cursorInScene);
     virtual void removePreviewItem();
 
-    QPointF scenePos() const;
-    QPointF scenePos(const QPoint &screenPos) const;
+    QPointF cursorInScene() const;
+    QPointF cursorInScene(const QPoint &screenPos) const;
 };
 
 } // ns msc

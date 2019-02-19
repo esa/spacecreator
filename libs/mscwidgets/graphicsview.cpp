@@ -58,6 +58,16 @@ void GraphicsView::setZoom(double percent)
     scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
 }
 
+void GraphicsView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier) {
+        Q_EMIT createMessageToolRequested();
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     const QPoint &screenPos(event->pos());

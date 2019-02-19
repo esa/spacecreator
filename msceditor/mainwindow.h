@@ -75,6 +75,7 @@ private Q_SLOTS:
     void showHierarchyTypeMenu(const QPoint &point);
     void changHeierarchyType();
     void updateTreeViewItem(const msc::MscDocument *document);
+    void onCreateMessageToolRequested();
 
 private:
     std::unique_ptr<MainWindowPrivate> const d;

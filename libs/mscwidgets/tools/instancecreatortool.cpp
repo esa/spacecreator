@@ -45,7 +45,7 @@ void InstanceCreatorTool::createPreviewItem()
         return;
 
     MscInstance *orphaninstance = new MscInstance(tr("Instance"));
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, scenePos());
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, cursorInScene());
 
     if (!instanceItem) {
         delete orphaninstance;
@@ -65,7 +65,7 @@ void InstanceCreatorTool::commitPreviewItem()
         return;
 
     auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity);
-    const int pos = m_model->instanceOrderFromPos(scenePos());
+    const int pos = m_model->instanceOrderFromPos(cursorInScene());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
 

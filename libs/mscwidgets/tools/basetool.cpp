@@ -116,7 +116,7 @@ bool BaseTool::onMouseRelease(QMouseEvent *e)
 bool BaseTool::onMouseMove(QMouseEvent *e)
 {
     if (m_view)
-        movePreviewItem(scenePos(e->globalPos()));
+        movePreviewItem(cursorInScene(e->globalPos()));
     return true;
 }
 
@@ -150,12 +150,12 @@ void BaseTool::movePreviewItem(const QPointF &scenePos)
 
 void BaseTool::removePreviewItem() {}
 
-QPointF BaseTool::scenePos() const
+QPointF BaseTool::cursorInScene() const
 {
-    return scenePos(QCursor::pos()); // TODO: add current screen detection
+    return cursorInScene(QCursor::pos()); // TODO: add current screen detection
 }
 
-QPointF BaseTool::scenePos(const QPoint &globalPos) const
+QPointF BaseTool::cursorInScene(const QPoint &globalPos) const
 {
     QPointF sceneCoordinates;
     if (m_view) {

@@ -22,6 +22,7 @@
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
+#include "graphicsview.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -119,7 +120,7 @@ struct MainWindowPrivate {
 
     QAction *m_actAsnEditor = nullptr;
 
-    QVector<msc::BaseTool *> m_tools;
+    QMultiMap<msc::BaseTool::ToolType, msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
 
@@ -598,45 +599,44 @@ void MainWindow::initMenuHelp()
     d->m_actAboutQt = d->m_menuHelp->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
+void MainWindow::onCreateMessageToolRequested()
+{
+    if (msc::MessageCreatorTool *tool =
+                qobject_cast<msc::MessageCreatorTool *>(d->m_tools.value(msc::BaseTool::ToolType::MessageCreator))) {
+        tool->activate();
+    }
+}
+
 void MainWindow::initTools()
 {
+    auto registerTool = [&](msc::BaseTool *tool) { d->m_tools.insert(tool->toolType(), tool); };
+
     auto pointerTool = new msc::PointerTool(nullptr, this);
-    d->m_tools.append(pointerTool);
+    registerTool(pointerTool);
 
     auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(instanceCreateTool, &msc::InstanceCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(instanceCreateTool);
+    registerTool(instanceCreateTool);
 
     auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(messageCreateTool);
-
-    auto messageCreateTool2 = new msc::MessageCreatorTool2(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(messageCreateTool2, &msc::MessageCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(messageCreateTool2);
+    registerTool(messageCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(actionCreateTool);
+    registerTool(actionCreateTool);
 
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(conditionCreateTool);
+    registerTool(conditionCreateTool);
 
     auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
-    connect(startTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(startTimerCreateTool);
+    registerTool(startTimerCreateTool);
 
     auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
-    connect(stopTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(stopTimerCreateTool);
+    registerTool(stopTimerCreateTool);
 
     auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
-    connect(timeoutCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::activateDefaultTool);
-    d->m_tools.append(timeoutCreateTool);
+    registerTool(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
     toolsActions->setExclusive(false);
@@ -648,6 +648,9 @@ void MainWindow::initTools()
         toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
+        connect(qobject_cast<msc::BaseCreatorTool *>(tool), &msc::InstanceCreatorTool::created, this,
+                &MainWindow::activateDefaultTool);
+        connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
 
         toolsActions->addAction(toolAction);
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
@@ -700,6 +703,9 @@ void MainWindow::initConnections()
                                                  .arg(item.x())
                                                  .arg(item.y()));
             });
+
+    connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
+            &MainWindow::onCreateMessageToolRequested);
 
     connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
         d->ui->mscTextBrowser->setModel(d->m_model->mscModel());

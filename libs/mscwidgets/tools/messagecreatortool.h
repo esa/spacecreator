@@ -29,6 +29,8 @@ public:
     MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
     virtual BaseTool::ToolType toolType() const override;
 
+    void activate();
+
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *) override;
 
@@ -38,10 +40,18 @@ protected:
         ChooseSource,
         ChooseTarget,
     };
-
     Step m_currStep = Step::ChooseSource;
 
+    enum class InteractionMode
+    {
+        None,
+        Drag,
+        Click
+    };
+    InteractionMode m_currMode = InteractionMode::None;
+
     QPointer<MessageItem> m_messageItem = nullptr;
+    QPointF m_mouseDown;
     void createPreviewItem() override;
     void commitPreviewItem() override;
     void removePreviewItem() override;
@@ -53,20 +63,14 @@ protected:
     QVariantList prepareMessage();
 
     void movePreviewItemTo(const QPointF &newScenePos);
-};
 
-class MessageCreatorTool2 : public MessageCreatorTool
-{
-    Q_OBJECT
-public:
-    MessageCreatorTool2(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    void processMousePressDrag(QMouseEvent *e);
+    void processMouseReleaseDrag(QMouseEvent *e);
+    void processMouseMoveDrag(QMouseEvent *e);
 
-protected:
-    void createPreviewItem() override;
-
-    virtual bool onMousePress(QMouseEvent *e) override;
-    virtual bool onMouseRelease(QMouseEvent *e) override;
-    virtual bool onMouseMove(QMouseEvent *e) override;
+    void processMousePressClick(QMouseEvent *e);
+    void processMouseReleaseClick(QMouseEvent *e);
+    void processMouseMoveClick(QMouseEvent *e);
 };
 
 } // ns msc
