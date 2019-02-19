@@ -60,6 +60,7 @@ private Q_SLOTS:
     void onNameEdited(const QString &name);
     void rebuildLayout() override;
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void onInstanceMoved(const QPointF &from, const QPointF &to);
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;

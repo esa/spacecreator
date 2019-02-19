@@ -647,10 +647,11 @@ void MainWindow::initTools()
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
+
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
-        connect(qobject_cast<msc::BaseCreatorTool *>(tool), &msc::InstanceCreatorTool::created, this,
-                &MainWindow::activateDefaultTool);
         connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
+        if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool))
+            connect(creatorTool, &msc::InstanceCreatorTool::created, this, &MainWindow::activateDefaultTool);
 
         toolsActions->addAction(toolAction);
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
