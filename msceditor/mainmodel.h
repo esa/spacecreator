@@ -75,7 +75,7 @@ private Q_SLOTS:
 
 private:
     msc::MscChart *firstChart() const;
-    msc::MscChart *firstChart(const QVector<msc::MscDocument *> docs) const;
+    msc::MscChart *firstChart(const QVector<msc::MscDocument *> &docs) const;
     void clearMscModel();
     void setNewModel(msc::MscModel *model);
 

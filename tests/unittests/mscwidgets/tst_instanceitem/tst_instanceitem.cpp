@@ -15,13 +15,48 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "chartviewmodel.h"
+#include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "instanceitem.h"
+#include "mscchart.h"
+#include "mscdocument.h"
+#include "mscfile.h"
 #include "mscinstance.h"
+#include "mscmodel.h"
 
+#include <QGraphicsView>
+#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
+
+namespace mouse {
+
+void syntheticPress(QWidget *widget, const QPoint &point)
+{
+    QMouseEvent event(QEvent::MouseButtonPress, point, widget->mapToGlobal(point), Qt::LeftButton, Qt::LeftButton,
+                      Qt::NoModifier);
+    QApplication::sendEvent(widget, &event);
+    QApplication::processEvents();
+}
+
+void syntheticMove(QWidget *widget, const QPoint &point, Qt::MouseButton button)
+{
+    QMouseEvent event(QEvent::MouseMove, point, button, button, Qt::NoModifier);
+    QApplication::sendEvent(widget, &event);
+    QApplication::processEvents();
+}
+
+void syntheticRelease(QWidget *widget, const QPoint &point)
+{
+    QMouseEvent event(QEvent::MouseButtonRelease, point, widget->mapToGlobal(point), Qt::LeftButton, Qt::NoButton,
+                      Qt::NoModifier);
+    QApplication::sendEvent(widget, &event);
+    QApplication::processEvents();
+}
+
+} // ns mouse
 
 class tst_InstanceItem : public QObject
 {
@@ -32,6 +67,7 @@ private Q_SLOTS:
     void cleanup();
     void testNameUpdate();
     void testKindUpdate();
+    void testMoveByHead();
 
 private:
     MscInstance *m_instance = nullptr;
@@ -66,6 +102,65 @@ void tst_InstanceItem::testKindUpdate()
 
     m_instance->setKind("kindda");
     QCOMPARE(m_instanceItem->kind(), QString("kindda"));
+}
+
+void tst_InstanceItem::testMoveByHead()
+{
+    static constexpr bool isLocalBuild = false;
+    static constexpr int iterationsCount = 100;
+    static constexpr int headVerticalOffsetPixels = 30;
+
+    static const QString msc("MSCDOCUMENT doc1; \
+                             MSC msc1; \
+                                 INSTANCE A; \
+                                 ENDINSTANCE; \
+                                 INSTANCE B; \
+                                 ENDINSTANCE; \
+                             ENDMSC; \
+                         ENDMSCDOCUMENT;");
+
+    QScopedPointer<ChartViewModel> m_chartModel(new ChartViewModel());
+    QScopedPointer<MscFile> file(new MscFile);
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<QGraphicsView> m_view(new QGraphicsView());
+    m_view->setScene(m_chartModel->graphicsScene());
+
+    m_chartModel->fillView(model->documents().first()->charts().first());
+
+    cmd::CommandsStack::setCurrent(new QUndoStack(this));
+
+    // This could be usefull during local development,
+    // but fails the test in CI environment:
+    if (isLocalBuild)
+        m_view->show();
+
+    auto getHead = [&](InstanceItem *instance) {
+        const QRectF &r = instance->sceneBoundingRect();
+        return m_view->mapFromScene({ r.center().x(), r.top() + headVerticalOffsetPixels });
+    };
+
+    for (int i = 0; i < iterationsCount; ++i) {
+        MscInstance *instanceA = m_chartModel->currentChart()->instances().first();
+        MscInstance *instanceB = m_chartModel->currentChart()->instances().last();
+
+        InstanceItem *itemA = m_chartModel->itemForInstance(instanceA);
+        InstanceItem *itemB = m_chartModel->itemForInstance(instanceB);
+
+        const QPoint &rightHead = getHead(itemB);
+        const QPoint &destination = getHead(itemA);
+
+        mouse::syntheticMove(m_view.data()->viewport(), rightHead, Qt::NoButton);
+
+        mouse::syntheticPress(m_view.data()->viewport(), rightHead);
+        mouse::syntheticMove(m_view.data()->viewport(), destination, Qt::LeftButton);
+        mouse::syntheticRelease(m_view.data()->viewport(), destination);
+
+        // Now instances should be in reversed order
+        // and no crash, ofcourse - see https://git.vikingsoftware.com/esa/msceditor/issues/134
+        // (crash when moving an instance item by head to the leftmost position).
+        QCOMPARE(instanceA, m_chartModel->currentChart()->instances().last());
+        QCOMPARE(instanceB, m_chartModel->currentChart()->instances().first());
+    }
 }
 
 QTEST_MAIN(tst_InstanceItem)

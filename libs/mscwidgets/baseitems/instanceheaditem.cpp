@@ -215,11 +215,12 @@ void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
-    if (m_manualMovementFrom != m_manualMovementTo) {
-        emit manualMoveFinished();
-    }
 
+    const bool posDiffers = m_manualMovementFrom != m_manualMovementTo;
     m_manualMovementFrom = m_manualMovementTo = QPointF();
+
+    if (posDiffers)
+        Q_EMIT manualMoveFinished();
 }
 
 void InstanceHeadItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
