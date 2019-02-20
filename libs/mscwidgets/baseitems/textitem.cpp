@@ -216,6 +216,7 @@ void TextItem::focusOutEvent(QFocusEvent *event)
 
 void TextItem::keyPressEvent(QKeyEvent *event)
 {
+
     if (isEditable() && hasFocus()) {
         switch (event->key()) {
         case Qt::Key_Escape: {
@@ -233,8 +234,13 @@ void TextItem::keyPressEvent(QKeyEvent *event)
         }
         }
 
+        QGraphicsTextItem::keyPressEvent(event);
+
+        setTextWidth(idealWidth());
         adjustSize();
+
         emit keyPressed();
+        return;
     }
 
     QGraphicsTextItem::keyPressEvent(event);

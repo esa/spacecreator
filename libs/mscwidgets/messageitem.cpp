@@ -47,6 +47,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
+    connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
@@ -54,6 +55,17 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
     m_arrowItem->setDashed(isCreator());
+}
+
+void MessageItem::onTextChanged()
+{
+    rebuildLayout();
+    commitGeometryChange();
+
+    if (m_gripPoints)
+        m_gripPoints->updateLayout();
+
+    update();
 }
 
 MscMessage *MessageItem::modelItem() const

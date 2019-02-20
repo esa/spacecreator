@@ -72,6 +72,9 @@ public Q_SLOTS:
     void setName(const QString &name);
     void setPositionChangeIgnored(bool ignored);
 
+private Q_SLOTS:
+    void onTextChanged();
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
