@@ -19,6 +19,7 @@
 
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/objectanchor.h"
+#include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "mscmessage.h"
@@ -47,7 +48,8 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage = new MscMessage(tr("Message\n"));
+    MscMessage *orphanMessage =
+            new MscMessage(tr("Message\n")); // "\n" mades the title be not overlapped by mouse cursor
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());
 
     movePreviewItemTo(cursorInScene());
@@ -161,7 +163,6 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
             const QPointF &scenePos = cursorInScene(e->globalPos());
             movePreviewItemTo(scenePos);
         }
-
         break;
     }
     case InteractionMode::Drag: {
@@ -184,6 +185,7 @@ void MessageCreatorTool::processMousePressDrag(QMouseEvent *e)
         m_currStep = Step::ChooseTarget;
     }
 }
+
 void MessageCreatorTool::processMouseReleaseDrag(QMouseEvent *e)
 {
     if (m_currStep == Step::ChooseTarget) {
@@ -197,6 +199,7 @@ void MessageCreatorTool::processMouseReleaseDrag(QMouseEvent *e)
         }
     }
 }
+
 void MessageCreatorTool::processMouseMoveDrag(QMouseEvent *e)
 {
     if (m_messageItem) {
@@ -268,25 +271,46 @@ QVariantList MessageCreatorTool::prepareMessage()
     // onMouseRelease: current(210,75) m_mouseDown(210,76)
     //
     // While technicaly it's a drag, mostprobably it was not the user's intent to
-    // create such a short arrow - discard it silently.
+    // create such a short arrow.
+    // That's a reason for arrow geometry validation - it should intersect the geometry of
+    // source or target instance, otherwise message would be discarded silently.
     //
     // Same for "async" messages (which currently are not supported) detection -
-    // message discarded in case an arrow's dy > 15 pixels.
-    //
-    // TODO: discuss is it necessery to show some notification or not.
-    auto validateArrow = [this]() {
-        const QLineF arrow(m_view->mapFromScene(m_messageItem->tail()), m_view->mapFromScene(m_messageItem->head()));
+    // message discarded in case an arrow's delta y > 15 pixels.
 
-        static constexpr qreal lenghtTolerancePixels = 5.;
-        const qreal dy = qAbs(arrow.dy());
-        const bool isLongEnough = qAbs(arrow.dx()) >= lenghtTolerancePixels || dy >= lenghtTolerancePixels;
-        if (!isLongEnough) {
-            qWarning() << "Message too short, discarded.";
+    auto arrowLine = [&]() {
+        if (m_view && m_messageItem)
+            return QLineF(m_messageItem->tail(), m_messageItem->head());
+        return QLineF();
+    };
+
+    auto instanceItemRect = [&](MscInstance *instance) {
+        if (instance)
+            if (InstanceItem *item = m_model->itemForInstance(instance)) {
+                return item->sceneBoundingRect();
+            }
+        return QRectF();
+    };
+
+    auto ensureIntersected = [&](const QLineF &arrow, MscInstance *instance) {
+        const QRectF r = instanceItemRect(instance);
+        if (!r.isNull() && !utils::intersects(r, arrow))
+            return false;
+        return true;
+    };
+
+    auto validateArrow = [&](MscMessage *message) {
+        const QLineF &arrow = arrowLine();
+
+        const bool exceedsInstanceWidth = ensureIntersected(arrow, message->sourceInstance())
+                && ensureIntersected(arrow, message->targetInstance());
+        if (!exceedsInstanceWidth) {
+            qWarning() << "Message intersects neither source nor target instance bounds, discarded.";
             return false;
         }
 
         static constexpr qreal horizontalityTolerancePixels = 15.;
-        const bool isHorizontal = dy <= horizontalityTolerancePixels;
+        const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
         if (!isHorizontal) {
             qWarning() << "Async messages are not supported yet, discarded.";
             return false;
@@ -297,10 +321,12 @@ QVariantList MessageCreatorTool::prepareMessage()
     QVariantList args;
 
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
-    if (validateArrow()) {
+    if (validateArrow(message)) {
         if (!message->isOrphan()) {
             if (message->sourceInstance() == message->targetInstance())
                 message->setTargetInstance(nullptr);
+
+            message->setName(tr("Message")); // rm the trailing new line sign
 
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
             args = { QVariant::fromValue<msc::MscMessage *>(message),

@@ -19,6 +19,7 @@
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
 
+#include <QDebug>
 #include <QPropertyAnimation>
 #include <QtGlobal>
 
@@ -124,6 +125,26 @@ bool removeSceneItem(QGraphicsItem *item)
     scene->removeItem(item);
     scene->setItemIndexMethod(original);
     return true;
+}
+
+bool intersects(const QRectF &rect, const QLineF &line)
+{
+    if (rect.isNull() || line.isNull())
+        return false;
+
+    const QVector<QLineF> rectLines = {
+        { rect.topLeft(), rect.topRight() },
+        { rect.topRight(), rect.bottomRight() },
+        { rect.bottomRight(), rect.bottomLeft() },
+        { rect.bottomLeft(), rect.topLeft() },
+    };
+
+    QPointF intersectionPoint;
+    for (const QLineF &rectLine : rectLines)
+        if (rectLine.intersect(line, &intersectionPoint) == QLineF::BoundedIntersection)
+            return true;
+
+    return false;
 }
 
 } // ns utils
