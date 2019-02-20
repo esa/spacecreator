@@ -125,20 +125,6 @@ QRectF GripPointsHandler::boundingRect() const
     return bounds;
 }
 
-QVariant GripPointsHandler::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case ItemVisibleChange: {
-        if (value.toBool())
-            updateLayout();
-        break;
-    }
-    default:
-        break;
-    }
-    return QGraphicsItem::itemChange(change, value);
-}
-
 void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);

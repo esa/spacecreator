@@ -65,7 +65,6 @@ Q_SIGNALS:
 
 protected:
     void changeVisibilityAnimated(bool appear);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     const QMap<GripPoint::Location, GripPoint *> m_gripPoints;
     DrawRectInfo m_highlighter;
