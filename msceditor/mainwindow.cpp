@@ -58,6 +58,8 @@
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
+const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
+
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
@@ -174,16 +176,19 @@ void MainWindow::createNewDocument()
 
 void MainWindow::selectAndOpenFile()
 {
-    static const QLatin1String suffixMsc(".msc");
-    static const QLatin1String suffixAsn(".asn");
-    static const QStringList suffixes = { "*" + suffixMsc, "*" + suffixAsn };
+    static const QString suffixAsn(".asn");
+    static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
+                                          QString("ASN1 files (*.%1 *.%2)").arg(suffixAsn, suffixAsn.toUpper()),
+                                          QString("All files (*.*)") };
+
+    qDebug() << suffixes;
 
     const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
 
-    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(" "));
+    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
         d->ui->errorTextEdit->clear();
-        if (filename.endsWith(suffixMsc))
+        if (filename.endsWith(DotMscFileExtensionLow))
             openFileMsc(filename);
         else if (filename.endsWith(suffixAsn))
             openFileAsn(filename);
@@ -253,7 +258,7 @@ bool MainWindow::openMscChain(const QString &dirPath)
     if (!dir.exists() || !dir.isReadable())
         return false;
 
-    for (const QFileInfo &file : dir.entryInfoList({ "*.msc" })) {
+    for (const QFileInfo &file : dir.entryInfoList(mscFileFilters())) {
         openFileMsc(file.absoluteFilePath());
     }
     return true;
@@ -336,9 +341,12 @@ void MainWindow::saveMsc()
 
 void MainWindow::saveAsMsc()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
-                                                    tr("MSC files (*.msc);;All files (*.*)"));
+    QString fileName =
+            QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
+                                         tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(DotMscFileExtensionLow))
+            fileName.append(DotMscFileExtensionLow);
         d->m_mscFileName = fileName;
         saveMsc();
     }
@@ -874,4 +882,14 @@ void MainWindow::updateMscToolbarActionsChecked()
             for (QAction *action : d->m_mscToolBar->actions())
                 if (action != senderAction)
                     action->setChecked(false);
+}
+
+QStringList MainWindow::mscFileFilters()
+{
+    static QStringList filters;
+    if (filters.isEmpty()) {
+        const QString asterisk("*%1");
+        filters << asterisk.arg(DotMscFileExtensionLow) << asterisk.arg(DotMscFileExtensionLow).toUpper();
+    }
+    return filters;
 }

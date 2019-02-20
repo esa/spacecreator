@@ -78,6 +78,7 @@ private Q_SLOTS:
     void onCreateMessageToolRequested();
 
 private:
+    static const QLatin1String DotMscFileExtensionLow;
     std::unique_ptr<MainWindowPrivate> const d;
 
     void loadSettings();
@@ -109,6 +110,8 @@ private:
 
     void updateMscToolbarActionsEnablement();
     void updateMscToolbarActionsChecked();
+
+    static QStringList mscFileFilters();
 };
 
 #endif // MAINWINDOW_H
