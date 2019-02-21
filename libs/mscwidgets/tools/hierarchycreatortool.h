@@ -27,9 +27,10 @@ class HierarchyCreatorTool : public BaseCreatorTool
     Q_OBJECT
 
 public:
-    HierarchyCreatorTool(ToolType type, ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    HierarchyCreatorTool(BaseTool::ToolType type, ChartViewModel *model, QGraphicsView *view,
+                         QObject *parent = nullptr);
 
-    virtual ToolType toolType() const override;
+    virtual BaseTool::ToolType toolType() const override;
 
 protected:
     void createPreviewItem() override;
@@ -39,7 +40,7 @@ private:
     void initTool();
 
 private:
-    ToolType m_toolType;
+    BaseTool::ToolType m_toolType;
 };
 
 } // ns msc

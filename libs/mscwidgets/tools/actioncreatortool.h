@@ -27,7 +27,7 @@ class ActionCreatorTool : public BaseCreatorTool
     Q_OBJECT
 public:
     ActionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
-    ToolType toolType() const override;
+    BaseTool::ToolType toolType() const override;
 
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *chart) override;

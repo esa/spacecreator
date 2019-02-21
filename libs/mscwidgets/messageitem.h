@@ -72,7 +72,12 @@ public Q_SLOTS:
     void setName(const QString &name);
     void setPositionChangeIgnored(bool ignored);
 
+private Q_SLOTS:
+    void onTextChanged();
+
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void updateGripPoints() override;

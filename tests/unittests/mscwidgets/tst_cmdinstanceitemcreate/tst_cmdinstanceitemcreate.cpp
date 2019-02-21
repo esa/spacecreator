@@ -22,7 +22,7 @@
 #include "commands/common/commandsstack.h"
 #include "messageitem.h"
 #include "mscchart.h"
-#include "mscmessage.h"
+#include "mscinstance.h"
 
 #include <QAction>
 #include <QGraphicsScene>
@@ -34,7 +34,7 @@
 
 using namespace msc;
 
-class tst_CmdMessageItemCreate : public QObject
+class tst_CmdInstanceItemCreate : public QObject
 {
     Q_OBJECT
 
@@ -45,23 +45,20 @@ private Q_SLOTS:
     void testCreate();
     void testUndo();
     void testRedo();
-    void testPerformance();
     void testInsertingOrder();
 
 private:
     ChartViewModel m_chartModel;
     static constexpr int CommandsCount = 10;
-    static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
 
     int itemsCount();
 };
 
 // make cpp11 happy for ODR-use:
-constexpr int tst_CmdMessageItemCreate::CommandsCount;
-constexpr bool tst_CmdMessageItemCreate::SkipBenchmark;
+constexpr int tst_CmdInstanceItemCreate::CommandsCount;
 
-void tst_CmdMessageItemCreate::initTestCase()
+void tst_CmdInstanceItemCreate::initTestCase()
 {
     m_chart = new msc::MscChart();
     m_chartModel.fillView(m_chart);
@@ -69,12 +66,12 @@ void tst_CmdMessageItemCreate::initTestCase()
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::cleanupTestCase()
+void tst_CmdInstanceItemCreate::cleanupTestCase()
 {
     delete m_chart;
 }
 
-void tst_CmdMessageItemCreate::testCreate()
+void tst_CmdInstanceItemCreate::testCreate()
 {
     m_chartModel.clearScene();
     cmd::CommandsStack::current()->clear();
@@ -82,15 +79,15 @@ void tst_CmdMessageItemCreate::testCreate()
     QCOMPARE(itemsCount(), 0);
 
     for (int i = 0; i < CommandsCount; ++i) {
-        cmd::CommandsStack::push(
-                cmd::Id::CreateMessage,
-                { QVariant::fromValue<msc::MscMessage *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
+        cmd::CommandsStack::push(cmd::Id::CreateInstance,
+                                 { QVariant::fromValue<msc::MscInstance *>(nullptr),
+                                   QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::testUndo()
+void tst_CmdInstanceItemCreate::testUndo()
 {
     QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
     int undone(0);
@@ -103,7 +100,7 @@ void tst_CmdMessageItemCreate::testUndo()
     QCOMPARE(undone, CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::testRedo()
+void tst_CmdInstanceItemCreate::testRedo()
 {
     QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
     int redone(0);
@@ -116,52 +113,12 @@ void tst_CmdMessageItemCreate::testRedo()
     QCOMPARE(redone, CommandsCount);
 }
 
-void tst_CmdMessageItemCreate::testPerformance()
+int tst_CmdInstanceItemCreate::itemsCount()
 {
-    if (SkipBenchmark)
-        QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 "
-                                 "CreateMessage commands (create, undo, redo).\n"
-                                 "It's intended for manual testing, so skipped here.")
-                                 .arg(CommandsCount)));
-
-    m_chartModel.clearScene();
-    cmd::CommandsStack::current()->clear();
-
-    QCOMPARE(itemsCount(), 0);
-
-    QBENCHMARK {
-        m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount,
-                                                   2. * CommandsCount);
-
-        // create:
-        for (int i = 0; i < CommandsCount; ++i) {
-            cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                     { QVariant::fromValue<msc::MscMessage *>(nullptr),
-                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
-        }
-
-        // undo:
-        int undone(0);
-        while (cmd::CommandsStack::current()->canUndo()) {
-            cmd::CommandsStack::current()->undo();
-            ++undone;
-        }
-
-        // redo:
-        int redone(0);
-        while (cmd::CommandsStack::current()->canRedo()) {
-            cmd::CommandsStack::current()->redo();
-            ++redone;
-        }
-    }
+    return m_chart->instances().size();
 }
 
-int tst_CmdMessageItemCreate::itemsCount()
-{
-    return m_chart->instanceEvents().size();
-}
-
-void tst_CmdMessageItemCreate::testInsertingOrder()
+void tst_CmdInstanceItemCreate::testInsertingOrder()
 {
     static const QStringList names = { "A", "B", "C", "D" };
 
@@ -173,18 +130,18 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
     QCOMPARE(itemsCount(), 0);
 
     for (const QString &name : names) {
-        cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                 { QVariant::fromValue<msc::MscMessage *>(new msc::MscMessage(name)),
-                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends message
+        cmd::CommandsStack::push(cmd::Id::CreateInstance,
+                                 { QVariant::fromValue<msc::MscInstance *>(new msc::MscInstance(name)),
+                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends instance
     }
 
-    QCOMPARE(m_chart->instanceEvents().size(), names.size());
+    QCOMPARE(m_chart->instances().size(), names.size());
 
     int i = names.size() - 1;
-    for (msc::MscInstanceEvent *event : m_chart->instanceEvents())
-        QCOMPARE(event->name(), names.at(i--));
+    for (msc::MscInstance *instance : m_chart->instances())
+        QCOMPARE(instance->name(), names.at(i--));
 }
 
-QTEST_MAIN(tst_CmdMessageItemCreate)
+QTEST_MAIN(tst_CmdInstanceItemCreate)
 
-#include "tst_cmdmessageitemcreate.moc"
+#include "tst_cmdinstanceitemcreate.moc"

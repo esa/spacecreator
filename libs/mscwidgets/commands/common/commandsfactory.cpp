@@ -131,11 +131,11 @@ QUndoCommand *CommandsFactory::createMessageItemRetarget(const QVariantList &par
 
 QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
 
     msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
     if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-        return new CmdMessageItemCreate(message, chart);
+        return new CmdMessageItemCreate(message, chart, params.at(2).toInt());
     }
 
     return nullptr;
@@ -157,11 +157,12 @@ QUndoCommand *CommandsFactory::createInstanceItemMove(const QVariantList &params
 
 QUndoCommand *CommandsFactory::createInstanceItemCreate(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
 
     msc::MscInstance *message = params.at(0).value<msc::MscInstance *>();
     if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-        return new CmdInstanceItemCreate(message, chart);
+        const int pos = params.at(2).toInt();
+        return new CmdInstanceItemCreate(message, chart, pos);
     }
 
     return nullptr;

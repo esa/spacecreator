@@ -82,6 +82,7 @@ QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propNa
                                           const QVariant &to, const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool removeSceneItem(QGraphicsItem *item);
+bool intersects(const QRectF &rect, const QLineF &line);
 
 } // ns utils
 } // ns msc

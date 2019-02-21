@@ -70,6 +70,9 @@ public:
     void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
                              msc::MscMessage::EndType endType);
 
+public Q_SLOTS:
+    void checkTimerRelations();
+
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);
     void instanceRemoved(MscInstance *instance);

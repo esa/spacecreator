@@ -69,9 +69,40 @@ MscInstance *MscTimer::instance() const
     return m_instance;
 }
 
-bool MscTimer::relatesTo(MscInstance *instance) const
+bool MscTimer::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;
 }
 
+void MscTimer::setPrecedingTimer(MscTimer *timer)
+{
+    if (m_precedingTimer == timer) {
+        return;
+    }
+
+    m_precedingTimer = timer;
+    Q_EMIT precedingTimerChanged();
+    Q_EMIT dataChanged();
+}
+
+MscTimer *MscTimer::precedingTimer() const
+{
+    return m_precedingTimer;
+}
+
+void MscTimer::setFollowingTimer(MscTimer *timer)
+{
+    if (m_followingTimer == timer) {
+        return;
+    }
+
+    m_followingTimer = timer;
+    Q_EMIT followingTimerChanged();
+    Q_EMIT dataChanged();
+}
+
+MscTimer *MscTimer::followingTimer() const
+{
+    return m_followingTimer;
+}
 }

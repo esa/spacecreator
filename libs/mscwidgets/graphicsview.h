@@ -41,6 +41,7 @@ public:
 Q_SIGNALS:
     void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
     void zoomChanged(qreal percent);
+    void createMessageToolRequested();
 
 public Q_SLOTS:
     qreal minZoomPercent() const;
@@ -53,6 +54,7 @@ public Q_SLOTS:
     void setZoomStepPercent(qreal percent);
 
 protected:
+    void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;

@@ -166,6 +166,11 @@ bool TextItem::isEditable() const
     return m_editable;
 }
 
+bool TextItem::isEditing() const
+{
+    return isEditable() && textInteractionFlags() != Qt::NoTextInteraction;
+}
+
 void TextItem::setEditable(bool editable)
 {
     if (editable == m_editable)
@@ -179,6 +184,12 @@ void TextItem::enableEditMode()
     if (!m_editable) {
         return;
     }
+
+    if (m_prevText.isEmpty()) {
+        m_prevText = toPlainText();
+    }
+
+    selectText(true);
 
     setTextInteractionFlags(Qt::TextEditorInteraction | Qt::TextEditable);
     setFocus();
@@ -205,6 +216,7 @@ void TextItem::focusOutEvent(QFocusEvent *event)
 
 void TextItem::keyPressEvent(QKeyEvent *event)
 {
+
     if (isEditable() && hasFocus()) {
         switch (event->key()) {
         case Qt::Key_Escape: {
@@ -222,8 +234,13 @@ void TextItem::keyPressEvent(QKeyEvent *event)
         }
         }
 
+        QGraphicsTextItem::keyPressEvent(event);
+
+        setTextWidth(idealWidth());
         adjustSize();
+
         emit keyPressed();
+        return;
     }
 
     QGraphicsTextItem::keyPressEvent(event);
@@ -248,6 +265,10 @@ void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
+/*!
+   \brief TextItem::selectText
+   \param select if true, the entire text will be selected. If false, the the selection will be cleared
+ */
 void TextItem::selectText(bool select)
 {
     QTextCursor txtCursor = textCursor();
@@ -265,6 +286,11 @@ void TextItem::setTextMargin(qreal margin)
 qreal TextItem::textMargin() const
 {
     return document()->documentMargin();
+}
+
+qreal TextItem::idealWidth() const
+{
+    return document()->idealWidth();
 }
 
 } // namespace msc

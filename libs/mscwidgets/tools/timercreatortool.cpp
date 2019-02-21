@@ -34,9 +34,9 @@ TimerCreatorTool::TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, Q
     m_icon = QPixmap(":/icons/toolbar/starttimer.svg");
 }
 
-ToolType TimerCreatorTool::toolType() const
+BaseTool::ToolType TimerCreatorTool::toolType() const
 {
-    return ToolType::TimerCreator;
+    return BaseTool::ToolType::TimerCreator;
 }
 
 void TimerCreatorTool::setTimerType(MscTimer::TimerType type)
@@ -79,7 +79,7 @@ void TimerCreatorTool::createPreviewItem()
     auto orphantimer = new MscTimer(this);
     orphantimer->setName(tr("New_timer"));
     orphantimer->setTimerType(m_timerType);
-    auto timerItem = new TimerItem(orphantimer);
+    auto timerItem = new TimerItem(orphantimer, m_model);
 
     m_previewItem = timerItem;
     m_previewEntity = timerItem->modelItem();
@@ -104,6 +104,8 @@ void TimerCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(timer);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
 
     Q_EMIT created();

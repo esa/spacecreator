@@ -23,10 +23,11 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart)
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex)
     : BaseCommand(message)
     , m_message(message)
     , m_chart(chart)
+    , m_eventIndex(eventIndex)
 {
     Q_ASSERT(m_chart.data());
 
@@ -41,12 +42,9 @@ void CmdMessageItemCreate::redo()
         m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
         m_modelItem = m_message;
     }
-    if (!m_message->sourceInstance() && !m_message->targetInstance() && !m_chart->instances().empty()) {
-        m_message->setSourceInstance(m_chart->instances().at(0));
-    }
 
     // The chart takes over parent-/owner-ship
-    m_chart->addInstanceEvent(m_message);
+    m_chart->addInstanceEvent(m_message, m_eventIndex);
 }
 
 void CmdMessageItemCreate::undo()

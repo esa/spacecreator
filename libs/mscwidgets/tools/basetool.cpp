@@ -29,6 +29,7 @@ BaseTool::BaseTool(QGraphicsView *view, QObject *parent)
     : QObject(parent)
     , m_view(view)
     , m_scene(m_view ? m_view->scene() : nullptr)
+    , m_cursor(Qt::ArrowCursor)
 {
 }
 
@@ -78,14 +79,16 @@ void BaseTool::setActive(bool active)
     if (active == m_active)
         return;
 
-    if (m_active)
+    if (m_active) {
         removePreviewItem();
+    }
 
     m_active = active;
     if (m_view) {
         if (m_active) {
             m_view->viewport()->installEventFilter(this);
             createPreviewItem();
+            m_view->viewport()->setCursor(m_cursor);
         } else {
             m_view->viewport()->removeEventFilter(this);
         }
@@ -113,8 +116,7 @@ bool BaseTool::onMouseRelease(QMouseEvent *e)
 bool BaseTool::onMouseMove(QMouseEvent *e)
 {
     if (m_view)
-        movePreviewItem(m_view->mapToScene(m_view->mapFromGlobal(e->globalPos())));
-
+        movePreviewItem(cursorInScene(e->globalPos()));
     return true;
 }
 
@@ -148,12 +150,12 @@ void BaseTool::movePreviewItem(const QPointF &scenePos)
 
 void BaseTool::removePreviewItem() {}
 
-QPointF BaseTool::scenePos() const
+QPointF BaseTool::cursorInScene() const
 {
-    return scenePos(QCursor::pos()); // TODO: add current screen detection
+    return cursorInScene(QCursor::pos()); // TODO: add current screen detection
 }
 
-QPointF BaseTool::scenePos(const QPoint &globalPos) const
+QPointF BaseTool::cursorInScene(const QPoint &globalPos) const
 {
     QPointF sceneCoordinates;
     if (m_view) {

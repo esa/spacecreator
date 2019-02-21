@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QPointF>
+#include <QSizeF>
 #include <memory>
 
 class QGraphicsScene;
@@ -74,17 +75,22 @@ public:
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
 
+    QSizeF preferredChartBoxSize() const;
+    void setPreferredChartBoxSize(const QSizeF &size);
+
+    int instanceOrderFromPos(const QPointF &scenePos);
+
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
     void relayout();
-    void rearrangeInstances();
     void updateContentBounds();
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
+    void layoutComplete();
 
 private Q_SLOTS:
     void onInstanceItemMoved(InstanceItem *instanceItem);

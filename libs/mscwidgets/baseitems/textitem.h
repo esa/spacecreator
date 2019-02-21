@@ -50,6 +50,7 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    bool isEditing() const;
     bool isEditable() const;
     void setEditable(bool editable);
 
@@ -57,6 +58,10 @@ public:
 
     void setTextMargin(qreal margin);
     qreal textMargin() const;
+
+    void selectText(bool select);
+
+    qreal idealWidth() const;
 
 Q_SIGNALS:
     void edited(const QString &newText);
@@ -77,8 +82,6 @@ private:
     bool m_gradientUsed = false;
     bool m_editable = false;
     QString m_prevText;
-
-    void selectText(bool select);
 };
 
 } // ns msc

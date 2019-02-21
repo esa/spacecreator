@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "tooltypes.h"
-
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -39,7 +37,26 @@ public:
     BaseTool(QGraphicsView *view, QObject *parent = nullptr);
     ~BaseTool();
 
-    virtual ToolType toolType() const = 0;
+    enum class ToolType
+    {
+        Pointer = 0,
+        ActionCreator,
+        ConditionCreator,
+        InstanceCreator,
+        MessageCreator,
+        EntityDeleter,
+        TimerCreator,
+        HierarchyAndCreator,
+        HierarchyExceptionCreator,
+        HierarchyIsCreator,
+        HierarchyLeafCreator,
+        HierarchyOrCreator,
+        HierarchyParallelCreator,
+        HierarchyRepeatCreator
+    };
+    Q_ENUM(ToolType)
+
+    virtual BaseTool::ToolType toolType() const = 0;
 
     bool isActive() const;
 
@@ -62,6 +79,7 @@ protected:
     QString m_title = tr("Untitled");
     QString m_description = tr("Unimplemented tool");
     QPointer<QGraphicsObject> m_previewItem = nullptr;
+    QCursor m_cursor;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -72,11 +90,11 @@ protected:
     virtual void createPreviewItem() = 0;
     virtual void commitPreviewItem() = 0;
 
-    virtual void movePreviewItem(const QPointF &scenePos);
+    virtual void movePreviewItem(const QPointF &cursorInScene);
     virtual void removePreviewItem();
 
-    QPointF scenePos() const;
-    QPointF scenePos(const QPoint &screenPos) const;
+    QPointF cursorInScene() const;
+    QPointF cursorInScene(const QPoint &screenPos) const;
 };
 
 } // ns msc

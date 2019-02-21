@@ -33,9 +33,9 @@ ConditionCreatorTool::ConditionCreatorTool(ChartViewModel *model, QGraphicsView 
     m_description = tr("Create new Condition item");
     m_icon = QPixmap(":/icons/toolbar/condition.svg");
 }
-ToolType ConditionCreatorTool::toolType() const
+BaseTool::ToolType ConditionCreatorTool::toolType() const
 {
-    return ToolType::ConditionCreator;
+    return BaseTool::ToolType::ConditionCreator;
 }
 
 void ConditionCreatorTool::onCurrentChartChagend(MscChart *chart)
@@ -81,6 +81,8 @@ void ConditionCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(condition);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
 
     Q_EMIT created();

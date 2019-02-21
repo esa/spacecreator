@@ -17,6 +17,8 @@
 
 #include "basecreatortool.h"
 
+#include "baseitems/common/utils.h"
+#include "baseitems/interactiveobject.h"
 #include "mscchart.h"
 
 namespace msc {
@@ -41,6 +43,36 @@ void BaseCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
     if (isActive()) {
         createPreviewItem();
     }
+}
+
+void BaseCreatorTool::startWaitForModelLayoutComplete(MscEntity *addedEntity)
+{
+    m_addedEntity = addedEntity;
+    dropModelLayoutUpdateConnection();
+    m_modelUpdateFinishedListener =
+            connect(m_model, &ChartViewModel::layoutComplete, this, &BaseCreatorTool::onModelLayoutComplete);
+}
+
+void BaseCreatorTool::onModelLayoutComplete()
+{
+    dropModelLayoutUpdateConnection();
+
+    if (!m_scene || !m_addedEntity)
+        return;
+
+    for (InteractiveObject *item : utils::toplevelItems<InteractiveObject>(m_scene)) {
+        if (item->modelEntity()->entityType() == m_addedEntity->entityType()
+            && item->modelEntity()->internalId() == m_addedEntity->internalId()) {
+            item->postCreatePolishing();
+            break;
+        }
+    }
+}
+
+void BaseCreatorTool::dropModelLayoutUpdateConnection()
+{
+    if (m_modelUpdateFinishedListener)
+        QObject::disconnect(m_modelUpdateFinishedListener);
 }
 
 } // ns msc

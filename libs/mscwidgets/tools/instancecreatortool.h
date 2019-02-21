@@ -28,7 +28,7 @@ class InstanceCreatorTool : public BaseCreatorTool
     Q_OBJECT
 public:
     InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
-    virtual ToolType toolType() const override;
+    virtual BaseTool::ToolType toolType() const override;
 
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *) override;

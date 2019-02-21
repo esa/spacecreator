@@ -886,7 +886,7 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
     for (const MscInstanceEvent *event : m_currentChart->instanceEvents()) {
         if (event->entityType() == MscEntity::EntityType::Message) {
             const MscMessage *message = static_cast<const MscMessage *>(event);
-            if (message->sourceInstance() && message->targetInstance()) { // Ignore messages to/from Env
+            if (!message->isGlobal()) { // Ignore messages to/from Env
                 QString errorMessage;
                 if (!message->m_descrIn.isComplete()) {
                     errorMessage = prepareErrorMessage(message, message->m_descrOut);

@@ -93,6 +93,12 @@ void ActionItem::setActionText(const QString &text)
     updateLayout();
 }
 
+void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mouseDoubleClickEvent(event);
+    m_textItem->enableEditMode();
+}
+
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {

@@ -42,11 +42,18 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
     virtual void onCurrentChartChagend(msc::MscChart *);
+    virtual void onModelLayoutComplete();
 
 protected:
     QPointer<ChartViewModel> m_model = nullptr;
     QPointer<MscEntity> m_previewEntity = nullptr;
     QPointer<MscChart> m_activeChart = nullptr;
+    QPointer<MscEntity> m_addedEntity = nullptr;
+    QMetaObject::Connection m_modelUpdateFinishedListener;
+    virtual void startWaitForModelLayoutComplete(MscEntity *addedEntity);
+
+private:
+    void dropModelLayoutUpdateConnection();
 };
 
 } // ns msc

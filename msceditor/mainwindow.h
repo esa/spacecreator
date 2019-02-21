@@ -70,13 +70,15 @@ private Q_SLOTS:
     void showHierarchyView(bool show);
     void showErrorView();
     bool openMscChain(const QString &dirPath);
-    void enableDefaultTool();
+    void activateDefaultTool();
     void updateTextView();
     void showHierarchyTypeMenu(const QPoint &point);
     void changHeierarchyType();
     void updateTreeViewItem(const msc::MscDocument *document);
+    void onCreateMessageToolRequested();
 
 private:
+    static const QLatin1String DotMscFileExtensionLow;
     std::unique_ptr<MainWindowPrivate> const d;
 
     void loadSettings();
@@ -101,6 +103,15 @@ private:
 
     void updateTitles();
     void clearUndoStacks();
+
+    void changeEvent(QEvent *event) override;
+    void onGeometryRestored();
+    QSizeF prepareChartBoxSize() const;
+
+    void updateMscToolbarActionsEnablement();
+    void updateMscToolbarActionsChecked();
+
+    static QStringList mscFileFilters();
 };
 
 #endif // MAINWINDOW_H

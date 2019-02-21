@@ -127,7 +127,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
             events += serialize(static_cast<MscMessage *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Timer:
-            events += serialize(static_cast<MscTimer *>(instanceEvent), tabsSize);
+            events += serialize(static_cast<MscTimer *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Coregion:
             events += serialize(static_cast<MscCoregion *>(instanceEvent), tabsSize);
@@ -157,7 +157,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
 
 QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
 {
-    if (message == nullptr || !(message->sourceInstance() == instance || message->targetInstance() == instance))
+    if (message == nullptr || !(message->relatesTo(instance)))
         return QString();
 
     const QString comment = serializeComment(message);
@@ -208,9 +208,9 @@ QString MscWriter::serialize(const MscCreate *create, const MscInstance *instanc
     return {};
 }
 
-QString MscWriter::serialize(const MscTimer *timer, int tabsSize)
+QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance, int tabsSize)
 {
-    if (timer == nullptr) {
+    if (timer == nullptr || timer->instance() != instance) {
         return QString();
     }
 

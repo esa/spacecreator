@@ -31,7 +31,7 @@ namespace cmd {
 class CmdMessageItemCreate : public BaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart);
+    CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex);
 
     void redo() override;
     void undo() override;
@@ -41,6 +41,7 @@ public:
 private:
     MscMessage *m_message = nullptr;
     QPointer<MscChart> m_chart;
+    int m_eventIndex;
 };
 
 } // ns cmd

@@ -53,6 +53,7 @@ private Q_SLOTS:
     void testCondition();
     void testCoregion();
     void testTimer();
+    void testTimerRelation();
     void testAction();
     void testInstanceStop_data();
     void testInstanceStop();
@@ -332,7 +333,7 @@ void tst_MscFile::testTimer()
                        ENDINSTANCE; \
                    ENDMSC;";
 
-    MscModel *model = file->parseText(msc);
+    QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -356,8 +357,51 @@ void tst_MscFile::testTimer()
     timer = static_cast<MscTimer *>(event);
     QCOMPARE(timer->name(), QString("T3"));
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
+}
 
-    delete model;
+void tst_MscFile::testTimerRelation()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         starttimer T1; \
+                         stoptimer T1; \
+                         timeout T3; \
+                       ENDINSTANCE; \
+                       INSTANCE Inst_2; \
+                          timeout T1; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 4);
+    auto event = chart->instanceEvents().at(0);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    auto timer1 = static_cast<MscTimer *>(event);
+    event = chart->instanceEvents().at(1);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    auto timer2 = static_cast<MscTimer *>(event);
+    event = chart->instanceEvents().at(2);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    auto timer3 = static_cast<MscTimer *>(event);
+
+    QVERIFY(timer1->precedingTimer() == nullptr);
+    QCOMPARE(timer1->followingTimer(), timer2);
+
+    QCOMPARE(timer2->precedingTimer(), timer1);
+    QVERIFY(timer2->followingTimer() == nullptr);
+
+    QVERIFY(timer3->precedingTimer() == nullptr);
+    QVERIFY(timer3->followingTimer() == nullptr);
+
+    event = chart->instanceEvents().at(3);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    auto timer4 = static_cast<MscTimer *>(event);
+    QVERIFY(timer4->precedingTimer() == nullptr);
+    QVERIFY(timer4->followingTimer() == nullptr);
 }
 
 void tst_MscFile::testAction()

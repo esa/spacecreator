@@ -51,6 +51,8 @@ public:
     bool isHighlightable() const;
     void setHighlightable(bool highlightable);
 
+    virtual void postCreatePolishing();
+
 public Q_SLOTS:
     void updateLayout();
 

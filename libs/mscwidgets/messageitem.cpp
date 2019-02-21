@@ -22,6 +22,7 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/labeledarrowitem.h"
+#include "chartitem.h"
 #include "commands/common/commandsstack.h"
 
 #include <QBrush>
@@ -46,6 +47,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
+    connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
@@ -53,6 +55,17 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
     m_arrowItem->setDashed(isCreator());
+}
+
+void MessageItem::onTextChanged()
+{
+    rebuildLayout();
+    commitGeometryChange();
+
+    if (m_gripPoints)
+        m_gripPoints->updateLayout();
+
+    update();
 }
 
 MscMessage *MessageItem::modelItem() const
@@ -163,7 +176,13 @@ void MessageItem::rebuildLayout()
     const QPointF fromC(itemCenterScene(m_sourceInstance).x(), y());
     const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
-    const QRectF boxRect = scene()->sceneRect(); // TODO: use the actual MSC's box instead
+    auto getChartBox = [this]() {
+        // TODO: store the ChartItem* instance somewhere to avoid lookup whithin each MessageItem
+        const QList<ChartItem *> boxes = utils::toplevelItems<ChartItem>(scene());
+        return boxes.size() == 1 ? boxes.first()->sceneBoundingRect() : scene()->sceneRect();
+    };
+
+    const QRectF boxRect = getChartBox();
     auto extendToNearestEdge = [&boxRect](const QPointF &target) {
         const QLineF left({ boxRect.left(), target.y() }, target);
         const QLineF right({ boxRect.right(), target.y() }, target);
@@ -195,11 +214,14 @@ void MessageItem::rebuildLayout()
         pntFrom = extendToNearestEdge(pntTo);
     }
 
-    const QPointF &linkCenterInScene =
-            m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
-    setPositionChangeIgnored(true);
-    setPos(linkCenterInScene);
-    setPositionChangeIgnored(false);
+    const bool bothAreNulls = pntFrom.isNull() && pntTo.isNull();
+    if (!bothAreNulls) {
+        const QPointF &linkCenterInScene =
+                m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+        setPositionChangeIgnored(true);
+        setPos(linkCenterInScene);
+        setPositionChangeIgnored(false);
+    }
 
     commitGeometryChange();
 }
@@ -452,6 +474,12 @@ bool MessageItem::proceedPositionChange() const
 void MessageItem::setPositionChangeIgnored(bool ignored)
 {
     m_posChangeIgnored = ignored;
+}
+
+void MessageItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mouseDoubleClickEvent(event);
+    m_arrowItem->enableEditMode();
 }
 
 bool MessageItem::isCreator() const

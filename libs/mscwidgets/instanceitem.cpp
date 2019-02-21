@@ -21,6 +21,7 @@
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/instanceenditem.h"
+#include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
@@ -32,93 +33,47 @@
 #include <QDebug>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
 #include <QPainter>
 
 namespace msc {
 
-static constexpr qreal SymbolWidth = { 60.0 };
-const qreal InstanceItem::StartSymbolHeight = 20.;
-
-QLinearGradient InstanceItem::createGradientForKind(const QGraphicsItem *itemKind)
-{
-    static QLinearGradient prototype;
-    if (!itemKind)
-        return prototype;
-
-    static bool prototypeFilled(false);
-
-    if (!prototypeFilled) {
-        // colors were colorpicked from https://git.vikingsoftware.com/esa/msceditor/issues/30
-        prototype.setColorAt(0.0, QColor("#fefef9"));
-        prototype.setColorAt(0.5, QColor("#fefeca"));
-        prototype.setColorAt(1.0, QColor("#dedbb4"));
-        prototypeFilled = true;
-    }
-
-    QLinearGradient gradient(prototype);
-    const QRectF &bounds = itemKind->boundingRect();
-    gradient.setStart(bounds.topLeft());
-    gradient.setFinalStop(bounds.bottomRight());
-    return gradient;
-}
-
-QLinearGradient InstanceItem::createGradientForName(const QGraphicsItem *itemName)
-{
-    static QLinearGradient prototype;
-    if (!itemName)
-        return prototype;
-
-    static bool prototypeFilled(false);
-
-    if (!prototypeFilled) {
-        const QColor &whiteTransparent(QColor::fromRgbF(1., 1., 1., 0.25));
-        prototype.setColorAt(0.0, whiteTransparent);
-        prototype.setColorAt(0.5, Qt::white);
-        prototype.setColorAt(1.0, whiteTransparent);
-        prototypeFilled = true;
-    }
-
-    QLinearGradient gradient(prototype);
-    const QRectF &bounds = itemName->boundingRect();
-    gradient.setStart(bounds.topLeft());
-    gradient.setFinalStop(bounds.topRight());
-    return gradient;
-}
-
 InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     : InteractiveObject(instance, parent)
     , m_instance(instance)
     , m_axisSymbol(new QGraphicsLineItem(this))
-    , m_headSymbol(new QGraphicsRectItem(this))
-    , m_nameItem(new TextItem(this))
-    , m_kindItem(new TextItem(this))
+    , m_headSymbol(new InstanceHeadItem(this))
     , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
 {
     Q_ASSERT(m_instance != nullptr);
 
-    updateText(m_nameItem, m_instance->name());
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
-
-    updateText(m_kindItem, m_instance->kind());
     connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
 
+    m_headSymbol->setName(m_instance->name());
+    m_headSymbol->setKind(m_instance->kind());
     updateLayout();
 
     setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
-
-    m_kindItem->setBackgroundColor(Qt::transparent);
 
     // values are based on screenshot from https://git.vikingsoftware.com/esa/msceditor/issues/30
     QPen axisPen(Qt::darkGray);
     axisPen.setWidthF(3.);
     m_axisSymbol->setPen(axisPen);
 
-    m_nameItem->setEditable(true);
-    m_kindItem->setEditable(true);
-    connect(m_nameItem, &TextItem::edited, this, &InstanceItem::onNameEdited, Qt::QueuedConnection);
-    connect(m_kindItem, &TextItem::edited, this, &InstanceItem::onKindEdited, Qt::QueuedConnection);
+    connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
+    connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this, [this](const QPointF &from, const QPointF &to) {
+        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center)) {
+            onMoveRequested(gp, from, to);
+        }
+    });
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, &InstanceItem::moveLeftIfOverlaps);
+    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::updateLayout);
+
+    void();
 }
 
 MscInstance *InstanceItem::modelItem() const
@@ -128,12 +83,12 @@ MscInstance *InstanceItem::modelItem() const
 
 QString InstanceItem::name() const
 {
-    return m_nameItem->toPlainText();
+    return m_headSymbol->name();
 }
 
 QString InstanceItem::kind() const
 {
-    return m_kindItem->toPlainText();
+    return m_headSymbol->kind();
 }
 
 void InstanceItem::setAxisHeight(qreal height)
@@ -157,34 +112,34 @@ QLineF InstanceItem::axis() const
 
 void InstanceItem::setName(const QString &name)
 {
-    if (this->name() == name && m_instance->name() == name)
-        return;
-
-    m_instance->setName(name);
-    updateText(m_nameItem, name);
+    updatePropertyString(QLatin1String("name"), name);
 }
 
 void InstanceItem::setKind(const QString &kind)
 {
-    if (this->kind() == kind && m_instance->kind() == kind)
-        return;
-
-    m_instance->setKind(kind);
-    updateText(m_kindItem, kind);
+    updatePropertyString(QLatin1String("kind"), kind);
 }
 
-void InstanceItem::updateText(TextItem *holder, const QString &text)
+void InstanceItem::updatePropertyString(const QLatin1String &property, const QString &value)
 {
-    if (!holder)
+    if (property.size() == 0) // QLatin1String::isEmpty was introduced in Qt 5.10
         return;
 
-    holder->setPlainText(text);
-    holder->adjustSize();
-    rebuildLayout();
+    static const QLatin1String scheduledMethod("reflectTextLayoutChange");
 
-    ensureNotOverlapped();
+    const char *propertyName = property.data();
+    if (this->property(propertyName).toString() == value && m_instance->property(propertyName) == value) {
+        // If renaming has been performed via redo command,
+        // both the instance and the UI text are actualized for now,
+        // but the scene layout update is still necessary:
+        QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
+        return;
+    }
 
-    Q_EMIT needRelayout();
+    m_instance->setProperty(propertyName, value);
+    m_headSymbol->setProperty(propertyName, value);
+
+    QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
 }
 
 void InstanceItem::rebuildLayout()
@@ -197,38 +152,17 @@ void InstanceItem::buildLayout()
 {
     prepareGeometryChange();
 
-    QRectF nameRect({ 0., 0. }, m_nameItem->boundingRect().size());
-    const QRectF kindRect(m_kindItem->boundingRect());
-    QRectF kindR(nameRect.bottomLeft(),
-                 QSizeF(qMax(kindRect.width(), qMax(nameRect.width(), SymbolWidth)),
-                        qMax(kindRect.height(), StartSymbolHeight)));
-
+    const QPointF &prevP1 = m_axisSymbol->line().p1();
+    QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
 
     // precalculate own default size:
     if (m_boundingRect.isEmpty()) {
-        m_boundingRect.setTopLeft(nameRect.topLeft());
-        m_boundingRect.setWidth(qMax(nameRect.width(), kindR.width()));
-        m_boundingRect.setHeight(nameRect.height() + kindR.height() + m_axisHeight + endSymbolHeight);
+        m_boundingRect.setTopLeft(headRect.topLeft());
+        m_boundingRect.setWidth(headRect.width());
+        m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
         updateGripPoints();
     }
-
-    // move name to the top:
-    nameRect.moveTopLeft(m_boundingRect.topLeft());
-    const QPointF nameDelta = nameRect.center() - m_nameItem->boundingRect().center();
-    m_nameItem->setPos({ 0., 0. });
-    m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
-
-    // move head symb and kind txt below name:
-    kindR.moveTop(m_nameItem->boundingRect().bottom());
-    kindR.setWidth(m_boundingRect.width());
-    m_kindItem->setPos(m_nameItem->boundingRect().translated(m_nameItem->pos()).bottomLeft());
-    m_kindItem->setTextWidth(m_boundingRect.width());
-    m_nameItem->setTextWidth(m_boundingRect.width());
-
-    QRectF headRect = m_kindItem->boundingRect().translated(m_kindItem->pos());
-    headRect.setWidth(m_boundingRect.width());
-    m_headSymbol->setRect(headRect);
 
     // move end symb to the bottom:
     const QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
@@ -240,9 +174,18 @@ void InstanceItem::buildLayout()
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
 
-    // update head gradient:
-    m_nameItem->setBackgroundGradient(createGradientForName(m_nameItem));
-    m_headSymbol->setBrush(createGradientForKind(m_headSymbol));
+    if (prevP1 != p1) {
+        // local geometry changed due the text layout change, compensate it:
+        const QPointF &shift = prevP1 - p1;
+        if (!shift.isNull()) {
+            // Related messages to/from Env will be moved all together,
+            // To avoid it block the InteractiveObject::relocated
+            // (fired in InteractiveObject::itemChange)
+            QSignalBlocker dontMoveEnvMessages(this);
+
+            moveBy(shift.x(), shift.y());
+        }
+    }
 }
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -258,17 +201,6 @@ void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const Q
     Q_UNUSED(gp);
     Q_UNUSED(from);
     Q_UNUSED(to);
-}
-
-QPainterPath InstanceItem::shape() const
-{
-    QPainterPath result;
-    result.addRect(m_headSymbol->boundingRect());
-    result.addRect(m_nameItem->boundingRect());
-    result.addRect(m_kindItem->boundingRect());
-    result.addRect(m_endSymbol->boundingRect());
-    result.addPath(ObjectsLinkItem::hoverableLine(m_axisSymbol->line()));
-    return result;
 }
 
 void InstanceItem::setBoundingRect(const QRectF &geometry)
@@ -299,11 +231,10 @@ void InstanceItem::prepareHoverMark()
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
             &InstanceItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 
-    m_headSymbol->setZValue(m_gripPoints->zValue() - 1);
-    m_nameItem->setZValue(m_gripPoints->zValue() - 1);
-    m_kindItem->setZValue(m_gripPoints->zValue() - 1);
-    m_axisSymbol->setZValue(m_gripPoints->zValue() - 1);
-    m_endSymbol->setZValue(m_gripPoints->zValue() - 1);
+    const qreal zVal(m_gripPoints->zValue() - 1.);
+    m_headSymbol->setZValue(zVal);
+    m_axisSymbol->setZValue(zVal);
+    m_endSymbol->setZValue(zVal);
 }
 
 void InstanceItem::onNameEdited(const QString &newName)
@@ -322,6 +253,18 @@ void InstanceItem::onKindEdited(const QString &newKind)
     CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
 }
 
+void InstanceItem::reflectTextLayoutChange()
+{
+    if (QGraphicsScene *scene = this->scene()) {
+        const QRectF &myRect = sceneBoundingRect();
+        const QRectF &sceneRect = scene->sceneRect();
+        if (!myRect.intersected(sceneRect).isEmpty()) {
+            if (!moveLeftIfOverlaps())
+                Q_EMIT needRelayout();
+        }
+    }
+}
+
 void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
 {
     if (pos == GripPoint::Location::Center) {
@@ -329,12 +272,12 @@ void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location pos, const
     }
 }
 
-void InstanceItem::ensureNotOverlapped()
+bool InstanceItem::moveLeftIfOverlaps()
 {
     static constexpr qreal paddingPixels = { 40 };
 
     if (!scene())
-        return;
+        return false;
 
     const QRectF &mySceneRect(sceneBoundingRect());
     for (const InstanceItem *const other : utils::itemByPos<InstanceItem, QRectF>(scene(), mySceneRect)) {
@@ -348,10 +291,12 @@ void InstanceItem::ensureNotOverlapped()
             const QPointF &delta(mySceneRectValid.center() - mySceneRect.center());
             moveBy(delta.x(), 0.); // TODO: use the CmdInstanceItemMove instead?
 
-            ensureNotOverlapped();
-            return;
+            return moveLeftIfOverlaps();
         }
     }
-    Q_EMIT needRearrange();
+
+    Q_EMIT moved(this);
+    return true;
 }
+
 } // namespace msc

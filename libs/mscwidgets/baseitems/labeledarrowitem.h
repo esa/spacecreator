@@ -49,9 +49,12 @@ public:
 
     void setDashed(bool dashed);
 
+    void enableEditMode();
+
 Q_SIGNALS:
     void layoutChanged() const;
     void textEdited(const QString &text);
+    void textChanged();
 
 public Q_SLOTS:
     void setText(const QString &text);
@@ -59,6 +62,7 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
     void updateLayout();
+    void onKeyPressed();
 
 private:
     TextItem *m_itemText;

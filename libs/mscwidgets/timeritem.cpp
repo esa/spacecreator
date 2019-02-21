@@ -18,6 +18,7 @@
 #include "timeritem.h"
 
 #include "baseitems/textitem.h"
+#include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "msctimer.h"
@@ -34,12 +35,15 @@ namespace msc {
 
 static const QRectF symbolSize(0, 0, 50, 25);
 
-TimerItem::TimerItem(msc::MscTimer *timer, QGraphicsItem *parent)
+TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem *parent)
     : InteractiveObject(timer, parent)
     , m_timer(timer)
+    , m_model(model)
     , m_textItem(new TextItem(this))
+    , m_timerConnector(new QGraphicsLineItem(this))
 {
     Q_ASSERT(m_timer != nullptr);
+    Q_ASSERT(m_model != nullptr);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
@@ -51,6 +55,12 @@ TimerItem::TimerItem(msc::MscTimer *timer, QGraphicsItem *parent)
 
     connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::updateLayout);
+
+    connect(m_timer, &msc::MscTimer::precedingTimerChanged, this, &TimerItem::rebuildLayout);
+    m_textItem->setVisible(m_timer->precedingTimer() == nullptr);
+
+    m_timerConnector->setVisible(m_timer->precedingTimer() != nullptr);
+    m_timerConnector->setPen(QPen(Qt::black, 1));
 
     m_boundingRect = symbolSize;
     m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
@@ -90,18 +100,14 @@ void TimerItem::setInstance(InstanceItem *instance)
 
 void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    const qreal boxSize = symbolSize.height();
-
     painter->save();
 
     QPen pen(Qt::black, 1);
     painter->setPen(pen);
 
     QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
-    QPointF boxCenter(start.x() + symbolSize.width() - boxSize / 2, start.y());
-    painter->drawLine(start, boxCenter);
-
-    QRectF symboxRect(boxCenter.x() - boxSize / 2, boxCenter.y() - boxSize / 2, boxSize, boxSize);
+    const QRectF symboxRect = symbolBox();
+    painter->drawLine(start, symboxRect.center());
 
     if (m_timer->timerType() == MscTimer::TimerType::Start) {
         drawStartSymbol(painter, symboxRect);
@@ -129,6 +135,12 @@ void TimerItem::setName(const QString &text)
     m_textItem->setPlainText(text);
 
     updateLayout();
+}
+
+void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mouseDoubleClickEvent(event);
+    m_textItem->enableEditMode();
 }
 
 void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -177,8 +189,27 @@ void TimerItem::rebuildLayout()
     m_textItem->setY((symbolSize.height() - m_textItem->boundingRect().height()) / 2);
 
     m_boundingRect = symbolSize;
-    m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
-    const double x = m_instance->centerInScene().x();
+
+    if (m_timer->precedingTimer() == nullptr) {
+        m_textItem->setVisible(true);
+        m_timerConnector->setVisible(false);
+        m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+    } else {
+        m_textItem->setVisible(false);
+        m_timerConnector->setVisible(true);
+        TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
+        if (preTimer) {
+            const QRectF &symbolRect = symbolBox();
+            const QPointF &boxCenter = symbolRect.center();
+            const qreal extraY = preTimer->sceneBoundingRect().bottom() - scenePos().y();
+            const qreal startY = m_timer->timerType() == MscTimer::TimerType::Stop ? boxCenter.y() : symbolRect.top();
+            m_timerConnector->setLine(boxCenter.x(), startY, boxCenter.x(), extraY);
+            connect(preTimer, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
+            connect(this, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
+        }
+    }
+
+    const qreal x = m_instance->centerInScene().x();
     setX(x);
 }
 
@@ -223,6 +254,14 @@ void TimerItem::drawTimeoutArrow(QPainter *painter, const QPointF &pt)
     path.lineTo(pt - QPointF(-10, 5));
     path.closeSubpath();
     painter->fillPath(path, Qt::black);
+}
+
+QRectF TimerItem::symbolBox() const
+{
+    const qreal boxSize = symbolSize.height();
+    const QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
+    const QPointF boxCenter(start.x() + symbolSize.width() - boxSize / 2, start.y());
+    return QRectF(boxCenter.x() - boxSize / 2, boxCenter.y() - boxSize / 2, boxSize, boxSize);
 }
 
 } // namespace msc

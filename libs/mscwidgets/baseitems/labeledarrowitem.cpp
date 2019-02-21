@@ -47,6 +47,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     updateLayout();
 
     connect(m_itemArrow, &ArrowItem::geometryChanged, this, &LabeledArrowItem::updateLayout);
+    connect(m_itemText, &TextItem::keyPressed, this, &LabeledArrowItem::onKeyPressed);
     connect(m_itemText, &TextItem::edited, this, &LabeledArrowItem::onTextEdited);
 }
 
@@ -169,6 +170,20 @@ void LabeledArrowItem::setDashed(bool dashed)
     QPen linePen = m_itemArrow->bodyPen();
     linePen.setStyle(dashed ? Qt::DashLine : Qt::SolidLine);
     m_itemArrow->setBodyPen(linePen);
+}
+
+void LabeledArrowItem::enableEditMode()
+{
+    m_itemText->enableEditMode();
+}
+
+void LabeledArrowItem::onKeyPressed()
+{
+    {
+        QSignalBlocker suppressLayoutUpdated(this);
+        updateLayout();
+    }
+    Q_EMIT textChanged();
 }
 
 } // ns msc

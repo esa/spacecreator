@@ -34,9 +34,9 @@ ActionCreatorTool::ActionCreatorTool(ChartViewModel *model, QGraphicsView *view,
     m_icon = QPixmap(":/icons/toolbar/action.svg");
 }
 
-ToolType ActionCreatorTool::toolType() const
+BaseTool::ToolType ActionCreatorTool::toolType() const
 {
-    return ToolType::ActionCreator;
+    return BaseTool::ToolType::ActionCreator;
 }
 
 void ActionCreatorTool::onCurrentChartChagend(MscChart *chart)
@@ -82,6 +82,8 @@ void ActionCreatorTool::commitPreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
+
+    startWaitForModelLayoutComplete(action);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
 
     Q_EMIT created();

@@ -23,6 +23,7 @@
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
+#include "graphicsview.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -57,6 +58,8 @@
 #include <functional>
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
+
+const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -120,13 +123,11 @@ struct MainWindowPrivate {
 
     QAction *m_actAsnEditor = nullptr;
 
-    QVector<msc::BaseTool *> m_tools;
+    QMultiMap<msc::BaseTool::ToolType, msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
 
     QMenu *m_hierarchyTypeMenu = nullptr;
-
-    QModelIndex m_modelIndex;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -160,6 +161,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createNewDocument()
 {
+    d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
     d->ui->documentTreeView->expandAll();
     d->m_mscFileName.clear();
@@ -175,16 +177,19 @@ void MainWindow::createNewDocument()
 
 void MainWindow::selectAndOpenFile()
 {
-    static const QLatin1String suffixMsc(".msc");
-    static const QLatin1String suffixAsn(".asn");
-    static const QStringList suffixes = { "*" + suffixMsc, "*" + suffixAsn };
+    static const QString suffixAsn(".asn");
+    static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
+                                          QString("ASN1 files (*.%1 *.%2)").arg(suffixAsn, suffixAsn.toUpper()),
+                                          QString("All files (*.*)") };
+
+    qDebug() << suffixes;
 
     const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
 
-    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(" "));
+    const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
         d->ui->errorTextEdit->clear();
-        if (filename.endsWith(suffixMsc))
+        if (filename.endsWith(DotMscFileExtensionLow))
             openFileMsc(filename);
         else if (filename.endsWith(suffixAsn))
             openFileAsn(filename);
@@ -199,6 +204,8 @@ bool MainWindow::openFileMsc(const QString &file)
         d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
         return false;
     }
+
+    d->m_model->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
@@ -252,13 +259,13 @@ bool MainWindow::openMscChain(const QString &dirPath)
     if (!dir.exists() || !dir.isReadable())
         return false;
 
-    for (const QFileInfo &file : dir.entryInfoList({ "*.msc" })) {
+    for (const QFileInfo &file : dir.entryInfoList(mscFileFilters())) {
         openFileMsc(file.absoluteFilePath());
     }
     return true;
 }
 
-void MainWindow::enableDefaultTool()
+void MainWindow::activateDefaultTool()
 {
     Q_ASSERT(d->m_defaultToolAction);
     d->m_defaultToolAction->setChecked(true);
@@ -349,9 +356,12 @@ void MainWindow::saveMsc()
 
 void MainWindow::saveAsMsc()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
-                                                    tr("MSC files (*.msc);;All files (*.*)"));
+    QString fileName =
+            QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
+                                         tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(DotMscFileExtensionLow))
+            fileName.append(DotMscFileExtensionLow);
         d->m_mscFileName = fileName;
         saveMsc();
     }
@@ -423,6 +433,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
+    if (obj == nullptr) {
+        return;
+    }
     auto chart = dynamic_cast<msc::MscChart *>(obj);
 
     if (chart) {
@@ -609,57 +622,68 @@ void MainWindow::initMenuHelp()
     d->m_actAboutQt = d->m_menuHelp->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
+void MainWindow::onCreateMessageToolRequested()
+{
+    if (msc::MessageCreatorTool *tool =
+                qobject_cast<msc::MessageCreatorTool *>(d->m_tools.value(msc::BaseTool::ToolType::MessageCreator))) {
+        tool->activate();
+    }
+}
+
 void MainWindow::initTools()
 {
+    auto registerTool = [&](msc::BaseTool *tool) { d->m_tools.insert(tool->toolType(), tool); };
+
     auto pointerTool = new msc::PointerTool(nullptr, this);
-    d->m_tools.append(pointerTool);
+    registerTool(pointerTool);
 
     auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(instanceCreateTool, &msc::InstanceCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(instanceCreateTool);
+    registerTool(instanceCreateTool);
 
     auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(messageCreateTool, &msc::MessageCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(messageCreateTool);
+    registerTool(messageCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(actionCreateTool, &msc::ActionCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(actionCreateTool);
+    registerTool(actionCreateTool);
 
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    connect(conditionCreateTool, &msc::ConditionCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(conditionCreateTool);
+    registerTool(conditionCreateTool);
 
     auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
-    connect(startTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(startTimerCreateTool);
+    registerTool(startTimerCreateTool);
 
     auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
-    connect(stopTimerCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(stopTimerCreateTool);
+    registerTool(stopTimerCreateTool);
 
     auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
-    connect(timeoutCreateTool, &msc::TimerCreatorTool::created, this, &MainWindow::enableDefaultTool);
-    d->m_tools.append(timeoutCreateTool);
+    registerTool(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
+    toolsActions->setExclusive(false);
     for (msc::BaseTool *tool : d->m_tools) {
         QAction *toolAction = d->m_mscToolBar->addAction(tool->title());
         toolAction->setCheckable(true);
         toolAction->setIcon(tool->icon());
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
+
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
+        connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
+        if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool))
+            connect(creatorTool, &msc::InstanceCreatorTool::created, this, &MainWindow::activateDefaultTool);
 
         toolsActions->addAction(toolAction);
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
+        connect(toolAction, &QAction::toggled, this, &MainWindow::updateMscToolbarActionsChecked);
     }
 
     d->m_defaultToolAction = toolsActions->actions().first();
-    enableDefaultTool();
+    d->m_defaultToolAction->setVisible(false);
+    activateDefaultTool();
 }
 
 void MainWindow::initMainToolbar()
@@ -704,9 +728,13 @@ void MainWindow::initConnections()
                                                  .arg(item.y()));
             });
 
+    connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
+            &MainWindow::onCreateMessageToolRequested);
+
     connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
         d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
         d->ui->mscTextBrowser->updateView();
+        updateMscToolbarActionsEnablement();
     });
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
@@ -716,12 +744,8 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
 
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelAboutToBeReset, this,
-            [this]() { d->m_modelIndex = d->ui->documentTreeView->currentIndex(); });
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this, [this]() {
-        d->ui->documentTreeView->expandAll();
-        d->ui->documentTreeView->setCurrentIndex(d->m_modelIndex);
-    });
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this,
+            [this]() { d->ui->documentTreeView->expandAll(); });
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
@@ -787,4 +811,100 @@ void MainWindow::closeEvent(QCloseEvent *e)
 {
     saveSettings();
     QMainWindow::closeEvent(e);
+}
+
+void MainWindow::changeEvent(QEvent *e)
+{
+    QMainWindow::changeEvent(e);
+
+    if (e->type() == QEvent::ActivationChange) {
+
+        // In order to automatically create on startup a default doc with a ChartItem
+        // box sized accordingly to this->centralWidget(), we have to wait while
+        // processing of restoreState(...) & restoreGeometry(...) will be finished.
+        // The final geometry (which is stored in a QByteArray and not in a QRect)
+        // is applyed after QEvent::Show, so QEvent::Resize handler seems to be
+        // a proper entry point, but actually it's not:
+        // in case the saved window state is "normal", the resizeEvent(...) will
+        // be called once, but for "maximized" there would be one more call, and
+        // there is no easy way to detect without additional routines is it necessary
+        // to wait for the second call or not.
+        // That's why it's performed here and in such way.
+        // (But now I suspect writing those additional routines would take about
+        // same time as writing this comment did)
+
+        static bool isFirstCall(true);
+        if (isFirstCall) {
+            isFirstCall = false;
+            onGeometryRestored();
+        }
+    }
+}
+
+void MainWindow::onGeometryRestored()
+{
+    // A new document should be created only if no files were opened by command line args
+    if (d->m_mscFileName.isEmpty()) {
+        QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
+    }
+}
+
+QSizeF MainWindow::prepareChartBoxSize() const
+{
+    static constexpr qreal padding = 100.;
+    if (centralWidget()) {
+        return centralWidget()->geometry().size() - QSizeF(padding, padding);
+    }
+    return QSizeF();
+}
+
+void MainWindow::updateMscToolbarActionsEnablement()
+{
+    auto chart = d->m_model->chartViewModel().currentChart();
+    const bool hasInstance = chart && !chart->instances().isEmpty();
+
+    bool forceDefault(false);
+    for (QAction *act : d->m_mscToolBar->actions()) {
+        const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
+        switch (toolType) {
+        case msc::BaseTool::ToolType::ActionCreator:
+        case msc::BaseTool::ToolType::ConditionCreator:
+        case msc::BaseTool::ToolType::MessageCreator:
+        case msc::BaseTool::ToolType::EntityDeleter:
+        case msc::BaseTool::ToolType::TimerCreator: {
+            const bool changed = act->isEnabled() && !hasInstance;
+            forceDefault = forceDefault || changed;
+            act->setEnabled(hasInstance);
+            break;
+        }
+        case msc::BaseTool::ToolType::Pointer:
+        case msc::BaseTool::ToolType::InstanceCreator:
+        default: {
+            act->setEnabled(true);
+            break;
+        }
+        }
+    }
+
+    if (forceDefault)
+        activateDefaultTool();
+}
+
+void MainWindow::updateMscToolbarActionsChecked()
+{
+    if (QAction *senderAction = qobject_cast<QAction *>(sender()))
+        if (senderAction->isChecked())
+            for (QAction *action : d->m_mscToolBar->actions())
+                if (action != senderAction)
+                    action->setChecked(false);
+}
+
+QStringList MainWindow::mscFileFilters()
+{
+    static QStringList filters;
+    if (filters.isEmpty()) {
+        const QString asterisk("*%1");
+        filters << asterisk.arg(DotMscFileExtensionLow) << asterisk.arg(DotMscFileExtensionLow).toUpper();
+    }
+    return filters;
 }

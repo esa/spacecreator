@@ -27,7 +27,7 @@ class PointerTool : public BaseTool
 public:
     PointerTool(QGraphicsView *view, QObject *parent = nullptr);
 
-    ToolType toolType() const override;
+    BaseTool::ToolType toolType() const override;
 
 protected:
     bool onMousePress(QMouseEvent *e) override;

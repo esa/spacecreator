@@ -27,6 +27,7 @@ namespace msc {
 
 class MscInstance;
 
+class InstanceHeadItem;
 class InstanceEndItem;
 class MessageItem;
 class TextItem;
@@ -36,8 +37,6 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    static const qreal StartSymbolHeight;
-
     explicit InstanceItem(MscInstance *instance, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
@@ -49,15 +48,12 @@ public:
     qreal axisHeight() const;
     QLineF axis() const;
 
-    QPainterPath shape() const override;
-
     void setBoundingRect(const QRectF &geometry);
 
     static InstanceItem *createDefaultItem(MscInstance *instance, const QPointF &pos);
 
 Q_SIGNALS:
     void needRelayout() const;
-    void needRearrange() const;
     void moved(InstanceItem *);
 
 public Q_SLOTS:
@@ -65,7 +61,7 @@ public Q_SLOTS:
     void setKind(const QString &kind);
     void buildLayout();
     void rebuildLayout() override;
-    void ensureNotOverlapped();
+    bool moveLeftIfOverlaps();
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -76,16 +72,13 @@ protected:
 private:
     msc::MscInstance *m_instance = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
-    QGraphicsRectItem *m_headSymbol = nullptr;
-    TextItem *m_nameItem = nullptr;
-    TextItem *m_kindItem = nullptr;
+    InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = 150.0;
 
-    static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
-    static QLinearGradient createGradientForName(const QGraphicsItem *itemName);
+    Q_INVOKABLE void reflectTextLayoutChange();
 
-    void updateText(TextItem *holder, const QString &text);
+    void updatePropertyString(const QLatin1String &property, const QString &value);
 
 private Q_SLOTS:
     void onNameEdited(const QString &newName);

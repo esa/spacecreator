@@ -33,9 +33,8 @@ public:
     explicit MscInstanceEvent(const QString &name, QObject *parent = nullptr);
     ~MscInstanceEvent() override;
 
-    virtual bool relatesTo(MscInstance *instance) const = 0;
+    virtual bool relatesTo(const MscInstance *instance) const = 0;
 };
-
 }
 
 #endif // MSCEVENT_H

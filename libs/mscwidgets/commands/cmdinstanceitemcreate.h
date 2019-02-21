@@ -31,7 +31,7 @@ namespace cmd {
 class CmdInstanceItemCreate : public BaseCommand
 {
 public:
-    CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart);
+    CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart, int orderId);
 
     void redo() override;
     void undo() override;
@@ -41,6 +41,7 @@ public:
 private:
     MscInstance *m_instance = nullptr;
     QPointer<MscChart> m_chart;
+    const int m_instanceOrderNum;
 };
 
 } // ns cmd

@@ -34,9 +34,9 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
     m_icon = QPixmap(":/icons/toolbar/instance.png");
 }
 
-ToolType InstanceCreatorTool::toolType() const
+BaseTool::ToolType InstanceCreatorTool::toolType() const
 {
-    return msc::ToolType::InstanceCreator;
+    return BaseTool::ToolType::InstanceCreator;
 }
 
 void InstanceCreatorTool::createPreviewItem()
@@ -45,7 +45,7 @@ void InstanceCreatorTool::createPreviewItem()
         return;
 
     MscInstance *orphaninstance = new MscInstance(tr("Instance"));
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, scenePos());
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, cursorInScene());
 
     if (!instanceItem) {
         delete orphaninstance;
@@ -65,11 +65,13 @@ void InstanceCreatorTool::commitPreviewItem()
         return;
 
     auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity);
+    const int pos = m_model->instanceOrderFromPos(cursorInScene());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart) };
+                                      QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
 
     removePreviewItem(); // free the space to avoid overlapping
 
+    startWaitForModelLayoutComplete(instance);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 
     Q_EMIT created();

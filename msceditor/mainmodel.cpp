@@ -180,7 +180,7 @@ MscChart *MainModel::firstChart() const
     return firstChart(d->m_mscModel->documents());
 }
 
-MscChart *MainModel::firstChart(const QVector<MscDocument *> docs) const
+MscChart *MainModel::firstChart(const QVector<MscDocument *> &docs) const
 {
     for (MscDocument *doc : docs) {
         if (!doc->charts().isEmpty()) {
