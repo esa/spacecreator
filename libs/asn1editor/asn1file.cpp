@@ -18,7 +18,6 @@
 #include "asn1file.h"
 
 #include "asn1errorlistener.h"
-#include "asn1itemmodel.h"
 #include "asn1parservisitor.h"
 #include "parser/ASNBaseVisitor.h"
 #include "parser/ASNLexer.h"
@@ -35,7 +34,7 @@ namespace asn1 {
 
 Asn1File::Asn1File() {}
 
-Asn1ItemModel *Asn1File::parseFile(const QString &filename, QStringList *errorMessages)
+QVariantList Asn1File::parseFile(const QString &filename, QStringList *errorMessages)
 {
     if (!QFileInfo::exists(filename)) {
         throw QObject::tr("File not found");
@@ -51,13 +50,13 @@ Asn1ItemModel *Asn1File::parseFile(const QString &filename, QStringList *errorMe
     return parse(input, errorMessages);
 }
 
-Asn1ItemModel *Asn1File::parseText(const QString &text, QStringList *errorMessages)
+QVariantList Asn1File::parseText(const QString &text, QStringList *errorMessages)
 {
     ANTLRInputStream input(text.toStdString());
     return parse(input, errorMessages);
 }
 
-Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessages)
+QVariantList Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
     Asn1ErrorListener errorListener;
 
@@ -84,7 +83,7 @@ Asn1ItemModel *Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessag
         throw QObject::tr("Parser syntax error");
     }
 
-    return nullptr; // visitor.detachModel();
+    return visitor.detachTypesData();
 }
 
 } // namespace asn1

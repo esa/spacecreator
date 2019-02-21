@@ -323,7 +323,7 @@ bool MainWindow::openFileAsn(const QString &file)
     QStringList errorMessages;
 
     try {
-        f.parseFile(file, &errorMessages);
+        QVariantList ans1Types = f.parseFile(file, &errorMessages);
     } catch (...) {
         // print error message
     }
