@@ -19,6 +19,7 @@
 #define ASN1ILE_H
 
 #include <QString>
+#include <QVariant>
 
 namespace antlr4 {
 class ANTLRInputStream;
@@ -26,20 +27,18 @@ class ANTLRInputStream;
 
 namespace asn1 {
 
-class Asn1ItemModel;
-
 class Asn1File
 {
 public:
     Asn1File();
 
-    Asn1ItemModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
-    Asn1ItemModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
+    QVariantList parseFile(const QString &filename, QStringList *errorMessages = nullptr);
+    QVariantList parseText(const QString &text, QStringList *errorMessages = nullptr);
 
     QStringList getErrorMessages() const;
 
 private:
-    Asn1ItemModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
+    QVariantList parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
 };
 
 } // namespace asn1

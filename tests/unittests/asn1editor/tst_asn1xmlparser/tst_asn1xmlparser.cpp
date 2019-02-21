@@ -127,15 +127,10 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
     auto valuesInt = typeMap["valuesInt"].toList();
 
     QCOMPARE(values.count(), 3);
-    QCOMPARE(values.count(), valuesInt.count());
 
     QCOMPARE(values.at(0).toString(), QString("red"));
     QCOMPARE(values.at(1).toString(), QString("green"));
     QCOMPARE(values.at(2).toString(), QString("blue"));
-
-    QCOMPARE(valuesInt.at(0).toInt(), 0);
-    QCOMPARE(valuesInt.at(1).toInt(), 1);
-    QCOMPARE(valuesInt.at(2).toInt(), 2);
 }
 
 void tst_Asn1XMLParser::testChoiceType()

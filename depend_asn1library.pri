@@ -18,3 +18,6 @@ DEPENDPATH += $$PWD/libs/asn1editor
 
 win32:PRE_TARGETDEPS += $$OUT_PWD_BASE/$$BuildType/$${LibPrefix}asn1editor.$$LibSuffix
 else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$${LibPrefix}asn1editor.$$LibSuffix
+
+# Add ANTLR runtime
+include("$$PWD/link_antlr_rt.pri")
