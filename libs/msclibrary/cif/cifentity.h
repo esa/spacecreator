@@ -70,6 +70,9 @@ public:
 
     virtual bool initFrom(const QString &sourceLine); // TODO: made it pure virtual
 
+    static QString nameForType(CifEntity::CifType t);
+    static CifEntity::CifType typeForName(const QString &name);
+
 protected:
     const CifType m_type;
 };

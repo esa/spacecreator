@@ -41,9 +41,6 @@ private:
     static const QString m_typePattern;
     static const QRegularExpression m_typeRx;
 
-    const QMap<QString, CifEntity::CifType> m_typesByName;
-    const QMap<CifEntity::CifType, QString> m_namesByType;
-
     CifEntity::CifType readCifType(const QString &from) const;
 
     CifEntityShared readEntityAction(const QString &from) const;

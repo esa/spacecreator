@@ -18,6 +18,7 @@
 #include "cifentity.h"
 
 #include <QDebug>
+#include <QMetaEnum>
 
 namespace msc {
 namespace cif {
@@ -43,6 +44,39 @@ bool CifEntity::initFrom(const QString &sourceLine)
 {
     qWarning() << Q_FUNC_INFO << "Base implimentation call!" << sourceLine;
     return false;
+}
+
+QString CifEntity::nameForType(CifEntity::CifType t)
+{
+    auto initTypes = []() {
+        QMap<CifEntity::CifType, QString> res;
+
+        const QMetaEnum &e = QMetaEnum::fromType<CifEntity::CifType>();
+        for (int i = 0; i < e.keyCount(); ++i)
+            res.insert(CifEntity::CifType(e.value(i)), QString(e.key(i)).toUpper());
+
+        return res;
+    };
+
+    static const QMap<CifEntity::CifType, QString> namesByType = initTypes();
+    return namesByType.contains(t) ? namesByType.value(t) : namesByType.value(CifEntity::CifType::Unknown);
+}
+
+CifEntity::CifType CifEntity::typeForName(const QString &name)
+{
+    auto initNames = []() {
+        QMap<QString, CifEntity::CifType> res;
+
+        const QMetaEnum &e = QMetaEnum::fromType<CifEntity::CifType>();
+        for (int i = 0; i < e.keyCount(); ++i)
+            res.insert(QString(e.key(i)).toUpper(), CifEntity::CifType(e.value(i)));
+
+        return res;
+    };
+    static const QMap<QString, CifEntity::CifType> typesByName = initNames();
+
+    return typesByName.contains(name) ? typesByName.value(name)
+                                      : typesByName.value(nameForType(CifEntity::CifType::Unknown));
 }
 
 } // ns cif

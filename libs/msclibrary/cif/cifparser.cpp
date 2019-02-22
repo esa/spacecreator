@@ -20,32 +20,9 @@
 #include "exceptions.h"
 
 #include <QDebug>
-#include <QMetaEnum>
 
 namespace msc {
 namespace cif {
-
-QMap<QString, CifEntity::CifType> initNames()
-{
-    QMap<QString, CifEntity::CifType> res;
-
-    const QMetaEnum &e = QMetaEnum::fromType<CifEntity::CifType>();
-    for (int i = 0; i < e.keyCount(); ++i)
-        res.insert(QString(e.key(i)).toUpper(), CifEntity::CifType(e.value(i)));
-
-    return res;
-}
-
-QMap<CifEntity::CifType, QString> initTypes()
-{
-    QMap<CifEntity::CifType, QString> res;
-
-    const QMetaEnum &e = QMetaEnum::fromType<CifEntity::CifType>();
-    for (int i = 0; i < e.keyCount(); ++i)
-        res.insert(CifEntity::CifType(e.value(i)), QString(e.key(i)).toUpper());
-
-    return res;
-}
 
 const QLatin1String CifParser::CifLineTag("CIF");
 
@@ -55,8 +32,6 @@ const QRegularExpression CifParser::m_typeRx = QRegularExpression(m_typePattern)
 
 CifParser::CifParser(QObject *parent)
     : QObject(parent)
-    , m_typesByName(initNames())
-    , m_namesByType(initTypes())
 {
 }
 
@@ -66,8 +41,7 @@ CifEntity::CifType CifParser::readCifType(const QString &from) const
         QRegularExpressionMatch matched = m_typeRx.match(from);
         if (matched.hasMatch()) {
             const QString &typeName = matched.captured(1).toUpper();
-            if (m_typesByName.contains(typeName))
-                return m_typesByName.value(typeName);
+            return CifEntity::typeForName(typeName);
         }
     }
 
