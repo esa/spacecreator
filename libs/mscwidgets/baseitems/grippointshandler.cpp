@@ -127,12 +127,13 @@ QRectF GripPointsHandler::boundingRect() const
 
 void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    painter->fillPath(m_bodyPath, m_bodyBrush);
-    painter->fillPath(m_borderPath, m_highlighter.bodyColor());
-    painter->strokePath(m_borderPath, m_highlighter.borderColor());
+    //    painter->fillPath(m_bodyPath, m_bodyBrush);
+    //    painter->fillPath(m_borderPath, m_highlighter.bodyColor());
+    //    painter->strokePath(m_borderPath, m_highlighter.borderColor());
 }
 
 void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to)

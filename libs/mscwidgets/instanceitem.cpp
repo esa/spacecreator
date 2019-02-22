@@ -203,6 +203,15 @@ void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const Q
     Q_UNUSED(to);
 }
 
+QPainterPath InstanceItem::shape() const
+{
+    QPainterPath result;
+    result.addRect(m_headSymbol->boundingRect());
+    result.addRect(m_endSymbol->boundingRect());
+    result.addPath(ObjectsLinkItem::hoverableLine(m_axisSymbol->line()));
+    return result;
+}
+
 void InstanceItem::setBoundingRect(const QRectF &geometry)
 {
     if (geometry == boundingRect())
