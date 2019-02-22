@@ -23,6 +23,10 @@
 #include <QVector>
 
 namespace msc {
+namespace cif {
+class CifParser;
+} // ns cif
+
 class MscChart;
 class MscDocument;
 class MscInstance;
@@ -90,6 +94,7 @@ private:
     QVector<InstanceEvents> m_instanceEventsList;
 
     antlr4::CommonTokenStream *m_tokens = nullptr;
+    msc::cif::CifParser *m_cifParser = nullptr;
 
     msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
     msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);

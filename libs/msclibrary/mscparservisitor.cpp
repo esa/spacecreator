@@ -17,6 +17,7 @@
 
 #include "mscparservisitor.h"
 
+#include "cif/cifparser.h"
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -94,11 +95,13 @@ using namespace msc;
 MscParserVisitor::MscParserVisitor(antlr4::CommonTokenStream *tokens)
     : m_model(new MscModel)
     , m_tokens(tokens)
+    , m_cifParser(new cif::CifParser())
 {
 }
 
 MscParserVisitor::~MscParserVisitor()
 {
+    delete m_cifParser;
     delete m_model;
 }
 
@@ -145,7 +148,8 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     auto handleComment = [=](antlr4::Token *token) {
         if (token->getChannel() == 2) {
             // Handle this token
-            auto line = QString::fromStdString(token->getText()).trimmed();
+            const QString &srcLine = QString::fromStdString(token->getText()).trimmed();
+            QString line = srcLine;
             if (line.startsWith("/*")) {
                 line = line.mid(2);
             }
@@ -154,8 +158,12 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
             }
             line = line.trimmed();
 
-            if (line.startsWith("CIF")) {
-                // Handle CIF here
+            if (line.startsWith(cif::CifParser::CifLineTag)) {
+                cif::CifEntityShared cifInfo = m_cifParser->readCIF(srcLine);
+                if (cifInfo) {
+                    // TODO: process found info
+                    qDebug() << cifInfo->entityType();
+                }
             } else if (line.startsWith("MSC")) {
                 // Handle MSC here
                 // This is really simple first version of an MSC hierarchy parser
