@@ -145,10 +145,8 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(typeMap["type"].toString(), QString("choice"));
 
     auto choices = typeMap["choices"].toList();
-    auto choiceIdx = typeMap["choiceIdx"].toList();
 
     QCOMPARE(choices.count(), 2);
-    QCOMPARE(choices.count(), choiceIdx.count());
 
     auto choiceItem = choices.at(0).toMap();
     QCOMPARE(choiceItem.size(), 4);
@@ -162,9 +160,6 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(choiceItem["type"].toString(), QString("double"));
     QCOMPARE(choiceItem["min"].toDouble(), -90.0);
     QCOMPARE(choiceItem["max"].toDouble(), 90.0);
-
-    QCOMPARE(choiceIdx.at(0).toString(), QString("hop_PRESENT"));
-    QCOMPARE(choiceIdx.at(1).toString(), QString("lat_PRESENT"));
 }
 
 void tst_Asn1XMLParser::testSequenceType()

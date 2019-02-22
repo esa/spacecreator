@@ -114,12 +114,12 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
     QString asnType = model->item(row, MODEL_TYPE_INDEX)->text();
 
     if (asnType == "choice" && hide) {
-        QVariantList choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST).toList();
+        QVariantList choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
         onChoiceFieldChanged(model->item(row)->index(), choices.size(),
                              choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
     } else if (asnType.indexOf("sequenceOf") >= 0 && hide) {
         onSequenceOfSizeChanged(model->item(row)->index(), model->item(row, MODEL_VALUE_INDEX)->text(),
-                                model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE));
+                                model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
     }
 
     for (int x = 0; x < item->rowCount(); ++x) {
@@ -128,9 +128,9 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
         asnType = item->child(x, MODEL_TYPE_INDEX)->text();
         if (asnType.indexOf("sequenceOf") >= 0)
             onSequenceOfSizeChanged(item->child(x)->index(), item->child(x, MODEL_VALUE_INDEX)->text(),
-                                    item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE));
+                                    item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
         else if (asnType == "choice") {
-            QVariantList choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST).toList();
+            QVariantList choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
             onChoiceFieldChanged(item->child(x)->index(), choices.size(),
                                  choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));
         }
@@ -178,7 +178,7 @@ void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &
         for (int x = 0; x < rowCount; ++x) {
             setChildRowValue(rootItem, x, asn1Value);
 
-            bool isOptional = rootItem->child(x, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL).toBool();
+            bool isOptional = rootItem->child(x, MODEL_IS_OPTIONAL_INDEX)->data(OPTIONAL_ROLE).toBool();
             if (isOptional) {
                 // asn1Value = list of map
                 const auto &valueMap =

@@ -20,6 +20,7 @@
 
 #include "parser/ASNBaseVisitor.h"
 
+#include <QSharedPointer>
 #include <QVariant>
 
 namespace asn1 {
@@ -30,7 +31,6 @@ public:
     explicit Asn1ParserVisitor();
 
     antlrcpp::Any visitAssignment(ASNParser::AssignmentContext *ctx) override;
-    //    antlrcpp::Any visitBuiltinType(ASNParser::BuiltinTypeContext *context) override;
 
     antlrcpp::Any visitIntegerType(ASNParser::IntegerTypeContext *context) override;
     antlrcpp::Any visitRealType(ASNParser::RealTypeContext *context) override;
@@ -43,32 +43,49 @@ public:
     antlrcpp::Any visitSetOfType(ASNParser::SetOfTypeContext *context) override;
     antlrcpp::Any visitReferencedType(ASNParser::ReferencedTypeContext *context) override;
 
+    antlrcpp::Any visitSizeConstraint(ASNParser::SizeConstraintContext *context) override;
     antlrcpp::Any visitConstraint(ASNParser::ConstraintContext *context) override;
     antlrcpp::Any visitSubtypeElements(ASNParser::SubtypeElementsContext *context) override;
 
     antlrcpp::Any visitComponentType(ASNParser::ComponentTypeContext *context) override;
     antlrcpp::Any visitNamedType(ASNParser::NamedTypeContext *context) override;
 
-    //    antlrcpp::Any visitEnumerations(ASNParser::EnumerationsContext *context) override;
     antlrcpp::Any visitEnumerationItem(ASNParser::EnumerationItemContext *context) override;
 
     QVariantList detachTypesData();
 
 private:
+    struct Asn1TypeData;
+
+    using Asn1TypeDataPtr = QSharedPointer<Asn1TypeData>;
+    using Asn1TypeDataList = QList<Asn1TypeDataPtr>;
+
     void setAns1Type(const QString &asn1Type);
     void setAns1TypeConstraint(const QString &constraintKey, const QString &constraintValue);
     void setAns1TypeOptional(bool value);
+    void takeLastParent();
 
-    void updateAns1TypesData();
-    void updateNamedTypeData();
+    Asn1TypeDataPtr createAsn1TypeData(const QString &name = {});
 
 private:
-    QVariantList m_asn1TypesData;
-    QVariantMap m_currentType;
-    QVariantList m_enumValues;
-    QVariantMap m_namedTypeData;
+    struct Asn1TypeData {
+        Asn1TypeData(const QString &name = {})
+            : m_name(name)
+        {
+        }
 
-    bool m_choiceType = false;
+        QString m_name;
+        QString m_type;
+        bool m_optional;
+        QString m_min;
+        QString m_max;
+
+        Asn1TypeDataList m_children;
+    };
+
+    Asn1TypeDataList m_asn1TypesData;
+    Asn1TypeDataPtr m_currentType = nullptr;
+    Asn1TypeDataList m_parentList;
 };
 
 } // namespace asn1

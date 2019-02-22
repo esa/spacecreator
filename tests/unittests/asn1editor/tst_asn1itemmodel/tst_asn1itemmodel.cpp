@@ -69,7 +69,7 @@ void tst_Asn1ItemModel::testIntTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyInt"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("integer"));
 }
 
 void tst_Asn1ItemModel::testRealTypeModel()
@@ -78,7 +78,7 @@ void tst_Asn1ItemModel::testRealTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyDouble"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("double"));
 }
 
 void tst_Asn1ItemModel::testIntTypeModelWithRange()
@@ -87,7 +87,7 @@ void tst_Asn1ItemModel::testIntTypeModelWithRange()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyInt"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("integer (5..15)"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("integer"));
 }
 
 void tst_Asn1ItemModel::testRealTypeModelWithRange()
@@ -96,7 +96,7 @@ void tst_Asn1ItemModel::testRealTypeModelWithRange()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyDouble"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("double (10..50)"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("double"));
 }
 
 void tst_Asn1ItemModel::testBoolTypeModel()
@@ -105,7 +105,7 @@ void tst_Asn1ItemModel::testBoolTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyBool"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("bool"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("bool"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("bool"));
 }
 
 void tst_Asn1ItemModel::testEnumTypeModel()
@@ -115,8 +115,8 @@ void tst_Asn1ItemModel::testEnumTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyEnum"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("enumerated"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("enumerated"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(CHOICE_LIST).toList().size(), 3);
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("enumerated"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList().size(), 3);
 }
 
 void tst_Asn1ItemModel::testChoiceTypeModel()
@@ -132,18 +132,18 @@ void tst_Asn1ItemModel::testChoiceTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyChoice"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("choice"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(), QString("choice"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("choice"));
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->rowCount(), 2);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0)->text(), QString("choiceInt"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(),
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
              QString("integer"));
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1)->text(), QString("choiceReal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(),
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
              QString("double"));
 }
 
@@ -163,23 +163,23 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MySequence"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("sequence"));
-    QVERIFY(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).isNull() == true);
+    QVERIFY(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).isNull() == true);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->rowCount(), 3);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0)->text(), QString("intVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(),
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
              QString("integer"));
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1)->text(), QString("realVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(),
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
              QString("double"));
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2)->text(), QString("boolVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_TYPE_INDEX)->text(), QString("bool"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_VALUE_INDEX)->data(ASN1TYPE).toString(),
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
              QString("bool"));
 }
 

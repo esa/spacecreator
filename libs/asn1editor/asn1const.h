@@ -23,11 +23,11 @@
 
 namespace asn1 {
 
-const int ASN1TYPE = Qt::UserRole;
-const int MIN_RANGE = Qt::UserRole + 1;
-const int MAX_RANGE = Qt::UserRole + 2;
-const int CHOICE_LIST = Qt::UserRole + 3;
-const int OPTIONAL = Qt::UserRole + 4;
+const int ASN1TYPE_ROLE = Qt::UserRole;
+const int MIN_RANGE_ROLE = Qt::UserRole + 1;
+const int MAX_RANGE_ROLE = Qt::UserRole + 2;
+const int CHOICE_LIST_ROLE = Qt::UserRole + 3;
+const int OPTIONAL_ROLE = Qt::UserRole + 4;
 
 const int MODEL_NAME_INDEX = 0;
 const int MODEL_TYPE_INDEX = 1;
@@ -42,15 +42,15 @@ const QString ASN1_TYPE_DOUBLE = "double";
 const QString ASN1_TYPE_BOOL = "bool";
 const QString ASN1_TYPE_SEQUENCE = "sequence";
 const QString ASN1_TYPE_SEQUENCEOF = "sequenceOf";
-const QString ASN1_TYPE_SET = "set";
-const QString ASN1_TYPE_SETOF = "setOf";
 const QString ASN1_TYPE_ENUMERATED = "enumerated";
 const QString ASN1_TYPE_CHOICE = "choice";
 const QString ASN1_TYPE_STRING = "string";
 const QString ASN1_MIN = "min";
 const QString ASN1_MAX = "max";
+
 const QString ASN1_VALUES = "values";
 const QString ASN1_CHOICES = "choices";
-
+const QString ASN1_CHILDREN = "children";
+const QString ASN1_SEQOFTYPE = "seqoftype";
 }
 #endif // ASN1CONST_H

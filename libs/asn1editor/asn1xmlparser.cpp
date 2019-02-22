@@ -100,7 +100,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QVariantMap typeData;
 
     typeData[ASN1_NAME] = name;
-    typeData["isOptional"] = false;
+    typeData[ASN1_IS_OPTIONAL] = false;
 
     QDomElement typeElem = type.firstChild().toElement();
     QString typeName = typeElem.tagName();
@@ -139,7 +139,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
         parseSequenceType(typeAssignments, typeElem, typeData);
     } else if (typeName == "SequenceOfType") {
         typeData[ASN1_TYPE] = ASN1_TYPE_SEQUENCEOF;
-        typeData["seqoftype"] = parseType(typeAssignments, typeElem.firstChild().toElement());
+        typeData[ASN1_SEQOFTYPE] = parseType(typeAssignments, typeElem.firstChild().toElement());
         parseRange<int>(typeElem, typeData);
     } else if (typeName == "EnumeratedType") {
         typeData[ASN1_TYPE] = ASN1_TYPE_ENUMERATED;
@@ -177,12 +177,12 @@ void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments
 
         QVariantMap childType = parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName"));
 
-        childType["isOptional"] = elem.attribute("Optional") == "True";
+        childType[ASN1_IS_OPTIONAL] = elem.attribute("Optional") == "True";
 
         children.append(childType);
     }
 
-    result["children"] = children;
+    result[ASN1_CHILDREN] = children;
 }
 
 void Asn1XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
@@ -227,17 +227,14 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, 
 */
 
     QVariantList choices;
-    QVariantList choiceIdx;
 
     for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement elem = n.toElement();
 
         choices.append(parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName")));
-        choiceIdx.append(elem.attribute("EnumID"));
     }
 
     result[ASN1_CHOICES] = choices;
-    result["choiceIdx"] = choiceIdx;
 }
 
 template<typename T>

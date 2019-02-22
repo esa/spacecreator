@@ -23,7 +23,9 @@
 #include "parser/ASNLexer.h"
 #include "parser/ASNParser.h"
 
+#include <QDebug>
 #include <QFileInfo>
+
 //#include <QObject>
 //#include <antlr4-runtime.h>
 //#include <fstream>
