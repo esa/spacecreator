@@ -60,32 +60,32 @@ QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
 QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *editor = nullptr;
-    QString asnType = index.data(ASN1TYPE).toString();
+    QString asnType = index.data(ASN1TYPE_ROLE).toString();
 
     if (asnType == "integer" || asnType == "sequenceOf") {
         QSpinBox *spinBox = new QSpinBox(parent);
 
-        if (index.data(MIN_RANGE).isValid())
-            spinBox->setMinimum(index.data(MIN_RANGE).toInt());
+        if (index.data(MIN_RANGE_ROLE).isValid())
+            spinBox->setMinimum(index.data(MIN_RANGE_ROLE).toInt());
 
-        if (index.data(MAX_RANGE).isValid())
-            spinBox->setMaximum(index.data(MAX_RANGE).toInt());
+        if (index.data(MAX_RANGE_ROLE).isValid())
+            spinBox->setMaximum(index.data(MAX_RANGE_ROLE).toInt());
 
         editor = spinBox;
     } else if (asnType == "double") {
         QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
 
-        if (index.data(MIN_RANGE).isValid())
-            spinBox->setMinimum(index.data(MIN_RANGE).toDouble());
+        if (index.data(MIN_RANGE_ROLE).isValid())
+            spinBox->setMinimum(index.data(MIN_RANGE_ROLE).toDouble());
 
-        if (index.data(MAX_RANGE).isValid())
-            spinBox->setMaximum(index.data(MAX_RANGE).toDouble());
+        if (index.data(MAX_RANGE_ROLE).isValid())
+            spinBox->setMaximum(index.data(MAX_RANGE_ROLE).toDouble());
 
         editor = spinBox;
     } else if (asnType == "enumerated" || asnType == "choice" || asnType == "bool") {
         QComboBox *comboBox = new QComboBox(parent);
 
-        QVariantList enumVals = index.data(CHOICE_LIST).toList();
+        QVariantList enumVals = index.data(CHOICE_LIST_ROLE).toList();
         for (const auto &val : enumVals)
             comboBox->addItem(val.toString());
 
@@ -100,7 +100,7 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 
 void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    QString asnType = index.data(ASN1TYPE).toString();
+    QString asnType = index.data(ASN1TYPE_ROLE).toString();
 
     if (asnType == "integer" || asnType == "sequenceOf")
         qobject_cast<QSpinBox *>(editor)->setValue(index.data().toInt());
@@ -114,7 +114,7 @@ void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 
 void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    QString asnType = index.data(ASN1TYPE).toString();
+    QString asnType = index.data(ASN1TYPE_ROLE).toString();
     QVariant value;
 
     if (asnType == "integer" || asnType == "sequenceOf")
@@ -130,11 +130,11 @@ void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 
     if (asnType == "sequenceOf")
         Q_EMIT const_cast<Asn1ItemDelegate *>(this)->sequenceOfSizeChanged(index.sibling(index.row(), 0), value,
-                                                                         index.data(MAX_RANGE));
+                                                                         index.data(MAX_RANGE_ROLE));
 
     if (asnType == "choice")
         Q_EMIT const_cast<Asn1ItemDelegate *>(this)->choiceFieldChanged(
-                index.sibling(index.row(), 0), index.data(CHOICE_LIST).toList().size(),
+                index.sibling(index.row(), 0), index.data(CHOICE_LIST_ROLE).toList().size(),
                 qobject_cast<QComboBox *>(editor)->currentIndex());
 }
 
@@ -143,7 +143,7 @@ void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 {
     QRect editorRect;
 
-    QString asnType = index.data(ASN1TYPE).toString();
+    QString asnType = index.data(ASN1TYPE_ROLE).toString();
     if (asnType == "string")
         editorRect = QRect(option.rect.x(), option.rect.y(), option.rect.width(), qMax(option.rect.height(), 100));
     else
