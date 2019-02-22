@@ -20,6 +20,7 @@
 
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
+#include <QRegularExpression>
 #include <QTextOption>
 
 namespace msc {
@@ -55,6 +56,7 @@ public:
     void setEditable(bool editable);
 
     void enableEditMode();
+    void disableEditMode();
 
     void setTextMargin(qreal margin);
     qreal textMargin() const;
@@ -63,17 +65,27 @@ public:
 
     qreal idealWidth() const;
 
+    QString inputValidationPattern() const;
+    void setInputValidationPattern(const QString &pattern);
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();
+    void inputValidationPatternChanged(const QString &);
+
+protected Q_SLOTS:
+    virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
+    virtual bool validateInput(const QString &c) const;
+
+    QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
+
+protected:
     QColor m_bgrColor = Qt::white;
     QLinearGradient m_gradient;
     QColor m_frameColor = Qt::black;
@@ -82,6 +94,35 @@ private:
     bool m_gradientUsed = false;
     bool m_editable = false;
     QString m_prevText;
+    QRegularExpression m_inputValidator;
+};
+
+class NameItem : public TextItem
+{
+    // This could be done on the caller side, but currently it's the only used
+    // concretization, so let's wrapp it here to manage in a centralized manner.
+    // And since it's just a single string customization I don't want to place
+    // it into a separate file (at least, for now).
+
+    Q_OBJECT
+public:
+    NameItem(QGraphicsItem *parent = nullptr)
+        : TextItem(parent)
+    {
+        // see the MSC spec or Msc.g4
+        static const QLatin1String LETTER("A-Za-z");
+        static const QLatin1String DECIMALDIGIT("\\d");
+        static const QLatin1String UNDERLINE("_");
+        static const QLatin1String FULLSTOP(".");
+        static const QLatin1String MINUS("\\-");
+        static const QLatin1String BACKQUOTE("`");
+        static const QLatin1String SLASH("/");
+
+        static const QString pattern =
+                // NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
+                "[" + LETTER + DECIMALDIGIT + UNDERLINE + FULLSTOP + MINUS + BACKQUOTE + SLASH + "]";
+        setInputValidationPattern(pattern);
+    }
 };
 
 } // ns msc

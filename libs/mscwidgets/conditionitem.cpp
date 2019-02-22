@@ -34,7 +34,7 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(condition, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
-    , m_nameItem(new TextItem(this))
+    , m_nameItem(new NameItem(this))
 {
     setName(m_condition->name());
     connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);

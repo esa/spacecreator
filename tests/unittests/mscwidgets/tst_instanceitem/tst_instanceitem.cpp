@@ -119,47 +119,47 @@ void tst_InstanceItem::testMoveByHead()
                              ENDMSC; \
                          ENDMSCDOCUMENT;");
 
-    QScopedPointer<ChartViewModel> m_chartModel(new ChartViewModel());
+    QScopedPointer<ChartViewModel> chartModel(new ChartViewModel());
     QScopedPointer<MscFile> file(new MscFile);
     QScopedPointer<MscModel> model(file->parseText(msc));
-    QScopedPointer<QGraphicsView> m_view(new QGraphicsView());
-    m_view->setScene(m_chartModel->graphicsScene());
+    QScopedPointer<QGraphicsView> view(new QGraphicsView());
+    view->setScene(chartModel->graphicsScene());
 
-    m_chartModel->fillView(model->documents().first()->charts().first());
+    chartModel->fillView(model->documents().first()->charts().first());
 
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
 
     // This could be usefull during local development,
     // but fails the test in CI environment:
     if (isLocalBuild)
-        m_view->show();
+        view->show();
 
     auto getHead = [&](InstanceItem *instance) {
         const QRectF &r = instance->sceneBoundingRect();
-        return m_view->mapFromScene({ r.center().x(), r.top() + headVerticalOffsetPixels });
+        return view->mapFromScene({ r.center().x(), r.top() + headVerticalOffsetPixels });
     };
 
     for (int i = 0; i < iterationsCount; ++i) {
-        MscInstance *instanceA = m_chartModel->currentChart()->instances().first();
-        MscInstance *instanceB = m_chartModel->currentChart()->instances().last();
+        MscInstance *instanceA = chartModel->currentChart()->instances().first();
+        MscInstance *instanceB = chartModel->currentChart()->instances().last();
 
-        InstanceItem *itemA = m_chartModel->itemForInstance(instanceA);
-        InstanceItem *itemB = m_chartModel->itemForInstance(instanceB);
+        InstanceItem *itemA = chartModel->itemForInstance(instanceA);
+        InstanceItem *itemB = chartModel->itemForInstance(instanceB);
 
         const QPoint &rightHead = getHead(itemB);
         const QPoint &destination = getHead(itemA);
 
-        mouse::syntheticMove(m_view.data()->viewport(), rightHead, Qt::NoButton);
+        mouse::syntheticMove(view.data()->viewport(), rightHead, Qt::NoButton);
 
-        mouse::syntheticPress(m_view.data()->viewport(), rightHead);
-        mouse::syntheticMove(m_view.data()->viewport(), destination, Qt::LeftButton);
-        mouse::syntheticRelease(m_view.data()->viewport(), destination);
+        mouse::syntheticPress(view.data()->viewport(), rightHead);
+        mouse::syntheticMove(view.data()->viewport(), destination, Qt::LeftButton);
+        mouse::syntheticRelease(view.data()->viewport(), destination);
 
         // Now instances should be in reversed order
         // and no crash, ofcourse - see https://git.vikingsoftware.com/esa/msceditor/issues/134
         // (crash when moving an instance item by head to the leftmost position).
-        QCOMPARE(instanceA, m_chartModel->currentChart()->instances().last());
-        QCOMPARE(instanceB, m_chartModel->currentChart()->instances().first());
+        QCOMPARE(instanceA, chartModel->currentChart()->instances().last());
+        QCOMPARE(instanceB, chartModel->currentChart()->instances().first());
     }
 }
 

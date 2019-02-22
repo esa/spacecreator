@@ -32,8 +32,8 @@ namespace msc {
 ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_rectItem(new QGraphicsRectItem(this))
-    , m_textItemMarker(new TextItem(this))
-    , m_textItemName(new TextItem(this))
+    , m_textItemMarker(new NameItem(this))
+    , m_textItemName(new NameItem(this))
     , m_chart(chart)
 {
     m_rectItem->setPen(QColor(Qt::black));
