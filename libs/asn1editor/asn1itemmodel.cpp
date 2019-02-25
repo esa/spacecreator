@@ -26,8 +26,6 @@ namespace asn1 {
 Asn1ItemModel::Asn1ItemModel(QObject *parent)
     : QStandardItemModel(1, 4, parent)
 {
-    QStringList headers = QStringList() << tr("Field") << tr("Type") << tr("Value") << tr("Optional");
-    setHorizontalHeaderLabels(headers);
 }
 
 Asn1ItemModel::Asn1ItemModel(const QVariantMap &asn1Item, QObject *parent)
@@ -39,6 +37,9 @@ Asn1ItemModel::Asn1ItemModel(const QVariantMap &asn1Item, QObject *parent)
 void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
 {
     clear();
+
+    static QStringList headers = QStringList() << tr("Field") << tr("Type") << tr("Value") << tr("Optional");
+    setHorizontalHeaderLabels(headers);
 
     ItemMap itemMap = createModelItems(asn1Item, false);
 
@@ -56,7 +57,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     QStandardItem *nameItem = new QStandardItem(asn1Item[ASN1_NAME].toString());
     nameItem->setEditable(false);
 
-    if (asn1Item[ASN1_TYPE] == ASN1_TYPE_INTEGER || asn1Item[ASN1_TYPE] == ASN1_TYPE_INTEGER) {
+    if (asn1Item[ASN1_TYPE] == ASN1_TYPE_INTEGER || asn1Item[ASN1_TYPE] == ASN1_TYPE_DOUBLE) {
         valueItem = createNumberItem(asn1Item);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX))
@@ -124,9 +125,9 @@ QStandardItem *Asn1ItemModel::createNumberItem(QVariantMap asn1Item)
 
 QStandardItem *Asn1ItemModel::createBoolItem(QVariantMap asn1Item)
 {
-    static const QVariantList choices{ QString("true"), QString("false") };
+    static const QVariantList choices { QString("true"), QString("false") };
 
-    QStandardItem *item = new QStandardItem(asn1Item["default"].toString());
+    QStandardItem *item = new QStandardItem("false");
 
     item->setData(asn1Item[ASN1_TYPE], ASN1TYPE_ROLE);
     item->setData(choices, CHOICE_LIST_ROLE);
@@ -165,8 +166,12 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(QVariantMap asn1Item, QStanda
     QList<QStandardItem *> valueItems;
     QList<QStandardItem *> presentItems;
 
+    auto typeOfMap = asn1Item[ASN1_SEQOFTYPE].type() == QVariant::List
+            ? asn1Item[ASN1_SEQOFTYPE].toList().value(0).toMap()
+            : asn1Item[ASN1_SEQOFTYPE].toMap();
+
     for (int x = 0; x < asn1Item[ASN1_MAX].toInt(); ++x) {
-        ItemMap chilItem = createModelItems(asn1Item[ASN1_SEQOFTYPE].toMap());
+        ItemMap chilItem = createModelItems(typeOfMap);
 
         chilItem["item"]->setText(QString(tr("elem%1")).arg(x + 1));
         parent->appendRow(chilItem["item"]);

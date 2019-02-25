@@ -99,7 +99,7 @@ void tst_Asn1File::testChoiceType()
     auto asn1Types = asn1File.parseText("TASTE-Dataview DEFINITIONS ::= BEGIN \
                                                 MyChoice ::= CHOICE { hop BOOLEAN, lat REAL(-90.0..90.0), CareerEntry SEQUENCE { \
                                                     from  INTEGER, \
-                                                    to    INTEGER (1..3) OPTIONAL, \
+                                                    to    REAL (-1.1..3.14) OPTIONAL, \
                                                     team  OCTETSTRING (SIZE (1..256))  } } \
                                             END");
 
@@ -199,7 +199,7 @@ void tst_Asn1File::testReferencedType()
 {
     auto asn1Types = asn1File.parseText("TASTE-Dataview DEFINITIONS ::= BEGIN \
                                                 MySeq ::= SEQUENCE { from  INTEGER, foo BOOLEAN } \
-                                                MySeqOf ::= SEQUENCE (SIZE(1..3)) OF INTEGER (2..6) \
+                                                MySeqOf ::= SET (SIZE(1..3)) OF MySeq \
                                             END");
 
     QCOMPARE(asn1Types.count(), 2);
@@ -210,7 +210,7 @@ void tst_Asn1File::testReferencedType()
     QCOMPARE(seqMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCE));
 
     auto seqOfMap = asn1Types.at(1).toMap();
-    QCOMPARE(seqOfMap.size(), 5);
+    QCOMPARE(seqOfMap.size(), 6);
     QCOMPARE(seqOfMap[ASN1_NAME].toString(), QString("MySeqOf"));
     QCOMPARE(seqOfMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCEOF));
     QCOMPARE(seqOfMap[ASN1_MIN].toInt(), 1);

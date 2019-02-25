@@ -119,7 +119,7 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
     QCOMPARE(typeMap["default"].toBool(), false);
 
     typeMap = asn1Types.at(1).toMap();
-    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap.size(), 4);
     QCOMPARE(typeMap["name"].toString(), QString("TypeEnumerated"));
     QCOMPARE(typeMap["type"].toString(), QString("enumerated"));
 
@@ -140,7 +140,7 @@ void tst_Asn1XMLParser::testChoiceType()
     QCOMPARE(asn1Types.count(), 1);
 
     auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap.size(), 4);
     QCOMPARE(typeMap["name"].toString(), QString("MyChoice"));
     QCOMPARE(typeMap["type"].toString(), QString("choice"));
 
