@@ -60,7 +60,7 @@ QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
 QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *editor = nullptr;
-    QString asnType = index.data(ASN1TYPE_ROLE).toString();
+    const QString &asnType = index.data(ASN1TYPE_ROLE).toString();
 
     if (asnType == ASN1_TYPE_SEQUENCEOF) {
         QSpinBox *spinBox = new QSpinBox(parent);
@@ -103,7 +103,7 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 
 void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    QString asnType = index.data(ASN1TYPE_ROLE).toString();
+    const QString &asnType = index.data(ASN1TYPE_ROLE).toString();
 
     if (asnType == ASN1_TYPE_SEQUENCEOF)
         qobject_cast<QSpinBox *>(editor)->setValue(index.data().toInt());
@@ -117,7 +117,7 @@ void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 
 void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    QString asnType = index.data(ASN1TYPE_ROLE).toString();
+    const QString &asnType = index.data(ASN1TYPE_ROLE).toString();
     QVariant value;
 
     if (asnType == ASN1_TYPE_SEQUENCEOF)
@@ -146,7 +146,7 @@ void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 {
     QRect editorRect;
 
-    QString asnType = index.data(ASN1TYPE_ROLE).toString();
+    const QString &asnType = index.data(ASN1TYPE_ROLE).toString();
     if (asnType == ASN1_TYPE_STRING)
         editorRect = QRect(option.rect.x(), option.rect.y(), option.rect.width(), qMax(option.rect.height(), 100));
     else

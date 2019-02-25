@@ -339,8 +339,8 @@ bool MainWindow::openFileAsn(const QString &file)
         asn1::Asn1Editor editor;
         editor.setAsn1Types(ans1Types);
         editor.exec();
-    } catch (...) {
-        // print error message
+    } catch (const std::exception &e) {
+        qWarning() << "Error parse asn1 file. " << e.what();
     }
 
     if (errorMessages.size()) {

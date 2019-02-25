@@ -30,15 +30,13 @@ void Asn1ErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Toke
     const QString positionInLine = QString::number(charPositionInLine);
     const QString errorMessage = QString::fromStdString(msg);
 
-    antlr4::Lexer *lexer = dynamic_cast<antlr4::Lexer *>(recognizer);
-    if (lexer) {
+    if (dynamic_cast<antlr4::Lexer *>(recognizer)) {
         m_errorMessages.append(QString("line %1:%2: <b>%3</b><br>").arg(lineOfError, positionInLine, errorMessage));
         return;
     }
 
     QString stack;
-    antlr4::Parser *parser = dynamic_cast<antlr4::Parser *>(recognizer);
-    if (parser) {
+    if (auto parser = dynamic_cast<antlr4::Parser *>(recognizer)) {
         QStringList strList;
         for (const std::string &str : parser->getRuleInvocationStack())
             strList.prepend(QString::fromStdString(str));
