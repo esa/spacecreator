@@ -35,6 +35,8 @@ class Asn1Editor : public QDialog
 
 public:
     Asn1Editor(QWidget *parent = nullptr);
+    void setAsn1Types(const QVariantList &asn1Types);
+
     ~Asn1Editor();
 
 public Q_SLOTS:
@@ -49,6 +51,7 @@ private Q_SLOTS:
 
 private:
     void loadFile(const QString &file);
+    void addAsn1TypeItems();
 
 private:
     Ui::Asn1Editor *ui;

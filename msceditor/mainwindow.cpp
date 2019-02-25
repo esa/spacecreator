@@ -179,7 +179,7 @@ void MainWindow::selectAndOpenFile()
 {
     static const QString suffixAsn(".asn");
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
-                                          QString("ASN1 files (*.%1 *.%2)").arg(suffixAsn, suffixAsn.toUpper()),
+                                          QString("ASN1 files (*%1 *%2)").arg(suffixAsn, suffixAsn.toUpper()),
                                           QString("All files (*.*)") };
 
     qDebug() << suffixes;
@@ -331,6 +331,10 @@ bool MainWindow::openFileAsn(const QString &file)
 
     try {
         QVariantList ans1Types = f.parseFile(file, &errorMessages);
+
+        asn1::Asn1Editor editor;
+        editor.setAsn1Types(ans1Types);
+        editor.exec();
     } catch (...) {
         // print error message
     }

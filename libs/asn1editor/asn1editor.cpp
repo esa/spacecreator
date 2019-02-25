@@ -45,6 +45,12 @@ Asn1Editor::Asn1Editor(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
+void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
+{
+    m_asn1Types = asn1Types;
+    addAsn1TypeItems();
+}
+
 Asn1Editor::~Asn1Editor()
 {
     delete ui;
@@ -98,7 +104,14 @@ void Asn1Editor::loadFile(const QString &file)
     connect(&parser, &Asn1XMLParser::parseError, this, &Asn1Editor::showParseError);
 
     m_asn1Types = parser.parseAsn1XmlFile(file);
+    addAsn1TypeItems();
+}
+
+void Asn1Editor::addAsn1TypeItems()
+{
     QStringList typeNames;
+
+    ui->typesCB->clear();
 
     for (const auto &asn1Type : m_asn1Types)
         typeNames << asn1Type.toMap()["name"].toString();

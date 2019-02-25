@@ -19,7 +19,6 @@
 
 #include "asn1const.h"
 
-#include <QDebug>
 #include <algorithm>
 
 namespace asn1 {
@@ -31,8 +30,6 @@ antlrcpp::Any Asn1ParserVisitor::visitAssignment(ASNParser::AssignmentContext *c
     if (ctx) {
         m_currentType = createAsn1TypeData(QString::fromStdString(ctx->IDENTIFIER()->getText()));
         m_asn1TypesData.append(m_currentType);
-
-        qDebug() << "assigment: " << QString::fromStdString(ctx->IDENTIFIER()->getText());
     }
 
     return visitChildren(ctx);
@@ -42,8 +39,6 @@ antlrcpp::Any Asn1ParserVisitor::visitIntegerType(ASNParser::IntegerTypeContext 
 {
     if (context) {
         setAns1Type(ASN1_TYPE_INTEGER);
-
-        qDebug() << "visitIntegerType: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -53,8 +48,6 @@ antlrcpp::Any Asn1ParserVisitor::visitRealType(ASNParser::RealTypeContext *conte
 {
     if (context) {
         setAns1Type(ASN1_TYPE_DOUBLE);
-
-        qDebug() << "visitRealType: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -64,8 +57,6 @@ antlrcpp::Any Asn1ParserVisitor::visitBooleanType(ASNParser::BooleanTypeContext 
 {
     if (context) {
         setAns1Type(ASN1_TYPE_BOOL);
-
-        qDebug() << "visitBooleanType: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -75,8 +66,6 @@ antlrcpp::Any Asn1ParserVisitor::visitEnumeratedType(ASNParser::EnumeratedTypeCo
 {
     if (context) {
         setAns1Type(ASN1_TYPE_ENUMERATED);
-
-        qDebug() << "visitEnumeratedType: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -87,8 +76,6 @@ antlrcpp::Any Asn1ParserVisitor::visitSequenceType(ASNParser::SequenceTypeContex
     if (context) {
         setAns1Type(ASN1_TYPE_SEQUENCE);
         m_parentList.append(m_currentType);
-
-        qDebug() << "visitSequenceType: " << QString::fromStdString(context->getText());
     }
 
     auto result = visitChildren(context);
@@ -103,10 +90,10 @@ antlrcpp::Any Asn1ParserVisitor::visitSequenceOfType(ASNParser::SequenceOfTypeCo
     if (context) {
         setAns1Type(ASN1_TYPE_SEQUENCEOF);
         m_parentList.append(m_currentType);
+
         m_currentType = createAsn1TypeData();
         m_parentList.last()->m_children.append(m_currentType);
-
-        qDebug() << "visitSequenceOfType: " << QString::fromStdString(context->getText());
+        m_segOfType = true;
     }
 
     auto result = visitChildren(context);
@@ -121,8 +108,6 @@ antlrcpp::Any Asn1ParserVisitor::visitChoiceType(ASNParser::ChoiceTypeContext *c
     if (context) {
         setAns1Type(ASN1_TYPE_CHOICE);
         m_parentList.append(m_currentType);
-
-        qDebug() << "visitChoiceType: " << QString::fromStdString(context->getText());
     }
 
     auto result = visitChildren(context);
@@ -137,8 +122,6 @@ antlrcpp::Any Asn1ParserVisitor::visitSetType(ASNParser::SetTypeContext *context
     if (context) {
         setAns1Type(ASN1_TYPE_SEQUENCE);
         m_parentList.append(m_currentType);
-
-        qDebug() << "visitSetType: " << QString::fromStdString(context->getText());
     }
 
     auto result = visitChildren(context);
@@ -156,8 +139,7 @@ antlrcpp::Any Asn1ParserVisitor::visitSetOfType(ASNParser::SetOfTypeContext *con
 
         m_currentType = createAsn1TypeData();
         m_parentList.last()->m_children.append(m_currentType);
-
-        qDebug() << "visitSetOfType: " << QString::fromStdString(context->getText());
+        m_segOfType = true;
     }
 
     auto result = visitChildren(context);
@@ -172,7 +154,7 @@ antlrcpp::Any Asn1ParserVisitor::visitReferencedType(ASNParser::ReferencedTypeCo
     if (context) {
         // referenced type should be already defined
         auto find_it = std::find_if(m_asn1TypesData.begin(), m_asn1TypesData.end(), [&](const Asn1TypeDataPtr &item) {
-            return item->m_type == QString::fromStdString(context->getText());
+            return item->m_name == QString::fromStdString(context->getText());
         });
 
         if (find_it != m_asn1TypesData.end()) {
@@ -182,26 +164,6 @@ antlrcpp::Any Asn1ParserVisitor::visitReferencedType(ASNParser::ReferencedTypeCo
             m_currentType->m_optional = (*find_it)->m_optional;
             m_currentType->m_children = (*find_it)->m_children;
         }
-
-        qDebug() << "visitReferencedType: " << QString::fromStdString(context->getText());
-    }
-
-    return visitChildren(context);
-}
-
-antlrcpp::Any Asn1ParserVisitor::visitSizeConstraint(ASNParser::SizeConstraintContext *context)
-{
-    if (context) {
-        qDebug() << "visitSizeConstraint: " << QString::fromStdString(context->getText());
-    }
-
-    return visitChildren(context);
-}
-
-antlrcpp::Any Asn1ParserVisitor::visitConstraint(ASNParser::ConstraintContext *context)
-{
-    if (context) {
-        qDebug() << "visitConstraint: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -220,22 +182,8 @@ antlrcpp::Any Asn1ParserVisitor::visitSubtypeElements(ASNParser::SubtypeElements
                                   QString::fromStdString(context->value(context->value().size() - 1)->getText()));
         }
 
-        qDebug() << "visitSubtypeElements: " << QString::fromStdString(context->getText()) << context->value().size();
-    }
-
-    return visitChildren(context);
-}
-
-antlrcpp::Any Asn1ParserVisitor::visitComponentType(ASNParser::ComponentTypeContext *context)
-{
-    if (context) {
-        qDebug() << "visitComponentType: " << QString::fromStdString(context->getText());
-
-        if (context->OPTIONAL_LITERAL()) {
-            //            setAns1TypeOptional(true);
-
-            qDebug() << "visitComponentType OPTIONAL_LITERAL: "
-                     << QString::fromStdString(context->OPTIONAL_LITERAL()->getText());
+        if (context->value().size()) {
+            m_segOfType = false;
         }
     }
 
@@ -257,8 +205,6 @@ antlrcpp::Any Asn1ParserVisitor::visitNamedType(ASNParser::NamedTypeContext *con
         } else {
             throw QObject::tr("No parent item");
         }
-
-        qDebug() << "visitNamedType: " << QString::fromStdString(context->IDENTIFIER()->getText());
     }
 
     return visitChildren(context);
@@ -268,8 +214,6 @@ antlrcpp::Any Asn1ParserVisitor::visitEnumerationItem(ASNParser::EnumerationItem
 {
     if (context) {
         m_currentType->m_children.append(createAsn1TypeData(QString::fromStdString(context->getText())));
-
-        qDebug() << "visitEnumerationItem: " << QString::fromStdString(context->getText());
     }
 
     return visitChildren(context);
@@ -338,11 +282,13 @@ void Asn1ParserVisitor::setAns1Type(const QString &asn1Type)
 
 void Asn1ParserVisitor::setAns1TypeConstraint(const QString &constraintKey, const QString &constraintValue)
 {
-    if (m_currentType) {
+    auto itemType = m_segOfType ? (!m_parentList.isEmpty() ? m_parentList.last() : nullptr) : m_currentType;
+
+    if (itemType) {
         if (constraintKey == ASN1_MIN) {
-            m_currentType->m_min = constraintValue;
+            itemType->m_min = constraintValue;
         } else {
-            m_currentType->m_max = constraintValue;
+            itemType->m_max = constraintValue;
         }
     }
 }

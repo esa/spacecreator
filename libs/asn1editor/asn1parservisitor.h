@@ -42,14 +42,8 @@ public:
     antlrcpp::Any visitSetType(ASNParser::SetTypeContext *context) override;
     antlrcpp::Any visitSetOfType(ASNParser::SetOfTypeContext *context) override;
     antlrcpp::Any visitReferencedType(ASNParser::ReferencedTypeContext *context) override;
-
-    antlrcpp::Any visitSizeConstraint(ASNParser::SizeConstraintContext *context) override;
-    antlrcpp::Any visitConstraint(ASNParser::ConstraintContext *context) override;
     antlrcpp::Any visitSubtypeElements(ASNParser::SubtypeElementsContext *context) override;
-
-    antlrcpp::Any visitComponentType(ASNParser::ComponentTypeContext *context) override;
     antlrcpp::Any visitNamedType(ASNParser::NamedTypeContext *context) override;
-
     antlrcpp::Any visitEnumerationItem(ASNParser::EnumerationItemContext *context) override;
 
     QVariantList detachTypesData();
@@ -86,6 +80,8 @@ private:
     Asn1TypeDataList m_asn1TypesData;
     Asn1TypeDataPtr m_currentType = nullptr;
     Asn1TypeDataList m_parentList;
+
+    bool m_segOfType = false;
 };
 
 } // namespace asn1
