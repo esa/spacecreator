@@ -282,9 +282,9 @@ void Asn1ParserVisitor::setAns1Type(const QString &asn1Type)
 
 void Asn1ParserVisitor::setAns1TypeConstraint(const QString &constraintKey, const QString &constraintValue)
 {
-    auto itemType = m_segOfType ? (!m_parentList.isEmpty() ? m_parentList.last() : nullptr) : m_currentType;
+    auto itemType = m_segOfType ? (!m_parentList.isEmpty() ? m_parentList.last() : Asn1TypeDataPtr()) : m_currentType;
 
-    if (itemType) {
+    if (!itemType.isNull()) {
         if (constraintKey == ASN1_MIN) {
             itemType->m_min = constraintValue;
         } else {
