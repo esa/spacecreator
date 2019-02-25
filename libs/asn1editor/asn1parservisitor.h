@@ -78,7 +78,7 @@ private:
     };
 
     Asn1TypeDataList m_asn1TypesData;
-    Asn1TypeDataPtr m_currentType = nullptr;
+    Asn1TypeDataPtr m_currentType;
     Asn1TypeDataList m_parentList;
 
     bool m_segOfType = false;
