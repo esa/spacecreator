@@ -334,7 +334,7 @@ bool MainWindow::openFileAsn(const QString &file)
     }
 
     try {
-        QVariantList ans1Types = f.parseFile(file, &errorMessages);
+        const QVariantList &ans1Types = f.parseFile(file, &errorMessages);
 
         asn1::Asn1Editor editor;
         editor.setAsn1Types(ans1Types);

@@ -45,7 +45,7 @@ private:
     QStandardItem *createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent);
     QStandardItem *createEnumeratedItem(QVariantMap asn1Item);
     QStandardItem *createChoiceItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createStringItem(QVariantMap asn1Item);
+    QStandardItem *createItem(QVariantMap asn1Item, const QString &text = QString());
 
     QStandardItem *createPresentItem(QVariantMap asn1Item);
 };
