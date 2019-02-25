@@ -8,4 +8,5 @@ SUBDIRS = \
     tst_mscmodel \
     tst_mscgate \
     tst_mscwriter \
-    tst_msceventsparsing
+    tst_msceventsparsing \
+    tst_cifparser

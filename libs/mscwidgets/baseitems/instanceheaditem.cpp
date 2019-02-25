@@ -78,9 +78,9 @@ QLinearGradient InstanceHeadItem::createGradientForName(const QGraphicsItem *ite
 
 InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , m_textItemName(new TextItem(this))
+    , m_textItemName(new NameItem(this))
     , m_rectItem(new QGraphicsRectItem(this))
-    , m_textItemKind(new TextItem(this))
+    , m_textItemKind(new NameItem(this))
 {
     m_textItemKind->setBackgroundColor(Qt::transparent);
     m_textItemKind->setEditable(true);

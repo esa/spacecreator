@@ -31,7 +31,9 @@ HEADERS += \
     mscparservisitor.h \
     msctimer.h \
     mscwriter.h \
-    msccreate.h
+    msccreate.h \
+    cif/cifentity.h \
+    cif/cifparser.h
 
 SOURCES += \
     parser/MscBaseVisitor.cpp \
@@ -55,7 +57,9 @@ SOURCES += \
     mscparservisitor.cpp \
     msctimer.cpp \
     mscwriter.cpp \
-    msccreate.cpp
+    msccreate.cpp \
+    cif/cifentity.cpp \
+    cif/cifparser.cpp
 
 antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")

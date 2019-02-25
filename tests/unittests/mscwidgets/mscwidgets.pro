@@ -16,4 +16,6 @@ SUBDIRS = \
     tst_objectslink \
     tst_chartitem \
     tst_chartviewmodel \
-    tst_cmdinstanceitemcreate
+    tst_cmdinstanceitemcreate \
+    tst_nameitem \
+    tst_textitem

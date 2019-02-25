@@ -17,9 +17,9 @@
 #include "labeledarrowitem.h"
 
 #include "arrowitem.h"
+#include "baseitems/textitem.h"
 #include "common/objectslink.h"
 #include "common/utils.h"
-#include "textitem.h"
 
 #include <QPainter>
 
@@ -35,7 +35,7 @@ namespace msc {
 
 LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , m_itemText(new TextItem(this))
+    , m_itemText(new NameItem(this))
     , m_itemArrow(new ArrowItem(this))
 {
     m_itemText->setFramed(false);

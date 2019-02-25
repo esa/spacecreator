@@ -147,5 +147,16 @@ bool intersects(const QRectF &rect, const QLineF &line)
     return false;
 }
 
+QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos)
+{
+    QVector<InstanceItem *> items;
+    if (scene)
+        for (InstanceItem *item : toplevelItems<InstanceItem>(scene))
+            if (item->sceneBoundingRect().contains(scenePos))
+                items << item;
+
+    return items;
+}
+
 } // ns utils
 } // ns msc

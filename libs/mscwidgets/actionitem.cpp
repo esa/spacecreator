@@ -30,7 +30,7 @@ namespace msc {
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     : InteractiveObject(action, parent)
     , m_action(action)
-    , m_textItem(new TextItem(this))
+    , m_textItem(new NameItem(this))
 {
     Q_ASSERT(m_action != nullptr);
 

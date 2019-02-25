@@ -19,6 +19,7 @@
 #include "textitem.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QKeyEvent>
 #include <QPainter>
@@ -40,6 +41,8 @@ TextItem::TextItem(QGraphicsItem *parent)
 {
     setTextAllignment(Qt::AlignCenter);
     setTextInteractionFlags(Qt::NoTextInteraction);
+    connect(document(), &QTextDocument::contentsChange, this, &TextItem::onContentsChange);
+    setInputValidationPattern(QString());
 }
 
 QBrush TextItem::background() const
@@ -181,13 +184,10 @@ void TextItem::setEditable(bool editable)
 
 void TextItem::enableEditMode()
 {
-    if (!m_editable) {
+    if (!m_editable)
         return;
-    }
 
-    if (m_prevText.isEmpty()) {
-        m_prevText = toPlainText();
-    }
+    m_prevText = toPlainText();
 
     selectText(true);
 
@@ -195,68 +195,59 @@ void TextItem::enableEditMode()
     setFocus();
 }
 
+void TextItem::disableEditMode()
+{
+    selectText(false);
+    m_prevText.clear();
+    setTextInteractionFlags(Qt::NoTextInteraction);
+}
+
 void TextItem::focusOutEvent(QFocusEvent *event)
 {
+    disableEditMode();
     QGraphicsTextItem::focusOutEvent(event);
-
-    if (!isEditable())
-        return;
-
-    const QString newText(toPlainText());
-    if (m_prevText != newText) {
-        Q_EMIT edited(newText);
-    }
-
-    selectText(false);
-
-    m_prevText.clear();
-
-    setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
 void TextItem::keyPressEvent(QKeyEvent *event)
 {
-
-    if (isEditable() && hasFocus()) {
+    bool accepted(false);
+    if (isEditing())
         switch (event->key()) {
         case Qt::Key_Escape: {
-            setPlainText(m_prevText);
-            clearFocus();
-            break;
-        }
-        case Qt::Key_Return:
-        case Qt::Key_Enter: {
-            if (event->modifiers() == Qt::NoModifier) {
-                clearFocus();
-                return;
+            accepted = true;
+            const QString newText = toPlainText();
+            if (m_prevText != newText) {
+                QSignalBlocker avoidValidation(document());
+                setPlainText(m_prevText);
+                Q_EMIT edited(m_prevText);
             }
             break;
         }
+        case Qt::Key_Return: {
+            accepted = event->modifiers() == Qt::NoModifier;
+            break;
+        }
+        case Qt::Key_Enter: {
+            accepted = event->modifiers() == Qt::KeypadModifier;
+            break;
+        }
+        default: {
+            break;
+        }
         }
 
-        QGraphicsTextItem::keyPressEvent(event);
-
-        setTextWidth(idealWidth());
-        adjustSize();
-
-        emit keyPressed();
+    if (accepted) {
+        event->accept();
+        clearFocus();
         return;
     }
 
     QGraphicsTextItem::keyPressEvent(event);
-}
 
-void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsTextItem::mouseReleaseEvent(event);
+    setTextWidth(idealWidth());
+    adjustSize();
 
-    if (!isEditable())
-        return;
-
-    if (m_prevText.isEmpty()) {
-        m_prevText = toPlainText();
-        selectText(true);
-    }
+    emit keyPressed();
 }
 
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -291,6 +282,106 @@ qreal TextItem::textMargin() const
 qreal TextItem::idealWidth() const
 {
     return document()->idealWidth();
+}
+
+/*!
+  \brief TextItem::inputValidationPattern
+  QRegularExpression pattern used for input validation on the fly. If empty,
+  text is not validated during input.
+*/
+QString TextItem::inputValidationPattern() const
+{
+    return m_inputValidator.pattern();
+}
+
+/*!
+  \brief TextItem::setInputValidationPattern
+  Sets pattern for QRegularExpression used for input validation on the fly.
+  Pass an empty string to disable text validation during input.
+*/
+void TextItem::setInputValidationPattern(const QString &pattern)
+{
+    const QString patternForced(pattern.isEmpty() ? ".*" : pattern);
+    if (m_inputValidator.pattern() == patternForced)
+        return;
+
+    m_inputValidator.setPattern(patternForced);
+    emit inputValidationPatternChanged(inputValidationPattern());
+}
+
+bool TextItem::validateInput(const QString &text) const
+{
+    if (inputValidationPattern().isEmpty() || text.isEmpty() || !m_inputValidator.isValid())
+        return false;
+
+    const QRegularExpressionMatch &matched = m_inputValidator.match(text);
+    return matched.hasMatch() && matched.captured() == text;
+}
+
+QPair<int, int> TextItem::prepareSelectionRange(int desiredFrom, int desiredTo) const
+{
+    QPair<int, int> res(0, 0);
+
+    auto validatePos = [](int pos, int totalLength) {
+        if (pos) {
+            if (pos >= totalLength)
+                pos = totalLength - 1;
+            if (pos < 0)
+                pos = 0;
+        }
+        return pos;
+    };
+
+    if (QTextDocument *doc = document()) {
+        const int totalChars = doc->characterCount();
+        if (totalChars > 0) {
+            res.first = validatePos(qMax(0, desiredFrom), totalChars);
+            res.second = validatePos(qMin(totalChars - 1, desiredTo), totalChars);
+        }
+    }
+
+    return res;
+}
+
+void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
+{
+    Q_UNUSED(charsRemoved);
+
+    if (0 == charsAdded)
+        return;
+
+    QString inputString, inputStringValid;
+    const int inputLength = position + charsAdded;
+    for (int i = position; i < inputLength; ++i) {
+        const QChar &newChar = document()->characterAt(i);
+        inputString.append(newChar);
+        if (validateInput(newChar))
+            inputStringValid.append(newChar);
+        else {
+            const QString wrnMsg("Invalid characted at #%1 filtered out");
+            qWarning() << wrnMsg.arg(i) << newChar;
+        }
+    }
+
+    if (inputStringValid == inputString)
+        return;
+
+    QTextCursor currCursor = textCursor();
+    if (currCursor.isNull()) {
+        // By default, if the item's text has not been set, this property contains a null text cursor;
+        // otherwise it contains a text cursor placed at the start of the item's document.
+        currCursor = QTextCursor(document());
+    }
+
+    if (currCursor.hasSelection())
+        currCursor.clearSelection();
+    const QPair<int, int> &selectionRange = prepareSelectionRange(position, inputLength);
+    currCursor.setPosition(selectionRange.first, QTextCursor::MoveAnchor);
+    currCursor.setPosition(selectionRange.second, QTextCursor::KeepAnchor);
+    currCursor.insertText(inputStringValid);
+
+    QSignalBlocker suppressContentsChange(document());
+    setTextCursor(currCursor);
 }
 
 } // namespace msc

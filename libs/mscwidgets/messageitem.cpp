@@ -280,8 +280,7 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     const bool targetFound(!prevTarget && m_targetInstance);
 
     if (sourceFound) {
-        const QPointF &instanceCenter(m_sourceInstance->boundingRect().center());
-        const QPointF &instanceCenterScene(m_sourceInstance->mapToScene(instanceCenter));
+        const QPointF &instanceCenterScene(m_sourceInstance->sceneBoundingRect().center());
         const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
         const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->source()->point());
 
@@ -292,8 +291,7 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
             updateTarget(m_arrowItem->arrow()->link()->target()->point() + delta, ObjectAnchor::Snap::NoSnap);
     }
     if (targetFound) {
-        const QPointF &instanceCenter(m_targetInstance->boundingRect().center());
-        const QPointF &instanceCenterScene(m_targetInstance->mapToScene(instanceCenter));
+        const QPointF &instanceCenterScene(m_targetInstance->sceneBoundingRect().center());
         const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
         const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->target()->point());
 
@@ -327,7 +325,7 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
 
 InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
 {
-    const QVector<InstanceItem *> &others = utils::itemByPos<InstanceItem, QPointF>(scene(), hoverPoint);
+    const QVector<InstanceItem *> &others = utils::instanceItemsByPos(scene(), hoverPoint);
     return others.isEmpty() ? nullptr : others.first();
 }
 
