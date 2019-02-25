@@ -893,3 +893,8 @@ QStringList MainWindow::mscFileFilters()
     }
     return filters;
 }
+
+QPlainTextEdit *MainWindow::textOutputPane() const
+{
+    return d->ui->errorTextEdit;
+}

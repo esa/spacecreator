@@ -350,16 +350,27 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
     if (0 == charsAdded)
         return;
 
+    // QTextDocument automatically appends the 'PARAGRAPH SEPARATOR' (U+2029) char
+    // which is not actually an input (and does not affect the view)
+    auto isAutoParagraphSeparator = [](const QChar &c, int pos, int length) {
+        const bool paragraph = c == QChar(0x2029);
+        const bool last = pos == length - 1;
+        return paragraph && last;
+    };
+
     QString inputString, inputStringValid;
     const int inputLength = position + charsAdded;
     for (int i = position; i < inputLength; ++i) {
         const QChar &newChar = document()->characterAt(i);
+        if (isAutoParagraphSeparator(newChar, i, inputLength))
+            break;
+
         inputString.append(newChar);
         if (validateInput(newChar))
             inputStringValid.append(newChar);
         else {
-            const QString wrnMsg("Invalid characted at #%1 filtered out");
-            qWarning() << wrnMsg.arg(i) << newChar;
+            const QString wrnMsg("Invalid characted '%1' [%2] at #%3 filtered out in '%4'");
+            qWarning() << wrnMsg.arg(newChar).arg(newChar.unicode()).arg(i + 1).arg(inputString);
         }
     }
 
