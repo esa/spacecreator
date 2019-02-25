@@ -84,14 +84,14 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
     // Schedule an Esc press to bypass it:
     auto scheduleMBCloser = [](int interval) {
         QTimer::singleShot(interval, []() {
-            if (QMessageBox *mb = qobject_cast<QMessageBox *>(QApplication::activeModalWidget()))
+            if (QDialog *mb = qobject_cast<QDialog *>(QApplication::activeModalWidget()))
                 mb->close();
         });
     };
 
     static const QCommandLineOption cmdOpenAsn =
             CommandLineParser::positionalArg(CommandLineParser::Positional::OpenFileAsn);
-    static const QString FileName(QString(EXAMPLES_STORAGE_PATH).append("no-such-file.asn"));
+    static const QString FileName(QString(EXAMPLES_STORAGE_PATH).append("dataview-uniq.asn"));
     static const QString NoFileName("./no-such-file.asn");
 
     CommandLineParser parser;
@@ -108,7 +108,6 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
 
     scheduleMBCloser(1000);
     const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser1);
-    QEXPECT_FAIL("", "ASN support is not implemented yet", Continue);
     QCOMPARE(processed, true);
 
     parser.process({ QApplication::instance()->applicationFilePath(),

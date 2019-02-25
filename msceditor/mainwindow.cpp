@@ -329,6 +329,10 @@ bool MainWindow::openFileAsn(const QString &file)
     asn1::Asn1File f;
     QStringList errorMessages;
 
+    if (!QFileInfo::exists(file)) {
+        return false;
+    }
+
     try {
         QVariantList ans1Types = f.parseFile(file, &errorMessages);
 
