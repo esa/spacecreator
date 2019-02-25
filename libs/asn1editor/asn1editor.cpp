@@ -47,8 +47,10 @@ Asn1Editor::Asn1Editor(QWidget *parent)
 
 void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
 {
-    m_asn1Types = asn1Types;
-    addAsn1TypeItems();
+    if (m_asn1Types != asn1Types) {
+        m_asn1Types = asn1Types;
+        addAsn1TypeItems();
+    }
 }
 
 Asn1Editor::~Asn1Editor()

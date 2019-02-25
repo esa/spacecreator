@@ -26,10 +26,6 @@
 #include <QDebug>
 #include <QFileInfo>
 
-//#include <QObject>
-//#include <antlr4-runtime.h>
-//#include <fstream>
-
 using namespace antlr4;
 
 namespace asn1 {
@@ -71,7 +67,7 @@ QVariantList Asn1File::parse(ANTLRInputStream &input, QStringList *errorMessages
     ASNParser parser(&tokens);
     parser.addErrorListener(&errorListener);
 
-    Asn1ParserVisitor visitor; //(&tokens);
+    Asn1ParserVisitor visitor;
     visitor.visitModuleDefinition(parser.moduleDefinition());
 
     if (errorMessages != nullptr) {

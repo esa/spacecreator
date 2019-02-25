@@ -79,10 +79,9 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
 #ifndef __clang_analyzer__ // Currently clang's scan-build on build server complains on the QTimer
                            // by some reason
 
-    // While ASN support is not implemented yet,
-    // attempt to open a file will raise a message box.
+    // Attempt to open a file will raise a ASN1Editor window.
     // Schedule an Esc press to bypass it:
-    auto scheduleMBCloser = [](int interval) {
+    auto scheduleASN1EditorCloser = [](int interval) {
         QTimer::singleShot(interval, []() {
             if (QDialog *mb = qobject_cast<QDialog *>(QApplication::activeModalWidget()))
                 mb->close();
@@ -106,7 +105,7 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
 
     MainWindow w;
 
-    scheduleMBCloser(1000);
+    scheduleASN1EditorCloser(1000);
     const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser1);
     QCOMPARE(processed, true);
 
@@ -117,7 +116,7 @@ void tst_CommandLineParser::testCmdArgumentOpenAsn()
     const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenFileAsn));
     QCOMPARE(argFromParser2, NoFileName);
 
-    scheduleMBCloser(1000);
+    scheduleASN1EditorCloser(1000);
     const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser2);
     QCOMPARE(notProcessed, false);
 #endif // __clang_analyzer__

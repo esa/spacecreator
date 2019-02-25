@@ -71,7 +71,7 @@ win32 {
     QMAKE_CXXFLAGS += -isystem $$clean_path($$ANTLR_RUNTIME_PATH/src)
 }
 
-message("Creating parser out of antlr grammar file")
+message("Creating ASN.1 parser out of ASN.g4 grammar file")
 system($$antlrGen.commands)
 
 DISTFILES += \

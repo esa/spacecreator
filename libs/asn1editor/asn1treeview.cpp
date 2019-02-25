@@ -114,7 +114,7 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
     QString asnType = model->item(row, MODEL_TYPE_INDEX)->text();
 
     if (asnType == "choice" && hide) {
-        QVariantList choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
+        const QVariantList &choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
         onChoiceFieldChanged(model->item(row)->index(), choices.size(),
                              choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
     } else if (asnType.indexOf("sequenceOf") >= 0 && hide) {
@@ -130,7 +130,7 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
             onSequenceOfSizeChanged(item->child(x)->index(), item->child(x, MODEL_VALUE_INDEX)->text(),
                                     item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
         else if (asnType == "choice") {
-            QVariantList choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
+            const QVariantList &choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
             onChoiceFieldChanged(item->child(x)->index(), choices.size(),
                                  choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));
         }
@@ -139,7 +139,7 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
 
 void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childIndex, const QVariant &asn1Value)
 {
-    QString asnType = rootItem->child(childIndex, MODEL_TYPE_INDEX)->text();
+    const QString &asnType = rootItem->child(childIndex, MODEL_TYPE_INDEX)->text();
     auto *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
 
     if (asn1Value.type() == QVariant::List && asn1Value.toList().count() < childIndex)
