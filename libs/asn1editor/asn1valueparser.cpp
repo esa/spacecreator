@@ -205,11 +205,11 @@ bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type, const QStrin
     /*
  choiceReal : 10.5
  */
-    QString name = asn1Value.left(asn1Value.indexOf(":")).trimmed();
-    QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
+    const QString name = asn1Value.left(asn1Value.indexOf(":")).trimmed();
 
     auto choiceType = getType(name, asn1Type);
     if (choiceType.size()) {
+        const QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
         valueMap["choice"] = parseAsn1Value(choiceType, value);
 
         return true;

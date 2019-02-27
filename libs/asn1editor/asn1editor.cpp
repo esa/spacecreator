@@ -53,7 +53,7 @@ Asn1Editor::~Asn1Editor()
 void Asn1Editor::openFile()
 {
     const QString filename =
-            QFileDialog::getOpenFileName(this, tr("ASN1"), QString(""), tr("XML files (*.xml);;All files (*.*)"));
+            QFileDialog::getOpenFileName(this, tr("ASN1"), QString(), tr("XML files (*.xml);;All files (*.*)"));
     if (!filename.isEmpty())
         loadFile(filename);
 }

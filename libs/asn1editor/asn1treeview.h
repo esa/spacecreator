@@ -40,8 +40,8 @@ public:
     QString getAsn1Value() const;
 
 private Q_SLOTS:
-    void onSequenceOfSizeChanged(const QModelIndex &index, const QVariant value, const QVariant maxRange);
-    void onChoiceFieldChanged(const QModelIndex &index, const QVariant length, const QVariant currentIndex);
+    void onSequenceOfSizeChanged(const QModelIndex &index, const QVariant &value, const QVariant &maxRange);
+    void onChoiceFieldChanged(const QModelIndex &index, const QVariant &length, const QVariant &currentIndex);
 
 private:
     void hideExtraFields(const QStandardItem *item, bool hide = false, int row = 0);
