@@ -112,13 +112,13 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     return itemMap;
 }
 
-QStandardItem *Asn1ItemModel::createNumberItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createNumberItem(const QVariantMap &asn1Item)
 {
     // set default value (min range):
     return createItem(asn1Item, asn1Item[ASN1_MIN].toString());
 }
 
-QStandardItem *Asn1ItemModel::createBoolItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createBoolItem(const QVariantMap &asn1Item)
 {
     static const QVariantList choices{ QString("true"), QString("false") };
 
@@ -128,7 +128,7 @@ QStandardItem *Asn1ItemModel::createBoolItem(QVariantMap asn1Item)
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createSequenceItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createSequenceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -153,7 +153,7 @@ QStandardItem *Asn1ItemModel::createSequenceItem(QVariantMap asn1Item, QStandard
     return new QStandardItem();
 }
 
-QStandardItem *Asn1ItemModel::createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createSequenceOfItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -181,12 +181,12 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(QVariantMap asn1Item, QStanda
     return createNumberItem(asn1Item);
 }
 
-QStandardItem *Asn1ItemModel::createEnumeratedItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createEnumeratedItem(const QVariantMap &asn1Item)
 {
     return createItem(asn1Item, asn1Item[ASN1_VALUES].toList().at(0).toString());
 }
 
-QStandardItem *Asn1ItemModel::createChoiceItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createChoiceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -216,7 +216,7 @@ QStandardItem *Asn1ItemModel::createChoiceItem(QVariantMap asn1Item, QStandardIt
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createItem(QVariantMap asn1Item, const QString &text)
+QStandardItem *Asn1ItemModel::createItem(const QVariantMap &asn1Item, const QString &text)
 {
     QStandardItem *item = new QStandardItem(text);
 
@@ -233,7 +233,7 @@ QStandardItem *Asn1ItemModel::createItem(QVariantMap asn1Item, const QString &te
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createPresentItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createPresentItem(const QVariantMap &asn1Item)
 {
     QStandardItem *item = new QStandardItem();
 
