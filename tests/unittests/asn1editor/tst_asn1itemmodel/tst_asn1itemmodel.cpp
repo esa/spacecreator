@@ -65,101 +65,99 @@ void tst_Asn1ItemModel::testModel()
 
 void tst_Asn1ItemModel::testIntTypeModel()
 {
-    itemModel->setAsn1Model({ { "name", "MyInt" }, { "type", "integer" } });
+    itemModel->setAsn1Model({ { "name", "MyInt" }, { "type", INTEGER } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyInt"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), INTEGER);
 }
 
 void tst_Asn1ItemModel::testRealTypeModel()
 {
-    itemModel->setAsn1Model({ { "name", "MyDouble" }, { "type", "double" } });
+    itemModel->setAsn1Model({ { "name", "MyDouble" }, { "type", DOUBLE } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyDouble"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), DOUBLE);
 }
 
 void tst_Asn1ItemModel::testIntTypeModelWithRange()
 {
-    itemModel->setAsn1Model({ { "name", "MyInt" }, { "type", "integer" }, { "min", 5 }, { "max", 15 } });
+    itemModel->setAsn1Model({ { "name", "MyInt" }, { "type", INTEGER }, { "min", 5 }, { "max", 15 } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyInt"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("integer (5..15)"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), INTEGER);
 }
 
 void tst_Asn1ItemModel::testRealTypeModelWithRange()
 {
-    itemModel->setAsn1Model({ { "name", "MyDouble" }, { "type", "double" }, { "min", 10.0 }, { "max", 50.0 } });
+    itemModel->setAsn1Model({ { "name", "MyDouble" }, { "type", DOUBLE }, { "min", 10.0 }, { "max", 50.0 } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyDouble"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("double (10..50)"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), DOUBLE);
 }
 
 void tst_Asn1ItemModel::testBoolTypeModel()
 {
-    itemModel->setAsn1Model({ { "name", "MyBool" }, { "type", "bool" } });
+    itemModel->setAsn1Model({ { "name", "MyBool" }, { "type", BOOL } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyBool"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("bool"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("bool"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), BOOL);
 }
 
 void tst_Asn1ItemModel::testEnumTypeModel()
 {
     QVariantList enumValues = { "enum1", "enum2", "enum3" };
-    itemModel->setAsn1Model({ { "name", "MyEnum" }, { "type", "enumerated" }, { "values", enumValues } });
+    itemModel->setAsn1Model({ { "name", "MyEnum" }, { "type", ENUMERATED }, { "values", enumValues } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyEnum"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("enumerated"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("enumerated"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), ENUMERATED);
     QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList().size(), 3);
 }
 
 void tst_Asn1ItemModel::testChoiceTypeModel()
 {
     QVariantList choices;
-    QVariantMap choice = { { "name", "choiceInt" }, { "type", "integer" } };
+    QVariantMap choice = { { "name", "choiceInt" }, { "type", INTEGER } };
     choices.append(choice);
 
-    choice = { { "name", "choiceReal" }, { "type", "double" } };
+    choice = { { "name", "choiceReal" }, { "type", DOUBLE } };
     choices.append(choice);
 
-    itemModel->setAsn1Model({ { "name", "MyChoice" }, { "type", "choice" }, { "choices", choices } });
+    itemModel->setAsn1Model({ { "name", "MyChoice" }, { "type", CHOICE }, { "choices", choices } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MyChoice"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("choice"));
-    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(), QString("choice"));
+    QCOMPARE(itemModel->item(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), CHOICE);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->rowCount(), 2);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0)->text(), QString("choiceInt"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
-             QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), INTEGER);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1)->text(), QString("choiceReal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
-             QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), DOUBLE);
 }
 
 void tst_Asn1ItemModel::testSequenceTypeModel()
 {
     QVariantList children;
-    QVariantMap child = { { "name", "intVal" }, { "type", "integer" } };
+    QVariantMap child = { { "name", "intVal" }, { "type", INTEGER } };
     children.append(child);
 
-    child = { { "name", "realVal" }, { "type", "double" } };
+    child = { { "name", "realVal" }, { "type", DOUBLE } };
     children.append(child);
 
-    child = { { "name", "boolVal" }, { "type", "bool" } };
+    child = { { "name", "boolVal" }, { "type", BOOL } };
     children.append(child);
 
-    itemModel->setAsn1Model({ { "name", "MySequence" }, { "type", "sequence" }, { "children", children } });
+    itemModel->setAsn1Model({ { "name", "MySequence" }, { "type", SEQUENCE }, { "children", children } });
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->text(), QString("MySequence"));
     QCOMPARE(itemModel->item(0, MODEL_TYPE_INDEX)->text(), QString("sequence"));
@@ -169,18 +167,15 @@ void tst_Asn1ItemModel::testSequenceTypeModel()
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0)->text(), QString("intVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_TYPE_INDEX)->text(), QString("integer"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
-             QString("integer"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(0, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), INTEGER);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1)->text(), QString("realVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_TYPE_INDEX)->text(), QString("double"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
-             QString("double"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(1, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), DOUBLE);
 
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2)->text(), QString("boolVal"));
     QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_TYPE_INDEX)->text(), QString("bool"));
-    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toString(),
-             QString("bool"));
+    QCOMPARE(itemModel->item(0, MODEL_NAME_INDEX)->child(2, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt(), BOOL);
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1ItemModel)

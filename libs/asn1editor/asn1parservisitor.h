@@ -18,6 +18,7 @@
 #ifndef ASN1PARSERVISITOR_H
 #define ASN1PARSERVISITOR_H
 
+#include "asn1const.h"
 #include "parser/ASNBaseVisitor.h"
 
 #include <QSharedPointer>
@@ -54,7 +55,7 @@ private:
     using Asn1TypeDataPtr = QSharedPointer<Asn1TypeData>;
     using Asn1TypeDataList = QList<Asn1TypeDataPtr>;
 
-    void setAns1Type(const QString &asn1Type);
+    void setAns1Type(const ASN1Type &asn1Type);
     void setAns1TypeConstraint(const QString &constraintKey, const QString &constraintValue);
     void setAns1TypeOptional(bool value);
     void takeLastParent();
@@ -69,7 +70,7 @@ private:
         }
 
         QString m_name;
-        QString m_type;
+        ASN1Type m_type;
         bool m_optional;
         QString m_min;
         QString m_max;

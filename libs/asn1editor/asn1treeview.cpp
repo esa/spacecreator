@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
     auto *nameItem = m_ItemModel->item(0, 0);
 
     int row = nameItem->row();
-    QString asnType = m_ItemModel->item(row, MODEL_TYPE_INDEX)->text();
+    auto asnType = m_ItemModel->item(row, MODEL_TYPE_INDEX)->text();
 
     if (asnType.startsWith("sequenceOf")) {
         int seqOfSize = asn1Value["seqofvalue"].toList().count();
@@ -111,13 +111,13 @@ void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index, const QVariant
 void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row)
 {
     QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
-    QString asnType = model->item(row, MODEL_TYPE_INDEX)->text();
+    auto asnType = static_cast<ASN1Type>(model->item(row, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt());
 
-    if (asnType == "choice" && hide) {
+    if (asnType == CHOICE && hide) {
         const QVariantList &choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
         onChoiceFieldChanged(model->item(row)->index(), choices.size(),
                              choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
-    } else if (asnType.indexOf("sequenceOf") >= 0 && hide) {
+    } else if (asnType == SEQUENCEOF && hide) {
         onSequenceOfSizeChanged(model->item(row)->index(), model->item(row, MODEL_VALUE_INDEX)->text(),
                                 model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
     }
@@ -125,11 +125,11 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
     for (int x = 0; x < item->rowCount(); ++x) {
         hideExtraFields(item->child(x));
 
-        asnType = item->child(x, MODEL_TYPE_INDEX)->text();
-        if (asnType.indexOf("sequenceOf") >= 0)
+        asnType = static_cast<ASN1Type>(item->child(x, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt());
+        if (asnType == SEQUENCEOF)
             onSequenceOfSizeChanged(item->child(x)->index(), item->child(x, MODEL_VALUE_INDEX)->text(),
                                     item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
-        else if (asnType == "choice") {
+        else if (asnType == CHOICE) {
             const QVariantList &choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
             onChoiceFieldChanged(item->child(x)->index(), choices.size(),
                                  choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));

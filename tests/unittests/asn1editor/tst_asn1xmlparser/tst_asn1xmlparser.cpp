@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "asn1const.h"
 #include "asn1xmlparser.h"
 
 #include <QDomElement>
@@ -93,17 +94,17 @@ void tst_Asn1XMLParser::testIntRealTypes()
 
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 5);
-    QCOMPARE(typeMap["name"].toString(), QString("MyInt"));
-    QCOMPARE(typeMap["type"].toString(), QString("integer"));
-    QCOMPARE(typeMap["min"].toInt(), 0);
-    QCOMPARE(typeMap["max"].toInt(), 20);
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyInt"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), INTEGER);
+    QCOMPARE(typeMap[ASN1_MIN].toInt(), 0);
+    QCOMPARE(typeMap[ASN1_MAX].toInt(), 20);
 
     typeMap = asn1Types.at(1).toMap();
     QCOMPARE(typeMap.size(), 5);
-    QCOMPARE(typeMap["name"].toString(), QString("MyReal"));
-    QCOMPARE(typeMap["type"].toString(), QString("double"));
-    QCOMPARE(typeMap["min"].toDouble(), 0.0);
-    QCOMPARE(typeMap["max"].toDouble(), 1000.0);
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyReal"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), DOUBLE);
+    QCOMPARE(typeMap[ASN1_MIN].toDouble(), 0.0);
+    QCOMPARE(typeMap[ASN1_MAX].toDouble(), 1000.0);
 }
 
 void tst_Asn1XMLParser::testBoolEnumTypes()
@@ -114,17 +115,15 @@ void tst_Asn1XMLParser::testBoolEnumTypes()
 
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap["name"].toString(), QString("MyBOOL"));
-    QCOMPARE(typeMap["type"].toString(), QString("bool"));
-    QCOMPARE(typeMap["default"].toBool(), false);
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyBOOL"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), BOOL);
 
     typeMap = asn1Types.at(1).toMap();
     QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap["name"].toString(), QString("TypeEnumerated"));
-    QCOMPARE(typeMap["type"].toString(), QString("enumerated"));
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("TypeEnumerated"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), ENUMERATED);
 
-    auto values = typeMap["values"].toList();
-    auto valuesInt = typeMap["valuesInt"].toList();
+    auto values = typeMap[ASN1_VALUES].toList();
 
     QCOMPARE(values.count(), 3);
 
@@ -141,25 +140,24 @@ void tst_Asn1XMLParser::testChoiceType()
 
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap["name"].toString(), QString("MyChoice"));
-    QCOMPARE(typeMap["type"].toString(), QString("choice"));
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyChoice"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), CHOICE);
 
-    auto choices = typeMap["choices"].toList();
+    auto choices = typeMap[ASN1_CHOICES].toList();
 
     QCOMPARE(choices.count(), 2);
 
     auto choiceItem = choices.at(0).toMap();
     QCOMPARE(choiceItem.size(), 4);
-    QCOMPARE(choiceItem["name"].toString(), QString("hop"));
-    QCOMPARE(choiceItem["type"].toString(), QString("bool"));
-    QCOMPARE(choiceItem["default"].toBool(), false);
+    QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("hop"));
+    QCOMPARE(choiceItem[ASN1_TYPE].toInt(), BOOL);
 
     choiceItem = choices.at(1).toMap();
     QCOMPARE(choiceItem.size(), 5);
-    QCOMPARE(choiceItem["name"].toString(), QString("lat"));
-    QCOMPARE(choiceItem["type"].toString(), QString("double"));
-    QCOMPARE(choiceItem["min"].toDouble(), -90.0);
-    QCOMPARE(choiceItem["max"].toDouble(), 90.0);
+    QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("lat"));
+    QCOMPARE(choiceItem[ASN1_TYPE].toInt(), DOUBLE);
+    QCOMPARE(choiceItem[ASN1_MIN].toDouble(), -90.0);
+    QCOMPARE(choiceItem[ASN1_MAX].toDouble(), 90.0);
 }
 
 void tst_Asn1XMLParser::testSequenceType()
@@ -170,24 +168,23 @@ void tst_Asn1XMLParser::testSequenceType()
 
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap["name"].toString(), QString("MySeq"));
-    QCOMPARE(typeMap["type"].toString(), QString("sequence"));
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MySeq"));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), SEQUENCE);
 
-    auto children = typeMap["children"].toList();
+    auto children = typeMap[ASN1_CHILDREN].toList();
     QCOMPARE(children.size(), 2);
 
     auto child = children.at(0).toMap();
     QCOMPARE(child.size(), 4);
-    QCOMPARE(child["name"].toString(), QString("foo"));
-    QCOMPARE(child["type"].toString(), QString("bool"));
-    QCOMPARE(child["default"].toBool(), false);
+    QCOMPARE(child[ASN1_NAME].toString(), QString("foo"));
+    QCOMPARE(child[ASN1_TYPE].toInt(), BOOL);
 
     child = children.at(1).toMap();
     QCOMPARE(child.size(), 5);
-    QCOMPARE(child["name"].toString(), QString("int2Val"));
-    QCOMPARE(child["type"].toString(), QString("integer"));
-    QCOMPARE(child["min"].toInt(), -10);
-    QCOMPARE(child["max"].toInt(), 10);
+    QCOMPARE(child[ASN1_NAME].toString(), QString("int2Val"));
+    QCOMPARE(child[ASN1_TYPE].toInt(), INTEGER);
+    QCOMPARE(child[ASN1_MIN].toInt(), -10);
+    QCOMPARE(child[ASN1_MAX].toInt(), 10);
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1XMLParser)

@@ -55,14 +55,14 @@ void tst_Asn1File::testIntRealTypes()
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 5);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyInt"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_INTEGER));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), INTEGER);
     QCOMPARE(typeMap[ASN1_MIN].toInt(), 0);
     QCOMPARE(typeMap[ASN1_MAX].toInt(), 20);
 
     typeMap = asn1Types.at(1).toMap();
     QCOMPARE(typeMap.size(), 5);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyReal"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_DOUBLE));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), DOUBLE);
     QCOMPARE(typeMap[ASN1_MIN].toDouble(), 0.0);
     QCOMPARE(typeMap[ASN1_MAX].toDouble(), 100.0);
 }
@@ -79,12 +79,12 @@ void tst_Asn1File::testBoolEnumTypes()
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 3);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyBOOL"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_BOOL));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), BOOL);
 
     typeMap = asn1Types.at(1).toMap();
     QCOMPARE(typeMap.size(), 4);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyEnum"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_ENUMERATED));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), ENUMERATED);
 
     auto values = typeMap[ASN1_VALUES].toList();
 
@@ -108,7 +108,7 @@ void tst_Asn1File::testChoiceType()
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyChoice"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_CHOICE));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), CHOICE);
 
     auto choices = typeMap[ASN1_CHOICES].toList();
 
@@ -117,19 +117,19 @@ void tst_Asn1File::testChoiceType()
     auto choiceItem = choices.at(0).toMap();
     QCOMPARE(choiceItem.size(), 3);
     QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("hop"));
-    QCOMPARE(choiceItem[ASN1_TYPE].toString(), QString(ASN1_TYPE_BOOL));
+    QCOMPARE(choiceItem[ASN1_TYPE].toInt(), BOOL);
 
     choiceItem = choices.at(1).toMap();
     QCOMPARE(choiceItem.size(), 5);
     QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("lat"));
-    QCOMPARE(choiceItem[ASN1_TYPE].toString(), QString(ASN1_TYPE_DOUBLE));
+    QCOMPARE(choiceItem[ASN1_TYPE].toInt(), DOUBLE);
     QCOMPARE(choiceItem[ASN1_MIN].toDouble(), -90.0);
     QCOMPARE(choiceItem[ASN1_MAX].toDouble(), 90.0);
 
     choiceItem = choices.at(2).toMap();
     QCOMPARE(choiceItem.size(), 4);
     QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("CareerEntry"));
-    QCOMPARE(choiceItem[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCE));
+    QCOMPARE(choiceItem[ASN1_TYPE].toInt(), SEQUENCE);
 
     auto children = choiceItem[ASN1_CHILDREN].toList();
     QCOMPARE(children.size(), 3);
@@ -137,12 +137,12 @@ void tst_Asn1File::testChoiceType()
     auto child = children.at(0).toMap();
     QCOMPARE(child.size(), 3);
     QCOMPARE(child[ASN1_NAME].toString(), QString("from"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_INTEGER));
+    QCOMPARE(child[ASN1_TYPE].toInt(), INTEGER);
 
     child = children.at(1).toMap();
     QCOMPARE(child.size(), 5);
     QCOMPARE(child[ASN1_NAME].toString(), QString("to"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_DOUBLE));
+    QCOMPARE(child[ASN1_TYPE].toInt(), DOUBLE);
     QCOMPARE(child[ASN1_MIN].toDouble(), -1.1);
     QCOMPARE(child[ASN1_MAX].toDouble(), 3.14);
     QVERIFY(child[ASN1_IS_OPTIONAL].toBool());
@@ -150,7 +150,7 @@ void tst_Asn1File::testChoiceType()
     child = children.at(2).toMap();
     QCOMPARE(child.size(), 5);
     QCOMPARE(child[ASN1_NAME].toString(), QString("team"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_STRING));
+    QCOMPARE(child[ASN1_TYPE].toInt(), STRING);
     QCOMPARE(child[ASN1_MIN].toInt(), 1);
     QCOMPARE(child[ASN1_MAX].toInt(), 256);
 }
@@ -169,7 +169,7 @@ void tst_Asn1File::testSequenceType()
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MySeq"));
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCE));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), SEQUENCE);
 
     auto children = typeMap[ASN1_CHILDREN].toList();
     QCOMPARE(children.size(), 3);
@@ -177,12 +177,12 @@ void tst_Asn1File::testSequenceType()
     auto child = children.at(0).toMap();
     QCOMPARE(child.size(), 3);
     QCOMPARE(child[ASN1_NAME].toString(), QString("from"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_INTEGER));
+    QCOMPARE(child[ASN1_TYPE].toInt(), INTEGER);
 
     child = children.at(1).toMap();
     QCOMPARE(child.size(), 5);
     QCOMPARE(child[ASN1_NAME].toString(), QString("to"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_DOUBLE));
+    QCOMPARE(child[ASN1_TYPE].toInt(), DOUBLE);
     QCOMPARE(child[ASN1_MIN].toDouble(), -1.1);
     QCOMPARE(child[ASN1_MAX].toDouble(), 3.14);
     QVERIFY(child[ASN1_IS_OPTIONAL].toBool());
@@ -190,7 +190,7 @@ void tst_Asn1File::testSequenceType()
     child = children.at(2).toMap();
     QCOMPARE(child.size(), 5);
     QCOMPARE(child[ASN1_NAME].toString(), QString("team"));
-    QCOMPARE(child[ASN1_TYPE].toString(), QString(ASN1_TYPE_STRING));
+    QCOMPARE(child[ASN1_TYPE].toInt(), STRING);
     QCOMPARE(child[ASN1_MIN].toInt(), 1);
     QCOMPARE(child[ASN1_MAX].toInt(), 256);
 }
@@ -207,12 +207,12 @@ void tst_Asn1File::testReferencedType()
     auto seqMap = asn1Types.at(0).toMap();
     QCOMPARE(seqMap.size(), 4);
     QCOMPARE(seqMap[ASN1_NAME].toString(), QString("MySeq"));
-    QCOMPARE(seqMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCE));
+    QCOMPARE(seqMap[ASN1_TYPE].toInt(), SEQUENCE);
 
     auto seqOfMap = asn1Types.at(1).toMap();
     QCOMPARE(seqOfMap.size(), 6);
     QCOMPARE(seqOfMap[ASN1_NAME].toString(), QString("MySeqOf"));
-    QCOMPARE(seqOfMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCEOF));
+    QCOMPARE(seqOfMap[ASN1_TYPE].toInt(), SEQUENCEOF);
     QCOMPARE(seqOfMap[ASN1_MIN].toInt(), 1);
     QCOMPARE(seqOfMap[ASN1_MAX].toInt(), 3);
 
@@ -221,7 +221,7 @@ void tst_Asn1File::testReferencedType()
 
     auto typeMap = seqOfType.at(0).toMap();
     QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap[ASN1_TYPE].toString(), QString(ASN1_TYPE_SEQUENCE));
+    QCOMPARE(typeMap[ASN1_TYPE].toInt(), SEQUENCE);
     QCOMPARE(seqMap[ASN1_CHILDREN].toList().size(), typeMap[ASN1_CHILDREN].toList().size());
 }
 
