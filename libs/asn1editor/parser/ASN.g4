@@ -172,13 +172,13 @@ objectClassDefn : CLASS_LITERAL L_BRACE  fieldSpec (COMMA fieldSpec  )*  R_BRACE
 ;
 withSyntaxSpec : WITH_LITERAL SYNTAX_LITERAL syntaxList
 ;
-syntaxList : L_BRACE tokenOrGroupSpec+ R_BRACE
+syntaxList : L_BRACE tokenOrGroupSpec (tokenOrGroupSpec)* R_BRACE
 ;
 
 tokenOrGroupSpec : requiredToken | optionalGroup
 ;
 
-optionalGroup : L_BRACKET (tokenOrGroupSpec)+ R_BRACKET
+optionalGroup : L_BRACKET tokenOrGroupSpec (tokenOrGroupSpec)* R_BRACKET
 ;
 
 requiredToken : literal | primitiveFieldName
