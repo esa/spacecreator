@@ -72,8 +72,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
     });
     connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, &InstanceItem::moveLeftIfOverlaps);
     connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::updateLayout);
-
-    void();
 }
 
 MscInstance *InstanceItem::modelItem() const

@@ -181,9 +181,6 @@ QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
         return QModelIndex();
     }
 
-    if (child.internalPointer() == nullptr) {
-        return QModelIndex();
-    }
     auto obj = static_cast<QObject *>(child.internalPointer());
 
     auto parentItem = dynamic_cast<MscDocument *>(obj->parent());

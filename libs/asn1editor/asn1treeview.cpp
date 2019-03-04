@@ -92,7 +92,7 @@ QString Asn1TreeView::getAsn1Value() const
     return m_ItemModel ? getItemValue(m_ItemModel->item(0, 0)) : QString();
 }
 
-void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index, const QVariant value, const QVariant maxRange)
+void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index, const QVariant &value, const QVariant &maxRange)
 {
     for (int x = 0; x < maxRange.toInt(); ++x)
         setRowHidden(x, index, x < value.toInt() ? false : true);
@@ -100,7 +100,7 @@ void Asn1TreeView::onSequenceOfSizeChanged(const QModelIndex &index, const QVari
     expand(index);
 }
 
-void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index, const QVariant length, const QVariant currentIndex)
+void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index, const QVariant &length, const QVariant &currentIndex)
 {
     for (int x = 0; x < length.toInt(); ++x)
         setRowHidden(x, index, x == currentIndex.toInt() ? false : true);

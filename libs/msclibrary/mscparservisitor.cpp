@@ -615,16 +615,16 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     auto action = new MscAction;
     m_currentEvent = action;
     action->setInstance(m_currentInstance);
-    if (context->informalAction()) {
+    if (MscParser::InformalActionContext *iaCtx = context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
-        if (context->informalAction()->CHARACTERSTRING()) {
-            action->setInformalAction(charactersToString(context->informalAction()->CHARACTERSTRING()));
+        if (iaCtx->CHARACTERSTRING()) {
+            action->setInformalAction(charactersToString(iaCtx->CHARACTERSTRING()));
         } else {
-            if (context->informalAction()->functionText().empty()) {
-                QString informalAction = nameToString(context->informalAction()->name());
+            if (iaCtx->functionText().empty()) {
+                const QString &informalAction = nameToString(iaCtx->name());
                 action->setInformalAction(informalAction);
             } else {
-                action->setInformalAction(::treeNodeToString(context->informalAction()));
+                action->setInformalAction(::treeNodeToString(iaCtx));
             }
         }
     } else {
@@ -807,11 +807,11 @@ void MscParserVisitor::orderInstanceEvents()
             // First, go through all the stacks and take away non-messages. This has to be done for
             // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
-                while (!m_instanceEventsList.at(j).isEmpty()
-                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message
-                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Condition) {
+                InstanceEvents events = m_instanceEventsList.at(j);
+                while (!events.isEmpty() && events.first()->entityType() != MscEntity::EntityType::Message
+                       && events.first()->entityType() != MscEntity::EntityType::Condition) {
                     // This is not a message, condition and timer move it to the chart
-                    m_currentChart->addInstanceEvent(m_instanceEventsList[j].takeFirst());
+                    m_currentChart->addInstanceEvent(events.takeFirst());
                 }
             }
 
@@ -850,10 +850,6 @@ void MscParserVisitor::orderInstanceEvents()
                 m_currentChart->addInstanceEvent(firstEvent);
 
                 break;
-            }
-
-            if (found && inOther) {
-                m_instanceEventsList[i].removeFirst();
             }
         }
 

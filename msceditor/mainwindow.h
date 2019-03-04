@@ -35,6 +35,7 @@ class MscDocument;
 class MainModel;
 class QUndoGroup;
 class QGraphicsView;
+class QPlainTextEdit;
 
 struct MainWindowPrivate;
 
@@ -49,6 +50,7 @@ public:
     QGraphicsView *currentView() const;
 
     bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
+    QPlainTextEdit *textOutputPane() const;
 
 public Q_SLOTS:
     void createNewDocument();

@@ -172,7 +172,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     m_visible = appear;
     const qreal from = m_visible ? 0. : 1.;
     const qreal to = m_visible ? 1. : 0.;
-    const int duration = m_visible ? 100. : 150.;
+    const int duration = m_visible ? 100 : 150;
     setVisible(true);
 
     if (QPropertyAnimation *anim = utils::createLinearAnimation(this, "opacity", from, to, duration)) {
