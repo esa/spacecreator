@@ -20,6 +20,64 @@
 
 #include <QApplication>
 #include <QMetaEnum>
+#include <QPlainTextEdit>
+#include <QPointer>
+
+// Get the default Qt message handler.
+static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
+
+struct LogHandler {
+    static LogHandler *instance()
+    {
+        if (!m_instance)
+            m_instance = new LogHandler();
+        return m_instance;
+    }
+
+    void setupOutputView(QPlainTextEdit *view) { instance()->m_view = view; }
+
+    void handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+    {
+        if (m_view) {
+            QString htmlPre, htmlPost, marker;
+            switch (type) {
+            case QtDebugMsg:
+                marker = "D";
+                break;
+            case QtInfoMsg:
+                marker = "I";
+                break;
+            case QtWarningMsg:
+                marker = "W";
+                htmlPre = "<i style='color:red;'>";
+                htmlPost = "</i>";
+                break;
+            case QtCriticalMsg:
+            case QtFatalMsg:
+                marker = "E";
+                htmlPre = "<i><b style='color:red;'>";
+                htmlPost = "</b></i>";
+                break;
+            }
+
+            m_view->appendHtml(QString("%1: %2%3%4").arg(marker, htmlPre, msg, htmlPost));
+        }
+        (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
+    }
+
+private:
+    QPointer<QPlainTextEdit> m_view = nullptr;
+    LogHandler() {}
+
+    static LogHandler *m_instance;
+};
+
+LogHandler *LogHandler::m_instance = nullptr;
+
+void globalLogMessageWrapper(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    LogHandler::instance()->handleMessage(type, context, msg);
+}
 
 int main(int argc, char *argv[])
 {
@@ -29,10 +87,13 @@ int main(int argc, char *argv[])
     a.setApplicationName(QObject::tr("MSC Editor"));
     a.setApplicationVersion("0.0.1");
 
+    MainWindow w;
+    LogHandler::instance()->setupOutputView(w.textOutputPane());
+
+    qInstallMessageHandler(globalLogMessageWrapper);
+
     CommandLineParser cmdParser;
     cmdParser.process(a.arguments());
-
-    MainWindow w;
 
     const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
     for (int i = 0; i < e.keyCount(); ++i) {

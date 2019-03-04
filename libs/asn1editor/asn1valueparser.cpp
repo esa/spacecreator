@@ -17,6 +17,8 @@
 
 #include "asn1valueparser.h"
 
+#include "asn1const.h"
+
 #include <QVariant>
 
 namespace asn1 {
@@ -35,35 +37,35 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
         return valueMap;
 
     QString value = asn1Value.trimmed();
-    QString valueType = asn1Type["type"].toString();
+    auto valueType = static_cast<ASN1Type>(asn1Type[ASN1_TYPE].toInt());
 
-    valueMap["name"] = asn1Type["name"];
+    valueMap["name"] = asn1Type[ASN1_NAME];
 
-    if (valueType == "integer") {
+    if (valueType == INTEGER) {
         int intVal = value.toInt(&ok);
 
         if (ok && (ok = checkRange(asn1Type, intVal)))
             valueMap["value"] = intVal;
-    } else if (valueType == "double") {
+    } else if (valueType == DOUBLE) {
         double doubleVal = value.toDouble(&ok);
 
         if (ok && (ok = checkRange(asn1Type, doubleVal)))
             valueMap["value"] = doubleVal;
-    } else if (valueType == "bool") {
+    } else if (valueType == BOOL) {
         if ((ok = value == "TRUE" || value == "FALSE"))
             valueMap["value"] = value == "TRUE" ? true : false;
-    } else if (valueType == "sequence") {
+    } else if (valueType == SEQUENCE) {
         ok = parseSequenceValue(asn1Type, value, valueMap);
-    } else if (valueType == "sequenceOf") {
+    } else if (valueType == SEQUENCEOF) {
         ok = parseSequenceOfValue(asn1Type, value, valueMap)
                 && checkRange(asn1Type, valueMap["seqofvalue"].toList().count());
-    } else if (valueType == "enumerated") {
+    } else if (valueType == ENUMERATED) {
         QVariantList values = asn1Type["values"].toList();
 
         // check enumerated value
         if ((ok = values.contains(value)))
             valueMap["value"] = value;
-    } else if (valueType == "choice") {
+    } else if (valueType == CHOICE) {
         ok = parseChoiceValue(asn1Type, value, valueMap);
     } else {
         // take string between " "
@@ -181,7 +183,7 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type, const QS
     while ((index = nextIndex(value))) {
         auto item = value.mid(0, index);
 
-        auto itemValue = parseAsn1Value(asn1Type["seqoftype"].toMap(), item);
+        auto itemValue = parseAsn1Value(asn1Type[ASN1_SEQOFTYPE].toMap(), item);
         if (itemValue.size())
             seqofValues.append(itemValue);
         else
@@ -205,11 +207,11 @@ bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type, const QStrin
     /*
  choiceReal : 10.5
  */
-    QString name = asn1Value.left(asn1Value.indexOf(":")).trimmed();
-    QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
+    const QString name = asn1Value.left(asn1Value.indexOf(":")).trimmed();
 
     auto choiceType = getType(name, asn1Type);
     if (choiceType.size()) {
+        const QString value = asn1Value.mid(asn1Value.indexOf(":") + 1).trimmed();
         valueMap["choice"] = parseAsn1Value(choiceType, value);
 
         return true;
@@ -222,19 +224,19 @@ QVariantMap Asn1ValueParser::getType(const QString &name, const QVariantMap &asn
 {
     QVariantMap result;
 
-    if (asn1Type["name"] == name)
+    if (asn1Type[ASN1_NAME] == name)
         return asn1Type;
 
-    if (asn1Type.contains("children")) {
-        for (const QVariant &child : asn1Type["children"].toList()) {
+    if (asn1Type.contains(ASN1_CHILDREN)) {
+        for (const QVariant &child : asn1Type[ASN1_CHILDREN].toList()) {
             result = getType(name, child.toMap());
             if (result.size())
                 break;
         }
     }
 
-    if (asn1Type.contains("choices")) {
-        for (const QVariant &choice : asn1Type["choices"].toList()) {
+    if (asn1Type.contains(ASN1_CHOICES)) {
+        for (const QVariant &choice : asn1Type[ASN1_CHOICES].toList()) {
             result = getType(name, choice.toMap());
             if (result.size())
                 break;
@@ -246,9 +248,9 @@ QVariantMap Asn1ValueParser::getType(const QString &name, const QVariantMap &asn
 
 bool Asn1ValueParser::checkRange(const QVariantMap &asn1Type, const QVariant &value) const
 {
-    if (asn1Type.contains("min") && value < asn1Type["min"])
+    if (asn1Type.contains(ASN1_MIN) && value < asn1Type[ASN1_MIN])
         return false;
-    else if (asn1Type.contains("max") && value > asn1Type["max"])
+    else if (asn1Type.contains(ASN1_MAX) && value > asn1Type[ASN1_MAX])
         return false;
 
     return true;

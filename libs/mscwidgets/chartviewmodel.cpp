@@ -830,18 +830,19 @@ void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
 void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)
 {
     Q_ASSERT(item);
-    Q_ASSERT(item->modelItem());
+    MscMessage *message = item->modelItem();
+    Q_ASSERT(message);
 
     MscInstance *newInstance = nearestInstance(pos);
-    MscInstance *currentInstance = endType == MscMessage::EndType::SOURCE_TAIL ? item->modelItem()->sourceInstance()
-                                                                               : item->modelItem()->targetInstance();
-    MscInstance *otherInstance = endType == MscMessage::EndType::SOURCE_TAIL ? item->modelItem()->targetInstance()
-                                                                             : item->modelItem()->sourceInstance();
-    const int currentIdx = d->m_currentChart->instanceEvents().indexOf(item->modelItem());
+    MscInstance *currentInstance =
+            endType == MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance();
+    MscInstance *otherInstance =
+            endType == MscMessage::EndType::SOURCE_TAIL ? message->targetInstance() : message->sourceInstance();
+    const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
     const int newIdx = eventIndex(pos.y());
     if ((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx) {
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MscMessage *>(item->modelItem()), newIdx,
+                                      { QVariant::fromValue<MscMessage *>(message), newIdx,
                                         QVariant::fromValue<MscInstance *>(newInstance),
                                         QVariant::fromValue<MscMessage::EndType>(endType),
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });

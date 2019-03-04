@@ -126,29 +126,29 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     }
 
     if (typeName == "IntegerType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_INTEGER;
+        typeData[ASN1_TYPE] = INTEGER;
         parseRange<int>(typeElem, typeData);
     } else if (typeName == "RealType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_DOUBLE;
+        typeData[ASN1_TYPE] = DOUBLE;
         parseRange<double>(typeElem, typeData);
     } else if (typeName == "BooleanType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_BOOL;
+        typeData[ASN1_TYPE] = BOOL;
         typeData["default"] = false;
     } else if (typeName == "SequenceType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_SEQUENCE;
+        typeData[ASN1_TYPE] = SEQUENCE;
         parseSequenceType(typeAssignments, typeElem, typeData);
     } else if (typeName == "SequenceOfType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_SEQUENCEOF;
+        typeData[ASN1_TYPE] = SEQUENCEOF;
         typeData[ASN1_SEQOFTYPE] = parseType(typeAssignments, typeElem.firstChild().toElement());
         parseRange<int>(typeElem, typeData);
     } else if (typeName == "EnumeratedType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_ENUMERATED;
+        typeData[ASN1_TYPE] = ENUMERATED;
         parseEnumeratedType(typeElem, typeData);
     } else if (typeName == "ChoiceType") {
-        typeData[ASN1_TYPE] = ASN1_TYPE_CHOICE;
+        typeData[ASN1_TYPE] = CHOICE;
         parseChoiceType(typeAssignments, typeElem, typeData);
     } else if (typeName.endsWith("StringType")) {
-        typeData[ASN1_TYPE] = ASN1_TYPE_STRING;
+        typeData[ASN1_TYPE] = STRING;
         parseRange<int>(typeElem, typeData);
     }
 

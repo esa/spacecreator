@@ -49,7 +49,7 @@ protected:
     QPointer<MscEntity> m_previewEntity = nullptr;
     QPointer<MscChart> m_activeChart = nullptr;
     QPointer<MscEntity> m_addedEntity = nullptr;
-    QMetaObject::Connection m_modelUpdateFinishedListener;
+    QMetaObject::Connection m_modelUpdateFinishedListener = QMetaObject::Connection();
     virtual void startWaitForModelLayoutComplete(MscEntity *addedEntity);
 
 private:

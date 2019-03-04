@@ -45,7 +45,7 @@ public:
 
     void setBoundingRect(const QRectF &geometry);
 
-    void connectObjects(InstanceItem *instance, qreal y, QRectF instancesRect);
+    void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
 
     static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
 

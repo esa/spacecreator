@@ -37,16 +37,20 @@ const int MODEL_IS_OPTIONAL_INDEX = 3;
 const QString ASN1_NAME = "name";
 const QString ASN1_IS_OPTIONAL = "isOptional";
 const QString ASN1_TYPE = "type";
-const QString ASN1_TYPE_INTEGER = "integer";
-const QString ASN1_TYPE_DOUBLE = "double";
-const QString ASN1_TYPE_BOOL = "bool";
-const QString ASN1_TYPE_SEQUENCE = "sequence";
-const QString ASN1_TYPE_SEQUENCEOF = "sequenceOf";
-const QString ASN1_TYPE_ENUMERATED = "enumerated";
-const QString ASN1_TYPE_CHOICE = "choice";
-const QString ASN1_TYPE_STRING = "string";
 const QString ASN1_MIN = "min";
 const QString ASN1_MAX = "max";
+
+enum ASN1Type
+{
+    INTEGER,
+    DOUBLE,
+    BOOL,
+    SEQUENCE,
+    SEQUENCEOF,
+    ENUMERATED,
+    CHOICE,
+    STRING
+};
 
 const QString ASN1_VALUES = "values";
 const QString ASN1_CHOICES = "choices";

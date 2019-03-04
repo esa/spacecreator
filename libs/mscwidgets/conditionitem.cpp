@@ -84,7 +84,7 @@ void ConditionItem::setBoundingRect(const QRectF &geometry)
     buildLayout();
 }
 
-void ConditionItem::connectObjects(InstanceItem *instance, qreal y, QRectF instancesRect)
+void ConditionItem::connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect)
 {
     m_InstancesRect = instancesRect;
 

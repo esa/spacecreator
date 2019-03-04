@@ -195,6 +195,7 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
 
 QString MscWriter::serialize(const MscCreate *create, const MscInstance *instance, int tabsSize)
 {
+    Q_ASSERT(create != nullptr);
     Q_ASSERT(create->targetInstance() != nullptr);
 
     if (create && instance == create->sourceInstance()) {

@@ -80,8 +80,8 @@ void tst_ObjectsLink::cleanup()
 
 void tst_ObjectsLink::testMakeLink()
 {
-    const QPointF centerA = m_itemA->mapToScene(m_itemA->boundingRect().center());
-    const QPointF centerB = m_itemB->mapToScene(m_itemB->boundingRect().center());
+    centerA = m_itemA->mapToScene(m_itemA->boundingRect().center());
+    centerB = m_itemB->mapToScene(m_itemB->boundingRect().center());
     const QLineF ab(centerA, centerB);
 
     ObjectsLink link;
@@ -98,8 +98,8 @@ void tst_ObjectsLink::testMakeLink()
 
 void tst_ObjectsLink::testLinkCenter()
 {
-    const QPointF centerA = m_itemA->mapToScene(m_itemA->boundingRect().center());
-    const QPointF centerB = m_itemB->mapToScene(m_itemB->boundingRect().center());
+    centerA = m_itemA->mapToScene(m_itemA->boundingRect().center());
+    centerB = m_itemB->mapToScene(m_itemB->boundingRect().center());
     const QLineF ab(centerA, centerB);
 
     ObjectsLink link;

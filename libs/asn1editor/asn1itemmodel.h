@@ -39,15 +39,15 @@ private:
 
     ItemMap createModelItems(const QVariantMap &asn1Item, bool isPresentItem = true);
 
-    QStandardItem *createNumberItem(QVariantMap asn1Item);
-    QStandardItem *createBoolItem(QVariantMap asn1Item);
-    QStandardItem *createSequenceItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createEnumeratedItem(QVariantMap asn1Item);
-    QStandardItem *createChoiceItem(QVariantMap asn1Item, QStandardItem *parent);
-    QStandardItem *createItem(QVariantMap asn1Item, const QString &text = QString());
+    QStandardItem *createNumberItem(const QVariantMap &asn1Item);
+    QStandardItem *createBoolItem(const QVariantMap &asn1Item);
+    QStandardItem *createSequenceItem(const QVariantMap &asn1Item, QStandardItem *parent);
+    QStandardItem *createSequenceOfItem(const QVariantMap &asn1Item, QStandardItem *parent);
+    QStandardItem *createEnumeratedItem(const QVariantMap &asn1Item);
+    QStandardItem *createChoiceItem(const QVariantMap &asn1Item, QStandardItem *parent);
+    QStandardItem *createItem(const QVariantMap &asn1Item, const QString &text = QString());
 
-    QStandardItem *createPresentItem(QVariantMap asn1Item);
+    QStandardItem *createPresentItem(const QVariantMap &asn1Item);
 };
 
 } // namespace asn1

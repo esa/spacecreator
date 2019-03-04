@@ -53,20 +53,25 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     ItemMap itemMap;
     QString typeLimit;
     QStandardItem *valueItem;
+    static QMap<ASN1Type, QString> asn1TypeStringMap{
+        { INTEGER, "integer" },       { DOUBLE, "double" },         { BOOL, "bool" },     { SEQUENCE, "sequence" },
+        { SEQUENCEOF, "sequenceOf" }, { ENUMERATED, "enumerated" }, { CHOICE, "choice" }, { STRING, "string" }
+    };
 
     QStandardItem *nameItem = new QStandardItem(asn1Item[ASN1_NAME].toString());
     nameItem->setEditable(false);
+    auto asnType = static_cast<ASN1Type>(asn1Item[ASN1_TYPE].toInt());
 
-    if (asn1Item[ASN1_TYPE] == ASN1_TYPE_INTEGER || asn1Item[ASN1_TYPE] == ASN1_TYPE_DOUBLE) {
+    if (asnType == INTEGER || asnType == DOUBLE) {
         valueItem = createNumberItem(asn1Item);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX))
             typeLimit = QString(" (%1..%2)").arg(asn1Item[ASN1_MIN].toString(), asn1Item[ASN1_MAX].toString());
-    } else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_BOOL)
+    } else if (asnType == BOOL)
         valueItem = createBoolItem(asn1Item);
-    else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_SEQUENCE)
+    else if (asnType == SEQUENCE)
         valueItem = createSequenceItem(asn1Item, nameItem);
-    else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_SEQUENCEOF) {
+    else if (asnType == SEQUENCEOF) {
         valueItem = createSequenceOfItem(asn1Item, nameItem);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX)) {
@@ -76,11 +81,11 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
                 typeLimit =
                         QString(tr(" Size(%1..%2)")).arg(asn1Item[ASN1_MIN].toString(), asn1Item[ASN1_MAX].toString());
         }
-    } else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_ENUMERATED)
+    } else if (asnType == ENUMERATED)
         valueItem = createEnumeratedItem(asn1Item);
-    else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_CHOICE)
+    else if (asnType == CHOICE)
         valueItem = createChoiceItem(asn1Item, nameItem);
-    else if (asn1Item[ASN1_TYPE] == ASN1_TYPE_STRING) {
+    else if (asnType == STRING) {
         valueItem = createItem(asn1Item);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX)) {
@@ -93,7 +98,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     } else
         valueItem = new QStandardItem();
 
-    QStandardItem *typeItem = new QStandardItem(asn1Item[ASN1_TYPE].toString() + typeLimit);
+    QStandardItem *typeItem = new QStandardItem(asn1TypeStringMap[asnType] + typeLimit);
     typeItem->setData(QBrush(QColor("gray")), Qt::ForegroundRole);
     typeItem->setEditable(false);
 
@@ -107,15 +112,15 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     return itemMap;
 }
 
-QStandardItem *Asn1ItemModel::createNumberItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createNumberItem(const QVariantMap &asn1Item)
 {
     // set default value (min range):
     return createItem(asn1Item, asn1Item[ASN1_MIN].toString());
 }
 
-QStandardItem *Asn1ItemModel::createBoolItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createBoolItem(const QVariantMap &asn1Item)
 {
-    static const QVariantList choices { QString("true"), QString("false") };
+    static const QVariantList choices{ QString("true"), QString("false") };
 
     QStandardItem *item = createItem(asn1Item, "false");
     item->setData(choices, CHOICE_LIST_ROLE);
@@ -123,7 +128,7 @@ QStandardItem *Asn1ItemModel::createBoolItem(QVariantMap asn1Item)
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createSequenceItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createSequenceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -148,7 +153,7 @@ QStandardItem *Asn1ItemModel::createSequenceItem(QVariantMap asn1Item, QStandard
     return new QStandardItem();
 }
 
-QStandardItem *Asn1ItemModel::createSequenceOfItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createSequenceOfItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -176,12 +181,12 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(QVariantMap asn1Item, QStanda
     return createNumberItem(asn1Item);
 }
 
-QStandardItem *Asn1ItemModel::createEnumeratedItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createEnumeratedItem(const QVariantMap &asn1Item)
 {
     return createItem(asn1Item, asn1Item[ASN1_VALUES].toList().at(0).toString());
 }
 
-QStandardItem *Asn1ItemModel::createChoiceItem(QVariantMap asn1Item, QStandardItem *parent)
+QStandardItem *Asn1ItemModel::createChoiceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
     QList<QStandardItem *> valueItems;
@@ -211,7 +216,7 @@ QStandardItem *Asn1ItemModel::createChoiceItem(QVariantMap asn1Item, QStandardIt
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createItem(QVariantMap asn1Item, const QString &text)
+QStandardItem *Asn1ItemModel::createItem(const QVariantMap &asn1Item, const QString &text)
 {
     QStandardItem *item = new QStandardItem(text);
 
@@ -228,7 +233,7 @@ QStandardItem *Asn1ItemModel::createItem(QVariantMap asn1Item, const QString &te
     return item;
 }
 
-QStandardItem *Asn1ItemModel::createPresentItem(QVariantMap asn1Item)
+QStandardItem *Asn1ItemModel::createPresentItem(const QVariantMap &asn1Item)
 {
     QStandardItem *item = new QStandardItem();
 

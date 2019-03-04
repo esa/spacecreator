@@ -267,9 +267,11 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     const InstanceItem *prevSource(m_sourceInstance);
     const InstanceItem *prevTarget(m_targetInstance);
 
-    const QPointF shiftedSource(m_arrowItem->arrow()->anchorPointSource() + shift);
+    ArrowItem *arrow = m_arrowItem->arrow();
+
+    const QPointF shiftedSource(arrow->anchorPointSource() + shift);
     res |= updateSource(shiftedSource, ObjectAnchor::Snap::NoSnap);
-    const QPointF shiftedTarget(m_arrowItem->arrow()->anchorPointTarget() + shift);
+    const QPointF shiftedTarget(arrow->anchorPointTarget() + shift);
     res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::NoSnap);
 
     if (!isAutoResizable())
@@ -282,24 +284,24 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     if (sourceFound) {
         const QPointF &instanceCenterScene(m_sourceInstance->sceneBoundingRect().center());
         const QPointF newAnchor(instanceCenterScene.x(), shiftedSource.y());
-        const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->source()->point());
+        const QPointF &delta(newAnchor - arrow->link()->source()->point());
 
         const bool updated =
                 updateSource(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
 
         if (updated && !m_targetInstance && !delta.isNull())
-            updateTarget(m_arrowItem->arrow()->link()->target()->point() + delta, ObjectAnchor::Snap::NoSnap);
+            updateTarget(arrow->link()->target()->point() + delta, ObjectAnchor::Snap::NoSnap);
     }
     if (targetFound) {
         const QPointF &instanceCenterScene(m_targetInstance->sceneBoundingRect().center());
         const QPointF newAnchor(instanceCenterScene.x(), shiftedTarget.y());
-        const QPointF &delta(newAnchor - m_arrowItem->arrow()->link()->target()->point());
+        const QPointF &delta(newAnchor - arrow->link()->target()->point());
 
         const bool updated =
                 updateTarget(newAnchor, isAutoResizable() ? ObjectAnchor::Snap::SnapTo : ObjectAnchor::Snap::NoSnap);
 
         if (updated && !m_sourceInstance && !delta.isNull())
-            updateSource(m_arrowItem->arrow()->link()->source()->point() + delta, ObjectAnchor::Snap::NoSnap);
+            updateSource(arrow->link()->source()->point() + delta, ObjectAnchor::Snap::NoSnap);
     }
 
     return res;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cif/cifentity.h"
+#include "cif/cifblock.h"
 
 #include <QMap>
 #include <QObject>
@@ -35,42 +35,43 @@ public:
 
     explicit CifParser(QObject *parent = nullptr);
 
-    CifEntityShared readCIF(const QString &line) const;
+    CifLineShared readCifLine(const QString &line) const;
+    QVector<CifBlockShared> readCifBlocks(const QStringList &lines);
 
 private:
     static const QString m_typePattern;
     static const QRegularExpression m_typeRx;
 
-    CifEntity::CifType readCifType(const QString &from) const;
+    CifLine::CifType readCifType(const QString &from) const;
 
-    CifEntityShared readEntityAction(const QString &from) const;
-    CifEntityShared readEntityCall(const QString &from) const;
-    CifEntityShared readEntityComment(const QString &from) const;
-    CifEntityShared readEntityCondition(const QString &from) const;
-    CifEntityShared readEntityCreate(const QString &from) const;
-    CifEntityShared readEntityCollapsed(const QString &from) const;
-    CifEntityShared readEntityEnd(const QString &from) const;
-    CifEntityShared readEntityHyperLink(const QString &from) const;
-    CifEntityShared readEntityInstance(const QString &from) const;
-    CifEntityShared readEntityImport(const QString &from) const;
-    CifEntityShared readEntityKeep(const QString &from) const;
-    CifEntityShared readEntityLastModified(const QString &from) const;
-    CifEntityShared readEntityMessage(const QString &from) const;
-    CifEntityShared readEntityMscDocument(const QString &from) const;
-    CifEntityShared readEntityModified(const QString &from) const;
-    CifEntityShared readEntityMscPageSize(const QString &from) const;
-    CifEntityShared readEntityNested(const QString &from) const;
-    CifEntityShared readEntityPosition(const QString &from) const;
-    CifEntityShared readEntityPreview(const QString &from) const;
-    CifEntityShared readEntityReset(const QString &from) const;
-    CifEntityShared readEntitySet(const QString &from) const;
-    CifEntityShared readEntityStop(const QString &from) const;
-    CifEntityShared readEntitySubmsc(const QString &from) const;
-    CifEntityShared readEntitySpecific(const QString &from) const;
-    CifEntityShared readEntityText(const QString &from) const;
-    CifEntityShared readEntityTimeout(const QString &from) const;
-    CifEntityShared readEntityTextMode(const QString &from) const;
-    CifEntityShared readEntityTextName(const QString &from) const;
+    CifLineShared readEntityAction(const QString &from) const;
+    CifLineShared readEntityCall(const QString &from) const;
+    CifLineShared readEntityComment(const QString &from) const;
+    CifLineShared readEntityCondition(const QString &from) const;
+    CifLineShared readEntityCreate(const QString &from) const;
+    CifLineShared readEntityCollapsed(const QString &from) const;
+    CifLineShared readEntityEnd(const QString &from) const;
+    CifLineShared readEntityHyperLink(const QString &from) const;
+    CifLineShared readEntityInstance(const QString &from) const;
+    CifLineShared readEntityImport(const QString &from) const;
+    CifLineShared readEntityKeep(const QString &from) const;
+    CifLineShared readEntityLastModified(const QString &from) const;
+    CifLineShared readEntityMessage(const QString &from) const;
+    CifLineShared readEntityMscDocument(const QString &from) const;
+    CifLineShared readEntityModified(const QString &from) const;
+    CifLineShared readEntityMscPageSize(const QString &from) const;
+    CifLineShared readEntityNested(const QString &from) const;
+    CifLineShared readEntityPosition(const QString &from) const;
+    CifLineShared readEntityPreview(const QString &from) const;
+    CifLineShared readEntityReset(const QString &from) const;
+    CifLineShared readEntitySet(const QString &from) const;
+    CifLineShared readEntityStop(const QString &from) const;
+    CifLineShared readEntitySubmsc(const QString &from) const;
+    CifLineShared readEntitySpecific(const QString &from) const;
+    CifLineShared readEntityText(const QString &from) const;
+    CifLineShared readEntityTimeout(const QString &from) const;
+    CifLineShared readEntityTextMode(const QString &from) const;
+    CifLineShared readEntityTextName(const QString &from) const;
 };
 
 } // ns cif

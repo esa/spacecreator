@@ -26,8 +26,7 @@ namespace cif {
 
 const QLatin1String CifParser::CifLineTag("CIF");
 
-//"    Line 99: /* CIF MSCDOCUMENT (20, 20), (1521, 1552) */"
-const QString CifParser::m_typePattern = QString("/*\\sCIF\\s(\\w+)\\s.*\\*/");
+const QString CifParser::m_typePattern = QString("CIF\\s(\\w+).*");
 const QRegularExpression CifParser::m_typeRx = QRegularExpression(m_typePattern);
 
 CifParser::CifParser(QObject *parent)
@@ -35,78 +34,78 @@ CifParser::CifParser(QObject *parent)
 {
 }
 
-CifEntity::CifType CifParser::readCifType(const QString &from) const
+CifLine::CifType CifParser::readCifType(const QString &from) const
 {
     if (!from.isEmpty()) {
         QRegularExpressionMatch matched = m_typeRx.match(from);
         if (matched.hasMatch()) {
             const QString &typeName = matched.captured(1).toUpper();
-            return CifEntity::typeForName(typeName);
+            return CifLine::typeForName(typeName);
         }
     }
 
-    return CifEntity::CifType::Unknown;
+    return CifLine::CifType::Unknown;
 }
 
-CifEntityShared CifParser::readCIF(const QString &line) const
+CifLineShared CifParser::readCifLine(const QString &line) const
 {
-    const CifEntity::CifType requestedType = readCifType(line);
+    const CifLine::CifType requestedType = readCifType(line);
     switch (requestedType) {
-    case CifEntity::CifType::Action:
+    case CifLine::CifType::Action:
         return readEntityAction(line);
-    case CifEntity::CifType::Call:
+    case CifLine::CifType::Call:
         return readEntityCall(line);
-    case CifEntity::CifType::Comment:
+    case CifLine::CifType::Comment:
         return readEntityComment(line);
-    case CifEntity::CifType::Condition:
+    case CifLine::CifType::Condition:
         return readEntityCondition(line);
-    case CifEntity::CifType::Create:
+    case CifLine::CifType::Create:
         return readEntityCreate(line);
-    case CifEntity::CifType::Collapsed:
+    case CifLine::CifType::Collapsed:
         return readEntityCollapsed(line);
-    case CifEntity::CifType::End:
+    case CifLine::CifType::End:
         return readEntityEnd(line);
-    case CifEntity::CifType::HyperLink:
+    case CifLine::CifType::HyperLink:
         return readEntityHyperLink(line);
-    case CifEntity::CifType::Instance:
+    case CifLine::CifType::Instance:
         return readEntityInstance(line);
-    case CifEntity::CifType::Import:
+    case CifLine::CifType::Import:
         return readEntityImport(line);
-    case CifEntity::CifType::Keep:
+    case CifLine::CifType::Keep:
         return readEntityKeep(line);
-    case CifEntity::CifType::LastModified:
+    case CifLine::CifType::LastModified:
         return readEntityLastModified(line);
-    case CifEntity::CifType::Message:
+    case CifLine::CifType::Message:
         return readEntityMessage(line);
-    case CifEntity::CifType::MscDocument:
+    case CifLine::CifType::MscDocument:
         return readEntityMscDocument(line);
-    case CifEntity::CifType::Modified:
+    case CifLine::CifType::Modified:
         return readEntityModified(line);
-    case CifEntity::CifType::MscPageSize:
+    case CifLine::CifType::MscPageSize:
         return readEntityMscPageSize(line);
-    case CifEntity::CifType::Nested:
+    case CifLine::CifType::Nested:
         return readEntityNested(line);
-    case CifEntity::CifType::Position:
+    case CifLine::CifType::Position:
         return readEntityPosition(line);
-    case CifEntity::CifType::Preview:
+    case CifLine::CifType::Preview:
         return readEntityPreview(line);
-    case CifEntity::CifType::Reset:
+    case CifLine::CifType::Reset:
         return readEntityReset(line);
-    case CifEntity::CifType::Set:
+    case CifLine::CifType::Set:
         return readEntitySet(line);
-    case CifEntity::CifType::Stop:
+    case CifLine::CifType::Stop:
         return readEntityStop(line);
-    case CifEntity::CifType::Submsc:
+    case CifLine::CifType::Submsc:
         return readEntitySubmsc(line);
-    case CifEntity::CifType::Specific:
+    case CifLine::CifType::Specific:
         return readEntitySpecific(line);
-    case CifEntity::CifType::Text:
+    case CifLine::CifType::Text:
         return readEntityText(line);
-    case CifEntity::CifType::Timeout:
+    case CifLine::CifType::Timeout:
         return readEntityTimeout(line);
-    case CifEntity::CifType::TextMode:
+    case CifLine::CifType::TextMode:
         return readEntityTextMode(line);
-    case CifEntity::CifType::TextName:
+    case CifLine::CifType::TextName:
         return readEntityTextName(line);
     default: {
         throw ParserException(QString("Unknow CIF entry: %1").arg(line));
@@ -114,252 +113,294 @@ CifEntityShared CifParser::readCIF(const QString &line) const
     }
 }
 
-CifEntityShared CifParser::readEntityAction(const QString &from) const
+QVector<CifBlockShared> CifParser::readCifBlocks(const QStringList &lines)
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Action));
+    QVector<CifBlockShared> blocks;
+    auto newBlock = [&]() -> CifBlockShared & {
+        blocks.append(CifBlockShared(new CifBlock));
+        return blocks.last();
+    };
+
+    auto block = [&]() -> CifBlockShared & { return blocks.isEmpty() ? newBlock() : blocks.last(); };
+
+    bool isText(false);
+    auto isCifComment = [](const QString &line) { return line.startsWith(cif::CifParser::CifLineTag); };
+
+    auto isAcceptableLine = [&isText, &isCifComment](const QString &line) { return isText || isCifComment(line); };
+
+    for (const QString &line : lines) {
+        if (isAcceptableLine(line)) {
+            if (isText && !isCifComment(line)) {
+                QVector<CifLineShared> currLines = block()->lines();
+                CifLineShared &lastLine = currLines.last();
+                QStringList txt = lastLine->payload().toStringList();
+                txt.append(line);
+                lastLine->setPayload(txt);
+                block()->setLines(currLines);
+            } else if (const CifLineShared &cifLine = readCifLine(line)) {
+                if (!block()->addLine(cifLine)) {
+                    newBlock()->addLine(cifLine);
+                    isText = false;
+                    continue;
+                }
+
+                if (!isText)
+                    isText = cifLine->entityType() == CifLine::CifType::Text;
+                else if (cifLine->entityType() == CifLine::CifType::End)
+                    isText = false;
+            }
+        }
+    }
+
+    return blocks;
+}
+
+CifLineShared CifParser::readEntityAction(const QString &from) const
+{
+    CifLineShared cif(new CifLine(CifLine::CifType::Action));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityCall(const QString &from) const
+CifLineShared CifParser::readEntityCall(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Call));
+    CifLineShared cif(new CifLine(CifLine::CifType::Call));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityComment(const QString &from) const
+CifLineShared CifParser::readEntityComment(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Comment));
+    CifLineShared cif(new CifLine(CifLine::CifType::Comment));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityCondition(const QString &from) const
+CifLineShared CifParser::readEntityCondition(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Condition));
+    CifLineShared cif(new CifLine(CifLine::CifType::Condition));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityCreate(const QString &from) const
+CifLineShared CifParser::readEntityCreate(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Create));
+    CifLineShared cif(new CifLine(CifLine::CifType::Create));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityCollapsed(const QString &from) const
+CifLineShared CifParser::readEntityCollapsed(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Collapsed));
+    CifLineShared cif(new CifLine(CifLine::CifType::Collapsed));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityEnd(const QString &from) const
+CifLineShared CifParser::readEntityEnd(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::End));
+    CifLineShared cif(new CifLine(CifLine::CifType::End));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityHyperLink(const QString &from) const
+CifLineShared CifParser::readEntityHyperLink(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::HyperLink));
+    CifLineShared cif(new CifLine(CifLine::CifType::HyperLink));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityInstance(const QString &from) const
+CifLineShared CifParser::readEntityInstance(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Instance));
+    CifLineShared cif(new CifLine(CifLine::CifType::Instance));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityImport(const QString &from) const
+CifLineShared CifParser::readEntityImport(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Import));
+    CifLineShared cif(new CifLine(CifLine::CifType::Import));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityKeep(const QString &from) const
+CifLineShared CifParser::readEntityKeep(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Keep));
+    CifLineShared cif(new CifLine(CifLine::CifType::Keep));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityLastModified(const QString &from) const
+CifLineShared CifParser::readEntityLastModified(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::LastModified));
+    CifLineShared cif(new CifLine(CifLine::CifType::LastModified));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityMessage(const QString &from) const
+CifLineShared CifParser::readEntityMessage(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Message));
+    CifLineShared cif(new CifLine(CifLine::CifType::Message));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityMscDocument(const QString &from) const
+CifLineShared CifParser::readEntityMscDocument(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::MscDocument));
+    CifLineShared cif(new CifLine(CifLine::CifType::MscDocument));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityModified(const QString &from) const
+CifLineShared CifParser::readEntityModified(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Modified));
+    CifLineShared cif(new CifLine(CifLine::CifType::Modified));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityMscPageSize(const QString &from) const
+CifLineShared CifParser::readEntityMscPageSize(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::MscPageSize));
+    CifLineShared cif(new CifLine(CifLine::CifType::MscPageSize));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityNested(const QString &from) const
+CifLineShared CifParser::readEntityNested(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Nested));
+    CifLineShared cif(new CifLine(CifLine::CifType::Nested));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityPosition(const QString &from) const
+CifLineShared CifParser::readEntityPosition(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Position));
+    CifLineShared cif(new CifLine(CifLine::CifType::Position));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityPreview(const QString &from) const
+CifLineShared CifParser::readEntityPreview(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Preview));
+    CifLineShared cif(new CifLine(CifLine::CifType::Preview));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityReset(const QString &from) const
+CifLineShared CifParser::readEntityReset(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Reset));
+    CifLineShared cif(new CifLine(CifLine::CifType::Reset));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntitySet(const QString &from) const
+CifLineShared CifParser::readEntitySet(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Set));
+    CifLineShared cif(new CifLine(CifLine::CifType::Set));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityStop(const QString &from) const
+CifLineShared CifParser::readEntityStop(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Stop));
+    CifLineShared cif(new CifLine(CifLine::CifType::Stop));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntitySubmsc(const QString &from) const
+CifLineShared CifParser::readEntitySubmsc(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Submsc));
+    CifLineShared cif(new CifLine(CifLine::CifType::Submsc));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntitySpecific(const QString &from) const
+CifLineShared CifParser::readEntitySpecific(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Specific));
+    CifLineShared cif(new CifLine(CifLine::CifType::Specific));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityText(const QString &from) const
+CifLineShared CifParser::readEntityText(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Text));
+    CifLineShared cif(new CifLine(CifLine::CifType::Text));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityTimeout(const QString &from) const
+CifLineShared CifParser::readEntityTimeout(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::Timeout));
+    CifLineShared cif(new CifLine(CifLine::CifType::Timeout));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityTextMode(const QString &from) const
+CifLineShared CifParser::readEntityTextMode(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::TextMode));
+    CifLineShared cif(new CifLine(CifLine::CifType::TextMode));
     if (!cif->initFrom(from)) {
         cif.reset();
     }
     return cif;
 }
 
-CifEntityShared CifParser::readEntityTextName(const QString &from) const
+CifLineShared CifParser::readEntityTextName(const QString &from) const
 {
-    CifEntityShared cif(new CifEntity(CifEntity::CifType::TextName));
+    CifLineShared cif(new CifLine(CifLine::CifType::TextName));
     if (!cif->initFrom(from)) {
         cif.reset();
     }

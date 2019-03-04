@@ -86,11 +86,11 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
     // Calculate the size and position of the boxes
     QRectF boxRect, relationRect;
-    boxRect.setX((boundingRect().width() - boxSize().width()) / 2);
+    boxRect.setX((boundingRect().width() - boxSize().width()) / 2.);
     boxRect.setSize(boxSize());
-    qreal relationHeight = boxRect.height() / 5;
-    qreal relationWidth = relationHeight * 3;
-    relationRect.setX(boxRect.center().x() - relationWidth / 2);
+    const qreal relationHeight = boxRect.height() / 5.;
+    const qreal relationWidth = relationHeight * 3.;
+    relationRect.setX(boxRect.center().x() - relationWidth / 2.);
     relationRect.setHeight(relationHeight);
     relationRect.setWidth(relationWidth);
     relationRect.moveBottom(boxRect.bottom());

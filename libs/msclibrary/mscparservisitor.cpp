@@ -115,11 +115,15 @@ msc::MscModel *MscParserVisitor::detachModel()
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 {
     Q_ASSERT(m_model != nullptr);
+
+    handlePrecedingCif(context, Q_FUNC_INFO);
     return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
 {
+    handlePrecedingCif(context, Q_FUNC_INFO);
+
     if (context->REFERENCED()) {
         // ignore referenced documents (spec extension) for now
         qWarning() << "Referenced documents are not supported";
@@ -146,29 +150,12 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     }
 
     auto handleComment = [=](antlr4::Token *token) {
-        if (token->getChannel() == 2) {
-            // Handle this token
-            const QString &srcLine = QString::fromStdString(token->getText()).trimmed();
-            QString line = srcLine;
-            if (line.startsWith("/*")) {
-                line = line.mid(2);
-            }
-            if (line.endsWith("*/")) {
-                line.chop(2);
-            }
-            line = line.trimmed();
-
-            if (line.startsWith(cif::CifParser::CifLineTag)) {
-                cif::CifEntityShared cifInfo = m_cifParser->readCIF(srcLine);
-                if (cifInfo) {
-                    // TODO: process found info
-                    qDebug() << cifInfo->entityType();
-                }
-            } else if (line.startsWith("MSC")) {
+        const QString &line = dropCommentBraces(readCommentLine(token)).toLower();
+        if (!line.isEmpty()) {
+            if (line.startsWith("msc ")) {
                 // Handle MSC here
                 // This is really simple first version of an MSC hierarchy parser
                 // For something more complete, we might need to really parse this
-                line = line.toLower();
                 if (line.contains("goal") || line.contains("time")) {
                     // Not supported
                 } else if (line.contains("leaf")) {
@@ -217,6 +204,8 @@ antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext
 
 antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext *context)
 {
+    handlePrecedingCif(context, Q_FUNC_INFO);
+
     if (!m_currentChart) {
         return visitChildren(context);
     }
@@ -230,6 +219,8 @@ antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
+    handlePrecedingCif(context, Q_FUNC_INFO);
+
     QString mscName;
     if (context->mscHead()) {
         mscName = ::nameToString(context->mscHead()->name());
@@ -328,7 +319,10 @@ antlrcpp::Any MscParserVisitor::visitInstanceEvent(MscParser::InstanceEventConte
 
 antlrcpp::Any MscParserVisitor::visitOrderableEvent(MscParser::OrderableEventContext *context)
 {
+    handlePrecedingCif(context, Q_FUNC_INFO);
+
     auto ret = visitChildren(context);
+
     if (!context->end().empty()) {
         parseComment(m_currentEvent, context->end().back());
     }
@@ -615,16 +609,16 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
     auto action = new MscAction;
     m_currentEvent = action;
     action->setInstance(m_currentInstance);
-    if (context->informalAction()) {
+    if (MscParser::InformalActionContext *iaCtx = context->informalAction()) {
         action->setActionType(MscAction::ActionType::Informal);
-        if (context->informalAction()->CHARACTERSTRING()) {
-            action->setInformalAction(charactersToString(context->informalAction()->CHARACTERSTRING()));
+        if (iaCtx->CHARACTERSTRING()) {
+            action->setInformalAction(charactersToString(iaCtx->CHARACTERSTRING()));
         } else {
-            if (context->informalAction()->functionText().empty()) {
-                QString informalAction = nameToString(context->informalAction()->name());
+            if (iaCtx->functionText().empty()) {
+                const QString &informalAction = nameToString(iaCtx->name());
                 action->setInformalAction(informalAction);
             } else {
-                action->setInformalAction(::treeNodeToString(context->informalAction()));
+                action->setInformalAction(::treeNodeToString(iaCtx));
             }
         }
     } else {
@@ -717,24 +711,24 @@ antlrcpp::Any MscParserVisitor::visitDataDefinition(MscParser::DataDefinitionCon
     return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionContext *ctx)
+antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionContext *context)
 {
     if (!m_currentChart) {
-        return visitChildren(ctx);
+        return visitChildren(context);
     }
 
     m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
-    return visitChildren(ctx);
+    return visitChildren(context);
 }
 
-antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *ctx)
+antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *context)
 {
     if (!m_currentChart) {
-        return visitChildren(ctx);
+        return visitChildren(context);
     }
 
     m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
-    return visitChildren(ctx);
+    return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementContext *context)
@@ -807,11 +801,11 @@ void MscParserVisitor::orderInstanceEvents()
             // First, go through all the stacks and take away non-messages. This has to be done for
             // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
-                while (!m_instanceEventsList.at(j).isEmpty()
-                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Message
-                       && m_instanceEventsList.at(j).first()->entityType() != MscEntity::EntityType::Condition) {
+                InstanceEvents events = m_instanceEventsList.at(j);
+                while (!events.isEmpty() && events.first()->entityType() != MscEntity::EntityType::Message
+                       && events.first()->entityType() != MscEntity::EntityType::Condition) {
                     // This is not a message, condition and timer move it to the chart
-                    m_currentChart->addInstanceEvent(m_instanceEventsList[j].takeFirst());
+                    m_currentChart->addInstanceEvent(events.takeFirst());
                 }
             }
 
@@ -850,10 +844,6 @@ void MscParserVisitor::orderInstanceEvents()
                 m_currentChart->addInstanceEvent(firstEvent);
 
                 break;
-            }
-
-            if (found && inOther) {
-                m_instanceEventsList[i].removeFirst();
             }
         }
 
@@ -921,4 +911,65 @@ QString MscParserVisitor::denominatorString(const QString &name) const
     }
 
     return {};
+}
+
+QString MscParserVisitor::readCommentLine(const antlr4::Token *const token)
+{
+    if (!token || token->getChannel() != m_commentsStreamNum)
+        return QString();
+
+    return QString::fromStdString(token->getText()).trimmed();
+}
+
+QString MscParserVisitor::dropCommentBraces(const QString &srcLine)
+{
+    QString line(srcLine);
+    if (!line.isEmpty()) {
+        if (line.startsWith("/*")) {
+            line = line.mid(2);
+        }
+        if (line.endsWith("*/")) {
+            line.chop(2);
+        }
+        line = line.trimmed();
+    }
+    return line;
+}
+
+void MscParserVisitor::handlePrecedingCif(antlr4::ParserRuleContext *ctx, const char *caller)
+{
+    static const QRegularExpression rx(".*::(\\w+)\\(.*\\)");
+    const QRegularExpressionMatch m = rx.match(caller);
+
+    //    qDebug() << "handlePrecedingCif called from" << m.captured(1);
+    auto readComments = [](const std::vector<antlr4::Token *> &tokens) {
+        QStringList lines;
+        for (const antlr4::Token *const token : tokens)
+            lines << dropCommentBraces(readCommentLine(token));
+        return lines;
+    };
+
+    auto precedingComments = m_tokens->getHiddenTokensToLeft(ctx->start->getTokenIndex());
+    const QStringList &left = readComments(precedingComments);
+    if (!left.isEmpty()) {
+        const QVector<cif::CifBlockShared> &cifs = m_cifParser->readCifBlocks(left);
+        for (const cif::CifBlockShared &cifBlock : cifs) {
+            const QString &hashKey = cifBlock->hashKey();
+            if (!m_cifBlocks.contains(hashKey)) {
+                m_cifBlocks.append(hashKey);
+                //                qDebug() << "DOCUMENT:" << (m_currentDocument ? m_currentDocument->name() : "-");
+                //                qDebug() << "CHART:" << (m_currentChart ? m_currentChart->name() : "-");
+                //                qDebug() << "INSTANCE:" << (m_currentInstance ? m_currentInstance->name() : "-");
+                //                qDebug() << "EVENT:" << (m_currentEvent ? m_currentEvent->name() : "-");
+                //                qDebug() << "MESSAGE:" << (m_currentMessage ? m_currentMessage->name() : "-");
+
+                //                qDebug() << "CIF:";
+                //                for (const cif::CifLineShared &cifLine : cifBlock->lines())
+                //                    qDebug() << "line:" << cifLine->sourceLine();
+            } /*else {
+                qDebug() << "CifBlock #" << hashKey << "already added!";
+            }
+            qDebug() << "---------------";*/
+        }
+    }
 }
