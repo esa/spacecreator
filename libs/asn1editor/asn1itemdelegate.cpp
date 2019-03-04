@@ -87,11 +87,7 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
         editor = spinBox;
     } else if (asnType == ASN1_TYPE_ENUMERATED || asnType == ASN1_TYPE_CHOICE || asnType == ASN1_TYPE_BOOL) {
         QComboBox *comboBox = new QComboBox(parent);
-
-        QVariantList enumVals = index.data(CHOICE_LIST_ROLE).toList();
-        for (const auto &val : enumVals)
-            comboBox->addItem(val.toString());
-
+        comboBox->addItems(index.data(CHOICE_LIST_ROLE).toStringList());
         comboBox->setCurrentIndex(0);
         editor = comboBox;
     } else if (asnType == ASN1_TYPE_STRING) {
@@ -132,13 +128,11 @@ void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
     model->setData(index, value);
 
     if (asnType == ASN1_TYPE_SEQUENCEOF)
-        Q_EMIT const_cast<Asn1ItemDelegate *>(this)->sequenceOfSizeChanged(index.sibling(index.row(), 0), value,
-                                                                           index.data(MAX_RANGE_ROLE));
+        Q_EMIT sequenceOfSizeChanged(index.sibling(index.row(), 0), value, index.data(MAX_RANGE_ROLE));
 
     if (asnType == ASN1_TYPE_CHOICE)
-        Q_EMIT const_cast<Asn1ItemDelegate *>(this)->choiceFieldChanged(
-                index.sibling(index.row(), 0), index.data(CHOICE_LIST_ROLE).toList().size(),
-                qobject_cast<QComboBox *>(editor)->currentIndex());
+        Q_EMIT choiceFieldChanged(index.sibling(index.row(), 0), index.data(CHOICE_LIST_ROLE).toList().size(),
+                                  qobject_cast<QComboBox *>(editor)->currentIndex());
 }
 
 void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,

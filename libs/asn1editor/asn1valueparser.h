@@ -31,7 +31,7 @@ public:
     QVariantMap parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const;
 
 Q_SIGNALS:
-    void parseError(const QString &error);
+    void parseError(const QString &error) const;
 
 private:
     bool checkFormat(const QString &asn1Value) const;
@@ -44,8 +44,6 @@ private:
     bool checkRange(const QVariantMap &asn1Type, const QVariant &value) const;
 
     int nextIndex(const QString &value) const;
-
-    void emitError(const QString &error) const;
 };
 
 } // namespace asn1

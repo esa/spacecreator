@@ -79,7 +79,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
 
     if (!ok) {
         valueMap.clear();
-        emitError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
+        Q_EMIT parseError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
     }
 
     return valueMap;
@@ -110,7 +110,7 @@ bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type, const QStr
     QString value = asn1Value.trimmed();
 
     if (!checkFormat(value)) {
-        emitError(tr("Incorrect format for ASN.1 sequence value"));
+        Q_EMIT parseError(tr("Incorrect format for ASN.1 sequence value"));
         return false;
     }
 
@@ -169,7 +169,7 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type, const QS
     QString value = asn1Value.trimmed();
 
     if (!checkFormat(value)) {
-        emitError(tr("Incorrect format for ASN.1 sequence value"));
+        Q_EMIT parseError(tr("Incorrect format for ASN.1 sequence value"));
         return false;
     }
 
@@ -283,11 +283,6 @@ int Asn1ValueParser::nextIndex(const QString &value) const
     }
 
     return index;
-}
-
-void Asn1ValueParser::emitError(const QString &error) const
-{
-    Q_EMIT const_cast<Asn1ValueParser *>(this)->parseError(error);
 }
 
 } // namespace asn1
