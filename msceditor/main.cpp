@@ -60,7 +60,7 @@ struct LogHandler {
                 break;
             }
 
-            m_view->appendHtml(QString("%1: %2%3%4").arg(marker, htmlPre, msg.mid(1, msg.length() - 2), htmlPost));
+            m_view->appendHtml(QString("%1: %2%3%4").arg(marker, htmlPre, msg, htmlPost));
         }
         (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
     }

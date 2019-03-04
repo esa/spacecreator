@@ -96,10 +96,21 @@ private:
     antlr4::CommonTokenStream *m_tokens = nullptr;
     msc::cif::CifParser *m_cifParser = nullptr;
 
+    // keep it synced with Msc.g4 -
+    // COMMENTLOST : '/*' .*? '*/' -> channel(2);
+    static const int m_commentsStreamNum = 2;
+
     msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
     msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);
 
     void checkMessagesDoubleNotation() const;
+
+    void handlePrecedingCif(antlr4::ParserRuleContext *ctx, const char *caller);
+
+    static QString readCommentLine(const antlr4::Token *const token);
+    static QString dropCommentBraces(const QString &line);
+
+    QStringList m_cifBlocks;
 };
 
 #endif // MSCPARSERVISITOR_H
