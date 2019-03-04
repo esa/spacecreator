@@ -27,6 +27,7 @@
 #include "commands/common/commandsstack.h"
 #include "messageitem.h"
 #include "mscinstance.h"
+#include "mscchart.h"
 
 #include <QApplication>
 #include <QBrush>
@@ -40,9 +41,10 @@
 
 namespace msc {
 
-InstanceItem::InstanceItem(msc::MscInstance *instance, QGraphicsItem *parent)
+InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(instance, parent)
     , m_instance(instance)
+    , m_chart(chart)
     , m_axisSymbol(new QGraphicsLineItem(this))
     , m_headSymbol(new InstanceHeadItem(this))
     , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
@@ -222,9 +224,9 @@ void InstanceItem::setBoundingRect(const QRectF &geometry)
     updateLayout();
 }
 
-InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, const QPointF &pos)
+InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos)
 {
-    InstanceItem *messageItem = new InstanceItem(instance);
+    InstanceItem *messageItem = new InstanceItem(instance, chart);
     messageItem->setPos(pos);
 
     return messageItem;
@@ -246,12 +248,17 @@ void InstanceItem::prepareHoverMark()
 
 void InstanceItem::onNameEdited(const QString &newName)
 {
-    if (newName.isEmpty()) {
+    if (newName.isEmpty())
         return;
-    }
 
-    using namespace msc::cmd;
-    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
+    if (m_chart->instanceByName(newName)) {
+        m_headSymbol->setName(m_instance->name());
+    } else {
+        m_instance->setName(newName);
+
+        using namespace msc::cmd;
+        CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
+    }
 }
 
 void InstanceItem::onKindEdited(const QString &newKind)

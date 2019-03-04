@@ -566,7 +566,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
             currentChart()->addInstance(orphanInstance);
         }
 
-        InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, pos);
+        InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, currentChart(), pos);
         connect(instanceItem, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
 
         const qreal axisHeight = d->calcInstanceAxisHeight();
