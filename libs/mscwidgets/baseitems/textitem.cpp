@@ -204,6 +204,7 @@ void TextItem::disableEditMode()
 
 void TextItem::focusOutEvent(QFocusEvent *event)
 {
+    Q_EMIT edited(toPlainText());
     disableEditMode();
     QGraphicsTextItem::focusOutEvent(event);
 }
@@ -219,7 +220,6 @@ void TextItem::keyPressEvent(QKeyEvent *event)
             if (m_prevText != newText) {
                 QSignalBlocker avoidValidation(document());
                 setPlainText(m_prevText);
-                Q_EMIT edited(m_prevText);
             }
             break;
         }

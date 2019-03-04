@@ -91,9 +91,11 @@ void tst_InstanceItem::cleanup()
 void tst_InstanceItem::testNameUpdate()
 {
     QCOMPARE(m_instanceItem->name(), QString("INST1"));
+    QCOMPARE(m_instanceItem->modelItem()->name(), m_instanceItem->name());
 
     m_instance->setName("FirstInst");
     QCOMPARE(m_instanceItem->name(), QString("FirstInst"));
+    QCOMPARE(m_instanceItem->modelItem()->name(), m_instanceItem->name());
 }
 
 void tst_InstanceItem::testKindUpdate()

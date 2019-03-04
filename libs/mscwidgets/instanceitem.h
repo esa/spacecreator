@@ -26,6 +26,7 @@ class QGraphicsTextItem;
 namespace msc {
 
 class MscInstance;
+class MscChart;
 
 class InstanceHeadItem;
 class InstanceEndItem;
@@ -37,7 +38,7 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit InstanceItem(MscInstance *instance, QGraphicsItem *parent = nullptr);
+    explicit InstanceItem(MscInstance *instance, MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
 
@@ -51,7 +52,7 @@ public:
     QPainterPath shape() const override;
     void setBoundingRect(const QRectF &geometry);
 
-    static InstanceItem *createDefaultItem(MscInstance *instance, const QPointF &pos);
+    static InstanceItem *createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos);
 
 Q_SIGNALS:
     void needRelayout() const;
@@ -72,6 +73,7 @@ protected:
 
 private:
     msc::MscInstance *m_instance = nullptr;
+    msc::MscChart *m_chart = nullptr;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
