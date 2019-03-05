@@ -38,7 +38,7 @@ void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
 {
     clear();
 
-    static QStringList headers = QStringList() << tr("Field") << tr("Type") << tr("Value") << tr("Optional");
+    static QStringList headers = { tr("Field"), tr("Type"), tr("Value"), tr("Optional") };
     setHorizontalHeaderLabels(headers);
 
     ItemMap itemMap = createModelItems(asn1Item, false);
@@ -62,16 +62,21 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     nameItem->setEditable(false);
     auto asnType = static_cast<ASN1Type>(asn1Item[ASN1_TYPE].toInt());
 
-    if (asnType == INTEGER || asnType == DOUBLE) {
+    switch (asnType) {
+    case INTEGER:
+    case DOUBLE:
         valueItem = createNumberItem(asn1Item);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX))
             typeLimit = QString(" (%1..%2)").arg(asn1Item[ASN1_MIN].toString(), asn1Item[ASN1_MAX].toString());
-    } else if (asnType == BOOL)
+        break;
+    case BOOL:
         valueItem = createBoolItem(asn1Item);
-    else if (asnType == SEQUENCE)
+        break;
+    case SEQUENCE:
         valueItem = createSequenceItem(asn1Item, nameItem);
-    else if (asnType == SEQUENCEOF) {
+        break;
+    case SEQUENCEOF:
         valueItem = createSequenceOfItem(asn1Item, nameItem);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX)) {
@@ -81,11 +86,14 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
                 typeLimit =
                         QString(tr(" Size(%1..%2)")).arg(asn1Item[ASN1_MIN].toString(), asn1Item[ASN1_MAX].toString());
         }
-    } else if (asnType == ENUMERATED)
+        break;
+    case ENUMERATED:
         valueItem = createEnumeratedItem(asn1Item);
-    else if (asnType == CHOICE)
+        break;
+    case CHOICE:
         valueItem = createChoiceItem(asn1Item, nameItem);
-    else if (asnType == STRING) {
+        break;
+    case STRING:
         valueItem = createItem(asn1Item);
 
         if (asn1Item.contains(ASN1_MIN) && asn1Item.contains(ASN1_MAX)) {
@@ -95,8 +103,10 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
                 typeLimit = QString(tr(" Length(%1..%2)"))
                                     .arg(asn1Item[ASN1_MIN].toString(), asn1Item[ASN1_MAX].toString());
         }
-    } else
+        break;
+    default:
         valueItem = new QStandardItem();
+    }
 
     QStandardItem *typeItem = new QStandardItem(asn1TypeStringMap[asnType] + typeLimit);
     typeItem->setData(QBrush(QColor("gray")), Qt::ForegroundRole);

@@ -41,33 +41,48 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
 
     valueMap["name"] = asn1Type[ASN1_NAME];
 
-    if (valueType == INTEGER) {
+    switch (valueType) {
+    case INTEGER: {
         int intVal = value.toInt(&ok);
 
         if (ok && (ok = checkRange(asn1Type, intVal)))
             valueMap["value"] = intVal;
-    } else if (valueType == DOUBLE) {
+
+        break;
+    }
+    case DOUBLE: {
         double doubleVal = value.toDouble(&ok);
 
         if (ok && (ok = checkRange(asn1Type, doubleVal)))
             valueMap["value"] = doubleVal;
-    } else if (valueType == BOOL) {
+
+        break;
+    }
+    case BOOL:
         if ((ok = value == "TRUE" || value == "FALSE"))
             valueMap["value"] = value == "TRUE" ? true : false;
-    } else if (valueType == SEQUENCE) {
+
+        break;
+    case SEQUENCE:
         ok = parseSequenceValue(asn1Type, value, valueMap);
-    } else if (valueType == SEQUENCEOF) {
+        break;
+    case SEQUENCEOF:
         ok = parseSequenceOfValue(asn1Type, value, valueMap)
                 && checkRange(asn1Type, valueMap["seqofvalue"].toList().count());
-    } else if (valueType == ENUMERATED) {
+        break;
+    case ENUMERATED: {
         QVariantList values = asn1Type["values"].toList();
 
         // check enumerated value
         if ((ok = values.contains(value)))
             valueMap["value"] = value;
-    } else if (valueType == CHOICE) {
+
+        break;
+    }
+    case CHOICE:
         ok = parseChoiceValue(asn1Type, value, valueMap);
-    } else {
+        break;
+    default:
         // take string between " "
         if (value.startsWith("\""))
             value = value.remove(0, 1);
@@ -77,6 +92,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
 
         if ((ok = checkRange(asn1Type, value.length())))
             valueMap["value"] = value;
+        break;
     }
 
     if (!ok) {

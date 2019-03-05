@@ -105,6 +105,17 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QDomElement typeElem = type.firstChild().toElement();
     QString typeName = typeElem.tagName();
 
+    auto typeByTypeName = [](const QString &typeName) {
+        static QMap<QString, ASN1Type> asn1TypeStringMap{
+            { "IntegerType", ASN1Type::INTEGER },       { "RealType", ASN1Type::DOUBLE },
+            { "BooleanType", ASN1Type::BOOL },          { "SequenceType", ASN1Type::SEQUENCE },
+            { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },
+            { "ChoiceType", ASN1Type::CHOICE }
+        };
+
+        return asn1TypeStringMap.contains(typeName) ? asn1TypeStringMap[typeName] : ASN1Type::STRING;
+    };
+
     // find type node for ReferenceType
     while (typeName == "ReferenceType") {
         parseRange<int>(typeElem, typeData);
@@ -125,31 +136,32 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
         }
     }
 
-    if (typeName == "IntegerType") {
-        typeData[ASN1_TYPE] = INTEGER;
+    typeData[ASN1_TYPE] = typeByTypeName(typeName);
+
+    switch (static_cast<ASN1Type>(typeData[ASN1_TYPE].toInt())) {
+    case INTEGER:
+    case STRING:
         parseRange<int>(typeElem, typeData);
-    } else if (typeName == "RealType") {
-        typeData[ASN1_TYPE] = DOUBLE;
+        break;
+    case DOUBLE:
         parseRange<double>(typeElem, typeData);
-    } else if (typeName == "BooleanType") {
-        typeData[ASN1_TYPE] = BOOL;
+        break;
+    case BOOL:
         typeData["default"] = false;
-    } else if (typeName == "SequenceType") {
-        typeData[ASN1_TYPE] = SEQUENCE;
+        break;
+    case SEQUENCE:
         parseSequenceType(typeAssignments, typeElem, typeData);
-    } else if (typeName == "SequenceOfType") {
-        typeData[ASN1_TYPE] = SEQUENCEOF;
+        break;
+    case SEQUENCEOF:
         typeData[ASN1_SEQOFTYPE] = parseType(typeAssignments, typeElem.firstChild().toElement());
         parseRange<int>(typeElem, typeData);
-    } else if (typeName == "EnumeratedType") {
-        typeData[ASN1_TYPE] = ENUMERATED;
+        break;
+    case ENUMERATED:
         parseEnumeratedType(typeElem, typeData);
-    } else if (typeName == "ChoiceType") {
-        typeData[ASN1_TYPE] = CHOICE;
+        break;
+    case CHOICE:
         parseChoiceType(typeAssignments, typeElem, typeData);
-    } else if (typeName.endsWith("StringType")) {
-        typeData[ASN1_TYPE] = STRING;
-        parseRange<int>(typeElem, typeData);
+        break;
     }
 
     return typeData;
