@@ -10,4 +10,6 @@ SUBDIRS += \
     qtcreator \
     tests
 
-CONFIG += ordered
+msceditor.depends = libs
+qtcreator.depends = libs
+tests.depends = libs

@@ -5,4 +5,4 @@ SUBDIRS = \
     mscwidgets \
     asn1editor 
 
-CONFIG += ordered
+mscwidgets.depends = msclibrary

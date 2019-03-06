@@ -31,6 +31,7 @@ build_linux_gcc:
   artifacts:
     paths:
       - build
+      - libs/asn1editor/parser
       - libs/msclibrary/parser
     expire_in: 1 day
   cache:
@@ -118,9 +119,11 @@ test_docker:
     - docker
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
   script:
-    - find build | xargs touch # Avoid rebuilding
     - cd build
     - export QT_QPA_PLATFORM=offscreen
+    - /opt/Qt/5.12.0/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - find . | xargs touch # Avoid rebuilding
+    - make -j 8 # make sure everything is build
     - make check
   dependencies:
     - build_linux_gcc

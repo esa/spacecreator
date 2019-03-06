@@ -39,6 +39,10 @@
 .directory
 
 # ANTLR generated files
+libs/asn1editor/parser/*.cpp
+libs/asn1editor/parser/*.h
+libs/asn1editor/parser/*.interp
+libs/asn1editor/parser/*.tokens
 libs/msclibrary/parser/*.cpp
 libs/msclibrary/parser/*.h
 libs/msclibrary/parser/*.interp
