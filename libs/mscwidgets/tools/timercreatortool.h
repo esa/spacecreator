@@ -27,10 +27,8 @@ class TimerCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    TimerCreatorTool(MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view, QObject *parent);
     BaseTool::ToolType toolType() const override;
-
-    void setTimerType(MscTimer::TimerType type);
 
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *chart) override;

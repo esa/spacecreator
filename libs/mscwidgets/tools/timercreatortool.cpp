@@ -26,24 +26,15 @@
 
 namespace msc {
 
-TimerCreatorTool::TimerCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+TimerCreatorTool::TimerCreatorTool(MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view,
+                                   QObject *parent)
     : BaseCreatorTool(model, view, parent)
+    , m_timerType(type)
 {
+    Q_ASSERT(m_timerType != MscTimer::TimerType::Unknown);
+
     m_title = tr("Timer");
-    m_description = tr("Create new Timer item");
-    m_icon = QPixmap(":/icons/toolbar/starttimer.svg");
-}
 
-BaseTool::ToolType TimerCreatorTool::toolType() const
-{
-    return BaseTool::ToolType::TimerCreator;
-}
-
-void TimerCreatorTool::setTimerType(MscTimer::TimerType type)
-{
-    Q_ASSERT(type != MscTimer::TimerType::Unknown);
-
-    m_timerType = type;
     switch (m_timerType) {
     case MscTimer::TimerType::Start:
         m_icon = QPixmap(":/icons/toolbar/starttimer.svg");
@@ -60,6 +51,11 @@ void TimerCreatorTool::setTimerType(MscTimer::TimerType type)
     default:
         break;
     }
+}
+
+BaseTool::ToolType TimerCreatorTool::toolType() const
+{
+    return BaseTool::ToolType::TimerCreator;
 }
 
 void TimerCreatorTool::onCurrentChartChagend(MscChart *chart)

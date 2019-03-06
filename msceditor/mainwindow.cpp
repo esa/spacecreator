@@ -654,16 +654,16 @@ void MainWindow::initTools()
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(conditionCreateTool);
 
-    auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
+    auto startTimerCreateTool =
+            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Start, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(startTimerCreateTool);
 
-    auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
+    auto stopTimerCreateTool =
+            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Stop, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(stopTimerCreateTool);
 
-    auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
+    auto timeoutCreateTool = new msc::TimerCreatorTool(msc::MscTimer::TimerType::Timeout,
+                                                       &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
