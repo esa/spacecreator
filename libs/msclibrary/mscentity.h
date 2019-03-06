@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "cif/cifblock.h"
+
 #include <QObject>
 #include <QString>
 #include <QUuid>
@@ -60,6 +62,9 @@ public:
 
     virtual MscEntity::EntityType entityType() const = 0;
 
+    cif::CifBlockShared cif() const;
+    void setCif(const cif::CifBlockShared &cif);
+
 Q_SIGNALS:
     void dataChanged();
     void nameChanged(const QString &name);
@@ -69,6 +74,7 @@ private:
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QString m_comment;
+    cif::CifBlockShared m_cif;
 };
 
 } // namespace msc

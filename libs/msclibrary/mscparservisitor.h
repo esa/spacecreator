@@ -18,17 +18,16 @@
 #ifndef MSCPARSERVISITOR_H
 #define MSCPARSERVISITOR_H
 
+#include "cif/cifparser.h"
 #include "parser/MscBaseVisitor.h"
 
 #include <QVector>
 
 namespace msc {
-namespace cif {
-class CifParser;
-} // ns cif
 
 class MscChart;
 class MscDocument;
+class MscEntity;
 class MscInstance;
 class MscInstanceEvent;
 class MscMessage;
@@ -72,6 +71,10 @@ public:
     antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;
 
+    antlrcpp::Any visitEnd(MscParser::EndContext *ctx) override;
+
+    antlrcpp::Any visitChildren(antlr4::tree::ParseTree *node) override;
+
 private:
     void addInstance(const QString &name);
 
@@ -100,17 +103,19 @@ private:
     // COMMENTLOST : '/*' .*? '*/' -> channel(2);
     static const int m_commentsStreamNum = 2;
 
+    QStringList m_cifBlockKeys;
+    QVector<msc::cif::CifBlockShared> m_cifBlocks;
+
     msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
     msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);
 
     void checkMessagesDoubleNotation() const;
 
-    void handlePrecedingCif(antlr4::ParserRuleContext *ctx, const char *caller);
-
+    void storePrecedingCif(antlr4::ParserRuleContext *ctx);
     static QString readCommentLine(const antlr4::Token *const token);
     static QString dropCommentBraces(const QString &line);
-
-    QStringList m_cifBlocks;
+    QStringList readComments(const QVector<antlr4::Token *> &tokens) const;
+    msc::MscEntity *cifTarget() const;
 };
 
 #endif // MSCPARSERVISITOR_H

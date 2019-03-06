@@ -17,6 +17,8 @@
 
 #include "mscentity.h"
 
+#include <QDebug>
+
 namespace msc {
 
 /*!
@@ -74,6 +76,25 @@ void MscEntity::setComment(const QString &comment)
     m_comment = comment;
     Q_EMIT commentChanged(m_comment);
     Q_EMIT dataChanged();
+}
+
+cif::CifBlockShared MscEntity::cif() const
+{
+    return m_cif;
+}
+
+void MscEntity::setCif(const cif::CifBlockShared &cif)
+{
+    if (m_cif != cif) {
+        m_cif = cif;
+
+#ifdef QT_DEBUG
+        static const QString info = QObject::tr("TODO: %1(%2)->setCif(%3)");
+        qDebug() << "TODO:" << name() << "/" << entityType() << "->setCif:";
+        for (const cif::CifLineShared &line : m_cif->lines())
+            qDebug() << "\t" << line->sourceLine();
+#endif
+    }
 }
 
 } // namespace msc

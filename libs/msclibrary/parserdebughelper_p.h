@@ -17,33 +17,10 @@
 
 #pragma once
 
-#include "cifline.h"
+#include <QString>
 
-#include <QVector>
+namespace msc_dbg {
 
-namespace msc {
-namespace cif {
+QString ruleNameFromIndex(size_t ruleId);
 
-class CifBlock
-{
-public:
-    virtual ~CifBlock();
-    QVector<CifLineShared> lines() const;
-    void setLines(const QVector<CifLineShared> &lines);
-    bool addLine(const CifLineShared &line);
-
-    QString hashKey() const;
-
-    virtual bool isPeculiar() const;
-
-protected:
-    QVector<CifLineShared> m_lines;
-    QString m_hashKey;
-
-    void updateHashKey();
-};
-
-typedef QSharedPointer<CifBlock> CifBlockShared;
-
-} // ns cif
 } // ns msc

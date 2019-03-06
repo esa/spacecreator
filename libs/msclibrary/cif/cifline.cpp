@@ -29,6 +29,8 @@ CifLine::CifLine(CifType type, QObject *parent)
 {
 }
 
+CifLine::~CifLine() {}
+
 CifLine::CifType CifLine::entityType() const
 {
     return m_type;
