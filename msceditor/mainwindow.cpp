@@ -55,6 +55,7 @@
 #include <QTreeView>
 #include <QUndoGroup>
 #include <QUndoStack>
+#include <QVector>
 #include <functional>
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
@@ -123,9 +124,10 @@ struct MainWindowPrivate {
 
     QAction *m_actAsnEditor = nullptr;
 
-    QMultiMap<msc::BaseTool::ToolType, msc::BaseTool *> m_tools;
+    QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
+    msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
     QMenu *m_hierarchyTypeMenu = nullptr;
 };
@@ -632,42 +634,37 @@ void MainWindow::initMenuHelp()
 
 void MainWindow::onCreateMessageToolRequested()
 {
-    if (msc::MessageCreatorTool *tool =
-                qobject_cast<msc::MessageCreatorTool *>(d->m_tools.value(msc::BaseTool::ToolType::MessageCreator))) {
-        tool->activate();
-    }
+    d->m_messageCreateTool->activate();
 }
 
 void MainWindow::initTools()
 {
-    auto registerTool = [&](msc::BaseTool *tool) { d->m_tools.insert(tool->toolType(), tool); };
-
     auto pointerTool = new msc::PointerTool(nullptr, this);
-    registerTool(pointerTool);
+    d->m_tools.append(pointerTool);
 
     auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    registerTool(instanceCreateTool);
+    d->m_tools.append(instanceCreateTool);
 
-    auto messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    registerTool(messageCreateTool);
+    d->m_messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(d->m_messageCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    registerTool(actionCreateTool);
+    d->m_tools.append(actionCreateTool);
 
     auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    registerTool(conditionCreateTool);
+    d->m_tools.append(conditionCreateTool);
 
     auto startTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     startTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Start);
-    registerTool(startTimerCreateTool);
+    d->m_tools.append(startTimerCreateTool);
 
     auto stopTimerCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     stopTimerCreateTool->setTimerType(msc::MscTimer::TimerType::Stop);
-    registerTool(stopTimerCreateTool);
+    d->m_tools.append(stopTimerCreateTool);
 
     auto timeoutCreateTool = new msc::TimerCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     timeoutCreateTool->setTimerType(msc::MscTimer::TimerType::Timeout);
-    registerTool(timeoutCreateTool);
+    d->m_tools.append(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
     toolsActions->setExclusive(false);
