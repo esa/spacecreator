@@ -106,16 +106,31 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     painter->setPen(pen);
 
     QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
-    const QRectF symboxRect = symbolBox();
-    painter->drawLine(start, symboxRect.center());
+    QRectF symboxRect = symbolBox();
 
     if (m_timer->timerType() == MscTimer::TimerType::Start) {
+        painter->drawLine(start, symboxRect.center());
         drawStartSymbol(painter, symboxRect);
     }
     if (m_timer->timerType() == MscTimer::TimerType::Stop) {
-        drawStopSymbol(painter, symboxRect);
+        if (m_timer->precedingTimer() != nullptr) {
+            painter->drawLine(start, symboxRect.center());
+            drawStopSymbol(painter, symboxRect);
+        } else {
+            start.setY(m_boundingRect.height() - symboxRect.height() / 2.);
+            symboxRect.moveTop(m_boundingRect.height() - symboxRect.height());
+            painter->drawLine(start, symboxRect.center());
+            drawStopSymbol(painter, symboxRect);
+            // draw orphan start symbol
+            const QPointF endConnect = symboxRect.center();
+            symboxRect.moveTop(0);
+            QPointF startConnect(endConnect.x(), symboxRect.bottom());
+            drawStartSymbol(painter, symboxRect);
+            painter->drawLine(startConnect, endConnect);
+        }
     }
     if (m_timer->timerType() == MscTimer::TimerType::Timeout) {
+        painter->drawLine(start, symboxRect.center());
         drawStartSymbol(painter, symboxRect);
         drawTimeoutArrow(painter, start);
     }
@@ -186,7 +201,8 @@ void TimerItem::rebuildLayout()
     prepareGeometryChange();
 
     m_textItem->setX(symbolSize.right());
-    m_textItem->setY((symbolSize.height() - m_textItem->boundingRect().height()) / 2);
+    const qreal textOffset = (symbolSize.height() - m_textItem->boundingRect().height()) / 2.;
+    m_textItem->setY(textOffset);
 
     m_boundingRect = symbolSize;
 
@@ -194,6 +210,12 @@ void TimerItem::rebuildLayout()
         m_textItem->setVisible(true);
         m_timerConnector->setVisible(false);
         m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+
+        if (m_timer->timerType() == MscTimer::TimerType::Stop) {
+            m_boundingRect.setHeight(2. * symbolSize.height() + 20.);
+            const qreal textY = m_boundingRect.height() - symbolSize.height() - textOffset;
+            m_textItem->setY(textY);
+        }
     } else {
         m_textItem->setVisible(false);
         m_timerConnector->setVisible(true);
