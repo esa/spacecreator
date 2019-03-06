@@ -17,7 +17,6 @@
 
 #include "mscparservisitor.h"
 
-#include "cif/cifparser.h"
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -30,6 +29,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
+#include "parserdebughelper_p.h"
 
 #include <QDebug>
 #include <QScopedPointer>
@@ -116,14 +116,11 @@ antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 {
     Q_ASSERT(m_model != nullptr);
 
-    handlePrecedingCif(context, Q_FUNC_INFO);
     return visitChildren(context);
 }
 
 antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *context)
 {
-    handlePrecedingCif(context, Q_FUNC_INFO);
-
     if (context->REFERENCED()) {
         // ignore referenced documents (spec extension) for now
         qWarning() << "Referenced documents are not supported";
@@ -204,8 +201,6 @@ antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext
 
 antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext *context)
 {
-    handlePrecedingCif(context, Q_FUNC_INFO);
-
     if (!m_currentChart) {
         return visitChildren(context);
     }
@@ -219,8 +214,6 @@ antlrcpp::Any MscParserVisitor::visitInstanceItem(MscParser::InstanceItemContext
 
 antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequenceChartContext *context)
 {
-    handlePrecedingCif(context, Q_FUNC_INFO);
-
     QString mscName;
     if (context->mscHead()) {
         mscName = ::nameToString(context->mscHead()->name());
@@ -319,13 +312,14 @@ antlrcpp::Any MscParserVisitor::visitInstanceEvent(MscParser::InstanceEventConte
 
 antlrcpp::Any MscParserVisitor::visitOrderableEvent(MscParser::OrderableEventContext *context)
 {
-    handlePrecedingCif(context, Q_FUNC_INFO);
-
     auto ret = visitChildren(context);
 
     if (!context->end().empty()) {
         parseComment(m_currentEvent, context->end().back());
     }
+
+    m_currentMessage = nullptr;
+    m_currentEvent = nullptr;
     return ret;
 }
 
@@ -794,6 +788,8 @@ void MscParserVisitor::resetInstanceEvents()
 
 void MscParserVisitor::orderInstanceEvents()
 {
+    m_cifBlocks.clear();
+
     while (!m_instanceEventsList.isEmpty()) {
         bool found = false;
 
@@ -936,40 +932,84 @@ QString MscParserVisitor::dropCommentBraces(const QString &srcLine)
     return line;
 }
 
-void MscParserVisitor::handlePrecedingCif(antlr4::ParserRuleContext *ctx, const char *caller)
+QStringList MscParserVisitor::readComments(const QVector<antlr4::Token *> &tokens) const
 {
-    static const QRegularExpression rx(".*::(\\w+)\\(.*\\)");
-    const QRegularExpressionMatch m = rx.match(caller);
+    QStringList lines;
+    for (const antlr4::Token *const token : tokens)
+        lines << dropCommentBraces(readCommentLine(token));
+    return lines;
+}
 
-    //    qDebug() << "handlePrecedingCif called from" << m.captured(1);
-    auto readComments = [](const std::vector<antlr4::Token *> &tokens) {
-        QStringList lines;
-        for (const antlr4::Token *const token : tokens)
-            lines << dropCommentBraces(readCommentLine(token));
-        return lines;
-    };
+void MscParserVisitor::storePrecedingCif(antlr4::ParserRuleContext *ctx)
+{
+    if (!ctx)
+        return;
 
-    auto precedingComments = m_tokens->getHiddenTokensToLeft(ctx->start->getTokenIndex());
-    const QStringList &left = readComments(precedingComments);
-    if (!left.isEmpty()) {
-        const QVector<cif::CifBlockShared> &cifs = m_cifParser->readCifBlocks(left);
-        for (const cif::CifBlockShared &cifBlock : cifs) {
-            const QString &hashKey = cifBlock->hashKey();
-            if (!m_cifBlocks.contains(hashKey)) {
-                m_cifBlocks.append(hashKey);
-                //                qDebug() << "DOCUMENT:" << (m_currentDocument ? m_currentDocument->name() : "-");
-                //                qDebug() << "CHART:" << (m_currentChart ? m_currentChart->name() : "-");
-                //                qDebug() << "INSTANCE:" << (m_currentInstance ? m_currentInstance->name() : "-");
-                //                qDebug() << "EVENT:" << (m_currentEvent ? m_currentEvent->name() : "-");
-                //                qDebug() << "MESSAGE:" << (m_currentMessage ? m_currentMessage->name() : "-");
+    const auto &precedingTokens =
+            QVector<antlr4::Token *>::fromStdVector(m_tokens->getHiddenTokensToLeft(ctx->start->getTokenIndex()));
+    if (precedingTokens.empty())
+        return;
 
-                //                qDebug() << "CIF:";
-                //                for (const cif::CifLineShared &cifLine : cifBlock->lines())
-                //                    qDebug() << "line:" << cifLine->sourceLine();
-            } /*else {
-                qDebug() << "CifBlock #" << hashKey << "already added!";
-            }
-            qDebug() << "---------------";*/
+    const QStringList &left = readComments(precedingTokens);
+    if (left.isEmpty())
+        return;
+
+    const QVector<cif::CifBlockShared> &cifBlocks = m_cifParser->readCifBlocks(left);
+    for (const cif::CifBlockShared &cifBlock : cifBlocks) {
+        const QString &hashKey = cifBlock->hashKey();
+        if (!m_cifBlockKeys.contains(hashKey)) {
+            m_cifBlockKeys.append(hashKey);
+            m_cifBlocks.append(cifBlock);
         }
     }
+}
+
+antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
+{
+    storePrecedingCif(ctx);
+    if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {
+        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(pParentRule->getRuleIndex());
+    } else {
+        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(ctx->getRuleIndex());
+    }
+
+    if (!m_cifBlocks.isEmpty()) {
+        MscEntity *targetEntity = cifTarget();
+        int ctr(0);
+        for (const cif::CifBlockShared &cifBlock : m_cifBlocks) {
+            const QString marker = QString("CB %1/%2").arg(++ctr).arg(m_cifBlocks.size());
+            if (cifBlock->isPeculiar()) {
+                qDebug() << marker << "TODO: handle peculiar CIF entity";
+            } else {
+                if (targetEntity) {
+                    targetEntity->setCif(cifBlock);
+                } else {
+                    static const QString wrn = QObject::tr("CIF target unknown! Line: %1; pos: %2");
+                    qWarning() << marker
+                               << wrn.arg(QString::number(ctx->start->getLine()),
+                                          QString::number(ctx->start->getCharPositionInLine()));
+                }
+            }
+        }
+
+        m_cifBlocks.clear();
+    }
+
+    return MscParserVisitor::visitChildren(ctx);
+}
+
+antlrcpp::Any MscParserVisitor::visitChildren(antlr4::tree::ParseTree *node)
+{
+    storePrecedingCif(dynamic_cast<antlr4::ParserRuleContext *>(node));
+    return MscBaseVisitor::visitChildren(node);
+}
+
+msc::MscEntity *MscParserVisitor::cifTarget() const
+{
+    const QVector<MscEntity *> possibleTargets = { m_currentMessage, m_currentEvent, m_currentInstance, m_currentChart,
+                                                   m_currentDocument };
+    for (MscEntity *target : possibleTargets)
+        if (target)
+            return target;
+    return nullptr;
 }

@@ -22,6 +22,8 @@
 namespace msc {
 namespace cif {
 
+CifBlock::~CifBlock() {}
+
 QVector<CifLineShared> CifBlock::lines() const
 {
     return m_lines;
@@ -35,6 +37,10 @@ void CifBlock::setLines(const QVector<CifLineShared> &lines)
 
 bool CifBlock::addLine(const CifLineShared &line)
 {
+    if (!m_lines.isEmpty())
+        if (m_lines.last()->entityType() == CifLine::CifType::End)
+            return false;
+
     if (!m_lines.contains(line)) {
         m_lines.append(line);
         updateHashKey();
@@ -47,6 +53,21 @@ bool CifBlock::addLine(const CifLineShared &line)
 QString CifBlock::hashKey() const
 {
     return m_hashKey;
+}
+
+bool CifBlock::isPeculiar() const
+{
+    for (const CifLineShared &line : m_lines) {
+        switch (line->entityType()) {
+        case CifLine::CifType::Text:
+        case CifLine::CifType::End:
+            return true;
+        default:
+            break;
+        }
+    }
+
+    return false;
 }
 
 void CifBlock::updateHashKey()

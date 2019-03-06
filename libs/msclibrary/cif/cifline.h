@@ -66,6 +66,7 @@ public:
     Q_ENUM(CifType)
 
     CifLine(CifType type, QObject *parent = nullptr);
+    virtual ~CifLine();
 
     CifType entityType() const;
 
