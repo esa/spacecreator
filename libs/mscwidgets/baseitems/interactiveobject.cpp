@@ -245,8 +245,14 @@ void InteractiveObject::prepareHoverMark()
 
 void InteractiveObject::doRebuildLayout()
 {
+    const QRectF oldBounds = boundingRect();
+
     rebuildLayout();
     m_layoutDirty = false;
+
+    if (oldBounds != boundingRect()) {
+        Q_EMIT boundingBoxChanged();
+    }
     update();
 }
 

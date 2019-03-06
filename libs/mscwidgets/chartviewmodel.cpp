@@ -265,7 +265,7 @@ void ChartViewModel::addInstanceItems()
 
 void ChartViewModel::addInstanceEventItems()
 {
-    QGraphicsObject *instanceEventItem(nullptr);
+    InteractiveObject *instanceEventItem(nullptr);
     for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
         switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message: {
@@ -297,8 +297,10 @@ void ChartViewModel::addInstanceEventItems()
         }
         }
 
-        if (instanceEventItem)
+        if (instanceEventItem) {
             polishAddedEventItem(instanceEvent, instanceEventItem);
+            connect(instanceEventItem, &InteractiveObject::boundingBoxChanged, this, &ChartViewModel::updateLayout);
+        }
     }
 }
 
