@@ -72,6 +72,9 @@ private:
     CifLineShared readEntityTimeout(const QString &from) const;
     CifLineShared readEntityTextMode(const QString &from) const;
     CifLineShared readEntityTextName(const QString &from) const;
+
+    typedef QVector<CifLineShared> LinesCollection;
+    QVector<CifParser::LinesCollection> prepareCifLines(const QStringList &lines) const;
 };
 
 } // ns cif

@@ -18,6 +18,7 @@
 #include "mscentity.h"
 
 #include <QDebug>
+#include <QMetaEnum>
 
 namespace msc {
 
@@ -78,23 +79,41 @@ void MscEntity::setComment(const QString &comment)
     Q_EMIT dataChanged();
 }
 
-cif::CifBlockShared MscEntity::cif() const
+QVector<cif::CifBlockShared> MscEntity::cifs() const
 {
-    return m_cif;
+    return m_cifs;
 }
 
-void MscEntity::setCif(const cif::CifBlockShared &cif)
+void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 {
-    if (m_cif != cif) {
-        m_cif = cif;
-
-#ifdef QT_DEBUG
-        static const QString info = QObject::tr("TODO: %1(%2)->setCif(%3)");
-        qDebug() << "TODO:" << name() << "/" << entityType() << "->setCif:";
-        for (const cif::CifLineShared &line : m_cif->lines())
-            qDebug() << "\t" << line->sourceLine();
-#endif
+    if (m_cifs != cifs) {
+        m_cifs = cifs;
+        dbgShowCifs();
     }
+}
+
+void MscEntity::addCif(const cif::CifBlockShared &cif)
+{
+    if (!m_cifs.contains(cif)) {
+        m_cifs.append(cif);
+        dbgShowCifs();
+    }
+}
+
+void MscEntity::dbgShowCifs() const
+{
+#ifdef QT_DEBUG
+    static const QString info("TODO: %1(%2)->setCif(%3)");
+    const QMetaEnum &e = QMetaEnum::fromType<MscEntity::EntityType>();
+    const QString currTypeName(e.valueToKey(int(entityType())));
+    qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), currTypeName).arg(m_cifs.size());
+    for (int i = 0; i < m_cifs.size(); ++i) {
+        qDebug() << QString("\t CIF # %1").arg(i);
+        const cif::CifBlockShared &cifBlock = m_cifs.at(i);
+        for (const int j = 0; j < cifBlock->lines().size(); ++i)
+            qDebug() << QString("\t\t CIF Line #%1: %2").arg(j).arg(cifBlock->lines().at(j)->sourceLine());
+    }
+#endif
 }
 
 } // namespace msc

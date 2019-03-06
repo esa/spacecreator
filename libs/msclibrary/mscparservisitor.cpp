@@ -115,7 +115,6 @@ msc::MscModel *MscParserVisitor::detachModel()
 antlrcpp::Any MscParserVisitor::visitFile(MscParser::FileContext *context)
 {
     Q_ASSERT(m_model != nullptr);
-
     return visitChildren(context);
 }
 
@@ -982,7 +981,7 @@ antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
                 qDebug() << marker << "TODO: handle peculiar CIF entity";
             } else {
                 if (targetEntity) {
-                    targetEntity->setCif(cifBlock);
+                    targetEntity->addCif(cifBlock);
                 } else {
                     static const QString wrn = QObject::tr("CIF target unknown! Line: %1; pos: %2");
                     qWarning() << marker

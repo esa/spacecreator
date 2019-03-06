@@ -34,6 +34,9 @@
 # IDE files
 .project
 *.pro.user
+*.h.autosave
+*.cpp.autosave
+license.qtc.txt
 
 # System files
 .directory
@@ -47,6 +50,7 @@ libs/msclibrary/parser/*.cpp
 libs/msclibrary/parser/*.h
 libs/msclibrary/parser/*.interp
 libs/msclibrary/parser/*.tokens
+
 # ANTLR internals (win build)
 3rdparty/antlr/cpp_runtime/runtime/.vs/
 3rdparty/antlr/cpp_runtime/runtime/bin/

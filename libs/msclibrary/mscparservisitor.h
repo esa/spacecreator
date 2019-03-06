@@ -70,7 +70,6 @@ public:
     antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;
     antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;
-
     antlrcpp::Any visitEnd(MscParser::EndContext *ctx) override;
 
     antlrcpp::Any visitChildren(antlr4::tree::ParseTree *node) override;

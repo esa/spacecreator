@@ -62,8 +62,9 @@ public:
 
     virtual MscEntity::EntityType entityType() const = 0;
 
-    cif::CifBlockShared cif() const;
-    void setCif(const cif::CifBlockShared &cif);
+    QVector<cif::CifBlockShared> cifs() const;
+    void setCifs(const QVector<cif::CifBlockShared> &cifs);
+    void addCif(const cif::CifBlockShared &cif);
 
 Q_SIGNALS:
     void dataChanged();
@@ -74,7 +75,9 @@ private:
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QString m_comment;
-    cif::CifBlockShared m_cif;
+    QVector<cif::CifBlockShared> m_cifs;
+
+    void dbgShowCifs() const;
 };
 
 } // namespace msc

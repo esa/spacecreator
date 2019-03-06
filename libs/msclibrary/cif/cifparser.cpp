@@ -17,6 +17,7 @@
 
 #include "cifparser.h"
 
+#include "cifblockfactory.h"
 #include "exceptions.h"
 
 #include <QDebug>
@@ -115,31 +116,51 @@ CifLineShared CifParser::readCifLine(const QString &line) const
 
 QVector<CifBlockShared> CifParser::readCifBlocks(const QStringList &lines)
 {
-    QVector<CifBlockShared> blocks;
-    auto newBlock = [&]() -> CifBlockShared & {
-        blocks.append(CifBlockShared(new CifBlock));
-        return blocks.last();
+    const QVector<CifParser::LinesCollection> &preparedCifLines = prepareCifLines(lines);
+    return CifBlockFactory::createBlocks(preparedCifLines);
+}
+
+QVector<CifParser::LinesCollection> CifParser::prepareCifLines(const QStringList &lines) const
+{
+    QVector<LinesCollection> rawCifBlocks;
+
+    auto newBlock = [&]() -> LinesCollection & {
+        rawCifBlocks.append(LinesCollection());
+        return rawCifBlocks.last();
     };
 
-    auto block = [&]() -> CifBlockShared & { return blocks.isEmpty() ? newBlock() : blocks.last(); };
+    auto block = [&]() -> LinesCollection & { return rawCifBlocks.isEmpty() ? newBlock() : rawCifBlocks.last(); };
 
     bool isText(false);
     auto isCifComment = [](const QString &line) { return line.startsWith(cif::CifParser::CifLineTag); };
 
     auto isAcceptableLine = [&isText, &isCifComment](const QString &line) { return isText || isCifComment(line); };
 
+    auto addLine = [&](LinesCollection &to, const CifLineShared &line) {
+        if (!to.isEmpty())
+            if (to.last()->entityType() == CifLine::CifType::End)
+                return false;
+
+        if (!to.contains(line)) {
+            to.append(line);
+            return true;
+        }
+
+        return false;
+    };
+
     for (const QString &line : lines) {
         if (isAcceptableLine(line)) {
             if (isText && !isCifComment(line)) {
-                QVector<CifLineShared> currLines = block()->lines();
+                QVector<CifLineShared> &currLines = block();
                 CifLineShared &lastLine = currLines.last();
                 QStringList txt = lastLine->payload().toStringList();
                 txt.append(line);
                 lastLine->setPayload(txt);
-                block()->setLines(currLines);
+                block() = currLines;
             } else if (const CifLineShared &cifLine = readCifLine(line)) {
-                if (!block()->addLine(cifLine)) {
-                    newBlock()->addLine(cifLine);
+                if (!addLine(block(), cifLine)) {
+                    addLine(newBlock(), cifLine);
                     isText = false;
                     continue;
                 }
@@ -152,7 +173,7 @@ QVector<CifBlockShared> CifParser::readCifBlocks(const QStringList &lines)
         }
     }
 
-    return blocks;
+    return rawCifBlocks;
 }
 
 CifLineShared CifParser::readEntityAction(const QString &from) const
