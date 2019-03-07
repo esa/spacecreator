@@ -1,6 +1,5 @@
-
 /*
-   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -16,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef CMDHIERARCHYTYPECHANGE_H
-#define CMDHIERARCHYTYPECHANGE_H
+#pragma once
 
 #include "basecommand.h"
 #include "mscdocument.h"
@@ -44,5 +42,3 @@ private:
 
 } // namespace cmd
 } // namespace msc
-
-#endif // CMDHIERARCHYTYPECHANGE_H

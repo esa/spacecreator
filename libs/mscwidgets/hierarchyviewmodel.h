@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef HIERARCHYVIEWMODEL_H
-#define HIERARCHYVIEWMODEL_H
+#pragma once
 
 #include <QObject>
 #include <memory>
@@ -54,5 +53,3 @@ private:
     std::unique_ptr<HierarchyViewModelPrivate> const d;
 };
 }
-
-#endif // HIERARCHYVIEWMODEL_H

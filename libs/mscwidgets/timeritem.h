@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef TIMERITEM_H
-#define TIMERITEM_H
+#pragma once
 
 #include "baseitems/interactiveobject.h"
 
@@ -76,5 +75,3 @@ private:
 };
 
 } // namespace msc
-
-#endif // TIMERITEM_H

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef MSCTIMER_H
-#define MSCTIMER_H
+#pragma once
 
 #include "mscinstanceevent.h"
 
@@ -74,5 +73,3 @@ private:
     QPointer<MscTimer> m_followingTimer;
 };
 }
-
-#endif // MSCTIMER_H

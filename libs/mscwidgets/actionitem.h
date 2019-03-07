@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef ACTIONITEM_H
-#define ACTIONITEM_H
+#pragma once
 
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
@@ -64,5 +63,3 @@ private:
 };
 
 } // namespace msc
-
-#endif // ACTIONITEM_H

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef ASN1CONST_H
-#define ASN1CONST_H
+#pragma once
 
 #include <QString>
 #include <Qt>
@@ -57,4 +56,3 @@ const QString ASN1_CHOICES = "choices";
 const QString ASN1_CHILDREN = "children";
 const QString ASN1_SEQOFTYPE = "seqoftype";
 }
-#endif // ASN1CONST_H
