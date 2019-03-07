@@ -45,6 +45,7 @@ public:
 
         // TODO: add call/reply/method/etc?
     };
+    Q_ENUM(MessageType)
 
     enum class EndType
     {

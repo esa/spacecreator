@@ -3,9 +3,10 @@ include(../../../depend_asn1library.pri)
 include(../../../depend_mscwidgets.pri)
 include(../../../depend_msclibrary.pri)
 
-QT += core gui widgets xml
+QT += core gui widgets xml network websockets
 
 SOURCES += \
+    ../../../../msceditor/remotecontrolwebserver.cpp \
     ../../../../msceditor/mainwindow.cpp \
     ../../../../msceditor/mainmodel.cpp \
     ../../../../msceditor/commandlineparser.cpp \
@@ -13,6 +14,7 @@ SOURCES += \
     ../../../../msceditor/settings/appoptions.cpp \
 
 HEADERS += \
+    ../../../../msceditor/remotecontrolwebserver.h \
     ../../../../msceditor/mainwindow.h \
     ../../../../msceditor/mainmodel.h \
     ../../../../msceditor/commandlineparser.h \

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "commandlineparser.h"
+#include "remotecontrolwebserver.h"
 
 #include <QMainWindow>
 #include <QModelIndex>
@@ -97,6 +98,14 @@ private:
     void initTools();
     void initMainToolbar();
     void initConnections();
+
+    void handleRemoteCommand(RemoteControlWebServer::CommandType commandType,
+                             const QVariantMap &params, const QString &peerName);
+    bool handleInstanceCommand(const QVariantMap &params, QString *errorString);
+    bool handleMessageCommand(const QVariantMap &params, QString *errorString);
+    bool handleTimerCommand(const QVariantMap &params, QString *errorString);
+    bool handleActionCommand(const QVariantMap &params, QString *errorString);
+    bool handleConditionCommand(const QVariantMap &params, QString *errorString);
 
     void closeEvent(QCloseEvent *e) override;
 

@@ -26,10 +26,15 @@
 #include "graphicsview.h"
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
+#include "mscaction.h"
 #include "mscchart.h"
+#include "msccondition.h"
+#include "msccreate.h"
 #include "mscdocument.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
+#include "remotecontrolwebserver.h"
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
@@ -52,6 +57,7 @@
 #include <QItemSelectionModel>
 #include <QKeySequence>
 #include <QMessageBox>
+#include <QMetaEnum>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUndoGroup>
@@ -77,6 +83,7 @@ struct MainWindowPrivate {
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
+        , m_remoteControlWebServer(new RemoteControlWebServer(mainWindow))
     {
         m_mscToolBar->setObjectName("mscTools");
         m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -132,6 +139,7 @@ struct MainWindowPrivate {
 
     QMenu *m_hierarchyTypeMenu = nullptr;
 
+    RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
 };
 
@@ -154,14 +162,17 @@ MainWindow::MainWindow(QWidget *parent)
     d->ui->documentTreeView->expandAll();
 }
 
+MainWindow::~MainWindow()
+{
+    if (d->ui->documentTreeView->model()) {
+        disconnect(d->ui->documentTreeView->model(), nullptr, this, nullptr);
+    }
+    disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
+}
+
 QGraphicsView *MainWindow::currentView() const
 {
     return d->ui->graphicsView;
-}
-
-MainWindow::~MainWindow()
-{
-    disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
 }
 
 void MainWindow::createNewDocument()
@@ -784,8 +795,248 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
 
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this,
+            [this]() { d->ui->documentTreeView->expandAll(); });
+
     connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
             &QTreeView::expandAll);
+
+    connect(d->m_remoteControlWebServer, &RemoteControlWebServer::executeCommand, this,
+            &MainWindow::handleRemoteCommand);
+}
+
+void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
+                                     const QString &peerName)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    bool result = false;
+    if (!mscChart) {
+        d->m_remoteControlWebServer->commandDone(commandType, result, peerName, QLatin1String("Empty document"));
+        return;
+    }
+
+    QString errorString;
+    switch (commandType) {
+    case RemoteControlWebServer::CommandType::Instance:
+        result = handleInstanceCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::Message:
+        result = handleMessageCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::Timer:
+        result = handleTimerCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::Action:
+        result = handleActionCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::Condition:
+        result = handleConditionCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::Undo:
+        result = msc::cmd::CommandsStack::current()->canUndo();
+        if (result)
+            d->m_actUndo->trigger();
+        else
+            errorString = tr("Nothing to Undo");
+        break;
+    case RemoteControlWebServer::CommandType::Redo:
+        result = msc::cmd::CommandsStack::current()->canRedo();
+        if (result)
+            d->m_actRedo->trigger();
+        else
+            errorString = tr("Nothing to Redo");
+        break;
+    case RemoteControlWebServer::CommandType::Save: {
+        d->m_mscFileName = params.value(QLatin1String("fileName"), d->m_mscFileName).toString();
+        result = !d->m_mscFileName.isEmpty();
+        if (result)
+            d->m_actSaveFile->trigger();
+        else
+            errorString = tr("Empty filename");
+    } break;
+    default:
+        qWarning() << "Unknown command:" << commandType;
+        errorString = tr("Unknown command");
+        break;
+    }
+    if (result)
+        d->m_model->chartViewModel().relayout();
+    d->m_remoteControlWebServer->commandDone(commandType, result, peerName, errorString);
+}
+
+bool MainWindow::handleInstanceCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const int instanceIdx = mscChart->instances().size();
+    const QString name = params.value(QLatin1String("name"), QStringLiteral("Instance_%1").arg(instanceIdx)).toString();
+    if (mscChart->instanceByName(name)) {
+        *errorString = tr("Chart already has instance with the name: %1").arg(name);
+        return false;
+    }
+    const int pos = params.value(QLatin1String("pos"), -1).toInt();
+
+    msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
+    mscInstance->setKind(params.value(QLatin1String("kind")).toString());
+    mscInstance->setExplicitStop(params.value(QLatin1String("exStop"), false).toBool());
+    d->m_model->chartViewModel().currentChart()->addInstance(mscInstance);
+
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
+                                     QVariant::fromValue<msc::MscChart *>(mscChart), pos };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
+    if (!result)
+        *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+bool MainWindow::handleMessageCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const QString sourceInstanceName = params.value(QLatin1String("srcName")).toString();
+    msc::MscInstance *mscSourceInstance = mscChart->instanceByName(sourceInstanceName);
+    if (!mscSourceInstance && !sourceInstanceName.isEmpty()) {
+        *errorString = tr("Source instance with name %1 doesn't exist").arg(sourceInstanceName);
+        return false;
+    }
+
+    const QString targetInstanceName = params.value(QLatin1String("dstName")).toString();
+    msc::MscInstance *mscTargetInstance = mscChart->instanceByName(targetInstanceName);
+    if (!mscTargetInstance && !targetInstanceName.isEmpty()) {
+        *errorString = tr("Target instance with name %1 doesn't exist").arg(targetInstanceName);
+        return false;
+    }
+
+    if (!mscSourceInstance && !mscTargetInstance) {
+        *errorString = tr("Can't create Message without source or target Instances");
+        return false;
+    }
+    const QMetaEnum qtEnum = QMetaEnum::fromType<msc::MscMessage::MessageType>();
+    static const int defaultValue = static_cast<int>(msc::MscMessage::MessageType::Message);
+    const QString msgTypeStr = params.value(qtEnum.name(), qtEnum.valueToKey(defaultValue)).toString();
+    const int msgTypeInt = qtEnum.keyToValue(msgTypeStr.toLocal8Bit().constData());
+    const msc::MscMessage::MessageType messageType = static_cast<msc::MscMessage::MessageType>(msgTypeInt);
+
+    const int pos = params.value(QLatin1String("pos"), -1).toInt();
+    const int messageIdx = mscChart->instanceEvents().size();
+    const QString name = params.value(QLatin1String("name"),
+                                      messageType == msc::MscMessage::MessageType::Message
+                                              ? QStringLiteral("Message_%1").arg(messageIdx)
+                                              : QStringLiteral("Create_%1").arg(messageIdx))
+                                 .toString();
+    if (messageType == msc::MscMessage::MessageType::Create && !mscTargetInstance) {
+        *errorString = tr("Can't create Message with type Create without target Instance");
+        return false;
+    }
+    msc::MscMessage *message = messageType == msc::MscMessage::MessageType::Message ? new msc::MscMessage(mscChart)
+                                                                                    : new msc::MscCreate(mscChart);
+    message->setName(name);
+    if (messageType == msc::MscMessage::MessageType::Create && mscTargetInstance)
+        mscTargetInstance->setExplicitCreator(mscSourceInstance);
+    message->setTargetInstance(mscTargetInstance);
+    message->setSourceInstance(mscSourceInstance);
+    mscChart->addInstanceEvent(message, pos);
+
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
+                                     QVariant::fromValue<msc::MscChart *>(mscChart), pos };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+    if (!result)
+        *errorString = tr("Message is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+bool MainWindow::handleTimerCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const QString instanceName = params.value(QLatin1String("instanceName")).toString();
+    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    if (!mscInstance) {
+        *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
+        return false;
+    }
+
+    const int pos = params.value(QLatin1String("pos"), -1).toInt();
+
+    const QMetaEnum qtEnum = QMetaEnum::fromType<msc::MscTimer::TimerType>();
+    static const int defaultValue = static_cast<int>(msc::MscTimer::TimerType::Unknown);
+    const QString timerTypeStr = params.value(qtEnum.name(), qtEnum.valueToKey(defaultValue)).toString();
+    const int timerTypeInt = qtEnum.keyToValue(timerTypeStr.toLocal8Bit().constData());
+    if (timerTypeInt == defaultValue || timerTypeInt == -1) {
+        *errorString = tr("Unknown Timer type");
+        return false;
+    }
+
+    const msc::MscTimer::TimerType timerType = static_cast<msc::MscTimer::TimerType>(timerTypeInt);
+    msc::MscTimer *mscTimer = new msc::MscTimer(QLatin1String("New_timer"), timerType, mscChart);
+    mscTimer->setInstance(mscInstance);
+    mscChart->addInstanceEvent(mscTimer, pos);
+
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(mscTimer),
+                                      QVariant::fromValue<msc::MscTimer::TimerType>(timerType),
+                                      QVariant::fromValue<msc::MscChart *>(mscChart),
+                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
+    if (!result)
+        *errorString = tr("Timer is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+bool MainWindow::handleActionCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const QString instanceName = params.value(QLatin1String("instanceName")).toString();
+    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    if (!mscInstance) {
+        *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
+        return false;
+    }
+
+    const int pos = params.value(QLatin1String("pos"), -1).toInt();
+
+    msc::MscAction *mscAction = new msc::MscAction(mscChart);
+    const int actionIdx = mscChart->instanceEvents().size();
+    const QString name = params.value(QLatin1String("name"), QStringLiteral("Action_%1").arg(actionIdx)).toString();
+    mscAction->setInformalAction(name);
+    mscAction->setInstance(mscInstance);
+    mscChart->addInstanceEvent(mscAction, pos);
+
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(mscAction),
+                                      QVariant::fromValue<msc::MscChart *>(mscChart),
+                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
+    if (!result)
+        *errorString = tr("Action is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+bool MainWindow::handleConditionCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const QString instanceName = params.value(QLatin1String("instanceName")).toString();
+    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    if (!mscInstance) {
+        *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
+        return false;
+    }
+
+    const int pos = params.value(QLatin1String("pos"), -1).toInt();
+    const int conditionIdx = mscChart->instanceEvents().size();
+    const QString name =
+            params.value(QLatin1String("name"), QStringLiteral("Condition_%1").arg(conditionIdx)).toString();
+    msc::MscCondition *mscCondition = new msc::MscCondition(name, mscChart);
+    mscCondition->setInstance(mscInstance);
+    mscChart->addInstanceEvent(mscCondition, pos);
+
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(mscCondition),
+                                      QVariant::fromValue<msc::MscChart *>(mscChart),
+                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
+    if (!result)
+        *errorString = tr("Condition is added but unavailable for Undo/Redo actions");
+
+    return result;
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
