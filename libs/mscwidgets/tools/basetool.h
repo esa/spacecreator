@@ -46,13 +46,7 @@ public:
         MessageCreator,
         EntityDeleter,
         TimerCreator,
-        HierarchyAndCreator,
-        HierarchyExceptionCreator,
-        HierarchyIsCreator,
-        HierarchyLeafCreator,
-        HierarchyOrCreator,
-        HierarchyParallelCreator,
-        HierarchyRepeatCreator
+        HierarchyCreator
     };
     Q_ENUM(ToolType)
 

@@ -38,12 +38,15 @@ public:
 
     void setModel(MscModel *model);
 
+    MscDocument *selectedDocument() const;
+
 Q_SIGNALS:
     void documentDoubleClicked(msc::MscDocument *document);
     void documentClicked(const msc::MscDocument *document);
 
 public Q_SLOTS:
     void selectionChanged(const msc::MscDocument *document);
+    void updateModel();
 
 private Q_SLOTS:
     void modelDeleted();

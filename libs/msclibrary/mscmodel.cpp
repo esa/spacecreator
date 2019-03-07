@@ -55,6 +55,20 @@ bool MscModel::addDocument(MscDocument *document)
     return true;
 }
 
+void MscModel::removeDocument(MscDocument *document)
+{
+    if (document == nullptr) {
+        return;
+    }
+    if (!m_documents.contains(document)) {
+        return;
+    }
+
+    if (m_documents.removeAll(document)) {
+        document->clear();
+    }
+}
+
 const QVector<MscChart *> &MscModel::charts() const
 {
     return m_charts;

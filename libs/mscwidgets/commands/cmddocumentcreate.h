@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,35 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDDOCUMENTCREATE_H
+#define CMDDOCUMENTCREATE_H
 
-#include "basecreatortool.h"
-#include "mscdocument.h"
+#include "commands/basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
 
-class HierarchyViewModel;
+class MscDocument;
 
-class HierarchyCreatorTool : public BaseCreatorTool
+namespace cmd {
+
+class CmdDocumentCreate : public BaseCommand
 {
-    Q_OBJECT
-
 public:
-    HierarchyCreatorTool(MscDocument::HierarchyType hierarchyType, HierarchyViewModel *model, QGraphicsView *view,
-                         QObject *parent = nullptr);
+    CmdDocumentCreate(msc::MscDocument *document, msc::MscDocument *parentDocument);
 
-    virtual BaseTool::ToolType toolType() const override;
-
-protected:
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
 private:
-    void initTool();
-
-private:
-    MscDocument::HierarchyType m_hierarchyType;
-    QPointer<HierarchyViewModel> m_hierarchyViewModel;
+    MscDocument *m_document = nullptr;
+    QPointer<MscDocument> m_parentDocument;
 };
 
-} // ns msc
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDDOCUMENTCREATE_H

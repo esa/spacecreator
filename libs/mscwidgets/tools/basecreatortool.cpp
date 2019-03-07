@@ -26,10 +26,12 @@ namespace msc {
 BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseTool(view, parent)
     , m_model(model)
-    , m_activeChart(m_model->currentChart())
+    , m_activeChart(m_model ? m_model->currentChart() : nullptr)
 
 {
-    connect(model, &ChartViewModel::currentChartChanged, this, &BaseCreatorTool::onCurrentChartChagend);
+    if (model) {
+        connect(model, &ChartViewModel::currentChartChanged, this, &BaseCreatorTool::onCurrentChartChagend);
+    }
 }
 
 void BaseCreatorTool::setModel(ChartViewModel *model)

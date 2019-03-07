@@ -110,6 +110,11 @@ ChartViewModel &MainModel::chartViewModel() const
     return d->m_chartModel;
 }
 
+HierarchyViewModel &MainModel::hierarchyViewModel() const
+{
+    return d->m_hierarchyModel;
+}
+
 QString MainModel::modelText() const
 {
     msc::MscWriter mscWriter;

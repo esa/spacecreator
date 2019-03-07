@@ -183,9 +183,8 @@ QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
 
     auto obj = static_cast<QObject *>(child.internalPointer());
 
-    auto parentItem = dynamic_cast<MscDocument *>(obj->parent());
-
-    if (!parentItem) {
+    MscDocument *parentItem;
+    if (!obj || !(parentItem = dynamic_cast<MscDocument *>(obj->parent()))) {
         return QModelIndex();
     }
 
@@ -365,7 +364,13 @@ void DocumentItemModel::onEntityDataChanged()
 
 void DocumentItemModel::connectDocument(MscDocument *document)
 {
-    connect(document, &msc::MscDocument::documentAdded, this,
+    connect(document, &msc::MscDocument::dataChanged, this,
+            [&]() {
+                beginResetModel();
+                endResetModel();
+            },
+            Qt::UniqueConnection);
+    connect(document, &msc::MscDocument::documentRemoved, this,
             [&]() {
                 beginResetModel();
                 endResetModel();

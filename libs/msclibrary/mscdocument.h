@@ -47,6 +47,7 @@ public:
 
     const QVector<MscDocument *> &documents() const;
     bool addDocument(MscDocument *document);
+    void removeDocument(MscDocument *document);
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
@@ -64,6 +65,7 @@ public:
 
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
+    void documentRemoved(MscDocument *document);
     void chartAdded(MscChart *chart);
     void cleared();
     void hierarchyTypeChanged(HierarchyType type);

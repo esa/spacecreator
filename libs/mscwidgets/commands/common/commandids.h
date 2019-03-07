@@ -37,6 +37,7 @@ enum Id
     CreateTimer,
     MoveTimer,
     HierarchyType,
+    CreateDocument,
 
     LastId
 };

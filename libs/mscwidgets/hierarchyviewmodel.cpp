@@ -21,7 +21,6 @@
 #include "mscdocument.h"
 #include "mscmodel.h"
 
-#include <QDebug>
 #include <QGraphicsScene>
 
 namespace msc {
@@ -120,11 +119,15 @@ public:
         return QSizeF(width, height);
     }
 
-    void clearScene()
+    void clear()
     {
         scene.clear();
         documentItems.clear();
         topLevelDocumentItems.clear();
+
+        if (model != nullptr) {
+            model->disconnect(this);
+        }
     }
 
     MscModel *model = nullptr;
@@ -150,25 +153,23 @@ QGraphicsScene *HierarchyViewModel::graphicsScene() const
 void HierarchyViewModel::setModel(MscModel *model)
 {
     if (model != d->model) {
-        if (d->model != nullptr) {
-            // Remove the old connections and clear the current scene
-            d->clearScene();
-
-            d->model->disconnect(this);
-        }
+        d->clear();
 
         d->model = model;
         connect(model, &QObject::destroyed, this, &HierarchyViewModel::modelDeleted);
 
-        d->addDocuments(model->documents(), nullptr);
-        d->layoutItems();
-
-        for (msc::DocumentItem *item : d->documentItems) {
-            QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
-                             &msc::HierarchyViewModel::documentDoubleClicked);
-            QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::documentClicked);
-        }
+        updateModel();
     }
+}
+
+MscDocument *HierarchyViewModel::selectedDocument() const
+{
+    for (msc::DocumentItem *item : d->documentItems) {
+        if (item->isSelected())
+            return item->document();
+    }
+
+    return nullptr;
 }
 
 void HierarchyViewModel::selectionChanged(const MscDocument *document)
@@ -178,9 +179,29 @@ void HierarchyViewModel::selectionChanged(const MscDocument *document)
     }
 }
 
+void HierarchyViewModel::updateModel()
+{
+    d->clear();
+
+    if (d->model != nullptr) {
+        d->addDocuments(d->model->documents(), nullptr);
+        d->layoutItems();
+
+        for (msc::DocumentItem *item : d->documentItems) {
+            QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
+                             &msc::HierarchyViewModel::documentDoubleClicked, Qt::UniqueConnection);
+            QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::documentClicked,
+                             Qt::UniqueConnection);
+
+            QObject::connect(item->document(), &MscDocument::dataChanged, this, &HierarchyViewModel::updateModel,
+                             Qt::UniqueConnection);
+        }
+    }
+}
+
 void HierarchyViewModel::modelDeleted()
 {
-    d->clearScene();
+    d->clear();
     d->model = nullptr;
 }
 }

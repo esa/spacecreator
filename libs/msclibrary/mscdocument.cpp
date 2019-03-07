@@ -70,6 +70,22 @@ bool MscDocument::addDocument(MscDocument *document)
     return true;
 }
 
+void MscDocument::removeDocument(MscDocument *document)
+{
+    if (document == nullptr) {
+        return;
+    }
+    if (!m_documents.contains(document)) {
+        return;
+    }
+
+    if (m_documents.removeAll(document)) {
+        document->clear();
+    }
+
+    Q_EMIT documentRemoved(document);
+}
+
 const QVector<MscChart *> &MscDocument::charts() const
 {
     return m_charts;
@@ -143,5 +159,4 @@ bool MscDocument::isSingleChildDocument() const
     return m_hierarchyType == HierarchyIs || m_hierarchyType == HierarchyParallel || m_hierarchyType == HierarchyRepeat
             || m_hierarchyType == HierarchyException;
 }
-
 }

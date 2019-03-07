@@ -33,6 +33,7 @@ public:
 
     const QVector<MscDocument *> &documents() const;
     bool addDocument(MscDocument *document);
+    void removeDocument(MscDocument *document);
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);

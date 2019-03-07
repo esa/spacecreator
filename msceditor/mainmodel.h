@@ -25,6 +25,7 @@
 namespace msc {
 class ChartViewModel;
 class DocumentItemModel;
+class HierarchyViewModel;
 class MscChart;
 class MscDocument;
 class MscModel;
@@ -54,6 +55,7 @@ public:
     QStringList errorMessages() const;
 
     msc::ChartViewModel &chartViewModel() const;
+    msc::HierarchyViewModel &hierarchyViewModel() const;
 
     QString modelText() const;
     msc::MscModel *mscModel() const;

@@ -24,6 +24,7 @@
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "graphicsview.h"
+#include "hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -130,6 +131,8 @@ struct MainWindowPrivate {
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
     QMenu *m_hierarchyTypeMenu = nullptr;
+
+    QPointer<msc::MscDocument> m_selectedDocument;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -298,6 +301,8 @@ void MainWindow::changHeierarchyType()
 {
     static_cast<msc::DocumentItemModel *>(d->ui->documentTreeView->model())
             ->updateHierarchyType(d->ui->documentTreeView->currentIndex(), sender()->property(HIERARCHY_TYPE_TAG));
+
+    showSelection(d->ui->documentTreeView->currentIndex(), QModelIndex());
 }
 
 void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
@@ -444,15 +449,24 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
     if (obj == nullptr) {
+        d->m_selectedDocument = nullptr;
         return;
     }
-    auto chart = dynamic_cast<msc::MscChart *>(obj);
 
-    if (chart) {
+    if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
         d->m_model->chartViewModel().fillView(chart);
         showDocumentView(true);
     } else {
         showHierarchyView(true);
+
+        auto actionConstraint = [&](QAction *action, msc::MscDocument::HierarchyType hierarchyType, int docSize) {
+            action->setDisabled(docSize
+                                && (hierarchyType == msc::MscDocument::HierarchyType::HierarchyRepeat
+                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyParallel
+                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyIs
+                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyException
+                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyLeaf));
+        };
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
             for (auto action : d->m_hierarchyTypeMenu->actions()) {
@@ -461,16 +475,20 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
                 action->setEnabled(actionType != document->hierarchyType());
 
-                // constraint for "repeat", "leaf", "is" and "exception" - possible if only one child
-                if (document->documents().size() > 1
-                    && (actionType == msc::MscDocument::HierarchyType::HierarchyRepeat
-                        || actionType == msc::MscDocument::HierarchyType::HierarchyLeaf
-                        || actionType == msc::MscDocument::HierarchyType::HierarchyIs
-                        || actionType == msc::MscDocument::HierarchyType::HierarchyException)) {
+                // constraint for "repeat", "paralel", "is", "leaf" and "exception" - possible if only one child
+                actionConstraint(action, actionType, document->documents().size());
+            }
+
+            for (auto action : d->m_hierarchyToolBar->actions()) {
+                if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf) {
+                    // no any children for "leaf"
                     action->setEnabled(false);
+                } else {
+                    actionConstraint(action, document->hierarchyType(), document->documents().size());
                 }
             }
 
+            d->m_selectedDocument = document;
             Q_EMIT selectionChanged(document);
         }
     }
@@ -592,14 +610,31 @@ void MainWindow::initHierarchyTypeActions()
 {
     d->m_hierarchyTypeMenu = new QMenu(this);
 
-    auto addAction = [&](const QString &icon, const QString &text, QVariant type) {
+    auto addAction = [&](const QString &icon, const QString &text, msc::MscDocument::HierarchyType type) {
         auto action = new QAction(QIcon(icon), text, this);
         action->setProperty(HIERARCHY_TYPE_TAG, type);
 
         connect(action, &QAction::triggered, this, &MainWindow::changHeierarchyType);
 
         d->m_hierarchyTypeMenu->addAction(action);
-        d->m_hierarchyToolBar->addAction(action);
+
+        // create tool
+        auto tool = new msc::HierarchyCreatorTool(type, &(d->m_model->hierarchyViewModel()), nullptr, this);
+        action = d->m_hierarchyToolBar->addAction(tool->title());
+        action->setProperty(HIERARCHY_TYPE_TAG, type);
+        action->setCheckable(true);
+        action->setIcon(tool->icon());
+        action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        tool->setView(d->ui->hierarchyView);
+
+        connect(tool, &msc::HierarchyCreatorTool::created, this, [&]() {
+            activateDefaultTool();
+            updateTreeViewItem(d->m_selectedDocument);
+            Q_EMIT selectionChanged(d->m_selectedDocument);
+        });
+
+        connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
+        connect(action, &QAction::toggled, this, &MainWindow::updateMscToolbarActionsChecked);
     };
 
     addAction(":/icons/document_and.png", tr("Hierarchy And"), msc::MscDocument::HierarchyAnd);
@@ -749,8 +784,8 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
 
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this,
-            [this]() { d->ui->documentTreeView->expandAll(); });
+    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
+            &QTreeView::expandAll);
 }
 
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
@@ -898,10 +933,15 @@ void MainWindow::updateMscToolbarActionsEnablement()
 void MainWindow::updateMscToolbarActionsChecked()
 {
     if (QAction *senderAction = qobject_cast<QAction *>(sender()))
-        if (senderAction->isChecked())
+        if (senderAction->isChecked()) {
             for (QAction *action : d->m_mscToolBar->actions())
                 if (action != senderAction)
                     action->setChecked(false);
+
+            for (QAction *action : d->m_hierarchyToolBar->actions())
+                if (action != senderAction)
+                    action->setChecked(false);
+        }
 }
 
 QStringList MainWindow::mscFileFilters()

@@ -22,6 +22,7 @@
 #include "commands/cmdconditionitemcreate.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmddeleteentity.h"
+#include "commands/cmddocumentcreate.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdhierarchytypechange.h"
 #include "commands/cmdinstanceitemcreate.h"
@@ -36,6 +37,7 @@
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscinstance.h"
+#include "mscmodel.h"
 #include "msctimer.h"
 
 #include <QDebug>
@@ -78,6 +80,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createTimerItemMove(params);
     case cmd::HierarchyType:
         return cmd::CommandsFactory::createHierarchyTypeChange(params);
+    case cmd::CreateDocument:
+        return cmd::CommandsFactory::createDocumentCreate(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -293,6 +297,19 @@ QUndoCommand *CommandsFactory::createHierarchyTypeChange(const QVariantList &par
         const MscDocument::HierarchyType type = static_cast<MscDocument::HierarchyType>(params.last().toInt());
         if (item->hierarchyType() != type)
             return new CmdHierarchyTypeChange(item, type);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createDocumentCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (auto document = params.first().value<MscDocument *>()) {
+        if (auto parent = params.last().value<MscDocument *>()) {
+            return new CmdDocumentCreate(document, parent);
+        }
     }
 
     return nullptr;

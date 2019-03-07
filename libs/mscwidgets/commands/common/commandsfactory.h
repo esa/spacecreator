@@ -46,6 +46,7 @@ public:
     static QUndoCommand *createTimerItemCreate(const QVariantList &params);
     static QUndoCommand *createTimerItemMove(const QVariantList &params);
     static QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
+    static QUndoCommand *createDocumentCreate(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;
