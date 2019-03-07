@@ -135,7 +135,7 @@ coverage_docker:
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
   script:
     - mkdir -p build_coverage; cd build_coverage
-    - qmake CONFIG+=debug CONFIG+=coverage -recursive ..
+    - /opt/Qt/5.12.0/gcc_64/bin/qmake CONFIG+=debug CONFIG+=coverage -recursive ..
     - make -j 8
     - export QT_QPA_PLATFORM=offscreen
     - make coverage-html
