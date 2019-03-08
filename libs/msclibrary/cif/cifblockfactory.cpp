@@ -17,6 +17,8 @@
 
 #include "cifblockfactory.h"
 
+#include "cifblocks.h"
+
 #include <QDebug>
 
 namespace msc {
@@ -34,7 +36,7 @@ QVector<CifBlockShared> CifBlockFactory::createBlocks(const QVector<QVector<CifL
 CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
 {
     for (const CifLineShared &line : lines) {
-        switch (line->entityType()) {
+        switch (line->lineType()) {
         case CifLine::CifType::Action:
             return createBlockAction(lines);
         case CifLine::CifType::Call:
@@ -71,96 +73,109 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
     }
     return CifBlockShared();
 }
-
 CifBlockShared CifBlockFactory::createBlockAction(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockAction());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockCall(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockCall());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockComment(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockComment());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockCondition(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockCondition());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockCreate(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockCreate());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockInstance(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockInstance());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockImport(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockImport());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockMessage(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockMessage());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockMscDocument(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockMscDocument());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockReset(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockReset());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockSet(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockSet());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockStop(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockStop());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockSubmsc(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockSubmsc());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockText(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockText());
+    block->setLines(lines);
+    return block;
 }
+
 CifBlockShared CifBlockFactory::createBlockTimeout(const QVector<CifLineShared> &lines)
 {
-    Q_UNUSED(lines);
-    qWarning() << Q_FUNC_INFO << "Not implemented yet";
-    return CifBlockShared();
+    CifBlockShared block(new CifBlockTimeout());
+    block->setLines(lines);
+    return block;
 }
 
 } // ns cif

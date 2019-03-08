@@ -18,6 +18,7 @@
 #include "cifblock.h"
 
 #include <QCryptographicHash>
+#include <QDebug>
 
 namespace msc {
 namespace cif {
@@ -35,21 +36,6 @@ void CifBlock::setLines(const QVector<CifLineShared> &lines)
     updateHashKey();
 }
 
-bool CifBlock::addLine(const CifLineShared &line)
-{
-    if (!m_lines.isEmpty())
-        if (m_lines.last()->entityType() == CifLine::CifType::End)
-            return false;
-
-    if (!m_lines.contains(line)) {
-        m_lines.append(line);
-        updateHashKey();
-        return true;
-    }
-
-    return false;
-}
-
 QString CifBlock::hashKey() const
 {
     return m_hashKey;
@@ -57,29 +43,52 @@ QString CifBlock::hashKey() const
 
 bool CifBlock::isPeculiar() const
 {
-    for (const CifLineShared &line : m_lines) {
-        switch (line->entityType()) {
-        case CifLine::CifType::Text:
-        case CifLine::CifType::End:
-            return true;
-        default:
-            break;
-        }
-    }
+    return m_linesByType.contains(CifLine::CifType::Text) || m_linesByType.contains(CifLine::CifType::End);
+}
 
-    return false;
+QVariant CifBlock::payload(CifLine::CifType forType) const
+{
+    CifLine::CifType targetType = (forType == CifLine::CifType::Unknown) ? blockType() : forType;
+    return m_linesByType.contains(targetType) ? m_linesByType.value(targetType)->payload() : QVariant();
+}
+
+void CifBlock::setPayload(const QVariant &p, CifLine::CifType forType)
+{
+    CifLine::CifType targetType = (forType == CifLine::CifType::Unknown) ? blockType() : forType;
+
+    if (targetType != CifLine::CifType::Unknown) {
+        if (m_linesByType.contains(targetType))
+            m_linesByType.value(targetType)->setPayload(p);
+        else {
+            qWarning() << Q_FUNC_INFO << "Line for type not found:" << targetType;
+        }
+    } else {
+        qWarning() << Q_FUNC_INFO << "Attempt to update payload for CIF block with Unkonw type.";
+    }
 }
 
 void CifBlock::updateHashKey()
 {
     m_hashKey.clear();
+    m_linesByType.clear();
 
     QString strings;
-    for (const CifLineShared &line : lines())
+    for (const CifLineShared &line : lines()) {
         strings.append(line->sourceLine());
+        m_linesByType.insert(line->lineType(), line);
+    }
 
     if (!strings.isEmpty())
         m_hashKey = QCryptographicHash::hash(strings.toUtf8(), QCryptographicHash::Md5);
+}
+
+void CifBlock::addLine(const CifLineShared &line)
+{
+    if (m_lines.contains(line) || m_linesByType.contains(line->lineType()))
+        return;
+
+    m_lines.append(line);
+    updateHashKey();
 }
 
 } // ns cif

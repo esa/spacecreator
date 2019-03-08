@@ -34,9 +34,11 @@ HEADERS += \
     msccreate.h \
     cif/cifparser.h \
     cif/cifline.h \
-    cif/cifblock.h \
     parserdebughelper_p.h \
-    cif/cifblockfactory.h
+    cif/cifblockfactory.h \
+    cif/ciflines.h \
+    cif/cifblock.h \
+    cif/cifblocks.h
 
 SOURCES += \
     parser/MscBaseVisitor.cpp \
@@ -63,9 +65,11 @@ SOURCES += \
     msccreate.cpp \
     cif/cifparser.cpp \
     cif/cifline.cpp \
-    cif/cifblock.cpp \
     parserdebughelper_p.cpp \
-    cif/cifblockfactory.cpp
+    cif/cifblockfactory.cpp \
+    cif/ciflines.cpp \
+    cif/cifblock.cpp \
+    cif/cifblocks.cpp
 
 antlrGen.target = antlr4-gen
 ANTLR_RUNTIME_PATH=$$shell_path("$$_PRO_FILE_PWD_\..\..\3rdparty\antlr\cpp_runtime\runtime")

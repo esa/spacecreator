@@ -19,6 +19,7 @@
 
 #include <QMap>
 #include <QObject>
+#include <QPoint>
 #include <QSharedPointer>
 #include <QVariant>
 
@@ -65,12 +66,13 @@ public:
     };
     Q_ENUM(CifType)
 
-    CifLine(CifType type, QObject *parent = nullptr);
+    CifLine(QObject *parent = nullptr);
     virtual ~CifLine();
 
-    CifType entityType() const;
-
-    virtual bool initFrom(const QString &sourceLine); // TODO: make it pure virtual
+    virtual CifType lineType() const = 0;
+    virtual bool initFrom(const QString &sourceLine) = 0;
+    virtual QVariant payload() const;
+    virtual void setPayload(const QVariant &p);
 
     static QString nameForType(CifLine::CifType t);
     static CifLine::CifType typeForName(const QString &name);
@@ -79,16 +81,54 @@ public:
 
     QString sourceLine() const;
 
-    QVariant payload() const;
-    void setPayload(const QVariant &p);
-
 protected:
-    const CifType m_type;
     QString m_sourceLine;
     QVariant m_payload;
+
+    void setPayloadPoints(const QVector<QPoint> &points);
+
+    static QPoint stringToPoint(const QString &from, bool *ok);
 };
 
 typedef QSharedPointer<CifLine> CifLineShared;
 
+// utility class for lines with Point data
+class CifLinePointsHolder : public CifLine
+{
+public:
+    CifLinePointsHolder(int pointsCount);
+    bool initFrom(const QString &sourceLine) override;
+
+private:
+    const int m_pointsCount;
+    bool initPoints(const QString &line, int pointsCount);
+};
+
+class CifLineOnePointHolder : public CifLinePointsHolder
+{
+public:
+    CifLineOnePointHolder()
+        : CifLinePointsHolder(1)
+    {
+    }
+};
+
+class CifLineTwoPointsHolder : public CifLinePointsHolder
+{
+public:
+    CifLineTwoPointsHolder()
+        : CifLinePointsHolder(2)
+    {
+    }
+};
+
+class CifLineThreePointsHolder : public CifLinePointsHolder
+{
+public:
+    CifLineThreePointsHolder()
+        : CifLinePointsHolder(3)
+    {
+    }
+};
 } // ns cif
 } // ns msc

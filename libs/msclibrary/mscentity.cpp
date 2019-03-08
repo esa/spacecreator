@@ -108,10 +108,13 @@ void MscEntity::dbgShowCifs() const
     const QString currTypeName(e.valueToKey(int(entityType())));
     qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), currTypeName).arg(m_cifs.size());
     for (int i = 0; i < m_cifs.size(); ++i) {
-        qDebug() << QString("\t CIF # %1").arg(i);
+        qDebug() << QString("\t CIF # %1/%2").arg(i).arg(m_cifs.size());
         const cif::CifBlockShared &cifBlock = m_cifs.at(i);
-        for (const int j = 0; j < cifBlock->lines().size(); ++i)
-            qDebug() << QString("\t\t CIF Line #%1: %2").arg(j).arg(cifBlock->lines().at(j)->sourceLine());
+        for (int j = 0; j < cifBlock->lines().size(); ++j)
+            qDebug() << QString("\t\t CIF Line #%1/%2: %3")
+                                .arg(j)
+                                .arg(cifBlock->lines().size())
+                                .arg(cifBlock->lines().at(j)->sourceLine());
     }
 #endif
 }

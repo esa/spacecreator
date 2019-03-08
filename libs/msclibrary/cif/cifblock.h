@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cifline.h"
+#include "cif/cifline.h"
 
 #include <QVector>
 
@@ -29,18 +29,24 @@ class CifBlock
 public:
     virtual ~CifBlock();
     QVector<CifLineShared> lines() const;
-    void setLines(const QVector<CifLineShared> &lines);
-    bool addLine(const CifLineShared &line);
+    virtual void setLines(const QVector<CifLineShared> &lines);
 
     QString hashKey() const;
 
     virtual bool isPeculiar() const;
 
+    virtual QVariant payload(CifLine::CifType forType = CifLine::CifType::Unknown) const;
+    virtual void setPayload(const QVariant &p, CifLine::CifType forType = CifLine::CifType::Unknown);
+
+    virtual CifLine::CifType blockType() const = 0;
+
 protected:
     QVector<CifLineShared> m_lines;
     QString m_hashKey;
+    QMap<CifLine::CifType, CifLineShared> m_linesByType;
 
     void updateHashKey();
+    void addLine(const CifLineShared &line);
 };
 
 typedef QSharedPointer<CifBlock> CifBlockShared;

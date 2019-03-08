@@ -19,41 +19,17 @@
 
 #include <QDebug>
 #include <QMetaEnum>
+#include <QRegularExpression>
 
 namespace msc {
 namespace cif {
 
-CifLine::CifLine(CifType type, QObject *parent)
+CifLine::CifLine(QObject *parent)
     : QObject(parent)
-    , m_type(type)
 {
 }
 
 CifLine::~CifLine() {}
-
-CifLine::CifType CifLine::entityType() const
-{
-    return m_type;
-}
-
-/*!
-  \brief CifLine::initFrom
-  Parse concrete instance of derived class from a \a sourceLine.
-  \return true in case of successful parsing.
-  Default implementation prints warning and returns false.
-*/
-bool CifLine::initFrom(const QString &sourceLine)
-{
-#ifdef QT_DEBUG
-    // For initial development/tests only, to be removed
-    m_sourceLine = sourceLine;
-    return true;
-#else
-    qWarning() << Q_FUNC_INFO << "Base implimentation call!" << sourceLine;
-    m_sourceLine = sourceLine;
-    return false;
-#endif
-}
 
 QString CifLine::nameForType(CifLine::CifType t)
 {
@@ -90,7 +66,7 @@ CifLine::CifType CifLine::typeForName(const QString &name)
 
 bool CifLine::operator==(const CifLine &other) const
 {
-    return m_type == other.m_type && m_sourceLine == other.m_sourceLine;
+    return lineType() == other.lineType() && m_sourceLine == other.m_sourceLine;
 }
 
 QString CifLine::sourceLine() const
@@ -102,10 +78,90 @@ QVariant CifLine::payload() const
 {
     return m_payload;
 }
-
 void CifLine::setPayload(const QVariant &p)
 {
-    m_payload = p;
+    if (m_payload != p)
+        m_payload = p;
+}
+
+void CifLine::setPayloadPoints(const QVector<QPoint> &points)
+{
+    setPayload(QVariant::fromValue(points));
+}
+
+QPoint CifLine::stringToPoint(const QString &from, bool *ok)
+{
+    QPoint res;
+    const QStringList &coordinates = from.split(",", QString::SkipEmptyParts);
+    if (coordinates.size() == 2) {
+        res.rx() = coordinates.first().trimmed().toInt(ok);
+        if (ok && *ok)
+            res.ry() = coordinates.last().trimmed().toInt(ok);
+    }
+    return res;
+};
+
+CifLinePointsHolder::CifLinePointsHolder(int pointsCount)
+    : CifLine()
+    , m_pointsCount(pointsCount)
+{
+    Q_ASSERT(m_pointsCount > 0);
+
+    QVector<QPoint> defaultPoints;
+    for (int i = 0; i < m_pointsCount; ++i)
+        defaultPoints << QPoint();
+    setPayloadPoints(defaultPoints);
+}
+
+bool CifLinePointsHolder::initFrom(const QString &sourceLine)
+{
+    m_sourceLine = sourceLine;
+    return initPoints(sourceLine, m_pointsCount);
+}
+
+bool CifLinePointsHolder::initPoints(const QString &line, int pointsCount)
+{
+    if (line.isEmpty() || pointsCount <= 0)
+        return false;
+
+    static const QString pointPattern("\\((\\d+,\\s\\d+)\\)");
+    static const QString pointsJoiner(",*\\s*");
+    static const QString rxPatternTemplate("CIF\\s%1\\s%2");
+    const QString currentName(nameForType(lineType()));
+
+    QString pointsPattern;
+    for (int i = 0; i < pointsCount; ++i) {
+        if (!pointsPattern.isEmpty())
+            pointsPattern.append(pointsJoiner);
+        pointsPattern.append(pointPattern);
+    }
+    const QString &pattern = rxPatternTemplate.arg(currentName).arg(pointsPattern);
+    const QRegularExpression rx(pattern, QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpressionMatch m = rx.match(m_sourceLine);
+    const QStringList &captures = m.capturedTexts();
+    if (captures.size() == pointsCount + 1) {
+        QVector<QPoint> points;
+        for (int pointNum = 1; pointNum <= pointsCount; ++pointNum) {
+            bool pointOk(false);
+            const QPoint &point = CifLine::stringToPoint(captures.at(pointNum), &pointOk);
+            if (!pointOk) {
+                qWarning() << QString("Failed to parse CIF %1 in %2").arg(currentName).arg(m_sourceLine);
+                qDebug() << pattern << point;
+                return false;
+            }
+            points << point;
+        }
+
+        setPayloadPoints(points);
+        return true;
+    } else {
+        qWarning() << QString("Expected amount of points is %1, matched is%2. (%3)")
+                              .arg(m_pointsCount)
+                              .arg(captures.size() - 1)
+                              .arg(m_sourceLine);
+    }
+
+    return false;
 }
 
 } // ns cif

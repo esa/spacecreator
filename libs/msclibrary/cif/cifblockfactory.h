@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cifblock.h"
+#include "cif/cifblock.h"
 
 #include <QVector>
 

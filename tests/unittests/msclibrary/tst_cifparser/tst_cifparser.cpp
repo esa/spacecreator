@@ -108,20 +108,8 @@ private:
 
     void testParsingCifLine(CifLine::CifType entityType);
     void testParsingCifBlock(const QVector<QVector<CifLine::CifType>> &blocks);
-
-    void forceFailInReleaseBuild() const;
 };
 
-void tst_CifParser::forceFailInReleaseBuild() const
-{
-    // The CifLine::initFrom should (and will) be a pure virtual, but currently
-    // it's used as being a 'concrete' method in debug mode to simplify development
-    // of indirectly related parts of parsing process.
-    // TODO: remove it ASAP
-#ifndef QT_DEBUG
-    QEXPECT_FAIL("", "Not implemented yet", Continue);
-#endif
-}
 QString tst_CifParser::createMscSource(const QString &cifLine)
 {
     static const QString mscTemplate = "MSCDOCUMENT doc_name;"
@@ -143,19 +131,19 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
     switch (cif) {
 
     case CifLine::CifType::Action:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Action)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Action)));
         break;
     case CifLine::CifType::Call:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Call)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Call)));
         break;
     case CifLine::CifType::Comment:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Comment)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Comment)));
         break;
     case CifLine::CifType::Condition:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Condition)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Condition)));
         break;
     case CifLine::CifType::Create:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Create)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Create)));
         break;
     case CifLine::CifType::Collapsed:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Collapsed)));
@@ -167,7 +155,8 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::HyperLink)));
         break;
     case CifLine::CifType::Instance:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Instance)));
+        cifLine = lineTemplate.arg(
+                QString("%1 (1, 1), (2, 2) (3, 3)").arg(CifLine::nameForType(CifLine::CifType::Instance)));
         break;
     case CifLine::CifType::Import:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Import)));
@@ -179,35 +168,36 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::LastModified)));
         break;
     case CifLine::CifType::Message:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Message)));
+        cifLine = lineTemplate.arg(
+                QString("%1 (1, 1), (2, 2), (3, 3)").arg(CifLine::nameForType(CifLine::CifType::Message)));
         break;
     case CifLine::CifType::MscDocument:
-        cifLine = lineTemplate.arg(
-                QString("%1 (20, 20), (1500, 1090)").arg(CifLine::nameForType(CifLine::CifType::MscDocument)));
+        cifLine =
+                lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::MscDocument)));
         break;
     case CifLine::CifType::Modified:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Modified)));
         break;
     case CifLine::CifType::MscPageSize:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::MscPageSize)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1)").arg(CifLine::nameForType(CifLine::CifType::MscPageSize)));
         break;
     case CifLine::CifType::Nested:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Nested)));
         break;
     case CifLine::CifType::Position:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Position)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1)").arg(CifLine::nameForType(CifLine::CifType::Position)));
         break;
     case CifLine::CifType::Preview:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Preview)));
         break;
     case CifLine::CifType::Reset:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Reset)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Reset)));
         break;
     case CifLine::CifType::Set:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Set)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Set)));
         break;
     case CifLine::CifType::Stop:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Stop)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Stop)));
         break;
     case CifLine::CifType::Submsc:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Submsc)));
@@ -216,10 +206,10 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Specific)));
         break;
     case CifLine::CifType::Text:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Text)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Text)));
         break;
     case CifLine::CifType::Timeout:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::Timeout)));
+        cifLine = lineTemplate.arg(QString("%1 (1, 1), (2, 2)").arg(CifLine::nameForType(CifLine::CifType::Timeout)));
         break;
     case CifLine::CifType::TextMode:
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::TextMode)));
@@ -296,142 +286,114 @@ void tst_CifParser::testParsingCifLine(CifLine::CifType entityType)
 
 void tst_CifParser::testParsingCifLineAction()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Action);
 }
 void tst_CifParser::testParsingCifLineCall()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Call);
 }
 void tst_CifParser::testParsingCifLineComment()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Comment);
 }
 void tst_CifParser::testParsingCifLineCondition()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Condition);
 }
 void tst_CifParser::testParsingCifLineCreate()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Create);
 }
 void tst_CifParser::testParsingCifLineCollapsed()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Collapsed);
 }
 void tst_CifParser::testParsingCifLineEnd()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::End);
 }
 void tst_CifParser::testParsingCifLineHyperLink()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::HyperLink);
 }
 void tst_CifParser::testParsingCifLineInstance()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Instance);
 }
 void tst_CifParser::testParsingCifLineImport()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Import);
 }
 void tst_CifParser::testParsingCifLineKeep()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Keep);
 }
 void tst_CifParser::testParsingCifLineLastModified()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::LastModified);
 }
 void tst_CifParser::testParsingCifLineMessage()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Message);
 }
 void tst_CifParser::testParsingCifLineMscDocument()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::MscDocument);
 }
 void tst_CifParser::testParsingCifLineModified()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Modified);
 }
 void tst_CifParser::testParsingCifLineMscPageSize()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::MscPageSize);
 }
 void tst_CifParser::testParsingCifLineNested()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Nested);
 }
 void tst_CifParser::testParsingCifLinePosition()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Position);
 }
 void tst_CifParser::testParsingCifLinePreview()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Preview);
 }
 void tst_CifParser::testParsingCifLineReset()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Reset);
 }
 void tst_CifParser::testParsingCifLineSet()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Set);
 }
 void tst_CifParser::testParsingCifLineStop()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Stop);
 }
 void tst_CifParser::testParsingCifLineSubmsc()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Submsc);
 }
 void tst_CifParser::testParsingCifLineSpecific()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Specific);
 }
 void tst_CifParser::testParsingCifLineText()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Text);
 }
 void tst_CifParser::testParsingCifLineTimeout()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::Timeout);
 }
 void tst_CifParser::testParsingCifLineTextMode()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::TextMode);
 }
 void tst_CifParser::testParsingCifLineTextName()
 {
-    forceFailInReleaseBuild();
     testParsingCifLine(CifLine::CifType::TextName);
 }
 
