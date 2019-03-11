@@ -20,4 +20,5 @@ SUBDIRS = \
     tst_ciflinemscpagesize \
     tst_ciflineposition \
     tst_ciflinereset \
-    tst_ciflineset
+    tst_ciflineset \
+    tst_ciflinestop
