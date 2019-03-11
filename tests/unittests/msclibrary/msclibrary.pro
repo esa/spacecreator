@@ -21,4 +21,5 @@ SUBDIRS = \
     tst_ciflineposition \
     tst_ciflinereset \
     tst_ciflineset \
-    tst_ciflinestop
+    tst_ciflinestop \
+    tst_ciflinetext
