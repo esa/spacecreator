@@ -32,6 +32,8 @@ private Q_SLOTS:
 
     void initTestCase() {
         window = new MainWindow;
+        QVERIFY(window->processCommandLineArg(CommandLineParser::Positional::StartRemoteControl,
+                                      QString::number(34622)));
         socket = new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, window);
     }
 

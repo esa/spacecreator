@@ -32,7 +32,7 @@ public:
         OpenFileAsn,
 
         DbgOpenMscExamplesChain,
-
+        StartRemoteControl,
         Unknown
     };
     Q_ENUM(Positional)

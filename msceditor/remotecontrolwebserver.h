@@ -43,6 +43,7 @@ public:
     explicit RemoteControlWebServer(QObject *parent = nullptr);
     ~RemoteControlWebServer() override;
 
+    bool start(quint16 port);
     void onNewConnection();
     void processTextMessage(const QString &message);
     void socketConnected();

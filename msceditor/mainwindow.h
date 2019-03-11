@@ -78,6 +78,7 @@ private Q_SLOTS:
     void changHeierarchyType();
     void updateTreeViewItem(const msc::MscDocument *document);
     void onCreateMessageToolRequested();
+    bool startRemoteControl(quint16 port);
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

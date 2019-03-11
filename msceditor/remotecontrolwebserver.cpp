@@ -27,8 +27,6 @@
 
 #include "remotecontrolwebserver.h"
 
-static const int kPort = 34622;
-
 static inline QByteArray generateResponse(bool result, const QString &errorString = QString()) {
     QJsonObject obj;
     obj.insert(QLatin1String("result"), result);
@@ -107,17 +105,32 @@ RemoteControlWebServer::RemoteControlWebServer(QObject *parent)
     , m_webSocketServer(new QWebSocketServer(QLatin1String("Remote Control"),
                                              QWebSocketServer::NonSecureMode, this))
 {
-    if (m_webSocketServer->listen(QHostAddress::Any, kPort)) {
-        qDebug() << "Echoserver listening on port" << kPort;
-        connect(m_webSocketServer, &QWebSocketServer::newConnection,
-                this, &RemoteControlWebServer::onNewConnection);
-    }
+
 }
 
 RemoteControlWebServer::~RemoteControlWebServer()
 {
     m_webSocketServer->close();
     qDeleteAll(m_clients.begin(), m_clients.end());
+}
+
+bool RemoteControlWebServer::start(quint16 port)
+{
+    if (m_webSocketServer->isListening()) {
+        if (m_webSocketServer->serverPort() == port)
+            return true;
+        else
+            m_webSocketServer->close();
+    }
+    if (m_webSocketServer->listen(QHostAddress::Any, port)) {
+        qDebug() << "Remote control server listening on port" << port;
+        connect(m_webSocketServer, &QWebSocketServer::newConnection,
+                this, &RemoteControlWebServer::onNewConnection);
+        return true;
+    }
+    qWarning() << "Websocket server failed to start listening port:" << port
+               << m_webSocketServer->error() << m_webSocketServer->errorString();
+    return false;
 }
 
 void RemoteControlWebServer::onNewConnection()

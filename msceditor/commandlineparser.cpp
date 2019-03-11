@@ -65,6 +65,11 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                 QCoreApplication::translate("CommandLineParser", "Open all MSC files in the <dir> one-by-one"),
                 QCoreApplication::translate("CommandLineParser", "dir"));
     }
+    case CommandLineParser::Positional::StartRemoteControl: {
+        return QCommandLineOption({ "p", "remote-control-port" },
+                                  QCoreApplication::translate("CommandLineParser", "Start remote control using <port>"),
+                                  QCoreApplication::translate("CommandLineParser", "port"));
+    }
     default: {
         Q_UNREACHABLE();
         break;

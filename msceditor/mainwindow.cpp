@@ -83,7 +83,6 @@ struct MainWindowPrivate {
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
         , m_undoGroup(new QUndoGroup(mainWindow))
-        , m_remoteControlWebServer(new RemoteControlWebServer(mainWindow))
     {
         m_mscToolBar->setObjectName("mscTools");
         m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -683,6 +682,23 @@ void MainWindow::onCreateMessageToolRequested()
     d->m_messageCreateTool->activate();
 }
 
+bool MainWindow::startRemoteControl(quint16 port)
+{
+    if (!d->m_remoteControlWebServer) {
+        d->m_remoteControlWebServer = new RemoteControlWebServer(this);
+
+        connect(d->m_remoteControlWebServer, &RemoteControlWebServer::executeCommand, this,
+                &MainWindow::handleRemoteCommand);
+    }
+    if (d->m_remoteControlWebServer->start(port))
+        return true;
+
+    d->m_remoteControlWebServer->deleteLater();
+    d->m_remoteControlWebServer = nullptr;
+    qWarning() << "Continue app running without remote control enabled";
+    return false;
+}
+
 void MainWindow::initTools()
 {
     auto pointerTool = new msc::PointerTool(nullptr, this);
@@ -801,9 +817,6 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
             &QTreeView::expandAll);
-
-    connect(d->m_remoteControlWebServer, &RemoteControlWebServer::executeCommand, this,
-            &MainWindow::handleRemoteCommand);
 }
 
 void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
@@ -1051,6 +1064,9 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     }
     case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
         return openMscChain(value);
+    }
+    case CommandLineParser::Positional::StartRemoteControl: {
+        return startRemoteControl(value.toUShort());
     }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
