@@ -697,8 +697,12 @@ void MainWindow::initTools()
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(actionCreateTool);
 
-    auto conditionCreateTool = new msc::ConditionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    auto conditionCreateTool = new msc::ConditionCreatorTool(false, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(conditionCreateTool);
+
+    auto sharedConditionCreateTool =
+            new msc::ConditionCreatorTool(true, &(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(sharedConditionCreateTool);
 
     auto startTimerCreateTool =
             new msc::TimerCreatorTool(msc::MscTimer::TimerType::Start, &(d->m_model->chartViewModel()), nullptr, this);

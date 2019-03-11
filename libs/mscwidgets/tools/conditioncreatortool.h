@@ -26,7 +26,7 @@ class ConditionCreatorTool : public BaseCreatorTool
     Q_OBJECT
 
 public:
-    ConditionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ConditionCreatorTool(bool shared, ChartViewModel *model, QGraphicsView *view, QObject *parent);
     BaseTool::ToolType toolType() const override;
 
 protected Q_SLOTS:
@@ -36,6 +36,9 @@ protected:
     void createPreviewItem() override;
     void commitPreviewItem() override;
     void removePreviewItem() override;
+
+private:
+    bool m_shared = false;
 };
 
 } // namespace msc

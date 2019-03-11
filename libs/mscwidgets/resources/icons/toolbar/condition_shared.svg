@@ -84,12 +84,22 @@
        y="20.449877">C</tspan></text>
   <path
      style="fill:none;stroke:#000000;stroke-width:1.03948498px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="m 16.138658,6.8002848 -0.04776,-6.18761568 v 0 0 0"
+     d="m 12.351442,6.7523454 -0.04776,-6.18761572 v 0 0 0"
      id="path4521"
      inkscape:connector-curvature="0" />
   <path
      style="fill:none;stroke:#000000;stroke-width:1.03948498px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="m 16.025665,31.229301 -0.04776,-6.187616 v 0 0 0"
+     d="m 12.14257,31.421059 -0.04776,-6.187616 v 0 0 0"
      id="path4521-2"
+     inkscape:connector-curvature="0" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.03948498px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 20.398144,6.8095365 -0.04776,-6.18761566 v 0 0 0"
+     id="path4521-1"
+     inkscape:connector-curvature="0" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.03948498px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 19.87081,31.45041 -0.04776,-6.187616 v 0 0 0"
+     id="path4521-2-0"
      inkscape:connector-curvature="0" />
 </svg>
