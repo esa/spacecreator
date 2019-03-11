@@ -34,7 +34,7 @@ protected:
 
     virtual QString generateTestLine(int pointsCount, const QString &separator) const;
 
-    void checkInitFfromValid(const QString &source);
+    void checkInitFromValid(const QString &source);
 
     virtual void checkDefault();
     virtual void checkInitFromValidSeparatorComma();

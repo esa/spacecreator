@@ -22,4 +22,5 @@ SUBDIRS = \
     tst_ciflinereset \
     tst_ciflineset \
     tst_ciflinestop \
-    tst_ciflinetext
+    tst_ciflinetext \
+    tst_ciflinetimeout

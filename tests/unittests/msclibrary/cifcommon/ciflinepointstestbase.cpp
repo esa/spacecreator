@@ -69,7 +69,7 @@ QString CifLinePointsTestBase::generateTestLine(int pointsCount, const QString &
     return lineTemplate.arg(lineTag(), points);
 }
 
-void CifLinePointsTestBase::checkInitFfromValid(const QString &source)
+void CifLinePointsTestBase::checkInitFromValid(const QString &source)
 {
     if (CifLineShared line = createCifLine()) {
         const bool initialized = line->initFrom(source);
@@ -99,22 +99,22 @@ void CifLinePointsTestBase::checkDefault()
 
 void CifLinePointsTestBase::checkInitFromValidSeparatorComma()
 {
-    checkInitFfromValid(generateTestLine(expectedPointsAmount(), m_separatorComma));
+    checkInitFromValid(generateTestLine(expectedPointsAmount(), m_separatorComma));
 }
 
 void CifLinePointsTestBase::checkInitFromValidSeparatorSpace()
 {
-    checkInitFfromValid(generateTestLine(expectedPointsAmount(), m_separatorSpace));
+    checkInitFromValid(generateTestLine(expectedPointsAmount(), m_separatorSpace));
 }
 
 void CifLinePointsTestBase::checkInitFromValidSeparatorCommaSpace()
 {
-    checkInitFfromValid(generateTestLine(expectedPointsAmount(), m_separatorCommaSpace));
+    checkInitFromValid(generateTestLine(expectedPointsAmount(), m_separatorCommaSpace));
 }
 
 void CifLinePointsTestBase::checkInitFromValidSeparatorNo()
 {
-    checkInitFfromValid(generateTestLine(expectedPointsAmount(), m_separatorNone));
+    checkInitFromValid(generateTestLine(expectedPointsAmount(), m_separatorNone));
 }
 
 void CifLinePointsTestBase::checkInitFromInsufficient()

@@ -62,25 +62,25 @@ void tst_CifLineMessage::testDefault()
 void tst_CifLineMessage::testInitFromValidSeparatorComma()
 {
     for (m_expectedPointsAmount = 1; m_expectedPointsAmount <= 10; ++m_expectedPointsAmount)
-        checkInitFfromValid(generateTestLine(m_expectedPointsAmount, m_separatorComma));
+        checkInitFromValid(generateTestLine(m_expectedPointsAmount, m_separatorComma));
 }
 
 void tst_CifLineMessage::testInitFromValidSeparatorSpace()
 {
     for (m_expectedPointsAmount = 1; m_expectedPointsAmount <= 10; ++m_expectedPointsAmount)
-        checkInitFfromValid(generateTestLine(m_expectedPointsAmount, m_separatorSpace));
+        checkInitFromValid(generateTestLine(m_expectedPointsAmount, m_separatorSpace));
 }
 
 void tst_CifLineMessage::testInitFromValidSeparatorCommaSpace()
 {
     for (m_expectedPointsAmount = 1; m_expectedPointsAmount <= 10; ++m_expectedPointsAmount)
-        checkInitFfromValid(generateTestLine(m_expectedPointsAmount, m_separatorCommaSpace));
+        checkInitFromValid(generateTestLine(m_expectedPointsAmount, m_separatorCommaSpace));
 }
 
 void tst_CifLineMessage::testInitFromValidSeparatorNo()
 {
     for (m_expectedPointsAmount = 1; m_expectedPointsAmount <= 10; ++m_expectedPointsAmount)
-        checkInitFfromValid(generateTestLine(m_expectedPointsAmount, m_separatorNone));
+        checkInitFromValid(generateTestLine(m_expectedPointsAmount, m_separatorNone));
 }
 
 void tst_CifLineMessage::testInitFromInsufficient()
