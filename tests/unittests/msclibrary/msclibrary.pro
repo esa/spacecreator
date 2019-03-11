@@ -16,4 +16,5 @@ SUBDIRS = \
     tst_ciflinecreate \
     tst_ciflineinstance \
     tst_ciflinemessage \
-    tst_ciflinemscdocument
+    tst_ciflinemscdocument \
+    tst_ciflinemscpagesize
