@@ -14,4 +14,5 @@ SUBDIRS = \
     tst_ciflinecall \
     tst_ciflinecondition \
     tst_ciflinecreate \
-    tst_ciflineinstance
+    tst_ciflineinstance \
+    tst_ciflinemessage
