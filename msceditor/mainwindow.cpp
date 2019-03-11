@@ -799,9 +799,6 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
 
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, this,
-            [this]() { d->ui->documentTreeView->expandAll(); });
-
     connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
             &QTreeView::expandAll);
 

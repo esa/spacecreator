@@ -201,13 +201,14 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> &docs) const
 
 void MainModel::clearMscModel()
 {
+    d->m_documentItemModel->setMscModel(nullptr);
+    d->m_chartModel.clearScene();
+    d->m_hierarchyModel.setModel(nullptr);
     if (d->m_mscModel) {
         disconnect(d->m_mscModel, nullptr, this, nullptr);
         delete d->m_mscModel;
         d->m_mscModel = nullptr;
     }
-    d->m_chartModel.clearScene();
-    d->m_documentItemModel->setMscModel(nullptr);
 }
 
 void MainModel::setNewModel(MscModel *model)
