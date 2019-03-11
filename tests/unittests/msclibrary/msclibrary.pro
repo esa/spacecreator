@@ -15,4 +15,5 @@ SUBDIRS = \
     tst_ciflinecondition \
     tst_ciflinecreate \
     tst_ciflineinstance \
-    tst_ciflinemessage
+    tst_ciflinemessage \
+    tst_ciflinemscdocument
