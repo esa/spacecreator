@@ -11,4 +11,5 @@ SUBDIRS = \
     tst_msceventsparsing \
     tst_cifparser \
     tst_ciflineaction \
-    tst_ciflinecall
+    tst_ciflinecall \
+    tst_ciflinecondition
