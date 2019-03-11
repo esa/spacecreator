@@ -12,4 +12,5 @@ SUBDIRS = \
     tst_cifparser \
     tst_ciflineaction \
     tst_ciflinecall \
-    tst_ciflinecondition
+    tst_ciflinecondition \
+    tst_ciflinecreate
