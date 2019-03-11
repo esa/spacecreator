@@ -103,7 +103,7 @@ public:
     QVariant payload() const override;
     void setPayload(const QVariant &p) override;
 };
-class CifLineMessage : public CifLineThreePointsHolder
+class CifLineMessage : public CifLinePointsHolder
 {
 public:
     CifLine::CifType lineType() const override;

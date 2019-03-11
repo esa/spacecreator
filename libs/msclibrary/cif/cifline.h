@@ -95,13 +95,17 @@ typedef QSharedPointer<CifLine> CifLineShared;
 // utility class for lines with Point data
 class CifLinePointsHolder : public CifLine
 {
+
 public:
-    CifLinePointsHolder(int pointsCount);
+    static const int AllPoints = -1;
+
+    CifLinePointsHolder(int pointsCount = CifLinePointsHolder::AllPoints);
     bool initFrom(const QString &sourceLine) override;
+    int targetPointsCount() const;
 
 private:
     const int m_pointsCount;
-    bool initPoints(const QString &line, int pointsCount);
+    bool initPoints(const QString &line);
 };
 
 class CifLineOnePointHolder : public CifLinePointsHolder

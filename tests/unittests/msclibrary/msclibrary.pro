@@ -9,4 +9,5 @@ SUBDIRS = \
     tst_mscgate \
     tst_mscwriter \
     tst_msceventsparsing \
-    tst_cifparser
+    tst_cifparser \
+    tst_ciflineaction

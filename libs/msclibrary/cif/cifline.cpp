@@ -105,59 +105,45 @@ CifLinePointsHolder::CifLinePointsHolder(int pointsCount)
     : CifLine()
     , m_pointsCount(pointsCount)
 {
-    Q_ASSERT(m_pointsCount > 0);
-
-    QVector<QPoint> defaultPoints;
-    for (int i = 0; i < m_pointsCount; ++i)
-        defaultPoints << QPoint();
-    setPayloadPoints(defaultPoints);
 }
 
 bool CifLinePointsHolder::initFrom(const QString &sourceLine)
 {
     m_sourceLine = sourceLine;
-    return initPoints(sourceLine, m_pointsCount);
+    return initPoints(sourceLine);
 }
 
-bool CifLinePointsHolder::initPoints(const QString &line, int pointsCount)
+int CifLinePointsHolder::targetPointsCount() const
 {
-    if (line.isEmpty() || pointsCount <= 0)
+    return m_pointsCount;
+}
+
+bool CifLinePointsHolder::initPoints(const QString &line)
+{
+    if (line.isEmpty())
         return false;
 
-    static const QString pointPattern("\\((\\d+,\\s\\d+)\\)");
-    static const QString pointsJoiner(",*\\s*");
-    static const QString rxPatternTemplate("CIF\\s%1\\s%2");
-    const QString currentName(nameForType(lineType()));
-
-    QString pointsPattern;
-    for (int i = 0; i < pointsCount; ++i) {
-        if (!pointsPattern.isEmpty())
-            pointsPattern.append(pointsJoiner);
-        pointsPattern.append(pointPattern);
-    }
-    const QString &pattern = rxPatternTemplate.arg(currentName).arg(pointsPattern);
-    const QRegularExpression rx(pattern, QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpressionMatch m = rx.match(m_sourceLine);
-    const QStringList &captures = m.capturedTexts();
-    if (captures.size() == pointsCount + 1) {
-        QVector<QPoint> points;
-        for (int pointNum = 1; pointNum <= pointsCount; ++pointNum) {
-            bool pointOk(false);
-            const QPoint &point = CifLine::stringToPoint(captures.at(pointNum), &pointOk);
-            if (!pointOk) {
-                qWarning() << QString("Failed to parse CIF %1 in %2").arg(currentName).arg(m_sourceLine);
-                qDebug() << pattern << point;
-                return false;
-            }
-            points << point;
+    const QRegularExpression rxPoint("\\((\\d+, \\d+)\\)");
+    QRegularExpressionMatchIterator m = rxPoint.globalMatch(line);
+    QVector<QPoint> points;
+    while (m.hasNext()) {
+        QRegularExpressionMatch match = m.next();
+        bool parsed(false);
+        const QPoint &point = stringToPoint(match.captured(1), &parsed);
+        if (!parsed) {
+            qWarning() << "Failed to parse point at" << match.capturedStart() << "in" << line;
+            return false;
         }
+        points.append(point);
+    }
 
+    if (points.size() == m_pointsCount || (CifLinePointsHolder::AllPoints == m_pointsCount && !points.isEmpty())) {
         setPayloadPoints(points);
         return true;
     } else {
-        qWarning() << QString("Expected amount of points is %1, matched is%2. (%3)")
+        qWarning() << QString("Expected amount of points is %1, the matched one: %2. (%3)")
                               .arg(m_pointsCount)
-                              .arg(captures.size() - 1)
+                              .arg(points.size())
                               .arg(m_sourceLine);
     }
 
