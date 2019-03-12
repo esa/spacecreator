@@ -19,6 +19,11 @@
 
 #include "mscinstance.h"
 
+/*!
+   \class msc::MscMessage
+   \brief Class to describe a MSC message
+ */
+
 namespace msc {
 
 MscMessage::MscMessage(QObject *parent)
@@ -29,6 +34,37 @@ MscMessage::MscMessage(QObject *parent)
 MscMessage::MscMessage(const QString &name, QObject *parent)
     : MscInstanceEvent(name, parent)
 {
+}
+
+/*!
+   \fn MscMessage::messageInstanceName
+   In case, where the \<message name\> and the \<output address\> or \<input address\>
+   are not sufficient for a unique mapping the \<message instance name\> has to be employed.
+   \sa msc::MscEntity::name() sourceInstance() targetInstance()
+ */
+const QString &MscMessage::messageInstanceName() const
+{
+    return m_messageInstanceName;
+}
+
+void MscMessage::setMessageInstanceName(const QString &name)
+{
+    if (name == m_messageInstanceName) {
+        return;
+    }
+
+    m_messageInstanceName = name;
+    Q_EMIT messageInstanceNameChanged();
+    Q_EMIT dataChanged();
+}
+
+/*!
+   \fn MscMessage::fullName
+   \return The full name of the message including name and message instance name
+ */
+QString MscMessage::fullName() const
+{
+    return m_messageInstanceName.isEmpty() ? name() : QString("%1,%2").arg(name(), m_messageInstanceName);
 }
 
 MscInstance *MscMessage::sourceInstance() const

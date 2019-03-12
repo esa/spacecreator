@@ -65,7 +65,7 @@ messageDeclClause
 
 mscDefinition
     : messageSequenceChart
-        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList RIGHTOPEN)? end
+        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList? RIGHTOPEN)? end // parameterList should be mandatory according to the spec
     ;
 
 identifier
@@ -218,7 +218,7 @@ incompleteMessageInput
     : IN msgIdentification FROM FOUND (outputAddress)?
     ;
 msgIdentification
-    : messageName=name (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    : messageName=name (COMMA messageInstanceName=NAME)? (LEFTOPEN parameterList? RIGHTOPEN)? // parameterList should be mandatory according to the spec
     (VIA gateName=NAME)? // the via is not according ot the spec
     ;
 outputAddress
@@ -466,6 +466,7 @@ wildcard
     : . | CHARACTERSTRING // TODO not correct ?
     | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
     | functionText // extending the spec
+    | LEFTCURLYBRACKET functionText RIGHTCURLYBRACKET // extending the spec
     | LEFTCURLYBRACKET (name | sdlText)+ (COMMA (name | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
     ;
 
@@ -484,6 +485,7 @@ paramaterDefn
 expressionString
     : name COLON NAME // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
+    | name COLON LEFTCURLYBRACKET NAME SEQUENCEOF RIGHTCURLYBRACKET // extending the spec here
     ;
 
 variableValue
@@ -530,9 +532,10 @@ substructureReference
 
 // Not in the spec
 functionText
-    : name LEFTOPEN sdlText (COMMA sdlText)* RIGHTOPEN
-    | name LEFTOPEN (name (COMMA name)*)? RIGHTOPEN
-    | name LEFTOPEN functionText RIGHTOPEN
+    : functionName=name LEFTOPEN sdlText (COMMA sdlText)* RIGHTOPEN
+    | functionName=name LEFTOPEN (name (COMMA name)*)? RIGHTOPEN
+    | functionName=name LEFTOPEN functionText RIGHTOPEN
+    | functionName=name SEQUENCEOF
     ;
 sdlText
     : LEFTOPEN '.' (name (COMMA name)*) '.' RIGHTOPEN

@@ -163,7 +163,7 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     const QString comment = serializeComment(message);
 
     QString direction = tabs(tabsSize);
-    QString name = message->name();
+    QString name = message->fullName();
     QString instanceName;
 
     if (message->sourceInstance() == instance) {
@@ -173,9 +173,6 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         direction += "in %1 from %2%3;\n";
         instanceName = message->sourceInstance() != nullptr ? message->sourceInstance()->name() : "env";
     }
-
-    if (!message->parameters().name.isEmpty())
-        name += QString(",%1").arg(message->parameters().name);
 
     if (!message->parameters().expression.isEmpty() || !message->parameters().pattern.isEmpty())
         name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression

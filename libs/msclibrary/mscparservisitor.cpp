@@ -468,11 +468,11 @@ antlrcpp::Any MscParserVisitor::visitMsgIdentification(MscParser::MsgIdentificat
         return visitChildren(context);
     }
 
-    MscMessage::Parameters parameters;
     if (context->messageInstanceName) {
-        parameters.name = ::treeNodeToString(context->messageInstanceName);
+        m_currentMessage->setMessageInstanceName(::treeNodeToString(context->messageInstanceName));
     }
 
+    MscMessage::Parameters parameters;
     auto *parameterList = context->parameterList();
     if (parameterList && parameterList->paramaterDefn()) {
         auto *paramaterDefn = parameterList->paramaterDefn();
@@ -667,7 +667,7 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         m_currentMessage->m_descrIn.from = createInstance;
 
         MscMessage::Parameters parameters;
-        parameters.name = name; // TODO: use the createInstance's name instead?
+        m_currentMessage->setMessageInstanceName(name); // TODO: use the createInstance's name instead?
 
         auto *parameterList = context->parameterList();
         if (parameterList && parameterList->paramaterDefn()) {

@@ -27,6 +27,7 @@
 #include "msctimer.h"
 
 #include <QCoreApplication>
+#include <QScopedPointer>
 #include <QtTest>
 
 using namespace msc;
@@ -45,10 +46,13 @@ private Q_SLOTS:
     void testMessage();
     void testSameMessageInTwoInstances();
     void testMessageWithParameters();
+    void testMessageParameterWildcard();
+    void testMessageParameterExpression();
 
     void testInstanceCreate();
     void testInstanceCreateNoParameter();
     void testInstanceCreateMultiParameter();
+    void testInstanceCreateEmptyParameter();
     void testInstanceCreateNoInstance();
     void testInstanceCreateDublicate();
 
@@ -62,6 +66,8 @@ private Q_SLOTS:
     void testIncompleteMessageOut();
 
     void testConditionDublicate();
+
+    void testTestMessageInstanceName();
 
 private:
     MscFile *file = nullptr;
@@ -145,17 +151,60 @@ void tst_MscEventsParsing::testMessageWithParameters()
 
     auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
-    QCOMPARE(message->parameters().name, QString("a"));
+    QCOMPARE(message->messageInstanceName(), QString("a"));
     QCOMPARE(message->parameters().expression, QString("longitude:-174.0"));
 
 #ifndef __clang_analyzer__
     message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
     QVERIFY(message != nullptr);
-    QVERIFY(message->parameters().name.isEmpty());
+    QVERIFY(message->messageInstanceName().isEmpty());
     QCOMPARE(message->parameters().pattern, QString("12"));
 
     delete model;
 #endif
+}
+
+void tst_MscEventsParsing::testMessageParameterWildcard()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE inst1; \
+                         in HeartbeatIn,113({header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) from inst2; \
+                         stoptimer ToggleTimer; \
+                         out ODWriteObject,118(bDefault:bus-a) to inst2; \
+                     ENDINSTANCE; \
+                     INSTANCE subscriber; \
+                         out HeartbeatIn,113({header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) to inst1; \
+                         in ODWriteObject,118(bDefault:bus-a) from inst1; \
+                     ENDINSTANCE; \
+                  ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
+}
+
+void tst_MscEventsParsing::testMessageParameterExpression()
+{
+    QString msc = "MSC msc1; \
+                      INSTANCE inst1; \
+                        in CanFrameIn,111(heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) from inst2; \
+                     ENDINSTANCE; \
+                     INSTANCE inst2; \
+                        out CanFrameIn,111(heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) to inst1; \
+                     ENDINSTANCE; \
+                  ENDMSC;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
 }
 
 void tst_MscEventsParsing::testInstanceCreate()
@@ -245,6 +294,31 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
     for (int i = 0; i < paramsOut.size(); ++i) {
         QCOMPARE(paramsOut.at(i), paramsIn.at(i));
     }
+}
+
+void tst_MscEventsParsing::testInstanceCreateEmptyParameter()
+{
+    static const QString msc = QString("MSC msc1; \
+                      INSTANCE Inst_1; \
+                         out Heartbeat,120() to subscriber; \
+                      ENDINSTANCE; \
+                      INSTANCE subscriber; \
+                         in Heartbeat,120() from Inst_1; \
+                      ENDINSTANCE; \
+                   ENDMSC;");
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+
+    auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
+    QCOMPARE(msg->parameters().pattern, QString());
+    QCOMPARE(msg->parameters().expression, QString());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoInstance()
@@ -660,6 +734,32 @@ void tst_MscEventsParsing::testConditionDublicate()
     QCOMPARE(event->instance(), responder);
 
     delete model;
+}
+
+void tst_MscEventsParsing::testTestMessageInstanceName()
+{
+    static const QLatin1String msc("mscdocument automade; \
+                    inst mux; \
+                    inst mastercanfsm; \
+                    msc recorded; \
+                        mux: instance; \
+                            in HeartbeatOut,51 from mastercanfsm; \
+                            in HeartbeatOut,52 from mastercanfsm; \
+                        endinstance; \
+                        mastercanfsm: instance; \
+                            out HeartbeatOut,51 to mux; \
+                            out HeartbeatOut,52 to mux; \
+                        endinstance; \
+                endmsc; endmscdocument;");
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->documents().size(), 1);
+
+    QCOMPARE(model->documents().at(0)->charts().size(), 1);
+    MscChart *chart = model->documents().at(0)->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
 QTEST_APPLESS_MAIN(tst_MscEventsParsing)

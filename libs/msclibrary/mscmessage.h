@@ -28,12 +28,13 @@ class MscInstance;
 class MscMessage : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(QString messageInstanceName READ messageInstanceName WRITE setMessageInstanceName NOTIFY
+                       messageInstanceNameChanged)
     Q_PROPERTY(MscInstance *sourceInstance READ sourceInstance WRITE setSourceInstance NOTIFY sourceChanged)
     Q_PROPERTY(MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
 
 public:
     struct Parameters {
-        QString name;
         QString expression;
         QString pattern;
     };
@@ -56,6 +57,11 @@ public:
 
     explicit MscMessage(QObject *parent = nullptr);
     explicit MscMessage(const QString &name, QObject *parent = nullptr);
+
+    const QString &messageInstanceName() const;
+    void setMessageInstanceName(const QString &name);
+
+    QString fullName() const;
 
     MscInstance *sourceInstance() const;
     void setSourceInstance(MscInstance *source);
@@ -91,6 +97,7 @@ public:
     bool isOrphan() const;
 
 Q_SIGNALS:
+    void messageInstanceNameChanged();
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
 
@@ -98,6 +105,7 @@ protected:
     MscMessage::MessageType m_msgType = MscMessage::MessageType::Message;
 
 private:
+    QString m_messageInstanceName;
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
     Parameters m_parameters;

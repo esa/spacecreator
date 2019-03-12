@@ -121,7 +121,8 @@ void tst_MscWriter::testSerializeMscMessage()
 void tst_MscWriter::testSerializeMscMessageParameters()
 {
     MscMessage message("Msg_1");
-    message.setParameters({ "a", "longitude:-174.0", "" });
+    message.setMessageInstanceName("a");
+    message.setParameters({ "longitude:-174.0", "" });
 
     MscInstance source("Inst_1");
     MscInstance target("Inst_2");
