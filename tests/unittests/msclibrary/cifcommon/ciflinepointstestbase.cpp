@@ -57,36 +57,47 @@ int CifLinePointsTestBase::expectedPointsAmount() const
     return CifLinePointsHolder::AllPoints; // TODO: replace with QFAIL?
 }
 
-QString CifLinePointsTestBase::generateTestLine(int pointsCount, const QString &separator) const
+QStringList CifLinePointsTestBase::generateTestLine(int pointsCount, const QString &separator) const
 {
     static const QString lineTemplate("CIF %1 %2");
-    QString points;
-    for (int i = 1; i <= pointsCount; ++i) {
-        if (!separator.isEmpty() && !points.isEmpty())
-            points.append(separator);
-        points.append(QString("(%1, %1)").arg(i));
-    }
-    return lineTemplate.arg(lineTag(), points);
+    auto fillPoints = [pointsCount, separator](int positiveness, bool isInt) {
+        const QString pointTemplate(isInt ? "(%1, %1)" : "(%1.%1, %1.%1)");
+        QString points;
+        for (int i = 1; i <= pointsCount; ++i) {
+            if (!separator.isEmpty() && !points.isEmpty())
+                points.append(separator);
+            points.append(pointTemplate.arg(i * positiveness));
+        }
+        return points;
+    };
+
+    const QString &lineTypeName = lineTag();
+    const QString &positiveInts = lineTemplate.arg(lineTypeName, fillPoints(1, true));
+    const QString &negativeInts = lineTemplate.arg(lineTypeName, fillPoints(-1, true));
+
+    return { positiveInts, negativeInts };
 }
 
-void CifLinePointsTestBase::checkInitFromValid(const QString &source)
+void CifLinePointsTestBase::checkInitFromValid(const QStringList &sources)
 {
-    if (CifLineShared line = createCifLine()) {
-        const bool initialized = line->initFrom(source);
-        QVERIFY(initialized == true);
+    for (const QString &source : sources)
+        if (CifLineShared line = createCifLine()) {
+            const bool initialized = line->initFrom(source);
+            QVERIFY(initialized == true);
 
-        const QVector<QPoint> &points = line->payload().value<QVector<QPoint>>();
+            const QVector<QPoint> &points = line->payload().value<QVector<QPoint>>();
 
-        const int expectedPointsCount = expectedPointsAmount();
-        if (expectedPointsCount != CifLinePointsHolder::AllPoints)
-            QCOMPARE(points.size(), expectedPointsCount);
+            const int expectedPointsCount = expectedPointsAmount();
+            if (expectedPointsCount != CifLinePointsHolder::AllPoints)
+                QCOMPARE(points.size(), expectedPointsCount);
 
-        for (int i = 0; i < points.size(); ++i) {
-            const QPoint &point = points.at(i);
-            const int coordinate = i + 1;
-            QCOMPARE(point, QPoint(coordinate, coordinate));
+            const int positiveness = sources.indexOf(source) % 2 == 0 ? 1 : -1;
+            for (int i = 0; i < points.size(); ++i) {
+                const QPoint &point = points.at(i);
+                const int coordinate = (i + 1) * positiveness;
+                QCOMPARE(point, QPoint(coordinate, coordinate));
+            }
         }
-    }
 }
 
 void CifLinePointsTestBase::checkDefault()
@@ -120,9 +131,11 @@ void CifLinePointsTestBase::checkInitFromValidSeparatorNo()
 void CifLinePointsTestBase::checkInitFromInsufficient()
 {
     if (CifLineShared line = createCifLine()) {
-        const QString &sourceLine = generateTestLine(expectedPointsAmount() - 1, m_separatorCommaSpace);
-        const bool initialized = line->initFrom(sourceLine);
-        QVERIFY(initialized == false);
+        const QStringList &sourceLines = generateTestLine(expectedPointsAmount() - 1, m_separatorCommaSpace);
+        for (const QString &sourceLine : sourceLines) {
+            const bool initialized = line->initFrom(sourceLine);
+            QVERIFY(initialized == false);
+        }
     } else {
         QFAIL("Can't aquire CifLine for testing.");
     }
@@ -131,9 +144,11 @@ void CifLinePointsTestBase::checkInitFromInsufficient()
 void CifLinePointsTestBase::checkInitFromExcessive()
 {
     if (CifLineShared line = createCifLine()) {
-        const QString &sourceLine = generateTestLine(expectedPointsAmount() + 1, m_separatorCommaSpace);
-        const bool initialized = line->initFrom(sourceLine);
-        QVERIFY(initialized == false);
+        const QStringList &sourceLines = generateTestLine(expectedPointsAmount() + 1, m_separatorCommaSpace);
+        for (const QString &sourceLine : sourceLines) {
+            const bool initialized = line->initFrom(sourceLine);
+            QVERIFY(initialized == false);
+        }
     } else {
         QFAIL("Can't aquire CifLine for testing.");
     }

@@ -32,9 +32,9 @@ protected:
     virtual QString lineTag() const;
     virtual int expectedPointsAmount() const;
 
-    virtual QString generateTestLine(int pointsCount, const QString &separator) const;
+    virtual QStringList generateTestLine(int pointsCount, const QString &separator) const;
 
-    void checkInitFromValid(const QString &source);
+    void checkInitFromValid(const QStringList &sources);
 
     virtual void checkDefault();
     virtual void checkInitFromValidSeparatorComma();

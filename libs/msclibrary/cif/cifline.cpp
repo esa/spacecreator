@@ -123,7 +123,9 @@ bool CifLinePointsHolder::initPoints(const QString &line)
     if (line.isEmpty())
         return false;
 
-    const QRegularExpression rxPoint("\\((\\d+, \\d+)\\)");
+    // It seems the reals are not used in CIF, but the negative ints are in use.
+    //    const QRegularExpression rxPoint("\\((-?\\d+\\.?\\d*, -?\\d+\\.?\\d*)\\)");
+    const QRegularExpression rxPoint("\\((-?\\d+, -?\\d+)\\)");
     QRegularExpressionMatchIterator m = rxPoint.globalMatch(line);
     QVector<QPoint> points;
     while (m.hasNext()) {
