@@ -23,6 +23,8 @@
 #include "instanceitem.h"
 #include "msctimer.h"
 
+#include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
 namespace msc {
@@ -150,6 +152,71 @@ void TimerItem::setName(const QString &text)
     m_textItem->setPlainText(text);
 
     updateLayout();
+}
+
+void TimerItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mousePressEvent(event);
+}
+
+void TimerItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    auto removeHighlight = [this]() {
+        if (m_connectingItem != nullptr) {
+            m_connectingItem->setHighlightable(false);
+            m_connectingItem = nullptr;
+        }
+    };
+
+    msc::MscInstanceEvent *instanceEvent = m_model->eventAtPosition(event->scenePos());
+    if (instanceEvent) {
+        auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
+        if (timer) {
+            if (canConnectTimers(timer, event->scenePos())) {
+                TimerItem *item = m_model->itemForTimer(timer);
+                if (m_connectingItem != item)
+                    removeHighlight();
+                if (item && !item->isHighlightable()) {
+                    item->setHighlightable(true);
+                    item->doHighlighting(Qt::darkGreen, true);
+                    m_connectingItem = item;
+                }
+            }
+        } else {
+            removeHighlight();
+        }
+    } else
+        removeHighlight();
+
+    m_timerConnector->setVisible(true);
+    const QPointF start = symbolBox().center();
+    const QPointF end(start.x(), event->pos().y());
+    m_timerConnector->setLine(QLineF(start, end));
+
+    InteractiveObject::mouseMoveEvent(event);
+}
+
+void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    msc::MscInstanceEvent *instanceEvent = m_model->eventAtPosition(event->scenePos());
+    if (instanceEvent) {
+        auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
+        if (timer) {
+            if (canConnectTimers(timer, event->scenePos())) {
+                using namespace msc::cmd;
+                CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(timer), m_timer->name() });
+                updateLayout();
+            }
+        }
+    }
+    if (m_connectingItem != nullptr) {
+        m_connectingItem->setHighlightable(false);
+        m_connectingItem = nullptr;
+    }
+
+    m_timerConnector->setVisible(false);
+
+    InteractiveObject::mouseReleaseEvent(event);
 }
 
 void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -284,6 +351,28 @@ QRectF TimerItem::symbolBox() const
     const QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
     const QPointF boxCenter(start.x() + symbolSize.width() - boxSize / 2, start.y());
     return QRectF(boxCenter.x() - boxSize / 2, boxCenter.y() - boxSize / 2, boxSize, boxSize);
+}
+
+bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos)
+{
+    if (targetTimer->instance() != m_timer->instance() || m_timer->instance() == nullptr)
+        return false;
+
+    if (targetTimer->timerType() == m_timer->timerType()) {
+        if (m_timer->timerType() == msc::MscTimer::TimerType::Start
+            || m_timer->timerType() == msc::MscTimer::TimerType::Timeout)
+            return false;
+    }
+
+    if (m_timer->timerType() == msc::MscTimer::TimerType::Start) {
+        return scenePos().y() < targetPos.y();
+    }
+
+    if (m_timer->timerType() == msc::MscTimer::TimerType::Timeout) {
+        return scenePos().y() > targetPos.y();
+    }
+
+    return true;
 }
 
 } // namespace msc

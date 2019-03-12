@@ -523,6 +523,15 @@ int ChartViewModel::eventIndex(qreal y)
     return idx;
 }
 
+MscInstanceEvent *ChartViewModel::eventAtPosition(const QPointF &scenePos)
+{
+    for (auto eventItem : d->m_instanceEventItems) {
+        if (eventItem->sceneBoundingRect().contains(scenePos))
+            return qobject_cast<MscInstanceEvent *>(eventItem->modelEntity());
+    }
+    return nullptr;
+}
+
 void ChartViewModel::updateLayout()
 {
     if (d->m_layoutDirty) {

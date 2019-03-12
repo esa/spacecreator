@@ -73,6 +73,7 @@ public:
 
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
+    msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
 
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);

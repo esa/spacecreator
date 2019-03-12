@@ -151,12 +151,15 @@ bool InteractiveObject::isHovered() const
 
 HighlightRectItem *InteractiveObject::createHighlighter()
 {
-    HighlightRectItem *highlighter(new HighlightRectItem(this));
-    connect(highlighter, &HighlightRectItem::highlighted, highlighter, &QObject::deleteLater);
+    if (m_highlighter)
+        delete m_highlighter;
+    m_highlighter = new HighlightRectItem(this);
+    connect(m_highlighter, &HighlightRectItem::highlighted, m_highlighter, &QObject::deleteLater);
+    connect(m_highlighter, &QObject::destroyed, this, [this]() { m_highlighter = nullptr; });
 
-    highlighter->setRect(m_boundingRect);
+    m_highlighter->setRect(m_boundingRect);
 
-    return highlighter;
+    return m_highlighter;
 }
 
 bool InteractiveObject::isHighlightable() const
@@ -167,9 +170,25 @@ bool InteractiveObject::isHighlightable() const
 void InteractiveObject::setHighlightable(bool highlightable)
 {
     m_highlightable = highlightable;
+    clearHighlight();
 }
 
-void InteractiveObject::doHighlighting(const QColor &color)
+void InteractiveObject::highlightConnected()
+{
+    doHighlighting(Qt::green, false);
+}
+
+void InteractiveObject::highlightDisconnected()
+{
+    doHighlighting(Qt::red, false);
+}
+
+/*!
+   \brief InteractiveObject::doHighlighting
+   \param color
+   \param permanent if false, the highlight is shown as animation and fades out within a short time
+ */
+void InteractiveObject::doHighlighting(const QColor &color, bool permanent)
 {
     if (!m_highlightable) {
         return;
@@ -183,18 +202,22 @@ void InteractiveObject::doHighlighting(const QColor &color)
         targetColor.setAlphaF(0.25);
         highlighter->setBrush(targetColor);
 
-        highlighter->highlight();
+        if (!permanent)
+            highlighter->highlight();
     }
 }
 
-void InteractiveObject::highlightConnected()
+void InteractiveObject::clearHighlight()
 {
-    doHighlighting(Qt::green);
+    if (m_highlighter) {
+        delete m_highlighter;
+        m_highlighter = nullptr;
+    }
 }
 
-void InteractiveObject::highlightDisconnected()
+bool InteractiveObject::isHighlighting() const
 {
-    doHighlighting(Qt::red);
+    return m_highlighter != nullptr;
 }
 
 QPointF InteractiveObject::centerInScene() const

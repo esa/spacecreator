@@ -43,6 +43,9 @@ public:
 
     void highlightConnected();
     void highlightDisconnected();
+    void doHighlighting(const QColor &color, bool permanent);
+    void clearHighlight();
+    bool isHighlighting() const;
 
     QPointF centerInScene() const;
 
@@ -76,6 +79,7 @@ protected:
     bool m_layoutDirty = false;
 
     bool m_highlightable = false;
+    HighlightRectItem *m_highlighter = nullptr;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
@@ -92,7 +96,6 @@ protected:
     virtual void prepareHoverMark();
 
     HighlightRectItem *createHighlighter();
-    void doHighlighting(const QColor &color);
 };
 
 } // namespace msc

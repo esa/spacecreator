@@ -25,6 +25,8 @@
 
 class QGraphicsLineItem;
 
+class tst_TimerItem;
+
 namespace msc {
 
 class ChartViewModel;
@@ -49,6 +51,9 @@ public Q_SLOTS:
     void setName(const QString &text);
 
 protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -66,12 +71,16 @@ private:
     void drawStopSymbol(QPainter *painter, const QRectF &rect);
     void drawTimeoutArrow(QPainter *painter, const QPointF &pt);
     QRectF symbolBox() const;
+    bool canConnectTimers(msc::MscTimer *targetTimer, const QPointF &targetPos);
 
     QPointer<msc::MscTimer> m_timer;
     QPointer<InstanceItem> m_instance;
     QPointer<ChartViewModel> m_model;
     TextItem *m_textItem = nullptr;
     QGraphicsLineItem *m_timerConnector = nullptr;
+    msc::TimerItem *m_connectingItem = nullptr;
+
+    friend tst_TimerItem;
 };
 
 } // namespace msc

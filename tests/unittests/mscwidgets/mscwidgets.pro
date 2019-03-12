@@ -18,4 +18,5 @@ SUBDIRS = \
     tst_chartviewmodel \
     tst_cmdinstanceitemcreate \
     tst_nameitem \
-    tst_textitem
+    tst_textitem \
+    tst_timeritem
