@@ -156,7 +156,9 @@ void HierarchyViewModel::setModel(MscModel *model)
         d->clear();
 
         d->model = model;
-        connect(model, &QObject::destroyed, this, &HierarchyViewModel::modelDeleted);
+        if (model) {
+            connect(model, &QObject::destroyed, this, &HierarchyViewModel::modelDeleted);
+        }
 
         updateModel();
     }

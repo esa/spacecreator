@@ -124,6 +124,8 @@ private:
 
     static QStringList mscFileFilters();
 
+    bool saveDocument();
+
 #ifdef QT_DEBUG
     void showMousePositioner();
 #endif

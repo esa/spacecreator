@@ -63,7 +63,7 @@ MainModel::MainModel(QObject *parent)
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentClicked, this, &MainModel::documentClicked);
     connect(this, &MainModel::selectionChanged, &d->m_hierarchyModel, &HierarchyViewModel::selectionChanged);
 
-    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    connect(d->m_mscModel, SIGNAL(dataChanged()), this, SIGNAL(modelDataChanged()));
 
     initialModel();
     showFirstChart();
@@ -223,10 +223,10 @@ void MainModel::setNewModel(MscModel *model)
     connect(d->m_mscModel, &msc::MscModel::documentAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
-    connect(d->m_mscModel, &MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    connect(d->m_mscModel, SIGNAL(dataChanged()), this, SIGNAL(modelDataChanged()));
 
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
-    Q_EMIT modelDataChanged();
+    Q_EMIT modelDataChanged(true);
 }

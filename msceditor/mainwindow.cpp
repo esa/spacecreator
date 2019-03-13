@@ -140,6 +140,8 @@ struct MainWindowPrivate {
 
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
+
+    bool m_saveDocument = false;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -176,6 +178,10 @@ QGraphicsView *MainWindow::currentView() const
 
 void MainWindow::createNewDocument()
 {
+    if (!saveDocument()) {
+        return;
+    }
+
     d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
     d->ui->documentTreeView->expandAll();
@@ -192,6 +198,10 @@ void MainWindow::createNewDocument()
 
 void MainWindow::selectAndOpenFile()
 {
+    if (!saveDocument()) {
+        return;
+    }
+
     static const QString suffixAsn(".asn");
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
                                           QString("ASN1 files (*%1 *%2)").arg(suffixAsn, suffixAsn.toUpper()),
@@ -376,6 +386,8 @@ void MainWindow::saveMsc()
     } else {
         d->m_model->saveMsc(d->m_mscFileName);
         updateTitles();
+
+        d->m_saveDocument = false;
     }
 }
 
@@ -802,10 +814,11 @@ void MainWindow::initConnections()
     connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
             &MainWindow::onCreateMessageToolRequested);
 
-    connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
+    connect(d->m_model, &MainModel::modelDataChanged, this, [this](bool newModel) {
         d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
         d->ui->mscTextBrowser->updateView();
         updateMscToolbarActionsEnablement();
+        d->m_saveDocument = !newModel;
     });
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
@@ -1124,8 +1137,12 @@ void MainWindow::saveSettings()
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    saveSettings();
-    QMainWindow::closeEvent(e);
+    if (saveDocument()) {
+        saveSettings();
+        QMainWindow::closeEvent(e);
+    } else {
+        e->ignore();
+    }
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -1227,6 +1244,22 @@ QStringList MainWindow::mscFileFilters()
         filters << asterisk.arg(DotMscFileExtensionLow) << asterisk.arg(DotMscFileExtensionLow).toUpper();
     }
     return filters;
+}
+
+bool MainWindow::saveDocument()
+{
+    if (d->m_saveDocument) {
+        auto result = QMessageBox::question(this, windowTitle(), tr("Do you want to save the MSC document?"),
+                                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+
+        if (result == QMessageBox::Cancel) {
+            return false;
+        } else if (result == QMessageBox::Yes) {
+            saveMsc();
+        }
+    }
+
+    return true;
 }
 
 QPlainTextEdit *MainWindow::textOutputPane() const

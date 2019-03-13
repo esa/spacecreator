@@ -62,7 +62,7 @@ public:
 
 Q_SIGNALS:
     void showChartVew();
-    void modelDataChanged();
+    void modelDataChanged(bool newModel = false);
     void documentClicked(const msc::MscDocument *document);
     void selectionChanged(const msc::MscDocument *document);
 
