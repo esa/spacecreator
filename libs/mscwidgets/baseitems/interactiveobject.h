@@ -56,6 +56,8 @@ public:
 
     virtual void postCreatePolishing();
 
+    virtual void applyCif();
+
 public Q_SLOTS:
     void updateLayout();
 

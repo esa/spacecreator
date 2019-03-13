@@ -117,6 +117,8 @@ private:
 
     void addInstanceItems();
     void addInstanceEventItems();
+
+    void applyCif();
 };
 
 } // namespace msc

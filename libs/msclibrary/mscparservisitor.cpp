@@ -966,11 +966,16 @@ void MscParserVisitor::storePrecedingCif(antlr4::ParserRuleContext *ctx)
 antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
 {
     storePrecedingCif(ctx);
-    if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {
-        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(pParentRule->getRuleIndex());
-    } else {
-        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(ctx->getRuleIndex());
-    }
+
+    // While currently the order of rules parsing seems to be correct,
+    // dbg output below may be usefull for upcoming CIF improvements/tunning.
+    // Please keep it as a dead code for a while
+    // TODO: Remove after completing (more or less) CIF support
+    //    if (antlr4::ParserRuleContext *pParentRule = dynamic_cast<antlr4::ParserRuleContext *>(ctx->parent)) {
+    //        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(pParentRule->getRuleIndex());
+    //    } else {
+    //        qDebug() << "visitEnd of:" << msc_dbg::ruleNameFromIndex(ctx->getRuleIndex());
+    //    }
 
     if (!m_cifBlocks.isEmpty()) {
         MscEntity *targetEntity = cifTarget();

@@ -20,6 +20,7 @@
 #include "common/objectslink.h"
 #include "common/utils.h"
 
+#include <QGraphicsView>
 #include <QPainter>
 
 namespace msc {
@@ -38,6 +39,14 @@ ArrowItem::ArrowItem(QGraphicsItem *parent)
 {
 }
 
+void ArrowItem::drawBody(QPainter *painter)
+{
+    painter->save();
+    painter->setPen(m_bodyPen);
+    painter->strokePath(m_bodyPath, m_bodyPen);
+    painter->restore();
+}
+
 void ArrowItem::drawStartSign(QPainter *painter)
 {
     if (m_bodyPath.isEmpty())
@@ -45,8 +54,8 @@ void ArrowItem::drawStartSign(QPainter *painter)
 
     painter->save();
 
-    const QPointF p1(m_bodyPath.elementAt(0));
-    const QPointF p2(m_bodyPath.elementAt(m_bodyPath.elementCount() - 1));
+    const QPointF p1(startSignLocal());
+    const QPointF p2(endSignLocal());
 
     painter->translate(p1.x(), p1.y());
     painter->rotate(-QLineF(p1, p2).angle());
@@ -64,8 +73,10 @@ void ArrowItem::drawEndSign(QPainter *painter)
 
     painter->save();
 
-    const QPointF p1(m_bodyPath.elementAt(0));
-    const QPointF p2(m_bodyPath.elementAt(m_bodyPath.elementCount() - 1));
+    QPointF p1(m_polyLine.at(m_polyLine.size() - 2));
+    QPointF p2(m_polyLine.last());
+    if (m_polyLine.size() > 2 && p1 == p2)
+        p1 = m_polyLine.at(m_polyLine.size() - 3);
 
     painter->translate(p2.x(), p2.y());
     painter->rotate(-QLineF(p1, p2).angle());
@@ -117,17 +128,66 @@ void ArrowItem::buildLayout()
     updateLine(line);
 }
 
+void ArrowItem::addTurnPoint(const QPointF &scenePoint)
+{
+    m_polyLine.append(mapFromScene(scenePoint));
+    updatePath();
+}
+
+void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
+{
+    QVector<QPointF> newPolyLine;
+    newPolyLine.reserve(scenePoints.size());
+    for (const QPointF &scenePoint : scenePoints)
+        newPolyLine << mapFromScene(scenePoint);
+
+    if (m_polyLine != newPolyLine) {
+        m_polyLine = newPolyLine;
+        QSignalBlocker silently(this);
+        updatePath();
+    }
+}
+
+/*!
+  \brief ArrowItem::turnPointsScene
+  \return A collection of points in local coordinates that represent the whole arrow.
+  This includes start, end and subline edges in between, thus a valid collection
+  should contain at least two entries - the start and end points.
+*/
+QVector<QPointF> ArrowItem::turnPoints() const
+{
+    return m_polyLine;
+}
+
 void ArrowItem::updateLine(const QLineF &newLine)
+{
+    if (m_polyLine.isEmpty()) {
+        m_polyLine = { newLine.p1(), newLine.p2() };
+    } else {
+        if (m_polyLine.size() == 2)
+            m_polyLine.replace(0, newLine.p1());
+        m_polyLine.replace(m_polyLine.size() - 1, newLine.p2());
+    }
+
+    updatePath();
+}
+
+void ArrowItem::updatePath()
 {
     prepareGeometryChange();
 
     m_bodyPath = QPainterPath();
-    m_bodyPath.moveTo(newLine.p1());
-    m_bodyPath.lineTo(newLine.p2());
+    const int pointsCount = m_polyLine.size();
+    if (pointsCount) {
+        m_bodyPath.moveTo(m_polyLine.first());
+        int point(1);
+        while (point < pointsCount) {
+            m_bodyPath.lineTo(m_polyLine.at(point++));
+        }
 
-    m_arrowHeads.Source.pointTo(newLine.p1());
-    m_arrowHeads.Target.pointTo(newLine.p2());
-
+        m_arrowHeads.Source.pointTo(m_polyLine.first());
+        m_arrowHeads.Target.pointTo(m_polyLine.last());
+    }
     m_symbols.Source = m_arrowHeads.Source.path();
     m_symbols.Target = m_arrowHeads.Target.path();
 
@@ -164,7 +224,12 @@ QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnc
 
 QPointF ArrowItem::pathPoint(int num) const
 {
-    return utils::pointFromPath(m_bodyPath, num);
+    QPointF result;
+    if (!m_polyLine.isEmpty()) {
+        num = qBound(0, num, m_polyLine.size() - 1);
+        result = m_polyLine.at(num);
+    }
+    return result;
 }
 
 QPainterPath ArrowItem::shape() const

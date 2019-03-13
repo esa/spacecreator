@@ -102,8 +102,10 @@ void tst_InstanceItem::testKindUpdate()
 {
     QCOMPARE(m_instanceItem->kind(), QString(""));
 
-    m_instance->setKind("kindda");
-    QCOMPARE(m_instanceItem->kind(), QString("kindda"));
+    static const QLatin1String testKind("kindda");
+    m_instance->setKind(testKind);
+    QCOMPARE(m_instanceItem->kind(), testKind);
+    QCOMPARE(m_instanceItem->modelItem()->kind(), m_instanceItem->kind());
 }
 
 void tst_InstanceItem::testMoveByHead()

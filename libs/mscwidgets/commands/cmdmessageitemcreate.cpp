@@ -17,17 +17,21 @@
 
 #include "cmdmessageitemcreate.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "mscchart.h"
 #include "mscmessage.h"
 
 namespace msc {
 namespace cmd {
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex)
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex,
+                                           const QVector<QPointF> &points)
     : BaseCommand(message)
     , m_message(message)
     , m_chart(chart)
     , m_eventIndex(eventIndex)
+    , m_msgPoints(points)
 {
     Q_ASSERT(m_chart.data());
 
@@ -42,6 +46,14 @@ void CmdMessageItemCreate::redo()
         m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
         m_modelItem = m_message;
     }
+
+    if (!m_msgPoints.isEmpty())
+        if (cif::CifBlockShared msgCif = cif::CifBlockFactory::createBlockMessage()) {
+            QVector<cif::CifLineShared> lines = { cif::CifLineShared(new cif::CifLineMessage) };
+            msgCif->setLines(lines);
+            msgCif->setPayload(QVariant::fromValue(m_msgPoints), cif::CifLine::CifType::Message);
+            m_modelItem->setCifs({ msgCif });
+        }
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_message, m_eventIndex);

@@ -54,12 +54,15 @@ private:
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
 
+    static const QVariant m_dummyCif;
+
     int itemsCount();
 };
 
 // make cpp11 happy for ODR-use:
 constexpr int tst_CmdMessageItemCreate::CommandsCount;
 constexpr bool tst_CmdMessageItemCreate::SkipBenchmark;
+const QVariant tst_CmdMessageItemCreate::m_dummyCif = QVariant::fromValue<QVector<QPoint>>(QVector<QPoint>());
 
 void tst_CmdMessageItemCreate::initTestCase()
 {
@@ -82,9 +85,9 @@ void tst_CmdMessageItemCreate::testCreate()
     QCOMPARE(itemsCount(), 0);
 
     for (int i = 0; i < CommandsCount; ++i) {
-        cmd::CommandsStack::push(
-                cmd::Id::CreateMessage,
-                { QVariant::fromValue<msc::MscMessage *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
+        const QVariantList &params = { QVariant::fromValue<msc::MscMessage *>(nullptr),
+                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1, m_dummyCif };
+        cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -137,7 +140,7 @@ void tst_CmdMessageItemCreate::testPerformance()
         for (int i = 0; i < CommandsCount; ++i) {
             cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                      { QVariant::fromValue<msc::MscMessage *>(nullptr),
-                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
+                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1, m_dummyCif });
         }
 
         // undo:
@@ -175,7 +178,7 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
     for (const QString &name : names) {
         cmd::CommandsStack::push(cmd::Id::CreateMessage,
                                  { QVariant::fromValue<msc::MscMessage *>(new msc::MscMessage(name)),
-                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends message
+                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0, m_dummyCif }); // prepends message
     }
 
     QCOMPARE(m_chart->instanceEvents().size(), names.size());

@@ -42,6 +42,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     , m_arrowItem(new LabeledArrowItem(this))
 {
     Q_ASSERT(m_message != nullptr);
+
     connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
     m_arrowItem->setText(m_message->name());
 
@@ -164,6 +165,23 @@ QRectF MessageItem::boundingRect() const
 
 void MessageItem::rebuildLayout()
 {
+    // don't use default layout in case there is appropriate CIF specified
+    using namespace cif;
+    const QVector<CifBlockShared> &cifs = m_message->cifs();
+    if (!cifs.isEmpty()) {
+        QGraphicsScene *scene = this->scene();
+        for (const CifBlockShared &cif : cifs) {
+            if (cif->blockType() == CifLine::CifType::Message) {
+                const QVector<QPoint> &cifPixels = cif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
+                if (!cifPixels.isEmpty()) {
+                    const QVector<QPointF> &sceneCoords = utils::cifToScene(cifPixels, scene);
+                    if (m_arrowItem->arrow()->turnPoints() == sceneCoords)
+                        return;
+                }
+            }
+        }
+    }
+
     auto itemCenterScene = [](InstanceItem *item) {
         QPointF res;
         if (item) {
@@ -519,6 +537,41 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
     } else if (pos == GripPoint::Right) {
         Q_EMIT retargeted(this, to, msc::MscMessage::EndType::TARGET_HEAD);
     }
+}
+
+void MessageItem::addMessagePoint(const QPointF &scenePoint)
+{
+    m_arrowItem->arrow()->addTurnPoint(scenePoint);
+}
+
+QVector<QPointF> MessageItem::messagePoints() const
+{
+    return m_arrowItem->arrow()->turnPoints();
+}
+
+void MessageItem::applyCif()
+{
+    QSignalBlocker sb(this);
+    setPositionChangeIgnored(true);
+    using namespace cif;
+    QGraphicsScene *scene = this->scene();
+    const QVector<CifBlockShared> &cifs = modelEntity()->cifs();
+    for (const CifBlockShared &cif : cifs) {
+        switch (cif->blockType()) {
+        case CifLine::CifType::Message: {
+            const QVector<QPoint> &points = cif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
+            m_arrowItem->arrow()->setTurnPoints(utils::cifToScene(points, scene));
+            break;
+        }
+        default: {
+#ifdef QT_DEBUG
+            qWarning() << Q_FUNC_INFO << "Unsupported cif:" << cif->blockType();
+#endif
+            break;
+        }
+        }
+    }
+    setPositionChangeIgnored(false);
 }
 
 } // namespace msc

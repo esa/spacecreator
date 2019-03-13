@@ -26,8 +26,8 @@
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "messageitem.h"
-#include "mscinstance.h"
 #include "mscchart.h"
+#include "mscinstance.h"
 
 #include <QApplication>
 #include <QBrush>

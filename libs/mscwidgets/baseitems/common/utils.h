@@ -85,5 +85,10 @@ bool removeSceneItem(QGraphicsItem *item);
 bool intersects(const QRectF &rect, const QLineF &line);
 QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos);
 
+QPoint sceneToCif(const QPointF &scenePoint, QGraphicsScene *scene);
+QVector<QPoint> sceneToCif(const QVector<QPointF> &scenePoints, QGraphicsScene *scene);
+QPointF cifToScene(const QPoint &pixelPoint, QGraphicsScene *scene);
+QVector<QPointF> cifToScene(const QVector<QPoint> &pixelPoints, QGraphicsScene *scene);
+
 } // ns utils
 } // ns msc

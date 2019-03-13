@@ -224,6 +224,7 @@ void ChartViewModel::relayout()
     addInstanceItems(); // which are not highlightable now to avoid flickering
     addInstanceEventItems();
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->InterMessageSpan);
+    applyCif();
     updateContentBounds();
 
     // make instance items be highlightable on message (dis-)connection
@@ -398,7 +399,8 @@ void ChartViewModel::updateContentBounds()
         switch (event->entityType()) {
         case MscEntity::EntityType::Message: {
             MscMessage *message = static_cast<MscMessage *>(event);
-            if (message->isGlobal()) {
+            const bool noCif = message->cifs().isEmpty(); // TODO: check for exactly MESSAGE and/or POSITION
+            if (message->isGlobal() && noCif) {
                 if (MessageItem *item = itemForMessage(message)) {
                     item->updateLayout(); // place it on the correct box edge
                 }
@@ -893,6 +895,19 @@ int ChartViewModel::instanceOrderFromPos(const QPointF &scenePos)
         return -1; // otherwise it could be prepended
 
     return existentId + (distance.dx() <= 0. ? 0 : 1);
+}
+
+void ChartViewModel::applyCif()
+{
+    // While CIF support is not complete it breaks almost all examples.
+    // To keep the master in a usable state use this locally:
+    /*
+    const QList<InteractiveObject *> &toplevelItems = utils::toplevelItems<InteractiveObject>(graphicsScene());
+    const int toplevelItemsCount = toplevelItems.size();
+    for (int i = 0; i < toplevelItemsCount; ++i)
+        if (InteractiveObject *gi = toplevelItems.at(i))
+            gi->applyCif();
+    */
 }
 
 } // namespace msc

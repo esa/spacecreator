@@ -56,9 +56,9 @@ protected:
     void commitPreviewItem() override;
     void removePreviewItem() override;
 
-    virtual bool onMousePress(QMouseEvent *e) override;
-    virtual bool onMouseRelease(QMouseEvent *e) override;
-    virtual bool onMouseMove(QMouseEvent *e) override;
+    bool onMousePress(QMouseEvent *e) override;
+    bool onMouseRelease(QMouseEvent *e) override;
+    bool onMouseMove(QMouseEvent *e) override;
 
     QVariantList prepareMessage();
 

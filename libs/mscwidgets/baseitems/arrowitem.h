@@ -43,10 +43,15 @@ public:
     bool updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 
+    void addTurnPoint(const QPointF &scenePoint);
+    void setTurnPoints(const QVector<QPointF> &scenePoints);
+    QVector<QPointF> turnPoints() const;
+
 protected:
     PairOf<ArrowSign> m_arrowHeads;
     QPainterPath m_bodyPath;
 
+    void drawBody(QPainter *painter) override;
     void drawStartSign(QPainter *painter) override;
     void drawEndSign(QPainter *painter) override;
 
@@ -55,9 +60,12 @@ protected:
     void updateLine(const QLineF &to);
 
 private:
+    QVector<QPointF> m_polyLine;
     QPointF pathPoint(int num) const;
     bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint,
                       ObjectAnchor::Snap snap);
+
+    void updatePath();
 };
 
 } // ns msc

@@ -125,7 +125,8 @@ CifBlockShared CifBlockFactory::createBlockImport(const QVector<CifLineShared> &
 CifBlockShared CifBlockFactory::createBlockMessage(const QVector<CifLineShared> &lines)
 {
     CifBlockShared block(new CifBlockMessage());
-    block->setLines(lines);
+    if (!lines.isEmpty())
+        block->setLines(lines);
     return block;
 }
 

@@ -135,11 +135,13 @@ QUndoCommand *CommandsFactory::createMessageItemRetarget(const QVariantList &par
 
 QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() >= 3);
 
     msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
     if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-        return new CmdMessageItemCreate(message, chart, params.at(2).toInt());
+        const QVector<QPointF> &points =
+                params.size() == 4 ? params.at(3).value<QVector<QPointF>>() : QVector<QPointF>();
+        return new CmdMessageItemCreate(message, chart, params.at(2).toInt(), points);
     }
 
     return nullptr;

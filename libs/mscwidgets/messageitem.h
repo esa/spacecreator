@@ -63,6 +63,11 @@ public:
     void onTargetInstanceMoved(const QPointF &from, const QPointF &to);
     bool isCreator() const;
 
+    void addMessagePoint(const QPointF &scenePoint);
+    QVector<QPointF> messagePoints() const;
+
+    void applyCif() override;
+
 Q_SIGNALS:
     void needRelayout() const;
     void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);

@@ -231,14 +231,21 @@ void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
         break;
     }
     case Step::ChooseTarget: {
-        commitPreviewItem();
-        m_currStep = Step::ChooseSource;
-        createPreviewItem();
+        const QPointF &scenePos = this->cursorInScene(e->globalPos());
+        const bool isClick = m_currMode == InteractionMode::Click;
+        const bool needCommit = m_currMode == InteractionMode::Drag || (isClick && e->modifiers() != Qt::NoModifier);
+        if (needCommit) {
+            commitPreviewItem();
+            m_currStep = Step::ChooseSource;
+            createPreviewItem();
 
-        if (m_messageItem) {
-            const QPointF &scenePos = this->cursorInScene(e->globalPos());
-            movePreviewItemTo(scenePos);
+            if (m_messageItem) {
+                movePreviewItemTo(scenePos);
+            }
+        } else if (isClick) {
+            m_messageItem->addMessagePoint(scenePos);
         }
+
         break;
     }
     }
@@ -309,15 +316,19 @@ QVariantList MessageCreatorTool::prepareMessage()
             return false;
         }
 
-        static constexpr qreal horizontalityTolerancePixels = 15.;
-        const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
-        if (!isHorizontal) {
-            qWarning() << "Async messages are not supported yet, discarded.";
-            return false;
-        }
         return true;
     };
 
+    auto getCif = [&](const QVector<QPointF> &sceneCoords) {
+        if (sceneCoords.size() > 2)
+            return utils::sceneToCif(sceneCoords, m_scene);
+
+        const QLineF &arrow = arrowLine();
+        static constexpr qreal horizontalityTolerancePixels = 15.;
+        const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
+
+        return isHorizontal ? QVector<QPoint>() : utils::sceneToCif(sceneCoords, m_scene);
+    };
     QVariantList args;
 
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
@@ -330,7 +341,8 @@ QVariantList MessageCreatorTool::prepareMessage()
 
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
             args = { QVariant::fromValue<msc::MscMessage *>(message),
-                     QVariant::fromValue<msc::MscChart *>(m_activeChart), eventIndex };
+                     QVariant::fromValue<msc::MscChart *>(m_activeChart), eventIndex,
+                     QVariant::fromValue<QVector<QPoint>>(getCif(m_messageItem->messagePoints())) };
         }
     }
 

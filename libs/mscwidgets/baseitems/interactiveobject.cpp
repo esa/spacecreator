@@ -24,6 +24,7 @@
 #include "mscentity.h"
 
 #include <QBrush>
+#include <QDebug>
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPen>
@@ -305,6 +306,13 @@ void InteractiveObject::postCreatePolishing()
     };
 
     findTextItem(this);
+}
+
+void InteractiveObject::applyCif()
+{
+    const QVector<cif::CifBlockShared> &cifs = modelEntity()->cifs();
+    if (cifs.size())
+        qWarning() << Q_FUNC_INFO << "CIF data ignored.";
 }
 
 } // namespace msc
