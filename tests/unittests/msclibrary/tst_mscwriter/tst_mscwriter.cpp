@@ -41,6 +41,7 @@ private Q_SLOTS:
     void testSelthTabbing();
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
+    void testSerializeMscMessageMultiParameters();
     void testSerializeMscTimer();
     void testSerializeMscCoregion();
     void testSerializeMscInstance();
@@ -122,7 +123,7 @@ void tst_MscWriter::testSerializeMscMessageParameters()
 {
     MscMessage message("Msg_1");
     message.setMessageInstanceName("a");
-    message.setParameters({ "longitude:-174.0", "" });
+    message.setParameters({ { "longitude:-174.0", "" } });
 
     MscInstance source("Inst_1");
     MscInstance target("Inst_2");
@@ -131,6 +132,21 @@ void tst_MscWriter::testSerializeMscMessageParameters()
     message.setTargetInstance(&target);
 
     QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
+}
+
+void tst_MscWriter::testSerializeMscMessageMultiParameters()
+{
+    MscMessage message("Msg_1");
+    message.setMessageInstanceName("a");
+    message.setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
+
+    MscInstance source("Inst_1");
+    MscInstance target("Inst_2");
+
+    message.setSourceInstance(&source);
+    message.setTargetInstance(&target);
+
+    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0, init) to Inst_2;\n"));
 }
 
 void tst_MscWriter::testSerializeMscTimer()
@@ -456,8 +472,12 @@ void tst_MscWriter::testSerializeCreate()
     QScopedPointer<MscCreate> createSubscriber(new MscCreate());
     createSubscriber->setSourceInstance(&instanceSource);
     createSubscriber->setTargetInstance(&instanceSubscriber);
-    MscMessage::Parameters parameters;
-    parameters.expression = "data1, data2";
+    QVector<MscMessage::Parameter> parameters;
+    MscMessage::Parameter parameter;
+    parameter.pattern = "data1";
+    parameters << parameter;
+    parameter.pattern = "data2";
+    parameters << parameter;
     createSubscriber->setParameters(parameters);
 
     messages.append(createSubscriber.data());

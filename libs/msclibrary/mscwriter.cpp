@@ -174,9 +174,10 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         instanceName = message->sourceInstance() != nullptr ? message->sourceInstance()->name() : "env";
     }
 
-    if (!message->parameters().expression.isEmpty() || !message->parameters().pattern.isEmpty())
-        name += QString("(%1)").arg(!message->parameters().expression.isEmpty() ? message->parameters().expression
-                                                                                : message->parameters().pattern);
+    const QString parameters = serializeParameters(message);
+    if (!parameters.isEmpty()) {
+        name = name.append("(%1)").arg(parameters);
+    }
 
     return QString(direction).arg(name, instanceName, comment);
 }
@@ -197,10 +198,10 @@ QString MscWriter::serialize(const MscCreate *create, const MscInstance *instanc
 
     if (create && instance == create->sourceInstance()) {
         QString res = tabs(tabsSize) + QString("create %1").arg(create->targetInstance()->name());
-        const MscMessage::Parameters &params = create->parameters();
-        const QString &param = params.pattern.isEmpty() ? params.expression : params.pattern;
-        if (!param.isEmpty())
-            res = res.append("(%1)").arg(param);
+        const QString parameters = serializeParameters(create);
+        if (!parameters.isEmpty()) {
+            res = res.append("(%1)").arg(parameters);
+        }
         return res.append(";\n");
     }
     return {};
@@ -372,6 +373,17 @@ QString MscWriter::serializeComment(const msc::MscEntity *entity) const
     }
 
     return QString(" comment '%1'").arg(entity->comment());
+}
+
+QString MscWriter::serializeParameters(const MscMessage *message) const
+{
+    QString parameters;
+    for (const msc::MscMessage::Parameter &param : message->parameters()) {
+        if (!parameters.isEmpty())
+            parameters += ", ";
+        parameters += param.pattern.isEmpty() ? param.expression : param.pattern;
+    }
+    return parameters;
 }
 
 } // namespace msc

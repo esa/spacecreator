@@ -26,7 +26,6 @@
 #include "mscdocument.h"
 #include "mscgate.h"
 #include "mscinstance.h"
-#include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "parserdebughelper_p.h"
@@ -472,14 +471,7 @@ antlrcpp::Any MscParserVisitor::visitMsgIdentification(MscParser::MsgIdentificat
         m_currentMessage->setMessageInstanceName(::treeNodeToString(context->messageInstanceName));
     }
 
-    MscMessage::Parameters parameters;
-    auto *parameterList = context->parameterList();
-    if (parameterList && parameterList->paramaterDefn()) {
-        auto *paramaterDefn = parameterList->paramaterDefn();
-        parameters.expression = ::treeNodeToString(paramaterDefn->expression());
-        parameters.pattern = ::treeNodeToString(paramaterDefn->pattern());
-    }
-    m_currentMessage->setParameters(parameters);
+    m_currentMessage->setParameters(readParameterList(context->parameterList()));
     return visitChildren(context);
 }
 
@@ -666,16 +658,9 @@ antlrcpp::Any MscParserVisitor::visitCreate(MscParser::CreateContext *context)
         m_currentMessage->m_descrIn.to = m_currentInstance;
         m_currentMessage->m_descrIn.from = createInstance;
 
-        MscMessage::Parameters parameters;
         m_currentMessage->setMessageInstanceName(name); // TODO: use the createInstance's name instead?
 
-        auto *parameterList = context->parameterList();
-        if (parameterList && parameterList->paramaterDefn()) {
-            auto *paramaterDefn = parameterList->paramaterDefn();
-            parameters.expression = ::treeNodeToString(paramaterDefn->expression());
-            parameters.pattern = ::treeNodeToString(paramaterDefn->pattern());
-            m_currentMessage->setParameters(parameters);
-        }
+        m_currentMessage->setParameters(readParameterList(context->parameterList()));
 
         m_instanceEvents.append(m_currentMessage);
     }
@@ -1016,4 +1001,20 @@ msc::MscEntity *MscParserVisitor::cifTarget() const
         if (target)
             return target;
     return nullptr;
+}
+
+QVector<msc::MscMessage::Parameter> MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)
+{
+    QVector<msc::MscMessage::Parameter> parameters;
+    while (parameterList && parameterList->paramaterDefn()) {
+        auto *paramaterDefn = parameterList->paramaterDefn();
+        MscMessage::Parameter parameter;
+        parameter.expression = ::treeNodeToString(paramaterDefn->expression());
+        parameter.pattern = ::treeNodeToString(paramaterDefn->pattern());
+        if (!parameter.expression.isEmpty() || !parameter.pattern.isEmpty())
+            parameters << parameter;
+
+        parameterList = parameterList->parameterList();
+    }
+    return parameters;
 }

@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testMessageWithParameters();
     void testMessageParameterWildcard();
     void testMessageParameterExpression();
+    void testMultiParameters();
 
     void testInstanceCreate();
     void testInstanceCreateNoParameter();
@@ -152,13 +153,16 @@ void tst_MscEventsParsing::testMessageWithParameters()
     auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->messageInstanceName(), QString("a"));
-    QCOMPARE(message->parameters().expression, QString("longitude:-174.0"));
+    QVector<MscMessage::Parameter> parameters = message->parameters();
+    QCOMPARE(parameters.size(), 1);
+    QCOMPARE(parameters.at(0).expression, QString("longitude:-174.0"));
 
 #ifndef __clang_analyzer__
     message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
     QVERIFY(message != nullptr);
     QVERIFY(message->messageInstanceName().isEmpty());
-    QCOMPARE(message->parameters().pattern, QString("12"));
+    parameters = message->parameters();
+    QCOMPARE(parameters.at(0).pattern, QString("12"));
 
     delete model;
 #endif
@@ -207,6 +211,31 @@ void tst_MscEventsParsing::testMessageParameterExpression()
     QCOMPARE(chart->instanceEvents().size(), 1);
 }
 
+void tst_MscEventsParsing::testMultiParameters()
+{
+    QString msc = "msc Untitled_1; \
+       instance Inst_1; \
+          out hello(b:   FALSE, 11) to Inst_2; \
+       endinstance; \
+       instance Inst_2; \
+          in hello(b:   FALSE, 11) from Inst_1; \
+       endinstance; \
+    endmsc;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    auto *message = static_cast<MscCreate *>(chart->instanceEvents().at(0));
+    QCOMPARE(message->name(), QString("hello"));
+    QVector<MscMessage::Parameter> parameters = message->parameters();
+    QCOMPARE(parameters.size(), 2);
+    QCOMPARE(parameters.at(0).expression, QString("b:FALSE"));
+    QCOMPARE(parameters.at(1).pattern, QString("11"));
+}
+
 void tst_MscEventsParsing::testInstanceCreate()
 {
     QString msc = "MSC msc1; \
@@ -231,8 +260,10 @@ void tst_MscEventsParsing::testInstanceCreate()
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
-    QCOMPARE(create->parameters().pattern, QString("data"));
-    QCOMPARE(create->parameters().expression, QString());
+    QVector<MscMessage::Parameter> parameters = create->parameters();
+    QCOMPARE(parameters.size(), 1);
+    QCOMPARE(parameters.at(0).pattern, QString("data"));
+    QCOMPARE(parameters.at(0).expression, QString());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoParameter()
@@ -257,8 +288,7 @@ void tst_MscEventsParsing::testInstanceCreateNoParameter()
     QCOMPARE(create->name(), QString());
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
-    QVERIFY(create->parameters().pattern.isEmpty());
-    QVERIFY(create->parameters().expression.isEmpty());
+    QVERIFY(create->parameters().isEmpty());
 }
 
 void tst_MscEventsParsing::testInstanceCreateMultiParameter()
@@ -286,9 +316,11 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
-    const QStringList &paramsOut = create->parameters().pattern.split(",");
+    QStringList paramsOut;
+    for (const MscMessage::Parameter &param : create->parameters()) {
+        paramsOut << param.pattern;
+    }
 
-    QEXPECT_FAIL("", "Multiple parameters are not supported yet", Continue);
     QCOMPARE(paramsOut.size(), paramsIn.size());
 
     for (int i = 0; i < paramsOut.size(); ++i) {
@@ -317,8 +349,7 @@ void tst_MscEventsParsing::testInstanceCreateEmptyParameter()
 
     auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
-    QCOMPARE(msg->parameters().pattern, QString());
-    QCOMPARE(msg->parameters().expression, QString());
+    QVERIFY(msg->parameters().isEmpty());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoInstance()

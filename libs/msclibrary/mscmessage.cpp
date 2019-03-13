@@ -104,13 +104,16 @@ MscEntity::EntityType MscMessage::entityType() const
     return MscEntity::EntityType::Message;
 }
 
-const MscMessage::Parameters &MscMessage::parameters() const
+const QVector<MscMessage::Parameter> &MscMessage::parameters() const
 {
     return m_parameters;
 }
 
-void MscMessage::setParameters(const MscMessage::Parameters &parameters)
+void MscMessage::setParameters(const QVector<MscMessage::Parameter> &parameters)
 {
+    if (m_parameters == parameters)
+        return;
+
     m_parameters = parameters;
     Q_EMIT dataChanged();
 }

@@ -63,6 +63,7 @@ private:
     QString tabs(int tabsSize) const;
     QString dataDefinition() const;
     QString serializeComment(const msc::MscEntity *entity) const;
+    QString serializeParameters(const MscMessage *message) const;
 
     const MscModel *m_model = nullptr;
 };

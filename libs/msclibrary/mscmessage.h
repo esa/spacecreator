@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVector>
 
 namespace msc {
 class MscInstance;
@@ -34,7 +35,12 @@ class MscMessage : public MscInstanceEvent
     Q_PROPERTY(MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
 
 public:
-    struct Parameters {
+    struct Parameter {
+        bool operator==(const msc::MscMessage::Parameter &other) const
+        {
+            return expression == other.expression && pattern == other.pattern;
+        }
+
         QString expression;
         QString pattern;
     };
@@ -71,8 +77,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    const Parameters &parameters() const;
-    void setParameters(const Parameters &parameters);
+    const QVector<Parameter> &parameters() const;
+    void setParameters(const QVector<Parameter> &parameters);
 
     MscMessage::MessageType messageType() const;
 
@@ -108,6 +114,6 @@ private:
     QString m_messageInstanceName;
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
-    Parameters m_parameters;
+    QVector<Parameter> m_parameters;
 };
 }

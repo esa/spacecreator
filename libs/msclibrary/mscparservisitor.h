@@ -18,6 +18,7 @@
 #pragma once
 
 #include "cif/cifparser.h"
+#include "mscmessage.h"
 #include "parser/MscBaseVisitor.h"
 
 #include <QVector>
@@ -29,7 +30,6 @@ class MscDocument;
 class MscEntity;
 class MscInstance;
 class MscInstanceEvent;
-class MscMessage;
 class MscModel;
 }
 
@@ -114,4 +114,5 @@ private:
     static QString dropCommentBraces(const QString &line);
     QStringList readComments(const QVector<antlr4::Token *> &tokens) const;
     msc::MscEntity *cifTarget() const;
+    QVector<msc::MscMessage::Parameter> readParameterList(MscParser::ParameterListContext *parameterList);
 };
