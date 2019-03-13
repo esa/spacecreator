@@ -100,8 +100,8 @@ private:
     void initMainToolbar();
     void initConnections();
 
-    void handleRemoteCommand(RemoteControlWebServer::CommandType commandType,
-                             const QVariantMap &params, const QString &peerName);
+    void handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
+                             const QString &peerName);
     bool handleInstanceCommand(const QVariantMap &params, QString *errorString);
     bool handleMessageCommand(const QVariantMap &params, QString *errorString);
     bool handleTimerCommand(const QVariantMap &params, QString *errorString);
@@ -123,4 +123,8 @@ private:
     void updateMscToolbarActionsChecked();
 
     static QStringList mscFileFilters();
+
+#ifdef QT_DEBUG
+    void showMousePositioner();
+#endif
 };

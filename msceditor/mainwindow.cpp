@@ -1094,6 +1094,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         }
         break;
     }
+    case Qt::Key_M: {
+        if (!e->isAutoRepeat() && e->modifiers().testFlag(Qt::AltModifier)
+            && e->modifiers().testFlag(Qt::ControlModifier) && e->modifiers().testFlag(Qt::ShiftModifier)) {
+            showMousePositioner();
+        }
+        break;
+    }
 #endif
     }
 }
@@ -1226,3 +1233,31 @@ QPlainTextEdit *MainWindow::textOutputPane() const
 {
     return d->ui->errorTextEdit;
 }
+
+#ifdef QT_DEBUG
+#include <QInputDialog>
+// A way to precisiousely move mouse pointer to scene coordinates without pixel hunting.
+// Invoked by CTRL+ALT+SHIFT+M
+void MainWindow::showMousePositioner()
+{
+    const QString &input = QInputDialog::getText(this, "Move mouse to", "x y:");
+    static const QRegularExpression rxPoint("(-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)");
+    QRegularExpressionMatch m = rxPoint.match(input);
+    const QStringList &coords = m.capturedTexts();
+    if (coords.size() == 3) {
+        bool xOk(false), yOk(false);
+        const QPointF &scenePos = { coords.at(1).toDouble(&xOk), coords.at(2).toDouble(&yOk) };
+        if (xOk && yOk) {
+            const QPoint &localPos = currentView()->mapFromScene(scenePos);
+            const QPoint &globalPos = currentView()->mapToGlobal(localPos);
+
+            QCursor::setPos(globalPos);
+
+            // Update the status bar info:
+            QMouseEvent event(QEvent::MouseMove, localPos, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+            QApplication::sendEvent(currentView()->viewport(), &event);
+        }
+    }
+}
+
+#endif
