@@ -386,8 +386,6 @@ void MainWindow::saveMsc()
     } else {
         d->m_model->saveMsc(d->m_mscFileName);
         updateTitles();
-
-        d->m_saveDocument = false;
     }
 }
 
@@ -814,12 +812,12 @@ void MainWindow::initConnections()
     connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
             &MainWindow::onCreateMessageToolRequested);
 
-    connect(d->m_model, &MainModel::modelDataChanged, this, [this](bool newModel) {
-        d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
-        d->ui->mscTextBrowser->updateView();
-        updateMscToolbarActionsEnablement();
-        d->m_saveDocument = !newModel;
+    connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
+        updateModel();
+        d->m_saveDocument = true;
     });
+    connect(d->m_model, &MainModel::modelUpdated, this, [this]() { updateModel(); });
+
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
             QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
@@ -1249,7 +1247,8 @@ QStringList MainWindow::mscFileFilters()
 bool MainWindow::saveDocument()
 {
     if (d->m_saveDocument) {
-        auto result = QMessageBox::question(this, windowTitle(), tr("Do you want to save the MSC document?"),
+        auto result = QMessageBox::question(this, windowTitle(),
+                                            tr("You have unsaved data. Do you want to save the MSC document?"),
                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
 
         if (result == QMessageBox::Cancel) {
@@ -1257,9 +1256,18 @@ bool MainWindow::saveDocument()
         } else if (result == QMessageBox::Yes) {
             saveMsc();
         }
+
+        d->m_saveDocument = false;
     }
 
     return true;
+}
+
+void MainWindow::updateModel()
+{
+    d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
+    d->ui->mscTextBrowser->updateView();
+    updateMscToolbarActionsEnablement();
 }
 
 QPlainTextEdit *MainWindow::textOutputPane() const
