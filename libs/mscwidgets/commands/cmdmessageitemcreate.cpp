@@ -20,6 +20,7 @@
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
 #include "mscchart.h"
+#include "mscinstance.h"
 #include "mscmessage.h"
 
 namespace msc {
@@ -46,6 +47,8 @@ void CmdMessageItemCreate::redo()
         m_message = new MscMessage(QObject::tr("Message_%1").arg(m_chart->instanceEvents().size()));
         m_modelItem = m_message;
     }
+    if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance())
+        m_message->targetInstance()->setExplicitCreator(m_message->sourceInstance());
 
     if (!m_msgPoints.isEmpty())
         if (cif::CifBlockShared msgCif = cif::CifBlockFactory::createBlockMessage()) {
@@ -66,6 +69,8 @@ void CmdMessageItemCreate::undo()
 
     // this command takes over ownership
     m_message->setParent(this);
+    if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance())
+        m_message->targetInstance()->setExplicitCreator(nullptr);
 }
 
 bool CmdMessageItemCreate::mergeWith(const QUndoCommand *command)

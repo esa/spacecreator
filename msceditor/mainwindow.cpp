@@ -722,8 +722,13 @@ void MainWindow::initTools()
     d->m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
     d->m_tools.append(d->m_instanceStopTool);
 
-    d->m_messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    d->m_messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Message,
+                                                         &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(d->m_messageCreateTool);
+
+    auto messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Create,
+                                                         &(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(messageCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(actionCreateTool);

@@ -26,7 +26,8 @@ class MessageCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    MessageCreatorTool(MscMessage::MessageType msgType, ChartViewModel *model, QGraphicsView *view,
+                       QObject *parent = nullptr);
     virtual BaseTool::ToolType toolType() const override;
 
     void activate();
@@ -34,24 +35,7 @@ public:
 protected Q_SLOTS:
     void onCurrentChartChagend(msc::MscChart *) override;
 
-protected:
-    enum class Step
-    {
-        ChooseSource,
-        ChooseTarget,
-    };
-    Step m_currStep = Step::ChooseSource;
-
-    enum class InteractionMode
-    {
-        None,
-        Drag,
-        Click
-    };
-    InteractionMode m_currMode = InteractionMode::None;
-
-    QPointer<MessageItem> m_messageItem = nullptr;
-    QPointF m_mouseDown;
+private:
     void createPreviewItem() override;
     void commitPreviewItem() override;
     void removePreviewItem() override;
@@ -71,6 +55,26 @@ protected:
     void processMousePressClick(QMouseEvent *e);
     void processMouseReleaseClick(QMouseEvent *e);
     void processMouseMoveClick(QMouseEvent *e);
+
+private:
+    enum class Step
+    {
+        ChooseSource,
+        ChooseTarget,
+    };
+    Step m_currStep = Step::ChooseSource;
+
+    enum class InteractionMode
+    {
+        None,
+        Drag,
+        Click
+    };
+    InteractionMode m_currMode = InteractionMode::None;
+
+    QPointer<MessageItem> m_messageItem = nullptr;
+    QPointF m_mouseDown;
+    MscMessage::MessageType m_messageType;
 };
 
 } // ns msc

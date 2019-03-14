@@ -23,18 +23,27 @@
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "mscmessage.h"
+#include "msccreate.h"
 
 #include <QDebug>
 #include <QMouseEvent>
 
 namespace msc {
 
-MessageCreatorTool::MessageCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+MessageCreatorTool::MessageCreatorTool(MscMessage::MessageType msgType, ChartViewModel *model,
+                                       QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
+    , m_messageType(msgType)
 {
-    m_title = tr("Message (Drag)");
-    m_description = tr("Create new Message item");
-    m_icon = QPixmap(":/icons/toolbar/message.png");
+    if (msgType == MscMessage::MessageType::Create) {
+        m_title = tr("Create (Drag)");
+        m_description = tr("Create new Create item");
+        m_icon = QPixmap(":/icons/toolbar/create.svg");
+    } else {
+        m_title = tr("Message (Drag)");
+        m_description = tr("Create new Message item");
+        m_icon = QPixmap(":/icons/toolbar/message.png");
+    }
     m_cursor = QCursor(Qt::CrossCursor);
 }
 
@@ -48,7 +57,10 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage = new MscMessage(tr("Message"));
+    MscMessage *orphanMessage = m_messageType == MscMessage::MessageType::Message
+            // "\n" mades the title be not overlapped by mouse cursor
+            ? new MscMessage(tr("Message"))
+            : new MscCreate(tr("Create"));
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());
 
     movePreviewItemTo(cursorInScene());

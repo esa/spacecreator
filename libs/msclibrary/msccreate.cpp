@@ -22,7 +22,13 @@
 namespace msc {
 
 MscCreate::MscCreate(QObject *parent)
-    : MscMessage(QString(), parent) // rename from default one (which is MscEntity::DefaultName - "Untitled")
+    : MscCreate(QString(), parent) // rename from default one (which is MscEntity::DefaultName - "Untitled")
+{
+
+}
+
+MscCreate::MscCreate(const QString &name, QObject *parent)
+    : MscMessage(name, parent)
 {
     m_msgType = MscMessage::MessageType::Create;
 }
