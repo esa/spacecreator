@@ -93,19 +93,19 @@ build_MacOS:
   only:
     - master
 
-build_Windows:
-  stage: build
-  tags:
-    - win10
-    - vs2017
-    - x64
-  script:
-    - 'call scripts\build_windows.bat'
-  cache:
-    key: antlrRuntime
-    paths:
-      - 3rdparty/antlr/cpp_runtime/runtime/bin
-      - 3rdparty/antlr/cpp_runtime/runtime/obj
+#build_Windows:
+#  stage: build
+#  tags:
+#    - win10
+#    - vs2017
+#    - x64
+#  script:
+#    - 'call scripts\build_windows.bat'
+#  cache:
+#    key: antlrRuntime
+#    paths:
+#      - 3rdparty/antlr/cpp_runtime/runtime/bin
+#      - 3rdparty/antlr/cpp_runtime/runtime/obj
 #  only:
 #    - master
 
