@@ -106,8 +106,8 @@ build_Windows:
     paths:
       - 3rdparty/antlr/cpp_runtime/runtime/bin
       - 3rdparty/antlr/cpp_runtime/runtime/obj
-  only:
-    - master
+#  only:
+#    - master
 
 ##################
 # TEST
