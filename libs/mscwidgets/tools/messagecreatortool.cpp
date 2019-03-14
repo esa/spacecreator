@@ -48,8 +48,7 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage =
-            new MscMessage(tr("Message\n")); // "\n" mades the title be not overlapped by mouse cursor
+    MscMessage *orphanMessage = new MscMessage(tr("Message"));
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());
 
     movePreviewItemTo(cursorInScene());
@@ -336,8 +335,6 @@ QVariantList MessageCreatorTool::prepareMessage()
         if (!message->isOrphan()) {
             if (message->sourceInstance() == message->targetInstance())
                 message->setTargetInstance(nullptr);
-
-            message->setName(tr("Message")); // rm the trailing new line sign
 
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
             args = { QVariant::fromValue<msc::MscMessage *>(message),
