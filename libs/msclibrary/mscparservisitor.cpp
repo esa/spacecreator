@@ -930,7 +930,7 @@ void MscParserVisitor::storePrecedingCif(antlr4::ParserRuleContext *ctx)
         return;
 
     const auto &precedingTokens =
-            QVector<antlr4::Token *>::fromStdVector(m_tokens->getHiddenTokensToLeft(ctx->start->getTokenIndex()));
+            QVector<antlr4::Token *>::fromStdVector(getHiddenCommentTokensToLeft(ctx->start->getTokenIndex()));
     if (precedingTokens.empty())
         return;
 
@@ -1001,6 +1001,27 @@ msc::MscEntity *MscParserVisitor::cifTarget() const
         if (target)
             return target;
     return nullptr;
+}
+
+/*!
+   Replaces antlr4::BufferedTokenStream::getHiddenTokensToLeft as that one has a bug if the first toke in a file is a
+   hidden one
+ */
+std::vector<antlr4::Token *> MscParserVisitor::getHiddenCommentTokensToLeft(int tokenIndex)
+{
+    std::vector<antlr4::Token *> commentTokens;
+    --tokenIndex;
+    while (tokenIndex >= 0) {
+        antlr4::Token *token = m_tokens->get(tokenIndex);
+        if (token->getText().substr(0, 2) == "/*") {
+            commentTokens.insert(commentTokens.begin(), token);
+        } else {
+            break;
+        }
+        --tokenIndex;
+    }
+
+    return commentTokens;
 }
 
 QVector<msc::MscMessage::Parameter> MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)

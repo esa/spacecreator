@@ -22,6 +22,9 @@
 #include <QMetaEnum>
 #include <QMetaObject>
 #include <QtTest>
+#include <mscchart.h>
+#include <mscdocument.h>
+#include <mscmodel.h>
 
 // add necessary includes here
 
@@ -99,6 +102,8 @@ private slots:
     void testParsingCifBlockTimeout();
     void testParsingCifBlockTextMode();
     void testParsingCifBlockTextName();
+
+    void testParsingCifAtDocumentFront();
 
 private:
     static QString createMscSource(const QString &cifLine);
@@ -653,6 +658,27 @@ void tst_CifParser::testParsingCifBlockTextName()
 {
     // used within text?
     QSKIP(qPrintable(QString("Unsupported yet")));
+}
+
+void tst_CifParser::testParsingCifAtDocumentFront()
+{
+    const QString source = "\
+            /* CIF MSCDOCUMENT (20, 20), (1521, 1552) */\
+            /* CIF MscPageSize (2100, 2970) */ \
+            MSCDOCUMENT doc;\
+            ENDMSCDOCUMENT;";
+    QScopedPointer<msc::MscModel> model;
+    try {
+        model.reset(m_mscFile->parseText(source));
+    } catch (...) {
+        QFAIL("Unexpected exception!");
+    }
+
+    QCOMPARE(model->documents().size(), 1);
+    msc::MscDocument *doc = model->documents().at(0);
+    QVector<cif::CifBlockShared> cifs = doc->cifs();
+    // MSDOCUMENT comment only is used, as MscPageSize is ignored in CifBlockFactory::createBlock
+    QCOMPARE(cifs.size(), 1);
 }
 
 QTEST_APPLESS_MAIN(tst_CifParser)

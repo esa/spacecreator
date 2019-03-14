@@ -114,5 +114,6 @@ private:
     static QString dropCommentBraces(const QString &line);
     QStringList readComments(const QVector<antlr4::Token *> &tokens) const;
     msc::MscEntity *cifTarget() const;
+    std::vector<antlr4::Token *> getHiddenCommentTokensToLeft(int tokenIndex);
     QVector<msc::MscMessage::Parameter> readParameterList(MscParser::ParameterListContext *parameterList);
 };
