@@ -15,24 +15,43 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include "basetool.h"
+#include "cmdinstancestopchange.h"
+#include "mscinstance.h"
 
 namespace msc {
+namespace cmd {
 
-class PointerTool : public BaseTool
+CmdInstanceStopChange::CmdInstanceStopChange(msc::MscInstance *item, bool newValue)
+    : BaseCommand(item)
+    , m_instance(item)
+    , m_newExStop(newValue)
 {
-    Q_OBJECT
-public:
-    PointerTool(QGraphicsView *view, QObject *parent = nullptr);
 
-    BaseTool::ToolType toolType() const override;
+}
 
-protected:
-    bool onMousePress(QMouseEvent *e) override;
-    bool onMouseRelease(QMouseEvent *e) override;
-    bool onMouseMove(QMouseEvent *e) override;
-};
+void CmdInstanceStopChange::redo()
+{
+    if (m_instance)
+        m_instance->setExplicitStop(m_newExStop);
+}
 
+void CmdInstanceStopChange::undo()
+{
+    if (m_instance)
+        m_instance->setExplicitStop(!m_newExStop);
+}
+
+bool CmdInstanceStopChange::mergeWith(const QUndoCommand *command)
+{
+    Q_UNUSED(command);
+    return false;
+}
+
+int CmdInstanceStopChange::id() const
+{
+    return msc::cmd::Id::StopInstance;
+}
+
+} // ns cmd
 } // ns msc
+

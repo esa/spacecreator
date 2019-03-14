@@ -93,10 +93,6 @@ bool EntityDeleteTool::onMouseMove(QMouseEvent *e)
     return false;
 }
 
-void EntityDeleteTool::createPreviewItem() {}
-
-void EntityDeleteTool::commitPreviewItem() {}
-
 void EntityDeleteTool::deleteSelectedItems()
 {
     if (!m_view || !m_view->scene() || !m_currentChart) {

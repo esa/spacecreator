@@ -35,7 +35,7 @@ class BaseTool : public QObject
     Q_OBJECT
 public:
     BaseTool(QGraphicsView *view, QObject *parent = nullptr);
-    ~BaseTool();
+    ~BaseTool() override;
 
     enum class ToolType
     {
@@ -43,6 +43,7 @@ public:
         ActionCreator,
         ConditionCreator,
         InstanceCreator,
+        InstanceStopper,
         MessageCreator,
         EntityDeleter,
         TimerCreator,
@@ -81,8 +82,8 @@ protected:
     virtual bool onMouseRelease(QMouseEvent *e);
     virtual bool onMouseMove(QMouseEvent *e);
 
-    virtual void createPreviewItem() = 0;
-    virtual void commitPreviewItem() = 0;
+    virtual void createPreviewItem() {}
+    virtual void commitPreviewItem() {}
 
     virtual void movePreviewItem(const QPointF &cursorInScene);
     virtual void removePreviewItem();

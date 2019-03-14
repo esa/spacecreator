@@ -43,9 +43,6 @@ protected:
     bool onMouseRelease(QMouseEvent *e) override;
     bool onMouseMove(QMouseEvent *e) override;
 
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
-
 protected Q_SLOTS:
     void deleteSelectedItems();
     void updateEnabledState();

@@ -105,6 +105,7 @@ void MscInstance::setExplicitStop(bool stop)
         return;
 
     m_explicitStop = stop;
+    Q_EMIT explicitStopChanged(m_explicitStop);
     Q_EMIT dataChanged();
 }
 

@@ -17,15 +17,22 @@
 
 #pragma once
 
+#include <QAction>
+
 #include "basetool.h"
 
 namespace msc {
+class MscChart;
+class MscInstance;
 
-class PointerTool : public BaseTool
+
+class InstanceStopTool : public BaseTool
 {
     Q_OBJECT
 public:
-    PointerTool(QGraphicsView *view, QObject *parent = nullptr);
+    explicit InstanceStopTool(QGraphicsView *view, QObject *parent = nullptr);
+    void setView(QGraphicsView *view) override;
+    void setAction(QAction *action);
 
     BaseTool::ToolType toolType() const override;
 
@@ -33,6 +40,13 @@ protected:
     bool onMousePress(QMouseEvent *e) override;
     bool onMouseRelease(QMouseEvent *e) override;
     bool onMouseMove(QMouseEvent *e) override;
+
+private:
+    void setExplicitStop();
+    void updateEnabledState();
+
+private:
+    QPointer<QAction> m_action = nullptr;
 };
 
-} // ns msc
+}; // ns msc

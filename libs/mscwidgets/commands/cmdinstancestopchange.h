@@ -17,22 +17,27 @@
 
 #pragma once
 
-#include "basetool.h"
+#include "basecommand.h"
 
 namespace msc {
+class MscInstance;
 
-class PointerTool : public BaseTool
+namespace cmd {
+
+class CmdInstanceStopChange : public BaseCommand
 {
-    Q_OBJECT
 public:
-    PointerTool(QGraphicsView *view, QObject *parent = nullptr);
+    explicit CmdInstanceStopChange(MscInstance *item, bool newValue);
 
-    BaseTool::ToolType toolType() const override;
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
-protected:
-    bool onMousePress(QMouseEvent *e) override;
-    bool onMouseRelease(QMouseEvent *e) override;
-    bool onMouseMove(QMouseEvent *e) override;
+private:
+    QPointer<MscInstance> m_instance;
+    bool m_newExStop;
 };
 
+} // ns cmd
 } // ns msc

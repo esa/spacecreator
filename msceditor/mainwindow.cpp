@@ -42,6 +42,7 @@
 #include "tools/entitydeletetool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
+#include "tools/instancestoptool.h"
 #include "tools/messagecreatortool.h"
 #include "tools/pointertool.h"
 #include "tools/timercreatortool.h"
@@ -133,6 +134,7 @@ struct MainWindowPrivate {
 
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
+    msc::InstanceStopTool *m_instanceStopTool = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
@@ -717,6 +719,9 @@ void MainWindow::initTools()
     auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(instanceCreateTool);
 
+    d->m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
+    d->m_tools.append(d->m_instanceStopTool);
+
     d->m_messageCreateTool = new msc::MessageCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(d->m_messageCreateTool);
 
@@ -751,6 +756,8 @@ void MainWindow::initTools()
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
+        if (tool == d->m_instanceStopTool)
+            d->m_instanceStopTool->setAction(toolAction);
 
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
         connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
@@ -1201,6 +1208,7 @@ void MainWindow::updateMscToolbarActionsEnablement()
         case msc::BaseTool::ToolType::ConditionCreator:
         case msc::BaseTool::ToolType::MessageCreator:
         case msc::BaseTool::ToolType::EntityDeleter:
+        case msc::BaseTool::ToolType::InstanceStopper:
         case msc::BaseTool::ToolType::TimerCreator: {
             const bool changed = act->isEnabled() && !hasInstance;
             forceDefault = forceDefault || changed;

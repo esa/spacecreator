@@ -28,6 +28,7 @@ enum Id
     CreateMessage,
     MoveInstance,
     CreateInstance,
+    StopInstance,
     RenameInstanceKind,
     CreateCondition,
     MoveCondition,

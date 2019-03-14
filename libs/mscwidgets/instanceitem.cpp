@@ -53,6 +53,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
 
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
     connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
+    connect(m_instance, &msc::MscInstance::explicitStopChanged, this, &msc::InstanceItem::setExplicitStop);
 
     m_headSymbol->setName(m_instance->name());
     m_headSymbol->setKind(m_instance->kind());
@@ -118,6 +119,12 @@ void InstanceItem::setName(const QString &name)
 void InstanceItem::setKind(const QString &kind)
 {
     updatePropertyString(QLatin1String("kind"), kind);
+}
+
+void InstanceItem::setExplicitStop(bool exStop)
+{
+    m_endSymbol->setStop(exStop);
+    rebuildLayout();
 }
 
 void InstanceItem::updatePropertyString(const QLatin1String &property, const QString &value)

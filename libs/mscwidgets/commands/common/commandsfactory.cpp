@@ -28,6 +28,7 @@
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstancekindchange.h"
+#include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
 #include "commands/cmdtimeritemcreate.h"
@@ -64,6 +65,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createInstanceItemCreate(params);
     case cmd::RenameInstanceKind:
         return cmd::CommandsFactory::createInstanceKindChange(params);
+    case cmd::StopInstance:
+        return cmd::CommandsFactory::createInstanceStopChange(params);
     case cmd::CreateCondition:
         return cmd::CommandsFactory::createConditionItemCreate(params);
     case cmd::MoveCondition:
@@ -182,6 +185,18 @@ QUndoCommand *CommandsFactory::createInstanceKindChange(const QVariantList &para
         const QString &name = params.last().toString();
         if (item->kind() != name)
             return new CmdInstanceKindChange(item, name);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createInstanceStopChange(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscInstance *item = params.first().value<MscInstance *>()) {
+        const bool newValue = params.last().toBool();
+        return new CmdInstanceStopChange(item, newValue);
     }
 
     return nullptr;

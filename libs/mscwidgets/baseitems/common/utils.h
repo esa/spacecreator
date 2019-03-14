@@ -75,6 +75,23 @@ ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
     return nullptr;
 }
 
+/*!
+  Returns the specified Entities from given scene;
+ */
+template<typename ItemType, typename MscEntityType>
+QVector<MscEntityType *> getEntityFromSelection(QGraphicsScene *scene)
+{
+    QVector<MscEntityType *> items;
+    for (auto item : scene->selectedItems()) {
+        auto obj = dynamic_cast<ItemType *>(item);
+        if (obj && obj->modelItem()) {
+            items.append(obj->modelItem());
+        }
+    }
+    return items;
+}
+
+
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
 QPointF pointFromPath(const QPainterPath &path, int num);

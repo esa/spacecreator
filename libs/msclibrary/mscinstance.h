@@ -28,6 +28,7 @@ class MscInstance : public MscEntity
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindChanged)
     Q_PROPERTY(QString inheritance READ inheritance WRITE setInheritance NOTIFY inheritanceChanged)
     Q_PROPERTY(MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY explicitCreatorChanged)
+    Q_PROPERTY(bool explicitCreator READ explicitStop WRITE setExplicitStop NOTIFY explicitStopChanged)
 
 public:
     explicit MscInstance(QObject *parent = nullptr);
@@ -55,6 +56,7 @@ Q_SIGNALS:
     void kindChanged(const QString &kind);
     void inheritanceChanged(const QString &inheritance);
     void explicitCreatorChanged(MscInstance *creator);
+    void explicitStopChanged(bool value);
 
 private:
     QString m_denominator;

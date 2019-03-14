@@ -66,7 +66,9 @@ HEADERS += \
     timeritem.h \
     tools/conditioncreatortool.h \
     commands/cmdconditionitemcreate.h \
-    commands/cmddocumentcreate.h
+    commands/cmddocumentcreate.h \
+    tools/instancestoptool.h \
+    commands/cmdinstancestopchange.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -124,7 +126,9 @@ SOURCES += \
     timeritem.cpp \
     tools/conditioncreatortool.cpp \
     commands/cmdconditionitemcreate.cpp \
-    commands/cmddocumentcreate.cpp
+    commands/cmddocumentcreate.cpp \
+    tools/instancestoptool.cpp \
+    commands/cmdinstancestopchange.cpp
 
 RESOURCES += \
     resources.qrc
