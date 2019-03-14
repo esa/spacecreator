@@ -781,7 +781,7 @@ void MscParserVisitor::orderInstanceEvents()
             // First, go through all the stacks and take away non-messages. This has to be done for
             // every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
-                InstanceEvents events = m_instanceEventsList.at(j);
+                InstanceEvents &events = m_instanceEventsList[j];
                 while (!events.isEmpty() && events.first()->entityType() != MscEntity::EntityType::Message
                        && events.first()->entityType() != MscEntity::EntityType::Condition) {
                     // This is not a message, condition and timer move it to the chart
