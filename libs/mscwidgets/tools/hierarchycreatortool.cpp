@@ -48,27 +48,10 @@ void HierarchyCreatorTool::createPreviewItem()
             QObject::tr("Document_%1").arg(m_hierarchyViewModel->selectedDocument()->documents().size()));
     document->setHierarchyType(m_hierarchyType);
     document->addChart(new MscChart(document->name() + QObject::tr("_msc")));
-    DocumentItem *item = new DocumentItem(document);
 
-    m_previewItem = item;
-    m_previewEntity = item->document();
-
-    m_scene->addItem(m_previewItem);
-}
-
-void HierarchyCreatorTool::commitPreviewItem()
-{
-    if (!m_previewEntity) {
-        return;
-    }
-
-    auto document = qobject_cast<MscDocument *>(m_previewEntity);
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
                                       QVariant::fromValue<msc::MscDocument *>(
                                               m_hierarchyViewModel->selectedDocument()) };
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateDocument, cmdParams);
 

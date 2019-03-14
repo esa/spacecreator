@@ -656,7 +656,10 @@ void MainWindow::initHierarchyTypeActions()
         });
 
         connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
-        connect(action, &QAction::toggled, this, &MainWindow::updateMscToolbarActionsChecked);
+        connect(action, &QAction::toggled, this, [this]() {
+            for (QAction *action : d->m_hierarchyToolBar->actions())
+                action->setChecked(false);
+        });
     };
 
     addAction(":/icons/document_and.png", tr("Hierarchy And"), msc::MscDocument::HierarchyAnd);
@@ -1238,10 +1241,6 @@ void MainWindow::updateMscToolbarActionsChecked()
     if (QAction *senderAction = qobject_cast<QAction *>(sender()))
         if (senderAction->isChecked()) {
             for (QAction *action : d->m_mscToolBar->actions())
-                if (action != senderAction)
-                    action->setChecked(false);
-
-            for (QAction *action : d->m_hierarchyToolBar->actions())
                 if (action != senderAction)
                     action->setChecked(false);
         }

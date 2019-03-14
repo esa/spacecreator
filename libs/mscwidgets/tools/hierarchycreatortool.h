@@ -36,7 +36,6 @@ public:
 
 protected:
     void createPreviewItem() override;
-    void commitPreviewItem() override;
 
 private:
     void initTool();
