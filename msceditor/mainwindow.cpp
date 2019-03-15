@@ -860,6 +860,9 @@ void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType command
     case RemoteControlWebServer::CommandType::Instance:
         result = handleInstanceCommand(params, &errorString);
         break;
+    case RemoteControlWebServer::CommandType::StopInstance:
+        result = handleInstanceStopCommand(params, &errorString);
+        break;
     case RemoteControlWebServer::CommandType::Message:
         result = handleMessageCommand(params, &errorString);
         break;
@@ -894,13 +897,21 @@ void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType command
         else
             errorString = tr("Empty filename");
     } break;
+    case RemoteControlWebServer::CommandType::VisibleItemLimit: {
+        const int number = params.value(QLatin1String("number")).toInt(&result);
+        if (!result)
+            errorString = tr("Wrong limit number for items visibility");
+        else
+            d->m_model->chartViewModel().setVisibleItemLimit(number);
+    } break;
     default:
         qWarning() << "Unknown command:" << commandType;
         errorString = tr("Unknown command");
         break;
     }
     if (result)
-        d->m_model->chartViewModel().relayout();
+        d->m_model->chartViewModel().updateLayout();
+
     d->m_remoteControlWebServer->commandDone(commandType, result, peerName, errorString);
 }
 
@@ -917,12 +928,31 @@ bool MainWindow::handleInstanceCommand(const QVariantMap &params, QString *error
 
     msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
-    mscInstance->setExplicitStop(params.value(QLatin1String("exStop"), false).toBool());
     d->m_model->chartViewModel().currentChart()->addInstance(mscInstance);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
                                      QVariant::fromValue<msc::MscChart *>(mscChart), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
+    if (!result)
+        *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+bool MainWindow::handleInstanceStopCommand(const QVariantMap &params, QString *errorString)
+{
+    msc::MscChart *mscChart = d->m_model->chartViewModel().currentChart();
+    const QString name = params.value(QLatin1String("name")).toString();
+    msc::MscInstance *mscInstance = mscChart->instanceByName(name);
+    if (!mscInstance) {
+        *errorString = tr("There is no Instance with the name: %1").arg(name);
+        return false;
+    }
+    mscInstance->setExplicitStop(true);
+
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
+                                     mscInstance->explicitStop() };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::StopInstance, cmdParams);
     if (!result)
         *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
 
@@ -1006,8 +1036,10 @@ bool MainWindow::handleTimerCommand(const QVariantMap &params, QString *errorStr
         return false;
     }
 
+    const int timerIdx = mscChart->instanceEvents().size();
     const msc::MscTimer::TimerType timerType = static_cast<msc::MscTimer::TimerType>(timerTypeInt);
-    msc::MscTimer *mscTimer = new msc::MscTimer(QLatin1String("New_timer"), timerType, mscChart);
+    const QString name = params.value(QLatin1String("name"), QStringLiteral("Timer_%1").arg(timerIdx)).toString();
+    msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
     mscTimer->setInstance(mscInstance);
     mscChart->addInstanceEvent(mscTimer, pos);
 
@@ -1067,6 +1099,7 @@ bool MainWindow::handleConditionCommand(const QVariantMap &params, QString *erro
             params.value(QLatin1String("name"), QStringLiteral("Condition_%1").arg(conditionIdx)).toString();
     msc::MscCondition *mscCondition = new msc::MscCondition(name, mscChart);
     mscCondition->setInstance(mscInstance);
+    mscCondition->setShared(params.value(QLatin1String("shared")).toBool());
     mscChart->addInstanceEvent(mscCondition, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(mscCondition),
@@ -1092,8 +1125,23 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         return openMscChain(value);
     }
     case CommandLineParser::Positional::StartRemoteControl: {
-        return startRemoteControl(value.toUShort());
-    }
+        if (startRemoteControl(value.toUShort())) {
+            menuBar()->setVisible(false);
+
+            d->m_mscToolBar->setVisible(false);
+            d->m_hierarchyToolBar->setVisible(false);
+            d->ui->mainToolBar->setVisible(false);
+
+            d->ui->dockWidgetErrors->hide();
+            d->ui->dockWidgetMscText->hide();
+            d->ui->dockWidgetDocument->hide();
+            d->ui->dockWidgetErrorsContents->hide();
+            d->ui->dockWidgetDocumenetContents->hide();
+
+            statusBar()->hide();
+            return true;
+        }
+    } break;
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;

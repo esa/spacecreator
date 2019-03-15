@@ -80,6 +80,8 @@ public:
 
     int instanceOrderFromPos(const QPointF &scenePos);
 
+    void setVisibleItemLimit(int number);
+
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
@@ -103,7 +105,7 @@ private:
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
     void actualizeInstancesHeights(qreal height) const;
-    void updateStoppedInstanceHeight(InstanceItem *instanceItem) const;
+    void updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
     void ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance);

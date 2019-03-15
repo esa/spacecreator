@@ -85,6 +85,7 @@ struct ChartViewModelPrivate {
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 20.;
     static constexpr qreal InterInstanceSpan = 100.;
+    int m_visibleItemLimit = -1;
     bool m_layoutDirty = false;
 
     ChartViewLayoutInfo m_layoutInfo;
@@ -92,7 +93,7 @@ struct ChartViewModelPrivate {
     qreal calcInstanceAxisHeight() const
     {
         static constexpr qreal oneMessageHeight = 50.;
-        const int eventsCount = qMax(1, m_currentChart->instanceEvents().size());
+        const int eventsCount = qMax(1, m_instanceEventItems.size());
         return eventsCount * (oneMessageHeight + ChartViewModelPrivate::InterMessageSpan);
     }
 };
@@ -261,13 +262,41 @@ void ChartViewModel::addInstanceItems()
         }
 
         d->m_layoutInfo.m_instancesRect = d->m_layoutInfo.m_instancesRect.united(item->sceneBoundingRect());
+
+        if (d->m_visibleItemLimit != -1 && instance->explicitStop()) {
+            const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
+            const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
+            auto chartEvItEnd = chartEvents.crbegin();
+            std::advance(chartEvItEnd, qMin(d->m_visibleItemLimit, chartEvents.size()));
+            auto instEvItEnd = instanceEvents.crbegin();
+            std::advance(instEvItEnd, qMin(d->m_visibleItemLimit, instanceEvents.size()));
+            for (auto chartEvIt = chartEvents.crbegin(); chartEvIt != chartEvItEnd; ++chartEvIt) {
+                auto it = std::find(instanceEvents.crbegin(), instEvItEnd, *chartEvIt);
+                if (it != instEvItEnd) {
+                    item->setVisible(true);
+                    return;
+                }
+            }
+            item->setVisible(false);
+        }
     }
 }
 
 void ChartViewModel::addInstanceEventItems()
 {
     InteractiveObject *instanceEventItem(nullptr);
-    for (MscInstanceEvent *instanceEvent : d->m_currentChart->instanceEvents()) {
+    QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
+    if (d->m_visibleItemLimit != -1) {
+        for (auto it = chartEvents.begin(); it != chartEvents.end(); ) {
+            if (std::distance(it, chartEvents.end()) <= d->m_visibleItemLimit)
+                break;
+            removeEventItem(*it);
+            it = chartEvents.erase(it);
+            continue;
+        }
+    }
+
+    for (MscInstanceEvent *instanceEvent : chartEvents) {
         switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message: {
             instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
@@ -300,7 +329,8 @@ void ChartViewModel::addInstanceEventItems()
 
         if (instanceEventItem) {
             polishAddedEventItem(instanceEvent, instanceEventItem);
-            connect(instanceEventItem, &InteractiveObject::boundingBoxChanged, this, &ChartViewModel::updateLayout);
+            connect(instanceEventItem, &InteractiveObject::boundingBoxChanged,
+                    this, &ChartViewModel::updateLayout, Qt::UniqueConnection);
         }
     }
 }
@@ -421,7 +451,7 @@ void ChartViewModel::actualizeInstancesHeights(qreal height) const
 
             bool updated(false);
             if (instance->explicitStop()) {
-                updateStoppedInstanceHeight(instanceItem);
+                updateStoppedInstanceHeight(instanceItem, height);
                 updated = true;
             }
 
@@ -437,7 +467,7 @@ void ChartViewModel::actualizeInstancesHeights(qreal height) const
     }
 }
 
-void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) const
+void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const
 {
     // update instance's end Y-postion to the last message
     QVector<QGraphicsObject *> events(instanceEventItems(instanceItem->modelItem()));
@@ -452,6 +482,8 @@ void ChartViewModel::updateStoppedInstanceHeight(InstanceItem *instanceItem) con
             axisLine.setP2({ axisLine.x2(), bottomY });
             instanceItem->setAxisHeight(axisLine.length());
         }
+    } else {
+        updateCreatedInstanceHeight(instanceItem, totalH);
     }
 }
 
@@ -895,6 +927,12 @@ int ChartViewModel::instanceOrderFromPos(const QPointF &scenePos)
         return -1; // otherwise it could be prepended
 
     return existentId + (distance.dx() <= 0. ? 0 : 1);
+}
+
+void ChartViewModel::setVisibleItemLimit(int number)
+{
+    d->m_visibleItemLimit = number;
+    updateLayout();
 }
 
 void ChartViewModel::applyCif()

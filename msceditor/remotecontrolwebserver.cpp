@@ -88,6 +88,12 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
         \list
         \li \c name - Condition's Name, optional
         \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+        \li \c shared - is it shared Condition, optional, default No
+        \endlist
+    \endlist
+    \li \c VisibleItemLimit - limit visible events in the scene
+        \list
+        \li \c number - count of visible items, -1 if all of them should be visible
         \endlist
     \endlist
     After command processing returns JSON packet:

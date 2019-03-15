@@ -30,6 +30,7 @@ class RemoteControlWebServer : public QObject
 public:
     enum class CommandType {
         Instance,
+        StopInstance,
         Message,
         Timer,
         Action,
@@ -37,6 +38,7 @@ public:
         Undo,
         Redo,
         Save,
+        VisibleItemLimit,
     };
     Q_ENUM(CommandType)
 
