@@ -104,6 +104,7 @@ private slots:
     void testParsingCifBlockTextName();
 
     void testParsingCifAtDocumentFront();
+    void testIgnoreUnknownCif();
 
 private:
     static QString createMscSource(const QString &cifLine);
@@ -286,7 +287,7 @@ void tst_CifParser::testParsingCifLine(CifLine::CifType entityType)
     QString cifLineInvalid(cifLine);
     cifLineInvalid.replace(cifLineHead, cifLineHead + "_invalid");
 
-    QVERIFY_EXCEPTION_THROWN(m_cifParser->readCifLine(cifLineInvalid), ParserException);
+    QVERIFY(m_cifParser->readCifLine(cifLineInvalid).isNull());
 }
 
 void tst_CifParser::testParsingCifLineAction()
@@ -679,6 +680,25 @@ void tst_CifParser::testParsingCifAtDocumentFront()
     QVector<cif::CifBlockShared> cifs = doc->cifs();
     // MSDOCUMENT comment only is used, as MscPageSize is ignored in CifBlockFactory::createBlock
     QCOMPARE(cifs.size(), 1);
+}
+
+void tst_CifParser::testIgnoreUnknownCif()
+{
+    const QString source = "\
+            /* CIF Font  '-microsoft windows-arial-bold-r-*-*-12-*-*-*-*-*-*-*' */\
+            MSCDOCUMENT doc;\
+            ENDMSCDOCUMENT;";
+    QScopedPointer<msc::MscModel> model;
+    try {
+        model.reset(m_mscFile->parseText(source));
+    } catch (...) {
+        QFAIL("Unexpected exception!");
+    }
+
+    QCOMPARE(model->documents().size(), 1);
+    msc::MscDocument *doc = model->documents().at(0);
+    QVector<cif::CifBlockShared> cifs = doc->cifs();
+    QCOMPARE(cifs.size(), 0);
 }
 
 QTEST_APPLESS_MAIN(tst_CifParser)
