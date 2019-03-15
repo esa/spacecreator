@@ -355,24 +355,10 @@ QRectF TimerItem::symbolBox() const
 
 bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos)
 {
-    if (targetTimer->instance() != m_timer->instance() || m_timer->instance() == nullptr)
-        return false;
-
-    if (targetTimer->timerType() == m_timer->timerType()) {
-        if (m_timer->timerType() == msc::MscTimer::TimerType::Start
-            || m_timer->timerType() == msc::MscTimer::TimerType::Timeout)
-            return false;
-    }
-
-    if (m_timer->timerType() == msc::MscTimer::TimerType::Start) {
-        return scenePos().y() < targetPos.y();
-    }
-
-    if (m_timer->timerType() == msc::MscTimer::TimerType::Timeout) {
-        return scenePos().y() > targetPos.y();
-    }
-
-    return true;
+    if (scenePos().y() < targetPos.y())
+        return m_timer->allowFollowingTimer(targetTimer);
+    else
+        return m_timer->allowPrecedingTimer(targetTimer);
 }
 
 } // namespace msc

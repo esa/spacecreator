@@ -56,9 +56,11 @@ public:
 
     void setPrecedingTimer(MscTimer *timer);
     MscTimer *precedingTimer() const;
+    bool allowPrecedingTimer(MscTimer *timer);
 
     void setFollowingTimer(MscTimer *timer);
     MscTimer *followingTimer() const;
+    bool allowFollowingTimer(MscTimer *timer);
 
 Q_SIGNALS:
     void timerTypeChanged();

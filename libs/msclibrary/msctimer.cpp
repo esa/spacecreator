@@ -76,7 +76,7 @@ bool MscTimer::relatesTo(const MscInstance *instance) const
 
 void MscTimer::setPrecedingTimer(MscTimer *timer)
 {
-    if (m_precedingTimer == timer) {
+    if (m_precedingTimer == timer || !allowPrecedingTimer(timer)) {
         return;
     }
 
@@ -90,11 +90,27 @@ MscTimer *MscTimer::precedingTimer() const
     return m_precedingTimer;
 }
 
+bool MscTimer::allowPrecedingTimer(MscTimer *timer)
+{
+    if (timer == nullptr)
+        return true;
+
+    if (timer->m_instance != m_instance || m_instance == nullptr)
+        return false;
+
+    if (m_timerType == TimerType::Start)
+        return false;
+
+    if (timer->m_timerType == TimerType::Timeout)
+        return false;
+
+    return true;
+}
+
 void MscTimer::setFollowingTimer(MscTimer *timer)
 {
-    if (m_followingTimer == timer) {
+    if (m_followingTimer == timer || !allowFollowingTimer(timer))
         return;
-    }
 
     m_followingTimer = timer;
     Q_EMIT followingTimerChanged();
@@ -105,4 +121,22 @@ MscTimer *MscTimer::followingTimer() const
 {
     return m_followingTimer;
 }
+
+bool MscTimer::allowFollowingTimer(MscTimer *timer)
+{
+    if (timer == nullptr)
+        return true;
+
+    if (timer->m_instance != m_instance || m_instance == nullptr)
+        return false;
+
+    if (timer->m_timerType == TimerType::Start)
+        return false;
+
+    if (m_timerType == TimerType::Timeout)
+        return false;
+
+    return true;
+}
+
 }

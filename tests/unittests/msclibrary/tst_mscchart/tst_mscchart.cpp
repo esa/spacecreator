@@ -53,6 +53,7 @@ private Q_SLOTS:
     void testAddCondition();
     void testRemoveCondition();
     void testTimerRelation();
+    void testInvalidTimerRelation();
 
 private:
     MscChart *m_chart = nullptr;
@@ -307,7 +308,7 @@ void tst_MscChart::testTimerRelation()
 
     MscInstance *instance2 = new MscInstance("OUT", m_chart);
     m_chart->addInstance(instance2);
-    MscTimer *timer4 = new MscTimer("T1", MscTimer::TimerType::Start);
+    MscTimer *timer4 = new MscTimer("T1", MscTimer::TimerType::Stop);
     timer4->setInstance(instance2);
     m_chart->addInstanceEvent(timer4);
 
@@ -370,6 +371,26 @@ void tst_MscChart::testTimerRelation()
     QVERIFY(timer3->followingTimer() == nullptr);
     QCOMPARE(timer4->precedingTimer(), timer1);
     QVERIFY(timer4->followingTimer() == nullptr);
+}
+
+void tst_MscChart::testInvalidTimerRelation()
+{
+    MscInstance *instance1 = new MscInstance("IN", m_chart);
+    m_chart->addInstance(instance1);
+    MscTimer *timer1 = new MscTimer("T1", MscTimer::TimerType::Stop);
+    timer1->setInstance(instance1);
+    m_chart->addInstanceEvent(timer1);
+    MscTimer *timer2 = new MscTimer("T1", MscTimer::TimerType::Start);
+    timer2->setInstance(instance1);
+    m_chart->addInstanceEvent(timer2);
+
+    m_chart->checkTimerRelations();
+
+    QVERIFY(timer1->precedingTimer() == nullptr);
+    QVERIFY(timer1->followingTimer() == nullptr);
+
+    QVERIFY(timer2->precedingTimer() == nullptr);
+    QVERIFY(timer2->followingTimer() == nullptr);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)
