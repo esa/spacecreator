@@ -143,7 +143,7 @@ struct MainWindowPrivate {
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
 
-    bool m_saveDocument = false;
+    int m_lastSavedUndoId = -1;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -171,6 +171,10 @@ MainWindow::~MainWindow()
         disconnect(d->ui->documentTreeView->model(), nullptr, this, nullptr);
     }
     disconnect(&(d->m_model->chartViewModel()), nullptr, this, nullptr);
+
+    // Had this connection not dropped, the currentUndoStack() would need check
+    // for nullptr d, d->ui, d->ui->graphicsView
+    disconnect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
 QGraphicsView *MainWindow::currentView() const
@@ -263,18 +267,19 @@ bool MainWindow::openFileMsc(const QString &file)
 
 void MainWindow::updateTitles()
 {
-    static const QString title = tr("%1 [%2]");
+    static const QString title = tr("%1 [%2]%3");
 
+    const QString dirtyMarker(needSave() ? "*" : "");
     const QString mscFileName(d->m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(d->m_mscFileName).fileName());
-    setWindowTitle(title.arg(qApp->applicationName(), mscFileName));
+    setWindowTitle(title.arg(qApp->applicationName(), mscFileName, dirtyMarker));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
 }
 
 void MainWindow::clearUndoStacks()
 {
-    QUndoStack *undoStack = d->ui->graphicsView->undoStack();
-    undoStack->clear();
+    currentUndoStack()->clear();
+    storeCurrentUndoCommandId();
 }
 
 bool MainWindow::openMscChain(const QString &dirPath)
@@ -387,7 +392,7 @@ void MainWindow::saveMsc()
         saveAsMsc();
     } else {
         d->m_model->saveMsc(d->m_mscFileName);
-        updateTitles();
+        storeCurrentUndoCommandId();
     }
 }
 
@@ -439,7 +444,7 @@ void MainWindow::selectCurrentChart()
         const QModelIndex idx = d->m_model->documentItemModel()->index(chart);
         d->ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
 
-        if (QUndoStack *currentStack = d->ui->graphicsView->undoStack()) {
+        if (QUndoStack *currentStack = currentUndoStack()) {
             if (!d->m_undoGroup->stacks().contains(currentStack))
                 d->m_undoGroup->addStack(currentStack);
             d->m_undoGroup->setActiveStack(currentStack);
@@ -827,11 +832,8 @@ void MainWindow::initConnections()
     connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
             &MainWindow::onCreateMessageToolRequested);
 
-    connect(d->m_model, &MainModel::modelDataChanged, this, [this]() {
-        updateModel();
-        d->m_saveDocument = true;
-    });
-    connect(d->m_model, &MainModel::modelUpdated, this, [this]() { updateModel(); });
+    connect(d->m_model, &MainModel::modelDataChanged, this, &MainWindow::updateModel);
+    connect(d->m_model, &MainModel::modelUpdated, this, &MainWindow::updateModel);
 
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
@@ -843,6 +845,8 @@ void MainWindow::initConnections()
 
     connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
             &QTreeView::expandAll);
+
+    connect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
 void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
@@ -1306,7 +1310,7 @@ QStringList MainWindow::mscFileFilters()
 
 bool MainWindow::saveDocument()
 {
-    if (d->m_saveDocument) {
+    if (needSave()) {
         auto result = QMessageBox::question(this, windowTitle(),
                                             tr("You have unsaved data. Do you want to save the MSC document?"),
                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
@@ -1316,8 +1320,6 @@ bool MainWindow::saveDocument()
         } else if (result == QMessageBox::Yes) {
             saveMsc();
         }
-
-        d->m_saveDocument = false;
     }
 
     return true;
@@ -1360,5 +1362,20 @@ void MainWindow::showMousePositioner()
         }
     }
 }
-
 #endif
+
+QUndoStack *MainWindow::currentUndoStack() const
+{
+    return d->ui->graphicsView->undoStack();
+}
+
+void MainWindow::storeCurrentUndoCommandId()
+{
+    d->m_lastSavedUndoId = currentUndoStack()->index();
+    updateTitles();
+}
+
+bool MainWindow::needSave() const
+{
+    return d->m_lastSavedUndoId != currentUndoStack()->index();
+}

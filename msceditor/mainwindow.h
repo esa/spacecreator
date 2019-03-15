@@ -24,6 +24,8 @@
 #include <QModelIndex>
 #include <memory>
 
+class QUndoStack;
+
 namespace Ui {
 class MainWindow;
 }
@@ -79,6 +81,8 @@ private Q_SLOTS:
     void updateTreeViewItem(const msc::MscDocument *document);
     void onCreateMessageToolRequested();
     bool startRemoteControl(quint16 port);
+    void updateTitles();
+    void updateModel();
 
 private:
     static const QLatin1String DotMscFileExtensionLow;
@@ -113,7 +117,6 @@ private:
 
     void keyPressEvent(QKeyEvent *e) override;
 
-    void updateTitles();
     void clearUndoStacks();
 
     void changeEvent(QEvent *event) override;
@@ -126,9 +129,12 @@ private:
     static QStringList mscFileFilters();
 
     bool saveDocument();
-    void updateModel();
 
 #ifdef QT_DEBUG
     void showMousePositioner();
 #endif
+
+    QUndoStack *currentUndoStack() const;
+    void storeCurrentUndoCommandId();
+    bool needSave() const;
 };
