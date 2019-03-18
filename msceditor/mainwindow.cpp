@@ -143,7 +143,7 @@ struct MainWindowPrivate {
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
 
-    int m_lastSavedUndoId = -1;
+    int m_lastSavedUndoId = 0;
 };
 
 MainWindow::MainWindow(QWidget *parent)
