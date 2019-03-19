@@ -48,6 +48,15 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     QString asn1FileName = fullFilePath(filePath, fileName);
     QString asn1XMLFileName = fullFilePath(QDir::tempPath(), "asn1.xml");
 
+    connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            [&](int, QProcess::ExitStatus exitStatus) {
+                if (exitStatus == QProcess::CrashExit)
+                    qWarning() << "Process was crashed";
+            });
+
+    connect(&asn1Process, &QProcess::errorOccurred,
+            [&](QProcess::ProcessError) { qWarning() << asn1Process.errorString(); });
+
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
     asn1Process.setProcessChannelMode(QProcess::MergedChannels);
     asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileName));
