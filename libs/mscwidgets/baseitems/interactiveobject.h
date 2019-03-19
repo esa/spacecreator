@@ -65,6 +65,7 @@ Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
+    void needRelayout() const;
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);

@@ -83,6 +83,7 @@ private Q_SLOTS:
     bool startRemoteControl(quint16 port);
     void updateTitles();
     void updateModel();
+    void showCoordinatesInfo(const QString &info);
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

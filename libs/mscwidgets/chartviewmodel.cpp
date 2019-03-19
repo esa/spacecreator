@@ -287,7 +287,7 @@ void ChartViewModel::addInstanceEventItems()
     InteractiveObject *instanceEventItem(nullptr);
     QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
     if (d->m_visibleItemLimit != -1) {
-        for (auto it = chartEvents.begin(); it != chartEvents.end(); ) {
+        for (auto it = chartEvents.begin(); it != chartEvents.end();) {
             if (std::distance(it, chartEvents.end()) <= d->m_visibleItemLimit)
                 break;
             removeEventItem(*it);
@@ -329,8 +329,8 @@ void ChartViewModel::addInstanceEventItems()
 
         if (instanceEventItem) {
             polishAddedEventItem(instanceEvent, instanceEventItem);
-            connect(instanceEventItem, &InteractiveObject::boundingBoxChanged,
-                    this, &ChartViewModel::updateLayout, Qt::UniqueConnection);
+            connect(instanceEventItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
+                    Qt::UniqueConnection);
         }
     }
 }
@@ -612,7 +612,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         }
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, currentChart(), pos);
-        connect(instanceItem, &InstanceItem::needRelayout, this, &ChartViewModel::relayout);
+        connect(instanceItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout);
 
         const qreal axisHeight = d->calcInstanceAxisHeight();
         if (!qFuzzyIsNull(axisHeight))
@@ -763,7 +763,7 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
 
-        connect(item, &ConditionItem::needRelayout, this, &ChartViewModel::relayout);
+        connect(item, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout);
     }
 
     InstanceItem *instance = itemForInstance(condition->instance());
@@ -796,7 +796,6 @@ TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
         d->m_instanceEventItems.append(item);
     }
     item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
-    item->updateLayout();
 
     return item;
 }

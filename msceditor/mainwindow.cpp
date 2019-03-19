@@ -818,16 +818,7 @@ void MainWindow::initConnections()
 
     connect(this, &MainWindow::selectionChanged, d->m_model, &MainModel::selectionChanged);
 
-    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, this,
-            [this](const QPoint &screen, const QPointF &scene, const QPointF &item) {
-                statusBar()->showMessage(tr("Screen: [%1;%2]\tScene: [%3;%4]\tObject: [%5;%6]")
-                                                 .arg(screen.x())
-                                                 .arg(screen.y())
-                                                 .arg(scene.x())
-                                                 .arg(scene.y())
-                                                 .arg(item.x())
-                                                 .arg(item.y()));
-            });
+    connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
 
     connect(d->ui->graphicsView, &msc::GraphicsView::createMessageToolRequested, this,
             &MainWindow::onCreateMessageToolRequested);
@@ -1343,7 +1334,11 @@ QPlainTextEdit *MainWindow::textOutputPane() const
 // Invoked by CTRL+ALT+SHIFT+M
 void MainWindow::showMousePositioner()
 {
-    const QString &input = QInputDialog::getText(this, "Move mouse to", "x y:");
+    bool gotText(false);
+    const QString &input = QInputDialog::getText(this, "Move mouse to", "x y:", QLineEdit::Normal, "0 0", &gotText);
+    if (!gotText || input.isEmpty())
+        return;
+
     static const QRegularExpression rxPoint("(-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)");
     QRegularExpressionMatch m = rxPoint.match(input);
     const QStringList &coords = m.capturedTexts();
@@ -1378,4 +1373,9 @@ void MainWindow::storeCurrentUndoCommandId()
 bool MainWindow::needSave() const
 {
     return d->m_lastSavedUndoId != currentUndoStack()->index();
+}
+
+void MainWindow::showCoordinatesInfo(const QString &info)
+{
+    statusBar()->showMessage(info);
 }
