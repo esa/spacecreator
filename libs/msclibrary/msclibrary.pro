@@ -2,12 +2,13 @@ TEMPLATE = lib
 TARGET = msclibrary
 
 include(../../esa.pri)
+include(../../depend_asn1library.pri)
 include(../../suppress_antlr_wrn.pri)
 
 CONFIG += static
 CONFIG += no_keywords
 
-QT += core gui
+QT += core gui xml
 
 HEADERS += \
     parser/MscBaseVisitor.h \

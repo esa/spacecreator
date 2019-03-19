@@ -44,6 +44,9 @@ public:
     const QString &dataDefinitionString() const;
     void setDataDefinitionString(const QString &dataString);
 
+    const QVariantList &asn1TypesData() const;
+    void setAsn1TypesData(const QVariantList &asn1TypesData);
+
     void clear();
 
 Q_SIGNALS:
@@ -59,6 +62,7 @@ private:
     QVector<MscChart *> m_charts;
     QString m_dataLanguage;
     QString m_dataDefinitionString;
+    QVariantList m_asn1TypesData;
 };
 
 } // namespace msc

@@ -31,7 +31,8 @@ class Asn1XMLParser : public QObject
 public:
     Asn1XMLParser(QObject *parent = nullptr);
 
-    QVariantList parseAsn1XmlFile(const QString &filename);
+    QVariantList parseAsn1File(const QString &filePath, const QString &fileName);
+    QVariantList parseAsn1XmlFile(const QString &fileName, bool deleteFile = false);
 
 Q_SIGNALS:
     void parseError(const QString &error);

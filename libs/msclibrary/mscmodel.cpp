@@ -118,8 +118,19 @@ void MscModel::setDataDefinitionString(const QString &dataString)
     }
 
     m_dataDefinitionString = dataString;
+
     Q_EMIT dataDefinitionStringChanged(m_dataDefinitionString);
     Q_EMIT dataChanged();
+}
+
+const QVariantList &MscModel::asn1TypesData() const
+{
+    return m_asn1TypesData;
+}
+
+void MscModel::setAsn1TypesData(const QVariantList &asn1TypesData)
+{
+    m_asn1TypesData = asn1TypesData;
 }
 
 void MscModel::clear()

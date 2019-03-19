@@ -19,10 +19,15 @@
 
 #include "asn1const.h"
 
+#include <QDebug>
+#include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFileInfo>
+#include <QProcess>
 #include <QVariantMap>
+
+const QString asn1Command = "asn1 -ast %1 %2"; // TODO: test for win and linux
 
 namespace asn1 {
 
@@ -31,14 +36,44 @@ Asn1XMLParser::Asn1XMLParser(QObject *parent)
 {
 }
 
-QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &filename)
+QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString &fileName)
 {
-    if (QFileInfo::exists(filename)) {
-        QFile file(filename);
+    // convert ASN.1 to XML
+    QProcess asn1Process;
+
+    auto fullFilePath = [](const QString &path, const QString &name) {
+        return QFileInfo(QDir(path), name).absoluteFilePath();
+    };
+
+    QString asn1FileName = fullFilePath(filePath, fileName);
+    QString asn1XMLFileName = fullFilePath(filePath, "asn1.xml");
+
+    asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+    asn1Process.setProcessChannelMode(QProcess::MergedChannels);
+    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileName));
+    asn1Process.waitForFinished();
+
+    auto error = asn1Process.readAll();
+    if (!error.isEmpty()) {
+        qWarning() << error;
+        return {};
+    }
+
+    return parseAsn1XmlFile(asn1XMLFileName, true);
+}
+
+QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName, bool deleteFile)
+{
+    if (QFileInfo::exists(fileName)) {
+        QFile file(fileName);
 
         if (file.open(QIODevice::ReadOnly)) {
             const auto content = file.readAll();
             file.close();
+
+            if (deleteFile) {
+                file.remove();
+            }
 
             return parseXml(content);
         } else
@@ -106,7 +141,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QString typeName = typeElem.tagName();
 
     auto typeByTypeName = [](const QString &typeName) {
-        static QMap<QString, ASN1Type> asn1TypeStringMap{
+        static QMap<QString, ASN1Type> asn1TypeStringMap {
             { "IntegerType", ASN1Type::INTEGER },       { "RealType", ASN1Type::DOUBLE },
             { "BooleanType", ASN1Type::BOOL },          { "SequenceType", ASN1Type::SEQUENCE },
             { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },

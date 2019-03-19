@@ -17,6 +17,7 @@
 
 #include "mscfile.h"
 
+#include "asn1xmlparser.h"
 #include "exceptions.h"
 #include "mscerrorlistener.h"
 #include "mscmodel.h"
@@ -63,7 +64,17 @@ MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages
     }
 
     ANTLRInputStream input(stream);
-    return parse(input, errorMessages);
+    MscModel *mscModel = parse(input, errorMessages);
+
+    if (!mscModel->dataDefinitionString().isEmpty()) {
+        // parse ASN.1
+        asn1::Asn1XMLParser xmlParser;
+
+        mscModel->setAsn1TypesData(
+                xmlParser.parseAsn1File(QFileInfo(filename).absolutePath(), mscModel->dataDefinitionString()));
+    }
+
+    return mscModel;
 }
 
 MscModel *MscFile::parseText(const QString &text, QStringList *errorMessages)
