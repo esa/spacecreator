@@ -93,7 +93,9 @@ struct ChartViewModelPrivate {
     qreal calcInstanceAxisHeight() const
     {
         static constexpr qreal oneMessageHeight = 50.;
-        const int eventsCount = qMax(1, m_instanceEventItems.size());
+        const int eventsCount = qMax(1,
+                                     m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
+                                                              : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
         return eventsCount * (oneMessageHeight + ChartViewModelPrivate::InterMessageSpan);
     }
 };
