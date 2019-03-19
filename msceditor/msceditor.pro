@@ -6,7 +6,7 @@ include(../depend_asn1library.pri)
 include(../depend_mscwidgets.pri)
 include(../depend_msclibrary.pri)
 
-QT += core gui widgets xml network websockets
+QT += core gui widgets network websockets
 
 SOURCES += \
     main.cpp \

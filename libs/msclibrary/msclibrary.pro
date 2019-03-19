@@ -8,7 +8,7 @@ include(../../suppress_antlr_wrn.pri)
 CONFIG += static
 CONFIG += no_keywords
 
-QT += core gui xml
+QT += core gui
 
 HEADERS += \
     parser/MscBaseVisitor.h \

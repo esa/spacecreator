@@ -46,7 +46,7 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     };
 
     QString asn1FileName = fullFilePath(filePath, fileName);
-    QString asn1XMLFileName = fullFilePath(filePath, "asn1.xml");
+    QString asn1XMLFileName = fullFilePath(QDir::tempPath(), "asn1.xml");
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
     asn1Process.setProcessChannelMode(QProcess::MergedChannels);
@@ -59,10 +59,14 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
         return {};
     }
 
-    return parseAsn1XmlFile(asn1XMLFileName, true);
+    QVariantList asn1TypesData = parseAsn1XmlFile(asn1XMLFileName);
+
+    QFile::remove(asn1XMLFileName);
+
+    return asn1TypesData;
 }
 
-QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName, bool deleteFile)
+QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName)
 {
     if (QFileInfo::exists(fileName)) {
         QFile file(fileName);
@@ -70,10 +74,6 @@ QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName, bool delet
         if (file.open(QIODevice::ReadOnly)) {
             const auto content = file.readAll();
             file.close();
-
-            if (deleteFile) {
-                file.remove();
-            }
 
             return parseXml(content);
         } else
@@ -141,7 +141,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QString typeName = typeElem.tagName();
 
     auto typeByTypeName = [](const QString &typeName) {
-        static QMap<QString, ASN1Type> asn1TypeStringMap {
+        static QMap<QString, ASN1Type> asn1TypeStringMap{
             { "IntegerType", ASN1Type::INTEGER },       { "RealType", ASN1Type::DOUBLE },
             { "BooleanType", ASN1Type::BOOL },          { "SequenceType", ASN1Type::SEQUENCE },
             { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },

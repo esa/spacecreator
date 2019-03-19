@@ -1,6 +1,8 @@
 !isEmpty(ASN1_PRI_INCLUDED):error("depend_asn1library.pri already included")
 ASN1_PRI_INCLUDED = 1
 
+QT += xml
+
 include(depend_conf_utils.pri)
 
 sub_dir = $$_PRO_FILE_PWD_
