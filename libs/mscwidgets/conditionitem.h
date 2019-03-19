@@ -48,9 +48,6 @@ public:
 
     static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
 
-Q_SIGNALS:
-    void needRelayout() const;
-
 public Q_SLOTS:
     void setName(const QString &name);
     void buildLayout();

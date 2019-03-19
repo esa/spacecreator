@@ -17,9 +17,13 @@
 
 #include "graphicsview.h"
 
+#include "baseitems/common/utils.h"
+#include "baseitems/interactiveobject.h"
+
 #include <QGraphicsItem>
 #include <QMouseEvent>
 #include <QUndoStack>
+#include <mscentity.h>
 
 namespace msc {
 
@@ -73,11 +77,18 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     const QPoint &screenPos(event->pos());
     const QPointF &scenePos(mapToScene(screenPos));
 
-    QPointF itemPos(-1, -1);
-    if (QGraphicsItem *item = itemAt(screenPos))
-        itemPos = item->mapFromScene(scenePos);
+    auto coordinatesInfo = [](const QPointF &point, const QString &name) {
+        static const QString infoTemplate("%1: [%2;%3]; ");
+        return infoTemplate.arg(name, QString::number(point.x()), QString::number(point.y()));
+    };
 
-    Q_EMIT mouseMoved(screenPos, scenePos, itemPos);
+    QString info = coordinatesInfo(screenPos, "Screen");
+    info.append(coordinatesInfo(scenePos, "Scene"));
+
+    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene(), scenePos))
+        info.append(coordinatesInfo(item->mapFromScene(scenePos), item->modelEntity()->name()));
+
+    Q_EMIT mouseMoved(info);
 
     QGraphicsView::mouseMoveEvent(event);
 }

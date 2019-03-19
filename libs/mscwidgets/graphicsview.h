@@ -38,7 +38,7 @@ public:
     QUndoStack *undoStack() const;
 
 Q_SIGNALS:
-    void mouseMoved(const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) const;
+    void mouseMoved(const QString &coordsInfo) const;
     void zoomChanged(qreal percent);
     void createMessageToolRequested();
 

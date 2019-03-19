@@ -54,7 +54,6 @@ public:
     static InstanceItem *createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos);
 
 Q_SIGNALS:
-    void needRelayout() const;
     void moved(InstanceItem *);
 
 public Q_SLOTS:

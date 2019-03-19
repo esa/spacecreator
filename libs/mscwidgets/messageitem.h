@@ -69,7 +69,6 @@ public:
     void applyCif() override;
 
 Q_SIGNALS:
-    void needRelayout() const;
     void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
 public Q_SLOTS:
