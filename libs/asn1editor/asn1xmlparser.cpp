@@ -51,7 +51,7 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [&](int, QProcess::ExitStatus exitStatus) {
                 if (exitStatus == QProcess::CrashExit)
-                    qWarning() << "Process was crashed";
+                    qWarning() << "asn1scc compiler process crashed";
             });
 
     connect(&asn1Process, &QProcess::errorOccurred,
