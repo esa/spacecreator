@@ -144,6 +144,18 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
                     events.append(instanceEvent);
                 break;
             }
+            case MscEntity::EntityType::Action: {
+                auto action = static_cast<MscAction *>(instanceEvent);
+                if (action->instance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
+            case MscEntity::EntityType::Timer: {
+                auto timer = static_cast<MscTimer *>(instanceEvent);
+                if (timer->instance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
             default: {
                 qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
                 break;

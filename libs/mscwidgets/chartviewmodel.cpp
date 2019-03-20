@@ -623,12 +623,22 @@ QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *insta
     for (MscInstanceEvent *event : events) {
         switch (event->entityType()) {
         case MscEntity::EntityType::Message: {
-            if (MessageItem *item = itemForMessage(static_cast<MscMessage *>(event)))
+            if (auto item = itemForMessage(static_cast<MscMessage *>(event)))
                 res.append(item);
             break;
         }
         case MscEntity::EntityType::Condition: {
-            if (ConditionItem *item = itemForCondition(static_cast<MscCondition *>(event)))
+            if (auto item = itemForCondition(static_cast<MscCondition *>(event)))
+                res.append(item);
+            break;
+        }
+        case MscEntity::EntityType::Action: {
+            if (auto item = itemForAction(static_cast<MscAction *>(event)))
+                res.append(item);
+            break;
+        }
+        case MscEntity::EntityType::Timer: {
+            if (auto item = itemForTimer(static_cast<MscTimer *>(event)))
                 res.append(item);
             break;
         }

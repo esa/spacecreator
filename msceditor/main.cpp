@@ -60,7 +60,12 @@ struct LogHandler {
                 break;
             }
 
+#ifdef QT_DEBUG
             m_view->appendHtml(QString("%1: %2%3%4").arg(marker, htmlPre, msg, htmlPost));
+#else
+            if (type != QtDebugMsg && type != QtInfoMsg)
+                m_view->appendHtml(QString("%1: %2%3%4").arg(marker, htmlPre, msg, htmlPost));
+#endif
         }
         (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
     }
