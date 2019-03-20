@@ -24,7 +24,7 @@ build_linux_gcc:
     - export QTC_BUILD=/opt/qtcreator/build
   script:
     - mkdir -p build; cd build
-    - /opt/Qt/5.12.0/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
     - make -j 8
     # move plugin to an artifact dir
     - cp /root/.local/share/data/QtProject/qtcreator/plugins/4.8.1/libMscPlugin.so .
@@ -121,7 +121,7 @@ test_docker:
   script:
     - cd build
     - export QT_QPA_PLATFORM=offscreen
-    - /opt/Qt/5.12.0/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
     - find . | xargs touch # Avoid rebuilding
     - make -j 8 # make sure everything is build
     - make check
@@ -135,7 +135,7 @@ coverage_docker:
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
   script:
     - mkdir -p build_coverage; cd build_coverage
-    - /opt/Qt/5.12.0/gcc_64/bin/qmake CONFIG+=debug CONFIG+=coverage -recursive ..
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake CONFIG+=debug CONFIG+=coverage -recursive ..
     - make -j 8
     - export QT_QPA_PLATFORM=offscreen
     - make coverage-html
