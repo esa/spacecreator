@@ -176,7 +176,7 @@ QPair<QPointF, bool> MessageItem::commentPoint() const
 
 void MessageItem::rebuildLayout()
 {
-    // don't use default layout in case there is appropriate CIF specified
+    // at first apply cif, if any
     using namespace cif;
     const QVector<CifBlockShared> &cifs = m_message->cifs();
     if (!cifs.isEmpty()) {
@@ -186,8 +186,7 @@ void MessageItem::rebuildLayout()
                 const QVector<QPoint> &cifPixels = cif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
                 if (!cifPixels.isEmpty()) {
                     const QVector<QPointF> &sceneCoords = utils::cifToScene(cifPixels, scene);
-                    if (m_arrowItem->arrow()->turnPoints() == sceneCoords)
-                        return;
+                    m_arrowItem->arrow()->setTurnPoints(sceneCoords);
                 }
             }
         }

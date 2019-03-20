@@ -469,8 +469,7 @@ void ChartViewModel::updateContentBounds()
         switch (event->entityType()) {
         case MscEntity::EntityType::Message: {
             MscMessage *message = static_cast<MscMessage *>(event);
-            const bool noCif = message->cifs().isEmpty(); // TODO: check for exactly MESSAGE and/or POSITION
-            if (message->isGlobal() && noCif) {
+            if (message->isGlobal()) {
                 if (MessageItem *item = itemForMessage(message)) {
                     item->updateLayout(); // place it on the correct box edge
                 }
