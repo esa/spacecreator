@@ -132,6 +132,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     MscDocument *parent = m_currentDocument;
 
     auto doc = new MscDocument();
+    doc->setHierarchyType(MscDocument::HierarchyUnkown);
     const auto docName = ::nameToString(context->documentHead()->name());
     doc->setName(docName);
 

@@ -175,6 +175,8 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
             painter->drawLine(QPointF(x3, y1), QPointF(x4, y2));
             painter->drawLine(QPointF(x4, y2), QPointF(x5, y1));
             break;
+        default:
+            break;
         }
         painter->setRenderHint(QPainter::Antialiasing, false);
     } else {

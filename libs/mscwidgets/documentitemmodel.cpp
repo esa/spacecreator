@@ -288,6 +288,8 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
             case msc::MscDocument::HierarchyException:
                 icon = QPixmap(":/icons/document_exception.png");
                 break;
+            default:
+                break;
             }
             return QVariant(icon);
         } else {

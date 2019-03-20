@@ -25,6 +25,7 @@ class ANTLRInputStream;
 
 namespace msc {
 class MscModel;
+class MscDocument;
 
 class MscFile
 {
@@ -38,6 +39,8 @@ public:
 
 private:
     MscModel *parse(antlr4::ANTLRInputStream &input, QStringList *errorMessages = nullptr);
+
+    void checkDocumentHierarchy(MscDocument *doc);
 };
 
 } // namespace msc

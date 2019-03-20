@@ -19,6 +19,7 @@
 
 #include "asn1xmlparser.h"
 #include "exceptions.h"
+#include "mscdocument.h"
 #include "mscerrorlistener.h"
 #include "mscmodel.h"
 #include "mscparservisitor.h"
@@ -110,7 +111,30 @@ MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
         throw ParserException(QObject::tr("Parser syntax error"));
     }
 
-    return visitor.detachModel();
+    msc::MscModel *model = visitor.detachModel();
+    if (model) {
+        for (MscDocument *doc : model->documents()) {
+            checkDocumentHierarchy(doc);
+        }
+    }
+
+    return model;
+}
+
+void MscFile::checkDocumentHierarchy(MscDocument *doc)
+{
+    Q_ASSERT(doc);
+    if (doc->hierarchyType() == MscDocument::HierarchyUnkown) {
+        if (doc->documents().empty()) {
+            doc->setHierarchyType(MscDocument::HierarchyLeaf);
+        } else {
+            doc->setHierarchyType(MscDocument::HierarchyAnd);
+        }
+    }
+
+    for (MscDocument *childDoc : doc->documents()) {
+        checkDocumentHierarchy(childDoc);
+    }
 }
 
 } // namespace msc

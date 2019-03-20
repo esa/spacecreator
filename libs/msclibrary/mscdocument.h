@@ -38,7 +38,8 @@ public:
         HierarchyOr,
         HierarchyParallel,
         HierarchyRepeat,
-        HierarchyException
+        HierarchyException,
+        HierarchyUnkown /// Only used when loaded from a file
     };
 
     explicit MscDocument(QObject *parent = nullptr);

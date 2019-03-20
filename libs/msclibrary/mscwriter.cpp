@@ -331,6 +331,11 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     case MscDocument::HierarchyException:
         relation = " /* MSC EXCEPTION */";
         break;
+    default:
+        Q_ASSERT(true);
+        qWarning() << "Invalid document type of document " << document->name();
+        relation = "";
+        break;
     }
 
     QString tabString = tabs(tabsSize);

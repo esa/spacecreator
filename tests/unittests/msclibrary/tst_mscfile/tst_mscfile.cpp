@@ -65,6 +65,7 @@ private Q_SLOTS:
     void testNonStandardInstance();
     void testDocumentsType_data();
     void testDocumentsType();
+    void testDefaultDocumentTypeFromLoad();
 
     // for message-related tests see the tst_MscEventsParsing
 
@@ -644,6 +645,34 @@ void tst_MscFile::testDocumentsType()
     QFETCH(QString, mscContent);
 
     QVERIFY_EXCEPTION_THROWN(file->parseText(mscContent), ParserException);
+}
+
+void tst_MscFile::testDefaultDocumentTypeFromLoad()
+{
+    QString msc = "MSCDOCUMENT root_doc /* MSC OR */; \
+                        MSCDOCUMENT doc1; \
+                          MSCDOCUMENT doc1_1; \
+                          ENDMSCDOCUMENT; \
+                        ENDMSCDOCUMENT; \
+                        MSCDOCUMENT doc2 /* MSC IS */; \
+                          MSCDOCUMENT doc2_2 /* MSC EXCEPTION */; \
+                          ENDMSCDOCUMENT; \
+                        ENDMSCDOCUMENT; \
+                  ENDMSCDOCUMENT;";
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->hierarchyType(), MscDocument::HierarchyOr);
+
+    MscDocument *childDoc = doc->documents().at(0);
+    QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyAnd);
+    childDoc = childDoc->documents().at(0);
+    QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyLeaf);
+
+    childDoc = doc->documents().at(1);
+    QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyIs);
+    childDoc = childDoc->documents().at(0);
+    QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyException);
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)
