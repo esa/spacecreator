@@ -95,6 +95,7 @@ Q_SIGNALS:
     void layoutComplete();
 
 private Q_SLOTS:
+    void onEntityCommentChange(msc::MscEntity *entity, const QString &comment);
     void onInstanceItemMoved(InstanceItem *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
@@ -116,7 +117,7 @@ private:
     TimerItem *addTimerItem(MscTimer *timer);
 
     void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
-
+    void updateCommentForInteractiveObject(InteractiveObject *iObj);
     void addInstanceItems();
     void addInstanceEventItems();
 

@@ -174,6 +174,12 @@ void InteractiveObject::setHighlightable(bool highlightable)
     clearHighlight();
 }
 
+QPair<QPointF, bool> InteractiveObject::commentPoint() const
+{
+    const QRectF br = sceneBoundingRect();
+    return qMakePair(QPointF(br.right(), br.center().y()), false);
+}
+
 void InteractiveObject::highlightConnected()
 {
     doHighlighting(Qt::green, false);

@@ -188,6 +188,11 @@ QRectF InstanceHeadItem::boundingRect() const
     return childrenBoundingRect();
 }
 
+QRectF InstanceHeadItem::rectGeometry() const
+{
+    return m_rectItem->sceneBoundingRect();
+}
+
 void InstanceHeadItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(painter);

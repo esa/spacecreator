@@ -33,6 +33,7 @@
 #include "commands/cmdmessageitemresize.h"
 #include "commands/cmdtimeritemcreate.h"
 #include "commands/cmdtimeritemmove.h"
+#include "commands/cmdentitycommentchange.h"
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -51,6 +52,8 @@ namespace cmd {
 QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 {
     switch (id) {
+    case cmd::ChangeComment:
+        return cmd::CommandsFactory::createChangeComment(params);
     case cmd::RenameEntity:
         return cmd::CommandsFactory::createRenameEntity(params);
     case cmd::DeleteEntity:
@@ -88,6 +91,19 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (MscEntity *item = params.first().value<MscEntity *>()) {
+        const QString &comment = params.last().toString();
+        if (item->comment() != comment)
+            return new CmdEntityCommentChange(item, comment);
     }
 
     return nullptr;

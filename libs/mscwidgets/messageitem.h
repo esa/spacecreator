@@ -46,6 +46,7 @@ public:
 
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
+    QPair<QPointF, bool> commentPoint() const override;
 
     QPointF head() const;
     void setHead(const QPointF &head, ObjectAnchor::Snap snap);

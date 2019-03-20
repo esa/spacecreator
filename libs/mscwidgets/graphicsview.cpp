@@ -85,8 +85,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     QString info = coordinatesInfo(screenPos, "Screen");
     info.append(coordinatesInfo(scenePos, "Scene"));
 
-    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene(), scenePos))
-        info.append(coordinatesInfo(item->mapFromScene(scenePos), item->modelEntity()->name()));
+    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene(), scenePos)) {
+        info.append(coordinatesInfo(item->mapFromScene(scenePos),
+                                    item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None")));
+    }
 
     Q_EMIT mouseMoved(info);
 

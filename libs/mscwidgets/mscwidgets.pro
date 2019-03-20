@@ -68,7 +68,9 @@ HEADERS += \
     commands/cmdconditionitemcreate.h \
     commands/cmddocumentcreate.h \
     tools/instancestoptool.h \
-    commands/cmdinstancestopchange.h
+    commands/cmdinstancestopchange.h \
+    baseitems/commentitem.h \
+    commands/cmdentitycommentchange.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -128,7 +130,9 @@ SOURCES += \
     commands/cmdconditionitemcreate.cpp \
     commands/cmddocumentcreate.cpp \
     tools/instancestoptool.cpp \
-    commands/cmdinstancestopchange.cpp
+    commands/cmdinstancestopchange.cpp \
+    baseitems/commentitem.cpp \
+    commands/cmdentitycommentchange.cpp
 
 RESOURCES += \
     resources.qrc

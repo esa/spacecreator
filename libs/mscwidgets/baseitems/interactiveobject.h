@@ -54,6 +54,8 @@ public:
     bool isHighlightable() const;
     void setHighlightable(bool highlightable);
 
+    virtual QPair<QPointF, bool> commentPoint() const;
+
     virtual void postCreatePolishing();
 
     virtual void applyCif();

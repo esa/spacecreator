@@ -18,6 +18,7 @@
 #include "chartviewmodel.h"
 
 #include "actionitem.h"
+#include "baseitems/commentitem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
@@ -82,6 +83,7 @@ struct ChartViewModelPrivate {
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::InteractiveObject *> m_instanceEventItems;
+    QHash<QUuid, CommentItem *> m_comments;
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 20.;
     static constexpr qreal InterInstanceSpan = 100.;
@@ -128,6 +130,9 @@ void ChartViewModel::clearScene()
 
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
+
+    qDeleteAll(d->m_comments);
+    d->m_comments.clear();
 
     d->m_layoutInfo.clear();
 
@@ -265,6 +270,8 @@ void ChartViewModel::addInstanceItems()
 
         d->m_layoutInfo.m_instancesRect = d->m_layoutInfo.m_instancesRect.united(item->sceneBoundingRect());
 
+        updateCommentForInteractiveObject(item);
+
         if (d->m_visibleItemLimit != -1 && instance->explicitStop()) {
             const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
             const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
@@ -333,6 +340,8 @@ void ChartViewModel::addInstanceEventItems()
             polishAddedEventItem(instanceEvent, instanceEventItem);
             connect(instanceEventItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
                     Qt::UniqueConnection);
+
+            updateCommentForInteractiveObject(instanceEventItem);
         }
     }
 }
@@ -389,6 +398,35 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
     }
 }
 
+void ChartViewModel::updateCommentForInteractiveObject(InteractiveObject *iObj)
+{
+    MscEntity *entity = iObj->modelEntity();
+    if (!entity)
+        return;
+
+    if (!entity->comment().isEmpty()) {
+        CommentItem *commentItem = d->m_comments.value(entity->internalId(), nullptr);
+        if (!commentItem) {
+            commentItem = new CommentItem;
+            commentItem->attachTo(iObj);
+            connect(entity, &MscEntity::commentChanged, commentItem, &CommentItem::setText, Qt::UniqueConnection);
+            connect(this, &ChartViewModel::layoutComplete, commentItem, &CommentItem::updateLayout,
+                    Qt::UniqueConnection);
+            connect(commentItem, &CommentItem::commentChanged, this,
+                    [this, entity](const QString &comment) { onEntityCommentChange(entity, comment); },
+                    Qt::UniqueConnection);
+
+            d->m_scene.addItem(commentItem);
+            d->m_comments.insert(entity->internalId(), commentItem);
+        }
+        commentItem->setText(entity->comment());
+    } else if (CommentItem *commentItem = d->m_comments.value(entity->internalId(), nullptr)) {
+        d->m_scene.removeItem(commentItem);
+        delete commentItem;
+        d->m_comments.remove(entity->internalId());
+    }
+}
+
 void ChartViewModel::updateContentBounds()
 {
     QRectF totalRect;
@@ -396,7 +434,7 @@ void ChartViewModel::updateContentBounds()
     const int toplevelItemsCount = toplevelItems.size();
     for (int i = 0; i < toplevelItemsCount; ++i) {
         if (InteractiveObject *gi = toplevelItems.at(i)) {
-            if (gi->modelEntity()->entityType() == MscEntity::EntityType::Message) {
+            if (gi->modelEntity() && gi->modelEntity()->entityType() == MscEntity::EntityType::Message) {
                 MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
                 if (message->isGlobal()) // ignore, it will be connected to the ChartItem edge lately
                     continue;
@@ -689,6 +727,12 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
         delete item;
         updateLayout();
     }
+}
+
+void ChartViewModel::onEntityCommentChange(MscEntity *entity, const QString &comment)
+{
+    msc::cmd::CommandsStack::push(msc::cmd::ChangeComment, { QVariant::fromValue<MscEntity *>(entity), comment });
+    updateLayout();
 }
 
 void ChartViewModel::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance)

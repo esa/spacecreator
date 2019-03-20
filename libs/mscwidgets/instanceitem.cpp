@@ -239,6 +239,11 @@ InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, MscChart *c
     return messageItem;
 }
 
+QPair<QPointF, bool> InstanceItem::commentPoint() const
+{
+    return qMakePair(QPointF(m_headSymbol->rectGeometry().right(), m_headSymbol->rectGeometry().center().y()), false);
+}
+
 void InstanceItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();

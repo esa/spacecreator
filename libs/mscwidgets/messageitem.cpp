@@ -163,6 +163,17 @@ QRectF MessageItem::boundingRect() const
     return m_arrowItem->boundingRect();
 }
 
+QPair<QPointF, bool> MessageItem::commentPoint() const
+{
+    if (head().x() > tail().x() && !m_targetInstance)
+        return qMakePair(tail(), true);
+
+    if (tail().x() > head().x() && !m_sourceInstance)
+        return qMakePair(head(), true);
+
+    return qMakePair(head().x() > tail().x() ? head() : tail(), false);
+}
+
 void MessageItem::rebuildLayout()
 {
     // don't use default layout in case there is appropriate CIF specified

@@ -53,6 +53,8 @@ public:
 
     static InstanceItem *createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos);
 
+    QPair<QPointF, bool> commentPoint() const override;
+
 Q_SIGNALS:
     void moved(InstanceItem *);
 

@@ -40,6 +40,8 @@ public:
 
     virtual QRectF boundingRect() const override;
 
+    QRectF rectGeometry() const;
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public Q_SLOTS:
