@@ -286,7 +286,6 @@ void TimerItem::rebuildLayout()
         }
     } else {
         m_textItem->setVisible(false);
-        m_timerConnector->setVisible(true);
         TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
         if (preTimer) {
             const QRectF &symbolRect = symbolBox();
@@ -297,6 +296,7 @@ void TimerItem::rebuildLayout()
             connect(preTimer, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
             connect(this, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
         }
+        m_timerConnector->setVisible(preTimer && preTimer->isVisible());
     }
 
     const qreal x = m_instance->centerInScene().x();
