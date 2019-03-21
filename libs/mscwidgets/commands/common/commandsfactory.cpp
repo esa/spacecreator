@@ -124,13 +124,12 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
 
 QUndoCommand *CommandsFactory::createDeleteEntity(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
 
     QVector<MscEntity *> items = params.at(0).value<QVector<MscEntity *>>();
     if (!items.isEmpty()) {
-        if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-            return new CmdDeleteEntity(items, chart);
-        }
+        return new CmdDeleteEntity(items, params.at(1).value<msc::MscChart *>(),
+                                   params.at(2).value<msc::MscDocument *>());
     }
 
     return nullptr;

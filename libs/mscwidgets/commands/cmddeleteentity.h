@@ -25,8 +25,8 @@
 namespace msc {
 
 class MscChart;
+class MscDocument;
 class MscEntity;
-class MscInstance;
 class MscInstanceEvent;
 
 namespace cmd {
@@ -34,7 +34,7 @@ namespace cmd {
 class CmdDeleteEntity : public QUndoCommand
 {
 public:
-    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscChart *chart);
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscChart *chart, msc::MscDocument *document);
 
     void redo() override;
     void undo() override;
@@ -44,7 +44,8 @@ public:
 private:
     QPointer<MscChart> m_chart;
     QMap<int, MscInstanceEvent *> m_events;
-    QMap<int, MscInstance *> m_instances;
+    QMap<int, MscEntity *> m_entities;
+    QPointer<MscDocument> m_document;
 };
 
 } // namespace cmd

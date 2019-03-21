@@ -19,7 +19,9 @@
 
 #include "baseitems/interactiveobject.h"
 #include "commands/common/commandsstack.h"
+#include "documentitem.h"
 #include "mscchart.h"
+#include "mscdocument.h"
 #include "mscentity.h"
 
 #include <QAction>
@@ -95,31 +97,46 @@ bool EntityDeleteTool::onMouseMove(QMouseEvent *e)
 
 void EntityDeleteTool::deleteSelectedItems()
 {
-    if (!m_view || !m_view->scene() || !m_currentChart) {
+    if (!m_view || !m_view->scene()) {
         return;
     }
 
     QVector<msc::MscEntity *> items;
+    msc::MscDocument *parentDocument = nullptr;
+
     for (auto item : m_view->scene()->selectedItems()) {
         auto obj = dynamic_cast<msc::InteractiveObject *>(item);
         if (obj && obj->modelEntity()) {
             items.append(obj->modelEntity());
         }
+
+        auto documentItem = dynamic_cast<msc::DocumentItem *>(item);
+        if (documentItem) {
+            parentDocument = documentItem->document()->parentDocument();
+
+            if (parentDocument) {
+                items.append(documentItem->document());
+            } else {
+                return;
+            }
+        }
     }
 
     msc::cmd::CommandsStack::push(msc::cmd::DeleteEntity,
                                   { QVariant::fromValue<QVector<msc::MscEntity *>>(items),
-                                    QVariant::fromValue<msc::MscChart *>(m_currentChart) });
+                                    QVariant::fromValue<msc::MscChart *>(m_currentChart),
+                                    QVariant::fromValue<msc::MscDocument *>(parentDocument) });
 }
 
 void EntityDeleteTool::updateEnabledState()
 {
-    if (!m_view || !m_view->scene()) {
+    if (!m_view || !m_view->scene() || m_view->scene()->selectedItems().isEmpty()) {
         m_action->setEnabled(false);
         return;
     }
 
-    m_action->setEnabled(!m_view->scene()->selectedItems().isEmpty());
+    auto documentItem = dynamic_cast<msc::DocumentItem *>(m_view->scene()->selectedItems()[0]);
+    m_action->setEnabled(documentItem ? documentItem->document()->parentDocument() != nullptr : true);
 }
 
 } // namespace msc

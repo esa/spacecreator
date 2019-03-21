@@ -23,6 +23,7 @@ class QAction;
 
 namespace msc {
 class MscChart;
+class MscDocument;
 
 class EntityDeleteTool : public BaseTool
 {

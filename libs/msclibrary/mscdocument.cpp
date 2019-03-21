@@ -44,7 +44,7 @@ const QVector<MscDocument *> &MscDocument::documents() const
 /*!
    Adds a document event and takes over parentship.
  */
-bool MscDocument::addDocument(MscDocument *document)
+bool MscDocument::addDocument(MscDocument *document, int index)
 {
     if (document == nullptr) {
         return false;
@@ -62,7 +62,13 @@ bool MscDocument::addDocument(MscDocument *document)
     }
 
     document->setParent(this);
-    m_documents.append(document);
+
+    if (index < 0 || index >= m_documents.size()) {
+        m_documents.append(document);
+    } else {
+        m_documents.insert(index, document);
+    }
+
     connect(document, &MscDocument::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT documentAdded(document);
     Q_EMIT dataChanged();
@@ -70,7 +76,7 @@ bool MscDocument::addDocument(MscDocument *document)
     return true;
 }
 
-void MscDocument::removeDocument(MscDocument *document)
+void MscDocument::removeDocument(MscDocument *document, bool clear)
 {
     if (document == nullptr) {
         return;
@@ -79,11 +85,12 @@ void MscDocument::removeDocument(MscDocument *document)
         return;
     }
 
-    if (m_documents.removeAll(document)) {
+    if (m_documents.removeAll(document) && clear) {
         document->clear();
     }
 
     Q_EMIT documentRemoved(document);
+    Q_EMIT dataChanged();
 }
 
 const QVector<MscChart *> &MscDocument::charts() const

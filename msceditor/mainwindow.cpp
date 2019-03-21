@@ -416,6 +416,9 @@ void MainWindow::showDocumentView(bool show)
 
         d->m_hierarchyToolBar->hide();
         d->m_mscToolBar->show();
+
+        d->m_deleteTool->setView(d->ui->graphicsView);
+        d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
     }
 }
 
@@ -426,6 +429,9 @@ void MainWindow::showHierarchyView(bool show)
 
         d->m_hierarchyToolBar->show();
         d->m_mscToolBar->hide();
+
+        d->m_deleteTool->setView(d->ui->hierarchyView);
+        d->m_deleteTool->setCurrentChart(nullptr);
     }
 }
 

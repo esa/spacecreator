@@ -47,8 +47,8 @@ public:
     ~MscDocument() override;
 
     const QVector<MscDocument *> &documents() const;
-    bool addDocument(MscDocument *document);
-    void removeDocument(MscDocument *document);
+    bool addDocument(MscDocument *document, int index = -1);
+    void removeDocument(MscDocument *document, bool clear = true);
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
