@@ -43,8 +43,8 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 {
     Q_ASSERT(m_message != nullptr);
 
-    connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::setName);
-    m_arrowItem->setText(m_message->name());
+    connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::updateDisplayText);
+    updateDisplayText();
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
@@ -146,7 +146,7 @@ void MessageItem::updateTooltip()
 
 QString MessageItem::name() const
 {
-    return m_arrowItem->text();
+    return m_message->name();
 }
 
 void MessageItem::setName(const QString &name)
@@ -549,6 +549,25 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
     }
 }
 
+void MessageItem::updateDisplayText()
+{
+    m_arrowItem->setText(m_message->name());
+    //    if (m_message->parameters().isEmpty())
+    //        m_arrowItem->setText(m_message->name());
+    //    else {
+    //        QString parameters;
+    //        for (const auto &param : m_message->parameters()) {
+    //            if (!parameters.isEmpty())
+    //                parameters += ", ";
+    //            parameters += param.pattern + param.expression;
+    //        }
+    //        m_arrowItem->setText(m_message->name() + "(" + parameters + ")");
+    //    }
+
+    updateLayout();
+    Q_EMIT needRelayout();
+}
+
 void MessageItem::addMessagePoint(const QPointF &scenePoint)
 {
     m_arrowItem->arrow()->addTurnPoint(scenePoint);
@@ -582,6 +601,11 @@ void MessageItem::applyCif()
         }
     }
     setPositionChangeIgnored(false);
+}
+
+QString MessageItem::displayedText() const
+{
+    return m_arrowItem->text();
 }
 
 } // namespace msc

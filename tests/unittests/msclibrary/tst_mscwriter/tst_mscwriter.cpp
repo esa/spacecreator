@@ -472,11 +472,11 @@ void tst_MscWriter::testSerializeCreate()
     QScopedPointer<MscCreate> createSubscriber(new MscCreate());
     createSubscriber->setSourceInstance(&instanceSource);
     createSubscriber->setTargetInstance(&instanceSubscriber);
-    QVector<MscMessage::Parameter> parameters;
-    MscMessage::Parameter parameter;
-    parameter.pattern = "data1";
+    MscParameterList parameters;
+    MscParameter parameter;
+    parameter.setPattern("data1");
     parameters << parameter;
-    parameter.pattern = "data2";
+    parameter.setPattern("data2");
     parameters << parameter;
     createSubscriber->setParameters(parameters);
 

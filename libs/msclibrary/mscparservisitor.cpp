@@ -1025,16 +1025,17 @@ std::vector<antlr4::Token *> MscParserVisitor::getHiddenCommentTokensToLeft(int 
     return commentTokens;
 }
 
-QVector<msc::MscMessage::Parameter> MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)
+msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)
 {
-    QVector<msc::MscMessage::Parameter> parameters;
+    QVector<msc::MscParameter> parameters;
     while (parameterList && parameterList->paramaterDefn()) {
         auto *paramaterDefn = parameterList->paramaterDefn();
-        MscMessage::Parameter parameter;
-        parameter.expression = ::treeNodeToString(paramaterDefn->expression());
-        parameter.pattern = ::treeNodeToString(paramaterDefn->pattern());
-        if (!parameter.expression.isEmpty() || !parameter.pattern.isEmpty())
+        QString expression = ::treeNodeToString(paramaterDefn->expression());
+        QString pattern = ::treeNodeToString(paramaterDefn->pattern());
+        if (!expression.isEmpty() || !pattern.isEmpty()) {
+            msc::MscParameter parameter(expression, pattern);
             parameters << parameter;
+        }
 
         parameterList = parameterList->parameterList();
     }

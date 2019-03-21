@@ -153,16 +153,16 @@ void tst_MscEventsParsing::testMessageWithParameters()
     auto *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->messageInstanceName(), QString("a"));
-    QVector<MscMessage::Parameter> parameters = message->parameters();
+    MscParameterList parameters = message->parameters();
     QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).expression, QString("longitude:-174.0"));
+    QCOMPARE(parameters.at(0).expression(), QString("longitude:-174.0"));
 
 #ifndef __clang_analyzer__
     message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
     QVERIFY(message != nullptr);
     QVERIFY(message->messageInstanceName().isEmpty());
     parameters = message->parameters();
-    QCOMPARE(parameters.at(0).pattern, QString("12"));
+    QCOMPARE(parameters.at(0).pattern(), QString("12"));
 
     delete model;
 #endif
@@ -230,10 +230,10 @@ void tst_MscEventsParsing::testMultiParameters()
     QCOMPARE(chart->instanceEvents().size(), 1);
     auto *message = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(message->name(), QString("hello"));
-    QVector<MscMessage::Parameter> parameters = message->parameters();
+    MscParameterList parameters = message->parameters();
     QCOMPARE(parameters.size(), 2);
-    QCOMPARE(parameters.at(0).expression, QString("b:FALSE"));
-    QCOMPARE(parameters.at(1).pattern, QString("11"));
+    QCOMPARE(parameters.at(0).expression(), QString("b:FALSE"));
+    QCOMPARE(parameters.at(1).pattern(), QString("11"));
 }
 
 void tst_MscEventsParsing::testInstanceCreate()
@@ -260,10 +260,10 @@ void tst_MscEventsParsing::testInstanceCreate()
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
-    QVector<MscMessage::Parameter> parameters = create->parameters();
+    MscParameterList parameters = create->parameters();
     QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).pattern, QString("data"));
-    QCOMPARE(parameters.at(0).expression, QString());
+    QCOMPARE(parameters.at(0).pattern(), QString("data"));
+    QCOMPARE(parameters.at(0).expression(), QString());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoParameter()
@@ -317,8 +317,8 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
     QStringList paramsOut;
-    for (const MscMessage::Parameter &param : create->parameters()) {
-        paramsOut << param.pattern;
+    for (const MscParameter &param : create->parameters()) {
+        paramsOut << param.pattern();
     }
 
     QCOMPARE(paramsOut.size(), paramsIn.size());

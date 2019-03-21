@@ -197,6 +197,8 @@ void TextItem::enableEditMode()
 
 void TextItem::disableEditMode()
 {
+    if (m_prevText != toPlainText())
+        Q_EMIT edited(toPlainText());
     selectText(false);
     m_prevText.clear();
     setTextInteractionFlags(Qt::NoTextInteraction);
@@ -204,7 +206,6 @@ void TextItem::disableEditMode()
 
 void TextItem::focusOutEvent(QFocusEvent *event)
 {
-    Q_EMIT edited(toPlainText());
     disableEditMode();
     QGraphicsTextItem::focusOutEvent(event);
 }
@@ -238,6 +239,7 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 
     if (accepted) {
         event->accept();
+        disableEditMode();
         clearFocus();
         return;
     }

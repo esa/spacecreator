@@ -11,6 +11,7 @@ CONFIG += no_keywords
 QT += core gui
 
 HEADERS += \
+    mscparameterlist.h \
     parser/MscBaseVisitor.h \
     parser/MscLexer.h \
     parser/MscParser.h \
@@ -42,6 +43,7 @@ HEADERS += \
     cif/cifblocks.h
 
 SOURCES += \
+    mscparameterlist.cpp \
     parser/MscBaseVisitor.cpp \
     parser/MscLexer.cpp \
     parser/MscParser.cpp \

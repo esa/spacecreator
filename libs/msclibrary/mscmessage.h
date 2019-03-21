@@ -18,6 +18,7 @@
 #pragma once
 
 #include "mscinstanceevent.h"
+#include "mscparameterlist.h"
 
 #include <QObject>
 #include <QString>
@@ -35,16 +36,6 @@ class MscMessage : public MscInstanceEvent
     Q_PROPERTY(MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
 
 public:
-    struct Parameter {
-        bool operator==(const msc::MscMessage::Parameter &other) const
-        {
-            return expression == other.expression && pattern == other.pattern;
-        }
-
-        QString expression;
-        QString pattern;
-    };
-
     enum class MessageType
     {
         Message = 0,
@@ -77,8 +68,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    const QVector<Parameter> &parameters() const;
-    void setParameters(const QVector<Parameter> &parameters);
+    const MscParameterList &parameters() const;
+    void setParameters(const MscParameterList &parameters);
 
     MscMessage::MessageType messageType() const;
 
@@ -114,6 +105,6 @@ private:
     QString m_messageInstanceName;
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;
-    QVector<Parameter> m_parameters;
+    MscParameterList m_parameters;
 };
 }

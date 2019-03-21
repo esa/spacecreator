@@ -45,7 +45,7 @@ bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
 {
     QUndoCommand *command = cmd::CommandsFactory::create(id, params);
 
-    if (command) {
+    if (command && CommandsStack::current()) {
         CommandsStack::current()->push(command);
         return true;
     }

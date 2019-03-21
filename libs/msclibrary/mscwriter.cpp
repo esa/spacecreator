@@ -383,10 +383,10 @@ QString MscWriter::serializeComment(const msc::MscEntity *entity) const
 QString MscWriter::serializeParameters(const MscMessage *message) const
 {
     QString parameters;
-    for (const msc::MscMessage::Parameter &param : message->parameters()) {
+    for (const MscParameter &param : message->parameters()) {
         if (!parameters.isEmpty())
             parameters += ", ";
-        parameters += param.pattern.isEmpty() ? param.expression : param.pattern;
+        parameters += param.pattern().isEmpty() ? param.expression() : param.pattern();
     }
     return parameters;
 }

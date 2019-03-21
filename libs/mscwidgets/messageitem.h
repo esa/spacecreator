@@ -69,6 +69,8 @@ public:
 
     void applyCif() override;
 
+    QString displayedText() const;
+
 Q_SIGNALS:
     void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
@@ -93,6 +95,7 @@ private Q_SLOTS:
     void commitGeometryChange();
     void onRenamed(const QString &title);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void updateDisplayText();
 
 private:
     QPointer<msc::MscMessage> m_message = nullptr;

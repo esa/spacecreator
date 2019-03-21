@@ -115,5 +115,5 @@ private:
     QStringList readComments(const QVector<antlr4::Token *> &tokens) const;
     msc::MscEntity *cifTarget() const;
     std::vector<antlr4::Token *> getHiddenCommentTokensToLeft(int tokenIndex);
-    QVector<msc::MscMessage::Parameter> readParameterList(MscParser::ParameterListContext *parameterList);
+    msc::MscParameterList readParameterList(MscParser::ParameterListContext *parameterList);
 };
