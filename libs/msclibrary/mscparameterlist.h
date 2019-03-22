@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QMetaType>
 #include <QString>
 #include <QVector>
 
@@ -57,3 +58,6 @@ private:
 typedef QVector<msc::MscParameter> MscParameterList;
 
 } // namespace msc
+
+Q_DECLARE_METATYPE(msc::MscParameter);
+Q_DECLARE_METATYPE(msc::MscParameterList);

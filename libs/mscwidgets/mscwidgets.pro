@@ -17,12 +17,14 @@ HEADERS += \
     baseitems/common/objectslink.h \
     baseitems/common/utils.h \
     baseitems/arrowitem.h \
+    baseitems/commentitem.h \
     baseitems/grippoint.h \
     baseitems/grippointshandler.h \
     baseitems/instanceenditem.h \
     baseitems/instanceheaditem.h \
     baseitems/interactiveobject.h \
     baseitems/labeledarrowitem.h \
+    baseitems/msgidentificationitem.h \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
     commands/common/commandids.h \
@@ -32,23 +34,31 @@ HEADERS += \
     commands/cmdactioninformaltext.h \
     commands/cmdactionitemcreate.h \
     commands/cmdactionitemmove.h \
+    commands/cmdconditionitemcreate.h \
     commands/cmdconditionitemmove.h \
     commands/cmddeleteentity.h \
+    commands/cmdentitycommentchange.h \
     commands/cmdentitynamechange.h \
+    commands/cmddocumentcreate.h \
     commands/cmdhierarchytypechange.h \
+    commands/cmdinstancestopchange.h \
     commands/cmdinstanceitemcreate.h \
     commands/cmdinstanceitemmove.h \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
+    commands/cmdsetparameterlist.h \
     commands/cmdtimeritemcreate.h \
     commands/cmdtimeritemmove.h \
     tools/actioncreatortool.h \
     tools/basecreatortool.h \
     tools/basetool.h \
+    tools/commentcreatortool.h \
+    tools/conditioncreatortool.h \
     tools/entitydeletetool.h \
     tools/hierarchycreatortool.h \
     tools/instancecreatortool.h \
+    tools/instancestoptool.h \
     tools/messagecreatortool.h \
     tools/pointertool.h \
     tools/timercreatortool.h \
@@ -64,14 +74,6 @@ HEADERS += \
     messageitem.h \
     textview.h \
     timeritem.h \
-    tools/conditioncreatortool.h \
-    commands/cmdconditionitemcreate.h \
-    commands/cmddocumentcreate.h \
-    tools/instancestoptool.h \
-    commands/cmdinstancestopchange.h \
-    baseitems/commentitem.h \
-    commands/cmdentitycommentchange.h \
-    tools/commentcreatortool.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -81,12 +83,14 @@ SOURCES += \
     baseitems/common/objectslink.cpp \
     baseitems/common/utils.cpp \
     baseitems/arrowitem.cpp \
+    baseitems/commentitem.cpp \
     baseitems/grippoint.cpp \
     baseitems/grippointshandler.cpp \
     baseitems/instanceenditem.cpp \
     baseitems/instanceheaditem.cpp \
     baseitems/interactiveobject.cpp \
     baseitems/labeledarrowitem.cpp \
+    baseitems/msgidentificationitem.cpp \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
     commands/common/commandsfactory.cpp \
@@ -95,22 +99,30 @@ SOURCES += \
     commands/cmdactionitemcreate.cpp \
     commands/cmdactioninformaltext.cpp \
     commands/cmdactionitemmove.cpp \
+    commands/cmdconditionitemcreate.cpp \
     commands/cmdconditionitemmove.cpp \
     commands/cmddeleteentity.cpp \
+    commands/cmdentitycommentchange.cpp \
     commands/cmdentitynamechange.cpp \
+    commands/cmddocumentcreate.cpp \
     commands/cmdhierarchytypechange.cpp \
+    commands/cmdinstancestopchange.cpp \
     commands/cmdinstanceitemcreate.cpp \
     commands/cmdinstanceitemmove.cpp \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemresize.cpp \
+    commands/cmdsetparameterlist.cpp \
     commands/cmdtimeritemcreate.cpp \
     commands/cmdtimeritemmove.cpp \
     tools/actioncreatortool.cpp \
     tools/basecreatortool.cpp \
     tools/basetool.cpp \
+    tools/commentcreatortool.cpp \
+    tools/conditioncreatortool.cpp \
     tools/entitydeletetool.cpp \
     tools/instancecreatortool.cpp \
+    tools/instancestoptool.cpp \
     tools/hierarchycreatortool.cpp \
     tools/messagecreatortool.cpp \
     tools/timercreatortool.cpp \
@@ -127,14 +139,6 @@ SOURCES += \
     messageitem.cpp \
     textview.cpp \
     timeritem.cpp \
-    tools/conditioncreatortool.cpp \
-    commands/cmdconditionitemcreate.cpp \
-    commands/cmddocumentcreate.cpp \
-    tools/instancestoptool.cpp \
-    commands/cmdinstancestopchange.cpp \
-    baseitems/commentitem.cpp \
-    commands/cmdentitycommentchange.cpp \
-    tools/commentcreatortool.cpp
 
 RESOURCES += \
     resources.qrc

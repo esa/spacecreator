@@ -22,9 +22,10 @@
 
 namespace msc {
 
-class TextItem;
 class ArrowItem;
 class InteractiveObject;
+class MsgIdentificationItem;
+
 class LabeledArrowItem : public QGraphicsObject
 {
     Q_OBJECT
@@ -36,6 +37,7 @@ public:
     QRectF boundingRect() const override;
 
     QString text() const;
+    MsgIdentificationItem *identificationItem() const;
     ArrowItem *arrow() const;
 
     QPointF startSignPos() const;
@@ -65,7 +67,7 @@ protected Q_SLOTS:
     void onKeyPressed();
 
 private:
-    TextItem *m_itemText;
+    MsgIdentificationItem *m_itemText;
     ArrowItem *m_itemArrow;
     QPainterPath m_shape;
 

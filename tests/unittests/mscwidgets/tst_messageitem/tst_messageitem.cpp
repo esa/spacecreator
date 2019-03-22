@@ -38,6 +38,7 @@ private Q_SLOTS:
     void testNameEntering();
     void testNameWithParameter();
     void testNameAndParameterEntering();
+    void testNameAndParametersEntering();
 
 private:
     void enterText(const QString &text);
@@ -101,7 +102,6 @@ void tst_MessageItem::testNameEntering()
 
 void tst_MessageItem::testNameWithParameter()
 {
-    QSKIP("Not implemented yet");
     delete m_messageItem;
 
     m_message->setParameters({ { "", "pattern" } });
@@ -115,11 +115,19 @@ void tst_MessageItem::testNameWithParameter()
 
 void tst_MessageItem::testNameAndParameterEntering()
 {
-    QSKIP("Not implemented yet");
     enterText("call(47)");
     QCOMPARE(m_message->name(), QString("call"));
     QCOMPARE(m_message->parameters().size(), 1);
-    QCOMPARE(m_message->parameters().at(0).pattern(), "47");
+    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
+}
+
+void tst_MessageItem::testNameAndParametersEntering()
+{
+    enterText("call(47, ex: pression)");
+    QCOMPARE(m_message->name(), QString("call"));
+    QCOMPARE(m_message->parameters().size(), 2);
+    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
+    QCOMPARE(m_message->parameters().at(1).expression(), QString("ex: pression"));
 }
 
 QTEST_MAIN(tst_MessageItem)

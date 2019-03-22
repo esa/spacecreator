@@ -81,7 +81,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    virtual bool validateInput(const QString &c) const;
+    virtual bool validateInput(const QString &text) const;
 
     QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
 

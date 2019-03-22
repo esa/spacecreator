@@ -17,32 +17,29 @@
 
 #pragma once
 
+#include "basecommand.h"
+#include "mscparameterlist.h"
+
 namespace msc {
+
+class MscEntity;
+
 namespace cmd {
 
-enum Id
+class CmdSetParameterList : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    SetParameterList,
-    LastId
+public:
+    CmdSetParameterList(MscEntity *item, const MscParameterList &parameters);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    MscParameterList m_oldParameters;
+    MscParameterList m_newParameters;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc

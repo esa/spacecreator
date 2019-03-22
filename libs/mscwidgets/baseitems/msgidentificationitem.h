@@ -17,32 +17,26 @@
 
 #pragma once
 
-namespace msc {
-namespace cmd {
+#include "mscparameterlist.h"
+#include "textitem.h"
 
-enum Id
+#include <QStringList>
+
+namespace msc {
+
+class MsgIdentificationItem : public NameItem
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    SetParameterList,
-    LastId
+public:
+    explicit MsgIdentificationItem(QGraphicsItem *parent = nullptr);
+
+    QString name() const;
+    MscParameterList parameters() const;
+
+    static QString nameFromText(const QString &text);
+    static MscParameterList parametersFromText(const QString &text);
+
+protected:
+    bool validateInput(const QString &text) const override;
 };
 
-} // ns cmd
 } // ns msc

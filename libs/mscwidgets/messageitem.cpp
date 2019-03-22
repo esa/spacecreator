@@ -22,6 +22,7 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/labeledarrowitem.h"
+#include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
 
@@ -32,6 +33,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QPolygonF>
+#include <QUndoStack>
 
 namespace msc {
 
@@ -43,7 +45,7 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 {
     Q_ASSERT(m_message != nullptr);
 
-    connect(m_message, &msc::MscMessage::nameChanged, this, &msc::MessageItem::updateDisplayText);
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
     connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
@@ -287,6 +289,20 @@ QVariant MessageItem::itemChange(GraphicsItemChange change, const QVariant &valu
         break;
     }
     return InteractiveObject::itemChange(change, value);
+}
+
+QString MessageItem::displayTextFromModel() const
+{
+    if (m_message->parameters().isEmpty())
+        return m_message->name();
+
+    QString parameters;
+    for (const auto &param : m_message->parameters()) {
+        if (!parameters.isEmpty())
+            parameters += ", ";
+        parameters += param.parameter();
+    }
+    return m_message->name() + "(" + parameters + ")";
 }
 
 bool MessageItem::updateSourceAndTarget(const QPointF &shift)
@@ -536,8 +552,29 @@ void MessageItem::onRenamed(const QString &title)
         return;
     }
 
+    if (m_preventRecursion) {
+        qWarning() << "Unexpected signal slot recursion for message:" << title;
+        Q_ASSERT(m_preventRecursion);
+        return;
+    }
+    m_preventRecursion = true;
+
+    const QString name = MsgIdentificationItem::nameFromText(title);
+    const msc::MscParameterList parameters = MsgIdentificationItem::parametersFromText(title);
+
     using namespace msc::cmd;
-    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), title });
+
+    // prevent recursion, as parametes ans name are not set as one unit
+    disconnect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
+    CommandsStack::current()->beginMacro(tr("Set message identification"));
+    CommandsStack::push(
+            SetParameterList,
+            { QVariant::fromValue<MscEntity *>(m_message), QVariant::fromValue<MscParameterList>(parameters) });
+    CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(m_message), name });
+    CommandsStack::current()->endMacro();
+    connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
+
+    m_preventRecursion = false;
 }
 
 void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
@@ -551,21 +588,13 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
 
 void MessageItem::updateDisplayText()
 {
-    m_arrowItem->setText(m_message->name());
-    //    if (m_message->parameters().isEmpty())
-    //        m_arrowItem->setText(m_message->name());
-    //    else {
-    //        QString parameters;
-    //        for (const auto &param : m_message->parameters()) {
-    //            if (!parameters.isEmpty())
-    //                parameters += ", ";
-    //            parameters += param.pattern + param.expression;
-    //        }
-    //        m_arrowItem->setText(m_message->name() + "(" + parameters + ")");
-    //    }
+    QString modelText = displayTextFromModel();
+    if (modelText != displayedText()) {
+        m_arrowItem->setText(modelText);
 
-    updateLayout();
-    Q_EMIT needRelayout();
+        updateLayout();
+        Q_EMIT needRelayout();
+    }
 }
 
 void MessageItem::addMessagePoint(const QPointF &scenePoint)

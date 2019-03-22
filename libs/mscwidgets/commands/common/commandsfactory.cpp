@@ -32,6 +32,7 @@
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdsetparameterlist.h"
 #include "commands/cmdtimeritemcreate.h"
 #include "commands/cmdtimeritemmove.h"
 #include "messageitem.h"
@@ -62,6 +63,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createMessageItemRetarget(params);
     case cmd::CreateMessage:
         return cmd::CommandsFactory::createMessageItemCreate(params);
+    case cmd::SetParameterList:
+        return cmd::CommandsFactory::createSetParameterList(params);
     case cmd::MoveInstance:
         return cmd::CommandsFactory::createInstanceItemMove(params);
     case cmd::CreateInstance:
@@ -163,6 +166,15 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
     }
 
     return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createSetParameterList(const QVariantList &params)
+{
+    Q_ASSERT(params.size() >= 2);
+
+    msc::MscEntity *entity = params.at(0).value<msc::MscEntity *>();
+    msc::MscParameterList parameters = params.at(1).value<msc::MscParameterList>();
+    return new CmdSetParameterList(entity, parameters);
 }
 
 QUndoCommand *CommandsFactory::createInstanceItemMove(const QVariantList &params)

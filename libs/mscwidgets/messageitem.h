@@ -104,8 +104,11 @@ private:
     QPointer<InstanceItem> m_targetInstance = nullptr;
     bool m_posChangeIgnored = false;
     bool m_autoResize = true;
+    bool m_preventRecursion = false;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    QString displayTextFromModel() const;
 
     bool updateSource(const QPointF &to, ObjectAnchor::Snap snap);
     bool updateTarget(const QPointF &to, ObjectAnchor::Snap snap);

@@ -17,7 +17,7 @@
 #include "labeledarrowitem.h"
 
 #include "arrowitem.h"
-#include "baseitems/textitem.h"
+#include "baseitems/msgidentificationitem.h"
 #include "common/objectslink.h"
 #include "common/utils.h"
 
@@ -35,7 +35,7 @@ namespace msc {
 
 LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , m_itemText(new NameItem(this))
+    , m_itemText(new MsgIdentificationItem(this))
     , m_itemArrow(new ArrowItem(this))
 {
     m_itemText->setFramed(false);
@@ -64,6 +64,11 @@ void LabeledArrowItem::setText(const QString &text)
 QString LabeledArrowItem::text() const
 {
     return m_itemText->toPlainText();
+}
+
+MsgIdentificationItem *LabeledArrowItem::identificationItem() const
+{
+    return m_itemText;
 }
 
 ArrowItem *LabeledArrowItem::arrow() const
