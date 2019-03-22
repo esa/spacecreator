@@ -44,7 +44,7 @@ MscAction::ActionType MscAction::actionType() const
     return m_actionType;
 }
 
-void MscAction::setInformalAction(QString action)
+void MscAction::setInformalAction(const QString &action)
 {
     if (action == m_informalAction) {
         return;

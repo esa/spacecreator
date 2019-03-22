@@ -58,7 +58,7 @@ public:
     void setActionType(ActionType type);
     ActionType actionType() const;
 
-    void setInformalAction(QString action);
+    void setInformalAction(const QString &action);
     QString informalAction() const;
 
     void addDataStatement(const DataStatement &statement);

@@ -69,7 +69,7 @@ ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
 {
     if (event)
         for (ItemType *item : utils::toplevelItems<ItemType>(scene))
-            if (item && item->modelItem()->internalId() == event->internalId())
+            if (item && item->modelEntity() && item->modelEntity()->internalId() == event->internalId())
                 return item;
 
     return nullptr;
@@ -90,7 +90,6 @@ QVector<MscEntityType *> getEntityFromSelection(QGraphicsScene *scene)
     }
     return items;
 }
-
 
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);

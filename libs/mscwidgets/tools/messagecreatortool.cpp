@@ -58,7 +58,6 @@ void MessageCreatorTool::createPreviewItem()
         return;
 
     MscMessage *orphanMessage = m_messageType == MscMessage::MessageType::Message
-            // "\n" mades the title be not overlapped by mouse cursor
             ? new MscMessage(tr("Message"))
             : new MscCreate(tr("Create"));
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());

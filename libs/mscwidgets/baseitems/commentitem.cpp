@@ -49,11 +49,19 @@ CommentItem::CommentItem(QGraphicsItem *parent)
 
 void CommentItem::setText(const QString &text)
 {
+    if (m_textItem->toPlainText() == text)
+        return;
+
     m_textItem->setTextWidth(150);
     m_textItem->setPlainText(text);
     m_textItem->setTextWidth(m_textItem->idealWidth());
 
-    updateLayout();
+    textEdited(text);
+}
+
+QString CommentItem::text() const
+{
+    return m_textItem->toPlainText();
 }
 
 void CommentItem::attachTo(InteractiveObject *iObj)
@@ -69,6 +77,13 @@ void CommentItem::attachTo(InteractiveObject *iObj)
     connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::updateLayout, Qt::UniqueConnection);
     connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::updateLayout, Qt::UniqueConnection);
 
+    m_isGlobal = bool(m_iObj == nullptr);
+    updateLayout();
+}
+
+void CommentItem::setGlobal(bool isGlobal)
+{
+    m_isGlobal = isGlobal;
     updateLayout();
 }
 
@@ -87,15 +102,16 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     QPen pen = painter->pen();
     pen.setWidthF(kBorderWidth);
     painter->setPen(pen);
-    const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect())
-                              .adjusted(kBorderWidth, kBorderWidth, -kBorderWidth, -kBorderWidth);
-    painter->fillRect(br, QColor(0xf9e29c));
-    if (!m_iObj) {
-        painter->drawPolyline(QVector<QPointF> {
-                br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(), br.bottomRight(),
-                br.topRight() + QPointF(0, kMargins), br.topRight() - QPointF(kMargins, -kMargins),
-                br.topRight() - QPointF(kMargins, 0), br.topRight() + QPointF(0, kMargins) });
+    const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
+    if (m_isGlobal) {
+        painter->setBrush(QColor(0xf9e29c));
+        painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(),
+                                                br.bottomRight(), br.topRight() + QPointF(0, kMargins),
+                                                br.topRight() - QPointF(kMargins, -kMargins),
+                                                br.topRight() - QPointF(kMargins, 0) });
+        painter->drawLine(br.topRight() - QPointF(kMargins, 0), br.topRight() + QPointF(0, kMargins));
     } else {
+        painter->fillRect(br, QColor(0xf9e29c));
         if (m_inverseLayout)
             painter->drawPolyline(QVector<QPointF> { br.topLeft(), br.topRight(), br.bottomRight(), br.bottomLeft() });
         else
@@ -112,10 +128,15 @@ void CommentItem::prepareHoverMark()
 
 void CommentItem::rebuildLayout()
 {
-    if (!m_iObj)
+    prepareGeometryChange();
+    if (m_isGlobal) {
+        m_linkItem->setVisible(false);
+        m_boundingRect = m_textItem->boundingRect();
+        setPos(sceneBoundingRect().topLeft());
         return;
+    }
 
-    const QPair<QPointF, bool> commentData = m_iObj->commentPoint();
+    const QPair<QPointF, bool> commentData = m_iObj ? m_iObj->commentPoint() : qMakePair(QPointF(0, 0), false);
     const QPointF commentPosition = commentData.first;
     m_inverseLayout = commentData.second;
     QRectF br = m_textItem->boundingRect();
@@ -124,12 +145,13 @@ void CommentItem::rebuildLayout()
         line = { br.right(), br.center().y(), br.right() + kLineLength, br.center().y() };
     } else {
         line = { br.left(), br.center().y(), br.left() + kLineLength, br.center().y() };
-        br.moveLeft(kLineLength);
+        br.moveLeft(line.p2().x());
     }
+    m_linkItem->setVisible(true);
     m_linkItem->setLine(line);
     m_textItem->setPos(br.topLeft());
 
-    m_boundingRect = childrenBoundingRect();
+    m_boundingRect = m_textItem->boundingRect() | m_linkItem->boundingRect();
 
     QRectF rect = sceneBoundingRect();
     rect.moveCenter(commentPosition);

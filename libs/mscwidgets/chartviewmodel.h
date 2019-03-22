@@ -71,6 +71,7 @@ public:
     ActionItem *itemForAction(MscAction *action) const;
     TimerItem *itemForTimer(MscTimer *timer) const;
 
+    msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
     msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
@@ -95,7 +96,8 @@ Q_SIGNALS:
     void layoutComplete();
 
 private Q_SLOTS:
-    void onEntityCommentChange(msc::MscEntity *entity, const QString &comment);
+    void onEntityCommentChanged(const QString &comment = QString());
+    void onInteractiveObjectCommentChange(msc::MscEntity *entity, const QString &comment);
     void onInstanceItemMoved(InstanceItem *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
@@ -117,6 +119,7 @@ private:
     TimerItem *addTimerItem(MscTimer *timer);
 
     void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
+    void updateCommentForMscChart();
     void updateCommentForInteractiveObject(InteractiveObject *iObj);
     void addInstanceItems();
     void addInstanceEventItems();

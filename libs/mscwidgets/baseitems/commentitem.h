@@ -32,7 +32,9 @@ public:
     explicit CommentItem(QGraphicsItem *parent = nullptr);
 
     void setText(const QString &text);
+    QString text() const;
     void attachTo(msc::InteractiveObject *iObj);
+    void setGlobal(bool isGlobal);
     void updateLayout();
 
     QPainterPath shape() const override;
@@ -57,6 +59,7 @@ private:
     QGraphicsLineItem *m_linkItem = nullptr;
     InteractiveObject *m_iObj = nullptr;
     bool m_inverseLayout = false;
+    bool m_isGlobal = true;
 };
 
 } // ns msc

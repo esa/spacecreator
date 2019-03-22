@@ -70,7 +70,8 @@ HEADERS += \
     tools/instancestoptool.h \
     commands/cmdinstancestopchange.h \
     baseitems/commentitem.h \
-    commands/cmdentitycommentchange.h
+    commands/cmdentitycommentchange.h \
+    tools/commentcreatortool.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -132,7 +133,8 @@ SOURCES += \
     tools/instancestoptool.cpp \
     commands/cmdinstancestopchange.cpp \
     baseitems/commentitem.cpp \
-    commands/cmdentitycommentchange.cpp
+    commands/cmdentitycommentchange.cpp \
+    tools/commentcreatortool.cpp
 
 RESOURCES += \
     resources.qrc

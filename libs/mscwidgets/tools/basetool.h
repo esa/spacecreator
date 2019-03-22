@@ -45,6 +45,7 @@ public:
         InstanceCreator,
         InstanceStopper,
         MessageCreator,
+        CommentCreator,
         EntityDeleter,
         TimerCreator,
         HierarchyCreator

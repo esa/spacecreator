@@ -38,6 +38,7 @@
 #include "settings/appoptions.h"
 #include "textview.h"
 #include "tools/actioncreatortool.h"
+#include "tools/commentcreatortool.h"
 #include "tools/conditioncreatortool.h"
 #include "tools/entitydeletetool.h"
 #include "tools/hierarchycreatortool.h"
@@ -743,6 +744,9 @@ void MainWindow::initTools()
     auto messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Create,
                                                          &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(messageCreateTool);
+
+    auto commentCreateTool = new msc::CommentCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(commentCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(actionCreateTool);
