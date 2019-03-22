@@ -249,7 +249,7 @@ void TextItem::keyPressEvent(QKeyEvent *event)
     setTextWidth(idealWidth());
     adjustSize();
 
-    emit keyPressed();
+    Q_EMIT keyPressed();
 }
 
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -308,7 +308,7 @@ void TextItem::setInputValidationPattern(const QString &pattern)
         return;
 
     m_inputValidator.setPattern(patternForced);
-    emit inputValidationPatternChanged(inputValidationPattern());
+    Q_EMIT inputValidationPatternChanged(inputValidationPattern());
 }
 
 bool TextItem::validateInput(const QString &text) const

@@ -29,7 +29,7 @@ class tst_MscGate : public QObject
     static const QByteArray TestPropertyMethodNameMarker;
     static const QString TestGateName;
 
-private slots:
+private Q_SLOTS:
     void testConstructor();
     void testPropertyDirection();
     void testPropertyInstance();

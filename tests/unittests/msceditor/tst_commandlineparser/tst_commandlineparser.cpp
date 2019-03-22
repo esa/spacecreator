@@ -29,7 +29,7 @@ class tst_CommandLineParser : public QObject
     Q_OBJECT
 
 public:
-private slots:
+private Q_SLOTS:
     /*
      * A test slot name for each option must contain "testCmdArgument" -
      * it's used in the tst_CommandLineParser::testCoverage

@@ -29,7 +29,7 @@ protected:
     QString allowedText() const override;
     QString disallowedText() const override;
 
-private slots:
+private Q_SLOTS:
     void init();
     void cleanup();
 

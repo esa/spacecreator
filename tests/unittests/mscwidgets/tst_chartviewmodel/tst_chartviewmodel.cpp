@@ -43,7 +43,7 @@ public:
 private:
     void parseMsc(const QString &mscText);
 
-private slots:
+private Q_SLOTS:
     void init();
     void cleanup();
     void testNearestInstanceSimple();

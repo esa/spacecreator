@@ -167,7 +167,7 @@ void LabeledArrowItem::onTextEdited(const QString &text)
     m_itemText->adjustSize();
     updateLayout();
 
-    emit textEdited(text);
+    Q_EMIT textEdited(text);
 }
 
 void LabeledArrowItem::setDashed(bool dashed)

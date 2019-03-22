@@ -38,7 +38,7 @@ class tst_CifParser : public QObject
 private:
     MscFile *m_mscFile = nullptr;
     CifParser *m_cifParser = nullptr;
-private slots:
+private Q_SLOTS:
 
     void initTestCase();
     void cleanupTestCase();
