@@ -578,7 +578,7 @@ void MainWindow::initActions()
     d->m_actRedo->setShortcut(QKeySequence::Redo);
     d->m_actRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(":/icons/toolbar/redo.svg")));
 
-    d->m_deleteTool = new msc::EntityDeleteTool(d->ui->graphicsView, this);
+    d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
 
     d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);

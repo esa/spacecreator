@@ -34,6 +34,7 @@ public:
     void setText(const QString &text);
     QString text() const;
     void attachTo(msc::InteractiveObject *iObj);
+    InteractiveObject *object() const;
     void setGlobal(bool isGlobal);
     void updateLayout();
 
@@ -57,7 +58,7 @@ private:
 private:
     TextItem *m_textItem = nullptr;
     QGraphicsLineItem *m_linkItem = nullptr;
-    InteractiveObject *m_iObj = nullptr;
+    QPointer<InteractiveObject> m_iObj;
     bool m_inverseLayout = false;
     bool m_isGlobal = true;
 };

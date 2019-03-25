@@ -35,6 +35,7 @@ class InteractiveObject;
 class InstanceItem;
 class MessageItem;
 class TimerItem;
+class CommentItem;
 
 class MscAction;
 class MscChart;
@@ -71,6 +72,7 @@ public:
     ActionItem *itemForAction(MscAction *action) const;
     TimerItem *itemForTimer(MscTimer *timer) const;
 
+    CommentItem *commentForEntity(msc::MscEntity *entity);
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
@@ -119,10 +121,12 @@ private:
     TimerItem *addTimerItem(MscTimer *timer);
 
     void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
-    void updateCommentForMscChart();
-    void updateCommentForInteractiveObject(InteractiveObject *iObj);
     void addInstanceItems();
     void addInstanceEventItems();
+
+    void updateComment(msc::MscEntity *entity, msc::InteractiveObject *iObj = nullptr);
+    void updateCommentForMscChart();
+    void updateCommentForInteractiveObject(InteractiveObject *iObj);
 
     void applyCif();
 };

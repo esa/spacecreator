@@ -61,8 +61,9 @@ void CommentCreatorTool::commitPreviewItem()
     m_previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
     if (!m_previewEntity)
         m_previewEntity = m_model->currentChart();
-    if (m_previewEntity)
-        m_previewEntity->setComment(itemComment);
+
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(m_previewEntity), itemComment };
+    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
 
     removePreviewItem();
     startWaitForModelLayoutComplete(m_previewEntity);
@@ -77,14 +78,6 @@ void CommentCreatorTool::removePreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
-}
-
-void CommentCreatorTool::onModelLayoutComplete()
-{
-    BaseCreatorTool::onModelLayoutComplete();
-    const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(m_previewEntity),
-                                     m_previewEntity ? m_previewEntity->comment() : QString() };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
 }
 
 bool CommentCreatorTool::onMouseMove(QMouseEvent *e)

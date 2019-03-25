@@ -405,36 +405,25 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
 
 void ChartViewModel::updateCommentForMscChart()
 {
-    const QUuid id = d->m_currentChart->internalId();
-    CommentItem *commentItem = d->m_comments.value(id, nullptr);
-    if (d->m_currentChart->comment().isEmpty()) {
-        if (commentItem)
-            d->m_scene.removeItem(commentItem);
-        d->m_comments.remove(id);
-        delete commentItem;
-        commentItem = nullptr;
-    } else {
-        if (!commentItem) {
-            commentItem = new CommentItem;
-            commentItem->attachTo(nullptr);
-            connect(commentItem, &CommentItem::commentChanged, this,
-                    [this](const QString &comment) { d->m_currentChart->setComment(comment); });
-            d->m_scene.addItem(commentItem);
-            d->m_comments.insert(id, commentItem);
-        }
-        commentItem->setText(d->m_currentChart->comment());
-        commentItem->setPos(d->m_layoutInfo.m_pos.x(), d->m_layoutInfo.m_instancesRect.y());
-    }
+    updateComment(currentChart());
 }
 
 void ChartViewModel::updateCommentForInteractiveObject(InteractiveObject *iObj)
 {
-    MscEntity *entity = iObj->modelEntity();
+    if (!iObj)
+        return;
+
+    updateComment(iObj->modelEntity(), iObj);
+}
+
+void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObject *iObj)
+{
     if (!entity)
         return;
 
+    const QUuid id = entity->internalId();
+    CommentItem *commentItem = d->m_comments.value(id, nullptr);
     if (!entity->comment().isEmpty()) {
-        CommentItem *commentItem = d->m_comments.value(entity->internalId(), nullptr);
         if (!commentItem) {
             commentItem = new CommentItem;
             commentItem->attachTo(iObj);
@@ -442,14 +431,14 @@ void ChartViewModel::updateCommentForInteractiveObject(InteractiveObject *iObj)
                     [this, entity](const QString &comment) { onInteractiveObjectCommentChange(entity, comment); });
 
             d->m_scene.addItem(commentItem);
-            d->m_comments.insert(entity->internalId(), commentItem);
+            d->m_comments.insert(id, commentItem);
         }
+        commentItem->setVisible(true);
         commentItem->setText(entity->comment());
-    } else if (CommentItem *commentItem = d->m_comments.value(entity->internalId(), nullptr)) {
-        d->m_comments.remove(entity->internalId());
-        d->m_scene.removeItem(commentItem);
-        delete commentItem;
-        commentItem = nullptr;
+        if (!iObj && entity == currentChart())
+            commentItem->setPos(d->m_layoutInfo.m_pos.x(), d->m_layoutInfo.m_instancesRect.y());
+    } else if (commentItem) {
+        commentItem->setVisible(false);
     }
 }
 
@@ -583,6 +572,14 @@ ActionItem *ChartViewModel::itemForAction(MscAction *action) const
 TimerItem *ChartViewModel::itemForTimer(MscTimer *timer) const
 {
     return utils::itemForEntity<TimerItem, MscTimer>(timer, &d->m_scene);
+}
+
+CommentItem *ChartViewModel::commentForEntity(MscEntity *entity)
+{
+    if (!entity)
+        return nullptr;
+
+    return d->m_comments.value(entity->internalId());
 }
 
 /*!

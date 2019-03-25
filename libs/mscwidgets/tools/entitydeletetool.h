@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basetool.h"
+#include "basecreatortool.h"
 
 class QAction;
 
@@ -25,11 +25,11 @@ namespace msc {
 class MscChart;
 class MscDocument;
 
-class EntityDeleteTool : public BaseTool
+class EntityDeleteTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    EntityDeleteTool(QGraphicsView *view, QObject *parent = nullptr);
+    explicit EntityDeleteTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
 
     BaseTool::ToolType toolType() const override;
     void setView(QGraphicsView *view) override;

@@ -35,8 +35,6 @@ private:
     void commitPreviewItem() override;
     void removePreviewItem() override;
 
-    void onModelLayoutComplete() override;
-
     bool onMouseMove(QMouseEvent *e) override;
 };
 

@@ -17,6 +17,7 @@
 
 #include "entitydeletetool.h"
 
+#include "baseitems/commentitem.h"
 #include "baseitems/interactiveobject.h"
 #include "commands/common/commandsstack.h"
 #include "documentitem.h"
@@ -30,8 +31,8 @@
 
 namespace msc {
 
-EntityDeleteTool::EntityDeleteTool(QGraphicsView *view, QObject *parent)
-    : BaseTool(view, parent)
+EntityDeleteTool::EntityDeleteTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+    : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Delete");
     m_description = tr("Delete an item");
@@ -102,30 +103,47 @@ void EntityDeleteTool::deleteSelectedItems()
     }
 
     QVector<msc::MscEntity *> items;
+    QVector<msc::MscEntity *> itemsWithComments;
     msc::MscDocument *parentDocument = nullptr;
+
+    auto removeComment = [](QVector<msc::MscEntity *> &items, ChartViewModel *model, CommentItem *commentItem) {
+        const msc::InteractiveObject *iObj = commentItem->object();
+        items.append(iObj ? iObj->modelEntity() : model->currentChart());
+    };
 
     for (auto item : m_view->scene()->selectedItems()) {
         auto obj = dynamic_cast<msc::InteractiveObject *>(item);
-        if (obj && obj->modelEntity()) {
-            items.append(obj->modelEntity());
+        if (obj) {
+            if (obj->modelEntity()) {
+                items.append(obj->modelEntity());
+                if (CommentItem *commentItem = m_model->commentForEntity(obj->modelEntity()))
+                    removeComment(itemsWithComments, m_model, commentItem);
+            } else if (CommentItem *commentItem = qobject_cast<CommentItem *>(obj)) {
+                removeComment(itemsWithComments, m_model, commentItem);
+            }
         }
 
         auto documentItem = dynamic_cast<msc::DocumentItem *>(item);
         if (documentItem) {
             parentDocument = documentItem->document()->parentDocument();
 
-            if (parentDocument) {
+            if (parentDocument)
                 items.append(documentItem->document());
-            } else {
+            else
                 return;
-            }
         }
     }
 
+    msc::cmd::CommandsStack::current()->beginMacro(tr("Removing Entities"));
+    for (msc::MscEntity *entity : itemsWithComments) {
+        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
+                                      { QVariant::fromValue<msc::MscEntity *>(entity), QString() });
+    }
     msc::cmd::CommandsStack::push(msc::cmd::DeleteEntity,
                                   { QVariant::fromValue<QVector<msc::MscEntity *>>(items),
                                     QVariant::fromValue<msc::MscChart *>(m_currentChart),
                                     QVariant::fromValue<msc::MscDocument *>(parentDocument) });
+    msc::cmd::CommandsStack::current()->endMacro();
 }
 
 void EntityDeleteTool::updateEnabledState()

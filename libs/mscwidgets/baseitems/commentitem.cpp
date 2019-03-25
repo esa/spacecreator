@@ -35,6 +35,8 @@ CommentItem::CommentItem(QGraphicsItem *parent)
     , m_textItem(new TextItem(this))
     , m_linkItem(new QGraphicsLineItem(this))
 {
+    setFlag(QGraphicsItem::ItemIsSelectable);
+
     m_textItem->setFramed(false);
     m_textItem->setEditable(true);
     m_textItem->setBackgroundColor(Qt::transparent);
@@ -81,6 +83,11 @@ void CommentItem::attachTo(InteractiveObject *iObj)
     updateLayout();
 }
 
+InteractiveObject *CommentItem::object() const
+{
+    return m_iObj;
+}
+
 void CommentItem::setGlobal(bool isGlobal)
 {
     m_isGlobal = isGlobal;
@@ -118,6 +125,8 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
             painter->drawPolyline(QVector<QPointF> { br.topRight(), br.topLeft(), br.bottomLeft(), br.bottomRight() });
     }
     painter->restore();
+
+    InteractiveObject::paint(painter, option, widget);
 }
 
 void CommentItem::prepareHoverMark()
@@ -151,7 +160,8 @@ void CommentItem::rebuildLayout()
     m_linkItem->setLine(line);
     m_textItem->setPos(br.topLeft());
 
-    m_boundingRect = m_textItem->boundingRect() | m_linkItem->boundingRect();
+    m_boundingRect = mapRectFromItem(m_textItem, m_textItem->boundingRect())
+            | mapRectFromItem(m_linkItem, m_linkItem->boundingRect());
 
     QRectF rect = sceneBoundingRect();
     rect.moveCenter(commentPosition);
