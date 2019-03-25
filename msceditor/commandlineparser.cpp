@@ -70,6 +70,12 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                                   QCoreApplication::translate("CommandLineParser", "Start remote control using <port>"),
                                   QCoreApplication::translate("CommandLineParser", "port"));
     }
+    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+        return QCommandLineOption(
+                { "d", "drop-changes-silently" },
+                QCoreApplication::translate("CommandLineParser",
+                                            "Do not propose to save changes when closing a document"));
+    }
     default: {
         Q_UNREACHABLE();
         break;

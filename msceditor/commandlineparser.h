@@ -33,6 +33,8 @@ public:
 
         DbgOpenMscExamplesChain,
         StartRemoteControl,
+
+        DropUnsavedChangesSilently,
         Unknown
     };
     Q_ENUM(Positional)

@@ -145,6 +145,7 @@ struct MainWindowPrivate {
     QPointer<msc::MscDocument> m_selectedDocument;
 
     int m_lastSavedUndoId = 0;
+    bool m_dropUnsavedChangesSilently = false;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -1147,6 +1148,10 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
             return true;
         }
     } break;
+    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+        d->m_dropUnsavedChangesSilently = true;
+        break;
+    }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;
@@ -1314,7 +1319,7 @@ QStringList MainWindow::mscFileFilters()
 
 bool MainWindow::saveDocument()
 {
-    if (needSave()) {
+    if (!d->m_dropUnsavedChangesSilently && needSave()) {
         auto result = QMessageBox::question(this, windowTitle(),
                                             tr("You have unsaved data. Do you want to save the MSC document?"),
                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);

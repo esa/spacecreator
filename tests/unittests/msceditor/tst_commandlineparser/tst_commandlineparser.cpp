@@ -186,6 +186,7 @@ void tst_CommandLineParser::testCoverage()
     int ignoredCommands(0);
     ++ignoredCommands; // CommandLineParser::PositionalArg::Unknown
     ++ignoredCommands; // CommandLineParser::PositionalArg::DbgOpenMscExamplesChain
+    ++ignoredCommands; // CommandLineParser::PositionalArg::DropUnsavedChangesSilently
 
     QCOMPARE(testMethods.size(), e.keyCount() - ignoredCommands);
 }
