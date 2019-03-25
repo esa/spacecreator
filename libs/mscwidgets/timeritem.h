@@ -65,6 +65,7 @@ private Q_SLOTS:
     void rebuildLayout() override;
     void onInstanceMoved(const QPointF &from, const QPointF &to);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void updateConnectorLineVisibility();
 
 private:
     void drawStartSymbol(QPainter *painter, const QRectF &rect);

@@ -215,7 +215,8 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_connectingItem = nullptr;
     }
 
-    m_timerConnector->setVisible(false);
+    updateConnectorLineVisibility();
+    updateLayout();
 
     InteractiveObject::mouseReleaseEvent(event);
 }
@@ -296,8 +297,9 @@ void TimerItem::rebuildLayout()
             connect(preTimer, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
             connect(this, &InteractiveObject::relocated, this, &TimerItem::rebuildLayout, Qt::UniqueConnection);
         }
-        m_timerConnector->setVisible(preTimer && preTimer->isVisible());
     }
+
+    updateConnectorLineVisibility();
 
     const qreal x = m_instance->centerInScene().x();
     setX(x);
@@ -317,6 +319,12 @@ void TimerItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QP
     if (pos == GripPoint::Location::Center) {
         Q_EMIT moved(this);
     }
+}
+
+void TimerItem::updateConnectorLineVisibility()
+{
+    TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
+    m_timerConnector->setVisible(preTimer && preTimer->isVisible());
 }
 
 void TimerItem::drawStartSymbol(QPainter *painter, const QRectF &rect)
