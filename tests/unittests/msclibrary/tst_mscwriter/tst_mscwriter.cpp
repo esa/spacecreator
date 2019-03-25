@@ -23,6 +23,8 @@
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscmessagedeclaration.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "mscwriter.h"
@@ -59,6 +61,7 @@ private Q_SLOTS:
     void testSerializeCreate();
     void testSerializeChartWithCreate();
     void testSerializeComments();
+    void testSerializeMessageDeclarations();
 
 private:
     static const QString TabSpaces;
@@ -564,6 +567,21 @@ void tst_MscWriter::testSerializeComments()
     QCOMPARE(serializeList.at(5), tab2("endinstance;"));
     QCOMPARE(serializeList.at(6), tab1("endmsc;"));
     QCOMPARE(serializeList.at(7), QString("endmscdocument;"));
+}
+
+void tst_MscWriter::testSerializeMessageDeclarations()
+{
+    MscDocument document("Doc_1");
+    auto md = new MscMessageDeclaration(&document);
+    md->setNames({ "gui_send_tm", "pepe" });
+    md->setTypeRefList({ { "str" }, { "T-POS" } });
+    document.messageDeclarations()->append(md);
+
+    QStringList serializeList = this->serialize(&document).split("\n");
+    QVERIFY(serializeList.size() >= 3);
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
+    QCOMPARE(serializeList.at(1), tab1("msg gui_send_tm, pepe : (str, T-POS);"));
+    QCOMPARE(serializeList.at(2), QString("endmscdocument;"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscWriter)

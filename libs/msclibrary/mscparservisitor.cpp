@@ -26,6 +26,7 @@
 #include "mscdocument.h"
 #include "mscgate.h"
 #include "mscinstance.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "parserdebughelper_p.h"
@@ -690,6 +691,24 @@ antlrcpp::Any MscParserVisitor::visitDataDefinition(MscParser::DataDefinitionCon
     return visitChildren(context);
 }
 
+antlrcpp::Any MscParserVisitor::visitMessageDecl(MscParser::MessageDeclContext *context)
+{
+    if (m_currentDocument) {
+        MscMessageDeclarationList *mdl = m_currentDocument->messageDeclarations();
+        auto md = new MscMessageDeclaration(mdl);
+        QStringList names;
+        MscParser::MessageNameListContext *nameListContext = context->messageNameList();
+        while (nameListContext) {
+            names.append(::nameToString(nameListContext->name()));
+            nameListContext = nameListContext->messageNameList();
+        }
+        md->setNames(names);
+        md->setTypeRefList(readTypeRefList(context->typeRefList()));
+        mdl->append(md);
+    }
+    return visitChildren(context);
+}
+
 antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionContext *context)
 {
     if (!m_currentChart) {
@@ -1040,4 +1059,15 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
         parameterList = parameterList->parameterList();
     }
     return parameters;
+}
+
+QStringList MscParserVisitor::readTypeRefList(MscParser::TypeRefListContext *context)
+{
+    QStringList result;
+    while (context) {
+        result.append(::nameToString(context->name()));
+        context = context->typeRefList();
+    }
+
+    return result;
 }

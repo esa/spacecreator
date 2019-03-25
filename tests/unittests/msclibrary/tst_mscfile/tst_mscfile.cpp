@@ -24,6 +24,7 @@
 #include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 
@@ -66,6 +67,7 @@ private Q_SLOTS:
     void testDocumentsType_data();
     void testDocumentsType();
     void testDefaultDocumentTypeFromLoad();
+    void testMessageDeclaration();
 
     // for message-related tests see the tst_MscEventsParsing
 
@@ -673,6 +675,36 @@ void tst_MscFile::testDefaultDocumentTypeFromLoad()
     QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyIs);
     childDoc = childDoc->documents().at(0);
     QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyException);
+}
+
+void tst_MscFile::testMessageDeclaration()
+{
+    QString msc = "mscdocument automade; \
+                inst mygui_GUI : process; \
+                msg gui_send_tm, pepe : (str, T-POS); \
+                msc recorded; \
+                    gate out gui_send_tm,a(hello, b) to mygui_GUI; \
+                    mygui_GUI : instance  process; \
+                        in gui_send_tm,a(hello, b)  from env; \
+                    endinstance; \
+                endmsc; \
+            endmscdocument;";
+    QScopedPointer<MscModel> model(file->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    MscMessageDeclarationList *mdl = doc->messageDeclarations();
+    QCOMPARE(mdl->size(), 1);
+
+    MscMessageDeclaration *md = mdl->at(0);
+    QStringList nameList = md->names();
+    QCOMPARE(nameList.size(), 2);
+    QCOMPARE(nameList.at(0), QString("gui_send_tm"));
+    QCOMPARE(nameList.at(1), QString("pepe"));
+    QStringList typeRefs = md->typeRefList();
+    QCOMPARE(typeRefs.size(), 2);
+    QCOMPARE(typeRefs.at(0), QString("str"));
+    QCOMPARE(typeRefs.at(1), QString("T-POS"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

@@ -18,17 +18,24 @@
 #include "mscdocument.h"
 
 #include "mscchart.h"
+#include "mscmessagedeclarationlist.h"
 
 namespace msc {
 
 MscDocument::MscDocument(QObject *parent)
     : MscEntity(parent)
+    , m_messageDeclarations(new MscMessageDeclarationList(this))
 {
+    connect(m_messageDeclarations, &MscMessageDeclarationList::dataChanged, this, &MscDocument::dataChanged);
+    connect(m_messageDeclarations, &MscMessageDeclarationList::countChanged, this, &MscDocument::dataChanged);
 }
 
 MscDocument::MscDocument(const QString &name, QObject *parent)
     : MscEntity(name, parent)
+    , m_messageDeclarations(new MscMessageDeclarationList(this))
 {
+    connect(m_messageDeclarations, &MscMessageDeclarationList::dataChanged, this, &MscDocument::dataChanged);
+    connect(m_messageDeclarations, &MscMessageDeclarationList::countChanged, this, &MscDocument::dataChanged);
 }
 
 MscDocument::~MscDocument()
@@ -117,6 +124,14 @@ void MscDocument::addChart(MscChart *chart)
     Q_EMIT dataChanged();
 }
 
+/*!
+   \return The message declarations of the document head
+ */
+MscMessageDeclarationList *MscDocument::messageDeclarations() const
+{
+    return m_messageDeclarations;
+}
+
 void MscDocument::clear()
 {
     qDeleteAll(m_documents);
@@ -124,6 +139,11 @@ void MscDocument::clear()
 
     qDeleteAll(m_charts);
     m_charts.clear();
+
+    {
+        QSignalBlocker sb(this);
+        m_messageDeclarations->clear(true);
+    }
 
     Q_EMIT cleared();
     Q_EMIT dataChanged();

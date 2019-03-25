@@ -34,7 +34,7 @@ textDefinition
 // 3 Message Sequence Chart document
 
 mscDocument
-    : documentHead (containingClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
+    : documentHead (containingClause | messageDeclClause | mscDocument | mscDefinition)* ENDMSCDOCUMENT end definingMscReference*
     | MSCDOCUMENT NAME REFERENCED end // not in the spec
     ;
 
@@ -60,12 +60,11 @@ inheritance
     : INHERITS instanceKind
     ;
 messageDeclClause
-    : (MSG messageDecl end)*
+    : (MSG messageDecl end)+
     ;
 
 mscDefinition
     : messageSequenceChart
-        | MSG NAME (COMMA NAME)* (COLON LEFTOPEN parameterList? RIGHTOPEN)? end // parameterList should be mandatory according to the spec
     ;
 
 identifier
@@ -392,10 +391,10 @@ messageDeclList
     : messageDecl (end messageDeclList)?
     ;
 messageDecl
-    : messageNameList (COLON LEFTOPEN typeRefList RIGHTOPEN)?
+    : messageNameList (COLON LEFTOPEN typeRefList? RIGHTOPEN)? // typeRefList is mandatory accordint to the spec
     ;
 messageNameList
-    : NAME (COMMA messageNameList)?
+    : name (COMMA messageNameList)?
     ;
 timerDeclList
     : timerDecl (end timerDeclList)?
@@ -407,7 +406,7 @@ timerNameList
     : NAME (COMMA timerNameList)?
     ;
 typeRefList
-    : STRING (COMMA typeRefList)?
+    : name (COMMA typeRefList)?
     ;
 dynamicDeclList
     : VARIABLES variableDeclList end

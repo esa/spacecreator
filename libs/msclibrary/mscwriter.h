@@ -21,8 +21,6 @@
 
 namespace msc {
 
-class MscInstanceEvent;
-class MscTimer;
 class MscAction;
 class MscChart;
 class MscCondition;
@@ -31,8 +29,11 @@ class MscCreate;
 class MscDocument;
 class MscEntity;
 class MscInstance;
+class MscInstanceEvent;
 class MscMessage;
+class MscMessageDeclarationList;
 class MscModel;
+class MscTimer;
 
 class MscWriter : public QObject
 {
@@ -54,6 +55,7 @@ protected:
     QString serialize(const MscTimer *timer, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscAction *action, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCoregion *region, int tabsSize = 0);
+    QString serialize(const MscMessageDeclarationList *declarationList, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 

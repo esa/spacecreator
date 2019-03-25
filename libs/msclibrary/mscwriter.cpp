@@ -25,6 +25,7 @@
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 
@@ -278,6 +279,21 @@ QString MscWriter::serialize(const MscCoregion *region, int tabsSize)
     return QString("%1%2;\n").arg(tabs(tabsSize), type);
 }
 
+QString MscWriter::serialize(const MscMessageDeclarationList *declarationList, int tabsSize)
+{
+    Q_ASSERT(declarationList);
+    QString declarations;
+    QString tabString = tabs(tabsSize);
+    for (const MscMessageDeclaration *declaration : *declarationList) {
+        declarations += tabString + "msg " + declaration->names().join(", ");
+        if (!declaration->typeRefList().isEmpty()) {
+            declarations += QString(" : (%1)").arg(declaration->typeRefList().join(", "));
+        }
+        declarations += ";\n";
+    }
+    return declarations;
+}
+
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 {
     if (chart == nullptr)
@@ -302,6 +318,9 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     QString documentBody;
 
     const int tabCount = tabsSize + 1;
+
+    documentBody += serialize(document->messageDeclarations(), tabCount);
+
     for (const auto *doc : document->documents())
         documentBody += serialize(doc, tabCount);
 

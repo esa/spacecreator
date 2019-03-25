@@ -66,6 +66,7 @@ public:
     antlrcpp::Any visitCreate(MscParser::CreateContext *context) override;
     antlrcpp::Any visitStop(MscParser::StopContext *context) override;
     antlrcpp::Any visitDataDefinition(MscParser::DataDefinitionContext *context) override;
+    antlrcpp::Any visitMessageDecl(MscParser::MessageDeclContext *context) override;
     antlrcpp::Any visitStartCoregion(MscParser::StartCoregionContext *ctx) override;
     antlrcpp::Any visitEndCoregion(MscParser::EndCoregionContext *ctx) override;
     antlrcpp::Any visitCoregion(MscParser::CoregionContext *context) override;
@@ -116,4 +117,5 @@ private:
     msc::MscEntity *cifTarget() const;
     std::vector<antlr4::Token *> getHiddenCommentTokensToLeft(int tokenIndex);
     msc::MscParameterList readParameterList(MscParser::ParameterListContext *parameterList);
+    QStringList readTypeRefList(MscParser::TypeRefListContext *context);
 };

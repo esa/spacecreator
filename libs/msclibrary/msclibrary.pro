@@ -2,6 +2,7 @@ TEMPLATE = lib
 TARGET = msclibrary
 
 include(../../esa.pri)
+include(../../depend_qobjectlistmodel.pri)
 include(../../depend_asn1library.pri)
 include(../../suppress_antlr_wrn.pri)
 
@@ -11,6 +12,8 @@ CONFIG += no_keywords
 QT += core gui
 
 HEADERS += \
+    mscmessagedeclaration.h \
+    mscmessagedeclarationlist.h \
     mscparameterlist.h \
     parser/MscBaseVisitor.h \
     parser/MscLexer.h \
@@ -43,6 +46,8 @@ HEADERS += \
     cif/cifblocks.h
 
 SOURCES += \
+    mscmessagedeclaration.cpp \
+    mscmessagedeclarationlist.cpp \
     mscparameterlist.cpp \
     parser/MscBaseVisitor.cpp \
     parser/MscLexer.cpp \

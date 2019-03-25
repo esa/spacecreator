@@ -25,6 +25,7 @@
 
 namespace msc {
 class MscChart;
+class MscMessageDeclarationList;
 
 class MscDocument : public MscEntity
 {
@@ -53,6 +54,8 @@ public:
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
 
+    MscMessageDeclarationList *messageDeclarations() const;
+
     void clear();
 
     MscDocument *parentDocument() const;
@@ -74,6 +77,7 @@ Q_SIGNALS:
 private:
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
+    MscMessageDeclarationList *m_messageDeclarations = nullptr;
 
     HierarchyType m_hierarchyType = HierarchyAnd;
 };

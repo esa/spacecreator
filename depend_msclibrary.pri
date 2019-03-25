@@ -20,3 +20,6 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD_BASE/$${LibPrefix}msclibrary.$$LibSuffix
 
 # Add ANTLR runtime
 include("$$PWD/link_antlr_rt.pri")
+
+# add qobjectlistmodel
+include (depend_qobjectlistmodel.pri)
