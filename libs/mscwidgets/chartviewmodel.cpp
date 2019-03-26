@@ -275,6 +275,11 @@ void ChartViewModel::addInstanceItems()
         d->m_layoutInfo.m_instancesRect = d->m_layoutInfo.m_instancesRect.united(item->sceneBoundingRect());
 
         updateCommentForInteractiveObject(item);
+        if (!instance->comment().isEmpty()) {
+            msc::CommentItem *commentItem = d->m_comments.value(instance->internalId());
+            if (commentItem)
+                d->m_layoutInfo.m_pos.rx() += commentItem->boundingRect().width() - d->InterInstanceSpan;
+        }
 
         if (d->m_visibleItemLimit != -1 && instance->explicitStop()) {
             const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
@@ -435,8 +440,10 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
         }
         commentItem->setVisible(true);
         commentItem->setText(entity->comment());
-        if (!iObj && entity == currentChart())
-            commentItem->setPos(d->m_layoutInfo.m_pos.x(), d->m_layoutInfo.m_instancesRect.y());
+        if (!iObj && entity == currentChart()) {
+            commentItem->setPos(d->m_layoutInfo.m_pos.x() + d->InterInstanceSpan / 4,
+                                d->m_layoutInfo.m_instancesRect.y());
+        }
     } else if (commentItem) {
         commentItem->setVisible(false);
     }

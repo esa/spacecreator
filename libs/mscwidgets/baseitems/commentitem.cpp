@@ -47,6 +47,7 @@ CommentItem::CommentItem(QGraphicsItem *parent)
     m_linkItem->setPen(QPen(Qt::black, kBorderWidth, Qt::DashLine));
 
     setHighlightable(false);
+    setGlobal(true);
 }
 
 void CommentItem::setText(const QString &text)
@@ -79,8 +80,7 @@ void CommentItem::attachTo(InteractiveObject *iObj)
     connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::updateLayout, Qt::UniqueConnection);
     connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::updateLayout, Qt::UniqueConnection);
 
-    m_isGlobal = bool(m_iObj == nullptr);
-    updateLayout();
+    setGlobal(m_iObj == nullptr);
 }
 
 InteractiveObject *CommentItem::object() const
@@ -132,7 +132,8 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 void CommentItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({});
+    m_gripPoints->setUsedPoints(m_isGlobal ? GripPoint::Locations { GripPoint::Location::Center }
+                                           : GripPoint::Locations {});
 }
 
 void CommentItem::rebuildLayout()
@@ -174,9 +175,10 @@ void CommentItem::rebuildLayout()
 
 void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    if (m_isGlobal && gp->location() == GripPoint::Location::Center) {
+        const QPointF &delta = to - from;
+        setPos(pos() + delta);
+    }
 }
 
 void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
