@@ -24,6 +24,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <cmath>
 
 namespace msc {
 
@@ -143,7 +144,10 @@ void ActionItem::rebuildLayout()
 
     m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
-    setX(x);
+    if (std::abs(x - this->x()) > 1e-3) {
+        setX(x);
+        Q_EMIT needRelayout();
+    }
 }
 
 void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
