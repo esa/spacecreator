@@ -32,6 +32,7 @@
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
 #include "commands/cmdtimeritemcreate.h"
 #include "commands/cmdtimeritemmove.h"
@@ -40,6 +41,7 @@
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscinstance.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 
@@ -91,6 +93,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createHierarchyTypeChange(params);
     case cmd::CreateDocument:
         return cmd::CommandsFactory::createDocumentCreate(params);
+    case cmd::SetMessageDeclarations:
+        return cmd::CommandsFactory::createSetMessageDeclarations(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -353,6 +357,19 @@ QUndoCommand *CommandsFactory::createDocumentCreate(const QVariantList &params)
     if (auto document = params.first().value<MscDocument *>()) {
         if (auto parent = params.last().value<MscDocument *>()) {
             return new CmdDocumentCreate(document, parent);
+        }
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createSetMessageDeclarations(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (auto document = params.first().value<MscDocument *>()) {
+        if (auto declarations = params.last().value<MscMessageDeclarationList *>()) {
+            return new CmdSetMessageDeclarations(document, declarations);
         }
     }
 

@@ -22,6 +22,7 @@ SUBDIRS = \
     tst_msceventsparsing \
     tst_mscfile \
     tst_mscgate \
+    tst_mscmessagedeclarationlist \
     tst_mscmodel \
     tst_msctimer \
     tst_mscwriter \

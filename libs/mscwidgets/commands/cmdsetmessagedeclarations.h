@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,33 +17,30 @@
 
 #pragma once
 
+#include "commands/basecommand.h"
+
 namespace msc {
+
+class MscDocument;
+class MscMessageDeclarationList;
+
 namespace cmd {
 
-enum Id
+class CmdSetMessageDeclarations : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    SetParameterList,
-    SetMessageDeclarations,
-    LastId
+public:
+    CmdSetMessageDeclarations(msc::MscDocument *document, msc::MscMessageDeclarationList *declarations);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    MscDocument *m_document = nullptr;
+    MscMessageDeclarationList *m_newDeclarations = nullptr;
+    MscMessageDeclarationList *m_oldDeclarations = nullptr;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc

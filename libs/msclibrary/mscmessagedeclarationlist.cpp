@@ -24,4 +24,45 @@ MscMessageDeclarationList::MscMessageDeclarationList(QObject *parent)
 {
 }
 
+QVariant MscMessageDeclarationList::data(const QModelIndex &index, int role) const
+{
+    if (index.row() < 0 || index.row() >= m_objects.size()) {
+        return QVariant();
+    }
+
+    switch (role) {
+    case ObjectRole:
+        return QVariant::fromValue(m_objects.at(index.row()));
+    case Qt::DisplayRole:
+        return QVariant::fromValue(at(index.row())->names().join(", "));
+    }
+
+    return QVariant();
+}
+
+MscMessageDeclarationList *MscMessageDeclarationList::clone() const
+{
+    auto result = new MscMessageDeclarationList();
+
+    QList<MscMessageDeclaration *> list;
+    list.reserve(size());
+    for (const MscMessageDeclaration *decl : *this) {
+        auto copy = new MscMessageDeclaration(result);
+        copy->setNames(decl->names());
+        copy->setTypeRefList(decl->typeRefList());
+        list.append(copy);
+    }
+    result->setObjectList(list);
+
+    return result;
+}
+
+void MscMessageDeclarationList::setObjectList(const QList<MscMessageDeclaration *> &objects)
+{
+    QObjectListModelT::setObjectList(objects);
+    for (MscMessageDeclaration *delc : objects) {
+        delc->setParent(this);
+    }
+}
+
 } // namespace msc

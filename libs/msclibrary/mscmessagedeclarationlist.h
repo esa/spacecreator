@@ -28,6 +28,12 @@ class MscMessageDeclarationList : public QObjectListModelT<MscMessageDeclaration
     Q_OBJECT
 public:
     MscMessageDeclarationList(QObject *parent = nullptr);
+
+    QVariant data(const QModelIndex &index, int role) const override;
+
+    MscMessageDeclarationList *clone() const;
+
+    void setObjectList(const QList<MscMessageDeclaration *> &objects) override;
 };
 
 } // namespace msc

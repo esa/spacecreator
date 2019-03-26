@@ -27,6 +27,7 @@ HEADERS += \
     baseitems/msgidentificationitem.h \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
+    commands/cmdsetmessagedeclarations.h \
     commands/common/commandids.h \
     commands/common/commandsfactory.h \
     commands/common/commandsstack.h \
@@ -71,6 +72,7 @@ HEADERS += \
     graphicsview.h \
     hierarchyviewmodel.h \
     instanceitem.h \
+    messagedeclarationsdialog.h \
     messageitem.h \
     textview.h \
     timeritem.h \
@@ -93,6 +95,7 @@ SOURCES += \
     baseitems/msgidentificationitem.cpp \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
+    commands/cmdsetmessagedeclarations.cpp \
     commands/common/commandsfactory.cpp \
     commands/common/commandsstack.cpp \
     commands/basecommand.cpp \
@@ -136,9 +139,14 @@ SOURCES += \
     graphicsview.cpp \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
+    messagedeclarationsdialog.cpp \
     messageitem.cpp \
     textview.cpp \
     timeritem.cpp \
 
+FORMS += \
+    messagedeclarationsdialog.ui
+
 RESOURCES += \
     resources.qrc
+

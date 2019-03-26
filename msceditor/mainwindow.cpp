@@ -26,12 +26,14 @@
 #include "graphicsview.h"
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
+#include "messagedeclarationsdialog.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscmessage.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "remotecontrolwebserver.h"
@@ -637,6 +639,9 @@ void MainWindow::initMenuView()
     group->addAction(d->m_actShowDocument);
     group->addAction(d->m_actShowHierarchy);
     d->m_actShowDocument->setChecked(true);
+
+    d->m_menuView->addSeparator();
+    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::showMessages);
 
     initMenuViewWindows();
 }
@@ -1348,6 +1353,7 @@ QPlainTextEdit *MainWindow::textOutputPane() const
 
 #ifdef QT_DEBUG
 #include <QInputDialog>
+
 // A way to precisiousely move mouse pointer to scene coordinates without pixel hunting.
 // Invoked by CTRL+ALT+SHIFT+M
 void MainWindow::showMousePositioner()
@@ -1396,4 +1402,20 @@ bool MainWindow::needSave() const
 void MainWindow::showCoordinatesInfo(const QString &info)
 {
     statusBar()->showMessage(info);
+}
+
+void MainWindow::showMessages()
+{
+    QVector<msc::MscDocument *> docs = d->m_model->mscModel()->documents();
+    if (docs.isEmpty()) {
+        return;
+    }
+
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), this);
+    int result = dialog.exec();
+    if (result == QDialog::Accepted) {
+        const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
+                                         QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+    }
 }

@@ -55,6 +55,7 @@ public:
     void addChart(MscChart *chart);
 
     MscMessageDeclarationList *messageDeclarations() const;
+    MscMessageDeclarationList *messageDeclarations();
 
     void clear();
 

@@ -69,8 +69,8 @@ public:
         : QObjectListModel(objectListModel, parent)
     {
     }
-    QList<T> objectList() const;
-    void setObjectList(const QList<T> &objects);
+    const QList<T> objectList() const;
+    virtual void setObjectList(const QList<T> &objects);
     inline T at(int i) const { return static_cast<T>(m_objects.at(i)); }
     inline T operator[](int i) const { return static_cast<T>(m_objects[i]); }
     inline T first() const { return static_cast<T>(m_objects.at(0)); }
@@ -115,9 +115,9 @@ void QObjectListModelT<T>::setObjectList(const QList<T> &objects)
 }
 
 template<class T>
-QList<T> QObjectListModelT<T>::objectList() const
+const QList<T> QObjectListModelT<T>::objectList() const
 {
-    return *reinterpret_cast<QList<T> *>(&QObjectListModel::objectList());
+    return *reinterpret_cast<const QList<T> *>(&QObjectListModel::objectList());
 }
 
 template<class T>

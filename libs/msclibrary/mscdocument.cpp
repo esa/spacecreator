@@ -132,6 +132,11 @@ MscMessageDeclarationList *MscDocument::messageDeclarations() const
     return m_messageDeclarations;
 }
 
+MscMessageDeclarationList *MscDocument::messageDeclarations()
+{
+    return m_messageDeclarations;
+}
+
 void MscDocument::clear()
 {
     qDeleteAll(m_documents);

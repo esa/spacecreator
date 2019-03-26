@@ -17,33 +17,37 @@
 
 #pragma once
 
+#include <QDialog>
+
 namespace msc {
-namespace cmd {
+class MscModel;
+class MscMessageDeclaration;
+class MscMessageDeclarationList;
+}
 
-enum Id
+namespace Ui {
+class MessageDeclarationsDialog;
+}
+
+class MessageDeclarationsDialog : public QDialog
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    SetParameterList,
-    SetMessageDeclarations,
-    LastId
-};
+    Q_OBJECT
 
-} // ns cmd
-} // ns msc
+public:
+    explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, QWidget *parent = nullptr);
+    ~MessageDeclarationsDialog();
+
+    msc::MscMessageDeclarationList *declarations() const;
+
+private Q_SLOTS:
+    void showSelectedMessage();
+    void addDeclaration();
+    void removeDeclaration();
+
+    void updateNames();
+
+private:
+    Ui::MessageDeclarationsDialog *ui;
+    msc::MscMessageDeclarationList *m_model = nullptr;
+    msc::MscMessageDeclaration *m_selectedDeclaration = nullptr;
+};
