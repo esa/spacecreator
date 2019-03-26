@@ -58,7 +58,6 @@ void tst_MscMessageDeclarationList::testSetObjectList()
     MscMessageDeclarationList list;
     list.setObjectList(plainList);
 
-    QVERIFY(clone);
     QCOMPARE(list.size(), 1);
     QCOMPARE(list.at(0)->names(), QStringList { { "AAA" } });
     QCOMPARE(list.at(0)->parent(), &list);
