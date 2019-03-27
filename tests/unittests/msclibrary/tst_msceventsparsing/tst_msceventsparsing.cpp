@@ -142,8 +142,7 @@ void tst_MscEventsParsing::testMessageWithParameters()
                       OUT q_accept( { cardData (. 1002,9999,'1701' .),amount '400' } ) TO ENV VIA co_tr; \
                    ENDINSTANCE; \
                    ENDMSC;";
-
-    MscModel *model = file->parseText(msc);
+    QScopedPointer<MscModel> model(file->parseText(msc));
 
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
@@ -164,7 +163,11 @@ void tst_MscEventsParsing::testMessageWithParameters()
     parameters = message->parameters();
     QCOMPARE(parameters.at(0).pattern(), QString("12"));
 
-    delete model;
+    message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(6));
+    QVERIFY(message != nullptr);
+    parameters = message->parameters();
+    QCOMPARE(parameters.size(), 1);
+    QCOMPARE(parameters.at(0).pattern(), QString("(. 1002,9999,'1701' .)"));
 #endif
 }
 
@@ -232,7 +235,7 @@ void tst_MscEventsParsing::testMultiParameters()
     QCOMPARE(message->name(), QString("hello"));
     MscParameterList parameters = message->parameters();
     QCOMPARE(parameters.size(), 2);
-    QCOMPARE(parameters.at(0).expression(), QString("b:FALSE"));
+    QCOMPARE(parameters.at(0).expression(), QString("b:   FALSE"));
     QCOMPARE(parameters.at(1).pattern(), QString("11"));
 }
 

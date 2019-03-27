@@ -35,6 +35,21 @@
 #include <QScopedPointer>
 #include <string>
 
+namespace {
+
+static QString sourceTextForContext(antlr4::ParserRuleContext *context)
+{
+    if (context != nullptr) {
+        antlr4::CharStream *cs = context->start->getInputStream();
+        size_t startIndex = context->start->getStartIndex();
+        size_t stopIndex = context->stop != nullptr ? context->stop->getStopIndex() : -1;
+        antlr4::misc::Interval interval(startIndex, stopIndex);
+        std::string str = cs->getText(interval);
+        return QString::fromStdString(str);
+    }
+    return QString();
+}
+
 template<typename T>
 static QString treeNodeToString(T *node)
 {
@@ -88,6 +103,8 @@ static void parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
     if (end->comment()) {
         entity->setComment(charactersToString(end->comment()->CHARACTERSTRING()));
     }
+}
+
 }
 
 using namespace msc;
@@ -605,7 +622,7 @@ antlrcpp::Any MscParserVisitor::visitActionStatement(MscParser::ActionStatementC
                 const QString &informalAction = nameToString(iaCtx->name());
                 action->setInformalAction(informalAction);
             } else {
-                action->setInformalAction(::treeNodeToString(iaCtx));
+                action->setInformalAction(::sourceTextForContext(iaCtx));
             }
         }
     } else {
@@ -1049,8 +1066,11 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
     QVector<msc::MscParameter> parameters;
     while (parameterList && parameterList->paramaterDefn()) {
         auto *paramaterDefn = parameterList->paramaterDefn();
-        QString expression = ::treeNodeToString(paramaterDefn->expression());
-        QString pattern = ::treeNodeToString(paramaterDefn->pattern());
+        QString expression = ::sourceTextForContext(paramaterDefn->expression());
+        QString pattern = ::sourceTextForContext(paramaterDefn->pattern());
+        if (pattern.isEmpty()) {
+            pattern = ::sourceTextForContext(paramaterDefn->sdlText());
+        }
         if (!expression.isEmpty() || !pattern.isEmpty()) {
             msc::MscParameter parameter(expression, pattern);
             parameters << parameter;

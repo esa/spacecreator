@@ -419,7 +419,7 @@ void tst_MscFile::testAction()
             ENDINSTANCE; \
          ENDMSC;" };
 
-    MscModel *model = file->parseText(msc);
+    QScopedPointer<MscModel> model(file->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -438,7 +438,12 @@ void tst_MscFile::testAction()
     QCOMPARE(action->dataStatements().size(), 2);
     QCOMPARE(action->instance(), chart->instances().at(0));
 
-    delete model;
+    action = static_cast<MscAction *>(chart->instanceEvents().at(3));
+    QVERIFY(action != nullptr);
+    QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
+    QCOMPARE(action->informalAction(),
+             QString("filter(mkpixrow_t((. 0,0,0 .), (. 128,128,128 .)))=mkpixrow_t((. 4,0,0 .),(. 132,128,128 .))"));
+    QCOMPARE(action->instance(), chart->instances().at(0));
 }
 
 void tst_MscFile::testInstanceStop_data()

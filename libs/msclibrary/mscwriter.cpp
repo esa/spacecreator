@@ -247,7 +247,10 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
     const QString comment = serializeComment(action);
 
     if (action->actionType() == MscAction::ActionType::Informal) {
-        return QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment);
+        if (action->informalAction().contains('='))
+            return QString("%1action %2%3;\n").arg(tabString, action->informalAction(), comment);
+        else
+            return QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment);
     } else {
         QString actionText = tabString + "action ";
         bool first = true;
