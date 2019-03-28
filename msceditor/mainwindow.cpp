@@ -18,7 +18,7 @@
 #include "mainwindow.h"
 
 #include "asn1editor.h"
-#include "asn1file.h"
+#include "asn1xmlparser.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
@@ -373,19 +373,21 @@ void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
 
 bool MainWindow::openFileAsn(const QString &file)
 {
-    asn1::Asn1File f;
-    QStringList errorMessages;
-
-    if (!QFileInfo::exists(file)) {
+    QFileInfo fileInfo(file);
+    if (!fileInfo.exists()) {
         return false;
     }
 
+    QStringList errorMessages;
     try {
-        const QVariantList &ans1Types = f.parseFile(file, &errorMessages);
+        asn1::Asn1XMLParser parser;
+        const QVariantList ans1Types = parser.parseAsn1File(fileInfo, &errorMessages);
 
         asn1::Asn1Editor editor;
         editor.setAsn1Types(ans1Types);
-        editor.exec();
+        int result = editor.exec();
+        if (result == QDialog::Accepted)
+            d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
     } catch (const std::exception &e) {
         qWarning() << "Error parse asn1 file. " << e.what();
     }

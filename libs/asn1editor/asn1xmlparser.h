@@ -21,6 +21,7 @@
 
 class QDomElement;
 class QDomNodeList;
+class QFileInfo;
 
 namespace asn1 {
 
@@ -31,6 +32,7 @@ class Asn1XMLParser : public QObject
 public:
     Asn1XMLParser(QObject *parent = nullptr);
 
+    QVariantList parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages);
     QVariantList parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages);
     QVariantList parseAsn1XmlFile(const QString &fileName);
 
