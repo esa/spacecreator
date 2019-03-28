@@ -286,15 +286,22 @@ QString MscWriter::serialize(const MscMessageDeclarationList *declarationList, i
 {
     Q_ASSERT(declarationList);
     QString declarations;
-    QString tabString = tabs(tabsSize);
     for (const MscMessageDeclaration *declaration : *declarationList) {
-        declarations += tabString + "msg " + declaration->names().join(", ");
-        if (!declaration->typeRefList().isEmpty()) {
-            declarations += QString(" : (%1)").arg(declaration->typeRefList().join(", "));
-        }
-        declarations += ";\n";
+        declarations += serialize(declaration, tabsSize);
+        declarations += "\n";
     }
     return declarations;
+}
+
+QString MscWriter::serialize(const MscMessageDeclaration *declaration, int tabsSize)
+{
+    Q_ASSERT(declaration);
+    QString text = tabs(tabsSize) + "msg " + declaration->names().join(", ");
+    if (!declaration->typeRefList().isEmpty()) {
+        text += QString(" : (%1)").arg(declaration->typeRefList().join(", "));
+    }
+    text += ";";
+    return text;
 }
 
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)

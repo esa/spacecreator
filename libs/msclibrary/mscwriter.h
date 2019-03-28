@@ -31,6 +31,7 @@ class MscEntity;
 class MscInstance;
 class MscInstanceEvent;
 class MscMessage;
+class MscMessageDeclaration;
 class MscMessageDeclarationList;
 class MscModel;
 class MscTimer;
@@ -46,7 +47,6 @@ public:
     void saveChart(const MscChart *chart, const QString &fileName);
     QString modelText(const MscModel *model);
 
-protected:
     QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,
                       int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
@@ -56,6 +56,7 @@ protected:
     QString serialize(const MscAction *action, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCoregion *region, int tabsSize = 0);
     QString serialize(const MscMessageDeclarationList *declarationList, int tabsSize = 0);
+    QString serialize(const MscMessageDeclaration *declaration, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 

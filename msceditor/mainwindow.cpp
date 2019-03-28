@@ -1418,12 +1418,16 @@ void MainWindow::showCoordinatesInfo(const QString &info)
 
 void MainWindow::showMessages()
 {
-    QVector<msc::MscDocument *> docs = d->m_model->mscModel()->documents();
+    msc::MscModel *model = d->m_model->mscModel();
+    if (!model)
+        return;
+
+    QVector<msc::MscDocument *> docs = model->documents();
     if (docs.isEmpty()) {
         return;
     }
 
-    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), this);
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model->asn1TypesData(), this);
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),

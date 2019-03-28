@@ -46,6 +46,7 @@ void MscMessageDeclaration::setNames(const QStringList &names)
 
     m_names = names;
     Q_EMIT namesChanged();
+    Q_EMIT dataChanged();
 }
 
 void MscMessageDeclaration::setTypeRefList(const QStringList &typeRefList)
@@ -55,6 +56,7 @@ void MscMessageDeclaration::setTypeRefList(const QStringList &typeRefList)
 
     m_typeRefList = typeRefList;
     Q_EMIT typeRefListChanged();
+    Q_EMIT dataChanged();
 }
 
 } // namespace msc

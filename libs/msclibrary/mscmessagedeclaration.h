@@ -40,6 +40,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void namesChanged();
     void typeRefListChanged();
+    void dataChanged();
 
 private:
     QStringList m_names;

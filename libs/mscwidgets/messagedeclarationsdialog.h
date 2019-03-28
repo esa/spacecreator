@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QVariantList>
 
 namespace msc {
 class MscModel;
@@ -34,20 +35,29 @@ class MessageDeclarationsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, QWidget *parent = nullptr);
+    explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, const QVariantList &asn1Types,
+                                       QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;
+
+    const QVariantList &asn1Types() const;
 
 private Q_SLOTS:
     void showSelectedMessage();
     void addDeclaration();
     void removeDeclaration();
 
+    void addSelectedParameter();
+    void removeSelectedParameter();
+
     void updateNames();
+    void updateDeclarationDetails();
+    void updateParameterButtons();
 
 private:
     Ui::MessageDeclarationsDialog *ui;
     msc::MscMessageDeclarationList *m_model = nullptr;
     msc::MscMessageDeclaration *m_selectedDeclaration = nullptr;
+    QVariantList m_asn1Types;
 };
