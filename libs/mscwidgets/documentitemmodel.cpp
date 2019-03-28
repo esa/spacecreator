@@ -262,8 +262,10 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
+    auto entity = static_cast<MscEntity *>(index.internalPointer());
+
     if (role == Qt::DecorationRole) {
-        auto document = static_cast<MscDocument *>(index.internalPointer());
+        auto document = dynamic_cast<MscDocument *>(entity);
         if (document) {
             QPixmap icon;
             switch (document->hierarchyType()) {
@@ -298,11 +300,11 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
-        auto document = static_cast<MscDocument *>(index.internalPointer());
+        auto document = dynamic_cast<MscDocument *>(entity);
         if (document) {
             return QVariant(document->name());
         }
-        auto chart = static_cast<MscChart *>(index.internalPointer());
+        auto chart = dynamic_cast<MscChart *>(entity);
         if (chart) {
             return QVariant(chart->name());
         }
