@@ -15,36 +15,41 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDDOCUMENTMOVE_H
+#define CMDDOCUMENTMOVE_H
+
+#include "commands/basecommand.h"
+
+#include <QPointer>
 
 namespace msc {
+
+class MscDocument;
+
 namespace cmd {
 
-enum Id
+class CmdDocumentMove : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    LastId
+public:
+    CmdDocumentMove(msc::MscDocument *document, msc::MscDocument *parentDocument);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    void clearDocumentCharts(msc::MscDocument *document);
+    void addDocumentChart(msc::MscDocument *document);
+
+private:
+    QPointer<MscDocument> m_document;
+    QPointer<MscDocument> m_newParentDocument;
+    QPointer<MscDocument> m_oldParentDocument;
+    int m_documentIndex = -1;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDDOCUMENTMOVE_H

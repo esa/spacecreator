@@ -31,6 +31,9 @@ struct DocumentItem::DocumentItemPrivate {
     QSizeF boxSize;
     QVector<DocumentItem *> childDocuments;
     QRectF boundingRect;
+    bool disablePaint = false;
+    QPointF scenePos;
+    DocumentItem::DocumentState state = DocumentItem::StateCommon;
 };
 
 DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
@@ -44,7 +47,7 @@ DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
     connect(document, &msc::MscDocument::nameChanged, this, [&]() { update(); });
     connect(document, &msc::MscDocument::nameChanged, this, &DocumentItem::preferredSizeChanged);
 
-    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
 DocumentItem::~DocumentItem() {}
@@ -99,9 +102,21 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     // This is for the connecting lines below. Can be changed for non-leaf relations
     int startLineY = qRound(boxRect.bottom());
 
-    QPen pen(Qt::black);
+    QColor color(Qt::black);
+    switch (d->state) {
+    case StateChildEnable:
+        color = Qt::green;
+        break;
+    case StateChildDisable:
+        color = Qt::red;
+        break;
+    default:
+        break;
+    }
 
-    if (isSelected()) {
+    QPen pen(color);
+
+    if (isSelected() || d->state != DocumentItem::StateCommon) {
         pen.setWidth(3);
     }
 
@@ -109,7 +124,7 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     painter->setPen(pen);
     painter->drawRect(boxRect);
 
-    if (isSelected()) {
+    if (isSelected() || d->state != DocumentItem::StateCommon) {
         painter->setPen(QPen(Qt::black));
     }
 
@@ -185,6 +200,10 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
                           QPointF(boxRect.x() + (boxRect.center().y() - boxRect.y()) + 1, boxRect.bottom()));
     }
 
+    if (d->disablePaint) {
+        return;
+    }
+
     // Now draw the connections
     if (!d->childDocuments.isEmpty()) {
         const int startLineX = qRound(boxRect.center().x());
@@ -237,6 +256,12 @@ msc::MscDocument *DocumentItem::document() const
     return d->document.data();
 }
 
+void DocumentItem::setState(DocumentItem::DocumentState state)
+{
+    d->state = state;
+    update();
+}
+
 void DocumentItem::setBoxSize(const QSizeF &size)
 {
     d->boxSize = size;
@@ -252,6 +277,47 @@ void msc::DocumentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void msc::DocumentItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton) {
+        if (auto parent = dynamic_cast<DocumentItem *>(parentItem())) {
+            parent->d->disablePaint = true;
+        }
+
+        d->scenePos = event->scenePos();
+    }
+
     event->accept();
     Q_EMIT clicked(d->document.data());
+}
+
+void msc::DocumentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsObject::mouseReleaseEvent(event);
+
+    if (event->button() == Qt::LeftButton) {
+        if (auto parent = dynamic_cast<DocumentItem *>(parentItem())) {
+            parent->d->disablePaint = false;
+        }
+
+        if (d->scenePos != event->scenePos()) {
+            Q_EMIT moved(this, scenePos());
+        } else {
+            update();
+        }
+    }
+}
+
+QVariant msc::DocumentItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    switch (change) {
+    case QGraphicsItem::ItemSelectedChange:
+        setZValue(zValue() + (value.toBool() ? 1.0 : -1.0));
+        break;
+    case QGraphicsItem::ItemPositionHasChanged:
+        Q_EMIT positionChanged(scenePos());
+        break;
+    default:
+        break;
+    }
+
+    return QGraphicsItem::itemChange(change, value);
 }

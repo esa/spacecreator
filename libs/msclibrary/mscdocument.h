@@ -67,6 +67,7 @@ public:
     void setHierarchyType(HierarchyType type);
 
     bool isSingleChildDocument() const;
+    bool isAddChildEnable() const;
 
 Q_SIGNALS:
     void documentAdded(MscDocument *document);

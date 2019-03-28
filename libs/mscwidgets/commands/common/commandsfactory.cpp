@@ -23,6 +23,8 @@
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
+#include "commands/cmddocumentmove.h"
+#include "commands/cmdentitycommentchange.h"
 #include "commands/cmdentitycommentchange.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdhierarchytypechange.h"
@@ -93,6 +95,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createHierarchyTypeChange(params);
     case cmd::CreateDocument:
         return cmd::CommandsFactory::createDocumentCreate(params);
+    case cmd::MoveDocument:
+        return cmd::CommandsFactory::createDocumentMove(params);
     case cmd::SetMessageDeclarations:
         return cmd::CommandsFactory::createSetMessageDeclarations(params);
     default:
@@ -357,6 +361,19 @@ QUndoCommand *CommandsFactory::createDocumentCreate(const QVariantList &params)
     if (auto document = params.first().value<MscDocument *>()) {
         if (auto parent = params.last().value<MscDocument *>()) {
             return new CmdDocumentCreate(document, parent);
+        }
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createDocumentMove(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (auto document = params.first().value<MscDocument *>()) {
+        if (auto parent = params.last().value<MscDocument *>()) {
+            return new CmdDocumentMove(document, parent);
         }
     }
 

@@ -17,11 +17,13 @@
 
 #include "hierarchyviewmodel.h"
 
+#include "commands/common/commandsstack.h"
 #include "documentitem.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
 
 #include <QGraphicsScene>
+#include <QPointer>
 
 namespace msc {
 
@@ -197,6 +199,11 @@ void HierarchyViewModel::updateModel()
 
             QObject::connect(item->document(), &MscDocument::dataChanged, this, &HierarchyViewModel::updateModel,
                              Qt::UniqueConnection);
+
+            QObject::connect(item, &DocumentItem::moved, this, &HierarchyViewModel::documentMoved,
+                             Qt::UniqueConnection);
+            QObject::connect(item, &DocumentItem::positionChanged, this, &HierarchyViewModel::documentPositionChanged,
+                             Qt::UniqueConnection);
         }
     }
 }
@@ -205,5 +212,53 @@ void HierarchyViewModel::modelDeleted()
 {
     d->clear();
     d->model = nullptr;
+}
+
+void HierarchyViewModel::documentMoved(const DocumentItem *documentItem, const QPointF &point)
+{
+    DocumentItem *parentItem = nearestDocumentItem(documentItem, point);
+
+    if (parentItem && parentItem != documentItem->parentItem() && parentItem->document()->isAddChildEnable()) {
+        msc::cmd::CommandsStack::push(msc::cmd::MoveDocument,
+                                      { QVariant::fromValue<MscDocument *>(documentItem->document()),
+                                        QVariant::fromValue<MscDocument *>(parentItem->document()) });
+    } else {
+        updateModel();
+    }
+}
+
+void HierarchyViewModel::documentPositionChanged(const QPointF &position)
+{
+    static QPointer<DocumentItem> documentItem;
+
+    // reset prev document
+    if (documentItem) {
+        documentItem->setState(DocumentItem::StateCommon);
+    }
+
+    auto currentItem = dynamic_cast<DocumentItem *>(sender());
+    documentItem = nearestDocumentItem(currentItem, position);
+
+    if (documentItem) {
+        documentItem->setState(
+                (documentItem != currentItem->parentItem() && documentItem->document()->isAddChildEnable())
+                        ? DocumentItem::StateChildEnable
+                        : DocumentItem::StateChildDisable);
+    }
+}
+
+DocumentItem *HierarchyViewModel::nearestDocumentItem(const DocumentItem *documentItem, const QPointF &position)
+{
+    DocumentItem *nearestItem = nullptr;
+
+    QList<QGraphicsItem *> items = graphicsScene()->items(position);
+    for (const auto item : items) {
+        if (item != documentItem) {
+            nearestItem = dynamic_cast<DocumentItem *>(item);
+            break;
+        }
+    }
+
+    return nearestItem;
 }
 }

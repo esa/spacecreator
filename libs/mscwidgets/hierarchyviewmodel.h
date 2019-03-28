@@ -24,6 +24,7 @@ class QGraphicsScene;
 
 namespace msc {
 
+class DocumentItem;
 class MscDocument;
 class MscModel;
 
@@ -50,9 +51,13 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void modelDeleted();
+    void documentMoved(const DocumentItem *documentItem, const QPointF &point);
+    void documentPositionChanged(const QPointF &position);
 
 private:
     class HierarchyViewModelPrivate;
     std::unique_ptr<HierarchyViewModelPrivate> const d;
+
+    DocumentItem *nearestDocumentItem(const DocumentItem *documentItem, const QPointF &position);
 };
 }

@@ -41,6 +41,7 @@ HEADERS += \
     commands/cmdentitycommentchange.h \
     commands/cmdentitynamechange.h \
     commands/cmddocumentcreate.h \
+    commands/cmddocumentmove.h \
     commands/cmdhierarchytypechange.h \
     commands/cmdinstancestopchange.h \
     commands/cmdinstanceitemcreate.h \
@@ -75,7 +76,7 @@ HEADERS += \
     messagedeclarationsdialog.h \
     messageitem.h \
     textview.h \
-    timeritem.h \
+    timeritem.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -108,6 +109,7 @@ SOURCES += \
     commands/cmdentitycommentchange.cpp \
     commands/cmdentitynamechange.cpp \
     commands/cmddocumentcreate.cpp \
+    commands/cmddocumentmove.cpp \
     commands/cmdhierarchytypechange.cpp \
     commands/cmdinstancestopchange.cpp \
     commands/cmdinstanceitemcreate.cpp \
@@ -142,7 +144,8 @@ SOURCES += \
     messagedeclarationsdialog.cpp \
     messageitem.cpp \
     textview.cpp \
-    timeritem.cpp \
+    timeritem.cpp
+
 
 FORMS += \
     messagedeclarationsdialog.ui

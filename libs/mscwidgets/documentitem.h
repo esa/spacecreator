@@ -30,6 +30,13 @@ class DocumentItem : public QGraphicsObject
     Q_PROPERTY(QSizeF boxSize READ boxSize WRITE setBoxSize NOTIFY boxSizeChanged)
 
 public:
+    enum DocumentState
+    {
+        StateCommon,
+        StateChildEnable,
+        StateChildDisable
+    };
+
     explicit DocumentItem(MscDocument *document, QGraphicsItem *parent = nullptr);
     ~DocumentItem() override;
 
@@ -51,9 +58,14 @@ public:
 
     msc::MscDocument *document() const;
 
+    void setState(DocumentState state);
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 public Q_SLOTS:
     void setBoxSize(const QSizeF &size);
@@ -63,6 +75,8 @@ Q_SIGNALS:
     void boxSizeChanged(QSizeF size);
     void doubleClicked(msc::MscDocument *document);
     void clicked(msc::MscDocument *document);
+    void moved(const msc::DocumentItem *item, const QPointF &point);
+    void positionChanged(const QPointF &position);
 
 private:
     struct DocumentItemPrivate;
