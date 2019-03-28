@@ -45,6 +45,11 @@ Asn1Editor::Asn1Editor(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
+Asn1Editor::~Asn1Editor()
+{
+    delete ui;
+}
+
 void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
 {
     if (m_asn1Types != asn1Types) {
@@ -53,9 +58,9 @@ void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
     }
 }
 
-Asn1Editor::~Asn1Editor()
+const QVariantList &Asn1Editor::asn1Types() const
 {
-    delete ui;
+    return m_asn1Types;
 }
 
 void Asn1Editor::openFile()

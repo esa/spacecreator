@@ -34,9 +34,10 @@ class Asn1Editor : public QDialog
 
 public:
     Asn1Editor(QWidget *parent = nullptr);
-    void setAsn1Types(const QVariantList &asn1Types);
-
     ~Asn1Editor();
+
+    void setAsn1Types(const QVariantList &asn1Types);
+    const QVariantList &asn1Types() const;
 
 public Q_SLOTS:
     void accept() override;

@@ -26,8 +26,8 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QVariantMap>
-
-const QString asn1Command = "asn1 -ast %1 %2"; // TODO: test for win and linux
+#include <cstdlib>
+#include <ctime>
 
 namespace asn1 {
 
@@ -36,8 +36,21 @@ Asn1XMLParser::Asn1XMLParser(QObject *parent)
 {
 }
 
-QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString &fileName)
+QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
+    static QString asn1Command;
+    if (asn1Command.isEmpty()) {
+        std::srand(std::time(nullptr));
+        QString cmd = asn1CompilerCommand();
+        if (cmd.isEmpty()) {
+            if (errorMessages)
+                errorMessages->append(tr(
+                        "ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc"));
+            return {};
+        }
+        asn1Command = cmd + "%1 %2";
+    }
+
     // convert ASN.1 to XML
     QProcess asn1Process;
 
@@ -46,16 +59,24 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     };
 
     QString asn1FileName = fullFilePath(filePath, fileName);
-    QString asn1XMLFileName = fullFilePath(QDir::tempPath(), "asn1.xml");
+    int value = std::rand();
+    QString asn1XMLFileName = fullFilePath(QDir::tempPath(), QString("asn1_%1.xml").arg(value));
 
     connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [&](int, QProcess::ExitStatus exitStatus) {
-                if (exitStatus == QProcess::CrashExit)
-                    qWarning() << "asn1scc compiler process crashed";
+                if (exitStatus == QProcess::CrashExit) {
+                    const QString message = tr("asn1scc compiler process crashed");
+                    qWarning() << message;
+                    if (errorMessages)
+                        errorMessages->append(message);
+                }
             });
 
-    connect(&asn1Process, &QProcess::errorOccurred,
-            [&](QProcess::ProcessError) { qWarning() << asn1Process.errorString(); });
+    connect(&asn1Process, &QProcess::errorOccurred, [&](QProcess::ProcessError) {
+        qWarning() << asn1Process.errorString();
+        if (errorMessages)
+            errorMessages->append(asn1Process.errorString());
+    });
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
     asn1Process.setProcessChannelMode(QProcess::MergedChannels);
@@ -65,6 +86,9 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     auto error = asn1Process.readAll();
     if (!error.isEmpty()) {
         qWarning() << error;
+        if (errorMessages)
+            errorMessages->append(error);
+        QFile::remove(asn1XMLFileName);
         return {};
     }
 
@@ -106,7 +130,7 @@ QVariantList Asn1XMLParser::parseXml(const QString &content)
     }
 
     root = doc.documentElement();
-    if (root.isNull() || root.tagName() != "ASN1AST") {
+    if (root.isNull() || (root.tagName() != "ASN1AST")) {
         Q_EMIT parseError(tr("Invalid XML format"));
         return asn1TypesData;
     }
@@ -118,6 +142,7 @@ QVariantList Asn1XMLParser::parseXml(const QString &content)
     }
 
     QDomNodeList asn1Modules = root.elementsByTagName("Asn1Module");
+
     QList<QDomNodeList> typeAssignments;
 
     for (int x = 0; x < asn1Modules.size(); ++x) {
@@ -150,7 +175,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QString typeName = typeElem.tagName();
 
     auto typeByTypeName = [](const QString &typeName) {
-        static QMap<QString, ASN1Type> asn1TypeStringMap{
+        static QMap<QString, ASN1Type> asn1TypeStringMap {
             { "IntegerType", ASN1Type::INTEGER },       { "RealType", ASN1Type::DOUBLE },
             { "BooleanType", ASN1Type::BOOL },          { "SequenceType", ASN1Type::SEQUENCE },
             { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },
@@ -291,6 +316,35 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, 
     }
 
     result[ASN1_CHOICES] = choices;
+}
+
+QString Asn1XMLParser::asn1CompilerCommand() const
+{
+#ifdef Q_OS_WIN
+    return QString("asn1 -ast");
+#else
+    QProcess process;
+    process.start(QString("which asn1.exe"));
+    process.waitForFinished();
+    QString asn1Exec = process.readAll();
+    asn1Exec.remove('\n');
+    if (asn1Exec.isEmpty()) {
+        qWarning() << tr("Unable to find the asn1scc compiler");
+        return {};
+    }
+
+    process.start(QString("which mono"));
+    process.waitForFinished();
+    QString monoExec = process.readAll();
+    monoExec.remove('\n');
+    if (monoExec.isEmpty()) {
+        qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
+        return {};
+    }
+
+    QFileInfo asnFile(asn1Exec);
+    return QString("%1 %2 -customStg %3/xml.stg:").arg(monoExec, asn1Exec, asnFile.path());
+#endif
 }
 
 template<typename T>

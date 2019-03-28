@@ -70,9 +70,8 @@ MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages
     if (!mscModel->dataDefinitionString().isEmpty()) {
         // parse ASN.1
         asn1::Asn1XMLParser xmlParser;
-
-        mscModel->setAsn1TypesData(
-                xmlParser.parseAsn1File(QFileInfo(filename).absolutePath(), mscModel->dataDefinitionString()));
+        mscModel->setAsn1TypesData(xmlParser.parseAsn1File(QFileInfo(filename).absolutePath(),
+                                                           mscModel->dataDefinitionString(), errorMessages));
     }
 
     return mscModel;

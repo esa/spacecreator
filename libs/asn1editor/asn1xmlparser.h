@@ -31,7 +31,7 @@ class Asn1XMLParser : public QObject
 public:
     Asn1XMLParser(QObject *parent = nullptr);
 
-    QVariantList parseAsn1File(const QString &filePath, const QString &fileName);
+    QVariantList parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages);
     QVariantList parseAsn1XmlFile(const QString &fileName);
 
 Q_SIGNALS:
@@ -47,6 +47,8 @@ private:
     void parseSequenceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);
     void parseEnumeratedType(const QDomElement &type, QVariantMap &result);
     void parseChoiceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);
+
+    QString asn1CompilerCommand() const;
 };
 
 } // namespace asn1

@@ -217,8 +217,6 @@ void MainWindow::selectAndOpenFile()
                                           QString("ASN1 files (*%1 *%2)").arg(suffixAsn, suffixAsn.toUpper()),
                                           QString("All files (*.*)") };
 
-    qDebug() << suffixes;
-
     const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
 
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
@@ -250,15 +248,26 @@ bool MainWindow::openFileMsc(const QString &file)
                 d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
 
         d->ui->graphicsView->setZoom(100);
-    } else {
-        showErrorView();
     }
+
+    if (!d->m_model->errorMessages().isEmpty())
+        showErrorView();
 
     clearUndoStacks();
 
     d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
-    d->ui->errorTextEdit->appendHtml(tr("Model loading: <b><font color=%2>%1</font></b><br>")
-                                             .arg(ok ? tr("success") : tr("failed"), ok ? "black" : "red"));
+    QString loadStatus = tr("success");
+    QString statusColor = "black";
+    if (!d->m_model->errorMessages().isEmpty()) {
+        loadStatus = tr("warnings");
+        statusColor = "orange";
+    }
+    if (!ok) {
+        loadStatus = tr("failed");
+        statusColor = "red";
+    }
+    d->ui->errorTextEdit->appendHtml(
+            tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor));
 
     updateTitles();
 
@@ -474,7 +483,10 @@ void MainWindow::selectCurrentChart()
 void MainWindow::openAsn1Editor()
 {
     asn1::Asn1Editor editor;
-    editor.exec();
+    editor.setAsn1Types(d->m_model->mscModel()->asn1TypesData());
+    int result = editor.exec();
+    if (result == QDialog::Accepted)
+        d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
