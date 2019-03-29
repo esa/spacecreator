@@ -15,19 +15,18 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QMetaEnum>
-
-#include <QtWebSockets/QWebSocketServer>
-#include <QtWebSockets/QWebSocket>
-
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonParseError>
-
 #include "remotecontrolwebserver.h"
 
-static inline QByteArray generateResponse(bool result, const QString &errorString = QString()) {
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QMetaEnum>
+#include <QtWebSockets/QWebSocket>
+#include <QtWebSockets/QWebSocketServer>
+
+static inline QByteArray generateResponse(bool result, const QString &errorString = QString())
+{
     QJsonObject obj;
     obj.insert(QLatin1String("result"), result);
     if (!errorString.isEmpty())
@@ -70,30 +69,17 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
     \li \c Timer - creating new Timer
         \list
         \li \c name - Timer's Name, optional
-        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
-        \li \c TimerType - type of \c Timer, optional
-            \list
-            \li \c Start
-            \li \c Stop
-            \li \c Timeout
-            \li \c Unknown - default
-            \endlist
-        \endlist
-    \li \c Action - creating new Action
-        \list
-        \li \c name - Action's Name, optional
-        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name,
+   mandatory \li \c TimerType - type of \c Timer, optional \list \li \c Start \li \c Stop \li \c Timeout \li \c Unknown
+   - default \endlist \endlist \li \c Action - creating new Action \list \li \c name - Action's Name, optional \li \c
+   instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
         \endlist
     \li \c Condition - creating new Condition
         \list
         \li \c name - Condition's Name, optional
-        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
-        \li \c shared - is it shared Condition, optional, default No
-        \endlist
-    \endlist
-    \li \c VisibleItemLimit - limit visible events in the scene
-        \list
-        \li \c number - count of visible items, -1 if all of them should be visible
+        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name,
+   mandatory \li \c shared - is it shared Condition, optional, default No \endlist \endlist \li \c VisibleItemLimit -
+   limit visible events in the scene \list \li \c number - count of visible items, -1 if all of them should be visible
         \endlist
     \endlist
     After command processing returns JSON packet:
@@ -108,10 +94,8 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
 
 RemoteControlWebServer::RemoteControlWebServer(QObject *parent)
     : QObject(parent)
-    , m_webSocketServer(new QWebSocketServer(QLatin1String("Remote Control"),
-                                             QWebSocketServer::NonSecureMode, this))
+    , m_webSocketServer(new QWebSocketServer(QLatin1String("Remote Control"), QWebSocketServer::NonSecureMode, this))
 {
-
 }
 
 RemoteControlWebServer::~RemoteControlWebServer()
@@ -130,12 +114,11 @@ bool RemoteControlWebServer::start(quint16 port)
     }
     if (m_webSocketServer->listen(QHostAddress::Any, port)) {
         qDebug() << "Remote control server listening on port" << port;
-        connect(m_webSocketServer, &QWebSocketServer::newConnection,
-                this, &RemoteControlWebServer::onNewConnection);
+        connect(m_webSocketServer, &QWebSocketServer::newConnection, this, &RemoteControlWebServer::onNewConnection);
         return true;
     }
-    qWarning() << "Websocket server failed to start listening port:" << port
-               << m_webSocketServer->error() << m_webSocketServer->errorString();
+    qWarning() << "Websocket server failed to start listening port:" << port << m_webSocketServer->error()
+               << m_webSocketServer->errorString();
     return false;
 }
 
@@ -146,8 +129,8 @@ void RemoteControlWebServer::onNewConnection()
     connect(pSocket, &QWebSocket::textMessageReceived, this, &RemoteControlWebServer::processTextMessage);
     connect(pSocket, &QWebSocket::connected, this, &RemoteControlWebServer::socketConnected);
     connect(pSocket, &QWebSocket::disconnected, this, &RemoteControlWebServer::socketDisconnected);
-    connect(pSocket, static_cast<void(QWebSocket::*)(QAbstractSocket::SocketError)>(&QWebSocket::error),
-            this, &RemoteControlWebServer::error);
+    connect(pSocket, static_cast<void (QWebSocket::*)(QAbstractSocket::SocketError)>(&QWebSocket::error), this,
+            &RemoteControlWebServer::error);
 
     m_clients << pSocket;
 }
@@ -155,15 +138,16 @@ void RemoteControlWebServer::onNewConnection()
 void RemoteControlWebServer::processTextMessage(const QString &message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+#ifdef QT_DEBUG
     qDebug() << "Message received:" << message << pClient;
-
+#endif
     QJsonParseError error;
     const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8(), &error);
     if (QJsonParseError::NoError != error.error) {
         qWarning() << "Json document parsing error:" << error.error << error.errorString();
         if (pClient) {
             qDebug() << "Informing remote about error:"
-                    << pClient->sendTextMessage(generateResponse(false, error.errorString()));
+                     << pClient->sendTextMessage(generateResponse(false, error.errorString()));
         }
         return;
     }
@@ -205,9 +189,8 @@ void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType com
     const int commandTypeInt = static_cast<int>(commandType);
     const QString commandTypeStr = QLatin1String(qtEnum.valueToKey(commandTypeInt));
 
-    auto it = std::find_if(m_clients.constBegin(), m_clients.constEnd(), [peerName](const QWebSocket *socket){
-        return socket->peerName() == peerName;
-    });
+    auto it = std::find_if(m_clients.constBegin(), m_clients.constEnd(),
+                           [peerName](const QWebSocket *socket) { return socket->peerName() == peerName; });
     if (it == m_clients.constEnd())
         return;
 

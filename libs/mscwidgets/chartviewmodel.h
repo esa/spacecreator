@@ -71,6 +71,7 @@ public:
     ConditionItem *itemForCondition(MscCondition *condition) const;
     ActionItem *itemForAction(MscAction *action) const;
     TimerItem *itemForTimer(MscTimer *timer) const;
+    InteractiveObject *itemForEntity(MscEntity *entity) const;
 
     CommentItem *commentForEntity(msc::MscEntity *entity);
     msc::MscEntity *nearestEntity(const QPointF &pos);

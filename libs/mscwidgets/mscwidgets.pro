@@ -146,7 +146,6 @@ SOURCES += \
     textview.cpp \
     timeritem.cpp
 
-
 FORMS += \
     messagedeclarationsdialog.ui
 

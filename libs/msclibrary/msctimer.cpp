@@ -76,11 +76,11 @@ bool MscTimer::relatesTo(const MscInstance *instance) const
 
 void MscTimer::setPrecedingTimer(MscTimer *timer)
 {
-    if (m_precedingTimer == timer || !allowPrecedingTimer(timer)) {
+    if (m_precedingTimer == timer)
         return;
-    }
 
-    m_precedingTimer = timer;
+    m_precedingTimer = allowPrecedingTimer(timer) ? timer : nullptr;
+
     Q_EMIT precedingTimerChanged();
     Q_EMIT dataChanged();
 }
@@ -95,13 +95,13 @@ bool MscTimer::allowPrecedingTimer(MscTimer *timer)
     if (timer == nullptr)
         return true;
 
-    if (timer->m_instance != m_instance || m_instance == nullptr)
+    if (timer->m_instance != m_instance || m_instance == nullptr || timer->name() != name())
         return false;
 
-    if (m_timerType == TimerType::Start)
-        return false;
+    if (timer->m_timerType == TimerType::Start || m_timerType == TimerType::Start)
+        return true;
 
-    if (timer->m_timerType == TimerType::Timeout)
+    if (timer->m_timerType == TimerType::Timeout || timer->m_timerType == TimerType::Stop)
         return false;
 
     return true;
@@ -109,10 +109,11 @@ bool MscTimer::allowPrecedingTimer(MscTimer *timer)
 
 void MscTimer::setFollowingTimer(MscTimer *timer)
 {
-    if (m_followingTimer == timer || !allowFollowingTimer(timer))
+    if (m_followingTimer == timer)
         return;
 
-    m_followingTimer = timer;
+    m_followingTimer = allowFollowingTimer(timer) ? timer : nullptr;
+
     Q_EMIT followingTimerChanged();
     Q_EMIT dataChanged();
 }
@@ -127,13 +128,13 @@ bool MscTimer::allowFollowingTimer(MscTimer *timer)
     if (timer == nullptr)
         return true;
 
-    if (timer->m_instance != m_instance || m_instance == nullptr)
+    if (timer->m_instance != m_instance || m_instance == nullptr || timer->name() != name())
         return false;
 
-    if (timer->m_timerType == TimerType::Start)
-        return false;
+    if (m_timerType == TimerType::Start || timer->m_timerType == TimerType::Start)
+        return true;
 
-    if (m_timerType == TimerType::Timeout)
+    if (m_timerType == TimerType::Timeout || m_timerType == TimerType::Stop)
         return false;
 
     return true;

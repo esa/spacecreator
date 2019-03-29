@@ -35,7 +35,7 @@ private Q_SLOTS:
     void testBlockDifferentInsatncesConnection();
     void testBlockStartStartTimerConnection();
     void testBlockTimeoutTimeoutConnection();
-    void testAllowStopStopTimerConnection();
+    void testDenyStopStopTimerConnection();
     void testAllowStartBeforeStopConnection();
     void testBlockStartAfterStopConnection();
     void testBlockTimeoutBeforeStopConnection();
@@ -105,20 +105,21 @@ void tst_TimerItem::testBlockTimeoutTimeoutConnection()
     QCOMPARE(m_timerItem->canConnectTimers(&t2, QPointF(8, 8)), false);
 }
 
-void tst_TimerItem::testAllowStopStopTimerConnection()
+void tst_TimerItem::testDenyStopStopTimerConnection()
 {
     m_timer->setTimerType(msc::MscTimer::TimerType::Stop);
     MscTimer t2;
     t2.setTimerType(msc::MscTimer::TimerType::Stop);
     t2.setInstance(m_instance);
 
-    QCOMPARE(m_timerItem->canConnectTimers(&t2, QPointF(8, 8)), true);
+    QCOMPARE(m_timerItem->canConnectTimers(&t2, QPointF(8, 8)), false);
 }
 
 void tst_TimerItem::testAllowStartBeforeStopConnection()
 {
     m_timer->setTimerType(msc::MscTimer::TimerType::Start);
     MscTimer t2;
+    t2.setName(m_timer->name());
     t2.setTimerType(msc::MscTimer::TimerType::Stop);
     t2.setInstance(m_instance);
 

@@ -62,13 +62,8 @@ void BaseCreatorTool::onModelLayoutComplete()
     if (!m_scene || !m_addedEntity)
         return;
 
-    for (InteractiveObject *item : utils::toplevelItems<InteractiveObject>(m_scene)) {
-        if (item->modelEntity() && item->modelEntity()->entityType() == m_addedEntity->entityType()
-            && item->modelEntity()->internalId() == m_addedEntity->internalId()) {
-            item->postCreatePolishing();
-            break;
-        }
-    }
+    if (auto item = m_model->itemForEntity(m_addedEntity))
+        item->postCreatePolishing();
 }
 
 void BaseCreatorTool::dropModelLayoutUpdateConnection()

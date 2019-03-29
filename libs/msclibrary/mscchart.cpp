@@ -189,11 +189,14 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 
     if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
         MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
-        connect(timer, &MscInstanceEvent::nameChanged, this, &MscChart::checkTimerRelations);
-        connect(timer, &MscTimer::instanceChanged, this, &MscChart::checkTimerRelations);
-    }
+        connect(timer, &MscInstanceEvent::nameChanged, this, [this, timer](const QString &name) {
+            Q_UNUSED(name);
 
-    checkTimerRelations();
+            resetTimerRelations(timer);
+        });
+        connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        resetTimerRelations(timer);
+    }
 
     Q_EMIT instanceEventAdded(instanceEvent);
     Q_EMIT dataChanged();
@@ -348,6 +351,7 @@ void MscChart::updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eve
     changed |= moveEvent(timer, eventPos);
 
     if (changed) {
+        resetTimerRelations(timer);
         Q_EMIT eventMoved();
         Q_EMIT dataChanged();
     }
@@ -391,36 +395,47 @@ void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance
     }
 }
 
-void MscChart::checkTimerRelations()
+void MscChart::resetTimerRelations(MscTimer *timer)
 {
-    QVector<MscTimer *> timers;
-    for (MscInstanceEvent *event : instanceEvents()) {
-        if (event->entityType() == MscEntity::EntityType::Timer) {
-            auto timer = static_cast<MscTimer *>(event);
-            timers.append(timer);
+    MscTimer *precedingTimer = timer->precedingTimer();
+    MscTimer *followingTimer = timer->followingTimer();
+    if (precedingTimer)
+        precedingTimer->setFollowingTimer(followingTimer);
+    if (followingTimer)
+        followingTimer->setPrecedingTimer(precedingTimer);
+
+    timer->setFollowingTimer(nullptr);
+    timer->setPrecedingTimer(nullptr);
+
+    const QVector<MscInstanceEvent *> &events = instanceEvents();
+    const int idx = events.indexOf(timer);
+    if (idx == -1)
+        return;
+
+    const QString &timerName = timer->name();
+    for (int timerIdx = idx + 1; timerIdx < events.size(); ++timerIdx) {
+        MscInstanceEvent *event = events.value(timerIdx);
+        if (event->entityType() != MscEntity::EntityType::Timer)
+            continue;
+
+        MscTimer *mscTimer = static_cast<MscTimer *>(event);
+        if (mscTimer->name() == timerName && mscTimer->instance() == timer->instance()) {
+            mscTimer->setPrecedingTimer(timer);
+            timer->setFollowingTimer(mscTimer);
+            break;
         }
     }
 
-    for (auto it = timers.begin(); it != timers.end(); ++it) {
-        Q_ASSERT(*it != nullptr);
-        const QString &name = (*it)->name();
-        auto it2 = it;
-        ++it2;
-        while (it2 != timers.end()) {
-            if ((*it2)->name() == name && (*it2)->instance() == (*it)->instance()) {
-                (*it)->setFollowingTimer(*it2);
-                (*it2)->setPrecedingTimer(*it);
-                break;
-            }
-            ++it2;
-        }
-        if (it2 == timers.end()) {
-            (*it)->setFollowingTimer(nullptr);
-        }
-        if (MscTimer *oldPre = (*it)->precedingTimer()) {
-            if (oldPre->name() != name || oldPre->instance() != (*it)->instance()) {
-                (*it)->setPrecedingTimer(nullptr);
-            }
+    for (int timerIdx = idx - 1; timerIdx >= 0; --timerIdx) {
+        MscInstanceEvent *event = events.value(timerIdx);
+        if (event->entityType() != MscEntity::EntityType::Timer)
+            continue;
+
+        MscTimer *mscTimer = static_cast<MscTimer *>(event);
+        if (mscTimer->name() == timerName && mscTimer->instance() == timer->instance()) {
+            timer->setPrecedingTimer(mscTimer);
+            mscTimer->setFollowingTimer(timer);
+            break;
         }
     }
 }

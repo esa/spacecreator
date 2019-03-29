@@ -70,7 +70,7 @@ public:
                              msc::MscMessage::EndType endType);
 
 public Q_SLOTS:
-    void checkTimerRelations();
+    void resetTimerRelations(MscTimer *timer);
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance);

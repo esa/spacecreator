@@ -83,6 +83,7 @@ struct ChartViewModelPrivate {
     QGraphicsScene m_scene;
     QVector<msc::InstanceItem *> m_instanceItems;
     QVector<msc::InteractiveObject *> m_instanceEventItems;
+    QHash<QUuid, msc::InteractiveObject *> m_instanceEventItemsHash;
     QHash<QUuid, CommentItem *> m_comments;
     QPointer<msc::MscChart> m_currentChart = nullptr;
     static constexpr qreal InterMessageSpan = 20.;
@@ -127,6 +128,7 @@ void ChartViewModel::clearScene()
 {
     qDeleteAll(d->m_instanceEventItems);
     d->m_instanceEventItems.clear();
+    d->m_instanceEventItemsHash.clear();
 
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
@@ -199,6 +201,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
+        d->m_instanceEventItemsHash.insert(message->internalId(), item);
 
         if (isCreateMsg) {
             QLineF axisLine(targetItem->axis());
@@ -303,18 +306,19 @@ void ChartViewModel::addInstanceItems()
 void ChartViewModel::addInstanceEventItems()
 {
     InteractiveObject *instanceEventItem(nullptr);
-    QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> &chartEvents = d->m_currentChart->instanceEvents();
+    auto it = chartEvents.begin();
     if (d->m_visibleItemLimit != -1) {
-        for (auto it = chartEvents.begin(); it != chartEvents.end();) {
+        for (; it != chartEvents.end(); ++it) {
             if (std::distance(it, chartEvents.end()) <= d->m_visibleItemLimit)
                 break;
             removeEventItem(*it);
-            it = chartEvents.erase(it);
-            continue;
         }
     }
+    for (; it != chartEvents.end(); ++it) {
+        MscInstanceEvent *instanceEvent = *it;
+        Q_ASSERT(instanceEvent);
 
-    for (MscInstanceEvent *instanceEvent : chartEvents) {
         switch (instanceEvent->entityType()) {
         case MscEntity::EntityType::Message: {
             instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
@@ -347,10 +351,6 @@ void ChartViewModel::addInstanceEventItems()
 
         if (instanceEventItem) {
             polishAddedEventItem(instanceEvent, instanceEventItem);
-            connect(instanceEventItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
-                    Qt::UniqueConnection);
-            connect(instanceEvent, &MscEntity::commentChanged, this, &ChartViewModel::onEntityCommentChanged,
-                    Qt::UniqueConnection);
             updateCommentForInteractiveObject(instanceEventItem);
         }
     }
@@ -432,6 +432,9 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
         if (!commentItem) {
             commentItem = new CommentItem;
             commentItem->attachTo(iObj);
+            connect(iObj, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout, Qt::UniqueConnection);
+            connect(entity, &MscEntity::commentChanged, this, &ChartViewModel::onEntityCommentChanged,
+                    Qt::UniqueConnection);
             connect(commentItem, &CommentItem::commentChanged, this,
                     [this, entity](const QString &comment) { onInteractiveObjectCommentChange(entity, comment); });
 
@@ -452,17 +455,16 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
 void ChartViewModel::updateContentBounds()
 {
     QRectF totalRect;
-    const QList<InteractiveObject *> &toplevelItems = utils::toplevelItems<InteractiveObject>(graphicsScene());
-    const int toplevelItemsCount = toplevelItems.size();
-    for (int i = 0; i < toplevelItemsCount; ++i) {
-        if (InteractiveObject *gi = toplevelItems.at(i)) {
-            if (gi->modelEntity() && gi->modelEntity()->entityType() == MscEntity::EntityType::Message) {
-                MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
-                if (message->isGlobal()) // ignore, it will be connected to the ChartItem edge lately
-                    continue;
-            }
-            totalRect = totalRect.united(gi->sceneBoundingRect());
+    for (InstanceItem *gi : d->m_instanceItems)
+        totalRect = totalRect.united(gi->sceneBoundingRect());
+
+    for (InteractiveObject *gi : d->m_instanceEventItems) {
+        if (gi->modelEntity() && gi->modelEntity()->entityType() == MscEntity::EntityType::Message) {
+            MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
+            if (message->isGlobal()) // ignore, it will be connected to the ChartItem edge lately
+                continue;
         }
+        totalRect = totalRect.united(gi->sceneBoundingRect());
     }
 
     const QSizeF &preferredSize = preferredChartBoxSize();
@@ -481,6 +483,7 @@ void ChartViewModel::updateContentBounds()
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 
+    const int toplevelItemsCount = d->m_instanceItems.size() + d->m_instanceEventItems.size();
     d->m_layoutInfo.m_chartItem->setZValue(-toplevelItemsCount);
     d->m_layoutInfo.m_chartItem->setBox(totalRect);
 
@@ -563,22 +566,42 @@ InstanceItem *ChartViewModel::itemForInstance(msc::MscInstance *instance) const
 
 MessageItem *ChartViewModel::itemForMessage(MscMessage *message) const
 {
-    return utils::itemForEntity<MessageItem, MscMessage>(message, &d->m_scene);
+    if (!message)
+        return nullptr;
+
+    return qobject_cast<MessageItem *>(d->m_instanceEventItemsHash.value(message->internalId()));
 }
 
 ConditionItem *ChartViewModel::itemForCondition(MscCondition *condition) const
 {
-    return utils::itemForEntity<ConditionItem, MscCondition>(condition, &d->m_scene);
+    if (!condition)
+        return nullptr;
+
+    return qobject_cast<ConditionItem *>(d->m_instanceEventItemsHash.value(condition->internalId()));
 }
 
 ActionItem *ChartViewModel::itemForAction(MscAction *action) const
 {
-    return utils::itemForEntity<ActionItem, MscAction>(action, &d->m_scene);
+    if (!action)
+        return nullptr;
+
+    return qobject_cast<ActionItem *>(d->m_instanceEventItemsHash.value(action->internalId()));
 }
 
 TimerItem *ChartViewModel::itemForTimer(MscTimer *timer) const
 {
-    return utils::itemForEntity<TimerItem, MscTimer>(timer, &d->m_scene);
+    if (!timer)
+        return nullptr;
+
+    return qobject_cast<TimerItem *>(d->m_instanceEventItemsHash.value(timer->internalId()));
+}
+
+InteractiveObject *ChartViewModel::itemForEntity(MscEntity *entity) const
+{
+    if (!entity)
+        return nullptr;
+
+    return qobject_cast<InteractiveObject *>(d->m_instanceEventItemsHash.value(entity->internalId()));
 }
 
 CommentItem *ChartViewModel::commentForEntity(MscEntity *entity)
@@ -785,21 +808,10 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
 
 void ChartViewModel::removeEventItem(MscInstanceEvent *event)
 {
-    msc::InteractiveObject *item = nullptr;
-    int idx = -1;
-    for (msc::InteractiveObject *eitem : d->m_instanceEventItems) {
-        ++idx;
-        if (eitem->modelEntity() == event) {
-            item = eitem;
-            break;
-        }
-    }
-
+    msc::InteractiveObject *item = d->m_instanceEventItemsHash.take(event->internalId());
     if (item) {
         utils::removeSceneItem(item);
-        if (idx >= 0) {
-            d->m_instanceEventItems.remove(idx);
-        }
+        d->m_instanceEventItems.removeOne(item);
         delete item;
         updateLayout();
     }
@@ -884,6 +896,7 @@ ActionItem *ChartViewModel::addActionItem(MscAction *action)
 
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
+        d->m_instanceEventItemsHash.insert(action->internalId(), item);
     }
     item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVertiacalOffset);
     item->updateLayout();
@@ -900,6 +913,7 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
 
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
+        d->m_instanceEventItemsHash.insert(condition->internalId(), item);
 
         connect(item, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout);
     }
@@ -932,6 +946,7 @@ TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
 
         d->m_scene.addItem(item);
         d->m_instanceEventItems.append(item);
+        d->m_instanceEventItemsHash.insert(timer->internalId(), item);
     }
     item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
 
