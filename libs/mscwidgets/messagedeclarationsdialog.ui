@@ -6,49 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>987</width>
-    <height>639</height>
+    <width>981</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>List of declarations</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0" colspan="2">
-       <widget class="QListView" name="messagesView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="addDeclarationButton">
-        <property name="text">
-         <string>+</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="removeDeclarationButton">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="0" column="1">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="messageGroupBox">
      <property name="title">
       <string>Message</string>
      </property>
@@ -71,16 +38,23 @@
        </layout>
       </item>
       <item row="1" column="0" rowspan="4">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Used:</string>
+           <string>Available ASN.1 types</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="usedListWidget"/>
+         <widget class="QListWidget" name="availableListView"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="asn1Button">
+          <property name="text">
+           <string>Open ASN.1 editor ...</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -98,21 +72,21 @@
        </spacer>
       </item>
       <item row="1" column="2" rowspan="4">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Available</string>
+           <string>Used:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="availableListView"/>
+         <widget class="QListWidget" name="usedListWidget"/>
         </item>
        </layout>
       </item>
       <item row="2" column="1">
-       <widget class="QPushButton" name="addParameterButton">
+       <widget class="QPushButton" name="removeParameterButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -122,7 +96,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QPushButton" name="removeParameterButton">
+       <widget class="QPushButton" name="addParameterButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -167,6 +141,39 @@
          </widget>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>List of declarations</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0" colspan="2">
+       <widget class="QListView" name="messagesView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="addDeclarationButton">
+        <property name="text">
+         <string>Add</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="removeDeclarationButton">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

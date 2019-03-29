@@ -386,8 +386,10 @@ bool MainWindow::openFileAsn(const QString &file)
         asn1::Asn1Editor editor;
         editor.setAsn1Types(ans1Types);
         int result = editor.exec();
-        if (result == QDialog::Accepted)
+        if (result == QDialog::Accepted) {
             d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
+            d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+        }
     } catch (const std::exception &e) {
         qWarning() << "Error parse asn1 file. " << e.what();
     }
@@ -487,8 +489,10 @@ void MainWindow::openAsn1Editor()
     asn1::Asn1Editor editor;
     editor.setAsn1Types(d->m_model->mscModel()->asn1TypesData());
     int result = editor.exec();
-    if (result == QDialog::Accepted)
+    if (result == QDialog::Accepted) {
         d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
+        d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+    }
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
@@ -662,7 +666,8 @@ void MainWindow::initMenuView()
     d->m_actShowDocument->setChecked(true);
 
     d->m_menuView->addSeparator();
-    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::showMessages);
+    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::openMessageDeclarationEditor);
+    d->m_menuView->addAction(tr("Show ASN.1 editor ..."), this, &MainWindow::openAsn1Editor);
 
     initMenuViewWindows();
 }
@@ -836,10 +841,6 @@ void MainWindow::initMainToolbar()
 
     d->ui->mainToolBar->addSeparator();
     d->ui->mainToolBar->addAction(d->m_deleteTool->action());
-
-    // TODO: just for test Asn1Editor
-    d->ui->mainToolBar->addSeparator();
-    d->ui->mainToolBar->addAction(d->m_actAsnEditor);
 }
 
 void MainWindow::initConnections()
@@ -1425,7 +1426,7 @@ void MainWindow::showCoordinatesInfo(const QString &info)
     statusBar()->showMessage(info);
 }
 
-void MainWindow::showMessages()
+void MainWindow::openMessageDeclarationEditor()
 {
     msc::MscModel *model = d->m_model->mscModel();
     if (!model)
@@ -1442,5 +1443,7 @@ void MainWindow::showMessages()
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
                                          QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+        d->m_model->mscModel()->setAsn1TypesData(dialog.asn1Types());
+        d->m_model->mscModel()->setDataDefinitionString(dialog.fileName());
     }
 }

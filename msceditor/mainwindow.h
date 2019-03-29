@@ -84,7 +84,7 @@ private Q_SLOTS:
     void updateTitles();
     void updateModel();
     void showCoordinatesInfo(const QString &info);
-    void showMessages();
+    void openMessageDeclarationEditor();
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

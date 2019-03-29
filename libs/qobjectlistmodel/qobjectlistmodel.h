@@ -64,7 +64,7 @@ public:
 
     // connects destroy signals
     void setTracking(bool v);
-    void trackObject(const QObject *obj, const bool on);
+    virtual void trackObject(const QObject *obj, const bool on);
 
     // model API
     enum Roles
