@@ -43,6 +43,12 @@ public:
 
     const QVariantList &asn1Types() const;
 
+    void setFileName(const QString &fileName);
+    const QString &fileName() const;
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private Q_SLOTS:
     void showSelectedMessage();
     void addDeclaration();
@@ -55,9 +61,14 @@ private Q_SLOTS:
     void updateDeclarationDetails();
     void updateParameterButtons();
 
+    void openAsn1Editor();
+
 private:
+    void updateAsn1TypesView();
+
     Ui::MessageDeclarationsDialog *ui;
     msc::MscMessageDeclarationList *m_model = nullptr;
     msc::MscMessageDeclaration *m_selectedDeclaration = nullptr;
     QVariantList m_asn1Types;
+    QString m_fileName;
 };

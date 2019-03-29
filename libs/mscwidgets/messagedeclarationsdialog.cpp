@@ -17,6 +17,7 @@
 
 #include "messagedeclarationsdialog.h"
 
+#include "asn1editor.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
@@ -25,6 +26,8 @@
 
 #include <QDebug>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
+#include <QRegExpValidator>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model,
                                                      const QVariantList &asn1Types, QWidget *parent)
@@ -35,13 +38,13 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
 {
     Q_ASSERT(model);
     ui->setupUi(this);
+    QRegExp rx("([A-Z]|[a-z]|\\d|_|\\.|(\\s?,\\s?))+"); // name as per spec + "," as separator
+    QRegExpValidator *nameValidator = new QRegExpValidator(rx, this);
+    ui->nameLineEdit->setValidator(nameValidator);
 
     ui->messagesView->setModel(m_model);
 
-    for (const QVariant &asn1Type : m_asn1Types) {
-        const QString& name = asn1Type.toMap()["name"].toString();
-        ui->availableListView->addItem(name);
-    }
+    updateAsn1TypesView();
 
     connect(ui->messagesView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &MessageDeclarationsDialog::showSelectedMessage);
@@ -58,6 +61,10 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
     connect(ui->addParameterButton, &QPushButton::clicked, this, &MessageDeclarationsDialog::addSelectedParameter);
     connect(ui->removeParameterButton, &QPushButton::clicked, this,
             &MessageDeclarationsDialog::removeSelectedParameter);
+
+    connect(ui->asn1Button, &QPushButton::clicked, this, &MessageDeclarationsDialog::openAsn1Editor);
+
+    updateDeclarationDetails();
 }
 
 MessageDeclarationsDialog::~MessageDeclarationsDialog()
@@ -75,6 +82,25 @@ msc::MscMessageDeclarationList *MessageDeclarationsDialog::declarations() const
 const QVariantList &MessageDeclarationsDialog::asn1Types() const
 {
     return m_asn1Types;
+}
+
+void MessageDeclarationsDialog::setFileName(const QString &fileName)
+{
+    if(m_fileName == fileName)
+        return;
+    m_fileName = fileName;
+}
+
+const QString &MessageDeclarationsDialog::fileName() const
+{
+    return m_fileName;
+}
+
+void MessageDeclarationsDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+        return;
+    QDialog::keyPressEvent(event);
 }
 
 void MessageDeclarationsDialog::showSelectedMessage()
@@ -135,7 +161,6 @@ void MessageDeclarationsDialog::addSelectedParameter()
     if (items.isEmpty())
         return;
 
-
     QStringList types = m_selectedDeclaration->typeRefList();
     types.append(items.at(0)->text());
     m_selectedDeclaration->setTypeRefList(types);
@@ -146,7 +171,7 @@ void MessageDeclarationsDialog::removeSelectedParameter()
     if (!m_selectedDeclaration)
         return;
 
-    const QModelIndexList& selection = ui->usedListWidget->selectionModel()->selectedIndexes();
+    const QModelIndexList &selection = ui->usedListWidget->selectionModel()->selectedIndexes();
     if (selection.isEmpty())
         return;
 
@@ -160,6 +185,9 @@ void MessageDeclarationsDialog::removeSelectedParameter()
 void MessageDeclarationsDialog::updateNames()
 {
     if (!m_selectedDeclaration)
+        return;
+
+    if (ui->nameLineEdit->text().isEmpty())
         return;
 
     QStringList names = ui->nameLineEdit->text().split(",");
@@ -177,9 +205,13 @@ void MessageDeclarationsDialog::updateDeclarationDetails()
     if (!m_selectedDeclaration) {
         ui->nameLineEdit->clear();
         ui->resultLabel->setText("");
+        ui->nameLineEdit->setEnabled(false);
+        ui->usedListWidget->setEnabled(false);
         return;
     }
 
+    ui->nameLineEdit->setEnabled(true);
+    ui->usedListWidget->setEnabled(true);
     ui->nameLineEdit->setText(m_selectedDeclaration->names().join(", "));
 
     for (const QString &type : m_selectedDeclaration->typeRefList()) {
@@ -197,4 +229,26 @@ void MessageDeclarationsDialog::updateParameterButtons()
 
     selected = !ui->availableListView->selectedItems().isEmpty();
     ui->addParameterButton->setEnabled(selected && m_selectedDeclaration);
+}
+
+void MessageDeclarationsDialog::openAsn1Editor()
+{
+    asn1::Asn1Editor editor;
+    editor.setAsn1Types(m_asn1Types);
+    editor.setFileName(m_fileName);
+    int result = editor.exec();
+    if (result == QDialog::Accepted) {
+        m_asn1Types = editor.asn1Types();
+        updateAsn1TypesView();
+        m_fileName = editor.fileName();
+    }
+}
+
+void MessageDeclarationsDialog::updateAsn1TypesView()
+{
+    ui->availableListView->clear();
+    for (const QVariant &asn1Type : m_asn1Types) {
+        const QString &name = asn1Type.toMap()["name"].toString();
+        ui->availableListView->addItem(name);
+    }
 }

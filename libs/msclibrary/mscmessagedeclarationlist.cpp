@@ -22,6 +22,25 @@ namespace msc {
 MscMessageDeclarationList::MscMessageDeclarationList(QObject *parent)
     : QObjectListModelT<MscMessageDeclaration *>(parent)
 {
+    setTracking(true);
+}
+
+void MscMessageDeclarationList::trackObject(const QObject *obj, const bool on)
+{
+    QObjectListModel::trackObject(obj, on);
+    if (on) {
+        auto md = static_cast<const MscMessageDeclaration *>(obj);
+        connect(md, &MscMessageDeclaration::dataChanged, this, [&]() {
+            auto md1 = static_cast<MscMessageDeclaration *>(sender());
+            const int idx = indexOf(md1);
+            if (idx >= 0) {
+                QModelIndex index = createIndex(idx, 0);
+                Q_EMIT dataChanged(index, index);
+            }
+        });
+    } else {
+        disconnect(obj, nullptr, this, nullptr);
+    }
 }
 
 QVariant MscMessageDeclarationList::data(const QModelIndex &index, int role) const

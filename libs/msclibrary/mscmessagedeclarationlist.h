@@ -29,6 +29,8 @@ class MscMessageDeclarationList : public QObjectListModelT<MscMessageDeclaration
 public:
     MscMessageDeclarationList(QObject *parent = nullptr);
 
+    void trackObject(const QObject *obj, const bool on) override;
+
     QVariant data(const QModelIndex &index, int role) const override;
 
     MscMessageDeclarationList *clone() const;

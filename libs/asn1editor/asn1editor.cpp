@@ -22,6 +22,7 @@
 #include "asn1xmlparser.h"
 #include "ui_asn1editor.h"
 
+#include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -63,10 +64,22 @@ const QVariantList &Asn1Editor::asn1Types() const
     return m_asn1Types;
 }
 
+void Asn1Editor::setFileName(const QString &fileName)
+{
+    if(m_fileName == fileName)
+        return;
+    m_fileName = fileName;
+}
+
+const QString &Asn1Editor::fileName() const
+{
+    return m_fileName;
+}
+
 void Asn1Editor::openFile()
 {
-    const QString filename =
-            QFileDialog::getOpenFileName(this, tr("ASN1"), QString(), tr("XML files (*.xml);;All files (*.*)"));
+    const QString filename = QFileDialog::getOpenFileName(
+            this, tr("ASN1"), QString(), tr("ASN.1 files (*.asn);;XML files (*.xml);;All files (*.*)"));
     if (!filename.isEmpty())
         loadFile(filename);
 }
@@ -110,7 +123,20 @@ void Asn1Editor::loadFile(const QString &file)
     ui->typesCB->clear();
     connect(&parser, &Asn1XMLParser::parseError, this, &Asn1Editor::showParseError);
 
-    m_asn1Types = parser.parseAsn1XmlFile(file);
+    QStringList errors;
+    QFileInfo info(file);
+    if (!info.suffix().compare("asn", Qt::CaseInsensitive)) {
+        const QVariantList& types = parser.parseAsn1File(file, &errors);
+        if (errors.isEmpty()) {
+            m_asn1Types = types;
+            m_fileName = info.fileName();
+        } else {
+            qWarning() << "Could not load file" << file;
+            return;
+        }
+    } else {
+        m_asn1Types = parser.parseAsn1XmlFile(file);
+    }
     addAsn1TypeItems();
 }
 
@@ -129,5 +155,6 @@ void Asn1Editor::addAsn1TypeItems()
 void Asn1Editor::accept()
 {
     getAsn1Value();
+    QDialog::accept();
 }
 } // namespace asn1

@@ -95,10 +95,10 @@ int main(int argc, char *argv[])
     MainWindow w;
     LogHandler::instance()->setupOutputView(w.textOutputPane());
 
-    qInstallMessageHandler(globalLogMessageWrapper);
-
     CommandLineParser cmdParser;
     cmdParser.process(a.arguments());
+    if (!cmdParser.isSet(CommandLineParser::Positional::StartRemoteControl))
+        qInstallMessageHandler(globalLogMessageWrapper);
 
     const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
     for (int i = 0; i < e.keyCount(); ++i) {

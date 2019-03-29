@@ -39,6 +39,9 @@ public:
     void setAsn1Types(const QVariantList &asn1Types);
     const QVariantList &asn1Types() const;
 
+    void setFileName(const QString &fileName);
+    const QString &fileName() const;
+
 public Q_SLOTS:
     void accept() override;
 
@@ -57,6 +60,7 @@ private:
     Ui::Asn1Editor *ui;
     Asn1TreeView *m_asn1TreeView;
     QVariantList m_asn1Types;
+    QString m_fileName;
 };
 
 } // namespace asn1

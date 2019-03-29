@@ -18,7 +18,7 @@
 #include "mainwindow.h"
 
 #include "asn1editor.h"
-#include "asn1file.h"
+#include "asn1xmlparser.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
@@ -373,19 +373,23 @@ void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
 
 bool MainWindow::openFileAsn(const QString &file)
 {
-    asn1::Asn1File f;
-    QStringList errorMessages;
-
-    if (!QFileInfo::exists(file)) {
+    QFileInfo fileInfo(file);
+    if (!fileInfo.exists()) {
         return false;
     }
 
+    QStringList errorMessages;
     try {
-        const QVariantList &ans1Types = f.parseFile(file, &errorMessages);
+        asn1::Asn1XMLParser parser;
+        const QVariantList ans1Types = parser.parseAsn1File(fileInfo, &errorMessages);
 
         asn1::Asn1Editor editor;
         editor.setAsn1Types(ans1Types);
-        editor.exec();
+        int result = editor.exec();
+        if (result == QDialog::Accepted) {
+            d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
+            d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+        }
     } catch (const std::exception &e) {
         qWarning() << "Error parse asn1 file. " << e.what();
     }
@@ -485,8 +489,10 @@ void MainWindow::openAsn1Editor()
     asn1::Asn1Editor editor;
     editor.setAsn1Types(d->m_model->mscModel()->asn1TypesData());
     int result = editor.exec();
-    if (result == QDialog::Accepted)
+    if (result == QDialog::Accepted) {
         d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
+        d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+    }
 }
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
@@ -625,7 +631,14 @@ void MainWindow::initMenuFile()
 
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), qApp, &QApplication::quit, QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
+                                            [&]() {
+                                                if (this->saveDocument()) {
+                                                    this->saveSettings();
+                                                    QApplication::quit();
+                                                }
+                                            },
+                                            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
@@ -653,7 +666,8 @@ void MainWindow::initMenuView()
     d->m_actShowDocument->setChecked(true);
 
     d->m_menuView->addSeparator();
-    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::showMessages);
+    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::openMessageDeclarationEditor);
+    d->m_menuView->addAction(tr("Show ASN.1 editor ..."), this, &MainWindow::openAsn1Editor);
 
     initMenuViewWindows();
 }
@@ -827,10 +841,6 @@ void MainWindow::initMainToolbar()
 
     d->ui->mainToolBar->addSeparator();
     d->ui->mainToolBar->addAction(d->m_deleteTool->action());
-
-    // TODO: just for test Asn1Editor
-    d->ui->mainToolBar->addSeparator();
-    d->ui->mainToolBar->addAction(d->m_actAsnEditor);
 }
 
 void MainWindow::initConnections()
@@ -1337,9 +1347,9 @@ QStringList MainWindow::mscFileFilters()
 bool MainWindow::saveDocument()
 {
     if (!d->m_dropUnsavedChangesSilently && needSave()) {
-        auto result = QMessageBox::question(this, windowTitle(),
-                                            tr("You have unsaved data. Do you want to save the MSC document?"),
-                                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+        auto result = QMessageBox::warning(
+                this, windowTitle(), tr("You have unsaved data. Do you want to save the MSC document?"),
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 
         if (result == QMessageBox::Cancel) {
             return false;
@@ -1416,7 +1426,7 @@ void MainWindow::showCoordinatesInfo(const QString &info)
     statusBar()->showMessage(info);
 }
 
-void MainWindow::showMessages()
+void MainWindow::openMessageDeclarationEditor()
 {
     msc::MscModel *model = d->m_model->mscModel();
     if (!model)
@@ -1433,5 +1443,7 @@ void MainWindow::showMessages()
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
                                          QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+        d->m_model->mscModel()->setAsn1TypesData(dialog.asn1Types());
+        d->m_model->mscModel()->setDataDefinitionString(dialog.fileName());
     }
 }

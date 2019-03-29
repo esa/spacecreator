@@ -36,6 +36,11 @@ Asn1XMLParser::Asn1XMLParser(QObject *parent)
 {
 }
 
+QVariantList Asn1XMLParser::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
+{
+    return parseAsn1File(fileInfo.dir().absolutePath(), fileInfo.fileName(), errorMessages);
+}
+
 QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
     static QString asn1Command;

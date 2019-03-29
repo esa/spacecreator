@@ -10,8 +10,13 @@ except ImportError:
     import _thread as thread
 import time
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 def run(*args):
-    x = raw_input('Enter command:').strip()
+    x = input('Enter command:').strip()
 
     m = re.search(r'^(\S+)\s*\((.*)\)$', x)
     try:
