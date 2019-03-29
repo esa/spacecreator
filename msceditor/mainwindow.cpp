@@ -627,7 +627,14 @@ void MainWindow::initMenuFile()
 
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), qApp, &QApplication::quit, QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
+                                            [&]() {
+                                                if (this->saveDocument()) {
+                                                    this->saveSettings();
+                                                    QApplication::quit();
+                                                }
+                                            },
+                                            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
@@ -1339,9 +1346,9 @@ QStringList MainWindow::mscFileFilters()
 bool MainWindow::saveDocument()
 {
     if (!d->m_dropUnsavedChangesSilently && needSave()) {
-        auto result = QMessageBox::question(this, windowTitle(),
-                                            tr("You have unsaved data. Do you want to save the MSC document?"),
-                                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+        auto result = QMessageBox::warning(
+                this, windowTitle(), tr("You have unsaved data. Do you want to save the MSC document?"),
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 
         if (result == QMessageBox::Cancel) {
             return false;
