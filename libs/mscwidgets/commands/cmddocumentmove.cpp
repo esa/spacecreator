@@ -28,6 +28,7 @@ CmdDocumentMove::CmdDocumentMove(msc::MscDocument *document, MscDocument *parent
     , m_document(document)
     , m_newParentDocument(parentDocument)
     , m_oldParentDocument(m_document->parentDocument())
+    , m_newParentCharts(m_newParentDocument->charts())
     , m_documentIndex(m_oldParentDocument->documents().indexOf(m_document))
 {
     Q_ASSERT(m_newParentDocument.data());
@@ -54,7 +55,9 @@ void CmdDocumentMove::undo()
 
     if (m_newParentDocument && m_oldParentDocument) {
         m_newParentDocument->removeDocument(m_document, false);
-        addDocumentChart(m_newParentDocument);
+        // restore charts
+        for (auto chart : m_newParentCharts)
+            m_newParentDocument->addChart(chart);
 
         clearDocumentCharts(m_oldParentDocument);
         m_oldParentDocument->addDocument(m_document, m_documentIndex);
@@ -82,7 +85,8 @@ void CmdDocumentMove::clearDocumentCharts(MscDocument *document)
 
 void CmdDocumentMove::addDocumentChart(MscDocument *document)
 {
-    if (document->documents().empty() && document->charts().empty()) {
+    if (document->documents().empty() && document->charts().empty()
+        && document->hierarchyType() == MscDocument::HierarchyLeaf) {
         document->addChart(new MscChart(tr("msc")));
     }
 }

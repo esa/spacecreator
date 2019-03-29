@@ -28,6 +28,7 @@ CmdDocumentCreate::CmdDocumentCreate(msc::MscDocument *document, MscDocument *pa
     : BaseCommand(document)
     , m_document(document)
     , m_parentDocument(parentDocument)
+    , m_parentCharts(m_parentDocument->charts())
 {
     Q_ASSERT(m_parentDocument.data());
 
@@ -43,12 +44,11 @@ void CmdDocumentCreate::redo()
 
     if (m_parentDocument) {
         if (!m_parentDocument->charts().empty()) {
-            m_parentDocument->blockSignals(true);
+            QSignalBlocker blocker(m_parentDocument);
             m_parentDocument->clear();
-            m_parentDocument->blockSignals(false);
         }
 
-        if (m_document->charts().empty()) {
+        if (m_document->charts().empty() && m_document->hierarchyType() == MscDocument::HierarchyLeaf) {
             m_document->addChart(new MscChart(m_document->name() + QObject::tr("_msc")));
         }
 
@@ -64,7 +64,8 @@ void CmdDocumentCreate::undo()
         m_parentDocument->removeDocument(m_document);
 
         if (m_parentDocument->documents().empty() && m_parentDocument->charts().empty()) {
-            m_parentDocument->addChart(new MscChart(tr("msc")));
+            for (auto chart : m_parentCharts)
+                m_parentDocument->addChart(chart);
         }
     }
 }

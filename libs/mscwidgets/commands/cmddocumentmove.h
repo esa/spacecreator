@@ -21,10 +21,12 @@
 #include "commands/basecommand.h"
 
 #include <QPointer>
+#include <QVector>
 
 namespace msc {
 
 class MscDocument;
+class MscChart;
 
 namespace cmd {
 
@@ -46,6 +48,7 @@ private:
     QPointer<MscDocument> m_document;
     QPointer<MscDocument> m_newParentDocument;
     QPointer<MscDocument> m_oldParentDocument;
+    QVector<MscChart *> m_newParentCharts;
     int m_documentIndex = -1;
 };
 

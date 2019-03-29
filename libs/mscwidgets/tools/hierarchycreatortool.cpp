@@ -47,7 +47,6 @@ void HierarchyCreatorTool::createPreviewItem()
     MscDocument *document = new MscDocument(
             QObject::tr("Document_%1").arg(m_hierarchyViewModel->selectedDocument()->documents().size()));
     document->setHierarchyType(m_hierarchyType);
-    document->addChart(new MscChart(document->name() + QObject::tr("_msc")));
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
                                       QVariant::fromValue<msc::MscDocument *>(

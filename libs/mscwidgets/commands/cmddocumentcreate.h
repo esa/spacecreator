@@ -21,10 +21,12 @@
 #include "commands/basecommand.h"
 
 #include <QPointer>
+#include <QVector>
 
 namespace msc {
 
 class MscDocument;
+class MscChart;
 
 namespace cmd {
 
@@ -39,8 +41,9 @@ public:
     int id() const override;
 
 private:
-    MscDocument *m_document = nullptr;
+    QPointer<MscDocument> m_document;
     QPointer<MscDocument> m_parentDocument;
+    QVector<MscChart *> m_parentCharts;
 };
 
 } // namespace cmd
