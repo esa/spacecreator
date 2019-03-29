@@ -78,8 +78,15 @@ void MainModel::initialModel()
 {
     auto model = new MscModel();
     auto doc = new MscDocument(tr("Untitled_Document"));
-    auto chart = new MscChart(tr("Untitled_MSC"));
-    doc->addChart(chart);
+    doc->setHierarchyType(MscDocument::HierarchyAnd);
+
+    // leaf type document
+    auto leafDoc = new MscDocument(tr("Untitled_Leaf"));
+    leafDoc->setHierarchyType(MscDocument::HierarchyLeaf);
+    leafDoc->addChart(new MscChart(tr("Untitled_MSC")));
+
+    doc->addDocument(leafDoc);
+
     model->addDocument(doc);
 
     setNewModel(model);
