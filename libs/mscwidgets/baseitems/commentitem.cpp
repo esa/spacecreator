@@ -108,15 +108,17 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->setRenderHint(QPainter::Antialiasing);
     QPen pen = painter->pen();
     pen.setWidthF(kBorderWidth);
+    pen.setCapStyle(Qt::FlatCap);
     painter->setPen(pen);
     const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
     if (m_isGlobal) {
         painter->setBrush(QColor(0xf9e29c));
         painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(),
                                                 br.bottomRight(), br.topRight() + QPointF(0, kMargins),
-                                                br.topRight() - QPointF(kMargins, -kMargins),
                                                 br.topRight() - QPointF(kMargins, 0) });
-        painter->drawLine(br.topRight() - QPointF(kMargins, 0), br.topRight() + QPointF(0, kMargins));
+        painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, kMargins),
+                                                 br.topRight() - QPointF(kMargins, -kMargins),
+                                                 br.topRight() - QPointF(kMargins, 0) });
     } else {
         painter->fillRect(br, QColor(0xf9e29c));
         if (m_inverseLayout)

@@ -777,8 +777,11 @@ void MainWindow::initTools()
                                                          &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(messageCreateTool);
 
-    auto commentCreateTool = new msc::CommentCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    auto commentCreateTool = new msc::CommentCreatorTool(false, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(commentCreateTool);
+
+    auto globalCommentCreateTool = new msc::CommentCreatorTool(true, &(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(globalCommentCreateTool);
 
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(actionCreateTool);

@@ -25,12 +25,19 @@
 
 namespace msc {
 
-CommentCreatorTool::CommentCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+CommentCreatorTool::CommentCreatorTool(bool isGlobal, ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
+    , m_isGlobalComment(isGlobal)
 {
-    m_title = tr("Comment");
-    m_icon = QPixmap(":/icons/toolbar/comment.svg");
-    m_description = tr("Create new Comment for item");
+    if (m_isGlobalComment) {
+        m_title = tr("Comment");
+        m_icon = QPixmap(":/icons/toolbar/global_comment.svg");
+        m_description = tr("Create new Comment the Chart");
+    } else {
+        m_title = tr("Comment");
+        m_icon = QPixmap(":/icons/toolbar/comment.svg");
+        m_description = tr("Create new Comment for item");
+    }
 }
 
 msc::BaseTool::ToolType msc::CommentCreatorTool::toolType() const
@@ -44,6 +51,7 @@ void CommentCreatorTool::createPreviewItem()
         return;
 
     CommentItem *item = new CommentItem;
+    item->setGlobal(m_isGlobalComment);
     item->setText(tr("Add new comments here"));
     item->setOpacity(0.5);
     m_scene->addItem(item);
@@ -56,12 +64,11 @@ void CommentCreatorTool::commitPreviewItem()
     if (!m_previewItem || !m_activeChart)
         return;
 
+    m_previewEntity = m_isGlobalComment ? m_model->currentChart()
+                                        : m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+
     const CommentItem *item = qobject_cast<CommentItem *>(m_previewItem);
     const QString itemComment = item ? item->text() : QString();
-    m_previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
-    if (!m_previewEntity)
-        m_previewEntity = m_model->currentChart();
-
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(m_previewEntity), itemComment };
     msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
 
@@ -78,19 +85,6 @@ void CommentCreatorTool::removePreviewItem()
 
     utils::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
-}
-
-bool CommentCreatorTool::onMouseMove(QMouseEvent *e)
-{
-    if (!m_previewItem)
-        return BaseCreatorTool::onMouseMove(e);
-
-    auto entity = m_model->nearestEntity(m_view->mapToScene(e->pos()));
-    CommentItem *item = qobject_cast<CommentItem *>(m_previewItem);
-    if (item)
-        item->setGlobal(entity == nullptr);
-
-    return BaseCreatorTool::onMouseMove(e);
 }
 
 } // namespace msc

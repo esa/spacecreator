@@ -26,5 +26,6 @@
         <file alias="toolbar/undo.svg">resources/icons/toolbar/undo.svg</file>
         <file alias="toolbar/instance_stop.svg">resources/icons/toolbar/instance_stop.svg</file>
         <file alias="toolbar/create.svg">resources/icons/toolbar/create.svg</file>
+        <file alias="toolbar/global_comment.svg">resources/icons/toolbar/global_comment.svg</file>
     </qresource>
 </RCC>
