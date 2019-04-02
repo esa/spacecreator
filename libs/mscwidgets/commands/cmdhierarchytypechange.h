@@ -38,6 +38,7 @@ private:
     QPointer<MscDocument> m_document;
     MscDocument::HierarchyType m_oldType;
     MscDocument::HierarchyType m_newType;
+    bool m_newChart = false;
 };
 
 } // namespace cmd

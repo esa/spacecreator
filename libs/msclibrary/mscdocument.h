@@ -58,6 +58,7 @@ public:
     MscMessageDeclarationList *messageDeclarations();
 
     void clear();
+    void clearCharts();
 
     MscDocument *parentDocument() const;
 

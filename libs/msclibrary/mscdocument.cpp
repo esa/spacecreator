@@ -142,8 +142,7 @@ void MscDocument::clear()
     qDeleteAll(m_documents);
     m_documents.clear();
 
-    qDeleteAll(m_charts);
-    m_charts.clear();
+    clearCharts();
 
     {
         QSignalBlocker sb(this);
@@ -152,6 +151,12 @@ void MscDocument::clear()
 
     Q_EMIT cleared();
     Q_EMIT dataChanged();
+}
+
+void MscDocument::clearCharts()
+{
+    qDeleteAll(m_charts);
+    m_charts.clear();
 }
 
 /*!

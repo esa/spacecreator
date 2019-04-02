@@ -530,8 +530,15 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
                 action->setEnabled(actionType != document->hierarchyType());
 
-                // constraint for "repeat", "paralel", "is", "leaf" and "exception" - possible if only one child
-                actionConstraint(action, actionType, document->documents().size());
+                if (actionType != document->hierarchyType()) {
+                    if (!document->charts().isEmpty()) {
+                        // document has charts - possible only type leaf
+                        action->setDisabled(actionType != msc::MscDocument::HierarchyType::HierarchyLeaf);
+                    } else {
+                        // constraint for "repeat", "paralel", "is", "leaf" and "exception" - possible if only one child
+                        actionConstraint(action, actionType, document->documents().size());
+                    }
+                }
             }
 
             for (auto action : d->m_hierarchyToolBar->actions()) {
