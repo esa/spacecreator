@@ -36,7 +36,7 @@ public:
 private:
     using ItemMap = QMap<QString, QStandardItem *>;
 
-    ItemMap createModelItems(const QVariantMap &asn1Item, bool isPresentItem = true);
+    ItemMap createModelItems(const QVariantMap &asn1Item);
 
     QStandardItem *createNumberItem(const QVariantMap &asn1Item);
     QStandardItem *createBoolItem(const QVariantMap &asn1Item);

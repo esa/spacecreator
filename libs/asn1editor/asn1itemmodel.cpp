@@ -41,14 +41,15 @@ void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
     static QStringList headers = { tr("Field"), tr("Type"), tr("Value"), tr("Optional") };
     setHorizontalHeaderLabels(headers);
 
-    ItemMap itemMap = createModelItems(asn1Item, false);
+    ItemMap itemMap = createModelItems(asn1Item);
 
     setItem(0, MODEL_NAME_INDEX, itemMap["item"]);
     setItem(0, MODEL_TYPE_INDEX, itemMap["type"]);
     setItem(0, MODEL_VALUE_INDEX, itemMap["value"]);
+    setItem(0, MODEL_IS_OPTIONAL_INDEX, itemMap["present"]);
 }
 
-Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1Item, bool isPresentItem)
+Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1Item)
 {
     ItemMap itemMap;
     QString typeLimit;
@@ -115,9 +116,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     itemMap["item"] = nameItem;
     itemMap["type"] = typeItem;
     itemMap["value"] = valueItem;
-
-    if (isPresentItem)
-        itemMap["present"] = createPresentItem(asn1Item);
+    itemMap["present"] = createPresentItem(asn1Item);
 
     return itemMap;
 }
@@ -250,6 +249,8 @@ QStandardItem *Asn1ItemModel::createPresentItem(const QVariantMap &asn1Item)
     if (asn1Item[ASN1_IS_OPTIONAL].toBool() == true) {
         item->setCheckState(Qt::Unchecked);
         item->setCheckable(true);
+    } else {
+        item->setEnabled(false);
     }
 
     item->setData(asn1Item[ASN1_IS_OPTIONAL], OPTIONAL_ROLE);
