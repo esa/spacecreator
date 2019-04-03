@@ -24,10 +24,12 @@
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
 #include "conditionitem.h"
+#include "coregionitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccoregion.h"
 #include "msccreate.h"
 #include "mscinstance.h"
 #include "msctimer.h"
@@ -329,6 +331,10 @@ void ChartViewModel::addInstanceEventItems()
             instanceEventItem = addMessageItem(static_cast<MscMessage *>(instanceEvent));
             break;
         }
+        case MscEntity::EntityType::Coregion: {
+            instanceEventItem = addCoregionItem(static_cast<MscCoregion *>(instanceEvent));
+            break;
+        }
         case MscEntity::EntityType::Action: {
             instanceEventItem = addActionItem(static_cast<MscAction *>(instanceEvent));
             break;
@@ -374,6 +380,17 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
     };
 
     switch (event->entityType()) {
+    case MscEntity::EntityType::Coregion: {
+        MscCoregion *coregion = static_cast<MscCoregion *>(event);
+        if (coregion->type() == MscCoregion::Type::Begin) {
+            const QRectF srcRect = item->sceneBoundingRect();
+            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
+            if (!qFuzzyCompare(srcRect.top() + 1., targetTop + 1.))
+                item->moveBy(0., targetTop - srcRect.top());
+        } else {
+            qobject_cast<CoregionItem *>(item)->updateLayout();
+        }
+    } break;
     case MscEntity::EntityType::Message:
     case MscEntity::EntityType::Create: {
         MscMessage *message = static_cast<MscMessage *>(event);
@@ -432,7 +449,9 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
         if (!commentItem) {
             commentItem = new CommentItem;
             commentItem->attachTo(iObj);
-            connect(iObj, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout, Qt::UniqueConnection);
+            if (iObj)
+                connect(iObj, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
+                        Qt::UniqueConnection);
             connect(entity, &MscEntity::commentChanged, this, &ChartViewModel::onEntityCommentChanged,
                     Qt::UniqueConnection);
             connect(commentItem, &CommentItem::commentChanged, this,
@@ -594,6 +613,14 @@ TimerItem *ChartViewModel::itemForTimer(MscTimer *timer) const
         return nullptr;
 
     return qobject_cast<TimerItem *>(d->m_instanceEventItemsHash.value(timer->internalId()));
+}
+
+CoregionItem *ChartViewModel::itemForCoregion(MscCoregion *coregion) const
+{
+    if (!coregion)
+        return nullptr;
+
+    return qobject_cast<CoregionItem *>(d->m_instanceEventItemsHash.value(coregion->internalId()));
 }
 
 InteractiveObject *ChartViewModel::itemForEntity(MscEntity *entity) const
@@ -949,6 +976,57 @@ TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
         d->m_instanceEventItemsHash.insert(timer->internalId(), item);
     }
     item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+
+    return item;
+}
+
+CoregionItem *ChartViewModel::addCoregionItem(MscCoregion *coregion)
+{
+    InstanceItem *instance(nullptr);
+    qreal instanceVertiacalOffset(0);
+    if (coregion->instance()) {
+        instance = itemForInstance(coregion->instance());
+        instanceVertiacalOffset = instance->axis().p1().y();
+    }
+
+    CoregionItem *item = nullptr;
+    if (coregion->type() == MscCoregion::Type::Begin) {
+        item = itemForCoregion(coregion);
+    } else {
+        auto isCoregionBegin = [coregion](MscInstanceEvent *event) {
+            if (event->entityType() != MscEntity::EntityType::Coregion)
+                return false;
+
+            if (!event->relatesTo(coregion->instance()))
+                return false;
+
+            return static_cast<MscCoregion *>(event)->type() == MscCoregion::Type::Begin;
+        };
+
+        const QVector<MscInstanceEvent *> &events = currentChart()->instanceEvents();
+        auto it = std::find(events.rbegin(), events.rend(), coregion);
+        auto res = std::find_if(it, events.rend(), isCoregionBegin);
+        if (res == events.rend())
+            return nullptr;
+
+        item = itemForCoregion(qobject_cast<MscCoregion *>(*res));
+    }
+
+    if (!item) {
+        item = new CoregionItem(this);
+
+        connect(item, &TimerItem::moved, this, &ChartViewModel::onInstanceEventItemMoved, Qt::UniqueConnection);
+
+        d->m_scene.addItem(item);
+        d->m_instanceEventItems.append(item);
+        d->m_instanceEventItemsHash.insert(coregion->internalId(), item);
+    }
+    if (coregion->type() == MscCoregion::Type::Begin) {
+        item->setBegin(coregion);
+        item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+    } else {
+        item->setEnd(coregion);
+    }
 
     return item;
 }

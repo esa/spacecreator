@@ -22,8 +22,7 @@
 namespace msc {
 
 MscCoregion::MscCoregion(QObject *parent)
-    : MscInstanceEvent(parent)
-    , m_type(Type::Begin)
+    : MscCoregion(Type::Begin, parent)
 {
 }
 
@@ -35,17 +34,32 @@ MscCoregion::MscCoregion(Type type, QObject *parent)
 
 void MscCoregion::setType(MscCoregion::Type type)
 {
-    if (type == m_type) {
+    if (type == m_type)
         return;
-    }
+
     m_type = type;
     Q_EMIT typeChanged();
     Q_EMIT dataChanged();
 }
 
+MscInstance *MscCoregion::instance() const
+{
+    return m_instance;
+}
+
+void MscCoregion::setInstance(MscInstance *instance)
+{
+    if (instance == m_instance)
+        return;
+
+    m_instance = instance;
+    Q_EMIT instanceChanged();
+    Q_EMIT dataChanged();
+}
+
 bool MscCoregion::relatesTo(const MscInstance *instance) const
 {
-    Q_UNUSED(instance);
-    return false;
+    return m_instance == instance;
 }
-}
+
+} // namespace msc

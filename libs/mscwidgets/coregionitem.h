@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -12,53 +12,52 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see
-   <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
 
-#include "interactiveobject.h"
+#include "baseitems/interactiveobject.h"
 
-class QGraphicsLineItem;
+#include <QObject>
+#include <QPointer>
 
 namespace msc {
-class TextItem;
+class MscCoregion;
+class ChartViewModel;
+class InstanceItem;
 
-class CommentItem : public InteractiveObject
+class CoregionItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit CommentItem(QGraphicsItem *parent = nullptr);
+    explicit CoregionItem(ChartViewModel *model, QGraphicsItem *parent = nullptr);
 
-    void setText(const QString &text);
-    QString text() const;
-    void attachTo(msc::InteractiveObject *iObj);
-    InteractiveObject *object() const;
-    void setGlobal(bool isGlobal);
+    void setBegin(MscCoregion *begin) { m_begin = begin; }
+    MscCoregion *begin() const { return m_begin; }
 
-    QPainterPath shape() const override;
+    void setEnd(MscCoregion *end) { m_end = end; }
+    MscCoregion *end() const { return m_end; }
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-Q_SIGNALS:
-    void commentChanged(const QString &comment);
+    void connectObjects(InstanceItem *instance, qreal y);
+    void setInstance(InstanceItem *instance);
 
 protected:
     void prepareHoverMark() override;
     void rebuildLayout() override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
-    void textEdited(const QString &text);
+    QPointer<ChartViewModel> m_model;
+    QPointer<InstanceItem> m_instance;
 
-private:
-    TextItem *m_textItem = nullptr;
-    QGraphicsLineItem *m_linkItem = nullptr;
-    QPointer<InteractiveObject> m_iObj;
-    bool m_inverseLayout = false;
-    bool m_isGlobal = true;
+    MscCoregion *m_begin = nullptr;
+    MscCoregion *m_end = nullptr;
+
+    bool m_unorderedEntities = true;
 };
 
-} // ns msc
+} // namespace msc

@@ -732,7 +732,9 @@ antlrcpp::Any MscParserVisitor::visitStartCoregion(MscParser::StartCoregionConte
         return visitChildren(context);
     }
 
-    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
+    MscCoregion *coregion = new MscCoregion(MscCoregion::Type::Begin);
+    coregion->setInstance(m_currentInstance);
+    m_instanceEvents.append(coregion);
     return visitChildren(context);
 }
 
@@ -742,7 +744,9 @@ antlrcpp::Any MscParserVisitor::visitEndCoregion(MscParser::EndCoregionContext *
         return visitChildren(context);
     }
 
-    m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
+    MscCoregion *coregion = new MscCoregion(MscCoregion::Type::End);
+    coregion->setInstance(m_currentInstance);
+    m_instanceEvents.append(coregion);
     return visitChildren(context);
 }
 
@@ -781,10 +785,14 @@ antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *contex
     }
 
     if (context->CONCURRENT()) {
-        m_instanceEvents.append(new MscCoregion(MscCoregion::Type::Begin));
+        MscCoregion *coregion = new MscCoregion(MscCoregion::Type::Begin);
+        coregion->setInstance(m_currentInstance);
+        m_instanceEvents.append(coregion);
     }
     if (context->ENDCONCURRENT()) {
-        m_instanceEvents.append(new MscCoregion(MscCoregion::Type::End));
+        MscCoregion *coregion = new MscCoregion(MscCoregion::Type::End);
+        coregion->setInstance(m_currentInstance);
+        m_instanceEvents.append(coregion);
     }
 
     return visitChildren(context);

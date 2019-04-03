@@ -43,10 +43,15 @@ public:
 
     bool relatesTo(const MscInstance *instance) const override;
 
+    MscInstance *instance() const;
+    void setInstance(MscInstance *instance);
+
 Q_SIGNALS:
     void typeChanged();
+    void instanceChanged();
 
 private:
-    Type m_type;
+    MscInstance *m_instance = nullptr;
+    Type m_type = Type::Begin;
 };
 }

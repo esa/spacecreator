@@ -36,6 +36,7 @@ class InstanceItem;
 class MessageItem;
 class TimerItem;
 class CommentItem;
+class CoregionItem;
 
 class MscAction;
 class MscChart;
@@ -43,6 +44,7 @@ class MscCondition;
 class MscInstance;
 class MscInstanceEvent;
 class MscTimer;
+class MscCoregion;
 
 struct ChartViewModelPrivate;
 struct ChartViewLayoutInfo;
@@ -71,6 +73,7 @@ public:
     ConditionItem *itemForCondition(MscCondition *condition) const;
     ActionItem *itemForAction(MscAction *action) const;
     TimerItem *itemForTimer(MscTimer *timer) const;
+    CoregionItem *itemForCoregion(MscCoregion *coregion) const;
     InteractiveObject *itemForEntity(MscEntity *entity) const;
 
     CommentItem *commentForEntity(msc::MscEntity *entity);
@@ -120,6 +123,7 @@ private:
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
+    CoregionItem *addCoregionItem(MscCoregion *coregion);
 
     void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
     void addInstanceItems();

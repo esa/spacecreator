@@ -94,11 +94,6 @@ void CommentItem::setGlobal(bool isGlobal)
     updateLayout();
 }
 
-void CommentItem::updateLayout()
-{
-    rebuildLayout();
-}
-
 void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
