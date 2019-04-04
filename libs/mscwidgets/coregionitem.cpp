@@ -73,8 +73,10 @@ void CoregionItem::rebuildLayout()
     while (it != events.end()) {
         Q_ASSERT(*it);
 
-        if (InteractiveObject *iObj = m_model->itemForEntity(*it))
+        if (InteractiveObject *iObj = m_model->itemForEntity(*it)) {
             rect |= iObj->sceneBoundingRect();
+            stackBefore(iObj);
+        }
 
         if (*it == m_end)
             break;

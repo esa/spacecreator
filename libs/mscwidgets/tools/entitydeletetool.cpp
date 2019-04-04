@@ -20,8 +20,10 @@
 #include "baseitems/commentitem.h"
 #include "baseitems/interactiveobject.h"
 #include "commands/common/commandsstack.h"
+#include "coregionitem.h"
 #include "documentitem.h"
 #include "mscchart.h"
+#include "msccoregion.h"
 #include "mscdocument.h"
 #include "mscentity.h"
 
@@ -120,6 +122,8 @@ void EntityDeleteTool::deleteSelectedItems()
                     removeComment(itemsWithComments, m_model, commentItem);
             } else if (CommentItem *commentItem = qobject_cast<CommentItem *>(obj)) {
                 removeComment(itemsWithComments, m_model, commentItem);
+            } else if (CoregionItem *coregionItem = qobject_cast<CoregionItem *>(obj)) {
+                items << coregionItem->begin() << coregionItem->end();
             }
         }
 
