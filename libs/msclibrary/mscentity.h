@@ -20,6 +20,7 @@
 #include "cif/cifblock.h"
 
 #include <QObject>
+#include <QRegExp>
 #include <QString>
 #include <QUuid>
 
@@ -53,6 +54,8 @@ public:
     const QString &name() const;
     void setName(const QString &name);
 
+    static const QRegExp &nameVerifier();
+
     QUuid internalId() const;
 
     static const QString DefaultName;
@@ -76,6 +79,8 @@ private:
     const QUuid m_id;
     QString m_comment;
     QVector<cif::CifBlockShared> m_cifs;
+
+    static const QRegExp m_nameVerify;
 
     void dbgShowCifs() const;
 };

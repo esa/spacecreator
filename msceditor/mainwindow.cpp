@@ -827,7 +827,7 @@ void MainWindow::initTools()
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
         connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
         if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool))
-            connect(creatorTool, &msc::InstanceCreatorTool::created, this, &MainWindow::activateDefaultTool);
+            connect(creatorTool, &msc::BaseCreatorTool::created, this, &MainWindow::activateDefaultTool);
 
         toolsActions->addAction(toolAction);
         connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);

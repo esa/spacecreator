@@ -48,6 +48,8 @@ public:
     QRectF boundingRect() const override;
     QPair<QPointF, bool> commentPoint() const override;
 
+    void postCreatePolishing() override;
+
     QPointF head() const;
     void setHead(const QPointF &head, ObjectAnchor::Snap snap);
     QPointF tail() const;

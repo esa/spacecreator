@@ -17,7 +17,7 @@
 
 #include "messagedeclarationsdialog.h"
 
-#include "asn1editor.h"
+#include "asn1xmlparser.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
@@ -25,6 +25,7 @@
 #include "ui_messagedeclarationsdialog.h"
 
 #include <QDebug>
+#include <QFileDialog>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QRegExpValidator>
@@ -38,7 +39,9 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
 {
     Q_ASSERT(model);
     ui->setupUi(this);
-    QRegExp rx("([A-Z]|[a-z]|\\d|_|\\.|(\\s?,\\s?))+"); // name as per spec + "," as separator
+    QString regExPattern = msc::MscEntity::nameVerifier().pattern();
+    regExPattern.insert(regExPattern.size() - 2, "|(\\s?,\\s?)"); // name as per spec + "," as separator
+    QRegExp rx(regExPattern);
     QRegExpValidator *nameValidator = new QRegExpValidator(rx, this);
     ui->nameLineEdit->setValidator(nameValidator);
 
@@ -62,7 +65,7 @@ MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationL
     connect(ui->removeParameterButton, &QPushButton::clicked, this,
             &MessageDeclarationsDialog::removeSelectedParameter);
 
-    connect(ui->asn1Button, &QPushButton::clicked, this, &MessageDeclarationsDialog::openAsn1Editor);
+    connect(ui->asn1Button, &QPushButton::clicked, this, &MessageDeclarationsDialog::selectAsn1File);
 
     updateDeclarationDetails();
 }
@@ -86,7 +89,7 @@ const QVariantList &MessageDeclarationsDialog::asn1Types() const
 
 void MessageDeclarationsDialog::setFileName(const QString &fileName)
 {
-    if(m_fileName == fileName)
+    if (m_fileName == fileName)
         return;
     m_fileName = fileName;
 }
@@ -231,16 +234,21 @@ void MessageDeclarationsDialog::updateParameterButtons()
     ui->addParameterButton->setEnabled(selected && m_selectedDeclaration);
 }
 
-void MessageDeclarationsDialog::openAsn1Editor()
+void MessageDeclarationsDialog::selectAsn1File()
 {
-    asn1::Asn1Editor editor;
-    editor.setAsn1Types(m_asn1Types);
-    editor.setFileName(m_fileName);
-    int result = editor.exec();
-    if (result == QDialog::Accepted) {
-        m_asn1Types = editor.asn1Types();
-        updateAsn1TypesView();
-        m_fileName = editor.fileName();
+    QString fileName = QFileDialog::getOpenFileName(this, "ASN.1 file", QString(), "ASN.1 files (*.asn)");
+    if (!fileName.isEmpty()) {
+        QFileInfo fileInfo(fileName);
+        QStringList errors;
+        asn1::Asn1XMLParser parser;
+        const QVariantList &types = parser.parseAsn1File(fileInfo, &errors);
+        if (errors.isEmpty()) {
+            m_asn1Types = types;
+            updateAsn1TypesView();
+            m_fileName = fileInfo.fileName();
+        } else {
+            qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
+        }
     }
 }
 

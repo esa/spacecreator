@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Message declarations</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="1">
@@ -52,7 +52,7 @@
         <item>
          <widget class="QPushButton" name="asn1Button">
           <property name="text">
-           <string>Open ASN.1 editor ...</string>
+           <string>Select ASN.1 File ...</string>
           </property>
          </widget>
         </item>
@@ -76,7 +76,7 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Used:</string>
+           <string>Message parameters:</string>
           </property>
          </widget>
         </item>

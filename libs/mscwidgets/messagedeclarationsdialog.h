@@ -61,7 +61,7 @@ private Q_SLOTS:
     void updateDeclarationDetails();
     void updateParameterButtons();
 
-    void openAsn1Editor();
+    void selectAsn1File();
 
 private:
     void updateAsn1TypesView();

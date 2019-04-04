@@ -76,6 +76,7 @@ HEADERS += \
     hierarchyviewmodel.h \
     instanceitem.h \
     messagedeclarationsdialog.h \
+    messagedialog.h \
     messageitem.h \
     textview.h \
     timeritem.h
@@ -145,12 +146,14 @@ SOURCES += \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
     messagedeclarationsdialog.cpp \
+    messagedialog.cpp \
     messageitem.cpp \
     textview.cpp \
     timeritem.cpp
 
 FORMS += \
-    messagedeclarationsdialog.ui
+    messagedeclarationsdialog.ui \
+    messagedialog.ui
 
 RESOURCES += \
     resources.qrc

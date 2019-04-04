@@ -19,6 +19,18 @@
 
 namespace msc {
 
+/*!
+   Tries to detect if the given parameter is an expression or a pattern
+ */
+MscParameter::MscParameter(const QString &parameter)
+{
+    if (parameter.contains(':')) {
+        setExpression(parameter);
+    } else {
+        setPattern(parameter);
+    }
+}
+
 MscParameter::MscParameter(const QString &expression, const QString &pattern)
     : m_parameter(pattern.isEmpty() ? expression : pattern)
     , m_type(pattern.isEmpty() ? Type::Expression : Type::Pattern)

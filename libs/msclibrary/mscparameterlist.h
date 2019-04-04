@@ -34,6 +34,7 @@ public:
     };
 
     MscParameter() {}
+    explicit MscParameter(const QString &parameter);
     MscParameter(const QString &expression, const QString &pattern);
 
     bool operator==(const msc::MscParameter &other) const

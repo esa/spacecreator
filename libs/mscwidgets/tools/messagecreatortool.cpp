@@ -21,17 +21,19 @@
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
+#include "messagedialog.h"
 #include "mscchart.h"
-#include "mscmessage.h"
 #include "msccreate.h"
+#include "mscmessage.h"
 
 #include <QDebug>
 #include <QMouseEvent>
+#include <QUndoStack>
 
 namespace msc {
 
-MessageCreatorTool::MessageCreatorTool(MscMessage::MessageType msgType, ChartViewModel *model,
-                                       QGraphicsView *view, QObject *parent)
+MessageCreatorTool::MessageCreatorTool(MscMessage::MessageType msgType, ChartViewModel *model, QGraphicsView *view,
+                                       QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_messageType(msgType)
 {
@@ -57,9 +59,8 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage = m_messageType == MscMessage::MessageType::Message
-            ? new MscMessage(tr("Message"))
-            : new MscCreate(tr("Create"));
+    MscMessage *orphanMessage = m_messageType == MscMessage::MessageType::Message ? new MscMessage(tr("Message"))
+                                                                                  : new MscCreate(tr("Create"));
     m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());
 
     movePreviewItemTo(cursorInScene());
@@ -87,11 +88,12 @@ void MessageCreatorTool::commitPreviewItem()
     if (m_previewEntity && m_activeChart) {
         const QVariantList &cmdParams = prepareMessage();
         if (!cmdParams.isEmpty()) {
-            startWaitForModelLayoutComplete(qobject_cast<msc::MscMessage *>(m_previewEntity));
+            startWaitForModelLayoutComplete(m_previewEntity);
             msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
             Q_EMIT created(); // to deactivate toobar's item
             removePreviewItem();
+
             return;
         }
     }

@@ -25,6 +25,7 @@
 #include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
+#include "messagedialog.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -174,6 +175,12 @@ QPair<QPointF, bool> MessageItem::commentPoint() const
         return qMakePair(head(), true);
 
     return qMakePair(head().x() > tail().x() ? head() : tail(), false);
+}
+
+void MessageItem::postCreatePolishing()
+{
+    MessageDialog dialog(m_message);
+    dialog.exec();
 }
 
 void MessageItem::rebuildLayout()
@@ -523,7 +530,8 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
 void MessageItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
-    m_arrowItem->enableEditMode();
+    MessageDialog dialog(m_message);
+    dialog.exec();
 }
 
 bool MessageItem::isCreator() const
