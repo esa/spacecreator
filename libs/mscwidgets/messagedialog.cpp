@@ -17,6 +17,7 @@
 
 #include "messagedialog.h"
 
+#include "asn1editor.h"
 #include "commands/common/commandsstack.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
@@ -51,6 +52,9 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     connect(ui->removeParameterButton, &QPushButton::clicked, this, &MessageDialog::removeParameter);
     connect(ui->parameterTable->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &MessageDialog::checkRemoveButton);
+
+    connect(ui->parameterTable, QOverload<QTableWidgetItem *>::of(&QTableWidget::itemActivated), this,
+            &MessageDialog::editItem);
 
     connect(ui->declarationsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [&]() { ui->declarationButton->setEnabled(ui->declarationsComboBox->currentIndex() > 0); });
@@ -195,6 +199,26 @@ void MessageDialog::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         return;
     QDialog::keyPressEvent(event);
+}
+
+void MessageDialog::editItem(QTableWidgetItem *item)
+{
+    if (!m_selectedDeclaration)
+        return;
+
+    asn1::Asn1Editor editor(this);
+    editor.setValueEditOnlyMode();
+    const QVariantList &types = mscModel()->asn1TypesData();
+    editor.setAsn1Types(types);
+    const QString type = ui->parameterTable->verticalHeaderItem(item->row())->text();
+    editor.showAsn1Type(type);
+    editor.setValue(item->text());
+
+    const int result = editor.exec();
+    if (result == QDialog::Accepted)
+        item->setText(editor.value());
+
+    ui->parameterTable->closePersistentEditor(item);
 }
 
 void MessageDialog::fillMessageDeclartionBox()

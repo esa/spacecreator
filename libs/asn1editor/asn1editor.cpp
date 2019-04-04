@@ -66,7 +66,7 @@ const QVariantList &Asn1Editor::asn1Types() const
 
 void Asn1Editor::setFileName(const QString &fileName)
 {
-    if(m_fileName == fileName)
+    if (m_fileName == fileName)
         return;
     m_fileName = fileName;
 }
@@ -74,6 +74,35 @@ void Asn1Editor::setFileName(const QString &fileName)
 const QString &Asn1Editor::fileName() const
 {
     return m_fileName;
+}
+
+void Asn1Editor::setValue(const QString &value)
+{
+    const QString &currentType {ui->typesCB->currentText()};
+    if(value.isEmpty() || currentType.isEmpty())
+        return;
+
+    Asn1ValueParser valueParser;
+    connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
+
+    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
+        return value.toMap()["name"] == currentType;
+    });
+
+    if (find != m_asn1Types.end())
+        m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), value));
+}
+
+QString Asn1Editor::value() const
+{
+    return m_asn1TreeView->getAsn1Value();
+}
+
+void Asn1Editor::setValueEditOnlyMode()
+{
+    ui->typeLabel->setVisible(false);
+    ui->typesCB->setVisible(false);
+    ui->openBtn->setVisible(false);
 }
 
 void Asn1Editor::openFile()
@@ -96,19 +125,14 @@ void Asn1Editor::showAsn1Type(const QString &text)
 
     if (find != m_asn1Types.end())
         m_asn1TreeView->setAsn1Model((*find).toMap());
+
+    if (ui->typesCB->currentText() != text)
+        ui->typesCB->setCurrentText(text);
 }
 
 void Asn1Editor::setAsn1Value()
 {
-    Asn1ValueParser valueParser;
-    connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
-
-    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
-        return value.toMap()["name"] == ui->typesCB->currentText();
-    });
-
-    if (find != m_asn1Types.end())
-        m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), ui->valueEdit->toPlainText()));
+    setValue(ui->valueEdit->toPlainText());
 }
 
 void Asn1Editor::getAsn1Value()
@@ -126,7 +150,7 @@ void Asn1Editor::loadFile(const QString &file)
     QStringList errors;
     QFileInfo info(file);
     if (!info.suffix().compare("asn", Qt::CaseInsensitive)) {
-        const QVariantList& types = parser.parseAsn1File(file, &errors);
+        const QVariantList &types = parser.parseAsn1File(file, &errors);
         if (errors.isEmpty()) {
             m_asn1Types = types;
             m_fileName = info.fileName();

@@ -169,6 +169,9 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
 
 void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize, int choiceRow)
 {
+    if (!asn1Value.isValid())
+        return;
+
     if (choiceRow != -1) {
         // asn1Value = map
         setChildRowValue(rootItem, choiceRow, asn1Value);

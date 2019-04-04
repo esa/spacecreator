@@ -31,6 +31,8 @@ namespace Ui {
 class MessageDialog;
 }
 
+class QTableWidgetItem;
+
 class MessageDialog : public QDialog
 {
     Q_OBJECT
@@ -50,6 +52,9 @@ public Q_SLOTS:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+
+private Q_SLOTS:
+    void editItem(QTableWidgetItem *item);
 
 private:
     void fillMessageDeclartionBox();

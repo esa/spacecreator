@@ -42,13 +42,19 @@ public:
     void setFileName(const QString &fileName);
     const QString &fileName() const;
 
+    void setValue(const QString &value);
+    QString value() const;
+
+    void setValueEditOnlyMode();
+
 public Q_SLOTS:
     void accept() override;
+
+    void showAsn1Type(const QString &text);
 
 private Q_SLOTS:
     void openFile();
     void showParseError(const QString &error);
-    void showAsn1Type(const QString &text);
     void setAsn1Value();
     void getAsn1Value();
 
