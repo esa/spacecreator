@@ -17,6 +17,8 @@
 
 #include "mscinstance.h"
 
+#include <QStringList>
+
 namespace msc {
 
 MscInstance::MscInstance(QObject *parent)
@@ -29,6 +31,11 @@ MscInstance::MscInstance(const QString &name, QObject *parent)
 {
 }
 
+/*!
+   In an older standrad it says:
+   <kind denominator> ::= system | block | process | service
+   But in newest ones it's just a <name>
+ */
 const QString &MscInstance::denominator() const
 {
     return m_denominator;
@@ -42,6 +49,7 @@ void MscInstance::setDenominator(const QString &denominator)
 
     m_denominator = denominator;
     Q_EMIT denominatorChanged(m_denominator);
+    Q_EMIT denominatorOrKindChanged(denominatorAndKind());
     Q_EMIT dataChanged();
 }
 
@@ -58,7 +66,58 @@ void MscInstance::setKind(const QString &kind)
 
     m_kind = kind;
     Q_EMIT kindChanged(m_kind);
+    Q_EMIT denominatorOrKindChanged(denominatorAndKind());
     Q_EMIT dataChanged();
+}
+
+QString MscInstance::denominatorAndKind() const
+{
+    return QString("%1 %2").arg(m_denominator, m_kind).trimmed();
+}
+
+void MscInstance::setDenominatorAndKind(const QString &value)
+{
+    bool denominatorUpdated = false;
+    bool kindUpdated = false;
+
+    QString denominator;
+    QString kind;
+    splitDenominatorKind(value, denominator, kind);
+    if (denominator != m_denominator) {
+        denominatorUpdated = true;
+        m_denominator = denominator;
+    }
+    if (kind != m_kind) {
+        kindUpdated = true;
+        m_kind = kind;
+    }
+
+    if (denominatorUpdated)
+        Q_EMIT denominatorChanged(m_denominator);
+    if (kindUpdated)
+        Q_EMIT kindChanged(m_kind);
+    if (denominatorUpdated || kindUpdated) {
+        Q_EMIT denominatorOrKindChanged(denominatorAndKind());
+        Q_EMIT dataChanged();
+    }
+}
+
+void MscInstance::splitDenominatorKind(const QString &text, QString &denominator, QString &kind)
+{
+    QStringList tokens = text.split(" ");
+    if (tokens.size() > 1) {
+        const QString denom = tokens.at(0);
+        if (denom.compare("system", Qt::CaseInsensitive) == 0 || denom.compare("block", Qt::CaseInsensitive) == 0
+            || denom.compare("process", Qt::CaseInsensitive) == 0
+            || denom.compare("service", Qt::CaseInsensitive) == 0) {
+            tokens.removeAt(0);
+            kind = tokens.join(" ");
+            denominator = denom;
+            return;
+        }
+    }
+    kind = text;
+    denominator.clear();
 }
 
 const QString &MscInstance::inheritance() const

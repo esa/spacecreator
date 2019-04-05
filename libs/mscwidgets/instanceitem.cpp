@@ -52,11 +52,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
     Q_ASSERT(m_instance != nullptr);
 
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
-    connect(m_instance, &msc::MscInstance::kindChanged, this, &msc::InstanceItem::setKind);
+    connect(m_instance, &msc::MscInstance::denominatorOrKindChanged, this, &msc::InstanceItem::setDenominatorAndKind);
     connect(m_instance, &msc::MscInstance::explicitStopChanged, this, &msc::InstanceItem::setExplicitStop);
 
     m_headSymbol->setName(m_instance->name());
-    m_headSymbol->setKind(m_instance->kind());
+    m_headSymbol->setKind(m_instance->denominatorAndKind());
     updateLayout();
 
     setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
@@ -114,11 +114,13 @@ QLineF InstanceItem::axis() const
 void InstanceItem::setName(const QString &name)
 {
     updatePropertyString(QLatin1String("name"), name);
+    m_headSymbol->setName(name);
 }
 
-void InstanceItem::setKind(const QString &kind)
+void InstanceItem::setDenominatorAndKind(const QString &kind)
 {
-    updatePropertyString(QLatin1String("kind"), kind);
+    updatePropertyString(QLatin1String("denominatorAndKind"), kind);
+    m_headSymbol->setKind(m_instance->denominatorAndKind());
 }
 
 void InstanceItem::setExplicitStop(bool exStop)
@@ -132,21 +134,9 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
     if (property.size() == 0) // QLatin1String::isEmpty was introduced in Qt 5.10
         return;
 
-    static const QLatin1String scheduledMethod("reflectTextLayoutChange");
+    m_instance->setProperty(property.data(), value);
 
-    const char *propertyName = property.data();
-    if (this->property(propertyName).toString() == value && m_instance->property(propertyName) == value) {
-        // If renaming has been performed via redo command,
-        // both the instance and the UI text are actualized for now,
-        // but the scene layout update is still necessary:
-        QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
-        return;
-    }
-
-    m_instance->setProperty(propertyName, value);
-    m_headSymbol->setProperty(propertyName, value);
-
-    QMetaObject::invokeMethod(this, scheduledMethod.data(), Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
 
 void InstanceItem::rebuildLayout()
@@ -277,6 +267,8 @@ void InstanceItem::onKindEdited(const QString &newKind)
 {
     using namespace msc::cmd;
     CommandsStack::push(RenameInstanceKind, { QVariant::fromValue<MscEntity *>(this->modelItem()), newKind });
+    // Update to have the bold text correct
+    m_headSymbol->setKind(m_instance->denominatorAndKind());
 }
 
 void InstanceItem::reflectTextLayoutChange()

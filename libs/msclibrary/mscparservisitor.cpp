@@ -288,15 +288,20 @@ antlrcpp::Any MscParserVisitor::visitMscHead(MscParser::MscHeadContext *context)
 antlrcpp::Any MscParserVisitor::visitInstanceKind(MscParser::InstanceKindContext *context)
 {
     if (m_currentInstance) {
-        const QString kind = ::treeNodeToString(context->NAME(0));
+        QString kind = ::treeNodeToString(context->NAME(0));
         const QString denominator = denominatorString(kind);
         if (denominator.isEmpty()) {
             m_currentInstance->setKind(kind);
         } else {
             m_currentInstance->setDenominator(denominator);
-            if (context->NAME().size() > 1) {
-                m_currentInstance->setKind(::treeNodeToString(context->NAME(1)));
+            kind.clear();
+            for (size_t i = 1; i < context->NAME().size(); ++i) {
+                if (kind.isEmpty())
+                    kind = ::treeNodeToString(context->NAME(i));
+                else
+                    kind += QStringLiteral(" ") + ::treeNodeToString(context->NAME(i));
             }
+            m_currentInstance->setKind(kind);
         }
     }
 

@@ -18,6 +18,7 @@
 #include "instanceheaditem.h"
 
 #include "baseitems/textitem.h"
+#include "mscinstance.h"
 
 #include <QCursor>
 #include <QDebug>
@@ -80,7 +81,7 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_textItemName(new NameItem(this))
     , m_rectItem(new QGraphicsRectItem(this))
-    , m_textItemKind(new NameItem(this))
+    , m_textItemKind(new TextItem(this))
 {
     m_textItemKind->setBackgroundColor(Qt::transparent);
     m_textItemKind->setEditable(true);
@@ -97,7 +98,6 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
         updateLayout();
         Q_EMIT kindEdited(txt);
     });
-    connect(m_textItemKind, &TextItem::keyPressed, this, [this]() { updateLayout(); });
 
     m_rectItem->setCursor(Qt::SizeAllCursor);
     m_textItemKind->setCursor(Qt::SizeAllCursor); // TODO: restore regular cursor for editing
@@ -126,10 +126,14 @@ void InstanceHeadItem::setName(const QString &name)
 
 void InstanceHeadItem::setKind(const QString &kind)
 {
-    if (kind == this->kind())
-        return;
+    QString denominator;
+    QString kindText;
+    MscInstance::splitDenominatorKind(kind, denominator, kindText);
 
-    m_textItemKind->setPlainText(kind);
+    if (denominator.isEmpty())
+        m_textItemKind->setPlainText(kindText);
+    else
+        m_textItemKind->setHtml(QString("<b>%1</b> %2").arg(denominator, kindText));
     m_textItemKind->adjustSize();
 
     updateLayout();

@@ -246,6 +246,24 @@ void tst_MscFile::testInstanceWithKind()
     QCOMPARE(instance->name(), QString("mygui_GUI"));
     QCOMPARE(instance->kind(), QString("foo"));
     QCOMPARE(instance->denominator(), QString("process"));
+
+    // out of spec instance kind
+    model.reset(file->parseText(" \
+        mscdocument automade; \
+            msc recorded; \
+                instance mygui_GUI : process foo control unit; \
+                endinstance; \
+            endmsc; \
+        endmscdocument; \
+    "));
+    QCOMPARE(model->documents().size(), 1);
+    QCOMPARE(model->documents().at(0)->charts().size(), 1);
+    chart = model->documents().at(0)->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    instance = chart->instances().at(0);
+    QCOMPARE(instance->name(), QString("mygui_GUI"));
+    QCOMPARE(instance->kind(), QString("foo control unit"));
+    QCOMPARE(instance->denominator(), QString("process"));
 }
 
 void tst_MscFile::testGateMessage()

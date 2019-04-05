@@ -117,8 +117,8 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     ++tabsSize;
 
     QString comment = serializeComment(instance);
-    if (!instance->kind().isEmpty()) {
-        header += QString(": %1 %2%3;\n").arg(instance->kind(), instance->inheritance(), comment);
+    if (!instance->denominatorAndKind().isEmpty()) {
+        header += QString(": %1 %2%3;\n").arg(instance->denominatorAndKind(), instance->inheritance(), comment);
     } else
         header += comment + ";\n";
 

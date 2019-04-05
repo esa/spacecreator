@@ -60,7 +60,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void setName(const QString &name);
-    void setKind(const QString &kind);
+    void setDenominatorAndKind(const QString &kind);
     void setExplicitStop(bool exStop);
     void buildLayout();
     void rebuildLayout() override;

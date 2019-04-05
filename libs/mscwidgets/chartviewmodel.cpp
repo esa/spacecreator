@@ -267,7 +267,7 @@ void ChartViewModel::addInstanceItems()
 
         item->setX(d->m_layoutInfo.m_pos.x());
         item->setHighlightable(false);
-        item->setKind(instance->kind());
+        item->setDenominatorAndKind(instance->denominatorAndKind());
 
         d->m_layoutInfo.m_pos.rx() += d->InterInstanceSpan + item->boundingRect().width();
 

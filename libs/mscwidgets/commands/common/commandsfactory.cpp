@@ -221,7 +221,7 @@ QUndoCommand *CommandsFactory::createInstanceKindChange(const QVariantList &para
 
     if (MscInstance *item = params.first().value<MscInstance *>()) {
         const QString &name = params.last().toString();
-        if (item->kind() != name)
+        if (item->denominatorAndKind() != name)
             return new CmdInstanceKindChange(item, name);
     }
 

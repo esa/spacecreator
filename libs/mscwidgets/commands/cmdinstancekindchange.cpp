@@ -25,22 +25,22 @@ namespace cmd {
 CmdInstanceKindChange::CmdInstanceKindChange(MscInstance *item, const QString &newKind)
     : BaseCommand(item)
     , m_instance(item)
-    , m_oldKind(item->kind())
-    , m_newKind(newKind)
+    , m_oldValue(item->denominatorAndKind())
+    , m_newValue(newKind)
 {
 }
 
 void CmdInstanceKindChange::redo()
 {
     if (m_instance) {
-        m_instance->setKind(m_newKind);
+        m_instance->setDenominatorAndKind(m_newValue);
     }
 }
 
 void CmdInstanceKindChange::undo()
 {
     if (m_instance) {
-        m_instance->setKind(m_oldKind);
+        m_instance->setDenominatorAndKind(m_oldValue);
     }
 }
 
@@ -48,7 +48,7 @@ bool CmdInstanceKindChange::mergeWith(const QUndoCommand *command)
 {
     auto other = dynamic_cast<const CmdInstanceKindChange *>(command);
     if (canMergeWith(other)) {
-        m_newKind = other->m_newKind;
+        m_newValue = other->m_newValue;
         return true;
     }
 

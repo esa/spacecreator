@@ -26,6 +26,8 @@ class MscInstance : public MscEntity
     Q_OBJECT
     Q_PROPERTY(QString denominator READ denominator WRITE setDenominator NOTIFY denominatorChanged)
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindChanged)
+    Q_PROPERTY(QString denominatorAndKind READ denominatorAndKind WRITE setDenominatorAndKind NOTIFY
+                       denominatorOrKindChanged)
     Q_PROPERTY(QString inheritance READ inheritance WRITE setInheritance NOTIFY inheritanceChanged)
     Q_PROPERTY(MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY explicitCreatorChanged)
     Q_PROPERTY(bool explicitStop READ explicitStop WRITE setExplicitStop NOTIFY explicitStopChanged)
@@ -39,6 +41,10 @@ public:
 
     const QString &kind() const;
     void setKind(const QString &kind);
+
+    QString denominatorAndKind() const;
+    void setDenominatorAndKind(const QString &value);
+    static void splitDenominatorKind(const QString &text, QString &denominator, QString &kind);
 
     const QString &inheritance() const;
     void setInheritance(const QString &inheritance);
@@ -54,6 +60,7 @@ public:
 Q_SIGNALS:
     void denominatorChanged(const QString &denominator);
     void kindChanged(const QString &kind);
+    void denominatorOrKindChanged(const QString &value);
     void inheritanceChanged(const QString &inheritance);
     void explicitCreatorChanged(MscInstance *creator);
     void explicitStopChanged(bool value);

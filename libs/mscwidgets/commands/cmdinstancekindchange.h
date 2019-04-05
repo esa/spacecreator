@@ -37,8 +37,8 @@ public:
 
 private:
     QPointer<MscInstance> m_instance;
-    QString m_oldKind;
-    QString m_newKind;
+    QString m_oldValue;
+    QString m_newValue;
 };
 
 } // namespace cmd

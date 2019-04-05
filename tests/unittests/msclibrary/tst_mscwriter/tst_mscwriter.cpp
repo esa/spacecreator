@@ -196,11 +196,12 @@ void tst_MscWriter::testSerializeMscInstanceStop()
 void tst_MscWriter::testSerializeMscInstanceKind()
 {
     MscInstance instance("Inst_1");
-    instance.setKind("process");
+    instance.setDenominator("PROCESS");
+    instance.setKind("cu_unit");
     instance.setInheritance("P1");
 
     QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()),
-             QString("instance Inst_1: process P1;\nendinstance;\n"));
+             QString("instance Inst_1: PROCESS cu_unit P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
