@@ -72,6 +72,14 @@ void MessageItem::onTextChanged()
     update();
 }
 
+void MessageItem::showMessageDialog()
+{
+    if (m_message->messageType() == MscMessage::MessageType::Message) {
+        MessageDialog dialog(m_message);
+        dialog.exec();
+    }
+}
+
 MscMessage *MessageItem::modelItem() const
 {
     return m_message;
@@ -179,8 +187,9 @@ QPair<QPointF, bool> MessageItem::commentPoint() const
 
 void MessageItem::postCreatePolishing()
 {
-    MessageDialog dialog(m_message);
-    dialog.exec();
+    showMessageDialog();
+    if (m_message->messageType() == MscMessage::MessageType::Create)
+        m_arrowItem->enableEditMode();
 }
 
 void MessageItem::rebuildLayout()
@@ -530,8 +539,7 @@ void MessageItem::setPositionChangeIgnored(bool ignored)
 void MessageItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
-    MessageDialog dialog(m_message);
-    dialog.exec();
+    showMessageDialog();
 }
 
 bool MessageItem::isCreator() const

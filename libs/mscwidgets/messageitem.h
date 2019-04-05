@@ -82,6 +82,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onTextChanged();
+    void showMessageDialog();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;

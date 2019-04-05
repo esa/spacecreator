@@ -86,15 +86,25 @@ void MessageCreatorTool::commitPreviewItem()
     m_mouseDown = QPointF();
 
     if (m_previewEntity && m_activeChart) {
-        const QVariantList &cmdParams = prepareMessage();
-        if (!cmdParams.isEmpty()) {
-            startWaitForModelLayoutComplete(m_previewEntity);
-            msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+        bool isValid = true;
+        if (m_messageType == MscMessage::MessageType::Create) {
+            auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
+            isValid = message->sourceInstance() != nullptr && message->targetInstance() != nullptr
+                    && message->sourceInstance() != message->targetInstance();
+            qWarning() << "Create messages need to be connected to different existing instances";
+        }
 
-            Q_EMIT created(); // to deactivate toobar's item
-            removePreviewItem();
+        if (isValid) {
+            const QVariantList &cmdParams = prepareMessage();
+            if (!cmdParams.isEmpty()) {
+                startWaitForModelLayoutComplete(m_previewEntity);
+                msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
-            return;
+                Q_EMIT created(); // to deactivate toobar's item
+                removePreviewItem();
+
+                return;
+            }
         }
     }
 
