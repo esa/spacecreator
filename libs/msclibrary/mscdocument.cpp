@@ -201,4 +201,32 @@ bool MscDocument::isAddChildEnable() const
 {
     return !(isSingleChildDocument() && m_documents.size() >= 1) && m_hierarchyType != HierarchyLeaf;
 }
+
+/*!
+   Looks for messageInstanceName and timerInstanceName and if they are numbers, returns the highest number
+   Returns 1 as a minimum. Even if nothing was found.
+ */
+int MscDocument::maxInstanceNameNumber() const
+{
+    int num = 1;
+    for (MscChart *chart : m_charts) {
+        num = std::max(num, chart->maxInstanceNameNumber());
+    }
+    for (MscDocument *doc : m_documents) {
+        num = std::max(num, doc->maxInstanceNameNumber());
+    }
+    return num;
+}
+
+int MscDocument::setInstanceNameNumbers(int nextNumber)
+{
+    for (MscChart *chart : m_charts) {
+        nextNumber = chart->setInstanceNameNumbers(nextNumber);
+    }
+    for (MscDocument *doc : m_documents) {
+        nextNumber = doc->setInstanceNameNumbers(nextNumber);
+    }
+    return nextNumber;
+}
+
 }

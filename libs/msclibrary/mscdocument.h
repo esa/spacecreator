@@ -70,6 +70,9 @@ public:
     bool isSingleChildDocument() const;
     bool isAddChildEnable() const;
 
+    int maxInstanceNameNumber() const;
+    int setInstanceNameNumbers(int nextNumber);
+
 Q_SIGNALS:
     void documentAdded(MscDocument *document);
     void documentRemoved(MscDocument *document);

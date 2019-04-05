@@ -62,16 +62,23 @@ public:
     MscTimer *followingTimer() const;
     bool allowFollowingTimer(MscTimer *timer);
 
+    const QString &timerInstanceName() const;
+    void setTimerInstanceName(const QString &name);
+
+    QString fullName() const;
+
 Q_SIGNALS:
     void timerTypeChanged();
     void instanceChanged();
     void precedingTimerChanged();
     void followingTimerChanged();
+    void timerInstanceNameChanged();
 
 private:
     TimerType m_timerType = TimerType::Unknown;
     MscInstance *m_instance = nullptr;
     QPointer<MscTimer> m_precedingTimer;
     QPointer<MscTimer> m_followingTimer;
+    QString m_timerInstanceName;
 };
 }

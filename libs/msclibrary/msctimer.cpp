@@ -140,4 +140,30 @@ bool MscTimer::allowFollowingTimer(MscTimer *timer)
     return true;
 }
 
+/*!
+   \fn MscTimer::timerInstanceName
+   Where the <timer name> is not sufficient for a unique mapping the <timer instance name> must be
+   employed.
+ */
+const QString &MscTimer::timerInstanceName() const
+{
+    return m_timerInstanceName;
+}
+
+void MscTimer::setTimerInstanceName(const QString &name)
+{
+    if (name == m_timerInstanceName) {
+        return;
+    }
+
+    m_timerInstanceName = name;
+    Q_EMIT timerInstanceNameChanged();
+    Q_EMIT dataChanged();
+}
+
+QString MscTimer::fullName() const
+{
+    return m_timerInstanceName.isEmpty() ? name() : QString("%1,%2").arg(name(), m_timerInstanceName);
+}
+
 }

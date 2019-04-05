@@ -69,6 +69,9 @@ public:
     void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
                              msc::MscMessage::EndType endType);
 
+    int maxInstanceNameNumber() const;
+    int setInstanceNameNumbers(int nextNumber);
+
 public Q_SLOTS:
     void resetTimerRelations(MscTimer *timer);
 
@@ -85,6 +88,20 @@ Q_SIGNALS:
 
 private:
     bool moveEvent(MscInstanceEvent *event, int newIndex);
+
+    /*!
+       Return a QVector with all events in this chart of the given type
+     */
+    template<typename T>
+    QVector<T *> allEvents()
+    {
+        QVector<T *> events;
+        for (auto ev : m_instanceEvents) {
+            if (auto obj = qobject_cast<T *>(ev))
+                events.append(obj);
+        }
+        return events;
+    }
 
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;

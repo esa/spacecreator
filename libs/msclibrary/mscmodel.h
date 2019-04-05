@@ -49,6 +49,8 @@ public:
 
     void clear();
 
+    void checkInstanceNames();
+
 Q_SIGNALS:
     void dataChanged();
     void documentAdded(MscDocument *document);

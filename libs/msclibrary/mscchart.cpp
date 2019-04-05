@@ -25,6 +25,7 @@
 #include "msctimer.h"
 
 #include <QDebug>
+#include <QVector>
 
 namespace msc {
 
@@ -395,6 +396,54 @@ void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance
     }
 }
 
+/*!
+   Looks for messageInstanceName and timerInstanceName and if they are numbers, returns the highest number
+   Returns 1 as a minimum. Even if nothing was found.
+ */
+int MscChart::maxInstanceNameNumber() const
+{
+    int num = 1;
+    for (const MscInstanceEvent *event : m_instanceEvents) {
+        int nameNum = -1;
+        if (event->entityType() == MscEntity::EntityType::Message) {
+            auto msg = static_cast<const MscMessage *>(event);
+            nameNum = msg->messageInstanceName().toInt();
+        }
+        if (event->entityType() == MscEntity::EntityType::Timer) {
+            auto timer = static_cast<const MscTimer *>(event);
+            nameNum = timer->timerInstanceName().toInt();
+        }
+        if (nameNum > num)
+            num = nameNum;
+    }
+    return num;
+}
+
+/*!
+   Sets instance names if needed, starting with the given number
+   @return the next free number to be used for instance names
+   
+   For more documentation see \see MscModel::checkInstanceNames
+ */
+int MscChart::setInstanceNameNumbers(int nextNumber)
+{
+    QVector<MscMessage *> messages = allEvents<MscMessage>();
+    for (auto msg = messages.begin(); msg != messages.end(); ++msg) {
+        for (auto msg2 = msg + 1; msg2 != messages.end(); ++msg2) {
+            // now check if they are not unique
+            if ((*msg)->name() == (*msg2)->name() && (*msg)->sourceInstance() == (*msg2)->sourceInstance()
+                && (*msg)->targetInstance() == (*msg2)->targetInstance()) {
+                if ((*msg)->messageInstanceName().isEmpty())
+                    (*msg)->setMessageInstanceName(QString::number(nextNumber++));
+                if ((*msg2)->messageInstanceName().isEmpty())
+                    (*msg2)->setMessageInstanceName(QString::number(nextNumber++));
+            }
+        }
+    }
+    //@todo check timer too ?
+    return nextNumber;
+}
+
 void MscChart::resetTimerRelations(MscTimer *timer)
 {
     MscTimer *precedingTimer = timer->precedingTimer();
@@ -412,14 +461,14 @@ void MscChart::resetTimerRelations(MscTimer *timer)
     if (idx == -1)
         return;
 
-    const QString &timerName = timer->name();
+    const QString &timerName = timer->fullName();
     for (int timerIdx = idx + 1; timerIdx < events.size(); ++timerIdx) {
         MscInstanceEvent *event = events.value(timerIdx);
         if (event->entityType() != MscEntity::EntityType::Timer)
             continue;
 
         MscTimer *mscTimer = static_cast<MscTimer *>(event);
-        if (mscTimer->name() == timerName && mscTimer->instance() == timer->instance()) {
+        if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
             mscTimer->setPrecedingTimer(timer);
             timer->setFollowingTimer(mscTimer);
             break;
@@ -432,7 +481,7 @@ void MscChart::resetTimerRelations(MscTimer *timer)
             continue;
 
         MscTimer *mscTimer = static_cast<MscTimer *>(event);
-        if (mscTimer->name() == timerName && mscTimer->instance() == timer->instance()) {
+        if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
             timer->setPrecedingTimer(mscTimer);
             mscTimer->setFollowingTimer(timer);
             break;

@@ -762,12 +762,15 @@ antlrcpp::Any MscParserVisitor::visitTimerStatement(MscParser::TimerStatementCon
     if (MscParser::StartTimerContext *startTimer = context->startTimer()) {
         timer->setTimerType(MscTimer::TimerType::Start);
         timer->setName(::treeNodeToString(startTimer->NAME(0)));
+        timer->setTimerInstanceName(::treeNodeToString(context->startTimer()->timerInstanceName));
     } else if (MscParser::StopTimerContext *stopTimer = context->stopTimer()) {
         timer->setTimerType(MscTimer::TimerType::Stop);
         timer->setName(::treeNodeToString(stopTimer->NAME(0)));
+        timer->setTimerInstanceName(::treeNodeToString(context->stopTimer()->timerInstanceName));
     } else if (MscParser::TimeoutContext *timeout = context->timeout()) {
         timer->setTimerType(MscTimer::TimerType::Timeout);
         timer->setName(::treeNodeToString(timeout->NAME(0)));
+        timer->setTimerInstanceName(::treeNodeToString(context->timeout()->timerInstanceName));
     } else {
         qWarning() << Q_FUNC_INFO << "Bad timer declaration";
         throw ParserException(QObject::tr("Bad timer declaration '%1'").arg(::treeNodeToString(context)));

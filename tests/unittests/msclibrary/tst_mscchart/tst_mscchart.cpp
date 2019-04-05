@@ -54,6 +54,8 @@ private Q_SLOTS:
     void testRemoveCondition();
     void testTimerRelation();
     void testInvalidTimerRelation();
+    void testMaxInstanceNameNumber();
+    void testSetInstanceNameNumber();
 
 private:
     MscChart *m_chart = nullptr;
@@ -399,6 +401,68 @@ void tst_MscChart::testInvalidTimerRelation()
 
     QVERIFY(timer2->precedingTimer() == nullptr);
     QVERIFY(timer2->followingTimer() == nullptr);
+}
+
+void tst_MscChart::testMaxInstanceNameNumber()
+{
+    auto instance = new MscInstance("IN", m_chart);
+    m_chart->addInstance(instance);
+
+    int num = m_chart->maxInstanceNameNumber();
+    QCOMPARE(num, 1);
+
+    auto message1 = new MscMessage("Msg1", m_chart);
+    message1->setSourceInstance(instance);
+    m_chart->addInstanceEvent(message1);
+
+    num = m_chart->maxInstanceNameNumber();
+    QCOMPARE(num, 1);
+
+    message1->setMessageInstanceName("3");
+    num = m_chart->maxInstanceNameNumber();
+    QCOMPARE(num, 3);
+
+    auto timer1 = new MscTimer(m_chart);
+    timer1->setName("Timer1");
+    timer1->setInstance(instance);
+    timer1->setTimerInstanceName("5");
+    m_chart->addInstanceEvent(timer1);
+    num = m_chart->maxInstanceNameNumber();
+    QCOMPARE(num, 5);
+}
+
+void tst_MscChart::testSetInstanceNameNumber()
+{
+    auto instance1 = new MscInstance("Inst1", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst2", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto message1 = new MscMessage("Msg", m_chart);
+    message1->setSourceInstance(instance1);
+    m_chart->addInstanceEvent(message1);
+
+    // identical - set number - as with first
+    auto message2 = new MscMessage("Msg", m_chart);
+    message2->setSourceInstance(instance1);
+    m_chart->addInstanceEvent(message2);
+
+    // Different name
+    auto message3 = new MscMessage("Message", m_chart);
+    message3->setSourceInstance(instance1);
+    m_chart->addInstanceEvent(message3);
+
+    // Different instance
+    auto message4 = new MscMessage("Msg", m_chart);
+    message4->setTargetInstance(instance1);
+    m_chart->addInstanceEvent(message4);
+
+    int result = m_chart->setInstanceNameNumbers(5);
+    QCOMPARE(result, 7);
+    QCOMPARE(message1->messageInstanceName(), QString("5"));
+    QCOMPARE(message2->messageInstanceName(), QString("6"));
+    QCOMPARE(message3->messageInstanceName(), QString(""));
+    QCOMPARE(message4->messageInstanceName(), QString(""));
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

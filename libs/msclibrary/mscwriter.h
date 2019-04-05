@@ -43,9 +43,9 @@ class MscWriter : public QObject
 public:
     MscWriter(QObject *parent = nullptr);
 
-    void saveModel(const MscModel *model, const QString &fileName);
+    void saveModel(MscModel *model, const QString &fileName);
     void saveChart(const MscChart *chart, const QString &fileName);
-    QString modelText(const MscModel *model);
+    QString modelText(MscModel *model);
 
     QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,
                       int tabsSize = 0);
@@ -60,7 +60,7 @@ public:
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 
-    void setModel(const MscModel *model);
+    void setModel(MscModel *model);
 
 private:
     QString tabs(int tabsSize) const;
@@ -68,7 +68,7 @@ private:
     QString serializeComment(const msc::MscEntity *entity) const;
     QString serializeParameters(const MscMessage *message) const;
 
-    const MscModel *m_model = nullptr;
+    MscModel *m_model = nullptr;
 };
 
 } // namespace msc

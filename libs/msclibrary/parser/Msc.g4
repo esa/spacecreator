@@ -323,7 +323,7 @@ timerStatement
     ;
 
 startTimer
-    : (STARTTIMER|SET) NAME (COMMA NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
+    : (STARTTIMER|SET) NAME (COMMA timerInstanceName=NAME)? duration? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
 duration
@@ -336,11 +336,11 @@ durationLimit
     ;
 
 stopTimer
-    : (STOPTIMER|RESET) NAME (COMMA NAME)?
+    : (STOPTIMER|RESET) NAME (COMMA timerInstanceName=NAME)?
     ;
 
 timeout
-    : TIMEOUT NAME (COMMA NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
+    : TIMEOUT NAME (COMMA timerInstanceName=NAME)? (LEFTOPEN parameterList RIGHTOPEN)?
     ;
 
 // 4.9 ACTION

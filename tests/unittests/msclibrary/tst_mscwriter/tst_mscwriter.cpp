@@ -155,9 +155,10 @@ void tst_MscWriter::testSerializeMscMessageMultiParameters()
 void tst_MscWriter::testSerializeMscTimer()
 {
     MscTimer timer1("T1", MscTimer::TimerType::Start);
-    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1;\n"));
+    timer1.setTimerInstanceName("a");
+    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1,a;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1,a;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1,a;\n"));
 
     MscTimer timer2("T2", MscTimer::TimerType::Stop);
     QCOMPARE(this->serialize(&timer2, nullptr), QString("stoptimer T2;\n"));

@@ -40,7 +40,7 @@ MscWriter::MscWriter(QObject *parent)
 {
 }
 
-void MscWriter::saveModel(const MscModel *model, const QString &fileName)
+void MscWriter::saveModel(MscModel *model, const QString &fileName)
 {
     if (model == nullptr || fileName.isEmpty())
         return;
@@ -81,7 +81,7 @@ void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     mscFile.close();
 }
 
-QString MscWriter::modelText(const MscModel *model)
+QString MscWriter::modelText(MscModel *model)
 {
     setModel(model);
 
@@ -217,20 +217,20 @@ QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance,
     QString timerType;
     switch (timer->timerType()) {
     case MscTimer::TimerType::Start:
-        timerType = "starttimer";
+        timerType = QStringLiteral("starttimer");
         break;
     case MscTimer::TimerType::Stop:
-        timerType = "stoptimer";
+        timerType = QStringLiteral("stoptimer");
         break;
     case MscTimer::TimerType::Timeout:
-        timerType = "timeout";
+        timerType = QStringLiteral("timeout");
         break;
     default:
         // Not good
         return QString();
     }
 
-    return tabs(tabsSize) + timerType + " " + timer->name() + ";\n";
+    return QString("%1%2 %3;\n").arg(tabs(tabsSize), timerType, timer->fullName());
 }
 
 QString MscWriter::serialize(const MscAction *action, const MscInstance *instance, int tabsSize)
@@ -372,9 +372,11 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
             .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document));
 }
 
-void MscWriter::setModel(const MscModel *model)
+void MscWriter::setModel(MscModel *model)
 {
     m_model = model;
+    if (m_model)
+        m_model->checkInstanceNames();
 }
 
 QString MscWriter::tabs(int tabsSize) const
