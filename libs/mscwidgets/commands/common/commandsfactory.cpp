@@ -21,10 +21,10 @@
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdconditionitemcreate.h"
 #include "commands/cmdconditionitemmove.h"
+#include "commands/cmdcoregionitemcreate.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
 #include "commands/cmddocumentmove.h"
-#include "commands/cmdentitycommentchange.h"
 #include "commands/cmdentitycommentchange.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdhierarchytypechange.h"
@@ -42,6 +42,7 @@
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
+#include "msccoregion.h"
 #include "mscinstance.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
@@ -83,6 +84,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createConditionItemMove(params);
     case cmd::CreateAction:
         return cmd::CommandsFactory::createActionItemCreate(params);
+    case cmd::CreateCoregion:
+        return cmd::CommandsFactory::createCoregionItemCreate(params);
     case cmd::MoveAction:
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
@@ -276,6 +279,22 @@ QUndoCommand *CommandsFactory::createActionItemCreate(const QVariantList &params
         auto instance = params.at(2).value<msc::MscInstance *>();
         int eventIndex = params.at(3).toInt();
         return new CmdActionItemCreate(action, chart, instance, eventIndex);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createCoregionItemCreate(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 5);
+
+    auto begin = params.value(0).value<msc::MscCoregion *>();
+    auto end = params.value(1).value<msc::MscCoregion *>();
+    if (auto chart = params.value(2).value<msc::MscChart *>()) {
+        auto instance = params.value(3).value<msc::MscInstance *>();
+        bool ok;
+        int eventIndex = params.value(4).toInt(&ok);
+        return new CmdCoregionItemCreate(begin, end, chart, instance, ok ? eventIndex : -1);
     }
 
     return nullptr;

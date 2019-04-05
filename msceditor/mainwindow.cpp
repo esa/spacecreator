@@ -42,6 +42,7 @@
 #include "tools/actioncreatortool.h"
 #include "tools/commentcreatortool.h"
 #include "tools/conditioncreatortool.h"
+#include "tools/coregioncreatortool.h"
 #include "tools/entitydeletetool.h"
 #include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
@@ -790,6 +791,9 @@ void MainWindow::initTools()
     auto globalCommentCreateTool = new msc::CommentCreatorTool(true, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(globalCommentCreateTool);
 
+    auto coregionCreateTool = new msc::CoregionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(coregionCreateTool);
+
     auto actionCreateTool = new msc::ActionCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(actionCreateTool);
 
@@ -1313,6 +1317,8 @@ void MainWindow::updateMscToolbarActionsEnablement()
         case msc::BaseTool::ToolType::ActionCreator:
         case msc::BaseTool::ToolType::ConditionCreator:
         case msc::BaseTool::ToolType::MessageCreator:
+        case msc::BaseTool::ToolType::CommentCreator:
+        case msc::BaseTool::ToolType::CoregionCreator:
         case msc::BaseTool::ToolType::EntityDeleter:
         case msc::BaseTool::ToolType::InstanceStopper:
         case msc::BaseTool::ToolType::TimerCreator: {

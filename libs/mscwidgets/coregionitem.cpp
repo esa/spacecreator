@@ -60,10 +60,14 @@ void CoregionItem::prepareHoverMark()
 
 void CoregionItem::rebuildLayout()
 {
+    static const qreal kCoregionWidth = 50;
+    static const qreal kOffset = 20;
+
     prepareGeometryChange();
     m_boundingRect = QRectF();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
         || m_end->instance() != m_instance->modelItem()) {
+        m_boundingRect = QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset));
         return;
     }
 
@@ -83,11 +87,15 @@ void CoregionItem::rebuildLayout()
 
         ++it;
     }
-
     const QRectF instanceRect = m_instance->sceneBoundingRect();
-    static const qreal kCoregionWidth = 50;
+    if (!rect.isValid()) {
+        m_boundingRect = QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset));
+        setX(instanceRect.x() + (instanceRect.width() - kCoregionWidth) / 2);
+        return;
+    }
+
     rect.setWidth(kCoregionWidth);
-    rect.adjust(0, -10, 0, 10);
+    rect.adjust(0, -kOffset, 0, kOffset);
     rect.translate(instanceRect.center().x() - rect.center().x(), 0);
     m_boundingRect = { QPointF(0, 0), rect.size() };
     setPos(rect.topLeft());

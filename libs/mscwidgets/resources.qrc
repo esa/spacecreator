@@ -27,5 +27,6 @@
         <file alias="toolbar/instance_stop.svg">resources/icons/toolbar/instance_stop.svg</file>
         <file alias="toolbar/create.svg">resources/icons/toolbar/create.svg</file>
         <file alias="toolbar/global_comment.svg">resources/icons/toolbar/global_comment.svg</file>
+        <file alias="toolbar/coregion.svg">resources/icons/toolbar/coregion.svg</file>
     </qresource>
 </RCC>

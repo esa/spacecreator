@@ -44,6 +44,7 @@ public:
     static QUndoCommand *createConditionItemCreate(const QVariantList &params);
     static QUndoCommand *createConditionItemMove(const QVariantList &params);
     static QUndoCommand *createActionItemCreate(const QVariantList &params);
+    static QUndoCommand *createCoregionItemCreate(const QVariantList &params);
     static QUndoCommand *createActionItemMove(const QVariantList &params);
     static QUndoCommand *createActionInformalText(const QVariantList &params);
     static QUndoCommand *createTimerItemCreate(const QVariantList &params);

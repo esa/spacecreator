@@ -17,35 +17,36 @@
 
 #pragma once
 
+#include "commands/basecommand.h"
+
+#include <QPointer>
+
 namespace msc {
+
+class MscCoregion;
+class MscChart;
+class MscInstance;
+
 namespace cmd {
 
-enum Id
+class CmdCoregionItemCreate : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    CreateCoregion,
-    LastId
+    Q_OBJECT
+public:
+    explicit CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscChart *chart,
+                                   msc::MscInstance *instance, int eventIndex);
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    MscCoregion *m_begin = nullptr;
+    MscCoregion *m_end = nullptr;
+    QPointer<MscInstance> m_instance;
+    QPointer<MscChart> m_chart;
+    int m_eventIndex = -1;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace msc
+} // namespace cmd

@@ -19,7 +19,6 @@
 
 #include "baseitems/interactiveobject.h"
 
-#include <QObject>
 #include <QPointer>
 
 namespace msc {

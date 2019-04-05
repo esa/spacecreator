@@ -383,13 +383,12 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, QGraphicsObje
     case MscEntity::EntityType::Coregion: {
         MscCoregion *coregion = static_cast<MscCoregion *>(event);
         if (coregion->type() == MscCoregion::Type::Begin) {
-            const QRectF srcRect = item->sceneBoundingRect();
             const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
-            if (!qFuzzyCompare(srcRect.top() + 1., targetTop + 1.))
-                item->moveBy(0., targetTop - srcRect.top());
+            item->setY(targetTop);
         } else {
             qobject_cast<CoregionItem *>(item)->updateLayout();
         }
+        d->m_layoutInfo.m_pos.ry() += 2 * d->InterMessageSpan;
     } break;
     case MscEntity::EntityType::Message:
     case MscEntity::EntityType::Create: {
@@ -708,6 +707,10 @@ int ChartViewModel::eventIndex(qreal y)
     for (auto item : d->m_instanceEventItems) {
         if (item->y() < y) {
             ++idx;
+            if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
+                if (coregionItem->sceneBoundingRect().bottom() < y)
+                    ++idx;
+            }
         }
     }
     return idx;

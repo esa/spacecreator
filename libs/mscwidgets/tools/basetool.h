@@ -48,7 +48,8 @@ public:
         CommentCreator,
         EntityDeleter,
         TimerCreator,
-        HierarchyCreator
+        HierarchyCreator,
+        CoregionCreator
     };
     Q_ENUM(ToolType)
 

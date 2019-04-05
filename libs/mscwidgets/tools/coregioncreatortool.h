@@ -17,35 +17,21 @@
 
 #pragma once
 
-namespace msc {
-namespace cmd {
+#include "basecreatortool.h"
 
-enum Id
+namespace msc {
+
+class CoregionCreatorTool : public BaseCreatorTool
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    CreateCoregion,
-    LastId
+    Q_OBJECT
+public:
+    explicit CoregionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    BaseTool::ToolType toolType() const override;
+
+private:
+    void createPreviewItem() override;
+    void commitPreviewItem() override;
+    void removePreviewItem() override;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace msc

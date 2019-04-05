@@ -28,6 +28,7 @@ HEADERS += \
     baseitems/msgidentificationitem.h \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
+    commands/cmdcoregionitemcreate.h \
     commands/cmdsetmessagedeclarations.h \
     commands/common/commandids.h \
     commands/common/commandsfactory.h \
@@ -59,6 +60,7 @@ HEADERS += \
     tools/basetool.h \
     tools/commentcreatortool.h \
     tools/conditioncreatortool.h \
+    tools/coregioncreatortool.h \
     tools/entitydeletetool.h \
     tools/hierarchycreatortool.h \
     tools/instancecreatortool.h \
@@ -99,6 +101,7 @@ SOURCES += \
     baseitems/msgidentificationitem.cpp \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
+    commands/cmdcoregionitemcreate.cpp \
     commands/cmdsetmessagedeclarations.cpp \
     commands/common/commandsfactory.cpp \
     commands/common/commandsstack.cpp \
@@ -129,6 +132,7 @@ SOURCES += \
     tools/basetool.cpp \
     tools/commentcreatortool.cpp \
     tools/conditioncreatortool.cpp \
+    tools/coregioncreatortool.cpp \
     tools/entitydeletetool.cpp \
     tools/instancecreatortool.cpp \
     tools/instancestoptool.cpp \
