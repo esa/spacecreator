@@ -53,7 +53,7 @@ void CoregionCreatorTool::createPreviewItem()
     auto orphanCoregionEnd = new MscCoregion(this);
     orphanCoregionEnd->setType(MscCoregion::Type::End);
     coregionItem->setEnd(orphanCoregionEnd);
-    coregionItem->updateLayout();
+    coregionItem->scheduleLayoutUpdate();
 
     m_previewItem = coregionItem;
 

@@ -17,6 +17,8 @@
 
 #include "mscchart.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "mscaction.h"
 #include "msccondition.h"
 #include "mscdocument.h"
@@ -75,7 +77,7 @@ void MscChart::addInstance(MscInstance *instance, int index)
         m_instances.insert(index, instance);
     }
     connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
-    Q_EMIT instanceAdded(instance);
+    Q_EMIT instanceAdded(instance, m_instances.indexOf(instance));
     Q_EMIT dataChanged();
 }
 
@@ -422,7 +424,7 @@ int MscChart::maxInstanceNameNumber() const
 /*!
    Sets instance names if needed, starting with the given number
    @return the next free number to be used for instance names
-   
+
    For more documentation see \see MscModel::checkInstanceNames
  */
 int MscChart::setInstanceNameNumbers(int nextNumber)
@@ -486,6 +488,50 @@ void MscChart::resetTimerRelations(MscTimer *timer)
             mscTimer->setFollowingTimer(timer);
             break;
         }
+    }
+}
+
+cif::CifBlockShared MscChart::cifMscDoc() const
+{
+    return parentDocument() ? parentDocument()->cifBlockByType(cif::CifLine::CifType::MscDocument)
+                            : cif::CifBlockShared();
+}
+
+QRect MscChart::cifRect() const
+{
+    using namespace cif;
+
+    if (const cif::CifBlockShared &cif = cifMscDoc())
+        if (cif->hasPayloadFor(CifLine::CifType::MscDocument)) {
+            const QVector<QPoint> &points = cif->payload(CifLine::CifType::MscDocument).value<QVector<QPoint>>();
+            if (points.size() == 2) {
+                const QPoint &pos = points.first();
+                const QPoint &size = points.last();
+                return { pos.x(), pos.y(), size.x(), size.y() };
+            }
+        }
+    return {};
+}
+
+void MscChart::setCifRect(const QRect &rect)
+{
+    using namespace cif;
+
+    if (MscDocument *pDoc = parentDocument()) {
+
+        CifBlockShared mscDocCif = cifMscDoc();
+        if (!mscDocCif) {
+            mscDocCif = CifBlockFactory::createBlockMscDocument();
+            pDoc->addCif(mscDocCif);
+        }
+
+        if (!mscDocCif->hasPayloadFor(CifLine::CifType::MscDocument)) {
+            mscDocCif->addLine(CifLineShared(new CifLineMscDocument()));
+        }
+
+        const QVector<QPoint> points { rect.topLeft(), { rect.width(), rect.height() } };
+        mscDocCif->setPayload(QVariant::fromValue(points), CifLine::CifType::MscDocument);
+        Q_EMIT dataChanged(); // update MscTextView
     }
 }
 

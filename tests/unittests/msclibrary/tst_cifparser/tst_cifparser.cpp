@@ -235,6 +235,7 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
 
 void tst_CifParser::initTestCase()
 {
+    msc::MscEntity::setCifEnabled(true);
     m_mscFile = new MscFile;
     m_cifParser = new CifParser;
 }

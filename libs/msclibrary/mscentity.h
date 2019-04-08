@@ -68,6 +68,14 @@ public:
     QVector<cif::CifBlockShared> cifs() const;
     void setCifs(const QVector<cif::CifBlockShared> &cifs);
     void addCif(const cif::CifBlockShared &cif);
+    cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
+
+#ifdef QT_DEBUG
+    void dbgShowCifs() const;
+#endif
+
+    static void setCifEnabled(bool enabled);
+    static bool cifEnabled();
 
 Q_SIGNALS:
     void dataChanged();
@@ -75,14 +83,13 @@ Q_SIGNALS:
     void commentChanged(const QString &name);
 
 private:
+    static bool m_cifEnabled;
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QString m_comment;
     QVector<cif::CifBlockShared> m_cifs;
 
     static const QRegExp m_nameVerify;
-
-    void dbgShowCifs() const;
 };
 
 } // namespace msc

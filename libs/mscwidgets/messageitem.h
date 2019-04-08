@@ -20,9 +20,9 @@
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
-#include "mscmessage.h"
 
 #include <QPointer>
+#include <mscmessage.h>
 
 namespace msc {
 class LabeledArrowItem;
@@ -31,16 +31,27 @@ class MessageItem : public InteractiveObject
 {
     Q_OBJECT
 public:
+    struct GeometryNotificationBlocker {
+        GeometryNotificationBlocker(MessageItem *target);
+        ~GeometryNotificationBlocker();
+
+    private:
+        const QPointer<MessageItem> m_target;
+        const bool m_storedPositionChangeIgnored;
+
+        GeometryNotificationBlocker() = delete;
+        GeometryNotificationBlocker(const GeometryNotificationBlocker &other) = delete;
+        GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
+    };
+
     explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr, InstanceItem *target = nullptr,
-                         qreal y = 0., QGraphicsItem *parent = nullptr);
+                         QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
 
-    void connectObjects(InstanceItem *source, InstanceItem *target, qreal y);
-
     void setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance);
-    void setSourceInstanceItem(InstanceItem *sourceInstance);
-    void setTargetInstanceItem(InstanceItem *targetInstance);
+    bool setSourceInstanceItem(InstanceItem *sourceInstance);
+    bool setTargetInstanceItem(InstanceItem *targetInstance);
 
     QString name() const;
 
@@ -68,6 +79,8 @@ public:
 
     void addMessagePoint(const QPointF &scenePoint);
     QVector<QPointF> messagePoints() const;
+    void setMessagePoints(const QVector<QPointF> &scenePoints);
+    bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);
 
     void applyCif() override;
 
@@ -92,6 +105,9 @@ protected:
     void updateGripPoints() override;
 
     void prepareHoverMark() override;
+    cif::CifLine::CifType mainCifType() const override;
+    void updateCif() override;
+    void moveSilentlyBy(const QPointF &shift) override;
 
 private Q_SLOTS:
     void rebuildLayout() override;
@@ -113,8 +129,8 @@ private:
 
     QString displayTextFromModel() const;
 
-    bool updateSource(const QPointF &to, ObjectAnchor::Snap snap);
-    bool updateTarget(const QPointF &to, ObjectAnchor::Snap snap);
+    bool updateSource(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance = nullptr);
+    bool updateTarget(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance = nullptr);
     bool updateSourceAndTarget(const QPointF &shift);
     void updateTooltip();
 
@@ -122,6 +138,11 @@ private:
     bool proceedPositionChange() const;
 
     InstanceItem *hoveredItem(const QPointF &hoverPoint) const;
+
+    void updateMessagePoints();
+
+    cif::CifBlockShared cifMessage() const;
+    cif::CifBlockShared cifPosition() const;
 };
 
 } // namespace mas

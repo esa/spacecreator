@@ -20,6 +20,7 @@
 #include "instanceitem.h"
 
 #include <QDebug>
+#include <QGraphicsView>
 #include <QPropertyAnimation>
 #include <QtGlobal>
 
@@ -156,58 +157,6 @@ QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF 
                 items << item;
 
     return items;
-}
-
-QPoint sceneToCif(const QPointF &scenePoint, QGraphicsScene *scene)
-{
-    Q_UNUSED(scene);
-
-    static bool warned(false);
-    if (!warned) {
-        qWarning() << "Scene to pixel coordinates conversion is not implemented yet";
-        warned = true;
-    }
-
-    return scenePoint.toPoint();
-}
-
-QPointF cifToScene(const QPoint &pixelPoint, QGraphicsScene *scene)
-{
-    Q_UNUSED(scene);
-
-    static bool warned(false);
-    if (!warned) {
-        qWarning() << "Pixel to scene coordinates conversion is not implemented yet";
-        warned = true;
-    }
-
-    return QPointF(pixelPoint);
-}
-
-QVector<QPoint> sceneToCif(const QVector<QPointF> &scenePoints, QGraphicsScene *scene)
-{
-    QVector<QPoint> pixels;
-
-    if (const int pointsAmount = scenePoints.size()) {
-        pixels.reserve(pointsAmount);
-        for (const QPointF &scenePoint : scenePoints)
-            pixels << sceneToCif(scenePoint, scene);
-    }
-
-    return pixels;
-}
-
-QVector<QPointF> cifToScene(const QVector<QPoint> &pixelPoints, QGraphicsScene *scene)
-{
-    QVector<QPointF> sceneCoords;
-
-    if (const int pointsAmount = pixelPoints.size()) {
-        sceneCoords.reserve(pointsAmount);
-        for (const QPoint &pixel : pixelPoints)
-            sceneCoords << cifToScene(pixel, scene);
-    }
-
-    return sceneCoords;
 }
 
 } // ns utils

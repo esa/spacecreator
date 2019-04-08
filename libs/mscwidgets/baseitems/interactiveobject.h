@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "cif/cifblock.h"
+#include "cif/cifline.h"
 #include "grippoint.h"
 #include "grippointshandler.h"
 
@@ -60,19 +62,25 @@ public:
 
     virtual void applyCif();
 
+    bool geometryManagedByCif() const;
+
+    virtual void moveSilentlyBy(const QPointF &shift);
+    virtual void updateCif();
+
 public Q_SLOTS:
-    void updateLayout();
+    void scheduleLayoutUpdate();
+    void instantLayoutUpdate();
 
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
     void needRelayout() const;
+    void cifChanged();
 
 protected Q_SLOTS:
     void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void rebuildLayout();
-    void doRebuildLayout();
 
 protected:
     QPointer<msc::MscEntity> m_entity;
@@ -101,6 +109,9 @@ protected:
     virtual void prepareHoverMark();
 
     HighlightRectItem *createHighlighter();
+
+    cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
+    virtual cif::CifLine::CifType mainCifType() const;
 };
 
 } // namespace msc

@@ -72,6 +72,7 @@ public:
     virtual CifType lineType() const = 0;
     virtual bool initFrom(const QString &sourceLine) = 0;
     virtual QVariant payload() const;
+    virtual QVariant &payload();
     virtual void setPayload(const QVariant &p);
 
     static QString nameForType(CifLine::CifType t);
@@ -80,6 +81,9 @@ public:
     bool operator==(const CifLine &other) const;
 
     QString sourceLine() const;
+
+    QString toString(int tabsSize) const;
+    virtual QString payloadToString() const;
 
 protected:
     QString m_sourceLine;
@@ -95,13 +99,14 @@ typedef QSharedPointer<CifLine> CifLineShared;
 // utility class for lines with Point data
 class CifLinePointsHolder : public CifLine
 {
-
 public:
     static const int AllPoints = -1;
 
     CifLinePointsHolder(int pointsCount = CifLinePointsHolder::AllPoints);
     bool initFrom(const QString &sourceLine) override;
     int targetPointsCount() const;
+
+    QString payloadToString() const override;
 
 private:
     const int m_pointsCount;

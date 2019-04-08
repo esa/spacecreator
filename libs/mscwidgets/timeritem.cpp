@@ -56,7 +56,7 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
     connect(m_timer, &msc::MscTimer::nameChanged, this, &msc::TimerItem::setName);
 
     connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
-    connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::updateLayout);
+    connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::scheduleLayoutUpdate);
 
     connect(m_timer, &msc::MscTimer::precedingTimerChanged, this, &TimerItem::rebuildLayout);
     m_textItem->setVisible(m_timer->precedingTimer() == nullptr);
@@ -98,7 +98,7 @@ void TimerItem::setInstance(InstanceItem *instance)
         m_timer->setInstance(nullptr);
     }
 
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -152,7 +152,7 @@ void TimerItem::setName(const QString &text)
     m_timer->setName(text);
     m_textItem->setPlainText(text);
 
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void TimerItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -206,7 +206,7 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             if (canConnectTimers(timer, event->scenePos())) {
                 using namespace msc::cmd;
                 CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(timer), m_timer->name() });
-                updateLayout();
+                scheduleLayoutUpdate();
             }
         }
     }
@@ -216,7 +216,7 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     updateConnectorLineVisibility();
-    updateLayout();
+    scheduleLayoutUpdate();
 
     InteractiveObject::mouseReleaseEvent(event);
 }
@@ -309,7 +309,7 @@ void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void TimerItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to)

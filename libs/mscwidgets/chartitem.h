@@ -44,19 +44,25 @@ public:
     QRectF box() const;
     void setBox(const QRectF &r);
 
+    void applyCif();
+
+    bool geometryManagedByCif() const;
+    QRectF storedCustomRect() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);
-    void updateBox();
+    void updateTitlePos();
 
 private:
     QGraphicsRectItem *m_rectItem = nullptr;
-    TextItem *m_textItemMarker = nullptr;
     TextItem *m_textItemName = nullptr;
     MscChart *m_chart = nullptr;
     QRectF m_box;
+
+    void updateCif();
 };
 
 } // ns msc

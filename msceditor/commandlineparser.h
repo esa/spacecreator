@@ -30,11 +30,11 @@ public:
     {
         OpenFileMsc = 0,
         OpenFileAsn,
-
         DbgOpenMscExamplesChain,
         StartRemoteControl,
-
         DropUnsavedChangesSilently,
+        EnableCifSupport,
+
         Unknown
     };
     Q_ENUM(Positional)

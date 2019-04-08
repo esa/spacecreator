@@ -81,7 +81,8 @@ HEADERS += \
     messagedialog.h \
     messageitem.h \
     textview.h \
-    timeritem.h
+    timeritem.h \
+    baseitems/common/coordinatesconverter.h
 
 SOURCES += \
     baseitems/common/arrowsign.cpp \
@@ -153,7 +154,8 @@ SOURCES += \
     messagedialog.cpp \
     messageitem.cpp \
     textview.cpp \
-    timeritem.cpp
+    timeritem.cpp \
+    baseitems/common/coordinatesconverter.cpp
 
 FORMS += \
     messagedeclarationsdialog.ui \

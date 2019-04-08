@@ -55,8 +55,7 @@ public:
 
     QPair<QPointF, bool> commentPoint() const override;
 
-Q_SIGNALS:
-    void moved(InstanceItem *);
+    void applyCif() override;
 
 public Q_SLOTS:
     void setName(const QString &name);
@@ -64,13 +63,15 @@ public Q_SLOTS:
     void setExplicitStop(bool exStop);
     void buildLayout();
     void rebuildLayout() override;
-    bool moveLeftIfOverlaps();
 
 protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void prepareHoverMark() override;
+    cif::CifLine::CifType mainCifType() const override;
+
+    void updateCif() override;
 
 private:
     msc::MscInstance *m_instance = nullptr;
@@ -88,6 +89,8 @@ private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+
+    void notifyCifChanged();
 };
 
 } // namespace msc

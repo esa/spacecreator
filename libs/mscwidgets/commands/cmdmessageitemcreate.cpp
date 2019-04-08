@@ -27,7 +27,7 @@ namespace msc {
 namespace cmd {
 
 CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex,
-                                           const QVector<QPointF> &points)
+                                           const QVector<QPoint> &points)
     : BaseCommand(message)
     , m_message(message)
     , m_chart(chart)
@@ -52,8 +52,7 @@ void CmdMessageItemCreate::redo()
 
     if (!m_msgPoints.isEmpty())
         if (cif::CifBlockShared msgCif = cif::CifBlockFactory::createBlockMessage()) {
-            QVector<cif::CifLineShared> lines = { cif::CifLineShared(new cif::CifLineMessage) };
-            msgCif->setLines(lines);
+            msgCif->setLines({ cif::CifLineShared(new cif::CifLineMessage) });
             msgCif->setPayload(QVariant::fromValue(m_msgPoints), cif::CifLine::CifType::Message);
             m_modelItem->setCifs({ msgCif });
         }

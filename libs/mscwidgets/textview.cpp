@@ -22,6 +22,8 @@
 #include "mscmodel.h"
 #include "mscwriter.h"
 
+#include <QGuiApplication>
+
 /*!
   \class TextView
   \inmodule MscWidgets
@@ -42,6 +44,11 @@ void TextView::setModel(msc::MscModel *model)
 void TextView::updateView()
 {
     if (m_dirty) {
+        return;
+    }
+
+    if (QGuiApplication::mouseButtons() != Qt::NoButton) {
+        // Prevent the waterflow of "cifChanged" notifications on manual item moves
         return;
     }
 

@@ -35,10 +35,10 @@ public:
     static CifBlockShared createBlockComment(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockCondition(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockCreate(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockInstance(const QVector<CifLineShared> &lines);
+    static CifBlockShared createBlockInstance(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockImport(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockMessage(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockMscDocument(const QVector<CifLineShared> &lines);
+    static CifBlockShared createBlockMscDocument(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     static CifBlockShared createBlockReset(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockSet(const QVector<CifLineShared> &lines);
     static CifBlockShared createBlockStop(const QVector<CifLineShared> &lines);

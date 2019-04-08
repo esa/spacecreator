@@ -36,9 +36,15 @@ public:
     virtual bool isPeculiar() const;
 
     virtual QVariant payload(CifLine::CifType forType = CifLine::CifType::Unknown) const;
+    virtual QVariant &payload(CifLine::CifType forType);
+    bool hasPayloadFor(CifLine::CifType forType) const;
     virtual void setPayload(const QVariant &p, CifLine::CifType forType = CifLine::CifType::Unknown);
 
     virtual CifLine::CifType blockType() const = 0;
+
+    void addLine(const CifLineShared &line);
+
+    QString toString(int tabsSize) const;
 
 protected:
     QVector<CifLineShared> m_lines;
@@ -46,7 +52,6 @@ protected:
     QMap<CifLine::CifType, CifLineShared> m_linesByType;
 
     void updateHashKey();
-    void addLine(const CifLineShared &line);
 };
 
 typedef QSharedPointer<CifBlock> CifBlockShared;

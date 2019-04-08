@@ -43,13 +43,23 @@ QString CifBlock::hashKey() const
 
 bool CifBlock::isPeculiar() const
 {
-    return m_linesByType.contains(CifLine::CifType::Text) || m_linesByType.contains(CifLine::CifType::End);
+    return hasPayloadFor(CifLine::CifType::Text) || hasPayloadFor(CifLine::CifType::End);
 }
 
 QVariant CifBlock::payload(CifLine::CifType forType) const
 {
     CifLine::CifType targetType = (forType == CifLine::CifType::Unknown) ? blockType() : forType;
-    return m_linesByType.contains(targetType) ? m_linesByType.value(targetType)->payload() : QVariant();
+    return hasPayloadFor(targetType) ? m_linesByType.value(targetType)->payload() : QVariant();
+}
+
+QVariant &CifBlock::payload(CifLine::CifType forType)
+{
+    return m_linesByType.value(forType)->payload();
+}
+
+bool CifBlock::hasPayloadFor(CifLine::CifType forType) const
+{
+    return m_linesByType.contains(forType);
 }
 
 void CifBlock::setPayload(const QVariant &p, CifLine::CifType forType)
@@ -57,7 +67,7 @@ void CifBlock::setPayload(const QVariant &p, CifLine::CifType forType)
     CifLine::CifType targetType = (forType == CifLine::CifType::Unknown) ? blockType() : forType;
 
     if (targetType != CifLine::CifType::Unknown) {
-        if (m_linesByType.contains(targetType))
+        if (hasPayloadFor(targetType))
             m_linesByType.value(targetType)->setPayload(p);
         else {
             qWarning() << Q_FUNC_INFO << "Line for type not found:" << targetType;
@@ -84,11 +94,20 @@ void CifBlock::updateHashKey()
 
 void CifBlock::addLine(const CifLineShared &line)
 {
-    if (m_lines.contains(line) || m_linesByType.contains(line->lineType()))
+    if (m_lines.contains(line) || hasPayloadFor(line->lineType()))
         return;
 
     m_lines.append(line);
     updateHashKey();
+}
+
+QString CifBlock::toString(int tabsSize) const
+{
+    QString result;
+    for (const CifLineShared &line : m_lines)
+        result += line->toString(tabsSize);
+
+    return result;
 }
 
 } // ns cif

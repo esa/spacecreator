@@ -32,6 +32,7 @@ class MainWindow;
 
 namespace msc {
 class MscDocument;
+class BaseTool;
 }
 
 class MainModel;
@@ -139,4 +140,6 @@ private:
     QUndoStack *currentUndoStack() const;
     void storeCurrentUndoCommandId();
     bool needSave() const;
+
+    msc::BaseTool *activeTool() const;
 };

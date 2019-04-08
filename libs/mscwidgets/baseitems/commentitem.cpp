@@ -78,8 +78,8 @@ void CommentItem::attachTo(InteractiveObject *iObj)
 
     m_iObj = iObj;
 
-    connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::updateLayout, Qt::UniqueConnection);
-    connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::updateLayout, Qt::UniqueConnection);
+    connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
+    connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
 
     setGlobal(m_iObj == nullptr);
 }
@@ -92,7 +92,7 @@ InteractiveObject *CommentItem::object() const
 void CommentItem::setGlobal(bool isGlobal)
 {
     m_isGlobal = isGlobal;
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -197,11 +197,9 @@ void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
     Q_UNUSED(to);
 }
 
-void CommentItem::textEdited(const QString &text)
+void CommentItem::textEdited(const QString & /*text*/)
 {
-    updateLayout();
-
-    Q_EMIT commentChanged(text);
+    scheduleLayoutUpdate();
 }
 
 void CommentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

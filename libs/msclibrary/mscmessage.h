@@ -93,6 +93,10 @@ public:
     bool isGlobal() const;
     bool isOrphan() const;
 
+#ifdef QT_DEBUG
+    QString toDbgString() const;
+#endif
+
 Q_SIGNALS:
     void messageInstanceNameChanged();
     void sourceChanged(MscInstance *source);

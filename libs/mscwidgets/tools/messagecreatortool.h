@@ -56,6 +56,10 @@ private:
     void processMouseReleaseClick(QMouseEvent *e);
     void processMouseMoveClick(QMouseEvent *e);
 
+    bool processKeyPress(QKeyEvent *e) override;
+
+    bool validateUserPoints(msc::MscMessage *message);
+
 private:
     enum class Step
     {
@@ -75,6 +79,8 @@ private:
     QPointer<MessageItem> m_messageItem = nullptr;
     QPointF m_mouseDown;
     MscMessage::MessageType m_messageType;
+
+    void finishArrowCreation(const QPointF &scenePos);
 };
 
 } // ns msc

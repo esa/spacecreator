@@ -44,6 +44,9 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    void setTextboxSize(const QSizeF &size);
+    QRectF textBoxSceneRect() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setKind(const QString &kind);
@@ -52,7 +55,7 @@ Q_SIGNALS:
     void nameEdited(const QString &name);
     void kindEdited(const QString &kind);
     void manualMoveRequested(const QPointF &sceneFrom, const QPointF &sceneTo);
-    void manualMoveFinished();
+    void manualMoveFinished(const QPointF &sceneFrom, const QPointF &sceneTo);
     void layoutUpdated();
 
 protected:
@@ -66,6 +69,7 @@ private:
     QGraphicsRectItem *m_rectItem;
     TextItem *m_textItemKind;
     QPointF m_manualMovementFrom, m_manualMovementTo;
+    QRectF m_explicitTextBox;
 
     static QLinearGradient createGradientForKind(const QGraphicsItem *itemKind);
     static QLinearGradient createGradientForName(const QGraphicsItem *itemName);

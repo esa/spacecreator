@@ -397,4 +397,21 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
     setTextCursor(currCursor);
 }
 
+void TextItem::setExplicitSize(const QSizeF &r)
+{
+    if (m_explicitSize != r) {
+        m_explicitSize = r;
+        if (!m_explicitSize.isEmpty()) {
+            setTextMargin(0);
+            setTextWidth(m_explicitSize.width());
+        }
+        update();
+    }
+}
+
+QRectF TextItem::boundingRect() const
+{
+    return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
+}
+
 } // namespace msc

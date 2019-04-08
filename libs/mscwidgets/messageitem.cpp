@@ -18,12 +18,16 @@
 #include "messageitem.h"
 
 #include "baseitems/arrowitem.h"
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/grippointshandler.h"
 #include "baseitems/labeledarrowitem.h"
 #include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"
+#include "cif/cifblockfactory.h"
+#include "cif/cifblocks.h"
+#include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
 #include "messagedialog.h"
 
@@ -38,8 +42,21 @@
 
 namespace msc {
 
-MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, qreal y,
-                         QGraphicsItem *parent)
+MessageItem::GeometryNotificationBlocker ::GeometryNotificationBlocker(MessageItem *target)
+    : m_target(target)
+    , m_storedPositionChangeIgnored(target->ignorePositionChange())
+{
+    m_target->setPositionChangeIgnored(true);
+}
+
+MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
+{
+    if (m_target) {
+        m_target->setPositionChangeIgnored(m_storedPositionChangeIgnored);
+    }
+}
+
+MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, QGraphicsItem *parent)
     : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
@@ -49,13 +66,13 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
-    connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
+    //    connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
     connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
-    connectObjects(source, target, y);
+    setInstances(source, target);
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
     m_arrowItem->setDashed(isCreator());
@@ -64,7 +81,6 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 void MessageItem::onTextChanged()
 {
     rebuildLayout();
-    commitGeometryChange();
 
     if (m_gripPoints)
         m_gripPoints->updateLayout();
@@ -85,30 +101,26 @@ MscMessage *MessageItem::modelItem() const
     return m_message;
 }
 
-void MessageItem::connectObjects(InstanceItem *source, InstanceItem *target, qreal y)
-{
-    setPositionChangeIgnored(true); // ignore position changes in MessageItem::itemChange
-
-    setY(y);
-    if (source || target)
-        setInstances(source, target);
-
-    setPositionChangeIgnored(false);
-}
-
 void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance)
 {
     m_layoutDirty = true;
-    setSourceInstanceItem(sourceInstance);
-    setTargetInstanceItem(targetInstance);
+    const bool sourceChanged = setSourceInstanceItem(sourceInstance);
+    const bool targetChanged = setTargetInstanceItem(targetInstance);
+
+    if (sourceChanged || targetChanged) {
+        rebuildLayout();
+    }
+
     m_layoutDirty = false;
-    rebuildLayout();
 }
 
-void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
+bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
+    if (m_targetInstance && m_targetInstance == sourceInstance)
+        return false;
+
     if (sourceInstance == m_sourceInstance) {
-        return;
+        return false;
     }
 
     if (m_sourceInstance) {
@@ -124,12 +136,16 @@ void MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
         m_message->setSourceInstance(nullptr);
 
     updateTooltip();
+    return true;
 }
 
-void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
+bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
+    if (m_sourceInstance && m_sourceInstance == targetInstance)
+        return false;
+
     if (targetInstance == m_targetInstance) {
-        return;
+        return false;
     }
 
     if (m_targetInstance) {
@@ -145,6 +161,7 @@ void MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
         m_message->setTargetInstance(nullptr);
 
     updateTooltip();
+    return true;
 }
 
 void MessageItem::updateTooltip()
@@ -165,8 +182,7 @@ void MessageItem::setName(const QString &name)
     m_message->setName(name);
     m_arrowItem->setText(m_message->name());
 
-    updateLayout();
-    Q_EMIT needRelayout();
+    scheduleLayoutUpdate();
 }
 
 QRectF MessageItem::boundingRect() const
@@ -194,20 +210,11 @@ void MessageItem::postCreatePolishing()
 
 void MessageItem::rebuildLayout()
 {
-    // at first apply cif, if any
-    using namespace cif;
-    const QVector<CifBlockShared> &cifs = m_message->cifs();
-    if (!cifs.isEmpty()) {
-        QGraphicsScene *scene = this->scene();
-        for (const CifBlockShared &cif : cifs) {
-            if (cif->blockType() == CifLine::CifType::Message) {
-                const QVector<QPoint> &cifPixels = cif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
-                if (!cifPixels.isEmpty()) {
-                    const QVector<QPointF> &sceneCoords = utils::cifToScene(cifPixels, scene);
-                    m_arrowItem->arrow()->setTurnPoints(sceneCoords);
-                }
-            }
-        }
+    const QVector<QPointF> &points = messagePoints();
+    if (points.size() > 1) {
+        updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
+        updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
+        return;
     }
 
     auto itemCenterScene = [](InstanceItem *item) {
@@ -223,9 +230,15 @@ void MessageItem::rebuildLayout()
     const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
 
     auto getChartBox = [this]() {
-        // TODO: store the ChartItem* instance somewhere to avoid lookup whithin each MessageItem
-        const QList<ChartItem *> boxes = utils::toplevelItems<ChartItem>(scene());
-        return boxes.size() == 1 ? boxes.first()->sceneBoundingRect() : scene()->sceneRect();
+        // Try ChartItem's rect first
+        if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+            return chartItem->sceneBoundingRect();
+
+        // Fallback to instance's rect
+        if (QGraphicsScene *scene = this->scene())
+            return scene->sceneRect();
+
+        return QRectF();
     };
 
     const QRectF boxRect = getChartBox();
@@ -262,11 +275,9 @@ void MessageItem::rebuildLayout()
 
     const bool bothAreNulls = pntFrom.isNull() && pntTo.isNull();
     if (!bothAreNulls) {
-        const QPointF &linkCenterInScene =
-                m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
-        setPositionChangeIgnored(true);
-        setPos(linkCenterInScene);
-        setPositionChangeIgnored(false);
+        m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
+        GeometryNotificationBlocker geometryNotificationBlocker(this);
+        setPos(messagePoints().first());
     }
 
     commitGeometryChange();
@@ -323,14 +334,13 @@ QString MessageItem::displayTextFromModel() const
 
 bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 {
-    bool res(false);
     const InstanceItem *prevSource(m_sourceInstance);
     const InstanceItem *prevTarget(m_targetInstance);
 
     ArrowItem *arrow = m_arrowItem->arrow();
 
-    const QPointF shiftedSource(arrow->anchorPointSource() + shift);
-    res |= updateSource(shiftedSource, ObjectAnchor::Snap::NoSnap);
+    const QPointF &shiftedSource = arrow->anchorPointSource() + shift;
+    bool res = updateSource(shiftedSource, ObjectAnchor::Snap::NoSnap);
     const QPointF shiftedTarget(arrow->anchorPointTarget() + shift);
     res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::NoSnap);
 
@@ -367,21 +377,29 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
     return res;
 }
 
-bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap)
+bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
-    setSourceInstanceItem(hoveredItem(to));
+    setSourceInstanceItem(keepInstance ? keepInstance : hoveredItem(to));
     const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
-    updateGripPoints();
-    commitGeometryChange();
+    if (res) {
+        updateMessagePoints();
+        updateGripPoints();
+        commitGeometryChange();
+    }
     return res;
 }
 
-bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap)
+bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
-    setTargetInstanceItem(hoveredItem(to));
+    setTargetInstanceItem(keepInstance ? keepInstance : hoveredItem(to));
     const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
-    updateGripPoints();
-    commitGeometryChange();
+
+    if (res) {
+        updateMessagePoints();
+        updateGripPoints();
+        commitGeometryChange();
+    }
+
     return res;
 }
 
@@ -393,46 +411,35 @@ InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
 
 void MessageItem::commitGeometryChange()
 {
-    prepareGeometryChange();
-    m_boundingRect = m_arrowItem->boundingRect();
+    const QRectF &newBounds = mapRectFromItem(m_arrowItem, m_arrowItem->boundingRect());
+    if (m_boundingRect != newBounds) {
+        prepareGeometryChange();
+        m_boundingRect = newBounds;
+    }
 }
 
 void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 {
-    setPositionChangeIgnored(true);
     const QPointF offset(to - from);
+    const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + offset;
+    updateSource(desitnation, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
 
-    const QPointF srcPoint(m_arrowItem->arrow()->anchorPointSource() + offset);
-    QPointF dstPoint(m_arrowItem->arrow()->anchorPointTarget());
+    scheduleLayoutUpdate();
 
-    if (!m_targetInstance) {
-        moveBy(offset.x(), offset.y());
-        dstPoint += offset;
-    }
-
-    m_arrowItem->updatePoints(srcPoint, dstPoint);
-    setPositionChangeIgnored(false);
-
-    updateLayout();
+    if (geometryManagedByCif())
+        updateCif();
 }
 
 void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 {
-    setPositionChangeIgnored(true);
     const QPointF offset(to - from);
+    const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + offset;
+    updateTarget(desitnation, ObjectAnchor::Snap::NoSnap, m_targetInstance);
 
-    QPointF srcPoint(m_arrowItem->arrow()->anchorPointSource());
-    const QPointF dstPoint(m_arrowItem->arrow()->anchorPointTarget() + offset);
+    scheduleLayoutUpdate();
 
-    if (!m_sourceInstance) {
-        moveBy(offset.x(), offset.y());
-        srcPoint += offset;
-    }
-
-    m_arrowItem->updatePoints(srcPoint, dstPoint);
-    setPositionChangeIgnored(false);
-
-    updateLayout();
+    if (geometryManagedByCif())
+        updateCif();
 }
 
 QPointF MessageItem::head() const
@@ -487,24 +494,17 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
     if (isCreator())
         return;
 
-    //    const QPointF shift(to - from);
-    if (gp->location() == GripPoint::Left) {
-        //        setTail(tail() + shift, ObjectAnchor::Snap::NoSnap);
-        //        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-        //                                      { QVariant::fromValue<MessageItem *>(this), head(), tail() + shift });
-        m_arrowItem->updateSource(m_sourceInstance, to, ObjectAnchor::Snap::NoSnap);
-    } else if (gp->location() == GripPoint::Right) {
-        //        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-        //                                      { QVariant::fromValue<MessageItem *>(this), head() + shift, tail() });
-        //        setHead(head() + shift, ObjectAnchor::Snap::NoSnap);
-        m_arrowItem->updateTarget(m_targetInstance, to, ObjectAnchor::Snap::NoSnap);
-    }
-    updateGripPoints();
+    if (gp->location() == GripPoint::Left)
+        updateSource(to, ObjectAnchor::Snap::NoSnap);
+    else if (gp->location() == GripPoint::Right)
+        updateTarget(to, ObjectAnchor::Snap::NoSnap);
+
+    updateCif();
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
 {
-    MessageItem *messageItem = new MessageItem(message, nullptr, nullptr, pos.y());
+    MessageItem *messageItem = new MessageItem(message);
     static constexpr qreal halfLength(ArrowItem::DEFAULT_WIDTH / 2.);
     const QPointF head(halfLength, pos.y());
     const QPointF tail(-halfLength, pos.y());
@@ -608,8 +608,7 @@ void MessageItem::updateDisplayText()
     if (modelText != displayedText()) {
         m_arrowItem->setText(modelText);
 
-        updateLayout();
-        Q_EMIT needRelayout();
+        scheduleLayoutUpdate();
     }
 }
 
@@ -620,37 +619,123 @@ void MessageItem::addMessagePoint(const QPointF &scenePoint)
 
 QVector<QPointF> MessageItem::messagePoints() const
 {
-    return m_arrowItem->arrow()->turnPoints();
+    const QVector<QPointF> &localPoints = m_arrowItem->arrow()->turnPoints();
+    QVector<QPointF> scenePoints(localPoints.size());
+    ArrowItem *pArrow = m_arrowItem->arrow();
+    std::transform(localPoints.cbegin(), localPoints.cend(), scenePoints.begin(),
+                   [&pArrow](const QPointF &point) { return pArrow->mapToScene(point); });
+
+    return scenePoints;
+}
+
+cif::CifBlockShared MessageItem::cifMessage() const
+{
+    return cifBlockByType(cif::CifLine::CifType::Message);
+}
+cif::CifBlockShared MessageItem::cifPosition() const
+{
+    return cifBlockByType(cif::CifLine::CifType::Position);
+}
+
+bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
+{
+    const QVector<QPointF> &arrowPoints = messagePoints();
+    if (scenePoints == arrowPoints)
+        return false;
+
+    Q_ASSERT(!scenePoints.isEmpty());
+
+    GeometryNotificationBlocker keepSilent(this);
+    setPos(scenePoints.first());
+    m_arrowItem->arrow()->setTurnPoints(scenePoints);
+
+    return true;
+}
+
+void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
+{
+    if (!setMessagePointsNoCif(scenePoints))
+        return;
+
+    if (scenePoints.size() <= 1)
+        return;
+
+    updateCif();
 }
 
 void MessageItem::applyCif()
 {
     QSignalBlocker sb(this);
-    setPositionChangeIgnored(true);
-    using namespace cif;
-    QGraphicsScene *scene = this->scene();
-    const QVector<CifBlockShared> &cifs = modelEntity()->cifs();
-    for (const CifBlockShared &cif : cifs) {
-        switch (cif->blockType()) {
-        case CifLine::CifType::Message: {
-            const QVector<QPoint> &points = cif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
-            m_arrowItem->arrow()->setTurnPoints(utils::cifToScene(points, scene));
-            break;
-        }
-        default: {
-#ifdef QT_DEBUG
-            qWarning() << Q_FUNC_INFO << "Unsupported cif:" << cif->blockType();
-#endif
-            break;
-        }
-        }
+    GeometryNotificationBlocker geometryNotificationBlocker(this);
+    if (const cif::CifBlockShared &cifBlock = cifMessage()) {
+        const QVector<QPoint> &pointsCif = cifBlock->payload(cif::CifLine::CifType::Message).value<QVector<QPoint>>();
+        bool converted(false);
+        const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
+        if (converted)
+            setMessagePoints(pointsScene);
     }
-    setPositionChangeIgnored(false);
 }
 
 QString MessageItem::displayedText() const
 {
     return m_arrowItem->text();
+}
+
+void MessageItem::updateMessagePoints()
+{
+    QVector<QPointF> points = messagePoints();
+    const int pointsCount = points.size();
+    if (pointsCount < 2)
+        return;
+
+    bool updated(false);
+    const QPointF &currentAnchorFrom = m_arrowItem->arrow()->anchorPointSource();
+    if (points.first() != currentAnchorFrom) {
+        points.replace(0, currentAnchorFrom);
+        updated = true;
+    }
+
+    const QPointF &currentAnchorTo = m_arrowItem->arrow()->anchorPointTarget();
+    if (points.last() != currentAnchorTo) {
+        points.replace(pointsCount - 1, currentAnchorTo);
+        updated = true;
+    }
+
+    if (updated)
+        setMessagePoints(points);
+}
+
+cif::CifLine::CifType MessageItem::mainCifType() const
+{
+    return cif::CifLine::CifType::Message;
+}
+
+void MessageItem::updateCif()
+{
+    if (!MscEntity::cifEnabled())
+        return;
+
+    using namespace cif;
+
+    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());
+    if (!geometryManagedByCif()) {
+        const CifBlockShared &emptyCif = CifBlockFactory::createBlockMessage();
+        m_message->addCif(emptyCif);
+    }
+
+    const CifBlockShared &msgCif = cifMessage();
+    if (!msgCif->hasPayloadFor(CifLine::CifType::Message))
+        msgCif->addLine(CifLineShared(new CifLineMessage()));
+
+    const QVector<QPoint> &pointsCifStored = msgCif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
+    if (pointsCifStored != pointsCif)
+        msgCif->setPayload(QVariant::fromValue(pointsCif), CifLine::CifType::Message);
+}
+
+void MessageItem::moveSilentlyBy(const QPointF &shift)
+{
+    GeometryNotificationBlocker silently(this);
+    InteractiveObject::moveSilentlyBy(shift);
 }
 
 } // namespace msc

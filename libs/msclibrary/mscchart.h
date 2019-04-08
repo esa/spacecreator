@@ -21,6 +21,7 @@
 #include "mscmessage.h"
 
 #include <QObject>
+#include <QRectF>
 #include <QString>
 #include <QVector>
 
@@ -69,6 +70,8 @@ public:
     void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
                              msc::MscMessage::EndType endType);
 
+    QRect cifRect() const;
+    void setCifRect(const QRect &rect);
     int maxInstanceNameNumber() const;
     int setInstanceNameNumbers(int nextNumber);
 
@@ -76,7 +79,7 @@ public Q_SLOTS:
     void resetTimerRelations(MscTimer *timer);
 
 Q_SIGNALS:
-    void instanceAdded(MscInstance *instance);
+    void instanceAdded(MscInstance *instance, int pos);
     void instanceRemoved(MscInstance *instance);
     void instanceMoved(MscInstance *instance, int from, int to);
     void instanceEventAdded(MscInstanceEvent *message);
@@ -106,6 +109,8 @@ private:
     QVector<MscInstance *> m_instances;
     QVector<MscInstanceEvent *> m_instanceEvents;
     QVector<MscGate *> m_gates;
+
+    cif::CifBlockShared cifMscDoc() const;
 };
 
 } // namespace msc

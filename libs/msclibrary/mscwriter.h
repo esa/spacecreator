@@ -68,6 +68,8 @@ private:
     QString serializeComment(const msc::MscEntity *entity) const;
     QString serializeParameters(const MscMessage *message) const;
 
+    QString serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const;
+
     MscModel *m_model = nullptr;
 };
 

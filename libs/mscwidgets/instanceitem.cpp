@@ -17,6 +17,7 @@
 
 #include "instanceitem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/grippoint.h"
 #include "baseitems/grippointshandler.h"
@@ -24,6 +25,9 @@
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
+#include "cif/cifblockfactory.h"
+#include "cif/cifblocks.h"
+#include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
 #include "messageitem.h"
 #include "mscchart.h"
@@ -57,7 +61,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
 
     m_headSymbol->setName(m_instance->name());
     m_headSymbol->setKind(m_instance->denominatorAndKind());
-    updateLayout();
+    scheduleLayoutUpdate();
 
     setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
 
@@ -73,8 +77,12 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
             onMoveRequested(gp, from, to);
         }
     });
-    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, &InstanceItem::moveLeftIfOverlaps);
-    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::updateLayout);
+
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, [this](const QPointF &from, const QPointF &to) {
+        onManualGeometryChangeFinished(GripPoint::Center, from, to);
+    });
+
+    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::scheduleLayoutUpdate);
 }
 
 MscInstance *InstanceItem::modelItem() const
@@ -135,7 +143,6 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
         return;
 
     m_instance->setProperty(property.data(), value);
-
     QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
 
@@ -145,8 +152,38 @@ void InstanceItem::rebuildLayout()
     buildLayout();
 }
 
+void InstanceItem::applyCif()
+{
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
+        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
+        if (cifPoints.size() == 3) {
+            bool converted(false);
+            const QVector<QPointF> &scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
+            if (!converted)
+                return;
+
+            const QPointF &textBoxTopLeft = scenePoints.at(0);
+            const QPointF &textBoxSize = scenePoints.at(1);
+            const QPointF &axisHeight = scenePoints.at(2);
+
+            QSignalBlocker keepSilent(this);
+            QSignalBlocker keepSilentHeader(m_headSymbol);
+
+            m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
+            const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
+            const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
+
+            moveBy(shift.x(), shift.y());
+
+            m_axisHeight = axisHeight.y();
+        }
+    }
+}
+
 void InstanceItem::buildLayout()
 {
+    applyCif();
+
     prepareGeometryChange();
 
     const QPointF &prevP1 = m_axisSymbol->line().p1();
@@ -187,10 +224,15 @@ void InstanceItem::buildLayout()
 
 void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() == GripPoint::Location::Center) {
-        const QPointF &delta = { (to - from).x(), 0. };
-        setPos(pos() + delta);
-    }
+    if (gp->location() != GripPoint::Location::Center)
+        return;
+
+    const QPointF delta { (to - from).x(), 0. };
+    if (delta.isNull())
+        return;
+
+    setPos(pos() + delta);
+    updateCif();
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -218,7 +260,7 @@ void InstanceItem::setBoundingRect(const QRectF &geometry)
     m_boundingRect = geometry;
     if (m_gripPoints)
         m_gripPoints->updateLayout();
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos)
@@ -239,13 +281,13 @@ void InstanceItem::prepareHoverMark()
     InteractiveObject::prepareHoverMark();
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &InstanceItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
-
     const qreal zVal(m_gripPoints->zValue() - 1.);
     m_headSymbol->setZValue(zVal);
     m_axisSymbol->setZValue(zVal);
     m_endSymbol->setZValue(zVal);
+
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &InstanceItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 void InstanceItem::onNameEdited(const QString &newName)
@@ -276,45 +318,103 @@ void InstanceItem::reflectTextLayoutChange()
     if (QGraphicsScene *scene = this->scene()) {
         const QRectF &myRect = sceneBoundingRect();
         const QRectF &sceneRect = scene->sceneRect();
-        if (!myRect.intersected(sceneRect).isEmpty()) {
-            if (!moveLeftIfOverlaps())
-                Q_EMIT needRelayout();
+        const QRectF &intersection = myRect.intersected(sceneRect);
+        if (intersection != myRect) {
+            Q_EMIT needRelayout();
+            return;
         }
     }
 }
 
-void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
+cif::CifLine::CifType InstanceItem::mainCifType() const
 {
-    if (pos == GripPoint::Location::Center) {
-        Q_EMIT moved(this);
+    return cif::CifLine::CifType::Instance;
+}
+
+void InstanceItem::updateCif()
+{
+    if (!MscEntity::cifEnabled())
+        return;
+
+    using namespace cif;
+
+    if (!geometryManagedByCif()) {
+        CifBlockShared emptyCif = CifBlockFactory::createBlockInstance();
+        emptyCif->addLine(CifLineShared(new CifLineInstance()));
+        m_instance->addCif(emptyCif);
+    }
+
+    const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
+    const QVector<QPointF> scenePoints = { textBoxRect.topLeft(), textBoxRect.bottomRight(), axis().p1(), axis().p2() };
+    bool converted(false);
+    const QVector<QPoint> &cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
+    if (converted) {
+        const CifBlockShared &cifBlock = cifBlockByType(mainCifType());
+        Q_ASSERT(cifBlock != nullptr);
+
+        const QPoint wh { cifPoints.at(1) - cifPoints.at(0) };
+        const QPoint axisHeight { CifBlockInstance::AxisWidth, QPoint(cifPoints.at(3) - cifPoints.at(2)).y() };
+
+        const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
+        const QVector<QPoint> newCif { cifPoints.at(0), wh, axisHeight };
+        if (storedCif != newCif) {
+            cifBlock->setPayload(QVariant::fromValue(newCif));
+            Q_EMIT cifChanged();
+        }
+    } else {
+        qWarning() << Q_FUNC_INFO << "Can't convert scene coordinates to CIF";
     }
 }
 
-bool InstanceItem::moveLeftIfOverlaps()
+void InstanceItem::notifyCifChanged()
 {
-    static constexpr qreal paddingPixels = { 40 };
+    // update text in the Msc Text view, if any
+    // (dynamic updates were disabled for performance reasons, see the TextView::updateView)
+    Q_EMIT cifChanged();
+}
 
-    if (!scene())
-        return false;
+void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to)
+{
+    std::function<QPointF(InstanceItem *, const QPointF &, const QRectF &)> avoidOverlaps;
+    avoidOverlaps = [&avoidOverlaps](InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) {
+        if (delta.isNull())
+            return delta;
 
-    const QRectF &mySceneRect(sceneBoundingRect());
-    for (const InstanceItem *const other : utils::itemByPos<InstanceItem, QRectF>(scene(), mySceneRect)) {
-        if (other == this)
-            continue;
-        const QRectF &intersection(other->sceneBoundingRect().intersected(mySceneRect));
-        if (!intersection.isEmpty()) {
-            QRectF mySceneRectValid(mySceneRect);
-            mySceneRectValid.moveRight(intersection.left() - paddingPixels);
+        const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
+        for (InstanceItem *otherItem : utils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
+            if (otherItem != caller) {
+                const QRectF &otherRect = otherItem->sceneBoundingRect();
+                if (callerRect.intersects(otherRect)) {
+                    qreal nextShiftX(0.);
+                    if (delta.x() < 0)
+                        nextShiftX = otherRect.left() - callerRect.right();
+                    else
+                        nextShiftX = otherRect.right() - callerRect.left();
 
-            const QPointF &delta(mySceneRectValid.center() - mySceneRect.center());
-            moveBy(delta.x(), 0.); // TODO: use the CmdInstanceItemMove instead?
-
-            return moveLeftIfOverlaps();
+                    const QPointF nextShift { nextShiftX, 0. };
+                    return nextShift + avoidOverlaps(caller, nextShift, callerRect);
+                }
+            }
         }
+
+        return QPointF(0., 0.);
+    };
+
+    const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
+    if (!delta.isNull())
+        setPos(pos() + delta);
+
+    const QRectF &myRect = sceneBoundingRect();
+    const QRectF &chartBox = utils::CoordinatesConverter::currentChartItem()
+            ? utils::CoordinatesConverter::currentChartItem()->box()
+            : QRectF();
+    if (!chartBox.isNull()) {
+        utils::CoordinatesConverter::currentChartItem()->setBox(chartBox | myRect);
     }
 
+    updateCif();
+    Q_EMIT cifChanged();
     Q_EMIT moved(this);
-    return true;
 }
 
 } // namespace msc

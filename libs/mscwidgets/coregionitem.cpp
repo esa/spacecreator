@@ -133,8 +133,9 @@ void CoregionItem::setInstance(InstanceItem *instance)
     instance->stackBefore(this);
 
     if (m_instance) {
-        connect(m_instance, &InteractiveObject::relocated, this, &CoregionItem::updateLayout, Qt::UniqueConnection);
-        connect(m_instance, &InteractiveObject::moved, this, &CoregionItem::updateLayout, Qt::UniqueConnection);
+        connect(m_instance, &InteractiveObject::relocated, this, &CoregionItem::scheduleLayoutUpdate,
+                Qt::UniqueConnection);
+        connect(m_instance, &InteractiveObject::moved, this, &CoregionItem::scheduleLayoutUpdate, Qt::UniqueConnection);
     }
 
     MscInstance *instanceEntity = m_instance ? m_instance->modelItem() : nullptr;

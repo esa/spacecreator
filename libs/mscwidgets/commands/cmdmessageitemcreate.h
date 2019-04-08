@@ -33,7 +33,7 @@ class CmdMessageItemCreate : public BaseCommand
 {
 public:
     CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex,
-                         const QVector<QPointF> &points = QVector<QPointF>());
+                         const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
     void undo() override;
@@ -44,7 +44,7 @@ private:
     MscMessage *m_message = nullptr;
     QPointer<MscChart> m_chart;
     int m_eventIndex;
-    QVector<QPointF> m_msgPoints;
+    QVector<QPoint> m_msgPoints;
 };
 
 } // ns cmd

@@ -97,6 +97,8 @@ protected:
 
     bool m_used = true;
 
+    QPointF m_posStart, m_posFinish;
+
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;

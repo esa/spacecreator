@@ -171,8 +171,7 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
 
     msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
     if (msc::MscChart *chart = params.at(1).value<msc::MscChart *>()) {
-        const QVector<QPointF> &points =
-                params.size() == 4 ? params.at(3).value<QVector<QPointF>>() : QVector<QPointF>();
+        const QVector<QPoint> &points = params.size() == 4 ? params.at(3).value<QVector<QPoint>>() : QVector<QPoint>();
         return new CmdMessageItemCreate(message, chart, params.at(2).toInt(), points);
     }
 

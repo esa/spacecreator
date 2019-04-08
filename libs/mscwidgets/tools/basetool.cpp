@@ -97,6 +97,12 @@ void BaseTool::setActive(bool active)
     Q_EMIT activeChanged(m_active);
 }
 
+bool BaseTool::processKeyPress(QKeyEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
+
 bool BaseTool::onMousePress(QMouseEvent *e)
 {
     Q_UNUSED(e);

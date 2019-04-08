@@ -153,7 +153,8 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
         }
     }
 
-    return header + events + footer;
+    const QString instanceSerialized(header + events + footer);
+    return serializeCif(instance, instanceSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
@@ -180,7 +181,8 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
         name = name.append("(%1)").arg(parameters);
     }
 
-    return QString(direction).arg(name, instanceName, comment);
+    const QString messageSerialized(QString(direction).arg(name, instanceName, comment));
+    return serializeCif(message, messageSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
@@ -188,8 +190,10 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
     if (condition == nullptr)
         return "";
 
-    return QString("%1condition %2%3;\n")
-            .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "");
+    const QString conditionSerialized(
+            QString("%1condition %2%3;\n")
+                    .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : ""));
+    return serializeCif(condition, conditionSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscCreate *create, const MscInstance *instance, int tabsSize)
@@ -203,7 +207,9 @@ QString MscWriter::serialize(const MscCreate *create, const MscInstance *instanc
         if (!parameters.isEmpty()) {
             res = res.append("(%1)").arg(parameters);
         }
-        return res.append(";\n");
+
+        const QString createSerialized(res.append(";\n"));
+        return serializeCif(create, createSerialized, tabsSize);
     }
     return {};
 }
@@ -230,7 +236,8 @@ QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance,
         return QString();
     }
 
-    return QString("%1%2 %3;\n").arg(tabs(tabsSize), timerType, timer->fullName());
+    const QString timerSerialized(QString("%1%2 %3;\n").arg(tabs(tabsSize), timerType, timer->fullName()));
+    return serializeCif(timer, timerSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscAction *action, const MscInstance *instance, int tabsSize)
@@ -248,9 +255,11 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
 
     if (action->actionType() == MscAction::ActionType::Informal) {
         if (action->informalAction().contains('='))
-            return QString("%1action %2%3;\n").arg(tabString, action->informalAction(), comment);
+            return serializeCif(action, QString("%1action %2%3;\n").arg(tabString, action->informalAction(), comment),
+                                tabsSize);
         else
-            return QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment);
+            return serializeCif(action, QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment),
+                                tabsSize);
     } else {
         QString actionText = tabString + "action ";
         bool first = true;
@@ -272,14 +281,15 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
             first = false;
         }
         actionText += comment + ";\n";
-        return actionText;
+        return serializeCif(action, actionText, tabsSize);
     }
 }
 
 QString MscWriter::serialize(const MscCoregion *region, int tabsSize)
 {
     const char *type = region->type() == MscCoregion::Type::Begin ? "concurrent" : "endconcurrent";
-    return QString("%1%2;\n").arg(tabs(tabsSize), type);
+    const QString regionSerialized(QString("%1%2;\n").arg(tabs(tabsSize), type));
+    return serializeCif(region, regionSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscMessageDeclarationList *declarationList, int tabsSize)
@@ -314,8 +324,10 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
     for (const auto *instance : chart->instances())
         instances += serialize(instance, chart->instanceEvents(), tabsSize + 1);
 
-    QString tabString = tabs(tabsSize);
-    return QString("%1msc %2%4;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances, serializeComment(chart));
+    const QString &tabString = tabs(tabsSize);
+    const QString chartSerialized(
+            QString("%1msc %2%4;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances, serializeComment(chart)));
+    return serializeCif(chart, chartSerialized, tabsSize);
 }
 
 QString MscWriter::serialize(const MscDocument *document, int tabsSize)
@@ -367,9 +379,11 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
         break;
     }
 
-    QString tabString = tabs(tabsSize);
-    return QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
-            .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document));
+    const QString &tabString = tabs(tabsSize);
+    const QString documentSerialized(
+            QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
+                    .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document)));
+    return serializeCif(document, documentSerialized, tabsSize);
 }
 
 void MscWriter::setModel(MscModel *model)
@@ -420,6 +434,21 @@ QString MscWriter::serializeParameters(const MscMessage *message) const
         parameters += param.pattern().isEmpty() ? param.expression() : param.pattern();
     }
     return parameters;
+}
+
+QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const
+{
+    if (!entity || entitySerialized.isEmpty() || entity->cifs().isEmpty())
+        return entitySerialized;
+
+    const QVector<cif::CifBlockShared> &cifs = entity->cifs();
+    QStringList cifTexts;
+    cifTexts.reserve(cifs.size());
+    for (const cif::CifBlockShared &cifBlock : cifs) {
+        cifTexts << cifBlock->toString(tabsSize);
+    }
+
+    return cifTexts.join("\n") + entitySerialized;
 }
 
 } // namespace msc

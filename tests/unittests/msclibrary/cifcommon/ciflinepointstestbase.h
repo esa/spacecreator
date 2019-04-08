@@ -23,6 +23,7 @@ class CifLinePointsTestBase : public QObject
 {
     Q_OBJECT
 protected:
+    CifLinePointsTestBase();
     static const QString m_separatorCommaSpace;
     static const QString m_separatorComma;
     static const QString m_separatorSpace;

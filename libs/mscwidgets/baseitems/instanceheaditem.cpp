@@ -151,12 +151,15 @@ void InstanceHeadItem::updateLayout()
     m_textItemName->setTextWidth(width);
     m_textItemKind->setTextWidth(width);
 
-    QRectF symbolRect(0., 0., width, qMax(kindRect.height(), StartSymbolHeight));
+    QRectF symbolRect(m_explicitTextBox);
+    if (symbolRect.isEmpty()) {
+        symbolRect = { 0., 0., width, qMax(kindRect.height(), StartSymbolHeight) };
 
-    static const qreal padding = 5.;
-    symbolRect.adjust(-padding, -padding, padding, padding);
+        static const qreal padding = 5.;
+        symbolRect.adjust(-padding, -padding, padding, padding);
 
-    symbolRect.moveTopLeft({ 0., 0. });
+        symbolRect.moveTopLeft({ 0., 0. });
+    }
 
     // center name horizontaly:
     nameRect.moveCenter(symbolRect.center());
@@ -207,7 +210,7 @@ void InstanceHeadItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     m_manualMovementFrom =
-            (!m_textItemKind->isEditing() && m_rectItem->contains(event->pos())) ? event->pos() : QPointF();
+            (!m_textItemKind->isEditing() && m_rectItem->contains(event->pos())) ? event->scenePos() : QPointF();
 
     m_manualMovementTo = m_manualMovementFrom;
 
@@ -226,10 +229,10 @@ void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     Q_UNUSED(event);
 
     const bool posDiffers = m_manualMovementFrom != m_manualMovementTo;
-    m_manualMovementFrom = m_manualMovementTo = QPointF();
-
     if (posDiffers)
-        Q_EMIT manualMoveFinished();
+        Q_EMIT manualMoveFinished(m_manualMovementFrom, event->scenePos());
+
+    m_manualMovementFrom = m_manualMovementTo = QPointF();
 }
 
 void InstanceHeadItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -251,8 +254,23 @@ void InstanceHeadItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!m_manualMovementFrom.isNull() && event->lastScenePos() != event->scenePos()) {
         m_manualMovementTo = event->scenePos();
-        Q_EMIT manualMoveRequested(event->lastScenePos(), event->scenePos());
+        Q_EMIT manualMoveRequested(event->lastScenePos(), m_manualMovementTo);
     }
+}
+
+void InstanceHeadItem::setTextboxSize(const QSizeF &size)
+{
+    const QRectF newTextBox { QPointF(0., 0.), size };
+    if (newTextBox != m_explicitTextBox) {
+        m_explicitTextBox = newTextBox;
+        QSignalBlocker keepSilent(this);
+        updateLayout();
+    }
+}
+
+QRectF InstanceHeadItem::textBoxSceneRect() const
+{
+    return m_rectItem->sceneBoundingRect();
 }
 
 } // ns msc

@@ -57,6 +57,7 @@ class CifBlockInstance : public CifBlock
 {
 public:
     CifLine::CifType blockType() const override;
+    static constexpr int AxisWidth { 800 };
 };
 
 class CifBlockImport : public CifBlock

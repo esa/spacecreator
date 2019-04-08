@@ -61,6 +61,8 @@ public:
     QString title() const;
     QString description() const;
 
+    virtual bool processKeyPress(QKeyEvent *e);
+
 public Q_SLOTS:
     void setActive(bool active);
     virtual void setView(QGraphicsView *view);

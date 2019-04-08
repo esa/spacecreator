@@ -92,7 +92,6 @@ public:
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
-    void relayout();
     void updateContentBounds();
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
@@ -100,16 +99,20 @@ public Q_SLOTS:
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
     void layoutComplete();
+    void cifDataChanged();
 
 private Q_SLOTS:
     void onEntityCommentChanged(const QString &comment = QString());
     void onInteractiveObjectCommentChange(msc::MscEntity *entity, const QString &comment);
-    void onInstanceItemMoved(InstanceItem *instanceItem);
+    void onInstanceItemMoved(InteractiveObject *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
+    void onInstanceAdded(MscInstance *instance, int pos);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
+
+    Q_INVOKABLE void relayout();
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
@@ -119,21 +122,34 @@ private:
     MessageItem *fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal y);
     void ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance);
 
+    template<class ItemType>
+    ItemType *itemForInstanceEvent(MscInstanceEvent *event) const;
+
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 
-    void polishAddedEventItem(MscInstanceEvent *event, QGraphicsObject *item);
-    void addInstanceItems();
-    void addInstanceEventItems();
-
+    void polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item);
     void updateComment(msc::MscEntity *entity, msc::InteractiveObject *iObj = nullptr);
     void updateCommentForMscChart();
     void updateCommentForInteractiveObject(InteractiveObject *iObj);
 
-    void applyCif();
+    void addInstanceItems();
+    void addInstanceEventItems();
+
+    void storeEntityItem(InteractiveObject *item);
+
+    QRectF prepareContentRect() const;
+    void applyContentRect(const QRectF &totalRect);
+
+    void connectItems();
+    void connectInstanceItem(InteractiveObject *instanceItem);
+    void connectInstanceEventItem(InteractiveObject *instanceEventItem);
+    void disconnectItems();
+
+    QLineF commonAxis() const;
 };
 
 } // namespace msc

@@ -18,6 +18,7 @@
 #include "ciflinepointstestbase.h"
 
 #include <QtTest>
+#include <mscentity.h>
 
 using namespace msc::cif;
 
@@ -25,6 +26,11 @@ const QString CifLinePointsTestBase::m_separatorCommaSpace = QString(", ");
 const QString CifLinePointsTestBase::m_separatorComma = QString(',');
 const QString CifLinePointsTestBase::m_separatorSpace = QString(' ');
 const QString CifLinePointsTestBase::m_separatorNone = QString();
+
+CifLinePointsTestBase::CifLinePointsTestBase()
+{
+    msc::MscEntity::setCifEnabled(true);
+}
 
 QString CifLinePointsTestBase::lineTag() const
 {

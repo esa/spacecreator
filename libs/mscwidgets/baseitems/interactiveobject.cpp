@@ -238,19 +238,37 @@ MscEntity *InteractiveObject::modelEntity() const
 }
 
 /*!
-   \brief InteractiveObject::updateLayout
+   \brief InteractiveObject::scheduleLayoutUpdate
    Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
    it's data.
-   The actual update is done in the derived itmes in the virtual function \see InteractiveObject::rebuildLayout
+   The actual update is done in the derived itmes in the virtual function \see InteractiveObject::rebuildLayout.
+   To perform update instantly use the \see InteractiveObject::instantLayoutUpdate
  */
-void InteractiveObject::updateLayout()
+void InteractiveObject::scheduleLayoutUpdate()
 {
-    if (m_layoutDirty) {
+    if (m_layoutDirty)
         return;
-    }
-
     m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "doRebuildLayout", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "instantLayoutUpdate", Qt::QueuedConnection);
+}
+
+/*!
+   \brief InteractiveObject::instantLayoutUpdate
+   Triggers a gemoetry update of that item. That might be needed if for example the underlaying entity changes some of
+   it's data.
+   Unlike the \see InteractiveObject::scheduleLayoutUpdate actual update is performed instantly
+ */
+void InteractiveObject::instantLayoutUpdate()
+{
+    const QRectF oldBounds = boundingRect();
+
+    rebuildLayout();
+    m_layoutDirty = false;
+
+    if (oldBounds != boundingRect()) {
+        Q_EMIT boundingBoxChanged();
+    }
+    update();
 }
 
 void InteractiveObject::prepareHoverMark()
@@ -271,19 +289,6 @@ void InteractiveObject::prepareHoverMark()
     }
 
     m_gripPoints->showAnimated();
-}
-
-void InteractiveObject::doRebuildLayout()
-{
-    const QRectF oldBounds = boundingRect();
-
-    rebuildLayout();
-    m_layoutDirty = false;
-
-    if (oldBounds != boundingRect()) {
-        Q_EMIT boundingBoxChanged();
-    }
-    update();
 }
 
 /*!
@@ -316,9 +321,49 @@ void InteractiveObject::postCreatePolishing()
 
 void InteractiveObject::applyCif()
 {
+    if (!modelEntity())
+        return;
+
     const QVector<cif::CifBlockShared> &cifs = modelEntity()->cifs();
     if (cifs.size())
-        qWarning() << Q_FUNC_INFO << "CIF data ignored.";
+        qWarning() << Q_FUNC_INFO << "CIF data ignored for" << modelEntity()->name();
+}
+
+cif::CifBlockShared InteractiveObject::cifBlockByType(cif::CifLine::CifType type) const
+{
+    return modelEntity() ? modelEntity()->cifBlockByType(type) : cif::CifBlockShared();
+}
+
+/*!
+  \brief InteractiveObject::mainCifType
+  An item could have more than one CIF blocks that affects its geometry,
+  say usually a Message has both the CifType::Message and CifType::Position.
+  While the first one is about "how to draw message", the second is about its
+  text/name position which is not so important for layouting process.
+  Ancestors should override this to provide
+  \return appropriate CIF type (CifType::Message in example above).
+*/
+
+cif::CifLine::CifType InteractiveObject::mainCifType() const
+{
+    return cif::CifLine::CifType::Unknown;
+}
+
+bool InteractiveObject::geometryManagedByCif() const
+{
+    const cif::CifLine::CifType targetType = mainCifType();
+    return targetType == cif::CifLine::CifType::Unknown ? false : nullptr != cifBlockByType(targetType);
+}
+
+void InteractiveObject::updateCif() {}
+
+void InteractiveObject::moveSilentlyBy(const QPointF &shift)
+{
+    if (shift.isNull())
+        return;
+
+    QSignalBlocker suppressMoved(this);
+    moveBy(shift.x(), shift.y());
 }
 
 } // namespace msc

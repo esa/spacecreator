@@ -68,6 +68,10 @@ public:
     QString inputValidationPattern() const;
     void setInputValidationPattern(const QString &pattern);
 
+    void setExplicitSize(const QSizeF &r);
+
+    QRectF boundingRect() const override;
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void keyPressed();
@@ -95,6 +99,7 @@ protected:
     bool m_editable = false;
     QString m_prevText;
     QRegularExpression m_inputValidator;
+    QSizeF m_explicitSize;
 };
 
 class NameItem : public TextItem

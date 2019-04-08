@@ -18,6 +18,7 @@
 #include "messagecreatortool.h"
 
 #include "baseitems/arrowitem.h"
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
@@ -246,24 +247,18 @@ void MessageCreatorTool::processMousePressClick(QMouseEvent *e)
 
 void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
 {
+    const QPointF &scenePos = this->cursorInScene(e->globalPos());
     switch (m_currStep) {
     case Step::ChooseSource: {
-        m_messageItem->setTail(cursorInScene(e->globalPos()), ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
         m_currStep = Step::ChooseTarget;
         break;
     }
     case Step::ChooseTarget: {
-        const QPointF &scenePos = this->cursorInScene(e->globalPos());
         const bool isClick = m_currMode == InteractionMode::Click;
-        const bool needCommit = m_currMode == InteractionMode::Drag || (isClick && e->modifiers() != Qt::NoModifier);
+        const bool needCommit = m_currMode == InteractionMode::Drag || (isClick && e->modifiers() == Qt::AltModifier);
         if (needCommit) {
-            commitPreviewItem();
-            m_currStep = Step::ChooseSource;
-            createPreviewItem();
-
-            if (m_messageItem) {
-                movePreviewItemTo(scenePos);
-            }
+            finishArrowCreation(scenePos);
         } else if (isClick) {
             m_messageItem->addMessagePoint(scenePos);
         }
@@ -290,9 +285,9 @@ void MessageCreatorTool::processMouseMoveClick(QMouseEvent *e)
     }
 }
 
-QVariantList MessageCreatorTool::prepareMessage()
+bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
 {
-    // Depending on the pointing device, sometimes it's possible to get such event flow:
+    // Depending on the pointing device, sometimes it's possible to get such events flow:
     //
     // onMousePress:   current(210,76) m_mouseDown(0,0)
     // onMouseMove:    current(210,75) m_mouseDown(210,76)
@@ -301,23 +296,29 @@ QVariantList MessageCreatorTool::prepareMessage()
     //
     // While technicaly it's a drag, mostprobably it was not the user's intent to
     // create such a short arrow.
-    // That's a reason for arrow geometry validation - it should intersect the geometry of
-    // source or target instance, otherwise message would be discarded silently.
+    // That's the first reason for validation - a message should intersect geometry
+    // of source or target instances, otherwise it will be discarded silently.
     //
-    // Same for "async" messages (which currently are not supported) detection -
-    // message discarded in case an arrow's delta y > 15 pixels.
+    // If user has added 2+ same points in a row, these should be filtered out:
+    // (10,10),(20,20),(20,20),(30,30),(30,30),(30,30) -> (10,10),(20,20),(30,30)
+    //
+    // Next thing is the general direction of the arrow, it should be Top to Bottom
+    // (start.y <= end.y)
+    //
+    // At the end the start/end points are snapped to an appropriate axis x.
 
-    auto arrowLine = [&]() {
-        if (m_view && m_messageItem)
-            return QLineF(m_messageItem->tail(), m_messageItem->head());
-        return QLineF();
-    };
+    if (!m_view || !m_messageItem || !message)
+        return false;
+
+    QVector<QPointF> points = m_messageItem->messagePoints();
+    if (points.size() < 2)
+        return false;
 
     auto instanceItemRect = [&](MscInstance *instance) {
         if (instance)
-            if (InstanceItem *item = m_model->itemForInstance(instance)) {
+            if (InstanceItem *item = m_model->itemForInstance(instance))
                 return item->sceneBoundingRect();
-            }
+
         return QRectF();
     };
 
@@ -328,41 +329,94 @@ QVariantList MessageCreatorTool::prepareMessage()
         return true;
     };
 
-    auto validateArrow = [&](MscMessage *message) {
-        const QLineF &arrow = arrowLine();
+    auto snapPoint = [&instanceItemRect](MscInstance *instance, const QPointF &edge) {
+        if (!instance)
+            return edge;
 
-        const bool exceedsInstanceWidth = ensureIntersected(arrow, message->sourceInstance())
-                && ensureIntersected(arrow, message->targetInstance());
-        if (!exceedsInstanceWidth) {
-            qWarning() << "Message intersects neither source nor target instance bounds, discarded.";
-            return false;
-        }
+        const QRectF &instanceRect = instanceItemRect(instance);
+        if (instanceRect.isNull())
+            return edge;
 
-        return true;
+        return QPointF(instanceRect.center().x(), edge.y());
     };
 
+    auto snapToInstance = [&](MscInstance *instance, QVector<QPointF> &points, int pointNumber) {
+        const QPointF &selectedPoint = points.at(pointNumber);
+        const QPointF &snapped = snapPoint(instance, selectedPoint);
+        if (snapped != selectedPoint)
+            points.replace(pointNumber, snapped);
+    };
+
+    const QLineF &arrow = { points.first(), points.last() };
+    const bool exceedsInstanceWidth =
+            ensureIntersected(arrow, message->sourceInstance()) && ensureIntersected(arrow, message->targetInstance());
+    if (!exceedsInstanceWidth) {
+        qWarning() << "Message intersects neither source nor target instance bounds, discarded.";
+        return false;
+    }
+
+    // Remove one of two same points in a row:
+    int pointId = points.size() - 1;
+    while (pointId > 1) {
+        const QPointF current = points.at(pointId);
+        const QPointF preCurrent = points.at(pointId - 1);
+        if (current == preCurrent)
+            points.removeAt(pointId);
+        --pointId;
+    }
+
+    // ensure the direction is Top to Bottom:
+    if (points.size() > 1) {
+        const QPointF &start(points.first());
+        const QPointF &end(points.last());
+        const QPointF &endCorrected = { end.x(), qMax(start.y(), end.y()) };
+        if (end != endCorrected)
+            points.replace(points.size() - 1, endCorrected);
+    }
+
+    // snap to instances, if any:
+    if (MscInstance *sourceInstance = message->sourceInstance())
+        snapToInstance(sourceInstance, points, 0);
+
+    if (MscInstance *targetInstance = message->targetInstance())
+        snapToInstance(targetInstance, points, points.size() - 1);
+
+    m_messageItem->setMessagePoints(points);
+
+    return points.size() > 1;
+}
+
+QVariantList MessageCreatorTool::prepareMessage()
+{
     auto getCif = [&](const QVector<QPointF> &sceneCoords) {
-        if (sceneCoords.size() > 2)
-            return utils::sceneToCif(sceneCoords, m_scene);
+        QVector<QPoint> retPoints;
 
-        const QLineF &arrow = arrowLine();
-        static constexpr qreal horizontalityTolerancePixels = 15.;
-        const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
+        if (sceneCoords.size() < 2)
+            return retPoints;
 
-        return isHorizontal ? QVector<QPoint>() : utils::sceneToCif(sceneCoords, m_scene);
+        if (sceneCoords.size() > 2) {
+            retPoints = utils::CoordinatesConverter::sceneToCif(sceneCoords);
+        } else {
+            const QLineF &arrow = { sceneCoords.first(), sceneCoords.last() };
+            static constexpr qreal horizontalityTolerancePixels = 15.;
+            const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
+            retPoints = isHorizontal ? QVector<QPoint>() : utils::CoordinatesConverter::sceneToCif(sceneCoords);
+        }
+        return retPoints;
     };
     QVariantList args;
 
     auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
-    if (validateArrow(message)) {
+    if (validateUserPoints(message)) {
         if (!message->isOrphan()) {
             if (message->sourceInstance() == message->targetInstance())
                 message->setTargetInstance(nullptr);
 
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
+            const QVector<QPoint> &arrowPoints = getCif(m_messageItem->messagePoints());
             args = { QVariant::fromValue<msc::MscMessage *>(message),
                      QVariant::fromValue<msc::MscChart *>(m_activeChart), eventIndex,
-                     QVariant::fromValue<QVector<QPoint>>(getCif(m_messageItem->messagePoints())) };
+                     QVariant::fromValue<QVector<QPoint>>(arrowPoints) };
         }
     }
 
@@ -381,6 +435,39 @@ void MessageCreatorTool::activate()
     m_currMode = InteractionMode::None;
     m_mouseDown = cursorInScene();
     setActive(true);
+}
+
+bool MessageCreatorTool::processKeyPress(QKeyEvent *e)
+{
+    if (BaseTool::processKeyPress(e))
+        return true;
+
+    switch (e->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: {
+        if (m_currMode == InteractionMode::Click && m_currStep == Step::ChooseTarget) {
+            const QPointF &scenePos = cursorInScene();
+            m_messageItem->addMessagePoint(scenePos);
+            finishArrowCreation(scenePos);
+            return true;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return false;
+}
+
+void MessageCreatorTool::finishArrowCreation(const QPointF &scenePos)
+{
+    commitPreviewItem();
+    m_currStep = Step::ChooseSource;
+    createPreviewItem();
+
+    if (m_messageItem) {
+        movePreviewItemTo(scenePos);
+    }
 }
 
 } // ns msc

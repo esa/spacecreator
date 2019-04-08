@@ -70,7 +70,7 @@ void tst_MessageItem::init()
     m_view->setScene(new QGraphicsScene(m_view));
 
     m_message = new MscMessage("Event1");
-    m_messageItem = new MessageItem(m_message, nullptr, nullptr, 0.);
+    m_messageItem = new MessageItem(m_message);
 
     m_view->scene()->addItem(m_messageItem);
 }
@@ -105,7 +105,7 @@ void tst_MessageItem::testNameWithParameter()
     delete m_messageItem;
 
     m_message->setParameters({ { "", "pattern" } });
-    m_messageItem = new MessageItem(m_message, nullptr, nullptr, 0.);
+    m_messageItem = new MessageItem(m_message);
 
     QCOMPARE(m_messageItem->displayedText(), QString("Event1(pattern)"));
 

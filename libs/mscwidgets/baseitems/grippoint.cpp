@@ -204,14 +204,18 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    m_posStart = m_posFinish = event->scenePos();
     if (m_listener)
         m_listener->handleGripPointPress(this, event->lastScenePos(), event->scenePos());
 }
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    m_posFinish = event->scenePos();
     if (m_listener)
-        m_listener->handleGripPointRelease(this, event->lastScenePos(), event->scenePos());
+        m_listener->handleGripPointRelease(this, m_posStart, m_posFinish);
+
+    m_posStart = m_posFinish = QPointF();
 }
 
 } // namespace msc

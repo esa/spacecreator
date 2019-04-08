@@ -149,4 +149,15 @@ bool MscMessage::isOrphan() const
     return !(m_source || m_target);
 }
 
+#ifdef QT_DEBUG
+QString MscMessage::toDbgString() const
+{
+    auto instanceName = [](MscInstance *instance) {
+        static const QString envName("ENV");
+        return instance ? instance->name() : envName;
+    };
+    return QString("%1->%2:%3").arg(instanceName(m_source), instanceName(m_target), name());
+}
+#endif
+
 } // namespace msc

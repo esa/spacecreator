@@ -17,6 +17,7 @@
 
 #include "actionitem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
@@ -44,10 +45,10 @@ ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     connect(m_action, &msc::MscAction::informalActionChanged, this, &msc::ActionItem::setActionText);
 
     connect(m_textItem, &TextItem::edited, this, &ActionItem::onTextEdited, Qt::QueuedConnection);
-    connect(m_textItem, &TextItem::keyPressed, this, &ActionItem::updateLayout);
+    connect(m_textItem, &TextItem::keyPressed, this, &ActionItem::scheduleLayoutUpdate);
 
     m_boundingRect = m_textItem->boundingRect();
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 MscAction *ActionItem::modelItem() const
@@ -79,7 +80,7 @@ void ActionItem::setInstance(InstanceItem *instance)
         m_action->setInstance(nullptr);
     }
 
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void ActionItem::setActionText(const QString &text)
@@ -91,7 +92,7 @@ void ActionItem::setActionText(const QString &text)
     m_action->setInformalAction(text);
     m_textItem->setHtml(actionText());
 
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -140,13 +141,14 @@ void ActionItem::rebuildLayout()
         return;
     }
 
+    applyCif();
+
     prepareGeometryChange();
 
     m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
     if (std::abs(x - this->x()) > 1e-3) {
         setX(x);
-        Q_EMIT needRelayout();
     }
 }
 
@@ -154,7 +156,7 @@ void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
-    updateLayout();
+    instantLayoutUpdate();
 }
 
 void ActionItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
@@ -187,6 +189,35 @@ QString ActionItem::actionText() const
             }
         }
         return text;
+    }
+}
+
+cif::CifLine::CifType ActionItem::mainCifType() const
+{
+    return cif::CifLine::CifType::Action;
+}
+
+void ActionItem::applyCif()
+{
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(cif::CifLine::CifType::Action)) {
+        const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
+        if (cifPoints.size() == 2) {
+            bool converted(false);
+            const QVector<QPointF> &scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
+            if (!converted)
+                return;
+
+            const QPointF &textBoxTopLeft = scenePoints.at(0);
+            const QPointF &textBoxSize = scenePoints.at(1);
+
+            QSignalBlocker keepSilent(this);
+            m_boundingRect = m_textItem->boundingRect();
+
+            m_textItem->setExplicitSize({ textBoxSize.x(), textBoxSize.y() });
+            const QPointF shift = textBoxTopLeft - pos();
+
+            moveBy(shift.x(), shift.y());
+        }
     }
 }
 

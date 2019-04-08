@@ -64,6 +64,7 @@ MainModel::MainModel(QObject *parent)
     connect(this, &MainModel::selectionChanged, &d->m_hierarchyModel, &HierarchyViewModel::selectionChanged);
 
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, this, &MainModel::modelDataChanged);
 
     initialModel();
     showFirstChart();

@@ -38,6 +38,8 @@ public:
     void connectObjects(InstanceItem *instance, qreal y);
     void setInstance(InstanceItem *instance);
 
+    void applyCif() override;
+
 public Q_SLOTS:
     void setActionText(const QString &text);
 
@@ -47,6 +49,7 @@ protected:
     void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;
+    cif::CifLine::CifType mainCifType() const override;
 
 private Q_SLOTS:
     void onTextEdited(const QString &text);

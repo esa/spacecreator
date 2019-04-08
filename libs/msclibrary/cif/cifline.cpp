@@ -78,6 +78,12 @@ QVariant CifLine::payload() const
 {
     return m_payload;
 }
+
+QVariant &CifLine::payload()
+{
+    return m_payload;
+}
+
 void CifLine::setPayload(const QVariant &p)
 {
     if (m_payload != p)
@@ -100,6 +106,19 @@ QPoint CifLine::stringToPoint(const QString &from, bool *ok)
     }
     return res;
 };
+
+QString CifLine::toString(int tabsSize) const
+{
+    const QString tabs(4 * (tabsSize > 0 ? tabsSize - 1 : tabsSize), ' ');
+    const QString &payload = payloadToString();
+    return payload.isEmpty() ? QString("%1/* CIF %2 */\n").arg(tabs, nameForType(lineType()))
+                             : QString("%1/* CIF %2 %3 */\n").arg(tabs, nameForType(lineType()), payload);
+}
+
+QString CifLine::payloadToString() const
+{
+    return QString();
+}
 
 CifLinePointsHolder::CifLinePointsHolder(int pointsCount)
     : CifLine()
@@ -150,6 +169,19 @@ bool CifLinePointsHolder::initPoints(const QString &line)
     }
 
     return false;
+}
+
+QString CifLinePointsHolder::payloadToString() const
+{
+    QString result;
+    const QVector<QPoint> &points = payload().value<QVector<QPoint>>();
+    for (const QPoint &point : points) {
+        if (!result.isEmpty())
+            result += " ";
+
+        result += QString("(%1, %2)").arg(QString::number(point.x()), QString::number(point.y()));
+    }
+    return result;
 }
 
 } // ns cif

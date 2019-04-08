@@ -124,8 +124,7 @@ void ConditionItem::setName(const QString &name)
     m_nameItem->setPlainText(name);
     m_nameItem->adjustSize();
 
-    updateLayout();
-    Q_EMIT needRelayout();
+    scheduleLayoutUpdate();
 }
 
 void ConditionItem::buildLayout()
@@ -239,7 +238,7 @@ void ConditionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(from);
     Q_UNUSED(to);
-    updateLayout();
+    scheduleLayoutUpdate();
 }
 
 } // namespace msc

@@ -17,6 +17,7 @@
 
 #include "graphicsview.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 
@@ -84,6 +85,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     QString info = coordinatesInfo(screenPos, "Screen");
     info.append(coordinatesInfo(scenePos, "Scene"));
+    info.append(coordinatesInfo(utils::CoordinatesConverter::sceneToCif(scenePos), "CIF"));
 
     for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene(), scenePos)) {
         info.append(coordinatesInfo(item->mapFromScene(scenePos),

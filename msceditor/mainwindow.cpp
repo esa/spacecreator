@@ -19,6 +19,7 @@
 
 #include "asn1editor.h"
 #include "asn1xmlparser.h"
+#include "baseitems/common/coordinatesconverter.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
@@ -199,9 +200,6 @@ void MainWindow::createNewDocument()
     d->m_mscFileName.clear();
     clearUndoStacks();
 
-    d->ui->graphicsView->centerOn(
-            d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
-
     d->ui->graphicsView->setZoom(100);
 
     updateTitles();
@@ -245,9 +243,6 @@ bool MainWindow::openFileMsc(const QString &file)
     if (ok) {
         d->m_mscFileName = file;
         d->ui->documentTreeView->expandAll();
-        d->ui->graphicsView->centerOn(
-                d->ui->graphicsView->mapFromScene(d->ui->graphicsView->scene()->sceneRect().topLeft()));
-
         d->ui->graphicsView->setZoom(100);
     }
 
@@ -564,6 +559,7 @@ void MainWindow::setupUi()
     d->ui->documentTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
+    //    d->ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft); // make scene's origin be great^W in topLeft
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
 
     d->ui->hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
@@ -1193,11 +1189,24 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         d->m_dropUnsavedChangesSilently = true;
         break;
     }
+    case CommandLineParser::Positional::EnableCifSupport: {
+        msc::MscEntity::setCifEnabled(true);
+        break;
+    }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;
     }
     return false;
+}
+
+msc::BaseTool *MainWindow::activeTool() const
+{
+    for (auto tool : d->m_tools)
+        if (tool->isActive())
+            return tool;
+
+    return nullptr;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -1224,6 +1233,11 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             && e->modifiers().testFlag(Qt::ControlModifier) && e->modifiers().testFlag(Qt::ShiftModifier)) {
             showMousePositioner();
         }
+        break;
+    }
+    default: {
+        if (msc::BaseTool *tool = activeTool())
+            tool->processKeyPress(e);
         break;
     }
 #endif
@@ -1396,26 +1410,42 @@ QPlainTextEdit *MainWindow::textOutputPane() const
 // Invoked by CTRL+ALT+SHIFT+M
 void MainWindow::showMousePositioner()
 {
+    const bool isItemMove = currentView()->scene()->selectedItems().size() == 1;
     bool gotText(false);
-    const QString &input = QInputDialog::getText(this, "Move mouse to", "x y:", QLineEdit::Normal, "0 0", &gotText);
-    if (!gotText || input.isEmpty())
+    QString input = QInputDialog::getText(this, isItemMove ? "Move selected item to" : "Move mouse to",
+                                          "x y:", QLineEdit::Normal, "0 0", &gotText)
+                            .trimmed();
+    if (!gotText || input.size() < 3) // minimal valid input is "0 0"
         return;
 
-    static const QRegularExpression rxPoint("(-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)");
+    bool isCif = input.at(0).toUpper() == 'C';
+    if (isCif)
+        input.remove(0, 1);
+
+    static const QRegularExpression rxPoint("(-?\\d+\\.?\\d*),?\\s?(-?\\d+\\.?\\d*)");
     QRegularExpressionMatch m = rxPoint.match(input);
     const QStringList &coords = m.capturedTexts();
     if (coords.size() == 3) {
         bool xOk(false), yOk(false);
-        const QPointF &scenePos = { coords.at(1).toDouble(&xOk), coords.at(2).toDouble(&yOk) };
+        const QPointF &inputPos = { coords.at(1).toDouble(&xOk), coords.at(2).toDouble(&yOk) };
         if (xOk && yOk) {
+            QPointF scenePos(inputPos);
+            if (isCif)
+                scenePos = msc::utils::CoordinatesConverter::cifToScene(scenePos.toPoint());
+
             const QPoint &localPos = currentView()->mapFromScene(scenePos);
             const QPoint &globalPos = currentView()->mapToGlobal(localPos);
 
-            QCursor::setPos(globalPos);
+            if (isItemMove) {
+                if (QGraphicsItem *item = currentView()->scene()->selectedItems().first())
+                    item->setPos(scenePos);
+            } else {
+                QCursor::setPos(globalPos);
 
-            // Update the status bar info:
-            QMouseEvent event(QEvent::MouseMove, localPos, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-            QApplication::sendEvent(currentView()->viewport(), &event);
+                // Update the status bar info:
+                QMouseEvent event(QEvent::MouseMove, localPos, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+                QApplication::sendEvent(currentView()->viewport(), &event);
+            }
         }
     }
 }
