@@ -484,6 +484,8 @@ void ChartViewModel::updateContentBounds()
         }
         totalRect = totalRect.united(gi->sceneBoundingRect());
     }
+    for (CommentItem *commentItem : d->m_comments)
+        totalRect = totalRect.united(commentItem->sceneBoundingRect());
 
     const QSizeF &preferredSize = preferredChartBoxSize();
     if (!preferredSize.isEmpty()) {

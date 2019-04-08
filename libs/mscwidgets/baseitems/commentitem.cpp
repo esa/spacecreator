@@ -22,6 +22,7 @@
 #include "objectslinkitem.h"
 #include "textitem.h"
 
+#include <QGraphicsScene>
 #include <QPainter>
 
 static const qreal kBorderWidth = 1;
@@ -173,8 +174,19 @@ void CommentItem::rebuildLayout()
 void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_isGlobal && gp->location() == GripPoint::Location::Center) {
-        const QPointF &delta = to - from;
-        setPos(pos() + delta);
+        const QRectF sceneRect = scene()->sceneRect();
+        QPointF newPos = pos() + (to - from);
+        if (newPos.x() < sceneRect.left())
+            newPos.setX(sceneRect.left());
+        else if ((newPos.x() + m_boundingRect.width()) > sceneRect.right())
+            newPos.setX(sceneRect.right() - m_boundingRect.width());
+        if (newPos.y() < sceneRect.top())
+            newPos.setY(sceneRect.top());
+        else if ((newPos.y() + m_boundingRect.height()) > sceneRect.bottom())
+            newPos.setY(sceneRect.bottom() - m_boundingRect.height());
+        setPos(newPos);
+
+        Q_EMIT needRelayout();
     }
 }
 
