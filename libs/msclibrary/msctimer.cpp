@@ -24,12 +24,24 @@ namespace msc {
 MscTimer::MscTimer(QObject *parent)
     : MscInstanceEvent(parent)
 {
+    connect(this, &MscInstanceEvent::nameChanged, this, [this](const QString &name) {
+        if (auto precedingTimer = this->precedingTimer()) {
+            const QSignalBlocker blocker(precedingTimer);
+            precedingTimer->setName(name);
+        }
+
+        if (auto followingTimer = this->followingTimer()) {
+            const QSignalBlocker blocker(followingTimer);
+            followingTimer->setName(name);
+        }
+    });
 }
 
 MscTimer::MscTimer(const QString &name, TimerType type, QObject *parent)
-    : MscInstanceEvent(name, parent)
-    , m_timerType(type)
+    : MscTimer(parent)
 {
+    setName(name);
+    setTimerType(type);
 }
 
 MscEntity::EntityType MscTimer::entityType() const

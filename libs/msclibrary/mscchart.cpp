@@ -192,11 +192,6 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 
     if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
         MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
-        connect(timer, &MscInstanceEvent::nameChanged, this, [this, timer](const QString &name) {
-            Q_UNUSED(name);
-
-            resetTimerRelations(timer);
-        });
         connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
         resetTimerRelations(timer);
     }
