@@ -160,9 +160,8 @@ instanceEvent
 orderableEvent
     : (LABEL eventName=NAME end)? (messageEvent
 //    | incompleteMessageEvent
-    | create | timerStatement | action
-    | coregion) // Not like in the standard and this does not prevet recursive coregion statements
-//    | methodCallEvent | incompleteMethodCallEvent | create | timerStatement | action)
+    | methodCallEvent | incompleteMethodCallEvent | create | timerStatement | action
+    | coregion ) // Not like in the standard and this does not prevet recursive coregion statements
 //        (BEFORE orderDestList)? (AFTER orderDestList)?  end (TIME timeDestList end)?
     end
     ;
