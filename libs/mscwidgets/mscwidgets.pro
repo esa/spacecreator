@@ -51,6 +51,7 @@ HEADERS += \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
+    commands/cmdpastechart.h \
     commands/cmdsetparameterlist.h \
     commands/cmdtimeritemcreate.h \
     commands/cmdtimeritemmove.h \
@@ -124,6 +125,7 @@ SOURCES += \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemresize.cpp \
+    commands/cmdpastechart.cpp \
     commands/cmdsetparameterlist.cpp \
     commands/cmdtimeritemcreate.cpp \
     commands/cmdtimeritemmove.cpp \

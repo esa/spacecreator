@@ -43,6 +43,7 @@ enum Id
     MoveDocument,
     SetParameterList,
     SetMessageDeclarations,
+    PasteChart,
     CreateCoregion,
     LastId
 };

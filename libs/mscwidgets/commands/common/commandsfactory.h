@@ -53,6 +53,7 @@ public:
     static QUndoCommand *createDocumentCreate(const QVariantList &params);
     static QUndoCommand *createDocumentMove(const QVariantList &params);
     static QUndoCommand *createSetMessageDeclarations(const QVariantList &params);
+    static QUndoCommand *createChartPaste(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

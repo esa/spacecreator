@@ -34,6 +34,7 @@
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdpastechart.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
 #include "commands/cmdtimeritemcreate.h"
@@ -102,6 +103,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createDocumentMove(params);
     case cmd::SetMessageDeclarations:
         return cmd::CommandsFactory::createSetMessageDeclarations(params);
+    case cmd::PasteChart:
+        return cmd::CommandsFactory::createChartPaste(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -406,6 +409,17 @@ QUndoCommand *CommandsFactory::createSetMessageDeclarations(const QVariantList &
         if (auto declarations = params.last().value<MscMessageDeclarationList *>()) {
             return new CmdSetMessageDeclarations(document, declarations);
         }
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createChartPaste(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (auto document = params.first().value<MscDocument *>()) {
+        return new CmdPasteChart(document, params.last().toString());
     }
 
     return nullptr;

@@ -55,6 +55,7 @@
 
 #include <QActionGroup>
 #include <QApplication>
+#include <QClipboard>
 #include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
@@ -64,6 +65,7 @@
 #include <QKeySequence>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include <QMimeData>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUndoGroup>
@@ -74,6 +76,7 @@
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
+const QLatin1String MainWindow::MscChartMimeType("application/mscchart");
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -122,6 +125,9 @@ struct MainWindowPrivate {
     QMenu *m_menuEdit = nullptr;
     QAction *m_actUndo = nullptr;
     QAction *m_actRedo = nullptr;
+
+    QAction *m_actCopy = nullptr;
+    QAction *m_actPaste = nullptr;
 
     QMenu *m_menuView = nullptr;
     QAction *m_actShowDocument = nullptr;
@@ -430,6 +436,10 @@ void MainWindow::showDocumentView(bool show)
         d->m_hierarchyToolBar->hide();
         d->m_mscToolBar->show();
 
+        d->m_actCopy->setEnabled(true);
+        d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MscChartMimeType)
+                                  && d->m_model->chartViewModel().currentChart()->instances().isEmpty());
+
         d->m_deleteTool->setView(d->ui->graphicsView);
         d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
     }
@@ -442,6 +452,9 @@ void MainWindow::showHierarchyView(bool show)
 
         d->m_hierarchyToolBar->show();
         d->m_mscToolBar->hide();
+
+        d->m_actCopy->setEnabled(false);
+        d->m_actPaste->setEnabled(false);
 
         d->m_deleteTool->setView(d->ui->hierarchyView);
         d->m_deleteTool->setCurrentChart(nullptr);
@@ -547,6 +560,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
             }
 
             d->m_selectedDocument = document;
+            d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MscChartMimeType)
+                                      && d->m_selectedDocument->isAddChildEnable());
+
             Q_EMIT selectionChanged(document);
         }
     }
@@ -602,6 +618,17 @@ void MainWindow::initActions()
     d->m_actRedo->setShortcut(QKeySequence::Redo);
     d->m_actRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(":/icons/toolbar/redo.svg")));
 
+    d->m_actCopy = new QAction(tr("Copy:"), this);
+    d->m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
+    d->m_actCopy->setMenu(new QMenu(this));
+    d->m_actCopy->menu()->addAction(tr("Copy Diagram"), this, &MainWindow::copyAsDiagram, QKeySequence::Copy);
+    d->m_actCopy->menu()->addAction(tr("Copy as Picture"), this, &MainWindow::copyAsPicture);
+
+    d->m_actPaste = new QAction(tr("Paste:"), this);
+    d->m_actPaste->setShortcut(QKeySequence::Paste);
+    d->m_actPaste->setIcon(QIcon::fromTheme("edit-paste"));
+    connect(d->m_actPaste, &QAction::triggered, this, &MainWindow::pasteChart);
+
     d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
 
@@ -652,6 +679,9 @@ void MainWindow::initMenuEdit()
     d->m_menuEdit->addAction(d->m_actRedo);
     d->m_menuEdit->addSeparator();
     d->m_menuEdit->addAction(d->m_deleteTool->action());
+    d->m_menuEdit->addSeparator();
+    d->m_menuEdit->addAction(d->m_actCopy);
+    d->m_menuEdit->addAction(d->m_actPaste);
 }
 
 void MainWindow::initMenuView()
@@ -851,6 +881,10 @@ void MainWindow::initMainToolbar()
 
     d->ui->mainToolBar->addSeparator();
     d->ui->mainToolBar->addAction(d->m_deleteTool->action());
+
+    d->ui->mainToolBar->addSeparator();
+    d->ui->mainToolBar->addAction(d->m_actCopy);
+    d->ui->mainToolBar->addAction(d->m_actPaste);
 }
 
 void MainWindow::initConnections()
@@ -1491,5 +1525,62 @@ void MainWindow::openMessageDeclarationEditor()
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
         d->m_model->mscModel()->setAsn1TypesData(dialog.asn1Types());
         d->m_model->mscModel()->setDataDefinitionString(dialog.fileName());
+    }
+}
+
+void MainWindow::copyAsDiagram()
+{
+    const QString charText = d->m_model->chartText(d->m_model->chartViewModel().currentChart());
+
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData(MscChartMimeType, charText.toLatin1());
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->clear();
+    clipboard->setMimeData(mimeData);
+}
+
+void MainWindow::copyAsPicture()
+{
+    const auto scene = d->m_model->chartViewModel().graphicsScene();
+
+    QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    scene->render(&painter);
+
+    QApplication::clipboard()->setImage(image);
+}
+
+void MainWindow::pasteChart()
+{
+    const QMimeData *mideData = QApplication::clipboard()->mimeData();
+
+    auto *obj = static_cast<QObject *>(d->ui->documentTreeView->currentIndex().internalPointer());
+    if (obj == nullptr) {
+        return;
+    }
+
+    if (mideData->hasFormat(MscChartMimeType)) {
+        QString textChart = mideData->data(MscChartMimeType);
+        msc::MscDocument *document;
+
+        if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
+            document = chart->instances().isEmpty() ? chart->parentDocument() : nullptr;
+        } else {
+            document = dynamic_cast<msc::MscDocument *>(obj);
+        }
+
+        if (document) {
+            const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
+                                              mideData->data(MscChartMimeType) };
+
+            msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
+        }
+
+        updateTreeViewItem(document);
     }
 }

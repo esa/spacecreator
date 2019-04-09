@@ -134,6 +134,12 @@ MscModel *MainModel::mscModel() const
     return d->m_mscModel;
 }
 
+QString MainModel::chartText(const MscChart *chart) const
+{
+    msc::MscWriter mscWriter;
+    return mscWriter.serialize(chart);
+}
+
 void MainModel::showFirstChart()
 {
     d->m_chartModel.fillView(firstChart());

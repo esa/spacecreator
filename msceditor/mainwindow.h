@@ -86,9 +86,13 @@ private Q_SLOTS:
     void updateModel();
     void showCoordinatesInfo(const QString &info);
     void openMessageDeclarationEditor();
+    void copyAsDiagram();
+    void copyAsPicture();
+    void pasteChart();
 
 private:
     static const QLatin1String DotMscFileExtensionLow;
+    static const QLatin1String MscChartMimeType;
     std::unique_ptr<MainWindowPrivate> const d;
 
     void loadSettings();

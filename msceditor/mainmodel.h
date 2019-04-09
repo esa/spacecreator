@@ -60,6 +60,8 @@ public:
     QString modelText() const;
     msc::MscModel *mscModel() const;
 
+    QString chartText(const msc::MscChart *chart) const;
+
 Q_SIGNALS:
     void showChartVew();
     void modelDataChanged();
