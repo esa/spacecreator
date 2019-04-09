@@ -42,6 +42,7 @@
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
 #include <QPainter>
+#include <functional>
 
 namespace msc {
 
