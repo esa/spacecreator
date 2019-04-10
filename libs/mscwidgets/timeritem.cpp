@@ -155,11 +155,6 @@ void TimerItem::setName(const QString &text)
     scheduleLayoutUpdate();
 }
 
-void TimerItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    InteractiveObject::mousePressEvent(event);
-}
-
 void TimerItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     auto removeHighlight = [this]() {

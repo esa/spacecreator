@@ -204,9 +204,13 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_posStart = m_posFinish = event->scenePos();
-    if (m_listener)
-        m_listener->handleGripPointPress(this, event->lastScenePos(), event->scenePos());
+    if (event->button() == Qt::LeftButton) {
+        m_posStart = m_posFinish = event->scenePos();
+        if (m_listener)
+            m_listener->handleGripPointPress(this, event->lastScenePos(), event->scenePos());
+        event->accept();
+    } else
+        event->ignore();
 }
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

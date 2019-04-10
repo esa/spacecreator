@@ -283,10 +283,11 @@ void msc::DocumentItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
 
         d->scenePos = event->scenePos();
-    }
 
-    event->accept();
-    Q_EMIT clicked(d->document.data());
+        event->accept();
+        Q_EMIT clicked(d->document.data());
+    } else
+        event->ignore();
 }
 
 void msc::DocumentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

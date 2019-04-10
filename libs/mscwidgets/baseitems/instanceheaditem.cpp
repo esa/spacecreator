@@ -209,19 +209,22 @@ void InstanceHeadItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void InstanceHeadItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_manualMovementFrom =
-            (!m_textItemKind->isEditing() && m_rectItem->contains(event->pos())) ? event->scenePos() : QPointF();
+    if (event->button() == Qt::LeftButton) {
+        m_manualMovementFrom =
+                (!m_textItemKind->isEditing() && m_rectItem->contains(event->pos())) ? event->scenePos() : QPointF();
 
-    m_manualMovementTo = m_manualMovementFrom;
+        m_manualMovementTo = m_manualMovementFrom;
 
-    event->accept();
+        event->accept();
 
-    if (QGraphicsItem *parent = parentItem()) {
-        if (event->modifiers() == Qt::NoModifier)
-            scene()->clearSelection();
+        if (QGraphicsItem *parent = parentItem()) {
+            if (event->modifiers() == Qt::NoModifier)
+                scene()->clearSelection();
 
-        parent->setSelected(!parent->isSelected());
-    }
+            parent->setSelected(!parent->isSelected());
+        }
+    } else
+        event->ignore();
 }
 
 void InstanceHeadItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

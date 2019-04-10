@@ -34,7 +34,9 @@ namespace msc {
 
   \inmodule MscWidgets
 
-  Some documentation
+  * Handles the middle mouse button to pan the view.
+  * Provides zoom functionality.
+  * Reports the current mouse position as signal
 */
 
 /*!
@@ -70,6 +72,11 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         return;
     }
 
+    if (event->buttons() == Qt::MidButton) {
+        m_panning = true;
+        m_lastMousePosition = event->localPos();
+    }
+
     QGraphicsView::mousePressEvent(event);
 }
 
@@ -94,7 +101,19 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     Q_EMIT mouseMoved(info);
 
+    if (m_panning) {
+        QPointF translation = event->localPos() - m_lastMousePosition;
+        translate(translation.x(), translation.y());
+        m_lastMousePosition = event->localPos();
+    }
+
     QGraphicsView::mouseMoveEvent(event);
+}
+
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_panning = false;
+    QGraphicsView::mouseReleaseEvent(event);
 }
 
 void GraphicsView::wheelEvent(QWheelEvent *event)

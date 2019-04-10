@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QGraphicsView>
+#include <QPointF>
 
 class QUndoStack;
 namespace msc {
@@ -55,6 +56,7 @@ public Q_SLOTS:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -66,6 +68,9 @@ private:
     qreal m_minZoomPercent = 50.0;
     qreal m_zoomStepPercent = 25.0;
     qreal m_maxZoomPercent = 400.0;
+
+    bool m_panning = false;
+    QPointF m_lastMousePosition;
 };
 
 } // namespace msc
