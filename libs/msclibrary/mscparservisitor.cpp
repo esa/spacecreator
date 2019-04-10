@@ -57,7 +57,7 @@ static QString treeNodeToString(T *node)
         QString text = QString::fromStdString(node->getText());
 
         // filtering hyperlinks: `oid`1`351`enterAmount`
-        if (text.endsWith("`")) {
+        if (text.indexOf(QRegExp("^`oid`\\d{1}`\\d{1,}`\\w+`$")) == 0) {
             text.chop(1);
             text = text.mid(text.lastIndexOf("`") + 1);
         }

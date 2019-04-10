@@ -746,17 +746,22 @@ void tst_MscFile::testNameFiltering()
                         INSTANCE `oid`1`351`Inst_1`; \
                             condition `oid`1`351`Con_2`; \
                         ENDINSTANCE; \
+                        INSTANCE `FLX`Inst_2`; \
+                        ENDINSTANCE; \
                    ENDMSC;";
 
     MscModel *model = file->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
-    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 1);
 
-    auto *instance = static_cast<MscInstance *>(chart->instances().at(0));
-    QCOMPARE(instance->name(), QString("Inst_1"));
+    auto *instance1 = static_cast<MscInstance *>(chart->instances().at(0));
+    QCOMPARE(instance1->name(), QString("Inst_1"));
+
+    auto *instance2 = static_cast<MscInstance *>(chart->instances().at(1));
+    QCOMPARE(instance2->name(), QString("`FLX`Inst_2`"));
 
     auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
     QCOMPARE(condition->name(), QString("Con_2"));
