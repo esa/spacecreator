@@ -68,6 +68,7 @@ private Q_SLOTS:
     void testDocumentsType();
     void testDefaultDocumentTypeFromLoad();
     void testMessageDeclaration();
+    void testNameFiltering();
 
     // for message-related tests see the tst_MscEventsParsing
 
@@ -737,6 +738,28 @@ void tst_MscFile::testMessageDeclaration()
     QCOMPARE(typeRefs.size(), 2);
     QCOMPARE(typeRefs.at(0), QString("str"));
     QCOMPARE(typeRefs.at(1), QString("T-POS"));
+}
+
+void tst_MscFile::testNameFiltering()
+{
+    QString msc = "MSC msc1; \
+                        INSTANCE `oid`1`351`Inst_1`; \
+                            condition `oid`1`351`Con_2`; \
+                        ENDINSTANCE; \
+                   ENDMSC;";
+
+    MscModel *model = file->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+
+    auto *instance = static_cast<MscInstance *>(chart->instances().at(0));
+    QCOMPARE(instance->name(), QString("Inst_1"));
+
+    auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
+    QCOMPARE(condition->name(), QString("Con_2"));
 }
 
 QTEST_APPLESS_MAIN(tst_MscFile)

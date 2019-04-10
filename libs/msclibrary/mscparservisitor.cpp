@@ -54,7 +54,15 @@ template<typename T>
 static QString treeNodeToString(T *node)
 {
     if (node != nullptr) {
-        return QString::fromStdString(node->getText());
+        QString text = QString::fromStdString(node->getText());
+
+        // filtering hyperlinks: `oid`1`351`enterAmount`
+        if (text.endsWith("`")) {
+            text.chop(1);
+            text = text.mid(text.lastIndexOf("`") + 1);
+        }
+
+        return text;
     }
     return QString();
 };
