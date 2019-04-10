@@ -230,8 +230,18 @@ void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
-        const QPointF &delta = to - from;
-        setPos(pos() + delta);
+        const QPointF &newPos = pos() + (to - from);
+
+        bool exceedsLimits = false;
+        TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
+        if (preTimer)
+            exceedsLimits = newPos.y() < (preTimer->pos().y() + preTimer->boundingRect().height());
+        TimerItem *followTimer = m_model->itemForTimer(m_timer->followingTimer());
+        if (followTimer)
+            exceedsLimits |= (newPos.y() + boundingRect().height()) > followTimer->pos().y();
+
+        if (!exceedsLimits)
+            setPos(newPos);
     }
 }
 
