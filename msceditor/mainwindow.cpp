@@ -1223,10 +1223,6 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         d->m_dropUnsavedChangesSilently = true;
         break;
     }
-    case CommandLineParser::Positional::EnableCifSupport: {
-        msc::MscEntity::setCifEnabled(true);
-        break;
-    }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;

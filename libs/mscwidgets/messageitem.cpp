@@ -712,9 +712,6 @@ cif::CifLine::CifType MessageItem::mainCifType() const
 
 void MessageItem::updateCif()
 {
-    if (!MscEntity::cifEnabled())
-        return;
-
     using namespace cif;
 
     const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());

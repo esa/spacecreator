@@ -76,11 +76,6 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                 QCoreApplication::translate("CommandLineParser",
                                             "Do not propose to save changes when closing a document"));
     }
-    case CommandLineParser::Positional::EnableCifSupport: {
-        return QCommandLineOption(
-                { "c", "cif-enabled" },
-                QCoreApplication::translate("CommandLineParser", "Enable geometry management via CIF"));
-    }
     default: {
         Q_UNREACHABLE();
         break;

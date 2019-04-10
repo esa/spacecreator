@@ -33,7 +33,6 @@ public:
         DbgOpenMscExamplesChain,
         StartRemoteControl,
         DropUnsavedChangesSilently,
-        EnableCifSupport,
 
         Unknown
     };

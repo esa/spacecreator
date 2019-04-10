@@ -135,9 +135,6 @@ void ChartItem::applyCif()
 
 void ChartItem::updateCif()
 {
-    if (!MscEntity::cifEnabled())
-        return;
-
     if (!m_chart)
         return;
 

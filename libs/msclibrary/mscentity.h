@@ -74,16 +74,12 @@ public:
     void dbgShowCifs() const;
 #endif
 
-    static void setCifEnabled(bool enabled);
-    static bool cifEnabled();
-
 Q_SIGNALS:
     void dataChanged();
     void nameChanged(const QString &name);
     void commentChanged(const QString &name);
 
 private:
-    static bool m_cifEnabled;
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QString m_comment;

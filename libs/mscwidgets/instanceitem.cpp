@@ -334,9 +334,6 @@ cif::CifLine::CifType InstanceItem::mainCifType() const
 
 void InstanceItem::updateCif()
 {
-    if (!MscEntity::cifEnabled())
-        return;
-
     using namespace cif;
 
     if (!geometryManagedByCif()) {

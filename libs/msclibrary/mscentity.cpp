@@ -24,16 +24,6 @@ namespace msc {
 
 const QRegExp MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
 
-bool MscEntity::m_cifEnabled = false;
-void MscEntity::setCifEnabled(bool enabled)
-{
-    m_cifEnabled = enabled;
-}
-bool MscEntity::cifEnabled()
-{
-    return m_cifEnabled;
-}
-
 /*!
    \class msc::MscEntity
    \brief base class for all MSC entities
@@ -101,17 +91,11 @@ void MscEntity::setComment(const QString &comment)
 
 QVector<cif::CifBlockShared> MscEntity::cifs() const
 {
-    if (!cifEnabled())
-        return QVector<cif::CifBlockShared>();
-
     return m_cifs;
 }
 
 void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 {
-    if (!cifEnabled())
-        return;
-
     if (m_cifs != cifs) {
         m_cifs = cifs;
     }
@@ -119,9 +103,6 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 
 void MscEntity::addCif(const cif::CifBlockShared &cif)
 {
-    if (!cifEnabled())
-        return;
-
     if (!m_cifs.contains(cif)) {
         m_cifs.append(cif);
     }
@@ -129,9 +110,6 @@ void MscEntity::addCif(const cif::CifBlockShared &cif)
 
 cif::CifBlockShared MscEntity::cifBlockByType(cif::CifLine::CifType type) const
 {
-    if (!cifEnabled())
-        return cif::CifBlockShared();
-
     for (const cif::CifBlockShared &block : cifs())
         if (block->blockType() == type)
             return block;
