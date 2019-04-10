@@ -53,7 +53,7 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     connect(ui->parameterTable->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &MessageDialog::checkRemoveButton);
 
-    connect(ui->parameterTable, QOverload<QTableWidgetItem *>::of(&QTableWidget::itemActivated), this,
+    connect(ui->parameterTable, QOverload<QTableWidgetItem *>::of(&QTableWidget::itemDoubleClicked), this,
             &MessageDialog::editItem);
 
     connect(ui->declarationsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
@@ -136,13 +136,18 @@ void MessageDialog::selectDeclarationFromName()
         ui->parameterTable->verticalHeader()->setVisible(true);
 
         ui->addParameterButton->setEnabled(false);
-
     } else {
         ui->parameterTable->verticalHeader()->setVisible(false);
         ui->addParameterButton->setEnabled(true);
     }
 
     checkRemoveButton();
+
+    for (int row = 0; row < ui->parameterTable->rowCount(); ++row) {
+        QTableWidgetItem *item = ui->parameterTable->item(row, 0);
+        if (item)
+            setItemFlags(item);
+    }
 }
 
 void MessageDialog::editDeclarations()
@@ -176,6 +181,7 @@ void MessageDialog::addParameter()
         tableItem = new QTableWidgetItem();
         ui->parameterTable->setItem(count, 0, tableItem);
     }
+    setItemFlags(tableItem);
     ui->parameterTable->editItem(tableItem);
 }
 
@@ -221,6 +227,14 @@ void MessageDialog::editItem(QTableWidgetItem *item)
     ui->parameterTable->closePersistentEditor(item);
 }
 
+void MessageDialog::setItemFlags(QTableWidgetItem *item)
+{
+    Qt::ItemFlags itemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    if (m_selectedDeclaration)
+        itemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    item->setFlags(itemFlags);
+}
+
 void MessageDialog::fillMessageDeclartionBox()
 {
     const msc::MscMessageDeclarationList *declarations = messageDeclarations();
@@ -249,6 +263,7 @@ void MessageDialog::fillParameters()
             tableItem = new QTableWidgetItem();
             ui->parameterTable->setItem(row, 0, tableItem);
         }
+        setItemFlags(tableItem);
         tableItem->setText(parameter.parameter());
         ++row;
     }

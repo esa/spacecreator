@@ -55,6 +55,7 @@ protected:
 
 private Q_SLOTS:
     void editItem(QTableWidgetItem *item);
+    void setItemFlags(QTableWidgetItem *item);
 
 private:
     void fillMessageDeclartionBox();
