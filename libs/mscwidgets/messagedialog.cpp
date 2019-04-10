@@ -162,13 +162,18 @@ void MessageDialog::editDeclarations()
         return;
 
     MessageDeclarationsDialog dialog(declarations, mscModel()->asn1TypesData(), this);
+    dialog.setFileName(model->dataDefinitionString());
+
     int result = dialog.exec();
+
     if (result == QDialog::Accepted) {
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
                                          QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
         model->setAsn1TypesData(dialog.asn1Types());
         model->setDataDefinitionString(dialog.fileName());
+        fillMessageDeclartionBox();
+        selectDeclarationFromName();
     }
 }
 
@@ -237,6 +242,8 @@ void MessageDialog::setItemFlags(QTableWidgetItem *item)
 
 void MessageDialog::fillMessageDeclartionBox()
 {
+    ui->declarationsComboBox->clear();
+
     const msc::MscMessageDeclarationList *declarations = messageDeclarations();
     if (!declarations) {
         ui->declarationsComboBox->setEnabled(false);
