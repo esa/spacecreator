@@ -64,7 +64,8 @@ public:
         // Now layout the items with child sizes
         const qreal boxSpacingX = maxSize.width() / 3;
         const qreal boxSpacingY = margin * 1.5;
-        layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
+        const QSizeF &totalSize = layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
+        scene.setSceneRect({ { 0., 0. }, totalSize });
 
         scene.update();
     }
