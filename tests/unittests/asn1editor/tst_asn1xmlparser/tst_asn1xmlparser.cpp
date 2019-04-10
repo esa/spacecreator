@@ -91,14 +91,14 @@ void tst_Asn1XMLParser::testIntRealTypes()
 {
     auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("number_type.xml"));
 
-    QCOMPARE(asn1Types.count(), 2);
+    QCOMPARE(asn1Types.count(), 3);
 
     auto typeMap = asn1Types.at(0).toMap();
     QCOMPARE(typeMap.size(), 5);
     QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyInt"));
     QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), INTEGER);
-    QCOMPARE(typeMap[ASN1_MIN].toInt(), 0);
-    QCOMPARE(typeMap[ASN1_MAX].toInt(), 20);
+    QCOMPARE(typeMap[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(typeMap[ASN1_MAX].toLongLong(), static_cast<qlonglong>(20));
 
     typeMap = asn1Types.at(1).toMap();
     QCOMPARE(typeMap.size(), 5);
@@ -106,6 +106,13 @@ void tst_Asn1XMLParser::testIntRealTypes()
     QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), DOUBLE);
     QCOMPARE(typeMap[ASN1_MIN].toDouble(), 0.0);
     QCOMPARE(typeMap[ASN1_MAX].toDouble(), 1000.0);
+
+    typeMap = asn1Types.at(2).toMap();
+    QCOMPARE(typeMap.size(), 5);
+    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("T-UInt32"));
+    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), INTEGER);
+    QCOMPARE(typeMap[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(typeMap[ASN1_MAX].toLongLong(), static_cast<qlonglong>(4294967295));
 }
 
 void tst_Asn1XMLParser::testBoolEnumTypes()

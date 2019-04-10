@@ -13,6 +13,11 @@
                   <RealType Min="0.00000000000000000000E+000" Max="1.00000000000000000000E+003" />
                </Type>
             </TypeAssignment>
+             <TypeAssignment Name="T-UInt32" Line="3" CharPositionInLine="13">
+                 <Type Line="3" CharPositionInLine="13">
+                     <IntegerType Min="0" Max="4294967295"/>
+                 </Type>
+             </TypeAssignment>
          </TypeAssignments>
       </Asn1Module>
    </Asn1File>

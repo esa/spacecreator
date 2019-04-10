@@ -28,6 +28,7 @@
 #include <QVariantMap>
 #include <cstdlib>
 #include <ctime>
+#include <type_traits>
 
 namespace asn1 {
 
@@ -192,7 +193,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
 
     // find type node for ReferenceType
     while (typeName == "ReferenceType") {
-        parseRange<int>(typeElem, typeData);
+        parseRange<qlonglong>(typeElem, typeData);
 
         for (const QDomNodeList &typeAssignment : typeAssignments) {
             for (int x = 0; x < typeAssignment.size(); ++x) {
@@ -215,7 +216,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     switch (static_cast<ASN1Type>(typeData[ASN1_TYPE].toInt())) {
     case INTEGER:
     case STRING:
-        parseRange<int>(typeElem, typeData);
+        parseRange<qlonglong>(typeElem, typeData);
         break;
     case DOUBLE:
         parseRange<double>(typeElem, typeData);
@@ -228,7 +229,7 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
         break;
     case SEQUENCEOF:
         typeData[ASN1_SEQOFTYPE] = parseType(typeAssignments, typeElem.firstChild().toElement());
-        parseRange<int>(typeElem, typeData);
+        parseRange<qlonglong>(typeElem, typeData);
         break;
     case ENUMERATED:
         parseEnumeratedType(typeElem, typeData);
@@ -355,14 +356,19 @@ QString Asn1XMLParser::asn1CompilerCommand() const
 template<typename T>
 void Asn1XMLParser::parseRange(const QDomElement &type, QVariantMap &result)
 {
-    bool ok;
-    double value;
-
     auto parseAttribute = [&](const QString &attrName, const QString &mapName) {
         if (type.hasAttribute(attrName)) {
-            value = type.attribute(attrName).toDouble(&ok);
-            if (ok && !result.contains(mapName))
-                result[mapName] = static_cast<T>(value);
+            bool ok;
+            QString valueText = type.attribute(attrName);
+            if (std::is_same<T, qlonglong>::value) {
+                qlonglong valueInt = valueText.toLongLong(&ok);
+                if (ok && !result.contains(mapName))
+                    result[mapName] = valueInt;
+            } else {
+                double valueDouble = valueText.toDouble(&ok);
+                if (ok && !result.contains(mapName))
+                    result[mapName] = static_cast<T>(valueDouble);
+            }
         }
     };
 
