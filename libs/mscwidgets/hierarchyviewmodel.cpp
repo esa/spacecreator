@@ -64,8 +64,10 @@ public:
         // Now layout the items with child sizes
         const qreal boxSpacingX = maxSize.width() / 3;
         const qreal boxSpacingY = margin * 1.5;
-        const QSizeF &totalSize = layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
-        scene.setSceneRect({ { 0., 0. }, totalSize });
+        QSizeF totalSize = layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
+        // Add some extra width on the bounding box for drawing outside the box
+        totalSize = totalSize + QSizeF(2. * margin, 2. * margin);
+        scene.setSceneRect({ { -margin, -margin }, totalSize });
 
         scene.update();
     }
@@ -105,17 +107,13 @@ public:
             QRectF boundingRect(0, 0, qMax(boxSize.width(), childrensRect.width()),
                                 qMax(posY + boxSize.height(), childrensRect.height()));
 
-            if (boundingRect.height() > height) {
-                height = boundingRect.height();
-            }
-
+            qreal pathHeight = boxSize.height() + (childrensRect.height() > 0 ? childrensRect.height() + spaceY : 0.);
+            height = std::max(height, pathHeight);
             width = x + boundingRect.width();
 
             // Position of the next box
             x += boundingRect.width() + spaceX;
 
-            // Add some extra width on the bounding box for drawing outside the box
-            boundingRect.setWidth(boundingRect.width() + boxSize.height());
             item->setBoundingRect(boundingRect);
         }
 
