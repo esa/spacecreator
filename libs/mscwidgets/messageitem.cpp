@@ -224,10 +224,10 @@ void MessageItem::rebuildLayout()
     // ensure that ENV has not been replaced by the edge of an instance located nearby
     if (wasGlobal && modelItem()->isGlobal() != wasGlobal) {
         QSignalBlocker suppressDataChanged(m_message);
-        if (m_sourceInstance && !qFuzzyCompare(1. + points.first().x(), 1 + utils::itemCenter(m_sourceInstance).x()))
+        if (m_sourceInstance && !qFuzzyCompare(1. + points.first().x(), 1 + m_sourceInstance->centerInScene().x()))
             setSourceInstanceItem(nullptr);
 
-        if (m_targetInstance && !qFuzzyCompare(1. + points.last().x(), 1 + utils::itemCenter(m_targetInstance).x()))
+        if (m_targetInstance && !qFuzzyCompare(1. + points.last().x(), 1 + m_targetInstance->centerInScene().x()))
             setTargetInstanceItem(nullptr);
     }
 
@@ -609,6 +609,7 @@ bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
     m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
 
+    commitGeometryChange();
     return true;
 }
 
@@ -730,7 +731,8 @@ void MessageItem::extendGlobalMessage()
     const int shiftPointId = isFromEnv ? 0 : points.size() - 1;
     QPointF shiftMe(points.at(shiftPointId));
     if (!geometryManagedByCif()) {
-        const QPointF &instanceCenter = utils::itemCenter(isFromEnv ? m_targetInstance : m_sourceInstance);
+        const QPointF &instanceCenter =
+                isFromEnv ? m_targetInstance->centerInScene() : m_sourceInstance->centerInScene();
         shiftMe.rx() = instanceCenter.x();
     }
     const QPointF &shiftedMe = extendToNearestEdge(shiftMe);

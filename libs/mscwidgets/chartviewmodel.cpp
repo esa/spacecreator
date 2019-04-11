@@ -440,8 +440,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             item->moveSilentlyBy({ 0., deltaY });
         }
 
-        d->m_layoutInfo.m_pos.ry() +=
-                item->sceneBoundingRect().height(); // + (!geometryFromCif ? d->InterMessageSpan : 0.);
+        d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
 
         return deltaY;
     };

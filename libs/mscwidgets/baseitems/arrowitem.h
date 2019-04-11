@@ -47,6 +47,8 @@ public:
     void setTurnPoints(const QVector<QPointF> &scenePoints);
     QVector<QPointF> turnPoints() const;
 
+    QPainterPath bodyPath() const override;
+
 protected:
     PairOf<ArrowSign> m_arrowHeads;
     QPainterPath m_bodyPath;
@@ -55,7 +57,6 @@ protected:
     void drawStartSign(QPainter *painter) override;
     void drawEndSign(QPainter *painter) override;
 
-    QPainterPath bodyPath() const override;
     void buildLayout() override;
     void updateLine(const QLineF &to);
 

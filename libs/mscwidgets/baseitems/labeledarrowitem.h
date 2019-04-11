@@ -70,6 +70,7 @@ private:
     MsgIdentificationItem *m_itemText;
     ArrowItem *m_itemArrow;
     QPainterPath m_shape;
+    QPen m_selectionHighlighterPen;
 
     static constexpr qreal TextMargin = 1.;
 };

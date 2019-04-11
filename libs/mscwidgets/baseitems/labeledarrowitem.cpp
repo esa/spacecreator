@@ -37,6 +37,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_itemText(new MsgIdentificationItem(this))
     , m_itemArrow(new ArrowItem(this))
+    , m_selectionHighlighterPen(Qt::green)
 {
     m_itemText->setFramed(false);
     m_itemText->setBackgroundColor(Qt::transparent);
@@ -49,6 +50,8 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     connect(m_itemArrow, &ArrowItem::geometryChanged, this, &LabeledArrowItem::updateLayout);
     connect(m_itemText, &TextItem::keyPressed, this, &LabeledArrowItem::onKeyPressed);
     connect(m_itemText, &TextItem::edited, this, &LabeledArrowItem::onTextEdited);
+
+    m_selectionHighlighterPen.setWidthF(m_itemArrow->bodyPen().widthF() * 2.);
 }
 
 void LabeledArrowItem::setText(const QString &text)
@@ -119,9 +122,15 @@ void LabeledArrowItem::setColor(const QColor &color)
 
 void LabeledArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
+
+    if (parentItem() && parentItem()->isSelected()) {
+        painter->save();
+        painter->setPen(m_selectionHighlighterPen);
+        painter->drawPath(arrow()->bodyPath());
+        painter->restore();
+    }
 }
 
 QPainterPath LabeledArrowItem::shape() const
@@ -135,9 +144,20 @@ QPainterPath LabeledArrowItem::shape() const
 
 QRectF LabeledArrowItem::boundingRect() const
 {
-    QRectF arrowRect = m_itemArrow->boundingRect();
-    QRectF textRect = m_itemText->boundingRect().translated(m_itemText->pos());
-    return arrowRect.united(textRect);
+    const QPointF &tail = endSignPos();
+    const QPointF &head = startSignPos();
+
+    if (qFuzzyCompare(tail.y(), head.y()) && arrow()->turnPoints().size() == 2) {
+        // this takes into account dimensions of the triangle sign
+        return childrenBoundingRect();
+    }
+
+    // construct a rect where one couple of corners is the tail and head points:
+    const QPointF topLeft { qMin(tail.x(), head.x()), qMin(tail.y(), head.y()) };
+    const QPointF bottomRight { qMax(tail.x(), head.x()), qMax(tail.y(), head.y()) };
+
+    const QRectF arrowRect { topLeft, bottomRight };
+    return m_itemText->boundingRect().translated(m_itemText->pos()).united(arrowRect);
 }
 
 void LabeledArrowItem::updateLayout()

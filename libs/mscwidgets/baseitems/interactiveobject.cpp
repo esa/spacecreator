@@ -229,7 +229,7 @@ bool InteractiveObject::isHighlighting() const
 
 QPointF InteractiveObject::centerInScene() const
 {
-    return mapToScene(boundingRect().center());
+    return sceneBoundingRect().center();
 }
 
 MscEntity *InteractiveObject::modelEntity() const
