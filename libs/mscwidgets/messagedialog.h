@@ -49,6 +49,7 @@ public Q_SLOTS:
     void addParameter();
     void removeParameter();
     void checkRemoveButton();
+    void setParameterEditState();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

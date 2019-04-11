@@ -65,6 +65,7 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     selectDeclarationFromName();
 
     fillParameters();
+    setParameterEditState();
 }
 
 MessageDialog::~MessageDialog()
@@ -125,6 +126,7 @@ void MessageDialog::selectDeclarationFromName()
         if (names.contains(ui->nameLineEdit->text())) {
             currentIdx = i;
             m_selectedDeclaration = declaration;
+            break;
         }
     }
     ui->declarationsComboBox->setCurrentIndex(currentIdx);
@@ -142,12 +144,7 @@ void MessageDialog::selectDeclarationFromName()
     }
 
     checkRemoveButton();
-
-    for (int row = 0; row < ui->parameterTable->rowCount(); ++row) {
-        QTableWidgetItem *item = ui->parameterTable->item(row, 0);
-        if (item)
-            setItemFlags(item);
-    }
+    setParameterEditState();
 }
 
 void MessageDialog::editDeclarations()
@@ -203,6 +200,18 @@ void MessageDialog::checkRemoveButton()
 {
     bool enabled = !m_selectedDeclaration && !ui->parameterTable->selectedItems().isEmpty();
     ui->removeParameterButton->setEnabled(enabled);
+}
+
+void MessageDialog::setParameterEditState()
+{
+    for (int row = 0; row < ui->parameterTable->rowCount(); ++row) {
+        QTableWidgetItem *tableItem = ui->parameterTable->item(row, 0);
+        if (!tableItem) {
+            tableItem = new QTableWidgetItem();
+            ui->parameterTable->setItem(row, 0, tableItem);
+        }
+        setItemFlags(tableItem);
+    }
 }
 
 void MessageDialog::keyPressEvent(QKeyEvent *event)
