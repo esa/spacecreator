@@ -478,29 +478,43 @@ void MscChart::resetTimerRelations(MscTimer *timer)
         return;
 
     const QString &timerName = timer->fullName();
-    for (int timerIdx = idx + 1; timerIdx < events.size(); ++timerIdx) {
-        MscInstanceEvent *event = events.value(timerIdx);
-        if (event->entityType() != MscEntity::EntityType::Timer)
-            continue;
 
-        MscTimer *mscTimer = static_cast<MscTimer *>(event);
-        if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
-            mscTimer->setPrecedingTimer(timer);
-            timer->setFollowingTimer(mscTimer);
-            break;
+    // Limit thes connection of stop/start timers to appropriate pairs only,
+    // to be able to load that do not use timerInstanceName properly
+
+    // only connect stop/timeout after start timers
+    if (timer->timerType() == msc::MscTimer::TimerType::Start) {
+        for (int timerIdx = idx + 1; timerIdx < events.size(); ++timerIdx) {
+            MscInstanceEvent *event = events.value(timerIdx);
+            if (event->entityType() != MscEntity::EntityType::Timer)
+                continue;
+
+            MscTimer *mscTimer = static_cast<MscTimer *>(event);
+            if (mscTimer->timerType() != msc::MscTimer::TimerType::Start) {
+                if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
+                    mscTimer->setPrecedingTimer(timer);
+                    timer->setFollowingTimer(mscTimer);
+                    break;
+                }
+            }
         }
     }
 
-    for (int timerIdx = idx - 1; timerIdx >= 0; --timerIdx) {
-        MscInstanceEvent *event = events.value(timerIdx);
-        if (event->entityType() != MscEntity::EntityType::Timer)
-            continue;
+    // only connect start before stop/timout timers
+    if (timer->timerType() != msc::MscTimer::TimerType::Start) {
+        for (int timerIdx = idx - 1; timerIdx >= 0; --timerIdx) {
+            MscInstanceEvent *event = events.value(timerIdx);
+            if (event->entityType() != MscEntity::EntityType::Timer)
+                continue;
 
-        MscTimer *mscTimer = static_cast<MscTimer *>(event);
-        if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
-            timer->setPrecedingTimer(mscTimer);
-            mscTimer->setFollowingTimer(timer);
-            break;
+            MscTimer *mscTimer = static_cast<MscTimer *>(event);
+            if (mscTimer->timerType() == msc::MscTimer::TimerType::Start) {
+                if (mscTimer->fullName() == timerName && mscTimer->instance() == timer->instance()) {
+                    timer->setPrecedingTimer(mscTimer);
+                    mscTimer->setFollowingTimer(timer);
+                    break;
+                }
+            }
         }
     }
 }

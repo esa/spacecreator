@@ -340,8 +340,8 @@ void tst_MscChart::testTimerRelation()
     timer2->setTimerType(MscTimer::TimerType::Start);
     m_chart->resetTimerRelations(timer2);
     QVERIFY(timer1->precedingTimer() == nullptr);
-    QCOMPARE(timer1->followingTimer(), timer2);
-    QCOMPARE(timer2->precedingTimer(), timer1);
+    QVERIFY(timer1->followingTimer() == nullptr);
+    QVERIFY(timer2->precedingTimer() == nullptr);
     QCOMPARE(timer2->followingTimer(), timer3);
     QCOMPARE(timer3->precedingTimer(), timer2);
     QVERIFY(timer3->followingTimer() == nullptr);
@@ -352,8 +352,8 @@ void tst_MscChart::testTimerRelation()
     timer5->setInstance(instance2);
     m_chart->addInstanceEvent(timer5);
     QVERIFY(timer1->precedingTimer() == nullptr);
-    QCOMPARE(timer1->followingTimer(), timer2);
-    QCOMPARE(timer2->precedingTimer(), timer1);
+    QVERIFY(timer1->followingTimer() == nullptr);
+    QVERIFY(timer2->precedingTimer() == nullptr);
     QCOMPARE(timer2->followingTimer(), timer3);
     QCOMPARE(timer3->precedingTimer(), timer2);
     QVERIFY(timer3->followingTimer() == nullptr);
@@ -366,8 +366,8 @@ void tst_MscChart::testTimerRelation()
     m_chart->removeInstanceEvent(timer5);
     delete timer5;
     QVERIFY(timer1->precedingTimer() == nullptr);
-    QCOMPARE(timer1->followingTimer(), timer2);
-    QCOMPARE(timer2->precedingTimer(), timer1);
+    QVERIFY(timer1->followingTimer() == nullptr);
+    QVERIFY(timer2->precedingTimer() == nullptr);
     QCOMPARE(timer2->followingTimer(), timer3);
     QCOMPARE(timer3->precedingTimer(), timer2);
     QVERIFY(timer3->followingTimer() == nullptr);

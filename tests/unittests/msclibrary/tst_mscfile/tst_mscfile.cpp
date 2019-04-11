@@ -433,6 +433,56 @@ void tst_MscFile::testTimerRelation()
     auto timer4 = static_cast<MscTimer *>(event);
     QVERIFY(timer4->precedingTimer() == nullptr);
     QVERIFY(timer4->followingTimer() == nullptr);
+
+    msc = "MSC msc1; \
+            INSTANCE Inst_1; \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+                SET nox25reply(3000000.0); \
+                RESET nox25reply; \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+                SET nox25reply(3000000.0); \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+                SET nox25reply(3000000.0); \
+                RESET nox25reply; \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+                SET nox25reply(3000000.0); \
+                SET nouseraction(30000000.0); \
+                RESET nouseraction; \
+            ENDINSTANCE; \
+           ENDMSC;";
+
+    model.reset(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    chart = model->charts().at(0);
+    QCOMPARE(chart->instanceEvents().size(), 18);
+
+    QVector<msc::MscTimer *> timers;
+    for (int i = 0; i < chart->instanceEvents().size(); ++i)
+        timers.append(qobject_cast<MscTimer *>(chart->instanceEvents().at(i)));
+
+    QVERIFY(timers[0]->precedingTimer() == nullptr);
+    QVERIFY(timers[0]->followingTimer() == timers[1]);
+
+    QVERIFY(timers[1]->precedingTimer() == timers[0]);
+    QVERIFY(timers[1]->followingTimer() == nullptr);
+
+    QVERIFY(timers[2]->precedingTimer() == nullptr);
+    QVERIFY(timers[2]->followingTimer() == timers[3]);
+
+    QVERIFY(timers[3]->precedingTimer() == timers[2]);
+    QVERIFY(timers[3]->followingTimer() == nullptr);
+
+    QVERIFY(timers[4]->precedingTimer() == nullptr);
+    QVERIFY(timers[4]->followingTimer() == timers[5]);
+
+    QVERIFY(timers[5]->precedingTimer() == timers[4]);
+    QVERIFY(timers[5]->followingTimer() == nullptr);
 }
 
 void tst_MscFile::testAction()
