@@ -64,6 +64,7 @@ public:
         // Now layout the items with child sizes
         const qreal boxSpacingX = maxSize.width() / 3;
         const qreal boxSpacingY = margin * 1.5;
+
         QSizeF totalSize = layoutItemsHelper(topLevelDocumentItems, boxSpacingX, boxSpacingY, 0, boxSize);
         // Add some extra width on the bounding box for drawing outside the box
         totalSize = totalSize + QSizeF(2. * margin, 2. * margin);

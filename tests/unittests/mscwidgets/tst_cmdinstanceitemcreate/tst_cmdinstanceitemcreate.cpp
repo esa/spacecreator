@@ -77,7 +77,7 @@ void tst_CmdInstanceItemCreate::testCreate()
     cmd::CommandsStack::current()->clear();
 
     QCOMPARE(itemsCount(), 0);
-
+    QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
     for (int i = 0; i < CommandsCount; ++i) {
         cmd::CommandsStack::push(cmd::Id::CreateInstance,
                                  { QVariant::fromValue<msc::MscInstance *>(nullptr),
@@ -128,6 +128,8 @@ void tst_CmdInstanceItemCreate::testInsertingOrder()
     cmd::CommandsStack::current()->clear();
 
     QCOMPARE(itemsCount(), 0);
+
+    QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
 
     for (const QString &name : names) {
         cmd::CommandsStack::push(cmd::Id::CreateInstance,

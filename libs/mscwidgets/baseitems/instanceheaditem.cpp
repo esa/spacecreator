@@ -126,6 +126,9 @@ void InstanceHeadItem::setName(const QString &name)
 
 void InstanceHeadItem::setKind(const QString &kind)
 {
+    if (kind == m_textItemKind->toPlainText())
+        return;
+
     QString denominator;
     QString kindText;
     MscInstance::splitDenominatorKind(kind, denominator, kindText);

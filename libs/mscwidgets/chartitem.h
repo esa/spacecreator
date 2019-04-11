@@ -16,8 +16,7 @@
 */
 
 #pragma once
-#include <QGraphicsObject>
-#include <memory>
+#include "baseitems/interactiveobject.h"
 
 class QGraphicsRectItem;
 
@@ -26,7 +25,7 @@ namespace msc {
 class MscChart;
 class TextItem;
 
-class ChartItem : public QGraphicsObject
+class ChartItem : public InteractiveObject
 {
     Q_OBJECT
 
@@ -44,25 +43,35 @@ public:
     QRectF box() const;
     void setBox(const QRectF &r);
 
-    void applyCif();
+    void applyCif() override;
 
     bool geometryManagedByCif() const;
     QRectF storedCustomRect() const;
 
+Q_SIGNALS:
+    void chartBoxChanged();
+
 public Q_SLOTS:
     void setName(const QString &name);
+
+protected:
+    void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void prepareHoverMark() override;
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
 
 private:
+    void updateCif() override;
+    MscChart *chart() const;
+
+private:
     QGraphicsRectItem *m_rectItem = nullptr;
     TextItem *m_textItemName = nullptr;
-    MscChart *m_chart = nullptr;
     QRectF m_box;
-
-    void updateCif();
+    bool m_guard = false;
 };
 
 } // ns msc

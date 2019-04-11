@@ -195,16 +195,11 @@ void ChartViewModel::fillView(MscChart *chart)
 
     clearScene();
 
-    if (!d->m_layoutInfo.m_chartItem) {
-        d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
-        d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
-    }
-
-    utils::CoordinatesConverter::init(&d->m_scene, d->m_layoutInfo.m_chartItem);
+    prepareChartBoxItem();
 
     const QRectF &initialChartRect = d->m_layoutInfo.m_chartItem->storedCustomRect();
     if (d->m_currentChart)
-        relayout();
+        doLayout();
 
     // restore initial chart box, because it's overriden by actual content bounds
     if (!initialChartRect.isNull())
@@ -216,13 +211,10 @@ void ChartViewModel::fillView(MscChart *chart)
     connect(d->m_currentChart, &msc::MscChart::instanceMoved, this,
             [this](MscInstance *instance, int, int) { onInstanceItemMoved(itemForInstance(instance)); });
 
-    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
+    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::relayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
     connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartViewModel::updateLayout);
-    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, [&]() {
-        this->clearScene();
-        this->updateLayout();
-    });
+    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartViewModel::relayout);
     connect(d->m_currentChart, &msc::MscChart::commentChanged, this, &ChartViewModel::onEntityCommentChanged);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
@@ -272,10 +264,8 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         pntTarget.setY(newY);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
-        if (!item->geometryManagedByCif())
-            item->setPos(pntSource.isNull() ? pntTarget : pntSource);
         item->setInstances(sourceItem, targetItem);
-        item->setMessagePointsNoCif({ pntSource, pntTarget });
+        item->setMessagePoints({ pntSource, pntTarget }, MessageItem::CifUpdatePolicy::DontChange);
     }
 
     if (item)
@@ -286,11 +276,29 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
 void ChartViewModel::relayout()
 {
+    d->m_layoutDirty = true; // prevent update scheduling in ChartViewModel::updateLayout()
+
+    clearScene();
+    doLayout();
+}
+
+void ChartViewModel::updateLayout()
+{
+    if (d->m_layoutDirty)
+        return;
+
+    d->m_layoutDirty = true;
+    QMetaObject::invokeMethod(this, "doLayout", Qt::QueuedConnection);
+}
+
+void ChartViewModel::doLayout()
+{
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
     d->m_layoutInfo.m_instancesRect = QRectF();
     d->m_layoutInfo.m_instancesCommonAxisStart = 0.;
 
+    prepareChartBoxItem();
     if (d->m_layoutInfo.m_chartItem)
         d->m_layoutInfo.m_chartItem->applyCif();
 
@@ -432,7 +440,8 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             item->moveSilentlyBy({ 0., deltaY });
         }
 
-        d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
+        d->m_layoutInfo.m_pos.ry() +=
+                item->sceneBoundingRect().height(); // + (!geometryFromCif ? d->InterMessageSpan : 0.);
 
         return deltaY;
     };
@@ -474,7 +483,9 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
                     const QPointF delta = newStart - messagePoints.first();
                     for (int i = 0; i < messagePoints.size() - 1; ++i)
                         messagePoints[i] += delta;
-                    messageItem->setMessagePointsNoCif(messagePoints); // changes its pos to the source point
+                    messageItem->setMessagePoints(
+                            messagePoints,
+                            MessageItem::CifUpdatePolicy::DontChange); // changes its pos to the source point
                 }
                 messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
             }
@@ -514,7 +525,7 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
             commentItem = new CommentItem;
             commentItem->attachTo(iObj);
             if (iObj)
-                connect(iObj, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
+                connect(iObj, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout,
                         Qt::UniqueConnection);
             connect(entity, &MscEntity::commentChanged, this, &ChartViewModel::onEntityCommentChanged,
                     Qt::UniqueConnection);
@@ -539,26 +550,28 @@ QRectF ChartViewModel::prepareContentRect() const
 {
     QRectF totalRect;
     for (InteractiveObject *gi : d->allItems()) {
-        const QRectF &currRect = gi->sceneBoundingRect();
+        QRectF currRect = gi->sceneBoundingRect();
+        if (gi->modelEntity()
+            && gi->modelEntity()->entityType() == MscEntity::EntityType::Message) // TODO: same for Create?
+        {
+            MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
+            if (message->isGlobal()) {
+                if (MessageItem *messageItem = dynamic_cast<MessageItem *>(gi)) {
+                    // if it's a simple (two point) horizontal message only its height
+                    // accounted since it will be extended to the chart edge afterwhile
+                    // TODO: add support for complex global message
+                    const QLineF arrowLine(messageItem->tail(), messageItem->head());
+                    if (qFuzzyIsNull(arrowLine.dy())) {
+                        const QPointF &currCenter = currRect.center();
+                        currRect.setWidth(1.);
+                        currRect.moveCenter(currCenter);
+                    }
+                }
+            }
+        }
         totalRect = totalRect.united(currRect);
     }
     return totalRect;
-}
-
-void ChartViewModel::applyContentRect(const QRectF &requestedTotalRect)
-{
-    QRectF newBox(requestedTotalRect);
-    if (d->m_layoutInfo.m_chartItem->geometryManagedByCif()) {
-        newBox = requestedTotalRect;
-    } else {
-        const QPointF &shift = -requestedTotalRect.topLeft();
-        if (!shift.isNull()) {
-            newBox.translate(shift);
-            for (InteractiveObject *item : d->allItems())
-                item->moveSilentlyBy(shift);
-        }
-    }
-    d->m_layoutInfo.m_chartItem->setBox(newBox);
 }
 
 QLineF ChartViewModel::commonAxis() const
@@ -582,7 +595,19 @@ void ChartViewModel::updateContentBounds()
     if (!d->m_layoutInfo.m_chartItem)
         return;
 
-    applyContentRect(prepareContentRect());
+    QRectF chartBox = d->m_layoutInfo.m_chartItem->geometryManagedByCif()
+            ? d->m_layoutInfo.m_chartItem->storedCustomRect()
+            : d->m_layoutInfo.m_chartItem->box();
+    const QRectF &contentRect = prepareContentRect();
+    if (chartBox.isEmpty())
+        chartBox = contentRect;
+    else {
+        if (chartBox.width() < contentRect.width())
+            chartBox.setWidth(contentRect.width());
+        if (chartBox.height() < contentRect.height())
+            chartBox.setHeight(contentRect.height());
+    }
+    d->m_layoutInfo.m_chartItem->setBox(chartBox);
 
     const int totalItemsCount = d->allItemsCount();
     d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
@@ -774,16 +799,6 @@ MscInstanceEvent *ChartViewModel::eventAtPosition(const QPointF &scenePos)
     return nullptr;
 }
 
-void ChartViewModel::updateLayout()
-{
-    if (d->m_layoutDirty) {
-        return;
-    }
-
-    d->m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "relayout", Qt::QueuedConnection);
-}
-
 QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *instance) const
 {
     QVector<QGraphicsObject *> res;
@@ -878,7 +893,7 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
         d->m_instanceItemsSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
-        updateLayout();
+        relayout();
     }
 }
 
@@ -891,7 +906,7 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
         d->m_instanceEventItemSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
-        updateLayout();
+        relayout();
     }
 }
 
@@ -1157,8 +1172,7 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
                                         QVariant::fromValue<MscMessage::EndType>(endType),
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });
     } else {
-        clearScene();
-        updateLayout();
+        relayout();
     }
 }
 
@@ -1237,7 +1251,8 @@ void ChartViewModel::connectItems()
 
 void ChartViewModel::connectInstanceItem(InteractiveObject *instanceItem)
 {
-    connect(instanceItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout, Qt::UniqueConnection);
+    connect(instanceItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout,
+            Qt::UniqueConnection);
     connect(instanceItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged, Qt::UniqueConnection);
     connect(instanceItem->modelEntity(), &MscEntity::commentChanged, this, &ChartViewModel::onEntityCommentChanged,
             Qt::UniqueConnection);
@@ -1246,7 +1261,7 @@ void ChartViewModel::connectInstanceItem(InteractiveObject *instanceItem)
 
 void ChartViewModel::connectInstanceEventItem(InteractiveObject *instanceEventItem)
 {
-    connect(instanceEventItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout,
+    connect(instanceEventItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout,
             Qt::UniqueConnection);
     connect(instanceEventItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged,
             Qt::UniqueConnection);
@@ -1257,14 +1272,14 @@ void ChartViewModel::connectInstanceEventItem(InteractiveObject *instanceEventIt
 void ChartViewModel::disconnectItems()
 {
     for (InteractiveObject *instanceItem : d->m_instanceItems) {
-        disconnect(instanceItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout);
+        disconnect(instanceItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout);
         disconnect(instanceItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged);
         disconnect(instanceItem->modelEntity(), &MscEntity::commentChanged, this,
                    &ChartViewModel::onEntityCommentChanged);
         disconnect(instanceItem, &InteractiveObject::moved, this, &ChartViewModel::onInstanceItemMoved);
     }
     for (InteractiveObject *instanceEventItem : d->m_instanceEventItems) {
-        disconnect(instanceEventItem, &InteractiveObject::needRelayout, this, &ChartViewModel::updateLayout);
+        disconnect(instanceEventItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout);
         disconnect(instanceEventItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged);
         disconnect(instanceEventItem, &InteractiveObject::moved, this, &ChartViewModel::onInstanceEventItemMoved);
     }
@@ -1318,7 +1333,22 @@ void ChartViewModel::onInstanceAdded(MscInstance *instance, int pos)
         ++nextIdx;
     }
 
-    updateContentBounds();
+    const QRectF &newItemBounds = prepareContentRect();
+    const QRectF &newBox = newItemBounds | d->m_layoutInfo.m_chartItem->box();
+    d->m_layoutInfo.m_chartItem->setBox(newBox);
+
+    // TODO: update global messages?
+}
+
+void ChartViewModel::prepareChartBoxItem()
+{
+    if (!d->m_layoutInfo.m_chartItem) {
+        d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
+        connect(d->m_layoutInfo.m_chartItem, &ChartItem::cifChanged, this, [this]() { updateContentBounds(); });
+        d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
+    }
+
+    utils::CoordinatesConverter::init(&d->m_scene, d->m_layoutInfo.m_chartItem);
 }
 
 } // namespace msc

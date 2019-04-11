@@ -89,6 +89,7 @@ Q_SIGNALS:
     void messageRetargeted();
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
+    void rectChanged();
 
 private:
     bool moveEvent(MscInstanceEvent *event, int newIndex);

@@ -44,6 +44,13 @@ public:
         GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
     };
 
+    enum class CifUpdatePolicy
+    {
+        DontChange,
+        ForceCreate,
+        UpdateIfExists
+    };
+
     explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr, InstanceItem *target = nullptr,
                          QGraphicsItem *parent = nullptr);
 
@@ -79,8 +86,7 @@ public:
 
     void addMessagePoint(const QPointF &scenePoint);
     QVector<QPointF> messagePoints() const;
-    void setMessagePoints(const QVector<QPointF> &scenePoints);
-    bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);
+    void setMessagePoints(const QVector<QPointF> &scenePoints, MessageItem::CifUpdatePolicy cifUpdate);
 
     void applyCif() override;
 
@@ -92,10 +98,6 @@ Q_SIGNALS:
 public Q_SLOTS:
     void setName(const QString &name);
     void setPositionChangeIgnored(bool ignored);
-
-private Q_SLOTS:
-    void onTextChanged();
-    void showMessageDialog();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
@@ -110,11 +112,14 @@ protected:
     void moveSilentlyBy(const QPointF &shift) override;
 
 private Q_SLOTS:
+    void onTextChanged();
+    void showMessageDialog();
     void rebuildLayout() override;
     void commitGeometryChange();
     void onRenamed(const QString &title);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     void updateDisplayText();
+    void onChartBoxChanged();
 
 private:
     QPointer<msc::MscMessage> m_message = nullptr;
@@ -143,6 +148,9 @@ private:
 
     cif::CifBlockShared cifMessage() const;
     cif::CifBlockShared cifPosition() const;
+
+    void extendGlobalMessage();
+    bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);
 };
 
 } // namespace mas

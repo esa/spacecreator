@@ -75,7 +75,7 @@ Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
-    void needRelayout() const;
+    void needUpdateLayout() const;
     void cifChanged();
 
 protected Q_SLOTS:

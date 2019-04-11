@@ -143,6 +143,9 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
     if (property.size() == 0) // QLatin1String::isEmpty was introduced in Qt 5.10
         return;
 
+    if (m_instance->property(property.data()).toString() == value)
+        return;
+
     m_instance->setProperty(property.data(), value);
     QMetaObject::invokeMethod(this, "reflectTextLayoutChange", Qt::QueuedConnection);
 }
@@ -321,7 +324,7 @@ void InstanceItem::reflectTextLayoutChange()
         const QRectF &sceneRect = scene->sceneRect();
         const QRectF &intersection = myRect.intersected(sceneRect);
         if (intersection != myRect) {
-            Q_EMIT needRelayout();
+            Q_EMIT needUpdateLayout();
             return;
         }
     }

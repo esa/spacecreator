@@ -108,11 +108,12 @@ private Q_SLOTS:
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
     void onInstanceAdded(MscInstance *instance, int pos);
+    void relayout();
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;
 
-    Q_INVOKABLE void relayout();
+    Q_INVOKABLE void doLayout();
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
@@ -142,7 +143,6 @@ private:
     void storeEntityItem(InteractiveObject *item);
 
     QRectF prepareContentRect() const;
-    void applyContentRect(const QRectF &totalRect);
 
     void connectItems();
     void connectInstanceItem(InteractiveObject *instanceItem);
@@ -150,6 +150,8 @@ private:
     void disconnectItems();
 
     QLineF commonAxis() const;
+
+    void prepareChartBoxItem();
 };
 
 } // namespace msc

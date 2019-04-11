@@ -101,5 +101,7 @@ bool removeSceneItem(QGraphicsItem *item);
 bool intersects(const QRectF &rect, const QLineF &line);
 QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos);
 
+QPointF itemCenter(QGraphicsItem *item);
+
 } // ns utils
 } // ns msc

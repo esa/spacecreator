@@ -159,5 +159,10 @@ QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF 
     return items;
 }
 
+QPointF itemCenter(QGraphicsItem *item)
+{
+    return item ? item->sceneBoundingRect().center() : QPointF();
+}
+
 } // ns utils
 } // ns msc

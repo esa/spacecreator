@@ -545,6 +545,7 @@ void MscChart::setCifRect(const QRect &rect)
 
         const QVector<QPoint> points { rect.topLeft(), { rect.width(), rect.height() } };
         mscDocCif->setPayload(QVariant::fromValue(points), CifLine::CifType::MscDocument);
+        Q_EMIT rectChanged();
         Q_EMIT dataChanged(); // update MscTextView
     }
 }

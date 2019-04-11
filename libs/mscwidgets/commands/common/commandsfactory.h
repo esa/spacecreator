@@ -51,6 +51,7 @@ public:
     static QUndoCommand *createTimerItemMove(const QVariantList &params);
     static QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
     static QUndoCommand *createDocumentCreate(const QVariantList &params);
+    static QUndoCommand *createChartGeometryChange(const QVariantList &params);
     static QUndoCommand *createDocumentMove(const QVariantList &params);
     static QUndoCommand *createSetMessageDeclarations(const QVariantList &params);
     static QUndoCommand *createChartPaste(const QVariantList &params);

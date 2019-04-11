@@ -100,13 +100,24 @@ int main(int argc, char *argv[])
     if (!cmdParser.isSet(CommandLineParser::Positional::StartRemoteControl))
         qInstallMessageHandler(globalLogMessageWrapper);
 
+    QVector<CommandLineParser::Positional> args;
     const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
     for (int i = 0; i < e.keyCount(); ++i) {
         const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
-
         if (CommandLineParser::Positional::Unknown != posArgType)
-            if (cmdParser.isSet(posArgType))
-                w.processCommandLineArg(posArgType, cmdParser.value(posArgType));
+            if (cmdParser.isSet(posArgType)) {
+                if (posArgType == CommandLineParser::Positional::OpenFileAsn
+                    || posArgType == CommandLineParser::Positional::OpenFileMsc)
+                    args.prepend(posArgType);
+                else
+                    args.append(posArgType);
+            }
+    }
+    QVector<CommandLineParser::Positional>::const_reverse_iterator it = args.crbegin();
+    while (it != args.crend()) {
+        const CommandLineParser::Positional arg = *it;
+        w.processCommandLineArg(arg, cmdParser.value(arg));
+        ++it;
     }
 
     w.show();

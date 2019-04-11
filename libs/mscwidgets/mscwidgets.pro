@@ -28,6 +28,7 @@ HEADERS += \
     baseitems/msgidentificationitem.h \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
+    commands/cmdchartitemchangegeometry.h \
     commands/cmdcoregionitemcreate.h \
     commands/cmdsetmessagedeclarations.h \
     commands/common/commandids.h \
@@ -103,6 +104,7 @@ SOURCES += \
     baseitems/msgidentificationitem.cpp \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
+    commands/cmdchartitemchangegeometry.cpp \
     commands/cmdcoregionitemcreate.cpp \
     commands/cmdsetmessagedeclarations.cpp \
     commands/common/commandsfactory.cpp \

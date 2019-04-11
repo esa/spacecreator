@@ -66,7 +66,6 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
 
-    //    connect(m_arrowItem, &LabeledArrowItem::layoutChanged, this, &MessageItem::commitGeometryChange);
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
     connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
@@ -76,6 +75,9 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
     m_arrowItem->setDashed(isCreator());
+
+    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+        connect(chartItem, &ChartItem::chartBoxChanged, this, &MessageItem::onChartBoxChanged);
 }
 
 void MessageItem::onTextChanged()
@@ -211,76 +213,26 @@ void MessageItem::postCreatePolishing()
 void MessageItem::rebuildLayout()
 {
     const QVector<QPointF> &points = messagePoints();
-    if (points.size() > 1) {
-        updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
-        updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
+    if (points.size() < 2)
         return;
+
+    const bool wasGlobal = modelItem()->isGlobal();
+
+    updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
+    updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
+
+    // ensure that ENV has not been replaced by the edge of an instance located nearby
+    if (wasGlobal && modelItem()->isGlobal() != wasGlobal) {
+        QSignalBlocker suppressDataChanged(m_message);
+        if (m_sourceInstance && !qFuzzyCompare(1. + points.first().x(), 1 + utils::itemCenter(m_sourceInstance).x()))
+            setSourceInstanceItem(nullptr);
+
+        if (m_targetInstance && !qFuzzyCompare(1. + points.last().x(), 1 + utils::itemCenter(m_targetInstance).x()))
+            setTargetInstanceItem(nullptr);
     }
 
-    auto itemCenterScene = [](InstanceItem *item) {
-        QPointF res;
-        if (item) {
-            const QPointF b = item->boundingRect().center();
-            res = item->mapToScene(b);
-        }
-
-        return res;
-    };
-    const QPointF fromC(itemCenterScene(m_sourceInstance).x(), y());
-    const QPointF toC(itemCenterScene(m_targetInstance).x(), y());
-
-    auto getChartBox = [this]() {
-        // Try ChartItem's rect first
-        if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-            return chartItem->sceneBoundingRect();
-
-        // Fallback to instance's rect
-        if (QGraphicsScene *scene = this->scene())
-            return scene->sceneRect();
-
-        return QRectF();
-    };
-
-    const QRectF boxRect = getChartBox();
-    auto extendToNearestEdge = [&boxRect](const QPointF &target) {
-        const QLineF left({ boxRect.left(), target.y() }, target);
-        const QLineF right({ boxRect.right(), target.y() }, target);
-
-        if (left.length() <= right.length())
-            return QPointF(boxRect.left(), target.y());
-        else
-            return QPointF(boxRect.right(), target.y());
-    };
-
-    QPointF pntFrom, pntTo;
-    if (isCreator() && m_targetInstance) {
-        // make the CREATE message point to the correct instance's "edge" and not its center
-        pntFrom = fromC;
-        pntTo.ry() = toC.y();
-        const QRectF &targetR = m_targetInstance->boundingRect().translated(m_targetInstance->pos());
-        pntTo.rx() = toC.x() > fromC.x() ? targetR.left() : targetR.right();
-    } else if (m_sourceInstance && m_targetInstance) {
-        // connect two centers (y)
-        pntFrom = fromC;
-        pntTo = toC;
-    } else if (m_sourceInstance) {
-        // instance to external
-        pntFrom = fromC;
-        pntTo = extendToNearestEdge(pntFrom);
-    } else if (m_targetInstance) {
-        // external to instance
-        pntTo = toC;
-        pntFrom = extendToNearestEdge(pntTo);
-    }
-
-    const bool bothAreNulls = pntFrom.isNull() && pntTo.isNull();
-    if (!bothAreNulls) {
-        m_arrowItem->arrow()->makeArrow(m_sourceInstance, pntFrom, m_targetInstance, pntTo);
-        GeometryNotificationBlocker geometryNotificationBlocker(this);
-        setPos(messagePoints().first());
-    }
-
-    commitGeometryChange();
+    if (!geometryManagedByCif())
+        onChartBoxChanged(); // extends global message to chart edges, if necessary
 }
 
 QPainterPath MessageItem::shape() const
@@ -490,7 +442,9 @@ void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(from);
+    if (from == to)
+        return;
+
     if (isCreator())
         return;
 
@@ -498,8 +452,22 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
         updateSource(to, ObjectAnchor::Snap::NoSnap);
     else if (gp->location() == GripPoint::Right)
         updateTarget(to, ObjectAnchor::Snap::NoSnap);
+}
 
-    updateCif();
+void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
+{
+    auto commitUpdate = [&](msc::MscMessage::EndType endType) {
+        if (endType == msc::MscMessage::EndType::SOURCE_TAIL)
+            updateSource(to, ObjectAnchor::Snap::SnapTo);
+        else
+            updateTarget(to, ObjectAnchor::Snap::SnapTo);
+
+        updateCif();
+        Q_EMIT retargeted(this, to, endType);
+    };
+
+    commitUpdate(pos == GripPoint::Left ? msc::MscMessage::EndType::SOURCE_TAIL
+                                        : msc::MscMessage::EndType::TARGET_HEAD);
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
@@ -593,15 +561,6 @@ void MessageItem::onRenamed(const QString &title)
     m_preventRecursion = false;
 }
 
-void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
-{
-    if (pos == GripPoint::Left) {
-        Q_EMIT retargeted(this, to, msc::MscMessage::EndType::SOURCE_TAIL);
-    } else if (pos == GripPoint::Right) {
-        Q_EMIT retargeted(this, to, msc::MscMessage::EndType::TARGET_HEAD);
-    }
-}
-
 void MessageItem::updateDisplayText()
 {
     QString modelText = displayTextFromModel();
@@ -640,25 +599,35 @@ cif::CifBlockShared MessageItem::cifPosition() const
 bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
 {
     const QVector<QPointF> &arrowPoints = messagePoints();
-    if (scenePoints == arrowPoints)
+    if (scenePoints.size() < 2 || scenePoints == arrowPoints)
         return false;
 
     Q_ASSERT(!scenePoints.isEmpty());
 
     GeometryNotificationBlocker keepSilent(this);
-    setPos(scenePoints.first());
+    setPos(utils::lineCenter({ scenePoints.first(), scenePoints.last() }));
+    m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
 
     return true;
 }
 
-void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
+void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints, MessageItem::CifUpdatePolicy cifUpdate)
 {
     if (!setMessagePointsNoCif(scenePoints))
         return;
 
-    if (scenePoints.size() <= 1)
+    switch (cifUpdate) {
+    case MessageItem::CifUpdatePolicy::DontChange:
         return;
+    case MessageItem::CifUpdatePolicy::UpdateIfExists: {
+        if (!geometryManagedByCif())
+            return;
+        break;
+    }
+    default:
+        break;
+    }
 
     updateCif();
 }
@@ -672,7 +641,7 @@ void MessageItem::applyCif()
         bool converted(false);
         const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
         if (converted)
-            setMessagePoints(pointsScene);
+            setMessagePoints(pointsScene, MessageItem::CifUpdatePolicy::UpdateIfExists);
     }
 }
 
@@ -702,7 +671,7 @@ void MessageItem::updateMessagePoints()
     }
 
     if (updated)
-        setMessagePoints(points);
+        setMessagePoints(points, MessageItem::CifUpdatePolicy::ForceCreate);
 }
 
 cif::CifLine::CifType MessageItem::mainCifType() const
@@ -733,6 +702,50 @@ void MessageItem::moveSilentlyBy(const QPointF &shift)
 {
     GeometryNotificationBlocker silently(this);
     InteractiveObject::moveSilentlyBy(shift);
+}
+
+void MessageItem::extendGlobalMessage()
+{
+    auto getChartBox = [this]() {
+        if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+            return chartItem->sceneBoundingRect();
+        if (QGraphicsScene *scene = this->scene())
+            return scene->sceneRect();
+        return QRectF();
+    };
+
+    const QRectF boxRect = getChartBox();
+    auto extendToNearestEdge = [&](const QPointF &shiftMe) {
+        const QLineF left({ boxRect.left(), shiftMe.y() }, shiftMe);
+        const QLineF right({ boxRect.right(), shiftMe.y() }, shiftMe);
+
+        if (left.length() <= right.length())
+            return QPointF(boxRect.left(), shiftMe.y());
+        else
+            return QPointF(boxRect.right(), shiftMe.y());
+    };
+
+    QVector<QPointF> points(messagePoints());
+    const bool isFromEnv = !m_sourceInstance;
+    const int shiftPointId = isFromEnv ? 0 : points.size() - 1;
+    QPointF shiftMe(points.at(shiftPointId));
+    if (!geometryManagedByCif()) {
+        const QPointF &instanceCenter = utils::itemCenter(isFromEnv ? m_targetInstance : m_sourceInstance);
+        shiftMe.rx() = instanceCenter.x();
+    }
+    const QPointF &shiftedMe = extendToNearestEdge(shiftMe);
+    if (shiftedMe != points.at(shiftPointId)) {
+        points.replace(shiftPointId, shiftedMe);
+        setMessagePoints(points, MessageItem::CifUpdatePolicy::UpdateIfExists);
+    }
+}
+
+void MessageItem::onChartBoxChanged()
+{
+    if (!m_message->isGlobal())
+        return;
+
+    extendGlobalMessage();
 }
 
 } // namespace msc

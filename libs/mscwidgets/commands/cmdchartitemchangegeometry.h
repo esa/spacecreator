@@ -17,37 +17,32 @@
 
 #pragma once
 
+#include "basecommand.h"
+
+#include <QPointer>
+#include <QRectF>
+
 namespace msc {
+
+class MscChart;
+
 namespace cmd {
 
-enum Id
+class CmdChartItemChangeGeometry : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    LastId
-};
+    Q_OBJECT
+public:
+    explicit CmdChartItemChangeGeometry(const QRect &oldRect, const QRect &newRect, MscChart *chart);
 
-} // ns cmd
-} // ns msc
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+protected:
+    QPointer<MscChart> m_chart;
+    const QRect m_oldRect;
+    QRect m_newRect;
+};
+} // namespace cmd
+} // namespace msc

@@ -19,6 +19,7 @@
 #include "commands/cmdactioninformaltext.h"
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
+#include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdconditionitemcreate.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdcoregionitemcreate.h"
@@ -99,6 +100,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createHierarchyTypeChange(params);
     case cmd::CreateDocument:
         return cmd::CommandsFactory::createDocumentCreate(params);
+    case cmd::ChangeChartGeometry:
+        return cmd::CommandsFactory::createChartGeometryChange(params);
     case cmd::MoveDocument:
         return cmd::CommandsFactory::createDocumentMove(params);
     case cmd::SetMessageDeclarations:
@@ -384,6 +387,16 @@ QUndoCommand *CommandsFactory::createDocumentCreate(const QVariantList &params)
             return new CmdDocumentCreate(document, parent);
         }
     }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createChartGeometryChange(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (auto chart = params.last().value<MscChart *>())
+        return new CmdChartItemChangeGeometry(params.value(0).toRect(), params.value(1).toRect(), chart);
 
     return nullptr;
 }

@@ -186,7 +186,7 @@ void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
             newPos.setY(sceneRect.bottom() - m_boundingRect.height());
         setPos(newPos);
 
-        Q_EMIT needRelayout();
+        Q_EMIT needUpdateLayout();
     }
 }
 
