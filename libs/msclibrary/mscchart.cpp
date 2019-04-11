@@ -58,6 +58,24 @@ const QVector<MscInstance *> &MscChart::instances() const
     return m_instances;
 }
 
+MscInstance *MscChart::makeInstance(const QString &name, int index)
+{
+    QString instanceName(name);
+    if (instanceName.isEmpty()) {
+        int count = m_instances.size();
+        do {
+            instanceName = tr("Instance_%1").arg(++count);
+        } while (instanceByName(instanceName));
+    } else if (MscInstance *instance = instanceByName(instanceName)) {
+        qWarning() << "Can't create. Instance with such name already exists:" << instanceName;
+        return instance;
+    }
+
+    auto instance = new MscInstance(instanceName);
+    addInstance(instance, index);
+    return instance;
+}
+
 /*!
    Adds an instance, and takes over parentship.
  */
@@ -105,11 +123,12 @@ void MscChart::removeInstance(MscInstance *instance)
 
 MscInstance *MscChart::instanceByName(const QString &name) const
 {
-    for (MscInstance *instance : m_instances) {
-        if (instance->name() == name) {
-            return instance;
-        }
-    }
+    auto it = std::find_if(m_instances.constBegin(), m_instances.constEnd(),
+                           [name](MscInstance *instance) { return name == instance->name(); });
+
+    if (it != m_instances.constEnd())
+        return *it;
+
     return nullptr;
 }
 

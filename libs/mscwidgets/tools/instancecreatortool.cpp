@@ -44,13 +44,9 @@ void InstanceCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscInstance *orphaninstance = new MscInstance(tr("Instance"));
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(orphaninstance, cursorInScene());
-
-    if (!instanceItem) {
-        delete orphaninstance;
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, cursorInScene());
+    if (!instanceItem)
         return;
-    }
 
     m_previewItem = instanceItem;
     m_previewEntity = instanceItem->modelItem();

@@ -39,7 +39,7 @@ void CmdInstanceItemCreate::redo()
     Q_ASSERT(m_chart.data());
 
     if (!m_instance) {
-        m_instance = new MscInstance(QObject::tr("Instance_%1").arg(m_chart->instances().size()));
+        m_instance = m_chart->makeInstance();
         m_modelItem = m_instance;
     }
 

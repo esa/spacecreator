@@ -44,6 +44,7 @@ public:
     ~MscChart() override;
 
     const QVector<MscInstance *> &instances() const;
+    MscInstance *makeInstance(const QString &name = QString(), int index = -1);
     void addInstance(MscInstance *instance, int index = -1);
     void removeInstance(MscInstance *instance);
 

@@ -816,11 +816,7 @@ antlrcpp::Any MscParserVisitor::visitCoregion(MscParser::CoregionContext *contex
 
 void MscParserVisitor::addInstance(const QString &name)
 {
-    MscInstance *instance = m_currentChart->instanceByName(name);
-    if (!instance) {
-        instance = new MscInstance(name, m_currentChart);
-        m_currentChart->addInstance(instance);
-    }
+    m_currentChart->makeInstance(name);
 }
 
 void MscParserVisitor::resetInstanceEvents()

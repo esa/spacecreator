@@ -291,7 +291,8 @@ void ChartViewModel::relayout()
     d->m_layoutInfo.m_instancesRect = QRectF();
     d->m_layoutInfo.m_instancesCommonAxisStart = 0.;
 
-    d->m_layoutInfo.m_chartItem->applyCif();
+    if (d->m_layoutInfo.m_chartItem)
+        d->m_layoutInfo.m_chartItem->applyCif();
 
     // The calls order below DOES matter
     addInstanceItems(); // which are not highlightable now to avoid flickering
@@ -823,10 +824,8 @@ QVector<QGraphicsObject *> ChartViewModel::instanceEventItems(MscInstance *insta
 InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)
 {
     if (currentChart()) {
-        if (!orphanInstance) {
-            orphanInstance = new MscInstance(tr("Instance_%1").arg(currentChart()->instances().size()));
-            currentChart()->addInstance(orphanInstance);
-        }
+        if (!orphanInstance)
+            orphanInstance = currentChart()->makeInstance();
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, currentChart(), pos);
         const qreal axisHeight = d->calcInstanceAxisHeight();
