@@ -353,6 +353,7 @@ void tst_MscFile::testTimer()
                          stoptimer T2; \
                          timeout T3; \
                          starttimer T1, 1; \
+                         starttimer timer; \
                        ENDINSTANCE; \
                    ENDMSC;";
 
@@ -361,7 +362,7 @@ void tst_MscFile::testTimer()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 4);
+    QCOMPARE(chart->instanceEvents().size(), 5);
 
     auto event = chart->instanceEvents().at(0);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
@@ -381,6 +382,7 @@ void tst_MscFile::testTimer()
     QCOMPARE(timer->name(), QString("T3"));
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Timeout);
 
+    // check for timer instance name
     event = chart->instanceEvents().at(3);
     QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
     timer = static_cast<MscTimer *>(event);
@@ -388,6 +390,12 @@ void tst_MscFile::testTimer()
     QCOMPARE(timer->timerType(), MscTimer::TimerType::Start);
     QCOMPARE(timer->timerInstanceName(), QString("1"));
     QCOMPARE(timer->fullName(), QString("T1,1"));
+
+    // check if a timer can have the name "timer"
+    event = chart->instanceEvents().at(4);
+    QVERIFY(event->entityType() == MscEntity::EntityType::Timer);
+    timer = static_cast<MscTimer *>(event);
+    QCOMPARE(timer->name(), QString("timer"));
 }
 
 void tst_MscFile::testTimerRelation()
