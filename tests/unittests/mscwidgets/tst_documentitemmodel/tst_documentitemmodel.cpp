@@ -39,7 +39,6 @@ private Q_SLOTS:
     void testRowCount();
     void testIndex();
     void testParent();
-    void testIndexForModel();
 
 private:
     DocumentItemModel *m_document = nullptr;
@@ -87,7 +86,7 @@ void tst_DocumentItemModel::testMscRowCount()
     m_model->clear();
     QCOMPARE(m_document->rowCount(QModelIndex()), 0);
     m_model->addChart(new MscChart(m_model));
-    QCOMPARE(m_document->rowCount(QModelIndex()), 1);
+    QCOMPARE(m_document->rowCount(QModelIndex()), 0);
 }
 
 void tst_DocumentItemModel::testRowCount()
@@ -98,7 +97,7 @@ void tst_DocumentItemModel::testRowCount()
     QCOMPARE(m_document->rowCount(idx1), 1);
 
     QModelIndex idx2 = m_document->index(0, 0, idx1);
-    QCOMPARE(m_document->rowCount(idx2), 2);
+    QCOMPARE(m_document->rowCount(idx2), 0);
 }
 
 void tst_DocumentItemModel::testIndex()
@@ -113,12 +112,10 @@ void tst_DocumentItemModel::testIndex()
 
     // check the charts
     QModelIndex idx21 = m_document->index(0, 0, idx2);
-    auto chart21 = static_cast<MscChart *>(idx21.internalPointer());
-    QCOMPARE(chart21->name(), QString("Level 2 - Chart 1"));
+    QCOMPARE(idx21.isValid(), false);
 
     QModelIndex idx22 = m_document->index(1, 0, idx2);
-    auto chart22 = static_cast<MscChart *>(idx22.internalPointer());
-    QCOMPARE(chart22->name(), QString("Level 2 - Chart 2"));
+    QCOMPARE(idx22.isValid(), false);
 }
 
 void tst_DocumentItemModel::testParent()
@@ -135,32 +132,10 @@ void tst_DocumentItemModel::testParent()
 
     // check the charts
     QModelIndex idx21 = m_document->index(0, 0, idx2);
-    QModelIndex parent21 = m_document->parent(idx21);
-    QCOMPARE(parent21.internalPointer(), idx2.internalPointer());
+    QCOMPARE(idx21.isValid(), false);
 
     QModelIndex idx22 = m_document->index(1, 0, idx2);
-    QModelIndex parent22 = m_document->parent(idx22);
-    QCOMPARE(parent22.internalPointer(), idx2.internalPointer());
-}
-
-void tst_DocumentItemModel::testIndexForModel()
-{
-    QModelIndex idx1 = m_document->index(0, 0, QModelIndex());
-    QModelIndex idx2 = m_document->index(0, 0, idx1);
-    QModelIndex idx21 = m_document->index(0, 0, idx2);
-
-    MscChart *chart1 = m_document->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
-    QModelIndex chart1Index = m_document->index(chart1);
-    QCOMPARE(chart1Index, idx21);
-
-    QModelIndex idx22 = m_document->index(1, 0, idx2);
-    MscChart *chart2 = m_document->mscModel()->documents().at(0)->documents().at(0)->charts().at(1);
-    QModelIndex chart2Index = m_document->index(chart2);
-    QCOMPARE(chart2Index, idx22);
-
-    MscChart *chart = nullptr;
-    QModelIndex index = m_document->index(chart);
-    QCOMPARE(index.isValid(), false);
+    QCOMPARE(idx22.isValid(), false);
 }
 
 QTEST_APPLESS_MAIN(tst_DocumentItemModel)

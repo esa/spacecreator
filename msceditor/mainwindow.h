@@ -66,6 +66,7 @@ Q_SIGNALS:
     void selectionChanged(const msc::MscDocument *document);
 
 private Q_SLOTS:
+    void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     bool openFileMsc(const QString &file);
     bool openFileAsn(const QString &file);

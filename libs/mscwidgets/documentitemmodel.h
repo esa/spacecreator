@@ -34,7 +34,6 @@ public:
     void setMscModel(MscModel *mscModel);
     MscModel *mscModel() const;
 
-    QModelIndex index(MscChart *chart) const;
     QModelIndex index(MscDocument *document) const;
 
     void updateHierarchyType(const QModelIndex &index, const QVariant &hierarchyType);

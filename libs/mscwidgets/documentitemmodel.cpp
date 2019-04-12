@@ -80,22 +80,6 @@ MscModel *DocumentItemModel::mscModel() const
     return m_mscModel.data();
 }
 
-/*!
-   \brief DocumentItemModel::index returns the ModelIndex of the given chart
- */
-QModelIndex DocumentItemModel::index(MscChart *chart) const
-{
-    if (!chart || m_mscModel.isNull()) {
-        return QModelIndex();
-    }
-
-    if (chart->parentDocument()) {
-        return createIndex(chart->parentDocument()->charts().indexOf(chart), 0, chart);
-    } else {
-        return createIndex(m_mscModel->charts().indexOf(chart), 0, chart);
-    }
-}
-
 QModelIndex DocumentItemModel::index(MscDocument *document) const
 {
     if (!document || m_mscModel.isNull()) {
@@ -139,19 +123,11 @@ QModelIndex DocumentItemModel::index(int row, int column, const QModelIndex &par
     MscDocument *parentItem = nullptr;
 
     if (!parent.isValid()) {
-        if (m_mscModel->documents().isEmpty()) {
-            if (row >= m_mscModel->charts().size()) {
-                qWarning() << Q_FUNC_INFO << "row index exceeds charts list";
-                return QModelIndex();
-            }
-            return createIndex(row, column, m_mscModel->charts().at(row));
-        } else {
-            if (row >= m_mscModel->documents().size()) {
-                qWarning() << Q_FUNC_INFO << "row index exceeds documents list";
-                return QModelIndex();
-            }
-            return createIndex(row, column, m_mscModel->documents().at(row));
+        if (row >= m_mscModel->documents().size()) {
+            qWarning() << Q_FUNC_INFO << "row index exceeds documents list";
+            return QModelIndex();
         }
+        return createIndex(row, column, m_mscModel->documents().at(row));
     } else {
         parentItem = static_cast<MscDocument *>(parent.internalPointer());
     }
@@ -160,19 +136,12 @@ QModelIndex DocumentItemModel::index(int row, int column, const QModelIndex &par
         return QModelIndex();
     }
 
-    if (parentItem->documents().isEmpty()) {
-        if (row >= parentItem->charts().size()) {
-            qWarning() << Q_FUNC_INFO << "row index exceeds charts list";
-            return QModelIndex();
-        }
-        return createIndex(row, column, parentItem->charts().at(row));
-    } else {
-        if (row >= parentItem->documents().size()) {
-            qWarning() << Q_FUNC_INFO << "row index exceeds documents list";
-            return QModelIndex();
-        }
-        return createIndex(row, column, parentItem->documents().at(row));
+    if (row >= parentItem->documents().size()) {
+        qWarning() << Q_FUNC_INFO << "row index exceeds documents list";
+        return QModelIndex();
     }
+
+    return createIndex(row, column, parentItem->documents().at(row));
 }
 
 QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
@@ -189,31 +158,20 @@ QModelIndex DocumentItemModel::parent(const QModelIndex &child) const
     }
 
     auto documentItem = dynamic_cast<MscDocument *>(parentItem);
-    auto mscItem = dynamic_cast<MscChart *>(parentItem);
 
-    if (!documentItem && !mscItem) {
+    if (!documentItem) {
         return QModelIndex();
     }
 
     auto grandParentItem = dynamic_cast<MscDocument *>(parentItem->parent());
     auto model = dynamic_cast<MscModel *>(parentItem->parent());
 
-    if (grandParentItem) {
-        if (documentItem) {
-            return createIndex(grandParentItem->documents().indexOf(documentItem), 0, parentItem);
-        }
-        if (mscItem) {
-            return createIndex(grandParentItem->charts().indexOf(mscItem), 0, parentItem);
-        }
+    if (grandParentItem && documentItem) {
+        return createIndex(grandParentItem->documents().indexOf(documentItem), 0, parentItem);
     }
 
-    if (model) {
-        if (documentItem) {
-            return createIndex(model->documents().indexOf(documentItem), 0, parentItem);
-        }
-        if (mscItem) {
-            return createIndex(model->charts().indexOf(mscItem), 0, mscItem);
-        }
+    if (model && documentItem) {
+        return createIndex(model->documents().indexOf(documentItem), 0, parentItem);
     }
 
     return QModelIndex();
@@ -230,11 +188,7 @@ int DocumentItemModel::rowCount(const QModelIndex &parent) const
     }
 
     if (!parent.isValid()) {
-        if (m_mscModel->documents().isEmpty()) {
-            return m_mscModel->charts().size();
-        } else {
-            return m_mscModel->documents().size();
-        }
+        return m_mscModel->documents().size();
     }
 
     auto obj = static_cast<QObject *>(parent.internalPointer());
@@ -243,11 +197,7 @@ int DocumentItemModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    if (documentItem->documents().isEmpty()) {
-        return documentItem->charts().size();
-    } else {
-        return documentItem->documents().size();
-    }
+    return documentItem->documents().size();
 }
 
 int DocumentItemModel::columnCount(const QModelIndex &parent) const
@@ -300,13 +250,8 @@ QVariant DocumentItemModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
-        auto document = dynamic_cast<MscDocument *>(entity);
-        if (document) {
+        if (auto document = dynamic_cast<MscDocument *>(entity)) {
             return QVariant(document->name());
-        }
-        auto chart = dynamic_cast<MscChart *>(entity);
-        if (chart) {
-            return QVariant(chart->name());
         }
     }
 
@@ -329,34 +274,18 @@ bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value,
         return false;
     }
 
-    QVariant item;
-    auto document = static_cast<MscDocument *>(index.internalPointer());
-    if (document) {
+    if (auto document = static_cast<MscDocument *>(index.internalPointer())) {
+        QVariant item;
         item = QVariant::fromValue(document);
-    } else {
-        auto chart = static_cast<MscChart *>(index.internalPointer());
-        if (!chart) {
-            return false;
-        }
 
-        item = QVariant::fromValue(chart);
+        cmd::CommandsStack::push(cmd::RenameEntity, { item, value });
     }
-
-    cmd::CommandsStack::push(cmd::RenameEntity, { item, value });
 
     return true;
 }
 
 void DocumentItemModel::onEntityDataChanged()
 {
-    auto chart = qobject_cast<msc::MscChart *>(sender());
-    if (chart) {
-        QModelIndex idx = index(chart);
-        if (idx.isValid()) {
-            Q_EMIT dataChanged(idx, idx);
-        }
-    }
-
     auto doc = qobject_cast<msc::MscDocument *>(sender());
     if (doc) {
         QModelIndex idx = index(doc);
@@ -396,11 +325,6 @@ void DocumentItemModel::connectDocument(MscDocument *document)
     for (auto doc : document->documents()) {
         connectDocument(doc);
     }
-
-    for (auto chart : document->charts()) {
-        connect(chart, &msc::MscChart::nameChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
-                Qt::UniqueConnection);
-    }
 }
 
 void DocumentItemModel::disconnectDocument(MscDocument *document)
@@ -409,10 +333,6 @@ void DocumentItemModel::disconnectDocument(MscDocument *document)
 
     for (auto doc : document->documents()) {
         disconnectDocument(doc);
-    }
-
-    for (auto chart : document->charts()) {
-        disconnect(chart, nullptr, this, nullptr);
     }
 }
 

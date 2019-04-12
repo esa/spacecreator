@@ -175,6 +175,7 @@ MainWindow::MainWindow(QWidget *parent)
     d->m_mscToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
     d->m_hierarchyToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
     d->ui->documentTreeView->expandAll();
+    d->ui->documentTreeView->setEditTriggers(QAbstractItemView::SelectedClicked);
 }
 
 MainWindow::~MainWindow()
@@ -473,9 +474,6 @@ void MainWindow::selectCurrentChart()
     msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
 
     if (chart != nullptr) {
-        const QModelIndex idx = d->m_model->documentItemModel()->index(chart);
-        d->ui->documentTreeView->selectionModel()->select(idx, QItemSelectionModel::SelectCurrent);
-
         if (QUndoStack *currentStack = currentUndoStack()) {
             if (!d->m_undoGroup->stacks().contains(currentStack))
                 d->m_undoGroup->addStack(currentStack);
@@ -501,6 +499,25 @@ void MainWindow::openAsn1Editor()
     if (result == QDialog::Accepted) {
         d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
         d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+    }
+}
+
+void MainWindow::showChart(const QModelIndex &index)
+{
+    if (!index.isValid()) {
+        return;
+    }
+
+    auto *obj = static_cast<QObject *>(index.internalPointer());
+    if (obj == nullptr) {
+        return;
+    }
+
+    if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
+        if (!document->charts().empty()) {
+            d->m_model->chartViewModel().fillView(document->charts()[0]);
+            showDocumentView(true);
+        }
     }
 }
 
@@ -891,6 +908,7 @@ void MainWindow::initConnections()
 {
     connect(d->ui->documentTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &MainWindow::showSelection);
+    connect(d->ui->documentTreeView, &QTreeView::doubleClicked, this, &MainWindow::showChart);
 
     connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChanged, this,
             &MainWindow::selectCurrentChart);

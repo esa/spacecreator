@@ -55,7 +55,7 @@ void ChartItem::onNameEdited(const QString &text)
     if (!m_entity)
         return;
 
-    cmd::CommandsStack::push(cmd::RenameEntity, { QVariant::fromValue(m_entity), text });
+    cmd::CommandsStack::push(cmd::RenameEntity, { QVariant::fromValue(m_entity.data()), text });
 }
 
 ChartItem::~ChartItem() {}
@@ -100,7 +100,7 @@ void ChartItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoint
 
 bool sceneToCif(const QRectF sceneRect, QRect &cifRect)
 {
-    const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
+    const QVector<QPointF> scenePoints{ sceneRect.topLeft(), sceneRect.bottomRight() };
     bool converted(false);
     const QVector<QPoint> cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
     if (converted)
@@ -110,7 +110,7 @@ bool sceneToCif(const QRectF sceneRect, QRect &cifRect)
 
 bool cifToScene(const QRect &cifRect, QRectF &sceneRect)
 {
-    const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
+    const QVector<QPoint> cifPoints{ cifRect.topLeft(), cifRect.bottomRight() };
     bool converted(false);
     const QVector<QPointF> scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
     if (converted)
@@ -174,9 +174,9 @@ void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPoi
 void ChartItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(GripPoint::Locations { GripPoint::Left, GripPoint::Top, GripPoint::Right,
-                                                       GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
-                                                       GripPoint::TopRight, GripPoint::BottomRight });
+    m_gripPoints->setUsedPoints(GripPoint::Locations{ GripPoint::Left, GripPoint::Top, GripPoint::Right,
+                                                      GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
+                                                      GripPoint::TopRight, GripPoint::BottomRight });
 }
 
 void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

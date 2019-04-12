@@ -17,6 +17,8 @@
 
 #include "cmdentitynamechange.h"
 
+#include "mscchart.h"
+#include "mscdocument.h"
 #include "mscentity.h"
 
 namespace msc {
@@ -33,6 +35,7 @@ void CmdEntityNameChange::redo()
 {
     if (m_modelItem) {
         m_modelItem->setName(m_newName);
+        setChartDocumentName(m_newName);
     }
 }
 
@@ -40,6 +43,7 @@ void CmdEntityNameChange::undo()
 {
     if (m_modelItem) {
         m_modelItem->setName(m_oldName);
+        setChartDocumentName(m_oldName);
     }
 }
 
@@ -57,6 +61,19 @@ bool CmdEntityNameChange::mergeWith(const QUndoCommand *command)
 int CmdEntityNameChange::id() const
 {
     return msc::cmd::Id::RenameEntity;
+}
+
+void CmdEntityNameChange::setChartDocumentName(const QString &name)
+{
+    if (auto document = dynamic_cast<MscDocument *>(m_modelItem.data())) {
+        if (!document->charts().empty()) {
+            document->charts()[0]->setName(name);
+        }
+    } else if (auto chart = dynamic_cast<MscChart *>(m_modelItem.data())) {
+        if (chart->parentDocument()) {
+            chart->parentDocument()->setName(name);
+        }
+    }
 }
 
 } // namespace cmd

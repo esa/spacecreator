@@ -36,6 +36,9 @@ public:
     int id() const override;
 
 private:
+    void setChartDocumentName(const QString &name);
+
+private:
     QString m_oldName;
     QString m_newName;
 };
