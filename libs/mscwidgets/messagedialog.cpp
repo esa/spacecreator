@@ -18,10 +18,13 @@
 #include "messagedialog.h"
 
 #include "asn1editor.h"
+#include "asn1valueparser.h"
 #include "commands/common/commandsstack.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "mscdocument.h"
+#include "mscfile.h"
+#include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
@@ -32,8 +35,16 @@
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QRegExpValidator>
+#include <QStyledItemDelegate>
 #include <QUndoStack>
 
+/*!
+   \brief MessageDialog::MessageDialog
+
+   The name is checked using a validator.
+   But the parameters a only checked after editing using the msc parser, as the parameters can be
+   quite complex. See paramaterDefn in the msc.g4 grammar file.
+ */
 MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDialog)
@@ -52,9 +63,9 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     connect(ui->removeParameterButton, &QPushButton::clicked, this, &MessageDialog::removeParameter);
     connect(ui->parameterTable->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &MessageDialog::checkRemoveButton);
-
     connect(ui->parameterTable, QOverload<QTableWidgetItem *>::of(&QTableWidget::itemDoubleClicked), this,
             &MessageDialog::editItem);
+    connect(ui->parameterTable, &QTableWidget::cellChanged, this, &MessageDialog::checkTextValidity);
 
     connect(ui->declarationsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [&]() { ui->declarationButton->setEnabled(ui->declarationsComboBox->currentIndex() > 0); });
@@ -66,6 +77,8 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
 
     fillParameters();
     setParameterEditState();
+
+    checkTextValidity();
 }
 
 MessageDialog::~MessageDialog()
@@ -145,6 +158,7 @@ void MessageDialog::selectDeclarationFromName()
 
     checkRemoveButton();
     setParameterEditState();
+    checkTextValidity();
 }
 
 void MessageDialog::editDeclarations()
@@ -247,6 +261,68 @@ void MessageDialog::setItemFlags(QTableWidgetItem *item)
     if (m_selectedDeclaration)
         itemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     item->setFlags(itemFlags);
+}
+
+void MessageDialog::checkTextValidity()
+{
+    msc::MscMessage msg;
+    msg.setTargetInstance(m_message->targetInstance());
+    msg.setSourceInstance(m_message->sourceInstance());
+
+    msg.setName(ui->nameLineEdit->text());
+
+    msc::MscParameterList parameters;
+    for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
+        const QString &text = ui->parameterTable->item(i, 0)->text();
+        if (!text.isEmpty()) {
+            parameters << msc::MscParameter(text);
+        } else {
+            qWarning() << "An empty parameter is not allowed";
+        }
+    }
+    msg.setParameters(parameters);
+
+    msc::MscInstance *instance =
+            m_message->sourceInstance() ? m_message->sourceInstance() : m_message->targetInstance();
+    if (!instance)
+        return;
+
+    msc::MscWriter writer;
+    QString text = writer.serialize(&msg, instance);
+    text.remove("\n");
+
+    try {
+        msc::MscFile file;
+        const QString mscText = QString("msc chart; instance %1; %2 endinstance; endmsc;").arg(instance->name(), text);
+        QScopedPointer<msc::MscModel> model(file.parseText(mscText));
+        m_isValid = true;
+    } catch (...) {
+        m_isValid = false;
+    }
+
+    if (m_selectedDeclaration) {
+        asn1::Asn1ValueParser parser;
+        const QVariantList &asn1Types = mscModel()->asn1TypesData();
+        for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
+            const QString &value = ui->parameterTable->item(i, 0)->text();
+            const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
+            auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
+                                     [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
+            if (find != asn1Types.end()) {
+                bool ok;
+                parser.parseAsn1Value((*find).toMap(), value, &ok);
+                m_isValid = m_isValid && ok;
+            } else
+                m_isValid = false;
+        }
+    }
+
+    if (m_isValid)
+        ui->previewLabel->setText("");
+    else
+        ui->previewLabel->setText(tr("<font color='red'>Invalid message:<br>%1</font>").arg(text));
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_isValid);
 }
 
 void MessageDialog::fillMessageDeclartionBox()

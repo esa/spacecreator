@@ -27,7 +27,7 @@ class Asn1ValueParser : public QObject
 public:
     Asn1ValueParser(QObject *parent = nullptr);
 
-    QVariantMap parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const;
+    QVariantMap parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value, bool *valueOk = nullptr) const;
 
 Q_SIGNALS:
     void parseError(const QString &error) const;

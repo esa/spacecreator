@@ -28,7 +28,7 @@ Asn1ValueParser::Asn1ValueParser(QObject *parent)
 {
 }
 
-QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value) const
+QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value, bool *valueOk) const
 {
     QVariantMap valueMap;
     bool ok = true;
@@ -100,6 +100,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
         Q_EMIT parseError(QString(tr("Incorrect value for %1")).arg(asn1Type["name"].toString()));
     }
 
+    if (valueOk != nullptr)
+        *valueOk = ok;
     return valueMap;
 }
 

@@ -57,6 +57,7 @@ protected:
 private Q_SLOTS:
     void editItem(QTableWidgetItem *item);
     void setItemFlags(QTableWidgetItem *item);
+    void checkTextValidity();
 
 private:
     void fillMessageDeclartionBox();
@@ -68,4 +69,5 @@ private:
     Ui::MessageDialog *ui;
     QPointer<msc::MscMessage> m_message;
     QPointer<msc::MscMessageDeclaration> m_selectedDeclaration;
+    bool m_isValid = true;
 };
