@@ -131,7 +131,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
             events += serialize(static_cast<MscTimer *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Coregion:
-            events += serialize(static_cast<MscCoregion *>(instanceEvent), tabsSize);
+            events += serialize(static_cast<MscCoregion *>(instanceEvent), instance, tabsSize);
             break;
         case MscEntity::EntityType::Action:
             events += serialize(static_cast<MscAction *>(instanceEvent), instance, tabsSize);
@@ -285,8 +285,11 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
     }
 }
 
-QString MscWriter::serialize(const MscCoregion *region, int tabsSize)
+QString MscWriter::serialize(const MscCoregion *region, const MscInstance *instance, int tabsSize)
 {
+    if (region == nullptr || region->instance() == nullptr || region->instance() != instance)
+        return {};
+
     const char *type = region->type() == MscCoregion::Type::Begin ? "concurrent" : "endconcurrent";
     const QString regionSerialized(QString("%1%2;\n").arg(tabs(tabsSize), type));
     return serializeCif(region, regionSerialized, tabsSize);

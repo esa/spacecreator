@@ -1065,13 +1065,16 @@ CoregionItem *ChartViewModel::addCoregionItem(MscCoregion *coregion)
 
     if (!item) {
         item = new CoregionItem(this);
-        storeEntityItem(item);
+        d->m_instanceEventItems.insert(coregion->internalId(), item);
+        d->m_instanceEventItemSorted.append(item);
+        d->m_scene.addItem(item);
     }
     if (coregion->type() == MscCoregion::Type::Begin) {
         item->setBegin(coregion);
         item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
     } else {
         item->setEnd(coregion);
+        item->instantLayoutUpdate();
     }
 
     return item;

@@ -54,7 +54,7 @@ public:
     QString serialize(const MscCreate *create, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscTimer *timer, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscAction *action, const MscInstance *instance, int tabsSize = 0);
-    QString serialize(const MscCoregion *region, int tabsSize = 0);
+    QString serialize(const MscCoregion *region, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscMessageDeclarationList *declarationList, int tabsSize = 0);
     QString serialize(const MscMessageDeclaration *declaration, int tabsSize = 0);
     QString serialize(const MscChart *chart, int tabsSize = 0);

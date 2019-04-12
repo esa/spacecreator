@@ -169,13 +169,17 @@ void tst_MscWriter::testSerializeMscTimer()
 
 void tst_MscWriter::testSerializeMscCoregion()
 {
+    MscInstance instance("Inst_1");
+
     MscCoregion region1(MscCoregion::Type::Begin);
-    QCOMPARE(this->serialize(&region1), QString("concurrent;\n"));
-    QCOMPARE(this->serialize(&region1, 1), tab1("concurrent;\n"));
-    QCOMPARE(this->serialize(&region1, 2), tab2("concurrent;\n"));
+    region1.setInstance(&instance);
+    QCOMPARE(this->serialize(&region1, &instance), QString("concurrent;\n"));
+    QCOMPARE(this->serialize(&region1, &instance, 1), tab1("concurrent;\n"));
+    QCOMPARE(this->serialize(&region1, &instance, 2), tab2("concurrent;\n"));
 
     MscCoregion region2(MscCoregion::Type::End);
-    QCOMPARE(this->serialize(&region2), QString("endconcurrent;\n"));
+    region2.setInstance(&instance);
+    QCOMPARE(this->serialize(&region2, &instance), QString("endconcurrent;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstance()

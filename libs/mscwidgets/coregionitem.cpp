@@ -63,6 +63,9 @@ void CoregionItem::rebuildLayout()
     static const qreal kCoregionWidth = 50;
     static const qreal kOffset = 20;
 
+    if (m_instance)
+        m_instance->stackBefore(this);
+
     prepareGeometryChange();
     m_boundingRect = QRectF();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
@@ -72,7 +75,7 @@ void CoregionItem::rebuildLayout()
     }
 
     QRectF rect;
-    const QVector<MscInstanceEvent *> &events = m_model->currentChart()->instanceEvents();
+    const QVector<MscInstanceEvent *> &events = m_model->currentChart()->eventsForInstance(m_instance->modelItem());
     auto it = std::next(std::find(events.constBegin(), events.constEnd(), m_begin));
     while (it != events.end()) {
         Q_ASSERT(*it);
@@ -130,7 +133,6 @@ void CoregionItem::setInstance(InstanceItem *instance)
         disconnect(m_instance, nullptr, this, nullptr);
 
     m_instance = instance;
-    instance->stackBefore(this);
 
     if (m_instance) {
         connect(m_instance, &InteractiveObject::relocated, this, &CoregionItem::scheduleLayoutUpdate,

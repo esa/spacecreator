@@ -21,6 +21,7 @@
 #include "cif/ciflines.h"
 #include "mscaction.h"
 #include "msccondition.h"
+#include "msccoregion.h"
 #include "mscdocument.h"
 #include "mscgate.h"
 #include "mscinstance.h"
@@ -175,6 +176,12 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
             case MscEntity::EntityType::Timer: {
                 auto timer = static_cast<MscTimer *>(instanceEvent);
                 if (timer->instance() == instance)
+                    events.append(instanceEvent);
+                break;
+            }
+            case MscEntity::EntityType::Coregion: {
+                auto coregion = static_cast<MscCoregion *>(instanceEvent);
+                if (coregion->relatesTo(instance))
                     events.append(instanceEvent);
                 break;
             }
