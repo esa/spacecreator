@@ -710,13 +710,6 @@ void tst_MscFile::testDocumentsType_data()
                   ENDMSCDOCUMENT; \
               ENDMSCDOCUMENT;";
     QTest::newRow("Repeat type docs have only one child doc") << msc;
-    msc = "MSCDOCUMENT root_doc /* MSC PARALLEL */; \
-                    MSCDOCUMENT doc1; \
-                    ENDMSCDOCUMENT; \
-                    MSCDOCUMENT doc1; \
-                    ENDMSCDOCUMENT; \
-                ENDMSCDOCUMENT;";
-    QTest::newRow("Parallel type docs have only one child doc") << msc;
     msc = "MSCDOCUMENT root_doc /* MSC EXCEPTION */; \
                     MSCDOCUMENT doc1; \
                     ENDMSCDOCUMENT; \
@@ -736,7 +729,6 @@ void tst_MscFile::testDocumentsType_data()
 void tst_MscFile::testDocumentsType()
 {
     QFETCH(QString, mscContent);
-
     QVERIFY_EXCEPTION_THROWN(file->parseText(mscContent), ParserException);
 }
 

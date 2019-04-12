@@ -193,7 +193,7 @@ void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
  */
 bool MscDocument::isSingleChildDocument() const
 {
-    return m_hierarchyType == HierarchyIs || m_hierarchyType == HierarchyParallel || m_hierarchyType == HierarchyRepeat
+    return m_hierarchyType == HierarchyIs || m_hierarchyType == HierarchyRepeat
             || m_hierarchyType == HierarchyException;
 }
 
