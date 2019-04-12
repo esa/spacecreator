@@ -587,11 +587,12 @@ QVector<QPointF> MessageItem::messagePoints() const
     return scenePoints;
 }
 
-cif::CifBlockShared MessageItem::cifMessage() const
+cif::CifBlockShared MessageItem::mainCifBlock() const
 {
-    return cifBlockByType(cif::CifLine::CifType::Message);
+    return cifBlockByType(mainCifType());
 }
-cif::CifBlockShared MessageItem::cifPosition() const
+
+cif::CifBlockShared MessageItem::positionCifBlock() const
 {
     return cifBlockByType(cif::CifLine::CifType::Position);
 }
@@ -637,8 +638,8 @@ void MessageItem::applyCif()
 {
     QSignalBlocker sb(this);
     GeometryNotificationBlocker geometryNotificationBlocker(this);
-    if (const cif::CifBlockShared &cifBlock = cifMessage()) {
-        const QVector<QPoint> &pointsCif = cifBlock->payload(cif::CifLine::CifType::Message).value<QVector<QPoint>>();
+    if (const cif::CifBlockShared &cifBlock = mainCifBlock()) {
+        const QVector<QPoint> &pointsCif = cifBlock->payload(mainCifType()).value<QVector<QPoint>>();
         bool converted(false);
         const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
         if (converted)
@@ -677,26 +678,28 @@ void MessageItem::updateMessagePoints()
 
 cif::CifLine::CifType MessageItem::mainCifType() const
 {
-    return cif::CifLine::CifType::Message;
+    return isCreator() ? cif::CifLine::CifType::Create : cif::CifLine::CifType::Message;
 }
 
 void MessageItem::updateCif()
 {
     using namespace cif;
 
+    const cif::CifLine::CifType usedCifType = mainCifType();
     const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());
     if (!geometryManagedByCif()) {
-        const CifBlockShared &emptyCif = CifBlockFactory::createBlockMessage();
+        const CifBlockShared &emptyCif =
+                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
         m_message->addCif(emptyCif);
     }
 
-    const CifBlockShared &msgCif = cifMessage();
-    if (!msgCif->hasPayloadFor(CifLine::CifType::Message))
-        msgCif->addLine(CifLineShared(new CifLineMessage()));
+    const CifBlockShared &msgCif = mainCifBlock();
+    if (!msgCif->hasPayloadFor(usedCifType))
+        msgCif->addLine(isCreator() ? CifLineShared(new CifLineCreate()) : CifLineShared(new CifLineMessage()));
 
-    const QVector<QPoint> &pointsCifStored = msgCif->payload(CifLine::CifType::Message).value<QVector<QPoint>>();
+    const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
     if (pointsCifStored != pointsCif)
-        msgCif->setPayload(QVariant::fromValue(pointsCif), CifLine::CifType::Message);
+        msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
 }
 
 void MessageItem::moveSilentlyBy(const QPointF &shift)

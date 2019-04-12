@@ -146,8 +146,8 @@ private:
 
     void updateMessagePoints();
 
-    cif::CifBlockShared cifMessage() const;
-    cif::CifBlockShared cifPosition() const;
+    cif::CifBlockShared mainCifBlock() const;
+    cif::CifBlockShared positionCifBlock() const;
 
     void extendGlobalMessage();
     bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);

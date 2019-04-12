@@ -476,15 +476,17 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
                     if (!createdInstanceItem->geometryManagedByCif())
                         createdInstanceItem->moveBy(0., deltaY);
 
-                    // move arrow head to the created instance, shift other points accordingly:
-                    QVector<QPointF> messagePoints = messageItem->messagePoints();
-                    const QPointF newStart = { messagePoints.first().x(), messagePoints.first().y() + deltaY };
-                    const QPointF delta = newStart - messagePoints.first();
-                    for (int i = 0; i < messagePoints.size() - 1; ++i)
-                        messagePoints[i] += delta;
-                    messageItem->setMessagePoints(
-                            messagePoints,
-                            MessageItem::CifUpdatePolicy::DontChange); // changes its pos to the source point
+                    if (!messageItem->geometryManagedByCif()) {
+                        // move arrow head to the created instance, shift other points accordingly:
+                        QVector<QPointF> messagePoints = messageItem->messagePoints();
+                        const QPointF newStart = { messagePoints.first().x(), messagePoints.first().y() + deltaY };
+                        const QPointF delta = newStart - messagePoints.first();
+                        for (int i = 0; i < messagePoints.size() - 1; ++i)
+                            messagePoints[i] += delta;
+                        messageItem->setMessagePoints(
+                                messagePoints,
+                                MessageItem::CifUpdatePolicy::DontChange); // changes its pos to the source point
+                    }
                 }
                 messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
             }

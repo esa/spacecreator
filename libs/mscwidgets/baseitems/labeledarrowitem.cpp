@@ -144,17 +144,30 @@ QPainterPath LabeledArrowItem::shape() const
 
 QRectF LabeledArrowItem::boundingRect() const
 {
-    const QPointF &tail = endSignPos();
-    const QPointF &head = startSignPos();
+    const QVector<QPointF> &trajectory = arrow()->turnPoints();
+    if (trajectory.isEmpty())
+        return m_itemText->boundingRect().translated(m_itemText->pos());
 
-    if (qFuzzyCompare(tail.y(), head.y()) && arrow()->turnPoints().size() == 2) {
+    const QPointF &tail = trajectory.first();
+    const QPointF &head = trajectory.last();
+
+    if (qFuzzyCompare(tail.y(), head.y()) && trajectory.size() == 2) {
         // this takes into account dimensions of the triangle sign
         return childrenBoundingRect();
     }
 
-    // construct a rect where one couple of corners is the tail and head points:
-    const QPointF topLeft { qMin(tail.x(), head.x()), qMin(tail.y(), head.y()) };
-    const QPointF bottomRight { qMax(tail.x(), head.x()), qMax(tail.y(), head.y()) };
+    // construct a rect where one couple of corners is the tail and head points
+    // (in the case when the arrow consits of just a pair of points)
+    // or includes all the points set (for more complex arrows).
+
+    QPointF topLeft(tail), bottomRight(head);
+    for (const QPointF &currentPoint : trajectory) {
+        topLeft.rx() = qMin(topLeft.x(), currentPoint.x());
+        topLeft.ry() = qMin(topLeft.y(), currentPoint.y());
+
+        bottomRight.rx() = qMax(bottomRight.x(), currentPoint.x());
+        bottomRight.ry() = qMax(bottomRight.y(), currentPoint.y());
+    }
 
     const QRectF arrowRect { topLeft, bottomRight };
     return m_itemText->boundingRect().translated(m_itemText->pos()).united(arrowRect);
