@@ -38,26 +38,26 @@ build_linux_gcc:
     paths:
       - ccache/
 
-build_linux_clang:
-  stage: build
-  tags:
-    - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
-  before_script:
-    # CCache Config
-    - mkdir -p ccache
-    - export CCACHE_BASEDIR=${PWD}
-    - export CCACHE_DIR=${PWD}/ccache 
-    - export CCACHE_COMPILERCHECK=content
-    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
-  script:
-    - mkdir -p build_clang
-    - cd build_clang
-    - qmake QMAKE_CC="ccache clang" QMAKE_CXX="ccache clang++" -recursive ..
-    - make -j 8
-  cache:
-    paths:
-      - ccache/
+#build_linux_clang:
+#  stage: build
+#  tags:
+#    - docker
+#  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
+#  before_script:
+#    # CCache Config
+#    - mkdir -p ccache
+#    - export CCACHE_BASEDIR=${PWD}
+#    - export CCACHE_DIR=${PWD}/ccache
+#    - export CCACHE_COMPILERCHECK=content
+#    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
+#  script:
+#    - mkdir -p build_clang
+#    - cd build_clang
+#    - qmake QMAKE_CC="ccache clang" QMAKE_CXX="ccache clang++" -recursive ..
+#    - make -j 8
+#  cache:
+#    paths:
+#      - ccache/
 
 build_debian9_gcc:
   stage: build
@@ -144,6 +144,8 @@ coverage_docker:
     paths:
       - build_coverage/coverage-html
     expire_in: 1 week
+  only:
+    - master
 
 ##################
 # CHECKS - static analyses
@@ -164,7 +166,7 @@ clang_analyze:
   image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
   script:
     - mkdir -p build_clang_analyze; cd build_clang_analyze
-    - qmake ..
+    - qmake CONFIG+=no_tests ..
     - /usr/share/clang/scan-build-7/bin/scan-build --status-bugs -o ../clang-analyze make -j8
   artifacts:
     paths:

@@ -8,8 +8,12 @@ SUBDIRS += \
     libs \
     msceditor \
     qtcreator \
-    tests
 
 msceditor.depends = libs
 qtcreator.depends = libs
-tests.depends = libs
+
+CONFIG(no_tests) {
+} else {
+    SUBDIRS += tests
+    tests.depends = libs
+}
