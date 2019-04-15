@@ -367,6 +367,9 @@ void ChartViewModel::addInstanceItems()
             item->setVisible(false);
         }
     }
+
+    Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItems.size());
+    Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItemsSorted.size());
 }
 
 void ChartViewModel::addInstanceEventItems()
@@ -424,6 +427,9 @@ void ChartViewModel::addInstanceEventItems()
             updateCommentForInteractiveObject(instanceEventItem);
         }
     }
+
+    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItems.size());
+    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItemSorted.size());
 }
 
 void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item)
@@ -959,7 +965,7 @@ MessageItem *ChartViewModel::addMessageItem(MscMessage *message)
 
         if (instance) {
             res = itemForInstance(instance);
-            if (res->modelItem()->explicitCreator()) {
+            if (res && res->modelItem()->explicitCreator()) {
                 ensureInstanceCreationAdded(message, res->modelItem());
                 instanceVertiacalOffset += res->axis().p1().y();
             }
@@ -980,7 +986,8 @@ ActionItem *ChartViewModel::addActionItem(MscAction *action)
     qreal instanceVertiacalOffset(0);
     if (action->instance()) {
         instance = itemForInstance(action->instance());
-        instanceVertiacalOffset = instance->axis().p1().y();
+        if (instance)
+            instanceVertiacalOffset = instance->axis().p1().y();
     }
 
     ActionItem *item = itemForAction(action);
@@ -1003,13 +1010,15 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
     }
 
     InstanceItem *instance = itemForInstance(condition->instance());
-    qreal verticalOffset = instance->axis().p1().y();
-    if (prevItem && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
-        verticalOffset += prevItem->boundingRect().height() + d->InterMessageSpan;
+    if (instance) {
+        qreal verticalOffset = instance->axis().p1().y();
+        if (prevItem
+            && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
+            verticalOffset += prevItem->boundingRect().height() + d->InterMessageSpan;
+        }
+        item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + verticalOffset, instancesRect);
+        item->instantLayoutUpdate();
     }
-
-    item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + verticalOffset, instancesRect);
-    item->instantLayoutUpdate();
 
     return item;
 }
@@ -1020,7 +1029,8 @@ TimerItem *ChartViewModel::addTimerItem(MscTimer *timer)
     qreal instanceVertiacalOffset(0);
     if (timer->instance()) {
         instance = itemForInstance(timer->instance());
-        instanceVertiacalOffset = instance->axis().p1().y();
+        if (instance)
+            instanceVertiacalOffset = instance->axis().p1().y();
     }
 
     TimerItem *item = itemForTimer(timer);
@@ -1039,7 +1049,8 @@ CoregionItem *ChartViewModel::addCoregionItem(MscCoregion *coregion)
     qreal instanceVertiacalOffset(0);
     if (coregion->instance()) {
         instance = itemForInstance(coregion->instance());
-        instanceVertiacalOffset = instance->axis().p1().y();
+        if (instance)
+            instanceVertiacalOffset = instance->axis().p1().y();
     }
 
     CoregionItem *item = nullptr;
