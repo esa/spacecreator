@@ -22,6 +22,7 @@
 #include "mscdocument.h"
 #include "mscmodel.h"
 
+#include <QDebug>
 #include <QGraphicsScene>
 #include <QPointer>
 
@@ -197,8 +198,14 @@ void HierarchyViewModel::updateModel()
             QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::documentClicked,
                              Qt::UniqueConnection);
 
-            QObject::connect(item->document(), &MscDocument::dataChanged, this, &HierarchyViewModel::updateModel,
+            QObject::connect(item->document(), &MscDocument::documentAdded, this, &HierarchyViewModel::updateModel,
                              Qt::UniqueConnection);
+            QObject::connect(item->document(), &MscDocument::documentRemoved, this, &HierarchyViewModel::updateModel,
+                             Qt::UniqueConnection);
+            QObject::connect(item->document(), &MscDocument::nameChanged, this, &HierarchyViewModel::updateModel,
+                             Qt::UniqueConnection);
+            QObject::connect(item->document(), &MscDocument::hierarchyTypeChanged, this,
+                             &HierarchyViewModel::updateModel, Qt::UniqueConnection);
 
             QObject::connect(item, &DocumentItem::moved, this, &HierarchyViewModel::documentMoved,
                              Qt::UniqueConnection);
