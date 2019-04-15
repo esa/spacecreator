@@ -49,6 +49,7 @@ public:
 
     const QVector<MscDocument *> &documents() const;
     bool addDocument(MscDocument *document, int index = -1);
+    bool addDocument(MscDocument *document, bool checkType, int index = -1);
     void removeDocument(MscDocument *document, bool clear = true);
 
     const QVector<MscChart *> &charts() const;

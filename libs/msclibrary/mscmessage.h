@@ -71,10 +71,13 @@ public:
     const MscParameterList &parameters() const;
     void setParameters(const MscParameterList &parameters);
 
+    bool isSame(const msc::MscMessage *message) const;
+
     MscMessage::MessageType messageType() const;
 
     bool relatesTo(const MscInstance *instance) const override;
 
+    // Begin of parsing helper block
     struct Flow {
         MscInstance *from = nullptr;
         MscInstance *to = nullptr;
@@ -87,11 +90,11 @@ public:
             size_t m_pos = 0;
         } m_sourceLineInfo;
     };
-
     Flow m_descrIn, m_descrOut;
-
     bool isGlobal() const;
     bool isOrphan() const;
+    bool isConnected() const;
+    // End of parsing helper block
 
 #ifdef QT_DEBUG
     QString toDbgString() const;

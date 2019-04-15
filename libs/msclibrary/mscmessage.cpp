@@ -118,6 +118,28 @@ void MscMessage::setParameters(const MscParameterList &parameters)
     Q_EMIT dataChanged();
 }
 
+/*!
+   Returns the the given message is defining the same.
+   As per spec the identification is done by name, message instance name, parameter, in- and out instance
+ */
+bool MscMessage::isSame(const MscMessage *message) const
+{
+    bool same =
+            (fullName() == message->fullName()) && (m_source == message->m_source) && (m_target == message->m_target);
+    if (!same)
+        return false;
+
+    if (m_parameters.size() != message->m_parameters.size())
+        return false;
+
+    for (int i = 0; i < m_parameters.size(); ++i) {
+        if (m_parameters[i] != message->m_parameters[i])
+            return false;
+    }
+
+    return true;
+}
+
 MscMessage::MessageType MscMessage::messageType() const
 {
     return m_msgType;
@@ -147,6 +169,14 @@ bool MscMessage::isGlobal() const
 bool MscMessage::isOrphan() const
 {
     return !(m_source || m_target);
+}
+
+/*!
+   Returns if the message is already used by an in and an out
+ */
+bool MscMessage::isConnected() const
+{
+    return m_descrIn.to != nullptr && m_descrOut.from != nullptr;
 }
 
 #ifdef QT_DEBUG

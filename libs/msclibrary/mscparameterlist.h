@@ -41,6 +41,7 @@ public:
     {
         return m_type == other.m_type && m_parameter == other.m_parameter;
     }
+    bool operator!=(const msc::MscParameter &other) const { return !(*this == other); }
 
     Type type() const;
     const QString &parameter() const;

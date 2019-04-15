@@ -147,14 +147,10 @@ void tst_MscFile::testEmptyDocument()
 
 void tst_MscFile::testComments()
 {
-    MscModel *model;
-    model = file->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;");
-    delete model;
-    model = file->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;");
-    delete model;
-    model = file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;");
+    QScopedPointer<MscModel> model(file->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
+    model.reset(file->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;"));
+    model.reset(file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;"));
     // no exception thrown
-    delete model;
 }
 
 void tst_MscFile::testEntityComments()
@@ -220,12 +216,19 @@ void tst_MscFile::testMscInDocument()
 
 void tst_MscFile::testInstance()
 {
-    MscModel *model = file->parseText("MSC msc1; INSTANCE inst1; ENDINSTANCE; ENDMSC;");
+    QScopedPointer<MscModel> model(file->parseText("MSC msc1; INSTANCE inst1; ENDINSTANCE; ENDMSC;"));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
     QCOMPARE(chart->instances().at(0)->name(), QString("inst1"));
-    delete model;
+
+    // test "instance : name" - which is not according to the spec
+    QString msc = "msc chart; \
+            instance : bla;\
+                IN status FROM  /* MSC AT [104] */ ;\
+        endinstance; endmsc;";
+    model.reset(file->parseText(msc));
+    // no exception
 }
 
 void tst_MscFile::testInstanceWithKind()
@@ -696,6 +699,7 @@ void tst_MscFile::testNonStandardInstance()
 
 void tst_MscFile::testDocumentsType_data()
 {
+    QSKIP("Types are not checked at startup - so old files can be loaded");
     QTest::addColumn<QString>("mscContent");
 
     QString msc = "MSCDOCUMENT root_doc /* MSC LEAF */; \

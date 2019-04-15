@@ -306,7 +306,7 @@ conditionNameList
     : name (COMMA conditionNameList)* // to support old spec names as well
     ;
 shared
-    : SHARED (sharedInstanceList | ALL)
+    : SHARED (sharedInstanceList | ALL)?
     ;
 sharedInstanceList
     : NAME (COMMA sharedInstanceList)?

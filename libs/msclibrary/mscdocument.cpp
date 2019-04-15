@@ -53,6 +53,11 @@ const QVector<MscDocument *> &MscDocument::documents() const
  */
 bool MscDocument::addDocument(MscDocument *document, int index)
 {
+    return addDocument(document, true, index);
+}
+
+bool MscDocument::addDocument(MscDocument *document, bool checkType, int index)
+{
     if (document == nullptr) {
         return false;
     }
@@ -60,12 +65,13 @@ bool MscDocument::addDocument(MscDocument *document, int index)
         return false;
     }
 
-    if (isSingleChildDocument() && m_documents.size() >= 1) {
-        return false;
-    }
-
-    if (m_hierarchyType == HierarchyLeaf) {
-        return false;
+    if (checkType) {
+        if (isSingleChildDocument() && m_documents.size() >= 1) {
+            return false;
+        }
+        if (m_hierarchyType == HierarchyLeaf) {
+            return false;
+        }
     }
 
     document->setParent(this);

@@ -69,6 +69,9 @@ private Q_SLOTS:
     void testConditionDublicate();
 
     void testTestMessageInstanceName();
+    void testSameNameDifferentInstances();
+    void testDifferentParameter();
+    void testMultiMessageOccurrence();
 
 private:
     MscFile *file = nullptr;
@@ -179,7 +182,7 @@ void tst_MscEventsParsing::testMessageParameterWildcard()
                          stoptimer ToggleTimer; \
                          out ODWriteObject,118(bDefault:bus-a) to inst2; \
                      ENDINSTANCE; \
-                     INSTANCE subscriber; \
+                     INSTANCE inst2; \
                          out HeartbeatIn,113({header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) to inst1; \
                          in ODWriteObject,118(bDefault:bus-a) from inst1; \
                      ENDINSTANCE; \
@@ -794,6 +797,71 @@ void tst_MscEventsParsing::testTestMessageInstanceName()
 
     QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 2);
+}
+
+void tst_MscEventsParsing::testSameNameDifferentInstances()
+{
+    static const QLatin1String msc("MSC msc1;\
+      INSTANCE instA;\
+        IN getbts ( duke ) FROM instB;\
+      ENDINSTANCE;\
+      INSTANCE instB;\
+        OUT getbts ( ann ) TO instC;\
+        OUT getbts ( duke ) TO instA; /* Check if it still loads if this is the second message */\
+      ENDINSTANCE;\
+      INSTANCE instC;\
+        IN getbts ( ann ) FROM instB;\
+      ENDINSTANCE;\
+      ENDMSC;");
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 3);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+}
+
+void tst_MscEventsParsing::testDifferentParameter()
+{
+    static const QLatin1String msc("msc recorded; \
+                        instance mux; \
+                            in HeartbeatOut(3) from responder; \
+                            in HeartbeatOut(11) from responder; \
+                        endinstance; \
+                        instance responder; \
+                            out HeartbeatOut(3) to mux; \
+                            out HeartbeatOut(11) to mux; \
+                        endinstance; \
+                endmsc; ");
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+}
+
+void tst_MscEventsParsing::testMultiMessageOccurrence()
+{
+    static const QLatin1String msc("msc recorded; \
+                        instance sender; \
+                            out ping to responder; \
+                            out ping to responder; \
+                            out ping to responder; \
+                        endinstance; \
+                        instance responder; \
+                            in ping from sender; \
+                            in ping from sender; \
+                            in ping from sender; \
+                        endinstance; \
+                endmsc; ");
+
+    QScopedPointer<MscModel> model(file->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 3);
 }
 
 QTEST_APPLESS_MAIN(tst_MscEventsParsing)

@@ -105,8 +105,8 @@ private:
     QStringList m_cifBlockKeys;
     QVector<msc::cif::CifBlockShared> m_cifBlocks;
 
-    msc::MscMessage *lookupMessageIn(const QString &name, msc::MscInstance *to);
-    msc::MscMessage *lookupMessageOut(const QString &name, msc::MscInstance *from);
+    msc::MscMessage *lookupMessageIn(const msc::MscMessage *msg);
+    msc::MscMessage *lookupMessageOut(const msc::MscMessage *msg);
 
     void checkMessagesDoubleNotation() const;
 

@@ -165,7 +165,7 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
     if (parent == nullptr) {
         m_model->addDocument(doc);
     } else {
-        bool ok = parent->addDocument(doc);
+        bool ok = parent->addDocument(doc, false);
         if (!ok) {
             throw ParserException(QString("Unable to add document %1 to %2").arg(docName, parent->name()));
         }
@@ -367,6 +367,9 @@ antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHe
             auto kindCtx = context->instanceKind();
             if (kindCtx) {
                 name = ::treeNodeToString(kindCtx->NAME(0));
+            } else {
+                if (context->name())
+                    name = ::nameToString(context->name());
             }
         }
 
@@ -398,35 +401,32 @@ antlrcpp::Any MscParserVisitor::visitInstanceEndStatement(MscParser::InstanceEnd
     return visitChildren(context);
 }
 
-MscMessage *MscParserVisitor::lookupMessageIn(const QString &name, MscInstance *to)
+MscMessage *MscParserVisitor::lookupMessageIn(const MscMessage *msg)
 {
     for (int i = 0; i < m_instanceEventsList.size(); ++i)
         for (int j = 0; j < m_instanceEventsList.at(i).size(); ++j) {
             MscInstanceEvent *event = m_instanceEventsList.at(i).at(j);
-            if (event->entityType() != MscEntity::EntityType::Message || event->name() != name)
+            if (event->entityType() != MscEntity::EntityType::Message)
                 continue;
 
             MscMessage *message = static_cast<MscMessage *>(event);
-            if (message->m_descrIn.from == to && !message->m_descrOut.isComplete()) {
+            if (msg->isSame(message) && !message->isConnected())
                 return message;
-            }
         }
     return nullptr;
 }
 
-MscMessage *MscParserVisitor::lookupMessageOut(const QString &name, MscInstance *to)
+MscMessage *MscParserVisitor::lookupMessageOut(const MscMessage *msg)
 {
     for (int i = 0; i < m_instanceEventsList.size(); ++i)
         for (int j = 0; j < m_instanceEventsList.at(i).size(); ++j) {
             MscInstanceEvent *event = m_instanceEventsList.at(i).at(j);
-            if (event->entityType() != MscEntity::EntityType::Message || event->name() != name)
+            if (event->entityType() != MscEntity::EntityType::Message)
                 continue;
 
             MscMessage *message = static_cast<MscMessage *>(event);
-
-            if (message->m_descrOut.to == to && !message->m_descrIn.isComplete()) {
+            if (msg->isSame(message) && !message->isConnected())
                 return message;
-            }
         }
     return nullptr;
 }
@@ -438,28 +438,35 @@ antlrcpp::Any MscParserVisitor::visitMessageOutput(MscParser::MessageOutputConte
     }
 
     const QString name = ::nameToString(context->msgIdentification()->messageName);
-    m_currentMessage = lookupMessageIn(name, m_currentInstance); // TODO: params also should be compared
+    MscMessage *message = new MscMessage(name);
+    m_currentMessage = message;
+    auto result = visitChildren(context); // get instance name and parameters
+
+    m_currentMessage->setSourceInstance(m_currentInstance);
+    MscInstance *targetInstance = nullptr;
+    MscParser::InputAddressContext *inputAddress = context->inputAddress();
+    if (inputAddress && inputAddress->instanceName) {
+        const QString target = ::treeNodeToString(inputAddress->instanceName);
+        targetInstance = m_currentChart->instanceByName(target);
+        m_currentMessage->setTargetInstance(targetInstance);
+    }
+
+    m_currentMessage = lookupMessageIn(message);
     if (m_currentMessage == nullptr) {
-        m_currentMessage = new MscMessage(name);
+        m_currentMessage = message; // this is a new message
+    } else {
+        delete message; // the message already existed - delete this
     }
 
     m_currentEvent = m_currentMessage;
     m_instanceEvents.append(m_currentEvent);
 
-    MscParser::InputAddressContext *inputAddress = context->inputAddress();
-    if (inputAddress && inputAddress->instanceName) {
-        const QString target = QString::fromStdString(inputAddress->instanceName->getText());
-        auto *instance = m_currentChart->instanceByName(target);
-        m_currentMessage->setTargetInstance(instance);
-        m_currentMessage->m_descrOut.to = instance;
-    }
-    m_currentMessage->setSourceInstance(m_currentInstance);
-
+    m_currentMessage->m_descrOut.to = targetInstance;
     m_currentMessage->m_descrOut.from = m_currentInstance;
     m_currentMessage->m_descrOut.m_sourceLineInfo.m_line = context->start->getLine();
     m_currentMessage->m_descrOut.m_sourceLineInfo.m_pos = context->start->getCharPositionInLine();
 
-    return visitChildren(context);
+    return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext *context)
@@ -469,28 +476,35 @@ antlrcpp::Any MscParserVisitor::visitMessageInput(MscParser::MessageInputContext
     }
 
     const QString name = ::treeNodeToString(context->msgIdentification()->messageName);
-    m_currentMessage = lookupMessageOut(name, m_currentInstance);
+    MscMessage *message = new MscMessage(name);
+    m_currentMessage = message;
+    auto result = visitChildren(context); // get instance name and parameters
+
+    m_currentMessage->setTargetInstance(m_currentInstance);
+    MscInstance *sourceInstance = nullptr;
+    MscParser::OutputAddressContext *outputAddress = context->outputAddress();
+    if (outputAddress && outputAddress->instanceName) {
+        const QString source = ::treeNodeToString(outputAddress->instanceName);
+        sourceInstance = m_currentChart->instanceByName(source);
+        m_currentMessage->setSourceInstance(sourceInstance);
+    }
+
+    m_currentMessage = lookupMessageOut(message);
     if (m_currentMessage == nullptr) {
-        m_currentMessage = new MscMessage(name);
+        m_currentMessage = message; // this is a new message
+    } else {
+        delete message; // the message already existed - delete this
     }
 
     m_currentEvent = m_currentMessage;
     m_instanceEvents.append(m_currentEvent);
 
-    MscParser::OutputAddressContext *outputAddress = context->outputAddress();
-    if (outputAddress && outputAddress->instanceName) {
-        const QString source = ::treeNodeToString(outputAddress->instanceName);
-        auto *instance = m_currentChart->instanceByName(source);
-        m_currentMessage->setSourceInstance(instance);
-        m_currentMessage->m_descrIn.from = instance;
-    }
-    m_currentMessage->setTargetInstance(m_currentInstance);
-
+    m_currentMessage->m_descrIn.from = sourceInstance;
     m_currentMessage->m_descrIn.to = m_currentInstance;
     m_currentMessage->m_descrIn.m_sourceLineInfo.m_line = context->start->getLine();
     m_currentMessage->m_descrIn.m_sourceLineInfo.m_pos = context->start->getCharPositionInLine();
 
-    return visitChildren(context);
+    return result;
 }
 
 antlrcpp::Any MscParserVisitor::visitMsgIdentification(MscParser::MsgIdentificationContext *context)
@@ -865,7 +879,12 @@ void MscParserVisitor::orderInstanceEvents()
             // look first elements of others list
             for (int j = i + 1; j < m_instanceEventsList.size(); ++j) {
                 if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkEvent)) {
-                    if (m_instanceEventsList[j][0]->name() == firstEvent->name()) {
+                    bool isSame = false;
+                    if (firstEvent->entityType() == MscEntity::EntityType::Message)
+                        isSame = m_instanceEventsList[j][0]->internalId() == firstEvent->internalId();
+                    else
+                        isSame = m_instanceEventsList[j][0]->name() == firstEvent->name();
+                    if (isSame) {
                         m_instanceEventsList[j].removeFirst();
 
                         found = true;
@@ -908,7 +927,7 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
 
         const QString missedLine =
                 QString("%1 %2 %3 %4;")
-                        .arg(QLatin1String(missedIn ? "in" : "out"), message->name(),
+                        .arg(QLatin1String(missedIn ? "in" : "out"), message->fullName(),
                              QLatin1String(missedIn ? "from" : "to"),
                              instanceName(missedIn ? message->sourceInstance() : message->targetInstance()));
 
