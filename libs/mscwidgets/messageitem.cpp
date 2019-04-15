@@ -118,12 +118,10 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (m_targetInstance && m_targetInstance == sourceInstance)
+    if (m_targetInstance == sourceInstance)
         return false;
-
-    if (sourceInstance == m_sourceInstance) {
+    if (sourceInstance == m_sourceInstance)
         return false;
-    }
 
     if (m_sourceInstance) {
         disconnect(m_sourceInstance, nullptr, this, nullptr);
@@ -143,12 +141,10 @@ bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 
 bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (m_sourceInstance && m_sourceInstance == targetInstance)
+    if (m_sourceInstance == targetInstance)
         return false;
-
-    if (targetInstance == m_targetInstance) {
+    if (targetInstance == m_targetInstance)
         return false;
-    }
 
     if (m_targetInstance) {
         disconnect(m_targetInstance, nullptr, this, nullptr);
