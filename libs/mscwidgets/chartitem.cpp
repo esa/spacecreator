@@ -30,6 +30,8 @@
 
 namespace msc {
 
+static const QSizeF minChartSize { 200.0, 200.0 };
+
 ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(chart, parent)
     , m_rectItem(new QGraphicsRectItem(this))
@@ -50,6 +52,8 @@ ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     }
 }
 
+ChartItem::~ChartItem() {}
+
 void ChartItem::onNameEdited(const QString &text)
 {
     if (!m_entity)
@@ -57,8 +61,6 @@ void ChartItem::onNameEdited(const QString &text)
 
     cmd::CommandsStack::push(cmd::RenameEntity, { QVariant::fromValue(m_entity.data()), text });
 }
-
-ChartItem::~ChartItem() {}
 
 QRectF ChartItem::boundingRect() const
 {
@@ -100,7 +102,7 @@ void ChartItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoint
 
 bool sceneToCif(const QRectF sceneRect, QRect &cifRect)
 {
-    const QVector<QPointF> scenePoints{ sceneRect.topLeft(), sceneRect.bottomRight() };
+    const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
     bool converted(false);
     const QVector<QPoint> cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
     if (converted)
@@ -110,7 +112,7 @@ bool sceneToCif(const QRectF sceneRect, QRect &cifRect)
 
 bool cifToScene(const QRect &cifRect, QRectF &sceneRect)
 {
-    const QVector<QPoint> cifPoints{ cifRect.topLeft(), cifRect.bottomRight() };
+    const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
     bool converted(false);
     const QVector<QPointF> scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
     if (converted)
@@ -174,9 +176,9 @@ void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPoi
 void ChartItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(GripPoint::Locations{ GripPoint::Left, GripPoint::Top, GripPoint::Right,
-                                                      GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
-                                                      GripPoint::TopRight, GripPoint::BottomRight });
+    m_gripPoints->setUsedPoints(GripPoint::Locations { GripPoint::Left, GripPoint::Top, GripPoint::Right,
+                                                       GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
+                                                       GripPoint::TopRight, GripPoint::BottomRight });
 }
 
 void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -193,14 +195,18 @@ QRectF ChartItem::box() const
 
 void ChartItem::setBox(const QRectF &r)
 {
-    if (m_box == r)
+    QRectF newBox = r;
+    const QSizeF s = r.size().expandedTo(minChartSize).expandedTo(m_textItemName->boundingRect().size());
+    newBox.setSize(s);
+
+    if (m_box == newBox)
         return;
 
     if (m_guard)
         return;
     m_guard = true;
 
-    m_box = r;
+    m_box = newBox;
     m_rectItem->setRect(m_box);
 
     if (QGraphicsScene *pScene = scene())
@@ -210,6 +216,13 @@ void ChartItem::setBox(const QRectF &r)
     updateTitlePos();
 
     Q_EMIT chartBoxChanged();
+}
+
+const QMarginsF &ChartItem::chartMargins()
+{
+    static constexpr qreal margin { 20.0 };
+    static constexpr QMarginsF margins { margin, margin, margin, margin };
+    return margins;
 }
 
 void ChartItem::updateTitlePos()

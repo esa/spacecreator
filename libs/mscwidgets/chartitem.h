@@ -18,6 +18,8 @@
 #pragma once
 #include "baseitems/interactiveobject.h"
 
+#include <QMargins>
+
 class QGraphicsRectItem;
 
 namespace msc {
@@ -42,6 +44,8 @@ public:
 
     QRectF box() const;
     void setBox(const QRectF &r);
+
+    static const QMarginsF &chartMargins();
 
     void applyCif() override;
 

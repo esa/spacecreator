@@ -553,6 +553,9 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
     }
 }
 
+/*!
+   Returns the scene rectangle of all instances and events
+ */
 QRectF ChartViewModel::prepareContentRect() const
 {
     QRectF totalRect;
@@ -605,7 +608,7 @@ void ChartViewModel::updateContentBounds()
     QRectF chartBox = d->m_layoutInfo.m_chartItem->geometryManagedByCif()
             ? d->m_layoutInfo.m_chartItem->storedCustomRect()
             : d->m_layoutInfo.m_chartItem->box();
-    const QRectF &contentRect = prepareContentRect();
+    const QRectF &contentRect = prepareContentRect().marginsAdded(d->m_layoutInfo.m_chartItem->geometryManagedByCif() ? QMarginsF() : ChartItem::chartMargins());
     if (chartBox.isEmpty())
         chartBox = contentRect;
     else {
@@ -1348,7 +1351,7 @@ void ChartViewModel::onInstanceAdded(MscInstance *instance, int pos)
         ++nextIdx;
     }
 
-    const QRectF &newItemBounds = prepareContentRect();
+    const QRectF &newItemBounds = prepareContentRect().marginsAdded(ChartItem::chartMargins());
     const QRectF &newBox = newItemBounds | d->m_layoutInfo.m_chartItem->box();
     d->m_layoutInfo.m_chartItem->setBox(newBox);
 
