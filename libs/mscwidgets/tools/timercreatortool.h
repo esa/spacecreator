@@ -29,13 +29,9 @@ public:
     TimerCreatorTool(MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view, QObject *parent);
     BaseTool::ToolType toolType() const override;
 
-protected Q_SLOTS:
-    void onCurrentChartChagend(msc::MscChart *chart) override;
-
 protected:
     void createPreviewItem() override;
     void commitPreviewItem() override;
-    void removePreviewItem() override;
 
 private:
     MscTimer::TimerType m_timerType = MscTimer::TimerType::Start;

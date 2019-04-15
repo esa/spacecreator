@@ -41,6 +41,11 @@ void BaseCreatorTool::setModel(ChartViewModel *model)
 
 void BaseCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
 {
+    if (chart == m_activeChart)
+        return;
+
+    removePreviewItem();
+
     m_activeChart = chart;
     if (isActive()) {
         createPreviewItem();
@@ -55,6 +60,17 @@ void BaseCreatorTool::startWaitForModelLayoutComplete(MscEntity *addedEntity)
             connect(m_model, &ChartViewModel::layoutComplete, this, &BaseCreatorTool::onModelLayoutComplete);
 }
 
+void BaseCreatorTool::removePreviewItem()
+{
+    if (!m_previewItem) {
+        return;
+    }
+
+    utils::removeSceneItem(m_previewItem);
+    delete m_previewItem.data();
+    m_previewEntity.reset();
+}
+
 void BaseCreatorTool::onModelLayoutComplete()
 {
     dropModelLayoutUpdateConnection();
@@ -64,6 +80,7 @@ void BaseCreatorTool::onModelLayoutComplete()
 
     if (auto item = m_model->itemForEntity(m_addedEntity))
         item->postCreatePolishing();
+    m_addedEntity.clear();
 }
 
 void BaseCreatorTool::dropModelLayoutUpdateConnection()

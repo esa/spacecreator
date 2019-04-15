@@ -32,13 +32,9 @@ public:
 
     void activate();
 
-protected Q_SLOTS:
-    void onCurrentChartChagend(msc::MscChart *) override;
-
 private:
     void createPreviewItem() override;
     void commitPreviewItem() override;
-    void removePreviewItem() override;
 
     bool onMousePress(QMouseEvent *e) override;
     bool onMouseRelease(QMouseEvent *e) override;

@@ -39,17 +39,6 @@ BaseTool::ToolType ActionCreatorTool::toolType() const
     return BaseTool::ToolType::ActionCreator;
 }
 
-void ActionCreatorTool::onCurrentChartChagend(MscChart *chart)
-{
-    if (m_previewEntity && m_activeChart)
-        if (MscMessage *message = dynamic_cast<MscMessage *>(m_previewEntity.data())) {
-            m_activeChart->removeInstanceEvent(message);
-            delete m_previewEntity;
-        }
-
-    BaseCreatorTool::onCurrentChartChagend(chart);
-}
-
 void ActionCreatorTool::createPreviewItem()
 {
     if (!m_scene || m_previewItem || !m_active) {
@@ -61,7 +50,7 @@ void ActionCreatorTool::createPreviewItem()
     auto actionItem = new ActionItem(orphanAction);
 
     m_previewItem = actionItem;
-    m_previewEntity = actionItem->modelItem();
+    m_previewEntity.reset(actionItem->modelItem());
 
     m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
@@ -73,31 +62,17 @@ void ActionCreatorTool::commitPreviewItem()
         return;
     }
 
-    auto action = qobject_cast<msc::MscAction *>(m_previewEntity);
+    auto action = qobject_cast<msc::MscAction *>(m_previewEntity.take());
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(action),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart),
                                       QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
+    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
 
     startWaitForModelLayoutComplete(action);
-    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
+    removePreviewItem();
 
     Q_EMIT created();
 }
-
-void ActionCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem) {
-        return;
-    }
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
-    delete m_previewEntity.data();
-}
-
 } // namespace msc

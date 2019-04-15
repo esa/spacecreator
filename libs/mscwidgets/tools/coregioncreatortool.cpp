@@ -73,23 +73,11 @@ void CoregionCreatorTool::commitPreviewItem()
                                       QVariant::fromValue<msc::MscCoregion *>(coregion->end()),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart),
                                       QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
-
-    startWaitForModelLayoutComplete(nullptr);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCoregion, cmdParams);
 
+    removePreviewItem();
+
     Q_EMIT created();
-}
-
-void CoregionCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem)
-        return;
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
 }
 
 } // namespace msc

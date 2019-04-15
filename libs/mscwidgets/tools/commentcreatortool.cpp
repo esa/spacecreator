@@ -64,27 +64,18 @@ void CommentCreatorTool::commitPreviewItem()
     if (!m_previewItem || !m_activeChart)
         return;
 
-    m_previewEntity = m_isGlobalComment ? m_model->currentChart()
-                                        : m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+    auto previewEntity = m_isGlobalComment ? m_model->currentChart()
+                                           : m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
 
     const CommentItem *item = qobject_cast<CommentItem *>(m_previewItem);
     const QString itemComment = item ? item->text() : QString();
-    const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(m_previewEntity), itemComment };
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
     msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
 
     removePreviewItem();
-    startWaitForModelLayoutComplete(m_previewEntity);
+    startWaitForModelLayoutComplete(previewEntity);
 
     Q_EMIT created();
-}
-
-void CommentCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem)
-        return;
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
 }
 
 } // namespace msc

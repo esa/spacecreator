@@ -58,17 +58,6 @@ BaseTool::ToolType TimerCreatorTool::toolType() const
     return BaseTool::ToolType::TimerCreator;
 }
 
-void TimerCreatorTool::onCurrentChartChagend(MscChart *chart)
-{
-    if (m_previewEntity && m_activeChart)
-        if (MscMessage *message = dynamic_cast<MscMessage *>(m_previewEntity.data())) {
-            m_activeChart->removeInstanceEvent(message);
-            delete m_previewEntity;
-        }
-
-    BaseCreatorTool::onCurrentChartChagend(chart);
-}
-
 void TimerCreatorTool::createPreviewItem()
 {
     if (!m_scene || m_previewItem || !m_active) {
@@ -81,7 +70,7 @@ void TimerCreatorTool::createPreviewItem()
     auto timerItem = new TimerItem(orphantimer, m_model);
 
     m_previewItem = timerItem;
-    m_previewEntity = timerItem->modelItem();
+    m_previewEntity.reset(timerItem->modelItem());
 
     m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
@@ -93,32 +82,19 @@ void TimerCreatorTool::commitPreviewItem()
         return;
     }
 
-    auto timer = qobject_cast<msc::MscTimer *>(m_previewEntity);
+    auto timer = qobject_cast<msc::MscTimer *>(m_previewEntity.take());
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(timer),
                                       QVariant::fromValue<msc::MscTimer::TimerType>(m_timerType),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart),
                                       QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
-
-    startWaitForModelLayoutComplete(timer);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
 
+    startWaitForModelLayoutComplete(timer);
+    removePreviewItem();
+
     Q_EMIT created();
-}
-
-void TimerCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem) {
-        return;
-    }
-
-    utils::removeSceneItem(m_previewItem);
-    delete m_previewItem.data();
-    delete m_previewEntity.data();
 }
 
 } // namespace msc

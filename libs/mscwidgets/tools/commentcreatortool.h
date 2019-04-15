@@ -33,7 +33,6 @@ public:
 private:
     void createPreviewItem() override;
     void commitPreviewItem() override;
-    void removePreviewItem() override;
 
     const bool m_isGlobalComment;
 };

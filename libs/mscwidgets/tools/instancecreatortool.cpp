@@ -49,7 +49,7 @@ void InstanceCreatorTool::createPreviewItem()
         return;
 
     m_previewItem = instanceItem;
-    m_previewEntity = instanceItem->modelItem();
+    m_previewEntity.reset(instanceItem->modelItem());
 
     m_scene->addItem(m_previewItem);
     m_previewItem->setOpacity(0.5);
@@ -60,36 +60,16 @@ void InstanceCreatorTool::commitPreviewItem()
     if (!m_previewEntity || !m_activeChart)
         return;
 
-    auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity);
+    auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity.take());
     const int pos = m_model->instanceOrderFromPos(cursorInScene());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
-
-    removePreviewItem(); // free the space to avoid overlapping
-
-    startWaitForModelLayoutComplete(instance);
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
 
+    startWaitForModelLayoutComplete(instance);
+    removePreviewItem(); // free the space to avoid overlapping
+
     Q_EMIT created();
-}
-
-void InstanceCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem)
-        return;
-
-    m_model->removeInstanceItem(dynamic_cast<InstanceItem *>(m_previewItem.data()));
-}
-
-void InstanceCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
-{
-    if (m_previewEntity && m_activeChart)
-        if (MscInstance *instance = dynamic_cast<MscInstance *>(m_previewEntity.data())) {
-            m_activeChart->removeInstance(instance);
-            delete m_previewEntity;
-        }
-
-    BaseCreatorTool::onCurrentChartChagend(chart);
 }
 
 } // ns msc

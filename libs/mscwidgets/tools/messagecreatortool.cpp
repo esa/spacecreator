@@ -72,7 +72,7 @@ void MessageCreatorTool::createPreviewItem()
     }
 
     m_previewItem = m_messageItem;
-    m_previewEntity = m_messageItem->modelItem();
+    m_previewEntity.reset(m_messageItem->modelItem());
 
     m_messageItem->setAutoResizable(false);
 
@@ -88,8 +88,8 @@ void MessageCreatorTool::commitPreviewItem()
 
     if (m_previewEntity && m_activeChart) {
         bool isValid = true;
+        auto message = qobject_cast<msc::MscMessage *>(m_previewEntity.data());
         if (m_messageType == MscMessage::MessageType::Create) {
-            auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
             isValid = message->sourceInstance() != nullptr && message->targetInstance() != nullptr
                     && message->sourceInstance() != message->targetInstance();
             qWarning() << "Create messages need to be connected to different existing instances";
@@ -98,38 +98,15 @@ void MessageCreatorTool::commitPreviewItem()
         if (isValid) {
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
-                startWaitForModelLayoutComplete(m_previewEntity);
                 msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
+                startWaitForModelLayoutComplete(message);
 
                 Q_EMIT created(); // to deactivate toobar's item
-                removePreviewItem();
-
-                return;
             }
         }
     }
 
     removePreviewItem();
-    delete m_previewEntity.data();
-}
-
-void MessageCreatorTool::removePreviewItem()
-{
-    if (!m_previewItem)
-        return;
-
-    m_model->removeMessageItem(dynamic_cast<MessageItem *>(m_previewItem.data()));
-}
-
-void MessageCreatorTool::onCurrentChartChagend(msc::MscChart *chart)
-{
-    if (m_previewEntity && m_activeChart)
-        if (MscMessage *message = dynamic_cast<MscMessage *>(m_previewEntity.data())) {
-            m_activeChart->removeInstanceEvent(message);
-            delete m_previewEntity;
-        }
-
-    BaseCreatorTool::onCurrentChartChagend(chart);
 }
 
 bool MessageCreatorTool::onMousePress(QMouseEvent *e)
@@ -406,7 +383,7 @@ QVariantList MessageCreatorTool::prepareMessage()
     };
     QVariantList args;
 
-    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity);
+    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity.data());
     if (validateUserPoints(message)) {
         if (!message->isOrphan()) {
             if (message->sourceInstance() == message->targetInstance())

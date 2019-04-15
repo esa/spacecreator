@@ -31,7 +31,6 @@ public:
 private:
     void createPreviewItem() override;
     void commitPreviewItem() override;
-    void removePreviewItem() override;
 };
 
 } // namespace msc

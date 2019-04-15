@@ -46,11 +46,12 @@ protected Q_SLOTS:
 
 protected:
     QPointer<ChartViewModel> m_model = nullptr;
-    QPointer<MscEntity> m_previewEntity = nullptr;
+    QScopedPointer<MscEntity> m_previewEntity;
     QPointer<MscChart> m_activeChart = nullptr;
     QPointer<MscEntity> m_addedEntity = nullptr;
     QMetaObject::Connection m_modelUpdateFinishedListener = QMetaObject::Connection();
     virtual void startWaitForModelLayoutComplete(MscEntity *addedEntity);
+    void removePreviewItem() override;
 
 private:
     void dropModelLayoutUpdateConnection();

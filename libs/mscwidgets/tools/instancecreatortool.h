@@ -30,16 +30,12 @@ public:
     InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
     virtual BaseTool::ToolType toolType() const override;
 
-protected Q_SLOTS:
-    void onCurrentChartChagend(msc::MscChart *) override;
-
 protected:
     QPointer<MscInstance> m_instance = nullptr;
     QPointer<InstanceItem> m_instanceItem = nullptr;
 
     void createPreviewItem() override;
     void commitPreviewItem() override;
-    void removePreviewItem() override;
 };
 
 } // ns msc
