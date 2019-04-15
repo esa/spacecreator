@@ -58,8 +58,10 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
     connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::scheduleLayoutUpdate);
 
-    connect(m_timer, &msc::MscTimer::precedingTimerChanged, this, &TimerItem::rebuildLayout);
+    connect(m_timer, &msc::MscTimer::precedingTimerChanged, this, &TimerItem::scheduleLayoutUpdate);
     m_textItem->setVisible(m_timer->precedingTimer() == nullptr);
+
+    connect(this, &TimerItem::relocated, this, &TimerItem::scheduleLayoutUpdate);
 
     m_timerConnector->setVisible(m_timer->precedingTimer() != nullptr);
     m_timerConnector->setPen(QPen(Qt::black, 1));
@@ -201,7 +203,6 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             if (canConnectTimers(timer, event->scenePos())) {
                 using namespace msc::cmd;
                 CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(timer), m_timer->name() });
-                scheduleLayoutUpdate();
             }
         }
     }
@@ -282,7 +283,6 @@ void TimerItem::rebuildLayout()
 
     if (m_timer->precedingTimer() == nullptr) {
         m_textItem->setVisible(true);
-        m_timerConnector->setVisible(false);
         m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
 
         if (m_timer->timerType() == MscTimer::TimerType::Stop) {
@@ -369,10 +369,17 @@ QRectF TimerItem::symbolBox() const
 
 bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos)
 {
-    if (scenePos().y() < targetPos.y())
-        return m_timer->allowFollowingTimer(targetTimer);
-    else
-        return m_timer->allowPrecedingTimer(targetTimer);
+    if (targetTimer == nullptr || m_timer->instance() != targetTimer->instance())
+        return false;
+
+    MscTimer *start = m_timer;
+    MscTimer *end = targetTimer;
+    if (scenePos().y() > targetPos.y()) {
+        start = targetTimer;
+        end = m_timer;
+    }
+
+    return start->timerType() == MscTimer::TimerType::Start && end->timerType() != MscTimer::TimerType::Start;
 }
 
 } // namespace msc

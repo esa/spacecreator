@@ -230,6 +230,7 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
     if (instanceEvent->entityType() == MscEntity::EntityType::Timer) {
         MscTimer *timer = static_cast<MscTimer *>(instanceEvent);
         connect(timer, &MscTimer::instanceChanged, this, [this, timer]() { resetTimerRelations(timer); });
+        connect(timer, &MscTimer::nameChanged, this, [this, timer]() { resetTimerRelations(timer); });
         resetTimerRelations(timer);
     }
 
