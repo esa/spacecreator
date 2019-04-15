@@ -92,6 +92,8 @@ public:
 
     QString displayedText() const;
 
+    void onChartBoxChanged();
+
 Q_SIGNALS:
     void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
@@ -119,7 +121,6 @@ private Q_SLOTS:
     void onRenamed(const QString &title);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     void updateDisplayText();
-    void onChartBoxChanged();
 
 private:
     QPointer<msc::MscMessage> m_message = nullptr;

@@ -76,6 +76,8 @@ public:
     int maxInstanceNameNumber() const;
     int setInstanceNameNumbers(int nextNumber);
 
+    QString createUniqueInstanceName() const;
+
 public Q_SLOTS:
     void resetTimerRelations(MscTimer *timer);
 

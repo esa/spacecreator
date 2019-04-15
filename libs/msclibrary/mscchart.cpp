@@ -59,6 +59,17 @@ const QVector<MscInstance *> &MscChart::instances() const
     return m_instances;
 }
 
+QString MscChart::createUniqueInstanceName() const
+{
+    QString instanceName;
+    int count = m_instances.size();
+    do {
+        instanceName = tr("Instance_%1").arg(++count);
+    } while (instanceByName(instanceName));
+
+    return instanceName;
+}
+
 MscInstance *MscChart::makeInstance(const QString &name, int index)
 {
     QString instanceName(name);

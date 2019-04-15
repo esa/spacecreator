@@ -98,8 +98,8 @@ void MessageCreatorTool::commitPreviewItem()
         if (isValid) {
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
-                msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
                 startWaitForModelLayoutComplete(message);
+                msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
                 Q_EMIT created(); // to deactivate toobar's item
             }
@@ -381,9 +381,9 @@ QVariantList MessageCreatorTool::prepareMessage()
         }
         return retPoints;
     };
-    QVariantList args;
 
-    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity.data());
+    QVariantList args;
+    auto message = qobject_cast<msc::MscMessage *>(m_previewEntity.take());
     if (validateUserPoints(message)) {
         if (!message->isOrphan()) {
             if (message->sourceInstance() == message->targetInstance())
@@ -395,6 +395,8 @@ QVariantList MessageCreatorTool::prepareMessage()
                      QVariant::fromValue<msc::MscChart *>(m_activeChart), eventIndex,
                      QVariant::fromValue<QVector<QPoint>>(arrowPoints) };
         }
+    } else {
+        m_previewEntity.reset(message); // make it be clearable within removePreviewItem
     }
 
     return args;

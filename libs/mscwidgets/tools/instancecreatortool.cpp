@@ -44,7 +44,9 @@ void InstanceCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(nullptr, cursorInScene());
+    const QString &instanceName = m_model->currentChart()->createUniqueInstanceName();
+    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(new MscInstance(instanceName), cursorInScene());
+
     if (!instanceItem)
         return;
 

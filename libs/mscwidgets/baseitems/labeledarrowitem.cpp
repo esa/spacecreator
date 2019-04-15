@@ -144,9 +144,10 @@ QPainterPath LabeledArrowItem::shape() const
 
 QRectF LabeledArrowItem::boundingRect() const
 {
+    const QRectF &textBox = m_itemText->boundingRect().translated(m_itemText->pos());
     const QVector<QPointF> &trajectory = arrow()->turnPoints();
     if (trajectory.isEmpty())
-        return m_itemText->boundingRect().translated(m_itemText->pos());
+        return textBox;
 
     const QPointF &tail = trajectory.first();
     const QPointF &head = trajectory.last();
@@ -170,7 +171,7 @@ QRectF LabeledArrowItem::boundingRect() const
     }
 
     const QRectF arrowRect { topLeft, bottomRight };
-    return m_itemText->boundingRect().translated(m_itemText->pos()).united(arrowRect);
+    return textBox | arrowRect;
 }
 
 void LabeledArrowItem::updateLayout()

@@ -30,8 +30,6 @@
 
 namespace msc {
 
-static const QSizeF minChartSize { 200.0, 200.0 };
-
 ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(chart, parent)
     , m_rectItem(new QGraphicsRectItem(this))
@@ -195,18 +193,16 @@ QRectF ChartItem::box() const
 
 void ChartItem::setBox(const QRectF &r)
 {
-    QRectF newBox = r;
-    const QSizeF s = r.size().expandedTo(minChartSize).expandedTo(m_textItemName->boundingRect().size());
-    newBox.setSize(s);
-
-    if (m_box == newBox)
+    if (m_box == r)
         return;
 
     if (m_guard)
         return;
     m_guard = true;
 
-    m_box = newBox;
+    prepareGeometryChange();
+
+    m_box = r;
     m_rectItem->setRect(m_box);
 
     if (QGraphicsScene *pScene = scene())

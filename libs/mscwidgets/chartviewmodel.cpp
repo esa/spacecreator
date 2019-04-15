@@ -201,20 +201,24 @@ void ChartViewModel::fillView(MscChart *chart)
     if (d->m_currentChart)
         doLayout();
 
-    // restore initial chart box, because it's overriden by actual content bounds
+    // restore initial chart box (stored in CIF), because it's overriden by actual content bounds
     if (!initialChartRect.isNull())
         d->m_layoutInfo.m_chartItem->setBox(initialChartRect);
+    else if (!d->m_layoutInfo.m_preferredBox.isEmpty()) {
+        const QRectF prefferedBox { d->m_layoutInfo.m_chartItem->box().topLeft(), d->m_layoutInfo.m_preferredBox };
+        d->m_layoutInfo.m_chartItem->setBox(prefferedBox);
+    }
 
-    connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::onInstanceAdded);
+    connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
             QOverload<msc::MscInstance *>::of(&ChartViewModel::removeInstanceItem));
     connect(d->m_currentChart, &msc::MscChart::instanceMoved, this,
             [this](MscInstance *instance, int, int) { onInstanceItemMoved(itemForInstance(instance)); });
 
-    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::relayout);
+    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
     connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartViewModel::updateLayout);
-    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartViewModel::relayout);
+    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::commentChanged, this, &ChartViewModel::onEntityCommentChanged);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
@@ -272,14 +276,6 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         item->instantLayoutUpdate();
 
     return item;
-}
-
-void ChartViewModel::relayout()
-{
-    d->m_layoutDirty = true; // prevent update scheduling in ChartViewModel::updateLayout()
-
-    clearScene();
-    doLayout();
 }
 
 void ChartViewModel::updateLayout()
@@ -600,15 +596,49 @@ QLineF ChartViewModel::commonAxis() const
     return QLineF(0., commonAxisStart, 0., commonAxisStop);
 }
 
+void ChartViewModel::onChartBoxChanged()
+{
+    const QRectF &contentRect = prepareContentRect();
+    QRectF currentChartBox = d->m_layoutInfo.m_chartItem->box();
+
+    if (currentChartBox.width() < contentRect.width())
+        currentChartBox.setWidth(contentRect.width());
+    if (currentChartBox.height() < contentRect.height())
+        currentChartBox.setHeight(contentRect.height());
+    /*
+        // expand non stopped instances to the bottom
+        for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
+            if (instanceItem->modelItem()->explicitStop())
+                continue;
+            if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + currentChartBox.bottom())) {
+                const qreal deltaH = currentChartBox.bottom() - instanceItem->sceneBoundingRect().bottom();
+                qDebug() << "updating instance height:" << instanceItem->axisHeight() << deltaH
+                         << (instanceItem->axisHeight() + deltaH);
+                instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH);
+            }
+        }
+    */
+    // expand global messages
+    for (InteractiveObject *io : d->m_instanceEventItemSorted)
+        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
+            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
+                messageItem->onChartBoxChanged();
+
+    if (currentChartBox == d->m_layoutInfo.m_chartItem->box())
+        return;
+    d->m_layoutInfo.m_chartItem->setBox(currentChartBox);
+}
+
 void ChartViewModel::updateContentBounds()
 {
     if (!d->m_layoutInfo.m_chartItem)
         return;
 
-    QRectF chartBox = d->m_layoutInfo.m_chartItem->geometryManagedByCif()
-            ? d->m_layoutInfo.m_chartItem->storedCustomRect()
-            : d->m_layoutInfo.m_chartItem->box();
-    const QRectF &contentRect = prepareContentRect().marginsAdded(d->m_layoutInfo.m_chartItem->geometryManagedByCif() ? QMarginsF() : ChartItem::chartMargins());
+    const bool customBoxUsed = d->m_layoutInfo.m_chartItem->geometryManagedByCif();
+    QRectF chartBox =
+            customBoxUsed ? d->m_layoutInfo.m_chartItem->storedCustomRect() : d->m_layoutInfo.m_chartItem->box();
+    const QRectF &contentRect =
+            prepareContentRect().marginsAdded(customBoxUsed ? QMarginsF() : ChartItem::chartMargins());
     if (chartBox.isEmpty())
         chartBox = contentRect;
     else {
@@ -903,7 +933,7 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
         d->m_instanceItemsSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
-        relayout();
+        updateLayout();
     }
 }
 
@@ -916,7 +946,7 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
         d->m_instanceEventItemSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
-        relayout();
+        updateLayout();
     }
 }
 
@@ -1190,7 +1220,7 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
                                         QVariant::fromValue<MscMessage::EndType>(endType),
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });
     } else {
-        relayout();
+        updateLayout();
     }
 }
 
@@ -1303,66 +1333,13 @@ void ChartViewModel::disconnectItems()
     }
 }
 
-void ChartViewModel::onInstanceAdded(MscInstance *instance, int pos)
-{
-    Q_ASSERT(instance != nullptr);
-
-    const int currentIdx = pos;
-    Q_ASSERT(currentIdx >= 0);
-
-    const int prevIdx = currentIdx - 1;
-
-    qreal instanceX(0.);
-    if (prevIdx >= 0 && prevIdx < d->m_currentChart->instances().size()) {
-        if (MscInstance *prevInstance = d->m_currentChart->instances().at(prevIdx)) {
-            if (InstanceItem *prevInstanceItem = itemForInstance(prevInstance)) {
-                instanceX = prevInstanceItem->sceneBoundingRect().right() + d->InterInstanceSpan;
-            }
-        }
-    }
-
-    const QLineF &commonAxis = this->commonAxis();
-    const qreal commonAxisStart { commonAxis.p1().y() };
-    const qreal commonAxisStop { commonAxis.p2().y() };
-    const qreal totalAxisHeight = commonAxisStop - commonAxisStart;
-
-    InstanceItem *item = itemForInstance(instance);
-    if (!item) {
-        item = createDefaultInstanceItem(instance, QPointF(instanceX, 0.));
-        d->m_instanceItems.insert(instance->internalId(), item);
-        d->m_instanceItemsSorted.insert(currentIdx, item);
-        d->m_scene.addItem(item);
-        connectInstanceItem(item);
-    }
-
-    const qreal verticalShift = commonAxisStart - item->axis().p1().y();
-    if (!qFuzzyIsNull(verticalShift))
-        item->moveSilentlyBy({ 0., verticalShift });
-    if (!qFuzzyCompare(item->axis().p2().y() + 1., commonAxisStop + 1.)) {
-        item->setAxisHeight(totalAxisHeight);
-    }
-
-    const QPointF shiftOthers { item->boundingRect().width() + d->InterMessageSpan, 0. };
-    int nextIdx = currentIdx + 1;
-    while (nextIdx < d->m_currentChart->instances().size()) {
-        if (MscInstance *nextInstance = d->m_currentChart->instances().at(nextIdx))
-            if (InstanceItem *nextInstanceItem = itemForInstance(nextInstance))
-                nextInstanceItem->moveBy(shiftOthers.x(), shiftOthers.y());
-        ++nextIdx;
-    }
-
-    const QRectF &newItemBounds = prepareContentRect().marginsAdded(ChartItem::chartMargins());
-    const QRectF &newBox = newItemBounds | d->m_layoutInfo.m_chartItem->box();
-    d->m_layoutInfo.m_chartItem->setBox(newBox);
-
-    // TODO: update global messages?
-}
-
 void ChartViewModel::prepareChartBoxItem()
 {
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
         connect(d->m_layoutInfo.m_chartItem, &ChartItem::cifChanged, this, [this]() { updateContentBounds(); });
+        connect(d->m_layoutInfo.m_chartItem, &ChartItem::chartBoxChanged, this, &ChartViewModel::onChartBoxChanged);
+
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 

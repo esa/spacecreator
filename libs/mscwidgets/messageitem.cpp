@@ -75,9 +75,6 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
 
     m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
     m_arrowItem->setDashed(isCreator());
-
-    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-        connect(chartItem, &ChartItem::chartBoxChanged, this, &MessageItem::onChartBoxChanged);
 }
 
 void MessageItem::onTextChanged()
