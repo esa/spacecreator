@@ -327,7 +327,17 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, 
 QString Asn1XMLParser::asn1CompilerCommand() const
 {
 #ifdef Q_OS_WIN
-    return QString("asn1 -ast");
+    QProcess process;
+    process.start(QString("where asn1"));
+    process.waitForFinished();
+    QString asn1Exec = process.readAll();
+    asn1Exec.remove("\r\n");
+    asn1Exec.remove("asn1.exe");
+    if (asn1Exec.isEmpty()) {
+        qWarning() << tr("Unable to find the asn1scc compiler");
+        return {};
+    }
+    return QString("asn1 -customStg \"%1xml.stg\"::").arg(asn1Exec);
 #else
     QProcess process;
     process.start(QString("which asn1.exe"));
