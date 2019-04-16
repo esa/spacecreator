@@ -657,7 +657,7 @@ void ChartViewModel::updateContentBounds()
     const bool customBoxUsed = d->m_layoutInfo.m_chartItem->geometryManagedByCif();
     QRectF chartBox =
             customBoxUsed ? d->m_layoutInfo.m_chartItem->storedCustomRect() : d->m_layoutInfo.m_chartItem->box();
-    const QRectF &minRect = minimalContentRect();
+    const QRectF &minRect = minimalContentRect().marginsAdded(ChartItem::chartMargins());
     const QRectF &contentRect = minRect;
 
     if (chartBox.isEmpty())
@@ -671,7 +671,7 @@ void ChartViewModel::updateContentBounds()
         chartBox.setHeight(contentRect.height());
 
     QSignalBlocker sb(d->m_layoutInfo.m_chartItem);
-    d->m_layoutInfo.m_chartItem->setBox(chartBox.marginsAdded(ChartItem::chartMargins()));
+    d->m_layoutInfo.m_chartItem->setBox(chartBox);
 
     // expand global messages
     for (InteractiveObject *io : d->m_instanceEventItemsSorted)
@@ -683,8 +683,10 @@ void ChartViewModel::updateContentBounds()
     for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
         if (instanceItem->modelItem()->explicitStop())
             continue;
-        if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + chartBox.bottom())) {
-            const qreal deltaH = chartBox.bottom() - instanceItem->sceneBoundingRect().bottom();
+
+        const qreal targetInstanceBottom = chartBox.bottom() - ChartItem::chartMargins().bottom();
+        if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + targetInstanceBottom)) {
+            const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
             instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
         }
     }

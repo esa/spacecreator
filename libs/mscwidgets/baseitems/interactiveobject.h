@@ -93,6 +93,7 @@ protected:
 
     bool m_highlightable = false;
     HighlightRectItem *m_highlighter = nullptr;
+    QPen m_selectedPen;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

@@ -43,6 +43,7 @@ namespace msc {
 InteractiveObject::InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_entity(entity)
+    , m_selectedPen(Qt::black, 3.)
 {
     setAcceptHoverEvents(true);
 
@@ -58,8 +59,7 @@ void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
     if (isSelected()) {
         painter->save();
-        QPen selectionPen(Qt::black, 3);
-        painter->setPen(selectionPen);
+        painter->setPen(m_selectedPen);
         painter->drawRect(m_boundingRect);
         painter->restore();
     }
@@ -67,12 +67,6 @@ void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 QRectF InteractiveObject::boundingRect() const
 {
-    static const QMarginsF selectionMargins(1, 1, 1, 1);
-
-    if (isSelected()) {
-        return m_boundingRect.marginsAdded(selectionMargins);
-    }
-
     return m_boundingRect;
 }
 
