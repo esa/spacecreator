@@ -149,7 +149,7 @@ struct MainWindowPrivate {
     msc::EntityDeleteTool *m_deleteTool = nullptr;
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
-    QMenu *m_hierarchyTypeMenu = nullptr;
+    QMenu *m_documentViewMenu = nullptr;
 
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
@@ -327,15 +327,15 @@ void MainWindow::updateTextView()
     d->ui->mscTextBrowser->updateView();
 }
 
-void MainWindow::showHierarchyTypeMenu(const QPoint &point)
+void MainWindow::showDocumentViewMenu(const QPoint &point)
 {
     QModelIndex index = d->ui->documentTreeView->indexAt(point);
 
-    if (d->m_hierarchyTypeMenu && index.isValid()) {
+    if (d->m_documentViewMenu && index.isValid()) {
         auto *obj = static_cast<QObject *>(index.internalPointer());
 
         if (dynamic_cast<msc::MscDocument *>(obj)) {
-            d->m_hierarchyTypeMenu->exec(d->ui->documentTreeView->viewport()->mapToGlobal(point));
+            d->m_documentViewMenu->exec(d->ui->documentTreeView->viewport()->mapToGlobal(point));
         }
     }
 }
@@ -523,7 +523,8 @@ void MainWindow::showChart(const QModelIndex &index)
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
 {
-    Q_UNUSED(previous);
+    d->ui->documentTreeView->closePersistentEditor(previous);
+
     if (!current.isValid()) {
         return;
     }
@@ -550,7 +551,11 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
         };
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            for (auto action : d->m_hierarchyTypeMenu->actions()) {
+            for (auto action : d->m_documentViewMenu->actions()) {
+                if (!action->property(HIERARCHY_TYPE_TAG).isValid()) {
+                    return;
+                }
+
                 auto actionType =
                         static_cast<msc::MscDocument::HierarchyType>(action->property(HIERARCHY_TYPE_TAG).toInt());
 
@@ -604,7 +609,7 @@ void MainWindow::setupUi()
     initMenus();
     initTools();
     initMainToolbar();
-    initHierarchyTypeActions();
+    initDocumentViewActions();
 
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
@@ -723,9 +728,9 @@ void MainWindow::initMenuView()
     initMenuViewWindows();
 }
 
-void MainWindow::initHierarchyTypeActions()
+void MainWindow::initDocumentViewActions()
 {
-    d->m_hierarchyTypeMenu = new QMenu(this);
+    d->m_documentViewMenu = new QMenu(this);
 
     auto addAction = [&](const QString &icon, const QString &text, msc::MscDocument::HierarchyType type) {
         auto action = new QAction(QIcon(icon), text, this);
@@ -733,7 +738,7 @@ void MainWindow::initHierarchyTypeActions()
 
         connect(action, &QAction::triggered, this, &MainWindow::changHeierarchyType);
 
-        d->m_hierarchyTypeMenu->addAction(action);
+        d->m_documentViewMenu->addAction(action);
 
         // create tool
         auto tool = new msc::HierarchyCreatorTool(type, &(d->m_model->hierarchyViewModel()), nullptr, this);
@@ -764,6 +769,11 @@ void MainWindow::initHierarchyTypeActions()
     addAction(":/icons/document_repeat.png", tr("Hierarchy Repeat"), msc::MscDocument::HierarchyRepeat);
     addAction(":/icons/document_exception.png", tr("Hierarchy Exception"), msc::MscDocument::HierarchyException);
     addAction(":/icons/document_leaf.png", tr("Hierarchy Leaf"), msc::MscDocument::HierarchyLeaf);
+
+    d->m_documentViewMenu->addSeparator();
+    d->m_documentViewMenu->addAction(tr("Rename"), this, [&]() {
+        d->ui->documentTreeView->openPersistentEditor(d->ui->documentTreeView->currentIndex());
+    });
 }
 
 void MainWindow::initMenuViewWindows()
@@ -932,7 +942,7 @@ void MainWindow::initConnections()
         }
     });
 
-    connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showHierarchyTypeMenu);
+    connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showDocumentViewMenu);
 
     connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
             &QTreeView::expandAll);
@@ -1263,10 +1273,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
     switch (e->key()) {
     case Qt::Key_Escape: {
-        if (!e->isAutoRepeat())
+        if (!e->isAutoRepeat()) {
             if (QAction *pointerToolAction = d->m_mscToolBar->actions().first())
                 if (!pointerToolAction->isChecked())
                     pointerToolAction->setChecked(true);
+
+            d->ui->documentTreeView->closePersistentEditor(d->ui->documentTreeView->currentIndex());
+        }
         break;
     }
 #ifdef QT_DEBUG
