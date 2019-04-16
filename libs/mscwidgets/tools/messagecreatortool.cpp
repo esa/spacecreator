@@ -232,13 +232,17 @@ void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
         break;
     }
     case Step::ChooseTarget: {
-        const bool isClick = m_currMode == InteractionMode::Click;
-        const bool needCommit = m_currMode == InteractionMode::Drag || (isClick && e->modifiers() == Qt::AltModifier);
-        if (needCommit) {
-            finishArrowCreation(scenePos);
-        } else if (isClick) {
-            m_messageItem->addMessagePoint(scenePos);
-        }
+        // disable message creation with multiple points for now
+        // const bool isClick = m_currMode == InteractionMode::Click;
+        // const bool needCommit = m_currMode == InteractionMode::Drag || (isClick && e->modifiers() ==
+        // Qt::AltModifier);
+        // if (needCommit) {
+        //    finishArrowCreation(scenePos);
+        // } else if (isClick) {
+        //    m_messageItem->addMessagePoint(scenePos);
+        // }
+
+        finishArrowCreation(scenePos);
 
         break;
     }
