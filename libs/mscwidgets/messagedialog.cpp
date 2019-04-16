@@ -115,11 +115,14 @@ void MessageDialog::copyDeclarationData()
     if (!declarations)
         return;
 
-    const int idx = ui->declarationsComboBox->currentIndex();
-    if (idx == 0 || (idx - 1) >= declarations->size())
+    const int idx = ui->declarationsComboBox->currentIndex() - 1;
+    if (idx < 0 || idx >= declarations->size())
         return;
 
-    const QString name = declarations->at(idx - 1)->names().at(0);
+    const msc::MscMessageDeclaration *declaration = declarations->at(idx);
+    Q_ASSERT(declaration != nullptr);
+    Q_ASSERT(!declaration->names().isEmpty());
+    const QString name = declaration->names().at(0);
     ui->nameLineEdit->setText(name);
     selectDeclarationFromName();
 }
@@ -142,7 +145,8 @@ void MessageDialog::selectDeclarationFromName()
             break;
         }
     }
-    ui->declarationsComboBox->setCurrentIndex(currentIdx);
+    if (ui->declarationsComboBox->currentIndex() != currentIdx)
+        ui->declarationsComboBox->setCurrentIndex(currentIdx);
 
     if (m_selectedDeclaration) {
         const QStringList &types = m_selectedDeclaration->typeRefList();

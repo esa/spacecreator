@@ -41,7 +41,8 @@ const QStringList &MscMessageDeclaration::typeRefList() const
 
 void MscMessageDeclaration::setNames(const QStringList &names)
 {
-    if (m_names == names)
+    Q_ASSERT(!names.isEmpty());
+    if (m_names == names || names.isEmpty())
         return;
 
     m_names = names;
