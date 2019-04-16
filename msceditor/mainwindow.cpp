@@ -523,8 +523,7 @@ void MainWindow::showChart(const QModelIndex &index)
 
 void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &previous)
 {
-    d->ui->documentTreeView->closePersistentEditor(previous);
-
+    Q_UNUSED(previous)
     if (!current.isValid()) {
         return;
     }
@@ -771,9 +770,8 @@ void MainWindow::initDocumentViewActions()
     addAction(":/icons/document_leaf.png", tr("Hierarchy Leaf"), msc::MscDocument::HierarchyLeaf);
 
     d->m_documentViewMenu->addSeparator();
-    d->m_documentViewMenu->addAction(tr("Rename"), this, [&]() {
-        d->ui->documentTreeView->openPersistentEditor(d->ui->documentTreeView->currentIndex());
-    });
+    d->m_documentViewMenu->addAction(tr("Rename"), this,
+                                     [&]() { d->ui->documentTreeView->edit(d->ui->documentTreeView->currentIndex()); });
 }
 
 void MainWindow::initMenuViewWindows()
@@ -1277,8 +1275,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             if (QAction *pointerToolAction = d->m_mscToolBar->actions().first())
                 if (!pointerToolAction->isChecked())
                     pointerToolAction->setChecked(true);
-
-            d->ui->documentTreeView->closePersistentEditor(d->ui->documentTreeView->currentIndex());
         }
         break;
     }
