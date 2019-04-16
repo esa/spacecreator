@@ -277,11 +277,13 @@ void MessageDialog::checkTextValidity()
 
     msc::MscParameterList parameters;
     for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
-        const QString &text = ui->parameterTable->item(i, 0)->text();
-        if (!text.isEmpty()) {
-            parameters << msc::MscParameter(text);
-        } else {
-            qWarning() << "An empty parameter is not allowed";
+        QTableWidgetItem *item = ui->parameterTable->item(i, 0);
+        if (item) {
+            const QString &text = item->text();
+            if (!text.isEmpty())
+                parameters << msc::MscParameter(text);
+            else
+                m_isValid = false;
         }
     }
     msg.setParameters(parameters);
@@ -308,16 +310,19 @@ void MessageDialog::checkTextValidity()
         asn1::Asn1ValueParser parser;
         const QVariantList &asn1Types = mscModel()->asn1TypesData();
         for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
-            const QString &value = ui->parameterTable->item(i, 0)->text();
-            const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
-            auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
-                                     [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
-            if (find != asn1Types.end()) {
-                bool ok;
-                parser.parseAsn1Value((*find).toMap(), value, &ok);
-                m_isValid = m_isValid && ok;
-            } else
-                m_isValid = false;
+            QTableWidgetItem *item = ui->parameterTable->item(i, 0);
+            if (item) {
+                const QString &value = ui->parameterTable->item(i, 0)->text();
+                const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
+                auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
+                                         [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
+                if (find != asn1Types.end()) {
+                    bool ok;
+                    parser.parseAsn1Value((*find).toMap(), value, &ok);
+                    m_isValid = m_isValid && ok;
+                } else
+                    m_isValid = false;
+            }
         }
     }
 
