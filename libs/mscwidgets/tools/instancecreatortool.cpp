@@ -18,8 +18,6 @@
 #include "instancecreatortool.h"
 
 #include "commands/common/commandsstack.h"
-#include "instanceitem.h"
-#include "mscchart.h"
 #include "mscinstance.h"
 
 #include <QDebug>
@@ -34,44 +32,59 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
     m_icon = QPixmap(":/icons/toolbar/instance.png");
 }
 
+void InstanceCreatorTool::setAction(QAction *action)
+{
+    if (m_action == action)
+        return;
+
+    if (m_action)
+        disconnect(m_action, nullptr, this, nullptr);
+
+    m_action = action;
+
+    if (m_action)
+        connect(m_action, &QAction::triggered, this, &InstanceCreatorTool::onActionTriggered);
+}
+
+bool InstanceCreatorTool::onMousePress(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
+
+bool InstanceCreatorTool::onMouseRelease(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
+
+bool InstanceCreatorTool::onMouseMove(QMouseEvent *e)
+{
+    Q_UNUSED(e);
+    return false;
+}
+
 BaseTool::ToolType InstanceCreatorTool::toolType() const
 {
     return BaseTool::ToolType::InstanceCreator;
 }
 
-void InstanceCreatorTool::createPreviewItem()
+void InstanceCreatorTool::onActionTriggered(bool activated)
 {
-    if (!m_scene || m_previewItem || !m_active)
+    if (!activated)
         return;
 
-    const QString &instanceName = m_model->currentChart()->createUniqueInstanceName();
-    InstanceItem *instanceItem = m_model->createDefaultInstanceItem(new MscInstance(instanceName), cursorInScene());
-
-    if (!instanceItem)
+    if (!m_activeChart)
         return;
 
-    m_previewItem = instanceItem;
-    m_previewEntity.reset(instanceItem->modelItem());
+    MscInstance *instance = m_activeChart->makeInstance();
+    startWaitForModelLayoutComplete(instance);
 
-    m_scene->addItem(m_previewItem);
-    m_previewItem->setOpacity(0.5);
-}
-
-void InstanceCreatorTool::commitPreviewItem()
-{
-    if (!m_previewEntity || !m_activeChart)
-        return;
-
-    auto instance = qobject_cast<msc::MscInstance *>(m_previewEntity.take());
-    const int pos = m_model->instanceOrderFromPos(cursorInScene());
+    static constexpr int pos { -1 };
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
                                       QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
-
-    startWaitForModelLayoutComplete(instance);
-    removePreviewItem(); // free the space to avoid overlapping
-
     Q_EMIT created();
 }
 
-} // ns msc
+}; // ns msc

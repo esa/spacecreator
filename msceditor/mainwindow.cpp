@@ -146,6 +146,7 @@ struct MainWindowPrivate {
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::InstanceStopTool *m_instanceStopTool = nullptr;
+    msc::InstanceCreatorTool *m_instanceCreatorTool = nullptr;
     msc::EntityDeleteTool *m_deleteTool = nullptr;
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
@@ -683,14 +684,15 @@ void MainWindow::initMenuFile()
 
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
-                                            [&]() {
-                                                if (this->saveDocument()) {
-                                                    this->saveSettings();
-                                                    QApplication::quit();
-                                                }
-                                            },
-                                            QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(
+            tr("&Quit"), this,
+            [&]() {
+                if (this->saveDocument()) {
+                    this->saveSettings();
+                    QApplication::quit();
+                }
+            },
+            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
@@ -822,8 +824,8 @@ void MainWindow::initTools()
     auto pointerTool = new msc::PointerTool(nullptr, this);
     d->m_tools.append(pointerTool);
 
-    auto instanceCreateTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
-    d->m_tools.append(instanceCreateTool);
+    d->m_instanceCreatorTool = new msc::InstanceCreatorTool(&(d->m_model->chartViewModel()), nullptr, this);
+    d->m_tools.append(d->m_instanceCreatorTool);
 
     d->m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
     d->m_tools.append(d->m_instanceStopTool);
@@ -878,6 +880,8 @@ void MainWindow::initTools()
         tool->setView(currentView());
         if (tool == d->m_instanceStopTool)
             d->m_instanceStopTool->setAction(toolAction);
+        else if (tool == d->m_instanceCreatorTool)
+            d->m_instanceCreatorTool->setAction(toolAction);
 
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
         connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);

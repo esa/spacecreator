@@ -204,7 +204,7 @@ void ChartViewModel::fillView(MscChart *chart)
 
     // restore initial chart box (stored in CIF), because it's overriden by actual content bounds
     if (!initialChartRect.isNull())
-        d->m_layoutInfo.m_chartItem->setBox(initialChartRect);
+        d->m_layoutInfo.m_chartItem->setBox(initialChartRect.marginsAdded(ChartItem::chartMargins()));
     else if (!d->m_layoutInfo.m_preferredBox.isEmpty()) {
         const QRectF prefferedBox { d->m_layoutInfo.m_chartItem->box().topLeft(), d->m_layoutInfo.m_preferredBox };
         d->m_layoutInfo.m_chartItem->setBox(prefferedBox);
@@ -973,6 +973,8 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
         d->m_instanceItemsSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
+
+        clearScene();
         updateLayout();
     }
 }

@@ -18,8 +18,9 @@
 #pragma once
 
 #include "basecreatortool.h"
-#include "instanceitem.h"
 #include "mscinstance.h"
+
+#include <QAction>
 
 namespace msc {
 
@@ -27,15 +28,20 @@ class InstanceCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
     virtual BaseTool::ToolType toolType() const override;
+    void setAction(QAction *action);
 
 protected:
-    QPointer<MscInstance> m_instance = nullptr;
-    QPointer<InstanceItem> m_instanceItem = nullptr;
+    bool onMousePress(QMouseEvent *e) override;
+    bool onMouseRelease(QMouseEvent *e) override;
+    bool onMouseMove(QMouseEvent *e) override;
 
-    void createPreviewItem() override;
-    void commitPreviewItem() override;
+private:
+    QPointer<QAction> m_action = nullptr;
+
+private Q_SLOTS:
+    void onActionTriggered(bool activated);
 };
 
-} // ns msc
+}; // ns msc
