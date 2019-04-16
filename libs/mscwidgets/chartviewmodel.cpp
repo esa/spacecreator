@@ -424,8 +424,7 @@ void ChartViewModel::addInstanceEventItems()
         }
     }
 
-    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItems.size());
-    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItemSorted.size());
+    Q_ASSERT(d->m_instanceEventItems.size() == d->m_instanceEventItemSorted.size());
 }
 
 void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item)
@@ -620,7 +619,7 @@ void ChartViewModel::onChartBoxChanged()
     */
     // expand global messages
     for (InteractiveObject *io : d->m_instanceEventItemSorted)
-        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
+        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
             if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
                 messageItem->onChartBoxChanged();
 
