@@ -54,6 +54,11 @@ GraphicsView::GraphicsView(QWidget *parent)
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
+double GraphicsView::zoom() const
+{
+    return m_zoomPercent;
+}
+
 void GraphicsView::setZoom(double percent)
 {
     if (percent < minZoomPercent() || percent > maxZoomPercent())

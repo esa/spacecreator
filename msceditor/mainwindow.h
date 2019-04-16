@@ -90,6 +90,7 @@ private Q_SLOTS:
     void copyAsDiagram();
     void copyAsPicture();
     void pasteChart();
+    void updateZoomBox(double percent);
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

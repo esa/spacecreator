@@ -444,6 +444,8 @@ void MainWindow::showDocumentView(bool show)
 
         d->m_deleteTool->setView(d->ui->graphicsView);
         d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
+
+        updateZoomBox(d->ui->graphicsView->zoom());
     }
 }
 
@@ -460,6 +462,8 @@ void MainWindow::showHierarchyView(bool show)
 
         d->m_deleteTool->setView(d->ui->hierarchyView);
         d->m_deleteTool->setCurrentChart(nullptr);
+
+        updateZoomBox(d->ui->hierarchyView->zoom());
     }
 }
 
@@ -620,11 +624,14 @@ void MainWindow::setupUi()
     d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(100));
 
     connect(d->m_zoomBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [&](int index) {
-        d->ui->graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
+        if (auto graphicsView = dynamic_cast<msc::GraphicsView *>(d->ui->centerView->currentWidget()))
+            graphicsView->setZoom(qobject_cast<QComboBox *>(sender())->itemData(index).toDouble());
     });
 
     connect(d->ui->graphicsView, QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
-            [&](qreal percent) { d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(percent)); });
+            &MainWindow::updateZoomBox);
+    connect(d->ui->hierarchyView, QOverload<double>::of(&msc::GraphicsView::zoomChanged), this,
+            &MainWindow::updateZoomBox);
 
     statusBar()->addPermanentWidget(d->m_zoomBox);
     statusBar()->show();
@@ -1610,4 +1617,11 @@ void MainWindow::pasteChart()
 
         updateTreeViewItem(document);
     }
+}
+
+void MainWindow::updateZoomBox(double percent)
+{
+    const QSignalBlocker blocker(d->m_zoomBox);
+
+    d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(percent));
 }

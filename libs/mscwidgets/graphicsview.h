@@ -34,6 +34,7 @@ class GraphicsView : public QGraphicsView
 public:
     explicit GraphicsView(QWidget *parent = nullptr);
 
+    double zoom() const;
     void setZoom(double percent);
 
     QUndoStack *undoStack() const;
