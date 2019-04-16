@@ -641,10 +641,7 @@ void ChartViewModel::updateContentBounds()
     if (chartBox.isEmpty())
         chartBox = contentRect;
     else {
-        if (chartBox.width() < contentRect.width())
-            chartBox.setWidth(contentRect.width());
-        if (chartBox.height() < contentRect.height())
-            chartBox.setHeight(contentRect.height());
+        chartBox = chartBox.united(contentRect);
     }
     d->m_layoutInfo.m_chartItem->setBox(chartBox);
 
