@@ -18,6 +18,7 @@
 #pragma once
 
 #include "baseitems/common/objectanchor.h"
+#include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
 
@@ -42,13 +43,6 @@ public:
         GeometryNotificationBlocker() = delete;
         GeometryNotificationBlocker(const GeometryNotificationBlocker &other) = delete;
         GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
-    };
-
-    enum class CifUpdatePolicy
-    {
-        DontChange,
-        ForceCreate,
-        UpdateIfExists
     };
 
     explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr, InstanceItem *target = nullptr,
@@ -86,7 +80,7 @@ public:
 
     void addMessagePoint(const QPointF &scenePoint);
     QVector<QPointF> messagePoints() const;
-    void setMessagePoints(const QVector<QPointF> &scenePoints, MessageItem::CifUpdatePolicy cifUpdate);
+    void setMessagePoints(const QVector<QPointF> &scenePoints, utils::CifUpdatePolicy cifUpdate);
 
     void applyCif() override;
 

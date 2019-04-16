@@ -33,6 +33,13 @@ namespace utils {
 
 static constexpr qreal LineHoverTolerance = 10.;
 
+enum class CifUpdatePolicy
+{
+    DontChange,
+    ForceCreate,
+    UpdateIfExists
+};
+
 template<class ItemType, class TargetPositioning>
 QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &scenePos)
 {

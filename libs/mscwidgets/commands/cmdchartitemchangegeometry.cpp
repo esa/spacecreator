@@ -17,12 +17,14 @@
 
 #include "cmdchartitemchangegeometry.h"
 
+#include "baseitems/common/coordinatesconverter.h"
+#include "chartitem.h"
 #include "mscchart.h"
 
 namespace msc {
 namespace cmd {
 
-CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRect &oldRect, const QRect &newRect, MscChart *chart)
+CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRectF &oldRect, const QRectF &newRect, MscChart *chart)
     : BaseCommand(chart)
     , m_chart(chart)
     , m_oldRect(oldRect)
@@ -32,14 +34,18 @@ CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRect &oldRect, con
 
 void CmdChartItemChangeGeometry::redo()
 {
-    if (m_chart)
-        m_chart->setCifRect(m_newRect);
+    //    if (m_chart)
+    //        m_chart->setCifRect(m_newRect);
+    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+        chartItem->setBox(m_newRect);
 }
 
 void CmdChartItemChangeGeometry::undo()
 {
-    if (m_chart)
-        m_chart->setCifRect(m_oldRect);
+    //    if (m_chart)
+    //        m_chart->setCifRect(m_oldRect);
+    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+        chartItem->setBox(m_oldRect);
 }
 
 bool CmdChartItemChangeGeometry::mergeWith(const QUndoCommand *command)

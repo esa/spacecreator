@@ -18,6 +18,7 @@
 #include "chartitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
+#include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
@@ -120,8 +121,14 @@ bool cifToScene(const QRect &cifRect, QRectF &sceneRect)
 
 void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    const QPoint shift = QPointF(to - from).toPoint();
-    QRect rect = m_rectItem->rect().toRect();
+    if (m_originalBox.isNull())
+        m_originalBox = m_box;
+
+    if (from == to)
+        return;
+
+    const QPointF shift = QPointF(to - from);
+    QRectF rect = m_box;
     switch (gp->location()) {
     case GripPoint::Left:
         rect.setLeft(rect.left() + shift.x());
@@ -152,23 +159,15 @@ void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPoi
         break;
     }
 
-    QRect oldRect;
-    if (geometryManagedByCif()) {
-        oldRect = chart()->cifRect();
-    } else if (!sceneToCif(m_box, oldRect)) {
-        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << oldRect;
-        return;
-    }
+    setBox(rect);
+}
 
-    QRect newRect;
-    if (sceneToCif(rect, newRect)) {
-        msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry,
-                                      { oldRect, newRect, QVariant::fromValue<MscChart *>(chart()) });
-        updateGripPoints();
-        updateCif();
-    } else {
-        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << rect;
-    }
+void ChartItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
+{
+    msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry,
+                                  { m_originalBox, m_box, QVariant::fromValue<MscChart *>(chart()) });
+    m_originalBox = QRectF();
+    updateCif();
 }
 
 void ChartItem::prepareHoverMark()
@@ -177,6 +176,8 @@ void ChartItem::prepareHoverMark()
     m_gripPoints->setUsedPoints(GripPoint::Locations { GripPoint::Left, GripPoint::Top, GripPoint::Right,
                                                        GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
                                                        GripPoint::TopRight, GripPoint::BottomRight });
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -206,12 +207,12 @@ void ChartItem::setBox(const QRectF &r)
     m_rectItem->setRect(m_box);
 
     if (QGraphicsScene *pScene = scene())
-        pScene->setSceneRect(sceneBoundingRect());
+        pScene->setSceneRect(sceneBoundingRect().marginsAdded(chartMargins()));
     m_guard = false;
 
     updateTitlePos();
 
-    Q_EMIT chartBoxChanged();
+    updateGripPoints();
 }
 
 const QMarginsF &ChartItem::chartMargins()
@@ -223,7 +224,9 @@ const QMarginsF &ChartItem::chartMargins()
 
 void ChartItem::updateTitlePos()
 {
-    m_textItemName->setPos(m_box.topLeft());
+    QRectF txtRect(m_textItemName->sceneBoundingRect());
+    txtRect.moveBottomLeft(m_box.topLeft());
+    m_textItemName->setPos(txtRect.topLeft());
 }
 
 void ChartItem::applyCif()
@@ -276,6 +279,19 @@ QRectF ChartItem::storedCustomRect() const
         qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << cifRect;
 
     return rect;
+}
+
+QPainterPath ChartItem::shape() const
+{
+    const QRectF &rect = boundingRect();
+    const QVector<QLineF> lines { { rect.topLeft(), rect.topRight() },
+                                  { rect.topRight(), rect.bottomRight() },
+                                  { rect.bottomRight(), rect.bottomLeft() },
+                                  { rect.bottomLeft(), rect.topLeft() } };
+    QPainterPath result;
+    for (const QLineF &line : lines)
+        result.addPath(utils::lineShape(line, utils::LineHoverTolerance));
+    return result;
 }
 
 } // ns msc

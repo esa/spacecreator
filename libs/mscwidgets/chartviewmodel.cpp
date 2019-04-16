@@ -21,6 +21,7 @@
 #include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
+#include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
@@ -90,7 +91,7 @@ struct ChartViewModelPrivate {
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
     QVector<msc::InstanceItem *> m_instanceItemsSorted;
     QHash<QUuid, msc::InteractiveObject *> m_instanceEventItems;
-    QVector<msc::InteractiveObject *> m_instanceEventItemSorted;
+    QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
 
     QHash<QUuid, CommentItem *> m_comments;
     QPointer<msc::MscChart> m_currentChart = nullptr;
@@ -132,7 +133,7 @@ struct ChartViewModelPrivate {
         for (InstanceItem *item : m_instanceItemsSorted)
             items << item;
 
-        for (InteractiveObject *item : m_instanceEventItemSorted)
+        for (InteractiveObject *item : m_instanceEventItemsSorted)
             items << item;
 
         for (CommentItem *item : m_comments)
@@ -167,7 +168,7 @@ void ChartViewModel::clearScene()
 {
     qDeleteAll(d->m_instanceEventItems);
     d->m_instanceEventItems.clear();
-    d->m_instanceEventItemSorted.clear();
+    d->m_instanceEventItemsSorted.clear();
 
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
@@ -269,7 +270,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
         item->setInstances(sourceItem, targetItem);
-        item->setMessagePoints({ pntSource, pntTarget }, MessageItem::CifUpdatePolicy::DontChange);
+        item->setMessagePoints({ pntSource, pntTarget }, utils::CifUpdatePolicy::DontChange);
     }
 
     if (item)
@@ -424,7 +425,9 @@ void ChartViewModel::addInstanceEventItems()
         }
     }
 
-    Q_ASSERT(d->m_instanceEventItems.size() == d->m_instanceEventItemSorted.size());
+    Q_ASSERT(d->m_instanceEventItems.size() == d->m_instanceEventItemsSorted.size());
+    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItems.size());
+    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItemsSorted.size());
 }
 
 void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item)
@@ -486,7 +489,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
                             messagePoints[i] += delta;
                         messageItem->setMessagePoints(
                                 messagePoints,
-                                MessageItem::CifUpdatePolicy::DontChange); // changes its pos to the source point
+                                utils::CifUpdatePolicy::DontChange); // changes its pos to the source point
                     }
                 }
                 messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
@@ -551,32 +554,78 @@ void ChartViewModel::updateComment(msc::MscEntity *entity, msc::InteractiveObjec
 /*!
    Returns the scene rectangle of all instances and events
  */
-QRectF ChartViewModel::prepareContentRect() const
+QRectF ChartViewModel::minimalContentRect() const
 {
-    QRectF totalRect;
-    for (InteractiveObject *gi : d->allItems()) {
-        QRectF currRect = gi->sceneBoundingRect();
-        if (gi->modelEntity()
-            && gi->modelEntity()->entityType() == MscEntity::EntityType::Message) // TODO: same for Create?
-        {
-            MscMessage *message = static_cast<MscMessage *>(gi->modelEntity());
-            if (message->isGlobal()) {
-                if (MessageItem *messageItem = dynamic_cast<MessageItem *>(gi)) {
-                    // if it's a simple (two point) horizontal message only its height
-                    // accounted since it will be extended to the chart edge afterwhile
-                    // TODO: add support for complex global message
-                    const QLineF arrowLine(messageItem->tail(), messageItem->head());
-                    if (qFuzzyIsNull(arrowLine.dy())) {
-                        const QPointF &currCenter = currRect.center();
-                        currRect.setWidth(1.);
-                        currRect.moveCenter(currCenter);
-                    }
+    constexpr qreal minWidth { 200. };
+    constexpr qreal minHeight { 200. };
+    auto ensureMinSize = [&](QRectF r) {
+        if (r.width() < minWidth)
+            r.setWidth(minWidth);
+        if (r.height() < minHeight)
+            r.setHeight(minHeight);
+        return r;
+    };
+
+    auto effectiveRectInstances = [&ensureMinSize](const QVector<InstanceItem *> &instances) {
+        QRectF totalRect, cifsRect;
+        for (InstanceItem *item : instances) {
+            const QRectF &currRect = item->sceneBoundingRect();
+            totalRect |= currRect;
+            if (item->geometryManagedByCif())
+                cifsRect |= currRect;
+        }
+
+        if (cifsRect.isNull())
+            return ensureMinSize(totalRect);
+
+        return totalRect;
+    };
+
+    auto eventEffectiveRect = [](InteractiveObject *item) {
+        if (!item)
+            return QRectF();
+
+        QRectF currRect = item->sceneBoundingRect();
+        if (!item->modelEntity() || item->modelEntity()->entityType() != MscEntity::EntityType::Message)
+            return currRect;
+
+        MscMessage *message = static_cast<MscMessage *>(item->modelEntity());
+        if (message->isGlobal() && !item->geometryManagedByCif()) {
+            if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
+                // if it's a simple (two point) horizontal message only its height
+                // accounted since it will be extended to the chart edge afterwhile
+                // TODO: add support for complex global message
+                const QLineF arrowLine(messageItem->tail(), messageItem->head());
+                if (qFuzzyIsNull(arrowLine.dy())) {
+                    const QPointF &currCenter = currRect.center();
+                    currRect.setWidth(1.);
+                    currRect.moveCenter(currCenter);
                 }
             }
         }
-        totalRect = totalRect.united(currRect);
+        return currRect;
+    };
+
+    auto effectiveRectEvents = [&eventEffectiveRect](const QVector<InteractiveObject *> &events) {
+        QRectF totalRect;
+        for (InteractiveObject *item : events) {
+            const QRectF &currRect = eventEffectiveRect(item);
+            if (!currRect.isNull())
+                totalRect |= currRect;
+        }
+        return totalRect;
+    };
+
+    const QRectF &events = effectiveRectEvents(d->m_instanceEventItemsSorted);
+    QRectF instances = effectiveRectInstances(d->m_instanceItemsSorted);
+    if (events.isNull()) {
+        instances.setHeight(minHeight);
+        return instances;
     }
-    return totalRect;
+
+    QRectF contentRect = instances | events;
+    contentRect.setBottom(events.bottom() + InstanceEndItem::EndSymbolHeight);
+    return contentRect;
 }
 
 QLineF ChartViewModel::commonAxis() const
@@ -597,35 +646,7 @@ QLineF ChartViewModel::commonAxis() const
 
 void ChartViewModel::onChartBoxChanged()
 {
-    const QRectF &contentRect = prepareContentRect();
-    QRectF currentChartBox = d->m_layoutInfo.m_chartItem->box();
-
-    if (currentChartBox.width() < contentRect.width())
-        currentChartBox.setWidth(contentRect.width());
-    if (currentChartBox.height() < contentRect.height())
-        currentChartBox.setHeight(contentRect.height());
-    /*
-        // expand non stopped instances to the bottom
-        for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
-            if (instanceItem->modelItem()->explicitStop())
-                continue;
-            if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + currentChartBox.bottom())) {
-                const qreal deltaH = currentChartBox.bottom() - instanceItem->sceneBoundingRect().bottom();
-                qDebug() << "updating instance height:" << instanceItem->axisHeight() << deltaH
-                         << (instanceItem->axisHeight() + deltaH);
-                instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH);
-            }
-        }
-    */
-    // expand global messages
-    for (InteractiveObject *io : d->m_instanceEventItemSorted)
-        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
-            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
-                messageItem->onChartBoxChanged();
-
-    if (currentChartBox == d->m_layoutInfo.m_chartItem->box())
-        return;
-    d->m_layoutInfo.m_chartItem->setBox(currentChartBox);
+    updateContentBounds();
 }
 
 void ChartViewModel::updateContentBounds()
@@ -636,14 +657,37 @@ void ChartViewModel::updateContentBounds()
     const bool customBoxUsed = d->m_layoutInfo.m_chartItem->geometryManagedByCif();
     QRectF chartBox =
             customBoxUsed ? d->m_layoutInfo.m_chartItem->storedCustomRect() : d->m_layoutInfo.m_chartItem->box();
-    const QRectF &contentRect =
-            prepareContentRect().marginsAdded(customBoxUsed ? QMarginsF() : ChartItem::chartMargins());
+    const QRectF &minRect = minimalContentRect();
+    const QRectF &contentRect = minRect;
+
     if (chartBox.isEmpty())
         chartBox = contentRect;
-    else {
-        chartBox = chartBox.united(contentRect);
+    else
+        chartBox.moveTopLeft(contentRect.topLeft());
+
+    if (chartBox.width() < minRect.width())
+        chartBox.setWidth(contentRect.width());
+    if (chartBox.height() < minRect.height())
+        chartBox.setHeight(contentRect.height());
+
+    QSignalBlocker sb(d->m_layoutInfo.m_chartItem);
+    d->m_layoutInfo.m_chartItem->setBox(chartBox.marginsAdded(ChartItem::chartMargins()));
+
+    // expand global messages
+    for (InteractiveObject *io : d->m_instanceEventItemsSorted)
+        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
+            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
+                messageItem->onChartBoxChanged();
+
+    // expand non stopped instances to the bottom
+    for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
+        if (instanceItem->modelItem()->explicitStop())
+            continue;
+        if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + chartBox.bottom())) {
+            const qreal deltaH = chartBox.bottom() - instanceItem->sceneBoundingRect().bottom();
+            instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
+        }
     }
-    d->m_layoutInfo.m_chartItem->setBox(chartBox);
 
     const int totalItemsCount = d->allItemsCount();
     d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
@@ -814,7 +858,7 @@ MscInstance *ChartViewModel::nearestInstance(const QPointF &pos)
 int ChartViewModel::eventIndex(qreal y)
 {
     int idx = 0;
-    for (auto item : d->m_instanceEventItemSorted) {
+    for (auto item : d->m_instanceEventItemsSorted) {
         if (item->y() < y) {
             ++idx;
             if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
@@ -939,7 +983,7 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
         return;
 
     if (msc::InteractiveObject *item = d->m_instanceEventItems.take(event->internalId())) {
-        d->m_instanceEventItemSorted.removeOne(item);
+        d->m_instanceEventItemsSorted.removeOne(item);
         utils::removeSceneItem(item);
         delete item;
         updateLayout();
@@ -1108,7 +1152,7 @@ CoregionItem *ChartViewModel::addCoregionItem(MscCoregion *coregion)
     if (!item) {
         item = new CoregionItem(this);
         d->m_instanceEventItems.insert(coregion->internalId(), item);
-        d->m_instanceEventItemSorted.append(item);
+        d->m_instanceEventItemsSorted.append(item);
         d->m_scene.addItem(item);
     }
     if (coregion->type() == MscCoregion::Type::Begin) {
@@ -1277,7 +1321,7 @@ void ChartViewModel::storeEntityItem(InteractiveObject *item)
     }
     default: {
         d->m_instanceEventItems.insert(entity->internalId(), item);
-        d->m_instanceEventItemSorted.append(item);
+        d->m_instanceEventItemsSorted.append(item);
         break;
     }
     }
@@ -1333,9 +1377,7 @@ void ChartViewModel::prepareChartBoxItem()
 {
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
-        connect(d->m_layoutInfo.m_chartItem, &ChartItem::cifChanged, this, [this]() { updateContentBounds(); });
-        connect(d->m_layoutInfo.m_chartItem, &ChartItem::chartBoxChanged, this, &ChartViewModel::onChartBoxChanged);
-
+        connect(d->m_layoutInfo.m_chartItem, &ChartItem::cifChanged, this, &ChartViewModel::updateContentBounds);
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 

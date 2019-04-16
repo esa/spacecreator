@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 
 class QGraphicsRectItem;
@@ -44,7 +45,8 @@ public:
     QString name() const;
     QString kind() const;
 
-    void setAxisHeight(qreal height);
+    void setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate = utils::CifUpdatePolicy::DontChange);
+
     qreal axisHeight() const;
     QLineF axis() const;
 

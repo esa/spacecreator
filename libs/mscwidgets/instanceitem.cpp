@@ -101,12 +101,30 @@ QString InstanceItem::kind() const
     return m_headSymbol->kind();
 }
 
-void InstanceItem::setAxisHeight(qreal height)
+void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
 {
     if (qFuzzyCompare(m_axisHeight, height)) {
         return;
     }
     m_axisHeight = height;
+
+    bool writeCif(false);
+    switch (cifUpdate) {
+    case utils::CifUpdatePolicy::DontChange: {
+        break;
+    }
+    case utils::CifUpdatePolicy::UpdateIfExists: {
+        writeCif = geometryManagedByCif();
+        break;
+    }
+    case utils::CifUpdatePolicy::ForceCreate: {
+        writeCif = true;
+        break;
+    }
+    }
+    if (writeCif)
+        updateCif();
+
     rebuildLayout();
 }
 
@@ -346,7 +364,10 @@ void InstanceItem::updateCif()
     }
 
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
-    const QVector<QPointF> scenePoints = { textBoxRect.topLeft(), textBoxRect.bottomRight(), axis().p1(), axis().p2() };
+    const QPointF &axisStart = axis().p1();
+    const QPointF axisEnd { axisStart.x(), axisStart.y() + m_axisHeight };
+
+    const QVector<QPointF> scenePoints = { textBoxRect.topLeft(), textBoxRect.bottomRight(), axisStart, axisEnd };
     bool converted(false);
     const QVector<QPoint> &cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
     if (converted) {
@@ -410,7 +431,8 @@ void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPo
             ? utils::CoordinatesConverter::currentChartItem()->box()
             : QRectF();
     if (!chartBox.isNull()) {
-        utils::CoordinatesConverter::currentChartItem()->setBox(chartBox | myRect);
+        utils::CoordinatesConverter::currentChartItem()->setBox(chartBox
+                                                                | myRect.marginsAdded(ChartItem::chartMargins()));
     }
 
     updateCif();

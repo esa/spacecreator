@@ -52,6 +52,8 @@ public:
     bool geometryManagedByCif() const;
     QRectF storedCustomRect() const;
 
+    QPainterPath shape() const override;
+
 Q_SIGNALS:
     void chartBoxChanged();
 
@@ -66,6 +68,7 @@ protected:
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
+    void onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to);
 
 private:
     void updateCif() override;
@@ -74,7 +77,7 @@ private:
 private:
     QGraphicsRectItem *m_rectItem = nullptr;
     TextItem *m_textItemName = nullptr;
-    QRectF m_box;
+    QRectF m_box, m_originalBox;
     bool m_guard = false;
 };
 

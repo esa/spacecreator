@@ -362,7 +362,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
     if (MscInstance *targetInstance = message->targetInstance())
         snapToInstance(targetInstance, points, points.size() - 1);
 
-    m_messageItem->setMessagePoints(points, MessageItem::CifUpdatePolicy::ForceCreate);
+    m_messageItem->setMessagePoints(points, utils::CifUpdatePolicy::ForceCreate);
 
     return points.size() > 1;
 }

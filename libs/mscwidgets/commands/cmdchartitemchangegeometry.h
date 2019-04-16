@@ -32,7 +32,7 @@ class CmdChartItemChangeGeometry : public BaseCommand
 {
     Q_OBJECT
 public:
-    explicit CmdChartItemChangeGeometry(const QRect &oldRect, const QRect &newRect, MscChart *chart);
+    explicit CmdChartItemChangeGeometry(const QRectF &oldRect, const QRectF &newRect, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -41,8 +41,8 @@ public:
 
 protected:
     QPointer<MscChart> m_chart;
-    const QRect m_oldRect;
-    QRect m_newRect;
+    const QRectF m_oldRect;
+    QRectF m_newRect;
 };
 } // namespace cmd
 } // namespace msc

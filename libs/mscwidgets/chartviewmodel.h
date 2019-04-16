@@ -141,7 +141,7 @@ private:
 
     void storeEntityItem(InteractiveObject *item);
 
-    QRectF prepareContentRect() const;
+    QRectF minimalContentRect() const;
 
     void connectItems();
     void connectInstanceItem(InteractiveObject *instanceItem);

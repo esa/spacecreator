@@ -607,15 +607,15 @@ bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
     return true;
 }
 
-void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints, MessageItem::CifUpdatePolicy cifUpdate)
+void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints, utils::CifUpdatePolicy cifUpdate)
 {
     if (!setMessagePointsNoCif(scenePoints))
         return;
 
     switch (cifUpdate) {
-    case MessageItem::CifUpdatePolicy::DontChange:
+    case utils::CifUpdatePolicy::DontChange:
         return;
-    case MessageItem::CifUpdatePolicy::UpdateIfExists: {
+    case utils::CifUpdatePolicy::UpdateIfExists: {
         if (!geometryManagedByCif())
             return;
         break;
@@ -636,7 +636,7 @@ void MessageItem::applyCif()
         bool converted(false);
         const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
         if (converted)
-            setMessagePoints(pointsScene, MessageItem::CifUpdatePolicy::UpdateIfExists);
+            setMessagePoints(pointsScene, utils::CifUpdatePolicy::UpdateIfExists);
     }
 }
 
@@ -666,7 +666,7 @@ void MessageItem::updateMessagePoints()
     }
 
     if (updated)
-        setMessagePoints(points, MessageItem::CifUpdatePolicy::ForceCreate);
+        setMessagePoints(points, utils::CifUpdatePolicy::ForceCreate);
 }
 
 cif::CifLine::CifType MessageItem::mainCifType() const
@@ -705,7 +705,7 @@ void MessageItem::extendGlobalMessage()
 {
     auto getChartBox = [this]() {
         if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-            return chartItem->sceneBoundingRect();
+            return chartItem->box();
         if (QGraphicsScene *scene = this->scene())
             return scene->sceneRect();
         return QRectF();
@@ -734,7 +734,7 @@ void MessageItem::extendGlobalMessage()
     const QPointF &shiftedMe = extendToNearestEdge(shiftMe);
     if (shiftedMe != points.at(shiftPointId)) {
         points.replace(shiftPointId, shiftedMe);
-        setMessagePoints(points, MessageItem::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
     }
 }
 
