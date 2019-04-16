@@ -74,7 +74,7 @@ public:
 
 Q_SIGNALS:
     void edited(const QString &newText);
-    void keyPressed();
+    void textChanged();
     void inputValidationPatternChanged(const QString &);
 
 protected Q_SLOTS:

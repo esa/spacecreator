@@ -64,7 +64,7 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
     void updateLayout();
-    void onKeyPressed();
+    void onTextChanged();
 
 private:
     MsgIdentificationItem *m_itemText;

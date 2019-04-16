@@ -197,8 +197,16 @@ void TextItem::enableEditMode()
 
 void TextItem::disableEditMode()
 {
-    if (m_prevText != toPlainText())
-        Q_EMIT edited(toPlainText());
+    if (m_prevText != toPlainText()) {
+        if (toPlainText().isEmpty()) {
+            setPlainText(m_prevText);
+            setTextWidth(idealWidth());
+            adjustSize();
+            Q_EMIT textChanged();
+        } else {
+            Q_EMIT edited(toPlainText());
+        }
+    }
     selectText(false);
     m_prevText.clear();
     setTextInteractionFlags(Qt::NoTextInteraction);
@@ -249,7 +257,7 @@ void TextItem::keyPressEvent(QKeyEvent *event)
     setTextWidth(idealWidth());
     adjustSize();
 
-    Q_EMIT keyPressed();
+    Q_EMIT textChanged();
 }
 
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

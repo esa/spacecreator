@@ -135,7 +135,7 @@ QUndoCommand *CommandsFactory::createRenameEntity(const QVariantList &params)
 
     if (MscEntity *item = params.first().value<MscEntity *>()) {
         const QString &name = params.last().toString();
-        if (item->name() != name)
+        if (item->name() != name && !name.isEmpty())
             return new CmdEntityNameChange(item, name);
     }
 

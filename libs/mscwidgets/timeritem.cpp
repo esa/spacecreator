@@ -56,7 +56,7 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
     connect(m_timer, &msc::MscTimer::nameChanged, this, &msc::TimerItem::setName);
 
     connect(m_textItem, &TextItem::edited, this, &TimerItem::onTextEdited, Qt::QueuedConnection);
-    connect(m_textItem, &TextItem::keyPressed, this, &TimerItem::scheduleLayoutUpdate);
+    connect(m_textItem, &TextItem::textChanged, this, &TimerItem::scheduleLayoutUpdate);
 
     connect(m_timer, &msc::MscTimer::precedingTimerChanged, this, &TimerItem::scheduleLayoutUpdate);
     m_textItem->setVisible(m_timer->precedingTimer() == nullptr);

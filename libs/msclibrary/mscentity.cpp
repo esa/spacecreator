@@ -51,7 +51,7 @@ const QString &MscEntity::name() const
 
 void MscEntity::setName(const QString &name)
 {
-    if (name == m_name) {
+    if (name == m_name || name.isEmpty()) {
         return;
     }
 

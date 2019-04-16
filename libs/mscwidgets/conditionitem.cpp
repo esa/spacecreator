@@ -45,7 +45,7 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     m_nameItem->setBackgroundColor(Qt::transparent);
 
     connect(m_nameItem, &TextItem::edited, this, &ConditionItem::onNameEdited, Qt::QueuedConnection);
-    connect(m_nameItem, &TextItem::keyPressed, this, &ConditionItem::rebuildLayout);
+    connect(m_nameItem, &TextItem::textChanged, this, &ConditionItem::rebuildLayout);
 
     m_polygonItem->setBrush(Qt::white);
 

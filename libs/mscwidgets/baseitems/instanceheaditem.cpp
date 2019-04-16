@@ -92,7 +92,7 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
         Q_EMIT nameEdited(txt);
     });
 
-    connect(m_textItemName, &TextItem::keyPressed, this, [this]() { updateLayout(); });
+    connect(m_textItemName, &TextItem::textChanged, this, [this]() { updateLayout(); });
 
     connect(m_textItemKind, &TextItem::edited, this, [this](const QString &txt) {
         updateLayout();

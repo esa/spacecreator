@@ -48,7 +48,7 @@ LabeledArrowItem::LabeledArrowItem(QGraphicsItem *parent)
     updateLayout();
 
     connect(m_itemArrow, &ArrowItem::geometryChanged, this, &LabeledArrowItem::updateLayout);
-    connect(m_itemText, &TextItem::keyPressed, this, &LabeledArrowItem::onKeyPressed);
+    connect(m_itemText, &TextItem::textChanged, this, &LabeledArrowItem::onTextChanged);
     connect(m_itemText, &TextItem::edited, this, &LabeledArrowItem::onTextEdited);
 
     m_selectionHighlighterPen.setWidthF(m_itemArrow->bodyPen().widthF() * 2.);
@@ -216,7 +216,7 @@ void LabeledArrowItem::enableEditMode()
     m_itemText->enableEditMode();
 }
 
-void LabeledArrowItem::onKeyPressed()
+void LabeledArrowItem::onTextChanged()
 {
     {
         QSignalBlocker suppressLayoutUpdated(this);
