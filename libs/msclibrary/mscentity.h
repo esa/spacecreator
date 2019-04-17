@@ -69,6 +69,7 @@ public:
     void setCifs(const QVector<cif::CifBlockShared> &cifs);
     void addCif(const cif::CifBlockShared &cif);
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
+    void clearCifs();
 
 #ifdef QT_DEBUG
     void dbgShowCifs() const;

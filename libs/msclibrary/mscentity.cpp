@@ -98,6 +98,7 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 {
     if (m_cifs != cifs) {
         m_cifs = cifs;
+        Q_EMIT dataChanged();
     }
 }
 
@@ -105,6 +106,7 @@ void MscEntity::addCif(const cif::CifBlockShared &cif)
 {
     if (!m_cifs.contains(cif)) {
         m_cifs.append(cif);
+        Q_EMIT dataChanged();
     }
 }
 
@@ -114,6 +116,12 @@ cif::CifBlockShared MscEntity::cifBlockByType(cif::CifLine::CifType type) const
         if (block->blockType() == type)
             return block;
     return cif::CifBlockShared();
+}
+
+void MscEntity::clearCifs()
+{
+    m_cifs.clear();
+    Q_EMIT dataChanged();
 }
 
 #ifdef QT_DEBUG

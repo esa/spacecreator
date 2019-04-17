@@ -449,13 +449,19 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
 
 void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
 {
+    // @todo use a command to support undo
     auto commitUpdate = [&](msc::MscMessage::EndType endType) {
         if (endType == msc::MscMessage::EndType::SOURCE_TAIL)
             updateSource(to, ObjectAnchor::Snap::SnapTo);
         else
             updateTarget(to, ObjectAnchor::Snap::SnapTo);
 
-        updateCif();
+        if (utils::isHorizontal(messagePoints())) {
+            if (geometryManagedByCif()) {
+                m_message->clearCifs();
+            }
+        } else
+            updateCif();
         Q_EMIT retargeted(this, to, endType);
     };
 
