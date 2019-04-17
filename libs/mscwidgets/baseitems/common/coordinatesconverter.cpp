@@ -91,10 +91,13 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePoint, bool *ok)
                 const QPointF &targetPixels = converter->m_view->mapFromScene(scenePoint) - sceneOriginPixels;
                 const QPointF &targetInch = targetPixels * m_mmInInch;
 
-                const qreal mmX = (targetInch.x() / converter->m_dpiPhysical.x()) * m_cifMmScaleFactor;
-                const qreal mmY = (targetInch.y() / converter->m_dpiPhysical.y()) * m_cifMmScaleFactor;
+                const qreal mmX = (targetInch.x() / converter->m_dpiPhysical.x());
+                const qreal mmY = (targetInch.y() / converter->m_dpiPhysical.y());
 
-                mmPoint = QPointF(mmX, mmY).toPoint();
+                const QPointF mmPoints { mmX, mmY };
+                const QPointF mmPointsCif { mmPoints * m_cifMmScaleFactor };
+
+                mmPoint = mmPointsCif.toPoint();
 
                 if (ok)
                     *ok = true;
@@ -186,6 +189,26 @@ QVector<QPointF> CoordinatesConverter::cifToScene(const QVector<QPoint> &pixelPo
         *ok = sceneCoords.size() == pixelPoints.size();
 
     return sceneCoords;
+}
+
+bool CoordinatesConverter::sceneToCif(const QRectF sceneRect, QRect &cifRect)
+{
+    const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
+    bool converted(false);
+    const QVector<QPoint> cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
+    if (converted)
+        cifRect = { cifPoints.first(), cifPoints.last() };
+    return converted;
+}
+
+bool CoordinatesConverter::cifToScene(const QRect &cifRect, QRectF &sceneRect)
+{
+    const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
+    bool converted(false);
+    const QVector<QPointF> scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
+    if (converted)
+        sceneRect = { scenePoints.first(), scenePoints.last() };
+    return converted;
 }
 
 ChartItem *CoordinatesConverter::currentChartItem()

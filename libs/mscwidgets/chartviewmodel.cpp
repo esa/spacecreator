@@ -204,7 +204,7 @@ void ChartViewModel::fillView(MscChart *chart)
 
     // restore initial chart box (stored in CIF), because it's overriden by actual content bounds
     if (!initialChartRect.isNull())
-        d->m_layoutInfo.m_chartItem->setBox(initialChartRect.marginsAdded(ChartItem::chartMargins()));
+        d->m_layoutInfo.m_chartItem->setBox(initialChartRect);
     else if (!d->m_layoutInfo.m_preferredBox.isEmpty()) {
         const QRectF prefferedBox { d->m_layoutInfo.m_chartItem->box().topLeft(), d->m_layoutInfo.m_preferredBox };
         d->m_layoutInfo.m_chartItem->setBox(prefferedBox);
@@ -643,9 +643,30 @@ QLineF ChartViewModel::commonAxis() const
     return QLineF(0., commonAxisStart, 0., commonAxisStop);
 }
 
-void ChartViewModel::onChartBoxChanged()
+void ChartViewModel::advanceItemsToChartBox()
 {
-    updateContentBounds();
+    if (!d->m_layoutInfo.m_chartItem)
+        return;
+
+    const QRectF &chartBox = d->m_layoutInfo.m_chartItem->box();
+
+    // expand global messages
+    for (InteractiveObject *io : d->m_instanceEventItemsSorted)
+        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
+            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
+                messageItem->onChartBoxChanged();
+
+    // expand non stopped instances to the bottom
+    const qreal targetInstanceBottom = chartBox.bottom() - ChartItem::chartMargins().bottom();
+    for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
+        if (instanceItem->modelItem()->explicitStop())
+            continue;
+
+        const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
+        if (!qFuzzyIsNull(deltaH)) {
+            instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
+        }
+    }
 }
 
 void ChartViewModel::updateContentBounds()
@@ -669,29 +690,13 @@ void ChartViewModel::updateContentBounds()
     if (chartBox.height() < minRect.height())
         chartBox.setHeight(contentRect.height());
 
-    QSignalBlocker sb(d->m_layoutInfo.m_chartItem);
-    d->m_layoutInfo.m_chartItem->setBox(chartBox);
-
-    // expand global messages
-    for (InteractiveObject *io : d->m_instanceEventItemsSorted)
-        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
-            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
-                messageItem->onChartBoxChanged();
-
-    // expand non stopped instances to the bottom
-    for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
-        if (instanceItem->modelItem()->explicitStop())
-            continue;
-
-        const qreal targetInstanceBottom = chartBox.bottom() - ChartItem::chartMargins().bottom();
-        if (!qFuzzyCompare(1. + instanceItem->sceneBoundingRect().bottom(), 1. + targetInstanceBottom)) {
-            const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
-            instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
-        }
-    }
-
     const int totalItemsCount = d->allItemsCount();
     d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
+
+    if (d->m_layoutInfo.m_chartItem->box() == chartBox)
+        advanceItemsToChartBox();
+    else
+        d->m_layoutInfo.m_chartItem->setBox(chartBox); // fires a signal for advanceItemsToChartBox
 }
 
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
@@ -1380,7 +1385,8 @@ void ChartViewModel::prepareChartBoxItem()
 {
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
-        connect(d->m_layoutInfo.m_chartItem, &ChartItem::cifChanged, this, &ChartViewModel::updateContentBounds);
+        connect(d->m_layoutInfo.m_chartItem, &ChartItem::chartBoxChanged, this,
+                &ChartViewModel::advanceItemsToChartBox);
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 

@@ -63,7 +63,6 @@ public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);
     void setExplicitStop(bool exStop);
-    void buildLayout();
     void rebuildLayout() override;
 
 protected:
@@ -91,8 +90,6 @@ private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
     void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
-
-    void notifyCifChanged();
 };
 
 } // namespace msc

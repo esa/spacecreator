@@ -99,26 +99,6 @@ void ChartItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoint
     Q_UNUSED(to);
 }
 
-bool sceneToCif(const QRectF sceneRect, QRect &cifRect)
-{
-    const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
-    bool converted(false);
-    const QVector<QPoint> cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
-    if (converted)
-        cifRect = { cifPoints.first(), cifPoints.last() };
-    return converted;
-}
-
-bool cifToScene(const QRect &cifRect, QRectF &sceneRect)
-{
-    const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
-    bool converted(false);
-    const QVector<QPointF> scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
-    if (converted)
-        sceneRect = { scenePoints.first(), scenePoints.last() };
-    return converted;
-}
-
 void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_originalBox.isNull())
@@ -208,11 +188,16 @@ void ChartItem::setBox(const QRectF &r)
 
     if (QGraphicsScene *pScene = scene())
         pScene->setSceneRect(sceneBoundingRect().marginsAdded(chartMargins()));
-    m_guard = false;
 
     updateTitlePos();
 
     updateGripPoints();
+
+    if (geometryManagedByCif())
+        updateCif();
+
+    m_guard = false;
+    Q_EMIT chartBoxChanged();
 }
 
 const QMarginsF &ChartItem::chartMargins()
@@ -249,7 +234,7 @@ void ChartItem::updateCif()
         return;
 
     QRect cifRect;
-    if (!sceneToCif(m_box, cifRect))
+    if (!utils::CoordinatesConverter::sceneToCif(m_box, cifRect))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << cifRect;
 
     chart()->setCifRect(cifRect);
@@ -275,7 +260,7 @@ QRectF ChartItem::storedCustomRect() const
         return {};
 
     QRectF rect;
-    if (!cifToScene(cifRect, rect))
+    if (!utils::CoordinatesConverter::cifToScene(cifRect, rect))
         qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << cifRect;
 
     return rect;

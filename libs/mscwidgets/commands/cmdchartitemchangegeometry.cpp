@@ -34,16 +34,12 @@ CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRectF &oldRect, co
 
 void CmdChartItemChangeGeometry::redo()
 {
-    //    if (m_chart)
-    //        m_chart->setCifRect(m_newRect);
     if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
         chartItem->setBox(m_newRect);
 }
 
 void CmdChartItemChangeGeometry::undo()
 {
-    //    if (m_chart)
-    //        m_chart->setCifRect(m_oldRect);
     if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
         chartItem->setBox(m_oldRect);
 }

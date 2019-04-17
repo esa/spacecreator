@@ -37,6 +37,8 @@ public:
     static QVector<QPoint> sceneToCif(const QVector<QPointF> &scenePoints, bool *ok = nullptr);
     static QPointF cifToScene(const QPoint &cifPoint, bool *ok = nullptr);
     static QVector<QPointF> cifToScene(const QVector<QPoint> &cifPoints, bool *ok);
+    static bool sceneToCif(const QRectF sceneRect, QRect &cifRect);
+    static bool cifToScene(const QRect &cifRect, QRectF &sceneRect);
     static ChartItem *currentChartItem();
 
 private:

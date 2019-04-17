@@ -103,9 +103,10 @@ QString InstanceItem::kind() const
 
 void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
 {
-    if (qFuzzyCompare(m_axisHeight, height)) {
+    if (qFuzzyCompare(m_axisHeight, height) && cifUpdate == utils::CifUpdatePolicy::DontChange) {
         return;
     }
+
     m_axisHeight = height;
 
     bool writeCif(false);
@@ -122,8 +123,10 @@ void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
         break;
     }
     }
-    if (writeCif)
+    if (writeCif) {
+        QSignalBlocker suppressCifChanged(this);
         updateCif();
+    }
 
     rebuildLayout();
 }
@@ -170,8 +173,40 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
-    m_boundingRect = QRectF();
-    buildLayout();
+    prepareGeometryChange();
+
+    if (m_boundingRect.isEmpty())
+        applyCif();
+
+    const QPointF &prevP1 = m_axisSymbol->line().p1();
+    QRectF headRect(m_headSymbol->boundingRect());
+    const qreal endSymbolHeight = m_endSymbol->height();
+
+    m_boundingRect.setTopLeft(headRect.topLeft());
+    m_boundingRect.setWidth(headRect.width());
+    m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
+    updateGripPoints();
+
+    // move end symb to the bottom:
+    const QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
+                            endSymbolHeight);
+    m_endSymbol->setRect(footerRect);
+
+    // line between the head and end symbols:
+    const QPointF p1(headRect.center().x(), headRect.bottom());
+    const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
+    m_axisSymbol->setLine(QLineF(p1, p2));
+
+    if (prevP1 != p1) {
+        // local geometry changed due the text layout change, compensate it:
+        const QPointF &shift = prevP1 - p1;
+        if (!shift.isNull()) {
+            // Related messages to/from Env will be moved all together,
+            // To avoid it block the InteractiveObject::relocated
+            // (fired in InteractiveObject::itemChange)
+            moveSilentlyBy(shift);
+        }
+    }
 }
 
 void InstanceItem::applyCif()
@@ -194,52 +229,9 @@ void InstanceItem::applyCif()
             m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
             const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
             const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
-
             moveBy(shift.x(), shift.y());
 
             m_axisHeight = axisHeight.y();
-        }
-    }
-}
-
-void InstanceItem::buildLayout()
-{
-    applyCif();
-
-    prepareGeometryChange();
-
-    const QPointF &prevP1 = m_axisSymbol->line().p1();
-    QRectF headRect(m_headSymbol->boundingRect());
-    const qreal endSymbolHeight = m_endSymbol->height();
-
-    // precalculate own default size:
-    if (m_boundingRect.isEmpty()) {
-        m_boundingRect.setTopLeft(headRect.topLeft());
-        m_boundingRect.setWidth(headRect.width());
-        m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
-        updateGripPoints();
-    }
-
-    // move end symb to the bottom:
-    const QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
-                            endSymbolHeight);
-    m_endSymbol->setRect(footerRect);
-
-    // line between the head and end symbols:
-    const QPointF p1(headRect.center().x(), headRect.bottom());
-    const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
-    m_axisSymbol->setLine(QLineF(p1, p2));
-
-    if (prevP1 != p1) {
-        // local geometry changed due the text layout change, compensate it:
-        const QPointF &shift = prevP1 - p1;
-        if (!shift.isNull()) {
-            // Related messages to/from Env will be moved all together,
-            // To avoid it block the InteractiveObject::relocated
-            // (fired in InteractiveObject::itemChange)
-            QSignalBlocker dontMoveEnvMessages(this);
-
-            moveBy(shift.x(), shift.y());
         }
     }
 }
@@ -254,6 +246,7 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
         return;
 
     setPos(pos() + delta);
+
     updateCif();
 }
 
@@ -366,33 +359,31 @@ void InstanceItem::updateCif()
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
     const QPointF &axisStart = axis().p1();
     const QPointF axisEnd { axisStart.x(), axisStart.y() + m_axisHeight };
+    const QRectF axisRectScene { axisStart, axisEnd };
 
-    const QVector<QPointF> scenePoints = { textBoxRect.topLeft(), textBoxRect.bottomRight(), axisStart, axisEnd };
-    bool converted(false);
-    const QVector<QPoint> &cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
-    if (converted) {
-        const CifBlockShared &cifBlock = cifBlockByType(mainCifType());
-        Q_ASSERT(cifBlock != nullptr);
-
-        const QPoint wh { cifPoints.at(1) - cifPoints.at(0) };
-        const QPoint axisHeight { CifBlockInstance::AxisWidth, QPoint(cifPoints.at(3) - cifPoints.at(2)).y() };
-
-        const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
-        const QVector<QPoint> newCif { cifPoints.at(0), wh, axisHeight };
-        if (storedCif != newCif) {
-            cifBlock->setPayload(QVariant::fromValue(newCif));
-            Q_EMIT cifChanged();
-        }
-    } else {
-        qWarning() << Q_FUNC_INFO << "Can't convert scene coordinates to CIF";
+    QRect textBoxRectCif, axisRectCif;
+    if (!utils::CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
+        return;
     }
-}
 
-void InstanceItem::notifyCifChanged()
-{
-    // update text in the Msc Text view, if any
-    // (dynamic updates were disabled for performance reasons, see the TextView::updateView)
-    Q_EMIT cifChanged();
+    if (!utils::CoordinatesConverter::sceneToCif(axisRectScene, axisRectCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
+        return;
+    }
+
+    const CifBlockShared &cifBlock = cifBlockByType(mainCifType());
+    Q_ASSERT(cifBlock != nullptr);
+
+    const QPoint wh { textBoxRectCif.width(), textBoxRectCif.height() };
+    const QPoint axisHeight { CifBlockInstance::AxisWidth, axisRectCif.height() };
+
+    const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
+    const QVector<QPoint> newCif { textBoxRectCif.topLeft(), wh, axisHeight };
+    if (storedCif != newCif) {
+        cifBlock->setPayload(QVariant::fromValue(newCif));
+        Q_EMIT cifChanged();
+    }
 }
 
 void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to)

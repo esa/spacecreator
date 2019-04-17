@@ -60,7 +60,9 @@ void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (isSelected()) {
         painter->save();
         painter->setPen(m_selectedPen);
-        painter->drawRect(m_boundingRect);
+        static const qreal penHalf { m_selectedPen.widthF() / 2. };
+        static const QMarginsF margins { penHalf, penHalf, penHalf, penHalf };
+        painter->drawRect(m_boundingRect.marginsRemoved(margins));
         painter->restore();
     }
 }
