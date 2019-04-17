@@ -159,5 +159,18 @@ QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF 
     return items;
 }
 
+bool isHorizontal(const QLineF &line, const qreal verticalTolerance)
+{
+    return qAbs(line.dy()) < verticalTolerance;
+}
+bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance)
+{
+    return isHorizontal(QLineF(p1, p2), verticalTolerance);
+}
+bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance)
+{
+    return isHorizontal(twoPoints.first(), twoPoints.last(), verticalTolerance);
+}
+
 } // ns utils
 } // ns msc

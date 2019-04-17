@@ -32,7 +32,7 @@ class InstanceItem;
 namespace utils {
 
 static constexpr qreal LineHoverTolerance = 10.;
-
+static constexpr qreal LineHorizontalityTolerance = 15.;
 enum class CifUpdatePolicy
 {
     DontChange,
@@ -108,5 +108,8 @@ bool removeSceneItem(QGraphicsItem *item);
 bool intersects(const QRectF &rect, const QLineF &line);
 QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos);
 
+bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
+bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance = LineHorizontalityTolerance);
+bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance = LineHorizontalityTolerance);
 } // ns utils
 } // ns msc

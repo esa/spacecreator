@@ -595,8 +595,7 @@ QRectF ChartViewModel::minimalContentRect() const
                 // if it's a simple (two point) horizontal message only its height
                 // accounted since it will be extended to the chart edge afterwhile
                 // TODO: add support for complex global message
-                const QLineF arrowLine(messageItem->tail(), messageItem->head());
-                if (qFuzzyIsNull(arrowLine.dy())) {
+                if (utils::isHorizontal(messageItem->tail(), messageItem->head())) {
                     const QPointF &currCenter = currRect.center();
                     currRect.setWidth(1.);
                     currRect.moveCenter(currCenter);

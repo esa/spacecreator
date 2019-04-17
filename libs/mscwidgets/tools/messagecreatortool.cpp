@@ -362,7 +362,9 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
     if (MscInstance *targetInstance = message->targetInstance())
         snapToInstance(targetInstance, points, points.size() - 1);
 
-    m_messageItem->setMessagePoints(points, utils::CifUpdatePolicy::ForceCreate);
+    m_messageItem->setMessagePoints(points,
+                                    utils::isHorizontal(points) ? utils::CifUpdatePolicy::DontChange
+                                                                : utils::CifUpdatePolicy::ForceCreate);
 
     return points.size() > 1;
 }
@@ -378,10 +380,8 @@ QVariantList MessageCreatorTool::prepareMessage()
         if (sceneCoords.size() > 2) {
             retPoints = utils::CoordinatesConverter::sceneToCif(sceneCoords);
         } else {
-            const QLineF &arrow = { sceneCoords.first(), sceneCoords.last() };
-            static constexpr qreal horizontalityTolerancePixels = 15.;
-            const bool isHorizontal = qAbs(arrow.dy()) <= horizontalityTolerancePixels;
-            retPoints = isHorizontal ? QVector<QPoint>() : utils::CoordinatesConverter::sceneToCif(sceneCoords);
+            retPoints = utils::isHorizontal(sceneCoords) ? QVector<QPoint>()
+                                                         : utils::CoordinatesConverter::sceneToCif(sceneCoords);
         }
         return retPoints;
     };
