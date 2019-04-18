@@ -73,7 +73,7 @@ void HighlightRectItem::highlight()
 {
     static constexpr qreal from = 1.;
     static constexpr qreal to = 0.;
-    static constexpr int duration = 100;
+    static constexpr int duration = 250;
 
     show();
 
