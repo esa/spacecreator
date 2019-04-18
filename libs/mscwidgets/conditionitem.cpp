@@ -21,7 +21,9 @@
 #include "commands/common/commandsstack.h"
 #include "msccondition.h"
 
+#include <QDebug>
 #include <QGraphicsPolygonItem>
+#include <QGraphicsSceneMouseEvent>
 
 namespace msc {
 
@@ -36,20 +38,25 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     , m_polygonItem(new QGraphicsPolygonItem(this))
     , m_nameItem(new NameItem(this))
 {
-    setName(m_condition->name());
-    connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);
+    Q_ASSERT(m_condition != nullptr);
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
     m_nameItem->setEditable(true);
+    setName(m_condition->name());
     m_nameItem->setBackgroundColor(Qt::transparent);
+    m_nameItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+
+    connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);
 
     connect(m_nameItem, &TextItem::edited, this, &ConditionItem::onNameEdited, Qt::QueuedConnection);
     connect(m_nameItem, &TextItem::textChanged, this, &ConditionItem::rebuildLayout);
+    connect(m_nameItem, &TextItem::clicked, this, [&]() { this->setSelected(true); });
 
     m_polygonItem->setBrush(Qt::white);
+    m_polygonItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
-    buildLayout();
+    scheduleLayoutUpdate();
 }
 
 MscCondition *ConditionItem::modelItem() const
@@ -107,6 +114,8 @@ void ConditionItem::setInstance(InstanceItem *instance)
     m_instance = instance;
     if (m_instance)
         connect(m_instance, &InteractiveObject::relocated, this, &ConditionItem::onInstanceMoved, Qt::DirectConnection);
+
+    scheduleLayoutUpdate();
 }
 
 ConditionItem *ConditionItem::createDefaultItem(MscCondition *condition, const QPointF &pos)
@@ -205,10 +214,18 @@ void ConditionItem::onManualGeometryChangeFinished(GripPoint::Location pos, cons
     }
 }
 
+void ConditionItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mousePressEvent(event);
+    setSelected(true);
+    event->accept();
+}
+
 void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
     m_nameItem->enableEditMode();
+    event->accept();
 }
 
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

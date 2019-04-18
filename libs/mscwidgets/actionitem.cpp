@@ -24,6 +24,7 @@
 #include "mscaction.h"
 
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <cmath>
 
@@ -41,11 +42,13 @@ ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     m_textItem->setFramed(true);
     m_textItem->setEditable(true);
     m_textItem->setHtml(actionText());
+    m_textItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
     connect(m_action, &msc::MscAction::informalActionChanged, this, &msc::ActionItem::setActionText);
 
     connect(m_textItem, &TextItem::edited, this, &ActionItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::textChanged, this, &ActionItem::scheduleLayoutUpdate);
+    connect(m_textItem, &TextItem::clicked, this, [&]() { this->setSelected(true); });
 
     m_boundingRect = m_textItem->boundingRect();
     scheduleLayoutUpdate();
@@ -95,10 +98,18 @@ void ActionItem::setActionText(const QString &text)
     scheduleLayoutUpdate();
 }
 
+void ActionItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    InteractiveObject::mousePressEvent(event);
+    setSelected(true);
+    event->accept();
+}
+
 void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     InteractiveObject::mouseDoubleClickEvent(event);
     m_textItem->enableEditMode();
+    event->accept();
 }
 
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

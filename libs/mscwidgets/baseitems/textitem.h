@@ -76,6 +76,7 @@ Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
     void inputValidationPatternChanged(const QString &);
+    void clicked();
 
 protected Q_SLOTS:
     virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
@@ -83,6 +84,8 @@ protected Q_SLOTS:
 protected:
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual bool validateInput(const QString &text) const;

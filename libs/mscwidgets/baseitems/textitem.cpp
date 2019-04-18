@@ -260,6 +260,18 @@ void TextItem::keyPressEvent(QKeyEvent *event)
     Q_EMIT textChanged();
 }
 
+void TextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsTextItem::mousePressEvent(event);
+    event->accept();
+}
+
+void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsTextItem::mouseReleaseEvent(event);
+    Q_EMIT clicked();
+}
+
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     enableEditMode();
