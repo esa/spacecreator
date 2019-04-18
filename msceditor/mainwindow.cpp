@@ -176,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent)
     d->m_mscToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
     d->m_hierarchyToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
     d->ui->documentTreeView->expandAll();
-    d->ui->documentTreeView->setEditTriggers(QAbstractItemView::SelectedClicked);
+    d->ui->documentTreeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 }
 
 MainWindow::~MainWindow()
@@ -691,15 +691,14 @@ void MainWindow::initMenuFile()
 
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(
-            tr("&Quit"), this,
-            [&]() {
-                if (this->saveDocument()) {
-                    this->saveSettings();
-                    QApplication::quit();
-                }
-            },
-            QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
+                                            [&]() {
+                                                if (this->saveDocument()) {
+                                                    this->saveSettings();
+                                                    QApplication::quit();
+                                                }
+                                            },
+                                            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()

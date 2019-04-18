@@ -297,30 +297,22 @@ void DocumentItemModel::onEntityDataChanged()
 
 void DocumentItemModel::connectDocument(MscDocument *document)
 {
-    connect(document, &msc::MscDocument::dataChanged, this,
-            [&]() {
-                beginResetModel();
-                endResetModel();
-            },
-            Qt::UniqueConnection);
-    connect(document, &msc::MscDocument::documentRemoved, this,
-            [&]() {
-                beginResetModel();
-                endResetModel();
-            },
-            Qt::UniqueConnection);
-    connect(document, &msc::MscDocument::chartAdded, this,
-            [&]() {
-                beginResetModel();
-                endResetModel();
-            },
-            Qt::UniqueConnection);
+    disconnectDocument(document);
+
+    connect(document, &msc::MscDocument::documentAdded, this, [&]() {
+        beginResetModel();
+        endResetModel();
+    });
+    connect(document, &msc::MscDocument::documentRemoved, this, [&]() {
+        beginResetModel();
+        endResetModel();
+    });
 
     connect(document, &msc::MscDocument::hierarchyTypeChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
-            Qt::UniqueConnection);
+            Qt::QueuedConnection);
 
     connect(document, &msc::MscDocument::nameChanged, this, &msc::DocumentItemModel::onEntityDataChanged,
-            Qt::UniqueConnection);
+            Qt::QueuedConnection);
 
     for (auto doc : document->documents()) {
         connectDocument(doc);
