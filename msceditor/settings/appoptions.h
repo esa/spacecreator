@@ -60,6 +60,7 @@ public:
     const AppOption *Geometry = Options[0];
     const AppOption *State = Options[1];
     const AppOption *LastFilePath = Options[2];
+    const AppOption *DocOrHierarchyViewMode = Options[3];
 
 private:
     GroupMainWindow(const GroupMainWindow &) = delete;

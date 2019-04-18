@@ -439,11 +439,14 @@ void MainWindow::showDocumentView(bool show)
         d->m_mscToolBar->show();
 
         d->m_actCopy->setEnabled(true);
-        d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MscChartMimeType)
-                                  && d->m_model->chartViewModel().currentChart()->instances().isEmpty());
+        msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
+        QClipboard *clipboard = QApplication::clipboard();
+        const QMimeData *mimeData = clipboard->mimeData();
+        const bool clipBoardHasMscChart = mimeData ? mimeData->hasFormat(MscChartMimeType) : false;
+        d->m_actPaste->setEnabled(clipBoardHasMscChart && chart && chart->instances().isEmpty());
 
         d->m_deleteTool->setView(d->ui->graphicsView);
-        d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
+        d->m_deleteTool->setCurrentChart(chart);
 
         updateZoomBox(d->ui->graphicsView->zoom());
     }
@@ -1322,6 +1325,14 @@ void MainWindow::loadSettings()
 
     // the toolbar might be hidden from a streaming tool session
     d->ui->mainToolBar->show();
+
+    const bool isDocViewMode = 0 == AppOptions::MainWindow.DocOrHierarchyViewMode->read().toInt();
+    if (isDocViewMode)
+        showDocumentView(true);
+    else
+        showHierarchyView(true);
+    QAction *changeViewModeAction = isDocViewMode ? d->m_actShowDocument : d->m_actShowHierarchy;
+    changeViewModeAction->setChecked(true);
 }
 
 void MainWindow::saveSettings()
@@ -1329,6 +1340,7 @@ void MainWindow::saveSettings()
     AppOptions::MainWindow.Geometry->write(saveGeometry());
     AppOptions::MainWindow.State->write(saveState());
     AppOptions::MainWindow.LastFilePath->write(d->m_currentFilePath);
+    AppOptions::MainWindow.DocOrHierarchyViewMode->write(d->ui->centerView->currentIndex());
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)
