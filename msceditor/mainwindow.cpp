@@ -137,11 +137,10 @@ struct MainWindowPrivate {
     QAction *m_actToggleErrorView = nullptr;
     QAction *m_actToggleHierarchyView = nullptr;
     QAction *m_actToggleMscTextView = nullptr;
+    QAction *m_actToggleAsn1View = nullptr;
 
     QMenu *m_menuHelp = nullptr;
     QAction *m_actAboutQt = nullptr;
-
-    QAction *m_actAsnEditor = nullptr;
 
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
@@ -240,7 +239,8 @@ bool MainWindow::openFileMsc(const QString &file)
 {
     d->ui->errorTextEdit->appendPlainText(tr("Opening file: %1").arg(file));
 
-    if (!QFileInfo::exists(file)) {
+    QFileInfo fileInfo(file);
+    if (!fileInfo.exists()) {
         d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
         return false;
     }
@@ -277,6 +277,7 @@ bool MainWindow::openFileMsc(const QString &file)
 
     if (ok) {
         d->m_currentFilePath = file;
+        d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     }
 
     return ok;
@@ -392,7 +393,9 @@ bool MainWindow::openFileAsn(const QString &file)
         int result = editor.exec();
         if (result == QDialog::Accepted) {
             d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
-            d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
+
+            const QVariantList params { QVariant::fromValue(d->m_model->mscModel()), editor.fileName(), "ASN.1" };
+            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
         }
     } catch (const std::exception &e) {
         qWarning() << "Error parse asn1 file. " << e.what();
@@ -499,17 +502,6 @@ void MainWindow::selectCurrentChart()
     }
 }
 
-void MainWindow::openAsn1Editor()
-{
-    asn1::Asn1Editor editor;
-    editor.setAsn1Types(d->m_model->mscModel()->asn1TypesData());
-    int result = editor.exec();
-    if (result == QDialog::Accepted) {
-        d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
-        d->m_model->mscModel()->setDataDefinitionString(editor.fileName());
-    }
-}
-
 void MainWindow::showChart(const QModelIndex &index)
 {
     if (!index.isValid()) {
@@ -611,6 +603,7 @@ void MainWindow::setupUi()
     d->ui->hierarchyView->setScene(d->m_model->hierarchyScene());
 
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
+    d->ui->asn1Widget->setModel(d->m_model->mscModel());
 
     initActions();
     initMenus();
@@ -663,9 +656,6 @@ void MainWindow::initActions()
 
     d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
-
-    d->m_actAsnEditor = new QAction(tr("ASN.1 Editor"), d->ui->mainToolBar);
-    connect(d->m_actAsnEditor, &QAction::triggered, this, &MainWindow::openAsn1Editor);
 }
 
 void MainWindow::initMenus()
@@ -733,7 +723,6 @@ void MainWindow::initMenuView()
 
     d->m_menuView->addSeparator();
     d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::openMessageDeclarationEditor);
-    d->m_menuView->addAction(tr("Show ASN.1 editor ..."), this, &MainWindow::openAsn1Editor);
 
     initMenuViewWindows();
 }
@@ -798,6 +787,9 @@ void MainWindow::initMenuViewWindows()
 
     d->m_actToggleMscTextView = d->ui->dockWidgetMscText->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleMscTextView);
+
+    d->m_actToggleAsn1View = d->ui->dockWidgetAsn1->toggleViewAction();
+    d->m_menuViewWindows->addAction(d->m_actToggleAsn1View);
 }
 
 void MainWindow::initMenuHelp()
@@ -946,6 +938,7 @@ void MainWindow::initConnections()
 
     connect(d->m_model, &MainModel::modelDataChanged, this, &MainWindow::updateModel);
     connect(d->m_model, &MainModel::modelUpdated, this, &MainWindow::updateModel);
+    connect(d->m_model, &MainModel::modelUpdated, d->ui->asn1Widget, &ASN1FileView::setModel);
 
     connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
         if (on) {
@@ -1253,6 +1246,7 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
             d->ui->dockWidgetDocument->hide();
             d->ui->dockWidgetErrorsContents->hide();
             d->ui->dockWidgetDocumenetContents->hide();
+            d->ui->dockWidgetAsn1->hide();
 
             statusBar()->hide();
             return true;
@@ -1565,11 +1559,14 @@ void MainWindow::openMessageDeclarationEditor()
     MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model->asn1TypesData(), this);
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
+        msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
                                          QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+        const QVariantList params { QVariant::fromValue(d->m_model->mscModel()), dialog.fileName(), "ASN.1" };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
         d->m_model->mscModel()->setAsn1TypesData(dialog.asn1Types());
-        d->m_model->mscModel()->setDataDefinitionString(dialog.fileName());
+        msc::cmd::CommandsStack::current()->endMacro();
     }
 }
 

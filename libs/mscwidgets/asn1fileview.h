@@ -15,40 +15,41 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef ASN1FILEVIEW_H
+#define ASN1FILEVIEW_H
+
+#include <QPointer>
+#include <QWidget>
+
+namespace Ui {
+class ASN1FileView;
+}
 
 namespace msc {
-namespace cmd {
+class MscModel;
+}
 
-enum Id
+class ASN1FileView : public QWidget
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    SetAsn1File,
-    LastId
+    Q_OBJECT
+
+public:
+    explicit ASN1FileView(QWidget *parent = nullptr);
+    ~ASN1FileView();
+
+public Q_SLOTS:
+    void setModel(msc::MscModel *model);
+    void setCurrentDirectory(const QString &directory);
+
+private Q_SLOTS:
+    void updateView();
+    void selectFile();
+    void fillPreview();
+
+private:
+    Ui::ASN1FileView *ui;
+    QPointer<msc::MscModel> m_model;
+    QString m_currentDirectory; // directory of the current MSC file
 };
 
-} // ns cmd
-} // ns msc
+#endif // ASN1FILEVIEW_H

@@ -27,3 +27,6 @@ SOURCES += \
     asn1itemmodel.cpp
 
 FORMS += asn1editor.ui
+
+RESOURCES += \
+    asn1_resources.qrc

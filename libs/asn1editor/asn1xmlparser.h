@@ -36,6 +36,8 @@ public:
     QVariantList parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages);
     QVariantList parseAsn1XmlFile(const QString &fileName);
 
+    QString asn1AsHtml(const QString &filename) const;
+
 Q_SIGNALS:
     void parseError(const QString &error);
 
@@ -50,7 +52,12 @@ private:
     void parseEnumeratedType(const QDomElement &type, QVariantMap &result);
     void parseChoiceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);
 
+    void checkforCompiler() const;
     QString asn1CompilerCommand() const;
+    QString temporaryFileName(const QString &basename, const QString &suffix) const;
+
+    static QString m_asn1Compiler;
+    static QString m_mono;
 };
 
 } // namespace asn1

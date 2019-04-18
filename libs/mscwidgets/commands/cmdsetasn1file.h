@@ -15,40 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef CMDSETASN1FILE_H
+#define CMDSETASN1FILE_H
+
+#include <QPointer>
+#include <QUndoCommand>
 
 namespace msc {
+class MscModel;
+
 namespace cmd {
 
-enum Id
+class CmdSetAsn1File : public QUndoCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    SetAsn1File,
-    LastId
+public:
+    CmdSetAsn1File(msc::MscModel *model, const QString &filename, const QString &language);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<msc::MscModel> m_model;
+    QString m_newFilename;
+    QString m_oldFilename;
+    QString m_newLanguage;
+    QString m_oldLanguage;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace cmd
+} // namespace msc
+
+#endif // CMDSETASN1FILE_H

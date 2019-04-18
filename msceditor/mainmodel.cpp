@@ -242,5 +242,5 @@ void MainModel::setNewModel(MscModel *model)
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
-    Q_EMIT modelUpdated();
+    Q_EMIT modelUpdated(d->m_mscModel);
 }

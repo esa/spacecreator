@@ -10,6 +10,7 @@ CONFIG += static
 QT += core gui widgets
 
 HEADERS += \
+    asn1fileview.h \
     baseitems/common/abstractinteractiveobject.h \
     baseitems/common/arrowsign.h \
     baseitems/common/drawrectinfo.h \
@@ -30,6 +31,7 @@ HEADERS += \
     baseitems/textitem.h \
     commands/cmdchartitemchangegeometry.h \
     commands/cmdcoregionitemcreate.h \
+    commands/cmdsetasn1file.h \
     commands/cmdsetmessagedeclarations.h \
     commands/common/commandids.h \
     commands/common/commandsfactory.h \
@@ -87,6 +89,7 @@ HEADERS += \
     baseitems/common/coordinatesconverter.h
 
 SOURCES += \
+    asn1fileview.cpp \
     baseitems/common/arrowsign.cpp \
     baseitems/common/drawrectinfo.cpp \
     baseitems/common/highlightrectitem.cpp \
@@ -106,6 +109,7 @@ SOURCES += \
     baseitems/textitem.cpp \
     commands/cmdchartitemchangegeometry.cpp \
     commands/cmdcoregionitemcreate.cpp \
+    commands/cmdsetasn1file.cpp \
     commands/cmdsetmessagedeclarations.cpp \
     commands/common/commandsfactory.cpp \
     commands/common/commandsstack.cpp \
@@ -162,6 +166,7 @@ SOURCES += \
     baseitems/common/coordinatesconverter.cpp
 
 FORMS += \
+    asn1fileview.ui \
     messagedeclarationsdialog.ui \
     messagedialog.ui
 

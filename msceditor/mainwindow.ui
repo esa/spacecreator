@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>861</width>
-    <height>721</height>
+    <height>724</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,7 +88,7 @@
    </property>
    <property name="maximumSize">
     <size>
-     <width>500</width>
+     <width>800</width>
      <height>524287</height>
     </size>
    </property>
@@ -207,8 +207,47 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QGridLayout" name="gridLayout_3">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
      <item row="0" column="0">
       <widget class="TextView" name="mscTextBrowser"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetAsn1">
+   <property name="windowTitle">
+    <string>ASN.1 file</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_4">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="ASN1FileView" name="asn1Widget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -225,6 +264,12 @@
    <class>TextView</class>
    <extends>QTextBrowser</extends>
    <header>textview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ASN1FileView</class>
+   <extends>QWidget</extends>
+   <header>asn1fileview.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

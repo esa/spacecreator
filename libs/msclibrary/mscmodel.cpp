@@ -150,11 +150,11 @@ void MscModel::clear()
 /*!
    Goes through all messages in the model and checks if there are "duplicte" messages
    that need to have the message instance name set.
-   The instance name used is a simple number/counter, that starts at 1, or the 
+   The instance name used is a simple number/counter, that starts at 1, or the
    highest existing number (+1) in any instance name. That counter
    is used for the whole model, and not per instance or chart.
    Existing instance names won't be overwritten.
-   
+
    \see MscChart::setInstanceNameNumbers
  */
 void MscModel::checkInstanceNames()

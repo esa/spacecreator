@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QVector>
 
+class QFileInfo;
+
 namespace msc {
 class MscChart;
 class MscDocument;
@@ -27,6 +29,10 @@ class MscDocument;
 class MscModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString dataLanguage READ dataLanguage WRITE setDataLanguage NOTIFY dataLanguageChanged)
+    Q_PROPERTY(QString dataDefinitionString READ dataDefinitionString WRITE setDataDefinitionString NOTIFY
+                       dataDefinitionStringChanged)
+
 public:
     explicit MscModel(QObject *parent = nullptr);
     ~MscModel();

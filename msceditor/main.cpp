@@ -86,6 +86,7 @@ void globalLogMessageWrapper(QtMsgType type, const QMessageLogContext &context, 
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(asn1_resources);
     Q_INIT_RESOURCE(resources);
 
     QApplication a(argc, argv);

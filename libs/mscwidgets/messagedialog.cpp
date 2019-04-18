@@ -185,8 +185,10 @@ void MessageDialog::editDeclarations()
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
                                          QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
-        model->setAsn1TypesData(dialog.asn1Types());
+        const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
         model->setDataDefinitionString(dialog.fileName());
+        model->setAsn1TypesData(dialog.asn1Types());
         fillMessageDeclartionBox();
         selectDeclarationFromName();
     }

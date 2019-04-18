@@ -59,7 +59,6 @@ public Q_SLOTS:
     void createNewDocument();
     void selectAndOpenFile();
     void selectCurrentChart();
-    void openAsn1Editor();
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);

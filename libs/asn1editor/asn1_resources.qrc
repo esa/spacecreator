@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/asn1Resources">
+        <file>resources/pretty_print_asn1.stg</file>
+    </qresource>
+</RCC>

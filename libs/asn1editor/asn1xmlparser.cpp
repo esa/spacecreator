@@ -32,6 +32,9 @@
 
 namespace asn1 {
 
+QString Asn1XMLParser::m_asn1Compiler {};
+QString Asn1XMLParser::m_mono {};
+
 Asn1XMLParser::Asn1XMLParser(QObject *parent)
     : QObject(parent)
 {
@@ -46,7 +49,6 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
 {
     static QString asn1Command;
     if (asn1Command.isEmpty()) {
-        std::srand(std::time(nullptr));
         QString cmd = asn1CompilerCommand();
         if (cmd.isEmpty()) {
             if (errorMessages)
@@ -58,16 +60,14 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
     }
 
     // convert ASN.1 to XML
-    QProcess asn1Process;
-
     auto fullFilePath = [](const QString &path, const QString &name) {
         return QFileInfo(QDir(path), name).absoluteFilePath();
     };
 
     QString asn1FileName = fullFilePath(filePath, fileName);
-    int value = std::rand();
-    QString asn1XMLFileName = fullFilePath(QDir::tempPath(), QString("asn1_%1.xml").arg(value));
+    QString asn1XMLFileName = temporaryFileName("asn1", "xml");
 
+    QProcess asn1Process;
     connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [&](int, QProcess::ExitStatus exitStatus) {
                 if (exitStatus == QProcess::CrashExit) {
@@ -121,6 +121,62 @@ QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName)
         Q_EMIT parseError(tr("File not found"));
 
     return QVariantList();
+}
+
+QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
+{
+    if (filename.isEmpty() || !QFile::exists(filename))
+        return {};
+
+    checkforCompiler();
+    if (!m_asn1Compiler.isEmpty()) {
+        const QString prettyPrintFileName = temporaryFileName("pretty_print", "stg");
+        const QString asn1HtmlFileName = temporaryFileName("asn1", "html");
+
+        // copy over pretty print fileb
+        QFile prettyFile(prettyPrintFileName);
+        if (prettyFile.open(QIODevice::WriteOnly)) {
+            QFile pfile(":/asn1Resources/resources/pretty_print_asn1.stg");
+            if (pfile.open(QIODevice::ReadOnly)) {
+                prettyFile.write(pfile.readAll());
+            } else {
+                qDebug() << pfile.errorString() << "[:/asn1Resources/resources/pretty_print_asn1.stg]";
+                return {};
+            }
+        } else {
+            qDebug() << prettyFile.errorString() << "[" << prettyPrintFileName << "]";
+            return {};
+        }
+        prettyFile.close();
+
+#ifdef Q_OS_WIN
+        Qstring cmd = QString("asn1 -customStg \"%1::%2 %3\"").arg(prettyPrintFileName, asn1HtmlFileName, filename);
+#else
+        QString cmd = QString("%1 %2 -customIcdUper %3::%4 %5")
+                              .arg(m_mono, m_asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
+#endif
+        QProcess process;
+        process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+        process.setProcessChannelMode(QProcess::MergedChannels);
+        process.start(cmd);
+        process.waitForFinished();
+
+        QFile htmlFile(asn1HtmlFileName);
+        QString html;
+        if (htmlFile.open(QIODevice::ReadOnly)) {
+            html = htmlFile.readAll();
+            htmlFile.close();
+        } else {
+            qDebug() << htmlFile.errorString() << "[" << asn1HtmlFileName << "]";
+            return {};
+        }
+
+        QFile::remove(prettyPrintFileName);
+        QFile::remove(asn1HtmlFileName);
+        return html;
+    } else {
+        return {};
+    }
 }
 
 QVariantList Asn1XMLParser::parseXml(const QString &content)
@@ -324,43 +380,75 @@ void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, 
     result[ASN1_CHOICES] = choices;
 }
 
-QString Asn1XMLParser::asn1CompilerCommand() const
+void Asn1XMLParser::checkforCompiler() const
 {
 #ifdef Q_OS_WIN
-    QProcess process;
-    process.start(QString("where asn1"));
-    process.waitForFinished();
-    QString asn1Exec = process.readAll();
-    asn1Exec.remove("\r\n");
-    asn1Exec.remove("asn1.exe");
-    if (asn1Exec.isEmpty()) {
-        qWarning() << tr("Unable to find the asn1scc compiler");
-        return {};
+    if (m_asn1Compiler.isEmpty()) {
+        QProcess process;
+        process.start(QString("where asn1"));
+        process.waitForFinished();
+        QString asn1Exec = process.readAll();
+        asn1Exec.remove("\r\n");
+        asn1Exec.remove("asn1.exe");
+        if (asn1Exec.isEmpty()) {
+            qWarning() << tr("Unable to find the asn1scc compiler");
+            return;
+        }
+        m_asn1Compiler = asn1Exec;
     }
-    return QString("asn1 -customStg \"%1xml.stg\"::").arg(asn1Exec);
 #else
-    QProcess process;
-    process.start(QString("which asn1.exe"));
-    process.waitForFinished();
-    QString asn1Exec = process.readAll();
-    asn1Exec.remove('\n');
-    if (asn1Exec.isEmpty()) {
-        qWarning() << tr("Unable to find the asn1scc compiler");
-        return {};
+    if (m_asn1Compiler.isEmpty()) {
+        QProcess process;
+        process.start(QString("which asn1.exe"));
+        process.waitForFinished();
+        QString asn1Exec = process.readAll();
+        asn1Exec.remove('\n');
+        if (asn1Exec.isEmpty()) {
+            qWarning() << tr("Unable to find the asn1scc compiler");
+            return;
+        }
+        m_asn1Compiler = asn1Exec;
     }
 
-    process.start(QString("which mono"));
-    process.waitForFinished();
-    QString monoExec = process.readAll();
-    monoExec.remove('\n');
-    if (monoExec.isEmpty()) {
-        qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
-        return {};
+    if (m_mono.isEmpty()) {
+        QProcess process;
+        process.start(QString("which mono"));
+        process.waitForFinished();
+        QString monoExec = process.readAll();
+        monoExec.remove('\n');
+        if (monoExec.isEmpty()) {
+            qWarning() << tr("Unable to find the mono framework to run the asn1scc compiler");
+            return;
+        }
+        m_mono = monoExec;
     }
-
-    QFileInfo asnFile(asn1Exec);
-    return QString("%1 %2 -customStg %3/xml.stg:").arg(monoExec, asn1Exec, asnFile.path());
 #endif
+}
+
+QString Asn1XMLParser::asn1CompilerCommand() const
+{
+    checkforCompiler();
+    if (!m_asn1Compiler.isEmpty()) {
+#ifdef Q_OS_WIN
+        return QString("asn1 -customStg \"%1xml.stg\"::").arg(m_asn1Compiler);
+#else
+        QFileInfo asnFile(m_asn1Compiler);
+        return QString("%1 %2 -customStg %3/xml.stg:").arg(m_mono, m_asn1Compiler, asnFile.path());
+#endif
+    } else
+        return {};
+}
+
+QString Asn1XMLParser::temporaryFileName(const QString &basename, const QString &suffix) const
+{
+    static bool init = false;
+    if (!init) {
+        std::srand(std::time(nullptr));
+        init = true;
+    }
+
+    int value = std::rand();
+    return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
 }
 
 template<typename T>

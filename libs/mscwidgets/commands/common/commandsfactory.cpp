@@ -36,6 +36,7 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
 #include "commands/cmdpastechart.h"
+#include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
 #include "commands/cmdtimeritemcreate.h"
@@ -108,6 +109,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createSetMessageDeclarations(params);
     case cmd::PasteChart:
         return cmd::CommandsFactory::createChartPaste(params);
+    case cmd::SetAsn1File:
+        return cmd::CommandsFactory::createAsn1File(params);
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -433,6 +436,17 @@ QUndoCommand *CommandsFactory::createChartPaste(const QVariantList &params)
 
     if (auto document = params.first().value<MscDocument *>()) {
         return new CmdPasteChart(document, params.last().toString());
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createAsn1File(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (auto model = params.first().value<MscModel *>()) {
+        return new CmdSetAsn1File(model, params.at(1).toString(), params.at(2).toString());
     }
 
     return nullptr;
