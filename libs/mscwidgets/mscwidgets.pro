@@ -10,7 +10,6 @@ CONFIG += static
 QT += core gui widgets
 
 HEADERS += \
-    asn1fileview.h \
     baseitems/common/abstractinteractiveobject.h \
     baseitems/common/arrowsign.h \
     baseitems/common/drawrectinfo.h \
@@ -59,7 +58,6 @@ HEADERS += \
     commands/cmdtimeritemcreate.h \
     commands/cmdtimeritemmove.h \
     coregionitem.h \
-    documenttreeview.h \
     tools/actioncreatortool.h \
     tools/basecreatortool.h \
     tools/basetool.h \
@@ -78,7 +76,6 @@ HEADERS += \
     chartviewmodel.h \
     conditionitem.h \
     documentitem.h \
-    documentitemmodel.h \
     graphicsview.h \
     hierarchyviewmodel.h \
     instanceitem.h \
@@ -90,7 +87,6 @@ HEADERS += \
     baseitems/common/coordinatesconverter.h
 
 SOURCES += \
-    asn1fileview.cpp \
     baseitems/common/arrowsign.cpp \
     baseitems/common/drawrectinfo.cpp \
     baseitems/common/highlightrectitem.cpp \
@@ -137,7 +133,6 @@ SOURCES += \
     commands/cmdtimeritemcreate.cpp \
     commands/cmdtimeritemmove.cpp \
     coregionitem.cpp \
-    documenttreeview.cpp \
     tools/actioncreatortool.cpp \
     tools/basecreatortool.cpp \
     tools/basetool.cpp \
@@ -156,7 +151,6 @@ SOURCES += \
     actionitem.cpp \
     conditionitem.cpp \
     documentitem.cpp \
-    documentitemmodel.cpp \
     graphicsview.cpp \
     hierarchyviewmodel.cpp \
     instanceitem.cpp \
@@ -168,7 +162,6 @@ SOURCES += \
     baseitems/common/coordinatesconverter.cpp
 
 FORMS += \
-    asn1fileview.ui \
     messagedeclarationsdialog.ui \
     messagedialog.ui
 

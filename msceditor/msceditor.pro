@@ -5,24 +5,19 @@ include(../esa.pri)
 include(../depend_asn1library.pri)
 include(../depend_mscwidgets.pri)
 include(../depend_msclibrary.pri)
+include(../depend_application.pri)
 
 QT += core gui widgets network websockets
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mainmodel.cpp \
     commandlineparser.cpp \
-    settings/settingsmanager.cpp \
-    settings/appoptions.cpp \
     remotecontrolwebserver.cpp
 
 HEADERS += \
     mainwindow.h \
-    mainmodel.h \
     commandlineparser.h \
-    settings/settingsmanager.h \
-    settings/appoptions.h \
     remotecontrolwebserver.h
 
 FORMS += \

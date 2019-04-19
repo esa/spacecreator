@@ -4,4 +4,5 @@ SUBDIRS = \
     asn1editor \
     msclibrary \
     mscwidgets \
-    msceditor
+    application \
+    msceditor \

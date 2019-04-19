@@ -1,4 +1,4 @@
-include(../msceditortests.pri)
+include(../applicationtests.pri)
 
 QT += testlib gui
 CONFIG += qt warn_on depend_includepath testcase

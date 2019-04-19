@@ -5,7 +5,6 @@ SUBDIRS = \
     tst_arrowitem \
     tst_arrowsign \
     tst_cmdmessageitemcreate \
-    tst_documentitemmodel \
     tst_drawrectinfo \
     tst_grippoint \
     tst_grippointshandler \

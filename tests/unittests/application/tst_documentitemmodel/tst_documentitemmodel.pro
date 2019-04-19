@@ -1,4 +1,4 @@
-include(../mscwidgetstests.pri)
+include(../applicationtests.pri)
 
 QT += widgets testlib
 
