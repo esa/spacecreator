@@ -21,11 +21,35 @@
 #include "documentitemmodel.h"
 #include "mscdocument.h"
 
+#include <QLineEdit>
 #include <QMenu>
+#include <QRegExp>
+#include <QRegExpValidator>
 #include <QScopedPointer>
+#include <QStyledItemDelegate>
 
 namespace {
 const QByteArray HIERARCHY_TYPE_TAG { "hierarchyTag" };
+
+class DocumentDelegate : public QStyledItemDelegate
+{
+public:
+    DocumentDelegate(QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+    {
+    }
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        QWidget *editor = QStyledItemDelegate::createEditor(parent, option, index);
+        auto line = qobject_cast<QLineEdit *>(editor);
+        if (line) {
+            auto nameValidator = new QRegExpValidator(msc::MscEntity::nameVerifier(), line);
+            line->setValidator(nameValidator);
+        }
+        return editor;
+    }
+};
 }
 
 DocumentTreeView::DocumentTreeView(QWidget *parent)
@@ -33,6 +57,8 @@ DocumentTreeView::DocumentTreeView(QWidget *parent)
 {
     expandAll();
     setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+
+    setItemDelegate(new DocumentDelegate(this));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
 
