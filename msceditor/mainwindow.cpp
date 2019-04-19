@@ -148,8 +148,6 @@ struct MainWindowPrivate {
     msc::EntityDeleteTool *m_deleteTool = nullptr;
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
-    QMenu *m_documentViewMenu = nullptr;
-
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     QPointer<msc::MscDocument> m_selectedDocument;
 
@@ -324,27 +322,6 @@ void MainWindow::updateTextView()
         return;
     }
     d->ui->mscTextBrowser->updateView();
-}
-
-void MainWindow::showDocumentViewMenu(const QPoint &point)
-{
-    QModelIndex index = d->ui->documentTreeView->indexAt(point);
-
-    if (d->m_documentViewMenu && index.isValid()) {
-        auto *obj = static_cast<QObject *>(index.internalPointer());
-
-        if (dynamic_cast<msc::MscDocument *>(obj)) {
-            d->m_documentViewMenu->exec(d->ui->documentTreeView->viewport()->mapToGlobal(point));
-        }
-    }
-}
-
-void MainWindow::changHeierarchyType()
-{
-    static_cast<msc::DocumentItemModel *>(d->ui->documentTreeView->model())
-            ->updateHierarchyType(d->ui->documentTreeView->currentIndex(), sender()->property(HIERARCHY_TYPE_TAG));
-
-    showSelection(d->ui->documentTreeView->currentIndex(), QModelIndex());
 }
 
 void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
@@ -537,44 +514,18 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     } else {
         showHierarchyView(true);
 
-        auto actionConstraint = [&](QAction *action, msc::MscDocument::HierarchyType hierarchyType, int docSize) {
-            action->setDisabled(docSize
-                                && (hierarchyType == msc::MscDocument::HierarchyType::HierarchyRepeat
-                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyParallel
-                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyIs
-                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyException
-                                    || hierarchyType == msc::MscDocument::HierarchyType::HierarchyLeaf));
-        };
-
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            for (auto action : d->m_documentViewMenu->actions()) {
-                if (!action->property(HIERARCHY_TYPE_TAG).isValid()) {
-                    return;
-                }
-
-                auto actionType =
-                        static_cast<msc::MscDocument::HierarchyType>(action->property(HIERARCHY_TYPE_TAG).toInt());
-
-                action->setEnabled(actionType != document->hierarchyType());
-
-                if (actionType != document->hierarchyType()) {
-                    if (!document->charts().isEmpty()) {
-                        // document has charts - possible only type leaf
-                        action->setDisabled(actionType != msc::MscDocument::HierarchyType::HierarchyLeaf);
-                    } else {
-                        // constraint for "repeat", "paralel", "is", "leaf" and "exception" - possible if only one child
-                        actionConstraint(action, actionType, document->documents().size());
-                    }
-                }
+            bool canNewChild = true;
+            if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf)
+                canNewChild = false;
+            if (document->documents().size() > 0
+                && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
+                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
+                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
+                canNewChild = false;
             }
-
             for (auto action : d->m_hierarchyToolBar->actions()) {
-                if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf) {
-                    // no any children for "leaf"
-                    action->setEnabled(false);
-                } else {
-                    actionConstraint(action, document->hierarchyType(), document->documents().size());
-                }
+                action->setEnabled(canNewChild);
             }
 
             d->m_selectedDocument = document;
@@ -724,19 +675,10 @@ void MainWindow::initMenuView()
 
 void MainWindow::initDocumentViewActions()
 {
-    d->m_documentViewMenu = new QMenu(this);
-
-    auto addAction = [&](const QString &icon, const QString &text, msc::MscDocument::HierarchyType type) {
-        auto action = new QAction(QIcon(icon), text, this);
-        action->setProperty(HIERARCHY_TYPE_TAG, type);
-
-        connect(action, &QAction::triggered, this, &MainWindow::changHeierarchyType);
-
-        d->m_documentViewMenu->addAction(action);
-
+    auto addAction = [&](msc::MscDocument::HierarchyType type) {
         // create tool
         auto tool = new msc::HierarchyCreatorTool(type, &(d->m_model->hierarchyViewModel()), nullptr, this);
-        action = d->m_hierarchyToolBar->addAction(tool->title());
+        auto action = d->m_hierarchyToolBar->addAction(tool->title());
         action->setProperty(HIERARCHY_TYPE_TAG, type);
         action->setCheckable(true);
         action->setIcon(tool->icon());
@@ -744,6 +686,7 @@ void MainWindow::initDocumentViewActions()
         tool->setView(d->ui->hierarchyView);
 
         connect(tool, &msc::HierarchyCreatorTool::created, this, [&]() {
+            d->ui->documentTreeView->expandAll();
             activateDefaultTool();
             updateTreeViewItem(d->m_selectedDocument);
             Q_EMIT selectionChanged(d->m_selectedDocument);
@@ -756,17 +699,13 @@ void MainWindow::initDocumentViewActions()
         });
     };
 
-    addAction(":/icons/document_and.png", tr("Hierarchy And"), msc::MscDocument::HierarchyAnd);
-    addAction(":/icons/document_or.png", tr("Hierarchy Or"), msc::MscDocument::HierarchyOr);
-    addAction(":/icons/document_parallel.png", tr("Hierarchy Parallel"), msc::MscDocument::HierarchyParallel);
-    addAction(":/icons/document_is_scenario.png", tr("Hierarchy Is"), msc::MscDocument::HierarchyIs);
-    addAction(":/icons/document_repeat.png", tr("Hierarchy Repeat"), msc::MscDocument::HierarchyRepeat);
-    addAction(":/icons/document_exception.png", tr("Hierarchy Exception"), msc::MscDocument::HierarchyException);
-    addAction(":/icons/document_leaf.png", tr("Hierarchy Leaf"), msc::MscDocument::HierarchyLeaf);
-
-    d->m_documentViewMenu->addSeparator();
-    d->m_documentViewMenu->addAction(tr("Rename"), this,
-                                     [&]() { d->ui->documentTreeView->edit(d->ui->documentTreeView->currentIndex()); });
+    addAction(msc::MscDocument::HierarchyAnd);
+    addAction(msc::MscDocument::HierarchyOr);
+    addAction(msc::MscDocument::HierarchyParallel);
+    addAction(msc::MscDocument::HierarchyIs);
+    addAction(msc::MscDocument::HierarchyRepeat);
+    addAction(msc::MscDocument::HierarchyException);
+    addAction(msc::MscDocument::HierarchyLeaf);
 }
 
 void MainWindow::initMenuViewWindows()
@@ -941,7 +880,7 @@ void MainWindow::initConnections()
         }
     });
 
-    connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showDocumentViewMenu);
+    connect(d->m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWindow::showSelection);
 
     connect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }

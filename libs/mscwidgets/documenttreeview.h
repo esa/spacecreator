@@ -24,12 +24,22 @@ namespace msc {
 class MscDocument;
 }
 
+class QMenu;
+
 class DocumentTreeView : public QTreeView
 {
+    Q_OBJECT
 public:
     DocumentTreeView(QWidget *parent = nullptr);
 
     void setModel(QAbstractItemModel *model) override;
 
     msc::MscDocument *currentDocument() const;
+
+private Q_SLOTS:
+    void changHierarchyType();
+
+private:
+    void showDocumentViewMenu(const QPoint &point);
+    QMenu *contextMenu(msc::MscDocument *document);
 };

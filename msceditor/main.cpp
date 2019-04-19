@@ -17,6 +17,7 @@
 
 #include "commandlineparser.h"
 #include "mainwindow.h"
+#include "mscdocument.h"
 
 #include <QApplication>
 #include <QMetaEnum>
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
     Q_INIT_RESOURCE(resources);
+    qRegisterMetaType<msc::MscDocument::HierarchyType>("HierarchyType");
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));
