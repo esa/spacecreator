@@ -363,6 +363,11 @@ void ChartViewModel::addInstanceItems()
             }
             item->setVisible(false);
         }
+
+        if (!instance->explicitCreator()) {
+            const qreal headBottom = item->axis().p1().y();
+            d->m_layoutInfo.m_pos.setY(std::max(d->m_layoutInfo.m_pos.y(), headBottom));
+        }
     }
 
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItems.size());
@@ -426,8 +431,6 @@ void ChartViewModel::addInstanceEventItems()
     }
 
     Q_ASSERT(d->m_instanceEventItems.size() == d->m_instanceEventItemsSorted.size());
-    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItems.size());
-    Q_ASSERT(d->m_currentChart->instanceEvents().size() == d->m_instanceEventItemsSorted.size());
 }
 
 void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item)
@@ -652,7 +655,7 @@ void ChartViewModel::advanceItemsToChartBox()
 
     // expand global messages
     for (InteractiveObject *io : d->m_instanceEventItemsSorted)
-        if (io->modelEntity()->entityType() == MscEntity::EntityType::Message)
+        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
             if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
                 messageItem->onChartBoxChanged();
 
@@ -1308,6 +1311,11 @@ void ChartViewModel::setVisibleItemLimit(int number)
 {
     d->m_visibleItemLimit = number;
     updateLayout();
+}
+
+const QPointer<ChartItem> ChartViewModel::chartItem() const
+{
+    return d->m_layoutInfo.m_chartItem;
 }
 
 void ChartViewModel::storeEntityItem(InteractiveObject *item)

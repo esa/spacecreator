@@ -16,6 +16,7 @@
 */
 
 #include "baseitems/common/utils.h"
+#include "chartitem.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -23,6 +24,8 @@
 #include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmodel.h"
+#include "msctimer.h"
+#include "timeritem.h"
 
 #include <QDebug>
 #include <QGraphicsItem>
@@ -48,6 +51,8 @@ private Q_SLOTS:
     void cleanup();
     void testNearestInstanceSimple();
     void testNearestInstanceCreate();
+
+    void testTimerPositionWithCifInstance();
 
 private:
     QScopedPointer<ChartViewModel> m_chartModel;
@@ -143,6 +148,32 @@ void tst_ChartViewModel::testNearestInstanceCreate()
     // point above the create instance (but on height of first instance)
     inst = m_chartModel->nearestInstance({ m_instanceRects[1].center().x(), m_instanceRects[0].top() });
     QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
+}
+
+void tst_ChartViewModel::testTimerPositionWithCifInstance()
+{
+    QString mscText = "MSC alarm; \
+            /* CIF TextMode 4 */ \
+            /* CIF Modified */ \
+            /* CIF INSTANCE (261, 65), (349, 150), (800, 696) */ \
+            INSTANCE inst_1_cu_nominal.cu_controller : PROCESS /* MSC AT [206] */ ; \
+                /* CIF TIMEOUT (436, 303), (95, 110) */ \
+                /* CIF TextMode 3 */ \
+                /* CIF Modified */ \
+                TIMEOUT watchdog /* MSC AT [195] */ ; \
+            ENDINSTANCE; \
+            ENDMSC;";
+    parseMsc(mscText);
+    QCOMPARE(m_instanceItems.size(), 1);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+
+    MscTimer *watchdogEntity = qobject_cast<MscTimer *>(m_chart->instanceEvents().at(0));
+    TimerItem *watchdogItem = m_chartModel->itemForTimer(watchdogEntity);
+    QVERIFY(watchdogItem != nullptr);
+
+    // Check that the timer is below the instance head
+    const QPointF instanceHeadBootom = m_instanceItems[0]->axis().p1();
+    QVERIFY(watchdogItem->scenePos().y() > instanceHeadBootom.y());
 }
 
 QTEST_MAIN(tst_ChartViewModel)

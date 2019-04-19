@@ -30,21 +30,22 @@ class QGraphicsObject;
 namespace msc {
 
 class ActionItem;
+class ChartItem;
+class CommentItem;
 class ConditionItem;
-class InteractiveObject;
+class CoregionItem;
 class InstanceItem;
+class InteractiveObject;
 class MessageItem;
 class TimerItem;
-class CommentItem;
-class CoregionItem;
 
 class MscAction;
 class MscChart;
 class MscCondition;
+class MscCoregion;
 class MscInstance;
 class MscInstanceEvent;
 class MscTimer;
-class MscCoregion;
 
 struct ChartViewModelPrivate;
 struct ChartViewLayoutInfo;
@@ -88,6 +89,8 @@ public:
     int instanceOrderFromPos(const QPointF &scenePos);
 
     void setVisibleItemLimit(int number);
+
+    const QPointer<ChartItem> chartItem() const;
 
 public Q_SLOTS:
     void updateLayout();
