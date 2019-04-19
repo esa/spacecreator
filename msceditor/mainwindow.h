@@ -77,7 +77,6 @@ private Q_SLOTS:
     bool openMscChain(const QString &dirPath);
     void activateDefaultTool();
     void updateTextView();
-    void showDocumentViewMenu(const QPoint &point);
     void changHeierarchyType();
     void updateTreeViewItem(const msc::MscDocument *document);
     void onCreateMessageToolRequested();

@@ -67,7 +67,6 @@
 #include <QMetaEnum>
 #include <QMimeData>
 #include <QToolBar>
-#include <QTreeView>
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <QVector>
@@ -174,8 +173,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     d->m_mscToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
     d->m_hierarchyToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
-    d->ui->documentTreeView->expandAll();
-    d->ui->documentTreeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 }
 
 MainWindow::~MainWindow()
@@ -593,8 +590,6 @@ void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
 
-    d->ui->documentTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
     //    d->ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft); // make scene's origin be great^W in topLeft
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
@@ -947,9 +942,6 @@ void MainWindow::initConnections()
     });
 
     connect(d->ui->documentTreeView, &QTreeView::customContextMenuRequested, this, &MainWindow::showDocumentViewMenu);
-
-    connect(d->ui->documentTreeView->model(), &QAbstractItemModel::modelReset, d->ui->documentTreeView,
-            &QTreeView::expandAll);
 
     connect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
@@ -1599,30 +1591,16 @@ void MainWindow::copyAsPicture()
 
 void MainWindow::pasteChart()
 {
+    msc::MscDocument *document = d->ui->documentTreeView->currentDocument();
+    if (document == nullptr)
+        return;
+
     const QMimeData *mideData = QApplication::clipboard()->mimeData();
 
-    auto *obj = static_cast<QObject *>(d->ui->documentTreeView->currentIndex().internalPointer());
-    if (obj == nullptr) {
-        return;
-    }
-
     if (mideData->hasFormat(MscChartMimeType)) {
-        QString textChart = mideData->data(MscChartMimeType);
-        msc::MscDocument *document;
-
-        if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
-            document = chart->instances().isEmpty() ? chart->parentDocument() : nullptr;
-        } else {
-            document = dynamic_cast<msc::MscDocument *>(obj);
-        }
-
-        if (document) {
-            const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-                                              mideData->data(MscChartMimeType) };
-
-            msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
-        }
-
+        const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
+                                          mideData->data(MscChartMimeType) };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
         updateTreeViewItem(document);
     }
 }

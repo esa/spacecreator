@@ -59,6 +59,7 @@ HEADERS += \
     commands/cmdtimeritemcreate.h \
     commands/cmdtimeritemmove.h \
     coregionitem.h \
+    documenttreeview.h \
     tools/actioncreatortool.h \
     tools/basecreatortool.h \
     tools/basetool.h \
@@ -136,6 +137,7 @@ SOURCES += \
     commands/cmdtimeritemcreate.cpp \
     commands/cmdtimeritemmove.cpp \
     coregionitem.cpp \
+    documenttreeview.cpp \
     tools/actioncreatortool.cpp \
     tools/basecreatortool.cpp \
     tools/basetool.cpp \
