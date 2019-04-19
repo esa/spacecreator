@@ -216,8 +216,6 @@ void InstanceItem::applyCif()
         if (cifPoints.size() == 3) {
             bool converted(false);
             const QVector<QPointF> &scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
-            if (!converted)
-                return;
 
             const QPointF &textBoxTopLeft = scenePoints.at(0);
             const QPointF &textBoxSize = scenePoints.at(1);

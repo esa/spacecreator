@@ -641,8 +641,7 @@ void MessageItem::applyCif()
         const QVector<QPoint> &pointsCif = cifBlock->payload(mainCifType()).value<QVector<QPoint>>();
         bool converted(false);
         const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
-        if (converted)
-            setMessagePoints(pointsScene, utils::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(pointsScene, utils::CifUpdatePolicy::UpdateIfExists);
     }
 }
 

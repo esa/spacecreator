@@ -79,7 +79,7 @@ void TimerItem::connectObjects(InstanceItem *instance, qreal y)
 {
     setY(y);
     setInstance(instance);
-    rebuildLayout();
+    scheduleLayoutUpdate();
 }
 
 void TimerItem::setInstance(InstanceItem *instance)

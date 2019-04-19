@@ -80,7 +80,7 @@ QPoint CoordinatesConverter::sceneOriginInView(QGraphicsView *view)
 
 QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePoint, bool *ok)
 {
-    QPoint mmPoint;
+    QPoint mmPoint = scenePoint.toPoint(); // fallback
     if (ok)
         *ok = false;
 
@@ -114,7 +114,7 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePoint, bool *ok)
 QVector<QPoint> CoordinatesConverter::sceneToCif(const QVector<QPointF> &scenePoints, bool *ok)
 {
     if (ok)
-        *ok = false;
+        *ok = true;
 
     QVector<QPoint> pixels;
 
@@ -123,22 +123,18 @@ QVector<QPoint> CoordinatesConverter::sceneToCif(const QVector<QPointF> &scenePo
         for (const QPointF &scenePoint : scenePoints) {
             bool converted(false);
             const QPoint &cifPoint = sceneToCif(scenePoint, &converted);
-            if (converted)
-                pixels << cifPoint;
-            else
-                break;
+            pixels << cifPoint;
+            if (!converted && ok)
+                *ok = false;
         }
     }
-
-    if (ok)
-        *ok = pixels.size() == scenePoints.size();
 
     return pixels;
 }
 
 QPointF CoordinatesConverter::cifToScene(const QPoint &cifPoint, bool *ok)
 {
-    QPointF scenePoint;
+    QPointF scenePoint = cifPoint; // fallback
     if (ok)
         *ok = false;
 
@@ -169,7 +165,7 @@ QPointF CoordinatesConverter::cifToScene(const QPoint &cifPoint, bool *ok)
 QVector<QPointF> CoordinatesConverter::cifToScene(const QVector<QPoint> &pixelPoints, bool *ok)
 {
     if (ok)
-        *ok = false;
+        *ok = true;
 
     QVector<QPointF> sceneCoords;
 
@@ -178,10 +174,9 @@ QVector<QPointF> CoordinatesConverter::cifToScene(const QVector<QPoint> &pixelPo
         for (const QPoint &pixel : pixelPoints) {
             bool converted(false);
             const QPointF &scenePoint = cifToScene(pixel, &converted);
-            if (converted)
-                sceneCoords << scenePoint;
-            else
-                break;
+            sceneCoords << scenePoint;
+            if (!converted && ok)
+                *ok = false;
         }
     }
 
@@ -196,8 +191,7 @@ bool CoordinatesConverter::sceneToCif(const QRectF sceneRect, QRect &cifRect)
     const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
     bool converted(false);
     const QVector<QPoint> cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
-    if (converted)
-        cifRect = { cifPoints.first(), cifPoints.last() };
+    cifRect = { cifPoints.first(), cifPoints.last() };
     return converted;
 }
 
@@ -206,8 +200,7 @@ bool CoordinatesConverter::cifToScene(const QRect &cifRect, QRectF &sceneRect)
     const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
     bool converted(false);
     const QVector<QPointF> scenePoints = utils::CoordinatesConverter::cifToScene(cifPoints, &converted);
-    if (converted)
-        sceneRect = { scenePoints.first(), scenePoints.last() };
+    sceneRect = { scenePoints.first(), scenePoints.last() };
     return converted;
 }
 
