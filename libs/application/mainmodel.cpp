@@ -40,7 +40,6 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QUndoStack>
-#include <functional>
 
 using namespace msc;
 

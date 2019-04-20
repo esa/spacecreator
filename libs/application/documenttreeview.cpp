@@ -28,6 +28,7 @@
 #include <QRegExpValidator>
 #include <QScopedPointer>
 #include <QStyledItemDelegate>
+#include <functional>
 
 namespace {
 const QByteArray HIERARCHY_TYPE_TAG { "hierarchyTag" };
