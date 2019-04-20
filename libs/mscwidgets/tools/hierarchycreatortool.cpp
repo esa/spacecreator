@@ -55,6 +55,7 @@ void HierarchyCreatorTool::createPreviewItem()
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateDocument, cmdParams);
 
     Q_EMIT created();
+    Q_EMIT documentCreated(document);
 }
 
 void HierarchyCreatorTool::initTool()

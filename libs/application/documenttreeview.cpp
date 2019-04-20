@@ -23,6 +23,7 @@
 
 #include <QLineEdit>
 #include <QMenu>
+#include <QModelIndexList>
 #include <QRegExp>
 #include <QRegExpValidator>
 #include <QScopedPointer>
@@ -69,11 +70,54 @@ void DocumentTreeView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
     connect(model, &QAbstractItemModel::modelReset, this, &QTreeView::expandAll);
+    static bool connected = false;
+    if (!connected) {
+        connect(selectionModel(), &QItemSelectionModel::selectionChanged, this,
+                [&]() { Q_EMIT selectedDocumentChanged(selectedDocument()); });
+        connected = true;
+    }
 }
 
 msc::MscDocument *DocumentTreeView::currentDocument() const
 {
     auto *obj = static_cast<QObject *>(currentIndex().internalPointer());
+    if (obj == nullptr)
+        return nullptr;
+
+    return qobject_cast<msc::MscDocument *>(obj);
+}
+
+void DocumentTreeView::setSelectedDocument(msc::MscDocument *document)
+{
+    if (document == selectedDocument())
+        return;
+
+    std::function<void(int, const QModelIndex &)> findDocument;
+
+    findDocument = [&](int row, const QModelIndex &parent) -> void {
+        QModelIndex index = model()->index(row, 0, parent);
+
+        if (index.internalPointer() == document) {
+            selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+        }
+
+        for (int x = 0; x < model()->rowCount(index); ++x) {
+            findDocument(x, index);
+        }
+    };
+
+    for (int row = 0; row < model()->rowCount(); ++row) {
+        findDocument(row, QModelIndex());
+    }
+}
+
+msc::MscDocument *DocumentTreeView::selectedDocument() const
+{
+    QModelIndexList selection = selectedIndexes();
+    if (selection.isEmpty())
+        return nullptr;
+
+    auto *obj = static_cast<QObject *>(selection.at(0).internalPointer());
     if (obj == nullptr)
         return nullptr;
 

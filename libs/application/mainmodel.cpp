@@ -47,12 +47,13 @@ struct MainModelPrivate {
         delete m_documentItemModel;
     }
 
-    MscModel *m_mscModel = nullptr;
-    ChartViewModel m_chartModel;
-    HierarchyViewModel m_hierarchyModel;
-    DocumentItemModel *m_documentItemModel = nullptr;
+    MscModel *m_mscModel = nullptr; /// model of the msc data
+    ChartViewModel m_chartModel; /// model for the chart UI
+    HierarchyViewModel m_hierarchyModel; /// model of the graphical document UI
+    DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
+    QPointer<msc::MscDocument> m_selectedDocument;
+    QString m_mscFileName;
     QStringList m_errorMessages;
-    qreal m_instanceAxisHeight = 0.;
 };
 
 MainModel::MainModel(QObject *parent)
@@ -60,8 +61,7 @@ MainModel::MainModel(QObject *parent)
     , d(new MainModelPrivate(this))
 {
     connect(&d->m_hierarchyModel, &HierarchyViewModel::documentDoubleClicked, this, &MainModel::showChartFromDocument);
-    connect(&d->m_hierarchyModel, &HierarchyViewModel::documentClicked, this, &MainModel::documentClicked);
-    connect(this, &MainModel::selectionChanged, &d->m_hierarchyModel, &HierarchyViewModel::selectionChanged);
+    connect(&d->m_hierarchyModel, &HierarchyViewModel::selectedDocumentChanged, this, &MainModel::setSelectedDocument);
 
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
     connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, this, &MainModel::modelDataChanged);
@@ -138,6 +138,21 @@ QString MainModel::chartText(const MscChart *chart) const
 {
     msc::MscWriter mscWriter;
     return mscWriter.serialize(chart);
+}
+
+void MainModel::setSelectedDocument(MscDocument *document)
+{
+    if (d->m_selectedDocument == document)
+        return;
+
+    d->m_selectedDocument = document;
+    d->m_hierarchyModel.setSelectedDocument(d->m_selectedDocument);
+    Q_EMIT selectedDocumentChanged(d->m_selectedDocument);
+}
+
+MscDocument *MainModel::selectedDocument() const
+{
+    return d->m_selectedDocument;
 }
 
 void MainModel::showFirstChart()

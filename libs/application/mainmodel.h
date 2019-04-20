@@ -40,6 +40,8 @@ struct MainModelPrivate;
 class MainModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(msc::MscDocument *selectedDocument READ selectedDocument WRITE setSelectedDocument NOTIFY
+                       selectedDocumentChanged)
 
 public:
     explicit MainModel(QObject *parent = nullptr);
@@ -62,12 +64,14 @@ public:
 
     QString chartText(const msc::MscChart *chart) const;
 
+    void setSelectedDocument(msc::MscDocument *document);
+    msc::MscDocument *selectedDocument() const;
+
 Q_SIGNALS:
     void showChartVew();
     void modelDataChanged();
     void modelUpdated(msc::MscModel *);
-    void documentClicked(const msc::MscDocument *document);
-    void selectionChanged(const msc::MscDocument *document);
+    void selectedDocumentChanged(msc::MscDocument *selectedDocument);
 
 public Q_SLOTS:
     void showFirstChart();

@@ -36,6 +36,12 @@ public:
 
     msc::MscDocument *currentDocument() const;
 
+    void setSelectedDocument(msc::MscDocument *document);
+    msc::MscDocument *selectedDocument() const;
+
+Q_SIGNALS:
+    void selectedDocumentChanged(msc::MscDocument *selectedDocument);
+
 private Q_SLOTS:
     void changHierarchyType();
 

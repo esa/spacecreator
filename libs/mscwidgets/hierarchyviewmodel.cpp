@@ -167,6 +167,17 @@ void HierarchyViewModel::setModel(MscModel *model)
     }
 }
 
+void HierarchyViewModel::setSelectedDocument(MscDocument *document)
+{
+    if (document == selectedDocument())
+        return;
+
+    for (msc::DocumentItem *item : d->documentItems) {
+        item->setSelected(item->document() == document);
+    }
+    Q_EMIT selectedDocumentChanged(document);
+}
+
 MscDocument *HierarchyViewModel::selectedDocument() const
 {
     for (msc::DocumentItem *item : d->documentItems) {
@@ -175,13 +186,6 @@ MscDocument *HierarchyViewModel::selectedDocument() const
     }
 
     return nullptr;
-}
-
-void HierarchyViewModel::selectionChanged(const MscDocument *document)
-{
-    for (msc::DocumentItem *item : d->documentItems) {
-        item->setSelected(item->document() == document);
-    }
 }
 
 void HierarchyViewModel::updateModel()
@@ -195,7 +199,7 @@ void HierarchyViewModel::updateModel()
         for (msc::DocumentItem *item : d->documentItems) {
             QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
                              &msc::HierarchyViewModel::documentDoubleClicked, Qt::UniqueConnection);
-            QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::documentClicked,
+            QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::setSelectedDocument,
                              Qt::UniqueConnection);
 
             QObject::connect(item->document(), &MscDocument::documentAdded, this, &HierarchyViewModel::updateModel,

@@ -22,6 +22,7 @@
 
 namespace msc {
 
+class MscDocument;
 class HierarchyViewModel;
 
 class HierarchyCreatorTool : public BaseCreatorTool
@@ -33,6 +34,9 @@ public:
                          QObject *parent = nullptr);
 
     virtual BaseTool::ToolType toolType() const override;
+
+Q_SIGNALS:
+    void documentCreated(msc::MscDocument *document);
 
 protected:
     void createPreviewItem() override;

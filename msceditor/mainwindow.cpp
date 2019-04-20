@@ -25,7 +25,6 @@
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "graphicsview.h"
-#include "hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "messagedeclarationsdialog.h"
 #include "mscaction.h"
@@ -149,7 +148,6 @@ struct MainWindowPrivate {
     msc::MessageCreatorTool *m_messageCreateTool = nullptr;
 
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
-    QPointer<msc::MscDocument> m_selectedDocument;
 
     int m_lastSavedUndoId = 0;
     bool m_dropUnsavedChangesSilently = false;
@@ -198,7 +196,6 @@ void MainWindow::createNewDocument()
 
     d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
-    d->ui->documentTreeView->expandAll();
     d->m_mscFileName.clear();
     clearUndoStacks();
 
@@ -245,7 +242,6 @@ bool MainWindow::openFileMsc(const QString &file)
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
         d->m_mscFileName = file;
-        d->ui->documentTreeView->expandAll();
         d->ui->graphicsView->setZoom(100);
     }
 
@@ -322,32 +318,6 @@ void MainWindow::updateTextView()
         return;
     }
     d->ui->mscTextBrowser->updateView();
-}
-
-void MainWindow::updateTreeViewItem(const msc::MscDocument *document)
-{
-    if (document == nullptr)
-        return;
-
-    auto model = d->ui->documentTreeView->model();
-
-    std::function<void(int, const QModelIndex &)> findDocument;
-
-    findDocument = [&](int row, const QModelIndex &parent) -> void {
-        QModelIndex index = model->index(row, 0, parent);
-
-        if (index.internalPointer() == document) {
-            d->ui->documentTreeView->setCurrentIndex(index);
-        }
-
-        for (int x = 0; x < model->rowCount(index); ++x) {
-            findDocument(x, index);
-        }
-    };
-
-    for (int row = 0; row < model->rowCount(); ++row) {
-        findDocument(row, QModelIndex());
-    }
 }
 
 bool MainWindow::openFileAsn(const QString &file)
@@ -504,7 +474,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
     if (obj == nullptr) {
-        d->m_selectedDocument = nullptr;
+        d->m_model->setSelectedDocument(nullptr);
         return;
     }
 
@@ -528,11 +498,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
                 action->setEnabled(canNewChild);
             }
 
-            d->m_selectedDocument = document;
+            d->m_model->setSelectedDocument(document);
             d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MscChartMimeType)
-                                      && d->m_selectedDocument->isAddChildEnable());
-
-            Q_EMIT selectionChanged(document);
+                                      && d->m_model->selectedDocument()->isAddChildEnable());
         }
     }
 }
@@ -685,11 +653,9 @@ void MainWindow::initDocumentViewActions()
         action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         tool->setView(d->ui->hierarchyView);
 
-        connect(tool, &msc::HierarchyCreatorTool::created, this, [&]() {
-            d->ui->documentTreeView->expandAll();
+        connect(tool, &msc::HierarchyCreatorTool::documentCreated, this, [&](msc::MscDocument *document) {
             activateDefaultTool();
-            updateTreeViewItem(d->m_selectedDocument);
-            Q_EMIT selectionChanged(d->m_selectedDocument);
+            d->m_model->setSelectedDocument(document);
         });
 
         connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
@@ -861,9 +827,9 @@ void MainWindow::initConnections()
             &MainWindow::selectCurrentChart);
 
     connect(d->m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });
-    connect(d->m_model, &MainModel::documentClicked, this, &MainWindow::updateTreeViewItem);
 
-    connect(this, &MainWindow::selectionChanged, d->m_model, &MainModel::selectionChanged);
+    connect(d->m_model, &MainModel::selectedDocumentChanged, d->ui->documentTreeView,
+            &DocumentTreeView::setSelectedDocument);
 
     connect(d->ui->graphicsView, &msc::GraphicsView::mouseMoved, this, &MainWindow::showCoordinatesInfo);
 
@@ -1540,7 +1506,7 @@ void MainWindow::pasteChart()
         const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
                                           mideData->data(MscChartMimeType) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
-        updateTreeViewItem(document);
+        d->m_model->setSelectedDocument(document);
     }
 }
 

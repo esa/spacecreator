@@ -62,7 +62,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
-    void selectionChanged(const msc::MscDocument *document);
 
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
@@ -77,7 +76,6 @@ private Q_SLOTS:
     bool openMscChain(const QString &dirPath);
     void activateDefaultTool();
     void updateTextView();
-    void updateTreeViewItem(const msc::MscDocument *document);
     void onCreateMessageToolRequested();
     bool startRemoteControl(quint16 port);
     void updateTitles();
