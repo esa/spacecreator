@@ -17,8 +17,6 @@
 
 #include "mainwindow.h"
 
-#include "asn1editor.h"
-#include "asn1xmlparser.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
@@ -199,8 +197,6 @@ void MainWindow::createNewDocument()
     d->m_model->clearUndoStack();
 
     d->ui->graphicsView->setZoom(100);
-
-    updateTitles();
 }
 
 void MainWindow::selectAndOpenFile()
@@ -209,9 +205,7 @@ void MainWindow::selectAndOpenFile()
         return;
     }
 
-    static const QString suffixAsn(".asn");
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
-                                          QString("ASN1 files (*%1 *%2)").arg(suffixAsn, suffixAsn.toUpper()),
                                           QString("All files (*.*)") };
 
     const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
@@ -219,10 +213,7 @@ void MainWindow::selectAndOpenFile()
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
         d->ui->errorTextEdit->clear();
-        if (filename.endsWith(DotMscFileExtensionLow))
-            openFileMsc(filename);
-        else if (filename.endsWith(suffixAsn))
-            openFileAsn(filename);
+        openFileMsc(filename);
     }
 }
 
@@ -244,15 +235,15 @@ bool MainWindow::openFileMsc(const QString &file)
         d->ui->graphicsView->setZoom(100);
     }
 
-    if (!d->m_model->errorMessages().isEmpty())
+    if (!d->m_model->mscErrorMessages().isEmpty())
         showErrorView();
 
     d->m_model->clearUndoStack();
 
-    d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
+    d->ui->errorTextEdit->appendHtml(d->m_model->mscErrorMessages().join("\n"));
     QString loadStatus = tr("success");
     QString statusColor = "black";
-    if (!d->m_model->errorMessages().isEmpty()) {
+    if (!d->m_model->mscErrorMessages().isEmpty()) {
         loadStatus = tr("warnings");
         statusColor = "orange";
     }
@@ -262,8 +253,6 @@ bool MainWindow::openFileMsc(const QString &file)
     }
     d->ui->errorTextEdit->appendHtml(
             tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor));
-
-    updateTitles();
 
     if (ok) {
         d->m_currentFilePath = file;
@@ -311,40 +300,6 @@ void MainWindow::updateTextView()
         return;
     }
     d->ui->mscTextBrowser->updateView();
-}
-
-bool MainWindow::openFileAsn(const QString &file)
-{
-    QFileInfo fileInfo(file);
-    if (!fileInfo.exists()) {
-        return false;
-    }
-
-    QStringList errorMessages;
-    try {
-        asn1::Asn1XMLParser parser;
-        const QVariantList ans1Types = parser.parseAsn1File(fileInfo, &errorMessages);
-
-        asn1::Asn1Editor editor;
-        editor.setAsn1Types(ans1Types);
-        int result = editor.exec();
-        if (result == QDialog::Accepted) {
-            d->m_model->mscModel()->setAsn1TypesData(editor.asn1Types());
-
-            const QVariantList params { QVariant::fromValue(d->m_model->mscModel()), editor.fileName(), "ASN.1" };
-            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        }
-    } catch (const std::exception &e) {
-        qWarning() << "Error parse asn1 file. " << e.what();
-    }
-
-    if (errorMessages.size()) {
-        showErrorView();
-
-        d->ui->errorTextEdit->appendHtml(errorMessages.join("\n"));
-    }
-
-    return true;
 }
 
 void MainWindow::saveMsc()
@@ -1117,9 +1072,6 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     switch (arg) {
     case CommandLineParser::Positional::OpenFileMsc: {
         return openFileMsc(value);
-    }
-    case CommandLineParser::Positional::OpenFileAsn: {
-        return openFileAsn(value);
     }
     case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
         return openMscChain(value);

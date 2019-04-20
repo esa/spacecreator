@@ -29,7 +29,6 @@ public:
     enum class Positional
     {
         OpenFileMsc = 0,
-        OpenFileAsn,
         DbgOpenMscExamplesChain,
         StartRemoteControl,
         DropUnsavedChangesSilently,

@@ -49,12 +49,12 @@ struct MainModelPrivate {
     }
 
     MscModel *m_mscModel = nullptr; /// model of the msc data
+    QStringList m_mscErrorMessages;
     ChartViewModel m_chartModel; /// model for the chart UI
     HierarchyViewModel m_hierarchyModel; /// model of the graphical document UI
     DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
     QPointer<msc::MscDocument> m_selectedDocument;
     QString m_mscFileName;
-    QStringList m_errorMessages;
 
     QUndoStack m_undoStack;
     int m_lastSavedUndoId = 0;
@@ -112,9 +112,9 @@ msc::DocumentItemModel *MainModel::documentItemModel() const
     return d->m_documentItemModel;
 }
 
-QStringList MainModel::errorMessages() const
+QStringList MainModel::mscErrorMessages() const
 {
-    return d->m_errorMessages;
+    return d->m_mscErrorMessages;
 }
 
 ChartViewModel &MainModel::chartViewModel() const
@@ -192,10 +192,10 @@ bool MainModel::loadFile(const QString &filename)
     msc::MscModel *model = nullptr;
 
     try {
-        d->m_errorMessages.clear();
-        model = file.parseFile(filename, &d->m_errorMessages);
+        d->m_mscErrorMessages.clear();
+        model = file.parseFile(filename, &d->m_mscErrorMessages);
     } catch (const msc::ParserException &e) {
-        d->m_errorMessages.append(e.errorMessage());
+        d->m_mscErrorMessages.append(e.errorMessage());
         return false;
     } catch (...) {
         // print error message

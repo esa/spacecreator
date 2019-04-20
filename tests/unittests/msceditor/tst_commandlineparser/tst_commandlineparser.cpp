@@ -40,7 +40,6 @@ private Q_SLOTS:
      * so lets keep to this way - one option, one dedicated test slot.
      */
     void testCmdArgumentOpenMsc();
-    void testCmdArgumentOpenAsn();
     void testCmdArgumentRemoteControl();
 
     void testCoverage();
@@ -75,54 +74,6 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
 
     const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc, argFromParser2);
     QCOMPARE(notProcessed, false);
-}
-
-void tst_CommandLineParser::testCmdArgumentOpenAsn()
-{
-#ifndef __clang_analyzer__ // Currently clang's scan-build on build server complains on the QTimer
-                           // by some reason
-
-    // Attempt to open a file will raise a ASN1Editor window.
-    // Schedule an Esc press to bypass it:
-    auto scheduleASN1EditorCloser = [](int interval) {
-        QTimer::singleShot(interval, []() {
-            if (QDialog *mb = qobject_cast<QDialog *>(QApplication::activeModalWidget()))
-                mb->close();
-        });
-    };
-
-    static const QCommandLineOption cmdOpenAsn =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenFileAsn);
-    static const QString FileName(QString(EXAMPLES_STORAGE_PATH).append("dataview-uniq.asn"));
-    static const QString NoFileName("./no-such-file.asn");
-
-    CommandLineParser parser;
-    parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdOpenAsn.names().first(), FileName) });
-
-    QCOMPARE(parser.isSet(CommandLineParser::Positional::Unknown), false);
-    QCOMPARE(parser.isSet(CommandLineParser::Positional::OpenFileAsn), true);
-
-    const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenFileAsn));
-    QCOMPARE(argFromParser1, FileName);
-
-    MainWindow w;
-
-    scheduleASN1EditorCloser(1000);
-    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser1);
-    QCOMPARE(processed, true);
-
-    parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdOpenAsn.names().first(), NoFileName) });
-    QCOMPARE(parser.isSet(CommandLineParser::Positional::OpenFileAsn), true);
-
-    const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenFileAsn));
-    QCOMPARE(argFromParser2, NoFileName);
-
-    scheduleASN1EditorCloser(1000);
-    const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileAsn, argFromParser2);
-    QCOMPARE(notProcessed, false);
-#endif // __clang_analyzer__
 }
 
 void tst_CommandLineParser::testCmdArgumentRemoteControl()

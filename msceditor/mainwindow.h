@@ -67,7 +67,6 @@ private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     bool openFileMsc(const QString &file);
-    bool openFileAsn(const QString &file);
     void saveMsc();
     void saveAsMsc();
     void showDocumentView(bool show);

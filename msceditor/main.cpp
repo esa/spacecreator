@@ -109,8 +109,7 @@ int main(int argc, char *argv[])
         const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
         if (CommandLineParser::Positional::Unknown != posArgType)
             if (cmdParser.isSet(posArgType)) {
-                if (posArgType == CommandLineParser::Positional::OpenFileAsn
-                    || posArgType == CommandLineParser::Positional::OpenFileMsc)
+                if (posArgType == CommandLineParser::Positional::OpenFileMsc)
                     args.prepend(posArgType);
                 else
                     args.append(posArgType);

@@ -55,7 +55,7 @@ public:
 
     msc::DocumentItemModel *documentItemModel() const;
 
-    QStringList errorMessages() const;
+    QStringList mscErrorMessages() const;
 
     msc::ChartViewModel &chartViewModel() const;
     msc::HierarchyViewModel &hierarchyViewModel() const;
