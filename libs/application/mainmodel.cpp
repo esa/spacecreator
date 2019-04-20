@@ -30,9 +30,11 @@
 #include "mscmodel.h"
 #include "mscwriter.h"
 
+#include <QDir>
 #include <QGraphicsScene>
 #include <QUndoStack>
 #include <documentitemmodel.h>
+#include <functional>
 
 using namespace msc;
 
@@ -40,6 +42,13 @@ struct MainModelPrivate {
     explicit MainModelPrivate(MainModel *q)
         : m_mscModel(new MscModel())
         , m_documentItemModel(new DocumentItemModel(q))
+        , m_currentFilePath(
+#if defined(QT_DEBUG) && defined(Q_OS_WIN)
+                  QDir(QDir::current().path() + QString("/../../esa/examples")).path()
+#else
+                  "../../msceditor/examples"
+#endif // QT_DEBUG and Q_OS_WIN
+          )
     {
     }
     ~MainModelPrivate()
@@ -54,7 +63,7 @@ struct MainModelPrivate {
     HierarchyViewModel m_hierarchyModel; /// model of the graphical document UI
     DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
     QPointer<msc::MscDocument> m_selectedDocument;
-    QString m_mscFileName;
+    QString m_currentFilePath;
 
     QUndoStack m_undoStack;
     int m_lastSavedUndoId = 0;
@@ -91,10 +100,11 @@ void MainModel::initialModel()
     leafDoc->addChart(new MscChart(tr("Untitled_MSC")));
 
     doc->addDocument(leafDoc);
-
     model->addDocument(doc);
-
     setNewModel(model);
+
+    setCurrentFilePath("");
+    clearUndoStack();
 }
 
 QGraphicsScene *MainModel::graphicsScene() const
@@ -159,6 +169,20 @@ MscDocument *MainModel::selectedDocument() const
     return d->m_selectedDocument;
 }
 
+void MainModel::setCurrentFilePath(const QString &filePath)
+{
+    if (filePath == d->m_currentFilePath)
+        return;
+
+    d->m_currentFilePath = filePath;
+    Q_EMIT currentFilePathChanged(d->m_currentFilePath);
+}
+
+const QString &MainModel::currentFilePath() const
+{
+    return d->m_currentFilePath;
+}
+
 QUndoStack *MainModel::undoStack()
 {
     return &d->m_undoStack;
@@ -203,18 +227,23 @@ bool MainModel::loadFile(const QString &filename)
     }
 
     setNewModel(model);
+    setCurrentFilePath(filename);
+    clearUndoStack();
 
     return true;
 }
 
-void MainModel::saveMsc(const QString &fileName)
+void MainModel::saveMsc(const QString &filename)
 {
     msc::MscWriter mscWriter;
 
     if (d->m_mscModel && (d->m_mscModel->documents().size() || d->m_mscModel->charts().size()))
-        mscWriter.saveModel(d->m_mscModel, fileName);
+        mscWriter.saveModel(d->m_mscModel, filename);
     else
-        mscWriter.saveChart(d->m_chartModel.currentChart(), fileName);
+        mscWriter.saveChart(d->m_chartModel.currentChart(), filename);
+
+    setCurrentFilePath(filename);
+    storeCurrentUndoCommandId();
 }
 
 void MainModel::showChartFromDocument(MscDocument *document)

@@ -67,7 +67,6 @@
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <QVector>
-#include <functional>
 
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
@@ -77,13 +76,6 @@ const QLatin1String MainWindow::MscChartMimeType("application/mscchart");
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
-        , m_currentFilePath(
-#if defined(QT_DEBUG) && defined(Q_OS_WIN)
-                  QDir(QDir::current().path() + QString("/../../esa/examples")).path()
-#else
-                  "../../msceditor/examples"
-#endif // QT_DEBUG and Q_OS_WIN
-                          )
         , m_model(new MainModel(mainWindow))
         , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
         , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
@@ -101,11 +93,9 @@ struct MainWindowPrivate {
     ~MainWindowPrivate() { delete ui; }
 
     Ui::MainWindow *ui = nullptr;
-    QString m_currentFilePath;
 
     QComboBox *m_zoomBox = nullptr;
 
-    QString m_mscFileName;
     MainModel *m_model = nullptr;
     QToolBar *m_mscToolBar = nullptr;
     QToolBar *m_hierarchyToolBar = nullptr;
@@ -193,8 +183,6 @@ void MainWindow::createNewDocument()
 
     d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
-    d->m_mscFileName.clear();
-    d->m_model->clearUndoStack();
 
     d->ui->graphicsView->setZoom(100);
 }
@@ -208,7 +196,7 @@ void MainWindow::selectAndOpenFile()
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
                                           QString("All files (*.*)") };
 
-    const QString path = QFileInfo(d->m_currentFilePath).absoluteFilePath();
+    const QString path = QFileInfo(d->m_model->currentFilePath()).absoluteFilePath();
 
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
@@ -231,14 +219,11 @@ bool MainWindow::openFileMsc(const QString &file)
 
     const bool ok = d->m_model->loadFile(file);
     if (ok) {
-        d->m_mscFileName = file;
         d->ui->graphicsView->setZoom(100);
     }
 
     if (!d->m_model->mscErrorMessages().isEmpty())
         showErrorView();
-
-    d->m_model->clearUndoStack();
 
     d->ui->errorTextEdit->appendHtml(d->m_model->mscErrorMessages().join("\n"));
     QString loadStatus = tr("success");
@@ -254,11 +239,6 @@ bool MainWindow::openFileMsc(const QString &file)
     d->ui->errorTextEdit->appendHtml(
             tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor));
 
-    if (ok) {
-        d->m_currentFilePath = file;
-        d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
-    }
-
     return ok;
 }
 
@@ -267,7 +247,8 @@ void MainWindow::updateTitles()
     static const QString title = tr("%1 [%2]%3");
 
     const QString dirtyMarker(d->m_model->needSave() ? "*" : "");
-    const QString mscFileName(d->m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(d->m_mscFileName).fileName());
+    const QString &filename = d->m_model->currentFilePath();
+    const QString mscFileName(filename.isEmpty() ? tr("Untitled") : QFileInfo(filename).fileName());
     setWindowTitle(title.arg(qApp->applicationName(), mscFileName, dirtyMarker));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
@@ -304,23 +285,22 @@ void MainWindow::updateTextView()
 
 void MainWindow::saveMsc()
 {
-    if (d->m_mscFileName.isEmpty()) {
+    const QString &filename = d->m_model->currentFilePath();
+    if (filename.isEmpty()) {
         saveAsMsc();
     } else {
-        d->m_model->saveMsc(d->m_mscFileName);
-        d->m_model->storeCurrentUndoCommandId();
+        d->m_model->saveMsc(filename);
     }
 }
 
 void MainWindow::saveAsMsc()
 {
     QString fileName =
-            QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_mscFileName).path(),
+            QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_model->currentFilePath()).path(),
                                          tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(DotMscFileExtensionLow))
             fileName.append(DotMscFileExtensionLow);
-        d->m_mscFileName = fileName;
         saveMsc();
     }
 }
@@ -798,6 +778,11 @@ void MainWindow::initConnections()
 
     connect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
     connect(d->m_model, &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
+
+    connect(d->m_model, &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
+        QFileInfo fileInfo(filename);
+        d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
+    });
 }
 
 void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
@@ -845,8 +830,9 @@ void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType command
             errorString = tr("Nothing to Redo");
         break;
     case RemoteControlWebServer::CommandType::Save: {
-        d->m_mscFileName = params.value(QLatin1String("fileName"), d->m_mscFileName).toString();
-        result = !d->m_mscFileName.isEmpty();
+        d->m_model->setCurrentFilePath(
+                params.value(QLatin1String("fileName"), d->m_model->currentFilePath()).toString());
+        result = !d->m_model->currentFilePath().isEmpty();
         if (result)
             d->m_actSaveFile->trigger();
         else
@@ -1131,7 +1117,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 #ifdef QT_DEBUG
     case Qt::Key_R: {
         if (!e->isAutoRepeat() && (e->modifiers() == Qt::ControlModifier)) {
-            openFileMsc(d->m_currentFilePath);
+            openFileMsc(d->m_model->currentFilePath());
         }
         break;
     }
@@ -1158,7 +1144,7 @@ void MainWindow::loadSettings()
 
     restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
-    d->m_currentFilePath = AppOptions::MainWindow.LastFilePath->read().toString();
+    d->m_model->setCurrentFilePath(AppOptions::MainWindow.LastFilePath->read().toString());
 
     // the toolbar might be hidden from a streaming tool session
     d->ui->mainToolBar->show();
@@ -1176,7 +1162,7 @@ void MainWindow::saveSettings()
 {
     AppOptions::MainWindow.Geometry->write(saveGeometry());
     AppOptions::MainWindow.State->write(saveState());
-    AppOptions::MainWindow.LastFilePath->write(d->m_currentFilePath);
+    AppOptions::MainWindow.LastFilePath->write(d->m_model->currentFilePath());
     AppOptions::MainWindow.DocOrHierarchyViewMode->write(d->ui->centerView->currentIndex());
 }
 
@@ -1221,7 +1207,7 @@ void MainWindow::changeEvent(QEvent *e)
 void MainWindow::onGeometryRestored()
 {
     // A new document should be created only if no files were opened by command line args
-    if (d->m_mscFileName.isEmpty()) {
+    if (d->m_model->currentFilePath().isEmpty()) {
         QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
     }
 }
@@ -1310,7 +1296,6 @@ bool MainWindow::saveDocument()
 void MainWindow::updateModel()
 {
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
-    d->ui->mscTextBrowser->updateView();
     updateMscToolbarActionsEnablement();
 }
 

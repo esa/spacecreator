@@ -39,6 +39,7 @@ TextView::TextView(QWidget *parent)
 void TextView::setModel(msc::MscModel *model)
 {
     m_model = model;
+    updateView();
 }
 
 void TextView::updateView()

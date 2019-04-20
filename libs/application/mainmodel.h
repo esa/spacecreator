@@ -43,6 +43,7 @@ class MainModel : public QObject
     Q_OBJECT
     Q_PROPERTY(msc::MscDocument *selectedDocument READ selectedDocument WRITE setSelectedDocument NOTIFY
                        selectedDocumentChanged)
+    Q_PROPERTY(QString currentFilePath READ currentFilePath WRITE setCurrentFilePath NOTIFY currentFilePathChanged)
 
 public:
     explicit MainModel(QObject *parent = nullptr);
@@ -68,6 +69,9 @@ public:
     void setSelectedDocument(msc::MscDocument *document);
     msc::MscDocument *selectedDocument() const;
 
+    void setCurrentFilePath(const QString &filePath);
+    const QString &currentFilePath() const;
+
     QUndoStack *undoStack();
     void clearUndoStack();
     void storeCurrentUndoCommandId();
@@ -79,11 +83,12 @@ Q_SIGNALS:
     void modelUpdated(msc::MscModel *);
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
     void lasteSaveUndoChange();
+    void currentFilePathChanged(const QString &);
 
 public Q_SLOTS:
     void showFirstChart();
     bool loadFile(const QString &filename);
-    void saveMsc(const QString &fileName);
+    void saveMsc(const QString &filename);
 
 private Q_SLOTS:
     void showChartFromDocument(msc::MscDocument *document);
