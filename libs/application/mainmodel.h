@@ -46,6 +46,8 @@ class MainModel : public QObject
     Q_PROPERTY(QString currentFilePath READ currentFilePath WRITE setCurrentFilePath NOTIFY currentFilePathChanged)
 
 public:
+    static const QLatin1String MscChartMimeType;
+
     explicit MainModel(QObject *parent = nullptr);
     ~MainModel();
 
@@ -89,6 +91,9 @@ public Q_SLOTS:
     void showFirstChart();
     bool loadFile(const QString &filename);
     void saveMsc(const QString &filename);
+    void copyCurrentChart();
+    void copyCurrentChartAsPicture();
+    void pasteChart();
 
 private Q_SLOTS:
     void showChartFromDocument(msc::MscDocument *document);

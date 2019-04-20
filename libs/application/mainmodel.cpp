@@ -18,6 +18,8 @@
 #include "mainmodel.h"
 
 #include "chartviewmodel.h"
+#include "commands/common/commandsstack.h"
+#include "documentitemmodel.h"
 #include "exceptions.h"
 #include "hierarchyviewmodel.h"
 #include "instanceitem.h"
@@ -30,13 +32,19 @@
 #include "mscmodel.h"
 #include "mscwriter.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDir>
 #include <QGraphicsScene>
+#include <QImage>
+#include <QMimeData>
+#include <QPainter>
 #include <QUndoStack>
-#include <documentitemmodel.h>
 #include <functional>
 
 using namespace msc;
+
+const QLatin1String MainModel::MscChartMimeType("application/mscchart");
 
 struct MainModelPrivate {
     explicit MainModelPrivate(MainModel *q)
@@ -244,6 +252,49 @@ void MainModel::saveMsc(const QString &filename)
 
     setCurrentFilePath(filename);
     storeCurrentUndoCommandId();
+}
+
+void MainModel::copyCurrentChart()
+{
+    const QString charText = chartText(d->m_chartModel.currentChart());
+
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData(MscChartMimeType, charText.toLatin1());
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->clear();
+    clipboard->setMimeData(mimeData);
+}
+
+void MainModel::copyCurrentChartAsPicture()
+{
+    QGraphicsScene *scene = d->m_chartModel.graphicsScene();
+
+    QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    scene->render(&painter);
+
+    QApplication::clipboard()->setImage(image);
+}
+
+void MainModel::pasteChart()
+{
+    msc::MscDocument *document = d->m_selectedDocument;
+    if (document == nullptr)
+        return;
+
+    const QMimeData *mideData = QApplication::clipboard()->mimeData();
+
+    if (mideData->hasFormat(MscChartMimeType)) {
+        const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
+                                          mideData->data(MscChartMimeType) };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
+        setSelectedDocument(document);
+    }
 }
 
 void MainModel::showChartFromDocument(MscDocument *document)

@@ -71,7 +71,6 @@
 const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
-const QLatin1String MainWindow::MscChartMimeType("application/mscchart");
 
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
@@ -317,7 +316,7 @@ void MainWindow::showDocumentView(bool show)
         msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
         QClipboard *clipboard = QApplication::clipboard();
         const QMimeData *mimeData = clipboard->mimeData();
-        const bool clipBoardHasMscChart = mimeData ? mimeData->hasFormat(MscChartMimeType) : false;
+        const bool clipBoardHasMscChart = mimeData ? mimeData->hasFormat(MainModel::MscChartMimeType) : false;
         d->m_actPaste->setEnabled(clipBoardHasMscChart && chart && chart->instances().isEmpty());
 
         d->m_deleteTool->setView(d->ui->graphicsView);
@@ -427,7 +426,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
             }
 
             d->m_model->setSelectedDocument(document);
-            d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MscChartMimeType)
+            d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
                                       && d->m_model->selectedDocument()->isAddChildEnable());
         }
     }
@@ -488,13 +487,13 @@ void MainWindow::initActions()
     d->m_actCopy = new QAction(tr("Copy:"), this);
     d->m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
     d->m_actCopy->setMenu(new QMenu(this));
-    d->m_actCopy->menu()->addAction(tr("Copy Diagram"), this, &MainWindow::copyAsDiagram, QKeySequence::Copy);
-    d->m_actCopy->menu()->addAction(tr("Copy as Picture"), this, &MainWindow::copyAsPicture);
+    d->m_actCopy->menu()->addAction(tr("Copy Diagram"), d->m_model, &MainModel::copyCurrentChart, QKeySequence::Copy);
+    d->m_actCopy->menu()->addAction(tr("Copy as Picture"), d->m_model, &MainModel::copyCurrentChartAsPicture);
 
     d->m_actPaste = new QAction(tr("Paste:"), this);
     d->m_actPaste->setShortcut(QKeySequence::Paste);
     d->m_actPaste->setIcon(QIcon::fromTheme("edit-paste"));
-    connect(d->m_actPaste, &QAction::triggered, this, &MainWindow::pasteChart);
+    connect(d->m_actPaste, &QAction::triggered, d->m_model, &MainModel::pasteChart);
 
     d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
@@ -1379,49 +1378,6 @@ void MainWindow::openMessageDeclarationEditor()
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
         d->m_model->mscModel()->setAsn1TypesData(dialog.asn1Types());
         msc::cmd::CommandsStack::current()->endMacro();
-    }
-}
-
-void MainWindow::copyAsDiagram()
-{
-    const QString charText = d->m_model->chartText(d->m_model->chartViewModel().currentChart());
-
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setData(MscChartMimeType, charText.toLatin1());
-
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->clear();
-    clipboard->setMimeData(mimeData);
-}
-
-void MainWindow::copyAsPicture()
-{
-    const auto scene = d->m_model->chartViewModel().graphicsScene();
-
-    QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
-    image.fill(Qt::transparent);
-
-    QPainter painter(&image);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    scene->render(&painter);
-
-    QApplication::clipboard()->setImage(image);
-}
-
-void MainWindow::pasteChart()
-{
-    msc::MscDocument *document = d->ui->documentTreeView->currentDocument();
-    if (document == nullptr)
-        return;
-
-    const QMimeData *mideData = QApplication::clipboard()->mimeData();
-
-    if (mideData->hasFormat(MscChartMimeType)) {
-        const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-                                          mideData->data(MscChartMimeType) };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
-        d->m_model->setSelectedDocument(document);
     }
 }
 
