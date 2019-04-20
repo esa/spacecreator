@@ -31,6 +31,7 @@
 #include "mscwriter.h"
 
 #include <QGraphicsScene>
+#include <QUndoStack>
 #include <documentitemmodel.h>
 
 using namespace msc;
@@ -54,6 +55,9 @@ struct MainModelPrivate {
     QPointer<msc::MscDocument> m_selectedDocument;
     QString m_mscFileName;
     QStringList m_errorMessages;
+
+    QUndoStack m_undoStack;
+    int m_lastSavedUndoId = 0;
 };
 
 MainModel::MainModel(QObject *parent)
@@ -153,6 +157,28 @@ void MainModel::setSelectedDocument(MscDocument *document)
 MscDocument *MainModel::selectedDocument() const
 {
     return d->m_selectedDocument;
+}
+
+QUndoStack *MainModel::undoStack()
+{
+    return &d->m_undoStack;
+}
+
+void MainModel::clearUndoStack()
+{
+    d->m_undoStack.clear();
+    storeCurrentUndoCommandId();
+}
+
+void MainModel::storeCurrentUndoCommandId()
+{
+    d->m_lastSavedUndoId = d->m_undoStack.index();
+    Q_EMIT lasteSaveUndoChange();
+}
+
+bool MainModel::needSave() const
+{
+    return d->m_lastSavedUndoId != d->m_undoStack.index();
 }
 
 void MainModel::showFirstChart()

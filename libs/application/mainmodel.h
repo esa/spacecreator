@@ -34,6 +34,7 @@ class InstanceItem;
 }
 
 class QGraphicsScene;
+class QUndoStack;
 
 struct MainModelPrivate;
 
@@ -67,11 +68,17 @@ public:
     void setSelectedDocument(msc::MscDocument *document);
     msc::MscDocument *selectedDocument() const;
 
+    QUndoStack *undoStack();
+    void clearUndoStack();
+    void storeCurrentUndoCommandId();
+    bool needSave() const;
+
 Q_SIGNALS:
     void showChartVew();
     void modelDataChanged();
     void modelUpdated(msc::MscModel *);
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
+    void lasteSaveUndoChange();
 
 public Q_SLOTS:
     void showFirstChart();

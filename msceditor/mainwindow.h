@@ -138,9 +138,5 @@ private:
     void showMousePositioner();
 #endif
 
-    QUndoStack *currentUndoStack() const;
-    void storeCurrentUndoCommandId();
-    bool needSave() const;
-
     msc::BaseTool *activeTool() const;
 };

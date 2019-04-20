@@ -44,7 +44,6 @@ namespace msc {
 */
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
-    , m_undoStack(new QUndoStack(this))
 {
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
 
@@ -147,11 +146,6 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     } else {
         QGraphicsView::keyPressEvent(event);
     }
-}
-
-QUndoStack *GraphicsView::undoStack() const
-{
-    return m_undoStack;
 }
 
 qreal GraphicsView::minZoomPercent() const

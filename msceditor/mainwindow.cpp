@@ -149,7 +149,6 @@ struct MainWindowPrivate {
 
     RemoteControlWebServer *m_remoteControlWebServer = nullptr;
 
-    int m_lastSavedUndoId = 0;
     bool m_dropUnsavedChangesSilently = false;
 };
 
@@ -180,7 +179,7 @@ MainWindow::~MainWindow()
 
     // Had this connection not dropped, the currentUndoStack() would need check
     // for nullptr d, d->ui, d->ui->graphicsView
-    disconnect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
+    disconnect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
 QGraphicsView *MainWindow::currentView() const
@@ -197,7 +196,7 @@ void MainWindow::createNewDocument()
     d->m_model->chartViewModel().setPreferredChartBoxSize(prepareChartBoxSize());
     d->m_model->initialModel();
     d->m_mscFileName.clear();
-    clearUndoStacks();
+    d->m_model->clearUndoStack();
 
     d->ui->graphicsView->setZoom(100);
 
@@ -248,7 +247,7 @@ bool MainWindow::openFileMsc(const QString &file)
     if (!d->m_model->errorMessages().isEmpty())
         showErrorView();
 
-    clearUndoStacks();
+    d->m_model->clearUndoStack();
 
     d->ui->errorTextEdit->appendHtml(d->m_model->errorMessages().join("\n"));
     QString loadStatus = tr("success");
@@ -278,17 +277,11 @@ void MainWindow::updateTitles()
 {
     static const QString title = tr("%1 [%2]%3");
 
-    const QString dirtyMarker(needSave() ? "*" : "");
+    const QString dirtyMarker(d->m_model->needSave() ? "*" : "");
     const QString mscFileName(d->m_mscFileName.isEmpty() ? tr("Untitled") : QFileInfo(d->m_mscFileName).fileName());
     setWindowTitle(title.arg(qApp->applicationName(), mscFileName, dirtyMarker));
 
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
-}
-
-void MainWindow::clearUndoStacks()
-{
-    currentUndoStack()->clear();
-    storeCurrentUndoCommandId();
 }
 
 bool MainWindow::openMscChain(const QString &dirPath)
@@ -360,7 +353,7 @@ void MainWindow::saveMsc()
         saveAsMsc();
     } else {
         d->m_model->saveMsc(d->m_mscFileName);
-        storeCurrentUndoCommandId();
+        d->m_model->storeCurrentUndoCommandId();
     }
 }
 
@@ -429,7 +422,7 @@ void MainWindow::selectCurrentChart()
     msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
 
     if (chart != nullptr) {
-        if (QUndoStack *currentStack = currentUndoStack()) {
+        if (QUndoStack *currentStack = d->m_model->undoStack()) {
             if (!d->m_undoGroup->stacks().contains(currentStack))
                 d->m_undoGroup->addStack(currentStack);
             d->m_undoGroup->setActiveStack(currentStack);
@@ -848,7 +841,8 @@ void MainWindow::initConnections()
 
     connect(d->m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWindow::showSelection);
 
-    connect(currentUndoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
+    connect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
+    connect(d->m_model, &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
 }
 
 void MainWindow::handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
@@ -1346,7 +1340,7 @@ QStringList MainWindow::mscFileFilters()
 
 bool MainWindow::saveDocument()
 {
-    if (!d->m_dropUnsavedChangesSilently && needSave()) {
+    if (!d->m_dropUnsavedChangesSilently && d->m_model->needSave()) {
         auto result = QMessageBox::warning(
                 this, windowTitle(), tr("You have unsaved data. Do you want to save the MSC document?"),
                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
@@ -1420,22 +1414,6 @@ void MainWindow::showMousePositioner()
     }
 }
 #endif
-
-QUndoStack *MainWindow::currentUndoStack() const
-{
-    return d->ui->graphicsView->undoStack();
-}
-
-void MainWindow::storeCurrentUndoCommandId()
-{
-    d->m_lastSavedUndoId = currentUndoStack()->index();
-    updateTitles();
-}
-
-bool MainWindow::needSave() const
-{
-    return d->m_lastSavedUndoId != currentUndoStack()->index();
-}
 
 void MainWindow::showCoordinatesInfo(const QString &info)
 {

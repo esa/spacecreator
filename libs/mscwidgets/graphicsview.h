@@ -37,8 +37,6 @@ public:
     double zoom() const;
     void setZoom(double percent);
 
-    QUndoStack *undoStack() const;
-
 Q_SIGNALS:
     void mouseMoved(const QString &coordsInfo) const;
     void zoomChanged(qreal percent);
@@ -60,8 +58,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-
-    QUndoStack *m_undoStack = nullptr;
 
 private:
     qreal m_zoomPercent = 100.0;
