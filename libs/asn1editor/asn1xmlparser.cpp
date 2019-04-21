@@ -150,7 +150,7 @@ QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
         prettyFile.close();
 
 #ifdef Q_OS_WIN
-        Qstring cmd = QString("asn1 -customStg \"%1::%2 %3\"").arg(prettyPrintFileName, asn1HtmlFileName, filename);
+        QString cmd = QString("asn1 -customStg \"%1::%2 %3\"").arg(prettyPrintFileName, asn1HtmlFileName, filename);
 #else
         QString cmd = QString("%1 %2 -customIcdUper %3::%4 %5")
                               .arg(m_mono, m_asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);

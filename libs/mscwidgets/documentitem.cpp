@@ -295,14 +295,15 @@ void msc::DocumentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsObject::mouseReleaseEvent(event);
 
     if (event->button() == Qt::LeftButton) {
-        if (auto parent = dynamic_cast<DocumentItem *>(parentItem())) {
+        auto parent = dynamic_cast<DocumentItem *>(parentItem());
+        if (parent) {
             parent->d->disablePaint = false;
         }
 
         if (d->scenePos != event->scenePos()) {
             Q_EMIT moved(this, scenePos());
-        } else {
-            update();
+        } else if (parent) {
+            parent->update();
         }
     }
 }
