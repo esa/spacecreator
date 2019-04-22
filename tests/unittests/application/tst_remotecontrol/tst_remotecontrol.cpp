@@ -15,7 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mainwindow.h"
+#include "mainmodel.h"
+#include "remotecontrolhandler.h"
+#include "remotecontrolwebserver.h"
 
 #include <QCoreApplication>
 #include <QJsonDocument>
@@ -32,10 +34,17 @@ private Q_SLOTS:
 
     void initTestCase()
     {
-        window = new MainWindow;
-        QVERIFY(window->processCommandLineArg(CommandLineParser::Positional::StartRemoteControl,
-                                              QString::number(34622)));
-        socket = new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, window);
+        server = new RemoteControlWebServer(this);
+        handler = new RemoteControlHandler(this);
+        model = new MainModel(this);
+        model->initialModel();
+        handler->setModel(model);
+        connect(server, &RemoteControlWebServer::executeCommand, handler, &RemoteControlHandler::handleRemoteCommand);
+        connect(handler, &RemoteControlHandler::commandDone, server, &RemoteControlWebServer::commandDone);
+
+        server->start(kPort);
+
+        socket = new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, this);
     }
 
     void testInstanceCommand()
@@ -496,14 +505,24 @@ private Q_SLOTS:
     void cleanupTestCase()
     {
         socket->close();
+        delete socket;
+        socket = nullptr;
 
-        delete window;
-        window = nullptr;
+        delete server;
+        server = nullptr;
+
+        delete handler;
+        handler = nullptr;
+
+        delete model;
+        model = nullptr;
     }
 
 private:
-    MainWindow *window;
-    QWebSocket *socket;
+    RemoteControlWebServer *server = nullptr;
+    RemoteControlHandler *handler = nullptr;
+    MainModel *model = nullptr;
+    QWebSocket *socket = nullptr;
 };
 
 QTEST_MAIN(tst_RemoteControl)

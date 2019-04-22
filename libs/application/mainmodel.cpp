@@ -88,6 +88,8 @@ MainModel::MainModel(QObject *parent)
 
     initialModel();
     showFirstChart();
+
+    msc::cmd::CommandsStack::setCurrent(&d->m_undoStack);
 }
 
 MainModel::~MainModel()
