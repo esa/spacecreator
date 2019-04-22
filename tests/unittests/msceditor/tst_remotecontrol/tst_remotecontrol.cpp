@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include <QCoreApplication>
-#include <QWebSocket>
-#include <QJsonDocument>
-#include <QtTest>
-
 #include "mainwindow.h"
+
+#include <QCoreApplication>
+#include <QJsonDocument>
+#include <QWebSocket>
+#include <QtTest>
 
 static const int kPort = 34622;
 
@@ -30,14 +30,16 @@ class tst_RemoteControl : public QObject
 public:
 private Q_SLOTS:
 
-    void initTestCase() {
+    void initTestCase()
+    {
         window = new MainWindow;
         QVERIFY(window->processCommandLineArg(CommandLineParser::Positional::StartRemoteControl,
-                                      QString::number(34622)));
+                                              QString::number(34622)));
         socket = new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, window);
     }
 
-    void testInstanceCommand() {
+    void testInstanceCommand()
+    {
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
         QSignalSpy textMessageReceived(socket, SIGNAL(textMessageReceived(QString)));
         QSignalSpy socketError(socket, SIGNAL(error(QAbstractSocket::SocketError)));
@@ -89,7 +91,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testMessageCommand() {
+    void testMessageCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -174,7 +177,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testTimerCommand() {
+    void testTimerCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -291,7 +295,8 @@ private Q_SLOTS:
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testActionCommand() {
+    void testActionCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -346,7 +351,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testConditionCommand() {
+    void testConditionCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -401,7 +407,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testUndoRedoCommand() {
+    void testUndoRedoCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -449,7 +456,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void testSaveCommand() {
+    void testSaveCommand()
+    {
         QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
 
         QSignalSpy socketConnectedSpy(socket, SIGNAL(connected()));
@@ -485,7 +493,8 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void cleanupTestCase() {
+    void cleanupTestCase()
+    {
         socket->close();
 
         delete window;
@@ -496,7 +505,6 @@ private:
     MainWindow *window;
     QWebSocket *socket;
 };
-
 
 QTEST_MAIN(tst_RemoteControl)
 

@@ -3,7 +3,7 @@ isEmpty(APPLICATION_PRI_INCLUDED) {
 
     include(depend_conf_utils.pri)
 
-    QT += core gui widgets
+    QT += core gui widgets network websockets
 
     sub_dir = $$_PRO_FILE_PWD_
     sub_dir ~= s,^$$re_escape($$PWD),,

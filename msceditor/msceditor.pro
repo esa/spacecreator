@@ -7,18 +7,16 @@ include(../depend_mscwidgets.pri)
 include(../depend_msclibrary.pri)
 include(../depend_asn1library.pri)
 
-QT += core gui widgets network websockets
+QT += core gui widgets
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
     commandlineparser.cpp \
-    remotecontrolwebserver.cpp
 
 HEADERS += \
     mainwindow.h \
     commandlineparser.h \
-    remotecontrolwebserver.h
 
 FORMS += \
     mainwindow.ui

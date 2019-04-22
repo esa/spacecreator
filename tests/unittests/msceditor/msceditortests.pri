@@ -4,15 +4,13 @@ include(../../../depend_mscwidgets.pri)
 include(../../../depend_msclibrary.pri)
 include(../../../depend_asn1library.pri)
 
-QT += core gui widgets xml network websockets
+QT += core gui widgets xml
 
 SOURCES += \
-    ../../../../msceditor/remotecontrolwebserver.cpp \
     ../../../../msceditor/mainwindow.cpp \
     ../../../../msceditor/commandlineparser.cpp \
 
 HEADERS += \
-    ../../../../msceditor/remotecontrolwebserver.h \
     ../../../../msceditor/mainwindow.h \
     ../../../../msceditor/commandlineparser.h \
 

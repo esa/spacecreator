@@ -11,20 +11,22 @@ CONFIG += static
 QT += core gui widgets network websockets
 
 HEADERS += \
-    settings/settingsmanager.h \
     settings/appoptions.h \
+    settings/settingsmanager.h \
     asn1fileview.h \
     documenttreeview.h \
     documentitemmodel.h \
     mainmodel.h \
+    remotecontrolwebserver.h \
 
 SOURCES += \
-    settings/settingsmanager.cpp \
     settings/appoptions.cpp \
+    settings/settingsmanager.cpp \
     asn1fileview.cpp \
     documenttreeview.cpp \
     documentitemmodel.cpp \
     mainmodel.cpp \
+    remotecontrolwebserver.cpp \
 
 FORMS += \
     asn1fileview.ui \
