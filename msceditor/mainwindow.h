@@ -103,15 +103,6 @@ private:
     void initMainToolbar();
     void initConnections();
 
-    void handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
-                             const QString &peerName);
-    bool handleInstanceCommand(const QVariantMap &params, QString *errorString);
-    bool handleInstanceStopCommand(const QVariantMap &params, QString *errorString);
-    bool handleMessageCommand(const QVariantMap &params, QString *errorString);
-    bool handleTimerCommand(const QVariantMap &params, QString *errorString);
-    bool handleActionCommand(const QVariantMap &params, QString *errorString);
-    bool handleConditionCommand(const QVariantMap &params, QString *errorString);
-
     void closeEvent(QCloseEvent *e) override;
 
     void keyPressEvent(QKeyEvent *e) override;

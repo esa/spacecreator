@@ -11,6 +11,7 @@ CONFIG += static
 QT += core gui widgets network websockets
 
 HEADERS += \
+    remotecontrolhandler.h \
     settings/appoptions.h \
     settings/settingsmanager.h \
     asn1fileview.h \
@@ -20,6 +21,7 @@ HEADERS += \
     remotecontrolwebserver.h \
 
 SOURCES += \
+    remotecontrolhandler.cpp \
     settings/appoptions.cpp \
     settings/settingsmanager.cpp \
     asn1fileview.cpp \
