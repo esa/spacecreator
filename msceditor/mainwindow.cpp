@@ -302,6 +302,8 @@ void MainWindow::saveAsMsc()
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(DotMscFileExtensionLow))
             fileName.append(DotMscFileExtensionLow);
+        d->m_model->setCurrentFilePath(fileName);
+
         saveMsc();
     }
 }
@@ -527,14 +529,15 @@ void MainWindow::initMenuFile()
 
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
-                                            [&]() {
-                                                if (this->saveDocument()) {
-                                                    this->saveSettings();
-                                                    QApplication::quit();
-                                                }
-                                            },
-                                            QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(
+            tr("&Quit"), this,
+            [&]() {
+                if (this->saveDocument()) {
+                    this->saveSettings();
+                    QApplication::quit();
+                }
+            },
+            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
