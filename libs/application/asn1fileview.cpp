@@ -83,6 +83,7 @@ void ASN1FileView::selectFile()
         QFileInfo fi(file);
         const QVariantList params { QVariant::fromValue(m_model.data()), fi.fileName(), "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        fillPreview(file);
     }
 }
 
@@ -90,18 +91,26 @@ void ASN1FileView::fillPreview()
 {
     if (!m_model->dataDefinitionString().isEmpty()) {
         QString filename = m_currentDirectory + QDir::separator() + m_model->dataDefinitionString();
-
-        asn1::Asn1XMLParser parser;
-        QString html = parser.asn1AsHtml(filename);
-        if (html.isEmpty()) {
-            QFile file(filename);
-            if (file.exists()) {
-                file.open(QIODevice::ReadOnly);
-                ui->textEdit->setText(file.readAll());
-            }
-        } else {
-            ui->textEdit->setHtml(html);
-        }
+        fillPreview(filename);
     } else
         ui->textEdit->clear();
+}
+
+void ASN1FileView::fillPreview(const QString &filename)
+{
+    QFileInfo fi(filename);
+    if (!fi.exists())
+        qWarning() << "Can't find file" << filename;
+
+    asn1::Asn1XMLParser parser;
+    QString html = parser.asn1AsHtml(filename);
+    if (html.isEmpty()) {
+        QFile file(filename);
+        if (file.exists()) {
+            if (file.open(QIODevice::ReadOnly))
+                ui->textEdit->setText(file.readAll());
+        }
+    } else {
+        ui->textEdit->setHtml(html);
+    }
 }

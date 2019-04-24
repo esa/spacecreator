@@ -45,6 +45,7 @@ private Q_SLOTS:
     void updateView();
     void selectFile();
     void fillPreview();
+    void fillPreview(const QString &filename);
 
 private:
     Ui::ASN1FileView *ui;
