@@ -42,19 +42,19 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    m_polygonItem->setBrush(Qt::white);
+    m_polygonItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+
     m_nameItem->setEditable(true);
     setName(m_condition->name());
     m_nameItem->setBackgroundColor(Qt::transparent);
-    m_nameItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    m_nameItem->setSendClickEvent(true);
 
     connect(m_condition, &msc::MscCondition::nameChanged, this, &msc::ConditionItem::setName);
 
     connect(m_nameItem, &TextItem::edited, this, &ConditionItem::onNameEdited, Qt::QueuedConnection);
     connect(m_nameItem, &TextItem::textChanged, this, &ConditionItem::rebuildLayout);
     connect(m_nameItem, &TextItem::clicked, this, [&]() { this->setSelected(true); });
-
-    m_polygonItem->setBrush(Qt::white);
-    m_polygonItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
     scheduleLayoutUpdate();
 }

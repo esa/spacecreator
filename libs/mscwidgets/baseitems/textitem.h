@@ -72,10 +72,15 @@ public:
 
     QRectF boundingRect() const override;
 
+    void setSendClickEvent(bool send);
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
     void inputValidationPatternChanged(const QString &);
+    /*!
+       Send when setSendClickEvent() is set true, and the item was clicked.
+     */
     void clicked();
 
 protected Q_SLOTS:
@@ -103,6 +108,7 @@ protected:
     QString m_prevText;
     QRegularExpression m_inputValidator;
     QSizeF m_explicitSize;
+    bool m_sendClickEvent = false;
 };
 
 class NameItem : public TextItem

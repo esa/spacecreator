@@ -263,13 +263,15 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 void TextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem::mousePressEvent(event);
-    event->accept();
+    if (m_sendClickEvent) {
+        Q_EMIT clicked();
+        event->accept();
+    }
 }
 
 void TextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem::mouseReleaseEvent(event);
-    Q_EMIT clicked();
 }
 
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -432,6 +434,15 @@ void TextItem::setExplicitSize(const QSizeF &r)
 QRectF TextItem::boundingRect() const
 {
     return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
+}
+
+/*!
+   If set to ture, emits the clicked() signal when clicked. But consumes the mouse event.
+   So other items don't receive the event.
+ */
+void TextItem::setSendClickEvent(bool send)
+{
+    m_sendClickEvent = send;
 }
 
 } // namespace msc

@@ -48,7 +48,6 @@ ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
 
     connect(m_textItem, &TextItem::edited, this, &ActionItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::textChanged, this, &ActionItem::scheduleLayoutUpdate);
-    connect(m_textItem, &TextItem::clicked, this, [&]() { this->setSelected(true); });
 
     m_boundingRect = m_textItem->boundingRect();
     scheduleLayoutUpdate();
