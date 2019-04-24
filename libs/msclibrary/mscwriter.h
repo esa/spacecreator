@@ -43,8 +43,8 @@ class MscWriter : public QObject
 public:
     MscWriter(QObject *parent = nullptr);
 
-    void saveModel(MscModel *model, const QString &fileName);
-    void saveChart(const MscChart *chart, const QString &fileName);
+    bool saveModel(MscModel *model, const QString &fileName);
+    bool saveChart(const MscChart *chart, const QString &fileName);
     QString modelText(MscModel *model);
 
     QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,

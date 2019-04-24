@@ -17,14 +17,11 @@
 
 #pragma once
 
-#include <QAction>
-
 #include "basetool.h"
 
 namespace msc {
 class MscChart;
 class MscInstance;
-
 
 class InstanceStopTool : public BaseTool
 {
@@ -32,7 +29,7 @@ class InstanceStopTool : public BaseTool
 public:
     explicit InstanceStopTool(QGraphicsView *view, QObject *parent = nullptr);
     void setView(QGraphicsView *view) override;
-    void setAction(QAction *action);
+    void setAction(QAction *action) override;
 
     BaseTool::ToolType toolType() const override;
 
@@ -46,7 +43,6 @@ private:
     void updateEnabledState();
 
 private:
-    QPointer<QAction> m_action = nullptr;
 };
 
 }; // ns msc

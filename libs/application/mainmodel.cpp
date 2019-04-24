@@ -242,17 +242,20 @@ bool MainModel::loadFile(const QString &filename)
     return true;
 }
 
-void MainModel::saveMsc(const QString &filename)
+bool MainModel::saveMsc(const QString &filename)
 {
     msc::MscWriter mscWriter;
 
+    bool ok = true;
     if (d->m_mscModel && (d->m_mscModel->documents().size() || d->m_mscModel->charts().size()))
-        mscWriter.saveModel(d->m_mscModel, filename);
+        ok = mscWriter.saveModel(d->m_mscModel, filename);
     else
-        mscWriter.saveChart(d->m_chartModel.currentChart(), filename);
+        ok = mscWriter.saveChart(d->m_chartModel.currentChart(), filename);
 
     setCurrentFilePath(filename);
     storeCurrentUndoCommandId();
+
+    return ok;
 }
 
 void MainModel::copyCurrentChart()

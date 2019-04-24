@@ -17,28 +17,36 @@
 
 #pragma once
 
-#include "mscplugin_global.h"
+#include <QStackedWidget>
+#include <coreplugin/id.h>
 
-#include <extensionsystem/iplugin.h>
+namespace Core {
+class IEditor;
+class IMode;
+}
 
 namespace MscPlugin {
+
+class MscTextEditor;
+
 namespace Internal {
 
-class MscPluginPlugin : public ExtensionSystem::IPlugin
+class MscEditorStack : public QStackedWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "MscPlugin.json")
 
 public:
-    MscPluginPlugin();
-    ~MscPluginPlugin();
+    MscEditorStack(QWidget *parent = nullptr);
 
-    bool initialize(const QStringList &arguments, QString *errorString);
-    void extensionsInitialized();
-    ShutdownFlag aboutToShutdown();
+    void add(MscTextEditor *editor, QWidget *widget);
+    QWidget *widgetForEditor(MscTextEditor *editor);
+    void removeMscTextEditor(QObject *);
+    bool setVisibleEditor(Core::IEditor *xmlEditor);
 
 private:
-    void triggerAction();
+    void modeAboutToChange(Core::Id m);
+
+    QVector<MscTextEditor *> m_editors;
 };
 
 } // namespace Internal

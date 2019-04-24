@@ -16,11 +16,12 @@
 */
 
 #include "instancestoptool.h"
+
+#include "baseitems/common/utils.h"
+#include "baseitems/instanceenditem.h"
+#include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
-#include "baseitems/instanceenditem.h"
-#include "baseitems/common/utils.h"
-#include "commands/common/commandsstack.h"
 
 namespace msc {
 
@@ -32,8 +33,7 @@ InstanceStopTool::InstanceStopTool(QGraphicsView *view, QObject *parent)
     m_icon = QPixmap(":/icons/toolbar/instance_stop.svg");
 
     if (m_view) {
-        connect(m_view->scene(), &QGraphicsScene::selectionChanged,
-                this, &InstanceStopTool::updateEnabledState);
+        connect(m_view->scene(), &QGraphicsScene::selectionChanged, this, &InstanceStopTool::updateEnabledState);
     }
     updateEnabledState();
 }
@@ -46,8 +46,7 @@ void InstanceStopTool::setView(QGraphicsView *view)
     BaseTool::setView(view);
 
     if (m_view) {
-        connect(m_view->scene(), &QGraphicsScene::selectionChanged,
-                this, &InstanceStopTool::updateEnabledState);
+        connect(m_view->scene(), &QGraphicsScene::selectionChanged, this, &InstanceStopTool::updateEnabledState);
     }
     updateEnabledState();
 }
@@ -77,15 +76,11 @@ BaseTool::ToolType InstanceStopTool::toolType() const
 
 void InstanceStopTool::setAction(QAction *action)
 {
-    if (m_action)
-        m_action->disconnect(this);
+    BaseTool::setAction(action);
 
-    m_action = action;
     connect(m_action, &QAction::triggered, this, &InstanceStopTool::setExplicitStop);
-
     updateEnabledState();
 }
-
 
 void InstanceStopTool::setExplicitStop()
 {
@@ -104,7 +99,7 @@ void InstanceStopTool::setExplicitStop()
     instance->setExplicitStop(newValue);
 
     msc::cmd::CommandsStack::push(msc::cmd::StopInstance,
-    { QVariant::fromValue<msc::MscInstance *>(instance), newValue });
+                                  { QVariant::fromValue<msc::MscInstance *>(instance), newValue });
 }
 
 void InstanceStopTool::updateEnabledState()

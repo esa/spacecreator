@@ -20,8 +20,6 @@
 #include "basecreatortool.h"
 #include "mscinstance.h"
 
-#include <QAction>
-
 namespace msc {
 
 class InstanceCreatorTool : public BaseCreatorTool
@@ -30,15 +28,12 @@ class InstanceCreatorTool : public BaseCreatorTool
 public:
     InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
     virtual BaseTool::ToolType toolType() const override;
-    void setAction(QAction *action);
+    void setAction(QAction *action) override;
 
 protected:
     bool onMousePress(QMouseEvent *e) override;
     bool onMouseRelease(QMouseEvent *e) override;
     bool onMouseMove(QMouseEvent *e) override;
-
-private:
-    QPointer<QAction> m_action = nullptr;
 
 private Q_SLOTS:
     void onActionTriggered(bool activated);

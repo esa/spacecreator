@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QAction>
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -63,6 +64,9 @@ public:
 
     virtual bool processKeyPress(QKeyEvent *e);
 
+    virtual void setAction(QAction *action);
+    QAction *action() const;
+
 public Q_SLOTS:
     void setActive(bool active);
     virtual void setView(QGraphicsView *view);
@@ -79,6 +83,7 @@ protected:
     QString m_description = tr("Unimplemented tool");
     QPointer<QGraphicsObject> m_previewItem = nullptr;
     QCursor m_cursor;
+    QPointer<QAction> m_action = nullptr;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 

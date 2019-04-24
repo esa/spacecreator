@@ -19,27 +19,23 @@
 
 #include "mscplugin_global.h"
 
-#include <extensionsystem/iplugin.h>
+#include <texteditor/texteditor.h>
 
 namespace MscPlugin {
-namespace Internal {
 
-class MscPluginPlugin : public ExtensionSystem::IPlugin
+class MscTextEditor : public TextEditor::BaseTextEditor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "MscPlugin.json")
 
 public:
-    MscPluginPlugin();
-    ~MscPluginPlugin();
+    MscTextEditor();
 
-    bool initialize(const QStringList &arguments, QString *errorString);
-    void extensionsInitialized();
-    ShutdownFlag aboutToShutdown();
+    void finalizeInitialization() override;
+    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
 
-private:
-    void triggerAction();
+    QWidget *toolBar() override { return nullptr; }
+
+    bool isDesignModePreferred() const override { return true; }
 };
 
-} // namespace Internal
 } // namespace MscPlugin

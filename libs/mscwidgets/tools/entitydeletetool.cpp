@@ -40,7 +40,7 @@ EntityDeleteTool::EntityDeleteTool(ChartViewModel *model, QGraphicsView *view, Q
     m_description = tr("Delete an item");
     m_icon = QPixmap(":/icons/toolbar/delete.svg");
 
-    m_action = new QAction(m_icon, m_title, this);
+    setAction(new QAction(m_icon, m_title, this));
     m_action->setToolTip(m_description);
     m_action->setShortcut(QKeySequence::Delete);
     connect(m_action, &QAction::triggered, this, &EntityDeleteTool::deleteSelectedItems);
@@ -68,11 +68,6 @@ void EntityDeleteTool::setView(QGraphicsView *view)
         connect(m_view->scene(), &QGraphicsScene::selectionChanged, this, &EntityDeleteTool::updateEnabledState);
     }
     updateEnabledState();
-}
-
-QAction *EntityDeleteTool::action() const
-{
-    return m_action;
 }
 
 void EntityDeleteTool::setCurrentChart(MscChart *chart)

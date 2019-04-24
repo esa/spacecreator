@@ -15,31 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "msccontext.h"
 
-#include "mscplugin_global.h"
+using namespace MscPlugin::Internal;
 
-#include <extensionsystem/iplugin.h>
-
-namespace MscPlugin {
-namespace Internal {
-
-class MscPluginPlugin : public ExtensionSystem::IPlugin
+MscContext::MscContext(const Core::Context &context, QWidget *widget, QObject *parent)
+    : Core::IContext(parent)
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "MscPlugin.json")
-
-public:
-    MscPluginPlugin();
-    ~MscPluginPlugin();
-
-    bool initialize(const QStringList &arguments, QString *errorString);
-    void extensionsInitialized();
-    ShutdownFlag aboutToShutdown();
-
-private:
-    void triggerAction();
-};
-
-} // namespace Internal
-} // namespace MscPlugin
+    setContext(context);
+    setWidget(widget);
+}

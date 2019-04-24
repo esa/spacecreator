@@ -103,6 +103,22 @@ bool BaseTool::processKeyPress(QKeyEvent *e)
     return false;
 }
 
+void BaseTool::setAction(QAction *action)
+{
+    if (m_action)
+        m_action->disconnect(this);
+
+    m_action = action;
+
+    connect(action, &QAction::toggled, this, &msc::BaseTool::setActive);
+    connect(this, &msc::BaseTool::activeChanged, action, &QAction::setChecked);
+}
+
+QAction *BaseTool::action() const
+{
+    return m_action;
+}
+
 bool BaseTool::onMousePress(QMouseEvent *e)
 {
     Q_UNUSED(e);

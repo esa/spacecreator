@@ -1,20 +1,34 @@
 include(../../esa.pri)
-include(../../depend_asn1library.pri)
+include(../../depend_application.pri)
 include(../../depend_mscwidgets.pri)
 include(../../depend_msclibrary.pri)
-include(../../link_antlr_rt.pri)
+include(../../depend_asn1library.pri)
 
 DEFINES += MSCPLUGIN_LIBRARY
 
 # MscPlugin files
 
 SOURCES += \
-        mscpluginplugin.cpp
+    mainwidget.cpp \
+    msccontext.cpp \
+    msceditordata.cpp \
+    msceditordocument.cpp \
+    msceditorfactory.cpp \
+    msceditorstack.cpp \
+    mscpluginplugin.cpp \
+    msctexteditor.cpp \
 
 HEADERS += \
-        mscpluginplugin.h \
-        mscplugin_global.h \
-        mscpluginconstants.h
+    mainwidget.h \
+    msccontext.h \
+    msceditordata.h \
+    msceditordocument.h \
+    msceditorfactory.h \
+    msceditorstack.h \
+    mscplugin_global.h \
+    mscpluginconstants.h \
+    mscpluginplugin.h \
+    msctexteditor.h \
 
 # Qt Creator linking
 
@@ -43,7 +57,6 @@ USE_USER_DESTDIR = yes
 
 QTC_PLUGIN_NAME = MscPlugin
 QTC_LIB_DEPENDS += \
-    # nothing here at this time
 
 QTC_PLUGIN_DEPENDS += \
     coreplugin

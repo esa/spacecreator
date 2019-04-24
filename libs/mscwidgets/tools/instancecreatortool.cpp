@@ -34,13 +34,7 @@ InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *v
 
 void InstanceCreatorTool::setAction(QAction *action)
 {
-    if (m_action == action)
-        return;
-
-    if (m_action)
-        disconnect(m_action, nullptr, this, nullptr);
-
-    m_action = action;
+    BaseTool::setAction(action);
 
     if (m_action)
         connect(m_action, &QAction::triggered, this, &InstanceCreatorTool::onActionTriggered);

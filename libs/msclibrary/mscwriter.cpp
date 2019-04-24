@@ -40,14 +40,14 @@ MscWriter::MscWriter(QObject *parent)
 {
 }
 
-void MscWriter::saveModel(MscModel *model, const QString &fileName)
+bool MscWriter::saveModel(MscModel *model, const QString &fileName)
 {
     if (model == nullptr || fileName.isEmpty())
-        return;
+        return false;
 
     QFile mscFile(fileName);
     if (!mscFile.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
+        return false;
 
     QTextStream out(&mscFile);
 
@@ -63,22 +63,24 @@ void MscWriter::saveModel(MscModel *model, const QString &fileName)
     mscFile.close();
 
     setModel(nullptr);
+    return true;
 }
 
-void MscWriter::saveChart(const MscChart *chart, const QString &fileName)
+bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
 {
     if (chart == nullptr || fileName.isEmpty())
-        return;
+        return false;
 
     QFile mscFile(fileName);
     if (!mscFile.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
+        return false;
 
     QTextStream out(&mscFile);
 
     out << serialize(chart);
 
     mscFile.close();
+    return true;
 }
 
 QString MscWriter::modelText(MscModel *model)

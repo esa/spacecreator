@@ -90,7 +90,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void showFirstChart();
     bool loadFile(const QString &filename);
-    void saveMsc(const QString &filename);
+    bool saveMsc(const QString &filename);
     void copyCurrentChart();
     void copyCurrentChartAsPicture();
     void pasteChart();

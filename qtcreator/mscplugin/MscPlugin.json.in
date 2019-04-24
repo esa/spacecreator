@@ -6,7 +6,7 @@
     \"Copyright\" : \"(C) 2019 European Space Agency\",
     \"License\" : \"LGPL 2.1\",
     \"Category\" : \"Modeling\",
-    \"Description\" : \"Graphics model of MSC diagrams (message sequence diagram)\",
+    \"Description\" : \"Visual Editor for MSC (message sequence diagram) files\",
     \"Url\" : \"https://gitrepos.estec.esa.int/taste/MSC-NG\",
     $$dependencyList,
 

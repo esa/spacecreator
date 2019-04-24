@@ -23,6 +23,7 @@ build_linux_gcc:
     - export QTC_SOURCE=/opt/qtcreator/source
     - export QTC_BUILD=/opt/qtcreator/build
   script:
+    - scripts/build_antlr.sh
     - mkdir -p build; cd build
     - /opt/Qt/5.12.2/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
     - make -j 8
@@ -51,6 +52,7 @@ build_linux_gcc:
 #    - export CCACHE_COMPILERCHECK=content
 #    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
 #  script:
+#    - scripts/build_antlr.sh
 #    - mkdir -p build_clang
 #    - cd build_clang
 #    - qmake QMAKE_CC="ccache clang" QMAKE_CXX="ccache clang++" -recursive ..

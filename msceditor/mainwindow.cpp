@@ -717,18 +717,13 @@ void MainWindow::initTools()
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
         tool->setView(currentView());
-        if (tool == d->m_instanceStopTool)
-            d->m_instanceStopTool->setAction(toolAction);
-        else if (tool == d->m_instanceCreatorTool)
-            d->m_instanceCreatorTool->setAction(toolAction);
+        tool->setAction(toolAction);
 
         connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
-        connect(tool, &msc::BaseTool::activeChanged, toolAction, &QAction::setChecked);
         if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool))
             connect(creatorTool, &msc::BaseCreatorTool::created, this, &MainWindow::activateDefaultTool);
 
         toolsActions->addAction(toolAction);
-        connect(toolAction, &QAction::toggled, tool, &msc::BaseTool::setActive);
         connect(toolAction, &QAction::toggled, this, &MainWindow::updateMscToolbarActionsChecked);
     }
 

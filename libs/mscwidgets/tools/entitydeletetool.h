@@ -34,8 +34,6 @@ public:
     BaseTool::ToolType toolType() const override;
     void setView(QGraphicsView *view) override;
 
-    QAction *action() const;
-
 public Q_SLOTS:
     void setCurrentChart(msc::MscChart *chart);
 
@@ -49,7 +47,6 @@ protected Q_SLOTS:
     void updateEnabledState();
 
 private:
-    QAction *m_action = nullptr;
     QPointer<msc::MscChart> m_currentChart;
 };
 
