@@ -74,7 +74,6 @@ private Q_SLOTS:
     void showErrorView();
     bool openMscChain(const QString &dirPath);
     void activateDefaultTool();
-    void updateTextView();
     void onCreateMessageToolRequested();
     bool startRemoteControl(quint16 port);
     void updateTitles();

@@ -20,6 +20,7 @@
 
 #include <QPointer>
 #include <QTextBrowser>
+#include <QTimer>
 
 class MainModel;
 
@@ -43,4 +44,5 @@ private Q_SLOTS:
 private:
     bool m_dirty = false;
     QPointer<msc::MscModel> m_model;
+    QTimer m_updateTimer;
 };

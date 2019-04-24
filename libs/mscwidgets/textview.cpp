@@ -22,8 +22,6 @@
 #include "mscmodel.h"
 #include "mscwriter.h"
 
-#include <QGuiApplication>
-
 /*!
   \class TextView
   \inmodule MscWidgets
@@ -34,37 +32,38 @@
 TextView::TextView(QWidget *parent)
     : QTextBrowser(parent)
 {
+    m_updateTimer.setInterval(10);
+    m_updateTimer.setSingleShot(true);
+    connect(&m_updateTimer, &QTimer::timeout, this, &TextView::refillView);
 }
 
 void TextView::setModel(msc::MscModel *model)
 {
+    if (model == m_model)
+        return;
+
+    if (m_model)
+        disconnect(m_model, nullptr, this, nullptr);
+
     m_model = model;
+    connect(m_model, &msc::MscModel::dataChanged, this, &TextView::updateView);
+
     updateView();
 }
 
 void TextView::updateView()
 {
-    if (m_dirty) {
+    if (m_dirty || !isVisible() || !m_model)
         return;
-    }
-
-    if (QGuiApplication::mouseButtons() != Qt::NoButton) {
-        // Prevent the waterflow of "cifChanged" notifications on manual item moves
-        return;
-    }
 
     m_dirty = true;
-    QMetaObject::invokeMethod(this, "refillView", Qt::QueuedConnection);
+    m_updateTimer.start();
 }
 
 void TextView::refillView()
 {
-    Q_ASSERT(m_model);
-    m_dirty = false;
-
-    if (!isVisible()) {
+    if (!m_model)
         return;
-    }
 
     msc::MscWriter mscWriter;
     const QString &mscText = mscWriter.modelText(m_model);
@@ -77,4 +76,5 @@ void TextView::refillView()
         setTextColor(Qt::red);
     }
     setText(mscText);
+    m_dirty = false;
 }

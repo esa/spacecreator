@@ -276,14 +276,6 @@ void MainWindow::activateDefaultTool()
     d->m_defaultToolAction->setChecked(true);
 }
 
-void MainWindow::updateTextView()
-{
-    if (!d->ui->dockWidgetMscText->isVisible()) {
-        return;
-    }
-    d->ui->mscTextBrowser->updateView();
-}
-
 void MainWindow::saveMsc()
 {
     const QString &filename = d->m_model->currentFilePath();
