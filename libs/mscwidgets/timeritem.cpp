@@ -151,7 +151,6 @@ void TimerItem::setName(const QString &text)
         return;
     }
 
-    m_timer->setName(text);
     m_textItem->setPlainText(text);
 
     scheduleLayoutUpdate();

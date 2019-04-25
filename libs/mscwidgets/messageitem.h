@@ -92,7 +92,6 @@ Q_SIGNALS:
     void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
 public Q_SLOTS:
-    void setName(const QString &name);
     void setPositionChangeIgnored(bool ignored);
 
 protected:

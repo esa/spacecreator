@@ -128,8 +128,6 @@ ConditionItem *ConditionItem::createDefaultItem(MscCondition *condition, const Q
 
 void ConditionItem::setName(const QString &name)
 {
-    m_condition->setName(name);
-
     m_nameItem->setPlainText(name);
     m_nameItem->adjustSize();
 

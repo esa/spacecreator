@@ -55,6 +55,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
     , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
 {
     Q_ASSERT(m_instance != nullptr);
+    Q_ASSERT(m_chart);
 
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
     connect(m_instance, &msc::MscInstance::denominatorOrKindChanged, this, &msc::InstanceItem::setDenominatorAndKind);
@@ -305,14 +306,14 @@ void InstanceItem::prepareHoverMark()
 
 void InstanceItem::onNameEdited(const QString &newName)
 {
+    Q_ASSERT(m_chart);
     if (newName.isEmpty())
         return;
 
     if (m_chart->instanceByName(newName)) {
+        // revert to old name as the given name is used already
         m_headSymbol->setName(m_instance->name());
     } else {
-        m_instance->setName(newName);
-
         using namespace msc::cmd;
         CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(this->modelItem()), newName });
     }

@@ -172,14 +172,6 @@ QString MessageItem::name() const
     return m_message->name();
 }
 
-void MessageItem::setName(const QString &name)
-{
-    m_message->setName(name);
-    m_arrowItem->setText(m_message->name());
-
-    scheduleLayoutUpdate();
-}
-
 QRectF MessageItem::boundingRect() const
 {
     return m_arrowItem->boundingRect();

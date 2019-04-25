@@ -20,6 +20,8 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 
+#include <QPointer>
+
 class QGraphicsRectItem;
 class QGraphicsTextItem;
 
@@ -76,7 +78,7 @@ protected:
 
 private:
     msc::MscInstance *m_instance = nullptr;
-    msc::MscChart *m_chart = nullptr;
+    QPointer<msc::MscChart> m_chart;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
