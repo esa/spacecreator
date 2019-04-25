@@ -55,7 +55,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
     , m_endSymbol(new InstanceEndItem(m_instance->explicitStop(), this))
 {
     Q_ASSERT(m_instance != nullptr);
-    Q_ASSERT(m_chart);
 
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
     connect(m_instance, &msc::MscInstance::denominatorOrKindChanged, this, &msc::InstanceItem::setDenominatorAndKind);
