@@ -23,6 +23,7 @@
 #include "mscchart.h"
 #include "mscfile.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "timeritem.h"
@@ -53,6 +54,7 @@ private Q_SLOTS:
     void testNearestInstanceCreate();
 
     void testTimerPositionWithCifInstance();
+    void testLoadedMessagePosition();
 
 private:
     QScopedPointer<ChartViewModel> m_chartModel;
@@ -172,8 +174,32 @@ void tst_ChartViewModel::testTimerPositionWithCifInstance()
     QVERIFY(watchdogItem != nullptr);
 
     // Check that the timer is below the instance head
-    const QPointF instanceHeadBootom = m_instanceItems[0]->axis().p1();
-    QVERIFY(watchdogItem->scenePos().y() > instanceHeadBootom.y());
+    const QPointF instanceHeadBottom = m_instanceItems[0]->axis().p1();
+    QVERIFY(watchdogItem->scenePos().y() > instanceHeadBottom.y());
+}
+
+void tst_ChartViewModel::testLoadedMessagePosition()
+{
+    QSKIP("disabled because of issue #251");
+    QString mscText = "msc Untitled_MSC;\
+                            instance Instance_1;\
+                                out Message to env;\
+                            endinstance;\
+                        endmsc;";
+    parseMsc(mscText);
+    QCOMPARE(m_instanceItems.size(), 1);
+    QCOMPARE(m_chart->instanceEvents().size(), 1);
+
+    MscMessage *message = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(0));
+    MessageItem *messageItem = m_chartModel->itemForMessage(message);
+    QVERIFY(messageItem != nullptr);
+
+    // Check that the message is below the instance head
+    const QPointF instanceHeadBottom = m_instanceItems[0]->axis().p1();
+    QVERIFY(messageItem->scenePos().y() > instanceHeadBottom.y());
+    // Check that the message is above the instance end
+    const QPointF instanceEndTop = m_instanceItems[0]->axis().p2();
+    QVERIFY(messageItem->sceneBoundingRect().bottom() < instanceEndTop.y());
 }
 
 QTEST_MAIN(tst_ChartViewModel)
