@@ -113,7 +113,7 @@ void EntityDeleteTool::deleteSelectedItems()
         if (obj) {
             if (obj->modelEntity()) {
                 items.append(obj->modelEntity());
-                if (CommentItem *commentItem = m_model->commentForEntity(obj->modelEntity()))
+                if (CommentItem *commentItem = m_model->itemForComment(obj->modelEntity()->comment()))
                     removeComment(itemsWithComments, m_model, commentItem);
             } else if (CommentItem *commentItem = qobject_cast<CommentItem *>(obj)) {
                 removeComment(itemsWithComments, m_model, commentItem);

@@ -62,7 +62,7 @@ public:
 
     virtual void applyCif();
 
-    bool geometryManagedByCif() const;
+    virtual bool geometryManagedByCif() const;
 
     virtual void moveSilentlyBy(const QPointF &shift);
     virtual void updateCif();

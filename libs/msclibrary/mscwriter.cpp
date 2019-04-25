@@ -19,6 +19,7 @@
 
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "msccreate.h"
@@ -118,7 +119,7 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     // The rest is the internal part of this which should be indented
     ++tabsSize;
 
-    QString comment = serializeComment(instance);
+    QString comment = serializeComment(instance, tabsSize);
     if (!instance->denominatorAndKind().isEmpty()) {
         header += QString(": %1 %2%3;\n").arg(instance->denominatorAndKind(), instance->inheritance(), comment);
     } else
@@ -164,7 +165,7 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     if (message == nullptr || !(message->relatesTo(instance)))
         return QString();
 
-    const QString comment = serializeComment(message);
+    const QString comment = serializeComment(message, tabsSize);
 
     QString direction = tabs(tabsSize);
     QString name = message->fullName();
@@ -253,7 +254,7 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
     }
 
     const QString tabString = tabs(tabsSize);
-    const QString comment = serializeComment(action);
+    const QString comment = serializeComment(action, tabsSize);
 
     if (action->actionType() == MscAction::ActionType::Informal) {
         if (action->informalAction().contains('='))
@@ -330,8 +331,9 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
         instances += serialize(instance, chart->instanceEvents(), tabsSize + 1);
 
     const QString &tabString = tabs(tabsSize);
-    const QString chartSerialized(
-            QString("%1msc %2%4;\n%3%1endmsc;\n").arg(tabString, chart->name(), instances, serializeComment(chart)));
+    const QString chartSerialized(QString("%1msc %2%4;%5\n%3%1endmsc;\n")
+                                          .arg(tabString, chart->name(), instances, serializeComment(chart, tabsSize),
+                                               serializeGlobalComments(chart, tabsSize)));
     return serializeCif(chart, chartSerialized, tabsSize);
 }
 
@@ -385,9 +387,9 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     }
 
     const QString &tabString = tabs(tabsSize);
-    const QString documentSerialized(
-            QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
-                    .arg(tabString, document->name(), documentBody, relation, dataDef, serializeComment(document)));
+    const QString documentSerialized(QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
+                                             .arg(tabString, document->name(), documentBody, relation, dataDef,
+                                                  serializeComment(document, tabsSize)));
     return serializeCif(document, documentSerialized, tabsSize);
 }
 
@@ -421,13 +423,49 @@ QString MscWriter::dataDefinition() const
     return data;
 }
 
-QString MscWriter::serializeComment(const msc::MscEntity *entity) const
+QString MscWriter::serializeComment(const msc::MscEntity *entity, int tabsSize) const
 {
-    if (!entity || entity->comment().isEmpty()) {
+    if (!entity)
         return {};
+
+    MscComment *commentEntity = entity->comment();
+    if (!commentEntity || commentEntity->isGlobal())
+        return {};
+
+    QString cifInfo;
+    const QVector<cif::CifBlockShared> &cifs = commentEntity->cifs();
+    QStringList cifTexts;
+    cifTexts.reserve(cifs.size());
+    for (const cif::CifBlockShared &cifBlock : cifs)
+        cifTexts << cifBlock->toString(tabsSize);
+    cifInfo = cifTexts.join(QLatin1Char('\n'));
+    if (!cifInfo.isEmpty()) {
+        cifInfo.prepend(QLatin1Char('\n'));
+        cifInfo.append(QLatin1Char('\n'));
     }
 
-    return QString(" comment '%1'").arg(entity->comment());
+    return QString("%1 comment '%2'").arg(cifInfo, commentEntity->comment());
+}
+
+QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize) const
+{
+    if (!entity)
+        return {};
+
+    QStringList cifTexts;
+    if (MscComment *comment = entity->comment()) {
+        const QString globalText = comment->comment();
+        if (comment->isGlobal() && !globalText.isEmpty()) {
+            for (const cif::CifBlockShared &cifBlock : comment->cifs()) {
+                if (cifBlock->blockType() == cif::CifLine::CifType::Text)
+                    cifTexts << cifBlock->toString(tabsSize);
+            }
+        }
+    }
+    if (cifTexts.isEmpty())
+        return {};
+
+    return QLatin1Char('\n') + cifTexts.join("\n") + QLatin1Char('\n');
 }
 
 QString MscWriter::serializeParameters(const MscMessage *message) const
@@ -450,7 +488,8 @@ QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &ent
     QStringList cifTexts;
     cifTexts.reserve(cifs.size());
     for (const cif::CifBlockShared &cifBlock : cifs) {
-        cifTexts << cifBlock->toString(tabsSize);
+        if (cifBlock->blockType() != cif::CifLine::CifType::Comment)
+            cifTexts << cifBlock->toString(tabsSize);
     }
 
     return cifTexts.join("\n") + entitySerialized;

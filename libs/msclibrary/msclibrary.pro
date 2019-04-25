@@ -12,6 +12,7 @@ CONFIG += no_keywords
 QT += core gui
 
 HEADERS += \
+    msccomment.h \
     mscmessagedeclaration.h \
     mscmessagedeclarationlist.h \
     mscparameterlist.h \
@@ -46,6 +47,7 @@ HEADERS += \
     cif/cifblocks.h
 
 SOURCES += \
+    msccomment.cpp \
     mscmessagedeclaration.cpp \
     mscmessagedeclarationlist.cpp \
     mscparameterlist.cpp \

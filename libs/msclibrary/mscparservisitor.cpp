@@ -20,6 +20,7 @@
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "msccreate.h"
@@ -102,15 +103,15 @@ static QString charactersToString(antlr4::tree::TerminalNode *characterString)
     return string;
 }
 
-static void parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
+static msc::MscComment *parseComment(msc::MscEntity *entity, MscParser::EndContext *end)
 {
-    if (!entity || !end) {
-        return;
-    }
+    if (!entity || !end)
+        return nullptr;
 
-    if (end->comment()) {
-        entity->setComment(charactersToString(end->comment()->CHARACTERSTRING()));
-    }
+    if (end->comment())
+        return entity->setComment(charactersToString(end->comment()->CHARACTERSTRING()));
+
+    return nullptr;
 }
 
 }
@@ -218,7 +219,8 @@ antlrcpp::Any MscParserVisitor::visitMscDocument(MscParser::MscDocumentContext *
 antlrcpp::Any MscParserVisitor::visitDocumentHead(MscParser::DocumentHeadContext *context)
 {
     if (m_currentDocument) {
-        parseComment(m_currentDocument, context->end());
+        if (auto comment = parseComment(m_currentDocument, context->end()))
+            m_instanceEvents.append(comment);
     }
 
     return visitChildren(context);
@@ -289,7 +291,9 @@ antlrcpp::Any MscParserVisitor::visitMessageSequenceChart(MscParser::MessageSequ
 
 antlrcpp::Any MscParserVisitor::visitMscHead(MscParser::MscHeadContext *context)
 {
-    parseComment(m_currentChart, context->end());
+    if (auto comment = parseComment(m_currentChart, context->end()))
+        m_instanceEvents.append(comment);
+
     return visitChildren(context);
 }
 
@@ -345,7 +349,8 @@ antlrcpp::Any MscParserVisitor::visitOrderableEvent(MscParser::OrderableEventCon
     auto ret = visitChildren(context);
 
     if (!context->end().empty()) {
-        parseComment(m_currentEvent, context->end().back());
+        if (auto comment = parseComment(m_currentEvent, context->end().back()))
+            m_instanceEvents.append(comment);
     }
 
     m_currentMessage = nullptr;
@@ -389,7 +394,8 @@ antlrcpp::Any MscParserVisitor::visitInstanceHeadStatement(MscParser::InstanceHe
         }
     }
 
-    parseComment(m_currentInstance, context->end());
+    if (auto comment = parseComment(m_currentInstance, context->end()))
+        m_instanceEvents.append(comment);
 
     return visitChildren(context);
 }
@@ -1018,8 +1024,17 @@ void MscParserVisitor::storePrecedingCif(antlr4::ParserRuleContext *ctx)
     for (const cif::CifBlockShared &cifBlock : cifBlocks) {
         const QString &hashKey = cifBlock->hashKey();
         if (!m_cifBlockKeys.contains(hashKey)) {
+            if (cifBlock->blockType() == cif::CifLine::CifType::Text) {
+                if (m_currentChart) { /// TODO: check support for entities other than MscChart
+                    MscComment *comment = new MscComment(m_currentChart);
+                    comment->attachTo(m_currentChart);
+                    comment->addCif(cifBlock);
+                    m_instanceEvents.append(comment);
+                }
+            } else {
+                m_cifBlocks.append(cifBlock);
+            }
             m_cifBlockKeys.append(hashKey);
-            m_cifBlocks.append(cifBlock);
         }
     }
 }
@@ -1039,21 +1054,33 @@ antlrcpp::Any MscParserVisitor::visitEnd(MscParser::EndContext *ctx)
     //    }
 
     if (!m_cifBlocks.isEmpty()) {
-        MscEntity *targetEntity = cifTarget();
         int ctr(0);
         for (const cif::CifBlockShared &cifBlock : m_cifBlocks) {
             const QString marker = QString("CB %1/%2").arg(++ctr).arg(m_cifBlocks.size());
             if (cifBlock->isPeculiar()) {
-                qDebug() << marker << "TODO: handle peculiar CIF entity";
-            } else {
-                if (targetEntity) {
-                    targetEntity->addCif(cifBlock);
-                } else {
-                    static const QString wrn = QObject::tr("CIF target unknown! Line: %1; pos: %2");
-                    qWarning() << marker
-                               << wrn.arg(QString::number(ctx->start->getLine()),
-                                          QString::number(ctx->start->getCharPositionInLine()));
+                if (m_currentChart) {
+                    MscComment *comment = new MscComment(m_currentChart);
+                    comment->attachTo(m_currentChart);
+                    comment->addCif(cifBlock);
+                    m_instanceEvents.append(comment);
                 }
+            } else if (MscEntity *targetEntity = cifTarget()) {
+                if (cifBlock->hasPayloadFor(cif::CifLine::CifType::Comment)) {
+                    MscComment *comment = targetEntity->comment();
+                    if (!comment) {
+                        comment = new MscComment(targetEntity);
+                        comment->attachTo(targetEntity);
+                        m_instanceEvents.append(comment);
+                    }
+                    comment->addCif(cifBlock);
+                } else {
+                    targetEntity->addCif(cifBlock);
+                }
+            } else {
+                static const QString wrn = QObject::tr("CIF target unknown! Line: %1; pos: %2");
+                qWarning() << marker
+                           << wrn.arg(QString::number(ctx->start->getLine()),
+                                      QString::number(ctx->start->getCharPositionInLine()));
             }
         }
 

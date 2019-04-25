@@ -151,24 +151,14 @@ QVector<CifParser::LinesCollection> CifParser::prepareCifLines(const QStringList
         return false;
     };
 
-    auto getLine = [&](CifLine::CifType lineType, const LinesCollection &fromBlock) {
-        for (const CifLineShared &line : fromBlock)
-            if (line->lineType() == lineType)
-                return line;
-        return CifLineShared();
-    };
-
     for (const QString &line : lines) {
         if (isAcceptableLine(line)) {
             if (isText && !isCifComment(line)) {
-                LinesCollection &currLines = block();
-                if (CifLineShared lastLine = getLine(CifLine::CifType::Text, currLines)) {
-                    QString txt = lastLine->payload().toString();
-                    txt.append(line.trimmed());
-                    lastLine->setPayload(txt);
-                    block() = currLines;
+                if (CifLineShared cifLine = readCifLineGlobalComment(line)) {
+                    if (!addLine(block(), cifLine))
+                        qWarning() << QString("Can't add the \"CIF\" line with text");
                 } else {
-                    qWarning() << QString("Can't find the \"CIF Text\" to put the text in");
+                    qWarning() << QString("Can't create the \"CIF\" line to put the text in");
                 }
             } else if (const CifLineShared &cifLine = readCifLine(line)) {
                 if (!addLine(block(), cifLine)) {
@@ -434,6 +424,15 @@ CifLineShared CifParser::readCifLineTextMode(const QString &from) const
 CifLineShared CifParser::readCifLineTextName(const QString &from) const
 {
     CifLineShared cif(new CifLineTextName());
+    if (!cif->initFrom(from)) {
+        cif.reset();
+    }
+    return cif;
+}
+
+CifLineShared CifParser::readCifLineGlobalComment(const QString &from) const
+{
+    CifLineShared cif(new CifLineGlobalComment());
     if (!cif->initFrom(from)) {
         cif.reset();
     }

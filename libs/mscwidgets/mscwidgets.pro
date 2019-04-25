@@ -29,6 +29,7 @@ HEADERS += \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
     commands/cmdchartitemchangegeometry.h \
+    commands/cmdcommentitemchangegeometry.h \
     commands/cmdcoregionitemcreate.h \
     commands/cmdsetasn1file.h \
     commands/cmdsetmessagedeclarations.h \
@@ -105,6 +106,7 @@ SOURCES += \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
     commands/cmdchartitemchangegeometry.cpp \
+    commands/cmdcommentitemchangegeometry.cpp \
     commands/cmdcoregionitemcreate.cpp \
     commands/cmdsetasn1file.cpp \
     commands/cmdsetmessagedeclarations.cpp \

@@ -18,8 +18,11 @@
 #include "commentcreatortool.h"
 
 #include "baseitems/commentitem.h"
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
+#include "chartitem.h"
 #include "commands/common/commandsstack.h"
+#include "msccomment.h"
 
 #include <QMouseEvent>
 
@@ -50,10 +53,10 @@ void CommentCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    CommentItem *item = new CommentItem;
-    item->setGlobal(m_isGlobalComment);
+    CommentItem *item = new CommentItem(m_model->currentChart());
     item->setText(tr("Add new comments here"));
     item->setOpacity(0.5);
+    item->setGlobalPreview(m_isGlobalComment);
     m_scene->addItem(item);
 
     m_previewItem = item;
@@ -64,16 +67,35 @@ void CommentCreatorTool::commitPreviewItem()
     if (!m_previewItem || !m_activeChart)
         return;
 
-    auto previewEntity = m_isGlobalComment ? m_model->currentChart()
-                                           : m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+    CommentItem *item = qobject_cast<CommentItem *>(m_previewItem);
+    if (!item)
+        return;
 
-    const CommentItem *item = qobject_cast<CommentItem *>(m_previewItem);
-    const QString itemComment = item ? item->text() : QString();
-    const QVariantList cmdParams = { QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
+    const QString itemComment = item->text();
+    if (m_isGlobalComment) {
+        QRect newRect;
+        if (utils::CoordinatesConverter::sceneToCif(item->sceneBoundingRect(), newRect)) {
+            msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
+            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
+                                          { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
+                                            m_model->currentChart()->cifRect(), newRect,
+                                            QVariant::fromValue<MscEntity *>(m_model->currentChart()) });
+            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
+                                          { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
+                                            QVariant::fromValue<msc::MscEntity *>(m_model->currentChart()),
+                                            itemComment });
+            msc::cmd::CommandsStack::current()->endMacro();
+        }
+    } else {
+        auto previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
+        const QVariantList cmdParams = { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
+                                         QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
+    }
+
+    m_model->updateLayout();
 
     removePreviewItem();
-    startWaitForModelLayoutComplete(previewEntity);
 
     Q_EMIT created();
 }

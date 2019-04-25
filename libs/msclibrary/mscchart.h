@@ -92,6 +92,8 @@ Q_SIGNALS:
     void gateAdded(MscGate *gate);
     void gateRemoved(MscGate *gate);
     void rectChanged();
+    void globalCommentTextChanged(const QString &text, const QString &hash);
+    void globalCommentRectChanged(const QRect rect, const QString &hash);
 
 private:
     bool moveEvent(MscInstanceEvent *event, int newIndex);

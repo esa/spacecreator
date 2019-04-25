@@ -17,6 +17,8 @@
 
 #include "mscentity.h"
 
+#include "msccomment.h"
+
 #include <QDebug>
 #include <QMetaEnum>
 
@@ -73,20 +75,29 @@ QUuid MscEntity::internalId() const
     return m_id;
 }
 
-const QString &MscEntity::comment() const
+MscComment *MscEntity::comment() const
 {
     return m_comment;
 }
 
-void MscEntity::setComment(const QString &comment)
+void MscEntity::setComment(MscComment *comment)
 {
     if (comment == m_comment) {
         return;
     }
 
     m_comment = comment;
-    Q_EMIT commentChanged(m_comment);
-    Q_EMIT dataChanged();
+    Q_EMIT commentChanged();
+}
+
+MscComment *MscEntity::setComment(const QString &comment)
+{
+    if (!m_comment) {
+        m_comment = new MscComment(this);
+        m_comment->attachTo(this);
+    }
+    m_comment->setComment(comment);
+    return m_comment;
 }
 
 QVector<cif::CifBlockShared> MscEntity::cifs() const

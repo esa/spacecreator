@@ -19,18 +19,19 @@
 
 #include "cif/cifblock.h"
 
-#include <QObject>
+#include <QPointer>
 #include <QRegExp>
 #include <QString>
 #include <QUuid>
 
 namespace msc {
 
+class MscComment;
+
 class MscEntity : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
 
 public:
     enum class EntityType
@@ -44,7 +45,8 @@ public:
         Condition,
         Action,
         Coregion,
-        Create
+        Create,
+        Comment
     };
     Q_ENUM(EntityType)
 
@@ -60,8 +62,10 @@ public:
 
     static const QString DefaultName;
 
-    const QString &comment() const;
-    void setComment(const QString &comment);
+    MscComment *comment() const;
+    void setComment(MscComment *comment);
+
+    MscComment *setComment(const QString &comment);
 
     virtual MscEntity::EntityType entityType() const = 0;
 
@@ -78,12 +82,12 @@ public:
 Q_SIGNALS:
     void dataChanged();
     void nameChanged(const QString &name);
-    void commentChanged(const QString &name);
+    void commentChanged();
 
 private:
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
-    QString m_comment;
+    QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
 
     static const QRegExp m_nameVerify;

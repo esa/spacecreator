@@ -20,6 +20,7 @@
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
 #include "commands/cmdchartitemchangegeometry.h"
+#include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdconditionitemcreate.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdcoregionitemcreate.h"
@@ -44,6 +45,7 @@
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "mscinstance.h"
@@ -103,6 +105,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createDocumentCreate(params);
     case cmd::ChangeChartGeometry:
         return cmd::CommandsFactory::createChartGeometryChange(params);
+    case cmd::ChangeCommentGeometry:
+        return cmd::CommandsFactory::createCommentGeometryChange(params);
     case cmd::MoveDocument:
         return cmd::CommandsFactory::createDocumentMove(params);
     case cmd::SetMessageDeclarations:
@@ -121,13 +125,14 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 
 QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
 
-    if (MscEntity *item = params.first().value<MscEntity *>()) {
-        const QString &comment = params.last().toString();
-        if (item->comment() != comment)
-            return new CmdEntityCommentChange(item, comment);
-    }
+    MscChart *chart = params.first().value<MscChart *>();
+    if (!chart)
+        return nullptr;
+
+    if (MscEntity *item = params.at(1).value<MscEntity *>())
+        return new CmdEntityCommentChange(chart, item, params.last().toString());
 
     return nullptr;
 }
@@ -400,6 +405,20 @@ QUndoCommand *CommandsFactory::createChartGeometryChange(const QVariantList &par
 
     if (auto chart = params.last().value<MscChart *>())
         return new CmdChartItemChangeGeometry(params.value(0).toRect(), params.value(1).toRect(), chart);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createCommentGeometryChange(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 4);
+
+    MscChart *chart = params.first().value<MscChart *>();
+    if (!chart)
+        return nullptr;
+
+    if (auto entity = params.last().value<MscEntity *>())
+        return new CmdCommentItemChangeGeometry(chart, params.value(1).toRect(), params.value(2).toRect(), entity);
 
     return nullptr;
 }

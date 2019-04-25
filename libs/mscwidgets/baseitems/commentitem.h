@@ -20,30 +20,43 @@
 
 #include "interactiveobject.h"
 
-class QGraphicsLineItem;
+class QGraphicsPathItem;
 
 namespace msc {
 class TextItem;
+class MscComment;
+class MscChart;
 
 class CommentItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit CommentItem(QGraphicsItem *parent = nullptr);
+    explicit CommentItem(MscChart *chart, QGraphicsItem *parent = nullptr);
+    ~CommentItem() override;
 
     void setText(const QString &text);
     QString text() const;
+
     void attachTo(msc::InteractiveObject *iObj);
     InteractiveObject *object() const;
-    void setGlobal(bool isGlobal);
+
+    bool geometryManagedByCif() const override;
+
+    bool isGlobal() const;
 
     QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    void applyCif() override;
+    void updateCif() override;
+
+    void setGlobalPreview(bool isGlobalPreview);
+
 Q_SIGNALS:
-    void commentChanged(const QString &comment);
+    void dataChanged();
 
 protected:
+    cif::CifLine::CifType mainCifType() const override;
     void prepareHoverMark() override;
     void rebuildLayout() override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
@@ -52,13 +65,15 @@ protected:
 
 private:
     void textEdited(const QString &text);
+    MscComment *commentEntity() const;
 
 private:
     TextItem *m_textItem = nullptr;
-    QGraphicsLineItem *m_linkItem = nullptr;
+    QGraphicsPathItem *m_linkItem = nullptr;
+    QPointer<MscChart> m_chart;
     QPointer<InteractiveObject> m_iObj;
     bool m_inverseLayout = false;
-    bool m_isGlobal = true;
+    bool m_isGlobalPreview = false;
 };
 
 } // ns msc

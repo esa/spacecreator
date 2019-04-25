@@ -72,6 +72,7 @@ private:
     CifLineShared readCifLineTimeout(const QString &from) const;
     CifLineShared readCifLineTextMode(const QString &from) const;
     CifLineShared readCifLineTextName(const QString &from) const;
+    CifLineShared readCifLineGlobalComment(const QString &from) const;
 
     typedef QVector<CifLineShared> LinesCollection;
     QVector<CifParser::LinesCollection> prepareCifLines(const QStringList &lines) const;

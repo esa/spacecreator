@@ -65,7 +65,8 @@ public:
 private:
     QString tabs(int tabsSize) const;
     QString dataDefinition() const;
-    QString serializeComment(const msc::MscEntity *entity) const;
+    QString serializeComment(const msc::MscEntity *entity, int tabsSize) const;
+    QString serializeGlobalComments(const msc::MscEntity *entity, int tabsSize) const;
     QString serializeParameters(const MscMessage *message) const;
 
     QString serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const;

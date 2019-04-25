@@ -51,8 +51,6 @@ ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
     }
 }
 
-ChartItem::~ChartItem() {}
-
 void ChartItem::onNameEdited(const QString &text)
 {
     if (!m_entity)
@@ -158,13 +156,6 @@ void ChartItem::prepareHoverMark()
                                                        GripPoint::TopRight, GripPoint::BottomRight });
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
-}
-
-void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
 }
 
 QRectF ChartItem::box() const

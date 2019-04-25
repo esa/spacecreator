@@ -17,6 +17,8 @@
 
 #include "ciflines.h"
 
+#include "cifparser.h"
+
 #include <QDebug>
 #include <QPoint>
 #include <QRegularExpression>
@@ -38,19 +40,6 @@ CifLine::CifType CifLineCall::lineType() const
 CifLine::CifType CifLineComment::lineType() const
 {
     return CifLine::CifType::Comment;
-}
-bool CifLineComment::initFrom(const QString &sourceLine)
-{
-    m_sourceLine = sourceLine;
-    return !m_sourceLine.isEmpty();
-}
-QVariant CifLineComment::payload() const
-{
-    return CifLine::payload();
-}
-void CifLineComment::setPayload(const QVariant &p)
-{
-    return CifLine::setPayload(p);
 }
 
 CifLine::CifType CifLineCondition::lineType() const
@@ -336,7 +325,14 @@ CifLine::CifType CifLineTextName::lineType() const
 bool CifLineTextName::initFrom(const QString &sourceLine)
 {
     m_sourceLine = sourceLine;
-    return !m_sourceLine.isEmpty();
+
+    if (m_sourceLine.isEmpty())
+        return false;
+
+    const QString line = QString(sourceLine).remove(CifParser::CifLineTag).remove(nameForType(lineType()));
+    setPayload(line.trimmed());
+
+    return !line.isEmpty();
 }
 QVariant CifLineTextName::payload() const
 {
@@ -345,6 +341,31 @@ QVariant CifLineTextName::payload() const
 void CifLineTextName::setPayload(const QVariant &p)
 {
     return CifLine::setPayload(p);
+}
+
+CifLine::CifType CifLineGlobalComment::lineType() const
+{
+    return CifLine::CifType::GlobalComment;
+}
+
+bool CifLineGlobalComment::initFrom(const QString &sourceLine)
+{
+    m_sourceLine = sourceLine;
+
+    const QString text = sourceLine.trimmed();
+    setPayload(text);
+    return !text.isEmpty();
+}
+QString CifLineGlobalComment::payloadToString() const
+{
+    return payload().toString();
+}
+
+QString CifLineGlobalComment::toString(int tabsSize) const
+{
+    const QString tabs(4 * (tabsSize > 0 ? tabsSize - 1 : tabsSize), ' ');
+    const QString payload = payloadToString();
+    return payload.isEmpty() ? QString() : QString("%1/* %2 */\n").arg(tabs, payload);
 }
 
 } // ns cif

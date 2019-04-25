@@ -18,6 +18,7 @@
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "msccreate.h"
@@ -115,6 +116,16 @@ void tst_MscChart::testDestructor()
             chart->addInstanceEvent(new MscCreate());
             chartEntities.append(chart->instanceEvents().first());
             break;
+        case MscEntity::EntityType::Comment: {
+            auto comment = new MscComment;
+            auto instance = chart->instances().first();
+            Q_ASSERT(instance);
+            comment->setComment(QLatin1String("Text Comment for the First Instance"));
+            comment->attachTo(instance);
+            instance->setComment(comment);
+            chart->addInstanceEvent(comment);
+            chartEntities.append(chart->instanceEvents().first());
+        } break;
         default:
             QFAIL("It seems a new MscEntity::EntityType has been introduced,\n"
                   "but it's not covered here.\n"
@@ -124,7 +135,7 @@ void tst_MscChart::testDestructor()
     }
 
     QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 6);
+    QCOMPARE(chart->instanceEvents().size(), 7);
     QCOMPARE(chart->gates().size(), 1);
 
     delete chart;

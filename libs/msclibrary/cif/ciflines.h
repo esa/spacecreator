@@ -32,13 +32,10 @@ class CifLineCall : public CifLineTwoPointsHolder
 public:
     CifLine::CifType lineType() const override;
 };
-class CifLineComment : public CifLine
+class CifLineComment : public CifLinePointsHolder
 {
 public:
     CifLine::CifType lineType() const override;
-    bool initFrom(const QString &sourceLine) override;
-    QVariant payload() const override;
-    void setPayload(const QVariant &p) override;
 };
 class CifLineCondition : public CifLineTwoPointsHolder
 {
@@ -203,6 +200,14 @@ public:
     bool initFrom(const QString &sourceLine) override;
     QVariant payload() const override;
     void setPayload(const QVariant &p) override;
+};
+class CifLineGlobalComment : public CifLine
+{
+public:
+    CifLine::CifType lineType() const override;
+    bool initFrom(const QString &sourceLine) override;
+    QString payloadToString() const override;
+    QString toString(int tabsSize) const override;
 };
 
 } // ns cif

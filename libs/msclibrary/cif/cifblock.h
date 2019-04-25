@@ -39,6 +39,7 @@ public:
     virtual QVariant &payload(CifLine::CifType forType);
     bool hasPayloadFor(CifLine::CifType forType) const;
     virtual void setPayload(const QVariant &p, CifLine::CifType forType = CifLine::CifType::Unknown);
+    void clearPayload(CifLine::CifType forType);
 
     virtual CifLine::CifType blockType() const = 0;
 

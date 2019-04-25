@@ -15,23 +15,27 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentitycommentchange.h"
+#include "cmdcommentitemchangegeometry.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/cifline.h"
+#include "cif/ciflines.h"
 #include "mscchart.h"
 #include "msccomment.h"
 
 namespace msc {
 namespace cmd {
 
-CmdEntityCommentChange::CmdEntityCommentChange(MscChart *chart, MscEntity *item, const QString &newComment)
-    : BaseCommand(item)
+CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(MscChart *chart, const QRect &oldRect, const QRect &newRect,
+                                                           MscEntity *entity)
+    : BaseCommand(entity)
     , m_chart(chart)
-    , m_oldComment(item && item->comment() ? item->comment()->comment() : QString())
-    , m_newComment(newComment)
+    , m_oldRect(oldRect)
+    , m_newRect(newRect)
 {
 }
 
-void CmdEntityCommentChange::redo()
+void CmdCommentItemChangeGeometry::redo()
 {
     if (!m_modelItem)
         return;
@@ -41,10 +45,10 @@ void CmdEntityCommentChange::redo()
         comment = m_modelItem->setComment(QLatin1String("Default Comment"));
         m_chart->addInstanceEvent(comment);
     }
-    comment->setComment(m_newComment);
+    comment->setRect(m_newRect);
 }
 
-void CmdEntityCommentChange::undo()
+void CmdCommentItemChangeGeometry::undo()
 {
     if (!m_modelItem)
         return;
@@ -54,23 +58,21 @@ void CmdEntityCommentChange::undo()
         comment = m_modelItem->setComment(QLatin1String("Default Comment"));
         m_chart->addInstanceEvent(comment);
     }
-    comment->setComment(m_oldComment);
+    comment->setRect(m_oldRect);
 }
 
-bool CmdEntityCommentChange::mergeWith(const QUndoCommand *command)
+bool CmdCommentItemChangeGeometry::mergeWith(const QUndoCommand *command)
 {
-    auto other = dynamic_cast<const CmdEntityCommentChange *>(command);
-    if (canMergeWith(other)) {
-        m_newComment = other->m_newComment;
-        return true;
-    }
+    if (command->id() != id())
+        return false;
 
-    return false;
+    m_newRect = static_cast<const CmdCommentItemChangeGeometry *>(command)->m_newRect;
+    return true;
 }
 
-int CmdEntityCommentChange::id() const
+int CmdCommentItemChangeGeometry::id() const
 {
-    return msc::cmd::Id::ChangeComment;
+    return msc::cmd::Id::ChangeCommentGeometry;
 }
 
 } // namespace cmd

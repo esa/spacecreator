@@ -18,12 +18,22 @@
 
 #include "commentitem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
+#include "cif/cifblockfactory.h"
+#include "cif/cifline.h"
+#include "cif/ciflines.h"
+#include "commands/cmdcommentitemchangegeometry.h"
+#include "commands/common/commandsstack.h"
+#include "mscchart.h"
+#include "msccomment.h"
+#include "mscentity.h"
 #include "objectslinkitem.h"
 #include "textitem.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QtDebug>
 
 static const qreal kBorderWidth = 1;
 static const qreal kMargins = 6 + kBorderWidth;
@@ -31,10 +41,11 @@ static const qreal kLineLength = 20;
 
 namespace msc {
 
-CommentItem::CommentItem(QGraphicsItem *parent)
+CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(nullptr, parent)
     , m_textItem(new TextItem(this))
-    , m_linkItem(new QGraphicsLineItem(this))
+    , m_linkItem(new QGraphicsPathItem)
+    , m_chart(chart)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
@@ -44,11 +55,24 @@ CommentItem::CommentItem(QGraphicsItem *parent)
     m_textItem->setTextAllignment(Qt::AlignCenter);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
+    connect(m_textItem, &TextItem::textChanged, this, [this]() {
+        if (geometryManagedByCif() || isGlobal())
+            updateCif();
+        instantLayoutUpdate();
+    });
 
-    m_linkItem->setPen(QPen(Qt::black, kBorderWidth, Qt::DashLine));
+    m_linkItem->setPen(QPen(Qt::black, kBorderWidth, Qt::DotLine));
 
     setHighlightable(false);
-    setGlobal(true);
+}
+
+CommentItem::~CommentItem()
+{
+    if (scene())
+        scene()->removeItem(m_linkItem);
+
+    delete m_linkItem;
+    m_linkItem = nullptr;
 }
 
 void CommentItem::setText(const QString &text)
@@ -60,7 +84,7 @@ void CommentItem::setText(const QString &text)
     m_textItem->setPlainText(text);
     m_textItem->setTextWidth(m_textItem->idealWidth());
 
-    textEdited(text);
+    instantLayoutUpdate();
 }
 
 QString CommentItem::text() const
@@ -78,10 +102,20 @@ void CommentItem::attachTo(InteractiveObject *iObj)
 
     m_iObj = iObj;
 
-    connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
-    connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
+    if (!m_iObj)
+        return;
 
-    setGlobal(m_iObj == nullptr);
+    m_entity = m_iObj->modelEntity()->comment();
+
+    if (!isGlobal()) {
+        connect(m_iObj, &InteractiveObject::moved, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
+        connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
+    }
+
+    if (auto entity = commentEntity())
+        setText(entity->comment());
+
+    rebuildLayout();
 }
 
 InteractiveObject *CommentItem::object() const
@@ -89,10 +123,20 @@ InteractiveObject *CommentItem::object() const
     return m_iObj;
 }
 
-void CommentItem::setGlobal(bool isGlobal)
+bool CommentItem::geometryManagedByCif() const
 {
-    m_isGlobal = isGlobal;
-    scheduleLayoutUpdate();
+    if (auto entity = commentEntity())
+        return !entity->rect().isNull();
+
+    return false;
+}
+
+bool CommentItem::isGlobal() const
+{
+    if (auto entity = commentEntity())
+        return entity->isGlobal();
+
+    return false;
 }
 
 void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -107,7 +151,7 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     pen.setCapStyle(Qt::FlatCap);
     painter->setPen(pen);
     const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
-    if (m_isGlobal) {
+    if ((m_iObj && isGlobal()) || (!m_iObj && m_isGlobalPreview)) {
         painter->setBrush(QColor(0xf9e29c));
         painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(),
                                                 br.bottomRight(), br.topRight() + QPointF(0, kMargins),
@@ -130,76 +174,253 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 void CommentItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(m_isGlobal ? GripPoint::Locations { GripPoint::Location::Center }
-                                           : GripPoint::Locations {});
+    m_gripPoints->setUsedPoints(
+            isGlobal() ? GripPoint::Locations { GripPoint::Location::Top, GripPoint::Location::Left,
+                                                GripPoint::Location::Bottom, GripPoint::Location::Right,
+                                                GripPoint::Location::TopLeft, GripPoint::Location::BottomLeft,
+                                                GripPoint::Location::TopRight, GripPoint::Location::BottomRight,
+                                                GripPoint::Location::Center }
+                       : GripPoint::Locations { GripPoint::Location::Center });
+}
+
+cif::CifLine::CifType CommentItem::mainCifType() const
+{
+    if (auto entity = commentEntity())
+        return entity->mainCifType();
+
+    return cif::CifLine::CifType::Unknown;
 }
 
 void CommentItem::rebuildLayout()
 {
-    prepareGeometryChange();
-    if (m_isGlobal) {
-        m_linkItem->setVisible(false);
-        m_boundingRect = m_textItem->boundingRect();
-        setPos(sceneBoundingRect().topLeft());
-        return;
-    }
-
     const QPair<QPointF, bool> commentData = m_iObj ? m_iObj->commentPoint() : qMakePair(QPointF(0, 0), false);
     const QPointF commentPosition = commentData.first;
-    m_inverseLayout = commentData.second;
+    m_inverseLayout = commentData.second; // inverse layouting for comment
+
+    if (!m_linkItem->scene() && scene() != m_linkItem->scene())
+        scene()->addItem(m_linkItem);
+
     QRectF br = m_textItem->boundingRect();
-    QLineF line;
-    if (m_inverseLayout) { // inverse layouting for comment
-        line = { br.right(), br.center().y(), br.right() + kLineLength, br.center().y() };
+    if (geometryManagedByCif() || isGlobal()) {
+        applyCif();
+        br = m_textItem->sceneBoundingRect();
     } else {
-        line = { br.left(), br.center().y(), br.left() + kLineLength, br.center().y() };
-        br.moveLeft(line.p2().x());
+        br.moveCenter(commentPosition);
+        if (m_inverseLayout)
+            br.moveRight(commentPosition.x() - br.width() / 2 - kLineLength);
+        else
+            br.moveLeft(commentPosition.x() + br.width() / 2 + kLineLength);
+
+        setPos(br.topLeft());
+        m_textItem->setExplicitSize(br.size());
     }
-    m_linkItem->setVisible(true);
-    m_linkItem->setLine(line);
-    m_textItem->setPos(br.topLeft());
 
-    m_boundingRect = mapRectFromItem(m_textItem, m_textItem->boundingRect())
-            | mapRectFromItem(m_linkItem, m_linkItem->boundingRect());
+    QPolygonF link;
+    static const qreal tolerance = 5.;
+    const bool directLink = qAbs(br.center().y() - commentPosition.y()) < tolerance;
+    if (directLink) {
+        if (m_inverseLayout)
+            link = QPolygonF(QVector<QPointF> { QPointF(br.right(), br.center().y()), commentPosition });
+        else
+            link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()), commentPosition });
+    } else if (!isGlobal()) {
+        if (m_inverseLayout) {
+            if (br.left() - commentPosition.x() > kLineLength) {
+                link = QPolygonF(QVector<QPointF> {
+                        QPointF(br.left(), br.center().y()), QPointF(br.left() - kLineLength / 2, br.center().y()),
+                        QPointF(br.left() - kLineLength / 2, commentPosition.y()), commentPosition });
+                m_inverseLayout = false;
+            } else {
+                link = QPolygonF(QVector<QPointF> {
+                        QPointF(br.right(), br.center().y()),
+                        QPointF((br.right() + commentPosition.x()) / 2, br.center().y()),
+                        QPointF((br.right() + commentPosition.x()) / 2, commentPosition.y()), commentPosition });
+            }
+        } else {
+            if (br.left() - commentPosition.x() > kLineLength) {
+                link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()),
+                                                    QPointF((br.left() + commentPosition.x()) / 2, br.center().y()),
+                                                    QPointF((br.left() + commentPosition.x()) / 2, commentPosition.y()),
+                                                    commentPosition });
+            } else {
+                link = QPolygonF(QVector<QPointF> {
+                        QPointF(br.right(), br.center().y()), QPointF(br.right() + kLineLength / 2, br.center().y()),
+                        QPointF(br.right() + kLineLength / 2, commentPosition.y()), commentPosition });
+                m_inverseLayout = true;
+            }
+        }
+    }
 
-    QRectF rect = sceneBoundingRect();
-    rect.moveCenter(commentPosition);
-    if (m_inverseLayout)
-        rect.moveRight(commentPosition.x());
-    else
-        rect.moveLeft(commentPosition.x());
-    setPos(rect.topLeft());
+    prepareGeometryChange();
+    m_boundingRect = m_textItem->boundingRect();
+
+    m_linkItem->setVisible(isVisible() && !isGlobal());
+    QPainterPath pp;
+    pp.addPolygon(link);
+    m_linkItem->setPath(pp);
+}
+
+void CommentItem::applyCif()
+{
+    if (!m_iObj)
+        return;
+
+    const QRect storedCifRect = commentEntity()->rect();
+    if (storedCifRect.isNull())
+        return;
+
+    QRectF rect;
+    if (!utils::CoordinatesConverter::cifToScene(storedCifRect, rect))
+        qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << storedCifRect;
+
+    if (!rect.isNull() && rect != m_textItem->sceneBoundingRect()) {
+        setPos(rect.topLeft());
+        prepareGeometryChange();
+        m_textItem->setExplicitSize(rect.size());
+    }
+}
+
+void CommentItem::updateCif()
+{
+    if (!m_iObj)
+        return;
+
+    const QRect storedCifRect = commentEntity()->rect();
+    const QRectF textItemRect = m_textItem->sceneBoundingRect();
+    if (storedCifRect == textItemRect)
+        return;
+
+    QRect cifRect;
+    if (!utils::CoordinatesConverter::sceneToCif(textItemRect, cifRect))
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << cifRect;
+
+    commentEntity()->setRect(cifRect);
+}
+
+void CommentItem::setGlobalPreview(bool isGlobalPreview)
+{
+    m_isGlobalPreview = isGlobalPreview;
+    update();
 }
 
 void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (m_isGlobal && gp->location() == GripPoint::Location::Center) {
-        const QRectF sceneRect = scene()->sceneRect();
-        QPointF newPos = pos() + (to - from);
-        if (newPos.x() < sceneRect.left())
-            newPos.setX(sceneRect.left());
-        else if ((newPos.x() + m_boundingRect.width()) > sceneRect.right())
-            newPos.setX(sceneRect.right() - m_boundingRect.width());
-        if (newPos.y() < sceneRect.top())
-            newPos.setY(sceneRect.top());
-        else if ((newPos.y() + m_boundingRect.height()) > sceneRect.bottom())
-            newPos.setY(sceneRect.bottom() - m_boundingRect.height());
-        setPos(newPos);
+    if (gp->location() != GripPoint::Location::Center)
+        return;
+
+    const QRectF sceneRect = scene()->sceneRect() - ChartItem::chartMargins();
+    QPointF newPos = pos() + (to - from);
+    if (newPos.x() < sceneRect.left())
+        newPos.setX(sceneRect.left());
+    else if ((newPos.x() + m_boundingRect.width()) > sceneRect.right())
+        newPos.setX(sceneRect.right() - m_boundingRect.width());
+    if (newPos.y() < sceneRect.top())
+        newPos.setY(sceneRect.top());
+    else if ((newPos.y() + m_boundingRect.height()) > sceneRect.bottom())
+        newPos.setY(sceneRect.bottom() - m_boundingRect.height());
+
+    QRect oldRect;
+    if (geometryManagedByCif()) {
+        oldRect = commentEntity()->rect();
+    } else if (!utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << oldRect;
+        return;
+    }
+
+    QRectF rect { newPos, m_boundingRect.size() };
+    QRect newRect;
+    if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
+        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
+                                      { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+
+        rebuildLayout();
+        updateGripPoints();
 
         Q_EMIT needUpdateLayout();
+    } else {
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << rect;
     }
+
+    Q_EMIT needUpdateLayout();
 }
 
 void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    const QPoint shift = QPointF(to - from).toPoint();
+    QRect rect = m_textItem->sceneBoundingRect().toRect();
+    switch (gp->location()) {
+    case GripPoint::Left:
+        rect.setLeft(rect.left() + shift.x());
+        break;
+    case GripPoint::Top:
+        rect.setTop(rect.top() + shift.y());
+        break;
+    case GripPoint::Right:
+        rect.setRight(rect.right() + shift.x());
+        break;
+    case GripPoint::Bottom:
+        rect.setBottom(rect.bottom() + shift.y());
+        break;
+    case GripPoint::TopLeft:
+        rect.setTopLeft(rect.topLeft() + shift);
+        break;
+    case GripPoint::TopRight:
+        rect.setTopRight(rect.topRight() + shift);
+        break;
+    case GripPoint::BottomLeft:
+        rect.setBottomLeft(rect.bottomLeft() + shift);
+        break;
+    case GripPoint::BottomRight:
+        rect.setBottomRight(rect.bottomRight() + shift);
+        break;
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+
+    QRect oldRect;
+    if (geometryManagedByCif()) {
+        oldRect = commentEntity()->rect();
+    } else if (!utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << oldRect;
+        return;
+    }
+
+    QRect newRect;
+    if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
+        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
+                                      { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+
+        rebuildLayout();
+        updateGripPoints();
+
+        Q_EMIT needUpdateLayout();
+    } else {
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << rect;
+    }
 }
 
-void CommentItem::textEdited(const QString & /*text*/)
+void CommentItem::textEdited(const QString &text)
 {
+    QRect newRect;
+    if (utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
+        msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
+        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
+                                      { QVariant::fromValue<MscChart *>(m_chart), QRect(), newRect,
+                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
+                                      { QVariant::fromValue<MscChart *>(m_chart),
+                                        QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
+        msc::cmd::CommandsStack::current()->endMacro();
+    }
     scheduleLayoutUpdate();
+}
+
+MscComment *CommentItem::commentEntity() const
+{
+    return qobject_cast<MscComment *>(m_entity);
 }
 
 void CommentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -210,7 +431,10 @@ void CommentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 QPainterPath CommentItem::shape() const
 {
-    return m_textItem->shape() + m_linkItem->shape();
+    QPainterPath path;
+    path.addRect(m_textItem->boundingRect());
+    path.addPath(m_linkItem->shape());
+    return path;
 }
 
 } // ns msc

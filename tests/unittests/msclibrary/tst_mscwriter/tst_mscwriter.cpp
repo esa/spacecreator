@@ -17,6 +17,7 @@
 
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "msccreate.h"
@@ -544,21 +545,20 @@ void tst_MscWriter::testSerializeComments()
     document.setComment("Doc1 comment");
 
     MscChart *chart = new MscChart("Chart_1");
-    chart->setComment("Chart1 comment");
     document.addChart(chart);
 
     MscInstance *instance1 = new MscInstance("Inst_1");
-    instance1->setComment("Inst1 comment");
+    chart->addInstanceEvent(instance1->setComment("Inst1 comment"));
     chart->addInstance(instance1);
 
     MscMessage *message = new MscMessage("Msg_1");
-    message->setComment("Msg1 comment");
+    chart->addInstanceEvent(message->setComment("Msg1 comment"));
     message->setTargetInstance(instance1);
     chart->addInstanceEvent(message);
 
     MscAction *action = new MscAction();
     action->setInformalAction("Stop");
-    action->setComment("Action1 comment");
+    chart->addInstanceEvent(action->setComment("Action1 comment"));
     action->setInstance(instance1);
     chart->addInstanceEvent(action);
 
@@ -566,7 +566,7 @@ void tst_MscWriter::testSerializeComments()
 
     QVERIFY(serializeList.size() >= 8);
     QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 comment 'Doc1 comment' /* MSC AND */;"));
-    QCOMPARE(serializeList.at(1), tab1("msc Chart_1 comment 'Chart1 comment';"));
+    QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
     QCOMPARE(serializeList.at(2), tab2("instance Inst_1 comment 'Inst1 comment';"));
     QCOMPARE(serializeList.at(3), tab3("in Msg_1 from env comment 'Msg1 comment';"));
     QCOMPARE(serializeList.at(4), tab3("action 'Stop' comment 'Action1 comment';"));

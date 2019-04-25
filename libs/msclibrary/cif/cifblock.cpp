@@ -77,6 +77,20 @@ void CifBlock::setPayload(const QVariant &p, CifLine::CifType forType)
     }
 }
 
+void CifBlock::clearPayload(CifLine::CifType forType)
+{
+    if (m_linesByType.remove(forType)) {
+        for (auto it = m_lines.begin(); it != m_lines.end();) {
+            if (*it && (*it)->lineType() == forType) {
+                it = m_lines.erase(it);
+                continue;
+            }
+            ++it;
+        }
+        updateHashKey();
+    }
+}
+
 void CifBlock::updateHashKey()
 {
     m_hashKey.clear();

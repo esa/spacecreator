@@ -61,7 +61,7 @@ public:
         Timeout,
         TextMode,
         TextName,
-
+        GlobalComment,
         Unknown
     };
     Q_ENUM(CifType)
@@ -82,7 +82,7 @@ public:
 
     QString sourceLine() const;
 
-    QString toString(int tabsSize) const;
+    virtual QString toString(int tabsSize) const;
     virtual QString payloadToString() const;
 
 protected:

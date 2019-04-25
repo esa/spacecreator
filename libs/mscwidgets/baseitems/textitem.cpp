@@ -256,6 +256,13 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 
     setTextWidth(idealWidth());
     adjustSize();
+    if (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
+        || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height()) {
+        prepareGeometryChange();
+        m_explicitSize = QSizeF();
+        setTextWidth(idealWidth());
+        adjustSize();
+    }
 
     Q_EMIT textChanged();
 }

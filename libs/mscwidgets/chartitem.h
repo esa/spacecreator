@@ -33,14 +33,12 @@ class ChartItem : public InteractiveObject
 
 public:
     explicit ChartItem(MscChart *chartEntity, QGraphicsItem *parent = nullptr);
-    ~ChartItem() override;
+    ~ChartItem() override = default;
 
     QRectF boundingRect() const override;
 
     QString chartName() const;
     QString chartNameGuiText() const;
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF box() const;
     void setBox(const QRectF &r);
@@ -49,7 +47,7 @@ public:
 
     void applyCif() override;
 
-    bool geometryManagedByCif() const;
+    bool geometryManagedByCif() const override;
     QRectF storedCustomRect() const;
 
     QPainterPath shape() const override;

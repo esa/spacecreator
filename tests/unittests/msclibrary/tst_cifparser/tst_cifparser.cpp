@@ -221,7 +221,11 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::TextMode)));
         break;
     case CifLine::CifType::TextName:
-        cifLine = lineTemplate.arg(QString("%1").arg(CifLine::nameForType(CifLine::CifType::TextName)));
+        cifLine = lineTemplate.arg(
+                QString("%1 Text used for collapsed comments").arg(CifLine::nameForType(CifLine::CifType::TextName)));
+        break;
+    case CifLine::CifType::GlobalComment:
+        cifLine = QString("/* Text should be placed as global cif comment */");
         break;
 
     default:
@@ -264,6 +268,7 @@ void tst_CifParser::testCoverage()
     const QMetaEnum &e = QMetaEnum::fromType<CifLine::CifType>();
     int ignoredTypes(0);
     ++ignoredTypes; // CifLine::CifType::Unknown
+    ++ignoredTypes; // CifLine::CifType::GlobalComment, parsed as substring of CIF TEXT block
 
     QCOMPARE(testMethodsLine.size(), e.keyCount() - ignoredTypes);
 }

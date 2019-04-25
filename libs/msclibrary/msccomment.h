@@ -17,39 +17,42 @@
 
 #pragma once
 
-namespace msc {
-namespace cmd {
+#include "mscinstanceevent.h"
 
-enum Id
+#include <QPointer>
+#include <QRect>
+
+namespace msc {
+
+class MscComment : public MscInstanceEvent
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    ChangeCommentGeometry,
-    SetAsn1File,
-    LastId
+    Q_OBJECT
+public:
+    explicit MscComment(QObject *parent = nullptr);
+
+    MscEntity::EntityType entityType() const override;
+    cif::CifLine::CifType mainCifType() const;
+    bool isGlobal() const;
+
+    QRect rect() const;
+    void setRect(const QRect &rect);
+
+    QString comment() const;
+    void setComment(const QString &comment);
+
+    MscEntity *attachedEntity() const;
+    void attachTo(MscEntity *entity);
+
+    bool relatesTo(const MscInstance *instance) const override;
+
+private:
+    void updateCifComment();
+    void onDataChanged();
+
+private:
+    QPointer<MscEntity> m_attachedEntity;
+    QString m_comment;
+    QRect m_rect;
 };
 
-} // ns cmd
-} // ns msc
+} // namespace msc

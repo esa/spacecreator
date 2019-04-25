@@ -18,6 +18,7 @@
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "mscdocument.h"
@@ -167,19 +168,19 @@ void tst_MscFile::testEntityComments()
     "));
     QCOMPARE(model->documents().size(), 1);
     MscDocument *doc = model->documents().at(0);
-    QCOMPARE(doc->comment(), QString("doc comment"));
+    QCOMPARE(doc->comment()->comment(), QString("doc comment"));
 
     QCOMPARE(doc->charts().size(), 1);
     MscChart *chart = model->documents().at(0)->charts().at(0);
-    QCOMPARE(chart->comment(), QString("chart comment"));
+    QCOMPARE(chart->comment()->comment(), QString("chart comment"));
 
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
-    QCOMPARE(instance->comment(), QString("instance comment"));
+    QCOMPARE(instance->comment()->comment(), QString("instance comment"));
 
-    QCOMPARE(chart->instanceEvents().size(), 1);
-    MscInstanceEvent *event = chart->instanceEvents().at(0);
-    QCOMPARE(event->comment(), QString("msg comment"));
+    QCOMPARE(chart->instanceEvents().size(), 5);
+    MscInstanceEvent *event = chart->instanceEvents().at(3);
+    QCOMPARE(event->comment()->comment(), QString("msg comment"));
 }
 
 void tst_MscFile::testNestedDocuments()

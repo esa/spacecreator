@@ -69,6 +69,8 @@ public:
                                                const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
+    ChartItem *itemForChart() const;
+    CommentItem *itemForComment(msc::MscComment *comment) const;
     InstanceItem *itemForInstance(msc::MscInstance *instance) const;
     MessageItem *itemForMessage(MscMessage *message) const;
     ConditionItem *itemForCondition(MscCondition *condition) const;
@@ -77,7 +79,6 @@ public:
     CoregionItem *itemForCoregion(MscCoregion *coregion) const;
     InteractiveObject *itemForEntity(MscEntity *entity) const;
 
-    CommentItem *commentForEntity(msc::MscEntity *entity);
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(qreal y);
@@ -105,8 +106,6 @@ Q_SIGNALS:
     void cifDataChanged();
 
 private Q_SLOTS:
-    void onEntityCommentChanged(const QString &comment = QString());
-    void onInteractiveObjectCommentChange(msc::MscEntity *entity, const QString &comment);
     void onInstanceItemMoved(InteractiveObject *instanceItem);
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
@@ -128,6 +127,7 @@ private:
     template<class ItemType>
     ItemType *itemForInstanceEvent(MscInstanceEvent *event) const;
 
+    CommentItem *addCommentItem(MscComment *comment);
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
     ConditionItem *addConditionItem(MscCondition *condition, ConditionItem *prevItem, QRectF &instancesRect);
@@ -135,9 +135,6 @@ private:
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 
     void polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item);
-    void updateComment(msc::MscEntity *entity, msc::InteractiveObject *iObj = nullptr);
-    void updateCommentForMscChart();
-    void updateCommentForInteractiveObject(InteractiveObject *iObj);
 
     void addInstanceItems();
     void addInstanceEventItems();
