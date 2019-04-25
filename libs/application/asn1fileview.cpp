@@ -99,10 +99,20 @@ void ASN1FileView::fillPreview()
 void ASN1FileView::fillPreview(const QString &filename)
 {
     QFileInfo fi(filename);
-    if (!fi.exists())
-        qWarning() << "Can't find file" << filename;
+    if (!fi.exists()) {
+        return;
+    }
 
     asn1::Asn1XMLParser parser;
+    QStringList errorMessages;
+    QVariantList types = parser.parseAsn1File(QFileInfo(filename), &errorMessages);
+    if (!errorMessages.isEmpty()) {
+        qWarning() << "Asn.1 file" << filename << "is invalid";
+        return;
+    }
+
+    m_model->setAsn1TypesData(types);
+
     QString html = parser.asn1AsHtml(filename);
     if (html.isEmpty()) {
         QFile file(filename);
