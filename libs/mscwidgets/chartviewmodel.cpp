@@ -555,7 +555,7 @@ QRectF ChartViewModel::minimalContentRect() const
     auto effectiveRectEvents = [&eventEffectiveRect](const QVector<InteractiveObject *> &events) {
         QRectF totalRect;
         for (InteractiveObject *item : events) {
-            if (item->modelEntity()->entityType() == MscEntity::EntityType::Comment)
+            if (item->modelEntity() && item->modelEntity()->entityType() == MscEntity::EntityType::Comment)
                 continue;
 
             const QRectF &currRect = eventEffectiveRect(item);
