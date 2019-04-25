@@ -46,7 +46,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
         int intVal = value.toInt(&ok);
 
         if (ok && (ok = checkRange(asn1Type, intVal)))
-            valueMap["value"] = intVal;
+            valueMap["value"] = value;
 
         break;
     }
@@ -54,7 +54,7 @@ QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const Q
         double doubleVal = value.toDouble(&ok);
 
         if (ok && (ok = checkRange(asn1Type, doubleVal)))
-            valueMap["value"] = doubleVal;
+            valueMap["value"] = value;
 
         break;
     }
