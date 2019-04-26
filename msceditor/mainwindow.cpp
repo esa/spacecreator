@@ -873,7 +873,6 @@ void MainWindow::loadSettings()
 
     restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
-    d->m_model->setCurrentFilePath(AppOptions::MainWindow.LastFilePath->read().toString());
 
     // the toolbar might be hidden from a streaming tool session
     d->ui->mainToolBar->show();

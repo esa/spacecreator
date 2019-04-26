@@ -61,6 +61,9 @@ public:
 
     void applyCif() override;
 
+    QRectF boundingRect() const override;
+    void updateCif() override;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);
@@ -73,8 +76,6 @@ protected:
 
     void prepareHoverMark() override;
     cif::CifLine::CifType mainCifType() const override;
-
-    void updateCif() override;
 
 private:
     msc::MscInstance *m_instance = nullptr;

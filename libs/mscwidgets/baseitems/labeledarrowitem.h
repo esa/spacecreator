@@ -35,6 +35,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
+    QRectF textBoundingRect() const;
 
     QString text() const;
     MsgIdentificationItem *identificationItem() const;

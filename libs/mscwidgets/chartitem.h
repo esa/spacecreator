@@ -40,10 +40,13 @@ public:
     QString chartName() const;
     QString chartNameGuiText() const;
 
-    QRectF box() const;
-    void setBox(const QRectF &r);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    static const QMarginsF &chartMargins();
+    QRectF contentRect() const;
+    QPointF setContentRect(const QRectF &r);
+
+    static QPointF chartMargin();
+    static QMarginsF chartMargins();
 
     void applyCif() override;
 
@@ -51,9 +54,10 @@ public:
     QRectF storedCustomRect() const;
 
     QPainterPath shape() const override;
+    void updateCif() override;
 
 Q_SIGNALS:
-    void chartBoxChanged();
+    void contentRectChanged();
 
 public Q_SLOTS:
     void setName(const QString &name);
@@ -69,14 +73,16 @@ private Q_SLOTS:
     void onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to);
 
 private:
-    void updateCif() override;
     MscChart *chart() const;
 
 private:
     QGraphicsRectItem *m_rectItem = nullptr;
+    QGraphicsRectItem *m_contentArea = nullptr;
     TextItem *m_textItemName = nullptr;
-    QRectF m_box, m_originalBox;
+    QRectF m_prevContentRect;
     bool m_guard = false;
+
+    static QPointF m_margin;
 };
 
 } // ns msc

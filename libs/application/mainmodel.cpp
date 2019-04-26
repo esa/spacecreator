@@ -84,7 +84,7 @@ MainModel::MainModel(QObject *parent)
     connect(&d->m_hierarchyModel, &HierarchyViewModel::selectedDocumentChanged, this, &MainModel::setSelectedDocument);
 
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
-    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, this, &MainModel::modelDataChanged);
+    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     initialModel();
     showFirstChart();
@@ -344,7 +344,9 @@ void MainModel::clearMscModel()
     d->m_chartModel.clearScene();
     d->m_hierarchyModel.setModel(nullptr);
     if (d->m_mscModel) {
+        disconnect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
         disconnect(d->m_mscModel, nullptr, this, nullptr);
+
         delete d->m_mscModel;
         d->m_mscModel = nullptr;
     }
@@ -363,6 +365,7 @@ void MainModel::setNewModel(MscModel *model)
     connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);

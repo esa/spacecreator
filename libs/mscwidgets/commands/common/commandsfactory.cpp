@@ -404,7 +404,7 @@ QUndoCommand *CommandsFactory::createChartGeometryChange(const QVariantList &par
     Q_ASSERT(params.size() == 3);
 
     if (auto chart = params.last().value<MscChart *>())
-        return new CmdChartItemChangeGeometry(params.value(0).toRect(), params.value(1).toRect(), chart);
+        return new CmdChartItemChangeGeometry(params.value(0).toRectF(), params.value(1).toRectF(), chart);
 
     return nullptr;
 }

@@ -151,7 +151,7 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->setPen(pen);
     }
 
-    const qreal shift = painter->pen().widthF();
+    const qreal shift = painter->pen().widthF() / 2;
     const QRectF body = boundingRect().adjusted(shift, shift, -shift, -shift);
 
     painter->fillRect(body, background());

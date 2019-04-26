@@ -103,7 +103,8 @@ QString InstanceItem::kind() const
 
 void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
 {
-    if (qFuzzyCompare(m_axisHeight, height) && cifUpdate == utils::CifUpdatePolicy::DontChange) {
+    const qreal tolerance = qAbs(m_axisHeight - height);
+    if (tolerance <= 0.5 && cifUpdate == utils::CifUpdatePolicy::DontChange) {
         return;
     }
 
@@ -173,23 +174,20 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
-    prepareGeometryChange();
-
     if (m_boundingRect.isEmpty())
         applyCif();
 
     const QPointF &prevP1 = m_axisSymbol->line().p1();
     QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
-
-    m_boundingRect.setTopLeft(headRect.topLeft());
     m_boundingRect.setWidth(headRect.width());
     m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
+    m_boundingRect.moveTopLeft(headRect.topLeft());
     updateGripPoints();
 
     // move end symb to the bottom:
-    const QRectF footerRect(m_boundingRect.left(), m_boundingRect.bottom() - endSymbolHeight, m_boundingRect.width(),
-                            endSymbolHeight);
+    QRectF footerRect(m_boundingRect);
+    footerRect.setTop(footerRect.bottom() - endSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
     // line between the head and end symbols:
@@ -207,6 +205,13 @@ void InstanceItem::rebuildLayout()
             moveSilentlyBy(shift);
         }
     }
+
+    prepareGeometryChange();
+}
+
+QRectF InstanceItem::boundingRect() const
+{
+    return m_boundingRect.isEmpty() ? QRectF() : (m_headSymbol->boundingRect() | m_endSymbol->boundingRect());
 }
 
 void InstanceItem::applyCif()
@@ -244,8 +249,6 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
         return;
 
     setPos(pos() + delta);
-
-    updateCif();
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -344,6 +347,21 @@ cif::CifLine::CifType InstanceItem::mainCifType() const
     return cif::CifLine::CifType::Instance;
 }
 
+bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif)
+{
+    if (storedCif.size() != newCif.size())
+        return true;
+
+    static constexpr int HARDCODED_TOLERANCE { 10 }; // 1mm
+    for (int i = 0; i < storedCif.size(); ++i) {
+        const QPoint &delta = storedCif.at(i) - newCif.at(i);
+        if (qAbs(delta.x()) > HARDCODED_TOLERANCE || qAbs(delta.y()) > HARDCODED_TOLERANCE) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InstanceItem::updateCif()
 {
     using namespace cif;
@@ -378,8 +396,9 @@ void InstanceItem::updateCif()
 
     const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
     const QVector<QPoint> newCif { textBoxRectCif.topLeft(), wh, axisHeight };
-    if (storedCif != newCif) {
+    if (cifChangedEnough(storedCif, newCif)) {
         cifBlock->setPayload(QVariant::fromValue(newCif));
+
         Q_EMIT cifChanged();
     }
 }
@@ -417,15 +436,13 @@ void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPo
 
     const QRectF &myRect = sceneBoundingRect();
     const QRectF &chartBox = utils::CoordinatesConverter::currentChartItem()
-            ? utils::CoordinatesConverter::currentChartItem()->box()
+            ? utils::CoordinatesConverter::currentChartItem()->contentRect()
             : QRectF();
     if (!chartBox.isNull()) {
-        utils::CoordinatesConverter::currentChartItem()->setBox(chartBox
-                                                                | myRect.marginsAdded(ChartItem::chartMargins()));
+        utils::CoordinatesConverter::currentChartItem()->setContentRect(chartBox | myRect);
     }
 
     updateCif();
-    Q_EMIT cifChanged();
     Q_EMIT moved(this);
 }
 

@@ -58,6 +58,7 @@ public:
 
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
+    QRectF textBoundingRect() const;
     QPair<QPointF, bool> commentPoint() const override;
 
     void postCreatePolishing() override;

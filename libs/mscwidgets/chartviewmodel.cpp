@@ -193,16 +193,24 @@ void ChartViewModel::fillView(MscChart *chart)
     prepareChartBoxItem();
 
     const QRectF &initialChartRect = d->m_layoutInfo.m_chartItem->storedCustomRect();
+    if (!initialChartRect.isEmpty()) {
+        d->m_layoutInfo.m_chartItem->setContentRect(initialChartRect);
+    }
     if (d->m_currentChart)
         doLayout();
 
     // restore initial chart box (stored in CIF), because it's overriden by actual content bounds
-    if (!initialChartRect.isNull()) {
-        d->m_layoutInfo.m_chartItem->setBox(initialChartRect);
-    } else if (!d->m_layoutInfo.m_preferredBox.isEmpty()) {
-        const QRectF prefferedBox { d->m_layoutInfo.m_chartItem->box().topLeft(), d->m_layoutInfo.m_preferredBox };
-        d->m_layoutInfo.m_chartItem->setBox(prefferedBox);
+    QRectF updatedContentRect;
+    if (!initialChartRect.isNull())
+        updatedContentRect = initialChartRect;
+    else if (!d->m_layoutInfo.m_preferredBox.isEmpty()) {
+        const QRectF prefferedBox { d->m_layoutInfo.m_chartItem->contentRect().topLeft(),
+                                    d->m_layoutInfo.m_preferredBox };
+        updatedContentRect = prefferedBox;
     }
+
+    if (!updatedContentRect.isNull())
+        applyContentRect(updatedContentRect);
 
     connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
@@ -315,7 +323,7 @@ void ChartViewModel::addInstanceItems()
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
-            item = createDefaultInstanceItem(instance, QPointF());
+            item = createDefaultInstanceItem(instance);
             storeEntityItem(item);
         }
 
@@ -325,8 +333,17 @@ void ChartViewModel::addInstanceItems()
         const bool geomByCif = item->geometryManagedByCif();
         if (geomByCif)
             item->applyCif();
-        else
-            item->setX(d->m_layoutInfo.m_pos.x() + d->InterInstanceSpan);
+        else {
+            const QRectF &chartRect = d->m_layoutInfo.m_chartItem->contentRect();
+            const bool isFirstInstance = d->m_instanceItemsSorted.size() && d->m_instanceItemsSorted.first() == item;
+            const qreal targetX =
+                    isFirstInstance ? chartRect.left() : (d->m_layoutInfo.m_pos.x() + d->InterInstanceSpan);
+
+            const QRectF &instanceRect = item->sceneBoundingRect();
+            const QPointF defaultShift { targetX - instanceRect.left(), chartRect.top() - instanceRect.top() };
+            if (!defaultShift.isNull())
+                item->moveSilentlyBy(defaultShift);
+        }
 
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
 
@@ -528,7 +545,7 @@ QRectF ChartViewModel::minimalContentRect() const
         return totalRect;
     };
 
-    auto eventEffectiveRect = [](InteractiveObject *item) {
+    auto eventEffectiveRect = [this](InteractiveObject *item) {
         if (!item)
             return QRectF();
 
@@ -537,15 +554,25 @@ QRectF ChartViewModel::minimalContentRect() const
             return currRect;
 
         MscMessage *message = static_cast<MscMessage *>(item->modelEntity());
-        if (message->isGlobal() && !item->geometryManagedByCif()) {
+        if (message->isGlobal()) {
             if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
                 // if it's a simple (two point) horizontal message only its height
-                // accounted since it will be extended to the chart edge afterwhile
+                // and title width
+                // is accounted since it will be extended to the chart edge afterwhile
                 // TODO: add support for complex global message
-                if (utils::isHorizontal(messageItem->tail(), messageItem->head())) {
+                // TODO: include name rect into min bounding box
+                if (utils::isHorizontal(messageItem->tail(), messageItem->head()) || message->isGlobal()) {
                     const QPointF &currCenter = currRect.center();
-                    currRect.setWidth(1.);
-                    currRect.moveCenter(currCenter);
+
+                    // Using doubled title box width below instead of doing "real" geometry
+                    // calculation seems to be enough here, it allows to avoid the detection
+                    // of direction to the appropiate nearest chart box edge, etc:
+                    currRect.setWidth(messageItem->textBoundingRect().width() * (message->isGlobal() ? 2. : 1.));
+
+                    InstanceItem *connectedInstance = itemForInstance(
+                            message->sourceInstance() ? message->sourceInstance() : message->targetInstance());
+                    const QPointF newCenter { connectedInstance->sceneBoundingRect().center().x(), currCenter.y() };
+                    currRect.moveCenter(newCenter);
                 }
             }
         }
@@ -594,12 +621,30 @@ QLineF ChartViewModel::commonAxis() const
     return QLineF(0., commonAxisStart, 0., commonAxisStop);
 }
 
-void ChartViewModel::advanceItemsToChartBox()
+void ChartViewModel::updateContentBounds()
 {
     if (!d->m_layoutInfo.m_chartItem)
         return;
 
-    const QRectF &chartBox = d->m_layoutInfo.m_chartItem->box();
+    const bool customBoxUsed = d->m_layoutInfo.m_chartItem->geometryManagedByCif();
+    QRectF chartBox = customBoxUsed ? d->m_layoutInfo.m_chartItem->storedCustomRect()
+                                    : d->m_layoutInfo.m_chartItem->contentRect();
+    const QRectF &minRect = minimalContentRect();
+
+    if (chartBox.isEmpty())
+        chartBox = minRect;
+    else
+        chartBox.moveTopLeft(minRect.topLeft());
+
+    if (chartBox.width() < minRect.width())
+        chartBox.setWidth(minRect.width());
+    if (chartBox.height() < minRect.height())
+        chartBox.setHeight(minRect.height());
+
+    const int totalItemsCount = d->allItemsCount();
+    d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
+
+    applyContentRect(chartBox);
 
     // expand global messages
     for (InteractiveObject *io : d->m_instanceEventItemsSorted)
@@ -608,50 +653,21 @@ void ChartViewModel::advanceItemsToChartBox()
                 messageItem->onChartBoxChanged();
 
     // expand non stopped instances to the bottom
-    const qreal targetInstanceBottom = chartBox.bottom() - ChartItem::chartMargins().bottom();
+    const qreal targetInstanceBottom = d->m_layoutInfo.m_chartItem->contentRect().bottom();
     for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
         if (instanceItem->modelItem()->explicitStop())
             continue;
 
         const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
-        if (!qFuzzyIsNull(deltaH) && deltaH > 0) {
+        if (!qFuzzyIsNull(deltaH)) {
             instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
         }
     }
 }
 
-void ChartViewModel::updateContentBounds()
-{
-    if (!d->m_layoutInfo.m_chartItem)
-        return;
-
-    const bool customBoxUsed = d->m_layoutInfo.m_chartItem->geometryManagedByCif();
-    QRectF chartBox =
-            customBoxUsed ? d->m_layoutInfo.m_chartItem->storedCustomRect() : d->m_layoutInfo.m_chartItem->box();
-    const QRectF &minRect = minimalContentRect();
-    const QRectF &contentRect = minRect;
-
-    if (chartBox.isEmpty())
-        chartBox = contentRect;
-    else
-        chartBox.moveTopLeft(contentRect.topLeft());
-
-    if (chartBox.width() < minRect.width())
-        chartBox.setWidth(contentRect.width());
-    if (chartBox.height() < minRect.height())
-        chartBox.setHeight(contentRect.height());
-
-    const int totalItemsCount = d->allItemsCount();
-    d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
-
-    if (d->m_layoutInfo.m_chartItem->box() == chartBox)
-        advanceItemsToChartBox();
-    else
-        d->m_layoutInfo.m_chartItem->setBox(chartBox); // fires a signal for advanceItemsToChartBox
-}
-
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
 {
+    qreal commonY(0.);
     for (InstanceItem *instanceItem : d->m_instanceItems) {
         bool updated(false);
         if (instanceItem->modelItem()->explicitStop()) {
@@ -661,9 +677,23 @@ void ChartViewModel::actualizeInstancesHeights(qreal height) const
             updateCreatedInstanceHeight(instanceItem, height);
             updated = true;
         }
+        if (!instanceItem->modelItem()->explicitCreator())
+            commonY = qMax(commonY, instanceItem->axis().y1());
 
         if (!updated) {
-            instanceItem->setAxisHeight(height);
+            if (!instanceItem->geometryManagedByCif())
+                instanceItem->setAxisHeight(height);
+        }
+    }
+
+    for (InstanceItem *instanceItem : d->m_instanceItems) {
+        if (instanceItem->modelItem()->explicitCreator())
+            continue;
+
+        const qreal currAxisY1 = instanceItem->axis().y1();
+        const qreal deltaY1 = commonY - currAxisY1;
+        if (!qFuzzyIsNull(deltaY1)) {
+            instanceItem->moveSilentlyBy({ 0., deltaY1 });
         }
     }
 }
@@ -1159,6 +1189,17 @@ void ChartViewModel::onInstanceItemMoved(InteractiveObject *instanceItem)
     }
 
     updateContentBounds();
+
+    const QPointF &newPos = instanceItem->sceneBoundingRect().topLeft();
+    const QPointF offset { newPos.x() < 0. ? -newPos.x() : 0., newPos.y() < 0. ? -newPos.y() : 0 };
+
+    if (!offset.isNull()) {
+        d->m_layoutInfo.m_chartItem->updateCif();
+        for (InteractiveObject *io : d->m_instanceItemsSorted) {
+            io->moveBy(offset.x(), offset.y());
+            io->updateCif();
+        }
+    }
 }
 
 void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
@@ -1316,9 +1357,6 @@ void ChartViewModel::connectInstanceItem(InteractiveObject *instanceItem)
     connect(instanceItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout,
             Qt::UniqueConnection);
     connect(instanceItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged, Qt::UniqueConnection);
-    //    connect(instanceItem->modelEntity(), &MscEntity::commentChanged, this,
-    //    &ChartViewModel::onEntityCommentChanged,
-    //            Qt::UniqueConnection);
     connect(instanceItem, &InteractiveObject::moved, this, &ChartViewModel::onInstanceItemMoved, Qt::UniqueConnection);
 }
 
@@ -1337,8 +1375,6 @@ void ChartViewModel::disconnectItems()
     for (InteractiveObject *instanceItem : d->m_instanceItems) {
         disconnect(instanceItem, &InteractiveObject::needUpdateLayout, this, &ChartViewModel::updateLayout);
         disconnect(instanceItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged);
-        //        disconnect(instanceItem->modelEntity(), &MscEntity::commentChanged, this,
-        //                   &ChartViewModel::onEntityCommentChanged);
         disconnect(instanceItem, &InteractiveObject::moved, this, &ChartViewModel::onInstanceItemMoved);
     }
     for (InteractiveObject *instanceEventItem : d->m_instanceEventItems) {
@@ -1352,12 +1388,24 @@ void ChartViewModel::prepareChartBoxItem()
 {
     if (!d->m_layoutInfo.m_chartItem) {
         d->m_layoutInfo.m_chartItem = new ChartItem(d->m_currentChart);
-        connect(d->m_layoutInfo.m_chartItem, &ChartItem::chartBoxChanged, this,
-                &ChartViewModel::advanceItemsToChartBox);
+        connect(d->m_layoutInfo.m_chartItem, &ChartItem::contentRectChanged, this,
+                &ChartViewModel::updateContentBounds);
+
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 
     utils::CoordinatesConverter::init(&d->m_scene, d->m_layoutInfo.m_chartItem);
 }
 
+void ChartViewModel::applyContentRect(const QRectF &newRect)
+{
+    QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
+    const QPointF &originShift = d->m_layoutInfo.m_chartItem->setContentRect(newRect);
+    if (!originShift.isNull())
+        for (InteractiveObject *io : d->allItems()) {
+            io->moveSilentlyBy(originShift);
+            if (io->geometryManagedByCif())
+                io->updateCif();
+        }
+}
 } // namespace msc

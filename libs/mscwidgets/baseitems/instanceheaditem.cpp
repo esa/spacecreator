@@ -85,6 +85,7 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
 {
     m_textItemKind->setBackgroundColor(Qt::transparent);
     m_textItemKind->setEditable(true);
+    m_textItemName->setBackgroundColor(Qt::transparent);
     m_textItemName->setEditable(true);
 
     connect(m_textItemName, &TextItem::edited, this, [this](const QString &txt) {
@@ -187,7 +188,6 @@ void InstanceHeadItem::updateLayout()
     moveItem(m_rectItem, symbolRect.center());
 
     // update head gradient:
-    m_textItemName->setBackgroundGradient(createGradientForName(m_textItemName));
     m_rectItem->setBrush(createGradientForKind(m_rectItem));
 
     Q_EMIT layoutUpdated();
@@ -195,7 +195,8 @@ void InstanceHeadItem::updateLayout()
 
 QRectF InstanceHeadItem::boundingRect() const
 {
-    return childrenBoundingRect();
+    const qreal halfPenWidth = m_rectItem->pen().widthF() / 2.;
+    return childrenBoundingRect().adjusted(halfPenWidth, halfPenWidth, -halfPenWidth, -halfPenWidth);
 }
 
 QRectF InstanceHeadItem::rectGeometry() const

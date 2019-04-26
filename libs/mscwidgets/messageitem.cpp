@@ -177,6 +177,11 @@ QRectF MessageItem::boundingRect() const
     return m_arrowItem->boundingRect();
 }
 
+QRectF MessageItem::textBoundingRect() const
+{
+    return m_arrowItem->textBoundingRect();
+}
+
 QPair<QPointF, bool> MessageItem::commentPoint() const
 {
     if (head().x() > tail().x() && !m_targetInstance)
@@ -702,7 +707,7 @@ void MessageItem::extendGlobalMessage()
 {
     auto getChartBox = [this]() {
         if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-            return chartItem->box();
+            return chartItem->sceneBoundingRect(); // NOTE: not a contentRect!
         if (QGraphicsScene *scene = this->scene())
             return scene->sceneRect();
         return QRectF();

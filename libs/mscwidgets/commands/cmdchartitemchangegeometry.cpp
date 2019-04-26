@@ -35,13 +35,13 @@ CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRectF &oldRect, co
 void CmdChartItemChangeGeometry::redo()
 {
     if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-        chartItem->setBox(m_newRect);
+        chartItem->setContentRect(m_newRect);
 }
 
 void CmdChartItemChangeGeometry::undo()
 {
     if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-        chartItem->setBox(m_oldRect);
+        chartItem->setContentRect(m_oldRect);
 }
 
 bool CmdChartItemChangeGeometry::mergeWith(const QUndoCommand *command)
