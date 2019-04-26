@@ -34,6 +34,12 @@ CoregionItem::CoregionItem(ChartViewModel *model, QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
+void CoregionItem::setBegin(MscCoregion *begin)
+{
+    m_begin = begin;
+    m_entity = begin;
+}
+
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     const QRectF rect = boundingRect();
@@ -145,6 +151,7 @@ void CoregionItem::setInstance(InstanceItem *instance)
         m_begin->setInstance(instanceEntity);
     if (m_end)
         m_end->setInstance(instanceEntity);
+    instantLayoutUpdate();
 }
 
 } // namespace msc

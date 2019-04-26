@@ -32,7 +32,7 @@ class CoregionItem : public InteractiveObject
 public:
     explicit CoregionItem(ChartViewModel *model, QGraphicsItem *parent = nullptr);
 
-    void setBegin(MscCoregion *begin) { m_begin = begin; }
+    void setBegin(MscCoregion *begin);
     MscCoregion *begin() const { return m_begin; }
 
     void setEnd(MscCoregion *end) { m_end = end; }

@@ -434,7 +434,6 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             deltaY = targetTop - srcRect.top();
             item->moveSilentlyBy({ 0., deltaY });
         }
-
         d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
 
         return deltaY;
@@ -448,10 +447,11 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
         if (coregion->type() == MscCoregion::Type::Begin) {
             const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
             item->setY(targetTop);
+            d->m_layoutInfo.m_pos.ry() += 2 * d->InterMessageSpan;
         } else {
-            qobject_cast<CoregionItem *>(item)->scheduleLayoutUpdate();
+            qobject_cast<CoregionItem *>(item)->instantLayoutUpdate();
+            d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
         }
-        d->m_layoutInfo.m_pos.ry() += 2 * d->InterMessageSpan;
     } break;
     case MscEntity::EntityType::Message:
     case MscEntity::EntityType::Create: {
@@ -565,7 +565,8 @@ QRectF ChartViewModel::minimalContentRect() const
         return totalRect;
     };
 
-    const QRectF &events = effectiveRectEvents(d->m_instanceEventItemsSorted);
+    const QRectF &events =
+            effectiveRectEvents(d->m_instanceEventItemsSorted).adjusted(0, d->InterMessageSpan, 0, d->InterMessageSpan);
     QRectF instances = effectiveRectInstances(d->m_instanceItemsSorted);
     if (events.isNull()) {
         instances.setHeight(minHeight);
@@ -613,7 +614,7 @@ void ChartViewModel::advanceItemsToChartBox()
             continue;
 
         const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
-        if (!qFuzzyIsNull(deltaH)) {
+        if (!qFuzzyIsNull(deltaH) && deltaH > 0) {
             instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH, utils::CifUpdatePolicy::UpdateIfExists);
         }
     }
@@ -1125,7 +1126,7 @@ CoregionItem *ChartViewModel::addCoregionItem(MscCoregion *coregion)
     }
     if (coregion->type() == MscCoregion::Type::Begin) {
         item->setBegin(coregion);
-        item->connectObjects(instance, d->m_layoutInfo.m_pos.ry() + instanceVertiacalOffset);
+        item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVertiacalOffset);
     } else {
         item->setEnd(coregion);
         item->instantLayoutUpdate();

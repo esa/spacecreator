@@ -196,6 +196,8 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
                     events.append(instanceEvent);
                 break;
             }
+            case MscEntity::EntityType::Comment:
+                break;
             default: {
                 qWarning() << Q_FUNC_INFO << "ignored type:" << instanceEvent->entityType();
                 break;

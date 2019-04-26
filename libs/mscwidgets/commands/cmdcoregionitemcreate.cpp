@@ -50,7 +50,7 @@ void CmdCoregionItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_begin, m_eventIndex);
-    m_chart->addInstanceEvent(m_end);
+    m_chart->addInstanceEvent(m_end, m_eventIndex + 1);
 }
 
 void CmdCoregionItemCreate::undo()
