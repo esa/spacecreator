@@ -249,12 +249,11 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         storeEntityItem(item);
 
-        qreal deltaY(0.);
         if (isCreateMsg && !targetItem->geometryManagedByCif()) {
             QLineF axisLine(targetItem->axis());
             axisLine.setP1({ axisLine.x1(), newY + InstanceHeadItem::StartSymbolHeight / 2. });
 
-            deltaY = targetItem->axis().length() - axisLine.length();
+            const qreal deltaY = targetItem->axis().length() - axisLine.length();
 
             if (!targetItem->modelItem()->explicitStop()) {
                 axisLine.setP2({ axisLine.x2(), axisLine.y2() - axisLine.y1() });
@@ -1022,6 +1021,7 @@ CommentItem *ChartViewModel::addCommentItem(MscComment *comment)
             }
             storeEntityItem(item);
         }
+        item->setText(comment->comment());
         item->setVisible(true);
         item->instantLayoutUpdate();
     }

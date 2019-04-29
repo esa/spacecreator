@@ -131,8 +131,16 @@ QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
     if (!chart)
         return nullptr;
 
-    if (MscEntity *item = params.at(1).value<MscEntity *>())
-        return new CmdEntityCommentChange(chart, item, params.last().toString());
+    if (MscEntity *item = params.at(1).value<MscEntity *>()) {
+        const QString comment = params.last().toString();
+        if (!item->comment() && comment.isEmpty())
+            return nullptr;
+
+        if (item->comment() && item->comment()->comment() == comment)
+            return nullptr;
+
+        return new CmdEntityCommentChange(chart, item, comment);
+    }
 
     return nullptr;
 }
@@ -417,8 +425,17 @@ QUndoCommand *CommandsFactory::createCommentGeometryChange(const QVariantList &p
     if (!chart)
         return nullptr;
 
-    if (auto entity = params.last().value<MscEntity *>())
-        return new CmdCommentItemChangeGeometry(chart, params.value(1).toRect(), params.value(2).toRect(), entity);
+    if (auto entity = params.last().value<MscEntity *>()) {
+        const QRect &oldRect = params.value(1).toRect();
+        const QRect &newRect = params.value(2).toRect();
+        if (newRect == oldRect)
+            return nullptr;
+
+        if (entity->comment() && entity->comment()->rect() == newRect)
+            return nullptr;
+
+        return new CmdCommentItemChangeGeometry(chart, oldRect, newRect, entity);
+    }
 
     return nullptr;
 }

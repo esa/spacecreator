@@ -128,7 +128,7 @@ void MscComment::updateCifComment()
     }
 
     /// Comment text update
-    if (isGlobal() && !m_comment.isEmpty()) {
+    if (isGlobal() && !m_comment.isEmpty() && m_rect.isValid()) {
         if (cifBlock.isNull()) {
             cifBlock = cif::CifBlockFactory::createBlockText({ cif::CifLineShared(new cif::CifLineText()) });
             addCif(cifBlock);

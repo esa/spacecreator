@@ -37,11 +37,19 @@ void CmdEntityCommentChange::redo()
         return;
 
     auto comment = m_modelItem->comment();
-    if (!comment) {
-        comment = m_modelItem->setComment(QLatin1String("Default Comment"));
+    if (m_newComment.isEmpty()) {
+        if (comment) {
+            m_chart->removeInstanceEvent(comment);
+
+            // this command takes over ownership
+            comment->setParent(this);
+        }
+    } else {
+        if (!comment)
+            comment = m_modelItem->setComment(m_newComment);
         m_chart->addInstanceEvent(comment);
+        comment->setComment(m_newComment);
     }
-    comment->setComment(m_newComment);
 }
 
 void CmdEntityCommentChange::undo()
@@ -50,11 +58,19 @@ void CmdEntityCommentChange::undo()
         return;
 
     auto comment = m_modelItem->comment();
-    if (!comment) {
-        comment = m_modelItem->setComment(QLatin1String("Default Comment"));
+    if (m_oldComment.isEmpty()) {
+        if (comment) {
+            m_chart->removeInstanceEvent(comment);
+
+            // this command takes over ownership
+            comment->setParent(this);
+        }
+    } else {
+        if (!comment)
+            comment = m_modelItem->setComment(m_oldComment);
         m_chart->addInstanceEvent(comment);
+        comment->setComment(m_oldComment);
     }
-    comment->setComment(m_oldComment);
 }
 
 bool CmdEntityCommentChange::mergeWith(const QUndoCommand *command)

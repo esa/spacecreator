@@ -112,8 +112,10 @@ void CommentItem::attachTo(InteractiveObject *iObj)
         connect(m_iObj, &InteractiveObject::relocated, this, &CommentItem::scheduleLayoutUpdate, Qt::UniqueConnection);
     }
 
-    if (auto entity = commentEntity())
+    if (auto entity = commentEntity()) {
+        connect(entity, &MscComment::dataChanged, this, &CommentItem::needUpdateLayout, Qt::UniqueConnection);
         setText(entity->comment());
+    }
 
     rebuildLayout();
 }
@@ -404,16 +406,20 @@ void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
 
 void CommentItem::textEdited(const QString &text)
 {
+    const QRect oldRect = commentEntity() ? commentEntity()->rect() : QRect();
+    const QString oldText = commentEntity() ? commentEntity()->comment() : QString();
     QRect newRect;
     if (utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
-        msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
-        msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                                      { QVariant::fromValue<MscChart *>(m_chart), QRect(), newRect,
-                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
-        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                                      { QVariant::fromValue<MscChart *>(m_chart),
-                                        QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
-        msc::cmd::CommandsStack::current()->endMacro();
+        if (oldRect != newRect || oldText != text) {
+            msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
+            msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
+                                          { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                                            QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+            msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
+                                          { QVariant::fromValue<MscChart *>(m_chart),
+                                            QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
+            msc::cmd::CommandsStack::current()->endMacro();
+        }
     }
     scheduleLayoutUpdate();
 }
