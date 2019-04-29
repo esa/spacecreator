@@ -63,7 +63,6 @@ void ASN1FileView::setCurrentDirectory(const QString &directory)
 void ASN1FileView::updateView()
 {
     ui->filenameLabel->clear();
-    ui->textEdit->clear();
 
     if (!m_model)
         return;
