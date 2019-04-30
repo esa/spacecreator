@@ -474,7 +474,6 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
         MscMessage *message = static_cast<MscMessage *>(event);
         MessageItem *messageItem = dynamic_cast<MessageItem *>(item);
         Q_ASSERT(messageItem != nullptr);
-        MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(messageItem);
 
         const bool relatedToDynamicInstance =
                 (message->sourceInstance() && message->sourceInstance()->explicitCreator())
@@ -488,23 +487,10 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
                 if (event->entityType() == MscEntity::EntityType::Create) {
                     if (!createdInstanceItem->geometryManagedByCif())
                         createdInstanceItem->moveBy(0., deltaY);
-
-                    if (!messageItem->geometryManagedByCif()) {
-                        // move arrow head to the created instance, shift other points accordingly:
-                        QVector<QPointF> messagePoints = messageItem->messagePoints();
-                        const QPointF newStart = { messagePoints.first().x(), messagePoints.first().y() + deltaY };
-                        const QPointF delta = newStart - messagePoints.first();
-                        for (int i = 0; i < messagePoints.size() - 1; ++i)
-                            messagePoints[i] += delta;
-                        messageItem->setMessagePoints(
-                                messagePoints,
-                                utils::CifUpdatePolicy::DontChange); // changes its pos to the source point
-                    }
                 }
                 messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
             }
         }
-
         break;
     }
     default: {

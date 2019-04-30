@@ -655,7 +655,7 @@ bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
     setPos(utils::lineCenter({ scenePoints.first(), scenePoints.last() }));
     m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
-
+    updateGripPoints();
     commitGeometryChange();
     return true;
 }
@@ -745,12 +745,6 @@ void MessageItem::updateCif()
     const QVector<QPoint> &pointsCifStored = msgCif->payload(mainCifType()).value<QVector<QPoint>>();
     if (pointsCifStored != pointsCif)
         msgCif->setPayload(QVariant::fromValue(pointsCif), usedCifType);
-}
-
-void MessageItem::moveSilentlyBy(const QPointF &shift)
-{
-    GeometryNotificationBlocker silently(this);
-    InteractiveObject::moveSilentlyBy(shift);
 }
 
 void MessageItem::extendGlobalMessage()

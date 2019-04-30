@@ -108,7 +108,6 @@ protected:
     void prepareHoverMark() override;
     cif::CifLine::CifType mainCifType() const override;
     void updateCif() override;
-    void moveSilentlyBy(const QPointF &shift) override;
 
 private Q_SLOTS:
     void onTextChanged();
