@@ -18,8 +18,6 @@
 
 #include "textitem.h"
 
-#include "baseitems/common/utils.h"
-
 #include <QApplication>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -438,9 +436,7 @@ void TextItem::setExplicitSize(const QSizeF &r)
 
 QRectF TextItem::boundingRect() const
 {
-    const QRectF r =
-            m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
-    return utils::framedRect(r, frameWidth());
+    return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
 }
 
 /*!
