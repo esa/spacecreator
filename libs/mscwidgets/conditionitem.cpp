@@ -101,6 +101,14 @@ void ConditionItem::connectObjects(InstanceItem *instance, qreal y, const QRectF
     rebuildLayout();
 }
 
+void ConditionItem::setInstancesRect(const QRectF &instancesRect)
+{
+    if (m_InstancesRect != instancesRect) {
+        m_InstancesRect = instancesRect;
+        instantLayoutUpdate();
+    }
+}
+
 void ConditionItem::setInstance(InstanceItem *instance)
 {
     if (instance == m_instance) {
@@ -113,7 +121,7 @@ void ConditionItem::setInstance(InstanceItem *instance)
 
     m_instance = instance;
     if (m_instance)
-        connect(m_instance, &InteractiveObject::relocated, this, &ConditionItem::onInstanceMoved, Qt::DirectConnection);
+        connect(m_instance, &InteractiveObject::relocated, this, &ConditionItem::onInstanceMoved, Qt::UniqueConnection);
 
     scheduleLayoutUpdate();
 }

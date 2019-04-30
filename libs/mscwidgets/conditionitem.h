@@ -46,6 +46,8 @@ public:
 
     void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
 
+    void setInstancesRect(const QRectF &instancesRect);
+
     static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
 
 public Q_SLOTS:

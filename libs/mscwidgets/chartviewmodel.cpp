@@ -319,6 +319,7 @@ void ChartViewModel::doLayout()
 
 void ChartViewModel::addInstanceItems()
 {
+    d->m_layoutInfo.m_instancesRect = QRectF();
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
@@ -1179,11 +1180,24 @@ void ChartViewModel::onInstanceItemMoved(InteractiveObject *instanceItem)
     const QPointF &newPos = instanceItem->sceneBoundingRect().topLeft();
     const QPointF offset { newPos.x() < 0. ? -newPos.x() : 0., newPos.y() < 0. ? -newPos.y() : 0 };
 
-    if (!offset.isNull()) {
+    if (!offset.isNull())
         d->m_layoutInfo.m_chartItem->updateCif();
-        for (InteractiveObject *io : d->m_instanceItemsSorted) {
+
+    d->m_layoutInfo.m_instancesRect = QRectF();
+    for (InteractiveObject *io : d->m_instanceItemsSorted) {
+        d->m_layoutInfo.m_instancesRect = d->m_layoutInfo.m_instancesRect.united(io->sceneBoundingRect());
+        if (!offset.isNull()) {
             io->moveBy(offset.x(), offset.y());
             io->updateCif();
+        }
+    }
+
+    for (InteractiveObject *io : d->m_instanceEventItemsSorted) {
+        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Condition) {
+            if (auto conditionItem = qobject_cast<ConditionItem *>(io)) {
+                if (conditionItem->modelItem()->shared())
+                    conditionItem->setInstancesRect(d->m_layoutInfo.m_instancesRect);
+            }
         }
     }
 }
