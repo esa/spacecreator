@@ -172,5 +172,14 @@ bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalToleran
     return isHorizontal(twoPoints.first(), twoPoints.last(), verticalTolerance);
 }
 
+QRectF framedRect(const QRectF &rect, qreal frameWidth)
+{
+    if (qFuzzyIsNull(frameWidth))
+        return rect;
+
+    const qreal halfWidth = frameWidth / 2.;
+    return rect.adjusted(halfWidth, halfWidth, -halfWidth, -halfWidth);
+}
+
 } // ns utils
 } // ns msc

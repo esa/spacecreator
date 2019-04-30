@@ -17,6 +17,8 @@
 
 #include "instanceenditem.h"
 
+#include "baseitems/common/utils.h"
+
 #include <QBrush>
 #include <QDebug>
 #include <QPainter>
@@ -61,7 +63,7 @@ void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
                                               bounds.topRight() };
 
         QPen pen(this->pen());
-        pen.setWidthF(1.5);
+        pen.setWidthF(1.);
         pen.setColor(Qt::black);
         pen.setCapStyle(Qt::RoundCap);
 
@@ -94,6 +96,11 @@ void InstanceEndItem::setRect(const QRectF &r)
 qreal InstanceEndItem::height() const
 {
     return isStop() ? StopSymbolHeight : EndSymbolHeight;
+}
+
+QRectF InstanceEndItem::boundingRect() const
+{
+    return utils::framedRect(QGraphicsRectItem::boundingRect(), pen().widthF());
 }
 
 } // ns msc

@@ -111,5 +111,7 @@ QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF 
 bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
 bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance = LineHorizontalityTolerance);
 bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance = LineHorizontalityTolerance);
+
+QRectF framedRect(const QRectF &rect, qreal frameWidth);
 } // ns utils
 } // ns msc

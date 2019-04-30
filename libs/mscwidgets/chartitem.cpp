@@ -41,7 +41,7 @@ ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
 {
     QPen framePen = m_rectItem->pen();
     framePen.setColor(Qt::black);
-    framePen.setWidthF(0.5);
+    framePen.setWidthF(1.);
     m_rectItem->setPen(framePen);
     m_rectItem->setBrush(Qt::white);
 
@@ -71,7 +71,7 @@ void ChartItem::onNameEdited(const QString &text)
 
 QRectF ChartItem::boundingRect() const
 {
-    return m_rectItem->boundingRect();
+    return utils::framedRect(m_rectItem->boundingRect(), m_rectItem->pen().widthF());
 }
 
 QString ChartItem::chartName() const

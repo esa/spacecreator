@@ -144,17 +144,18 @@ QPainterPath LabeledArrowItem::shape() const
 
 QRectF LabeledArrowItem::boundingRect() const
 {
+    const qreal penWidth = m_selectionHighlighterPen.widthF();
     const QRectF &textBox = textBoundingRect();
     const QVector<QPointF> &trajectory = arrow()->turnPoints();
     if (trajectory.isEmpty())
-        return textBox;
+        return utils::framedRect(textBox, penWidth);
 
     const QPointF &tail = trajectory.first();
     const QPointF &head = trajectory.last();
 
     if (qFuzzyCompare(tail.y(), head.y()) && trajectory.size() == 2) {
         // this takes into account dimensions of the triangle sign
-        return childrenBoundingRect();
+        return utils::framedRect(childrenBoundingRect(), penWidth);
     }
 
     // construct a rect where one couple of corners is the tail and head points
@@ -171,7 +172,7 @@ QRectF LabeledArrowItem::boundingRect() const
     }
 
     const QRectF arrowRect { topLeft, bottomRight };
-    return textBox | arrowRect;
+    return utils::framedRect((textBox | arrowRect), penWidth);
 }
 
 QRectF LabeledArrowItem::textBoundingRect() const

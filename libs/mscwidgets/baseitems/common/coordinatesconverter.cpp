@@ -211,5 +211,15 @@ ChartItem *CoordinatesConverter::currentChartItem()
     return nullptr;
 }
 
+void CoordinatesConverter::setPhysicalDPI(QPoint dpi)
+{
+    instance()->m_dpiPhysical = dpi;
+}
+
+void CoordinatesConverter::setLogicalDPI(QPoint dpi)
+{
+    instance()->m_dpiLogical = dpi;
+}
+
 } // ns utils
 } // ns msc

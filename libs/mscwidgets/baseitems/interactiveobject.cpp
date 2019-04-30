@@ -18,6 +18,7 @@
 
 #include "interactiveobject.h"
 
+#include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
 #include "common/highlightrectitem.h"
 #include "grippointshandler.h"
@@ -43,7 +44,7 @@ namespace msc {
 InteractiveObject::InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_entity(entity)
-    , m_selectedPen(Qt::black, 3.)
+    , m_selectedPen(Qt::black, 2)
 {
     setAcceptHoverEvents(true);
 
@@ -60,9 +61,8 @@ void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (isSelected()) {
         painter->save();
         painter->setPen(m_selectedPen);
-        static const qreal penHalf { m_selectedPen.widthF() / 2. };
-        static const QMarginsF margins { penHalf, penHalf, penHalf, penHalf };
-        painter->drawRect(m_boundingRect.marginsRemoved(margins));
+
+        painter->drawRect(utils::framedRect(m_boundingRect, m_selectedPen.widthF()));
         painter->restore();
     }
 }
@@ -200,7 +200,7 @@ void InteractiveObject::doHighlighting(const QColor &color, bool permanent)
     if (HighlightRectItem *highlighter = createHighlighter()) {
         QColor targetColor(color);
         QPen p(targetColor);
-        p.setWidthF(3.);
+        p.setWidthF(1.);
         highlighter->setPen(p);
         targetColor.setAlphaF(0.25);
         highlighter->setBrush(targetColor);

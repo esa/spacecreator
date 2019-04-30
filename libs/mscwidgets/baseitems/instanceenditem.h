@@ -38,6 +38,8 @@ public:
 
     qreal height() const;
 
+    QRectF boundingRect() const override;
+
 private:
     bool m_stop = false;
     QColor m_bgrColor = Qt::black;

@@ -68,7 +68,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
 
     // values are based on screenshot from https://git.vikingsoftware.com/esa/msceditor/issues/30
     QPen axisPen(Qt::darkGray);
-    axisPen.setWidthF(3.);
+    axisPen.setWidthF(2.);
     m_axisSymbol->setPen(axisPen);
 
     connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
@@ -103,10 +103,8 @@ QString InstanceItem::kind() const
 
 void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
 {
-    const qreal tolerance = qAbs(m_axisHeight - height);
-    if (tolerance <= 0.5 && cifUpdate == utils::CifUpdatePolicy::DontChange) {
+    if (qFuzzyCompare(1. + height, 1. + m_axisHeight) && cifUpdate != utils::CifUpdatePolicy::ForceCreate)
         return;
-    }
 
     m_axisHeight = height;
 
@@ -199,9 +197,6 @@ void InstanceItem::rebuildLayout()
         // local geometry changed due the text layout change, compensate it:
         const QPointF &shift = prevP1 - p1;
         if (!shift.isNull()) {
-            // Related messages to/from Env will be moved all together,
-            // To avoid it block the InteractiveObject::relocated
-            // (fired in InteractiveObject::itemChange)
             moveSilentlyBy(shift);
         }
     }

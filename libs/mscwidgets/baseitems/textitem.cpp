@@ -18,6 +18,8 @@
 
 #include "textitem.h"
 
+#include "baseitems/common/utils.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -144,20 +146,16 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
     painter->save();
 
+    const QRectF body = boundingRect();
+    painter->fillRect(body, background());
+
     if (framed()) {
         QPen pen(painter->pen());
         pen.setWidthF(frameWidth());
         pen.setColor(frameColor());
         painter->setPen(pen);
-    }
-
-    const qreal shift = painter->pen().widthF() / 2;
-    const QRectF body = boundingRect().adjusted(shift, shift, -shift, -shift);
-
-    painter->fillRect(body, background());
-
-    if (framed())
         painter->drawRect(body);
+    }
 
     painter->restore();
 
@@ -440,7 +438,9 @@ void TextItem::setExplicitSize(const QSizeF &r)
 
 QRectF TextItem::boundingRect() const
 {
-    return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
+    const QRectF r =
+            m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
+    return utils::framedRect(r, frameWidth());
 }
 
 /*!

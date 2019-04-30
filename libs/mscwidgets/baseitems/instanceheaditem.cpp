@@ -17,6 +17,7 @@
 
 #include "instanceheaditem.h"
 
+#include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
 #include "mscinstance.h"
 
@@ -195,8 +196,7 @@ void InstanceHeadItem::updateLayout()
 
 QRectF InstanceHeadItem::boundingRect() const
 {
-    const qreal halfPenWidth = m_rectItem->pen().widthF() / 2.;
-    return childrenBoundingRect().adjusted(halfPenWidth, halfPenWidth, -halfPenWidth, -halfPenWidth);
+    return utils::framedRect(childrenBoundingRect(), m_rectItem->pen().widthF());
 }
 
 QRectF InstanceHeadItem::rectGeometry() const
@@ -277,7 +277,7 @@ void InstanceHeadItem::setTextboxSize(const QSizeF &size)
 
 QRectF InstanceHeadItem::textBoxSceneRect() const
 {
-    return m_rectItem->sceneBoundingRect();
+    return utils::framedRect(m_rectItem->sceneBoundingRect(), m_rectItem->pen().widthF());
 }
 
 } // ns msc

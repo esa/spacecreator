@@ -41,6 +41,14 @@ public:
     static bool cifToScene(const QRect &cifRect, QRectF &sceneRect);
     static ChartItem *currentChartItem();
 
+    /// @{
+    /** group test helper/access function */
+    static void setPhysicalDPI(QPoint dpi);
+    static void setLogicalDPI(QPoint dpi);
+    void setScene(QGraphicsScene *scene);
+    static CoordinatesConverter *instance();
+    /// @}
+
 private:
     static constexpr qreal m_mmInInch { 25.4 };
     static constexpr qreal m_cifMmScaleFactor { 10. };
@@ -51,9 +59,6 @@ private:
     QPointer<ChartItem> m_chartItem = nullptr;
     QPoint m_dpiPhysical;
     QPoint m_dpiLogical;
-
-    static CoordinatesConverter *instance();
-    void setScene(QGraphicsScene *scene);
 
     static QPoint sceneOriginInView(QGraphicsView *view);
 
