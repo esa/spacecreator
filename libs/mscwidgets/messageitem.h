@@ -20,6 +20,7 @@
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
+#include "chartviewmodel.h"
 #include "instanceitem.h"
 
 #include <QPointer>
@@ -45,14 +46,16 @@ public:
         GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
     };
 
-    explicit MessageItem(MscMessage *message, InstanceItem *source = nullptr, InstanceItem *target = nullptr,
-                         QGraphicsItem *parent = nullptr);
+    explicit MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source = nullptr,
+                         InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
 
     void setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance);
     bool setSourceInstanceItem(InstanceItem *sourceInstance);
+    InstanceItem *sourceInstanceItem() const;
     bool setTargetInstanceItem(InstanceItem *targetInstance);
+    InstanceItem *targetInstanceItem() const;
 
     QString name() const;
 
@@ -71,7 +74,7 @@ public:
     bool isAutoResizable() const;
     void setAutoResizable(bool resizable);
 
-    static MessageItem *createDefaultItem(MscMessage *message, const QPointF &pos);
+    static MessageItem *createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos);
 
     void performSnap();
 
@@ -119,6 +122,7 @@ private Q_SLOTS:
 private:
     QPointer<msc::MscMessage> m_message = nullptr;
     LabeledArrowItem *m_arrowItem = nullptr;
+    QPointer<msc::ChartViewModel> m_chartViewModel = nullptr;
     QPointer<InstanceItem> m_sourceInstance = nullptr;
     QPointer<InstanceItem> m_targetInstance = nullptr;
     bool m_posChangeIgnored = false;
@@ -148,4 +152,4 @@ private:
     bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);
 };
 
-} // namespace mas
+} // namespace msc

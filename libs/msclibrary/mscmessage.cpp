@@ -19,6 +19,8 @@
 
 #include "mscinstance.h"
 
+#include <QDebug>
+
 /*!
    \class msc::MscMessage
    \brief Class to describe a MSC message
@@ -179,7 +181,6 @@ bool MscMessage::isConnected() const
     return m_descrIn.to != nullptr && m_descrOut.from != nullptr;
 }
 
-#ifdef QT_DEBUG
 QString MscMessage::toDbgString() const
 {
     auto instanceName = [](MscInstance *instance) {
@@ -188,6 +189,12 @@ QString MscMessage::toDbgString() const
     };
     return QString("%1->%2:%3").arg(instanceName(m_source), instanceName(m_target), name());
 }
-#endif
 
 } // namespace msc
+
+QDebug operator<<(QDebug dbg, const msc::MscMessage &message)
+{
+    QDebugStateSaver saver(dbg);
+    dbg << message.toDbgString();
+    return dbg;
+}

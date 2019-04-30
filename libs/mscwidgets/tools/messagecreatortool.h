@@ -72,6 +72,7 @@ private:
     };
     InteractionMode m_currMode = InteractionMode::None;
 
+    QPointer<MscMessage> m_message = nullptr;
     QPointer<MessageItem> m_messageItem = nullptr;
     QPointF m_mouseDown;
     MscMessage::MessageType m_messageType;

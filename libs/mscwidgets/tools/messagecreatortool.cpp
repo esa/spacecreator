@@ -22,6 +22,7 @@
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/utils.h"
 #include "commands/common/commandsstack.h"
+#include "instanceitem.h"
 #include "messagedialog.h"
 #include "mscchart.h"
 #include "msccreate.h"
@@ -60,14 +61,14 @@ void MessageCreatorTool::createPreviewItem()
     if (!m_scene || m_previewItem || !m_active)
         return;
 
-    MscMessage *orphanMessage = m_messageType == MscMessage::MessageType::Message ? new MscMessage(tr("Message"))
-                                                                                  : new MscCreate(tr("Create"));
-    m_messageItem = m_model->createDefaultMessageItem(orphanMessage, cursorInScene());
+    m_message = m_messageType == MscMessage::MessageType::Message ? new MscMessage(tr("Message"))
+                                                                  : new MscCreate(tr("Create"));
+    m_messageItem = m_model->createDefaultMessageItem(m_message, cursorInScene());
 
     movePreviewItemTo(cursorInScene());
 
     if (!m_messageItem) {
-        delete orphanMessage;
+        delete m_message.data();
         return;
     }
 
@@ -86,19 +87,22 @@ void MessageCreatorTool::commitPreviewItem()
     m_currMode = InteractionMode::None;
     m_mouseDown = QPointF();
 
-    if (m_previewEntity && m_activeChart) {
+    if (m_message && m_activeChart && m_messageItem) {
+        m_message->setSourceInstance(
+                m_messageItem->sourceInstanceItem() ? m_messageItem->sourceInstanceItem()->modelItem() : nullptr);
+        m_message->setTargetInstance(
+                m_messageItem->targetInstanceItem() ? m_messageItem->targetInstanceItem()->modelItem() : nullptr);
         bool isValid = true;
-        auto message = qobject_cast<msc::MscMessage *>(m_previewEntity.data());
         if (m_messageType == MscMessage::MessageType::Create) {
-            isValid = message->sourceInstance() != nullptr && message->targetInstance() != nullptr
-                    && message->sourceInstance() != message->targetInstance();
+            isValid = m_message->sourceInstance() != nullptr && m_message->targetInstance() != nullptr
+                    && m_message->sourceInstance() != m_message->targetInstance();
             qWarning() << "Create messages need to be connected to different existing instances";
         }
 
         if (isValid) {
             const QVariantList &cmdParams = prepareMessage();
             if (!cmdParams.isEmpty()) {
-                startWaitForModelLayoutComplete(message);
+                startWaitForModelLayoutComplete(m_message);
                 msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
 
                 Q_EMIT created(); // to deactivate toobar's item
@@ -107,6 +111,7 @@ void MessageCreatorTool::commitPreviewItem()
     }
 
     removePreviewItem();
+    m_message.clear();
 }
 
 bool MessageCreatorTool::onMousePress(QMouseEvent *e)
@@ -181,7 +186,7 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
 void MessageCreatorTool::processMousePressDrag(QMouseEvent *e)
 {
     if (m_messageItem && m_currStep == Step::ChooseSource) {
-        m_messageItem->setTail(cursorInScene(e->globalPos()), ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setTail(cursorInScene(e->globalPos()), ObjectAnchor::Snap::SnapTo);
         m_currStep = Step::ChooseTarget;
     }
 }
@@ -210,7 +215,7 @@ void MessageCreatorTool::processMouseMoveDrag(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::SnapTo);
             break;
         }
         }
@@ -227,7 +232,7 @@ void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
     const QPointF &scenePos = this->cursorInScene(e->globalPos());
     switch (m_currStep) {
     case Step::ChooseSource: {
-        m_messageItem->setTail(scenePos, ObjectAnchor::Snap::NoSnap);
+        m_messageItem->setTail(scenePos, ObjectAnchor::Snap::SnapTo);
         m_currStep = Step::ChooseTarget;
         break;
     }
@@ -259,7 +264,7 @@ void MessageCreatorTool::processMouseMoveClick(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::NoSnap);
+            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::SnapTo);
             break;
         }
         }
@@ -408,8 +413,8 @@ QVariantList MessageCreatorTool::prepareMessage()
 
 void MessageCreatorTool::movePreviewItemTo(const QPointF &newScenePos)
 {
-    m_messageItem->setHead(newScenePos, ObjectAnchor::Snap::NoSnap);
-    m_messageItem->setTail(newScenePos, ObjectAnchor::Snap::NoSnap);
+    m_messageItem->setHead(newScenePos, ObjectAnchor::Snap::SnapTo);
+    m_messageItem->setTail(newScenePos, ObjectAnchor::Snap::SnapTo);
     m_messageItem->setPos(newScenePos);
 }
 

@@ -96,9 +96,7 @@ public:
     bool isConnected() const;
     // End of parsing helper block
 
-#ifdef QT_DEBUG
     QString toDbgString() const;
-#endif
 
 Q_SIGNALS:
     void messageInstanceNameChanged();
@@ -114,4 +112,6 @@ private:
     MscInstance *m_target = nullptr;
     MscParameterList m_parameters;
 };
-}
+} // msc
+
+QDebug operator<<(QDebug dbg, const msc::MscMessage &message);

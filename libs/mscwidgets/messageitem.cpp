@@ -30,6 +30,7 @@
 #include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
 #include "messagedialog.h"
+#include "mscinstance.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -56,12 +57,16 @@ MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
     }
 }
 
-MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem *target, QGraphicsItem *parent)
+MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source, InstanceItem *target,
+                         QGraphicsItem *parent)
     : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
+    , m_chartViewModel(chartView)
 {
     Q_ASSERT(m_message != nullptr);
+
+    setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     updateDisplayText();
@@ -69,11 +74,21 @@ MessageItem::MessageItem(MscMessage *message, InstanceItem *source, InstanceItem
     connect(m_arrowItem, &LabeledArrowItem::textEdited, this, &MessageItem::onRenamed);
     connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
-    setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
-
+    connect(m_message, &msc::MscMessage::sourceChanged, this, [&](msc::MscInstance *mscInstance) {
+        if (!m_chartViewModel)
+            return;
+        msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
+        this->setSourceInstanceItem(instance);
+    });
+    connect(m_message, &msc::MscMessage::targetChanged, this, [&](msc::MscInstance *mscInstance) {
+        if (!m_chartViewModel)
+            return;
+        msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
+        this->setTargetInstanceItem(instance);
+    });
     setInstances(source, target);
 
-    m_arrowItem->setColor(QColor("#3e47e6")); // see https://git.vikingsoftware.com/esa/msceditor/issues/30
+    m_arrowItem->setColor(QColor("#3e47e6"));
     m_arrowItem->setDashed(isCreator());
 }
 
@@ -128,12 +143,27 @@ bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
     if (m_sourceInstance) {
         connect(m_sourceInstance, &InteractiveObject::relocated, this, &MessageItem::onSourceInstanceMoved,
                 Qt::DirectConnection);
-        m_message->setSourceInstance(m_sourceInstance->modelItem());
-    } else
-        m_message->setSourceInstance(nullptr);
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (messagePoints().size() > 1) {
+        QPointF &pt = points.first();
+        if (m_sourceInstance)
+            pt.setX(m_sourceInstance->sceneBoundingRect().center().x());
+        else
+            pt.setX(0);
+        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
+    }
 
     updateTooltip();
+    scheduleLayoutUpdate();
+    Q_EMIT needUpdateLayout();
     return true;
+}
+
+InstanceItem *MessageItem::sourceInstanceItem() const
+{
+    return m_sourceInstance;
 }
 
 bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
@@ -151,12 +181,27 @@ bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
     if (m_targetInstance) {
         connect(m_targetInstance, &InteractiveObject::relocated, this, &MessageItem::onTargetInstanceMoved,
                 Qt::DirectConnection);
-        m_message->setTargetInstance(m_targetInstance->modelItem());
-    } else
-        m_message->setTargetInstance(nullptr);
+    }
+
+    QVector<QPointF> points = messagePoints();
+    if (messagePoints().size() > 1) {
+        QPointF &pt = points.last();
+        if (m_targetInstance)
+            pt.setX(m_targetInstance->sceneBoundingRect().center().x());
+        else
+            pt.setX(0);
+        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
+    }
 
     updateTooltip();
+    scheduleLayoutUpdate();
+    Q_EMIT needUpdateLayout();
     return true;
+}
+
+InstanceItem *MessageItem::targetInstanceItem() const
+{
+    return m_targetInstance;
 }
 
 void MessageItem::updateTooltip()
@@ -211,7 +256,6 @@ void MessageItem::rebuildLayout()
     updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
     updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
 
-    // ensure that ENV has not been replaced by the edge of an instance located nearby
     if (wasGlobal && modelItem()->isGlobal() != wasGlobal) {
         QSignalBlocker suppressDataChanged(m_message);
         if (m_sourceInstance && !qFuzzyCompare(1. + points.first().x(), 1 + m_sourceInstance->centerInScene().x()))
@@ -223,6 +267,8 @@ void MessageItem::rebuildLayout()
 
     if (!geometryManagedByCif())
         onChartBoxChanged(); // extends global message to chart edges, if necessary
+
+    update();
 }
 
 QPainterPath MessageItem::shape() const
@@ -321,7 +367,9 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 
 bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
-    setSourceInstanceItem(keepInstance ? keepInstance : hoveredItem(to));
+    if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo)
+        keepInstance = hoveredItem(to);
+    setSourceInstanceItem(keepInstance);
     const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
     if (res) {
         updateMessagePoints();
@@ -333,7 +381,9 @@ bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap, Insta
 
 bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
-    setTargetInstanceItem(keepInstance ? keepInstance : hoveredItem(to));
+    if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo)
+        keepInstance = hoveredItem(to);
+    setTargetInstanceItem(keepInstance);
     const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
 
     if (res) {
@@ -439,9 +489,9 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
         return;
 
     if (gp->location() == GripPoint::Left)
-        updateSource(to, ObjectAnchor::Snap::NoSnap);
+        updateSource(to, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
     else if (gp->location() == GripPoint::Right)
-        updateTarget(to, ObjectAnchor::Snap::NoSnap);
+        updateTarget(to, ObjectAnchor::Snap::NoSnap, m_targetInstance);
 }
 
 void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
@@ -466,9 +516,9 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
                                         : msc::MscMessage::EndType::TARGET_HEAD);
 }
 
-MessageItem *MessageItem::createDefaultItem(MscMessage *message, const QPointF &pos)
+MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)
 {
-    MessageItem *messageItem = new MessageItem(message);
+    MessageItem *messageItem = new MessageItem(message, chartView);
     static constexpr qreal halfLength(ArrowItem::DEFAULT_WIDTH / 2.);
     const QPointF head(halfLength, pos.y());
     const QPointF tail(-halfLength, pos.y());

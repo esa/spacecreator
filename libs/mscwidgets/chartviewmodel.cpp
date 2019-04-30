@@ -231,7 +231,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 {
     MessageItem *item = itemForMessage(message);
     if (!item) {
-        item = new MessageItem(message);
+        item = new MessageItem(message, this);
         connect(item, &MessageItem::retargeted, this, &ChartViewModel::onMessageRetargeted, Qt::UniqueConnection);
 
         const bool isCreateMsg =
@@ -269,8 +269,8 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         pntTarget.setY(newY);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
-        item->setInstances(sourceItem, targetItem);
         item->setMessagePoints({ pntSource, pntTarget }, utils::CifUpdatePolicy::DontChange);
+        item->setInstances(sourceItem, targetItem);
     }
 
     if (item)
@@ -927,7 +927,7 @@ msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orph
             currentChart()->addInstanceEvent(orphanMessage);
         }
 
-        return MessageItem::createDefaultItem(orphanMessage, pos);
+        return MessageItem::createDefaultItem(orphanMessage, this, pos);
     }
     return nullptr;
 }
@@ -1257,10 +1257,15 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
     Q_ASSERT(message);
 
     MscInstance *newInstance = nearestInstance(pos);
-    MscInstance *currentInstance =
-            endType == MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance();
-    MscInstance *otherInstance =
-            endType == MscMessage::EndType::SOURCE_TAIL ? message->targetInstance() : message->sourceInstance();
+    MscInstance *currentInstance = nullptr;
+    MscInstance *otherInstance = nullptr;
+    if (endType == MscMessage::EndType::SOURCE_TAIL) {
+        currentInstance = message->sourceInstance();
+        otherInstance = message->targetInstance();
+    } else {
+        currentInstance = message->targetInstance();
+        otherInstance = message->sourceInstance();
+    }
     const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
     const int newIdx = eventIndex(pos.y());
     if ((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx) {
