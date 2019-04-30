@@ -40,6 +40,7 @@ void CmdEntityCommentChange::redo()
     if (m_newComment.isEmpty()) {
         if (comment) {
             m_chart->removeInstanceEvent(comment);
+            comment->setComment(m_newComment);
 
             // this command takes over ownership
             comment->setParent(this);

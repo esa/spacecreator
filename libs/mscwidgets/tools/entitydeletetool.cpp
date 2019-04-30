@@ -23,6 +23,7 @@
 #include "coregionitem.h"
 #include "documentitem.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "msccoregion.h"
 #include "mscdocument.h"
 #include "mscentity.h"
@@ -100,23 +101,19 @@ void EntityDeleteTool::deleteSelectedItems()
     }
 
     QVector<msc::MscEntity *> items;
-    QVector<msc::MscEntity *> itemsWithComments;
+    QVector<msc::MscEntity *> comments;
     msc::MscDocument *parentDocument = nullptr;
-
-    auto removeComment = [](QVector<msc::MscEntity *> &items, ChartViewModel *model, CommentItem *commentItem) {
-        const msc::InteractiveObject *iObj = commentItem->object();
-        items.append(iObj ? iObj->modelEntity() : model->currentChart());
-    };
 
     for (auto item : m_view->scene()->selectedItems()) {
         auto obj = dynamic_cast<msc::InteractiveObject *>(item);
         if (obj) {
             if (obj->modelEntity()) {
-                items.append(obj->modelEntity());
-                if (CommentItem *commentItem = m_model->itemForComment(obj->modelEntity()->comment()))
-                    removeComment(itemsWithComments, m_model, commentItem);
-            } else if (CommentItem *commentItem = qobject_cast<CommentItem *>(obj)) {
-                removeComment(itemsWithComments, m_model, commentItem);
+                if (obj->modelEntity()->entityType() == MscEntity::EntityType::Comment) {
+                    if (MscComment *comment = qobject_cast<MscComment *>(obj->modelEntity()))
+                        comments.append(comment->attachedEntity());
+                } else {
+                    items.append(obj->modelEntity());
+                }
             } else if (CoregionItem *coregionItem = qobject_cast<CoregionItem *>(obj)) {
                 items << coregionItem->begin() << coregionItem->end();
             }
@@ -134,7 +131,7 @@ void EntityDeleteTool::deleteSelectedItems()
     }
 
     msc::cmd::CommandsStack::current()->beginMacro(tr("Removing Entities"));
-    for (msc::MscEntity *entity : itemsWithComments) {
+    for (msc::MscEntity *entity : comments) {
         msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
                                       { QVariant::fromValue<msc::MscEntity *>(m_currentChart),
                                         QVariant::fromValue<msc::MscEntity *>(entity), QString() });
