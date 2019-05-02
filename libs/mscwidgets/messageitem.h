@@ -87,6 +87,7 @@ public:
     void setMessagePoints(const QVector<QPointF> &scenePoints, utils::CifUpdatePolicy cifUpdate);
 
     void applyCif() override;
+    void updateCif() override;
 
     QString displayedText() const;
 
@@ -107,7 +108,6 @@ protected:
 
     void prepareHoverMark() override;
     cif::CifLine::CifType mainCifType() const override;
-    void updateCif() override;
 
 private Q_SLOTS:
     void onTextChanged();

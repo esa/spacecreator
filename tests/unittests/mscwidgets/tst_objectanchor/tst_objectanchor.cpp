@@ -138,6 +138,7 @@ void tst_ObjectAnchor::testReplaceSnap()
 {
     const QPointF shift1(1., 0.);
     m_instanceItemA->setPos(300., 300.);
+    m_instanceItemA->setBoundingRect(QRectF(0, 0, 50, 50));
     const QPointF itemCenterA = m_instanceItemA->mapToScene(m_instanceItemA->boundingRect().center());
     const QPointF itemCenterB = m_instanceItemB->mapToScene(m_instanceItemB->boundingRect().center());
     const QPointF anchorPointA(itemCenterA + shift1);

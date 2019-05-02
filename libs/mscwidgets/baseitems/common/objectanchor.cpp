@@ -103,8 +103,9 @@ bool ObjectAnchor::setPoint(const QPointF &scenePoint, ObjectAnchor::Snap snap)
 
     m_scenePoint = scenePoint;
     if (ObjectAnchor::Snap::SnapTo == snap && m_anchorObject) {
-        const QPointF objectCenter = m_anchorObject->sceneBoundingRect().center();
-        m_scenePoint = utils::snapToPointByX(objectCenter, m_scenePoint, utils::LineHoverTolerance);
+        const QRectF objectSceneRect = m_anchorObject->sceneBoundingRect();
+        if (objectSceneRect.contains(m_scenePoint))
+            m_scenePoint.setX(objectSceneRect.center().x());
     }
     notifyChanged();
     return true;

@@ -57,8 +57,10 @@ void tst_ObjectsLink::init()
     m_itemB = new InstanceItem(new MscInstance("B", this));
     m_itemC = new InstanceItem(new MscInstance("C", this));
 
-    for (InstanceItem *item : { m_itemA, m_itemB, m_itemC })
+    for (InstanceItem *item : { m_itemA, m_itemB, m_itemC }) {
         m_scene->addItem(item);
+        item->setBoundingRect(QRectF(0, 0, 50, 50));
+    }
 
     m_itemA->setPos(100., 100.);
     m_itemB->setPos(200., 100.);

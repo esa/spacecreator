@@ -55,16 +55,7 @@ void CmdMessageItemResize::undo()
 
 bool CmdMessageItemResize::mergeWith(const QUndoCommand *command)
 {
-    const CmdMessageItemResize *other = static_cast<const CmdMessageItemResize *>(command);
-    if (canMergeWith(other)) {
-        if (m_endType != other->m_endType) {
-            return false;
-        }
-        m_newIndex = other->m_newIndex;
-        m_newInstance = other->m_newInstance;
-        return true;
-    }
-
+    Q_UNUSED(command);
     return false;
 }
 

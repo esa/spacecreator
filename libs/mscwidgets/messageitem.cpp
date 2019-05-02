@@ -130,8 +130,9 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (m_targetInstance == sourceInstance)
+    if (m_targetInstance == sourceInstance && !m_message->isOrphan())
         return false;
+
     if (sourceInstance == m_sourceInstance)
         return false;
 
@@ -168,8 +169,9 @@ InstanceItem *MessageItem::sourceInstanceItem() const
 
 bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (m_sourceInstance == targetInstance)
+    if (m_sourceInstance == targetInstance && !m_message->isOrphan())
         return false;
+
     if (targetInstance == m_targetInstance)
         return false;
 
@@ -503,12 +505,6 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
         else
             updateTarget(to, ObjectAnchor::Snap::SnapTo);
 
-        if (utils::isHorizontal(messagePoints())) {
-            if (geometryManagedByCif()) {
-                m_message->clearCifs();
-            }
-        } else
-            updateCif();
         Q_EMIT retargeted(this, to, endType);
     };
 
@@ -749,6 +745,9 @@ void MessageItem::updateCif()
 
 void MessageItem::extendGlobalMessage()
 {
+    if (!m_targetInstance && !m_sourceInstance)
+        return;
+
     auto getChartBox = [this]() {
         if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
             return chartItem->sceneBoundingRect(); // NOTE: not a contentRect!
@@ -786,7 +785,7 @@ void MessageItem::extendGlobalMessage()
 
 void MessageItem::onChartBoxChanged()
 {
-    if (!m_message->isGlobal())
+    if (!m_message->isGlobal() || m_message->isOrphan())
         return;
 
     extendGlobalMessage();

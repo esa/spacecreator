@@ -271,6 +271,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
         item->setMessagePoints({ pntSource, pntTarget }, utils::CifUpdatePolicy::DontChange);
         item->setInstances(sourceItem, targetItem);
+        item->setAutoResizable(true);
     }
 
     if (item)
@@ -636,7 +637,8 @@ void ChartViewModel::updateContentBounds()
     for (InteractiveObject *io : d->m_instanceEventItemsSorted)
         if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
             if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
-                messageItem->onChartBoxChanged();
+                if (!messageItem->modelItem()->isOrphan())
+                    messageItem->onChartBoxChanged();
 
     // expand non stopped instances to the bottom
     const qreal targetInstanceBottom = d->m_layoutInfo.m_chartItem->contentRect().bottom();
@@ -1268,13 +1270,25 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
     }
     const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
     const int newIdx = eventIndex(pos.y());
-    if ((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx) {
+    if (((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx)
+        && (newInstance || otherInstance)) {
+
+        if (utils::isHorizontal(item->messagePoints())) {
+            if (item->geometryManagedByCif())
+                item->modelItem()->clearCifs();
+        } else {
+            item->updateCif();
+        }
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                                       { QVariant::fromValue<MscMessage *>(message), newIdx,
                                         QVariant::fromValue<MscInstance *>(newInstance),
                                         QVariant::fromValue<MscMessage::EndType>(endType),
                                         QVariant::fromValue<MscChart *>(d->m_currentChart) });
     } else {
+        if (item->geometryManagedByCif())
+            item->applyCif();
+
+        item->instantLayoutUpdate();
         updateLayout();
     }
 }

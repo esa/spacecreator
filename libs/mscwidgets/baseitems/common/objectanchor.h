@@ -35,7 +35,7 @@ public:
         SnapTo,
         NoSnap
     };
-    ObjectAnchor(QObject *parent = nullptr);
+    explicit ObjectAnchor(QObject *parent = nullptr);
     ObjectAnchor(InteractiveObject *anchorObject, const QPointF &scenePoint, QObject *parent = nullptr);
     ObjectAnchor(const ObjectAnchor &other);
     ~ObjectAnchor();
