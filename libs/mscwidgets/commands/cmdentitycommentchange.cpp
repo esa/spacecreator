@@ -39,8 +39,8 @@ void CmdEntityCommentChange::redo()
     auto comment = m_modelItem->comment();
     if (m_newComment.isEmpty()) {
         if (comment) {
-            m_chart->removeInstanceEvent(comment);
             comment->setComment(m_newComment);
+            m_chart->removeInstanceEvent(comment);
 
             // this command takes over ownership
             comment->setParent(this);
@@ -61,6 +61,7 @@ void CmdEntityCommentChange::undo()
     auto comment = m_modelItem->comment();
     if (m_oldComment.isEmpty()) {
         if (comment) {
+            comment->setComment(m_oldComment);
             m_chart->removeInstanceEvent(comment);
 
             // this command takes over ownership

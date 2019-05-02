@@ -442,6 +442,8 @@ QString MscWriter::serializeComment(const msc::MscEntity *entity, int tabsSize) 
     if (!cifInfo.isEmpty()) {
         cifInfo.prepend(QLatin1Char('\n'));
         cifInfo.append(QLatin1Char('\n'));
+    } else if (commentEntity->comment().isEmpty()) {
+        return {};
     }
 
     return QString("%1 comment '%2'").arg(cifInfo, commentEntity->comment());

@@ -52,9 +52,6 @@ public:
 
     void setGlobalPreview(bool isGlobalPreview);
 
-Q_SIGNALS:
-    void dataChanged();
-
 protected:
     cif::CifLine::CifType mainCifType() const override;
     void prepareHoverMark() override;
