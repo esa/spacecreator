@@ -34,7 +34,7 @@ class MessageItem : public InteractiveObject
     Q_OBJECT
 public:
     struct GeometryNotificationBlocker {
-        GeometryNotificationBlocker(MessageItem *target);
+        explicit GeometryNotificationBlocker(MessageItem *target);
         ~GeometryNotificationBlocker();
 
     private:
