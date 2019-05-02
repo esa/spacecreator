@@ -43,11 +43,13 @@ void CoregionItem::setBegin(MscCoregion *begin)
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     const QRectF rect = boundingRect();
-    painter->fillRect(rect, Qt::white);
     const QLineF topLine = { rect.topLeft(), rect.topRight() };
     const QLineF bottomLine = { rect.bottomLeft(), rect.bottomRight() };
+    painter->setPen(QPen(Qt::darkGray, 2., Qt::SolidLine));
     painter->drawLine(topLine);
     painter->drawLine(bottomLine);
+    painter->setPen(QPen(Qt::white, 3., Qt::SolidLine));
+    painter->drawLine(utils::lineCenter(topLine), utils::lineCenter(bottomLine));
     painter->setPen(QPen(Qt::darkGray, 3., Qt::DashLine));
     if (m_unorderedEntities) {
         painter->drawLine(utils::lineCenter(topLine), utils::lineCenter(bottomLine));
