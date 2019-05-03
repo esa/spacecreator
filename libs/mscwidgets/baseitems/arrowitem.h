@@ -29,7 +29,7 @@ class ArrowItem : public ObjectsLinkItem
 public:
     static constexpr qreal DEFAULT_WIDTH = 100.0;
 
-    ArrowItem(QGraphicsItem *parent = nullptr);
+    explicit ArrowItem(QGraphicsItem *parent = nullptr);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
