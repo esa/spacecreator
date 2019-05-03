@@ -16,7 +16,9 @@
 */
 
 #pragma once
+#include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
+#include "chartviewmodel.h"
 
 #include <QMargins>
 
@@ -32,7 +34,8 @@ class ChartItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit ChartItem(MscChart *chartEntity, QGraphicsItem *parent = nullptr);
+    explicit ChartItem(MscChart *chartEntity, ChartViewModel *chartViewModel = nullptr,
+                       QGraphicsItem *parent = nullptr);
     ~ChartItem() override = default;
 
     QRectF boundingRect() const override;
@@ -43,7 +46,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF contentRect() const;
-    QPointF setContentRect(const QRectF &r);
+    QPointF setContentRect(const QRectF &r, utils::CifUpdatePolicy cifUpdate = utils::CifUpdatePolicy::UpdateIfExists);
 
     static QPointF chartMargin();
     static QMarginsF chartMargins();
@@ -57,7 +60,7 @@ public:
     void updateCif() override;
 
 Q_SIGNALS:
-    void contentRectChanged();
+    void contentRectChanged(const QRectF &contentArea);
 
 public Q_SLOTS:
     void setName(const QString &name);
@@ -71,11 +74,13 @@ private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
     void onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to);
+    void onChartCifRectChanged();
 
 private:
     MscChart *chart() const;
 
 private:
+    QPointer<ChartViewModel> m_chartViewModel;
     QGraphicsRectItem *m_rectItem = nullptr;
     QGraphicsRectItem *m_contentArea = nullptr;
     TextItem *m_textItemName = nullptr;
@@ -83,6 +88,7 @@ private:
     bool m_guard = false;
 
     static QPointF m_margin;
+    void updateCifIfNecessary(utils::CifUpdatePolicy cause);
 };
 
 } // ns msc

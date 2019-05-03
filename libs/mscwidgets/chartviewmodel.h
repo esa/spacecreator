@@ -92,11 +92,14 @@ public:
     void setVisibleItemLimit(int number);
 
     const QPointer<ChartItem> chartItem() const;
+    QRectF minimalContentRect() const;
+    QRectF actualContentRect() const;
 
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
-    void updateContentBounds();
+    void updateChartboxToContent();
+    void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
 
@@ -106,7 +109,7 @@ Q_SIGNALS:
     void cifDataChanged();
 
 private Q_SLOTS:
-    void onInstanceItemMoved(InteractiveObject *instanceItem);
+    void onInstanceGeometryChanged();
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
 
@@ -140,8 +143,6 @@ private:
 
     void storeEntityItem(InteractiveObject *item);
 
-    QRectF minimalContentRect() const;
-
     void connectItems();
     void connectInstanceItem(InteractiveObject *instanceItem);
     void connectInstanceEventItem(InteractiveObject *instanceEventItem);
@@ -152,6 +153,8 @@ private:
     void prepareChartBoxItem();
 
     void applyContentRect(const QRectF &newRect);
+
+    QVariantList prepareChangeOrderCommand(MscInstance *instance) const;
 };
 
 } // namespace msc

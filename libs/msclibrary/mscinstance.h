@@ -19,6 +19,8 @@
 
 #include "mscentity.h"
 
+#include <QSize>
+
 namespace msc {
 
 class MscInstance : public MscEntity
@@ -57,6 +59,9 @@ public:
     bool explicitStop() const;
     void setExplicitStop(bool stop);
 
+    void setCifGeometry(const QVector<QPoint> &cifGeometry);
+    QVector<QPoint> cifGeometry() const;
+
 Q_SIGNALS:
     void denominatorChanged(const QString &denominator);
     void kindChanged(const QString &kind);
@@ -64,6 +69,7 @@ Q_SIGNALS:
     void inheritanceChanged(const QString &inheritance);
     void explicitCreatorChanged(MscInstance *creator);
     void explicitStopChanged(bool value);
+    void cifGeometryChanged();
 
 private:
     QString m_denominator;
@@ -71,6 +77,8 @@ private:
     QString m_inheritance;
     MscInstance *m_explicitCreator = nullptr;
     bool m_explicitStop = false;
+
+    cif::CifBlockShared cifInstance() const;
 };
 
 } // namespace msc

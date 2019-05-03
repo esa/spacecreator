@@ -208,11 +208,14 @@ void MainWindow::selectAndOpenFile()
 
 bool MainWindow::openFileMsc(const QString &file)
 {
-    d->ui->errorTextEdit->appendPlainText(tr("Opening file: %1").arg(file));
+    QString logRecord = tr("Opening file: %1").arg(file);
+    d->ui->errorTextEdit->appendPlainText(logRecord);
+    qDebug() << logRecord;
 
     QFileInfo fileInfo(file);
     if (!fileInfo.exists()) {
-        d->ui->errorTextEdit->appendPlainText(tr("File not exists."));
+        logRecord = tr("File not exists.");
+        d->ui->errorTextEdit->appendPlainText(logRecord);
         return false;
     }
 
@@ -237,8 +240,9 @@ bool MainWindow::openFileMsc(const QString &file)
         loadStatus = tr("failed");
         statusColor = "red";
     }
-    d->ui->errorTextEdit->appendHtml(
-            tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor));
+    logRecord = tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor);
+    d->ui->errorTextEdit->appendHtml(logRecord);
+    qDebug() << logRecord;
 
     return ok;
 }

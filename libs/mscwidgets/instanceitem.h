@@ -40,6 +40,7 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
+    static constexpr qreal DefaultAxisHeight = 100.;
     explicit InstanceItem(MscInstance *instance, MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
@@ -47,7 +48,7 @@ public:
     QString name() const;
     QString kind() const;
 
-    void setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate = utils::CifUpdatePolicy::DontChange);
+    void setAxisHeight(qreal height);
 
     qreal axisHeight() const;
     QLineF axis() const;
@@ -64,6 +65,10 @@ public:
     QRectF boundingRect() const override;
     void updateCif() override;
 
+    QPointF avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const;
+
+    void setInitialLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan);
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);
@@ -77,17 +82,23 @@ protected:
     void prepareHoverMark() override;
     cif::CifLine::CifType mainCifType() const override;
 
+#ifdef QT_DEBUG
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+#endif
+
 private:
     msc::MscInstance *m_instance = nullptr;
     QPointer<msc::MscChart> m_chart;
     QGraphicsLineItem *m_axisSymbol = nullptr;
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
-    qreal m_axisHeight = 150.0;
+    qreal m_axisHeight = DefaultAxisHeight;
 
     Q_INVOKABLE void reflectTextLayoutChange();
 
     void updatePropertyString(const QLatin1String &property, const QString &value);
+
+    QVariantList prepareChangePositionCommand() const;
 
 private Q_SLOTS:
     void onNameEdited(const QString &newName);

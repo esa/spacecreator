@@ -33,8 +33,9 @@ namespace msc {
 
 QPointF ChartItem::m_margin = { 20., 20. };
 
-ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
+ChartItem::ChartItem(MscChart *chart, ChartViewModel *chartViewModel, QGraphicsItem *parent)
     : InteractiveObject(chart, parent)
+    , m_chartViewModel(chartViewModel)
     , m_rectItem(new QGraphicsRectItem(this))
     , m_contentArea(new QGraphicsRectItem(this))
     , m_textItemName(new NameItem(this))
@@ -55,7 +56,8 @@ ChartItem::ChartItem(MscChart *chart, QGraphicsItem *parent)
 
     if (chart) {
         connect(chart, &msc::MscChart::nameChanged, this, &ChartItem::setName);
-        connect(chart, &msc::MscChart::rectChanged, this, &ChartItem::cifChanged);
+        connect(chart, &msc::MscChart::rectChanged, this, &ChartItem::onChartCifRectChanged);
+        connect(chart, &msc::MscChart::dataChanged, this, &ChartItem::cifChanged);
 
         setName(chart->name());
     }
@@ -147,22 +149,37 @@ void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPoi
         break;
     }
 
-    setContentRect(rect);
+    if (m_chartViewModel) {
+        const QRectF &minContentRect = m_chartViewModel->minimalContentRect();
+        rect.setWidth(qMax(minContentRect.width(), rect.width()));
+        rect.setHeight(qMax(minContentRect.height(), rect.height()));
+    }
+
+    QSignalBlocker suppressChartBoxChanged(this);
+    setContentRect(rect, utils::CifUpdatePolicy::DontChange);
 }
 
 void ChartItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
 {
-    msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry,
-                                  { m_prevContentRect, contentRect(), QVariant::fromValue<MscChart *>(chart()) });
+    QRect cifRectPrev;
+    if (!utils::CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << m_prevContentRect;
+
+    const QRectF &chartBox = contentRect();
+    QRect cifRectCurr;
+    if (!utils::CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
+        qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
+
+    const QVariantList params { cifRectPrev, cifRectCurr, QVariant::fromValue<MscChart *>(chart()) };
+    msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry, params);
     m_prevContentRect = QRectF();
-    updateCif();
 }
 
 void ChartItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(GripPoint::Locations { /*GripPoint::Left, */ GripPoint::Top, GripPoint::Right,
-                                                       GripPoint::Bottom, /*GripPoint::TopLeft, GripPoint::BottomLeft,*/
+    m_gripPoints->setUsedPoints(GripPoint::Locations { GripPoint::Left, GripPoint::Top, GripPoint::Right,
+                                                       GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
                                                        GripPoint::TopRight, GripPoint::BottomRight });
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
@@ -180,7 +197,7 @@ QRectF ChartItem::contentRect() const
     return m_contentArea->rect();
 }
 
-QPointF ChartItem::setContentRect(const QRectF &r)
+QPointF ChartItem::setContentRect(const QRectF &r, utils::CifUpdatePolicy cifUpdate)
 {
     const QRectF &currContentRect = contentRect();
     const QPointF &shift = -r.topLeft();
@@ -205,12 +222,11 @@ QPointF ChartItem::setContentRect(const QRectF &r)
 
     updateGripPoints();
 
-    if (geometryManagedByCif())
-        updateCif();
+    updateCifIfNecessary(cifUpdate);
 
     m_guard = false;
 
-    Q_EMIT contentRectChanged();
+    Q_EMIT contentRectChanged(contentRect());
     return shift;
 }
 
@@ -296,6 +312,36 @@ QPainterPath ChartItem::shape() const
     for (const QLineF &line : lines)
         result.addPath(utils::lineShape(line, utils::LineHoverTolerance));
     return result;
+}
+
+void ChartItem::updateCifIfNecessary(utils::CifUpdatePolicy cause)
+{
+    bool writeCif(false);
+    switch (cause) {
+    case utils::CifUpdatePolicy::DontChange: {
+        break;
+    }
+    case utils::CifUpdatePolicy::UpdateIfExists: {
+        writeCif = geometryManagedByCif();
+        break;
+    }
+    case utils::CifUpdatePolicy::ForceCreate: {
+        writeCif = true;
+        break;
+    }
+    }
+    if (writeCif)
+        updateCif();
+}
+
+void ChartItem::onChartCifRectChanged()
+{
+    applyCif();
+    Q_EMIT cifChanged();
+
+    // if it's a result of manual resizing, the following signal wouldn't be fired
+    // within applyCif->setContentRect chain because the rect is the same
+    Q_EMIT contentRectChanged(contentRect());
 }
 
 } // ns msc

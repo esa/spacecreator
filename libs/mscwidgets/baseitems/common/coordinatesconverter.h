@@ -34,6 +34,7 @@ class CoordinatesConverter
 public:
     static void init(QGraphicsScene *scene, ChartItem *chartItem);
     static QPoint sceneToCif(const QPointF &scenePoint, bool *ok = nullptr);
+    static bool sceneToCif(const QPointF &scenePoint, QPoint &cifPoint);
     static QVector<QPoint> sceneToCif(const QVector<QPointF> &scenePoints, bool *ok = nullptr);
     static QPointF cifToScene(const QPoint &cifPoint, bool *ok = nullptr);
     static QVector<QPointF> cifToScene(const QVector<QPoint> &cifPoints, bool *ok);

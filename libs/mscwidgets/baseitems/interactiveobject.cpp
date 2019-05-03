@@ -62,7 +62,7 @@ void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->save();
         painter->setPen(m_selectedPen);
 
-        painter->drawRect(utils::framedRect(m_boundingRect, m_selectedPen.widthF()));
+        painter->drawRect(m_boundingRect);
         painter->restore();
     }
 }

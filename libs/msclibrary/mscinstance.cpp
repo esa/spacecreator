@@ -17,6 +17,10 @@
 
 #include "mscinstance.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
+
+#include <QDebug>
 #include <QStringList>
 
 namespace msc {
@@ -166,6 +170,47 @@ void MscInstance::setExplicitStop(bool stop)
     m_explicitStop = stop;
     Q_EMIT explicitStopChanged(m_explicitStop);
     Q_EMIT dataChanged();
+}
+
+cif::CifBlockShared MscInstance::cifInstance() const
+{
+    return cifBlockByType(cif::CifLine::CifType::Instance);
+}
+
+void MscInstance::setCifGeometry(const QVector<QPoint> &cifGeometry)
+{
+    using namespace cif;
+
+    CifBlockShared instanceCif = cifInstance();
+    if (!instanceCif) {
+        instanceCif = CifBlockFactory::createBlockInstance();
+        addCif(instanceCif);
+    }
+
+    if (!instanceCif->hasPayloadFor(CifLine::CifType::Instance)) {
+        instanceCif->addLine(CifLineShared(new CifLineInstance()));
+    }
+
+    if (cifGeometry.isEmpty())
+        clearCifs();
+    else {
+        const QVector<QPoint> points { cifGeometry.at(0), cifGeometry.at(1), cifGeometry.at(2) };
+        instanceCif->setPayload(QVariant::fromValue(points), CifLine::CifType::Instance);
+    }
+
+    Q_EMIT cifGeometryChanged();
+    Q_EMIT dataChanged();
+}
+
+QVector<QPoint> MscInstance::cifGeometry() const
+{
+    using namespace cif;
+    if (const CifBlockShared &instanceCif = cifInstance()) {
+        const QVector<QPoint> &cifData = instanceCif->payload(CifLine::CifType::Instance).value<QVector<QPoint>>();
+        return cifData;
+    }
+
+    return QVector<QPoint>();
 }
 
 } // namespace msc

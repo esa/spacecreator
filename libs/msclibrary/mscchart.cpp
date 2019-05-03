@@ -582,6 +582,8 @@ void MscChart::setCifRect(const QRect &rect)
         mscDocCif->setPayload(QVariant::fromValue(points), CifLine::CifType::MscDocument);
         Q_EMIT rectChanged();
         Q_EMIT dataChanged(); // update MscTextView
+    } else {
+        qWarning() << "CIF is not supported for \"orphan\" MSC (one that is not enclosed in MSCDOCUMENT)";
     }
 }
 

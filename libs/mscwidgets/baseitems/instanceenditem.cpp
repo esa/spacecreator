@@ -100,7 +100,7 @@ qreal InstanceEndItem::height() const
 
 QRectF InstanceEndItem::boundingRect() const
 {
-    return utils::framedRect(QGraphicsRectItem::boundingRect(), pen().widthF());
+    return rect();
 }
 
 } // ns msc

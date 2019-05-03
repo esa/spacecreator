@@ -101,31 +101,12 @@ QString InstanceItem::kind() const
     return m_headSymbol->kind();
 }
 
-void InstanceItem::setAxisHeight(qreal height, utils::CifUpdatePolicy cifUpdate)
+void InstanceItem::setAxisHeight(qreal height)
 {
-    if (qFuzzyCompare(1. + height, 1. + m_axisHeight) && cifUpdate != utils::CifUpdatePolicy::ForceCreate)
+    if (qFuzzyCompare(1. + height, 1. + m_axisHeight))
         return;
 
     m_axisHeight = height;
-
-    bool writeCif(false);
-    switch (cifUpdate) {
-    case utils::CifUpdatePolicy::DontChange: {
-        break;
-    }
-    case utils::CifUpdatePolicy::UpdateIfExists: {
-        writeCif = geometryManagedByCif();
-        break;
-    }
-    case utils::CifUpdatePolicy::ForceCreate: {
-        writeCif = true;
-        break;
-    }
-    }
-    if (writeCif) {
-        QSignalBlocker suppressCifChanged(this);
-        updateCif();
-    }
 
     rebuildLayout();
 }
@@ -172,10 +153,7 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
-    if (m_boundingRect.isEmpty())
-        applyCif();
-
-    const QPointF &prevP1 = m_axisSymbol->line().p1();
+    //    const QPointF &prevP1 = m_axisSymbol->line().p1();
     QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
     m_boundingRect.setWidth(headRect.width());
@@ -193,20 +171,12 @@ void InstanceItem::rebuildLayout()
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
 
-    if (prevP1 != p1) {
-        // local geometry changed due the text layout change, compensate it:
-        const QPointF &shift = prevP1 - p1;
-        if (!shift.isNull()) {
-            moveSilentlyBy(shift);
-        }
-    }
-
     prepareGeometryChange();
 }
 
 QRectF InstanceItem::boundingRect() const
 {
-    return m_boundingRect.isEmpty() ? QRectF() : (m_headSymbol->boundingRect() | m_endSymbol->boundingRect());
+    return m_boundingRect;
 }
 
 void InstanceItem::applyCif()
@@ -221,15 +191,14 @@ void InstanceItem::applyCif()
             const QPointF &textBoxSize = scenePoints.at(1);
             const QPointF &axisHeight = scenePoints.at(2);
 
-            QSignalBlocker keepSilent(this);
-            QSignalBlocker keepSilentHeader(m_headSymbol);
-
             m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
             const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
             const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
+            // TODO: should we check for overlap here?
             moveBy(shift.x(), shift.y());
 
             m_axisHeight = axisHeight.y();
+            rebuildLayout();
         }
     }
 }
@@ -368,17 +337,14 @@ void InstanceItem::updateCif()
     }
 
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
-    const QPointF &axisStart = axis().p1();
-    const QPointF axisEnd { axisStart.x(), axisStart.y() + m_axisHeight };
-    const QRectF axisRectScene { axisStart, axisEnd };
-
-    QRect textBoxRectCif, axisRectCif;
+    QRect textBoxRectCif;
     if (!utils::CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
         return;
     }
 
-    if (!utils::CoordinatesConverter::sceneToCif(axisRectScene, axisRectCif)) {
+    QPoint axisPointCif;
+    if (!utils::CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
         return;
     }
@@ -387,58 +353,110 @@ void InstanceItem::updateCif()
     Q_ASSERT(cifBlock != nullptr);
 
     const QPoint wh { textBoxRectCif.width(), textBoxRectCif.height() };
-    const QPoint axisHeight { CifBlockInstance::AxisWidth, axisRectCif.height() };
+    const QPoint axisHeight { CifBlockInstance::AxisWidth, axisPointCif.y() };
 
     const QVector<QPoint> &storedCif = cifBlock->payload().value<QVector<QPoint>>();
     const QVector<QPoint> newCif { textBoxRectCif.topLeft(), wh, axisHeight };
     if (cifChangedEnough(storedCif, newCif)) {
         cifBlock->setPayload(QVariant::fromValue(newCif));
-
         Q_EMIT cifChanged();
     }
 }
 
-void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to)
+QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const
 {
-    std::function<QPointF(InstanceItem *, const QPointF &, const QRectF &)> avoidOverlaps;
-    avoidOverlaps = [&avoidOverlaps](InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) {
-        if (delta.isNull())
-            return delta;
+    if (delta.isNull())
+        return delta;
 
-        const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
-        for (InstanceItem *otherItem : utils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
-            if (otherItem != caller) {
-                const QRectF &otherRect = otherItem->sceneBoundingRect();
-                if (callerRect.intersects(otherRect)) {
-                    qreal nextShiftX(0.);
-                    if (delta.x() < 0)
-                        nextShiftX = otherRect.left() - callerRect.right();
-                    else
-                        nextShiftX = otherRect.right() - callerRect.left();
+    const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
+    for (InstanceItem *otherItem : utils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
+        if (otherItem != caller) {
+            const QRectF &otherRect = otherItem->sceneBoundingRect();
+            if (callerRect.intersects(otherRect)) {
+                qreal nextShiftX(0.);
+                if (delta.x() < 0)
+                    nextShiftX = otherRect.left() - callerRect.right();
+                else
+                    nextShiftX = otherRect.right() - callerRect.left();
 
-                    const QPointF nextShift { nextShiftX, 0. };
-                    return nextShift + avoidOverlaps(caller, nextShift, callerRect);
-                }
+                const QPointF nextShift { nextShiftX, 0. };
+                return nextShift + avoidOverlaps(caller, nextShift, callerRect);
             }
         }
+    }
 
-        return QPointF(0., 0.);
-    };
+    return QPointF(0., 0.);
+}
 
+void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to)
+{
     const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
     if (!delta.isNull())
         setPos(pos() + delta);
 
-    const QRectF &myRect = sceneBoundingRect();
-    const QRectF &chartBox = utils::CoordinatesConverter::currentChartItem()
-            ? utils::CoordinatesConverter::currentChartItem()->contentRect()
-            : QRectF();
-    if (!chartBox.isNull()) {
-        utils::CoordinatesConverter::currentChartItem()->setContentRect(chartBox | myRect);
+    const QVariantList &paramsPosition = prepareChangePositionCommand();
+    if (!paramsPosition.isEmpty())
+        cmd::CommandsStack::push(cmd::Id::ChangeInstancePosition, paramsPosition);
+}
+
+#ifdef QT_DEBUG
+void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    auto rectToStr = [](const QRectF &r) {
+        QString res("[%1,%2] (%3,%4)");
+        return res.arg(r.topLeft().x()).arg(r.topLeft().y()).arg(r.width()).arg(r.height());
+    };
+
+    if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
+        const QPoint axisToCif = utils::CoordinatesConverter::sceneToCif({ 0, m_axisHeight });
+        const QPointF axisFromCif = utils::CoordinatesConverter::cifToScene(axisToCif);
+        const QString tt = cifBlock->toString(0) + "\naxis:" + QString::number(m_axisHeight) + " "
+                + QString::number(m_axisSymbol->line().length()) + "\naxisToCif:" + QString::number(axisToCif.x()) + " "
+                + QString::number(axisToCif.y()) + "\naxisFromCif:" + QString::number(axisFromCif.x()) + " "
+                + QString::number(axisFromCif.y()) + "\nme mbr: " + rectToStr(m_boundingRect)
+                + "\nme bb: " + rectToStr(boundingRect()) + "\nme sbr: " + rectToStr(sceneBoundingRect());
+        setToolTip(tt);
     }
 
-    updateCif();
-    Q_EMIT moved(this);
+    InteractiveObject::hoverMoveEvent(event);
+}
+#endif
+
+QVariantList InstanceItem::prepareChangePositionCommand() const
+{
+    const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
+    QRect textBoxRectCif;
+    if (!utils::CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
+        return QVariantList();
+    }
+
+    QPoint axisPointCif;
+    if (!utils::CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
+        qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
+        return QVariantList();
+    }
+
+    const QPoint wh { textBoxRectCif.width(), textBoxRectCif.height() };
+    const QPoint axisHeight { cif::CifBlockInstance::AxisWidth, axisPointCif.y() };
+
+    const QVector<QPoint> geometryHolder { textBoxRectCif.topLeft(), wh, axisHeight };
+    const QVariantList params { QVariant::fromValue(m_instance), QVariant::fromValue(geometryHolder) };
+
+    return params;
+}
+
+void InstanceItem::setInitialLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan)
+{
+    const bool isFirstInstance = m_chart->instances().size() && m_chart->instances().first() == modelItem();
+    const qreal targetX = isFirstInstance ? chartRect.left() : (requested.x() + horSpan);
+    const QRectF &instanceRect = sceneBoundingRect();
+    const QPointF defaultShift { targetX, chartRect.top() - instanceRect.top() };
+    const QPointF &totalShift = avoidOverlaps(this, defaultShift, QRectF());
+
+    const QPointF &shift = (totalShift.x() > defaultShift.x() ? totalShift : defaultShift) - instanceRect.topLeft();
+    if (!shift.isNull())
+        moveSilentlyBy(shift);
 }
 
 } // namespace msc

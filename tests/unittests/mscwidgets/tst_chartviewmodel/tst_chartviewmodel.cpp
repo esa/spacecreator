@@ -278,43 +278,48 @@ void tst_ChartViewModel::testDefaultChartSize()
 
 void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
 {
-    QString mscText = "msc Untitled_MSC;\
-                            instance Instance_1;\
-                            endinstance;\
-                            /* CIF INSTANCE (697, -84) (215, 85) (800, 1374) */\
-                            instance Instance_2;\
-                            endinstance;\
-                        endmsc;";
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                              endinstance;\
+                              /* CIF INSTANCE (695, 42) (72, 31) (800, 264) */\
+                              instance Instance_2;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
     parseMsc(mscText);
 
     QPointer<ChartItem> chartItem = m_chartModel->chartItem();
-    // content area width is kept, but its height is forced to default minimum
-    const qreal inst2Right = m_instanceItems[1]->sceneBoundingRect().right(); // - chartItem->sceneBoundingRect().x();
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().width(), inst2Right));
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), defaultSize.height()));
+    // content area width and height are stretched accordingly to the instance1's CIF
+    const QRectF &inst2Rect = m_instanceItems[1]->sceneBoundingRect();
+    QVERIFY(qFuzzyCompare(chartItem->contentRect().width(), inst2Rect.right()));
+    QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), inst2Rect.height() + inst2Rect.top()));
 }
 
 void tst_ChartViewModel::testCifExtendedChartWidth()
 {
-    QString mscText = "mscdocument Untitled_Document /* MSC AND */;"
-                      "/* CIF MSCDOCUMENT (233, -140) (1290, 1581) */\
-                        mscdocument Untitled_Leaf /* MSC LEAF */;\
-                            msc Untitled_MSC;\
-                                instance Instance_1;\
-                                endinstance;\
-                                /* CIF INSTANCE (1121, -79) (222, 94) (800, 1346) */\
-                                instance Instance_2;\
-                                endinstance;\
-                            endmsc;\
-                        endmscdocument;\
-                    endmscdocument;";
+    const QSizeF chartSize(1425, 575);
+    const QString mscText = QString("mscdocument Untitled_Document /* MSC AND */;\
+                      /* CIF MSCDOCUMENT (0, 0) (%1, %2) */\
+                          mscdocument Untitled_Leaf /* MSC LEAF */;\
+                              msc Untitled_MSC;\
+                                  /* CIF INSTANCE (163, 42) (143, 62) (800, 264) */\
+                                  instance Instance_1;\
+                                  endinstance;\
+                                  instance Instance_2;\
+                                  endinstance;\
+                              endmsc;\
+                          endmscdocument;\
+                      endmscdocument;")
+                                    .arg(chartSize.width())
+                                    .arg(chartSize.height());
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
-    // content area restored completely
-    const QSizeF cifSize(1290, 1581);
-    QVERIFY(std::abs(chartItem->contentRect().width() - cifSize.width()) < m_maxOffset);
-    QVERIFY(std::abs(chartItem->contentRect().height() - cifSize.height()) < m_maxOffset);
+    const QSizeF &chartBoxSize = m_chartModel->chartItem()->contentRect().size();
+    QVERIFY(std::abs(chartBoxSize.width() - chartSize.width()) < m_maxOffset);
+    QVERIFY(std::abs(chartBoxSize.height() - chartSize.height()) < m_maxOffset);
 }
 
 QTEST_MAIN(tst_ChartViewModel)

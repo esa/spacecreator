@@ -168,6 +168,7 @@ void InstanceHeadItem::updateLayout()
 
     // center name horizontaly:
     nameRect.moveCenter(symbolRect.center());
+    nameRect.moveTop(0.);
 
     // shift box downward:
     symbolRect.moveTop(nameRect.bottom());
@@ -196,7 +197,7 @@ void InstanceHeadItem::updateLayout()
 
 QRectF InstanceHeadItem::boundingRect() const
 {
-    return utils::framedRect(childrenBoundingRect(), m_rectItem->pen().widthF());
+    return m_textItemName->boundingRect() | m_rectItem->rect();
 }
 
 QRectF InstanceHeadItem::rectGeometry() const
@@ -277,7 +278,7 @@ void InstanceHeadItem::setTextboxSize(const QSizeF &size)
 
 QRectF InstanceHeadItem::textBoxSceneRect() const
 {
-    return utils::framedRect(m_rectItem->sceneBoundingRect(), m_rectItem->pen().widthF());
+    return m_rectItem->mapRectToScene(m_rectItem->rect());
 }
 
 } // ns msc

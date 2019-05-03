@@ -109,6 +109,13 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePointSrc, bool *ok)
     return mmPoint;
 }
 
+bool CoordinatesConverter::sceneToCif(const QPointF &scenePoint, QPoint &cifPoint)
+{
+    bool converted(false);
+    cifPoint = sceneToCif(scenePoint, &converted);
+    return converted;
+}
+
 QVector<QPoint> CoordinatesConverter::sceneToCif(const QVector<QPointF> &scenePoints, bool *ok)
 {
     if (ok)
@@ -186,11 +193,11 @@ QVector<QPointF> CoordinatesConverter::cifToScene(const QVector<QPoint> &pixelPo
 
 bool CoordinatesConverter::sceneToCif(const QRectF sceneRect, QRect &cifRect)
 {
-    const QVector<QPointF> scenePoints { sceneRect.topLeft(), sceneRect.bottomRight() };
+    const QVector<QPointF> scenePoints { sceneRect.topLeft(), { sceneRect.width(), sceneRect.height() } };
     bool converted(false);
     const QVector<QPoint> &cifPoints = utils::CoordinatesConverter::sceneToCif(scenePoints, &converted);
     if (converted)
-        cifRect = { cifPoints.first(), cifPoints.last() };
+        cifRect = QRect(cifPoints.first(), QSize(cifPoints.last().x(), cifPoints.last().y()));
 
     return converted;
 }

@@ -17,40 +17,32 @@
 
 #pragma once
 
+#include "basecommand.h"
+#include "mscchart.h"
+#include "mscinstance.h"
+
+#include <QPointer>
+#include <QRectF>
+
 namespace msc {
+
 namespace cmd {
 
-enum Id
+class CmdChangeInstancePosition : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    MoveInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    ChangeCommentGeometry,
-    SetAsn1File,
-    ChangeInstancePosition,
-    LastId
-};
+    Q_OBJECT
+public:
+    explicit CmdChangeInstancePosition(MscInstance *instance, const QVector<QPoint> &newCif);
 
-} // ns cmd
-} // ns msc
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+protected:
+    QPointer<MscInstance> m_instance;
+    const QVector<QPoint> m_oldCif;
+    QVector<QPoint> m_newCif;
+};
+} // namespace cmd
+} // namespace msc

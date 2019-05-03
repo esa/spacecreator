@@ -19,6 +19,7 @@
 #include "commands/cmdactioninformaltext.h"
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
+#include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdconditionitemcreate.h"
@@ -115,6 +116,9 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createChartPaste(params);
     case cmd::SetAsn1File:
         return cmd::CommandsFactory::createAsn1File(params);
+    case cmd::ChangeInstancePosition:
+        return cmd::CommandsFactory::createChangeInstancePosition(params);
+
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
         break;
@@ -484,6 +488,16 @@ QUndoCommand *CommandsFactory::createAsn1File(const QVariantList &params)
     if (auto model = params.first().value<MscModel *>()) {
         return new CmdSetAsn1File(model, params.at(1).toString(), params.at(2).toString());
     }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createChangeInstancePosition(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+
+    if (auto instance = params.at(0).value<MscInstance *>())
+        return new CmdChangeInstancePosition(instance, params.at(1).value<QVector<QPoint>>());
 
     return nullptr;
 }
