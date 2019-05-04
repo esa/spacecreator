@@ -286,8 +286,10 @@ void ChartViewModel::doLayout()
     d->m_layoutInfo.m_instancesCommonAxisStart = 0.;
 
     prepareChartBoxItem();
-    if (d->m_layoutInfo.m_chartItem)
+    if (d->m_layoutInfo.m_chartItem) {
+        QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
         d->m_layoutInfo.m_chartItem->applyCif();
+    }
 
     // The calls order below DOES matter
     addInstanceItems(); // which are not highlightable now to avoid flickering
@@ -483,6 +485,21 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
     }
 }
 
+QRectF shrinkChartMargins(const QRectF &from, bool left, bool right)
+{
+    const QMarginsF &chartMargins = ChartItem::chartMargins();
+    QMarginsF toBeRemoved;
+    if (left)
+        toBeRemoved.setLeft(chartMargins.left());
+    if (right)
+        toBeRemoved.setRight(chartMargins.right());
+
+    if (!toBeRemoved.isNull())
+        return from.marginsRemoved(toBeRemoved);
+
+    return from;
+}
+
 /*!
    Returns the scene rectangle of all instances and events
  */
@@ -571,32 +588,39 @@ QRectF ChartViewModel::minimalContentRect() const
 
     QRectF contentRect = instances | events;
     contentRect.setBottom(events.bottom() + InstanceEndItem::EndSymbolHeight);
-    contentRect.setTopLeft(QPointF(0., 0.));
+    if (!contentRect.topLeft().isNull()) {
+        if (contentRect.topLeft().x() < 0)
+            contentRect.moveTopLeft(QPointF(0., 0.));
+        else
+            contentRect.setTopLeft(QPointF(0., 0.));
+    }
+
     return contentRect;
 }
 
 QRectF ChartViewModel::actualContentRect() const
 {
     QRectF r;
-    bool haveGlobalMessages(false);
+    bool globalToLeft(false), globalToRight(false);
     for (InteractiveObject *io : d->allItems()) {
         r |= io->sceneBoundingRect();
-        if (!haveGlobalMessages && !d->m_instanceEventItemsSorted.isEmpty()) {
+        if (!(globalToLeft || globalToRight) && !d->m_instanceEventItemsSorted.isEmpty()) {
             if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message) {
                 if (MessageItem *messageItem = qobject_cast<MessageItem *>(io)) {
                     if (messageItem->modelItem()->isGlobal()) {
-                        if (utils::isHorizontal(messageItem->tail(), messageItem->head()))
-                            haveGlobalMessages = true;
+                        if (utils::isHorizontal(messageItem->tail(), messageItem->head())) {
+                            globalToLeft = true;
+                            globalToRight = true;
+                        }
                     }
                 }
             }
         }
     }
 
-    if (haveGlobalMessages)
-        r = r.marginsRemoved(ChartItem::chartMargins());
+    r = shrinkChartMargins(r, globalToLeft, globalToRight);
 
-    r.setTopLeft(QPointF(0., 0.));
+    //    r.setTopLeft(QPointF(0., 0.));
 
     return r;
 }
@@ -710,7 +734,6 @@ void ChartViewModel::updateContentToChartbox(const QRectF &chartBoxRect)
     const int totalItemsCount = d->allItemsCount();
     d->m_layoutInfo.m_chartItem->setZValue(-totalItemsCount);
 
-    qDebug() << "applying:" << chartBox;
     applyContentRect(chartBox);
 
     if (chartBox == actualContentRect())
@@ -1269,11 +1292,26 @@ void ChartViewModel::onInstanceGeometryChanged()
         if (InstanceItem *instanceItem = itemForInstance(instance)) {
             qDebug() << "onInstanceGeometryChanged:" << instanceItem->name() << instanceItem->sceneBoundingRect();
 
+            const QRectF &newGeom = instanceItem->sceneBoundingRect();
             const QVariantList &changeOrderParams = prepareChangeOrderCommand(instance);
             if (!changeOrderParams.isEmpty())
                 msc::cmd::CommandsStack::push(msc::cmd::MoveInstance, changeOrderParams);
             else
                 updateLayout();
+
+            QPointF shiftToPositives;
+            if (newGeom.topLeft().x() < 0)
+                shiftToPositives.rx() = -newGeom.topLeft().x();
+            if (newGeom.topLeft().y() < 0)
+                shiftToPositives.ry() = -newGeom.topLeft().y();
+
+            if (!shiftToPositives.isNull()) {
+                for (InstanceItem *item : d->m_instanceItemsSorted) {
+                    item->moveBy(shiftToPositives.x(), shiftToPositives.y());
+                    if (item->geometryManagedByCif())
+                        item->updateCif();
+                }
+            }
         }
 }
 
@@ -1498,7 +1536,10 @@ void ChartViewModel::prepareChartBoxItem()
 
 void ChartViewModel::applyContentRect(const QRectF &newRect)
 {
+    qDebug() << "applyContentRect-1:" << d->m_layoutInfo.m_chartItem->contentRect() << newRect;
     QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
     d->m_layoutInfo.m_chartItem->setContentRect(newRect);
+    qDebug() << "applyContentRect-2:" << d->m_layoutInfo.m_chartItem->contentRect() << newRect;
 }
+
 } // namespace msc

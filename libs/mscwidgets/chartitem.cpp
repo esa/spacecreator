@@ -46,7 +46,7 @@ ChartItem::ChartItem(MscChart *chart, ChartViewModel *chartViewModel, QGraphicsI
     m_rectItem->setPen(framePen);
     m_rectItem->setBrush(Qt::white);
 
-    m_contentArea->setPen(QColor(Qt::white));
+    m_contentArea->setPen(QColor(Qt::black));
     m_contentArea->setBrush(Qt::white);
 
     m_textItemName->setEditable(true);

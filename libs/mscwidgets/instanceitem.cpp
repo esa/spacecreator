@@ -455,8 +455,12 @@ void InstanceItem::setInitialLocation(const QPointF &requested, const QRectF &ch
     const QPointF &totalShift = avoidOverlaps(this, defaultShift, QRectF());
 
     const QPointF &shift = (totalShift.x() > defaultShift.x() ? totalShift : defaultShift) - instanceRect.topLeft();
-    if (!shift.isNull())
-        moveSilentlyBy(shift);
+    if (!shift.isNull()) {
+        const QPointF horShift(shift.x(), 0.);
+        const QPointF verShift(0., shift.y());
+        moveBy(horShift.x(), horShift.y()); // notify any attached message so it could update itself
+        moveSilentlyBy(verShift); // but don't move its head/tail vertically
+    }
 }
 
 } // namespace msc
