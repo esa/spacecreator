@@ -18,6 +18,7 @@
 
 #include "arrowitem.h"
 #include "baseitems/msgidentificationitem.h"
+#include "chartitem.h"
 #include "common/objectslink.h"
 #include "common/utils.h"
 
@@ -135,68 +136,39 @@ void LabeledArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 QPainterPath LabeledArrowItem::shape() const
 {
-    QPainterPath arrowShape(m_itemArrow->shape());
-    QPainterPath textShape(m_itemText->shape());
-    textShape.translate(m_itemText->pos());
-    arrowShape.addPath(textShape);
-    return arrowShape;
+    return m_itemArrow->shape();
 }
 
 QRectF LabeledArrowItem::boundingRect() const
 {
     const qreal penWidth = m_selectionHighlighterPen.widthF();
-    const QRectF &textBox = textBoundingRect();
-    const QVector<QPointF> &trajectory = arrow()->turnPoints();
-    if (trajectory.isEmpty())
-        return utils::framedRect(textBox, penWidth);
-
-    const QPointF &tail = trajectory.first();
-    const QPointF &head = trajectory.last();
-
-    if (qFuzzyCompare(tail.y(), head.y()) && trajectory.size() == 2) {
-        // this takes into account dimensions of the triangle sign
-        return utils::framedRect(childrenBoundingRect(), penWidth);
-    }
-
-    // construct a rect where one couple of corners is the tail and head points
-    // (in the case when the arrow consits of just a pair of points)
-    // or includes all the points set (for more complex arrows).
-
-    QPointF topLeft(tail), bottomRight(head);
-    for (const QPointF &currentPoint : trajectory) {
-        topLeft.rx() = qMin(topLeft.x(), currentPoint.x());
-        topLeft.ry() = qMin(topLeft.y(), currentPoint.y());
-
-        bottomRight.rx() = qMax(bottomRight.x(), currentPoint.x());
-        bottomRight.ry() = qMax(bottomRight.y(), currentPoint.y());
-    }
-
-    const QRectF arrowRect { topLeft, bottomRight };
-    return utils::framedRect((textBox | arrowRect), penWidth);
+    return utils::framedRect(m_itemArrow->boundingRect(), penWidth);
 }
 
 QRectF LabeledArrowItem::textBoundingRect() const
 {
-    return m_itemText->boundingRect().translated(m_itemText->pos());
+    return m_itemText->sceneBoundingRect();
 }
 
 void LabeledArrowItem::updateLayout()
 {
-    const QRectF arrowRect(m_itemArrow->boundingRect());
-    m_itemText->adjustSize();
-    const QRectF textRectCurrent(m_itemText->boundingRect().translated(m_itemText->pos()));
-    QRectF textRect(textRectCurrent);
+    const qreal textWidth = QFontMetrics(m_itemText->font()).width(m_itemText->toPlainText()) + TextMargin * 2;
+    const QLineF axis = startSignPos().x() < endSignPos().x() ? QLineF { startSignPos(), endSignPos() }
+                                                              : QLineF { endSignPos(), startSignPos() };
+    const qreal angle = axis.angle();
+    const QMarginsF margins = ChartItem::chartMargins();
+    m_itemText->setTextWidth(axis.isNull() ? textWidth
+                                           : (axis.length() - 2 * (margins.left() + margins.right() + TextMargin * 2)));
 
-    const QLineF axis(startSignPos(), endSignPos());
-    textRect.moveCenter(utils::lineCenter(axis));
-
+    QLineF normalVector = axis.normalVector();
+    normalVector.setLength(m_itemText->boundingRect().height());
+    QLineF destVector;
+    destVector.setP1(normalVector.p2());
+    destVector.setAngle(angle);
+    destVector.setLength((axis.length() - m_itemText->textWidth()) / 2);
+    m_itemText->setPos(destVector.p2());
+    m_itemText->setRotation(-angle);
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
-
-    const QPointF &arrowCenter(arrowRect.center());
-    textRect.moveBottom(arrowCenter.y() - ArrowSign::ARROW_HEIGHT / 2 - TextMargin);
-
-    const QPointF delta = textRect.center() - textRectCurrent.center();
-    m_itemText->moveBy(delta.x(), delta.y());
     prepareGeometryChange();
 
     Q_EMIT layoutChanged();

@@ -541,24 +541,11 @@ QRectF ChartViewModel::minimalContentRect() const
         MscMessage *message = static_cast<MscMessage *>(item->modelEntity());
         if (message->isGlobal()) {
             if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
-                // if it's a simple (two point) horizontal message only its height
-                // and title width
-                // is accounted since it will be extended to the chart edge afterwhile
                 // TODO: add support for complex global message
                 // TODO: include name rect into min bounding box
-                if (utils::isHorizontal(messageItem->tail(), messageItem->head()) || message->isGlobal()) {
-                    const QPointF &currCenter = currRect.center();
-
-                    // Using doubled title box width below instead of doing "real" geometry
-                    // calculation seems to be enough here, it allows to avoid the detection
-                    // of direction to the appropiate nearest chart box edge, etc:
-                    currRect.setWidth(messageItem->textBoundingRect().width() * (message->isGlobal() ? 2. : 1.));
-
-                    InstanceItem *connectedInstance = itemForInstance(
-                            message->sourceInstance() ? message->sourceInstance() : message->targetInstance());
-                    const QPointF newCenter { connectedInstance->sceneBoundingRect().center().x(), currCenter.y() };
-                    currRect.moveCenter(newCenter);
-                }
+                // TODO: add proper calculation according to the arrow direction
+                if (message->isGlobal())
+                    currRect = currRect.marginsRemoved(2 * ChartItem::chartMargins());
             }
         }
         return currRect;
@@ -608,10 +595,8 @@ QRectF ChartViewModel::actualContentRect() const
             if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message) {
                 if (MessageItem *messageItem = qobject_cast<MessageItem *>(io)) {
                     if (messageItem->modelItem()->isGlobal()) {
-                        if (utils::isHorizontal(messageItem->tail(), messageItem->head())) {
-                            globalToLeft = true;
-                            globalToRight = true;
-                        }
+                        globalToLeft = true;
+                        globalToRight = true;
                     }
                 }
             }
