@@ -28,6 +28,7 @@ HEADERS += \
     baseitems/msgidentificationitem.h \
     baseitems/objectslinkitem.h \
     baseitems/textitem.h \
+    commands/cmdchangeinstanceorder.h \
     commands/cmdchangeinstanceposition.h \
     commands/cmdchartitemchangegeometry.h \
     commands/cmdcommentitemchangegeometry.h \
@@ -51,7 +52,6 @@ HEADERS += \
     commands/cmdhierarchytypechange.h \
     commands/cmdinstancestopchange.h \
     commands/cmdinstanceitemcreate.h \
-    commands/cmdinstanceitemmove.h \
     commands/cmdinstancekindchange.h \
     commands/cmdmessageitemcreate.h \
     commands/cmdmessageitemresize.h \
@@ -106,6 +106,7 @@ SOURCES += \
     baseitems/msgidentificationitem.cpp \
     baseitems/objectslinkitem.cpp \
     baseitems/textitem.cpp \
+    commands/cmdchangeinstanceorder.cpp \
     commands/cmdchangeinstanceposition.cpp \
     commands/cmdchartitemchangegeometry.cpp \
     commands/cmdcommentitemchangegeometry.cpp \
@@ -128,7 +129,6 @@ SOURCES += \
     commands/cmdhierarchytypechange.cpp \
     commands/cmdinstancestopchange.cpp \
     commands/cmdinstanceitemcreate.cpp \
-    commands/cmdinstanceitemmove.cpp \
     commands/cmdinstancekindchange.cpp \
     commands/cmdmessageitemcreate.cpp \
     commands/cmdmessageitemresize.cpp \

@@ -28,10 +28,10 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdInstanceItemMove : public BaseCommand
+class CmdChangeInstanceOrder : public BaseCommand
 {
 public:
-    CmdInstanceItemMove(msc::MscInstance *instance, int pos, MscChart *chart);
+    CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, MscChart *chart);
 
     void redo() override;
     void undo() override;

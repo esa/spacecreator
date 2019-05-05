@@ -16,7 +16,7 @@
    <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdinstanceitemmove.h"
+#include "cmdchangeinstanceorder.h"
 
 #include "mscchart.h"
 #include "mscinstance.h"
@@ -24,7 +24,7 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemMove::CmdInstanceItemMove(msc::MscInstance *instance, int pos, MscChart *chart)
+CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, MscChart *chart)
     : BaseCommand(instance)
     , m_instance(instance)
     , m_chart(chart)
@@ -34,21 +34,21 @@ CmdInstanceItemMove::CmdInstanceItemMove(msc::MscInstance *instance, int pos, Ms
     setText(QObject::tr("Move instance"));
 }
 
-void CmdInstanceItemMove::redo()
+void CmdChangeInstanceOrder::redo()
 {
     if (m_chart && m_instance)
-        m_chart->updateInstancePos(m_instance, m_posTo);
+        m_chart->updateInstanceOrder(m_instance, m_posTo);
 }
 
-void CmdInstanceItemMove::undo()
+void CmdChangeInstanceOrder::undo()
 {
     if (m_chart && m_instance)
-        m_chart->updateInstancePos(m_instance, m_posFrom);
+        m_chart->updateInstanceOrder(m_instance, m_posFrom);
 }
 
-bool CmdInstanceItemMove::mergeWith(const QUndoCommand *command)
+bool CmdChangeInstanceOrder::mergeWith(const QUndoCommand *command)
 {
-    const CmdInstanceItemMove *other = static_cast<const CmdInstanceItemMove *>(command);
+    const CmdChangeInstanceOrder *other = static_cast<const CmdChangeInstanceOrder *>(command);
     if (canMergeWith(other)) {
         m_posTo = other->m_posTo;
         return true;
@@ -57,9 +57,9 @@ bool CmdInstanceItemMove::mergeWith(const QUndoCommand *command)
     return false;
 }
 
-int CmdInstanceItemMove::id() const
+int CmdChangeInstanceOrder::id() const
 {
-    return msc::cmd::Id::MoveInstance;
+    return msc::cmd::Id::ReorderInstance;
 }
 
 } // namespace cmd

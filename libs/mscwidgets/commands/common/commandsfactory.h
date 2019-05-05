@@ -37,7 +37,7 @@ public:
     static QUndoCommand *createMessageItemRetarget(const QVariantList &params);
     static QUndoCommand *createMessageItemCreate(const QVariantList &params);
     static QUndoCommand *createSetParameterList(const QVariantList &params);
-    static QUndoCommand *createInstanceItemMove(const QVariantList &params);
+    static QUndoCommand *createChangeInstanceOrder(const QVariantList &params);
     static QUndoCommand *createInstanceItemCreate(const QVariantList &params);
     static QUndoCommand *createInstanceKindChange(const QVariantList &params);
     static QUndoCommand *createInstanceStopChange(const QVariantList &params);

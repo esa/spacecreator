@@ -19,6 +19,7 @@
 #include "commands/cmdactioninformaltext.h"
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdactionitemmove.h"
+#include "commands/cmdchangeinstanceorder.h"
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdcommentitemchangegeometry.h"
@@ -32,7 +33,6 @@
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdhierarchytypechange.h"
 #include "commands/cmdinstanceitemcreate.h"
-#include "commands/cmdinstanceitemmove.h"
 #include "commands/cmdinstancekindchange.h"
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
@@ -76,8 +76,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createMessageItemCreate(params);
     case cmd::SetParameterList:
         return cmd::CommandsFactory::createSetParameterList(params);
-    case cmd::MoveInstance:
-        return cmd::CommandsFactory::createInstanceItemMove(params);
+    case cmd::ReorderInstance:
+        return cmd::CommandsFactory::createChangeInstanceOrder(params);
     case cmd::CreateInstance:
         return cmd::CommandsFactory::createInstanceItemCreate(params);
     case cmd::RenameInstanceKind:
@@ -213,14 +213,14 @@ QUndoCommand *CommandsFactory::createSetParameterList(const QVariantList &params
     return new CmdSetParameterList(entity, parameters);
 }
 
-QUndoCommand *CommandsFactory::createInstanceItemMove(const QVariantList &params)
+QUndoCommand *CommandsFactory::createChangeInstanceOrder(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 3);
 
     if (MscInstance *item = params.first().value<MscInstance *>()) {
         const int &toIdx = params.at(1).toInt();
         if (msc::MscChart *chart = params.at(2).value<msc::MscChart *>()) {
-            return new CmdInstanceItemMove(item, toIdx, chart);
+            return new CmdChangeInstanceOrder(item, toIdx, chart);
         }
     }
 

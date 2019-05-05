@@ -64,7 +64,7 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
-    void updateInstancePos(MscInstance *instance, int pos);
+    void updateInstanceOrder(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
     void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
     void updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos);
@@ -83,7 +83,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance, int pos);
     void instanceRemoved(MscInstance *instance);
-    void instanceMoved(MscInstance *instance, int from, int to);
+    void instanceOrderChanged(MscInstance *instance, int from, int to);
     void instanceEventAdded(MscInstanceEvent *message);
     void instanceEventRemoved(MscInstanceEvent *message);
     void eventMoved();

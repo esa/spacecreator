@@ -332,7 +332,7 @@ MscEntity::EntityType MscChart::entityType() const
     return MscEntity::EntityType::Chart;
 }
 
-void MscChart::updateInstancePos(MscInstance *instance, int pos)
+void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
 {
     Q_ASSERT(instance);
 
@@ -345,7 +345,7 @@ void MscChart::updateInstancePos(MscInstance *instance, int pos)
     m_instances.takeAt(currPos);
     m_instances.insert(pos, instance);
 
-    Q_EMIT instanceMoved(instance, currPos, pos);
+    Q_EMIT instanceOrderChanged(instance, currPos, pos);
     Q_EMIT dataChanged();
 }
 

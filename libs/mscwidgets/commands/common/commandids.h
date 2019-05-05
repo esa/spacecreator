@@ -26,7 +26,7 @@ enum Id
     DeleteEntity,
     RetargetMessage,
     CreateMessage,
-    MoveInstance,
+    ReorderInstance,
     CreateInstance,
     StopInstance,
     RenameInstanceKind,
