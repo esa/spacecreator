@@ -255,8 +255,10 @@ void MessageItem::rebuildLayout()
 
     const bool wasGlobal = modelItem()->isGlobal();
 
-    updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
-    updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
+    if (points.first() != tail())
+        updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
+    if (points.last() != head())
+        updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
 
     if (wasGlobal && modelItem()->isGlobal() != wasGlobal) {
         QSignalBlocker suppressDataChanged(m_message);
@@ -499,17 +501,10 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
 void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
 {
     // @todo use a command to support undo
-    auto commitUpdate = [&](msc::MscMessage::EndType endType) {
-        if (endType == msc::MscMessage::EndType::SOURCE_TAIL)
-            updateSource(to, ObjectAnchor::Snap::SnapTo);
-        else
-            updateTarget(to, ObjectAnchor::Snap::SnapTo);
-
-        Q_EMIT retargeted(this, to, endType);
-    };
-
-    commitUpdate(pos == GripPoint::Left ? msc::MscMessage::EndType::SOURCE_TAIL
-                                        : msc::MscMessage::EndType::TARGET_HEAD);
+    updateCif();
+    Q_EMIT retargeted(this, to,
+                      pos == GripPoint::Left ? msc::MscMessage::EndType::SOURCE_TAIL
+                                             : msc::MscMessage::EndType::TARGET_HEAD);
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)

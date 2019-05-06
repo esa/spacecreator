@@ -205,7 +205,7 @@ void ChartViewModel::fillView(MscChart *chart)
     connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
             QOverload<msc::MscInstance *>::of(&ChartViewModel::removeInstanceItem));
-    //    connect(d->m_currentChart, &msc::MscChart::instanceOrderChanged, this, &ChartViewModel::updateLayout);
+    connect(d->m_currentChart, &msc::MscChart::instanceOrderChanged, this, &ChartViewModel::updateLayout);
 
     connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartViewModel::removeEventItem);
@@ -1281,8 +1281,8 @@ void ChartViewModel::onInstanceGeometryChanged()
             const QVariantList &changeOrderParams = prepareChangeOrderCommand(instance);
             if (!changeOrderParams.isEmpty())
                 msc::cmd::CommandsStack::push(msc::cmd::ReorderInstance, changeOrderParams);
-
-            updateLayout();
+            else
+                updateLayout();
 
             QPointF shiftToPositives;
             if (newGeom.topLeft().x() < 0)
