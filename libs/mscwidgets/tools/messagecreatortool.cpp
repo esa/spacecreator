@@ -215,7 +215,7 @@ void MessageCreatorTool::processMouseMoveDrag(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::SnapTo);
+            updateMessageHead(scenePos);
             break;
         }
         }
@@ -264,7 +264,7 @@ void MessageCreatorTool::processMouseMoveClick(QMouseEvent *e)
             break;
         }
         case Step::ChooseTarget: {
-            m_messageItem->setHead(scenePos, ObjectAnchor::Snap::SnapTo);
+            updateMessageHead(scenePos);
             break;
         }
         }
@@ -351,13 +351,16 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
         --pointId;
     }
 
-    // ensure the direction is Top to Bottom:
-    if (points.size() > 1) {
-        const QPointF &start(points.first());
-        const QPointF &end(points.last());
-        const QPointF &endCorrected = { end.x(), qMax(start.y(), end.y()) };
-        if (end != endCorrected)
-            points.replace(points.size() - 1, endCorrected);
+    // prevent points to have negative coordinates:
+    for (int i = 0; i < points.size(); ++i) {
+        QPointF point(points.at(i));
+        if (point.x() < 0.)
+            point.rx() = 0.;
+        if (point.y() < 0.)
+            point.ry() = 0.;
+
+        if (point != points.at(i))
+            points.replace(i, point);
     }
 
     // snap to instances, if any:
@@ -367,9 +370,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
     if (MscInstance *targetInstance = message->targetInstance())
         snapToInstance(targetInstance, points, points.size() - 1);
 
-    m_messageItem->setMessagePoints(points,
-                                    utils::isHorizontal(points) ? utils::CifUpdatePolicy::DontChange
-                                                                : utils::CifUpdatePolicy::ForceCreate);
+    m_messageItem->setMessagePoints(points);
 
     return points.size() > 1;
 }
@@ -457,6 +458,18 @@ void MessageCreatorTool::finishArrowCreation(const QPointF &scenePos)
     if (m_messageItem) {
         movePreviewItemTo(scenePos);
     }
+}
+
+void MessageCreatorTool::updateMessageHead(const QPointF &to)
+{
+    QPointF head(to);
+    const QPointF &tail = m_messageItem->tail();
+
+    // prevent the arrow being upward:
+    if (head.y() < tail.y())
+        head.ry() = tail.y();
+
+    m_messageItem->setHead(head, ObjectAnchor::Snap::SnapTo);
 }
 
 } // ns msc

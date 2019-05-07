@@ -78,6 +78,8 @@ private:
     MscMessage::MessageType m_messageType;
 
     void finishArrowCreation(const QPointF &scenePos);
+
+    void updateMessageHead(const QPointF &to);
 };
 
 } // ns msc

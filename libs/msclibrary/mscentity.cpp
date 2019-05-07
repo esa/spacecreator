@@ -131,8 +131,10 @@ cif::CifBlockShared MscEntity::cifBlockByType(cif::CifLine::CifType type) const
 
 void MscEntity::clearCifs()
 {
-    m_cifs.clear();
-    Q_EMIT dataChanged();
+    if (!m_cifs.isEmpty()) {
+        m_cifs.clear();
+        Q_EMIT dataChanged();
+    }
 }
 
 #ifdef QT_DEBUG

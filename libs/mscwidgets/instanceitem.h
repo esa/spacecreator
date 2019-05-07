@@ -69,6 +69,8 @@ public:
 
     void setInitialLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan);
 
+    QRectF kindBox() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);

@@ -17,40 +17,32 @@
 
 #pragma once
 
+#include "basecommand.h"
+#include "mscmessage.h"
+
+#include <QPointer>
+
 namespace msc {
+
+class MscChart;
+class MscInstance;
+
 namespace cmd {
 
-enum Id
+class CmdMessagePointsEdit : public BaseCommand
 {
-    RenameEntity = 0,
-    DeleteEntity,
-    RetargetMessage,
-    CreateMessage,
-    ReorderInstance,
-    CreateInstance,
-    StopInstance,
-    RenameInstanceKind,
-    CreateCondition,
-    MoveCondition,
-    CreateAction,
-    MoveAction,
-    InformatActionText,
-    CreateTimer,
-    MoveTimer,
-    HierarchyType,
-    CreateDocument,
-    ChangeComment,
-    MoveDocument,
-    SetParameterList,
-    SetMessageDeclarations,
-    PasteChart,
-    CreateCoregion,
-    ChangeChartGeometry,
-    ChangeCommentGeometry,
-    SetAsn1File,
-    ChangeInstancePosition,
-    EditMessagePoints,
-    LastId
+public:
+    CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<MscMessage> m_message;
+    QVector<QPoint> m_newCif;
+    const QVector<QPoint> m_oldCif;
 };
 
 } // ns cmd

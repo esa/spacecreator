@@ -17,6 +17,8 @@
 
 #include "mscmessage.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "mscinstance.h"
 
 #include <QDebug>
@@ -27,6 +29,8 @@
  */
 
 namespace msc {
+
+const cif::CifLine::CifType MscMessage::m_messageCifMainType = cif::CifLine::CifType::Message;
 
 MscMessage::MscMessage(QObject *parent)
     : MscInstanceEvent(parent)
@@ -188,6 +192,48 @@ QString MscMessage::toDbgString() const
         return instance ? instance->name() : envName;
     };
     return QString("%1->%2:%3").arg(instanceName(m_source), instanceName(m_target), name());
+}
+
+cif::CifBlockShared MscMessage::cifMessage() const
+{
+    return cifBlockByType(m_messageCifMainType);
+}
+
+QVector<QPoint> MscMessage::cifPoints() const
+{
+    using namespace cif;
+
+    if (const cif::CifBlockShared &cif = cifMessage())
+        if (cif->hasPayloadFor(m_messageCifMainType))
+            return cif->payload(m_messageCifMainType).value<QVector<QPoint>>();
+
+    return {};
+}
+
+void MscMessage::setCifPoints(const QVector<QPoint> &points)
+{
+    using namespace cif;
+
+    if (points.isEmpty()) {
+        clearCifs();
+        Q_EMIT cifPointsChanged();
+        Q_EMIT dataChanged(); // update MscTextView
+        return;
+    }
+
+    CifBlockShared msgCif = cifMessage();
+    if (!msgCif) {
+        msgCif = CifBlockFactory::createBlockMessage();
+        addCif(msgCif);
+    }
+
+    if (!msgCif->hasPayloadFor(m_messageCifMainType)) {
+        msgCif->addLine(CifLineShared(new CifLineMessage()));
+    }
+
+    msgCif->setPayload(QVariant::fromValue(points), m_messageCifMainType);
+    Q_EMIT cifPointsChanged();
+    Q_EMIT dataChanged(); // update MscTextView
 }
 
 } // namespace msc

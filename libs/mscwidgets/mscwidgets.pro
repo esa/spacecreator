@@ -33,6 +33,7 @@ HEADERS += \
     commands/cmdchartitemchangegeometry.h \
     commands/cmdcommentitemchangegeometry.h \
     commands/cmdcoregionitemcreate.h \
+    commands/cmdmessagepointsedit.h \
     commands/cmdsetasn1file.h \
     commands/cmdsetmessagedeclarations.h \
     commands/common/commandids.h \
@@ -111,6 +112,7 @@ SOURCES += \
     commands/cmdchartitemchangegeometry.cpp \
     commands/cmdcommentitemchangegeometry.cpp \
     commands/cmdcoregionitemcreate.cpp \
+    commands/cmdmessagepointsedit.cpp \
     commands/cmdsetasn1file.cpp \
     commands/cmdsetmessagedeclarations.cpp \
     commands/common/commandsfactory.cpp \

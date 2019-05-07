@@ -240,7 +240,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
 
         if (isCreateMsg && !targetItem->geometryManagedByCif()) {
             QLineF axisLine(targetItem->axis());
-            axisLine.setP1({ axisLine.x1(), newY + InstanceHeadItem::StartSymbolHeight / 2. });
+            axisLine.setP1({ axisLine.x1(), newY });
 
             const qreal deltaY = targetItem->axis().length() - axisLine.length();
 
@@ -249,7 +249,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
             }
 
             targetItem->setAxisHeight(axisLine.length());
-            targetItem->moveSilentlyBy({ 0., deltaY });
+            targetItem->moveSilentlyBy({ 0., deltaY + targetItem->kindBox().height() / 2 });
         }
 
         QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center() : d->m_layoutInfo.m_pos;
@@ -258,7 +258,7 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
         pntTarget.setY(newY);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
-        item->setMessagePoints({ pntSource, pntTarget }, utils::CifUpdatePolicy::DontChange);
+        item->setMessagePoints({ pntSource, pntTarget });
         item->setInstances(sourceItem, targetItem);
         item->setAutoResizable(true);
     }
@@ -471,7 +471,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             if (createdInstanceItem && creatorInstanceItem && messageItem) {
                 if (event->entityType() == MscEntity::EntityType::Create) {
                     if (!createdInstanceItem->geometryManagedByCif())
-                        createdInstanceItem->moveBy(0., deltaY);
+                        createdInstanceItem->moveSilentlyBy({ 0., deltaY });
                 }
                 messageItem->setInstances(creatorInstanceItem, createdInstanceItem);
             }
@@ -628,15 +628,9 @@ QLineF ChartViewModel::commonAxis() const
 
 void ChartViewModel::updateChartboxToContent()
 {
-    qDebug() << "updateChartboxToContent";
-
     if (!d->m_layoutInfo.m_chartItem)
         return;
 
-    qDebug() << "actual:" << actualContentRect();
-    qDebug() << "minimal:" << minimalContentRect();
-    qDebug() << "chartbox:" << d->m_layoutInfo.m_chartItem->contentRect();
-    qDebug() << "chartbox stored:" << d->m_layoutInfo.m_chartItem->storedCustomRect();
     QRectF chartBox = actualContentRect();
     const QRectF &minRect = minimalContentRect();
 
@@ -694,14 +688,8 @@ void ChartViewModel::updateChartboxToContent()
 
 void ChartViewModel::updateContentToChartbox(const QRectF &chartBoxRect)
 {
-    qDebug() << "updateContentToChartbox";
     if (!d->m_layoutInfo.m_chartItem)
         return;
-
-    qDebug() << "actual:" << actualContentRect();
-    qDebug() << "minimal:" << minimalContentRect();
-    qDebug() << "chartbox:" << d->m_layoutInfo.m_chartItem->contentRect();
-    qDebug() << "chartbox stored:" << d->m_layoutInfo.m_chartItem->storedCustomRect();
 
     QRectF chartBox = chartBoxRect;
     const QRectF &minRect = minimalContentRect();
@@ -1275,8 +1263,6 @@ void ChartViewModel::onInstanceGeometryChanged()
 {
     if (MscInstance *instance = qobject_cast<MscInstance *>(sender()))
         if (InstanceItem *instanceItem = itemForInstance(instance)) {
-            qDebug() << "onInstanceGeometryChanged:" << instanceItem->name() << instanceItem->sceneBoundingRect();
-
             const QRectF &newGeom = instanceItem->sceneBoundingRect();
             const QVariantList &changeOrderParams = prepareChangeOrderCommand(instance);
             if (!changeOrderParams.isEmpty())
@@ -1521,10 +1507,8 @@ void ChartViewModel::prepareChartBoxItem()
 
 void ChartViewModel::applyContentRect(const QRectF &newRect)
 {
-    qDebug() << "applyContentRect-1:" << d->m_layoutInfo.m_chartItem->contentRect() << newRect;
     QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
     d->m_layoutInfo.m_chartItem->setContentRect(newRect);
-    qDebug() << "applyContentRect-2:" << d->m_layoutInfo.m_chartItem->contentRect() << newRect;
 }
 
 } // namespace msc

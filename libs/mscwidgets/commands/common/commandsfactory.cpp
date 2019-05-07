@@ -37,6 +37,7 @@
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdmessageitemresize.h"
+#include "commands/cmdmessagepointsedit.h"
 #include "commands/cmdpastechart.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
@@ -118,6 +119,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createAsn1File(params);
     case cmd::ChangeInstancePosition:
         return cmd::CommandsFactory::createChangeInstancePosition(params);
+    case cmd::EditMessagePoints:
+        return cmd::CommandsFactory::createEditMessagePoints(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -498,6 +501,17 @@ QUndoCommand *CommandsFactory::createChangeInstancePosition(const QVariantList &
 
     if (auto instance = params.at(0).value<MscInstance *>())
         return new CmdChangeInstancePosition(instance, params.at(1).value<QVector<QPoint>>());
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createEditMessagePoints(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+
+    if (auto message = params.at(0).value<MscMessage *>())
+        return new CmdMessagePointsEdit(message, params.at(1).value<QVector<QPoint>>(),
+                                        params.at(2).value<QVector<QPoint>>());
 
     return nullptr;
 }

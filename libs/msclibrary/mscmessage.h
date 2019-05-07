@@ -98,15 +98,21 @@ public:
 
     QString toDbgString() const;
 
+    cif::CifBlockShared cifMessage() const;
+    QVector<QPoint> cifPoints() const;
+    void setCifPoints(const QVector<QPoint> &points);
+
 Q_SIGNALS:
     void messageInstanceNameChanged();
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
+    void cifPointsChanged();
 
 protected:
     MscMessage::MessageType m_msgType = MscMessage::MessageType::Message;
 
 private:
+    static const cif::CifLine::CifType m_messageCifMainType;
     QString m_messageInstanceName;
     MscInstance *m_source = nullptr;
     MscInstance *m_target = nullptr;

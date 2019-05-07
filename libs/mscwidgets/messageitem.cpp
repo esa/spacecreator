@@ -86,6 +86,10 @@ MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, Instanc
         msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
         this->setTargetInstanceItem(instance);
     });
+    connect(m_message, &MscMessage::cifPointsChanged, this, [this]() {
+        applyCif();
+        scheduleLayoutUpdate();
+    });
     setInstances(source, target);
 
     m_arrowItem->setColor(QColor("#3e47e6"));
@@ -153,7 +157,7 @@ bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
             pt.setX(m_sourceInstance->sceneBoundingRect().center().x());
         else
             pt.setX(0);
-        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(points);
     }
 
     updateTooltip();
@@ -192,7 +196,7 @@ bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
             pt.setX(m_targetInstance->sceneBoundingRect().center().x());
         else
             pt.setX(0);
-        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(points);
     }
 
     updateTooltip();
@@ -253,14 +257,14 @@ void MessageItem::rebuildLayout()
     if (points.size() < 2)
         return;
 
-    const bool wasGlobal = modelItem()->isGlobal();
+    const bool wasGlobal = wannabeGlobal();
 
     if (points.first() != tail())
         updateSource(points.first(), ObjectAnchor::Snap::NoSnap, m_sourceInstance);
     if (points.last() != head())
         updateTarget(points.last(), ObjectAnchor::Snap::NoSnap, m_targetInstance);
 
-    if (wasGlobal && modelItem()->isGlobal() != wasGlobal) {
+    if (wasGlobal && wannabeGlobal() != wasGlobal) {
         QSignalBlocker suppressDataChanged(m_message);
         if (m_sourceInstance && !qFuzzyCompare(1. + points.first().x(), 1 + m_sourceInstance->centerInScene().x()))
             setSourceInstanceItem(nullptr);
@@ -492,19 +496,63 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
     if (isCreator())
         return;
 
-    if (gp->location() == GripPoint::Left)
-        updateSource(to, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
-    else if (gp->location() == GripPoint::Right)
-        updateTarget(to, ObjectAnchor::Snap::NoSnap, m_targetInstance);
+    QSignalBlocker suppressUpdates(this);
+    QVector<QPointF> currentPoints(messagePoints());
+    if (m_originalMessagePoints.isEmpty())
+        m_originalMessagePoints = currentPoints;
+
+    const bool isSource = gp->location() == GripPoint::Left;
+    auto validatePoint = [&](const QPointF &requestedPoint, int pointId) {
+        QPointF point(requestedPoint);
+        const QPointF &oppositePoint = currentPoints.at(pointId == 0 ? currentPoints.size() - 1 : 0);
+
+        // Arrow direction - should be top-to-bottom:
+        if ((isSource && point.y() > oppositePoint.y()) || (!isSource && point.y() < oppositePoint.y()))
+            point.ry() = oppositePoint.y();
+
+        // Anchor point - should be within an appropriate axis:
+        if (InstanceItem *instance = isSource ? m_sourceInstance : m_targetInstance) {
+            const QLineF &axis = instance->axis();
+            if (point.y() < axis.y1())
+                point.ry() = axis.y1();
+            if (point.y() > axis.y2())
+                point.ry() = axis.y2();
+        }
+
+        return point;
+    };
+
+    const QPointF &validated = validatePoint(to, isSource ? 0 : currentPoints.size() - 1);
+    if (isSource)
+        updateSource(validated, ObjectAnchor::Snap::SnapTo);
+    else
+        updateTarget(validated, ObjectAnchor::Snap::SnapTo);
 }
 
-void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &to)
+void MessageItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
 {
-    // @todo use a command to support undo
-    updateCif();
-    Q_EMIT retargeted(this, to,
-                      pos == GripPoint::Left ? msc::MscMessage::EndType::SOURCE_TAIL
-                                             : msc::MscMessage::EndType::TARGET_HEAD);
+    bool converted(false);
+    const QVector<QPoint> &oldPointsCif = utils::CoordinatesConverter::sceneToCif(m_originalMessagePoints, &converted);
+    if (m_originalMessagePoints.size() && !converted) {
+        m_originalMessagePoints.clear();
+        qWarning() << "MessageItem move: scene->mm original coordinates conversion failed";
+        return;
+    }
+
+    const QVector<QPointF> &currPoints = messagePoints();
+    const QVector<QPoint> &newPointsCif =
+            wannabeGlobal() ? QVector<QPoint>() : utils::CoordinatesConverter::sceneToCif(currPoints, &converted);
+    if (!converted) {
+        qWarning() << "MessageItem move: scene->mm target coordinates conversion failed";
+        return;
+    }
+
+    m_originalMessagePoints.clear();
+
+    const QVariantList params { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
+                                QVariant::fromValue(newPointsCif) };
+
+    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints, params);
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)
@@ -634,11 +682,11 @@ cif::CifBlockShared MessageItem::positionCifBlock() const
     return cifBlockByType(cif::CifLine::CifType::Position);
 }
 
-bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
+void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
 {
     const QVector<QPointF> &arrowPoints = messagePoints();
     if (scenePoints.size() < 2 || scenePoints == arrowPoints)
-        return false;
+        return;
 
     Q_ASSERT(!scenePoints.isEmpty());
 
@@ -648,27 +696,6 @@ bool MessageItem::setMessagePointsNoCif(const QVector<QPointF> &scenePoints)
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
     updateGripPoints();
     commitGeometryChange();
-    return true;
-}
-
-void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints, utils::CifUpdatePolicy cifUpdate)
-{
-    if (!setMessagePointsNoCif(scenePoints))
-        return;
-
-    switch (cifUpdate) {
-    case utils::CifUpdatePolicy::DontChange:
-        return;
-    case utils::CifUpdatePolicy::UpdateIfExists: {
-        if (!geometryManagedByCif())
-            return;
-        break;
-    }
-    default:
-        break;
-    }
-
-    updateCif();
 }
 
 void MessageItem::applyCif()
@@ -679,7 +706,7 @@ void MessageItem::applyCif()
         const QVector<QPoint> &pointsCif = cifBlock->payload(mainCifType()).value<QVector<QPoint>>();
         bool converted(false);
         const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
-        setMessagePoints(pointsScene, utils::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(pointsScene);
     }
 }
 
@@ -709,7 +736,7 @@ void MessageItem::updateMessagePoints()
     }
 
     if (updated)
-        setMessagePoints(points, utils::CifUpdatePolicy::ForceCreate);
+        setMessagePoints(points);
 }
 
 cif::CifLine::CifType MessageItem::mainCifType() const
@@ -774,16 +801,31 @@ void MessageItem::extendGlobalMessage()
     const QPointF &shiftedMe = extendToNearestEdge(shiftMe);
     if (shiftedMe != points.at(shiftPointId)) {
         points.replace(shiftPointId, shiftedMe);
-        setMessagePoints(points, utils::CifUpdatePolicy::UpdateIfExists);
+        setMessagePoints(points);
     }
 }
 
 void MessageItem::onChartBoxChanged()
 {
-    if (!m_message->isGlobal() || m_message->isOrphan())
+    if (!wannabeGlobal() || m_message->isOrphan())
         return;
 
     extendGlobalMessage();
+}
+
+/*
+ * Almost the same as MscMessage::isGlobal, but the check is based on existence
+ * of InstanceItems instead of MscInstances.
+ *
+ * During manual editing the MessageItem may became "global" without changing
+ * corresponding MscInstance in the m_message which will be updated after finishing manual editing.
+ */
+bool MessageItem::wannabeGlobal() const
+{
+    const bool isRegular = m_message->messageType() == MscMessage::MessageType::Message;
+    const bool onlySource = m_sourceInstance && !m_targetInstance;
+    const bool onlyTarget = !m_sourceInstance && m_targetInstance;
+    return isRegular && (onlySource || onlyTarget);
 }
 
 } // namespace msc

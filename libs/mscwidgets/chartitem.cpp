@@ -45,8 +45,14 @@ ChartItem::ChartItem(MscChart *chart, ChartViewModel *chartViewModel, QGraphicsI
     framePen.setWidthF(1.);
     m_rectItem->setPen(framePen);
     m_rectItem->setBrush(Qt::white);
-
-    m_contentArea->setPen(QColor(Qt::black));
+    const QColor &borderColor = QColor(
+#ifdef QT_DEBUG
+            Qt::black
+#else
+            Qt::white
+#endif
+    );
+    m_contentArea->setPen(borderColor);
     m_contentArea->setBrush(Qt::white);
 
     m_textItemName->setEditable(true);

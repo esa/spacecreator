@@ -58,6 +58,7 @@ public:
     static QUndoCommand *createChartPaste(const QVariantList &params);
     static QUndoCommand *createAsn1File(const QVariantList &params);
     static QUndoCommand *createChangeInstancePosition(const QVariantList &params);
+    static QUndoCommand *createEditMessagePoints(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

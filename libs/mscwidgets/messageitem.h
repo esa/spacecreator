@@ -84,7 +84,7 @@ public:
 
     void addMessagePoint(const QPointF &scenePoint);
     QVector<QPointF> messagePoints() const;
-    void setMessagePoints(const QVector<QPointF> &scenePoints, utils::CifUpdatePolicy cifUpdate);
+    void setMessagePoints(const QVector<QPointF> &scenePoints);
 
     void applyCif() override;
     void updateCif() override;
@@ -127,6 +127,7 @@ private:
     bool m_posChangeIgnored = false;
     bool m_autoResize = true;
     bool m_preventRecursion = false;
+    QVector<QPointF> m_originalMessagePoints;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
@@ -148,7 +149,8 @@ private:
     cif::CifBlockShared positionCifBlock() const;
 
     void extendGlobalMessage();
-    bool setMessagePointsNoCif(const QVector<QPointF> &scenePoints);
+
+    bool wannabeGlobal() const;
 };
 
 } // namespace msc
