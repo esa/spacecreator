@@ -56,9 +56,9 @@ CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
     connect(m_textItem, &TextItem::textChanged, this, [this]() {
-        if (geometryManagedByCif() || isGlobal())
-            updateCif();
-        instantLayoutUpdate();
+        prepareGeometryChange();
+        m_boundingRect = m_textItem->boundingRect();
+        updateGripPoints();
     });
 
     m_linkItem->setPen(QPen(Qt::black, kBorderWidth, Qt::DotLine));
@@ -289,12 +289,12 @@ void CommentItem::updateCif()
 
     const QRect storedCifRect = commentEntity()->rect();
     const QRectF textItemRect = m_textItem->sceneBoundingRect();
-    if (storedCifRect == textItemRect)
-        return;
 
     QRect cifRect;
     if (!utils::CoordinatesConverter::sceneToCif(textItemRect, cifRect))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << cifRect;
+    else if (storedCifRect == textItemRect)
+        return;
 
     commentEntity()->setRect(cifRect);
 }
@@ -421,7 +421,10 @@ void CommentItem::textEdited(const QString &text)
             msc::cmd::CommandsStack::current()->endMacro();
         }
     }
-    scheduleLayoutUpdate();
+    rebuildLayout();
+    updateGripPoints();
+
+    Q_EMIT needUpdateLayout();
 }
 
 MscComment *CommentItem::commentEntity() const

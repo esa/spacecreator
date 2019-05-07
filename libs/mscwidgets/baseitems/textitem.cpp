@@ -250,14 +250,11 @@ void TextItem::keyPressEvent(QKeyEvent *event)
 
     QGraphicsTextItem::keyPressEvent(event);
 
-    setTextWidth(idealWidth());
-    adjustSize();
-    if (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
-        || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height()) {
+    if (m_explicitSize.isValid()
+        && (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
+            || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
         prepareGeometryChange();
-        m_explicitSize = QSizeF();
-        setTextWidth(idealWidth());
-        adjustSize();
+        m_explicitSize = QGraphicsTextItem::boundingRect().size();
     }
 
     Q_EMIT textChanged();
@@ -422,12 +419,12 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
     setTextCursor(currCursor);
 }
 
-void TextItem::setExplicitSize(const QSizeF &r)
+void TextItem::setExplicitSize(const QSizeF &size)
 {
-    if (m_explicitSize != r) {
-        m_explicitSize = r;
+    if (m_explicitSize != size) {
+        m_explicitSize = size;
         if (!m_explicitSize.isEmpty()) {
-            setTextMargin(0);
+            setTextMargin(textMargin());
             setTextWidth(m_explicitSize.width());
         }
         update();
