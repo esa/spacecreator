@@ -26,6 +26,7 @@
 #include "messagedialog.h"
 #include "mscchart.h"
 #include "msccreate.h"
+#include "mscinstance.h"
 #include "mscmessage.h"
 
 #include <QDebug>
@@ -82,6 +83,47 @@ void MessageCreatorTool::createPreviewItem()
     m_currMode = InteractionMode::None;
 }
 
+bool isCyclicCreation(MscMessage *message)
+{
+    if (message->sourceInstance()->explicitCreator() == message->targetInstance())
+        return false;
+
+    MscInstance *excludedCreator = message->targetInstance();
+
+    MscInstance *currentCreator = message->sourceInstance();
+    while (currentCreator) {
+        currentCreator = currentCreator->explicitCreator();
+        if (currentCreator == excludedCreator)
+            return true;
+    }
+    return false;
+}
+
+bool validateCreate(MscMessage *message)
+{
+    if (message->sourceInstance() && message->targetInstance()) {
+        if (message->sourceInstance() != message->targetInstance()) {
+            if (message->targetInstance()->explicitCreator() == nullptr) {
+                if (!isCyclicCreation(message)) {
+                    return true;
+                } else {
+                    qWarning() << "Cyclic CREATE messages are not allowed";
+                }
+            } else {
+                const QString &wrn = QString("The %1 instance already have a CREATE message attached")
+                                             .arg(message->targetInstance()->name());
+                qWarning() << wrn;
+            }
+        } else {
+            qWarning() << "CREATE messages need to be connected to different existing instances";
+        }
+    } else {
+        qWarning() << "CREATE message can't be global";
+    }
+
+    return false;
+}
+
 void MessageCreatorTool::commitPreviewItem()
 {
     m_currMode = InteractionMode::None;
@@ -94,9 +136,7 @@ void MessageCreatorTool::commitPreviewItem()
                 m_messageItem->targetInstanceItem() ? m_messageItem->targetInstanceItem()->modelItem() : nullptr);
         bool isValid = true;
         if (m_messageType == MscMessage::MessageType::Create) {
-            isValid = m_message->sourceInstance() != nullptr && m_message->targetInstance() != nullptr
-                    && m_message->sourceInstance() != m_message->targetInstance();
-            qWarning() << "Create messages need to be connected to different existing instances";
+            isValid = validateCreate(m_message);
         }
 
         if (isValid) {
@@ -402,7 +442,7 @@ QVariantList MessageCreatorTool::prepareMessage()
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
             const QVector<QPoint> &arrowPoints = getCif(m_messageItem->messagePoints());
             args = { QVariant::fromValue<msc::MscMessage *>(message),
-                     QVariant::fromValue<msc::MscChart *>(m_activeChart), eventIndex,
+                     QVariant::fromValue<msc::ChartViewModel *>(m_model), eventIndex,
                      QVariant::fromValue<QVector<QPoint>>(arrowPoints) };
         }
     } else {

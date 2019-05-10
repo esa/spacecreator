@@ -21,6 +21,7 @@
 #include "exceptions.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "mscdocument.h"
 #include "mscfile.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
@@ -55,7 +56,7 @@ private:
     void parseMsc(const QString &mscText);
 
     MscMessage *m_message = nullptr;
-    MessageItem *m_messageItem = nullptr;
+    QPointer<MessageItem> m_messageItem = nullptr;
 
     QGraphicsView *m_view = nullptr;
     QUndoStack *m_undoStack = nullptr;
@@ -84,7 +85,13 @@ void tst_MessageItem::parseMsc(const QString &mscText)
 {
     MscFile mscFile;
     m_mscModel = mscFile.parseText(mscText);
-    m_chart = m_mscModel->charts().at(0);
+
+    QVERIFY(!m_mscModel->documents().isEmpty());
+    QVERIFY(m_mscModel->documents().first());
+    QVERIFY(!m_mscModel->documents().first()->charts().isEmpty());
+    m_chart = m_mscModel->documents().first()->charts().first();
+    QVERIFY(m_chart);
+
     m_chartModel->fillView(m_chart);
     QApplication::processEvents();
 
@@ -99,18 +106,17 @@ void tst_MessageItem::parseMsc(const QString &mscText)
 
 void tst_MessageItem::init()
 {
+    m_chartModel = new ChartViewModel;
     m_undoStack = new QUndoStack();
     cmd::CommandsStack::setCurrent(m_undoStack);
 
     m_view = new QGraphicsView();
-    m_view->setScene(new QGraphicsScene(m_view));
+    m_view->setScene(m_chartModel->graphicsScene());
 
     m_message = new MscMessage("Event1");
     m_messageItem = new MessageItem(m_message, nullptr);
 
     m_view->scene()->addItem(m_messageItem);
-
-    m_chartModel = new ChartViewModel;
 }
 
 void tst_MessageItem::cleanup()
@@ -119,9 +125,12 @@ void tst_MessageItem::cleanup()
     m_messageItem = nullptr;
     delete m_message;
     m_message = nullptr;
-
+    delete m_view;
+    m_view = nullptr;
     delete m_undoStack;
     m_undoStack = nullptr;
+    delete m_chartModel;
+    m_chartModel = nullptr;
 
     m_instances.clear();
     m_instanceItems.clear();
@@ -173,7 +182,8 @@ void tst_MessageItem::testNameAndParametersEntering()
 
 void tst_MessageItem::testPositionUpdateOnInstanceChange()
 {
-    QString mscText = "msc Untitled_MSC;\
+    QString mscText = "MSCDOCUMENT mscdoc;\
+                        msc Untitled_MSC;\
                             instance Instance_1;\
                                 out Message to Instance_2;\
                             endinstance;\
@@ -182,7 +192,8 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
                             endinstance;\
                             instance Instance_3;\
                             endinstance;\
-                        endmsc;";
+                        endmsc;\
+                    ENDMSCDOCUMENT;";
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 3);
     QCOMPARE(m_chart->instanceEvents().size(), 1);
@@ -213,7 +224,8 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
 
 void tst_MessageItem::testFirstMessagePosition()
 {
-    QString mscText = "msc connection;\
+    QString mscText = "MSCDOCUMENT mscdoc;\
+        msc connection;\
         instance A: 111111111111111111111111122222222222222222222222223333333333333333333333333 ;\
             in EA from env;\
             out AE to env;\
@@ -234,7 +246,8 @@ void tst_MessageItem::testFirstMessagePosition()
             in E2ShortName from env;\
             out ShortName2E to env;\
         endinstance;\
-    endmsc;";
+    endmsc;\
+    ENDMSCDOCUMENT;";
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 5);
     QCOMPARE(m_chart->instanceEvents().size(), 7);

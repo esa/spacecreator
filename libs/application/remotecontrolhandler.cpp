@@ -206,7 +206,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     mscChart->addInstanceEvent(message, pos);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
-                                     QVariant::fromValue<msc::MscChart *>(mscChart), pos };
+                                     QVariant::fromValue<msc::ChartViewModel *>(&m_model->chartViewModel()), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
     if (!result)
         *errorString = tr("Message is added but unavailable for Undo/Redo actions");

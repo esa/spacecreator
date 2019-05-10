@@ -112,6 +112,7 @@ private Q_SLOTS:
     void onInstanceGeometryChanged();
     void onInstanceEventItemMoved(InteractiveObject *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
+    void onInstanceCreatorChanged(MscInstance *newCreator);
 
 private:
     std::unique_ptr<ChartViewModelPrivate> const d;

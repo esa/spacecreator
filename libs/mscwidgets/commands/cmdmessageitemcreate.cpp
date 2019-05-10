@@ -17,8 +17,10 @@
 
 #include "cmdmessageitemcreate.h"
 
+#include "chartviewmodel.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
+#include "instanceitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -26,13 +28,30 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex,
+CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(msc::InstanceItem *from)
+{
+    InstanceGeometry geometry;
+    if (from) {
+        geometry.m_pos = from->scenePos();
+        geometry.m_cif = from->modelItem()->cifGeometry();
+        geometry.m_axis = from->axisHeight();
+    }
+
+    return geometry;
+}
+
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::ChartViewModel *model, int eventIndex,
                                            const QVector<QPoint> &points)
     : BaseCommand(message)
     , m_message(message)
-    , m_chart(chart)
+    , m_viewModel(model)
+    , m_chart(m_viewModel ? m_viewModel->currentChart() : nullptr)
     , m_eventIndex(eventIndex)
     , m_msgPoints(points)
+    , m_sourceGeometryPrev(initGeometryHolder(
+              (m_viewModel && m_message) ? m_viewModel->itemForInstance(m_message->sourceInstance()) : nullptr))
+    , m_targetGeometryPrev(initGeometryHolder(
+              (m_viewModel && m_message) ? m_viewModel->itemForInstance(m_message->targetInstance()) : nullptr))
 {
     Q_ASSERT(m_chart.data());
 
@@ -64,6 +83,26 @@ void CmdMessageItemCreate::redo()
 void CmdMessageItemCreate::undo()
 {
     Q_ASSERT(m_chart.data());
+
+    auto resotreInstanceGeometry = [this](MscInstance *instance, const InstanceGeometry &geometry) {
+        if (!instance || !m_viewModel)
+            return;
+
+        if (InstanceItem *item = m_viewModel->itemForInstance(instance)) {
+            QSignalBlocker silently(instance);
+            if (!geometry.m_cif.isEmpty()) {
+                instance->setCifGeometry(geometry.m_cif);
+            } else {
+                const QPointF &shift = geometry.m_pos - item->scenePos();
+                item->moveSilentlyBy(shift);
+                item->setAxisHeight(geometry.m_axis);
+            }
+        }
+    };
+
+    resotreInstanceGeometry(m_message->sourceInstance(), m_sourceGeometryPrev);
+    resotreInstanceGeometry(m_message->targetInstance(), m_targetGeometryPrev);
+
     m_chart->removeInstanceEvent(m_message);
 
     // this command takes over ownership

@@ -190,17 +190,19 @@ void ChartViewModel::fillView(MscChart *chart)
 
     clearScene();
 
-    prepareChartBoxItem();
+    if (!d->m_scene.views().isEmpty()) {
+        prepareChartBoxItem();
 
-    const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
-    const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
-    applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
-    if (preferredRectCif.isNull()) {
-        QSignalBlocker supprecCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
-        d->m_layoutInfo.m_chartItem->updateCif();
+        const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
+        const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
+        applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
+        if (preferredRectCif.isNull()) {
+            QSignalBlocker supprecCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
+            d->m_layoutInfo.m_chartItem->updateCif();
+        }
+
+        doLayout();
     }
-
-    doLayout();
 
     connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartViewModel::updateLayout);
     connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
@@ -1468,6 +1470,8 @@ void ChartViewModel::connectInstanceItem(InteractiveObject *instanceItem)
     if (MscInstance *instance = qobject_cast<MscInstance *>(instanceItem->modelEntity())) {
         connect(instance, &MscInstance::cifGeometryChanged, this, &ChartViewModel::onInstanceGeometryChanged,
                 Qt::UniqueConnection);
+        connect(instance, &MscInstance::explicitCreatorChanged, this, &ChartViewModel::onInstanceCreatorChanged,
+                Qt::UniqueConnection);
     }
 }
 
@@ -1488,6 +1492,7 @@ void ChartViewModel::disconnectItems()
         disconnect(instanceItem, &InteractiveObject::cifChanged, this, &ChartViewModel::cifDataChanged);
         if (MscInstance *instance = qobject_cast<MscInstance *>(instanceItem->modelEntity())) {
             disconnect(instance, &MscInstance::cifGeometryChanged, this, &ChartViewModel::onInstanceGeometryChanged);
+            disconnect(instance, &MscInstance::explicitCreatorChanged, this, &ChartViewModel::onInstanceCreatorChanged);
         }
     }
     for (InteractiveObject *instanceEventItem : d->m_instanceEventItems) {
@@ -1515,6 +1520,17 @@ void ChartViewModel::applyContentRect(const QRectF &newRect)
 {
     QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
     d->m_layoutInfo.m_chartItem->setContentRect(newRect);
+}
+
+void ChartViewModel::onInstanceCreatorChanged(MscInstance *newCreator)
+{
+    if (!newCreator)
+        if (MscInstance *created = qobject_cast<MscInstance *>(sender())) {
+            if (InstanceItem *item = itemForInstance(created)) {
+                item->moveSilentlyBy({ 0., -item->y() });
+            }
+        }
+    updateLayout();
 }
 
 } // namespace msc

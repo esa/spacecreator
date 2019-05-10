@@ -19,20 +19,23 @@
 
 #include "commands/basecommand.h"
 
+#include <QPointF>
 #include <QPointer>
 #include <QVector>
 
 namespace msc {
 
+class ChartViewModel;
 class MscChart;
 class MscMessage;
+class InstanceItem;
 
 namespace cmd {
 
 class CmdMessageItemCreate : public BaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, msc::MscChart *chart, int eventIndex,
+    CmdMessageItemCreate(msc::MscMessage *message, msc::ChartViewModel *chart, int eventIndex,
                          const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
@@ -42,9 +45,21 @@ public:
 
 private:
     MscMessage *m_message = nullptr;
+    QPointer<ChartViewModel> m_viewModel;
     QPointer<MscChart> m_chart;
     int m_eventIndex;
     QVector<QPoint> m_msgPoints;
+
+    struct InstanceGeometry {
+        QVector<QPoint> m_cif;
+        QPointF m_pos;
+        qreal m_axis = 0.;
+    };
+
+    const InstanceGeometry m_sourceGeometryPrev;
+    const InstanceGeometry m_targetGeometryPrev;
+
+    static InstanceGeometry initGeometryHolder(msc::InstanceItem *from);
 };
 
 } // ns cmd

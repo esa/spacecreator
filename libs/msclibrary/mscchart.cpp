@@ -221,6 +221,13 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
         return;
     }
 
+    if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
+        if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
+            if (MscInstance *createdInstance = message->targetInstance())
+                createdInstance->setExplicitCreator(message->sourceInstance());
+        }
+    }
+
     instanceEvent->setParent(this);
     if (eventIndex < 0 || eventIndex >= m_instanceEvents.size()) {
         m_instanceEvents.append(instanceEvent);
@@ -251,6 +258,13 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
     }
     if (!m_instanceEvents.contains(instanceEvent)) {
         return;
+    }
+
+    if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
+        if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
+            if (MscInstance *createdInstance = message->targetInstance())
+                createdInstance->setExplicitCreator(nullptr);
+        }
     }
 
     if (m_instanceEvents.removeAll(instanceEvent)) {

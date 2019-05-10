@@ -55,6 +55,7 @@ private:
     msc::MscChart *m_chart = nullptr;
 
     static const QVariant m_dummyCif;
+    QVariantList createParams(MscMessage *message = nullptr, int insertId = -1);
 
     int itemsCount();
 };
@@ -77,6 +78,12 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
     delete m_chart;
 }
 
+QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int insertId)
+{
+    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::ChartViewModel *>(&m_chartModel),
+             insertId, m_dummyCif };
+}
+
 void tst_CmdMessageItemCreate::testCreate()
 {
     m_chartModel.clearScene();
@@ -85,9 +92,7 @@ void tst_CmdMessageItemCreate::testCreate()
     QCOMPARE(itemsCount(), 0);
 
     for (int i = 0; i < CommandsCount; ++i) {
-        const QVariantList &params = { QVariant::fromValue<msc::MscMessage *>(nullptr),
-                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1, m_dummyCif };
-        cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
+        cmd::CommandsStack::push(cmd::Id::CreateMessage, createParams());
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -138,9 +143,7 @@ void tst_CmdMessageItemCreate::testPerformance()
 
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
-            cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                     { QVariant::fromValue<msc::MscMessage *>(nullptr),
-                                       QVariant::fromValue<msc::MscChart *>(m_chart), -1, m_dummyCif });
+            cmd::CommandsStack::push(cmd::Id::CreateMessage, createParams());
         }
 
         // undo:
@@ -177,8 +180,7 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
 
     for (const QString &name : names) {
         cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                 { QVariant::fromValue<msc::MscMessage *>(new msc::MscMessage(name)),
-                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0, m_dummyCif }); // prepends message
+                                 createParams(new msc::MscMessage(name), 0)); // prepends message
     }
 
     QCOMPARE(m_chart->instanceEvents().size(), names.size());

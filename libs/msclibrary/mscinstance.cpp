@@ -156,6 +156,7 @@ void MscInstance::setExplicitCreator(MscInstance *creator)
 
     m_explicitCreator = creator;
     Q_EMIT dataChanged();
+    Q_EMIT explicitCreatorChanged(m_explicitCreator);
 }
 
 bool MscInstance::explicitStop() const

@@ -59,6 +59,10 @@ void CoordinatesConverter::setScene(QGraphicsScene *scene)
         m_dpiPhysical = QPoint(m_view->physicalDpiX(), m_view->physicalDpiY());
         m_dpiLogical = QPoint(m_view->logicalDpiX(), m_view->logicalDpiY());
     }
+
+    if (!m_view)
+        qWarning() << "CoordinatesConverter::setScene: received a scene with no attached view, no further scene<->mm "
+                      "conversion is possible.";
 }
 
 /*!
