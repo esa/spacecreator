@@ -55,10 +55,12 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QComboBox>
+#include <QDateTime>
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QIcon>
+#include <QImageWriter>
 #include <QItemSelectionModel>
 #include <QKeySequence>
 #include <QMessageBox>
@@ -114,6 +116,8 @@ struct MainWindowPrivate {
 
     QAction *m_actCopy = nullptr;
     QAction *m_actPaste = nullptr;
+
+    QAction *m_actScreenshot = nullptr;
 
     QMenu *m_menuView = nullptr;
     QAction *m_actShowDocument = nullptr;
@@ -523,6 +527,9 @@ void MainWindow::initMenuFile()
     d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
                                                   this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
 
+    d->m_actScreenshot =
+            d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save Screenshot..."), this,
+                                     &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
     d->m_menuFile->addSeparator();
 
     d->m_actQuit = d->m_menuFile->addAction(
@@ -1119,4 +1126,46 @@ void MainWindow::updateZoomBox(double percent)
     const QSignalBlocker blocker(d->m_zoomBox);
 
     d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(percent));
+}
+
+QStringList supportedImgFileExtensions()
+{
+    static QStringList extensions;
+    if (extensions.isEmpty()) {
+        const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
+        for (const QByteArray &format : formats)
+            extensions << ("*." + format.toLower());
+    }
+    return extensions;
+}
+
+void MainWindow::saveScreenshot()
+{
+    const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
+    const QStringList &extensions = supportedImgFileExtensions();
+    QString fileName =
+            QFileDialog::getSaveFileName(this, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
+
+    if (!fileName.isEmpty()) {
+        QFileInfo selectedFile(fileName);
+        const QString usedExtension = "*." + selectedFile.suffix().toLower();
+        if (!extensions.contains(usedExtension))
+            fileName.append(".png");
+
+        saveSceneRender(fileName);
+    }
+}
+
+void MainWindow::saveSceneRender(const QString &filePath) const
+{
+    if (filePath.isEmpty())
+        return;
+
+    if (QGraphicsScene *scene = d->m_model->graphicsScene()) {
+        QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+        img.fill(Qt::transparent);
+        QPainter p(&img);
+        scene->render(&p);
+        img.save(filePath);
+    }
 }

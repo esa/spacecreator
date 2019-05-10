@@ -81,6 +81,7 @@ private Q_SLOTS:
     void showCoordinatesInfo(const QString &info);
     void openMessageDeclarationEditor();
     void updateZoomBox(double percent);
+    void saveScreenshot();
 
 private:
     static const QLatin1String DotMscFileExtensionLow;
@@ -124,4 +125,6 @@ private:
 #endif
 
     msc::BaseTool *activeTool() const;
+
+    void saveSceneRender(const QString &filePath) const;
 };
