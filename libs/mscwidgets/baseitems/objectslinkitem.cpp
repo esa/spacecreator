@@ -20,7 +20,6 @@
 
 #include "common/objectanchor.h"
 #include "common/objectslink.h"
-#include "common/utils.h"
 
 #include <QEvent>
 #include <QGraphicsSceneMoveEvent>
@@ -37,9 +36,9 @@ namespace msc {
 
 */
 
-QPainterPath ObjectsLinkItem::hoverableLine(const QLineF &line)
+QPainterPath ObjectsLinkItem::hoverableLine(const QLineF &line, const qreal lineWidth)
 {
-    return utils::lineShape(line, utils::LineHoverTolerance);
+    return utils::lineShape(line, lineWidth);
 }
 
 ObjectsLinkItem::ObjectsLinkItem(QGraphicsItem *parent)

@@ -62,11 +62,14 @@ protected:
 
 private:
     QVector<QPointF> m_polyLine;
+    QRectF m_bounds;
     QPointF pathPoint(int num) const;
     bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint,
                       ObjectAnchor::Snap snap);
 
     void updatePath();
+
+    QPainterPath createShape(qreal lineWidth) const;
 };
 
 } // ns msc

@@ -530,7 +530,8 @@ QRectF ChartViewModel::minimalContentRect() const
         return totalRect;
     };
 
-    auto eventEffectiveRect = [this](InteractiveObject *item) {
+    const QRectF &currChartBox = utils::CoordinatesConverter::currentChartItem()->contentRect();
+    auto eventEffectiveRect = [&currChartBox](InteractiveObject *item) {
         if (!item)
             return QRectF();
 
@@ -543,9 +544,14 @@ QRectF ChartViewModel::minimalContentRect() const
             if (MessageItem *messageItem = dynamic_cast<MessageItem *>(item)) {
                 // TODO: add support for complex global message
                 // TODO: include name rect into min bounding box
-                // TODO: add proper calculation according to the arrow direction
-                if (message->isGlobal())
-                    currRect = currRect.marginsRemoved(2 * ChartItem::chartMargins());
+                if (message->isGlobal()) {
+                    InstanceItem *instanceItem = messageItem->sourceInstanceItem() ? messageItem->sourceInstanceItem()
+                                                                                   : messageItem->targetInstanceItem();
+                    if (instanceItem)
+                        currRect = instanceItem->sceneBoundingRect().intersected(currRect);
+                    else
+                        currRect = currChartBox.intersected(currRect);
+                }
             }
         }
         return currRect;

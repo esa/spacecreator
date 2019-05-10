@@ -125,12 +125,13 @@ void tst_ArrowItem::testBoundingRect()
     const QLineF itemCenters(rect1.center(), rect2.center());
 
     ai.makeArrow(m_item1, rect1.center(), m_item2, rect2.center());
+    ai.setPos(utils::lineCenter(itemCenters));
 
-    const QRectF &aiBounds(ai.boundingRect());
+    const QRectF &aiBounds(ai.sceneBoundingRect());
     QCOMPARE(aiBounds.width(), itemCenters.length());
-    QCOMPARE(aiBounds.height(), 2 * utils::LineHoverTolerance);
-    QCOMPARE(aiBounds.left(), -itemCenters.length() / 2);
-    QCOMPARE(aiBounds.top(), -utils::LineHoverTolerance);
+    QCOMPARE(aiBounds.height(), 0.);
+    QCOMPARE(aiBounds.topLeft(), itemCenters.p1());
+    QCOMPARE(aiBounds.bottomRight(), itemCenters.p2());
 }
 
 void tst_ArrowItem::testUpdateStart()

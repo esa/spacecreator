@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "common/utils.h"
 #include "interactiveobject.h"
 
 #include <QBrush>
@@ -31,7 +32,7 @@ class ObjectsLinkItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    static QPainterPath hoverableLine(const QLineF &line);
+    static QPainterPath hoverableLine(const QLineF &line, const qreal lineWidth = utils::LineHoverTolerance);
 
     ObjectsLinkItem(QGraphicsItem *parent = nullptr);
 

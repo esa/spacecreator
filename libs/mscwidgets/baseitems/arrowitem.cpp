@@ -191,6 +191,8 @@ void ArrowItem::updatePath()
     m_symbols.Source = m_arrowHeads.Source.path();
     m_symbols.Target = m_arrowHeads.Target.path();
 
+    m_bounds = m_bodyPath.boundingRect();
+
     Q_EMIT geometryChanged(boundingRect());
 }
 
@@ -201,7 +203,7 @@ QPainterPath ArrowItem::bodyPath() const
 
 QRectF ArrowItem::boundingRect() const
 {
-    return ArrowItem::shape().boundingRect();
+    return m_bounds;
 }
 
 QPointF ArrowItem::startSignLocal() const
@@ -234,6 +236,15 @@ QPointF ArrowItem::pathPoint(int num) const
 
 QPainterPath ArrowItem::shape() const
 {
+    QPainterPath result = createShape(utils::LineHoverTolerance);
+    if (result.isEmpty())
+        result = m_bodyPath;
+
+    return result;
+}
+
+QPainterPath ArrowItem::createShape(qreal lineWidth) const
+{
     QPainterPath result;
 
     const int pointsCount = m_bodyPath.elementCount();
@@ -243,14 +254,11 @@ QPainterPath ArrowItem::shape() const
         if (++point < pointsCount) {
             const QPointF p2(m_bodyPath.elementAt(point));
             const QLineF line(p1, p2);
-            result.addPath(ObjectsLinkItem::hoverableLine(line));
+            result.addPath(ObjectsLinkItem::hoverableLine(line, lineWidth));
         } else {
             break;
         }
     }
-
-    if (result.isEmpty())
-        result = m_bodyPath;
 
     return result;
 }

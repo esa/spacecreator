@@ -141,8 +141,14 @@ QPainterPath LabeledArrowItem::shape() const
 
 QRectF LabeledArrowItem::boundingRect() const
 {
-    const qreal penWidth = m_selectionHighlighterPen.widthF();
-    return utils::framedRect(m_itemArrow->boundingRect(), penWidth);
+    const QRectF &arrowBounds = m_itemArrow->boundingRect();
+    const QVector<QPointF> &currPoints = m_itemArrow->turnPoints();
+    if (currPoints.size() == 2 && utils::isHorizontal(currPoints)) {
+        const QRectF &titleBounds = m_itemText->boundingRect().translated(m_itemText->pos());
+        const QRectF &titledArrowBounds = arrowBounds | titleBounds;
+        return titledArrowBounds.adjusted(0., 0., 0., ArrowSign::ARROW_HEIGHT);
+    }
+    return arrowBounds;
 }
 
 QRectF LabeledArrowItem::textBoundingRect() const

@@ -337,8 +337,8 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 
     const QPointF &shiftedSource = arrow->anchorPointSource() + shift;
     const QPointF shiftedTarget(arrow->anchorPointTarget() + shift);
-    bool res = updateSource(shiftedSource, ObjectAnchor::Snap::SnapTo);
-    res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::SnapTo);
+    bool res = updateSource(shiftedSource, ObjectAnchor::Snap::SnapTo, m_sourceInstance);
+    res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::SnapTo, m_targetInstance);
 
     if (!isAutoResizable())
         return res;
