@@ -163,15 +163,21 @@ void LabeledArrowItem::updateLayout()
                                                               : QLineF { endSignPos(), startSignPos() };
     const qreal angle = axis.angle();
     const QMarginsF margins = ChartItem::chartMargins();
-    m_itemText->setTextWidth(axis.isNull() ? textWidth
-                                           : (axis.length() - 2 * (margins.left() + margins.right() + TextMargin * 2)));
+
+    qreal margin = 0;
+    if (arrow()->link()->source()->object() == nullptr)
+        margin = startSignPos().x() < endSignPos().x() ? margins.left() : -margins.right();
+    else if (arrow()->link()->target()->object() == nullptr)
+        margin = startSignPos().x() > endSignPos().x() ? margins.left() : -margins.right();
+
+    m_itemText->setTextWidth(axis.isNull() ? textWidth : (axis.length() - (margin + TextMargin * 2)));
 
     QLineF normalVector = axis.normalVector();
     normalVector.setLength(m_itemText->boundingRect().height());
     QLineF destVector;
     destVector.setP1(normalVector.p2());
     destVector.setAngle(angle);
-    destVector.setLength((axis.length() - m_itemText->textWidth()) / 2);
+    destVector.setLength((axis.length() - m_itemText->textWidth() + margin) / 2);
     m_itemText->setPos(destVector.p2());
     m_itemText->setRotation(-angle);
     m_itemText->setZValue(m_itemArrow->zValue() + 1);
