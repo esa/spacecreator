@@ -40,9 +40,7 @@ CmdTimerItemCreate::CmdTimerItemCreate(MscTimer *timer, MscTimer::TimerType time
 void CmdTimerItemCreate::redo()
 {
     if (!m_timer) {
-        m_timer = new MscTimer();
-        m_timer->setTimerType(MscTimer::TimerType::Start);
-        m_timer->setName(tr("New_timer"));
+        m_timer = new MscTimer(tr("New_timer"), m_timerType);
         m_modelItem = m_timer;
     }
     if (m_instance) {

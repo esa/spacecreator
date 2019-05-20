@@ -79,6 +79,8 @@ public:
 
 public Q_SLOTS:
     void resetTimerRelations(MscTimer *timer);
+    void updatePrecedingTimer(MscTimer *timer, int idx = -1);
+    void updateFollowingTimer(MscTimer *timer, int idx = -1);
 
 Q_SIGNALS:
     void instanceAdded(MscInstance *instance, int pos);

@@ -31,8 +31,8 @@ private Q_SLOTS:
     void testConnectStartTimeout();
     void testDenyConnectionFromDifferentInstances();
     void testDenyConnectionWithDifferentNames();
-    void testAllowStopStart();
-    void testAllowTimeoutStart();
+    void testDenyStopStart();
+    void testDenyTimeoutStart();
     void testDenyTimeoutStop();
     void testDenyStopStop();
     void testDenyStopTimeout();
@@ -95,7 +95,7 @@ void tst_MscTimer::testDenyConnectionWithDifferentNames()
     QVERIFY(t2.precedingTimer() == nullptr);
 }
 
-void tst_MscTimer::testAllowStopStart()
+void tst_MscTimer::testDenyStopStart()
 {
     MscTimer t1("T1", MscTimer::TimerType::Stop);
     t1.setInstance(&m_instance1);
@@ -103,12 +103,12 @@ void tst_MscTimer::testAllowStopStart()
     t2.setInstance(&m_instance1);
 
     t1.setFollowingTimer(&t2);
-    QCOMPARE(t1.followingTimer(), &t2);
+    QVERIFY(t1.followingTimer() == nullptr);
     t2.setPrecedingTimer(&t1);
-    QCOMPARE(t2.precedingTimer(), &t1);
+    QVERIFY(t2.precedingTimer() == nullptr);
 }
 
-void tst_MscTimer::testAllowTimeoutStart()
+void tst_MscTimer::testDenyTimeoutStart()
 {
     MscTimer t1("T1", MscTimer::TimerType::Timeout);
     t1.setInstance(&m_instance1);
@@ -116,9 +116,9 @@ void tst_MscTimer::testAllowTimeoutStart()
     t2.setInstance(&m_instance1);
 
     t1.setFollowingTimer(&t2);
-    QCOMPARE(t1.followingTimer(), &t2);
+    QVERIFY(t1.followingTimer() == nullptr);
     t2.setPrecedingTimer(&t1);
-    QCOMPARE(t2.precedingTimer(), &t1);
+    QVERIFY(t2.precedingTimer() == nullptr);
 }
 
 void tst_MscTimer::testDenyTimeoutStop()

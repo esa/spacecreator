@@ -126,12 +126,6 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             symboxRect.moveTop(m_boundingRect.height() - symboxRect.height());
             painter->drawLine(start, symboxRect.center());
             drawStopSymbol(painter, symboxRect);
-            // draw orphan start symbol
-            const QPointF endConnect = symboxRect.center();
-            symboxRect.moveTop(0);
-            QPointF startConnect(endConnect.x(), symboxRect.bottom());
-            drawStartSymbol(painter, symboxRect);
-            painter->drawLine(startConnect, endConnect);
         }
     }
     if (m_timer->timerType() == MscTimer::TimerType::Timeout) {
@@ -158,33 +152,6 @@ void TimerItem::setName(const QString &text)
 
 void TimerItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    auto removeHighlight = [this]() {
-        if (m_connectingItem != nullptr) {
-            m_connectingItem->setHighlightable(false);
-            m_connectingItem = nullptr;
-        }
-    };
-
-    msc::MscInstanceEvent *instanceEvent = m_model->eventAtPosition(event->scenePos());
-    if (instanceEvent) {
-        auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
-        if (timer) {
-            if (canConnectTimers(timer, event->scenePos())) {
-                TimerItem *item = m_model->itemForTimer(timer);
-                if (m_connectingItem != item)
-                    removeHighlight();
-                if (item && !item->isHighlightable()) {
-                    item->setHighlightable(true);
-                    item->doHighlighting(Qt::darkGreen, true);
-                    m_connectingItem = item;
-                }
-            }
-        } else {
-            removeHighlight();
-        }
-    } else
-        removeHighlight();
-
     m_timerConnector->setVisible(true);
     const QPointF start = symbolBox().center();
     const QPointF end(start.x(), event->pos().y());
@@ -205,10 +172,6 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             }
         }
     }
-    if (m_connectingItem != nullptr) {
-        m_connectingItem->setHighlightable(false);
-        m_connectingItem = nullptr;
-    }
 
     updateConnectorLineVisibility();
     scheduleLayoutUpdate();
@@ -226,17 +189,7 @@ void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoint
 {
     if (gp->location() == GripPoint::Location::Center) {
         const QPointF &newPos = pos() + (to - from);
-
-        bool exceedsLimits = false;
-        TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
-        if (preTimer)
-            exceedsLimits = newPos.y() < (preTimer->pos().y() + preTimer->boundingRect().height());
-        TimerItem *followTimer = m_model->itemForTimer(m_timer->followingTimer());
-        if (followTimer)
-            exceedsLimits |= (newPos.y() + boundingRect().height()) > followTimer->pos().y();
-
-        if (!exceedsLimits)
-            setPos(newPos);
+        setPos(newPos);
     }
 }
 
@@ -283,12 +236,6 @@ void TimerItem::rebuildLayout()
     if (m_timer->precedingTimer() == nullptr) {
         m_textItem->setVisible(true);
         m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
-
-        if (m_timer->timerType() == MscTimer::TimerType::Stop) {
-            m_boundingRect.setHeight(2. * symbolSize.height() + 20.);
-            const qreal textY = m_boundingRect.height() - symbolSize.height() - textOffset;
-            m_textItem->setY(textY);
-        }
     } else {
         m_textItem->setVisible(false);
         TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
@@ -368,17 +315,14 @@ QRectF TimerItem::symbolBox() const
 
 bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos)
 {
-    if (targetTimer == nullptr || m_timer->instance() != targetTimer->instance())
+    if (targetTimer == nullptr)
         return false;
 
-    MscTimer *start = m_timer;
-    MscTimer *end = targetTimer;
-    if (scenePos().y() > targetPos.y()) {
-        start = targetTimer;
-        end = m_timer;
-    }
+    const bool upperItem = scenePos().y() < targetPos.y();
+    MscTimer *start = upperItem ? m_timer.data() : targetTimer;
+    MscTimer *end = upperItem ? targetTimer : m_timer.data();
 
-    return start->timerType() == MscTimer::TimerType::Start && end->timerType() != MscTimer::TimerType::Start;
+    return start->allowFollowingTimer(end) && end->allowPrecedingTimer(start);
 }
 
 } // namespace msc

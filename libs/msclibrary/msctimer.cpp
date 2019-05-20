@@ -110,13 +110,10 @@ bool MscTimer::allowPrecedingTimer(MscTimer *timer)
     if (timer->m_instance != m_instance || m_instance == nullptr || timer->name() != name())
         return false;
 
-    if (timer->m_timerType == TimerType::Start || m_timerType == TimerType::Start)
+    if (timer->timerType() == TimerType::Start)
         return true;
 
-    if (timer->m_timerType == TimerType::Timeout || timer->m_timerType == TimerType::Stop)
-        return false;
-
-    return true;
+    return false;
 }
 
 void MscTimer::setFollowingTimer(MscTimer *timer)
@@ -143,13 +140,10 @@ bool MscTimer::allowFollowingTimer(MscTimer *timer)
     if (timer->m_instance != m_instance || m_instance == nullptr || timer->name() != name())
         return false;
 
-    if (m_timerType == TimerType::Start || timer->m_timerType == TimerType::Start)
+    if (m_timerType == TimerType::Start)
         return true;
 
-    if (m_timerType == TimerType::Timeout || m_timerType == TimerType::Stop)
-        return false;
-
-    return true;
+    return false;
 }
 
 /*!
