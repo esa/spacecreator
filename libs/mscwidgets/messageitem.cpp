@@ -134,9 +134,6 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (m_targetInstance == sourceInstance && !m_message->isOrphan())
-        return false;
-
     if (sourceInstance == m_sourceInstance)
         return false;
 
@@ -173,9 +170,6 @@ InstanceItem *MessageItem::sourceInstanceItem() const
 
 bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (m_sourceInstance == targetInstance && !m_message->isOrphan())
-        return false;
-
     if (targetInstance == m_targetInstance)
         return false;
 
@@ -272,9 +266,6 @@ void MessageItem::rebuildLayout()
         if (m_targetInstance && !qFuzzyCompare(1. + points.last().x(), 1 + m_targetInstance->centerInScene().x()))
             setTargetInstanceItem(nullptr);
     }
-
-    if (!geometryManagedByCif())
-        onChartBoxChanged(); // extends global message to chart edges, if necessary
 
     update();
 }
@@ -393,7 +384,6 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, Insta
         keepInstance = hoveredItem(to);
     setTargetInstanceItem(keepInstance);
     const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
-
     if (res) {
         updateMessagePoints();
         updateGripPoints();
@@ -529,8 +519,23 @@ void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
         updateTarget(validated, ObjectAnchor::Snap::SnapTo);
 }
 
-void MessageItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
+void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to)
 {
+    Q_UNUSED(to);
+
+    if (m_sourceInstance == m_targetInstance) {
+        GeometryNotificationBlocker keepSilent(this);
+        m_originalMessagePoints.clear();
+        const bool isSource = pos == GripPoint::Left;
+        if (isSource)
+            updateSource(from, ObjectAnchor::Snap::SnapTo);
+        else
+            updateTarget(from, ObjectAnchor::Snap::SnapTo);
+        updateCif();
+        commitGeometryChange();
+        return;
+    }
+
     bool converted(false);
     const QVector<QPoint> &oldPointsCif = utils::CoordinatesConverter::sceneToCif(m_originalMessagePoints, &converted);
     if (m_originalMessagePoints.size() && !converted) {

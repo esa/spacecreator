@@ -30,7 +30,7 @@ class LabeledArrowItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    LabeledArrowItem(QGraphicsItem *parent = nullptr);
+    explicit LabeledArrowItem(QGraphicsItem *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPainterPath shape() const override;

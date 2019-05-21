@@ -253,10 +253,11 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
             targetItem->setAxisHeight(axisLine.length());
             targetItem->moveSilentlyBy({ 0., deltaY + targetItem->kindBox().height() / 2 });
         }
-
-        QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center() : d->m_layoutInfo.m_pos;
+        QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center()
+                                       : d->m_layoutInfo.m_pos + ChartItem::chartMargin();
         pntSource.setY(newY);
-        QPointF pntTarget = targetItem ? targetItem->sceneBoundingRect().center() : d->m_layoutInfo.m_pos;
+        QPointF pntTarget = targetItem ? targetItem->sceneBoundingRect().center()
+                                       : d->m_layoutInfo.m_pos + ChartItem::chartMargin();
         pntTarget.setY(newY);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);

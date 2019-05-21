@@ -49,11 +49,7 @@ void CmdMessagePointsEdit::undo()
 
 bool CmdMessagePointsEdit::mergeWith(const QUndoCommand *command)
 {
-    auto other = dynamic_cast<const CmdMessagePointsEdit *>(command);
-    if (canMergeWith(other)) {
-        m_newCif = other->m_newCif;
-        return true;
-    }
+    Q_UNUSED(command);
     return false;
 }
 
