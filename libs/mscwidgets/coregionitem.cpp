@@ -108,6 +108,11 @@ void CoregionItem::rebuildLayout()
     rect.setWidth(kCoregionWidth);
     rect.adjust(0, -kOffset, 0, kOffset);
     rect.translate(instanceRect.center().x() - rect.center().x(), 0);
+    const QLineF axis = m_instance->axis();
+    if (rect.top() < axis.y1())
+        rect.setTop(axis.y1());
+    if (rect.bottom() > axis.y2())
+        rect.setBottom(axis.y2());
     m_boundingRect = { QPointF(0, 0), rect.size() };
     setPos(rect.topLeft());
 }
