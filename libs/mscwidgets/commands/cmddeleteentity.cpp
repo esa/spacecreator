@@ -19,6 +19,7 @@
 
 #include "common/commandids.h"
 #include "mscchart.h"
+#include "msccomment.h"
 #include "mscdocument.h"
 #include "mscentity.h"
 #include "mscinstance.h"
@@ -35,6 +36,13 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
     setText(QObject::tr("Delete"));
 
     if (m_chart) {
+        auto fetchRelatedComments = [this](MscEntity *entity) {
+            if (MscInstanceEvent *commentEntity = entity->comment()) {
+                const int idx = m_chart->instanceEvents().indexOf(commentEntity);
+                m_events[idx] = commentEntity;
+            }
+        };
+
         for (auto item : items) {
             auto event = dynamic_cast<MscInstanceEvent *>(item);
             if (event) {
@@ -46,6 +54,7 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
                 const int idx = m_chart->instances().indexOf(instance);
                 m_entities[idx] = instance;
             }
+            fetchRelatedComments(item);
         }
 
         // now add all events that depend on instances that are deleted
@@ -56,9 +65,11 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
                 if (event->relatesTo(instance)) {
                     const int idx = m_chart->instanceEvents().indexOf(event);
                     m_events[idx] = event;
+                    fetchRelatedComments(event);
                 }
             }
         }
+
     } else if (m_document && !items.empty()) {
         auto document = dynamic_cast<MscDocument *>(items[0]);
         if (document) {
