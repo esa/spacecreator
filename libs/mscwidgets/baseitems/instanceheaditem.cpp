@@ -86,10 +86,13 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
 {
     m_textItemKind->setBackgroundColor(Qt::transparent);
     m_textItemKind->setEditable(true);
+    m_textItemKind->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_textItemName->setBackgroundColor(Qt::transparent);
     m_textItemName->setEditable(true);
+    m_textItemName->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
     connect(m_textItemName, &TextItem::edited, this, [this](const QString &txt) {
+        m_textItemName->adjustSize();
         updateLayout();
         Q_EMIT nameEdited(txt);
     });
@@ -97,6 +100,7 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
     connect(m_textItemName, &TextItem::textChanged, this, [this]() { updateLayout(); });
 
     connect(m_textItemKind, &TextItem::edited, this, [this](const QString &txt) {
+        m_textItemKind->adjustSize();
         updateLayout();
         Q_EMIT kindEdited(txt);
     });
@@ -148,13 +152,12 @@ void InstanceHeadItem::updateLayout()
 {
     prepareGeometryChange();
 
-    QRectF nameRect = m_textItemName->boundingRect();
-    QRectF kindRect = m_textItemKind->boundingRect();
-
-    // prepare symbol's rect:
     const qreal width = qMax(SymbolWidth, qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
     m_textItemName->setTextWidth(width);
     m_textItemKind->setTextWidth(width);
+
+    QRectF nameRect = m_textItemName->boundingRect();
+    QRectF kindRect = m_textItemKind->boundingRect();
 
     QRectF symbolRect(m_explicitTextBox);
     if (symbolRect.isEmpty()) {

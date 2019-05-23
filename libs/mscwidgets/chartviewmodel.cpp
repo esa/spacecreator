@@ -317,6 +317,7 @@ void ChartViewModel::addInstanceItems()
     d->m_layoutInfo.m_instancesRect = QRectF();
     const QRectF &chartRect = d->m_layoutInfo.m_chartItem->contentRect();
 
+    qreal maxHeight = 0.0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
         InstanceItem *item = itemForInstance(instance);
         if (!item) {
@@ -354,9 +355,18 @@ void ChartViewModel::addInstanceItems()
         }
 
         if (!instance->explicitCreator()) {
-            const qreal headBottom = item->axis().p1().y();
+            const qreal headBottom = item->axis().y1();
             d->m_layoutInfo.m_pos.setY(std::max(d->m_layoutInfo.m_pos.y(), headBottom));
+            maxHeight = qMax(maxHeight, headBottom - item->pos().y());
         }
+    }
+
+    for (InstanceItem *instanceItem : d->m_instanceItems) {
+        if (instanceItem->modelItem()->explicitCreator())
+            continue;
+
+        const QPointF pos = instanceItem->pos();
+        instanceItem->setPos(pos.x(), maxHeight - (instanceItem->axis().y1() - pos.y()));
     }
 
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItems.size());
@@ -743,7 +753,6 @@ void ChartViewModel::updateContentToChartbox(const QRectF &chartBoxRect)
 
 void ChartViewModel::actualizeInstancesHeights(qreal height) const
 {
-    qreal commonY(0.);
     for (InstanceItem *instanceItem : d->m_instanceItems) {
         bool updated(false);
         if (instanceItem->modelItem()->explicitStop()) {
@@ -753,24 +762,8 @@ void ChartViewModel::actualizeInstancesHeights(qreal height) const
             updateCreatedInstanceHeight(instanceItem, height);
             updated = true;
         }
-        if (!instanceItem->modelItem()->explicitCreator())
-            commonY = qMax(commonY, instanceItem->axis().y1());
-
-        if (!updated) {
-            if (!instanceItem->geometryManagedByCif())
-                instanceItem->setAxisHeight(height);
-        }
-    }
-
-    for (InstanceItem *instanceItem : d->m_instanceItems) {
-        if (instanceItem->modelItem()->explicitCreator())
-            continue;
-
-        const qreal currAxisY1 = instanceItem->axis().y1();
-        const qreal deltaY1 = commonY - currAxisY1;
-        if (!qFuzzyIsNull(deltaY1)) {
-            instanceItem->moveSilentlyBy({ 0., deltaY1 });
-        }
+        if (!updated && !instanceItem->geometryManagedByCif())
+            instanceItem->setAxisHeight(height);
     }
 }
 
@@ -1270,7 +1263,7 @@ QVariantList ChartViewModel::prepareChangeOrderCommand(MscInstance *instance) co
 
 void ChartViewModel::onInstanceGeometryChanged()
 {
-    if (MscInstance *instance = qobject_cast<MscInstance *>(sender()))
+    if (MscInstance *instance = qobject_cast<MscInstance *>(sender())) {
         if (InstanceItem *instanceItem = itemForInstance(instance)) {
             const QRectF &newGeom = instanceItem->sceneBoundingRect();
             const QVariantList &changeOrderParams = prepareChangeOrderCommand(instance);
@@ -1293,6 +1286,7 @@ void ChartViewModel::onInstanceGeometryChanged()
                 }
             }
         }
+    }
 }
 
 void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)

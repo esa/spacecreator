@@ -326,8 +326,8 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 
     ArrowItem *arrow = m_arrowItem->arrow();
 
-    const QPointF &shiftedSource = arrow->anchorPointSource() + shift;
-    const QPointF shiftedTarget(arrow->anchorPointTarget() + shift);
+    const QPointF shiftedSource { arrow->anchorPointSource() + shift };
+    const QPointF shiftedTarget { arrow->anchorPointTarget() + shift };
     bool res = updateSource(shiftedSource, ObjectAnchor::Snap::SnapTo, m_sourceInstance);
     res |= updateTarget(shiftedTarget, ObjectAnchor::Snap::SnapTo, m_targetInstance);
 
@@ -411,8 +411,12 @@ void MessageItem::commitGeometryChange()
 void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
-    const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + offset;
-    updateSource(desitnation, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
+    if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
+        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + offset;
+        updateSource(desitnation, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
+    } else {
+        updateSourceAndTarget(offset);
+    }
 
     scheduleLayoutUpdate();
 
@@ -423,8 +427,12 @@ void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
-    const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + offset;
-    updateTarget(desitnation, ObjectAnchor::Snap::NoSnap, m_targetInstance);
+    if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
+        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + offset;
+        updateTarget(desitnation, ObjectAnchor::Snap::NoSnap, m_targetInstance);
+    } else {
+        updateSourceAndTarget(offset);
+    }
 
     scheduleLayoutUpdate();
 

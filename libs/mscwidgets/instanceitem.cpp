@@ -62,7 +62,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
 
     m_headSymbol->setName(m_instance->name());
     m_headSymbol->setKind(m_instance->denominatorAndKind());
-    scheduleLayoutUpdate();
 
     setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
 
@@ -83,7 +82,12 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphic
         onManualGeometryChangeFinished(GripPoint::Center, from, to);
     });
 
-    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, &InstanceItem::scheduleLayoutUpdate);
+    connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, [this]() {
+        instantLayoutUpdate();
+        Q_EMIT needUpdateLayout();
+    });
+
+    scheduleLayoutUpdate();
 }
 
 MscInstance *InstanceItem::modelItem() const
@@ -153,12 +157,13 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
+    prepareGeometryChange();
+
     //    const QPointF &prevP1 = m_axisSymbol->line().p1();
     QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
     m_boundingRect.setWidth(headRect.width());
     m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
-    m_boundingRect.moveTopLeft(headRect.topLeft());
     updateGripPoints();
 
     // move end symb to the bottom:
@@ -170,8 +175,6 @@ void InstanceItem::rebuildLayout()
     const QPointF p1(headRect.center().x(), headRect.bottom());
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
-
-    prepareGeometryChange();
 }
 
 QRectF InstanceItem::boundingRect() const
@@ -455,11 +458,8 @@ void InstanceItem::setInitialLocation(const QPointF &requested, const QRectF &ch
     const QPointF &totalShift = avoidOverlaps(this, defaultShift, QRectF());
     const QPointF &shift = (totalShift.x() > defaultShift.x() ? totalShift : defaultShift) - instanceRect.topLeft();
 
-    if (!shift.isNull()) {
-        const QPointF horShift(shift.x(), 0.);
-
-        moveBy(horShift.x(), horShift.y()); // notify any attached message so it could update itself
-    }
+    if (!shift.isNull())
+        moveBy(shift.x(), 0); // notify any attached message so it could update itself
 }
 
 QRectF InstanceItem::kindBox() const

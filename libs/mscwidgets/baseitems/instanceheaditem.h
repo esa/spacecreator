@@ -33,7 +33,7 @@ class InstanceHeadItem : public QGraphicsObject
 public:
     static const qreal StartSymbolHeight;
 
-    InstanceHeadItem(QGraphicsItem *parent = nullptr);
+    explicit InstanceHeadItem(QGraphicsItem *parent = nullptr);
 
     QString name() const;
     QString kind() const;
