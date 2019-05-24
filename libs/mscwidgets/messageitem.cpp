@@ -134,7 +134,7 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
 {
-    if (sourceInstance == m_sourceInstance)
+    if (sourceInstance == m_sourceInstance || (sourceInstance && sourceInstance == m_targetInstance))
         return false;
 
     if (m_sourceInstance) {
@@ -170,7 +170,7 @@ InstanceItem *MessageItem::sourceInstanceItem() const
 
 bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
 {
-    if (targetInstance == m_targetInstance)
+    if (targetInstance == m_targetInstance || (targetInstance && targetInstance == m_sourceInstance))
         return false;
 
     if (m_targetInstance) {
@@ -544,6 +544,8 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
         return;
     }
 
+    onChartBoxChanged();
+
     bool converted(false);
     const QVector<QPoint> &oldPointsCif = utils::CoordinatesConverter::sceneToCif(m_originalMessagePoints, &converted);
     if (m_originalMessagePoints.size() && !converted) {
@@ -553,8 +555,7 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
     }
 
     const QVector<QPointF> &currPoints = messagePoints();
-    const QVector<QPoint> &newPointsCif =
-            wannabeGlobal() ? QVector<QPoint>() : utils::CoordinatesConverter::sceneToCif(currPoints, &converted);
+    const QVector<QPoint> &newPointsCif = utils::CoordinatesConverter::sceneToCif(currPoints, &converted);
     if (!converted) {
         qWarning() << "MessageItem move: scene->mm target coordinates conversion failed";
         return;
