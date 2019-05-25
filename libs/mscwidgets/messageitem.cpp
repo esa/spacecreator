@@ -481,9 +481,40 @@ void MessageItem::setAutoResizable(bool resizable)
 
 void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    if (gp->location() != GripPoint::Location::Center || from == to || isCreator())
+        return;
+
+    const QPointF shift { 0, QPointF(to - from).y() };
+
+    QSignalBlocker suppressUpdates(this);
+    const QVector<QPointF> currentPoints(messagePoints());
+    if (m_originalMessagePoints.isEmpty())
+        m_originalMessagePoints = currentPoints;
+
+    auto validatePoint = [this](const QPointF &requestedPoint, int pointId, bool isSource,
+                                const QVector<QPointF> &currentPoints) {
+        QPointF point(requestedPoint);
+        const QPointF &oppositePoint = currentPoints.at(pointId == 0 ? currentPoints.size() - 1 : 0);
+
+        // Arrow direction - should be top-to-bottom:
+        if ((isSource && point.y() > oppositePoint.y()) || (!isSource && point.y() < oppositePoint.y()))
+            point.ry() = oppositePoint.y();
+
+        // Anchor point - should be within an appropriate axis:
+        if (InstanceItem *instance = isSource ? m_sourceInstance : m_targetInstance) {
+            const QLineF &axis = instance->axis();
+            if (point.y() < axis.y1())
+                point.ry() = axis.y1();
+            if (point.y() > axis.y2())
+                point.ry() = axis.y2();
+        }
+
+        return point;
+    };
+
+    updateSource(validatePoint(tail() + shift, 0, true, currentPoints), ObjectAnchor::Snap::SnapTo);
+    updateTarget(validatePoint(head() + shift, currentPoints.size() - 1, false, currentPoints),
+                 ObjectAnchor::Snap::SnapTo);
 }
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -621,7 +652,8 @@ void MessageItem::prepareHoverMark()
     if (isCreator())
         m_gripPoints->setUsedPoints(GripPoint::Locations());
     else
-        m_gripPoints->setUsedPoints({ GripPoint::Location::Left, GripPoint::Location::Right });
+        m_gripPoints->setUsedPoints(
+                { GripPoint::Location::Left, GripPoint::Location::Right, GripPoint::Location::Center });
 
     connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
             &MessageItem::onManualGeometryChangeFinished, Qt::UniqueConnection);

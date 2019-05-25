@@ -151,6 +151,7 @@ private:
     void extendGlobalMessage();
 
     bool wannabeGlobal() const;
+    QPointF validatePoint(const QPointF &requestedPoint, bool isSource, const QPointF &oppositePoint);
 };
 
 } // namespace msc
