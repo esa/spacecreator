@@ -17,6 +17,7 @@
 
 #include "arrowitem.h"
 
+#include "common/coordinatesconverter.h"
 #include "common/objectslink.h"
 #include "common/utils.h"
 
@@ -32,6 +33,16 @@ namespace msc {
   \inmodule MscWidgets
 
 */
+
+qreal ArrowItem::defaultWidth()
+{
+    static constexpr int defaultWidthCif { 200 };
+    static qreal defaultWidthScene { 0. };
+    if (qFuzzyIsNull(defaultWidthScene)) {
+        defaultWidthScene = utils::CoordinatesConverter::widthInScene(defaultWidthCif);
+    }
+    return defaultWidthScene;
+}
 
 ArrowItem::ArrowItem(QGraphicsItem *parent)
     : ObjectsLinkItem(parent)

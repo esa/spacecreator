@@ -95,8 +95,26 @@ struct ChartViewModelPrivate {
     QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
-    static constexpr qreal InterMessageSpan = 20.;
-    static constexpr qreal InterInstanceSpan = 100.;
+    static qreal interMessageSpan()
+    {
+        static constexpr int interMessageSpanCIF { 40 };
+        static qreal interMessageSpanScene { 0. };
+        if (qFuzzyIsNull(interMessageSpanScene)) {
+            interMessageSpanScene = utils::CoordinatesConverter::heightInScene(interMessageSpanCIF);
+        }
+        return interMessageSpanScene;
+    }
+
+    static qreal interInstanceSpan()
+    {
+        static constexpr int interInstanceSpanCIF { 200 };
+        static qreal interInstanceSpanScene { 0. };
+        if (qFuzzyIsNull(interInstanceSpanScene)) {
+            interInstanceSpanScene = utils::CoordinatesConverter::heightInScene(interInstanceSpanCIF);
+        }
+        return interInstanceSpanScene;
+    }
+
     int m_visibleItemLimit = -1;
     bool m_layoutDirty = false;
 
@@ -105,12 +123,12 @@ struct ChartViewModelPrivate {
     qreal calcInstanceAxisHeight() const
     {
         if (m_instanceItems.isEmpty()) {
-            static constexpr qreal oneMessageHeight = 50.;
+            static const qreal oneMessageHeight = utils::CoordinatesConverter::heightInScene(100);
             const int eventsCount =
                     qMax(1,
                          m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
                                                   : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
-            return eventsCount * (oneMessageHeight + ChartViewModelPrivate::InterMessageSpan);
+            return eventsCount * (oneMessageHeight + interMessageSpan());
         }
 
         qreal height(0);
@@ -195,8 +213,9 @@ void ChartViewModel::fillView(MscChart *chart)
 
         const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
         const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
+        const bool emptyDoc = d->m_currentChart->instances().isEmpty() && d->m_currentChart->instanceEvents().isEmpty();
         applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
-        if (preferredRectCif.isNull()) {
+        if (preferredRectCif.isNull() && emptyDoc) {
             QSignalBlocker supprecCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
             d->m_layoutInfo.m_chartItem->updateCif();
         }
@@ -298,7 +317,7 @@ void ChartViewModel::doLayout()
     addInstanceItems(); // which are not highlightable now to avoid flickering
     addInstanceEventItems();
     disconnectItems();
-    actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->InterMessageSpan);
+    actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->interMessageSpan());
     updateChartboxToContent();
     connectItems();
 
@@ -308,6 +327,8 @@ void ChartViewModel::doLayout()
             item->setHighlightable(true);
 
     d->m_layoutDirty = false;
+
+    forceCifForAll();
 
     Q_EMIT layoutComplete();
 }
@@ -332,7 +353,7 @@ void ChartViewModel::addInstanceItems()
         if (geomByCif)
             item->applyCif();
         else
-            item->setInitialLocation(d->m_layoutInfo.m_pos, chartRect, d->InterInstanceSpan);
+            item->setInitialLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
 
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
         d->m_layoutInfo.m_instancesRect |= item->sceneBoundingRect();
@@ -444,7 +465,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             item->applyCif();
         else {
             const QRectF srcRect = item->sceneBoundingRect();
-            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
+            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->interMessageSpan();
             deltaY = targetTop - srcRect.top();
             item->moveSilentlyBy({ 0., deltaY });
         }
@@ -459,9 +480,9 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
     case MscEntity::EntityType::Coregion: {
         MscCoregion *coregion = static_cast<MscCoregion *>(event);
         if (coregion->type() == MscCoregion::Type::Begin) {
-            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->InterMessageSpan;
+            const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->interMessageSpan();
             item->setY(targetTop);
-            d->m_layoutInfo.m_pos.ry() += 2 * d->InterMessageSpan;
+            d->m_layoutInfo.m_pos.ry() += 2 * d->interMessageSpan();
         } else {
             qobject_cast<CoregionItem *>(item)->instantLayoutUpdate();
             d->m_layoutInfo.m_pos.ry() = item->sceneBoundingRect().bottom();
@@ -583,8 +604,8 @@ QRectF ChartViewModel::minimalContentRect() const
         return totalRect;
     };
 
-    const QRectF &events =
-            effectiveRectEvents(d->m_instanceEventItemsSorted).adjusted(0, d->InterMessageSpan, 0, d->InterMessageSpan);
+    const QRectF &events = effectiveRectEvents(d->m_instanceEventItemsSorted)
+                                   .adjusted(0, d->interMessageSpan(), 0, d->interMessageSpan());
     QRectF instances = effectiveRectInstances(d->m_instanceItemsSorted);
     if (events.isNull()) {
         instances.setHeight(minHeight);
@@ -593,7 +614,7 @@ QRectF ChartViewModel::minimalContentRect() const
     }
 
     QRectF contentRect = instances | events;
-    contentRect.setBottom(events.bottom() + InstanceEndItem::EndSymbolHeight);
+    contentRect.setBottom(events.bottom() /*+ InstanceEndItem::EndSymbolHeight*/);
     if (!contentRect.topLeft().isNull()) {
         if (contentRect.topLeft().x() < 0)
             contentRect.moveTopLeft(QPointF(0., 0.));
@@ -1156,7 +1177,7 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
         qreal verticalOffset = instance->axis().p1().y();
         if (prevItem
             && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
-            verticalOffset += prevItem->boundingRect().height() + d->InterMessageSpan;
+            verticalOffset += prevItem->boundingRect().height() + d->interMessageSpan();
         }
         item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + verticalOffset, instancesRect);
         item->instantLayoutUpdate();
@@ -1526,6 +1547,19 @@ void ChartViewModel::onInstanceCreatorChanged(MscInstance *newCreator)
             }
         }
     updateLayout();
+}
+
+void ChartViewModel::forceCifForAll()
+{
+    for (InteractiveObject *item : d->allItems()) {
+        if (!item->geometryManagedByCif()) {
+            QSignalBlocker suppressItemCifAdded(item->modelEntity());
+            item->updateCif();
+        }
+    }
+
+    QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
+    d->m_layoutInfo.m_chartItem->updateCif();
 }
 
 } // namespace msc

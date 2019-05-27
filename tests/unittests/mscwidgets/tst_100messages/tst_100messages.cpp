@@ -92,7 +92,7 @@ void tst100messages::testPerformance()
                                  .arg(CommandsCount)));
     QBENCHMARK {
         const QPointF &instacneCenter = m_instanceItem->boundingRect().translated(m_instanceItem->pos()).center();
-        const QPointF &messagePos = { instacneCenter.x() - ArrowItem::DEFAULT_WIDTH / 2, instacneCenter.y() };
+        const QPointF &messagePos = { instacneCenter.x() - ArrowItem::defaultWidth() / 2, instacneCenter.y() };
 
         QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()),
                                 QVariant::fromValue<ChartViewModel *>(&m_model), QPointF() };

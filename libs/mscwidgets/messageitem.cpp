@@ -79,12 +79,18 @@ MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, Instanc
             return;
         msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
         this->setSourceInstanceItem(instance);
+
+        if (geometryManagedByCif())
+            updateCif();
     });
     connect(m_message, &msc::MscMessage::targetChanged, this, [&](msc::MscInstance *mscInstance) {
         if (!m_chartViewModel)
             return;
         msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
         this->setTargetInstanceItem(instance);
+
+        if (geometryManagedByCif())
+            updateCif();
     });
     connect(m_message, &MscMessage::cifPointsChanged, this, [this]() {
         applyCif();
@@ -603,7 +609,7 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)
 {
     MessageItem *messageItem = new MessageItem(message, chartView);
-    static constexpr qreal halfLength(ArrowItem::DEFAULT_WIDTH / 2.);
+    static const qreal halfLength(ArrowItem::defaultWidth() / 2.);
     const QPointF head(halfLength, pos.y());
     const QPointF tail(-halfLength, pos.y());
     messageItem->setHead(head, ObjectAnchor::Snap::NoSnap);
@@ -795,7 +801,29 @@ void MessageItem::updateCif()
     using namespace cif;
 
     const cif::CifLine::CifType usedCifType = mainCifType();
-    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());
+
+    const QVector<QPointF> &msgPointsActual = messagePoints();
+    QVector<QPointF> msgPointsInChartBox(msgPointsActual);
+    if (msgPointsInChartBox.size() >= 2) {
+        const QRectF contentRect = utils::CoordinatesConverter::currentChartItem()->contentRect();
+        auto ensureInRect = [&contentRect](const QPointF &pnt) {
+            QPointF validated(pnt);
+            if (pnt.x() < contentRect.left())
+                validated.rx() = contentRect.left();
+            if (pnt.x() > contentRect.right())
+                validated.rx() = contentRect.right();
+            if (pnt.y() < contentRect.top())
+                validated.ry() = contentRect.top();
+            if (pnt.y() > contentRect.bottom())
+                validated.ry() = contentRect.bottom();
+            return validated;
+        };
+
+        msgPointsInChartBox[0] = ensureInRect(msgPointsInChartBox.first());
+        msgPointsInChartBox[msgPointsInChartBox.size() - 1] = ensureInRect(msgPointsInChartBox.last());
+    }
+
+    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(msgPointsInChartBox);
     if (!geometryManagedByCif()) {
         const CifBlockShared &emptyCif =
                 isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();

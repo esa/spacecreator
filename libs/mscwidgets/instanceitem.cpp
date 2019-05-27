@@ -215,6 +215,13 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
     if (delta.isNull())
         return;
 
+    {
+        // TODO: place this into InteractiveObject to be shared among all its descendans
+        const QRectF newRect = sceneBoundingRect().translated(delta.x(), delta.y());
+        if (!utils::CoordinatesConverter::currentChartItem()->contentRect().contains(newRect))
+            return;
+    }
+
     setPos(pos() + delta);
 }
 
@@ -465,6 +472,18 @@ void InstanceItem::setInitialLocation(const QPointF &requested, const QRectF &ch
 QRectF InstanceItem::kindBox() const
 {
     return m_headSymbol->rectGeometry();
+}
+
+qreal InstanceItem::defaultAxisHeight()
+{
+    static constexpr int defaultAxisHeightCIF { 300 };
+    static qreal defaultAxisHeightScene { 0. };
+
+    if (qFuzzyIsNull(defaultAxisHeightScene)) {
+        defaultAxisHeightScene = utils::CoordinatesConverter::heightInScene(defaultAxisHeightCIF);
+    }
+
+    return defaultAxisHeightScene;
 }
 
 } // namespace msc

@@ -27,7 +27,7 @@ class ArrowItem : public ObjectsLinkItem
 {
     Q_OBJECT
 public:
-    static constexpr qreal DEFAULT_WIDTH = 100.0;
+    static qreal defaultWidth();
 
     explicit ArrowItem(QGraphicsItem *parent = nullptr);
 

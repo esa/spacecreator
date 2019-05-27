@@ -58,7 +58,6 @@ private Q_SLOTS:
     void testLoadedCifMessagePosition();
     void testDefaultChartSize();
     void testInstanceCifExtendedChartWidth();
-    void testCifExtendedChartWidth();
 
 private:
     QGraphicsView m_view;
@@ -106,8 +105,8 @@ void tst_ChartViewModel::init()
     m_chartModel.reset(new ChartViewModel);
     m_view.setScene(m_chartModel->graphicsScene());
     msc::utils::CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
-    msc::utils::CoordinatesConverter::setPhysicalDPI(QPoint(254, 254)); // results in cif <-> pixel as 1:1
-    msc::utils::CoordinatesConverter::setLogicalDPI(QPoint(254, 254));
+    static const QPointF dpi1to1(msc::utils::CoordinatesConverter::Dpi1To1, msc::utils::CoordinatesConverter::Dpi1To1);
+    msc::utils::CoordinatesConverter::setDPI(dpi1to1, dpi1to1); // results in cif <-> pixel as 1:1
 }
 
 void tst_ChartViewModel::cleanup()
@@ -150,7 +149,8 @@ void tst_ChartViewModel::testNearestInstanceSimple()
 
 void tst_ChartViewModel::testNearestInstanceCreate()
 {
-    QString mscText = "MSC msc1; \
+    QString mscText = "MSCDOCUMENT mscdoc;\
+                        MSC msc1; \
                           INSTANCE Instance_A; \
                               ACTION 'Boot'; \
                               CREATE New_Instance1; \
@@ -159,7 +159,8 @@ void tst_ChartViewModel::testNearestInstanceCreate()
                           INSTANCE New_Instance1; \
                               OUT Msg01 TO Instance_A; \
                           ENDINSTANCE; \
-                       ENDMSC;";
+                       ENDMSC;\
+                        ENDMSCDOCUMENT;";
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 2);
 
@@ -189,6 +190,9 @@ void tst_ChartViewModel::testTimerPositionWithCifInstance()
             ENDMSC;\
             endmscdocument;\
         endmscdocument;";
+
+    utils::CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
+
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 1);
     QCOMPARE(m_chart->instanceEvents().size(), 1);
@@ -297,43 +301,23 @@ void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
                           msc Untitled_MSC;\
                               instance Instance_1;\
                               endinstance;\
-                              /* CIF INSTANCE (695, 42) (72, 31) (800, 264) */\
+                              /* CIF INSTANCE (695, 42) (143, 69) (800, 264) */\
                               instance Instance_2;\
                               endinstance;\
                           endmsc;\
                       endmscdocument;\
                   endmscdocument;";
+
+    utils::CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
+
     parseMsc(mscText);
 
     QPointer<ChartItem> chartItem = m_chartModel->chartItem();
     // content area width and height are stretched accordingly to the instance1's CIF
     const QRectF &inst2Rect = m_instanceItems[1]->sceneBoundingRect();
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().width(), inst2Rect.right()));
-    QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), inst2Rect.height() + inst2Rect.top()));
-}
 
-void tst_ChartViewModel::testCifExtendedChartWidth()
-{
-    const QSizeF chartSize(1425, 575);
-    const QString mscText = QString("mscdocument Untitled_Document /* MSC AND */;\
-                      /* CIF MSCDOCUMENT (0, 0) (%1, %2) */\
-                          mscdocument Untitled_Leaf /* MSC LEAF */;\
-                              msc Untitled_MSC;\
-                                  /* CIF INSTANCE (163, 42) (143, 62) (800, 264) */\
-                                  instance Instance_1;\
-                                  endinstance;\
-                                  instance Instance_2;\
-                                  endinstance;\
-                              endmsc;\
-                          endmscdocument;\
-                      endmscdocument;")
-                                    .arg(chartSize.width())
-                                    .arg(chartSize.height());
-    parseMsc(mscText);
-
-    const QSizeF &chartBoxSize = m_chartModel->chartItem()->contentRect().size();
-    QVERIFY(std::abs(chartBoxSize.width() - chartSize.width()) < m_maxOffset);
-    QVERIFY(std::abs(chartBoxSize.height() - chartSize.height()) < m_maxOffset);
+    QVERIFY(std::abs(chartItem->contentRect().width() - inst2Rect.right()) <= m_maxOffset);
+    QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), inst2Rect.bottom()));
 }
 
 QTEST_MAIN(tst_ChartViewModel)

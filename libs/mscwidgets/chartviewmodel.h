@@ -156,6 +156,8 @@ private:
     void applyContentRect(const QRectF &newRect);
 
     QVariantList prepareChangeOrderCommand(MscInstance *instance) const;
+
+    void forceCifForAll();
 };
 
 } // namespace msc

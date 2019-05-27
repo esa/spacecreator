@@ -24,9 +24,6 @@ namespace msc {
 class InstanceEndItem : public QGraphicsRectItem
 {
 public:
-    static constexpr qreal EndSymbolHeight = 15.;
-    static constexpr qreal StopSymbolHeight = 25.;
-
     InstanceEndItem(bool stop = false, QGraphicsItem *parent = nullptr);
 
     bool isStop() const;
@@ -45,6 +42,9 @@ private:
     QColor m_bgrColor = Qt::black;
 
     void setStopImpl(bool stop);
+
+    static qreal stopSymbolHeight();
+    static qreal endSymbolHeight();
 };
 
 } // ns msc

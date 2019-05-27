@@ -56,13 +56,15 @@ void CoordinatesConverter::setScene(QGraphicsScene *scene)
     m_view = view;
 
     if (viewChanged && m_view) {
-        m_dpiPhysical = QPoint(m_view->physicalDpiX(), m_view->physicalDpiY());
-        m_dpiLogical = QPoint(m_view->logicalDpiX(), m_view->logicalDpiY());
+        setDPI(QPointF(m_view->physicalDpiX(), m_view->physicalDpiY()),
+               QPointF(m_view->logicalDpiX(), m_view->logicalDpiY()));
     }
 
     if (!m_view)
         qWarning() << "CoordinatesConverter::setScene: received a scene with no attached view, no further scene<->mm "
                       "conversion is possible.";
+    else if (viewChanged)
+        qDebug() << "CoordinatesConverter: current DPI: physical:" << m_dpiPhysical << "logical:" << m_dpiLogical;
 }
 
 /*!
@@ -87,7 +89,7 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePointSrc, bool *ok)
         *ok = false;
 
     if (CoordinatesConverter *converter = instance()) {
-        if (converter->m_dpiPhysical.x() && converter->m_dpiPhysical.y()) {
+        if (!converter->m_dpiPhysical.isNull()) {
             if (converter->m_view) {
                 const QPointF &sceneOriginPixels = sceneOriginInView(converter->m_view);
                 const QPointF &targetPixels = converter->m_view->mapFromScene(scenePoint) - sceneOriginPixels;
@@ -148,7 +150,7 @@ QPointF CoordinatesConverter::cifToScene(const QPoint &cifPoint, bool *ok)
         *ok = false;
 
     if (CoordinatesConverter *converter = instance()) {
-        if (converter->m_dpiPhysical.x() && converter->m_dpiPhysical.y()) {
+        if (!converter->m_dpiPhysical.isNull()) {
             if (converter->m_view) {
                 const QPointF sceneOriginPixels(sceneOriginInView(converter->m_view));
                 const QPointF cifPointOneMm(scenePoint / m_cifMmScaleFactor);
@@ -222,14 +224,31 @@ ChartItem *CoordinatesConverter::currentChartItem()
     return nullptr;
 }
 
-void CoordinatesConverter::setPhysicalDPI(QPoint dpi)
+void CoordinatesConverter::setDPI(const QPointF &physical, const QPointF &logical)
 {
-    instance()->m_dpiPhysical = dpi;
+    instance()->m_dpiPhysical = physical;
+    instance()->m_dpiLogical = logical;
 }
 
-void CoordinatesConverter::setLogicalDPI(QPoint dpi)
+QPointF CoordinatesConverter::vector2DInScene(const int mmX, const int mmY)
 {
-    instance()->m_dpiLogical = dpi;
+    bool converted(false);
+    const QPointF &scenePoint = cifToScene({ mmX, mmY }, &converted);
+    if (!converted) {
+        qWarning() << "CoordinatesConverter::vector2DInScene: failed";
+    }
+
+    return converted ? scenePoint : QPointF();
+}
+
+qreal CoordinatesConverter::widthInScene(const int mmX)
+{
+    return CoordinatesConverter::vector2DInScene(mmX, 0).x();
+}
+
+qreal CoordinatesConverter::heightInScene(const int mmY)
+{
+    return CoordinatesConverter::vector2DInScene(0, mmY).y();
 }
 
 } // ns utils

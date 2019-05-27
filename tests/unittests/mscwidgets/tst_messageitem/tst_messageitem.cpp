@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
@@ -212,14 +213,15 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
     message->setTargetInstance(m_instances[2]);
     QApplication::processEvents();
     points = messageItem->messagePoints();
-    QVERIFY(qFuzzyCompare(points[0].x(), instanceAxesX[0]));
-    QVERIFY(qFuzzyCompare(points[1].x(), instanceAxesX[2]));
+
+    QVERIFY(std::abs(points[0].x() - instanceAxesX[0]) < m_maxOffset);
+    QVERIFY(std::abs(points[1].x() - instanceAxesX[2]) < m_maxOffset);
 
     message->setSourceInstance(m_instances[1]);
     QApplication::processEvents();
     points = messageItem->messagePoints();
-    QVERIFY(qFuzzyCompare(points[0].x(), instanceAxesX[1]));
-    QVERIFY(qFuzzyCompare(points[1].x(), instanceAxesX[2]));
+    QVERIFY(std::abs(points[0].x() - instanceAxesX[1]) < m_maxOffset);
+    QVERIFY(std::abs(points[1].x() - instanceAxesX[2]) < m_maxOffset);
 }
 
 void tst_MessageItem::testFirstMessagePosition()

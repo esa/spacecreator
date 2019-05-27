@@ -17,6 +17,7 @@
 
 #include "instanceenditem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 
 #include <QBrush>
@@ -95,12 +96,34 @@ void InstanceEndItem::setRect(const QRectF &r)
 
 qreal InstanceEndItem::height() const
 {
-    return isStop() ? StopSymbolHeight : EndSymbolHeight;
+    return isStop() ? stopSymbolHeight() : endSymbolHeight();
 }
 
 QRectF InstanceEndItem::boundingRect() const
 {
     return rect();
+}
+
+qreal InstanceEndItem::stopSymbolHeight()
+{
+    static constexpr int stopSymbolHeightCIF { 50 };
+    static qreal stopSymbolHeightScene { 0. };
+    if (qFuzzyIsNull(stopSymbolHeightScene)) {
+        stopSymbolHeightScene = utils::CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
+    }
+
+    return stopSymbolHeightScene;
+}
+
+qreal InstanceEndItem::endSymbolHeight()
+{
+    static constexpr int endSymbolHeightCIF { 25 };
+    static qreal endSymbolHeightScene { 0. };
+    if (qFuzzyIsNull(endSymbolHeightScene)) {
+        endSymbolHeightScene = utils::CoordinatesConverter::heightInScene(endSymbolHeightCIF);
+    }
+
+    return endSymbolHeightScene;
 }
 
 } // ns msc

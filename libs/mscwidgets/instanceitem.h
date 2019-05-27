@@ -40,7 +40,6 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    static constexpr qreal DefaultAxisHeight = 100.;
     explicit InstanceItem(MscInstance *instance, MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
@@ -71,6 +70,8 @@ public:
 
     QRectF kindBox() const;
 
+    static qreal defaultAxisHeight();
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);
@@ -94,7 +95,7 @@ private:
     QGraphicsLineItem *m_axisSymbol = nullptr;
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
-    qreal m_axisHeight = DefaultAxisHeight;
+    qreal m_axisHeight = defaultAxisHeight();
 
     Q_INVOKABLE void reflectTextLayoutChange();
 

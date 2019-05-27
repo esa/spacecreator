@@ -32,6 +32,7 @@ namespace utils {
 class CoordinatesConverter
 {
 public:
+    static constexpr qreal Dpi1To1 { 96. };
     static void init(QGraphicsScene *scene, ChartItem *chartItem);
     static QPoint sceneToCif(const QPointF &scenePoint, bool *ok = nullptr);
     static bool sceneToCif(const QPointF &scenePoint, QPoint &cifPoint);
@@ -44,11 +45,14 @@ public:
 
     /// @{
     /** group test helper/access function */
-    static void setPhysicalDPI(QPoint dpi);
-    static void setLogicalDPI(QPoint dpi);
+    static void setDPI(const QPointF &physical, const QPointF &logical);
     void setScene(QGraphicsScene *scene);
     static CoordinatesConverter *instance();
     /// @}
+
+    static QPointF vector2DInScene(const int mmX, const int mmY);
+    static qreal widthInScene(const int mmX);
+    static qreal heightInScene(const int mmY);
 
 private:
     static constexpr qreal m_mmInInch { 25.4 };
@@ -58,8 +62,8 @@ private:
     QPointer<QGraphicsScene> m_scene = nullptr;
     QPointer<QGraphicsView> m_view = nullptr;
     QPointer<ChartItem> m_chartItem = nullptr;
-    QPoint m_dpiPhysical;
-    QPoint m_dpiLogical;
+    QPointF m_dpiPhysical;
+    QPointF m_dpiLogical;
 
     static QPoint sceneOriginInView(QGraphicsView *view);
 

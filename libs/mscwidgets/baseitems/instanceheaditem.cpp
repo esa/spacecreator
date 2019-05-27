@@ -17,6 +17,7 @@
 
 #include "instanceheaditem.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
 #include "mscinstance.h"
@@ -28,9 +29,6 @@
 #include <QPainter>
 
 namespace msc {
-
-static constexpr qreal SymbolWidth = { 60.0 };
-const qreal InstanceHeadItem::StartSymbolHeight = 20.;
 
 QLinearGradient InstanceHeadItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
@@ -152,7 +150,11 @@ void InstanceHeadItem::updateLayout()
 {
     prepareGeometryChange();
 
-    const qreal width = qMax(SymbolWidth, qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
+    const QSizeF defaultSizeScene = defaultSize();
+    // prepare symbol's rect:
+    const qreal width =
+            qMax(defaultSizeScene.width(), qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
+
     m_textItemName->setTextWidth(width);
     m_textItemKind->setTextWidth(width);
 
@@ -161,7 +163,7 @@ void InstanceHeadItem::updateLayout()
 
     QRectF symbolRect(m_explicitTextBox);
     if (symbolRect.isEmpty()) {
-        symbolRect = { 0., 0., width, qMax(kindRect.height(), StartSymbolHeight) };
+        symbolRect = { 0., 0., width, qMax(kindRect.height(), defaultSizeScene.height()) };
 
         static const qreal padding = 5.;
         symbolRect.adjust(-padding, -padding, padding, padding);
@@ -282,6 +284,18 @@ void InstanceHeadItem::setTextboxSize(const QSizeF &size)
 QRectF InstanceHeadItem::textBoxSceneRect() const
 {
     return m_rectItem->mapRectToScene(m_rectItem->rect());
+}
+
+QSizeF InstanceHeadItem::defaultSize()
+{
+    static constexpr QSize sizeCIF { 100, 50 };
+    static QSizeF sizeScene { 0., 0. };
+    if (sizeScene.isEmpty()) {
+        const QPointF sz = utils::CoordinatesConverter::vector2DInScene(sizeCIF.width(), sizeCIF.height());
+        sizeScene = { sz.x(), sz.y() };
+    }
+
+    return sizeScene;
 }
 
 } // ns msc

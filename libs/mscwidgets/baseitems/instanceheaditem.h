@@ -31,8 +31,6 @@ class InstanceHeadItem : public QGraphicsObject
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindEdited)
 
 public:
-    static const qreal StartSymbolHeight;
-
     explicit InstanceHeadItem(QGraphicsItem *parent = nullptr);
 
     QString name() const;
@@ -46,6 +44,8 @@ public:
 
     void setTextboxSize(const QSizeF &size);
     QRectF textBoxSceneRect() const;
+
+    static QSizeF defaultSize();
 
 public Q_SLOTS:
     void setName(const QString &name);
