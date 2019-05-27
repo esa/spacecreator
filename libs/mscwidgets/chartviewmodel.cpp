@@ -991,7 +991,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
         if (!orphanInstance)
             orphanInstance = currentChart()->makeInstance();
 
-        InstanceItem *instanceItem = InstanceItem::createDefaultItem(orphanInstance, currentChart(), pos);
+        InstanceItem *instanceItem = InstanceItem::createDefaultItem(this, orphanInstance, currentChart(), pos);
         const qreal axisHeight = d->calcInstanceAxisHeight();
         if (!qFuzzyIsNull(axisHeight))
             instanceItem->setAxisHeight(axisHeight);
@@ -1286,13 +1286,22 @@ void ChartViewModel::onInstanceGeometryChanged()
 {
     if (MscInstance *instance = qobject_cast<MscInstance *>(sender())) {
         if (InstanceItem *instanceItem = itemForInstance(instance)) {
-            const QRectF &newGeom = instanceItem->sceneBoundingRect();
-            const QVariantList &changeOrderParams = prepareChangeOrderCommand(instance);
-            if (!changeOrderParams.isEmpty())
-                msc::cmd::CommandsStack::push(msc::cmd::ReorderInstance, changeOrderParams);
+            Q_ASSERT(instanceItem != nullptr);
+
+            const int currentIdx = d->m_currentChart->instances().indexOf(instance);
+            Q_ASSERT(currentIdx >= 0);
+            int nextIdx = 0;
+            for (InstanceItem *inst : d->m_instanceItemsSorted) {
+                if (inst != instanceItem && instanceItem->x() > inst->x())
+                    ++nextIdx;
+            }
+
+            if (currentIdx != nextIdx)
+                d->m_currentChart->updateInstanceOrder(instance, nextIdx);
             else
                 updateLayout();
 
+            const QRectF newGeom = instanceItem->sceneBoundingRect();
             QPointF shiftToPositives;
             if (newGeom.topLeft().x() < 0)
                 shiftToPositives.rx() = -newGeom.topLeft().x();

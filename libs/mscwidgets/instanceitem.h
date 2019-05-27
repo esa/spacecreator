@@ -30,6 +30,7 @@ namespace msc {
 class MscInstance;
 class MscChart;
 
+class ChartViewModel;
 class InstanceHeadItem;
 class InstanceEndItem;
 class MessageItem;
@@ -40,7 +41,8 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit InstanceItem(MscInstance *instance, MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
+    explicit InstanceItem(MscInstance *instance, ChartViewModel *chartView = nullptr, MscChart *chart = nullptr,
+                          QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
 
@@ -55,7 +57,8 @@ public:
     QPainterPath shape() const override;
     void setBoundingRect(const QRectF &geometry);
 
-    static InstanceItem *createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos);
+    static InstanceItem *createDefaultItem(ChartViewModel *model, MscInstance *instance, MscChart *chart,
+                                           const QPointF &pos);
 
     QPair<QPointF, bool> commentPoint() const override;
 
@@ -90,6 +93,7 @@ protected:
 #endif
 
 private:
+    ChartViewModel *m_model = nullptr;
     msc::MscInstance *m_instance = nullptr;
     QPointer<msc::MscChart> m_chart;
     QGraphicsLineItem *m_axisSymbol = nullptr;

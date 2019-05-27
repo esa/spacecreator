@@ -356,8 +356,7 @@ void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
     if (currPos == pos)
         return;
 
-    m_instances.takeAt(currPos);
-    m_instances.insert(pos, instance);
+    m_instances.move(currPos, pos);
 
     Q_EMIT instanceOrderChanged(instance, currPos, pos);
     Q_EMIT dataChanged();

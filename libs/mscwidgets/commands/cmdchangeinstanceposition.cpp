@@ -45,12 +45,8 @@ void CmdChangeInstancePosition::undo()
 
 bool CmdChangeInstancePosition::mergeWith(const QUndoCommand *command)
 {
-    auto other = dynamic_cast<const CmdChangeInstancePosition *>(command);
-    if (!canMergeWith(other))
-        return false;
-
-    m_newCif = other->m_newCif;
-    return true;
+    Q_UNUSED(command);
+    return false;
 }
 int CmdChangeInstancePosition::id() const
 {

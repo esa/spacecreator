@@ -66,7 +66,7 @@ void tst100messages::initTestCase()
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
 
-    m_instanceItem = new InstanceItem(new MscInstance("Instance", this));
+    m_instanceItem = new InstanceItem(new MscInstance("Instance", this), &m_model);
     m_instanceItem->setAxisHeight(2 * CommandsCount);
     m_instanceItem->setPos(CommandsCount, 0.);
     m_model.graphicsScene()->addItem(m_instanceItem);

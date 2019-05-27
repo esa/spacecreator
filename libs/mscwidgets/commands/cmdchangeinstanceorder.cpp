@@ -48,12 +48,7 @@ void CmdChangeInstanceOrder::undo()
 
 bool CmdChangeInstanceOrder::mergeWith(const QUndoCommand *command)
 {
-    const CmdChangeInstanceOrder *other = static_cast<const CmdChangeInstanceOrder *>(command);
-    if (canMergeWith(other)) {
-        m_posTo = other->m_posTo;
-        return true;
-    }
-
+    Q_UNUSED(command);
     return false;
 }
 

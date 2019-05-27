@@ -25,6 +25,7 @@
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
+#include "chartviewmodel.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
@@ -46,8 +47,10 @@
 
 namespace msc {
 
-InstanceItem::InstanceItem(msc::MscInstance *instance, MscChart *chart, QGraphicsItem *parent)
+InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView, MscChart *chart,
+                           QGraphicsItem *parent)
     : InteractiveObject(instance, parent)
+    , m_model(chartView)
     , m_instance(instance)
     , m_chart(chart)
     , m_axisSymbol(new QGraphicsLineItem(this))
@@ -253,9 +256,10 @@ void InstanceItem::setBoundingRect(const QRectF &geometry)
     scheduleLayoutUpdate();
 }
 
-InstanceItem *InstanceItem::createDefaultItem(MscInstance *instance, MscChart *chart, const QPointF &pos)
+InstanceItem *InstanceItem::createDefaultItem(ChartViewModel *model, MscInstance *instance, MscChart *chart,
+                                              const QPointF &pos)
 {
-    InstanceItem *messageItem = new InstanceItem(instance, chart);
+    InstanceItem *messageItem = new InstanceItem(instance, model, chart);
     messageItem->setPos(pos);
 
     return messageItem;
@@ -405,8 +409,30 @@ void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPo
         setPos(pos() + delta);
 
     const QVariantList &paramsPosition = prepareChangePositionCommand();
-    if (!paramsPosition.isEmpty())
+    if (!paramsPosition.isEmpty()) {
+        cmd::CommandsStack::current()->beginMacro(QStringLiteral("Change Instance geometry"));
+        if (!geometryManagedByCif() && m_model) {
+            const QVector<MscInstance *> instances = m_model->currentChart()->instances();
+            const int oldIdx = instances.indexOf(m_instance);
+            int newIdx = 0;
+            for (MscInstance *instance : instances) {
+                if (instance == m_instance)
+                    continue;
+
+                if (auto item = m_model->itemForInstance(instance))
+                    if (x() > item->x())
+                        ++newIdx;
+            }
+
+            if (oldIdx != newIdx) {
+                cmd::CommandsStack::push(cmd::Id::ReorderInstance,
+                                         { QVariant::fromValue<MscInstance *>(m_instance), newIdx,
+                                           QVariant::fromValue<MscChart *>(m_chart) });
+            }
+        }
         cmd::CommandsStack::push(cmd::Id::ChangeInstancePosition, paramsPosition);
+        cmd::CommandsStack::current()->endMacro();
+    }
 }
 
 #ifdef QT_DEBUG
