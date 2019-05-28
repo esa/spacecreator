@@ -63,18 +63,7 @@ void ArrowItem::drawStartSign(QPainter *painter)
     if (m_bodyPath.isEmpty())
         return;
 
-    painter->save();
-
-    const QPointF p1(startSignLocal());
-    const QPointF p2(endSignLocal());
-
-    painter->translate(p1.x(), p1.y());
-    painter->rotate(-QLineF(p1, p2).angle());
-    painter->translate(-p1.x(), -p1.y());
-
     ObjectsLinkItem::drawStartSign(painter);
-
-    painter->restore();
 }
 
 void ArrowItem::drawEndSign(QPainter *painter)
@@ -82,20 +71,7 @@ void ArrowItem::drawEndSign(QPainter *painter)
     if (m_bodyPath.isEmpty())
         return;
 
-    painter->save();
-
-    QPointF p1(m_polyLine.at(m_polyLine.size() - 2));
-    QPointF p2(m_polyLine.last());
-    if (m_polyLine.size() > 2 && p1 == p2)
-        p1 = m_polyLine.at(m_polyLine.size() - 3);
-
-    painter->translate(p2.x(), p2.y());
-    painter->rotate(-QLineF(p1, p2).angle());
-    painter->translate(-p2.x(), -p2.y());
-
     ObjectsLinkItem::drawEndSign(painter);
-
-    painter->restore();
 }
 
 bool ArrowItem::updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap)
@@ -196,13 +172,17 @@ void ArrowItem::updatePath()
             m_bodyPath.lineTo(m_polyLine.at(point++));
         }
 
-        m_arrowHeads.Source.pointTo(m_polyLine.first());
-        m_arrowHeads.Target.pointTo(m_polyLine.last());
+        m_arrowHeads.Source.pointTo(m_polyLine.first(), QLineF(m_polyLine.first(), m_polyLine.last()).angle());
+        m_arrowHeads.Target.pointTo(m_polyLine.last(), QLineF(m_polyLine.last(), m_polyLine.first()).angle());
     }
     m_symbols.Source = m_arrowHeads.Source.path();
     m_symbols.Target = m_arrowHeads.Target.path();
 
     m_bounds = m_bodyPath.boundingRect();
+    if (m_symbolShown.Source)
+        m_bounds |= m_symbols.Source.boundingRect();
+    if (m_symbolShown.Target)
+        m_bounds |= m_symbols.Target.boundingRect();
 
     Q_EMIT geometryChanged(boundingRect());
 }

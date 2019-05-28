@@ -79,6 +79,21 @@ QPainterPath ArrowSign::path() const
     return m_path;
 }
 
+void ArrowSign::pointTo(const QPointF &target, const qreal angle)
+{
+    m_head = target;
+    QLineF line(target, target + QPointF(ARROW_WIDTH, 0));
+    line.setLength(ARROW_WIDTH);
+    line.setAngle(angle);
+    line = QLineF(line.p2(), line.p1());
+    QLineF normalVector = line.normalVector();
+    normalVector.setLength(ARROW_HEIGHT / 2);
+    m_bottom = normalVector.p2();
+    normalVector.setAngle(normalVector.angle() - 180);
+    m_top = normalVector.p2();
+
+    updatePath();
+}
 void ArrowSign::pointTo(const QPointF &target)
 {
     const QPointF offset = target - m_head;

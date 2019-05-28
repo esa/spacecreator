@@ -278,9 +278,7 @@ void MessageItem::rebuildLayout()
 
 QPainterPath MessageItem::shape() const
 {
-    QPainterPath result;
-    result.addPath(m_arrowItem->shape());
-    return result;
+    return m_arrowItem->shape();
 }
 
 void MessageItem::updateGripPoints()
@@ -494,37 +492,26 @@ void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
     if (gp->location() != GripPoint::Location::Center || from == to || isCreator())
         return;
 
-    const QPointF shift { 0, QPointF(to - from).y() };
+    const qreal shift = QPointF(to - from).y();
 
     QSignalBlocker suppressUpdates(this);
     const QVector<QPointF> currentPoints(messagePoints());
     if (m_originalMessagePoints.isEmpty())
         m_originalMessagePoints = currentPoints;
 
-    auto validatePoint = [this](const QPointF &requestedPoint, int pointId, bool isSource,
-                                const QVector<QPointF> &currentPoints) {
-        QPointF point(requestedPoint);
-        const QPointF &oppositePoint = currentPoints.at(pointId == 0 ? currentPoints.size() - 1 : 0);
+    const qreal newHead = head().y() + shift;
+    const qreal newTail = tail().y() + shift;
 
-        // Arrow direction - should be top-to-bottom:
-        if ((isSource && point.y() > oppositePoint.y()) || (!isSource && point.y() < oppositePoint.y()))
-            point.ry() = oppositePoint.y();
+    const QRectF actualContentRect = m_chartViewModel ? m_chartViewModel->actualContentRect() : QRectF();
+    const qreal upperBound = qMax(m_sourceInstance ? m_sourceInstance->axis().y1() : actualContentRect.top(),
+                                  m_targetInstance ? m_targetInstance->axis().y1() : actualContentRect.top());
+    const qreal lowerBound = qMin(m_sourceInstance ? m_sourceInstance->axis().y2() : actualContentRect.bottom(),
+                                  m_targetInstance ? m_targetInstance->axis().y2() : actualContentRect.bottom());
 
-        // Anchor point - should be within an appropriate axis:
-        if (InstanceItem *instance = isSource ? m_sourceInstance : m_targetInstance) {
-            const QLineF &axis = instance->axis();
-            if (point.y() < axis.y1())
-                point.ry() = axis.y1();
-            if (point.y() > axis.y2())
-                point.ry() = axis.y2();
-        }
+    if (newHead < upperBound || newHead > lowerBound || newTail < upperBound || newTail > lowerBound)
+        return;
 
-        return point;
-    };
-
-    updateSource(validatePoint(tail() + shift, 0, true, currentPoints), ObjectAnchor::Snap::SnapTo);
-    updateTarget(validatePoint(head() + shift, currentPoints.size() - 1, false, currentPoints),
-                 ObjectAnchor::Snap::SnapTo);
+    updateSourceAndTarget(QPointF(0, shift));
 }
 
 void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)

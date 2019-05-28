@@ -37,6 +37,7 @@ public:
 
     QPainterPath path() const;
     void pointTo(const QPointF &target);
+    void pointTo(const QPointF &target, const qreal angle);
 
     static ArrowSign createArrowLeft();
     static ArrowSign createArrowRight();

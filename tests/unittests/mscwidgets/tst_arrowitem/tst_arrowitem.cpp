@@ -129,9 +129,9 @@ void tst_ArrowItem::testBoundingRect()
 
     const QRectF &aiBounds(ai.sceneBoundingRect());
     QCOMPARE(aiBounds.width(), itemCenters.length());
-    QCOMPARE(aiBounds.height(), 0.);
-    QCOMPARE(aiBounds.topLeft(), itemCenters.p1());
-    QCOMPARE(aiBounds.bottomRight(), itemCenters.p2());
+    QVERIFY(!qFuzzyIsNull(aiBounds.height()));
+    QCOMPARE(utils::lineCenter(QLineF(aiBounds.topLeft(), aiBounds.bottomLeft())), itemCenters.p1());
+    QCOMPARE(utils::lineCenter(QLineF(aiBounds.topRight(), aiBounds.bottomRight())), itemCenters.p2());
 }
 
 void tst_ArrowItem::testUpdateStart()
