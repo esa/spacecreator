@@ -156,21 +156,21 @@ void tst_MscEventsParsing::testMessageWithParameters()
     QVERIFY(message != nullptr);
     QCOMPARE(message->messageInstanceName(), QString("a"));
     MscParameterList parameters = message->parameters();
-    QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).expression(), QString("longitude:-174.0"));
+    QCOMPARE(parameters.data().size(), 1);
+    QCOMPARE(parameters.data().at(0).expression(), QString("longitude:-174.0"));
 
 #ifndef __clang_analyzer__
     message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(1));
     QVERIFY(message != nullptr);
     QVERIFY(message->messageInstanceName().isEmpty());
     parameters = message->parameters();
-    QCOMPARE(parameters.at(0).pattern(), QString("12"));
+    QCOMPARE(parameters.data().at(0).pattern(), QString("12"));
 
     message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(6));
     QVERIFY(message != nullptr);
     parameters = message->parameters();
-    QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).pattern(), QString("(. 1002,9999,'1701' .)"));
+    QCOMPARE(parameters.data().size(), 1);
+    QCOMPARE(parameters.data().at(0).pattern(), QString("(. 1002,9999,'1701' .)"));
 #endif
 }
 
@@ -237,9 +237,9 @@ void tst_MscEventsParsing::testMultiParameters()
     auto *message = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(message->name(), QString("hello"));
     MscParameterList parameters = message->parameters();
-    QCOMPARE(parameters.size(), 2);
-    QCOMPARE(parameters.at(0).expression(), QString("b:   FALSE"));
-    QCOMPARE(parameters.at(1).pattern(), QString("11"));
+    QCOMPARE(parameters.data().size(), 2);
+    QCOMPARE(parameters.data().at(0).expression(), QString("b:   FALSE"));
+    QCOMPARE(parameters.data().at(1).pattern(), QString("11"));
 }
 
 void tst_MscEventsParsing::testInstanceCreate()
@@ -267,9 +267,9 @@ void tst_MscEventsParsing::testInstanceCreate()
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
     MscParameterList parameters = create->parameters();
-    QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).pattern(), QString("data"));
-    QCOMPARE(parameters.at(0).expression(), QString());
+    QCOMPARE(parameters.data().size(), 1);
+    QCOMPARE(parameters.data().at(0).pattern(), QString("data"));
+    QCOMPARE(parameters.data().at(0).expression(), QString());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoParameter()
@@ -294,7 +294,7 @@ void tst_MscEventsParsing::testInstanceCreateNoParameter()
     QCOMPARE(create->name(), QString());
     QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
-    QVERIFY(create->parameters().isEmpty());
+    QVERIFY(create->parameters().data().isEmpty());
 }
 
 void tst_MscEventsParsing::testInstanceCreateMultiParameter()
@@ -323,7 +323,7 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
     QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
 
     QStringList paramsOut;
-    for (const MscParameter &param : create->parameters()) {
+    for (const MscParameter &param : create->parameters().data()) {
         paramsOut << param.pattern();
     }
 
@@ -355,7 +355,7 @@ void tst_MscEventsParsing::testInstanceCreateEmptyParameter()
 
     auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
     QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
-    QVERIFY(msg->parameters().isEmpty());
+    QVERIFY(msg->parameters().data().isEmpty());
 }
 
 void tst_MscEventsParsing::testInstanceCreateNoInstance()

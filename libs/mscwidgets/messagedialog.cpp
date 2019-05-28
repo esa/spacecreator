@@ -97,7 +97,7 @@ void MessageDialog::accept()
     for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
         const QString &text = ui->parameterTable->item(i, 0)->text();
         if (!text.isEmpty()) {
-            parameters << msc::MscParameter(text);
+            parameters.dataRef() << msc::MscParameter(text);
         } else {
             qWarning() << "An empty parameter is not allowed";
         }
@@ -283,7 +283,7 @@ void MessageDialog::checkTextValidity()
         if (item) {
             const QString &text = item->text();
             if (!text.isEmpty())
-                parameters << msc::MscParameter(text);
+                parameters.dataRef() << msc::MscParameter(text);
             else
                 m_isValid = false;
         }
@@ -357,10 +357,10 @@ void MessageDialog::fillMessageDeclartionBox()
 
 void MessageDialog::fillParameters()
 {
-    const int size = m_message->parameters().size();
+    const int size = m_message->parameters().data().size();
     ui->parameterTable->setRowCount(size);
     int row = 0;
-    for (const msc::MscParameter &parameter : m_message->parameters()) {
+    for (const msc::MscParameter &parameter : m_message->parameters().data()) {
         QTableWidgetItem *tableItem = ui->parameterTable->item(row, 0);
         if (!tableItem) {
             tableItem = new QTableWidgetItem();

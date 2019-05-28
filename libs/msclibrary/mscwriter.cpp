@@ -473,12 +473,12 @@ QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize
 QString MscWriter::serializeParameters(const MscMessage *message) const
 {
     QString parameters;
-    for (const MscParameter &param : message->parameters()) {
+    for (const MscParameter &param : message->parameters().data()) {
         if (!parameters.isEmpty())
             parameters += ", ";
         parameters += param.pattern().isEmpty() ? param.expression() : param.pattern();
     }
-    return parameters;
+    return message->parameters().extraBraceOpen() + parameters + message->parameters().extraBraceClose();
 }
 
 QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const

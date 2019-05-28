@@ -127,7 +127,7 @@ void tst_MscWriter::testSerializeMscMessageParameters()
 {
     MscMessage message("Msg_1");
     message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" } });
+    message.setParameters({ "", "", { { "longitude:-174.0", "" } } });
 
     MscInstance source("Inst_1");
     MscInstance target("Inst_2");
@@ -142,7 +142,7 @@ void tst_MscWriter::testSerializeMscMessageMultiParameters()
 {
     MscMessage message("Msg_1");
     message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
+    message.setParameters({ "", "", { { "longitude:-174.0", "" }, { "", "init" } } });
 
     MscInstance source("Inst_1");
     MscInstance target("Inst_2");
@@ -485,9 +485,9 @@ void tst_MscWriter::testSerializeCreate()
     MscParameterList parameters;
     MscParameter parameter;
     parameter.setPattern("data1");
-    parameters << parameter;
+    parameters.dataRef() << parameter;
     parameter.setPattern("data2");
-    parameters << parameter;
+    parameters.dataRef() << parameter;
     createSubscriber->setParameters(parameters);
 
     messages.append(createSubscriber.data());

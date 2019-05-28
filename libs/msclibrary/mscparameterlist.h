@@ -57,7 +57,27 @@ private:
     Type m_type = Type::Unknown;
 };
 
-typedef QVector<msc::MscParameter> MscParameterList;
+class MscParameterList
+{
+public:
+    static const QChar DefaultExtraBraceOpen;
+    static const QChar DefaultExtraBraceClose;
+
+    MscParameterList(const QString &braceOpen = QString(), const QString &braceClose = QString(),
+                     const QVector<msc::MscParameter> &data = QVector<msc::MscParameter>());
+    const QVector<msc::MscParameter> &data() const;
+    QVector<msc::MscParameter> &dataRef();
+    QString extraBraceOpen() const;
+    QString extraBraceClose() const;
+
+    void setExtraBraces(const QString &open, const QString &close);
+
+    bool operator==(const MscParameterList &other) const;
+
+private:
+    QVector<msc::MscParameter> m_data;
+    QString m_braceOpen, m_braceClose;
+};
 
 } // namespace msc
 

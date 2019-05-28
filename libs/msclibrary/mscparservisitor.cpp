@@ -1129,8 +1129,20 @@ std::vector<antlr4::Token *> MscParserVisitor::getHiddenCommentTokensToLeft(int 
 
 msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)
 {
-    QVector<msc::MscParameter> parameters;
+    const QString &extraBraceOpen = parameterList && parameterList->LEFTCURLYBRACKET()
+            ? treeNodeToString(parameterList->LEFTCURLYBRACKET())
+            : QString();
+
+    QString extraBraceClose = parameterList && parameterList->RIGHTCURLYBRACKET()
+            ? treeNodeToString(parameterList->RIGHTCURLYBRACKET())
+            : QString();
+
+    msc::MscParameterList parameters;
     while (parameterList && parameterList->paramaterDefn()) {
+        if (!extraBraceOpen.isEmpty() && extraBraceClose.isEmpty() && parameterList
+            && parameterList->RIGHTCURLYBRACKET())
+            extraBraceClose = treeNodeToString(parameterList->RIGHTCURLYBRACKET());
+
         auto *paramaterDefn = parameterList->paramaterDefn();
         QString expression = ::sourceTextForContext(paramaterDefn->expression());
         QString pattern = ::sourceTextForContext(paramaterDefn->pattern());
@@ -1139,11 +1151,13 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
         }
         if (!expression.isEmpty() || !pattern.isEmpty()) {
             msc::MscParameter parameter(expression, pattern);
-            parameters << parameter;
+            parameters.dataRef() << parameter;
         }
 
         parameterList = parameterList->parameterList();
     }
+
+    parameters.setExtraBraces(extraBraceOpen, extraBraceClose);
     return parameters;
 }
 

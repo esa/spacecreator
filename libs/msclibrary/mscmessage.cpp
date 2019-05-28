@@ -120,7 +120,14 @@ void MscMessage::setParameters(const MscParameterList &parameters)
     if (m_parameters == parameters)
         return;
 
+    const QString &extraBraceOpen = m_parameters.extraBraceOpen();
+    const QString &extraBraceClose = m_parameters.extraBraceClose();
+
     m_parameters = parameters;
+
+    if (!extraBraceOpen.isEmpty() && m_parameters.extraBraceOpen().isEmpty())
+        m_parameters.setExtraBraces(extraBraceOpen, extraBraceClose);
+
     Q_EMIT dataChanged();
 }
 
@@ -135,11 +142,12 @@ bool MscMessage::isSame(const MscMessage *message) const
     if (!same)
         return false;
 
-    if (m_parameters.size() != message->m_parameters.size())
+    const int parametersSize = m_parameters.data().size();
+    if (parametersSize != message->m_parameters.data().size())
         return false;
 
-    for (int i = 0; i < m_parameters.size(); ++i) {
-        if (m_parameters[i] != message->m_parameters[i])
+    for (int i = 0; i < parametersSize; ++i) {
+        if (m_parameters.data().at(i) != message->m_parameters.data().at(i))
             return false;
     }
 

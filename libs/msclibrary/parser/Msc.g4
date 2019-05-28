@@ -471,7 +471,7 @@ wildcard
 // 5.8 Data in message and timer parameters
 
 parameterList
-    : paramaterDefn (COMMA parameterList)?
+    : (LEFTCURLYBRACKET)? paramaterDefn (COMMA parameterList)? (RIGHTCURLYBRACKET)?
     ;
 
 paramaterDefn
