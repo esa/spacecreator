@@ -31,6 +31,7 @@
 #include "commands/common/commandsstack.h"
 #include "messagedialog.h"
 #include "mscinstance.h"
+#include "baseitems/commentitem.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -595,6 +596,9 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
                                 QVariant::fromValue(newPointsCif) };
 
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints, params);
+
+    if (auto item = m_chartViewModel->itemForComment(m_message->comment()))
+        item->instantLayoutUpdate();
 }
 
 MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)
