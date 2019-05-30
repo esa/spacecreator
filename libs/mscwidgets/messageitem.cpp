@@ -30,6 +30,7 @@
 #include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
 #include "messagedialog.h"
+#include "mscchart.h"
 #include "mscinstance.h"
 #include "baseitems/commentitem.h"
 
@@ -592,10 +593,42 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
 
     m_originalMessagePoints.clear();
 
-    const QVariantList params { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                                QVariant::fromValue(newPointsCif) };
+    msc::cmd::CommandsStack::current()->beginMacro(tr("Change message geometry"));
 
-    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints, params);
+    bool sourceChanged = false;
+    if (auto src = sourceInstanceItem()) {
+        if (src->modelItem() != m_message->sourceInstance())
+            sourceChanged = true;
+    } else if (m_message->sourceInstance()) {
+        sourceChanged = true;
+    }
+
+    bool targetChanged = false;
+    if (auto trg = targetInstanceItem()) {
+        if (trg->modelItem() != m_message->targetInstance())
+            targetChanged = true;
+    } else if (m_message->targetInstance()) {
+        targetChanged = true;
+    }
+
+    if (sourceChanged) {
+        const int newIdx = m_chartViewModel->eventIndex(tail().y());
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage, { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                                                                   QVariant::fromValue<MscInstance *>(sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
+                                                                   QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
+                                                                   QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+    }
+    if (targetChanged) {
+        const int newIdx = m_chartViewModel->eventIndex(head().y());
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage, { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                                                                   QVariant::fromValue<MscInstance *>(targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
+                                                                   QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
+                                                                   QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+    }
+
+    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,  { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
+                                                                  QVariant::fromValue(newPointsCif) });
+    cmd::CommandsStack::current()->endMacro();
 
     if (auto item = m_chartViewModel->itemForComment(m_message->comment()))
         item->instantLayoutUpdate();
@@ -748,7 +781,6 @@ void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
 void MessageItem::applyCif()
 {
     QSignalBlocker sb(this);
-    GeometryNotificationBlocker geometryNotificationBlocker(this);
     if (const cif::CifBlockShared &cifBlock = mainCifBlock()) {
         const QVector<QPoint> &pointsCif = cifBlock->payload(mainCifType()).value<QVector<QPoint>>();
         bool converted(false);
