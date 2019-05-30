@@ -27,6 +27,11 @@
 
 namespace asn1 {
 
+/*!
+ * \class Asn1TreeView
+ *
+ * This is a widget that can show the contents of an ASN.1 file in a tree view
+ */
 Asn1TreeView::Asn1TreeView(QWidget *parent)
     : QTreeView(parent)
 {
@@ -42,6 +47,9 @@ Asn1TreeView::Asn1TreeView(QWidget *parent)
     connect(m_itemDelegate, &Asn1ItemDelegate::choiceFieldChanged, this, &Asn1TreeView::onChoiceFieldChanged);
 }
 
+/*!
+ * \brief Asn1TreeView::setAsn1Model Set the model of a row to \a asn1Item
+ */
 void Asn1TreeView::setAsn1Model(const QVariantMap &asn1Item, int row)
 {
     m_ItemModel.reset(new Asn1ItemModel(asn1Item, this));
@@ -55,6 +63,9 @@ void Asn1TreeView::setAsn1Model(const QVariantMap &asn1Item, int row)
     expandAll();
 }
 
+/*!
+ * \brief Asn1TreeView::setAsn1Value Update the value list with the values in \a asn1Value
+ */
 void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
 {
     if (model() == nullptr || asn1Value.empty())
@@ -108,6 +119,12 @@ void Asn1TreeView::onChoiceFieldChanged(const QModelIndex &index, const QVariant
     expand(index);
 }
 
+/*!
+ * \brief Asn1TreeView::hideExtraFields Hide a value row
+ * \param item
+ * \param hide
+ * \param row
+ */
 void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row)
 {
     QStandardItemModel *model = qobject_cast<QStandardItemModel *>(this->model());
@@ -137,6 +154,12 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
     }
 }
 
+/*!
+ * \brief Asn1TreeView::setChildRowValue Update the value of a child row
+ * \param rootItem
+ * \param childIndex
+ * \param asn1Value
+ */
 void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childIndex, const QVariant &asn1Value)
 {
     const QString &asnType = rootItem->child(childIndex, MODEL_TYPE_INDEX)->text();
@@ -167,6 +190,13 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     }
 }
 
+/*!
+ * \brief Asn1TreeView::setChildValue Update the value of a child
+ * \param rootItem
+ * \param asn1Value
+ * \param seqOfSize
+ * \param choiceRow
+ */
 void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize, int choiceRow)
 {
     if (!asn1Value.isValid())
@@ -193,6 +223,10 @@ void Asn1TreeView::setChildValue(const QStandardItem *rootItem, const QVariant &
     }
 }
 
+/*!
+ * \brief Asn1TreeView::findValue Find all values with \a name in \a asn1Value
+ * \return A map of the values
+ */
 QVariantMap Asn1TreeView::findValue(const QString &name, const QVariantMap &asn1Value) const
 {
     QVariantMap result;
@@ -214,6 +248,12 @@ QVariantMap Asn1TreeView::findValue(const QString &name, const QVariantMap &asn1
     return result;
 }
 
+/*!
+ * \brief Asn1TreeView::itemChoiceIndex Find the index with \a name
+ * \param item the item to search in
+ * \param name the name to search for
+ * \return the index of the row or 0 if none was found
+ */
 int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name) const
 {
     int choiceIndex = 0;
@@ -225,6 +265,12 @@ int Asn1TreeView::itemChoiceIndex(const QStandardItem *item, const QString &name
     return choiceIndex;
 }
 
+/*!
+ * \brief Asn1TreeView::getItemValue Get a string representation of an item
+ * \param item The item to stringify
+ * \param separator The separator between the values
+ * \return The generated string
+ */
 QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &separator) const
 {
     QString itemValue = "";

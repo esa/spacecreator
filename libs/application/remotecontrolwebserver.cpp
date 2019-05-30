@@ -104,6 +104,11 @@ RemoteControlWebServer::~RemoteControlWebServer()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
+/*!
+ * \brief RemoteControlWebServer::start Start the remote listener
+ * \param port The port to listen on
+ * \return True if successfull
+ */
 bool RemoteControlWebServer::start(quint16 port)
 {
     if (m_webSocketServer->isListening()) {
@@ -122,6 +127,9 @@ bool RemoteControlWebServer::start(quint16 port)
     return false;
 }
 
+/*!
+ * \brief RemoteControlWebServer::onNewConnection Handle a new incoming connection
+ */
 void RemoteControlWebServer::onNewConnection()
 {
     QWebSocket *pSocket = m_webSocketServer->nextPendingConnection();
@@ -135,6 +143,10 @@ void RemoteControlWebServer::onNewConnection()
     m_clients << pSocket;
 }
 
+/*!
+ * \brief RemoteControlWebServer::processTextMessage Parse and handle a remote command
+ * \param message The command to perform
+ */
 void RemoteControlWebServer::processTextMessage(const QString &message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -160,12 +172,19 @@ void RemoteControlWebServer::processTextMessage(const QString &message)
                           pClient ? pClient->peerName() : QString());
 }
 
+/*!
+ * \brief RemoteControlWebServer::socketConnected Called when remote connection
+ *  has been established. Only for debug output
+ */
 void RemoteControlWebServer::socketConnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     qDebug() << "Socket Connected:" << pClient;
 }
 
+/*!
+ * \brief RemoteControlWebServer::socketDisconnected Perform cleanup after a disconnection
+ */
 void RemoteControlWebServer::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -176,12 +195,23 @@ void RemoteControlWebServer::socketDisconnected()
     }
 }
 
+/*!
+ * \brief RemoteControlWebServer::error An error has occurred
+ * \param error
+ */
 void RemoteControlWebServer::error(QAbstractSocket::SocketError error)
 {
     const QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     qWarning() << "Socket error:" << error << (pClient ? pClient->errorString() : QString());
 }
 
+/*!
+ * \brief RemoteControlWebServer::commandDone Generate a response after a remote command has been handled
+ * \param commandType
+ * \param result
+ * \param peerName
+ * \param errorString
+ */
 void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType commandType, bool result,
                                          const QString &peerName, const QString &errorString)
 {

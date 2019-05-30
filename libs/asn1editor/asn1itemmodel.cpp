@@ -23,6 +23,11 @@
 
 namespace asn1 {
 
+/*!
+ * \class Asn1ItemModel
+ *
+ * This class is the model for the \sa Asn1TreeView.
+ */
 Asn1ItemModel::Asn1ItemModel(QObject *parent)
     : QStandardItemModel(1, 4, parent)
 {
@@ -34,6 +39,10 @@ Asn1ItemModel::Asn1ItemModel(const QVariantMap &asn1Item, QObject *parent)
     setAsn1Model(asn1Item);
 }
 
+/*!
+ * \brief Asn1ItemModel::setAsn1Model Populate the values in the model from this map.
+ * \param asn1Item
+ */
 void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
 {
     clear();
@@ -49,12 +58,17 @@ void Asn1ItemModel::setAsn1Model(const QVariantMap &asn1Item)
     setItem(0, MODEL_IS_OPTIONAL_INDEX, itemMap["present"]);
 }
 
+/*!
+ * \brief Asn1ItemModel::createModelItems Create items for the treeview from the map
+ * \param asn1Item The map with the items
+ * \return The created item map
+ */
 Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1Item)
 {
     ItemMap itemMap;
     QString typeLimit;
     QStandardItem *valueItem;
-    static QMap<ASN1Type, QString> asn1TypeStringMap{
+    static QMap<ASN1Type, QString> asn1TypeStringMap {
         { INTEGER, "integer" },       { DOUBLE, "double" },         { BOOL, "bool" },     { SEQUENCE, "sequence" },
         { SEQUENCEOF, "sequenceOf" }, { ENUMERATED, "enumerated" }, { CHOICE, "choice" }, { STRING, "string" }
     };
@@ -121,15 +135,25 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     return itemMap;
 }
 
+/*!
+ * \brief Asn1ItemModel::createNumberItem Create an item with the type number
+ * \param asn1Item
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createNumberItem(const QVariantMap &asn1Item)
 {
     // set default value (min range):
     return createItem(asn1Item, asn1Item[ASN1_MIN].toString());
 }
 
+/*!
+ * \brief Asn1ItemModel::createBoolItem  Create an item with the type bool
+ * \param asn1Item
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createBoolItem(const QVariantMap &asn1Item)
 {
-    static const QVariantList choices{ QString("true"), QString("false") };
+    static const QVariantList choices { QString("true"), QString("false") };
 
     QStandardItem *item = createItem(asn1Item, "false");
     item->setData(choices, CHOICE_LIST_ROLE);
@@ -137,6 +161,12 @@ QStandardItem *Asn1ItemModel::createBoolItem(const QVariantMap &asn1Item)
     return item;
 }
 
+/*!
+ * \brief Asn1ItemModel::createSequenceItem Create an item with the type sequence
+ * \param asn1Item
+ * \param parent
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createSequenceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
@@ -162,6 +192,12 @@ QStandardItem *Asn1ItemModel::createSequenceItem(const QVariantMap &asn1Item, QS
     return new QStandardItem();
 }
 
+/*!
+ * \brief Asn1ItemModel::createSequenceOfItem Create an item with the type sequence of
+ * \param asn1Item
+ * \param parent
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createSequenceOfItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
@@ -190,11 +226,22 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(const QVariantMap &asn1Item, 
     return createNumberItem(asn1Item);
 }
 
+/*!
+ * \brief Asn1ItemModel::createEnumeratedItem Create an item with the type values
+ * \param asn1Item
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createEnumeratedItem(const QVariantMap &asn1Item)
 {
     return createItem(asn1Item, asn1Item[ASN1_VALUES].toList().at(0).toString());
 }
 
+/*!
+ * \brief Asn1ItemModel::createChoiceItem Create an item with the type choice
+ * \param asn1Item
+ * \param parent
+ * \return
+ */
 QStandardItem *Asn1ItemModel::createChoiceItem(const QVariantMap &asn1Item, QStandardItem *parent)
 {
     QList<QStandardItem *> typeItems;
@@ -225,6 +272,12 @@ QStandardItem *Asn1ItemModel::createChoiceItem(const QVariantMap &asn1Item, QSta
     return item;
 }
 
+/*!
+ * \brief Asn1ItemModel::createItem Create an item for the model with \a text
+ * \param asn1Item Map used to set the type, min/max and choice list
+ * \param text The view text
+ * \return The created item
+ */
 QStandardItem *Asn1ItemModel::createItem(const QVariantMap &asn1Item, const QString &text)
 {
     QStandardItem *item = new QStandardItem(text);

@@ -30,6 +30,11 @@
 
 #include <QMetaEnum>
 
+/*!
+ * \class RemoteControlHandler
+ *
+ * Handles the remote control of the view.
+ */
 RemoteControlHandler::RemoteControlHandler(QObject *parent)
     : QObject(parent)
 {
@@ -40,6 +45,14 @@ void RemoteControlHandler::setModel(MainModel *model)
     m_model = model;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleRemoteCommand Perform a remote command
+ * \param commandType The type of the command to perform
+ * \param params Parameters for the command
+ * \param peerName The caller name
+ *
+ * This is the main function. Call this to perform a command.
+ */
 void RemoteControlHandler::handleRemoteCommand(RemoteControlWebServer::CommandType commandType,
                                                const QVariantMap &params, const QString &peerName)
 {
@@ -114,6 +127,12 @@ void RemoteControlHandler::handleRemoteCommand(RemoteControlWebServer::CommandTy
     Q_EMIT commandDone(commandType, result, peerName, errorString);
 }
 
+/*!
+ * \brief RemoteControlHandler::handleInstanceCommand Handle a remote instance command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
@@ -138,6 +157,12 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     return result;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleInstanceStopCommand Handle a remote stop command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
@@ -158,6 +183,12 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
     return result;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleMessageCommand Handle a remote message command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
@@ -214,6 +245,12 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     return result;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleTimerCommand Handle a remote timer command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
@@ -253,6 +290,12 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     return result;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleActionCommand Handle a remote action command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
@@ -282,6 +325,12 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     return result;
 }
 
+/*!
+ * \brief RemoteControlHandler::handleConditionCommand Handle a remote condition command
+ * \param params
+ * \param errorString
+ * \return
+ */
 bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();

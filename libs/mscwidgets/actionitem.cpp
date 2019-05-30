@@ -30,6 +30,11 @@
 
 namespace msc {
 
+/*!
+ * \class msc::ActionItem
+ *
+ * This class shows an action
+ */
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     : InteractiveObject(action, parent)
     , m_action(action)
@@ -64,6 +69,10 @@ void ActionItem::connectObjects(InstanceItem *instance, qreal y)
     setInstance(instance);
 }
 
+/*!
+ * \brief ActionItem::setInstance Update the instance this action is placed on
+ * \param instance
+ */
 void ActionItem::setInstance(InstanceItem *instance)
 {
     if (instance == m_instance) {

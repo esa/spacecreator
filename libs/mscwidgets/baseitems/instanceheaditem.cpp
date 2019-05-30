@@ -30,6 +30,12 @@
 
 namespace msc {
 
+/*!
+  \class msc:: InstanceHeadItem
+
+  Item showing the header of an instance
+  */
+
 QLinearGradient InstanceHeadItem::createGradientForKind(const QGraphicsItem *itemKind)
 {
     static QLinearGradient prototype;

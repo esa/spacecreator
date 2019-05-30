@@ -54,6 +54,14 @@ public:
 };
 }
 
+/*!
+ * \class DocumentTreeView The class for showing the document tree in the main window
+ */
+
+/*!
+ * \brief DocumentTreeView::DocumentTreeView Constructor
+ * \param parent Widget parent
+ */
 DocumentTreeView::DocumentTreeView(QWidget *parent)
     : QTreeView(parent)
 {
@@ -79,6 +87,10 @@ void DocumentTreeView::setModel(QAbstractItemModel *model)
     }
 }
 
+/*!
+ * \brief DocumentTreeView::currentDocument Get the current MSC document
+ * \return the current document
+ */
 msc::MscDocument *DocumentTreeView::currentDocument() const
 {
     auto *obj = static_cast<QObject *>(currentIndex().internalPointer());
@@ -88,6 +100,10 @@ msc::MscDocument *DocumentTreeView::currentDocument() const
     return qobject_cast<msc::MscDocument *>(obj);
 }
 
+/*!
+ * \brief DocumentTreeView::setSelectedDocument Choose the current document
+ * \param document The document to be selected
+ */
 void DocumentTreeView::setSelectedDocument(msc::MscDocument *document)
 {
     if (document == selectedDocument())
@@ -112,6 +128,10 @@ void DocumentTreeView::setSelectedDocument(msc::MscDocument *document)
     }
 }
 
+/*!
+ * \brief DocumentTreeView::selectedDocument Get the selected document
+ * \return The current document or null if none is selected
+ */
 msc::MscDocument *DocumentTreeView::selectedDocument() const
 {
     QModelIndexList selection = selectedIndexes();
@@ -125,12 +145,19 @@ msc::MscDocument *DocumentTreeView::selectedDocument() const
     return qobject_cast<msc::MscDocument *>(obj);
 }
 
+/*!
+ * \brief DocumentTreeView::changHierarchyType Update the hierarchy type
+ */
 void DocumentTreeView::changHierarchyType()
 {
     auto docModel = static_cast<msc::DocumentItemModel *>(model());
     docModel->updateHierarchyType(currentIndex(), sender()->property(HIERARCHY_TYPE_TAG));
 }
 
+/*!
+ * \brief DocumentTreeView::showDocumentViewMenu Show the context menu
+ * \param point Show at this point
+ */
 void DocumentTreeView::showDocumentViewMenu(const QPoint &point)
 {
     QModelIndex index = indexAt(point);
@@ -146,6 +173,11 @@ void DocumentTreeView::showDocumentViewMenu(const QPoint &point)
     }
 }
 
+/*!
+ * \brief DocumentTreeView::contextMenu Get a context menu
+ * \param document The document chosen to show the menu for
+ * \return The new menu. The caller must delete this menu.
+ */
 QMenu *DocumentTreeView::contextMenu(msc::MscDocument *document)
 {
     QMenu *menu = new QMenu(this);

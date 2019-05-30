@@ -23,11 +23,24 @@
 
 namespace asn1 {
 
+/*!
+ * \class Asn1ValueParser
+ *
+ * This class is used to parse an ASN.1 file.
+ */
+
 Asn1ValueParser::Asn1ValueParser(QObject *parent)
     : QObject(parent)
 {
 }
 
+/*!
+ * \brief Asn1ValueParser::parseAsn1Value Parse an ASN.1 value from a file
+ * \param asn1Type
+ * \param asn1Value
+ * \param valueOk
+ * \return
+ */
 QVariantMap Asn1ValueParser::parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value, bool *valueOk) const
 {
     QVariantMap valueMap;
@@ -110,6 +123,13 @@ bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
     return asn1Value.startsWith("{") && asn1Value.endsWith("}");
 }
 
+/*!
+ * \brief Asn1ValueParser::parseSequenceValue Parse a sequence value
+ * \param asn1Type
+ * \param asn1Value
+ * \param valueMap
+ * \return
+ */
 bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type, const QString &asn1Value,
                                          QVariantMap &valueMap) const
 {

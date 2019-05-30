@@ -27,6 +27,11 @@
 
 namespace msc {
 
+/*!
+ * \class msc::InstanceEndItem
+ *
+ * This class represents the end of an instance.
+ */
 InstanceEndItem::InstanceEndItem(bool stop, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {

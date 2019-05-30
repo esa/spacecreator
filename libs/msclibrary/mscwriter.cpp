@@ -36,11 +36,22 @@
 
 namespace msc {
 
+/*!
+ * \clas MscWriter
+ *
+ * This class writes an MSC model to a file.
+ */
 MscWriter::MscWriter(QObject *parent)
     : QObject(parent)
 {
 }
 
+/*!
+ * \brief MscWriter::saveModel Save a model text to file.
+ * \param model
+ * \param fileName
+ * \return True if success
+ */
 bool MscWriter::saveModel(MscModel *model, const QString &fileName)
 {
     if (model == nullptr || fileName.isEmpty())
@@ -67,6 +78,12 @@ bool MscWriter::saveModel(MscModel *model, const QString &fileName)
     return true;
 }
 
+/*!
+ * \brief MscWriter::saveChart Save a chart to file.
+ * \param chart
+ * \param fileName
+ * \return
+ */
 bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
 {
     if (chart == nullptr || fileName.isEmpty())
@@ -84,6 +101,11 @@ bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
     return true;
 }
 
+/*!
+ * \brief MscWriter::modelText Get a string representation of a model.
+ * \param model
+ * \return
+ */
 QString MscWriter::modelText(MscModel *model)
 {
     setModel(model);
@@ -103,6 +125,13 @@ QString MscWriter::modelText(MscModel *model)
     return text;
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation of an instance and events.
+ * \param instance
+ * \param instanceEvents
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents,
                              int tabsSize)
 {
@@ -160,6 +189,13 @@ QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInsta
     return serializeCif(instance, instanceSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation of a message
+ * \param message
+ * \param instance
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscMessage *message, const MscInstance *instance, int tabsSize)
 {
     if (message == nullptr || !(message->relatesTo(instance)))
@@ -188,6 +224,12 @@ QString MscWriter::serialize(const MscMessage *message, const MscInstance *insta
     return serializeCif(message, messageSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation of a condition
+ * \param condition
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
 {
     if (condition == nullptr)
@@ -199,6 +241,13 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
     return serializeCif(condition, conditionSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param create
+ * \param instance
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscCreate *create, const MscInstance *instance, int tabsSize)
 {
     Q_ASSERT(create != nullptr);
@@ -217,6 +266,13 @@ QString MscWriter::serialize(const MscCreate *create, const MscInstance *instanc
     return {};
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param timer
+ * \param instance
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance, int tabsSize)
 {
     if (timer == nullptr || timer->instance() != instance) {
@@ -243,6 +299,13 @@ QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance,
     return serializeCif(timer, timerSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param action
+ * \param instance
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscAction *action, const MscInstance *instance, int tabsSize)
 {
     if (action == nullptr) {
@@ -288,6 +351,13 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
     }
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param region
+ * \param instance
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscCoregion *region, const MscInstance *instance, int tabsSize)
 {
     if (region == nullptr || region->instance() == nullptr || region->instance() != instance)
@@ -298,6 +368,12 @@ QString MscWriter::serialize(const MscCoregion *region, const MscInstance *insta
     return serializeCif(region, regionSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param declarationList
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscMessageDeclarationList *declarationList, int tabsSize)
 {
     Q_ASSERT(declarationList);
@@ -309,6 +385,12 @@ QString MscWriter::serialize(const MscMessageDeclarationList *declarationList, i
     return declarations;
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param declaration
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscMessageDeclaration *declaration, int tabsSize)
 {
     Q_ASSERT(declaration);
@@ -320,6 +402,12 @@ QString MscWriter::serialize(const MscMessageDeclaration *declaration, int tabsS
     return text;
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param chart
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscChart *chart, int tabsSize)
 {
     if (chart == nullptr)
@@ -337,6 +425,12 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
     return serializeCif(chart, chartSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::serialize Get a string representation
+ * \param document
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serialize(const MscDocument *document, int tabsSize)
 {
     if (document == nullptr)
@@ -393,6 +487,10 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     return serializeCif(document, documentSerialized, tabsSize);
 }
 
+/*!
+ * \brief MscWriter::setModel Set the model to write
+ * \param model
+ */
 void MscWriter::setModel(MscModel *model)
 {
     m_model = model;
@@ -400,12 +498,21 @@ void MscWriter::setModel(MscModel *model)
         m_model->checkInstanceNames();
 }
 
+/*!
+ * \brief MscWriter::tabs Set the tab size. Default is 4.
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::tabs(int tabsSize) const
 {
     static constexpr int spaces(4);
     return QString().fill(' ', spaces * tabsSize);
 }
 
+/*!
+ * \brief MscWriter::dataDefinition Serialize the language and data of the model.
+ * \return
+ */
 QString MscWriter::dataDefinition() const
 {
     if (!m_model) {
@@ -423,6 +530,12 @@ QString MscWriter::dataDefinition() const
     return data;
 }
 
+/*!
+ * \brief MscWriter::serializeComment Get a string representation
+ * \param entity
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serializeComment(const msc::MscEntity *entity, int tabsSize) const
 {
     if (!entity)
@@ -449,6 +562,12 @@ QString MscWriter::serializeComment(const msc::MscEntity *entity, int tabsSize) 
     return QString("%1 comment '%2'").arg(cifInfo, commentEntity->comment());
 }
 
+/*!
+ * \brief MscWriter::serializeGlobalComments Get a string representation
+ * \param entity
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize) const
 {
     if (!entity)
@@ -470,6 +589,11 @@ QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize
     return QLatin1Char('\n') + cifTexts.join("\n") + QLatin1Char('\n');
 }
 
+/*!
+ * \brief MscWriter::serializeParameters Get a string representation of the parameters of a message
+ * \param message
+ * \return
+ */
 QString MscWriter::serializeParameters(const MscMessage *message) const
 {
     QString parameters;
@@ -481,6 +605,13 @@ QString MscWriter::serializeParameters(const MscMessage *message) const
     return message->parameters().extraBraceOpen() + parameters + message->parameters().extraBraceClose();
 }
 
+/*!
+ * \brief MscWriter::serializeCif Get a string representation of CIF
+ * \param entity
+ * \param entitySerialized
+ * \param tabsSize
+ * \return
+ */
 QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const
 {
     if (!entity || entitySerialized.isEmpty() || entity->cifs().isEmpty())

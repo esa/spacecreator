@@ -28,6 +28,13 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 
+/*!
+  \class ASN1FileView
+  \brief Show the contents of ASN.1 files.
+
+  This is the widget that is used in the main window to show the contents of ASN.1 files.
+*/
+
 ASN1FileView::ASN1FileView(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ASN1FileView)
@@ -42,10 +49,19 @@ ASN1FileView::~ASN1FileView()
     delete ui;
 }
 
+/*!
+ * Set the model of this widget to \a model.
+ *
+ * This will not delete the old model.
+ */
 void ASN1FileView::setModel(msc::MscModel *model)
 {
     if (model == m_model)
         return;
+
+    if (m_model) {
+        m_model->disconnect(this);
+    }
 
     m_model = model;
     if (m_model)
@@ -54,12 +70,18 @@ void ASN1FileView::setModel(msc::MscModel *model)
     updateView();
 }
 
+/*!
+ * Update the current directory to \a directory.
+ */
 void ASN1FileView::setCurrentDirectory(const QString &directory)
 {
     m_currentDirectory = directory;
     updateView();
 }
 
+/*!
+ * Update the view and fill the preview.
+ */
 void ASN1FileView::updateView()
 {
     ui->filenameLabel->clear();
@@ -71,6 +93,11 @@ void ASN1FileView::updateView()
     fillPreview();
 }
 
+/*!
+ * open a file dialog for the user to select a new file.
+ *
+ * Before calling this function, the model must be set.
+ */
 void ASN1FileView::selectFile()
 {
     if (!m_model)
@@ -86,6 +113,9 @@ void ASN1FileView::selectFile()
     }
 }
 
+/*!
+ * Show the contents in the preview
+ */
 void ASN1FileView::fillPreview()
 {
     if (!m_model->dataDefinitionString().isEmpty()) {
@@ -95,6 +125,10 @@ void ASN1FileView::fillPreview()
         ui->textEdit->clear();
 }
 
+/*!
+ * \brief ASN1FileView::fillPreview Open a file and use this for the preview.
+ * \param filename The filename to open.
+ */
 void ASN1FileView::fillPreview(const QString &filename)
 {
     QFileInfo fi(filename);

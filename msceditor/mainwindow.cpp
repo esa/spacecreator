@@ -145,6 +145,16 @@ struct MainWindowPrivate {
     bool m_dropUnsavedChangesSilently = false;
 };
 
+/*!
+  \class MainWindow
+
+  This is the main window class for the MSC editor.
+*/
+
+/*!
+ * \brief MainWindow::MainWindow Create an empty view.
+ * \param parent
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , d(new MainWindowPrivate(this))
@@ -175,11 +185,18 @@ MainWindow::~MainWindow()
     disconnect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
 }
 
+/*!
+ * \brief MainWindow::currentView Get the graphics view
+ * \return
+ */
 QGraphicsView *MainWindow::currentView() const
 {
     return d->ui->graphicsView;
 }
 
+/*!
+ * \brief MainWindow::createNewDocument Create a new document. This doesn't ask the user to save.
+ */
 void MainWindow::createNewDocument()
 {
     if (!saveDocument()) {
@@ -192,6 +209,9 @@ void MainWindow::createNewDocument()
     d->ui->graphicsView->setZoom(100);
 }
 
+/*!
+ * \brief MainWindow::selectAndOpenFile Show a file dialog and open the file.
+ */
 void MainWindow::selectAndOpenFile()
 {
     if (!saveDocument()) {
@@ -210,6 +230,11 @@ void MainWindow::selectAndOpenFile()
     }
 }
 
+/*!
+ * \brief MainWindow::openFileMsc Read an MSC file and populate the view with the contents
+ * \param file Filename
+ * \return True if success
+ */
 bool MainWindow::openFileMsc(const QString &file)
 {
     QString logRecord = tr("Opening file: %1").arg(file);
@@ -251,6 +276,9 @@ bool MainWindow::openFileMsc(const QString &file)
     return ok;
 }
 
+/*!
+ * \brief MainWindow::updateTitles Populate the titles in save action and window
+ */
 void MainWindow::updateTitles()
 {
     static const QString title = tr("%1 [%2]%3");
@@ -263,6 +291,11 @@ void MainWindow::updateTitles()
     d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
 }
 
+/*!
+ * \brief MainWindow::openMscChain Open MSC files in a directory
+ * \param dirPath
+ * \return
+ */
 bool MainWindow::openMscChain(const QString &dirPath)
 {
     if (dirPath.isEmpty())
@@ -278,12 +311,18 @@ bool MainWindow::openMscChain(const QString &dirPath)
     return true;
 }
 
+/*!
+ * \brief MainWindow::activateDefaultTool Set default tool to be active
+ */
 void MainWindow::activateDefaultTool()
 {
     Q_ASSERT(d->m_defaultToolAction);
     d->m_defaultToolAction->setChecked(true);
 }
 
+/*!
+ * \brief MainWindow::saveMsc Save the MSC file. Ask for the filename if necessary.
+ */
 void MainWindow::saveMsc()
 {
     const QString &filename = d->m_model->currentFilePath();
@@ -294,6 +333,9 @@ void MainWindow::saveMsc()
     }
 }
 
+/*!
+ * \brief MainWindow::saveAsMsc Save the file after asking for the filename.
+ */
 void MainWindow::saveAsMsc()
 {
     QString fileName =
@@ -308,6 +350,10 @@ void MainWindow::saveAsMsc()
     }
 }
 
+/*!
+ * \brief MainWindow::showDocumentView Set whether to show the document view or not.
+ * \param show
+ */
 void MainWindow::showDocumentView(bool show)
 {
     if (show) {
@@ -330,6 +376,10 @@ void MainWindow::showDocumentView(bool show)
     }
 }
 
+/*!
+ * \brief MainWindow::showHierarchyView Set whether to show the hierarchy view or not
+ * \param show
+ */
 void MainWindow::showHierarchyView(bool show)
 {
     if (show) {
@@ -348,6 +398,9 @@ void MainWindow::showHierarchyView(bool show)
     }
 }
 
+/*!
+ * \brief MainWindow::showErrorView Show the error view
+ */
 void MainWindow::showErrorView()
 {
     if (!d->ui->dockWidgetErrors->isVisible()) {
@@ -355,6 +408,9 @@ void MainWindow::showErrorView()
     }
 }
 
+/*!
+ * \brief MainWindow::selectCurrentChart Set the current chart as the currently selected.
+ */
 void MainWindow::selectCurrentChart()
 {
     msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
@@ -377,6 +433,9 @@ void MainWindow::selectCurrentChart()
     }
 }
 
+/*!
+ * \brief MainWindow::showChart Show the chart \a index
+ */
 void MainWindow::showChart(const QModelIndex &index)
 {
     if (!index.isValid()) {
@@ -436,6 +495,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 }
 
+/*!
+ * \brief MainWindow::setupUi Create the UI from the form
+ */
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
@@ -478,6 +540,9 @@ void MainWindow::setupUi()
     statusBar()->show();
 }
 
+/*!
+ * \brief MainWindow::initActions Initialize the actions
+ */
 void MainWindow::initActions()
 {
     d->m_actUndo = d->m_undoGroup->createUndoAction(this, tr("Undo:"));
@@ -503,6 +568,9 @@ void MainWindow::initActions()
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
 }
 
+/*!
+ * \brief MainWindow::initMenus Initialize the menus. Calls each menu initialization
+ */
 void MainWindow::initMenus()
 {
     initMenuFile();
@@ -532,15 +600,14 @@ void MainWindow::initMenuFile()
                                      &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(
-            tr("&Quit"), this,
-            [&]() {
-                if (this->saveDocument()) {
-                    this->saveSettings();
-                    QApplication::quit();
-                }
-            },
-            QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
+                                            [&]() {
+                                                if (this->saveDocument()) {
+                                                    this->saveSettings();
+                                                    QApplication::quit();
+                                                }
+                                            },
+                                            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
@@ -638,6 +705,11 @@ void MainWindow::onCreateMessageToolRequested()
     d->m_messageCreateTool->activate();
 }
 
+/*!
+ * \brief MainWindow::startRemoteControl Start the remote app controller
+ * \param port Listen on this port
+ * \return True if success
+ */
 bool MainWindow::startRemoteControl(quint16 port)
 {
     if (!d->m_remoteControlWebServer) {
@@ -793,6 +865,12 @@ void MainWindow::initConnections()
     });
 }
 
+/*!
+ * \brief MainWindow::processCommandLineArg Handle comm
+ * \param arg
+ * \param value
+ * \return
+ */
 bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
 {
     switch (arg) {

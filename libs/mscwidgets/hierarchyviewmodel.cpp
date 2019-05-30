@@ -140,6 +140,16 @@ public:
     QVector<DocumentItem *> topLevelDocumentItems;
 };
 
+/*!
+ * \class msc::HierarchyViewModel
+ *
+ * This class shows the document hierarchy of an MSC file
+ */
+
+/*!
+ * \brief HierarchyViewModel::HierarchyViewModel Create an empty view
+ * \param parent
+ */
 HierarchyViewModel::HierarchyViewModel(QObject *parent)
     : QObject(parent)
     , d(new HierarchyViewModelPrivate(this))
@@ -148,11 +158,19 @@ HierarchyViewModel::HierarchyViewModel(QObject *parent)
 
 HierarchyViewModel::~HierarchyViewModel() {}
 
+/*!
+ * \brief HierarchyViewModel::graphicsScene Get the graphics scene for this view
+ * \return
+ */
 QGraphicsScene *HierarchyViewModel::graphicsScene() const
 {
     return &d->scene;
 }
 
+/*!
+ * \brief HierarchyViewModel::setModel Set the current MSC model
+ * \param model
+ */
 void HierarchyViewModel::setModel(MscModel *model)
 {
     if (model != d->model) {
@@ -167,6 +185,10 @@ void HierarchyViewModel::setModel(MscModel *model)
     }
 }
 
+/*!
+ * \brief HierarchyViewModel::setSelectedDocument Choose the currently selected document
+ * \param document
+ */
 void HierarchyViewModel::setSelectedDocument(MscDocument *document)
 {
     if (document == selectedDocument())
@@ -178,6 +200,10 @@ void HierarchyViewModel::setSelectedDocument(MscDocument *document)
     Q_EMIT selectedDocumentChanged(document);
 }
 
+/*!
+ * \brief HierarchyViewModel::selectedDocument Get the currently selected document
+ * \return
+ */
 MscDocument *HierarchyViewModel::selectedDocument() const
 {
     for (msc::DocumentItem *item : d->documentItems) {
@@ -188,6 +214,9 @@ MscDocument *HierarchyViewModel::selectedDocument() const
     return nullptr;
 }
 
+/*!
+ * \brief HierarchyViewModel::updateModel Update the view to the current contents of the model
+ */
 void HierarchyViewModel::updateModel()
 {
     d->clear();
@@ -219,12 +248,20 @@ void HierarchyViewModel::updateModel()
     }
 }
 
+/*!
+ * \brief HierarchyViewModel::modelDeleted The model was deleted, remove it!
+ */
 void HierarchyViewModel::modelDeleted()
 {
     d->clear();
     d->model = nullptr;
 }
 
+/*!
+ * \brief HierarchyViewModel::documentMoved Handle movement of a document
+ * \param documentItem
+ * \param point
+ */
 void HierarchyViewModel::documentMoved(const DocumentItem *documentItem, const QPointF &point)
 {
     DocumentItem *parentItem = nearestDocumentItem(documentItem, point);

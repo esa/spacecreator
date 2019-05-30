@@ -22,6 +22,12 @@
 
 namespace msc {
 
+/*!
+ * \class MscDocument
+ *
+ * This is the main document class.
+ */
+
 MscDocument::MscDocument(QObject *parent)
     : MscEntity(parent)
     , m_messageDeclarations(new MscMessageDeclarationList(this))
@@ -43,6 +49,10 @@ MscDocument::~MscDocument()
     clear();
 }
 
+/*!
+ * \brief MscDocument::documents Get the list of child documents
+ * \return
+ */
 const QVector<MscDocument *> &MscDocument::documents() const
 {
     return m_documents;
@@ -56,6 +66,9 @@ bool MscDocument::addDocument(MscDocument *document, int index)
     return addDocument(document, true, index);
 }
 
+/*!
+   Adds a document event and takes over parentship.
+ */
 bool MscDocument::addDocument(MscDocument *document, bool checkType, int index)
 {
     if (document == nullptr) {
@@ -89,6 +102,11 @@ bool MscDocument::addDocument(MscDocument *document, bool checkType, int index)
     return true;
 }
 
+/*!
+ * \brief MscDocument::removeDocument Removes a sub document without deleting it
+ * \param document
+ * \param clear
+ */
 void MscDocument::removeDocument(MscDocument *document, bool clear)
 {
     if (document == nullptr) {
@@ -106,6 +124,10 @@ void MscDocument::removeDocument(MscDocument *document, bool clear)
     Q_EMIT dataChanged();
 }
 
+/*!
+ * \brief MscDocument::charts Get the charts in this document
+ * \return
+ */
 const QVector<MscChart *> &MscDocument::charts() const
 {
     return m_charts;
@@ -143,6 +165,9 @@ MscMessageDeclarationList *MscDocument::messageDeclarations()
     return m_messageDeclarations;
 }
 
+/*!
+ * \brief MscDocument::clear Remove all documents and charts
+ */
 void MscDocument::clear()
 {
     qDeleteAll(m_documents);
@@ -159,6 +184,9 @@ void MscDocument::clear()
     Q_EMIT dataChanged();
 }
 
+/*!
+ * \brief MscDocument::clearCharts Clear all charts
+ */
 void MscDocument::clearCharts()
 {
     qDeleteAll(m_charts);
@@ -180,11 +208,19 @@ MscEntity::EntityType MscDocument::entityType() const
     return MscEntity::EntityType::Document;
 }
 
+/*!
+ * \brief MscDocument::hierarchyType Get the hierarchy type of this document
+ * \return
+ */
 MscDocument::HierarchyType MscDocument::hierarchyType() const
 {
     return m_hierarchyType;
 }
 
+/*!
+ * \brief MscDocument::setHierarchyType Set the hierarchy type of this document
+ * \param type
+ */
 void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
 {
     if (type != m_hierarchyType) {
@@ -203,6 +239,10 @@ bool MscDocument::isSingleChildDocument() const
             || m_hierarchyType == HierarchyException;
 }
 
+/*!
+ * \brief MscDocument::isAddChildEnable Check if a child can be added
+ * \return true if a child can be added
+ */
 bool MscDocument::isAddChildEnable() const
 {
     return !(isSingleChildDocument() && m_documents.size() >= 1) && m_hierarchyType != HierarchyLeaf;

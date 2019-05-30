@@ -33,6 +33,11 @@ namespace msc {
 
 QPointF ChartItem::m_margin = { 20., 20. };
 
+/*!
+ * \class msc::ChartItem
+ *
+ * This class represents an entire chart. The contents with be children of this item
+ */
 ChartItem::ChartItem(MscChart *chart, ChartViewModel *chartViewModel, QGraphicsItem *parent)
     : InteractiveObject(chart, parent)
     , m_chartViewModel(chartViewModel)

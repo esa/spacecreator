@@ -41,6 +41,12 @@ static const qreal kLineLength = 20;
 
 namespace msc {
 
+/*!
+ * \class msc::CommentItem
+ *
+ * Comment box item.
+ */
+
 CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(nullptr, parent)
     , m_textItem(new TextItem(this))
@@ -92,6 +98,10 @@ QString CommentItem::text() const
     return m_textItem->toPlainText();
 }
 
+/*!
+ * \brief CommentItem::attachTo Place this comment on an object
+ * \param iObj
+ */
 void CommentItem::attachTo(InteractiveObject *iObj)
 {
     if (m_iObj == iObj)
@@ -404,6 +414,10 @@ void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
     }
 }
 
+/*!
+ * \brief CommentItem::textEdited Update the text in the comment
+ * \param text
+ */
 void CommentItem::textEdited(const QString &text)
 {
     const QRect oldRect = commentEntity() ? commentEntity()->rect() : QRect();

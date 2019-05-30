@@ -100,6 +100,11 @@ QModelIndex DocumentItemModel::index(MscDocument *document) const
     }
 }
 
+/*!
+ * \brief DocumentItemModel::updateHierarchyType Set a hierarchy type on an entry
+ * \param index the index of the entry
+ * \param hierarchyType the new hierarchy
+ */
 void DocumentItemModel::updateHierarchyType(const QModelIndex &index, const QVariant &hierarchyType)
 {
     if (!index.isValid() || index.internalPointer() == nullptr) {
@@ -291,6 +296,9 @@ bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
+/*!
+ * \brief DocumentItemModel::onEntityDataChanged Update the index when data changes
+ */
 void DocumentItemModel::onEntityDataChanged()
 {
     auto doc = qobject_cast<msc::MscDocument *>(sender());

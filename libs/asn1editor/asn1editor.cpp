@@ -28,6 +28,16 @@
 
 namespace asn1 {
 
+/*!
+ * \class Asn1Editor
+ *
+ * This is the main dialog that the user sees to manipulate the ASN.1 contents.
+ */
+
+/*!
+ * \brief Asn1Editor::Asn1Editor Constructor
+ * \param parent Dialog parent
+ */
 Asn1Editor::Asn1Editor(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Asn1Editor)
@@ -51,6 +61,10 @@ Asn1Editor::~Asn1Editor()
     delete ui;
 }
 
+/*!
+ * \brief Asn1Editor::setAsn1Types Set up the list of ASN.1 types
+ * \param asn1Types
+ */
 void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
 {
     if (m_asn1Types != asn1Types) {
@@ -59,11 +73,19 @@ void Asn1Editor::setAsn1Types(const QVariantList &asn1Types)
     }
 }
 
+/*!
+ * \brief Asn1Editor::asn1Types Get the list of ASN.1 types
+ * \return
+ */
 const QVariantList &Asn1Editor::asn1Types() const
 {
     return m_asn1Types;
 }
 
+/*!
+ * \brief Asn1Editor::setFileName Set the current filename
+ * \param fileName
+ */
 void Asn1Editor::setFileName(const QString &fileName)
 {
     if (m_fileName == fileName)
@@ -76,28 +98,38 @@ const QString &Asn1Editor::fileName() const
     return m_fileName;
 }
 
+/*!
+ * \brief Asn1Editor::setValue Set the current value
+ * \param value
+ */
 void Asn1Editor::setValue(const QString &value)
 {
-    const QString &currentType {ui->typesCB->currentText()};
-    if(value.isEmpty() || currentType.isEmpty())
+    const QString &currentType { ui->typesCB->currentText() };
+    if (value.isEmpty() || currentType.isEmpty())
         return;
 
     Asn1ValueParser valueParser;
     connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
 
-    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(), [&](const QVariant &value) {
-        return value.toMap()["name"] == currentType;
-    });
+    auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(),
+                             [&](const QVariant &value) { return value.toMap()["name"] == currentType; });
 
     if (find != m_asn1Types.end())
         m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), value));
 }
 
+/*!
+ * \brief Asn1Editor::value Get the current value as a string
+ * \return
+ */
 QString Asn1Editor::value() const
 {
     return m_asn1TreeView->getAsn1Value();
 }
 
+/*!
+ * \brief Asn1Editor::setValueEditOnlyMode After this is called, the user can only modify the value
+ */
 void Asn1Editor::setValueEditOnlyMode()
 {
     ui->typeLabel->setVisible(false);
@@ -105,6 +137,9 @@ void Asn1Editor::setValueEditOnlyMode()
     ui->openBtn->setVisible(false);
 }
 
+/*!
+ * \brief Asn1Editor::openFile Show an open dialog and open an ASN.1 file.
+ */
 void Asn1Editor::openFile()
 {
     const QString filename = QFileDialog::getOpenFileName(
@@ -113,11 +148,18 @@ void Asn1Editor::openFile()
         loadFile(filename);
 }
 
+/*!
+ * \brief Asn1Editor::showParseError Show a parser error in a message box
+ * \param error
+ */
 void Asn1Editor::showParseError(const QString &error)
 {
     QMessageBox::warning(this, tr("Error"), error);
 }
 
+/*!
+ * \brief Asn1Editor::showAsn1Type Show the value of the \a text parameter
+ */
 void Asn1Editor::showAsn1Type(const QString &text)
 {
     auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(),
@@ -130,16 +172,26 @@ void Asn1Editor::showAsn1Type(const QString &text)
         ui->typesCB->setCurrentText(text);
 }
 
+/*!
+ * \brief Asn1Editor::setAsn1Value Set the ASN.1 value to the contents of the string
+ */
 void Asn1Editor::setAsn1Value()
 {
     setValue(ui->valueEdit->toPlainText());
 }
 
+/*!
+ * \brief Asn1Editor::getAsn1Value Update the string in the view to the current value
+ */
 void Asn1Editor::getAsn1Value()
 {
     ui->valueEdit->setPlainText(m_asn1TreeView->getAsn1Value());
 }
 
+/*!
+ * \brief Asn1Editor::loadFile Load an ASN.1 file
+ * \param file
+ */
 void Asn1Editor::loadFile(const QString &file)
 {
     Asn1XMLParser parser;
