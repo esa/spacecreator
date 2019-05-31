@@ -1,8 +1,8 @@
 project     = "MSC Editor"
 description = "MSC Editor Reference Documentation"
 
-outputdir    = html
-outputformat = HMTL
+outputdir     = html
+outputformats = HMTL
 
 headerdirs  = ../libs \
     ../msceditor
