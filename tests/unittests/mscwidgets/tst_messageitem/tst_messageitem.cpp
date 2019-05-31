@@ -156,12 +156,12 @@ void tst_MessageItem::testNameWithParameter()
 {
     delete m_messageItem;
 
-    m_message->setParameters({ "", "", { { "", "pattern" } } });
+    m_message->setParameters({ { "", "pattern" } });
     m_messageItem = new MessageItem(m_message, nullptr);
 
     QCOMPARE(m_messageItem->displayedText(), QString("Event1(pattern)"));
 
-    m_message->setParameters({ "", "", { { "", "pattern" }, { "ex: pression", "" } } });
+    m_message->setParameters({ { "", "pattern" }, { "ex: pression", "" } });
     QCOMPARE(m_messageItem->displayedText(), QString("Event1(pattern, ex: pression)"));
 }
 
@@ -169,12 +169,21 @@ void tst_MessageItem::testNameWithParameterWithExtraBraces()
 {
     delete m_messageItem;
 
-    m_message->setParameters({ "{", "}", { { "", "pattern" } } });
+    m_message->setParameters({ { "", "{pattern}" } });
     m_messageItem = new MessageItem(m_message, nullptr);
 
     QCOMPARE(m_messageItem->displayedText(), QString("Event1({pattern})"));
 
-    m_message->setParameters({ "{", "}", { { "", "pattern" }, { "ex: pression", "" } } });
+    m_message->setParameters({ { "", "pattern" }, { "{ex: pression}", "" } });
+    QCOMPARE(m_messageItem->displayedText(), QString("Event1(pattern, {ex: pression})"));
+
+    m_message->setParameters({ { "", "{pattern" }, { "ex: pression}", "" } });
+    QCOMPARE(m_messageItem->displayedText(), QString("Event1({pattern, ex: pression})"));
+
+    m_message->setParameters({ { "{pattern", "" }, { "ex: pression}", "" } });
+    QCOMPARE(m_messageItem->displayedText(), QString("Event1({pattern, ex: pression})"));
+
+    m_message->setParameters({ { "", "{pattern" }, { "", "ex: pression}" } });
     QCOMPARE(m_messageItem->displayedText(), QString("Event1({pattern, ex: pression})"));
 }
 
@@ -182,17 +191,17 @@ void tst_MessageItem::testNameAndParameterEntering()
 {
     enterText("call(47)");
     QCOMPARE(m_message->name(), QString("call"));
-    QCOMPARE(m_message->parameters().data().size(), 1);
-    QCOMPARE(m_message->parameters().data().at(0).pattern(), QString("47"));
+    QCOMPARE(m_message->parameters().size(), 1);
+    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
 }
 
 void tst_MessageItem::testNameAndParametersEntering()
 {
     enterText("call(47, ex: pression)");
     QCOMPARE(m_message->name(), QString("call"));
-    QCOMPARE(m_message->parameters().data().size(), 2);
-    QCOMPARE(m_message->parameters().data().at(0).pattern(), QString("47"));
-    QCOMPARE(m_message->parameters().data().at(1).expression(), QString("ex: pression"));
+    QCOMPARE(m_message->parameters().size(), 2);
+    QCOMPARE(m_message->parameters().at(0).pattern(), QString("47"));
+    QCOMPARE(m_message->parameters().at(1).expression(), QString("ex: pression"));
 }
 
 void tst_MessageItem::testPositionUpdateOnInstanceChange()

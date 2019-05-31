@@ -471,7 +471,7 @@ wildcard
 // 5.8 Data in message and timer parameters
 
 parameterList
-    : (LEFTCURLYBRACKET)? paramaterDefn (COMMA parameterList)? (RIGHTCURLYBRACKET)?
+    : paramaterDefn (COMMA parameterList)?
     ;
 
 paramaterDefn
@@ -481,7 +481,7 @@ paramaterDefn
 //
 
 expressionString
-    : name COLON NAME // TODO not correct ?
+    : (LEFTCURLYBRACKET)? name COLON NAME (RIGHTCURLYBRACKET)? // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
     | name COLON LEFTCURLYBRACKET NAME SEQUENCEOF RIGHTCURLYBRACKET // extending the spec here
     ;
@@ -721,10 +721,6 @@ NOTE : '/*' TEXT '*/';
 
 QUALIFIER : QUALIFIERLEFT /* TEXT */ QUALIFIERRIGHT ;
 
-//NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | COMMA )+
-//{ if (-1 != $text.IndexOf(',')) { $text = $text.Substring(0, $text.IndexOf(','));}} ;
-//NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+ ;
-
 // '`', '/' are not as from the spec
 NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
 
@@ -732,10 +728,8 @@ FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
 STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
 
-
 SEQUENCEOF // custom
-//    : LEFTCURLYBRACKET ALPHANUMERIC+ (COMMA ALPHANUMERIC)* RIGHTCURLYBRACKET
-    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)+ RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)* RIGHTCURLYBRACKET
     ;
 
 

@@ -47,11 +47,7 @@ MscParameterList MsgIdentificationItem::parametersFromText(const QString &text)
 
         const int paramEnd = text.lastIndexOf(')');
         if (paramEnd > 0) {
-            const bool hasExtraOpenBrace = text.at(idx + 1) == MscParameterList::DefaultExtraBraceOpen;
-            const bool hasExtraCloseBrace = text.at(paramEnd - 1) == MscParameterList::DefaultExtraBraceClose;
-            const int shiftOpen = hasExtraOpenBrace ? 2 : 1;
-            const int shiftClose = hasExtraCloseBrace ? 3 : 1;
-            QStringRef paramsText = text.midRef(idx + shiftOpen, paramEnd - idx - shiftClose);
+            QStringRef paramsText = text.midRef(idx + 1, paramEnd - idx - 1);
             for (auto param : paramsText.split(',')) {
                 param = param.trimmed();
                 if (!param.isEmpty()) {
@@ -61,12 +57,9 @@ MscParameterList MsgIdentificationItem::parametersFromText(const QString &text)
                     } else {
                         mscParam.setPattern(param.toString());
                     }
-                    parameters.dataRef().append(mscParam);
+                    parameters.append(mscParam);
                 }
             }
-            if (hasExtraOpenBrace || hasExtraCloseBrace)
-                parameters.setExtraBraces(MscParameterList::DefaultExtraBraceOpen,
-                                          MscParameterList::DefaultExtraBraceClose);
         }
     }
 

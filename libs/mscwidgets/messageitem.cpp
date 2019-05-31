@@ -313,19 +313,17 @@ QVariant MessageItem::itemChange(GraphicsItemChange change, const QVariant &valu
 
 QString MessageItem::displayTextFromModel() const
 {
-    if (m_message->parameters().data().isEmpty() && m_message->parameters().extraBraceOpen().isEmpty())
+    if (m_message->parameters().isEmpty())
         return m_message->name();
 
     QString parameters;
-    for (const auto &param : m_message->parameters().data()) {
+    for (const auto &param : m_message->parameters()) {
         if (!parameters.isEmpty())
             parameters += ", ";
         parameters += param.parameter();
     }
 
-    const QString &text = QString("%1(%2%3%4)")
-                                  .arg(m_message->name(), m_message->parameters().extraBraceOpen(), parameters,
-                                       m_message->parameters().extraBraceClose());
+    const QString &text = QString("%1(%2)").arg(m_message->name(), parameters);
     return text;
 }
 

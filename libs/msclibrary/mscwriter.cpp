@@ -596,13 +596,7 @@ QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize
  */
 QString MscWriter::serializeParameters(const MscMessage *message) const
 {
-    QString parameters;
-    for (const MscParameter &param : message->parameters().data()) {
-        if (!parameters.isEmpty())
-            parameters += ", ";
-        parameters += param.pattern().isEmpty() ? param.expression() : param.pattern();
-    }
-    return message->parameters().extraBraceOpen() + parameters + message->parameters().extraBraceClose();
+    return message ? message->paramString() : QString();
 }
 
 /*!

@@ -102,6 +102,8 @@ public:
     QVector<QPoint> cifPoints() const;
     void setCifPoints(const QVector<QPoint> &points);
 
+    QString paramString() const;
+
 Q_SIGNALS:
     void messageInstanceNameChanged();
     void sourceChanged(MscInstance *source);

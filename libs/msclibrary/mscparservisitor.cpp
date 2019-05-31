@@ -1129,35 +1129,29 @@ std::vector<antlr4::Token *> MscParserVisitor::getHiddenCommentTokensToLeft(int 
 
 msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterListContext *parameterList)
 {
-    const QString &extraBraceOpen = parameterList && parameterList->LEFTCURLYBRACKET()
-            ? treeNodeToString(parameterList->LEFTCURLYBRACKET())
-            : QString();
-
-    QString extraBraceClose = parameterList && parameterList->RIGHTCURLYBRACKET()
-            ? treeNodeToString(parameterList->RIGHTCURLYBRACKET())
-            : QString();
-
     msc::MscParameterList parameters;
     while (parameterList && parameterList->paramaterDefn()) {
-        if (!extraBraceOpen.isEmpty() && extraBraceClose.isEmpty() && parameterList
-            && parameterList->RIGHTCURLYBRACKET())
-            extraBraceClose = treeNodeToString(parameterList->RIGHTCURLYBRACKET());
 
         auto *paramaterDefn = parameterList->paramaterDefn();
-        QString expression = ::sourceTextForContext(paramaterDefn->expression());
+        const QString &expression = ::sourceTextForContext(paramaterDefn->expression());
         QString pattern = ::sourceTextForContext(paramaterDefn->pattern());
+        if (pattern.isEmpty()) {
+            pattern = ::sourceTextForContext(paramaterDefn->binding());
+        }
         if (pattern.isEmpty()) {
             pattern = ::sourceTextForContext(paramaterDefn->sdlText());
         }
+        if (pattern.isEmpty()) {
+            pattern = ::treeNodeToString(paramaterDefn->SEQUENCEOF());
+        }
         if (!expression.isEmpty() || !pattern.isEmpty()) {
             msc::MscParameter parameter(expression, pattern);
-            parameters.dataRef() << parameter;
+            parameters << parameter;
         }
 
         parameterList = parameterList->parameterList();
     }
 
-    parameters.setExtraBraces(extraBraceOpen, extraBraceClose);
     return parameters;
 }
 

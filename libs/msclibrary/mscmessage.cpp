@@ -120,13 +120,7 @@ void MscMessage::setParameters(const MscParameterList &parameters)
     if (m_parameters == parameters)
         return;
 
-    const QString &extraBraceOpen = m_parameters.extraBraceOpen();
-    const QString &extraBraceClose = m_parameters.extraBraceClose();
-
     m_parameters = parameters;
-
-    if (!extraBraceOpen.isEmpty() && m_parameters.extraBraceOpen().isEmpty())
-        m_parameters.setExtraBraces(extraBraceOpen, extraBraceClose);
 
     Q_EMIT dataChanged();
 }
@@ -142,12 +136,12 @@ bool MscMessage::isSame(const MscMessage *message) const
     if (!same)
         return false;
 
-    const int parametersSize = m_parameters.data().size();
-    if (parametersSize != message->m_parameters.data().size())
+    const int parametersSize = m_parameters.size();
+    if (parametersSize != message->m_parameters.size())
         return false;
 
     for (int i = 0; i < parametersSize; ++i) {
-        if (m_parameters.data().at(i) != message->m_parameters.data().at(i))
+        if (m_parameters.at(i) != message->m_parameters.at(i))
             return false;
     }
 
@@ -242,6 +236,17 @@ void MscMessage::setCifPoints(const QVector<QPoint> &points)
     msgCif->setPayload(QVariant::fromValue(points), m_messageCifMainType);
     Q_EMIT cifPointsChanged();
     Q_EMIT dataChanged(); // update MscTextView
+}
+
+QString MscMessage::paramString() const
+{
+    QString parameters;
+    for (const MscParameter &param : this->parameters()) {
+        if (!parameters.isEmpty())
+            parameters += ", ";
+        parameters += param.pattern().isEmpty() ? param.expression() : param.pattern();
+    }
+    return parameters;
 }
 
 } // namespace msc

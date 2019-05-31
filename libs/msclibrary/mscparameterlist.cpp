@@ -70,46 +70,4 @@ void MscParameter::setPattern(const QString &pattern)
     m_type = Type::Pattern;
 }
 
-const QChar MscParameterList::DefaultExtraBraceOpen = '{';
-const QChar MscParameterList::DefaultExtraBraceClose = '}';
-
-MscParameterList::MscParameterList(const QString &braceOpen, const QString &braceClose,
-                                   const QVector<msc::MscParameter> &data)
-    : m_data(data)
-    , m_braceOpen(braceOpen)
-    , m_braceClose(braceClose)
-{
-}
-
-void MscParameterList::setExtraBraces(const QString &open, const QString &close)
-{
-    m_braceOpen = open;
-    m_braceClose = close;
-}
-
-const QVector<msc::MscParameter> &MscParameterList::data() const
-{
-    return m_data;
-}
-
-QVector<msc::MscParameter> &MscParameterList::dataRef()
-{
-    return m_data;
-}
-
-QString MscParameterList::extraBraceOpen() const
-{
-    return m_braceOpen;
-}
-
-QString MscParameterList::extraBraceClose() const
-{
-    return m_braceClose;
-}
-
-bool MscParameterList::operator==(const MscParameterList &other) const
-{
-    return m_data == other.m_data && m_braceOpen == other.m_braceOpen && m_braceClose == other.m_braceClose;
-}
-
 } // namespace msc
