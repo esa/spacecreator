@@ -18,6 +18,7 @@
 #include "messageitem.h"
 
 #include "baseitems/arrowitem.h"
+#include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
 #include "baseitems/common/utils.h"
@@ -32,7 +33,6 @@
 #include "messagedialog.h"
 #include "mscchart.h"
 #include "mscinstance.h"
-#include "baseitems/commentitem.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -611,21 +611,26 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
 
     if (sourceChanged) {
         const int newIdx = m_chartViewModel->eventIndex(tail().y());
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage, { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                                                                   QVariant::fromValue<MscInstance *>(sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
-                                                                   QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
-                                                                   QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+                                      { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                                        QVariant::fromValue<MscInstance *>(
+                                                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
+                                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
+                                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     }
     if (targetChanged) {
         const int newIdx = m_chartViewModel->eventIndex(head().y());
-        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage, { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                                                                   QVariant::fromValue<MscInstance *>(targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
-                                                                   QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
-                                                                   QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+        msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
+                                      { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                                        QVariant::fromValue<MscInstance *>(
+                                                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
+                                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
+                                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     }
 
-    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,  { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                                                                  QVariant::fromValue(newPointsCif) });
+    msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
+                                  { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
+                                    QVariant::fromValue(newPointsCif) });
     cmd::CommandsStack::current()->endMacro();
 
     if (auto item = m_chartViewModel->itemForComment(m_message->comment()))
@@ -826,29 +831,7 @@ void MessageItem::updateCif()
     using namespace cif;
 
     const cif::CifLine::CifType usedCifType = mainCifType();
-
-    const QVector<QPointF> &msgPointsActual = messagePoints();
-    QVector<QPointF> msgPointsInChartBox(msgPointsActual);
-    if (msgPointsInChartBox.size() >= 2) {
-        const QRectF contentRect = utils::CoordinatesConverter::currentChartItem()->contentRect();
-        auto ensureInRect = [&contentRect](const QPointF &pnt) {
-            QPointF validated(pnt);
-            if (pnt.x() < contentRect.left())
-                validated.rx() = contentRect.left();
-            if (pnt.x() > contentRect.right())
-                validated.rx() = contentRect.right();
-            if (pnt.y() < contentRect.top())
-                validated.ry() = contentRect.top();
-            if (pnt.y() > contentRect.bottom())
-                validated.ry() = contentRect.bottom();
-            return validated;
-        };
-
-        msgPointsInChartBox[0] = ensureInRect(msgPointsInChartBox.first());
-        msgPointsInChartBox[msgPointsInChartBox.size() - 1] = ensureInRect(msgPointsInChartBox.last());
-    }
-
-    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(msgPointsInChartBox);
+    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());
     if (!geometryManagedByCif()) {
         const CifBlockShared &emptyCif =
                 isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
