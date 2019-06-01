@@ -96,14 +96,14 @@ InstanceHeadItem::InstanceHeadItem(QGraphicsItem *parent)
     m_textItemName->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
     connect(m_textItemName, &TextItem::edited, this, [this](const QString &txt) {
+        m_explicitTextBox = QRectF();
         m_textItemName->adjustSize();
         updateLayout();
         Q_EMIT nameEdited(txt);
     });
 
-    connect(m_textItemName, &TextItem::textChanged, this, [this]() { updateLayout(); });
-
     connect(m_textItemKind, &TextItem::edited, this, [this](const QString &txt) {
+        m_explicitTextBox = QRectF();
         m_textItemKind->adjustSize();
         updateLayout();
         Q_EMIT kindEdited(txt);
@@ -128,6 +128,7 @@ void InstanceHeadItem::setName(const QString &name)
     if (name == this->name())
         return;
 
+    m_explicitTextBox = QRectF();
     m_textItemName->setPlainText(name);
     m_textItemName->adjustSize();
 
@@ -143,6 +144,7 @@ void InstanceHeadItem::setKind(const QString &kind)
     QString kindText;
     MscInstance::splitDenominatorKind(kind, denominator, kindText);
 
+    m_explicitTextBox = QRectF();
     if (denominator.isEmpty())
         m_textItemKind->setPlainText(kindText);
     else
@@ -175,6 +177,7 @@ void InstanceHeadItem::updateLayout()
         symbolRect.adjust(-padding, -padding, padding, padding);
 
         symbolRect.moveTopLeft({ 0., 0. });
+        m_explicitTextBox = symbolRect;
     }
 
     // center name horizontaly:

@@ -109,6 +109,7 @@ protected:
     QRegularExpression m_inputValidator;
     QSizeF m_explicitSize;
     bool m_sendClickEvent = false;
+    bool m_disableEditingGuard = false;
 };
 
 class NameItem : public TextItem

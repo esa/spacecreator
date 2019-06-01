@@ -193,6 +193,11 @@ void TextItem::enableEditMode()
 
 void TextItem::disableEditMode()
 {
+    if (m_disableEditingGuard)
+        return;
+
+    m_disableEditingGuard = true;
+
     if (m_prevText != toPlainText()) {
         if (toPlainText().isEmpty()) {
             setPlainText(m_prevText);
@@ -206,6 +211,8 @@ void TextItem::disableEditMode()
     selectText(false);
     m_prevText.clear();
     setTextInteractionFlags(Qt::NoTextInteraction);
+
+    m_disableEditingGuard = false;
 }
 
 void TextItem::focusOutEvent(QFocusEvent *event)

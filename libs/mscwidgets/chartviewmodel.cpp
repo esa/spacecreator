@@ -347,13 +347,13 @@ void ChartViewModel::addInstanceItems()
         }
 
         item->setHighlightable(false);
-        item->setDenominatorAndKind(instance->denominatorAndKind());
 
         const bool geomByCif = item->geometryManagedByCif();
         if (geomByCif)
             item->applyCif();
         else
             item->setInitialLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
+        item->setDenominatorAndKind(instance->denominatorAndKind());
 
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
         d->m_layoutInfo.m_instancesRect |= item->sceneBoundingRect();
@@ -992,9 +992,11 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
             orphanInstance = currentChart()->makeInstance();
 
         InstanceItem *instanceItem = InstanceItem::createDefaultItem(this, orphanInstance, currentChart(), pos);
-        const qreal axisHeight = d->calcInstanceAxisHeight();
-        if (!qFuzzyIsNull(axisHeight))
-            instanceItem->setAxisHeight(axisHeight);
+        if (!instanceItem->geometryManagedByCif()) {
+            const qreal axisHeight = d->calcInstanceAxisHeight();
+            if (!qFuzzyIsNull(axisHeight))
+                instanceItem->setAxisHeight(axisHeight);
+        }
         return instanceItem;
     }
     return nullptr;

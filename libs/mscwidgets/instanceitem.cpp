@@ -160,9 +160,11 @@ void InstanceItem::updatePropertyString(const QLatin1String &property, const QSt
 
 void InstanceItem::rebuildLayout()
 {
+    const qreal offset = geometryManagedByCif() && boundingRect().isValid()
+            ? (boundingRect().width() - m_headSymbol->boundingRect().width()) / 2
+            : 0.0;
     prepareGeometryChange();
 
-    //    const QPointF &prevP1 = m_axisSymbol->line().p1();
     QRectF headRect(m_headSymbol->boundingRect());
     const qreal endSymbolHeight = m_endSymbol->height();
     m_boundingRect.setWidth(headRect.width());
@@ -178,6 +180,12 @@ void InstanceItem::rebuildLayout()
     const QPointF p1(headRect.center().x(), headRect.bottom());
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
+
+    if (!qFuzzyIsNull(offset)) {
+        moveSilentlyBy(QPointF(offset, 0));
+        updateCif();
+        Q_EMIT needUpdateLayout();
+    }
 }
 
 QRectF InstanceItem::boundingRect() const
