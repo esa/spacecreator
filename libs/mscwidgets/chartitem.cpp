@@ -205,7 +205,7 @@ void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 QRectF ChartItem::contentRect() const
 {
-    return m_contentArea->rect();
+    return m_contentArea->sceneBoundingRect();
 }
 
 QPointF ChartItem::setContentRect(const QRectF &r, utils::CifUpdatePolicy cifUpdate)
@@ -223,7 +223,7 @@ QPointF ChartItem::setContentRect(const QRectF &r, utils::CifUpdatePolicy cifUpd
 
     prepareGeometryChange();
 
-    m_contentArea->setRect(newContentRect);
+    m_contentArea->setRect(utils::framedRect(newContentRect, m_contentArea->pen().widthF()));
     m_rectItem->setRect(newContentRect.marginsAdded(chartMargins()));
 
     if (QGraphicsScene *pScene = scene())

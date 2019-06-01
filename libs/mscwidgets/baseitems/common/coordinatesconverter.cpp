@@ -17,6 +17,8 @@
 
 #include "coordinatesconverter.h"
 
+#include "graphicsview.h"
+
 #include <QDebug>
 #include <QtMath>
 
@@ -80,6 +82,12 @@ QPoint CoordinatesConverter::sceneOriginInView(QGraphicsView *view)
     return view ? view->mapFromScene(currentChartItem()->contentRect().topLeft()) : sceneOrigin.toPoint();
 }
 
+static inline qreal viewScaleFactor(QGraphicsView *graphicsView)
+{
+    const auto view = qobject_cast<GraphicsView *>(graphicsView);
+    return view && !qFuzzyIsNull(view->zoom()) ? view->zoom() / 100.0 : 1.0;
+}
+
 QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePointSrc, bool *ok)
 {
     const QPointF scenePoint = scenePointSrc;
@@ -95,8 +103,9 @@ QPoint CoordinatesConverter::sceneToCif(const QPointF &scenePointSrc, bool *ok)
                 const QPointF &targetPixels = converter->m_view->mapFromScene(scenePoint) - sceneOriginPixels;
                 const QPointF &targetInch = targetPixels * m_mmInInch;
 
-                const qreal mmX = (targetInch.x() / converter->m_dpiPhysical.x());
-                const qreal mmY = (targetInch.y() / converter->m_dpiPhysical.y());
+                const qreal scaleFactor = viewScaleFactor(converter->m_view);
+                const qreal mmX = (targetInch.x() / converter->m_dpiPhysical.x()) / scaleFactor;
+                const qreal mmY = (targetInch.y() / converter->m_dpiPhysical.y()) / scaleFactor;
 
                 const QPointF mmPoints { mmX, mmY };
                 const QPointF mmPointsCif { mmPoints * m_cifMmScaleFactor };
@@ -154,8 +163,10 @@ QPointF CoordinatesConverter::cifToScene(const QPoint &cifPoint, bool *ok)
             if (converter->m_view) {
                 const QPointF sceneOriginPixels(sceneOriginInView(converter->m_view));
                 const QPointF cifPointOneMm(scenePoint / m_cifMmScaleFactor);
-                const qreal pixelsX = (cifPointOneMm.x() * converter->m_dpiPhysical.x()) / m_mmInInch;
-                const qreal pixelsY = (cifPointOneMm.y() * converter->m_dpiPhysical.y()) / m_mmInInch;
+
+                const qreal scaleFactor = viewScaleFactor(converter->m_view);
+                const qreal pixelsX = (cifPointOneMm.x() * converter->m_dpiPhysical.x()) / m_mmInInch * scaleFactor;
+                const qreal pixelsY = (cifPointOneMm.y() * converter->m_dpiPhysical.y()) / m_mmInInch * scaleFactor;
                 const QPointF pixels(QPointF(pixelsX, pixelsY) + sceneOriginPixels);
 
                 scenePoint = converter->m_view->mapToScene(pixels.toPoint());
