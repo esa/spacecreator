@@ -320,16 +320,16 @@ void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
     if (gp->location() != GripPoint::Location::Center)
         return;
 
-    const QRectF sceneRect = scene()->sceneRect() - ChartItem::chartMargins();
+    const QRectF contentRect = utils::CoordinatesConverter::currentChartItem()->contentRect();
     QPointF newPos = pos() + (to - from);
-    if (newPos.x() < sceneRect.left())
-        newPos.setX(sceneRect.left());
-    else if ((newPos.x() + m_boundingRect.width()) > sceneRect.right())
-        newPos.setX(sceneRect.right() - m_boundingRect.width());
-    if (newPos.y() < sceneRect.top())
-        newPos.setY(sceneRect.top());
-    else if ((newPos.y() + m_boundingRect.height()) > sceneRect.bottom())
-        newPos.setY(sceneRect.bottom() - m_boundingRect.height());
+    if (newPos.x() < contentRect.left())
+        newPos.setX(contentRect.left());
+    else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+        newPos.setX(contentRect.right() - m_boundingRect.width());
+    if (newPos.y() < contentRect.top())
+        newPos.setY(contentRect.top());
+    else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+        newPos.setY(contentRect.bottom() - m_boundingRect.height());
 
     QRect oldRect;
     if (geometryManagedByCif()) {

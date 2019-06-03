@@ -73,8 +73,19 @@ void CommentCreatorTool::commitPreviewItem()
 
     const QString itemComment = item->text();
     if (m_isGlobalComment) {
+        const QRectF contentRect = m_model->itemForChart()->contentRect();
+        QRectF itemSceneRect = item->sceneBoundingRect();
+        if (itemSceneRect.left() < contentRect.left())
+            itemSceneRect.moveLeft(contentRect.left());
+        if (itemSceneRect.top() < contentRect.top())
+            itemSceneRect.moveTop(contentRect.top());
+        if (itemSceneRect.right() > contentRect.right())
+            itemSceneRect.setRight(contentRect.right());
+        if (itemSceneRect.bottom() > contentRect.bottom())
+            itemSceneRect.setBottom(contentRect.bottom());
+
         QRect newRect;
-        if (utils::CoordinatesConverter::sceneToCif(item->sceneBoundingRect(), newRect)) {
+        if (utils::CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
                                           { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
