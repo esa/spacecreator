@@ -222,18 +222,20 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
     if (gp->location() != GripPoint::Location::Center)
         return;
 
-    const QPointF delta { (to - from).x(), 0. };
+    QPointF delta { (to - from).x(), 0. };
     if (delta.isNull())
         return;
 
-    {
-        // TODO: place this into InteractiveObject to be shared among all its descendans
-        const QRectF newRect = sceneBoundingRect().translated(delta.x(), delta.y());
-        if (!utils::CoordinatesConverter::currentChartItem()->contentRect().contains(newRect))
-            return;
-    }
+    const QRectF newRect = sceneBoundingRect().translated(delta.x(), delta.y());
+    const QRectF contentRect = m_model->itemForChart()->contentRect();
 
-    setPos(pos() + delta);
+    if (contentRect.left() > newRect.left())
+        delta += QPointF(contentRect.left() - newRect.left(), 0.);
+    else if (contentRect.right() < newRect.right())
+        delta += QPointF(contentRect.right() - newRect.right(), 0.);
+
+    if (!qFuzzyIsNull(delta.x()))
+        setPos(pos() + delta);
 }
 
 void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
