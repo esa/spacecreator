@@ -315,14 +315,16 @@ QRectF TimerItem::symbolBox() const
 
 bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos)
 {
-    if (targetTimer == nullptr)
+    if (targetTimer == nullptr || m_timer == nullptr)
+        return false;
+
+    if (m_timer->instance() != targetTimer->instance() || targetTimer->instance() == nullptr
+        || m_timer->instance() == nullptr)
         return false;
 
     const bool upperItem = scenePos().y() < targetPos.y();
     MscTimer *start = upperItem ? m_timer.data() : targetTimer;
-    MscTimer *end = upperItem ? targetTimer : m_timer.data();
-
-    return start->allowFollowingTimer(end) && end->allowPrecedingTimer(start);
+    return start->timerType() == MscTimer::TimerType::Start;
 }
 
 } // namespace msc
