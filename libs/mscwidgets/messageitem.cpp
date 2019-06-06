@@ -421,9 +421,7 @@ void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
     const QPointF offset(to - from);
     if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
         const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + offset;
-        updateSource(desitnation, ObjectAnchor::Snap::NoSnap, m_sourceInstance);
-    } else {
-        updateSourceAndTarget(offset);
+        updateSource(desitnation, ObjectAnchor::Snap::SnapTo, m_sourceInstance);
     }
 
     scheduleLayoutUpdate();
@@ -437,9 +435,7 @@ void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
     const QPointF offset(to - from);
     if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
         const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + offset;
-        updateTarget(desitnation, ObjectAnchor::Snap::NoSnap, m_targetInstance);
-    } else {
-        updateSourceAndTarget(offset);
+        updateTarget(desitnation, ObjectAnchor::Snap::SnapTo, m_targetInstance);
     }
 
     scheduleLayoutUpdate();

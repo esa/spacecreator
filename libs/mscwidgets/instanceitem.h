@@ -100,6 +100,7 @@ private:
     InstanceHeadItem *m_headSymbol = nullptr;
     InstanceEndItem *m_endSymbol = nullptr;
     qreal m_axisHeight = defaultAxisHeight();
+    qreal m_headHeight = 0;
 
     Q_INVOKABLE void reflectTextLayoutChange();
 
