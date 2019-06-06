@@ -163,9 +163,14 @@ void InstanceHeadItem::updateLayout()
     const qreal width =
             qMax(defaultSizeScene.width(), qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
 
-    m_textItemName->setTextWidth(width);
-    m_textItemKind->setTextWidth(width);
-
+    if (!qFuzzyIsNull(m_textItemKind->textWidth())
+        && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
+        m_textItemName->setTextWidth(width);
+    }
+    if (!qFuzzyIsNull(m_textItemKind->textWidth())
+        && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
+        m_textItemKind->setTextWidth(width);
+    }
     QRectF nameRect = m_textItemName->boundingRect();
     QRectF kindRect = m_textItemKind->boundingRect();
 
@@ -286,6 +291,8 @@ void InstanceHeadItem::setTextboxSize(const QSizeF &size)
     if (newTextBox != m_explicitTextBox) {
         m_explicitTextBox = newTextBox;
         QSignalBlocker keepSilent(this);
+        m_textItemKind->adjustSize();
+        m_textItemName->adjustSize();
         updateLayout();
     }
 }

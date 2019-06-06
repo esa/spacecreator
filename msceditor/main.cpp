@@ -20,6 +20,7 @@
 #include "mscdocument.h"
 
 #include <QApplication>
+#include <QDirIterator>
 #include <QMetaEnum>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -94,6 +95,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));
     a.setApplicationVersion("0.0.1");
+
+    QDirIterator dirIt(":/fonts");
+    while (dirIt.hasNext())
+        QFontDatabase::addApplicationFont(dirIt.next());
+    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
     MainWindow w;
     LogHandler::instance()->setupOutputView(w.textOutputPane());

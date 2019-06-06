@@ -354,6 +354,7 @@ void ChartViewModel::addInstanceItems()
         else
             item->setInitialLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
         item->setDenominatorAndKind(instance->denominatorAndKind());
+        item->setName(instance->name());
 
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
         d->m_layoutInfo.m_instancesRect |= item->sceneBoundingRect();

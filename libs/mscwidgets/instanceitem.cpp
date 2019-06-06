@@ -36,13 +36,13 @@
 
 #include <QApplication>
 #include <QBrush>
-#include <QDebug>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
 #include <QPainter>
+#include <QtDebug>
 #include <functional>
 
 namespace msc {
@@ -62,9 +62,6 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView
     connect(m_instance, &msc::MscInstance::nameChanged, this, &msc::InstanceItem::setName);
     connect(m_instance, &msc::MscInstance::denominatorOrKindChanged, this, &msc::InstanceItem::setDenominatorAndKind);
     connect(m_instance, &msc::MscInstance::explicitStopChanged, this, &msc::InstanceItem::setExplicitStop);
-
-    m_headSymbol->setName(m_instance->name());
-    m_headSymbol->setKind(m_instance->denominatorAndKind());
 
     setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
 
@@ -183,7 +180,8 @@ void InstanceItem::rebuildLayout()
 
     if (!qFuzzyIsNull(offset)) {
         moveSilentlyBy(QPointF(offset, 0));
-        updateCif();
+        if (geometryManagedByCif())
+            updateCif();
         Q_EMIT needUpdateLayout();
     }
 }

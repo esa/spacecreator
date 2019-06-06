@@ -78,6 +78,7 @@ void tst_InstanceItem::init()
 {
     m_instance = new MscInstance("INST1");
     m_instanceItem = new InstanceItem(m_instance);
+    m_instanceItem->setName(m_instance->name());
 }
 
 void tst_InstanceItem::cleanup()
