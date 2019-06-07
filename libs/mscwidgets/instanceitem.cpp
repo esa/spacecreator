@@ -162,12 +162,6 @@ void InstanceItem::rebuildLayout()
             : 0.0;
 
     const qreal endSymbolHeight = m_endSymbol->height();
-    const qreal yOffset = geometryManagedByCif() && boundingRect().isValid()
-            ? m_headSymbol->boundingRect().height() - m_headHeight
-            : 0.0;
-
-    m_headHeight = m_headSymbol->boundingRect().height();
-
     prepareGeometryChange();
 
     QRectF headRect(m_headSymbol->boundingRect());
@@ -185,27 +179,9 @@ void InstanceItem::rebuildLayout()
     const QPointF p2 = m_endSymbol->isStop() ? footerRect.center() : QPointF(footerRect.center().x(), footerRect.top());
     m_axisSymbol->setLine(QLineF(p1, p2));
 
-    if (!qFuzzyIsNull(yOffset)) {
-        const QVector<MscInstanceEvent *> events = m_model->currentChart()->eventsForInstance(m_instance);
-        for (MscInstanceEvent *event: events) {
-            if (event->entityType() == MscEntity::EntityType::Message || event->entityType() == MscEntity::EntityType::Create) {
-                if (MessageItem *msgItem = qobject_cast<MessageItem *>(m_model->itemForEntity(event))) {
-                    if (msgItem->sourceInstanceItem() == this) {
-                        msgItem->setTail(msgItem->tail() + QPointF(0, yOffset), ObjectAnchor::Snap::SnapTo);
-                        if (!msgItem->targetInstanceItem())
-                            msgItem->setHead(msgItem->head() + QPointF(0, yOffset), ObjectAnchor::Snap::NoSnap);
-                    } else if (msgItem->targetInstanceItem() == this) {
-                        msgItem->setHead(msgItem->head() + QPointF(0, yOffset), ObjectAnchor::Snap::SnapTo);
-                        if (!msgItem->sourceInstanceItem())
-                            msgItem->setTail(msgItem->tail() + QPointF(0, yOffset), ObjectAnchor::Snap::NoSnap);
-                    }
-                }
-            }
-        }
-    }
-
     if (!qFuzzyIsNull(xOffset)) {
         moveSilentlyBy(QPointF(xOffset, 0));
+        avoidOverlaps(this, QPointF(xOffset, 0), QRectF());
         if (geometryManagedByCif())
             updateCif();
         Q_EMIT needUpdateLayout();

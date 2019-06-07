@@ -70,7 +70,7 @@ struct ChartViewLayoutInfo {
             delete m_chartItem;
         }
 
-        m_instancesCommonAxisStart = 0.;
+        m_instancesCommonAxisOffset = 0.;
     }
 
     QMap<MscInstance *, MessageItem *> m_dynamicInstances;
@@ -78,7 +78,7 @@ struct ChartViewLayoutInfo {
     QRectF m_instancesRect;
     QSizeF m_preferredBox;
     QPointF m_pos;
-    qreal m_instancesCommonAxisStart = 0.;
+    qreal m_instancesCommonAxisOffset = 0.;
 
     QPointer<ChartItem> m_chartItem = nullptr;
 
@@ -305,7 +305,7 @@ void ChartViewModel::doLayout()
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
     d->m_layoutInfo.m_instancesRect = QRectF();
-    d->m_layoutInfo.m_instancesCommonAxisStart = 0.;
+    d->m_layoutInfo.m_instancesCommonAxisOffset = 0.;
 
     prepareChartBoxItem();
     if (d->m_layoutInfo.m_chartItem) {
@@ -387,9 +387,15 @@ void ChartViewModel::addInstanceItems()
         if (instanceItem->modelItem()->explicitCreator())
             continue;
 
-        const QPointF pos = instanceItem->pos();
-        instanceItem->setPos(pos.x(), maxHeight - (instanceItem->axis().y1() - pos.y()));
+        const qreal yOffset = maxHeight - instanceItem->axis().y1();
+        instanceItem->moveSilentlyBy(QPointF(0, yOffset));
+        if (instanceItem->geometryManagedByCif()) {
+            instanceItem->updateCif();
+            d->m_layoutInfo.m_instancesCommonAxisOffset = qMax(d->m_layoutInfo.m_instancesCommonAxisOffset, yOffset);
+        }
     }
+
+    d->m_layoutInfo.m_pos.setY(qMax(maxHeight, d->m_layoutInfo.m_pos.y()));
 
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItems.size());
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItemsSorted.size());
@@ -461,10 +467,19 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
 {
     auto moveNewItem = [&]() {
         qreal deltaY = 0.;
-        const bool geometryFromCif = item->geometryManagedByCif();
-        if (geometryFromCif)
-            item->applyCif();
-        else {
+        if (item->geometryManagedByCif()) {
+            if (!qFuzzyIsNull(d->m_layoutInfo.m_instancesCommonAxisOffset)) {
+                if (auto msgItem = qobject_cast<MessageItem *>(item)) {
+                    QVector<QPointF> points = msgItem->messagePoints();
+                    for (QPointF &point: points)
+                        point.ry() += d->m_layoutInfo.m_instancesCommonAxisOffset;
+                    msgItem->setMessagePoints(points);
+                    msgItem->updateCif();
+                }
+            } else {
+                item->applyCif();
+            }
+        } else {
             const QRectF srcRect = item->sceneBoundingRect();
             const qreal targetTop = d->m_layoutInfo.m_pos.y() + d->interMessageSpan();
             deltaY = targetTop - srcRect.top();

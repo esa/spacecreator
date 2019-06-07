@@ -419,10 +419,13 @@ void MessageItem::commitGeometryChange()
 void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
-    if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
-        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + offset;
+    if (!qFuzzyIsNull(offset.x())) {
+        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointSource() + QPointF(offset.x(), 0);
         updateSource(desitnation, ObjectAnchor::Snap::SnapTo, m_sourceInstance);
     }
+
+    if (!qFuzzyIsNull(offset.y()))
+        updateSourceAndTarget(QPointF(0, offset.y()));
 
     scheduleLayoutUpdate();
 
@@ -433,10 +436,13 @@ void MessageItem::onSourceInstanceMoved(const QPointF &from, const QPointF &to)
 void MessageItem::onTargetInstanceMoved(const QPointF &from, const QPointF &to)
 {
     const QPointF offset(to - from);
-    if (geometryManagedByCif() || qFuzzyIsNull(offset.y())) {
-        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + offset;
+    if (!qFuzzyIsNull(offset.x())) {
+        const QPointF &desitnation = m_arrowItem->arrow()->anchorPointTarget() + QPointF(offset.x(), 0);
         updateTarget(desitnation, ObjectAnchor::Snap::SnapTo, m_targetInstance);
     }
+
+    if (!qFuzzyIsNull(offset.y()))
+        updateSourceAndTarget(QPointF(0, offset.y()));
 
     scheduleLayoutUpdate();
 
