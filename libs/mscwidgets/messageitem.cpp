@@ -630,9 +630,11 @@ void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const 
                                         QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     }
 
+    const int newIdx = m_chartViewModel->eventIndex(sceneBoundingRect().y());
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
                                   { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                                    QVariant::fromValue(newPointsCif) });
+                                    QVariant::fromValue(newPointsCif), newIdx,
+                                    QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     cmd::CommandsStack::current()->endMacro();
 
     if (auto item = m_chartViewModel->itemForComment(m_message->comment()))

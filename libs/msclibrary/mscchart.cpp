@@ -416,7 +416,7 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
 {
     const int currentPos = m_instanceEvents.indexOf(event);
     if (newIndex != currentPos && currentPos >= 0 && newIndex >= 0 && newIndex < m_instanceEvents.size()) {
-        m_instanceEvents.takeAt(currentPos);
+        m_instanceEvents.removeAt(currentPos);
         m_instanceEvents.insert(newIndex, event);
         return true;
     }

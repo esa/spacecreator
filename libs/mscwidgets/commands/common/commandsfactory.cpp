@@ -507,11 +507,13 @@ QUndoCommand *CommandsFactory::createChangeInstancePosition(const QVariantList &
 
 QUndoCommand *CommandsFactory::createEditMessagePoints(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 5);
 
-    if (auto message = params.at(0).value<MscMessage *>())
-        return new CmdMessagePointsEdit(message, params.at(1).value<QVector<QPoint>>(),
-                                        params.at(2).value<QVector<QPoint>>());
+    if (auto chart = params.last().value<MscChart *>()) {
+        if (auto message = params.at(0).value<MscMessage *>())
+            return new CmdMessagePointsEdit(message, params.at(1).value<QVector<QPoint>>(),
+                                            params.at(2).value<QVector<QPoint>>(), params.at(3).toInt(), chart);
+    }
 
     return nullptr;
 }

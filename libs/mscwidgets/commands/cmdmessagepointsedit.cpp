@@ -26,23 +26,32 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-                                           const QVector<QPoint> &cifPointsNew)
+                                           const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart)
     : BaseCommand(message)
     , m_message(message)
+    , m_chart(chart)
     , m_newCif(cifPointsNew)
     , m_oldCif(cifPointsOld)
+    , m_newIdx(newIdx)
+    , m_oldIdx(m_chart->instanceEvents().indexOf(m_message))
 {
     setText(QObject::tr("Edit message trajectory"));
 }
 
 void CmdMessagePointsEdit::redo()
 {
+    if (m_chart)
+        m_chart->moveEvent(m_message, m_newIdx);
+
     if (m_message)
         m_message->setCifPoints(m_newCif);
 }
 
 void CmdMessagePointsEdit::undo()
 {
+    if (m_chart)
+        m_chart->moveEvent(m_message, m_oldIdx);
+
     if (m_message)
         m_message->setCifPoints(m_oldCif);
 }

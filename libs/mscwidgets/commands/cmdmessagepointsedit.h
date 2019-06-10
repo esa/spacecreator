@@ -32,7 +32,8 @@ namespace cmd {
 class CmdMessagePointsEdit : public BaseCommand
 {
 public:
-    CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew);
+    CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
+                         int newIdx, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -41,8 +42,11 @@ public:
 
 private:
     QPointer<MscMessage> m_message;
+    QPointer<MscChart> m_chart;
     QVector<QPoint> m_newCif;
     const QVector<QPoint> m_oldCif;
+    const int m_newIdx;
+    const int m_oldIdx;
 };
 
 } // ns cmd

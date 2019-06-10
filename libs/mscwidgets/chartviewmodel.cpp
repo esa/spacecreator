@@ -272,11 +272,19 @@ MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *
             targetItem->setAxisHeight(axisLine.length());
             targetItem->moveSilentlyBy({ 0., deltaY + targetItem->kindBox().height() / 2 });
         }
-        QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center()
-                                       : d->m_layoutInfo.m_pos + ChartItem::chartMargin();
+
+        QVector<QPointF> points { QPointF(0, 0), QPointF(0, 0) };
+        if (item->geometryManagedByCif()) {
+            bool converted = false;
+            const QVector<QPointF> pointsScene =
+                    utils::CoordinatesConverter::cifToScene(item->modelItem()->cifPoints(), &converted);
+            if (converted && points.size() == pointsScene.size())
+                points = pointsScene;
+        }
+
+        QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center() : points.front();
         pntSource.setY(newY);
-        QPointF pntTarget = targetItem ? targetItem->sceneBoundingRect().center()
-                                       : d->m_layoutInfo.m_pos + ChartItem::chartMargin();
+        QPointF pntTarget = targetItem ? targetItem->sceneBoundingRect().center() : points.back();
         pntTarget.setY(newY);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
@@ -471,7 +479,7 @@ void ChartViewModel::polishAddedEventItem(MscInstanceEvent *event, InteractiveOb
             if (!qFuzzyIsNull(d->m_layoutInfo.m_instancesCommonAxisOffset)) {
                 if (auto msgItem = qobject_cast<MessageItem *>(item)) {
                     QVector<QPointF> points = msgItem->messagePoints();
-                    for (QPointF &point: points)
+                    for (QPointF &point : points)
                         point.ry() += d->m_layoutInfo.m_instancesCommonAxisOffset;
                     msgItem->setMessagePoints(points);
                     msgItem->updateCif();
@@ -944,7 +952,7 @@ int ChartViewModel::eventIndex(qreal y)
 {
     int idx = 0;
     for (auto item : d->m_instanceEventItemsSorted) {
-        if (item->y() < y) {
+        if (item->sceneBoundingRect().y() < y) {
             ++idx;
             if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
                 if (coregionItem->sceneBoundingRect().bottom() < y)

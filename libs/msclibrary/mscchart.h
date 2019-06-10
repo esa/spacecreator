@@ -76,6 +76,7 @@ public:
     int setInstanceNameNumbers(int nextNumber);
 
     QString createUniqueInstanceName() const;
+    bool moveEvent(MscInstanceEvent *event, int newIndex);
 
 public Q_SLOTS:
     void resetTimerRelations(MscTimer *timer);
@@ -97,8 +98,6 @@ Q_SIGNALS:
     void globalCommentRectChanged(const QRect rect, const QString &hash);
 
 private:
-    bool moveEvent(MscInstanceEvent *event, int newIndex);
-
     /*!
        Return a QVector with all events in this chart of the given type
      */
