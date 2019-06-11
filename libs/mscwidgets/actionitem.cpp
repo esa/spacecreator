@@ -28,6 +28,8 @@
 #include <QPainter>
 #include <cmath>
 
+static const qreal kMaxTextWidth = 250.0;
+
 namespace msc {
 
 /*!
@@ -123,8 +125,7 @@ void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
-        const QPointF &delta = to - from;
-        setPos(pos() + delta);
+        moveBy(0., to.y() - from.y());
     }
 }
 
@@ -156,13 +157,19 @@ void ActionItem::onTextEdited(const QString &text)
 
 void ActionItem::rebuildLayout()
 {
-    if (!m_instance) {
+    if (!m_instance)
         return;
-    }
 
-    applyCif();
 
+
+    m_textItem->setTextWrapMode(QTextOption::ManualWrap);
+    const QSizeF nameSize(m_textItem->boundingRect().size());
     prepareGeometryChange();
+
+    if (nameSize.width() > kMaxTextWidth) {
+        m_textItem->setTextWrapMode(QTextOption::WrapAnywhere);
+        m_textItem->adjustSize();
+    }
 
     m_boundingRect = m_textItem->boundingRect();
     const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;

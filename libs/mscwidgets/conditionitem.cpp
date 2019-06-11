@@ -144,16 +144,17 @@ void ConditionItem::setName(const QString &name)
 
 void ConditionItem::buildLayout()
 {
-    prepareGeometryChange();
 
-    m_nameItem->setTextWrapMode(QTextOption::NoWrap);
+    m_nameItem->setTextWrapMode(QTextOption::ManualWrap);
 
     // set default size:
     QSizeF nameSize(m_nameItem->boundingRect().size());
+    prepareGeometryChange();
 
-    if (nameSize.width() > MAX_TEXT_WIDTH) {
+    if (nameSize.width()
+        > (modelItem()->shared() && m_InstancesRect.isValid() ? m_InstancesRect.width() : MAX_TEXT_WIDTH)) {
         m_nameItem->setTextWrapMode(QTextOption::WrapAnywhere);
-        m_nameItem->adjustSize();
+        m_nameItem->setTextWidth(m_InstancesRect.width() - 2 * CONDITION_MARGIN);
 
         nameSize = m_nameItem->boundingRect().size();
     }
@@ -237,8 +238,7 @@ void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
-        const QPointF &delta = to - from;
-        setPos(pos() + delta);
+        moveBy(0., to.y() - from.y());
     }
 }
 
