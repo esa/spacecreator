@@ -62,6 +62,7 @@ public:
     bool initFrom(const QString &sourceLine) override;
     QVariant payload() const override;
     void setPayload(const QVariant &p) override;
+    QString payloadToString() const override;
 };
 class CifLineHyperLink : public CifLine
 {

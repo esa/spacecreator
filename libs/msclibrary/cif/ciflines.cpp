@@ -88,6 +88,11 @@ void CifLineEnd::setPayload(const QVariant &p)
     return CifLine::setPayload(p);
 }
 
+QString CifLineEnd::payloadToString() const
+{
+    return payload().toString();
+}
+
 CifLine::CifType CifLineHyperLink::lineType() const
 {
     return CifLine::CifType::HyperLink;
