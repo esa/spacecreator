@@ -22,6 +22,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName("TASTE Editor 3.0");
     MainWindow w;
     w.show();
 
