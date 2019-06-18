@@ -7,4 +7,4 @@ win32 {
 }
 
 COMMIT_HASH = $$system($$shell_path($$GIT_APP) --git-dir $$shell_path($$_PRO_FILE_PWD_/../.git) describe --always)
-DEFINES += VS_BUILD_HASH=\\"$$COMMIT_HASH\\"
+DEFINES += VS_BUILD_HASH=\\\"$$COMMIT_HASH\\\"
