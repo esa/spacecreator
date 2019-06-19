@@ -19,6 +19,8 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QDirIterator>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -26,6 +28,12 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     a.setApplicationName("TASTE Editor 3.0");
+
+    QDirIterator dirIt(":/fonts");
+    while (dirIt.hasNext())
+        QFontDatabase::addApplicationFont(dirIt.next());
+    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
+
     MainWindow w;
     w.show();
 

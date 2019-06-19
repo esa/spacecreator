@@ -50,3 +50,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     version.pri
+
+RESOURCES += \
+    resources.qrc
