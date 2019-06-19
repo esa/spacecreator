@@ -19,6 +19,8 @@
 
 #include <QMainWindow>
 
+class QMenu;
+class QAction;
 namespace Ui {
 class MainWindow;
 }
@@ -34,6 +36,30 @@ public:
 protected:
     void changeEvent(QEvent *e);
 
+    void init();
+    void initMenus();
+    void initMenuFile();
+    void initMenuHelp();
+
+protected slots:
+    void onOpenFileRequested();
+    void onCreateFileRequested();
+    bool onCloseFileRequested();
+    void onQuitRequested();
+
+    void onAboutRequested();
+
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow *ui { nullptr };
+    QMenu *m_menuFile { nullptr };
+    QMenu *m_menuHelp { nullptr };
+
+    QAction *m_actOpenFile { nullptr };
+    QAction *m_actCreateFile { nullptr };
+    QAction *m_actCloseFile { nullptr };
+    QAction *m_actQuit { nullptr };
+
+    QAction *m_actAbout { nullptr };
+
+    void showNIY(const QString &caller);
 };
