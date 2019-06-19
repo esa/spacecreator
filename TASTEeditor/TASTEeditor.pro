@@ -25,11 +25,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include(version.pri)
 CONFIG += c++11
 
+DEFINES += QT_MESSAGELOGCONTEXT
+macx {
+    CONFIG -= app_bundle
+}
+
 SOURCES += \
+        loghandler.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        logcategory.h \
+        loghandler.h \
         mainwindow.h
 
 FORMS += \

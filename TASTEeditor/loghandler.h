@@ -15,19 +15,22 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "loghandler.h"
-#include "mainwindow.h"
+#pragma once
 
-#include <QApplication>
+#include <QFile>
 
-int main(int argc, char *argv[])
+class LogHandler
 {
-    LogHandler logHandler;
+public:
+    LogHandler();
+    virtual ~LogHandler();
 
-    QApplication a(argc, argv);
-    a.setApplicationName("TASTE Editor 3.0");
-    MainWindow w;
-    w.show();
+    static void msgHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    void open();
+    void close();
 
-    return a.exec();
-}
+private:
+    static LogHandler *m_instance;
+    static QFile m_logFile;
+    static QtMessageHandler defaultHandler;
+};

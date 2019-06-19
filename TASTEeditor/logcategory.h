@@ -15,19 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "loghandler.h"
-#include "mainwindow.h"
+#pragma once
 
-#include <QApplication>
+#include <QLoggingCategory>
 
-int main(int argc, char *argv[])
-{
-    LogHandler logHandler;
-
-    QApplication a(argc, argv);
-    a.setApplicationName("TASTE Editor 3.0");
-    MainWindow w;
-    w.show();
-
-    return a.exec();
-}
+Q_LOGGING_CATEGORY(c_log, "log")
+Q_LOGGING_CATEGORY(c_esa, "esa")
+Q_LOGGING_CATEGORY(c_aadl, "aadl")
