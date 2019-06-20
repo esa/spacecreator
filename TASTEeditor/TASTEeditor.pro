@@ -74,4 +74,5 @@ DISTFILES += \
     version.pri
 
 RESOURCES += \
-    resources.qrc
+    resources.qrc \
+    tab_interface/tab_interface_resources.qrc

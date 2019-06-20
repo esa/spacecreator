@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/tab_interface/toolbar">
+        <file>icns/comment.svg</file>
+        <file>icns/container.svg</file>
+        <file>icns/function.svg</file>
+        <file>icns/group.svg</file>
+        <file>icns/pi.svg</file>
+        <file>icns/ri.svg</file>
+    </qresource>
+</RCC>
