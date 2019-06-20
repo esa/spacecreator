@@ -58,32 +58,47 @@ bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 
 QVector<QAction *> InterfaceTabDocument::initActions()
 {
-    if (!m_actCreateFunction) {
-        m_actCreateFunction = new QAction(tr("Function"));
-        connect(m_actCreateFunction, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunction);
-    }
-
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
         connect(m_actCreateFunctionType, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunctionType);
+        m_actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
     }
 
-    if (!m_actCreateConnection) {
-        m_actCreateConnection = new QAction(tr("Connect"));
-        connect(m_actCreateConnection, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateConnection);
+    if (!m_actCreateFunction) {
+        m_actCreateFunction = new QAction(tr("Function"));
+        connect(m_actCreateFunction, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunction);
+
+        m_actCreateFunction->setIcon(QIcon(":/tab_interface/toolbar/icns/function.svg"));
+    }
+
+    if (!m_actCreateProvidedInterface) {
+        m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
+        connect(m_actCreateProvidedInterface, &QAction::triggered, this,
+                &InterfaceTabDocument::onActionCreateProvidedInterface);
+        m_actCreateProvidedInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/pi.svg"));
+    }
+
+    if (!m_actCreateRequiredInterface) {
+        m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
+        connect(m_actCreateRequiredInterface, &QAction::triggered, this,
+                &InterfaceTabDocument::onActionCreateRequiredInterface);
+        m_actCreateRequiredInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/ri.svg"));
+    }
+
+    if (!m_actCreateComment) {
+        m_actCreateComment = new QAction(tr("Comment"));
+        connect(m_actCreateComment, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateComment);
+        m_actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
     }
 
     if (!m_actGroupConnections) {
         m_actGroupConnections = new QAction(tr("Group"));
         connect(m_actGroupConnections, &QAction::triggered, this, &InterfaceTabDocument::onActionGroupConnections);
+        m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
     }
 
-    return { m_actCreateFunction, m_actCreateFunctionType, m_actCreateConnection, m_actGroupConnections };
-}
-
-void InterfaceTabDocument::onActionCreateFunction()
-{
-    WARN_NOT_IMPLEMENTED;
+    return { m_actCreateFunctionType,      m_actCreateFunction, m_actCreateProvidedInterface,
+             m_actCreateRequiredInterface, m_actCreateComment,  m_actGroupConnections };
 }
 
 void InterfaceTabDocument::onActionCreateFunctionType()
@@ -91,7 +106,22 @@ void InterfaceTabDocument::onActionCreateFunctionType()
     WARN_NOT_IMPLEMENTED;
 }
 
-void InterfaceTabDocument::onActionCreateConnection()
+void InterfaceTabDocument::onActionCreateFunction()
+{
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionCreateProvidedInterface()
+{
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionCreateRequiredInterface()
+{
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionCreateComment()
 {
     WARN_NOT_IMPLEMENTED;
 }

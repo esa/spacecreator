@@ -39,16 +39,20 @@ protected:
     virtual QVector<QAction *> initActions() override;
 
 protected slots:
-    void onActionCreateFunction();
     void onActionCreateFunctionType();
-    void onActionCreateConnection();
+    void onActionCreateFunction();
+    void onActionCreateProvidedInterface();
+    void onActionCreateRequiredInterface();
+    void onActionCreateComment();
     void onActionGroupConnections();
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
-    QAction *m_actCreateFunction { nullptr };
     QAction *m_actCreateFunctionType { nullptr };
-    QAction *m_actCreateConnection { nullptr };
+    QAction *m_actCreateFunction { nullptr };
+    QAction *m_actCreateProvidedInterface { nullptr };
+    QAction *m_actCreateRequiredInterface { nullptr };
+    QAction *m_actCreateComment { nullptr };
     QAction *m_actGroupConnections { nullptr };
 };
 
