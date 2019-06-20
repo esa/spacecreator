@@ -15,27 +15,34 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "app/mainwindow.h"
-#include "loghandler.h"
+#pragma once
 
-#include <QApplication>
-#include <QDirIterator>
-#include <QFontDatabase>
+#include "document/abstracttabdocument.h"
 
-int main(int argc, char *argv[])
+namespace taste3 {
+namespace document {
+
+class DummyGraphicsScene;
+class DummyTabDocument : public AbstractTabDocument
 {
-    LogHandler logHandler;
+    Q_OBJECT
+public:
+    DummyTabDocument(QObject *parent = nullptr);
 
-    QApplication a(argc, argv);
-    a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
+    QString title() const override;
 
-    QDirIterator dirIt(":/fonts");
-    while (dirIt.hasNext())
-        QFontDatabase::addApplicationFont(dirIt.next());
-    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
+protected:
+    virtual bool loadImpl(const QString &path) override;
+    virtual bool saveImpl(const QString &path) override;
+    virtual QVector<QAction *> initActions() override;
 
-    taste3::MainWindow w;
-    w.show();
+protected slots:
+    void onActionDummy();
 
-    return a.exec();
-}
+private:
+    QGraphicsScene *m_customScene { nullptr };
+    QAction *m_actDummy { nullptr };
+};
+
+} // ns document
+} // ns taste3

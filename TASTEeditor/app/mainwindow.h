@@ -17,12 +17,25 @@
 
 #pragma once
 
+#include "document/abstracttabdocument.h"
+
 #include <QMainWindow>
+#include <QPointer>
+#include <QToolBar>
 
 class QMenu;
 class QAction;
+class QTabWidget;
+class QUndoGroup;
+
 namespace Ui {
 class MainWindow;
+}
+
+namespace taste3 {
+
+namespace document {
+class DocumentsManager;
 }
 
 class MainWindow : public QMainWindow
@@ -39,7 +52,10 @@ protected:
     void init();
     void initMenus();
     void initMenuFile();
+    void initMenuEdit();
     void initMenuHelp();
+    void initConnections();
+    void initTabs();
 
 protected slots:
     void onOpenFileRequested();
@@ -49,9 +65,18 @@ protected slots:
 
     void onAboutRequested();
 
+    void onTabSwitched(int);
+
 private:
     Ui::MainWindow *ui { nullptr };
+    QTabWidget *m_tabWidget;
+    QPointer<QToolBar> m_docToolbar;
+    document::DocumentsManager *m_docsManager;
+    QPointer<document::AbstractTabDocument> m_currentDocument;
+    QUndoGroup *m_undoGroup { nullptr };
+
     QMenu *m_menuFile { nullptr };
+    QMenu *m_menuEdit { nullptr };
     QMenu *m_menuHelp { nullptr };
 
     QAction *m_actOpenFile { nullptr };
@@ -59,7 +84,12 @@ private:
     QAction *m_actCloseFile { nullptr };
     QAction *m_actQuit { nullptr };
 
+    QAction *m_actUndo { nullptr };
+    QAction *m_actRedo { nullptr };
+
     QAction *m_actAbout { nullptr };
 
     void showNIY(const QString &caller);
 };
+
+} // ns taste3

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) %YEAR% European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -14,4 +14,13 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+#include "interfacetabgraphicsscene.h"
 
+namespace taste3 {
+
+InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
+    : QGraphicsScene(parent)
+{
+}
+
+} // ns taste3

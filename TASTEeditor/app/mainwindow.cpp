@@ -17,14 +17,31 @@
 
 #include "mainwindow.h"
 
+#include "app/commandsstack.h"
+#include "document/documentsmanager.h"
+#include "tab_aadl/aadltabdocument.h"
+#include "tab_concurrency/concurrencytabdocument.h"
+#include "tab_data/datatabdocument.h"
+#include "tab_deployment/deploymenttabdocument.h"
+#include "tab_interface/interfacetabdocument.h"
+#include "tab_msc/msctabdocument.h"
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QGraphicsView>
 #include <QMessageBox>
+#include <QTabWidget>
+#include <QUndoGroup>
+
+namespace taste3 {
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_tabWidget(new QTabWidget(this))
+    , m_docToolbar(new QToolBar(this))
+    , m_docsManager(new document::DocumentsManager(m_tabWidget, this))
+    , m_undoGroup(new QUndoGroup(this))
 {
     init();
 }
@@ -50,12 +67,23 @@ void MainWindow::init()
 {
     ui->setupUi(this);
 
+    setCentralWidget(m_tabWidget);
+    m_docToolbar->setAllowedAreas(Qt::AllToolBarAreas);
+    m_docToolbar->setMovable(true);
+    addToolBar(m_docToolbar);
+    m_docToolbar->hide();
+
     initMenus();
+
+    initTabs();
+
+    initConnections();
 }
 
 void MainWindow::initMenus()
 {
     initMenuFile();
+    initMenuEdit();
     initMenuHelp();
 }
 
@@ -69,10 +97,29 @@ void MainWindow::initMenuFile()
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 }
 
+void MainWindow::initMenuEdit()
+{
+    m_actUndo = m_undoGroup->createUndoAction(this, tr("Undo:"));
+    m_actUndo->setShortcut(QKeySequence::Undo);
+
+    m_actRedo = m_undoGroup->createRedoAction(this, tr("Redo:"));
+    m_actRedo->setShortcut(QKeySequence::Redo);
+
+    m_menuEdit = menuBar()->addMenu(tr("&Edit"));
+    m_menuEdit->addAction(m_actUndo);
+    m_menuEdit->addAction(m_actRedo);
+    m_menuEdit->addSeparator();
+}
+
 void MainWindow::initMenuHelp()
 {
     m_menuHelp = menuBar()->addMenu(tr("&Help"));
     m_actAbout = m_menuHelp->addAction(tr("About"), this, &MainWindow::onAboutRequested, QKeySequence::HelpContents);
+}
+
+void MainWindow::initConnections()
+{
+    connect(m_docsManager, &document::DocumentsManager::currentDocIdChanged, this, &MainWindow::onTabSwitched);
 }
 
 void MainWindow::onOpenFileRequested()
@@ -117,3 +164,41 @@ void MainWindow::showNIY(const QString &caller)
     qDebug() << message;
     QMessageBox::information(this, "NIY", message);
 }
+
+void MainWindow::onTabSwitched(int tab)
+{
+    QUndoStack *currentStack { nullptr };
+    if (document::AbstractTabDocument *doc = m_docsManager->docById(tab)) {
+        doc->fillToolBar(m_docToolbar);
+        m_docToolbar->show();
+        currentStack = doc->commandsStack();
+    }
+
+    if (currentStack) {
+        if (m_undoGroup->stacks().contains(currentStack))
+            m_undoGroup->addStack(currentStack);
+        m_undoGroup->setActiveStack(currentStack);
+    } else {
+        m_undoGroup->removeStack(m_undoGroup->activeStack());
+    }
+
+    cmd::CommandsStack::setCurrent(currentStack);
+}
+
+void MainWindow::initTabs()
+{
+    using namespace document;
+    auto appendTab = [this](AbstractTabDocument *doc) { m_docsManager->addDocument(doc, new QGraphicsView(this)); };
+
+    appendTab(new DataTabDocument(this));
+    appendTab(new InterfaceTabDocument(this));
+    appendTab(new DeploymentTabDocument(this));
+    appendTab(new ConcurrencyTabDocument(this));
+    appendTab(new AADLTabDocument(this));
+    appendTab(new DataTabDocument(this));
+    appendTab(new MSCTabDocument(this));
+
+    onTabSwitched(0); // TODO: should be restored from settings
+}
+
+} // ns taste3
