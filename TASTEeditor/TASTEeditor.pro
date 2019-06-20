@@ -31,17 +31,39 @@ macx {
 }
 
 SOURCES += \
-        loghandler.cpp \
         main.cpp \
-        mainwindow.cpp
+        loghandler.cpp \
+        app/commandsstack.cpp \
+        app/mainwindow.cpp \
+        document/abstracttabdocument.cpp \
+        document/documentsmanager.cpp \
+        dummy/dummytabdocument.cpp \
+        tab_aadl/aadltabdocument.cpp \
+        tab_concurrency/concurrencytabdocument.cpp \
+        tab_data/datatabdocument.cpp \
+        tab_deployment/deploymenttabdocument.cpp \
+        tab_interface/interfacetabdocument.cpp \
+        tab_interface/interfacetabgraphicsscene.cpp \
+        tab_msc/msctabdocument.cpp
 
 HEADERS += \
         logcategory.h \
         loghandler.h \
-        mainwindow.h
+        app/commandsstack.h \
+        app/mainwindow.h \
+        document/abstracttabdocument.h \
+        document/documentsmanager.h \
+        dummy/dummytabdocument.h \
+        tab_aadl/aadltabdocument.h \
+        tab_concurrency/concurrencytabdocument.h \
+        tab_data/datatabdocument.h \
+        tab_deployment/deploymenttabdocument.h \
+        tab_interface/interfacetabdocument.h \
+        tab_interface/interfacetabgraphicsscene.h \
+        tab_msc/msctabdocument.h
 
 FORMS += \
-        mainwindow.ui
+    app/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

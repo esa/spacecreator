@@ -1,5 +1,5 @@
 /*
-   Copyright (C) %YEAR% European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,3 +15,20 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#pragma once
+
+#include "dummy/dummytabdocument.h"
+
+namespace taste3 {
+namespace document {
+
+class MSCTabDocument : public DummyTabDocument
+{
+    Q_OBJECT
+public:
+    MSCTabDocument(QObject *parent = nullptr);
+    QString title() const override;
+};
+
+} // ns document
+} // ns taste3
