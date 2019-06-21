@@ -31,6 +31,7 @@ macx {
 }
 
 SOURCES += \
+        app/commandlineparser.cpp \
         main.cpp \
         loghandler.cpp \
         app/commandsstack.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
+        app/commandlineparser.h \
         logcategory.h \
         loghandler.h \
         app/commandsstack.h \

@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QDirIterator>
 #include <QFontDatabase>
+#include <QMetaEnum>
 
 int main(int argc, char *argv[])
 {
@@ -37,7 +38,26 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    taste3::MainWindow w;
+    using namespace taste3;
+
+    MainWindow w;
+
+    CommandLineParser cmdParser;
+    cmdParser.process(a.arguments());
+
+    QVector<CommandLineParser::Positional> args;
+    const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
+    for (int i = 0; i < e.keyCount(); ++i) {
+        const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
+        if (CommandLineParser::Positional::Unknown != posArgType)
+            if (cmdParser.isSet(posArgType)) {
+                args.append(posArgType);
+            }
+    }
+
+    for (auto arg : args)
+        w.processCommandLineArg(arg, cmdParser.value(arg));
+
     w.show();
 
     return a.exec();

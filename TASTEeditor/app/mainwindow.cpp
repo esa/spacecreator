@@ -221,4 +221,22 @@ void MainWindow::initSettings()
     m_tabWidget->setCurrentIndex(AppOptions::MainWindow.LastTab.read().toInt());
 }
 
+/*!
+ * \brief MainWindow::processCommandLineArg handles initial option from command line
+ * \returns true if an option is handled
+ */
+bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
+{
+    switch (arg) {
+    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+        m_dropUnsavedChangesSilently = true;
+        return true;
+    }
+    default:
+        qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
+        break;
+    }
+    return false;
+}
+
 } // ns taste3
