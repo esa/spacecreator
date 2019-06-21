@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "commandlineparser.h"
 #include "document/abstracttabdocument.h"
 
 #include <QMainWindow>
@@ -46,6 +47,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
+
 protected:
     void changeEvent(QEvent *e) override;
     void closeEvent(QCloseEvent *e) override;
@@ -74,6 +77,7 @@ private:
     document::DocumentsManager *m_docsManager;
     QPointer<document::AbstractTabDocument> m_currentDocument;
     QUndoGroup *m_undoGroup { nullptr };
+    bool m_dropUnsavedChangesSilently { false };
 
     QMenu *m_menuFile { nullptr };
     QMenu *m_menuEdit { nullptr };
