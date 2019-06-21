@@ -17,6 +17,8 @@
 
 #include "mainwindow.h"
 
+#include "settings/appoptions.h"
+#include "settings/settingsmanager.h"
 #include "app/commandsstack.h"
 #include "document/documentsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
@@ -27,6 +29,7 @@
 #include "tab_msc/msctabdocument.h"
 #include "ui_mainwindow.h"
 
+#include <QCloseEvent>
 #include <QDebug>
 #include <QGraphicsView>
 #include <QMessageBox>
@@ -63,6 +66,12 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    e->ignore();
+    onQuitRequested();
+}
+
 void MainWindow::init()
 {
     ui->setupUi(this);
@@ -78,6 +87,8 @@ void MainWindow::init()
     initTabs();
 
     initConnections();
+
+    initSettings();
 }
 
 void MainWindow::initMenus()
@@ -140,11 +151,15 @@ bool MainWindow::onCloseFileRequested()
 
 void MainWindow::onQuitRequested()
 {
-    showNIY(Q_FUNC_INFO);
+    AppOptions::MainWindow.State.write(saveState());
+    AppOptions::MainWindow.Geometry.write(saveGeometry());
+    AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
 
     //    while(hasOpenDocs())
     //        if(!onCloseFileRequested())
     //            return;
+
+    qApp->quit();
 }
 
 void MainWindow::onAboutRequested()
@@ -197,8 +212,13 @@ void MainWindow::initTabs()
     appendTab(new AADLTabDocument(this));
     appendTab(new DataTabDocument(this));
     appendTab(new MSCTabDocument(this));
+}
 
-    onTabSwitched(0); // TODO: should be restored from settings
+void MainWindow::initSettings()
+{
+    restoreGeometry(AppOptions::MainWindow.Geometry.read().toByteArray());
+    restoreState(AppOptions::MainWindow.State.read().toByteArray());
+    m_tabWidget->setCurrentIndex(AppOptions::MainWindow.LastTab.read().toInt());
 }
 
 } // ns taste3

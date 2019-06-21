@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,30 +15,23 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "app/mainwindow.h"
-#include "settings/settingsmanager.h"
-#include "loghandler.h"
+#pragma once
 
-#include <QApplication>
-#include <QDirIterator>
-#include <QFontDatabase>
+#include <QObject>
+#include <QRect>
+#include <QSettings>
+#include <QVector>
 
-int main(int argc, char *argv[])
+class SettingsManager : public QObject
 {
-    LogHandler logHandler;
+    Q_OBJECT
+public:
+    SettingsManager(QObject *parent = nullptr);
 
-    QApplication a(argc, argv);
-    a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
+    QSettings *storage();
+    static SettingsManager *instance();
 
-    SettingsManager settings;
-
-    QDirIterator dirIt(":/fonts");
-    while (dirIt.hasNext())
-        QFontDatabase::addApplicationFont(dirIt.next());
-    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
-
-    taste3::MainWindow w;
-    w.show();
-
-    return a.exec();
-}
+private:
+    static SettingsManager *m_instance;
+    QSettings *m_settings = nullptr;
+};
