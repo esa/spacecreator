@@ -38,6 +38,8 @@ SOURCES += \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
         dummy/dummytabdocument.cpp \
+        settings/appoptions.cpp \
+        settings/settingsmanager.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
@@ -54,6 +56,8 @@ HEADERS += \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
         dummy/dummytabdocument.h \
+        settings/appoptions.h \
+        settings/settingsmanager.h \
         tab_aadl/aadltabdocument.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \

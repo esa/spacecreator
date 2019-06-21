@@ -44,10 +44,11 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
 protected:
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e) override;
+    void closeEvent(QCloseEvent *e) override;
 
     void init();
     void initMenus();
@@ -56,15 +57,14 @@ protected:
     void initMenuHelp();
     void initConnections();
     void initTabs();
+    void initSettings();
 
 protected slots:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();
     void onQuitRequested();
-
     void onAboutRequested();
-
     void onTabSwitched(int);
 
 private:
