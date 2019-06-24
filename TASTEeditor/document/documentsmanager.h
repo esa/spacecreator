@@ -39,6 +39,7 @@ public:
     bool removeDocument(document::AbstractTabDocument *doc);
     AbstractTabDocument *docById(int id) const;
     int currentDocId() const;
+    AbstractTabDocument *currentDoc() const;
 
 signals:
     void currentDocIdChanged(int currentDocId);

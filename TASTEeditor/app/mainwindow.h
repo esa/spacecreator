@@ -62,10 +62,14 @@ protected:
     void initTabs();
     void initSettings();
 
+    void updateActions();
+    void saveSceneRender(const QString &filePath) const;
+
 protected slots:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();
+    void onSaveRenderRequested();
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
@@ -86,6 +90,7 @@ private:
     QAction *m_actOpenFile { nullptr };
     QAction *m_actCreateFile { nullptr };
     QAction *m_actCloseFile { nullptr };
+    QAction *m_actSaveSceneRender { nullptr };
     QAction *m_actQuit { nullptr };
 
     QAction *m_actUndo { nullptr };
