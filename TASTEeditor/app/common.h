@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QMetaType>
 #include <QUuid>
 
 namespace taste3 {
@@ -27,3 +28,5 @@ Id createId();
 
 } // ns common
 } // ns taste3
+
+Q_DECLARE_METATYPE(taste3::common::Id)

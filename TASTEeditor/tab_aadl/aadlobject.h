@@ -29,8 +29,8 @@ struct AADLObjectPrivate;
 class AADLObject : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged);
-    Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged);
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
 
 public:
     explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr);
@@ -41,7 +41,7 @@ public:
 
 signals:
     void titleChanged(const QString &title);
-    void idChanged(const common::Id &id);
+    void idChanged(const taste3::common::Id &id);
 
 public slots:
     bool setTitle(const QString &title);
