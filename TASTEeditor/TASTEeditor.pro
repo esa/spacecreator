@@ -32,6 +32,7 @@ macx {
 
 SOURCES += \
         app/commandlineparser.cpp \
+        app/common.cpp \
         main.cpp \
         loghandler.cpp \
         app/commandsstack.cpp \
@@ -41,6 +42,7 @@ SOURCES += \
         dummy/dummytabdocument.cpp \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
+        tab_aadl/aadlobject.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
@@ -51,6 +53,7 @@ SOURCES += \
 
 HEADERS += \
         app/commandlineparser.h \
+        app/common.h \
         logcategory.h \
         loghandler.h \
         app/commandsstack.h \
@@ -60,6 +63,7 @@ HEADERS += \
         dummy/dummytabdocument.h \
         settings/appoptions.h \
         settings/settingsmanager.h \
+        tab_aadl/aadlobject.h \
         tab_aadl/aadltabdocument.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \
