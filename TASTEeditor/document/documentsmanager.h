@@ -40,6 +40,7 @@ public:
     AbstractTabDocument *docById(int id) const;
     int currentDocId() const;
     AbstractTabDocument *currentDoc() const;
+    int docCount() const;
 
 signals:
     void currentDocIdChanged(int currentDocId);

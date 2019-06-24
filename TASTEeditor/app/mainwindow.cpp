@@ -19,6 +19,8 @@
 
 #include "app/commandsstack.h"
 #include "document/documentsmanager.h"
+#include "logging/loghandler.h"
+#include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
@@ -132,6 +134,7 @@ void MainWindow::initMenuEdit()
 void MainWindow::initMenuHelp()
 {
     m_menuHelp = menuBar()->addMenu(tr("&Help"));
+    m_actReport = m_menuHelp->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
     m_actAbout = m_menuHelp->addAction(tr("About"), this, &MainWindow::onAboutRequested, QKeySequence::HelpContents);
 }
 
@@ -235,6 +238,34 @@ void MainWindow::onTabSwitched(int tab)
     cmd::CommandsStack::setCurrent(currentStack);
 
     updateActions();
+}
+
+void MainWindow::onReportRequested()
+{
+    QList<QPixmap> images;
+    for (int idx = 0; idx < m_docsManager->docCount(); ++idx) {
+        if (document::AbstractTabDocument *doc = m_docsManager->docById(idx)) {
+            if (QGraphicsScene *scene = doc->scene()) {
+                const QSize sceneSize = scene->sceneRect().size().toSize();
+                if (sceneSize.isNull())
+                    continue;
+
+                QPixmap pix(sceneSize);
+                pix.fill(Qt::transparent);
+
+                QPainter p;
+                p.begin(&pix);
+                p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+                scene->render(&p);
+                p.end();
+
+                images.append(pix);
+            }
+        }
+    }
+    BugreportDialog *dialog = new BugreportDialog(LogHandler::logPath(), images, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->exec();
 }
 
 void MainWindow::initTabs()

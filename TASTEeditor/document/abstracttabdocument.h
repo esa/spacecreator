@@ -47,6 +47,8 @@ public:
     bool load(const QString &path);
     bool save(const QString &path);
 
+    QString path() const;
+
     bool isDirty() const;
 
     virtual QString title() const;

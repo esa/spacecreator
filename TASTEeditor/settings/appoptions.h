@@ -21,6 +21,8 @@
 #include <QVariant>
 #include <QVector>
 
+namespace taste3 {
+
 class AppOption
 {
 public:
@@ -54,13 +56,32 @@ private:
     static const QString localName() { return "MainWindow"; }
 };
 
+class GroupBugReport
+{
+public:
+    GroupBugReport();
+
+    const AppOption Host;
+    const AppOption ProjectID;
+    const AppOption AccessToken;
+
+private:
+    GroupBugReport(const GroupBugReport &) = delete;
+    GroupBugReport &operator=(const GroupBugReport &) = delete;
+
+    static const QString localName() { return "GroupBugReport"; }
+};
+
 class AppOptions
 {
 public:
     static const GroupMainWindow MainWindow;
+    static const GroupBugReport BugReport;
 
 private:
     AppOptions() = delete;
     AppOptions(const AppOption &) = delete;
     AppOptions &operator=(const AppOptions &) = delete;
 };
+
+} // namespace taste3

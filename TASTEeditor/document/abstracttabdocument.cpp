@@ -33,6 +33,7 @@ struct AbstractTabDocumentPrivate {
 
     QPointer<QGraphicsScene> m_scene { nullptr };
     std::unique_ptr<QUndoStack> const m_commandsStack;
+    QString m_filePath;
     int m_lastSavedIndex { 0 };
     bool m_dirty { false };
 };
@@ -81,6 +82,7 @@ bool AbstractTabDocument::load(const QString &path)
     const bool loaded = loadImpl(path);
 
     if (loaded) {
+        d->m_filePath = path;
         d->m_commandsStack->clear();
         resetDirtyness();
     }
@@ -93,10 +95,16 @@ bool AbstractTabDocument::save(const QString &path)
     const bool saved = saveImpl(path);
 
     if (saved) {
+        d->m_filePath = path;
         resetDirtyness();
     }
 
     return saved;
+}
+
+QString AbstractTabDocument::path() const
+{
+    return d->m_filePath;
 }
 
 void AbstractTabDocument::resetDirtyness()
