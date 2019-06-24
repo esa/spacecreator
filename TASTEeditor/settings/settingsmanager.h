@@ -26,7 +26,7 @@ class SettingsManager : public QObject
 {
     Q_OBJECT
 public:
-    SettingsManager(QObject *parent = nullptr);
+    explicit SettingsManager(QObject *parent = nullptr);
 
     QSettings *storage();
     static SettingsManager *instance();

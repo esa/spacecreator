@@ -73,6 +73,7 @@ protected slots:
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
+    void onReportRequested();
 
 private:
     Ui::MainWindow *ui { nullptr };
@@ -97,6 +98,7 @@ private:
     QAction *m_actRedo { nullptr };
 
     QAction *m_actAbout { nullptr };
+    QAction *m_actReport { nullptr };
 
     void showNIY(const QString &caller);
 };

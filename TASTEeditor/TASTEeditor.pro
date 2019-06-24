@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,15 +31,17 @@ macx {
 }
 
 SOURCES += \
+        main.cpp \
         app/commandlineparser.cpp \
         app/common.cpp \
-        main.cpp \
-        loghandler.cpp \
         app/commandsstack.cpp \
         app/mainwindow.cpp \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
         dummy/dummytabdocument.cpp \
+        logging/loghandler.cpp \
+        reports/bugreportdialog.cpp \
+        reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
         tab_aadl/aadlobject.cpp \
@@ -54,13 +56,15 @@ SOURCES += \
 HEADERS += \
         app/commandlineparser.h \
         app/common.h \
-        logcategory.h \
-        loghandler.h \
         app/commandsstack.h \
         app/mainwindow.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
         dummy/dummytabdocument.h \
+        logging/logcategory.h \
+        logging/loghandler.h \
+        reports/bugreportdialog.h \
+        reports/bugreporthandler.h \
         settings/appoptions.h \
         settings/settingsmanager.h \
         tab_aadl/aadlobject.h \
@@ -73,7 +77,8 @@ HEADERS += \
         tab_msc/msctabdocument.h
 
 FORMS += \
-    app/mainwindow.ui
+    app/mainwindow.ui \
+    reports/bugreportdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
