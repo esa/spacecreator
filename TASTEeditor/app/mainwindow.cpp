@@ -17,10 +17,10 @@
 
 #include "mainwindow.h"
 
-#include "settings/appoptions.h"
-#include "settings/settingsmanager.h"
 #include "app/commandsstack.h"
 #include "document/documentsmanager.h"
+#include "settings/appoptions.h"
+#include "settings/settingsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
@@ -30,8 +30,12 @@
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
+#include <QDateTime>
 #include <QDebug>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QGraphicsView>
+#include <QImageWriter>
 #include <QMessageBox>
 #include <QTabWidget>
 #include <QUndoGroup>
@@ -77,6 +81,7 @@ void MainWindow::init()
     ui->setupUi(this);
 
     setCentralWidget(m_tabWidget);
+    m_docToolbar->setObjectName("Document ToolBar");
     m_docToolbar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolbar->setMovable(true);
     addToolBar(m_docToolbar);
@@ -104,6 +109,8 @@ void MainWindow::initMenuFile()
     m_actOpenFile = m_menuFile->addAction(tr("Open"), this, &MainWindow::onOpenFileRequested, QKeySequence::Open);
     m_actCreateFile = m_menuFile->addAction(tr("Create"), this, &MainWindow::onCreateFileRequested, QKeySequence::New);
     m_actCloseFile = m_menuFile->addAction(tr("Close"), this, &MainWindow::onCloseFileRequested, QKeySequence::Close);
+    m_menuFile->addSeparator();
+    m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 }
@@ -147,6 +154,34 @@ bool MainWindow::onCloseFileRequested()
 {
     showNIY(Q_FUNC_INFO);
     return true;
+}
+
+QStringList supportedImgFileExtensions()
+{
+    static QStringList extensions;
+    if (extensions.isEmpty()) {
+        const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
+        for (const QByteArray &format : formats)
+            extensions << ("*." + format.toLower());
+    }
+    return extensions;
+}
+
+void MainWindow::onSaveRenderRequested()
+{
+    const QString defaultFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("dd-MM-yyyy_HH-mm-ss"));
+    const QStringList &extensions = supportedImgFileExtensions();
+    QString fileName =
+            QFileDialog::getSaveFileName(this, tr("Save screenshot..."), defaultFileName, extensions.join(";; "));
+
+    if (!fileName.isEmpty()) {
+        QFileInfo selectedFile(fileName);
+        const QString usedExtension = "*." + selectedFile.suffix().toLower();
+        if (!extensions.contains(usedExtension))
+            fileName.append(".png");
+
+        saveSceneRender(fileName);
+    }
 }
 
 void MainWindow::onQuitRequested()
@@ -198,6 +233,8 @@ void MainWindow::onTabSwitched(int tab)
     }
 
     cmd::CommandsStack::setCurrent(currentStack);
+
+    updateActions();
 }
 
 void MainWindow::initTabs()
@@ -221,6 +258,18 @@ void MainWindow::initSettings()
     m_tabWidget->setCurrentIndex(AppOptions::MainWindow.LastTab.read().toInt());
 }
 
+void MainWindow::updateActions()
+{
+    {
+        bool renderAvailable(false);
+        if (document::AbstractTabDocument *doc = m_docsManager->currentDoc())
+            if (QGraphicsScene *scene = doc->scene()) {
+                renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
+            }
+        m_actSaveSceneRender->setEnabled(renderAvailable);
+    }
+}
+
 /*!
  * \brief MainWindow::processCommandLineArg handles initial option from command line
  * \returns true if an option is handled
@@ -237,6 +286,21 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         break;
     }
     return false;
+}
+
+void MainWindow::saveSceneRender(const QString &filePath) const
+{
+    if (filePath.isEmpty())
+        return;
+
+    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc())
+        if (QGraphicsScene *scene = doc->scene()) {
+            QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+            img.fill(Qt::transparent);
+            QPainter p(&img);
+            scene->render(&p);
+            img.save(filePath);
+        }
 }
 
 } // ns taste3

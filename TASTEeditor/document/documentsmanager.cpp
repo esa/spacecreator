@@ -78,5 +78,10 @@ int DocumentsManager::currentDocId() const
     return m_tabs->currentIndex();
 }
 
+AbstractTabDocument *DocumentsManager::currentDoc() const
+{
+    return docById(currentDocId());
+}
+
 } // ns document
 } // ns taste3
