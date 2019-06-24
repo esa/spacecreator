@@ -19,6 +19,8 @@
 
 #include "settingsmanager.h"
 
+namespace taste3 {
+
 AppOption::AppOption(const QString &name, const QVariant &defaultValue)
     : Name(name)
     , DefaultValue(defaultValue)
@@ -51,3 +53,14 @@ GroupMainWindow::GroupMainWindow()
 }
 
 const GroupMainWindow AppOptions::MainWindow = {};
+
+GroupBugReport::GroupBugReport()
+    : Host(QString("%1/Host").arg(localName()))
+    , ProjectID(QString("%1/ProjectID").arg(localName()))
+    , AccessToken(QString("%1/AccessToken").arg(localName()))
+{
+}
+
+const GroupBugReport AppOptions::BugReport = {};
+
+} // namespace taste3

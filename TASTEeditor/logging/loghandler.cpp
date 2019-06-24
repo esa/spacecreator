@@ -92,6 +92,11 @@ void LogHandler::close()
     m_logFile.close();
 }
 
+QString LogHandler::logPath()
+{
+    return QFileInfo(m_logFile).absoluteFilePath();
+}
+
 void LogHandler::msgHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     const QString newMsg = qFormatLogMessage(type, context, msg + QChar::CarriageReturn);

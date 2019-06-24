@@ -29,6 +29,8 @@ public:
     void open();
     void close();
 
+    static QString logPath();
+
 private:
     static LogHandler *m_instance;
     static QFile m_logFile;

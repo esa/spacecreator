@@ -83,5 +83,10 @@ AbstractTabDocument *DocumentsManager::currentDoc() const
     return docById(currentDocId());
 }
 
+int DocumentsManager::docCount() const
+{
+    return m_documents.size();
+}
+
 } // ns document
 } // ns taste3

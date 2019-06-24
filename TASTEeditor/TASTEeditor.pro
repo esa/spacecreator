@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,8 +32,10 @@ macx {
 
 SOURCES += \
         app/commandlineparser.cpp \
+        reports/bugreportdialog.cpp \
+        reports/bugreporthandler.cpp \
         main.cpp \
-        loghandler.cpp \
+        logging/loghandler.cpp \
         app/commandsstack.cpp \
         app/mainwindow.cpp \
         document/abstracttabdocument.cpp \
@@ -51,8 +53,10 @@ SOURCES += \
 
 HEADERS += \
         app/commandlineparser.h \
-        logcategory.h \
-        loghandler.h \
+        reports/bugreportdialog.h \
+        reports/bugreporthandler.h \
+        logging/logcategory.h \
+        logging/loghandler.h \
         app/commandsstack.h \
         app/mainwindow.h \
         document/abstracttabdocument.h \
@@ -69,7 +73,8 @@ HEADERS += \
         tab_msc/msctabdocument.h
 
 FORMS += \
-    app/mainwindow.ui
+    app/mainwindow.ui \
+    reports/bugreportdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
