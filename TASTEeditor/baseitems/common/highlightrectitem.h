@@ -17,36 +17,39 @@
 
 #pragma once
 
-#include <QObject>
-#include <QUndoStack>
-#include <QVariant>
+#include <QGraphicsObject>
+#include <QPointer>
+#include <QPropertyAnimation>
+
+class QGraphicsRectItem;
 
 namespace taste3 {
-namespace cmd {
 
-class CommandsStack : public QObject
+class HighlightRectItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    static CommandsStack *instance();
+    HighlightRectItem(QGraphicsItem *parent);
+    ~HighlightRectItem();
 
-    static void setCurrent(QUndoStack *stack);
-    static QUndoStack *current();
+    // QGraphicsItem interface
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QRectF boundingRect() const override;
 
-    static bool push(QUndoCommand *command);
+    void setRect(const QRectF &rect);
+    void setPen(const QPen &pen);
+    void setBrush(const QBrush &brush);
+
+    void highlight();
 
 Q_SIGNALS:
-    void currentStackChanged(QUndoStack *to);
+    void highlighted() const;
 
 private:
-    CommandsStack(QObject *parent = nullptr);
+    QGraphicsRectItem *m_rectItem = new QGraphicsRectItem(this);
+    QPointer<QPropertyAnimation> m_lastAnimation = nullptr;
 
-    void setCurrentStack(QUndoStack *stack);
-    QUndoStack *currentStack() const;
-
-    static CommandsStack *m_instance;
-    QUndoStack *m_current = nullptr;
+    void clearAnimation();
 };
 
-} // namespace taste3
 } // ns taste3

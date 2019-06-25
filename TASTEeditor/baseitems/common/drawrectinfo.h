@@ -17,36 +17,43 @@
 
 #pragma once
 
-#include <QObject>
-#include <QUndoStack>
-#include <QVariant>
+#include <QBrush>
+#include <QPen>
 
 namespace taste3 {
-namespace cmd {
 
-class CommandsStack : public QObject
+class DrawRectInfo
 {
-    Q_OBJECT
 public:
-    static CommandsStack *instance();
+    DrawRectInfo();
 
-    static void setCurrent(QUndoStack *stack);
-    static QUndoStack *current();
+    DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor);
+    QSizeF rectSize() const;
+    void setRectSize(const QSizeF &sz);
 
-    static bool push(QUndoCommand *command);
+    qreal borderWidth() const;
+    void setBorderWidth(qreal w);
 
-Q_SIGNALS:
-    void currentStackChanged(QUndoStack *to);
+    QColor borderColor() const;
+    void setBorderColor(const QColor &color);
+
+    QColor bodyColor() const;
+    void setBodyColor(const QColor &color);
+
+    QPen border() const;
+    QBrush body() const;
+
+    bool operator==(const DrawRectInfo &other) const;
 
 private:
-    CommandsStack(QObject *parent = nullptr);
+    QSizeF m_rectSize;
+    qreal m_borderWidth;
+    QColor m_borderColor;
+    QColor m_bodyColor;
+    QPen m_border;
+    QBrush m_body;
 
-    void setCurrentStack(QUndoStack *stack);
-    QUndoStack *currentStack() const;
-
-    static CommandsStack *m_instance;
-    QUndoStack *m_current = nullptr;
+    void update();
 };
 
-} // namespace taste3
 } // ns taste3

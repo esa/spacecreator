@@ -17,36 +17,18 @@
 
 #pragma once
 
-#include <QObject>
-#include <QUndoStack>
-#include <QVariant>
+class QPointF;
 
 namespace taste3 {
-namespace cmd {
 
-class CommandsStack : public QObject
+class GripPoint;
+class AbstractInteractiveObject
 {
-    Q_OBJECT
 public:
-    static CommandsStack *instance();
-
-    static void setCurrent(QUndoStack *stack);
-    static QUndoStack *current();
-
-    static bool push(QUndoCommand *command);
-
-Q_SIGNALS:
-    void currentStackChanged(QUndoStack *to);
-
-private:
-    CommandsStack(QObject *parent = nullptr);
-
-    void setCurrentStack(QUndoStack *stack);
-    QUndoStack *currentStack() const;
-
-    static CommandsStack *m_instance;
-    QUndoStack *m_current = nullptr;
+    virtual ~AbstractInteractiveObject() {}
+    virtual void handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
+    virtual void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
+    virtual void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
 };
 
-} // namespace taste3
 } // ns taste3
