@@ -70,4 +70,4 @@ QUndoStack *CommandsStack::currentStack() const
 }
 
 } // namespace cmd
-} // ns msc
+} // ns taste3

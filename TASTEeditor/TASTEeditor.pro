@@ -31,6 +31,15 @@ macx {
 }
 
 SOURCES += \
+        baseitems/common/arrowsign.cpp \
+        baseitems/common/drawrectinfo.cpp \
+        baseitems/common/highlightrectitem.cpp \
+        baseitems/common/objectanchor.cpp \
+        baseitems/common/objectslink.cpp \
+        baseitems/common/utils.cpp \
+        baseitems/grippoint.cpp \
+        baseitems/grippointshandler.cpp \
+        baseitems/interactiveobject.cpp \
         main.cpp \
         app/commandlineparser.cpp \
         app/common.cpp \
@@ -56,6 +65,16 @@ SOURCES += \
 HEADERS += \
         app/commandlineparser.h \
         app/common.h \
+        baseitems/common/abstractinteractiveobject.h \
+        baseitems/common/arrowsign.h \
+        baseitems/common/drawrectinfo.h \
+        baseitems/common/highlightrectitem.h \
+        baseitems/common/objectanchor.h \
+        baseitems/common/objectslink.h \
+        baseitems/common/utils.h \
+        baseitems/grippoint.h \
+        baseitems/grippointshandler.h \
+        baseitems/interactiveobject.h \
         app/commandsstack.h \
         app/mainwindow.h \
         document/abstracttabdocument.h \
