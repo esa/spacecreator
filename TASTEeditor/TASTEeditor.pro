@@ -31,18 +31,20 @@ macx {
 }
 
 SOURCES += \
-        app/commandlineparser.cpp \
-        reports/bugreportdialog.cpp \
-        reports/bugreporthandler.cpp \
         main.cpp \
-        logging/loghandler.cpp \
+        app/commandlineparser.cpp \
+        app/common.cpp \
         app/commandsstack.cpp \
         app/mainwindow.cpp \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
         dummy/dummytabdocument.cpp \
+        logging/loghandler.cpp \
+        reports/bugreportdialog.cpp \
+        reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
+        tab_aadl/aadlobject.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
@@ -53,17 +55,19 @@ SOURCES += \
 
 HEADERS += \
         app/commandlineparser.h \
-        reports/bugreportdialog.h \
-        reports/bugreporthandler.h \
-        logging/logcategory.h \
-        logging/loghandler.h \
+        app/common.h \
         app/commandsstack.h \
         app/mainwindow.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
         dummy/dummytabdocument.h \
+        logging/logcategory.h \
+        logging/loghandler.h \
+        reports/bugreportdialog.h \
+        reports/bugreporthandler.h \
         settings/appoptions.h \
         settings/settingsmanager.h \
+        tab_aadl/aadlobject.h \
         tab_aadl/aadltabdocument.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \
