@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="hostLineEdit"/>
+      <widget class="QLineEdit" name="hostLineEdit">
+       <property name="placeholderText">
+        <string>Remote endpoint (mandatory)</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -38,7 +42,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="projectLineEdit"/>
+      <widget class="QLineEdit" name="projectLineEdit">
+       <property name="placeholderText">
+        <string>Can be obtained from GitLab (mandatory)</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -56,6 +64,9 @@
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>
+       <property name="placeholderText">
+        <string>Can be obtained from GitLab (mandatory)</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -70,7 +81,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="titleLineEdit"/>
+      <widget class="QLineEdit" name="titleLineEdit">
+       <property name="placeholderText">
+        <string>Title of the issue (mandatory)</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -82,7 +97,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="descriptionTextEdit"/>
+    <widget class="QTextEdit" name="descriptionTextEdit">
+     <property name="placeholderText">
+      <string>Description of the issue or something useful related (optional)</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="label_5">
