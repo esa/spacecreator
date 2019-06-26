@@ -32,6 +32,7 @@ struct AbstractTabDocumentPrivate {
     }
 
     QPointer<QGraphicsScene> m_scene { nullptr };
+    QPointer<QWidget> m_view { nullptr };
     std::unique_ptr<QUndoStack> const m_commandsStack;
     QString m_filePath;
     int m_lastSavedIndex { 0 };
@@ -45,12 +46,40 @@ AbstractTabDocument::AbstractTabDocument(QObject *parent)
     connect(commandsStack(), &QUndoStack::indexChanged, this, &AbstractTabDocument::updateDirtyness);
 }
 
-void AbstractTabDocument::setDocScene(QGraphicsScene *scene)
+AbstractTabDocument::~AbstractTabDocument() {}
+
+void AbstractTabDocument::init()
+{
+    if (QGraphicsScene *scene = createScene())
+        setupScene(scene);
+    if (QWidget *view = createView())
+        setupView(view);
+}
+
+void AbstractTabDocument::setupScene(QGraphicsScene *scene)
 {
     d->m_scene = scene;
 }
 
-AbstractTabDocument::~AbstractTabDocument() {}
+QGraphicsScene *AbstractTabDocument::scene() const
+{
+    return d->m_scene;
+}
+
+void AbstractTabDocument::setupView(QWidget *view)
+{
+    d->m_view = view;
+}
+
+QWidget *AbstractTabDocument::view() const
+{
+    return d->m_view;
+}
+
+QUndoStack *AbstractTabDocument::commandsStack() const
+{
+    return d->m_commandsStack.get();
+}
 
 void AbstractTabDocument::fillToolBar(QToolBar *toolBar)
 {
@@ -65,16 +94,6 @@ void AbstractTabDocument::fillToolBar(QToolBar *toolBar)
         toolBar->addAction(action);
 
     toolBar->setUpdatesEnabled(true);
-}
-
-QGraphicsScene *AbstractTabDocument::scene() const
-{
-    return d->m_scene;
-}
-
-QUndoStack *AbstractTabDocument::commandsStack() const
-{
-    return d->m_commandsStack.get();
 }
 
 bool AbstractTabDocument::load(const QString &path)

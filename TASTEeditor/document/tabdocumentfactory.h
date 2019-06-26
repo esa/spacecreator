@@ -17,40 +17,29 @@
 
 #pragma once
 
-#include "document/abstracttabdocument.h"
-
-#include <QGraphicsView>
-#include <QPointer>
-
-class QGraphicsView;
+class QObject;
 namespace taste3 {
 namespace document {
 
-class DummyGraphicsScene;
-class DummyTabDocument : public AbstractTabDocument
+class AbstractTabDocument;
+
+class TabDocumentFactory
 {
-    Q_OBJECT
 public:
-    DummyTabDocument(QObject *parent = nullptr);
-    ~DummyTabDocument() override;
-
-    QString title() const override;
-
-protected:
-    virtual bool loadImpl(const QString &path) override;
-    virtual bool saveImpl(const QString &path) override;
-    virtual QVector<QAction *> initActions() override;
-
-    QWidget *createView() override;
-    QGraphicsScene *createScene() override;
-
-protected slots:
-    void onActionDummy();
+    static AbstractTabDocument *createDataTabDocument(QObject *parent);
+    static AbstractTabDocument *createInterfaceTabDocument(QObject *parent);
+    static AbstractTabDocument *createDeploymentTabDocument(QObject *parent);
+    static AbstractTabDocument *createConcurrencyTabDocument(QObject *parent);
+    static AbstractTabDocument *createAADLTabDocument(QObject *parent);
+    static AbstractTabDocument *createMSCTabDocument(QObject *parent);
 
 private:
-    QGraphicsScene *m_customScene { nullptr };
-    QPointer<QGraphicsView> m_view { nullptr };
-    QAction *m_actDummy { nullptr };
+    TabDocumentFactory() = delete;
+    ~TabDocumentFactory() = delete;
+    TabDocumentFactory(const TabDocumentFactory &other) = delete;
+    TabDocumentFactory *operator=(const TabDocumentFactory &other) = delete;
+
+    static AbstractTabDocument *initDoc(AbstractTabDocument *doc);
 };
 
 } // ns document

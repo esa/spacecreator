@@ -19,6 +19,7 @@
 
 #include "app/commandsstack.h"
 #include "document/documentsmanager.h"
+#include "document/tabdocumentfactory.h"
 #include "logging/loghandler.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
@@ -271,15 +272,13 @@ void MainWindow::onReportRequested()
 void MainWindow::initTabs()
 {
     using namespace document;
-    auto appendTab = [this](AbstractTabDocument *doc) { m_docsManager->addDocument(doc, new QGraphicsView(this)); };
 
-    appendTab(new DataTabDocument(this));
-    appendTab(new InterfaceTabDocument(this));
-    appendTab(new DeploymentTabDocument(this));
-    appendTab(new ConcurrencyTabDocument(this));
-    appendTab(new AADLTabDocument(this));
-    appendTab(new DataTabDocument(this));
-    appendTab(new MSCTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createInterfaceTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
+    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
 }
 
 void MainWindow::initSettings()

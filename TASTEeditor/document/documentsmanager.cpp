@@ -26,12 +26,16 @@ DocumentsManager::DocumentsManager(QTabWidget *tabWidget, QObject *parent)
     connect(m_tabs, &QTabWidget::currentChanged, this, &DocumentsManager::currentDocIdChanged);
 }
 
-bool DocumentsManager::addDocument(document::AbstractTabDocument *doc, QWidget *view)
+bool DocumentsManager::addDocument(document::AbstractTabDocument *doc)
 {
     if (m_documents.contains(doc))
         return false;
 
     m_documents.append(doc);
+
+    QWidget *view = doc->view();
+    Q_ASSERT(view != nullptr);
+
     m_views.insert(doc, view);
 
     m_tabs->addTab(view, doc->title());

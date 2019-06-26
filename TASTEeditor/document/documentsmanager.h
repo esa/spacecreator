@@ -34,7 +34,7 @@ class DocumentsManager : public QObject
 public:
     explicit DocumentsManager(QTabWidget *tabWidget, QObject *parent = nullptr);
 
-    bool addDocument(document::AbstractTabDocument *doc, QWidget *view);
+    bool addDocument(document::AbstractTabDocument *doc);
     bool removeDocument(int docId);
     bool removeDocument(document::AbstractTabDocument *doc);
     AbstractTabDocument *docById(int id) const;
