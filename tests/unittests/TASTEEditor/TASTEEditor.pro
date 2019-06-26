@@ -4,4 +4,5 @@ SUBDIRS = \
     aadl/tst_aadlobject \
     aadl/tst_aadlobjectfunction\
     aadl/tst_aadlobjectcontainer\
-    aadl/tst_aadlobjectiface
+    aadl/tst_aadlobjectiface\
+    aadl/tst_aadlobjectsmodel

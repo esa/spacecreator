@@ -60,6 +60,8 @@ private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
 };
 
+typedef QVector<AADLObjectIface *> AADLIfacesVector;
+
 } // ns aadl
 } // ns taste3
 
