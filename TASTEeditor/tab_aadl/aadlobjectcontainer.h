@@ -17,50 +17,42 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "aadlobject.h"
+#include "aadlobjectiface.h"
 
 #include <QObject>
+#include <QVector>
 #include <memory>
-
 namespace taste3 {
 namespace aadl {
 
-struct AADLObjectPrivate;
-class AADLObject : public QObject
+struct AADLObjectContainerPrivate;
+class AADLObjectContainer : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
-
 public:
-    enum class AADLObjectType
-    {
-        AADLFunctionType = 0,
-        AADLFunction,
-        AADLIface,
+    explicit AADLObjectContainer(const QString &title = QString(), QObject *parent = nullptr);
+    ~AADLObjectContainer();
 
-        AADLUnknown
-    };
-    Q_ENUM(AADLObjectType)
+    AADLObject::AADLObjectType aadlType() const override;
 
-    explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr);
-    virtual ~AADLObject();
+    QVector<AADLObject *> children() const;
+    bool addChild(AADLObject *child);
+    bool removeChild(AADLObject *child);
 
-    QString title() const;
-    common::Id id() const;
+    QVector<AADLObjectIface *> ris() const;
+    bool addRI(AADLObjectIface *ri);
+    bool removeRI(AADLObjectIface *ri);
 
-    virtual AADLObjectType aadlType() const = 0;
+    QVector<AADLObjectIface *> pis() const;
+    bool addPI(AADLObjectIface *pi);
+    bool removePI(AADLObjectIface *pi);
 
-signals:
-    void titleChanged(const QString &title);
-    void idChanged(const taste3::common::Id &id);
-
-public slots:
-    bool setTitle(const QString &title);
-    bool setId(const common::Id &id);
+    bool addInterface(AADLObjectIface *iface);
+    bool removeInterface(AADLObjectIface *iface);
 
 private:
-    const std::unique_ptr<AADLObjectPrivate> d;
+    const std::unique_ptr<AADLObjectContainerPrivate> d;
 };
 
 } // ns aadl
