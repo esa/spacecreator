@@ -19,6 +19,9 @@
 
 #include "document/abstracttabdocument.h"
 
+#include <QGraphicsView>
+#include <QPointer>
+
 namespace taste3 {
 
 class InterfaceTabGraphicsScene;
@@ -38,6 +41,9 @@ protected:
     virtual bool saveImpl(const QString &path) override;
     virtual QVector<QAction *> initActions() override;
 
+    QWidget *createView() override;
+    QGraphicsScene *createScene() override;
+
 protected slots:
     void onActionCreateFunctionType();
     void onActionCreateFunction();
@@ -48,6 +54,7 @@ protected slots:
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
+    QPointer<QGraphicsView> m_graphicsView { nullptr };
     QAction *m_actCreateFunctionType { nullptr };
     QAction *m_actCreateFunction { nullptr };
     QAction *m_actCreateProvidedInterface { nullptr };

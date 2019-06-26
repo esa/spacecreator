@@ -40,6 +40,7 @@ SOURCES += \
         baseitems/grippoint.cpp \
         baseitems/grippointshandler.cpp \
         baseitems/interactiveobject.cpp \
+        document/tabdocumentfactory.cpp \
         main.cpp \
         app/commandlineparser.cpp \
         app/common.cpp \
@@ -83,6 +84,7 @@ HEADERS += \
         app/mainwindow.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
+        document/tabdocumentfactory.h \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \

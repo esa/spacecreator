@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QGraphicsView>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
@@ -29,12 +30,28 @@ namespace document {
 
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
-    , m_graphicsScene(new InterfaceTabGraphicsScene(this))
 {
-    setDocScene(m_graphicsScene);
 }
 
-InterfaceTabDocument::~InterfaceTabDocument() {}
+InterfaceTabDocument::~InterfaceTabDocument()
+{
+    if (m_graphicsView && !m_graphicsView->parent())
+        delete m_graphicsView;
+}
+
+QWidget *InterfaceTabDocument::createView()
+{
+    if (!m_graphicsView)
+        m_graphicsView = new QGraphicsView;
+    return m_graphicsView;
+}
+
+QGraphicsScene *InterfaceTabDocument::createScene()
+{
+    if (!m_graphicsScene)
+        m_graphicsScene = new InterfaceTabGraphicsScene(this);
+    return m_graphicsScene;
+}
 
 QString InterfaceTabDocument::title() const
 {

@@ -19,15 +19,34 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QGraphicsScene>
+#include <QGraphicsView>
 
 namespace taste3 {
 namespace document {
 
 DummyTabDocument::DummyTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
-    , m_customScene(new QGraphicsScene(this))
 {
-    setDocScene(m_customScene);
+}
+
+DummyTabDocument::~DummyTabDocument()
+{
+    if (m_view && !m_view->parent())
+        delete m_view;
+}
+
+QWidget *DummyTabDocument::createView()
+{
+    if (!m_view)
+        m_view = new QGraphicsView;
+    return m_view;
+}
+
+QGraphicsScene *DummyTabDocument::createScene()
+{
+    if (!m_customScene)
+        m_customScene = new QGraphicsScene(this);
+    return m_customScene;
 }
 
 QString DummyTabDocument::title() const

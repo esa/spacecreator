@@ -38,10 +38,12 @@ public:
     explicit AbstractTabDocument(QObject *parent = nullptr);
     virtual ~AbstractTabDocument();
 
-    void setDocScene(QGraphicsScene *scene);
+    void init();
+
     void fillToolBar(QToolBar *toolBar);
 
     QGraphicsScene *scene() const;
+    QWidget *view() const;
     QUndoStack *commandsStack() const;
 
     bool load(const QString &path);
@@ -63,6 +65,12 @@ protected:
     virtual bool loadImpl(const QString &path) = 0;
     virtual bool saveImpl(const QString &path) = 0;
     virtual QVector<QAction *> initActions() = 0;
+
+    void setupScene(QGraphicsScene *scene);
+    void setupView(QWidget *view);
+
+    virtual QWidget *createView() = 0;
+    virtual QGraphicsScene *createScene() = 0;
 
 private:
     std::unique_ptr<AbstractTabDocumentPrivate> const d;
