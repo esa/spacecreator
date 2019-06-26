@@ -35,7 +35,7 @@ class AADLObject : public QObject
 public:
     enum class AADLObjectType
     {
-        AADLFunctionType = 0,
+        AADLFunctionContainer = 0,
         AADLFunction,
         AADLIface,
 

@@ -49,7 +49,7 @@ AADLIfacesVector AADLObjectsModel::ifaces() const
     return d->m_ifaces;
 }
 
-bool AADLObjectsModel::addFunctionType(AADLObjectContainer *container)
+bool AADLObjectsModel::addContainer(AADLObjectContainer *container)
 {
     if (container && !containers().contains(container)) {
         d->m_containers.append(container);
@@ -59,7 +59,7 @@ bool AADLObjectsModel::addFunctionType(AADLObjectContainer *container)
     return false;
 }
 
-bool AADLObjectsModel::removeFunctionType(AADLObjectContainer *container)
+bool AADLObjectsModel::removeContainer(AADLObjectContainer *container)
 {
     const int id = containers().indexOf(container);
     if (id >= 0 && id < containers().size()) {
@@ -116,8 +116,8 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
 {
     if (obj) {
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionType:
-            return addFunctionType(qobject_cast<AADLObjectContainer *>(obj));
+        case AADLObject::AADLObjectType::AADLFunctionContainer:
+            return addContainer(qobject_cast<AADLObjectContainer *>(obj));
         case AADLObject::AADLObjectType::AADLFunction:
             return addFunction(qobject_cast<AADLObjectFunction *>(obj));
         case AADLObject::AADLObjectType::AADLIface:
@@ -133,8 +133,8 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 {
     if (obj) {
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionType:
-            return removeFunctionType(qobject_cast<AADLObjectContainer *>(obj));
+        case AADLObject::AADLObjectType::AADLFunctionContainer:
+            return removeContainer(qobject_cast<AADLObjectContainer *>(obj));
         case AADLObject::AADLObjectType::AADLFunction:
             return removeFunction(qobject_cast<AADLObjectFunction *>(obj));
         case AADLObject::AADLObjectType::AADLIface:
@@ -150,8 +150,8 @@ void AADLObjectsModel::notifyObjectAdded(AADLObject *obj)
 {
     if (obj) {
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionType: {
-            emit functionTypeAdded(qobject_cast<AADLObjectContainer *>(obj));
+        case AADLObject::AADLObjectType::AADLFunctionContainer: {
+            emit containerAdded(qobject_cast<AADLObjectContainer *>(obj));
             break;
         }
         case AADLObject::AADLObjectType::AADLFunction: {
@@ -173,8 +173,8 @@ void AADLObjectsModel::notifyObjectRemoved(AADLObject *obj)
 {
     if (obj) {
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionType: {
-            emit functionTypeRemoved(qobject_cast<AADLObjectContainer *>(obj));
+        case AADLObject::AADLObjectType::AADLFunctionContainer: {
+            emit containerRemoved(qobject_cast<AADLObjectContainer *>(obj));
             break;
         }
         case AADLObject::AADLObjectType::AADLFunction: {

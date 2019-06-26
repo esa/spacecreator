@@ -36,7 +36,7 @@ AADLObjectContainer::~AADLObjectContainer() {}
 
 AADLObject::AADLObjectType AADLObjectContainer::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLFunctionType;
+    return AADLObject::AADLObjectType::AADLFunctionContainer;
 }
 
 QVector<AADLObject *> AADLObjectContainer::children() const

@@ -33,7 +33,7 @@ private slots:
     void testCommonInterfacesManagement();
 
     void testChildrenManagementFunction();
-    void testChildrenManagementFunctionType();
+    void testChildrenManagementContainer();
     void testChildrenManagementMixed();
 
 private:
@@ -46,7 +46,7 @@ void tst_AADLObjectContainer::testAadlType()
     using namespace taste3::aadl;
     AADLObjectContainer obj;
 
-    QCOMPARE(obj.aadlType(), AADLObject::AADLObjectType::AADLFunctionType);
+    QCOMPARE(obj.aadlType(), AADLObject::AADLObjectType::AADLFunctionContainer);
 }
 
 void tst_AADLObjectContainer::testRequiredInterfacesManagement()
@@ -211,7 +211,7 @@ void tst_AADLObjectContainer::testChildrenManagement(taste3::aadl::AADLObjectCon
     QCOMPARE(obj->children().size(), 0);
 }
 
-void tst_AADLObjectContainer::testChildrenManagementFunctionType()
+void tst_AADLObjectContainer::testChildrenManagementContainer()
 {
     using namespace taste3::aadl;
     AADLObjectContainer obj;

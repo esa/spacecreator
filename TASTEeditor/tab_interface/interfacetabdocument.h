@@ -45,7 +45,7 @@ protected:
     QGraphicsScene *createScene() override;
 
 protected slots:
-    void onActionCreateFunctionType();
+    void onActionCreateContainer();
     void onActionCreateFunction();
     void onActionCreateProvidedInterface();
     void onActionCreateRequiredInterface();
@@ -55,7 +55,7 @@ protected slots:
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QPointer<QGraphicsView> m_graphicsView { nullptr };
-    QAction *m_actCreateFunctionType { nullptr };
+    QAction *m_actCreateContainer { nullptr };
     QAction *m_actCreateFunction { nullptr };
     QAction *m_actCreateProvidedInterface { nullptr };
     QAction *m_actCreateRequiredInterface { nullptr };
