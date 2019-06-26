@@ -57,6 +57,7 @@ SOURCES += \
         tab_aadl/aadlobjectcontainer.cpp \
         tab_aadl/aadlobjectfunction.cpp \
         tab_aadl/aadlobjectiface.cpp \
+        tab_aadl/aadlobjectsmodel.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
@@ -93,6 +94,7 @@ HEADERS += \
         tab_aadl/aadlobjectcontainer.h \
         tab_aadl/aadlobjectfunction.h \
         tab_aadl/aadlobjectiface.h \
+        tab_aadl/aadlobjectsmodel.h \
         tab_aadl/aadltabdocument.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \

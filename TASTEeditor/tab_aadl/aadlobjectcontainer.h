@@ -32,7 +32,7 @@ class AADLObjectContainer : public AADLObject
     Q_OBJECT
 public:
     explicit AADLObjectContainer(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLObjectContainer();
+    ~AADLObjectContainer() override;
 
     AADLObject::AADLObjectType aadlType() const override;
 
@@ -54,6 +54,8 @@ public:
 private:
     const std::unique_ptr<AADLObjectContainerPrivate> d;
 };
+
+typedef QVector<AADLObjectContainer *> AADLContainersVector;
 
 } // ns aadl
 } // ns taste3

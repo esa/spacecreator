@@ -26,9 +26,10 @@ namespace aadl {
 
 class AADLObjectFunction : public AADLObjectContainer
 {
+    Q_OBJECT
 public:
     explicit AADLObjectFunction(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLObjectFunction();
+    ~AADLObjectFunction() override;
 
     AADLObject::AADLObjectType aadlType() const override;
 
@@ -37,6 +38,8 @@ private:
     bool addChild(AADLObject *child);
     bool removeChild(AADLObject *child);
 };
+
+typedef QVector<AADLObjectFunction *> AADLFunctionsVector;
 
 } // ns aadl
 } // ns taste3
