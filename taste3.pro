@@ -3,6 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     TASTEeditor
 
-!CONFIG(no_tests) {
-    SUBDIRS += tests
-}
+#!CONFIG(no_tests) {
+#    SUBDIRS += tests
+#}

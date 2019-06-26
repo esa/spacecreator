@@ -28,13 +28,13 @@ class tst_AADLObjectsModel : public QObject
     Q_OBJECT
 
 private slots:
-    void testManageFunctionTypes();
+    void testManageContainers();
     void testManageFunctions();
     void testManageIfaces();
     void testManageMixed();
 };
 
-void tst_AADLObjectsModel::testManageFunctionTypes()
+void tst_AADLObjectsModel::testManageContainers()
 {
     using namespace taste3::aadl;
     AADLObjectsModel model;
@@ -48,10 +48,10 @@ void tst_AADLObjectsModel::testManageFunctionTypes()
     const AADLContainersVector containers { &container1, &container2, &container3 };
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyConcrete(&model, &AADLObjectsModel::functionTypeAdded);
+        QSignalSpy spyConcrete(&model, &AADLObjectsModel::containerAdded);
         QSignalSpy spyCommon(&model, &AADLObjectsModel::aadlObjectAdded);
 
-        const bool added = model.addFunctionType(container);
+        const bool added = model.addContainer(container);
         QVERIFY(added);
         QCOMPARE(model.containers().size(), i + 1);
 
@@ -60,10 +60,10 @@ void tst_AADLObjectsModel::testManageFunctionTypes()
     }
 
     {
-        QSignalSpy spyConcrete(&model, &AADLObjectsModel::functionTypeAdded);
+        QSignalSpy spyConcrete(&model, &AADLObjectsModel::containerAdded);
         QSignalSpy spyCommon(&model, &AADLObjectsModel::aadlObjectAdded);
 
-        const bool nullAdded = model.addFunctionType(nullptr);
+        const bool nullAdded = model.addContainer(nullptr);
         QVERIFY(!nullAdded);
         QCOMPARE(model.containers().size(), containers.size());
 
@@ -72,10 +72,10 @@ void tst_AADLObjectsModel::testManageFunctionTypes()
     }
 
     {
-        QSignalSpy spyConcrete(&model, &AADLObjectsModel::functionTypeRemoved);
+        QSignalSpy spyConcrete(&model, &AADLObjectsModel::containerRemoved);
         QSignalSpy spyCommon(&model, &AADLObjectsModel::aadlObjectRemoved);
 
-        const bool nullRemoved = model.removeFunctionType(nullptr);
+        const bool nullRemoved = model.removeContainer(nullptr);
         QVERIFY(!nullRemoved);
         QCOMPARE(model.containers().size(), containers.size());
 
@@ -84,11 +84,11 @@ void tst_AADLObjectsModel::testManageFunctionTypes()
     }
 
     {
-        QSignalSpy spyConcrete(&model, &AADLObjectsModel::functionTypeRemoved);
+        QSignalSpy spyConcrete(&model, &AADLObjectsModel::containerRemoved);
         QSignalSpy spyCommon(&model, &AADLObjectsModel::aadlObjectRemoved);
 
         AADLObjectContainer dummy;
-        const bool dummyRemoved = model.removeFunctionType(&dummy);
+        const bool dummyRemoved = model.removeContainer(&dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.containers().size(), containers.size());
 
@@ -98,10 +98,10 @@ void tst_AADLObjectsModel::testManageFunctionTypes()
 
     for (int i = 0; i < containers.size(); ++i) {
         auto container = containers.at(i);
-        QSignalSpy spyConcrete(&model, &AADLObjectsModel::functionTypeRemoved);
+        QSignalSpy spyConcrete(&model, &AADLObjectsModel::containerRemoved);
         QSignalSpy spyCommon(&model, &AADLObjectsModel::aadlObjectRemoved);
 
-        const bool removed = model.removeFunctionType(container);
+        const bool removed = model.removeContainer(container);
         QVERIFY(removed);
         QCOMPARE(model.containers().size(), containers.size() - i - 1);
 

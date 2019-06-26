@@ -75,10 +75,10 @@ bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 
 QVector<QAction *> InterfaceTabDocument::initActions()
 {
-    if (!m_actCreateFunctionType) {
-        m_actCreateFunctionType = new QAction(tr("Function Type"));
-        connect(m_actCreateFunctionType, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunctionType);
-        m_actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
+    if (!m_actCreateContainer) {
+        m_actCreateContainer = new QAction(tr("Function Type"));
+        connect(m_actCreateContainer, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateContainer);
+        m_actCreateContainer->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
     }
 
     if (!m_actCreateFunction) {
@@ -114,11 +114,11 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
     }
 
-    return { m_actCreateFunctionType,      m_actCreateFunction, m_actCreateProvidedInterface,
+    return { m_actCreateContainer,         m_actCreateFunction, m_actCreateProvidedInterface,
              m_actCreateRequiredInterface, m_actCreateComment,  m_actGroupConnections };
 }
 
-void InterfaceTabDocument::onActionCreateFunctionType()
+void InterfaceTabDocument::onActionCreateContainer()
 {
     WARN_NOT_IMPLEMENTED;
 }

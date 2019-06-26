@@ -40,8 +40,8 @@ public:
     AADLFunctionsVector functions() const;
     AADLIfacesVector ifaces() const;
 
-    bool addFunctionType(AADLObjectContainer *container);
-    bool removeFunctionType(AADLObjectContainer *container);
+    bool addContainer(AADLObjectContainer *container);
+    bool removeContainer(AADLObjectContainer *container);
 
     bool addFunction(AADLObjectFunction *function);
     bool removeFunction(AADLObjectFunction *function);
@@ -53,8 +53,8 @@ public:
     bool removeObject(AADLObject *obj);
 
 signals:
-    void functionTypeAdded(AADLObjectContainer *container);
-    void functionTypeRemoved(AADLObjectContainer *container);
+    void containerAdded(AADLObjectContainer *container);
+    void containerRemoved(AADLObjectContainer *container);
 
     void functionAdded(AADLObjectFunction *function);
     void functionRemoved(AADLObjectFunction *function);
