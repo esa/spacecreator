@@ -13,9 +13,11 @@ INCLUDEPATH += $$TASTE_PRO_ROOT
 
 HEADERS += \
         $$TASTE_PRO_ROOT/app/common.h \
-        $$TASTE_PRO_ROOT/tab_aadl/aadlobject.h
+        $$TASTE_PRO_ROOT/tab_aadl/aadlobject.h \
+        $$TASTE_PRO_ROOT/tab_aadl/aadlobjectiface.h
 
 SOURCES += \
         $$TASTE_PRO_ROOT/app/common.cpp \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobject.cpp \
-        tst_aadlobject.cpp
+        $$TASTE_PRO_ROOT/tab_aadl/aadlobjectiface.cpp \
+        tst_aadlobjectiface.cpp

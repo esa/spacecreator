@@ -20,6 +20,18 @@
 #include <QVariant>
 #include <QtTest>
 
+class AADLObjectImp : public taste3::aadl::AADLObject
+{
+    Q_OBJECT
+public:
+    explicit AADLObjectImp(const QString &title = QString(), QObject *parent = nullptr)
+        : AADLObject(title, parent)
+    {
+    }
+
+    AADLObjectType aadlType() const override { return AADLObjectType::AADLUnknown; }
+};
+
 class tst_AADLObject : public QObject
 {
     Q_OBJECT
@@ -38,7 +50,7 @@ const QString tst_AADLObject::TestObjectTitle = { "Test Object Title" };
 
 void tst_AADLObject::test_defaultConstructor()
 {
-    taste3::aadl::AADLObject obj;
+    AADLObjectImp obj;
 
     QCOMPARE(obj.parent(), nullptr);
     QCOMPARE(obj.title(), QString());
@@ -47,7 +59,7 @@ void tst_AADLObject::test_defaultConstructor()
 
 void tst_AADLObject::test_paramConstructor()
 {
-    taste3::aadl::AADLObject obj(TestObjectTitle, this);
+    AADLObjectImp obj(TestObjectTitle, this);
 
     QCOMPARE(obj.parent(), this);
     QCOMPARE(obj.title(), TestObjectTitle);
@@ -57,7 +69,7 @@ void tst_AADLObject::test_paramConstructor()
 void tst_AADLObject::test_setTitle()
 {
     using namespace taste3::aadl;
-    AADLObject obj;
+    AADLObjectImp obj;
     QSignalSpy spy(&obj, &AADLObject::titleChanged);
 
     QVERIFY(obj.title() != TestObjectTitle);
@@ -78,7 +90,7 @@ void tst_AADLObject::test_setId()
 
     static const Id &testId = Id::createUuid();
 
-    AADLObject obj;
+    AADLObjectImp obj;
     qRegisterMetaType<Id>();
     QSignalSpy spy(&obj, &AADLObject::idChanged);
 

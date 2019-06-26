@@ -54,6 +54,9 @@ SOURCES += \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
         tab_aadl/aadlobject.cpp \
+        tab_aadl/aadlobjectcontainer.cpp \
+        tab_aadl/aadlobjectfunction.cpp \
+        tab_aadl/aadlobjectiface.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
@@ -87,6 +90,9 @@ HEADERS += \
         settings/appoptions.h \
         settings/settingsmanager.h \
         tab_aadl/aadlobject.h \
+        tab_aadl/aadlobjectcontainer.h \
+        tab_aadl/aadlobjectfunction.h \
+        tab_aadl/aadlobjectiface.h \
         tab_aadl/aadltabdocument.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \

@@ -17,51 +17,50 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "aadlobject.h"
 
+#include <QMetaType>
 #include <QObject>
+#include <QPointer>
 #include <memory>
 
 namespace taste3 {
 namespace aadl {
 
-struct AADLObjectPrivate;
-class AADLObject : public QObject
+struct AADLObjectIfacePrivate;
+class AADLObjectIface : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction)
 
 public:
-    enum class AADLObjectType
+    enum class IfaceType
     {
-        AADLFunctionType = 0,
-        AADLFunction,
-        AADLIface,
-
-        AADLUnknown
+        Required = 0,
+        Provided
     };
-    Q_ENUM(AADLObjectType)
+    Q_ENUM(IfaceType)
 
-    explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr);
-    virtual ~AADLObject();
+    static constexpr IfaceType DefaultDirection { IfaceType::Required };
 
-    QString title() const;
-    common::Id id() const;
+    explicit AADLObjectIface(AADLObjectIface::IfaceType direction = DefaultDirection, const QString &title = QString(),
+                             AADLObject *parent = nullptr);
+    ~AADLObjectIface();
 
-    virtual AADLObjectType aadlType() const = 0;
+    AADLObject::AADLObjectType aadlType() const override;
 
-signals:
-    void titleChanged(const QString &title);
-    void idChanged(const taste3::common::Id &id);
+    AADLObjectIface::IfaceType direction() const;
 
-public slots:
-    bool setTitle(const QString &title);
-    bool setId(const common::Id &id);
+    bool isProvided() const;
+    bool isRequired() const;
+
+    AADLObject *holder() const;
 
 private:
-    const std::unique_ptr<AADLObjectPrivate> d;
+    const std::unique_ptr<AADLObjectIfacePrivate> d;
 };
 
 } // ns aadl
 } // ns taste3
+
+Q_DECLARE_METATYPE(taste3::aadl::AADLObjectIface::IfaceType);
