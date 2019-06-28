@@ -33,9 +33,9 @@ class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObje
 public:
     GripPointsHandler(QGraphicsItem *parent = nullptr);
 
-    void handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to) override;
+    void handleGripPointPress(GripPoint *handle, const QPointF &at) override;
     void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) override;
-    void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) override;
+    void handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -59,9 +59,9 @@ protected Q_SLOTS:
     void onOpacityAnimationFinished();
 
 Q_SIGNALS:
-    void manualGeometryChangeStart(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeStart(GripPoint::Location pos, const QPointF &at);
     void manualGeometryChangeProgress(GripPoint::Location pos, const QPointF &from, const QPointF &to);
-    void manualGeometryChangeFinish(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeFinish(GripPoint::Location pos, const QPointF &startedAt, const QPointF &releasedAt);
 
 protected:
     void changeVisibilityAnimated(bool appear);

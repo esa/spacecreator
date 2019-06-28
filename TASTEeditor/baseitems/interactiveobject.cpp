@@ -62,19 +62,37 @@ QRectF InteractiveObject::boundingRect() const
     return m_boundingRect;
 }
 
+void InteractiveObject::gripPointPressed(GripPoint::Location gp, const QPointF &at)
+{
+    if (m_gripPoints)
+        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
+            if (gripPnt->isMover())
+                onManualMoveStart(gripPnt->location(), at);
+            else
+                onManualResizeStart(gripPnt->location(), at);
+        }
+}
+
 void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPointF &from, const QPointF &to)
 {
     if (m_gripPoints)
-        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos))
-            handleGripPointMovement(gripPnt, from, to);
+        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos)) {
+            if (gripPnt->isMover())
+                onManualMoveProgress(gripPnt->location(), from, to);
+            else
+                onManualResizeProgress(gripPnt->location(), from, to);
+        }
 }
 
-void InteractiveObject::handleGripPointMovement(GripPoint *grip, const QPointF &from, const QPointF &to)
+void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (grip->isMover())
-        onMoveRequested(grip, from, to);
-    else
-        onResizeRequested(grip, from, to);
+    if (m_gripPoints)
+        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
+            if (gripPnt->isMover())
+                onManualMoveFinish(gripPnt->location(), pressedAt, releasedAt);
+            else
+                onManualResizeFinish(gripPnt->location(), pressedAt, releasedAt);
+        }
 }
 
 void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -228,8 +246,13 @@ void InteractiveObject::prepareHoverMark()
         m_gripPoints = new GripPointsHandler(this);
         m_gripPoints->setZValue(0);
 
+        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeStart, this,
+                &InteractiveObject::gripPointPressed);
         connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
                 &InteractiveObject::gripPointMoved);
+        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+                &InteractiveObject::gripPointReleased);
+
         connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
             if (m_gripPoints && !m_gripPoints->isVisible())
                 delete m_gripPoints; // it's not a thing directly added to the scene, so just delete

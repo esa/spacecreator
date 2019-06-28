@@ -199,7 +199,7 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_posStart = m_posFinish = event->scenePos();
         if (m_listener)
-            m_listener->handleGripPointPress(this, event->lastScenePos(), event->scenePos());
+            m_listener->handleGripPointPress(this, event->scenePos());
         event->accept();
     } else
         event->ignore();

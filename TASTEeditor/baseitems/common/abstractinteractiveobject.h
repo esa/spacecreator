@@ -26,9 +26,9 @@ class AbstractInteractiveObject
 {
 public:
     virtual ~AbstractInteractiveObject() {}
-    virtual void handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
+    virtual void handleGripPointPress(GripPoint *handle, const QPointF &at) = 0;
     virtual void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
-    virtual void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
+    virtual void handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt) = 0;
 };
 
 } // ns taste3
