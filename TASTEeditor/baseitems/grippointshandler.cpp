@@ -128,9 +128,9 @@ void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     //    painter->strokePath(m_borderPath, m_highlighter.borderColor());
 }
 
-void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to)
+void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &at)
 {
-    Q_EMIT manualGeometryChangeStart(handle->location(), from, to);
+    Q_EMIT manualGeometryChangeStart(handle->location(), at);
 }
 
 void GripPointsHandler::handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to)
@@ -138,9 +138,9 @@ void GripPointsHandler::handleGripPointMove(GripPoint *handle, const QPointF &fr
     Q_EMIT manualGeometryChangeProgress(handle->location(), from, to);
 }
 
-void GripPointsHandler::handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to)
+void GripPointsHandler::handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_EMIT manualGeometryChangeFinish(handle->location(), from, to);
+    Q_EMIT manualGeometryChangeFinish(handle->location(), pressedAt, releasedAt);
 }
 
 void GripPointsHandler::showAnimated()

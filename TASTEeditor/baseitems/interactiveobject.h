@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include "grippoint.h"
+
 #include <QGraphicsObject>
 #include <QPointer>
-
-#include "grippoint.h"
 
 namespace taste3 {
 
@@ -62,7 +62,9 @@ Q_SIGNALS:
     void needUpdateLayout() const;
 
 protected Q_SLOTS:
-    void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
+    virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
     virtual void rebuildLayout() {}
 
 protected:
@@ -80,13 +82,17 @@ protected:
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual void handleGripPointMovement(GripPoint *gp, const QPointF &from, const QPointF &to);
-
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-    virtual void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
-    virtual void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) = 0;
+    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at) = 0;
+    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) = 0;
+    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) = 0;
+
+    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at) = 0;
+    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) = 0;
+    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                      const QPointF &releasedAt) = 0;
 
     virtual void updateGripPoints();
     virtual void prepareHoverMark();
