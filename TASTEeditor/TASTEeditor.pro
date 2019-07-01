@@ -31,6 +31,10 @@ macx {
 }
 
 SOURCES += \
+        app/commandlineparser.cpp \
+        app/commandsstack.cpp \
+        app/common.cpp \
+        app/mainwindow.cpp \
         baseitems/common/arrowsign.cpp \
         baseitems/common/drawrectinfo.cpp \
         baseitems/common/highlightrectitem.cpp \
@@ -40,16 +44,13 @@ SOURCES += \
         baseitems/grippoint.cpp \
         baseitems/grippointshandler.cpp \
         baseitems/interactiveobject.cpp \
-        document/tabdocumentfactory.cpp \
-        main.cpp \
-        app/commandlineparser.cpp \
-        app/common.cpp \
-        app/commandsstack.cpp \
-        app/mainwindow.cpp \
+        baseitems/textgraphicsitem.cpp \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
+        document/tabdocumentfactory.cpp \
         dummy/dummytabdocument.cpp \
         logging/loghandler.cpp \
+        main.cpp \
         reports/bugreportdialog.cpp \
         reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
@@ -63,13 +64,25 @@ SOURCES += \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
         tab_deployment/deploymenttabdocument.cpp \
+        tab_interface/aadlcommentgraphicsitem.cpp \
+        tab_interface/aadlcontainergraphicsitem.cpp \
+        tab_interface/aadlfunctiongraphicsitem.cpp \
+        tab_interface/commands/cmdcommentitemcreate.cpp \
+        tab_interface/commands/cmdcontaineritemcreate.cpp \
+        tab_interface/commands/cmdfunctionitemcreate.cpp \
+        tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
+        tab_interface/commands/cmdrequiredinterfaceitemcreate.cpp \
+        tab_interface/commands/commandsfactory.cpp \
+        tab_interface/creatortool.cpp \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
         app/commandlineparser.h \
+        app/commandsstack.h \
         app/common.h \
+        app/mainwindow.h \
         baseitems/common/abstractinteractiveobject.h \
         baseitems/common/arrowsign.h \
         baseitems/common/drawrectinfo.h \
@@ -80,8 +93,7 @@ HEADERS += \
         baseitems/grippoint.h \
         baseitems/grippointshandler.h \
         baseitems/interactiveobject.h \
-        app/commandsstack.h \
-        app/mainwindow.h \
+        baseitems/textgraphicsitem.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
         document/tabdocumentfactory.h \
@@ -101,6 +113,17 @@ HEADERS += \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \
         tab_deployment/deploymenttabdocument.h \
+        tab_interface/aadlcommentgraphicsitem.h \
+        tab_interface/aadlcontainergraphicsitem.h \
+        tab_interface/aadlfunctiongraphicsitem.h \
+        tab_interface/commands/cmdcommentitemcreate.h \
+        tab_interface/commands/cmdcontaineritemcreate.h \
+        tab_interface/commands/cmdfunctionitemcreate.h \
+        tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
+        tab_interface/commands/cmdrequiredinterfaceitemcreate.h \
+        tab_interface/commands/commandids.h \
+        tab_interface/commands/commandsfactory.h \
+        tab_interface/creatortool.h \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
         tab_msc/msctabdocument.h

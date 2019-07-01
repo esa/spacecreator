@@ -26,7 +26,7 @@ public:
     ~BugReportHandler() override;
     void sendReport(QSharedPointer<BugReport> report);
 
-signals:
+Q_SIGNALS:
     void error(const QString &errorText);
     void reportSent(const QString &text);
 
