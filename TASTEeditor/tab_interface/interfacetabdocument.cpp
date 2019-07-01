@@ -16,12 +16,14 @@
 */
 #include "interfacetabdocument.h"
 
+#include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QGraphicsView>
+#include <tab_aadl/aadlobjectsmodel.h>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
@@ -30,6 +32,7 @@ namespace document {
 
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
+    , m_model(new aadl::AADLObjectsModel(this))
 {
 }
 
@@ -43,6 +46,7 @@ QWidget *InterfaceTabDocument::createView()
 {
     if (!m_graphicsView)
         m_graphicsView = new QGraphicsView;
+    m_graphicsView->setScene(m_graphicsScene);
     return m_graphicsView;
 }
 
@@ -75,14 +79,31 @@ bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 
 QVector<QAction *> InterfaceTabDocument::initActions()
 {
+    if (!m_tool) {
+        m_tool = new aadl::CreatorTool(m_graphicsView, m_model, this);
+        connect(m_tool, &aadl::CreatorTool::created, this, [this]() {
+            if (QAction *currentAction = m_actionGroup->checkedAction())
+                currentAction->setChecked(false);
+        });
+    }
+
+    if (!m_actionGroup) {
+        m_actionGroup = new QActionGroup(this);
+        m_actionGroup->setExclusive(true);
+    }
+
     if (!m_actCreateContainer) {
         m_actCreateContainer = new QAction(tr("Function Type"));
+        m_actCreateContainer->setCheckable(true);
+        m_actCreateContainer->setActionGroup(m_actionGroup);
         connect(m_actCreateContainer, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateContainer);
         m_actCreateContainer->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
     }
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
+        m_actCreateFunction->setCheckable(true);
+        m_actCreateFunction->setActionGroup(m_actionGroup);
         connect(m_actCreateFunction, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunction);
 
         m_actCreateFunction->setIcon(QIcon(":/tab_interface/toolbar/icns/function.svg"));
@@ -90,6 +111,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
+        m_actCreateProvidedInterface->setCheckable(true);
+        m_actCreateProvidedInterface->setActionGroup(m_actionGroup);
         connect(m_actCreateProvidedInterface, &QAction::triggered, this,
                 &InterfaceTabDocument::onActionCreateProvidedInterface);
         m_actCreateProvidedInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/pi.svg"));
@@ -97,6 +120,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
+        m_actCreateRequiredInterface->setCheckable(true);
+        m_actCreateRequiredInterface->setActionGroup(m_actionGroup);
         connect(m_actCreateRequiredInterface, &QAction::triggered, this,
                 &InterfaceTabDocument::onActionCreateRequiredInterface);
         m_actCreateRequiredInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/ri.svg"));
@@ -104,12 +129,16 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
+        m_actCreateComment->setCheckable(true);
+        m_actCreateComment->setActionGroup(m_actionGroup);
         connect(m_actCreateComment, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateComment);
         m_actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
     }
 
     if (!m_actGroupConnections) {
         m_actGroupConnections = new QAction(tr("Group"));
+        m_actGroupConnections->setCheckable(true);
+        m_actGroupConnections->setActionGroup(m_actionGroup);
         connect(m_actGroupConnections, &QAction::triggered, this, &InterfaceTabDocument::onActionGroupConnections);
         m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
     }
@@ -120,11 +149,13 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
 void InterfaceTabDocument::onActionCreateContainer()
 {
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Container);
     WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateFunction()
 {
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Function);
     WARN_NOT_IMPLEMENTED;
 }
 
@@ -140,6 +171,7 @@ void InterfaceTabDocument::onActionCreateRequiredInterface()
 
 void InterfaceTabDocument::onActionCreateComment()
 {
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Comment);
     WARN_NOT_IMPLEMENTED;
 }
 

@@ -23,8 +23,12 @@
 #include <QPointer>
 
 namespace taste3 {
-
+namespace aadl {
+class CreatorTool;
+class AADLObjectsModel;
+} // namespace aadl
 class InterfaceTabGraphicsScene;
+
 namespace document {
 
 class InterfaceTabDocument : public AbstractTabDocument
@@ -55,12 +59,16 @@ protected slots:
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
     QPointer<QGraphicsView> m_graphicsView { nullptr };
+    aadl::AADLObjectsModel *m_model { nullptr };
+    QActionGroup *m_actionGroup { nullptr };
     QAction *m_actCreateContainer { nullptr };
     QAction *m_actCreateFunction { nullptr };
     QAction *m_actCreateProvidedInterface { nullptr };
     QAction *m_actCreateRequiredInterface { nullptr };
     QAction *m_actCreateComment { nullptr };
     QAction *m_actGroupConnections { nullptr };
+
+    aadl::CreatorTool *m_tool { nullptr };
 };
 
 } // ns document

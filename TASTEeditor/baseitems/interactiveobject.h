@@ -54,6 +54,7 @@ public:
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();
+    void setRect(const QRectF &geometry);
 
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
@@ -85,14 +86,13 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at) = 0;
-    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) = 0;
-    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) = 0;
+    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
+    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
+    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
 
-    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at) = 0;
-    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) = 0;
-    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
-                                      const QPointF &releasedAt) = 0;
+    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at);
+    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
+    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
 
     virtual void updateGripPoints();
     virtual void prepareHoverMark();

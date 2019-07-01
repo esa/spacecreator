@@ -117,6 +117,100 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsObject::hoverLeaveEvent(event);
 }
 
+void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(at);
+}
+
+void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    if (grip != GripPoint::Location::Center)
+        return;
+
+    const QRectF contentRect = scene()->sceneRect();
+    QPointF newPos = pos() + (to - from);
+    if (newPos.x() < contentRect.left())
+        newPos.setX(contentRect.left());
+    else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+        newPos.setX(contentRect.right() - m_boundingRect.width());
+    if (newPos.y() < contentRect.top())
+        newPos.setY(contentRect.top());
+    else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+        newPos.setY(contentRect.bottom() - m_boundingRect.height());
+
+    setPos(newPos);
+
+    rebuildLayout();
+    updateGripPoints();
+
+    Q_EMIT needUpdateLayout();
+}
+
+void InteractiveObject::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                           const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+}
+
+void InteractiveObject::onManualResizeStart(GripPoint::Location grip, const QPointF &at)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(at);
+}
+
+void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    const QPoint shift = QPointF(to - from).toPoint();
+    QRect rect = sceneBoundingRect().toRect();
+    switch (grip) {
+    case GripPoint::Left:
+        rect.setLeft(rect.left() + shift.x());
+        break;
+    case GripPoint::Top:
+        rect.setTop(rect.top() + shift.y());
+        break;
+    case GripPoint::Right:
+        rect.setRight(rect.right() + shift.x());
+        break;
+    case GripPoint::Bottom:
+        rect.setBottom(rect.bottom() + shift.y());
+        break;
+    case GripPoint::TopLeft:
+        rect.setTopLeft(rect.topLeft() + shift);
+        break;
+    case GripPoint::TopRight:
+        rect.setTopRight(rect.topRight() + shift);
+        break;
+    case GripPoint::BottomLeft:
+        rect.setBottomLeft(rect.bottomLeft() + shift);
+        break;
+    case GripPoint::BottomRight:
+        rect.setBottomRight(rect.bottomRight() + shift);
+        break;
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+
+    setPos(rect.topLeft());
+
+    rebuildLayout();
+    updateGripPoints();
+
+    Q_EMIT needUpdateLayout();
+}
+
+void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                             const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+}
+
 void InteractiveObject::updateGripPoints()
 {
     if (m_gripPoints)
@@ -237,6 +331,13 @@ void InteractiveObject::instantLayoutUpdate()
     if (oldBounds != boundingRect())
         Q_EMIT boundingBoxChanged();
 
+    update();
+}
+
+void InteractiveObject::setRect(const QRectF &geometry)
+{
+    setPos(geometry.topLeft());
+    m_boundingRect = { QPointF(0, 0), geometry.size() };
     update();
 }
 

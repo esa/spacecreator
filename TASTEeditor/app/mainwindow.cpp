@@ -290,14 +290,13 @@ void MainWindow::initSettings()
 
 void MainWindow::updateActions()
 {
-    {
-        bool renderAvailable(false);
-        if (document::AbstractTabDocument *doc = m_docsManager->currentDoc())
-            if (QGraphicsScene *scene = doc->scene()) {
-                renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
-            }
-        m_actSaveSceneRender->setEnabled(renderAvailable);
+    bool renderAvailable(false);
+    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc()) {
+        if (QGraphicsScene *scene = doc->scene()) {
+            renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
+        }
     }
+    m_actSaveSceneRender->setEnabled(renderAvailable);
 }
 
 /*!
@@ -323,7 +322,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc())
+    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc()) {
         if (QGraphicsScene *scene = doc->scene()) {
             QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
             img.fill(Qt::transparent);
@@ -331,6 +330,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
             scene->render(&p);
             img.save(filePath);
         }
+    }
 }
 
 } // ns taste3
