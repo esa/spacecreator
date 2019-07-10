@@ -15,23 +15,24 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "aadlconnectiongraphicsitem.h"
 
 namespace taste3 {
 namespace aadl {
-namespace cmd {
 
-enum Id
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(QGraphicsItem *parentItem)
+    : InteractiveObject(nullptr, parentItem)
+    , m_item(new QGraphicsPathItem(this))
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateConnectionEntity,
-    LastId
-};
+    m_item->setPen(QPen(Qt::black, 2));
+}
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
+{
+    QPainterPath pp;
+    pp.addPolygon(QPolygonF(points));
+    m_item->setPath(pp);
+}
+
+} // namespace aadl
+} // namespace taste3

@@ -19,50 +19,18 @@
 
 #include "aadlobject.h"
 
-#include <QMetaType>
-#include <QObject>
-#include <QPointer>
-#include <memory>
-
 namespace taste3 {
 namespace aadl {
 
-struct AADLObjectIfacePrivate;
-class AADLObjectIface : public AADLObject
+class AADLObjectComment : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction)
-
 public:
-    enum class IfaceType
-    {
-        Required = 0,
-        Provided
-    };
-    Q_ENUM(IfaceType)
-
-    static constexpr IfaceType DefaultDirection { IfaceType::Required };
-
-    explicit AADLObjectIface(AADLObjectIface::IfaceType direction = DefaultDirection, const QString &title = QString(),
-                             AADLObject *parent = nullptr);
-    ~AADLObjectIface() override;
+    explicit AADLObjectComment(const QString &comment = QString(), QObject *parent = nullptr);
+    ~AADLObjectComment() override;
 
     AADLObject::AADLObjectType aadlType() const override;
-
-    AADLObjectIface::IfaceType direction() const;
-
-    bool isProvided() const;
-    bool isRequired() const;
-
-    AADLObject *holder() const;
-
-private:
-    const std::unique_ptr<AADLObjectIfacePrivate> d;
 };
-
-typedef QVector<AADLObjectIface *> AADLIfacesVector;
 
 } // ns aadl
 } // ns taste3
-
-Q_DECLARE_METATYPE(taste3::aadl::AADLObjectIface::IfaceType);

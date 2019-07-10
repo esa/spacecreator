@@ -55,6 +55,7 @@ protected slots:
     void onActionCreateRequiredInterface();
     void onActionCreateComment();
     void onActionGroupConnections();
+    void onActionCreateConnection();
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
@@ -67,6 +68,7 @@ private:
     QAction *m_actCreateRequiredInterface { nullptr };
     QAction *m_actCreateComment { nullptr };
     QAction *m_actGroupConnections { nullptr };
+    QAction *m_actCreateConnection { nullptr };
 
     aadl::CreatorTool *m_tool { nullptr };
 };

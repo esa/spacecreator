@@ -35,11 +35,12 @@ class AADLObject : public QObject
 public:
     enum class AADLObjectType
     {
-        AADLFunctionContainer = 0,
+        AADLUnknown = 0,
+
+        AADLFunctionContainer,
         AADLFunction,
         AADLIface,
-
-        AADLUnknown
+        AADLComment,
     };
     Q_ENUM(AADLObjectType)
 

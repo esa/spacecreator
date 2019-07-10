@@ -16,6 +16,7 @@
 */
 #include "interfacetabdocument.h"
 
+#include "baseitems/graphicsview.h"
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
 
@@ -45,15 +46,17 @@ InterfaceTabDocument::~InterfaceTabDocument()
 QWidget *InterfaceTabDocument::createView()
 {
     if (!m_graphicsView)
-        m_graphicsView = new QGraphicsView;
+        m_graphicsView = new GraphicsView;
     m_graphicsView->setScene(m_graphicsScene);
     return m_graphicsView;
 }
 
 QGraphicsScene *InterfaceTabDocument::createScene()
 {
-    if (!m_graphicsScene)
+    if (!m_graphicsScene) {
         m_graphicsScene = new InterfaceTabGraphicsScene(this);
+        m_graphicsScene->setSceneRect(QRectF(0, 0, 640, 480));
+    }
     return m_graphicsScene;
 }
 
@@ -84,6 +87,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         connect(m_tool, &aadl::CreatorTool::created, this, [this]() {
             if (QAction *currentAction = m_actionGroup->checkedAction())
                 currentAction->setChecked(false);
+            m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Pointer);
         });
     }
 
@@ -143,8 +147,16 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
     }
 
-    return { m_actCreateContainer,         m_actCreateFunction, m_actCreateProvidedInterface,
-             m_actCreateRequiredInterface, m_actCreateComment,  m_actGroupConnections };
+    if (!m_actCreateConnection) {
+        m_actCreateConnection = new QAction(tr("Connection"));
+        m_actCreateConnection->setCheckable(true);
+        m_actCreateConnection->setActionGroup(m_actionGroup);
+        connect(m_actCreateConnection, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateConnection);
+        m_actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
+    }
+
+    return { m_actCreateContainer, m_actCreateFunction,   m_actCreateProvidedInterface, m_actCreateRequiredInterface,
+             m_actCreateComment,   m_actGroupConnections, m_actCreateConnection };
 }
 
 void InterfaceTabDocument::onActionCreateContainer()
@@ -161,11 +173,13 @@ void InterfaceTabDocument::onActionCreateFunction()
 
 void InterfaceTabDocument::onActionCreateProvidedInterface()
 {
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::ProvidedInterface);
     WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateRequiredInterface()
 {
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::RequiredInterface);
     WARN_NOT_IMPLEMENTED;
 }
 
@@ -177,6 +191,12 @@ void InterfaceTabDocument::onActionCreateComment()
 
 void InterfaceTabDocument::onActionGroupConnections()
 {
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionCreateConnection()
+{
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Connection);
     WARN_NOT_IMPLEMENTED;
 }
 

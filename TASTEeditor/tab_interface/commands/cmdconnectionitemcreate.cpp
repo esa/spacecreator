@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,23 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "cmdconnectionitemcreate.h"
+
+#include "commandids.h"
+#include "tab_aadl/aadlobjectsmodel.h"
 
 namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-enum Id
+CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, const QVector<QPointF> &points)
+    : m_model(model)
+    , m_points(points)
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateConnectionEntity,
-    LastId
-};
+}
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+void CmdConnectionItemCreate::redo() {}
+
+void CmdConnectionItemCreate::undo() {}
+
+bool CmdConnectionItemCreate::mergeWith(const QUndoCommand *command)
+{
+    Q_UNUSED(command)
+    return false;
+}
+
+int CmdConnectionItemCreate::id() const
+{
+    return CreateConnectionEntity;
+}
+
+} // namespace cmd
+} // namespace aadl
+} // namespace taste3

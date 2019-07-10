@@ -6,5 +6,6 @@
         <file>icns/group.svg</file>
         <file>icns/pi.svg</file>
         <file>icns/ri.svg</file>
+        <file>icns/connection.svg</file>
     </qresource>
 </RCC>

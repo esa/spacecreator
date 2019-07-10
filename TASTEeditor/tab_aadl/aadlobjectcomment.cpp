@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,23 +15,22 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "aadlobjectcomment.h"
 
 namespace taste3 {
 namespace aadl {
-namespace cmd {
 
-enum Id
+AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
+    : AADLObject(title, parent)
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateConnectionEntity,
-    LastId
-};
+}
 
-} // ns cmd
+AADLObjectComment::~AADLObjectComment() {}
+
+AADLObject::AADLObjectType taste3::aadl::AADLObjectComment::aadlType() const
+{
+    return AADLObject::AADLObjectType::AADLFunctionContainer;
+}
+
 } // ns aadl
 } // ns taste3

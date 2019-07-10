@@ -31,7 +31,7 @@ namespace taste3 {
 TextGraphicsItem::TextGraphicsItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
 {
-    setTextAllignment(Qt::AlignCenter);
+    setTextAlignment(Qt::AlignCenter);
     setTextInteractionFlags(Qt::NoTextInteraction);
     connect(document(), &QTextDocument::contentsChange, this, &TextGraphicsItem::onContentsChange);
     setInputValidationPattern(QString());
@@ -103,7 +103,7 @@ Qt::Alignment TextGraphicsItem::textAlignment() const
     return document()->defaultTextOption().alignment();
 }
 
-void TextGraphicsItem::setTextAllignment(Qt::Alignment alignment)
+void TextGraphicsItem::setTextAlignment(Qt::Alignment alignment)
 {
     QTextOption txtOpt = document()->defaultTextOption();
     txtOpt.setAlignment(alignment);

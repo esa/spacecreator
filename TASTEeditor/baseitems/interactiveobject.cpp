@@ -34,13 +34,18 @@ namespace taste3 {
 InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_entity(entity)
-    , m_selectedPen(Qt::black, 2)
+    , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     setCursor(Qt::ArrowCursor);
+}
+
+QObject *InteractiveObject::modelEntity() const
+{
+    return m_entity;
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -64,35 +69,68 @@ QRectF InteractiveObject::boundingRect() const
 
 void InteractiveObject::gripPointPressed(GripPoint::Location gp, const QPointF &at)
 {
-    if (m_gripPoints)
+    if (m_gripPoints) {
         if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
             if (gripPnt->isMover())
                 onManualMoveStart(gripPnt->location(), at);
             else
                 onManualResizeStart(gripPnt->location(), at);
         }
+    }
 }
 
 void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPointF &from, const QPointF &to)
 {
-    if (m_gripPoints)
+    if (m_gripPoints) {
         if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos)) {
             if (gripPnt->isMover())
                 onManualMoveProgress(gripPnt->location(), from, to);
             else
                 onManualResizeProgress(gripPnt->location(), from, to);
         }
+    }
 }
 
 void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (m_gripPoints)
+    if (m_gripPoints) {
         if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
             if (gripPnt->isMover())
                 onManualMoveFinish(gripPnt->location(), pressedAt, releasedAt);
             else
                 onManualResizeFinish(gripPnt->location(), pressedAt, releasedAt);
         }
+    }
+}
+
+QFont InteractiveObject::font() const
+{
+    return m_font;
+}
+
+void InteractiveObject::setFont(const QFont &font)
+{
+    m_font = font;
+}
+
+QBrush InteractiveObject::brush() const
+{
+    return m_brush;
+}
+
+void InteractiveObject::setBrush(const QBrush &brush)
+{
+    m_brush = brush;
+}
+
+QPen InteractiveObject::pen() const
+{
+    return m_pen;
+}
+
+void InteractiveObject::setPen(const QPen &pen)
+{
+    m_pen = pen;
 }
 
 void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -128,18 +166,22 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
     if (grip != GripPoint::Location::Center)
         return;
 
-    const QRectF contentRect = scene()->sceneRect();
-    QPointF newPos = pos() + (to - from);
-    if (newPos.x() < contentRect.left())
-        newPos.setX(contentRect.left());
-    else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
-        newPos.setX(contentRect.right() - m_boundingRect.width());
-    if (newPos.y() < contentRect.top())
-        newPos.setY(contentRect.top());
-    else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
-        newPos.setY(contentRect.bottom() - m_boundingRect.height());
-
-    setPos(newPos);
+    const QPointF delta { to - from };
+    QPointF newPos = pos() + delta;
+    if (parentItem()) {
+        const QRectF contentRect = parentItem()->boundingRect();
+        if (newPos.x() < contentRect.left())
+            newPos.setX(contentRect.left());
+        else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+            newPos.setX(contentRect.right() - m_boundingRect.width());
+        if (newPos.y() < contentRect.top())
+            newPos.setY(contentRect.top());
+        else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+            newPos.setY(contentRect.bottom() - m_boundingRect.height());
+        setPos(newPos);
+    } else {
+        setPos(newPos);
+    }
 
     rebuildLayout();
     updateGripPoints();
@@ -163,39 +205,55 @@ void InteractiveObject::onManualResizeStart(GripPoint::Location grip, const QPoi
 
 void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
-    const QPoint shift = QPointF(to - from).toPoint();
-    QRect rect = sceneBoundingRect().toRect();
+    const QPointF shift = QPointF(to - from);
+    QRectF rect = mapRectToParent(boundingRect());
     switch (grip) {
-    case GripPoint::Left:
-        rect.setLeft(rect.left() + shift.x());
-        break;
-    case GripPoint::Top:
-        rect.setTop(rect.top() + shift.y());
-        break;
-    case GripPoint::Right:
-        rect.setRight(rect.right() + shift.x());
-        break;
-    case GripPoint::Bottom:
-        rect.setBottom(rect.bottom() + shift.y());
-        break;
-    case GripPoint::TopLeft:
-        rect.setTopLeft(rect.topLeft() + shift);
-        break;
-    case GripPoint::TopRight:
-        rect.setTopRight(rect.topRight() + shift);
-        break;
-    case GripPoint::BottomLeft:
-        rect.setBottomLeft(rect.bottomLeft() + shift);
-        break;
-    case GripPoint::BottomRight:
-        rect.setBottomRight(rect.bottomRight() + shift);
-        break;
+    case GripPoint::Left: {
+        const qreal left = rect.left() + shift.x();
+        if (!parentItem() || left >= 0)
+            rect.setLeft(left);
+    } break;
+    case GripPoint::Top: {
+        const qreal top = rect.top() + shift.y();
+        if (!parentItem() || top >= 0)
+            rect.setTop(top);
+    } break;
+    case GripPoint::Right: {
+        const qreal right = rect.right() + shift.x();
+        if (!parentItem() || right <= parentItem()->boundingRect().right())
+            rect.setRight(right);
+    } break;
+    case GripPoint::Bottom: {
+        const qreal bottom = rect.bottom() + shift.y();
+        if (!parentItem() || bottom <= parentItem()->boundingRect().bottom())
+            rect.setBottom(bottom);
+    } break;
+    case GripPoint::TopLeft: {
+        const QPointF topLeft = rect.topLeft() + shift;
+        if (!parentItem() || parentItem()->boundingRect().contains(topLeft))
+            rect.setTopLeft(topLeft);
+    } break;
+    case GripPoint::TopRight: {
+        const QPointF topRight = rect.topRight() + shift;
+        if (!parentItem() || parentItem()->boundingRect().contains(topRight))
+            rect.setTopRight(topRight);
+    } break;
+    case GripPoint::BottomLeft: {
+        const QPointF bottomLeft = rect.bottomLeft() + shift;
+        if (!parentItem() || parentItem()->boundingRect().contains(bottomLeft))
+            rect.setBottomLeft(bottomLeft);
+    } break;
+    case GripPoint::BottomRight: {
+        const QPointF bottomRight = rect.bottomRight() + shift;
+        if (!parentItem() || parentItem()->boundingRect().contains(bottomRight))
+            rect.setBottomRight(bottomRight);
+    } break;
     default:
         qWarning() << "Update grip point handling";
         break;
     }
 
-    setPos(rect.topLeft());
+    setRect(rect.normalized());
 
     rebuildLayout();
     updateGripPoints();
@@ -337,8 +395,9 @@ void InteractiveObject::instantLayoutUpdate()
 void InteractiveObject::setRect(const QRectF &geometry)
 {
     setPos(geometry.topLeft());
+    prepareGeometryChange();
     m_boundingRect = { QPointF(0, 0), geometry.size() };
-    update();
+    instantLayoutUpdate();
 }
 
 void InteractiveObject::prepareHoverMark()

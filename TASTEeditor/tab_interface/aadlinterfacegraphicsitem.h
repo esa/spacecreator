@@ -12,46 +12,44 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see
+   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
+
 #include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
 
 namespace taste3 {
-class TextGraphicsItem;
-
 namespace aadl {
+class AADLObjectIface;
 
-/// TODO: create base comment item for all libraries
-class AADLCommentGraphicsItem : public InteractiveObject
+class AADLInterfaceGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLCommentGraphicsItem(AADLObject *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLComment)
+        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLIface)
     };
+
+    AADLObjectIface *entity() const;
 
     int type() const override { return Type; }
 
-    void setText(const QString &text);
-    QString text() const;
+    QGraphicsItem *targetItem() const { return m_item; }
+    void setTargetItem(QGraphicsItem *item, const QPointF &pos);
 
 protected:
     void rebuildLayout() override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
-    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-
-private Q_SLOTS:
-    void textEdited(const QString &newText);
+    void prepareHoverMark() override;
 
 private:
-    TextGraphicsItem *m_textItem = nullptr;
+    QGraphicsItem *m_item = nullptr;
+    QGraphicsPathItem *m_iface = nullptr;
+    QGraphicsTextItem *m_text = nullptr;
 };
 
 } // namespace aadl

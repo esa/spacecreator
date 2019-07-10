@@ -20,6 +20,7 @@
 
 #include "grippoint.h"
 
+#include <QFont>
 #include <QGraphicsObject>
 #include <QPointer>
 
@@ -32,6 +33,8 @@ class InteractiveObject : public QGraphicsObject
     Q_OBJECT
 public:
     InteractiveObject(QObject *entity, QGraphicsItem *parent = nullptr);
+
+    QObject *modelEntity() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
@@ -50,6 +53,15 @@ public:
     void setHighlightable(bool highlightable);
 
     virtual void postCreatePolishing() {}
+
+    QPen pen() const;
+    void setPen(const QPen &pen);
+
+    QBrush brush() const;
+    void setBrush(const QBrush &brush);
+
+    QFont font() const;
+    void setFont(const QFont &font);
 
 public Q_SLOTS:
     void scheduleLayoutUpdate();
@@ -80,6 +92,10 @@ protected:
     bool m_highlightable = false;
     HighlightRectItem *m_highlighter = nullptr;
     QPen m_selectedPen;
+
+    QBrush m_brush;
+    QPen m_pen;
+    QFont m_font;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

@@ -41,6 +41,7 @@ SOURCES += \
         baseitems/common/objectanchor.cpp \
         baseitems/common/objectslink.cpp \
         baseitems/common/utils.cpp \
+        baseitems/graphicsview.cpp \
         baseitems/grippoint.cpp \
         baseitems/grippointshandler.cpp \
         baseitems/interactiveobject.cpp \
@@ -56,6 +57,7 @@ SOURCES += \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
         tab_aadl/aadlobject.cpp \
+        tab_aadl/aadlobjectcomment.cpp \
         tab_aadl/aadlobjectcontainer.cpp \
         tab_aadl/aadlobjectfunction.cpp \
         tab_aadl/aadlobjectiface.cpp \
@@ -65,9 +67,12 @@ SOURCES += \
         tab_data/datatabdocument.cpp \
         tab_deployment/deploymenttabdocument.cpp \
         tab_interface/aadlcommentgraphicsitem.cpp \
+        tab_interface/aadlconnectiongraphicsitem.cpp \
         tab_interface/aadlcontainergraphicsitem.cpp \
         tab_interface/aadlfunctiongraphicsitem.cpp \
+        tab_interface/aadlinterfacegraphicsitem.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
+        tab_interface/commands/cmdconnectionitemcreate.cpp \
         tab_interface/commands/cmdcontaineritemcreate.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
@@ -90,6 +95,7 @@ HEADERS += \
         baseitems/common/objectanchor.h \
         baseitems/common/objectslink.h \
         baseitems/common/utils.h \
+        baseitems/graphicsview.h \
         baseitems/grippoint.h \
         baseitems/grippointshandler.h \
         baseitems/interactiveobject.h \
@@ -105,6 +111,7 @@ HEADERS += \
         settings/appoptions.h \
         settings/settingsmanager.h \
         tab_aadl/aadlobject.h \
+        tab_aadl/aadlobjectcomment.h \
         tab_aadl/aadlobjectcontainer.h \
         tab_aadl/aadlobjectfunction.h \
         tab_aadl/aadlobjectiface.h \
@@ -114,9 +121,12 @@ HEADERS += \
         tab_data/datatabdocument.h \
         tab_deployment/deploymenttabdocument.h \
         tab_interface/aadlcommentgraphicsitem.h \
+        tab_interface/aadlconnectiongraphicsitem.h \
         tab_interface/aadlcontainergraphicsitem.h \
         tab_interface/aadlfunctiongraphicsitem.h \
+        tab_interface/aadlinterfacegraphicsitem.h \
         tab_interface/commands/cmdcommentitemcreate.h \
+        tab_interface/commands/cmdconnectionitemcreate.h \
         tab_interface/commands/cmdcontaineritemcreate.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
