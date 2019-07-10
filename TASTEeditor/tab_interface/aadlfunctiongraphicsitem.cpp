@@ -20,6 +20,7 @@
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectfunction.h"
 
+#include <QApplication>
 #include <QPainter>
 
 static const qreal kBorderWidth = 2;
@@ -31,6 +32,14 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
     : InteractiveObject(entity, parent)
 {
     setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
+    setFlag(QGraphicsItem::ItemIsSelectable);
+
+    QColor brushColor { QLatin1String("#ffd11a") };
+    if (auto parentContainer = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
+        brushColor = parentContainer->brush().color().darker();
+    setBrush(brushColor);
+    setPen(QPen(brushColor.darker(), 2));
+    setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
@@ -44,13 +53,12 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     Q_UNUSED(widget)
 
     painter->save();
-    painter->setRenderHint(QPainter::Antialiasing);
-    QPen pen = painter->pen();
-    pen.setWidthF(kBorderWidth);
-    painter->setPen(pen);
-    painter->setBrush(QColor(0xf9e29c));
-    painter->drawRoundRect(
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    painter->setPen(pen());
+    painter->setBrush(brush());
+    painter->drawRoundedRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2), 10, 10);
+    painter->setFont(font());
     painter->drawText(boundingRect(), Qt::AlignCenter, entity()->title());
     painter->restore();
 

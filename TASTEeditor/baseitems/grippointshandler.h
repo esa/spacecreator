@@ -31,7 +31,7 @@ class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObje
     Q_OBJECT
 
 public:
-    GripPointsHandler(QGraphicsItem *parent = nullptr);
+    explicit GripPointsHandler(QGraphicsItem *parent = nullptr);
 
     void handleGripPointPress(GripPoint *handle, const QPointF &at) override;
     void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) override;

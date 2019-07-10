@@ -25,7 +25,7 @@ class InterfaceTabGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    InterfaceTabGraphicsScene(QObject *parent = nullptr);
+    explicit InterfaceTabGraphicsScene(QObject *parent = nullptr);
 };
 
 } // ns taste3

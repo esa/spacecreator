@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,21 +17,31 @@
 
 #pragma once
 
+#include <QPointer>
+#include <QRect>
+#include <QUndoCommand>
+#include <QVector>
+
 namespace taste3 {
 namespace aadl {
+class AADLObjectsModel;
 namespace cmd {
 
-enum Id
+class CmdConnectionItemCreate : public QUndoCommand
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateConnectionEntity,
-    LastId
+public:
+    explicit CmdConnectionItemCreate(AADLObjectsModel *model, const QVector<QPointF> &points);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<AADLObjectsModel> m_model;
+    const QVector<QPointF> m_points;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+} // namespace cmd
+} // namespace aadl
+} // namespace taste3

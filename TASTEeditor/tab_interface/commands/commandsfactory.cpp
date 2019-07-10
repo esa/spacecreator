@@ -17,6 +17,7 @@
 #include "commandsfactory.h"
 
 #include "cmdcommentitemcreate.h"
+#include "cmdconnectionitemcreate.h"
 #include "cmdcontaineritemcreate.h"
 #include "cmdfunctionitemcreate.h"
 #include "cmdprovidedinterfaceitemcreate.h"
@@ -45,6 +46,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createProvidedInterfaceCommand(params);
     case cmd::CreateRequiredInterfaceEntity:
         return cmd::CommandsFactory::createRequiredInterfaceCommand(params);
+    case cmd::CreateConnectionEntity:
+        return cmd::CommandsFactory::createConnectionCommand(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -110,6 +113,18 @@ QUndoCommand *CommandsFactory::createRequiredInterfaceCommand(const QVariantList
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
         && model.canConvert<AADLObjectsModel *>())
         return new CmdRequiredInterfaceItemCreate(model.value<AADLObjectsModel *>(), geometry.value<QRectF>());
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant points = params.value(0);
+    const QVariant model = params.value(1);
+    if (points.isValid() && points.canConvert<QVector<QPointF>>() && model.isValid()
+        && model.canConvert<AADLObjectsModel *>())
+        return new CmdConnectionItemCreate(model.value<AADLObjectsModel *>(), points.value<QVector<QPointF>>());
 
     return nullptr;
 }

@@ -42,7 +42,7 @@ public:
     void setFrameWidth(qreal w);
 
     Qt::Alignment textAlignment() const;
-    void setTextAllignment(Qt::Alignment alignment);
+    void setTextAlignment(Qt::Alignment alignment);
 
     void setTextWrapMode(QTextOption::WrapMode wrapMode);
 

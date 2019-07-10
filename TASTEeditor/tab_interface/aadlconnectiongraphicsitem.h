@@ -17,34 +17,23 @@
 
 #pragma once
 
-#include "commandids.h"
-
-#include <QVariantList>
-
-class QUndoCommand;
+#include "baseitems/interactiveobject.h"
+#include "tab_aadl/aadlobject.h"
 
 namespace taste3 {
 namespace aadl {
-namespace cmd {
 
-class CommandsFactory
+class AADLConnectionGraphicsItem : public InteractiveObject
 {
+    Q_OBJECT
 public:
-    static QUndoCommand *create(Id id, const QVariantList &params);
+    explicit AADLConnectionGraphicsItem(QGraphicsItem *parent = nullptr);
+
+    void setPoints(const QVector<QPointF> &points);
 
 private:
-    static QUndoCommand *createFunctionCommand(const QVariantList &params);
-    static QUndoCommand *createContainerCommand(const QVariantList &params);
-    static QUndoCommand *createCommentCommand(const QVariantList &params);
-    static QUndoCommand *createProvidedInterfaceCommand(const QVariantList &params);
-    static QUndoCommand *createRequiredInterfaceCommand(const QVariantList &params);
-    static QUndoCommand *createConnectionCommand(const QVariantList &params);
-
-private:
-    CommandsFactory() = delete;
-    CommandsFactory(const CommandsFactory &other) = delete;
+    QGraphicsPathItem *m_item = nullptr;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+} // namespace aadl
+} // namespace taste3

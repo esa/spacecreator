@@ -20,10 +20,12 @@
 #include <QCursor>
 #include <QObject>
 #include <QPointer>
+#include <QVector>
 
 class QMouseEvent;
-class QGraphicsRectItem;
 class QGraphicsView;
+class QGraphicsRectItem;
+class QGraphicsPathItem;
 
 namespace taste3 {
 namespace aadl {
@@ -41,7 +43,8 @@ public:
         Container,
         Comment,
         ProvidedInterface,
-        RequiredInterface
+        RequiredInterface,
+        Connection,
     };
     Q_ENUM(ToolType)
 
@@ -55,6 +58,8 @@ protected:
     QPointer<QGraphicsView> m_view;
     QPointer<AADLObjectsModel> m_model;
     QGraphicsRectItem *m_previewItem = nullptr;
+    QGraphicsPathItem *m_previewConnectionItem = nullptr;
+    QVector<QPointF> m_connectionPoints;
     QCursor m_cursor;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -67,7 +72,9 @@ protected:
     QPointF cursorInScene(const QPoint &screenPos) const;
 
 private:
-    void createItem(CreatorTool::ToolType type);
+    void handleToolType(CreatorTool::ToolType type);
+    void removeSelectedItems();
+    void clearPreviewItem();
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

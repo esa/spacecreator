@@ -2,6 +2,7 @@
 
 #include "tab_aadl/aadlobjectcontainer.h"
 
+#include <QApplication>
 #include <QPainter>
 
 static const qreal kBorderWidth = 2;
@@ -14,6 +15,13 @@ AADLContainerGraphicsItem::AADLContainerGraphicsItem(AADLObjectContainer *entity
     : InteractiveObject(entity, parent)
 {
     setObjectName(QLatin1String("AADLContainerGraphicsItem"));
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    QColor brushColor { QLatin1String("#a8a8a8") };
+    if (auto parentContainer = qgraphicsitem_cast<AADLContainerGraphicsItem *>(parentItem()))
+        brushColor = parentContainer->brush().color().darker();
+    setBrush(brushColor);
+    setPen(QPen(brushColor.darker(), 2));
+    setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
 }
 
 AADLObjectContainer *AADLContainerGraphicsItem::entity() const
@@ -27,19 +35,13 @@ void AADLContainerGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(widget)
 
     painter->save();
-    painter->setRenderHint(QPainter::Antialiasing);
-    QPen pen = painter->pen();
-    pen.setWidthF(kBorderWidth);
-    painter->setPen(pen);
-    painter->setBrush(QColor(0xf9e29c));
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    painter->setPen(pen());
+    painter->setBrush(brush());
     painter->drawRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2));
-    auto font = painter->font();
-    font.setPointSizeF(16);
-    font.setBold(true);
-    font.setItalic(true);
-    painter->setFont(font);
-    painter->drawText(boundingRect().marginsAdded(kTextMargins), Qt::AlignTop | Qt::AlignLeft, entity()->title());
+    painter->setFont(font());
+    painter->drawText(boundingRect().marginsRemoved(kTextMargins), Qt::AlignTop | Qt::AlignLeft, entity()->title());
     painter->restore();
 
     InteractiveObject::paint(painter, option, widget);
