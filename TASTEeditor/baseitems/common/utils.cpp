@@ -129,5 +129,86 @@ QRectF framedRect(const QRectF &rect, qreal frameWidth)
     return rect.adjusted(halfWidth, halfWidth, -halfWidth, -halfWidth);
 }
 
+Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
+{
+    Qt::Alignment alignment = Qt::AlignCenter;
+    qreal distance = std::numeric_limits<qreal>::max();
+    const qreal leftDistance = qAbs(pos.x() - boundingArea.left());
+    if (leftDistance < distance) {
+        distance = leftDistance;
+        alignment = Qt::AlignLeft;
+    }
+    const qreal topDistance = pos.y() - boundingArea.top();
+    if (topDistance < distance) {
+        distance = topDistance;
+        alignment = Qt::AlignTop;
+    }
+    const qreal rightDistance = boundingArea.width() - pos.x();
+    if (rightDistance < distance) {
+        distance = rightDistance;
+        alignment = Qt::AlignRight;
+    }
+    const qreal bottomDistance = boundingArea.height() - pos.y();
+    if (bottomDistance < distance) {
+        distance = bottomDistance;
+        alignment = Qt::AlignBottom;
+    }
+    return alignment;
+}
+
+QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
+{
+    switch (side) {
+    case Qt::AlignLeft:
+        return QPointF(boundingArea.left(), pos.y());
+    case Qt::AlignRight:
+        return QPointF(boundingArea.right(), pos.y());
+    case Qt::AlignTop:
+        return QPointF(pos.x(), boundingArea.top());
+    case Qt::AlignBottom:
+        return QPointF(pos.x(), boundingArea.bottom());
+    }
+
+    return boundingArea.center();
+}
+
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
+{
+    const QList<QGraphicsItem *> areaItems = scene->items(area);
+    if (areaItems.isEmpty())
+        return nullptr;
+
+    const QPointF point = area.center();
+    if (areaItems.size() == 1) {
+        auto item = areaItems.value(0);
+        if (item && item->contains(point) && acceptableTypes.contains(item->type()))
+            return item;
+    }
+
+    qreal distance = std::numeric_limits<int>::max();
+    QGraphicsItem *nearestToCenter = nullptr;
+    for (QGraphicsItem *item : areaItems) {
+        if (!acceptableTypes.isEmpty() && !acceptableTypes.contains(item->type()))
+            continue;
+
+        const QRectF itemRect = item->sceneBoundingRect();
+        qreal itemDistance = qAbs(itemRect.right() - point.x());
+        itemDistance = std::min(itemDistance, qAbs(itemRect.left() - point.x()));
+        itemDistance = std::min(itemDistance, qAbs(itemRect.top() - point.y()));
+        itemDistance = std::min(itemDistance, qAbs(itemRect.bottom() - point.y()));
+        if (itemDistance < distance) {
+            nearestToCenter = item;
+            distance = itemDistance;
+        }
+    }
+    return nearestToCenter;
+}
+
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset, const QList<int> &acceptableTypes)
+{
+    const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
+    return nearestItem(scene, area, acceptableTypes);
+}
+
 } // ns utils
 } // ns taste3
