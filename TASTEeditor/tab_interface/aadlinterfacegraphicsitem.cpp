@@ -37,6 +37,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
+    pp.closeSubpath();
     m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);

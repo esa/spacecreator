@@ -220,6 +220,45 @@ QPointF CreatorTool::cursorInScene(const QPoint &globalPos) const
     return sceneCoordinates;
 }
 
+template <typename ItemType>
+ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point) {
+    QList<QGraphicsItem *> items = scene->items(point);
+    if (items.isEmpty())
+        return nullptr;
+    auto it = std::find_if(items.constBegin(), items.constEnd(), [](const QGraphicsItem *item){
+        return item->type() == ItemType::Type;
+    });
+    if (it == items.constEnd())
+        return nullptr;
+
+    return qgraphicsitem_cast<ItemType *>(*it);
+}
+
+bool alignPoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign) {
+    auto ifaceItem = itemAt<AADLInterfaceGraphicsItem>(scene, point);
+    if (!ifaceItem)
+        return false;
+
+    QGraphicsItem *targetItem = ifaceItem->targetItem();
+    if (!targetItem)
+        return false ;
+
+    switch(utils::getNearestSide(targetItem->sceneBoundingRect(), point)) {
+    case Qt::AlignTop:
+    case Qt::AlignBottom:
+        pointToAlign.setX(point.x());
+        break;
+    case Qt::AlignLeft:
+    case Qt::AlignRight:
+        pointToAlign.setY(point.y());
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
+
 void CreatorTool::handleToolType(CreatorTool::ToolType type)
 {
     if (!m_view)
@@ -286,75 +325,16 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             }
         } break;
         case ToolType::Connection: {
-            if (!m_previewConnectionItem)
+            if (!handleConnectionCreate(scene, pos))
                 return;
 
-            if (QGraphicsItem *itemUnderCursor =
-                    utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
-                if (m_connectionPoints.size() < 2)
-                    return;
+            auto item = new AADLConnectionGraphicsItem();
+            item->setPoints(m_connectionPoints);
+            scene->addItem(item);
 
-                m_connectionPoints.append(itemUnderCursor->sceneBoundingRect().center());
-
-                auto item = new AADLConnectionGraphicsItem();
-                item->setPoints(m_connectionPoints);
-                scene->addItem(item);
-
-                taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
-                                                                cmd::CreateConnectionEntity,
-                { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
-            } else {
-                QPointF alignedPos { pos };
-                if (m_connectionPoints.size() == 1) {
-                    const QPointF startPoint = m_connectionPoints.value(0);
-                    QList<QGraphicsItem *> items = scene->items(startPoint);
-                    if (items.isEmpty())
-                        return;
-                    auto it = std::find_if(items.constBegin(), items.constEnd(), [](const QGraphicsItem *item){
-                        return item->type() == AADLInterfaceGraphicsItem::Type;
-                    });
-                    if (it == items.constEnd())
-                        return;
-
-                    AADLInterfaceGraphicsItem *ifaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(*it);
-                    if (!ifaceItem)
-                        return;
-
-                    QGraphicsItem *targetItem = ifaceItem->targetItem();
-                    if (!targetItem)
-                        return;
-
-                    switch(utils::getNearestSide(targetItem->sceneBoundingRect(), startPoint)) {
-                    case Qt::AlignTop:
-                    case Qt::AlignBottom:
-                        alignedPos.setX(startPoint.x());
-                        break;
-                    case Qt::AlignLeft:
-                    case Qt::AlignRight:
-                        alignedPos.setY(startPoint.y());
-                        break;
-                    default:
-                        break;
-                    }
-                } else if (m_connectionPoints.size() >= 2) {
-                    const QLineF line { m_connectionPoints.last(), m_connectionPoints.value(m_connectionPoints.size() - 2) };
-                    const QLineF current { m_connectionPoints.last(), pos };
-                    const qreal length = current.length() * qSin(qDegreesToRadians(line.angleTo(current)));
-                    QLineF normal = line.normalVector();
-                    normal.setLength(qAbs(length));
-                    if (length < 0)
-                        normal.setAngle(normal.angle() + 180);
-                    alignedPos = normal.p2();
-                }
-
-                m_connectionPoints.append(alignedPos);
-
-                QPainterPath pp;
-                pp.addPolygon(m_connectionPoints);
-                pp.lineTo(pos);
-                m_previewConnectionItem->setPath(pp);
-                return;
-            }
+            taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
+                                                            cmd::CreateConnectionEntity,
+            { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
         } break;
         default:
             break;
@@ -363,6 +343,48 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
     }
 
     emit created();
+}
+
+bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (!m_previewConnectionItem)
+        return false;
+
+    if (QGraphicsItem *itemUnderCursor =
+            utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
+        if (m_connectionPoints.size() < 2)
+            return false;
+
+        const QPointF finishPoint = itemUnderCursor->sceneBoundingRect().center();
+        if (!alignPoint(scene, finishPoint, m_connectionPoints.last()))
+            return false;
+
+        m_connectionPoints.append(finishPoint);
+        return true;
+    }
+
+    QPointF alignedPos { pos };
+    if (m_connectionPoints.size() == 1) {
+        if (!alignPoint(scene, m_connectionPoints.value(0), alignedPos))
+            return false;
+    } else if (m_connectionPoints.size() >= 2) {
+        const QLineF line { m_connectionPoints.last(), m_connectionPoints.value(m_connectionPoints.size() - 2) };
+        const QLineF current { m_connectionPoints.last(), pos };
+        const qreal length = current.length() * qSin(qDegreesToRadians(line.angleTo(current)));
+        QLineF normal = line.normalVector();
+        normal.setLength(qAbs(length));
+        if (length < 0)
+            normal.setAngle(normal.angle() + 180);
+        alignedPos = normal.p2();
+    }
+
+    m_connectionPoints.append(alignedPos);
+
+    QPainterPath pp;
+    pp.addPolygon(m_connectionPoints);
+    pp.lineTo(pos);
+    m_previewConnectionItem->setPath(pp);
+    return false;
 }
 
 void CreatorTool::removeSelectedItems()
