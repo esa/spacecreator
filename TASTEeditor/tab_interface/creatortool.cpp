@@ -240,16 +240,6 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
         if (auto scene = m_view->scene()) {
-            const QPointF startPoint = m_connectionPoints.value(0);
-            QGraphicsItem *startItem = scene->itemAt(startPoint, QTransform());
-            AADLInterfaceGraphicsItem *ifaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(startItem);
-            if (!ifaceItem)
-                return false;
-
-            QGraphicsItem *targetItem = ifaceItem->targetItem();
-            if (!targetItem)
-                return false;
-
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
             pp.lineTo(cursorInScene(e->globalPos()));
