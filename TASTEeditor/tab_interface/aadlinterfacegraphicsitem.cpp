@@ -20,6 +20,7 @@
 
 #include <QPainter>
 #include <baseitems/grippointshandler.h>
+#include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectiface.h>
 
 static qreal kBase = 15;
@@ -36,6 +37,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
+    pp.closeSubpath();
     m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);
@@ -48,43 +50,7 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
     return qobject_cast<AADLObjectIface *>(m_entity);
 }
 
-static inline QPointF getNearestSidePos(const QRectF &boundingArea, const QPointF &pos,
-                                        Qt::Alignment *alignmentPtr = nullptr)
-{
-    Qt::Alignment alignment = Qt::AlignCenter;
-    qreal distance = std::numeric_limits<qreal>::max();
-    if (pos.x() - boundingArea.left() < distance) {
-        distance = pos.x();
-        alignment = Qt::AlignLeft;
-    }
-    if (pos.y() - boundingArea.top() < distance) {
-        distance = pos.y();
-        alignment = Qt::AlignTop;
-    }
-    if (boundingArea.width() - pos.x() < distance) {
-        distance = boundingArea.right() - pos.x();
-        alignment = Qt::AlignRight;
-    }
-    if (boundingArea.height() - pos.y() < distance) {
-        distance = boundingArea.bottom() - pos.y();
-        alignment = Qt::AlignBottom;
-    }
-    if (alignmentPtr)
-        *alignmentPtr = alignment;
 
-    switch (alignment) {
-    case Qt::AlignLeft:
-        return QPointF(boundingArea.left(), pos.y());
-    case Qt::AlignRight:
-        return QPointF(boundingArea.right(), pos.y());
-    case Qt::AlignTop:
-        return QPointF(pos.x(), boundingArea.top());
-    case Qt::AlignBottom:
-        return QPointF(pos.x(), boundingArea.bottom());
-    }
-
-    return boundingArea.center();
-}
 
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &pos)
 {
@@ -100,8 +66,8 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
     prepareGeometryChange();
-    Qt::Alignment alignment;
-    const QPointF stickyPos = getNearestSidePos(m_item->boundingRect(), pos(), &alignment);
+    const Qt::Alignment alignment = utils::getNearestSide(m_item->boundingRect(), pos());
+    const QPointF stickyPos = utils::getSidePosition(m_item->boundingRect(), pos(), alignment);
     setPos(stickyPos);
     const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Provided;
     switch (alignment) {

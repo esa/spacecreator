@@ -26,6 +26,7 @@ class QMouseEvent;
 class QGraphicsView;
 class QGraphicsRectItem;
 class QGraphicsPathItem;
+class QGraphicsScene;
 
 namespace taste3 {
 namespace aadl {
@@ -72,9 +73,11 @@ protected:
     QPointF cursorInScene(const QPoint &screenPos) const;
 
 private:
-    void handleToolType(CreatorTool::ToolType type);
     void removeSelectedItems();
     void clearPreviewItem();
+
+    void handleToolType(CreatorTool::ToolType type);
+    bool handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

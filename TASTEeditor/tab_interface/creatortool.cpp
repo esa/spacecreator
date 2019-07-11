@@ -28,6 +28,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 
+#include <QtMath>
 #include <QAction>
 #include <QGraphicsItem>
 #include <QGraphicsView>
@@ -41,51 +42,13 @@
 #include <tab_aadl/aadlobjectfunction.h>
 #include <tab_aadl/aadlobjectiface.h>
 #include <tab_aadl/aadlobjectsmodel.h>
+#include <baseitems/common/utils.h>
 
 static const qreal kInterfaceTolerance = 20;
 static const qreal kConnectionTolerance = 20;
 
 namespace taste3 {
 namespace aadl {
-
-static inline QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area,
-                                         const QList<int> &acceptableTypes = QList<int>())
-{
-    const QList<QGraphicsItem *> areaItems = scene->items(area);
-    if (areaItems.isEmpty())
-        return nullptr;
-
-    const QPointF point = area.center();
-    if (areaItems.size() == 1) {
-        auto item = areaItems.value(0);
-        if (item && item->contains(point) && acceptableTypes.contains(item->type()))
-            return item;
-    }
-
-    qreal distance = std::numeric_limits<int>::max();
-    QGraphicsItem *nearestToCenter = nullptr;
-    for (QGraphicsItem *item : areaItems) {
-        if (!acceptableTypes.isEmpty() && !acceptableTypes.contains(item->type()))
-            continue;
-
-        const QRectF itemRect = item->sceneBoundingRect();
-        qreal itemDistance = qAbs(itemRect.right() - point.x());
-        itemDistance = std::min(itemDistance, qAbs(itemRect.left() - point.x()));
-        itemDistance = std::min(itemDistance, qAbs(itemRect.top() - point.y()));
-        itemDistance = std::min(itemDistance, qAbs(itemRect.bottom() - point.y()));
-        if (itemDistance < distance) {
-            nearestToCenter = item;
-            distance = itemDistance;
-        }
-    }
-    return nearestToCenter;
-}
-static inline QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
-                                         const QList<int> &acceptableTypes = QList<int>())
-{
-    const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
-    return nearestItem(scene, area, acceptableTypes);
-}
 
 CreatorTool::CreatorTool(QGraphicsView *view, AADLObjectsModel *model, QObject *parent)
     : QObject(parent)
@@ -159,7 +122,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
     if (m_toolType == ToolType::Connection) {
         const QPointF scenePos = cursorInScene(e->globalPos());
-        QGraphicsItem *item = nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
+        QGraphicsItem *item = utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
                 return false;
@@ -172,16 +135,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             m_connectionPoints.append(startPoint);
             return true;
         }
-        if (m_connectionPoints.contains(scenePos))
-            return false;
-
-        if (!m_connectionPoints.isEmpty())
-            m_connectionPoints.append(scenePos);
-
-        QPainterPath pp;
-        pp.addPolygon(m_connectionPoints);
-        m_previewConnectionItem->setPath(pp);
-        return true;
+        return !m_connectionPoints.contains(scenePos);
     } else if (m_toolType != ToolType::RequiredInterface && m_toolType != ToolType::ProvidedInterface) {
         if (!m_previewItem) {
             QGraphicsItem *parentItem = m_view->itemAt(e->localPos().toPoint());
@@ -240,16 +194,6 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
         if (auto scene = m_view->scene()) {
-            const QPointF startPoint = m_connectionPoints.value(0);
-            QGraphicsItem *startItem = scene->itemAt(startPoint, QTransform());
-            AADLInterfaceGraphicsItem *ifaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(startItem);
-            if (!ifaceItem)
-                return false;
-
-            QGraphicsItem *targetItem = ifaceItem->targetItem();
-            if (!targetItem)
-                return false;
-
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
             pp.lineTo(cursorInScene(e->globalPos()));
@@ -275,6 +219,45 @@ QPointF CreatorTool::cursorInScene(const QPoint &globalPos) const
     }
     return sceneCoordinates;
 }
+
+template <typename ItemType>
+ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point) {
+    QList<QGraphicsItem *> items = scene->items(point);
+    if (items.isEmpty())
+        return nullptr;
+    auto it = std::find_if(items.constBegin(), items.constEnd(), [](const QGraphicsItem *item){
+        return item->type() == ItemType::Type;
+    });
+    if (it == items.constEnd())
+        return nullptr;
+
+    return qgraphicsitem_cast<ItemType *>(*it);
+}
+
+bool alignPoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign) {
+    auto ifaceItem = itemAt<AADLInterfaceGraphicsItem>(scene, point);
+    if (!ifaceItem)
+        return false;
+
+    QGraphicsItem *targetItem = ifaceItem->targetItem();
+    if (!targetItem)
+        return false ;
+
+    switch(utils::getNearestSide(targetItem->sceneBoundingRect(), point)) {
+    case Qt::AlignTop:
+    case Qt::AlignBottom:
+        pointToAlign.setX(point.x());
+        break;
+    case Qt::AlignLeft:
+    case Qt::AlignRight:
+        pointToAlign.setY(point.y());
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
 
 void CreatorTool::handleToolType(CreatorTool::ToolType type)
 {
@@ -321,7 +304,7 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
         case ToolType::ProvidedInterface: {
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
 
-            if (auto parentItem = nearestItem(scene, itemSceneRect, types)) {
+            if (auto parentItem = utils::nearestItem(scene, itemSceneRect, types)) {
                 auto item = new AADLInterfaceGraphicsItem(
                         new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI")));
                 item->setTargetItem(parentItem, pos);
@@ -332,7 +315,7 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
         } break;
         case ToolType::RequiredInterface: {
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
-            if (auto parentItem = nearestItem(scene, itemSceneRect, types)) {
+            if (auto parentItem = utils::nearestItem(scene, itemSceneRect, types)) {
                 auto item = new AADLInterfaceGraphicsItem(
                         new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI")));
                 item->setTargetItem(parentItem, pos);
@@ -342,22 +325,16 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             }
         } break;
         case ToolType::Connection: {
-            if (!m_previewConnectionItem)
+            if (!handleConnectionCreate(scene, pos))
                 return;
 
-            QGraphicsItem *itemUnderCursor =
-                    nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
-            if (m_connectionPoints.size() >= 2 && itemUnderCursor) {
-                auto item = new AADLConnectionGraphicsItem();
-                item->setPoints(m_connectionPoints);
-                scene->addItem(item);
+            auto item = new AADLConnectionGraphicsItem();
+            item->setPoints(m_connectionPoints);
+            scene->addItem(item);
 
-                taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
-                        cmd::CreateConnectionEntity,
-                        { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
-            } else {
-                return;
-            }
+            taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
+                                                            cmd::CreateConnectionEntity,
+            { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
         } break;
         default:
             break;
@@ -366,6 +343,48 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
     }
 
     emit created();
+}
+
+bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (!m_previewConnectionItem)
+        return false;
+
+    if (QGraphicsItem *itemUnderCursor =
+            utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
+        if (m_connectionPoints.size() < 2)
+            return false;
+
+        const QPointF finishPoint = itemUnderCursor->sceneBoundingRect().center();
+        if (!alignPoint(scene, finishPoint, m_connectionPoints.last()))
+            return false;
+
+        m_connectionPoints.append(finishPoint);
+        return true;
+    }
+
+    QPointF alignedPos { pos };
+    if (m_connectionPoints.size() == 1) {
+        if (!alignPoint(scene, m_connectionPoints.value(0), alignedPos))
+            return false;
+    } else if (m_connectionPoints.size() >= 2) {
+        const QLineF line { m_connectionPoints.last(), m_connectionPoints.value(m_connectionPoints.size() - 2) };
+        const QLineF current { m_connectionPoints.last(), pos };
+        const qreal length = current.length() * qSin(qDegreesToRadians(line.angleTo(current)));
+        QLineF normal = line.normalVector();
+        normal.setLength(qAbs(length));
+        if (length < 0)
+            normal.setAngle(normal.angle() + 180);
+        alignedPos = normal.p2();
+    }
+
+    m_connectionPoints.append(alignedPos);
+
+    QPainterPath pp;
+    pp.addPolygon(m_connectionPoints);
+    pp.lineTo(pos);
+    m_previewConnectionItem->setPath(pp);
+    return false;
 }
 
 void CreatorTool::removeSelectedItems()

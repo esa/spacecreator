@@ -26,14 +26,14 @@ namespace taste3 {
 namespace document {
 
 struct AbstractTabDocumentPrivate {
-    explicit AbstractTabDocumentPrivate()
-        : m_commandsStack(new QUndoStack)
+    explicit AbstractTabDocumentPrivate(QObject *parent)
+        : m_commandsStack(new QUndoStack(parent))
     {
     }
 
     QPointer<QGraphicsScene> m_scene { nullptr };
     QPointer<QWidget> m_view { nullptr };
-    std::unique_ptr<QUndoStack> const m_commandsStack;
+    QPointer<QUndoStack> const m_commandsStack;
     QString m_filePath;
     int m_lastSavedIndex { 0 };
     bool m_dirty { false };
@@ -41,7 +41,7 @@ struct AbstractTabDocumentPrivate {
 
 AbstractTabDocument::AbstractTabDocument(QObject *parent)
     : QObject(parent)
-    , d(new AbstractTabDocumentPrivate())
+    , d(new AbstractTabDocumentPrivate(this))
 {
     connect(commandsStack(), &QUndoStack::indexChanged, this, &AbstractTabDocument::updateDirtyness);
 }
@@ -78,7 +78,7 @@ QWidget *AbstractTabDocument::view() const
 
 QUndoStack *AbstractTabDocument::commandsStack() const
 {
-    return d->m_commandsStack.get();
+    return d->m_commandsStack.data();
 }
 
 void AbstractTabDocument::fillToolBar(QToolBar *toolBar)
