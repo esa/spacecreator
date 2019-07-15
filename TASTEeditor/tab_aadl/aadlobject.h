@@ -41,6 +41,7 @@ public:
         AADLFunction,
         AADLIface,
         AADLComment,
+        AADLConnection,
     };
     Q_ENUM(AADLObjectType)
 

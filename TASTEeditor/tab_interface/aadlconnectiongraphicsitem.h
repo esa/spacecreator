@@ -31,6 +31,20 @@ public:
 
     void setPoints(const QVector<QPointF> &points);
 
+    //    AADLObjectConnection *entity() const;
+
+    enum
+    {
+        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLConnection)
+    };
+
+    int type() const override { return Type; }
+
+    QPainterPath shape() const override;
+
+protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
 private:
     QGraphicsPathItem *m_item = nullptr;
 };
