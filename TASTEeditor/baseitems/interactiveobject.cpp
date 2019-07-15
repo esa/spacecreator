@@ -39,7 +39,7 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     setAcceptHoverEvents(true);
 
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
-             | QGraphicsItem::ItemIsMovable);
+             /*| QGraphicsItem::ItemIsMovable*/);
 
     setCursor(Qt::ArrowCursor);
 }
@@ -187,10 +187,15 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
             newPos.setY(contentRect.top());
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
-        setPos(newPos);
     } else {
-        setPos(newPos);
+        const QRectF newGeometry { newPos, boundingRect().size() };
+        const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry);
+        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(),
+                               [this](const QGraphicsItem *item) { return item != this && !item->parentItem(); });
+        if (it != collidedItems.constEnd())
+            return;
     }
+    setPos(newPos);
 
     rebuildLayout();
     updateGripPoints();
@@ -262,6 +267,13 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
         break;
     }
 
+    if (!parentItem()) {
+        const QList<QGraphicsItem *> collidedItems = scene()->items(rect.normalized());
+        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(),
+                               [this](const QGraphicsItem *item) { return item != this && !item->parentItem(); });
+        if (it != collidedItems.constEnd())
+            return;
+    }
     setRect(rect.normalized());
 
     rebuildLayout();

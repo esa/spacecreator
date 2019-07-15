@@ -74,11 +74,10 @@ Q_SIGNALS:
     void boundingBoxChanged();
     void needUpdateLayout() const;
 
-protected Q_SLOTS:
+private Q_SLOTS:
     virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
     virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
-    virtual void rebuildLayout();
 
 protected:
     QPointer<QObject> m_entity;
@@ -112,6 +111,7 @@ protected:
 
     virtual void updateGripPoints();
     virtual void prepareHoverMark();
+    virtual void rebuildLayout();
 
     HighlightRectItem *createHighlighter();
 };
