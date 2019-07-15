@@ -78,7 +78,7 @@ protected Q_SLOTS:
     virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
     virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
-    virtual void rebuildLayout() {}
+    virtual void rebuildLayout();
 
 protected:
     QPointer<QObject> m_entity;

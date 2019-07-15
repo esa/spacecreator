@@ -46,6 +46,28 @@ AADLObjectContainer *AADLContainerGraphicsItem::entity() const
     return qobject_cast<AADLObjectContainer *>(m_entity);
 }
 
+void AADLContainerGraphicsItem::rebuildLayout()
+{
+    if (auto graphicsItemParent = parentItem()) {
+        QPointF newPos = pos();
+        if (parentItem()) {
+            const QRectF contentRect = graphicsItemParent->boundingRect();
+            if (newPos.x() < contentRect.left())
+                newPos.setX(contentRect.left());
+            else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+                newPos.setX(contentRect.right() - m_boundingRect.width());
+            if (newPos.y() < contentRect.top())
+                newPos.setY(contentRect.top());
+            else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+                newPos.setY(contentRect.bottom() - m_boundingRect.height());
+            setPos(newPos);
+        } else {
+            setPos(newPos);
+        }
+    }
+    InteractiveObject::rebuildLayout();
+}
+
 void AADLContainerGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
