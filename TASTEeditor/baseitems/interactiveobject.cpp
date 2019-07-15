@@ -38,7 +38,8 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
 {
     setAcceptHoverEvents(true);
 
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
+             | QGraphicsItem::ItemIsMovable);
 
     setCursor(Qt::ArrowCursor);
 }
@@ -100,6 +101,14 @@ void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF 
             else
                 onManualResizeFinish(gripPnt->location(), pressedAt, releasedAt);
         }
+    }
+}
+
+void InteractiveObject::rebuildLayout()
+{
+    for (auto item : childItems()) {
+        if (auto iObj = dynamic_cast<InteractiveObject *>(item))
+            iObj->instantLayoutUpdate();
     }
 }
 
