@@ -17,13 +17,16 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
+#include "baseitems/common/abstractinteractiveobject.h"
 #include "tab_aadl/aadlobject.h"
+
+#include <QGraphicsObject>
+#include <QGraphicsRectItem>
 
 namespace taste3 {
 namespace aadl {
 
-class AADLConnectionGraphicsItem : public InteractiveObject
+class AADLConnectionGraphicsItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
@@ -41,12 +44,28 @@ public:
     int type() const override { return Type; }
 
     QPainterPath shape() const override;
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
+
+    void updateLayout();
+    void updateGripPoints();
+
+    void handleSelectionChanged(bool isSelected);
+
+    bool handleGripPointPress(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
+    bool handleGripPointMove(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
+    bool handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
 
 private:
     QGraphicsPathItem *m_item = nullptr;
+    QRectF m_boundingRect;
+
+    QVector<QPointF> m_points;
+    QList<QGraphicsRectItem *> m_grips;
 };
 
 } // namespace aadl

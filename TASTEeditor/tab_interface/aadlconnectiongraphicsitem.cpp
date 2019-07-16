@@ -17,30 +17,39 @@
 
 #include "aadlconnectiongraphicsitem.h"
 
+#include "baseitems/common/utils.h"
+#include "baseitems/grippoint.h"
+
+#include <QEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QPen>
 #include <QtDebug>
+#include <QtMath>
 
 static const qreal kDefaulPenWidth = 2.0;
+static const QRectF kGripPointRect = { 0., 0., 12., 12. };
+static const QColor kGripPointBackground = QColor::fromRgbF(0, 0, 0.5, 0.75);
+static const QColor kGripPointBorder = Qt::red;
 
 namespace taste3 {
 namespace aadl {
 
 AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(QGraphicsItem *parentItem)
-    : InteractiveObject(nullptr, parentItem)
+    : QGraphicsObject(parentItem)
     , m_item(new QGraphicsPathItem(this))
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemHasNoContents);
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
     m_item->setPen(QPen(Qt::black, kDefaulPenWidth));
 }
 
 void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 {
-    prepareGeometryChange();
-    QPainterPath pp;
-    pp.addPolygon(QPolygonF(points));
-    m_item->setPath(pp);
-    m_boundingRect = pp.boundingRect();
+    m_points = points;
+
+    updateLayout();
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -48,16 +57,123 @@ QPainterPath AADLConnectionGraphicsItem::shape() const
     return m_item->path();
 }
 
+QRectF AADLConnectionGraphicsItem::boundingRect() const
+{
+    return m_boundingRect;
+}
+
+void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+}
+
 QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemSelectedChange) {
-        QPen pen = m_item->pen();
-        pen.setWidthF(value.toBool() ? 1.5 * kDefaulPenWidth : kDefaulPenWidth);
-        pen.setStyle(value.toBool() ? Qt::DotLine : Qt::SolidLine);
-        m_item->setPen(pen);
-    }
+    if (change == ItemSelectedChange)
+        handleSelectionChanged(value.toBool());
 
-    return InteractiveObject::itemChange(change, value);
+    return QGraphicsItem::itemChange(change, value);
+}
+
+bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent *event)
+{
+    if (event->type() == QEvent::GraphicsSceneMousePress) {
+        if (auto grip = qgraphicsitem_cast<QGraphicsRectItem *>(watched))
+            return handleGripPointPress(grip, static_cast<QGraphicsSceneMouseEvent *>(event));
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+        if (auto grip = qgraphicsitem_cast<QGraphicsRectItem *>(watched))
+            return handleGripPointRelease(grip, static_cast<QGraphicsSceneMouseEvent *>(event));
+    } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+        if (auto grip = qgraphicsitem_cast<QGraphicsRectItem *>(watched))
+            return handleGripPointMove(grip, static_cast<QGraphicsSceneMouseEvent *>(event));
+    }
+    return QGraphicsObject::sceneEventFilter(watched, event);
+}
+
+void AADLConnectionGraphicsItem::updateLayout()
+{
+    prepareGeometryChange();
+    QPainterPath pp;
+    pp.addPolygon(QPolygonF(m_points));
+    m_item->setPath(pp);
+    m_boundingRect = pp.boundingRect();
+    updateGripPoints();
+}
+
+void AADLConnectionGraphicsItem::updateGripPoints()
+{
+    for (int idx = 0; idx < m_grips.size(); ++idx) {
+        if (QGraphicsRectItem *grip = m_grips.value(idx)) {
+            const QPointF point = utils::lineCenter(QLineF(m_points.value(idx + 1), m_points.value(idx)));
+            QRectF br = grip->rect();
+            br.moveCenter(point);
+            grip->setRect(br);
+        }
+    }
+}
+
+void AADLConnectionGraphicsItem::handleSelectionChanged(bool isSelected)
+{
+    QPen pen = m_item->pen();
+    pen.setWidthF(isSelected ? 1.5 * kDefaulPenWidth : kDefaulPenWidth);
+    pen.setStyle(isSelected ? Qt::DotLine : Qt::SolidLine);
+    m_item->setPen(pen);
+
+    if (isSelected) {
+        for (int idx = 1; idx < m_points.size(); ++idx) {
+            QGraphicsRectItem *gripPoint =
+                    scene()->addRect(kGripPointRect, QPen(kGripPointBorder), QBrush(kGripPointBackground));
+            gripPoint->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIgnoresTransformations);
+            gripPoint->installSceneEventFilter(this);
+            m_grips.append(gripPoint);
+        }
+        updateGripPoints();
+    } else {
+        qDeleteAll(m_grips);
+        m_grips.clear();
+    }
+}
+
+bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
+{
+    const int idx = m_grips.indexOf(handle);
+    if (idx == -1)
+        return false;
+
+    return true;
+}
+
+bool AADLConnectionGraphicsItem::handleGripPointMove(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
+{
+    const int idx = m_grips.indexOf(handle);
+    if (idx == -1)
+        return false;
+
+    const QPointF p0 = event->scenePos();
+    const QPointF p1 = m_points.value(idx);
+    const QPointF p2 = m_points.value(idx + 1);
+    const QLineF current { p1, p2 };
+    QLineF path { event->lastScenePos(), p0 };
+    const qreal length = path.length() * qSin(qDegreesToRadians(current.angleTo(path)));
+    path.setAngle(current.angle() + (length < 0 ? -90 : 90));
+    path.setLength(qAbs(length));
+    const QPointF delta = path.p2() - path.p1();
+    m_points[idx] += delta;
+    m_points[idx + 1] += delta;
+
+    updateLayout();
+    return true;
+}
+
+bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
+{
+    const int idx = m_grips.indexOf(handle);
+    if (idx == -1)
+        return false;
+
+    return true;
 }
 
 } // namespace aadl

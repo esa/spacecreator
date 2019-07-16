@@ -190,8 +190,9 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
     } else {
         const QRectF newGeometry { newPos, boundingRect().size() };
         const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry);
-        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(),
-                               [this](const QGraphicsItem *item) { return item != this && !item->parentItem(); });
+        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
+            return dynamic_cast<const InteractiveObject *>(item) && item != this && !item->parentItem();
+        });
         if (it != collidedItems.constEnd())
             return;
     }
@@ -269,8 +270,9 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
 
     if (!parentItem()) {
         const QList<QGraphicsItem *> collidedItems = scene()->items(rect.normalized());
-        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(),
-                               [this](const QGraphicsItem *item) { return item != this && !item->parentItem(); });
+        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
+            return dynamic_cast<const InteractiveObject *>(item) && item != this && !item->parentItem();
+        });
         if (it != collidedItems.constEnd())
             return;
     }
