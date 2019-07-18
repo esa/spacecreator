@@ -37,9 +37,8 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
-
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
-             /*| QGraphicsItem::ItemIsMovable*/);
+             | QGraphicsItem::ItemIsMovable);
 
     setCursor(Qt::ArrowCursor);
 }
@@ -104,6 +103,16 @@ void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF 
     }
 }
 
+void InteractiveObject::handleSelectionChanged(bool isSelected)
+{
+    if (isSelected) {
+        showGripPoints();
+        updateGripPoints();
+    } else {
+        hideGripPoints();
+    }
+}
+
 void InteractiveObject::rebuildLayout()
 {
     for (auto item : childItems()) {
@@ -146,10 +155,8 @@ void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     m_hovered = true;
     m_storedZ = zValue();
-    setZValue(m_storedZ + 1.);
+    //    setZValue(m_storedZ + 1.);
 
-    prepareHoverMark();
-    updateGripPoints();
     QGraphicsObject::hoverEnterEvent(event);
 }
 
@@ -157,9 +164,6 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     m_hovered = false;
     setZValue(m_storedZ);
-
-    if (m_gripPoints)
-        m_gripPoints->hideAnimated();
 
     QGraphicsObject::hoverLeaveEvent(event);
 }
@@ -292,6 +296,39 @@ void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPo
     Q_UNUSED(releasedAt);
 }
 
+void InteractiveObject::hideGripPoints()
+{
+    if (m_gripPoints)
+        m_gripPoints->hideAnimated();
+}
+
+void InteractiveObject::showGripPoints()
+{
+    initGripPoints();
+    m_gripPoints->showAnimated();
+}
+
+void InteractiveObject::initGripPoints()
+{
+    if (m_gripPoints)
+        return;
+
+    m_gripPoints = new GripPointsHandler(this);
+    m_gripPoints->setZValue(0);
+
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeStart, this, &InteractiveObject::gripPointPressed);
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this, &InteractiveObject::gripPointMoved);
+    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this, &InteractiveObject::gripPointReleased);
+
+    connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
+        if (m_gripPoints && !m_gripPoints->isVisible())
+            delete m_gripPoints; // it's not a thing directly added to the scene, so just delete
+        // is enough
+    });
+    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
+        gp->setGripType(GripPoint::GripType::Mover);
+}
+
 void InteractiveObject::updateGripPoints()
 {
     if (m_gripPoints)
@@ -301,6 +338,9 @@ void InteractiveObject::updateGripPoints()
 QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
+    case QGraphicsItem::ItemSelectedChange:
+        handleSelectionChanged(value.toBool());
+        break;
     case QGraphicsItem::ItemPositionChange:
         m_prevPos = pos();
         break;
@@ -421,31 +461,6 @@ void InteractiveObject::setRect(const QRectF &geometry)
     prepareGeometryChange();
     m_boundingRect = { QPointF(0, 0), geometry.size() };
     instantLayoutUpdate();
-}
-
-void InteractiveObject::prepareHoverMark()
-{
-    if (!m_gripPoints) {
-        m_gripPoints = new GripPointsHandler(this);
-        m_gripPoints->setZValue(0);
-
-        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeStart, this,
-                &InteractiveObject::gripPointPressed);
-        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
-                &InteractiveObject::gripPointMoved);
-        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-                &InteractiveObject::gripPointReleased);
-
-        connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
-            if (m_gripPoints && !m_gripPoints->isVisible())
-                delete m_gripPoints; // it's not a thing directly added to the scene, so just delete
-                                     // is enough
-        });
-        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
-            gp->setGripType(GripPoint::GripType::Mover);
-    }
-
-    m_gripPoints->showAnimated();
 }
 
 } // namespace taste3

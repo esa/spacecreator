@@ -87,9 +87,9 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     m_boundingRect = m_iface->boundingRect();
 }
 
-void AADLInterfaceGraphicsItem::prepareHoverMark()
+void AADLInterfaceGraphicsItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
+    InteractiveObject::initGripPoints();
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
 }
 

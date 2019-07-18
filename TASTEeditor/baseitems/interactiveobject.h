@@ -79,6 +79,8 @@ private Q_SLOTS:
     virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
 
+    void handleSelectionChanged(bool isSelected);
+
 protected:
     QPointer<QObject> m_entity;
     QPointer<GripPointsHandler> m_gripPoints;
@@ -109,8 +111,10 @@ protected:
     virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
     virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
 
+    virtual void hideGripPoints();
+    virtual void showGripPoints();
+    virtual void initGripPoints();
     virtual void updateGripPoints();
-    virtual void prepareHoverMark();
     virtual void rebuildLayout();
 
     HighlightRectItem *createHighlighter();

@@ -44,7 +44,7 @@ public:
 
 protected:
     void rebuildLayout() override;
-    void prepareHoverMark() override;
+    void initGripPoints() override;
 
 private:
     QGraphicsItem *m_item = nullptr;
