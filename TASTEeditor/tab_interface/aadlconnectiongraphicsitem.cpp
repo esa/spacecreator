@@ -30,9 +30,20 @@ static const qreal kDefaulPenWidth = 2.0;
 static const QRectF kGripPointRect = { 0., 0., 12., 12. };
 static const QColor kGripPointBackground = QColor::fromRgbF(0, 0, 0.5, 0.75);
 static const QColor kGripPointBorder = Qt::red;
+static const qreal kSelectionOffset = 10;
 
 namespace taste3 {
 namespace aadl {
+
+static inline QPolygonF createSelectionPolygon(const QLineF &line)
+{
+    const qreal radAngle = qDegreesToRadians(line.angle());
+    const qreal dx = kSelectionOffset * qSin(radAngle);
+    const qreal dy = kSelectionOffset * qCos(radAngle);
+    const QPointF offset1 { dx, dy };
+    const QPointF offset2 { -dx, -dy };
+    return QVector<QPointF> { line.p1() + offset1, line.p1() + offset2, line.p2() + offset2, line.p2() + offset1 };
+}
 
 AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(QGraphicsItem *parentItem)
     : QGraphicsObject(parentItem)
@@ -54,7 +65,11 @@ void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
 {
-    return m_item->path();
+    QPainterPath pp;
+    for (int idx = 1; idx < m_points.size(); ++idx)
+        pp.addPolygon(createSelectionPolygon(QLineF(m_points.value(idx - 1), m_points.value(idx))));
+
+    return pp;
 }
 
 QRectF AADLConnectionGraphicsItem::boundingRect() const
@@ -138,6 +153,8 @@ void AADLConnectionGraphicsItem::handleSelectionChanged(bool isSelected)
 
 bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event);
+
     const int idx = m_grips.indexOf(handle);
     if (idx == -1)
         return false;
@@ -169,6 +186,8 @@ bool AADLConnectionGraphicsItem::handleGripPointMove(QGraphicsRectItem *handle, 
 
 bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event);
+
     const int idx = m_grips.indexOf(handle);
     if (idx == -1)
         return false;
