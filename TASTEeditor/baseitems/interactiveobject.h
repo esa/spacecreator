@@ -73,6 +73,7 @@ Q_SIGNALS:
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
     void needUpdateLayout() const;
+    void doubleClicked();
 
 private Q_SLOTS:
     virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
@@ -102,6 +103,7 @@ protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
     virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);

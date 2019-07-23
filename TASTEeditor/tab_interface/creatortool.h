@@ -45,7 +45,8 @@ public:
         Comment,
         ProvidedInterface,
         RequiredInterface,
-        Connection,
+        MultiPointConnection,
+        DirectConnection
     };
     Q_ENUM(ToolType)
 

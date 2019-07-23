@@ -196,7 +196,7 @@ void InterfaceTabDocument::onActionGroupConnections()
 
 void InterfaceTabDocument::onActionCreateConnection()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Connection);
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::MultiPointConnection);
     WARN_NOT_IMPLEMENTED;
 }
 

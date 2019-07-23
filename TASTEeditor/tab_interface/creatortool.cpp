@@ -117,13 +117,29 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if (!scene)
         return false;
 
+    if (e->modifiers() & Qt::ControlModifier)
+        m_toolType = ToolType::DirectConnection;
+
     if (!(e->button() & Qt::RightButton) && m_toolType == ToolType::Pointer)
         return false;
 
-    if (m_toolType == ToolType::Connection) {
-        const QPointF scenePos = cursorInScene(e->globalPos());
-        QGraphicsItem *item =
-                utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
+    const QPointF scenePos = cursorInScene(e->globalPos());
+    if (m_toolType == ToolType::DirectConnection) {
+        QGraphicsItem *item = utils::nearestItem(scene, scenePos, { AADLContainerGraphicsItem::Type, AADLFunctionGraphicsItem::Type });
+        if (!item)
+            return false;
+        if (m_previewConnectionItem) {
+            m_connectionPoints.clear();
+        } else {
+            m_previewConnectionItem = new QGraphicsPathItem;
+            m_previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
+            m_previewConnectionItem->setZValue(1);
+            scene->addItem(m_previewConnectionItem);
+        }
+        m_connectionPoints.append(scenePos);
+        return true;
+    } else if (m_toolType == ToolType::MultiPointConnection) {
+        QGraphicsItem *item = item = utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
                 return false;
@@ -146,8 +162,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             m_previewItem->setZValue(1);
             scene->addItem(m_previewItem);
         }
-        const QPointF scenePos = m_previewItem->mapFromScene(cursorInScene(e->globalPos()));
-        m_previewItem->setRect({ scenePos, scenePos });
+        const QPointF mappedScenePos = m_previewItem->mapFromScene(scenePos);
+        m_previewItem->setRect({ mappedScenePos, mappedScenePos });
         return true;
     }
 
@@ -337,17 +353,57 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                         cmd::CommandsFactory::create(cmd::CreateRequiredInterfaceEntity, params));
             }
         } break;
-        case ToolType::Connection: {
+        case ToolType::MultiPointConnection: {
             if (!handleConnectionCreate(scene, pos))
                 return;
 
             auto item = new AADLConnectionGraphicsItem();
-            item->setPoints(m_connectionPoints);
             scene->addItem(item);
+            item->setPoints(m_connectionPoints);
 
             taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
                     cmd::CreateConnectionEntity,
                     { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
+        } break;
+        case ToolType::DirectConnection: {
+            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
+            if (m_connectionPoints.isEmpty())
+                return;
+
+            m_connectionPoints.append(pos);
+
+            QGraphicsItem *startItem = utils::nearestItem(scene, m_connectionPoints.front(), types);
+            QGraphicsItem *endItem = utils::nearestItem(scene, pos, types);
+            if (!startItem || !endItem)
+                return;
+
+            auto item = new AADLInterfaceGraphicsItem(
+                    new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI")));
+            item->setTargetItem(startItem, m_connectionPoints.front());
+            m_connectionPoints[0] = item->sceneBoundingRect().center();
+
+            item = new AADLInterfaceGraphicsItem(
+                    new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI")));
+            item->setTargetItem(endItem, pos);
+            m_connectionPoints[1] = item->sceneBoundingRect().center();
+
+            auto connectionItem = new AADLConnectionGraphicsItem();
+            scene->addItem(connectionItem);
+            connectionItem->setPoints(m_connectionPoints);
+
+            taste3::cmd::CommandsStack::current()->beginMacro(tr("Create direct connection"));
+
+            taste3::cmd::CommandsStack::current()->push(
+                    cmd::CommandsFactory::create(cmd::CreateProvidedInterfaceEntity, params));
+
+            taste3::cmd::CommandsStack::current()->push(
+                    cmd::CommandsFactory::create(cmd::CreateRequiredInterfaceEntity, params));
+
+            taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(
+                    cmd::CreateConnectionEntity,
+                    { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
+
+            taste3::cmd::CommandsStack::current()->endMacro();
         } break;
         default:
             break;
