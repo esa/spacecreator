@@ -172,6 +172,16 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
     return boundingArea.center();
 }
 
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
+{
+
+    for (QGraphicsItem *item: scene->items(pos)) {
+        if (acceptableTypes.contains(item->type()))
+            return item;
+    }
+    return nullptr;
+}
+
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
 {
     const QList<QGraphicsItem *> areaItems = scene->items(area);

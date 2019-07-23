@@ -48,6 +48,8 @@ QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos,
+                           const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area,
                            const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,

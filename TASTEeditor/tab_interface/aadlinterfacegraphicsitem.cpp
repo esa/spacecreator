@@ -19,8 +19,8 @@
 #include "aadlinterfacegraphicsitem.h"
 
 #include <QPainter>
-#include <baseitems/grippointshandler.h>
 #include <baseitems/common/utils.h>
+#include <baseitems/grippointshandler.h>
 #include <tab_aadl/aadlobjectiface.h>
 
 static qreal kBase = 15;
@@ -43,14 +43,14 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPath(pp);
 
     m_text->setPlainText(tr("Interface Name"));
+
+    setFlag(QGraphicsItem::ItemIsMovable, false);
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
     return qobject_cast<AADLObjectIface *>(m_entity);
 }
-
-
 
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &pos)
 {

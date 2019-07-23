@@ -168,6 +168,13 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsObject::hoverLeaveEvent(event);
 }
 
+void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit doubleClicked();
+
+    QGraphicsObject::mouseDoubleClickEvent(event);
+}
+
 void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
 {
     Q_UNUSED(grip);
