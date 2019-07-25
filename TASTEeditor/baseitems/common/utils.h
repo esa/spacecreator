@@ -37,7 +37,7 @@ QPointF pointFromPath(const QPainterPath &path, int num);
 QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
                                           const QVariant &to, const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
-bool intersects(const QRectF &rect, const QLineF &line);
+bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
 
 bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
 bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance = LineHorizontalityTolerance);

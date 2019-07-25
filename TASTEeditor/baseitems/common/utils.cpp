@@ -87,7 +87,7 @@ QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal toler
     return result;
 }
 
-bool intersects(const QRectF &rect, const QLineF &line)
+bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
 {
     if (rect.isNull() || line.isNull())
         return false;
@@ -99,9 +99,8 @@ bool intersects(const QRectF &rect, const QLineF &line)
         { rect.bottomLeft(), rect.topLeft() },
     };
 
-    QPointF intersectionPoint;
     for (const QLineF &rectLine : rectLines)
-        if (rectLine.intersect(line, &intersectionPoint) == QLineF::BoundedIntersection)
+        if (rectLine.intersect(line, intersectPos) == QLineF::BoundedIntersection)
             return true;
 
     return false;
@@ -143,12 +142,12 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
         distance = topDistance;
         alignment = Qt::AlignTop;
     }
-    const qreal rightDistance = boundingArea.width() - pos.x();
+    const qreal rightDistance = boundingArea.right() - pos.x();
     if (rightDistance < distance) {
         distance = rightDistance;
         alignment = Qt::AlignRight;
     }
-    const qreal bottomDistance = boundingArea.height() - pos.y();
+    const qreal bottomDistance = boundingArea.bottom() - pos.y();
     if (bottomDistance < distance) {
         distance = bottomDistance;
         alignment = Qt::AlignBottom;

@@ -42,9 +42,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);
 
-    m_text->setPlainText(tr("Interface Name"));
-
-    setFlag(QGraphicsItem::ItemIsMovable, false);
+    m_text->setPlainText(tr("IFace Name"));
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
@@ -66,6 +64,11 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
     prepareGeometryChange();
+    if (!m_item) {
+        m_boundingRect = QRectF();
+        return;
+    }
+
     const Qt::Alignment alignment = utils::getNearestSide(m_item->boundingRect(), pos());
     const QPointF stickyPos = utils::getSidePosition(m_item->boundingRect(), pos(), alignment);
     setPos(stickyPos);

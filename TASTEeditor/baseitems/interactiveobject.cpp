@@ -37,8 +37,7 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
-             | QGraphicsItem::ItemIsMovable);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
 
     setCursor(Qt::ArrowCursor);
 }
@@ -183,6 +182,9 @@ void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPoint
 
 void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
+    if (!scene())
+        return;
+
     if (grip != GripPoint::Location::Center)
         return;
 
