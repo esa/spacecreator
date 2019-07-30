@@ -22,9 +22,12 @@
 
 #include <QGraphicsObject>
 #include <QGraphicsRectItem>
+#include <QPointer>
 
 namespace taste3 {
 namespace aadl {
+
+class AADLInterfaceGraphicsItem;
 
 class AADLConnectionGraphicsItem : public QGraphicsObject
 {
@@ -51,7 +54,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
-    void updateLayout();
+    void rebuildLayout();
     void updateGripPoints();
 
     void handleSelectionChanged(bool isSelected);
@@ -61,6 +64,12 @@ protected:
     bool handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
 
 private:
+    QGraphicsRectItem *createGripPoint();
+    void simplify();
+
+private:
+    QPointer<AADLInterfaceGraphicsItem> m_startItem;
+    QPointer<AADLInterfaceGraphicsItem> m_endItem;
     QGraphicsPathItem *m_item = nullptr;
     QRectF m_boundingRect;
 

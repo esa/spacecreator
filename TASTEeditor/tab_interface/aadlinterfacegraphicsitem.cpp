@@ -18,6 +18,7 @@
 
 #include "aadlinterfacegraphicsitem.h"
 
+#include <QtDebug>
 #include <QPainter>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
@@ -34,6 +35,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     , m_iface(new QGraphicsPathItem(this))
     , m_text(new QGraphicsTextItem(this))
 {
+    setFlag(QGraphicsItem::ItemHasNoContents);
+
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
@@ -41,7 +44,6 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);
-
     m_text->setPlainText(tr("IFace Name"));
 }
 
@@ -50,28 +52,30 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
     return qobject_cast<AADLObjectIface *>(m_entity);
 }
 
+QGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
+{
+    return parentItem();
+}
+
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &pos)
 {
-    if (!item || item == m_item)
+    if (!item || item == parentItem())
         return;
 
     setParentItem(item);
-    setPos(mapFromScene(pos));
-    m_item = item;
+    setPos(parentItem()->mapFromScene(pos));
     instantLayoutUpdate();
 }
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
     prepareGeometryChange();
-    if (!m_item) {
+    if (!parentItem()) {
         m_boundingRect = QRectF();
         return;
     }
 
-    const Qt::Alignment alignment = utils::getNearestSide(m_item->boundingRect(), pos());
-    const QPointF stickyPos = utils::getSidePosition(m_item->boundingRect(), pos(), alignment);
-    setPos(stickyPos);
+    const Qt::Alignment alignment = utils::getNearestSide(parentItem()->boundingRect(), pos());
     const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Provided;
     switch (alignment) {
     case Qt::AlignLeft:
@@ -87,13 +91,22 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
         m_iface->setRotation(insideOut ? 90 : 270);
         break;
     }
-    m_boundingRect = m_iface->boundingRect();
+    m_boundingRect = mapRectFromItem(m_iface, m_iface->boundingRect());
+    const QPointF stickyPos = utils::getSidePosition(parentItem()->boundingRect(), pos(), alignment);
+    setPos(stickyPos);
 }
 
 void AADLInterfaceGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
     m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+}
+
+void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
 
 } // namespace aadl

@@ -37,7 +37,7 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable);
 
     setCursor(Qt::ArrowCursor);
 }

@@ -130,29 +130,45 @@ QRectF framedRect(const QRectF &rect, qreal frameWidth)
 
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 {
-    Qt::Alignment alignment = Qt::AlignCenter;
-    qreal distance = std::numeric_limits<qreal>::max();
-    const qreal leftDistance = qAbs(pos.x() - boundingArea.left());
-    if (leftDistance < distance) {
-        distance = leftDistance;
-        alignment = Qt::AlignLeft;
+    Qt::Alignment side = Qt::AlignCenter;
+    if (boundingArea.contains(pos)) {
+        qreal distance = std::numeric_limits<qreal>::max();
+        const qreal leftDistance = pos.x() - boundingArea.left();
+        if (leftDistance < distance) {
+            distance = leftDistance;
+            side = Qt::AlignLeft;
+        }
+        const qreal topDistance = pos.y() - boundingArea.top();
+        if (topDistance < distance) {
+            distance = topDistance;
+            side = Qt::AlignTop;
+        }
+        const qreal rightDistance = boundingArea.right() - pos.x();
+        if (rightDistance < distance) {
+            distance = rightDistance;
+            side = Qt::AlignRight;
+        }
+        const qreal bottomDistance = boundingArea.bottom() - pos.y();
+        if (bottomDistance < distance) {
+            distance = bottomDistance;
+            side = Qt::AlignBottom;
+        }
+    } else {
+        const QVector<QPair<QLineF, Qt::Alignment>> rectLines = {
+            { QLineF(boundingArea.bottomLeft(), boundingArea.topLeft()), Qt::AlignLeft },
+            { QLineF(boundingArea.topLeft(), boundingArea.topRight()), Qt::AlignTop },
+            { QLineF(boundingArea.topRight(), boundingArea.bottomRight()), Qt::AlignRight },
+            { QLineF(boundingArea.bottomRight(), boundingArea.bottomLeft()), Qt::AlignBottom },
+        };
+        const QLineF line { boundingArea.center(), pos };
+        auto it = std::find_if(rectLines.constBegin(), rectLines.constEnd(), [line](const QPair<QLineF, Qt::Alignment> &rectSide){
+            QPointF dummyPoint;
+            return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
+        });
+        if (it != rectLines.constEnd())
+            side = it->second;
     }
-    const qreal topDistance = pos.y() - boundingArea.top();
-    if (topDistance < distance) {
-        distance = topDistance;
-        alignment = Qt::AlignTop;
-    }
-    const qreal rightDistance = boundingArea.right() - pos.x();
-    if (rightDistance < distance) {
-        distance = rightDistance;
-        alignment = Qt::AlignRight;
-    }
-    const qreal bottomDistance = boundingArea.bottom() - pos.y();
-    if (bottomDistance < distance) {
-        distance = bottomDistance;
-        alignment = Qt::AlignBottom;
-    }
-    return alignment;
+    return side;
 }
 
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
