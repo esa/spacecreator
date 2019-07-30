@@ -39,15 +39,16 @@ public:
 
     int type() const override { return Type; }
 
-    QGraphicsItem *targetItem() const { return m_item; }
+    QGraphicsItem *targetItem() const;
     void setTargetItem(QGraphicsItem *item, const QPointF &pos);
 
 protected:
     void rebuildLayout() override;
     void initGripPoints() override;
 
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 private:
-    QGraphicsItem *m_item = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
 };

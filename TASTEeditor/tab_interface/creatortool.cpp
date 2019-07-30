@@ -446,6 +446,7 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                 m_connectionPoints.insert(m_connectionPoints.size() - 1, mid);
             }
             connectionItem->setPoints(m_connectionPoints);
+            connectionItem->setSelected(true);
 
             taste3::cmd::CommandsStack::current()->beginMacro(tr("Create direct connection"));
 
