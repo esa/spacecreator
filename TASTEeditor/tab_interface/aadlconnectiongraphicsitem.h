@@ -35,6 +35,9 @@ class AADLConnectionGraphicsItem : public QGraphicsObject
 public:
     explicit AADLConnectionGraphicsItem(QGraphicsItem *parent = nullptr);
 
+    static AADLConnectionGraphicsItem *createConnection(QGraphicsScene *scene,
+                                                        const QPointF &startPoint,
+                                                        const QPointF &endPoint);
     void setPoints(const QVector<QPointF> &points);
 
     //    AADLObjectConnection *entity() const;
@@ -49,6 +52,8 @@ public:
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    static QVector<QPointF> simplify(const QVector<QPointF> &points);
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
