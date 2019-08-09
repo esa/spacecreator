@@ -311,7 +311,8 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
         } break;
         case ToolType::Container: {
-            auto item = new AADLContainerGraphicsItem(new AADLObjectContainer(tr("Function interface"), m_model),
+            static int sCounter = 0;
+            auto item = new AADLContainerGraphicsItem(new AADLObjectContainer(tr("Function_interface_%1").arg(++sCounter), m_model),
                                                       m_previewItem ? m_previewItem->parentItem() : nullptr);
             item->setRect(itemSceneRect);
             if (!item->parentItem())
@@ -321,7 +322,8 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                     cmd::CommandsFactory::create(cmd::CreateContainerEntity, params));
         } break;
         case ToolType::Function: {
-            auto item = new AADLFunctionGraphicsItem(new AADLObjectFunction(tr("Function"), m_model),
+            static int sCounter = 0;
+            auto item = new AADLFunctionGraphicsItem(new AADLObjectFunction(tr("Function_%1").arg(++sCounter), m_model),
                                                      m_previewItem ? m_previewItem->parentItem() : nullptr);
             item->setRect(itemSceneRect);
             if (!item->parentItem())
@@ -331,11 +333,12 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                     cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
         } break;
         case ToolType::ProvidedInterface: {
+            static int sCounter = 0;
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
 
             if (auto parentItem = utils::nearestItem(scene, itemSceneRect, types)) {
                 auto item = new AADLInterfaceGraphicsItem(
-                        new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI")));
+                        new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI_%1").arg(++sCounter)));
                 item->setTargetItem(parentItem, pos);
 
                 taste3::cmd::CommandsStack::current()->push(
@@ -343,10 +346,11 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             }
         } break;
         case ToolType::RequiredInterface: {
+            static int sCounter = 0;
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
             if (auto parentItem = utils::nearestItem(scene, itemSceneRect, types)) {
                 auto item = new AADLInterfaceGraphicsItem(
-                        new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI")));
+                        new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI_%1").arg(++sCounter)));
                 item->setTargetItem(parentItem, pos);
 
                 taste3::cmd::CommandsStack::current()->push(
@@ -366,87 +370,12 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                     { qVariantFromValue(m_connectionPoints), qVariantFromValue(m_model.data()) }));
         } break;
         case ToolType::DirectConnection: {
-            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
-            if (m_connectionPoints.isEmpty())
+            if (m_connectionPoints.size() < 1)
                 return;
 
             m_connectionPoints.append(pos);
-            Q_ASSERT(m_connectionPoints.size() == 2);
-            const QLineF connectionLine { m_connectionPoints.first(), m_connectionPoints.last() };
-
-            QGraphicsItem *startItem = utils::nearestItem(scene, m_connectionPoints.first(), types);
-            QGraphicsItem *endItem = utils::nearestItem(scene, m_connectionPoints.last(), types);
-            if (!startItem || !endItem)
-                return;
-
-            if (!utils::intersects(startItem->sceneBoundingRect(), connectionLine, &m_connectionPoints[0]))
-                return;
-
-            if (!utils::intersects(endItem->sceneBoundingRect(), connectionLine, &m_connectionPoints[1]))
-                return;
-
-            auto item = new AADLInterfaceGraphicsItem(
-                    new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI")));
-            item->setTargetItem(startItem, m_connectionPoints.first());
-
-            item = new AADLInterfaceGraphicsItem(
-                    new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI")));
-            item->setTargetItem(endItem, m_connectionPoints.last());
-
-            auto connectionItem = new AADLConnectionGraphicsItem();
-            scene->addItem(connectionItem);
-
-            auto getDirection = [](const QRectF &sceneRect,const QPointF &point){
-                switch (utils::getNearestSide(sceneRect, point)) {
-                case Qt::AlignTop:
-                    return QLineF(sceneRect.topLeft(), sceneRect.topRight()).normalVector();
-                    break;
-                case Qt::AlignBottom:
-                    return QLineF(sceneRect.bottomRight(), sceneRect.bottomLeft()).normalVector();
-                    break;
-                case Qt::AlignLeft:
-                    return QLineF(sceneRect.bottomLeft(), sceneRect.topLeft()).normalVector();
-                    break;
-                case Qt::AlignRight:
-                    return QLineF(sceneRect.topRight(), sceneRect.bottomRight()).normalVector();
-                    break;
-                default:
-                    break;
-                }
-                return QLineF();
-            };
-
-            QLineF startDirection = getDirection(startItem->sceneBoundingRect(), m_connectionPoints.first());
-            if (startDirection.isNull())
-                return;
-
-            startDirection.translate(m_connectionPoints.first() - startDirection.p1());
-            QLineF endDirection = getDirection(endItem->sceneBoundingRect(), m_connectionPoints.last());
-            if (endDirection.isNull())
-                return;
-
-            endDirection.translate(m_connectionPoints.last() - endDirection.p1());
-            const qreal angle = qAbs(startDirection.angleTo(endDirection)) - 180;
-            const qreal tolerance = 7;
-            if (qAbs(angle) <= tolerance) {
-                const QPointF mid = utils::lineCenter(QLineF(m_connectionPoints.first(), m_connectionPoints.last()));
-                QLineF midLine { mid, QPointF(0, 0) };
-                midLine.setAngle(startDirection.angle() - 90);
-
-                QPointF startLastPoint;
-                midLine.intersect(startDirection, &startLastPoint);
-                m_connectionPoints.insert(m_connectionPoints.size() - 1, startLastPoint);
-
-                QPointF endLastPoint;
-                midLine.intersect(endDirection, &endLastPoint);
-                m_connectionPoints.insert(m_connectionPoints.size() - 1, endLastPoint);
-            } else if (angle - 90 <= tolerance) {
-                QPointF mid;
-                startDirection.intersect(endDirection, &mid);
-                m_connectionPoints.insert(m_connectionPoints.size() - 1, mid);
-            }
-            connectionItem->setPoints(m_connectionPoints);
-            connectionItem->setSelected(true);
+            if (auto connectionItem = AADLConnectionGraphicsItem::createConnection(scene, m_connectionPoints.first(), m_connectionPoints.last()))
+                    connectionItem->setSelected(true);
 
             taste3::cmd::CommandsStack::current()->beginMacro(tr("Create direct connection"));
 

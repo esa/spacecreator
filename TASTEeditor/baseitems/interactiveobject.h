@@ -83,6 +83,30 @@ private Q_SLOTS:
     void handleSelectionChanged(bool isSelected);
 
 protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
+    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
+    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
+    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
+
+    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at);
+    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
+    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
+
+    virtual void onScenePositionChanged(const QPointF &scenePosition);
+
+    virtual void hideGripPoints();
+    virtual void showGripPoints();
+    virtual void initGripPoints();
+    virtual void updateGripPoints();
+    virtual void rebuildLayout();
+
+    HighlightRectItem *createHighlighter();
+
     QPointer<QObject> m_entity;
     QPointer<GripPointsHandler> m_gripPoints;
     QRectF m_boundingRect;
@@ -98,28 +122,6 @@ protected:
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
-    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
-    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
-    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
-
-    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at);
-    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
-    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
-
-    virtual void hideGripPoints();
-    virtual void showGripPoints();
-    virtual void initGripPoints();
-    virtual void updateGripPoints();
-    virtual void rebuildLayout();
-
-    HighlightRectItem *createHighlighter();
 };
 
 } // namespace taste3

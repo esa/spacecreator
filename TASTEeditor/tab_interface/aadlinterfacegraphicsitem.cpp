@@ -109,5 +109,12 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(widget);
 }
 
+void AADLInterfaceGraphicsItem::onScenePositionChanged(const QPointF &scenePosition)
+{
+    Q_UNUSED(scenePosition);
+
+    emit moved(this);
+}
+
 } // namespace aadl
 } // namespace taste3

@@ -38,10 +38,7 @@ QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propNa
                                           const QVariant &to, const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
-
-bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
-bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance = LineHorizontalityTolerance);
-bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance = LineHorizontalityTolerance);
+bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
 
 QRectF framedRect(const QRectF &rect, qreal frameWidth);
 

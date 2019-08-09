@@ -48,6 +48,8 @@ protected:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    void onScenePositionChanged(const QPointF &scenePosition) override;
+
 private:
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;

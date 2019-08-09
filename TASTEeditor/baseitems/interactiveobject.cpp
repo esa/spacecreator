@@ -305,6 +305,11 @@ void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPo
     Q_UNUSED(releasedAt);
 }
 
+void InteractiveObject::onScenePositionChanged(const QPointF &scenePosition)
+{
+    Q_UNUSED(scenePosition);
+}
+
 void InteractiveObject::hideGripPoints()
 {
     if (m_gripPoints)
@@ -352,6 +357,9 @@ QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant
         break;
     case QGraphicsItem::ItemPositionChange:
         m_prevPos = pos();
+        break;
+    case QGraphicsItem::ItemScenePositionHasChanged:
+        onScenePositionChanged(value.toPointF());
         break;
     case QGraphicsItem::ItemPositionHasChanged:
         Q_EMIT relocated(m_prevPos, pos());

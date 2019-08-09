@@ -106,17 +106,13 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
     return false;
 }
 
-bool isHorizontal(const QLineF &line, const qreal verticalTolerance)
+bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
 {
-    return qAbs(line.dy()) < verticalTolerance;
-}
-bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance)
-{
-    return isHorizontal(QLineF(p1, p2), verticalTolerance);
-}
-bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance)
-{
-    return isHorizontal(twoPoints.first(), twoPoints.last(), verticalTolerance);
+    for (int idx = 1; idx < polygon.size(); ++idx) {
+        if (intersects(rect, QLineF(polygon.value(idx - 1), polygon.value(idx)), intersectPos))
+            return true;
+    }
+    return false;
 }
 
 QRectF framedRect(const QRectF &rect, qreal frameWidth)
