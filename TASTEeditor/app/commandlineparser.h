@@ -31,6 +31,7 @@ public:
     enum class Positional
     {
         DropUnsavedChangesSilently,
+        OpenAADLXMLFile,
 
         Unknown
     };

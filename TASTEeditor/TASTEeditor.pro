@@ -58,11 +58,13 @@ SOURCES += \
         settings/settingsmanager.cpp \
         tab_aadl/aadlobject.cpp \
         tab_aadl/aadlobjectcomment.cpp \
+        tab_aadl/aadlobjectconnection.cpp \
         tab_aadl/aadlobjectcontainer.cpp \
         tab_aadl/aadlobjectfunction.cpp \
         tab_aadl/aadlobjectiface.cpp \
         tab_aadl/aadlobjectsmodel.cpp \
         tab_aadl/aadltabdocument.cpp \
+        tab_aadl/aadlxmlreader.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
         tab_data/datatabdocument.cpp \
         tab_deployment/deploymenttabdocument.cpp \
@@ -112,11 +114,13 @@ HEADERS += \
         settings/settingsmanager.h \
         tab_aadl/aadlobject.h \
         tab_aadl/aadlobjectcomment.h \
+        tab_aadl/aadlobjectconnection.h \
         tab_aadl/aadlobjectcontainer.h \
         tab_aadl/aadlobjectfunction.h \
         tab_aadl/aadlobjectiface.h \
         tab_aadl/aadlobjectsmodel.h \
         tab_aadl/aadltabdocument.h \
+        tab_aadl/aadlxmlreader.h \
         tab_concurrency/concurrencytabdocument.h \
         tab_data/datatabdocument.h \
         tab_deployment/deploymenttabdocument.h \

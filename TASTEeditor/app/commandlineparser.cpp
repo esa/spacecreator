@@ -57,6 +57,11 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                 QCoreApplication::translate("CommandLineParser",
                                             "Do not propose to save changes when closing a document"));
     }
+    case CommandLineParser::Positional::OpenAADLXMLFile: {
+        return QCommandLineOption({ "o", "open-aadl-xml" },
+                                  QCoreApplication::translate("CommandLineParser", "Open an AADL XML <file> on startup."),
+                                  QCoreApplication::translate("CommandLineParser", "file"));
+    }
     default: {
         Q_UNREACHABLE();
         break;

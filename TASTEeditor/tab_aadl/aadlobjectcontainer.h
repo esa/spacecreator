@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QVector>
 #include <memory>
+
 namespace taste3 {
 namespace aadl {
 
@@ -50,6 +51,24 @@ public:
 
     bool addInterface(AADLObjectIface *iface);
     bool removeInterface(AADLObjectIface *iface);
+
+    QString language() const;
+    void setLanguage(const QString &lang);
+
+    QStringList activeInterfaces() const;
+    void setActiveInterfaces(const QStringList &ifaces);
+
+    QVector<qint32> coordinates() const;
+    void setCoordinates(const QVector<qint32> &coordinates);
+
+    QString instanceOf() const;
+    void setInstanceOf(const QString &instance);
+
+signals:
+    void languageChanged(const QString &lang);
+    void instanceOfChanged(const QString &inst);
+    void activeInterfacesChanged(const QStringList &ifaces);
+    void coordinatesChanged(const QVector<qint32> &coordinates);
 
 private:
     const std::unique_ptr<AADLObjectContainerPrivate> d;
