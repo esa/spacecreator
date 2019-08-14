@@ -76,6 +76,8 @@ protected slots:
     void onReportRequested();
 
 private:
+    static constexpr int TABDOC_ID_InterfaceView {0};
+
     Ui::MainWindow *ui { nullptr };
     QTabWidget *m_tabWidget;
     QPointer<QToolBar> m_docToolbar;

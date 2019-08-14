@@ -24,6 +24,12 @@ struct AADLObjectContainerPrivate {
     QVector<AADLObject *> m_children {};
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
+
+    QString m_name;
+    QString m_lang;
+    QString m_instance_of;
+    QStringList m_activeIfaces;
+    QVector<qint32> m_coords;
 };
 
 AADLObjectContainer::AADLObjectContainer(const QString &title, QObject *parent)
@@ -125,6 +131,58 @@ bool AADLObjectContainer::addInterface(AADLObjectIface *iface)
 bool AADLObjectContainer::removeInterface(AADLObjectIface *iface)
 {
     return iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
+}
+
+QString AADLObjectContainer::language() const
+{
+    return d->m_lang;
+}
+
+void AADLObjectContainer::setLanguage(const QString &lang)
+{
+    if (d->m_lang != lang) {
+        d->m_lang = lang;
+        emit languageChanged(d->m_lang);
+    }
+}
+
+QString AADLObjectContainer::instanceOf() const
+{
+    return d->m_instance_of;
+}
+
+void AADLObjectContainer::setInstanceOf(const QString &instance)
+{
+    if (d->m_instance_of != instance) {
+        d->m_instance_of = instance;
+        emit instanceOfChanged(d->m_instance_of);
+    }
+}
+
+QStringList AADLObjectContainer::activeInterfaces() const
+{
+    return d->m_activeIfaces;
+}
+
+void AADLObjectContainer::setActiveInterfaces(const QStringList &ifaces)
+{
+    if (d->m_activeIfaces != ifaces) {
+        d->m_activeIfaces = ifaces;
+        emit activeInterfacesChanged(d->m_activeIfaces);
+    }
+}
+
+QVector<qint32> AADLObjectContainer::coordinates() const
+{
+    return d->m_coords;
+}
+
+void AADLObjectContainer::setCoordinates(const QVector<qint32> &coordinates)
+{
+    if (d->m_coords != coordinates) {
+        d->m_coords = coordinates;
+        emit coordinatesChanged(d->m_coords);
+    }
 }
 
 } // ns aadl

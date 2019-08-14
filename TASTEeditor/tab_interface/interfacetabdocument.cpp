@@ -19,12 +19,13 @@
 #include "baseitems/graphicsview.h"
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
+#include "tab_aadl/aadlobjectsmodel.h"
+#include "tab_aadl/aadlxmlreader.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QGraphicsView>
-#include <tab_aadl/aadlobjectsmodel.h>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
@@ -72,7 +73,11 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
         return false;
     }
 
-    return false;
+    aadl::AADLXMLReader parser;
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, m_model, &aadl::AADLObjectsModel::initFromObjects);
+    connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+
+    return parser.parse(path);
 }
 
 bool InterfaceTabDocument::saveImpl(const QString & /*path*/)

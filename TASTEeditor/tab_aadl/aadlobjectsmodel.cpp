@@ -34,6 +34,12 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
 
 AADLObjectsModel::~AADLObjectsModel() {}
 
+bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *>& objects)
+{
+    Q_UNUSED(objects);
+    return false;
+}
+
 AADLContainersVector AADLObjectsModel::containers() const
 {
     return d->m_containers;

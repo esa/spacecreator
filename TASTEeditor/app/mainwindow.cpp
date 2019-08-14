@@ -146,7 +146,12 @@ void MainWindow::initConnections()
 
 void MainWindow::onOpenFileRequested()
 {
-    showNIY(Q_FUNC_INFO);
+    const QString &fileName = QFileDialog::getOpenFileName(this, tr("Select a file"), QString(), "*.xml");
+    if (!fileName.isEmpty()) {
+        if (document::AbstractTabDocument *doc = m_docsManager->docById(m_tabWidget->currentIndex())) {
+            doc->load(fileName);
+        }
+    }
 }
 
 void MainWindow::onCreateFileRequested()
@@ -273,19 +278,19 @@ void MainWindow::initTabs()
 {
     using namespace document;
 
-    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
+//    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
     m_docsManager->addDocument(TabDocumentFactory::createInterfaceTabDocument(this));
-    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
-    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
-    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
-    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
+//    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
+//    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
+//    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
+//    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
 }
 
 void MainWindow::initSettings()
 {
     restoreGeometry(AppOptions::MainWindow.Geometry.read().toByteArray());
     restoreState(AppOptions::MainWindow.State.read().toByteArray());
-    m_tabWidget->setCurrentIndex(AppOptions::MainWindow.LastTab.read().toInt());
+    onTabSwitched(AppOptions::MainWindow.LastTab.read().toInt());
 }
 
 void MainWindow::updateActions()
@@ -309,6 +314,13 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     case CommandLineParser::Positional::DropUnsavedChangesSilently: {
         m_dropUnsavedChangesSilently = true;
         return true;
+    }
+    case CommandLineParser::Positional::OpenAADLXMLFile: {
+        if(!value.isEmpty())
+            if (document::AbstractTabDocument *doc = m_docsManager->docById(TABDOC_ID_InterfaceView))
+                return doc->load(value);
+
+        return false;
     }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;

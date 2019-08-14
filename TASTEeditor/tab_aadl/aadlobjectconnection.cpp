@@ -1,0 +1,85 @@
+/*
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
+#include "aadlobjectconnection.h"
+
+#include "aadlobjectiface.h"
+
+#include <QPointer>
+
+namespace taste3 {
+namespace aadl {
+
+struct AADLObjectConnectionPrivate {
+    QPointer<AADLObject> m_source { nullptr };
+    QPointer<AADLObject> m_target { nullptr };
+    QPointer<AADLObjectIfaceRequired> m_ri { nullptr };
+    QPointer<AADLObjectIfaceProvided> m_pi { nullptr };
+};
+
+AADLObjectConnection::AADLObjectConnection(AADLObject *from, AADLObject *to, AADLObjectIfaceRequired *ri,
+                                           AADLObjectIfaceProvided *pi, QObject *parent)
+    : AADLObject(QString(), parent)
+    , d(new AADLObjectConnectionPrivate { from, to, ri, pi })
+{
+}
+
+AADLObjectConnection::AADLObjectConnection(QObject *parent)
+    : AADLObject(QString(), parent)
+    , d(new AADLObjectConnectionPrivate)
+{
+}
+
+AADLObjectConnection::~AADLObjectConnection() {}
+
+AADLObject::AADLObjectType AADLObjectConnection::aadlType() const
+{
+    return AADLObject::AADLObjectType::AADLConnection;
+}
+
+AADLObject *AADLObjectConnection::source() const
+{
+    return d->m_source;
+}
+
+AADLObject *AADLObjectConnection::target() const
+{
+    return d->m_target;
+}
+
+AADLObjectIfaceRequired *AADLObjectConnection::requiredInterface() const
+{
+    return d->m_ri;
+}
+
+QString AADLObjectConnection::requiredInterfaceName() const
+{
+    return requiredInterface() ? requiredInterface()->title() : QString();
+}
+
+AADLObjectIfaceProvided *AADLObjectConnection::providedInterface() const
+{
+    return d->m_pi;
+}
+
+QString AADLObjectConnection::providedInterfaceName() const
+{
+    return providedInterface() ? providedInterface()->title() : QString();
+}
+
+} // ns aadl
+} // ns taste3

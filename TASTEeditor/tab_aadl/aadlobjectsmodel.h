@@ -65,6 +65,9 @@ signals:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
 
+public slots:
+    bool initFromObjects(const QVector<AADLObject *>& objects);
+
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;
     void notifyObjectAdded(AADLObject *object);
