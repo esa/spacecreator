@@ -37,7 +37,8 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
+             | QGraphicsItem::ItemIsSelectable);
 
     setCursor(Qt::ArrowCursor);
 }
@@ -201,10 +202,11 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
     } else {
+        static const QMarginsF kMargins { 50, 50, 50, 50 };
         const QRectF newGeometry { newPos, boundingRect().size() };
-        const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry);
+        const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry.marginsAdded(kMargins));
         auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-            return dynamic_cast<const InteractiveObject *>(item) && item != this && !item->parentItem();
+            return item && item != this && !item->parentItem() && dynamic_cast<const InteractiveObject *>(item);
         });
         if (it != collidedItems.constEnd())
             return;

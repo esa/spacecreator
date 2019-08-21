@@ -99,11 +99,36 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
         { rect.bottomLeft(), rect.topLeft() },
     };
 
-    for (const QLineF &rectLine : rectLines)
+    for (const QLineF &rectLine : rectLines) {
         if (rectLine.intersect(line, intersectPos) == QLineF::BoundedIntersection)
             return true;
+    }
 
     return false;
+}
+
+QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
+{
+    if (rect.isNull() || polygon.isEmpty())
+        return {};
+
+    const QVector<QLineF> rectLines = {
+        { rect.topLeft(), rect.topRight() },
+        { rect.topRight(), rect.bottomRight() },
+        { rect.bottomRight(), rect.bottomLeft() },
+        { rect.bottomLeft(), rect.topLeft() },
+    };
+
+    QPointF intersectPos;
+    QVector<QPointF> points;
+    for (int idx = 1; idx < polygon.size(); ++idx) {
+        const QLineF line = { polygon.value(idx - 1), polygon.value(idx) };
+        for (const QLineF &rectLine : rectLines) {
+            if (rectLine.intersect(line, &intersectPos) == QLineF::BoundedIntersection)
+                points.append(intersectPos);
+        }
+    }
+    return points;
 }
 
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
@@ -157,10 +182,11 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
             { QLineF(boundingArea.bottomRight(), boundingArea.bottomLeft()), Qt::AlignBottom },
         };
         const QLineF line { boundingArea.center(), pos };
-        auto it = std::find_if(rectLines.constBegin(), rectLines.constEnd(), [line](const QPair<QLineF, Qt::Alignment> &rectSide){
-            QPointF dummyPoint;
-            return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
-        });
+        auto it = std::find_if(rectLines.constBegin(), rectLines.constEnd(),
+                               [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
+                                   QPointF dummyPoint;
+                                   return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
+                               });
         if (it != rectLines.constEnd())
             side = it->second;
     }
@@ -186,7 +212,7 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
 {
 
-    for (QGraphicsItem *item: scene->items(pos)) {
+    for (QGraphicsItem *item : scene->items(pos)) {
         if (acceptableTypes.contains(item->type()))
             return item;
     }
@@ -225,7 +251,8 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QLis
     return nearestToCenter;
 }
 
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset, const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
+                           const QList<int> &acceptableTypes)
 {
     const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
     return nearestItem(scene, area, acceptableTypes);

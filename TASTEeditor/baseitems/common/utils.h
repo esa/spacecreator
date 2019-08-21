@@ -39,16 +39,14 @@ QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propNa
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
+QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
 
 QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
-
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos,
-                           const QList<int> &acceptableTypes = QList<int>());
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area,
-                           const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
                            const QList<int> &acceptableTypes = QList<int>());
 
