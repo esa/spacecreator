@@ -125,7 +125,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
     const QPointF scenePos = cursorInScene(e->globalPos());
     if (m_toolType == ToolType::DirectConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos, { AADLContainerGraphicsItem::Type, AADLFunctionGraphicsItem::Type });
+        QGraphicsItem *item = utils::nearestItem(scene, scenePos,
+                                                 { AADLContainerGraphicsItem::Type, AADLFunctionGraphicsItem::Type });
         if (!item)
             return false;
         if (m_previewConnectionItem) {
@@ -139,7 +140,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = item = utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
+        QGraphicsItem *item = item =
+                utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
                 return false;
@@ -312,8 +314,9 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
         } break;
         case ToolType::Container: {
             static int sCounter = 0;
-            auto item = new AADLContainerGraphicsItem(new AADLObjectContainer(tr("Function_interface_%1").arg(++sCounter), m_model),
-                                                      m_previewItem ? m_previewItem->parentItem() : nullptr);
+            auto item = new AADLContainerGraphicsItem(
+                    new AADLObjectContainer(tr("Function_interface_%1").arg(++sCounter), m_model),
+                    m_previewItem ? m_previewItem->parentItem() : nullptr);
             item->setRect(itemSceneRect);
             if (!item->parentItem())
                 scene->addItem(item);
@@ -374,8 +377,11 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                 return;
 
             m_connectionPoints.append(pos);
-            if (auto connectionItem = AADLConnectionGraphicsItem::createConnection(scene, m_connectionPoints.first(), m_connectionPoints.last()))
-                    connectionItem->setSelected(true);
+            if (auto connectionItem = AADLConnectionGraphicsItem::createConnection(scene, m_connectionPoints.first(),
+                                                                                   m_connectionPoints.last())) {
+                scene->clearSelection();
+                connectionItem->setSelected(true);
+            }
 
             taste3::cmd::CommandsStack::current()->beginMacro(tr("Create direct connection"));
 

@@ -35,8 +35,7 @@ class AADLConnectionGraphicsItem : public QGraphicsObject
 public:
     explicit AADLConnectionGraphicsItem(QGraphicsItem *parent = nullptr);
 
-    static AADLConnectionGraphicsItem *createConnection(QGraphicsScene *scene,
-                                                        const QPointF &startPoint,
+    static AADLConnectionGraphicsItem *createConnection(QGraphicsScene *scene, const QPointF &startPoint,
                                                         const QPointF &endPoint);
     void setPoints(const QVector<QPointF> &points);
 
@@ -60,7 +59,7 @@ protected:
     bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
     void rebuildLayout();
-    void updateGripPoints();
+    void updateGripPoints(bool forceVisible = false);
 
     void handleSelectionChanged(bool isSelected);
 
@@ -71,6 +70,7 @@ protected:
 private:
     QGraphicsRectItem *createGripPoint();
     void simplify();
+    void updateBoundingRect();
 
 private:
     QPointer<AADLInterfaceGraphicsItem> m_startItem;
@@ -79,6 +79,7 @@ private:
     QRectF m_boundingRect;
 
     QVector<QPointF> m_points;
+    QVector<QPointF> m_tmpPoints;
     QList<QGraphicsRectItem *> m_grips;
 };
 
