@@ -68,6 +68,7 @@ protected:
     bool handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
 
 private:
+    void adjustGripPointCount();
     QGraphicsRectItem *createGripPoint();
     void simplify();
     void updateBoundingRect();
