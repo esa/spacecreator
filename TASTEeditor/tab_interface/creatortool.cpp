@@ -186,12 +186,8 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
                         [this]() { handleToolType(ToolType::Container); });
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
                         [this]() { handleToolType(ToolType::Function); });
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Comment"), this,
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
                         [this]() { handleToolType(ToolType::Comment); });
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Prov.I"), this,
-                        [this]() { handleToolType(ToolType::ProvidedInterface); });
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Req.I"), this,
-                        [this]() { handleToolType(ToolType::RequiredInterface); });
         connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
         menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
         return true;
