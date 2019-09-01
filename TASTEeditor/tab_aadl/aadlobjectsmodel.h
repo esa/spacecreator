@@ -20,6 +20,8 @@
 #include "aadlobjectcontainer.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectcomment.h"
 
 #include <QObject>
 #include <QVector>
@@ -36,32 +38,18 @@ public:
     explicit AADLObjectsModel(QObject *parent = nullptr);
     ~AADLObjectsModel() override;
 
-    AADLContainersVector containers() const;
-    AADLFunctionsVector functions() const;
-    AADLIfacesVector ifaces() const;
+    bool addObject(AADLObject* obj);
+    bool removeObject(AADLObject* obj);
 
-    bool addContainer(AADLObjectContainer *container);
-    bool removeContainer(AADLObjectContainer *container);
-
-    bool addFunction(AADLObjectFunction *function);
-    bool removeFunction(AADLObjectFunction *function);
-
-    bool addIface(AADLObjectIface *iface);
-    bool removeIface(AADLObjectIface *iface);
-
-    bool addObject(AADLObject *obj);
-    bool removeObject(AADLObject *obj);
+    AADLObject* getObject( const common::Id& id ) const;
+    AADLObjectFunction* getFunction(const common::Id& id) const;
+    AADLObjectContainer* getContainer(const common::Id& id) const;
+    AADLObjectIfaceRequired* getRequiredInterface(const common::Id& id) const;
+    AADLObjectIfaceProvided* getProvidedInterface(const common::Id& id) const;
+    AADLObjectConnection* getConnection(const common::Id& id) const;
+    AADLObjectComment* getCommentById(const common::Id& id) const;
 
 signals:
-    void containerAdded(AADLObjectContainer *container);
-    void containerRemoved(AADLObjectContainer *container);
-
-    void functionAdded(AADLObjectFunction *function);
-    void functionRemoved(AADLObjectFunction *function);
-
-    void ifaceAdded(AADLObjectIface *iface);
-    void ifaceRemoved(AADLObjectIface *iface);
-
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
 
@@ -70,8 +58,6 @@ public slots:
 
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;
-    void notifyObjectAdded(AADLObject *object);
-    void notifyObjectRemoved(AADLObject *object);
 };
 
 } // ns aadl
