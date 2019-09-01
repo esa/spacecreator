@@ -17,13 +17,13 @@
 
 #include "aadlobjectsmodel.h"
 
+#include "app/common.h"
+
 namespace taste3 {
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
-    AADLContainersVector m_containers;
-    AADLFunctionsVector m_functions;
-    AADLIfacesVector m_ifaces;
+    QHash<common::Id, AADLObject *> m_objects;
 };
 
 AADLObjectsModel::AADLObjectsModel(QObject *parent)
@@ -34,168 +34,81 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
 
 AADLObjectsModel::~AADLObjectsModel() {}
 
-bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *>& objects)
+bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
-    Q_UNUSED(objects);
-    return false;
-}
+    qDeleteAll(d->m_objects);
+    d->m_objects.clear();
 
-AADLContainersVector AADLObjectsModel::containers() const
-{
-    return d->m_containers;
-}
+    for (auto obj : objects)
+        addObject(obj);
 
-AADLFunctionsVector AADLObjectsModel::functions() const
-{
-    return d->m_functions;
-}
-
-AADLIfacesVector AADLObjectsModel::ifaces() const
-{
-    return d->m_ifaces;
-}
-
-bool AADLObjectsModel::addContainer(AADLObjectContainer *container)
-{
-    if (container && !containers().contains(container)) {
-        d->m_containers.append(container);
-        notifyObjectAdded(container);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObjectsModel::removeContainer(AADLObjectContainer *container)
-{
-    const int id = containers().indexOf(container);
-    if (id >= 0 && id < containers().size()) {
-        d->m_containers.remove(id);
-        notifyObjectRemoved(container);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObjectsModel::addFunction(AADLObjectFunction *function)
-{
-    if (function && !functions().contains(function)) {
-        d->m_functions.append(function);
-        notifyObjectAdded(function);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObjectsModel::removeFunction(AADLObjectFunction *function)
-{
-    const int id = functions().indexOf(function);
-    if (id >= 0 && id < functions().size()) {
-        d->m_functions.remove(id);
-        notifyObjectRemoved(function);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObjectsModel::addIface(AADLObjectIface *iface)
-{
-    if (iface && !ifaces().contains(iface)) {
-        d->m_ifaces.append(iface);
-        notifyObjectAdded(iface);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObjectsModel::removeIface(AADLObjectIface *iface)
-{
-    const int id = ifaces().indexOf(iface);
-    if (id >= 0 && id < ifaces().size()) {
-        d->m_ifaces.remove(id);
-        notifyObjectRemoved(iface);
-        return true;
-    }
-    return false;
+    return d->m_objects.size() == objects.size();
 }
 
 bool AADLObjectsModel::addObject(AADLObject *obj)
 {
-    if (obj) {
-        switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionContainer:
-            return addContainer(qobject_cast<AADLObjectContainer *>(obj));
-        case AADLObject::AADLObjectType::AADLFunction:
-            return addFunction(qobject_cast<AADLObjectFunction *>(obj));
-        case AADLObject::AADLObjectType::AADLIface:
-            return addIface(qobject_cast<AADLObjectIface *>(obj));
-        default:
-            break;
-        }
-    }
-    return false;
+    if (!obj)
+        return false;
+
+    const common::Id &id = obj->id();
+    if (getObject(id))
+        return false;
+
+    if (!obj->parent())
+        obj->setParent(this);
+
+    d->m_objects.insert(id, obj);
+    emit aadlObjectAdded(obj);
+    return true;
 }
 
 bool AADLObjectsModel::removeObject(AADLObject *obj)
 {
-    if (obj) {
-        switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionContainer:
-            return removeContainer(qobject_cast<AADLObjectContainer *>(obj));
-        case AADLObject::AADLObjectType::AADLFunction:
-            return removeFunction(qobject_cast<AADLObjectFunction *>(obj));
-        case AADLObject::AADLObjectType::AADLIface:
-            return removeIface(qobject_cast<AADLObjectIface *>(obj));
-        default:
-            break;
-        }
-    }
-    return false;
+    if (!obj)
+        return false;
+
+    const common::Id &id = obj->id();
+    if (getObject(id))
+        return false;
+
+    d->m_objects.remove(id);
+    emit aadlObjectRemoved(obj);
+    return true;
 }
 
-void AADLObjectsModel::notifyObjectAdded(AADLObject *obj)
+AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
 {
-    if (obj) {
-        switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionContainer: {
-            emit containerAdded(qobject_cast<AADLObjectContainer *>(obj));
-            break;
-        }
-        case AADLObject::AADLObjectType::AADLFunction: {
-            emit functionAdded(qobject_cast<AADLObjectFunction *>(obj));
-            break;
-        }
-        case AADLObject::AADLObjectType::AADLIface: {
-            emit ifaceAdded(qobject_cast<AADLObjectIface *>(obj));
-            break;
-        }
-        default:
-            return;
-        }
-        emit aadlObjectAdded(obj);
-    }
+    return d->m_objects.value(id, nullptr);
 }
 
-void AADLObjectsModel::notifyObjectRemoved(AADLObject *obj)
+AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
 {
-    if (obj) {
-        switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunctionContainer: {
-            emit containerRemoved(qobject_cast<AADLObjectContainer *>(obj));
-            break;
-        }
-        case AADLObject::AADLObjectType::AADLFunction: {
-            emit functionRemoved(qobject_cast<AADLObjectFunction *>(obj));
-            break;
-        }
-        case AADLObject::AADLObjectType::AADLIface: {
-            emit ifaceRemoved(qobject_cast<AADLObjectIface *>(obj));
-            break;
-        }
-        default:
-            return;
-        }
-        emit aadlObjectRemoved(obj);
-    }
+    return qobject_cast<AADLObjectFunction *>(getObject(id));
+}
+
+AADLObjectContainer *AADLObjectsModel::getContainer(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectFunction *>(getObject(id));
+}
+
+AADLObjectIfaceRequired *AADLObjectsModel::getRequiredInterface(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectIfaceRequired *>(getObject(id));
+}
+
+AADLObjectIfaceProvided *AADLObjectsModel::getProvidedInterface(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectIfaceProvided *>(getObject(id));
+}
+
+AADLObjectConnection *AADLObjectsModel::getConnection(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectConnection *>(getObject(id));
+}
+
+AADLObjectComment *AADLObjectsModel::getCommentById(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectComment *>(getObject(id));
 }
 
 } // ns aadl
