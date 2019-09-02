@@ -68,7 +68,7 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
         return false;
 
     const common::Id &id = obj->id();
-    if (getObject(id))
+    if (!getObject(id))
         return false;
 
     d->m_objects.remove(id);
