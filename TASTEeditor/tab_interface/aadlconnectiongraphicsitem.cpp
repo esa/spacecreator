@@ -323,7 +323,7 @@ void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
     }
     Q_ASSERT(m_endItem);
 
-    rebuildLayout();
+    updateBoundingRect();
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -372,7 +372,6 @@ bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent
 
 void AADLConnectionGraphicsItem::rebuildLayout()
 {
-    prepareGeometryChange();
     if (m_startItem && m_endItem && m_points.size() >= 2)
         m_points = updatePoints(scene(), m_startItem, m_endItem);
 
@@ -381,6 +380,8 @@ void AADLConnectionGraphicsItem::rebuildLayout()
 
 void AADLConnectionGraphicsItem::updateBoundingRect()
 {
+    prepareGeometryChange();
+
     QPainterPath pp;
     pp.addPolygon(QPolygonF(m_points));
     m_item->setPath(pp);
@@ -570,6 +571,7 @@ AADLConnectionGraphicsItem::createConnection(QGraphicsScene *scene, const QPoint
     auto connectionItem = new AADLConnectionGraphicsItem();
     scene->addItem(connectionItem);
     connectionItem->setPoints(updatePoints(scene, startIfaceItem, endIfaceItem));
+    connectionItem->rebuildLayout();
     return connectionItem;
 }
 
