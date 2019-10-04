@@ -54,13 +54,16 @@ double GraphicsView::zoom() const
  */
 void GraphicsView::setZoom(double percent)
 {
-    if (percent < minZoomPercent() || percent > maxZoomPercent())
+    percent = qBound(minZoomPercent(), percent, maxZoomPercent());
+    if (qFuzzyCompare(m_zoomPercent, percent))
         return;
 
     m_zoomPercent = percent;
 
     resetTransform();
     scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
+
+    Q_EMIT zoomChanged(m_zoomPercent);
 }
 
 void GraphicsView::mousePressEvent(QMouseEvent *event)

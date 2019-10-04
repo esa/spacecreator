@@ -20,6 +20,12 @@
 
 #include "baseitems/textgraphicsitem.h"
 
+#include <app/commandsstack.h>
+
+#include "commands/cmdentitygeometrychange.h"
+#include "commands/commandids.h"
+#include "commands/commandsfactory.h"
+
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QPainter>
@@ -31,25 +37,21 @@ static const qreal kMargins = 14 + kBorderWidth;
 namespace taste3 {
 namespace aadl {
 
-AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObject *entity, QGraphicsItem *parent)
-    : InteractiveObject(entity, parent)
+AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent)
+    : InteractiveObject(comment, parent)
     , m_textItem(new TextGraphicsItem(this))
 {
     setObjectName(QLatin1String("AADLCommentGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    m_textItem->setPlainText(entity->title());
+    m_textItem->setPlainText(comment->title());
     m_textItem->setFramed(false);
     m_textItem->setEditable(true);
     m_textItem->setBackgroundColor(Qt::transparent);
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     connect(m_textItem, &TextGraphicsItem::edited, this, &AADLCommentGraphicsItem::textEdited);
-    connect(m_textItem, &TextGraphicsItem::textChanged, this, [this]() {
-        prepareGeometryChange();
-        m_boundingRect = m_textItem->boundingRect();
-        updateGripPoints();
-    });
+    connect(m_textItem, &TextGraphicsItem::textChanged, this, &AADLCommentGraphicsItem::textChanged);
 
     const QColor brushColor { 0xf9e29c };
     setBrush(brushColor);
@@ -60,6 +62,11 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObject *entity, QGraphicsIt
     setHighlightable(false);
 }
 
+AADLObjectComment *AADLCommentGraphicsItem::entity() const
+{
+    return qobject_cast<AADLObjectComment *>(m_entity);
+}
+
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualResizeProgress(grip, from, to);
@@ -68,12 +75,29 @@ void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, c
 
 void AADLCommentGraphicsItem::textEdited(const QString &text)
 {
-    Q_UNUSED(text);
+    if (entity()->title() == m_textItem->toPlainText())
+        return;
 
-    rebuildLayout();
+    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
+
+    const QRectF geometry = sceneBoundingRect();
+    const QVector<QPointF> points{ geometry.topLeft(), geometry.bottomRight() };
+    const QVariantList geometryParams{ qVariantFromValue(entity()), qVariantFromValue(points) };
+    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams);
+    taste3::cmd::CommandsStack::current()->push(geometryCmd);
+
+    const QVariantList commentTextParams{ qVariantFromValue(entity()), qVariantFromValue(text) };
+    const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);
+    taste3::cmd::CommandsStack::current()->push(commentTextCmd);
+
+    taste3::cmd::CommandsStack::current()->endMacro();
+}
+
+void AADLCommentGraphicsItem::textChanged()
+{
+    prepareGeometryChange();
+    m_boundingRect = m_textItem->boundingRect();
     updateGripPoints();
-
-    Q_EMIT needUpdateLayout();
 }
 
 void AADLCommentGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -135,6 +159,33 @@ void AADLCommentGraphicsItem::rebuildLayout()
 {
     m_textItem->setExplicitSize(m_boundingRect.size());
 }
+
+void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+
+    createCommand();
+}
+
+void AADLCommentGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+
+    createCommand();
+}
+
+void AADLCommentGraphicsItem::createCommand()
+{
+    const QRectF geometry = sceneBoundingRect();
+    const QVector<QPointF> points{ geometry.topLeft(), geometry.bottomRight() };
+    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, { qVariantFromValue(entity()), qVariantFromValue(points) });
+    taste3::cmd::CommandsStack::current()->push(geometryCmd);
+}
+
 
 } // namespace aadl
 } // namespace taste3

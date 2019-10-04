@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,25 +17,32 @@
 
 #pragma once
 
+#include <QPointer>
+#include <QUndoCommand>
+
 namespace taste3 {
 namespace aadl {
+class AADLObjectComment;
+class AADLObjectsModel;
 namespace cmd {
 
-enum Id
+class CmdCommentTextChange : public QUndoCommand
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateDirectConnectionEntity,
-    CreateManualConnectionEntity,
-    ChangeEntityGeometry,
-    RemoveEntity,
-    ChangeCommentText,
-    LastId
+public:
+    explicit CmdCommentTextChange(AADLObjectComment *comment, const QString &text);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<AADLObjectComment> m_entity;
+    const QString m_prevText;
+    const QString m_newText;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+} // namespace cmd
+} // namespace aadl
+} // namespace taste3
+

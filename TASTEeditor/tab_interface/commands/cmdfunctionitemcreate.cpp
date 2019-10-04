@@ -19,21 +19,46 @@
 
 #include "commandids.h"
 
+#include <QtDebug>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, const QRectF &geometry)
+static int sCounter = 0;
+
+CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectContainer *container,
+                                             const QRectF &geometry)
     : m_model(model)
     , m_geometry(geometry)
+    , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_model))
+    , m_parent(container)
 {
 }
 
-void CmdFunctionItemCreate::redo() {}
+void CmdFunctionItemCreate::redo()
+{
+    const QVector<qint32> coordinates {
+        qRound(m_geometry.left()),
+        qRound(m_geometry.top()),
+        qRound(m_geometry.right()),
+        qRound(m_geometry.bottom()),
+    };
+    m_entity->setCoordinates(coordinates);
+    if (m_parent)
+        m_parent->addChild(m_entity);
+    if (m_model)
+        m_model->addObject(m_entity);
+}
 
-void CmdFunctionItemCreate::undo() {}
+void CmdFunctionItemCreate::undo()
+{
+    if (m_model)
+        m_model->removeObject(m_entity);
+    if (m_parent)
+        m_parent->removeChild(m_entity);
+}
 
 bool CmdFunctionItemCreate::mergeWith(const QUndoCommand *command)
 {

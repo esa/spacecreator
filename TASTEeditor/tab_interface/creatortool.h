@@ -52,6 +52,7 @@ public:
 
     CreatorTool::ToolType toolType() const;
     void setCurrentToolType(CreatorTool::ToolType type);
+    void removeSelectedItems();
 
 Q_SIGNALS:
     void created();
@@ -74,7 +75,6 @@ protected:
     QPointF cursorInScene(const QPoint &screenPos) const;
 
 private:
-    void removeSelectedItems();
     void clearPreviewItem();
 
     void handleToolType(CreatorTool::ToolType type);

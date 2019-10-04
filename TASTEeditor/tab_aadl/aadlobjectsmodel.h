@@ -49,6 +49,8 @@ public:
     AADLObjectConnection* getConnection(const common::Id& id) const;
     AADLObjectComment* getCommentById(const common::Id& id) const;
 
+    AADLObjectConnection* getConnectionForIface(const common::Id& id) const;
+
 signals:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);

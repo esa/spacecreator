@@ -51,11 +51,8 @@ public:
 
     static constexpr IfaceType DefaultDirection { IfaceType::Required };
 
-    explicit AADLObjectIface(AADLObjectIface::IfaceType direction = DefaultDirection, const QString &title = QString(),
-                             AADLObject *parent = nullptr);
     ~AADLObjectIface() override;
 
-    AADLObject *holder() const;
     AADLObject::AADLObjectType aadlType() const override;
 
     AADLObjectIface::IfaceType direction() const;
@@ -91,14 +88,15 @@ public:
     QString rcmPeriod() const;
     bool setRcmPeriod(const QString &period);
 
-    QVector<qint32> coordinates() const;
-    bool setCoordinates(const QVector<qint32> &coords);
-
     QString interfaceName() const;
     bool setInterfaceName(const QString &name);
 
     bool labelInheritance() const;
     bool setLabelInheritance(bool label);
+
+protected:
+    explicit AADLObjectIface(AADLObjectIface::IfaceType direction = DefaultDirection, const QString &title = QString(),
+                             AADLObject *parent = nullptr);
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
@@ -108,14 +106,16 @@ class AADLObjectIfaceProvided : public AADLObjectIface
 {
     Q_OBJECT
 public:
-    AADLObjectIfaceProvided(AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceProvided(AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceProvided(const QString &title, AADLObject *parent = nullptr);
 };
 
 class AADLObjectIfaceRequired : public AADLObjectIface
 {
     Q_OBJECT
 public:
-    AADLObjectIfaceRequired(AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceRequired(AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceRequired(const QString &title, AADLObject *parent = nullptr);
 };
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;

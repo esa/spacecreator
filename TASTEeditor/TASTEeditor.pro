@@ -74,9 +74,13 @@ SOURCES += \
         tab_interface/aadlfunctiongraphicsitem.cpp \
         tab_interface/aadlinterfacegraphicsitem.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
-        tab_interface/commands/cmdconnectionitemcreate.cpp \
+        tab_interface/commands/cmdcommenttextchange.cpp \
         tab_interface/commands/cmdcontaineritemcreate.cpp \
+        tab_interface/commands/cmddirectconnectionitemcreate.cpp \
+        tab_interface/commands/cmdentitygeometrychange.cpp \
+        tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
+        tab_interface/commands/cmdmanualconnectionitemcreate.cpp \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.cpp \
         tab_interface/commands/commandsfactory.cpp \
@@ -130,9 +134,13 @@ HEADERS += \
         tab_interface/aadlfunctiongraphicsitem.h \
         tab_interface/aadlinterfacegraphicsitem.h \
         tab_interface/commands/cmdcommentitemcreate.h \
-        tab_interface/commands/cmdconnectionitemcreate.h \
+        tab_interface/commands/cmdcommenttextchange.h \
         tab_interface/commands/cmdcontaineritemcreate.h \
+        tab_interface/commands/cmddirectconnectionitemcreate.h \
+        tab_interface/commands/cmdentitygeometrychange.h \
+        tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
+        tab_interface/commands/cmdmanualconnectionitemcreate.h \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.h \
         tab_interface/commands/commandids.h \

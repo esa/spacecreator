@@ -24,6 +24,7 @@
 namespace taste3 {
 namespace aadl {
 class AADLObjectIface;
+class AADLConnectionGraphicsItem;
 
 class AADLInterfaceGraphicsItem : public InteractiveObject
 {
@@ -38,9 +39,13 @@ public:
     AADLObjectIface *entity() const;
 
     int type() const override { return Type; }
+    void connect(AADLConnectionGraphicsItem *item);
+    AADLConnectionGraphicsItem *connectedItem() const;
 
     QGraphicsItem *targetItem() const;
-    void setTargetItem(QGraphicsItem *item, const QPointF &pos);
+    void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
+
+    void setInterfaceName(const QString &name);
 
 protected:
     void rebuildLayout() override;
@@ -48,11 +53,10 @@ protected:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void onScenePositionChanged(const QPointF &scenePosition) override;
-
 private:
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
+    AADLConnectionGraphicsItem *m_connection = nullptr;
 };
 
 } // namespace aadl

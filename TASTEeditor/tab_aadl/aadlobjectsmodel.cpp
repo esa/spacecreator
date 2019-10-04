@@ -111,6 +111,20 @@ AADLObjectComment *AADLObjectsModel::getCommentById(const common::Id &id) const
     return qobject_cast<AADLObjectComment *>(getObject(id));
 }
 
+AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &id) const
+{
+    for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
+        if (it.value()->aadlType() != AADLObject::AADLObjectType::AADLConnection)
+            continue;
+
+        if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
+            if (connection->requiredInterface()->id() == id || connection->providedInterface()->id() == id)
+                return connection;
+        }
+    }
+    return nullptr;
+}
+
 } // ns aadl
 
 } // ns taste3

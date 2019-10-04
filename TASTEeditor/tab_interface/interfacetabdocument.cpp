@@ -21,10 +21,16 @@
 #include "interfacetabgraphicsscene.h"
 #include "tab_aadl/aadlobjectsmodel.h"
 #include "tab_aadl/aadlxmlreader.h"
+#include "tab_interface/aadlcommentgraphicsitem.h"
+#include "tab_interface/aadlconnectiongraphicsitem.h"
+#include "tab_interface/aadlcontainergraphicsitem.h"
+#include "tab_interface/aadlfunctiongraphicsitem.h"
+#include "tab_interface/aadlinterfacegraphicsitem.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QGraphicsItem>
 #include <QGraphicsView>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
@@ -36,6 +42,29 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
     , m_model(new aadl::AADLObjectsModel(this))
 {
+    connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, [this](aadl::AADLObject *object) {
+        auto propertyChanged = [this]() {
+            if (auto object = qobject_cast<aadl::AADLObject *>(sender())) {
+                if (auto item = m_items.value(object->id()))
+                    updateItem(item);
+            }
+        };
+
+        auto item = createItemForObject(object);
+        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
+        connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
+        Q_ASSERT(item);
+        m_items.insert(object->id(), item);
+        m_graphicsScene->addItem(item);
+        updateItem(item);
+        m_graphicsScene->clearSelection();
+        item->setSelected(true);
+    });
+    connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, [this](aadl::AADLObject *object) {
+        auto item = m_items.take(object->id());
+        m_graphicsScene->removeItem(item);
+        delete item;
+    });
 }
 
 InterfaceTabDocument::~InterfaceTabDocument()
@@ -46,18 +75,30 @@ InterfaceTabDocument::~InterfaceTabDocument()
 
 QWidget *InterfaceTabDocument::createView()
 {
-    if (!m_graphicsView)
+    if (!m_graphicsView) {
         m_graphicsView = new GraphicsView;
+        connect(m_graphicsView, &GraphicsView::zoomChanged, this, [this](qreal percent) {
+            for (auto item : m_graphicsScene->selectedItems()) {
+                if (auto connection = qgraphicsitem_cast<aadl::AADLConnectionGraphicsItem *>(item)) {
+                    connection->updateGripPoints();
+                } else if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+                    iObj->updateGripPoints();
+                }
+            }
+            m_actZoomIn->setEnabled(!qFuzzyCompare(percent, m_graphicsView->maxZoomPercent()));
+            m_actZoomOut->setEnabled(!qFuzzyCompare(percent, m_graphicsView->minZoomPercent()));
+        });
+    }
     m_graphicsView->setScene(m_graphicsScene);
+    m_graphicsView->setSceneRect(QRectF(0, 0, 640, 480));
     return m_graphicsView;
 }
 
 QGraphicsScene *InterfaceTabDocument::createScene()
 {
-    if (!m_graphicsScene) {
+    if (!m_graphicsScene)
         m_graphicsScene = new InterfaceTabGraphicsScene(this);
-        m_graphicsScene->setSceneRect(QRectF(0, 0, 640, 480));
-    }
+
     return m_graphicsScene;
 }
 
@@ -74,7 +115,10 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
     }
 
     aadl::AADLXMLReader parser;
-    connect(&parser, &aadl::AADLXMLReader::objectsParsed, m_model, &aadl::AADLObjectsModel::initFromObjects);
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
+        if (m_model->initFromObjects(objects))
+            m_graphicsView->setSceneRect(m_graphicsView->scene()->itemsBoundingRect());
+    });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.parse(path);
@@ -160,8 +204,30 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
     }
 
+    if (!m_actRemove) {
+        m_actRemove = new QAction(tr("Remove"));
+        m_actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
+        m_actRemove->setShortcut(QKeySequence::Delete);
+        connect(m_actRemove, &QAction::triggered, this, &InterfaceTabDocument::onActionRemoveItem);
+    }
+
+    if (!m_actZoomIn) {
+        m_actZoomIn = new QAction(tr("Zoom In"));
+        m_actZoomIn->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_in.svg")));
+        m_actZoomIn->setShortcut(QKeySequence::ZoomIn);
+        connect(m_actZoomIn, &QAction::triggered, this, &InterfaceTabDocument::onActionZoomIn);
+    }
+
+    if (!m_actZoomOut) {
+        m_actZoomOut = new QAction(tr("Zoom Out"));
+        m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
+        m_actZoomOut->setShortcut(QKeySequence::ZoomOut);
+        connect(m_actZoomOut, &QAction::triggered, this, &InterfaceTabDocument::onActionZoomOut);
+    }
+
     return { m_actCreateContainer, m_actCreateFunction,   m_actCreateProvidedInterface, m_actCreateRequiredInterface,
-             m_actCreateComment,   m_actGroupConnections, m_actCreateConnection };
+             m_actCreateComment,   m_actGroupConnections, m_actCreateConnection,        m_actRemove,
+             m_actZoomIn,          m_actZoomOut };
 }
 
 void InterfaceTabDocument::onActionCreateContainer()
@@ -203,6 +269,184 @@ void InterfaceTabDocument::onActionCreateConnection()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::MultiPointConnection);
     WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionRemoveItem()
+{
+    m_tool->removeSelectedItems();
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionZoomIn()
+{
+    m_graphicsView->setZoom(m_graphicsView->zoom() + m_graphicsView->zoomStepPercent());
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::onActionZoomOut()
+{
+    m_graphicsView->setZoom(m_graphicsView->zoom() - m_graphicsView->zoomStepPercent());
+    WARN_NOT_IMPLEMENTED;
+}
+
+void InterfaceTabDocument::updateItem(QGraphicsItem *item)
+{
+    Q_ASSERT(item);
+    if (!item)
+        return;
+
+    switch (item->type()) {
+    case aadl::AADLCommentGraphicsItem::Type:
+        updateComment(qgraphicsitem_cast<aadl::AADLCommentGraphicsItem *>(item));
+        break;
+    case aadl::AADLConnectionGraphicsItem::Type:
+        updateConnection(qgraphicsitem_cast<aadl::AADLConnectionGraphicsItem *>(item));
+        break;
+    case aadl::AADLFunctionGraphicsItem::Type:
+        updateFunction(qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item));
+        break;
+    case aadl::AADLContainerGraphicsItem::Type:
+        updateContainer(qgraphicsitem_cast<aadl::AADLContainerGraphicsItem *>(item));
+        break;
+    case aadl::AADLInterfaceGraphicsItem::Type:
+        updateInterface(qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(item));
+        break;
+    default:
+        return;
+    }
+}
+
+void InterfaceTabDocument::updateComment(aadl::AADLCommentGraphicsItem *comment)
+{
+    aadl::AADLObjectComment *entity = comment->entity();
+    Q_ASSERT(entity);
+    if (!entity)
+        return;
+
+    comment->setText(entity->title());
+    const auto coordinates = entity->coordinates();
+    if (coordinates.isEmpty()) {
+        comment->instantLayoutUpdate();
+    } else {
+        comment->setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
+                           QPointF(coordinates.value(2), coordinates.value(3)) });
+    }
+}
+
+void InterfaceTabDocument::updateInterface(aadl::AADLInterfaceGraphicsItem *iface)
+{
+    aadl::AADLObjectIface *entity = iface->entity();
+    Q_ASSERT(entity);
+    if (!entity)
+        return;
+
+    iface->setInterfaceName(entity->title());
+    const auto coordinates = entity->coordinates();
+    if (coordinates.isEmpty()) {
+        iface->instantLayoutUpdate();
+    } else {
+        QGraphicsItem *parentItem = nullptr;
+        aadl::AADLObject *entityParentObject = entity->parentObject();
+        if (entityParentObject)
+            parentItem = m_items.value(entityParentObject->id());
+        iface->setTargetItem(parentItem, QPointF(coordinates.value(0), coordinates.value(1)));
+    }
+}
+
+void InterfaceTabDocument::updateFunction(aadl::AADLFunctionGraphicsItem *function)
+{
+    aadl::AADLObjectFunction *entity = function->entity();
+    Q_ASSERT(entity);
+    if (!entity)
+        return;
+
+    const auto points = entity->coordinates();
+    if (points.isEmpty()) {
+        function->instantLayoutUpdate();
+    } else {
+        QGraphicsItem *parentItem = nullptr;
+        aadl::AADLObject *entityParentObject = entity->parentObject();
+        if (entityParentObject)
+            parentItem = m_items.value(entityParentObject->id());
+        function->setParentItem(parentItem);
+        function->setRect({ QPointF(points.value(0), points.value(1)), QPointF(points.value(2), points.value(3)) });
+    }
+}
+
+void InterfaceTabDocument::updateContainer(aadl::AADLContainerGraphicsItem *container)
+{
+    aadl::AADLObjectContainer *entity = container->entity();
+    Q_ASSERT(entity);
+    if (!entity)
+        return;
+
+    const auto coordinates = entity->coordinates();
+    if (coordinates.isEmpty()) {
+        container->instantLayoutUpdate();
+    } else {
+        QGraphicsItem *parentItem = nullptr;
+        aadl::AADLObject *entityParentObject = entity->parentObject();
+        if (entityParentObject)
+            parentItem = m_items.value(entityParentObject->id());
+        container->setParentItem(parentItem);
+        container->setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
+                             QPointF(coordinates.value(2), coordinates.value(3)) });
+    }
+}
+
+void InterfaceTabDocument::updateConnection(aadl::AADLConnectionGraphicsItem *connection)
+{
+    aadl::AADLObjectConnection *entity = connection->entity();
+    Q_ASSERT(entity);
+    if (!entity)
+        return;
+
+    const auto coordinates = entity->coordinates();
+    QVector<QPointF> points;
+    for (int idx = 1; idx < coordinates.size(); idx += 2)
+        points << QPointF(coordinates.value(idx - 1), coordinates.value(idx));
+
+    aadl::AADLObjectIface *ifaceStart = entity->providedInterface();
+    Q_ASSERT(ifaceStart);
+
+    aadl::AADLObjectIface *ifaceEnd = entity->requiredInterface();
+    Q_ASSERT(ifaceEnd);
+
+    QGraphicsItem *startItem = m_items.value(ifaceStart->id());
+    QGraphicsItem *endItem = m_items.value(ifaceEnd->id());
+    if (points.isEmpty()) {
+        connection->setEndPoints(qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(startItem),
+                                 qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(endItem));
+        return;
+    }
+
+    connection->setPoints(points);
+}
+
+QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
+{
+    switch (obj->aadlType()) {
+    case aadl::AADLObject::AADLObjectType::AADLComment: {
+        return new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj));
+    } break;
+    case aadl::AADLObject::AADLObjectType::AADLIface: {
+        return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj));
+    } break;
+    case aadl::AADLObject::AADLObjectType::AADLConnection: {
+        return new aadl::AADLConnectionGraphicsItem(qobject_cast<aadl::AADLObjectConnection *>(obj));
+    } break;
+    case aadl::AADLObject::AADLObjectType::AADLFunction: {
+        return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj));
+    } break;
+    case aadl::AADLObject::AADLObjectType::AADLFunctionContainer: {
+        return new aadl::AADLContainerGraphicsItem(qobject_cast<aadl::AADLObjectContainer *>(obj));
+    } break;
+    case aadl::AADLObject::AADLObjectType::AADLUnknown:
+        qCritical() << "Unknown object type!";
+    default:
+        break;
+    }
+    return nullptr;
 }
 
 } // ns document

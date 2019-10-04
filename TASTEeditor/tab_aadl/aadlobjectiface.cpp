@@ -21,14 +21,11 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectIfacePrivate {
-
-    AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir, AADLObject *parent)
+    AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
         : m_direction(dir)
-        , m_holder(parent)
     {
     }
     const AADLObjectIface::IfaceType m_direction;
-    const QPointer<AADLObject> m_holder;
     QString m_kind = {};
     qint32 m_period = 0;
     qint32 m_wcet = 0;
@@ -40,14 +37,13 @@ struct AADLObjectIfacePrivate {
     QString m_rcmOperationKind;
     QString m_deadline;
     QString m_rcmPeriod;
-    QVector<qint32> m_coordinates;
     QString m_interfaceName;
     bool m_labelInheritance;
 };
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
     : AADLObject(title, parent)
-    , d(new AADLObjectIfacePrivate(direction, parent))
+    , d(new AADLObjectIfacePrivate(direction))
 {
 }
 
@@ -70,11 +66,6 @@ bool AADLObjectIface::isProvided() const
 bool AADLObjectIface::isRequired() const
 {
     return direction() == IfaceType::Required;
-}
-
-AADLObject *AADLObjectIface::holder() const
-{
-    return d->m_holder;
 }
 
 QString AADLObjectIface::kind() const
@@ -207,20 +198,6 @@ bool AADLObjectIface::setRcmPeriod(const QString &period)
     return false;
 }
 
-QVector<qint32> AADLObjectIface::coordinates() const
-{
-    return d->m_coordinates;
-}
-
-bool AADLObjectIface::setCoordinates(const QVector<qint32> &coords)
-{
-    if (coordinates() != coords) {
-        d->m_coordinates = coords;
-        return true;
-    }
-    return false;
-}
-
 QString AADLObjectIface::interfaceName() const
 {
     return d->m_interfaceName;
@@ -254,8 +231,18 @@ AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
 {
 }
 
+AADLObjectIfaceProvided::AADLObjectIfaceProvided(const QString &title, AADLObject *parent)
+    : AADLObjectIface(IfaceType::Provided, title, parent)
+{
+}
+
 AADLObjectIfaceRequired::AADLObjectIfaceRequired(AADLObject *parent)
     : AADLObjectIface(IfaceType::Required, QString(), parent)
+{
+}
+
+AADLObjectIfaceRequired::AADLObjectIfaceRequired(const QString &title, AADLObject *parent)
+    : AADLObjectIface(IfaceType::Required, title, parent)
 {
 }
 

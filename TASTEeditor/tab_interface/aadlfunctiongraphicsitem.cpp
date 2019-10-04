@@ -17,11 +17,20 @@
 
 #include "aadlfunctiongraphicsitem.h"
 
+#include "aadlconnectiongraphicsitem.h"
+#include "aadlinterfacegraphicsitem.h"
+#include "commands/cmdfunctionitemcreate.h"
+#include "commands/commandids.h"
+#include "commands/commandsfactory.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectfunction.h"
 
 #include <QApplication>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QPainter>
+#include <app/commandsstack.h>
 
 static const qreal kBorderWidth = 2;
 
@@ -34,17 +43,45 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
     setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    QColor brushColor { QLatin1String("#ffd11a") };
-    if (auto parentContainer = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
-        brushColor = parentContainer->brush().color().darker();
-    setBrush(brushColor);
-    setPen(QPen(brushColor.darker(), 2));
+    updateColors();
     setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
 {
     return qobject_cast<AADLObjectFunction *>(m_entity);
+}
+
+QList<QVariantList> AADLFunctionGraphicsItem::prepareConnectionsParams() const
+{
+    QList<QVariantList> params;
+    for (auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
+            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
+                params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->points()) });
+            params.append(
+                    { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
+        }
+    }
+    return params;
+}
+
+void AADLFunctionGraphicsItem::createCommand()
+{
+    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change item geometry/position"));
+
+    for (auto connectionParams : prepareConnectionsParams()) {
+        const auto linkedItemsGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, connectionParams);
+        taste3::cmd::CommandsStack::current()->push(linkedItemsGeometryCmd);
+    }
+
+    const QRectF geometry = sceneBoundingRect();
+    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
+    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry,
+                                                          { qVariantFromValue(entity()), qVariantFromValue(points) });
+    taste3::cmd::CommandsStack::current()->push(geometryCmd);
+
+    taste3::cmd::CommandsStack::current()->endMacro();
 }
 
 void AADLFunctionGraphicsItem::rebuildLayout()
@@ -81,10 +118,71 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     painter->drawRoundedRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2), 10, 10);
     painter->setFont(font());
-    painter->drawText(boundingRect(), Qt::AlignCenter, entity()->title());
+    const double scaleValue = scale() / painter->transform().m11();
+    painter->scale(scaleValue, scaleValue);
+    const QRectF br(QPointF(0, 0), boundingRect().size() / scaleValue);
+    painter->drawText(br, Qt::AlignCenter, entity()->title());
     painter->restore();
 
     InteractiveObject::paint(painter, option, widget);
+}
+
+QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemParentHasChanged)
+        updateColors();
+    return InteractiveObject::itemChange(change, value);
+}
+
+void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                                  const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+
+    createCommand();
+}
+
+void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    InteractiveObject::onManualMoveProgress(grip, from, to);
+    for (auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
+            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
+                connection->instantLayoutUpdate();
+        }
+    }
+}
+
+void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                                    const QPointF &releasedAt)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(pressedAt);
+    Q_UNUSED(releasedAt);
+
+    createCommand();
+}
+
+void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    InteractiveObject::onManualResizeProgress(grip, from, to);
+    for (auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
+            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
+                connection->instantLayoutUpdate();
+        }
+    }
+}
+
+void AADLFunctionGraphicsItem::updateColors()
+{
+    QColor brushColor { QLatin1String("#ffd11a") };
+    if (auto parentContainer = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
+        brushColor = parentContainer->brush().color().darker(125);
+    setBrush(brushColor);
+    setPen(QPen(brushColor.darker(), 2));
 }
 
 } // namespace aadl

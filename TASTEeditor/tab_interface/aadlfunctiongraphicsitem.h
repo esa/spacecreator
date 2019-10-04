@@ -38,9 +38,21 @@ public:
 
     int type() const override { return Type; }
 
+    QList<QVariantList> prepareConnectionsParams() const;
+    void createCommand();
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+
+private:
+    void updateColors();
 };
 
 } // namespace aadl

@@ -53,13 +53,20 @@ public:
 
     virtual AADLObjectType aadlType() const = 0;
 
+    QVector<qint32> coordinates() const;
+    void setCoordinates(const QVector<qint32> &coordinates);
+
+    AADLObject *parentObject() const;
+
 signals:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
+    void coordinatesChanged(const QVector<qint32> &coordinates);
 
 public slots:
     bool setTitle(const QString &title);
     bool setId(const common::Id &id);
+    bool setParentObject(AADLObject *parentObject);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;
