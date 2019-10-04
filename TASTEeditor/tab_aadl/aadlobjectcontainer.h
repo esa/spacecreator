@@ -61,11 +61,6 @@ public:
     QString instanceOf() const;
     void setInstanceOf(const QString &instance);
 
-signals:
-    void languageChanged(const QString &lang);
-    void instanceOfChanged(const QString &inst);
-    void activeInterfacesChanged(const QStringList &ifaces);
-
 private:
     const std::unique_ptr<AADLObjectContainerPrivate> d;
 };

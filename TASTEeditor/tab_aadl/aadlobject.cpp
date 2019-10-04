@@ -16,6 +16,9 @@
 */
 
 #include "aadlobject.h"
+#include "aadlcommonprops.h"
+#include <QPointer>
+#include <QVector>
 
 #include <QPointer>
 #include <QVector>
@@ -24,14 +27,18 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate {
-    QString m_title;
     common::Id m_id;
-    QVector<qint32> m_coords;
+    QHash<QString, QVariant> m_attrs;
+    QHash<QString, QVariant> m_props;
 };
 
 AADLObject::AADLObject(const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate { title, common::createId(), QVector<qint32> {} })
+    , d(new AADLObjectPrivate {
+        common::createId(),
+        QHash<QString, QVariant> {{meta::token(meta::Token::name), title}}, // attrs
+        QHash<QString, QVariant> {} // props
+    })
 {
 }
 
@@ -39,7 +46,7 @@ AADLObject::~AADLObject() {}
 
 QString AADLObject::title() const
 {
-    return d->m_title;
+    return attr(meta::token(meta::Token::name)).toString();
 }
 
 common::Id AADLObject::id() const
@@ -49,9 +56,9 @@ common::Id AADLObject::id() const
 
 bool AADLObject::setTitle(const QString &title)
 {
-    if (title != d->m_title) {
-        d->m_title = title;
-        emit titleChanged(this->title());
+    if (title != this->title()) {
+        setProp(meta::token(meta::Token::name), title);
+        emit titleChanged(title);
         return true;
     }
     return false;
@@ -76,22 +83,113 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
     return true;
 }
 
+QVector<qint32> AADLObject::coordinatesFromString(const QString& strCoordinates) const
+{
+    const QStringList &strCoords = strCoordinates.split(' ');
+    const int coordsCount = strCoords.size();
+    QVector<qint32> coords(coordsCount);
+    for (int i = 0; i < coordsCount; ++i)
+        coords[i] = strCoords[i].toLong() / 100;
+    return coords;
+}
+
 QVector<qint32> AADLObject::coordinates() const
 {
-    return d->m_coords;
+    return coordinatesFromString(prop(meta::token(meta::Token::coordinates)).toString());
+}
+
+QString AADLObject::coordinatesToString(const QVector<qint32>& coordinates) const
+{
+    QString coordString;
+    for(auto coord : coordinates)
+    {
+        if(!coordString.isEmpty())
+            coordString.append(' ');
+        coordString.append(QString::number(coord*100));
+    }
+
+    return coordString;
 }
 
 void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 {
-    if (d->m_coords != coordinates) {
-        d->m_coords = coordinates;
-        emit coordinatesChanged(d->m_coords);
+    if (this->coordinates() != coordinates) {
+        setProp(meta::token(meta::Token::coordinates), coordinatesToString(coordinates));
+        emit coordinatesChanged(coordinates);
     }
 }
 
 AADLObject *AADLObject::parentObject() const
 {
     return qobject_cast<AADLObject *>(parent());
+}
+
+QHash<QString, QVariant> AADLObject::attrs() const
+{
+    return d->m_attrs;
+}
+
+void AADLObject::setAttrs(const QHash<QString, QVariant>& attrs)
+{
+    if(d->m_attrs != attrs)
+    {
+        d->m_attrs = attrs;
+        emit attributesChanged();
+    }
+}
+
+QVariant AADLObject::attr(const QString& name, const QVariant &defaultValue) const
+{
+    return d->m_attrs.value(name, defaultValue);
+}
+
+void AADLObject::setAttr(const QString& name, const QVariant& val)
+{
+    if(!name.isEmpty() && val != d->m_attrs[name])
+    {
+        d->m_attrs[name] = val;
+        emit attributesChanged();
+    }
+}
+
+void AADLObject::removeAttr(const QString& name)
+{
+    if(!name.isEmpty() && d->m_attrs.remove(name))
+        emit attributesChanged();
+}
+
+QHash<QString, QVariant> AADLObject::props() const
+{
+    return d->m_props;
+}
+
+void AADLObject::setProps(const QHash<QString, QVariant> &props)
+{
+    if(props != d->m_props)
+    {
+        d->m_props = props;
+        emit propertiesChanged();
+    }
+}
+
+QVariant AADLObject::prop(const QString& name, const QVariant &defaultValue) const
+{
+    return d->m_props.value(name, defaultValue);
+}
+
+void AADLObject::setProp(const QString& name, const QVariant& val)
+{
+    if(!name.isEmpty() && val != d->m_props[name])
+    {
+        d->m_props[name] = val;
+        emit propertiesChanged();
+    }
+}
+
+void AADLObject::removeProp(const QString& name)
+{
+    if(!name.isEmpty() && d->m_props.remove(name))
+        emit propertiesChanged();
 }
 
 } // ns aadl

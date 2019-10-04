@@ -97,11 +97,18 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
     }
     if (m_view == watched && event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Delete) {
+        switch (keyEvent->key()) {
+        case Qt::Key_Delete: {
             removeSelectedItems();
-        } else if (keyEvent->key() == Qt::Key_Escape) {
-            if (auto scene = m_view->scene())
-                scene->clearSelection();
+        } break;
+        case Qt::Key_Escape: {
+            if(toolType() == ToolType::Pointer) {
+                if (auto scene = m_view->scene())
+                    scene->clearSelection();
+            } else {
+                setCurrentToolType(ToolType::Pointer);
+            }
+        } break;
         }
     }
 
@@ -193,19 +200,21 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
 
     const QPointF scenePos = cursorInScene(e->globalPos());
 
-    if (e->button() & Qt::RightButton) {
-        QMenu *menu = new QMenu(m_view);
-        menu->setAttribute(Qt::WA_DeleteOnClose);
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/container.svg")), tr("Container"), this,
-                        [this]() { handleToolType(ToolType::Container); });
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
-                        [this]() { handleToolType(ToolType::Function); });
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
-                        [this]() { handleToolType(ToolType::Comment); });
-        connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
-        menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
-        return true;
-    } else if (m_toolType != ToolType::Pointer) {
+    if(m_toolType == ToolType::Pointer) {
+        if (e->button() & Qt::RightButton && e->buttons() == Qt::NoButton) {
+            QMenu *menu = new QMenu(m_view);
+            menu->setAttribute(Qt::WA_DeleteOnClose);
+//            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/container.svg")), tr("Container"), this,
+//                            [this]() { handleToolType(ToolType::Container); });
+            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
+                            [this]() { handleToolType(ToolType::Function); });
+            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+                            [this]() { handleToolType(ToolType::Comment); });
+            connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
+            menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
+            return true;
+        }
+    } else {
         handleToolType(m_toolType);
         return true;
     }

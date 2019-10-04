@@ -16,6 +16,7 @@
 */
 
 #include "aadlobjectcontainer.h"
+#include "aadlcommonprops.h"
 
 namespace taste3 {
 namespace aadl {
@@ -24,10 +25,6 @@ struct AADLObjectContainerPrivate {
     QVector<AADLObject *> m_children {};
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
-
-    QString m_lang;
-    QString m_instance_of;
-    QStringList m_activeIfaces;
 };
 
 AADLObjectContainer::AADLObjectContainer(const QString &title, QObject *parent)
@@ -139,41 +136,35 @@ bool AADLObjectContainer::removeInterface(AADLObjectIface *iface)
 
 QString AADLObjectContainer::language() const
 {
-    return d->m_lang;
+    return attr(meta::token(meta::Token::language)).toString();
 }
 
 void AADLObjectContainer::setLanguage(const QString &lang)
 {
-    if (d->m_lang != lang) {
-        d->m_lang = lang;
-        emit languageChanged(d->m_lang);
-    }
+    if (language() != lang)
+        setAttr(meta::token(meta::Token::language), lang);
 }
 
 QString AADLObjectContainer::instanceOf() const
 {
-    return d->m_instance_of;
+    return attr(meta::token(meta::Token::instance_of)).toString();
 }
 
 void AADLObjectContainer::setInstanceOf(const QString &instance)
 {
-    if (d->m_instance_of != instance) {
-        d->m_instance_of = instance;
-        emit instanceOfChanged(d->m_instance_of);
-    }
+    if (instanceOf() != instance)
+        setAttr(meta::token(meta::Token::instance_of), instance);
 }
 
 QStringList AADLObjectContainer::activeInterfaces() const
 {
-    return d->m_activeIfaces;
+    return prop(meta::token(meta::Token::Active_Interfaces)).toStringList();
 }
 
 void AADLObjectContainer::setActiveInterfaces(const QStringList &ifaces)
 {
-    if (d->m_activeIfaces != ifaces) {
-        d->m_activeIfaces = ifaces;
-        emit activeInterfacesChanged(d->m_activeIfaces);
-    }
+    if (activeInterfaces() != ifaces)
+        setProp(meta::token(meta::Token::Active_Interfaces), ifaces);
 }
 
 } // ns aadl

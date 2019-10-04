@@ -116,6 +116,7 @@ HEADERS += \
         reports/bugreporthandler.h \
         settings/appoptions.h \
         settings/settingsmanager.h \
+        tab_aadl/aadlcommonprops.h \
         tab_aadl/aadlobject.h \
         tab_aadl/aadlobjectcomment.h \
         tab_aadl/aadlobjectconnection.h \
