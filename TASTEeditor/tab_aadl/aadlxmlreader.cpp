@@ -21,6 +21,7 @@
 #include "aadlobjectcontainer.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "aadlcommonprops.h"
 
 #include <QDebug>
 #include <QFile>
@@ -33,49 +34,7 @@
 namespace taste3 {
 namespace aadl {
 
-const QHash<QString, AADLXMLReader::Token> AADLXMLReader::m_tokens = {
-    { "InterfaceView", AADLXMLReader::Token::InterfaceView },
-
-    // tags:
-    { "Function", AADLXMLReader::Token::Function },
-    { "Property", AADLXMLReader::Token::Property },
-    { "Provided_Interface", AADLXMLReader::Token::Provided_Interface },
-    { "Input_Parameter", AADLXMLReader::Token::Input_Parameter },
-    { "Output_Parameter", AADLXMLReader::Token::Output_Parameter },
-    { "Required_Interface", AADLXMLReader::Token::Required_Interface },
-    { "Connection", AADLXMLReader::Token::Connection },
-
-    // attrs:
-    { "name", AADLXMLReader::Token::name },
-    { "language", AADLXMLReader::Token::language },
-    { "is_type", AADLXMLReader::Token::is_type },
-    { "instance_of", AADLXMLReader::Token::instance_of },
-    { "value", AADLXMLReader::Token::value },
-    { "kind", AADLXMLReader::Token::kind },
-    { "period", AADLXMLReader::Token::period },
-    { "wcet", AADLXMLReader::Token::wcet },
-    { "queue_size", AADLXMLReader::Token::queue_size },
-    { "type", AADLXMLReader::Token::type },
-    { "encoding", AADLXMLReader::Token::encoding },
-    { "from", AADLXMLReader::Token::from },
-    { "ri_name", AADLXMLReader::Token::ri_name },
-    { "to", AADLXMLReader::Token::to },
-    { "pi_name", AADLXMLReader::Token::pi_name },
-
-    // TASTE props:
-    { "Taste::Active_Interfaces", AADLXMLReader::Token::Active_Interfaces },
-    { "Taste::coordinates", AADLXMLReader::Token::coordinates },
-    { "Taste::Deadline", AADLXMLReader::Token::Deadline },
-    { "Taste::InterfaceName", AADLXMLReader::Token::InterfaceName },
-    { "Taste::RCMoperationKind", AADLXMLReader::Token::RCMoperationKind },
-    { "Taste::RCMperiod", AADLXMLReader::Token::RCMperiod },
-    { "Taste::labelInheritance", AADLXMLReader::Token::labelInheritance }
-};
-
-AADLXMLReader::Token AADLXMLReader::token(const QString &fromString)
-{
-    return m_tokens.value(fromString, Token::Unknown);
-}
+using namespace taste3::aadl::meta;
 
 struct AADLXMLReaderPrivate {
     QVector<AADLObject *> m_allObjects {};
@@ -155,10 +114,10 @@ bool AADLXMLReader::readAADLObject(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (token(tagName)) {
-    case AADLXMLReader::Token::Function: {
+    case Token::Function: {
         return readFunction(xml);
     }
-    case AADLXMLReader::Token::Connection: {
+    case Token::Connection: {
         return readConnection(xml);
     }
     default:
@@ -206,20 +165,12 @@ bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectContai
     if (!obj)
         return false;
 
-    const QString &name = xml.attributes().value(m_tokens.key(Token::name)).toString();
-    const QString &valueString = xml.attributes().value(m_tokens.key(Token::value)).toString();
+    const QString &name = xml.attributes().value(token(Token::name)).toString();
+    const QString &valueString = xml.attributes().value(token(Token::value)).toString();
     switch (token(name)) {
-    case Token::Active_Interfaces: {
-        obj->setActiveInterfaces(valueString.split(","));
-        break;
-    }
+    case Token::Active_Interfaces:
     case Token::coordinates: {
-        const QStringList &strCoords = valueString.split(" ");
-        const int coordsCount = strCoords.size();
-        QVector<qint32> coords(coordsCount);
-        for (int i = 0; i < coordsCount; ++i)
-            coords[i] = strCoords[i].toLong() / 100;
-        obj->setCoordinates(coords);
+        obj->setProp(name, valueString);
         break;
     }
     default: {
@@ -277,24 +228,12 @@ bool AADLXMLReader::readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *
     for (const QXmlStreamAttribute &attr : attrs) {
         const QString &attrName = attr.name().toString();
         switch (token(attrName)) {
-        case Token::name: {
-            iface->setTitle(attrs.value(attrName).toString());
-            break;
-        }
-        case Token::kind: {
-            iface->setKind(attrs.value(attrName).toString());
-            break;
-        }
-        case Token::period: {
-            iface->setPeriod(attrs.value(attrName).toLong());
-            break;
-        }
-        case Token::wcet: {
-            iface->setWcet(attrs.value(attrName).toLong());
-            break;
-        }
+        case Token::name:
+        case Token::kind:
+        case Token::period:
+        case Token::wcet:
         case Token::queue_size: {
-            iface->setQueueSize(attrs.value(attrName).toLong());
+            iface->setAttr(attrName, attrs.value(attrName).toString());
             break;
         }
         default: {
@@ -337,37 +276,17 @@ bool AADLXMLReader::readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *
 
 bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *iface)
 {
-    const QString &name = xml.attributes().value(m_tokens.key(Token::name)).toString();
+    const QString &name = xml.attributes().value(token(Token::name)).toString();
     const QXmlStreamAttributes &attrs = xml.attributes();
-    const QString &propVal = attrs.value(m_tokens.key(Token::value)).toString();
+    const QString &propVal = attrs.value(token(Token::value)).toString();
     switch (token(name)) {
-    case Token::RCMoperationKind: {
-        iface->setRcmOperationKind(propVal);
-        break;
-    }
-    case Token::coordinates: {
-        const QStringList &strCoords = propVal.split(" ");
-        const int coordsCount = strCoords.size();
-        QVector<qint32> coords(coordsCount);
-        for (int i = 0; i < coordsCount; ++i)
-            coords[i] = strCoords[i].toLong() / 100;
-        iface->setCoordinates(coords);
-        break;
-    }
-    case Token::Deadline: {
-        iface->setDeadline(propVal);
-        break;
-    }
-    case Token::RCMperiod: {
-        iface->setRcmPeriod(propVal);
-        break;
-    }
-    case Token::InterfaceName: {
-        iface->setInterfaceName(propVal);
-        break;
-    }
+    case Token::RCMoperationKind:
+    case Token::coordinates:
+    case Token::Deadline:
+    case Token::RCMperiod:
+    case Token::InterfaceName:
     case Token::labelInheritance: {
-        iface->setLabelInheritance(QVariant(propVal).toBool());
+        iface->setProp(name,propVal);
         break;
     }
     default: {
@@ -395,15 +314,15 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         const QString &attrValue = attr.value().toString();
 
         switch (token(attrName)) {
-        case AADLXMLReader::Token::name: {
+        case Token::name: {
             param.m_name = attrValue;
             break;
         }
-        case AADLXMLReader::Token::type: {
+        case Token::type: {
             param.m_type = attrValue;
             break;
         }
-        case AADLXMLReader::Token::encoding: {
+        case Token::encoding: {
             param.m_encoding = attrValue;
             break;
         }
@@ -424,7 +343,7 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
 
 AADLObjectContainer *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
 {
-    static const QXmlStreamAttribute attrContainer(m_tokens.key(AADLXMLReader::Token::is_type), "true");
+    static const QXmlStreamAttribute attrContainer(token(Token::is_type), "true");
     const QXmlStreamAttributes &attributes(xml.attributes());
 
     AADLObjectContainer *currObj = attributes.contains(attrContainer) ? new AADLObjectContainer(QString(), parent)
@@ -433,20 +352,11 @@ AADLObjectContainer *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLOb
     for (const QXmlStreamAttribute &attr : attributes) {
         const QString &attrName = attr.name().toString();
         switch (token(attrName)) {
-        case AADLXMLReader::Token::name: {
-            currObj->setTitle(attr.value().toString());
-            break;
-        }
-        case AADLXMLReader::Token::language: {
-            currObj->setLanguage(attr.value().toString());
-            break;
-        }
-        case AADLXMLReader::Token::is_type: {
-            // provided by currObj's class, ignore here
-            break;
-        }
-        case AADLXMLReader::Token::instance_of: {
-            currObj->setInstanceOf(attr.value().toString());
+        case Token::name:
+        case Token::language:
+        case Token::is_type:
+        case Token::instance_of: {
+            currObj->setAttr(attrName, attr.value().toString());
             break;
         }
         default: {
@@ -482,25 +392,25 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
         const QString &attrValue = attr.value().toString();
 
         switch (token(attrName)) {
-        case AADLXMLReader::Token::from: {
+        case Token::from: {
             connectionInitParams.m_from = d->m_functionNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_from)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case AADLXMLReader::Token::to: {
+        case Token::to: {
             connectionInitParams.m_to = d->m_functionNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_to)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case AADLXMLReader::Token::ri_name: {
+        case Token::ri_name: {
             connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_ri)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case AADLXMLReader::Token::pi_name: {
+        case Token::pi_name: {
             connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_pi)
                 qCritical() << Q_FUNC_INFO << attrValue;

@@ -36,48 +36,6 @@ class AADLXMLReader : public QObject
     Q_OBJECT
 
 public:
-    enum class Token
-    {
-        Unknown = 0,
-        InterfaceView,
-
-        // tags:
-        Function,
-        Property,
-        Provided_Interface,
-        Input_Parameter,
-        Output_Parameter,
-        Required_Interface,
-        Connection,
-
-        // attrs:
-        name,
-        language,
-        is_type,
-        instance_of,
-        value,
-        kind,
-        period,
-        wcet,
-        queue_size,
-        type,
-        encoding,
-        from,
-        ri_name,
-        to,
-        pi_name,
-
-        // TASTE props:
-        Active_Interfaces,
-        coordinates,
-        Deadline,
-        InterfaceName,
-        RCMoperationKind,
-        RCMperiod,
-        labelInheritance
-    };
-    Q_ENUM(Token)
-
     explicit AADLXMLReader(QObject *parent = nullptr);
     ~AADLXMLReader() override;
 
@@ -89,8 +47,6 @@ signals:
 
 private:
     const std::unique_ptr<AADLXMLReaderPrivate> d;
-    static const QHash<QString, AADLXMLReader::Token> m_tokens;
-    static AADLXMLReader::Token token(const QString& fromString);
 
     static QString badTagWarningMessage(const QXmlStreamReader &xml, const QString& tag);
     bool handleError(const QXmlStreamReader &xml);

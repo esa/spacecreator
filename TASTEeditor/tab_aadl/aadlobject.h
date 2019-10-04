@@ -20,6 +20,8 @@
 #include "app/common.h"
 
 #include <QObject>
+#include <QVariant>
+
 #include <memory>
 
 namespace taste3 {
@@ -58,10 +60,29 @@ public:
 
     AADLObject *parentObject() const;
 
+    // "attributes" - payload data in the opening XML tag,
+    // like "name" and "kind" below:
+    // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
+
+    QHash<QString, QVariant> attrs() const;
+    void setAttrs( const QHash<QString, QVariant>& attrs );
+    QVariant attr( const QString& name, const QVariant &defaultValue = QVariant() ) const;
+    void setAttr( const QString& name, const QVariant& val);
+    void removeAttr( const QString& name);
+
+    // "properties" - XML children <Property>
+    QHash<QString, QVariant> props() const;
+    void setProps( const QHash<QString, QVariant> &props );
+    QVariant prop( const QString& name, const QVariant &defaultValue = QVariant()) const;
+    void setProp( const QString& name, const QVariant& val);
+    void removeProp( const QString& name);
+
 signals:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
+    void attributesChanged();
+    void propertiesChanged();
 
 public slots:
     bool setTitle(const QString &title);
@@ -70,6 +91,9 @@ public slots:
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;
+    QVector<qint32> coordinatesFromString( const QString& strCoordinates) const;
+    QString coordinatesToString( const QVector<qint32>& coordinates) const;
+
 };
 
 } // ns aadl

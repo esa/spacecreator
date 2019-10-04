@@ -16,6 +16,7 @@
 */
 
 #include "aadlobjectiface.h"
+#include "aadlcommonprops.h"
 
 namespace taste3 {
 namespace aadl {
@@ -26,19 +27,8 @@ struct AADLObjectIfacePrivate {
     {
     }
     const AADLObjectIface::IfaceType m_direction;
-    QString m_kind = {};
-    qint32 m_period = 0;
-    qint32 m_wcet = 0;
-    qint32 m_queueSize = 0;
-
     QVector<IfaceParam> m_paramasIn = {};
     QVector<IfaceParam> m_paramasOut = {};
-
-    QString m_rcmOperationKind;
-    QString m_deadline;
-    QString m_rcmPeriod;
-    QString m_interfaceName;
-    bool m_labelInheritance;
 };
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
@@ -70,13 +60,13 @@ bool AADLObjectIface::isRequired() const
 
 QString AADLObjectIface::kind() const
 {
-    return d->m_kind;
+    return attr(meta::token(meta::Token::kind)).toString();
 }
 
 bool AADLObjectIface::setKind(const QString &kind)
 {
-    if (d->m_kind != kind) {
-        d->m_kind = kind;
+    if (this->kind() != kind) {
+        setAttr(meta::token(meta::Token::kind), kind);
         return true;
     }
 
@@ -85,13 +75,13 @@ bool AADLObjectIface::setKind(const QString &kind)
 
 qint32 AADLObjectIface::period() const
 {
-    return d->m_period;
+    return attr(meta::token(meta::Token::period)).toInt();
 }
 
 bool AADLObjectIface::setPeriod(qint32 period)
 {
-    if (period != d->m_period) {
-        d->m_period = period;
+    if (this->period() != period) {
+        setAttr(meta::token(meta::Token::period), period);
         return true;
     }
 
@@ -100,13 +90,13 @@ bool AADLObjectIface::setPeriod(qint32 period)
 
 qint32 AADLObjectIface::wcet() const
 {
-    return d->m_wcet;
+    return attr(meta::token(meta::Token::wcet)).toInt();
 }
 
 bool AADLObjectIface::setWcet(qint32 wcet)
 {
-    if (d->m_wcet != wcet) {
-        d->m_wcet = wcet;
+    if (this->wcet() != wcet) {
+        setAttr(meta::token(meta::Token::wcet), wcet);
         return true;
     }
     return false;
@@ -114,13 +104,13 @@ bool AADLObjectIface::setWcet(qint32 wcet)
 
 qint32 AADLObjectIface::queueSize() const
 {
-    return d->m_queueSize;
+    return attr(meta::token(meta::Token::queue_size)).toInt();
 }
 
 bool AADLObjectIface::setQueueSize(qint32 size)
 {
-    if (d->m_queueSize != size) {
-        d->m_queueSize = size;
+    if (queueSize() != size) {
+        setAttr(meta::token(meta::Token::queue_size), size);
         return true;
     }
     return false;
@@ -158,13 +148,13 @@ void AADLObjectIface::addParamOut(const IfaceParam &param) const
 
 QString AADLObjectIface::rcmOperationKind() const
 {
-    return d->m_rcmOperationKind;
+    return prop(meta::token(meta::Token::RCMoperationKind)).toString();
 }
 
 bool AADLObjectIface::setRcmOperationKind(const QString &kind)
 {
     if (rcmOperationKind() != kind) {
-        d->m_rcmOperationKind = kind;
+        setProp(meta::token(meta::Token::RCMoperationKind), kind);
         return true;
     }
     return false;
@@ -172,13 +162,13 @@ bool AADLObjectIface::setRcmOperationKind(const QString &kind)
 
 QString AADLObjectIface::deadline() const
 {
-    return d->m_deadline;
+    return prop(meta::token(meta::Token::Deadline)).toString();
 }
 
 bool AADLObjectIface::setDeadline(const QString &deadline)
 {
     if (this->deadline() != deadline) {
-        d->m_deadline = deadline;
+        setProp(meta::token(meta::Token::Deadline), deadline);
         return true;
     }
     return false;
@@ -186,13 +176,13 @@ bool AADLObjectIface::setDeadline(const QString &deadline)
 
 QString AADLObjectIface::rcmPeriod() const
 {
-    return d->m_rcmPeriod;
+    return prop(meta::token(meta::Token::RCMperiod)).toString();
 }
 
 bool AADLObjectIface::setRcmPeriod(const QString &period)
 {
     if (rcmPeriod() != period) {
-        d->m_rcmPeriod = period;
+        setProp(meta::token(meta::Token::RCMperiod), period);
         return true;
     }
     return false;
@@ -200,13 +190,13 @@ bool AADLObjectIface::setRcmPeriod(const QString &period)
 
 QString AADLObjectIface::interfaceName() const
 {
-    return d->m_interfaceName;
+    return prop(meta::token(meta::Token::InterfaceName)).toString();
 }
 
 bool AADLObjectIface::setInterfaceName(const QString &name)
 {
     if (interfaceName() != name) {
-        d->m_interfaceName = name;
+        setProp(meta::token(meta::Token::InterfaceName), name);
         return true;
     }
     return false;
@@ -214,13 +204,13 @@ bool AADLObjectIface::setInterfaceName(const QString &name)
 
 bool AADLObjectIface::labelInheritance() const
 {
-    return d->m_labelInheritance;
+    return prop(meta::token(meta::Token::labelInheritance)).toBool();
 }
 
 bool AADLObjectIface::setLabelInheritance(bool label)
 {
     if (labelInheritance() != label) {
-        d->m_labelInheritance = label;
+        setProp(meta::token(meta::Token::labelInheritance), label);
         return true;
     }
     return false;
