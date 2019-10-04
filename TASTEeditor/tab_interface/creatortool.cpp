@@ -46,6 +46,7 @@
 
 static const qreal kInterfaceTolerance = 20;
 static const qreal kConnectionTolerance = 20;
+static const QMarginsF kMargins { 50, 50, 50, 50 };
 
 namespace taste3 {
 namespace aadl {
@@ -233,7 +234,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
             if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
                 return false;
         } else if (auto scene = m_view->scene()) {
-            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.normalized());
+            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.normalized().marginsAdded(kMargins));
             auto it = std::find_if(
                     collidedItems.constBegin(), collidedItems.constEnd(),
                     [this](const QGraphicsItem *item) { return item != m_previewItem && !item->parentItem(); });
