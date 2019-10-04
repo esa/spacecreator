@@ -145,13 +145,13 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actionGroup->setExclusive(true);
     }
 
-    if (!m_actCreateContainer) {
-        m_actCreateContainer = new QAction(tr("Function Type"));
-        m_actCreateContainer->setCheckable(true);
-        m_actCreateContainer->setActionGroup(m_actionGroup);
-        connect(m_actCreateContainer, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateContainer);
-        m_actCreateContainer->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
-    }
+    //    if (!m_actCreateContainer) {
+    //        m_actCreateContainer = new QAction(tr("Function Type"));
+    //        m_actCreateContainer->setCheckable(true);
+    //        m_actCreateContainer->setActionGroup(m_actionGroup);
+    //        connect(m_actCreateContainer, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateContainer);
+    //        m_actCreateContainer->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
+    //    }
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
@@ -188,13 +188,14 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
     }
 
-    if (!m_actGroupConnections) {
-        m_actGroupConnections = new QAction(tr("Group"));
-        m_actGroupConnections->setCheckable(true);
-        m_actGroupConnections->setActionGroup(m_actionGroup);
-        connect(m_actGroupConnections, &QAction::triggered, this, &InterfaceTabDocument::onActionGroupConnections);
-        m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
-    }
+    //    if (!m_actGroupConnections) {
+    //        m_actGroupConnections = new QAction(tr("Group"));
+    //        m_actGroupConnections->setCheckable(true);
+    //        m_actGroupConnections->setActionGroup(m_actionGroup);
+    //        connect(m_actGroupConnections, &QAction::triggered, this,
+    //        &InterfaceTabDocument::onActionGroupConnections);
+    //        m_actGroupConnections->setIcon(QIcon(":/tab_interface/toolbar/icns/group.svg"));
+    //    }
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
