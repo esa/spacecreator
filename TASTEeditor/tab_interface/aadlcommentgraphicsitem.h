@@ -17,7 +17,7 @@
 
 #pragma once
 #include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectcomment.h"
 
 namespace taste3 {
 class TextGraphicsItem;
@@ -29,7 +29,7 @@ class AADLCommentGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLCommentGraphicsItem(AADLObject *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
     enum
     {
         Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLComment)
@@ -40,15 +40,23 @@ public:
     void setText(const QString &text);
     QString text() const;
 
+    AADLObjectComment *entity() const;
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
 private Q_SLOTS:
     void textEdited(const QString &newText);
+    void textChanged();
+
+private:
+    void createCommand();
 
 private:
     TextGraphicsItem *m_textItem = nullptr;

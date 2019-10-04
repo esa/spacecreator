@@ -18,8 +18,8 @@
 
 #include "aadlinterfacegraphicsitem.h"
 
-#include <QtDebug>
 #include <QPainter>
+#include <QtDebug>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
 #include <tab_aadl/aadlobjectiface.h>
@@ -36,6 +36,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     , m_text(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
@@ -44,7 +45,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);
-    m_text->setPlainText(tr("IFace Name"));
+    m_text->setPlainText(entity->interfaceName());
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
@@ -52,19 +53,36 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
     return qobject_cast<AADLObjectIface *>(m_entity);
 }
 
+void AADLInterfaceGraphicsItem::connect(AADLConnectionGraphicsItem *item)
+{
+    m_connection = item;
+
+    setFlag(QGraphicsItem::ItemIsSelectable, m_connection == nullptr);
+}
+
+AADLConnectionGraphicsItem *AADLInterfaceGraphicsItem::connectedItem() const
+{
+    return m_connection;
+}
+
 QGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
 {
     return parentItem();
 }
 
-void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &pos)
+void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &scenePos)
 {
-    if (!item || item == parentItem())
+    if (!item)
         return;
 
     setParentItem(item);
-    setPos(parentItem()->mapFromScene(pos));
+    setPos(parentItem()->mapFromScene(scenePos));
     instantLayoutUpdate();
+}
+
+void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
+{
+    m_text->setPlainText(name);
 }
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
@@ -107,13 +125,6 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
-}
-
-void AADLInterfaceGraphicsItem::onScenePositionChanged(const QPointF &scenePosition)
-{
-    Q_UNUSED(scenePosition);
-
-    emit moved(this);
 }
 
 } // namespace aadl

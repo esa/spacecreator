@@ -17,17 +17,21 @@
 
 #include "aadlobject.h"
 
+#include <QPointer>
+#include <QVector>
+
 namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate {
     QString m_title;
     common::Id m_id;
+    QVector<qint32> m_coords;
 };
 
 AADLObject::AADLObject(const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate({ title, common::createId() }))
+    , d(new AADLObjectPrivate { title, common::createId(), QVector<qint32> {} })
 {
 }
 
@@ -61,6 +65,33 @@ bool AADLObject::setId(const common::Id &id)
         return true;
     }
     return false;
+}
+
+bool AADLObject::setParentObject(AADLObject *parentObject)
+{
+    if (parent() == parentObject)
+        return false;
+
+    setParent(parentObject);
+    return true;
+}
+
+QVector<qint32> AADLObject::coordinates() const
+{
+    return d->m_coords;
+}
+
+void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
+{
+    if (d->m_coords != coordinates) {
+        d->m_coords = coordinates;
+        emit coordinatesChanged(d->m_coords);
+    }
+}
+
+AADLObject *AADLObject::parentObject() const
+{
+    return qobject_cast<AADLObject *>(parent());
 }
 
 } // ns aadl

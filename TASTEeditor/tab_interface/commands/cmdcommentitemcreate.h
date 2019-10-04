@@ -23,6 +23,7 @@
 
 namespace taste3 {
 namespace aadl {
+class AADLObjectComment;
 class AADLObjectsModel;
 namespace cmd {
 
@@ -39,6 +40,7 @@ public:
 private:
     QPointer<AADLObjectsModel> m_model;
     const QRectF m_geometry;
+    QPointer<AADLObjectComment> m_entity;
 };
 
 } // namespace cmd

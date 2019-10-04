@@ -26,20 +26,26 @@
 
 namespace taste3 {
 namespace aadl {
-
+class AADLObjectConnection;
 class AADLInterfaceGraphicsItem;
 
 class AADLConnectionGraphicsItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGraphicsItem(QGraphicsItem *parent = nullptr);
+    explicit AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parent = nullptr);
+    ~AADLConnectionGraphicsItem() override;
 
     static AADLConnectionGraphicsItem *createConnection(QGraphicsScene *scene, const QPointF &startPoint,
                                                         const QPointF &endPoint);
+    void setEndPoints(AADLInterfaceGraphicsItem *pi, AADLInterfaceGraphicsItem *ri);
     void setPoints(const QVector<QPointF> &points);
+    QVector<QPointF> points() const;
 
-    //    AADLObjectConnection *entity() const;
+    AADLObjectConnection *entity() const;
+
+    void scheduleLayoutUpdate();
+    void instantLayoutUpdate();
 
     enum
     {
@@ -54,12 +60,17 @@ public:
 
     static QVector<QPointF> simplify(const QVector<QPointF> &points);
 
+    void clear();
+    void updateGripPoints(bool forceVisible = false);
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
     void rebuildLayout();
-    void updateGripPoints(bool forceVisible = false);
+
+    void updateProvidedInterface(AADLInterfaceGraphicsItem *pi);
+    void updateRequiredInterface(AADLInterfaceGraphicsItem *ri);
 
     void handleSelectionChanged(bool isSelected);
 
@@ -72,16 +83,19 @@ private:
     QGraphicsRectItem *createGripPoint();
     void simplify();
     void updateBoundingRect();
+    void createCommand();
 
 private:
     QPointer<AADLInterfaceGraphicsItem> m_startItem;
     QPointer<AADLInterfaceGraphicsItem> m_endItem;
     QGraphicsPathItem *m_item = nullptr;
+    AADLObjectConnection *m_connection = nullptr;
     QRectF m_boundingRect;
 
     QVector<QPointF> m_points;
     QVector<QPointF> m_tmpPoints;
     QList<QGraphicsRectItem *> m_grips;
+    bool m_layoutDirty = false;
 };
 
 } // namespace aadl

@@ -122,9 +122,13 @@ void MainWindow::initMenuEdit()
 {
     m_actUndo = m_undoGroup->createUndoAction(this, tr("Undo:"));
     m_actUndo->setShortcut(QKeySequence::Undo);
+    m_actUndo->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/undo.svg")));
+    ui->mainToolBar->addAction(m_actUndo);
 
     m_actRedo = m_undoGroup->createRedoAction(this, tr("Redo:"));
     m_actRedo->setShortcut(QKeySequence::Redo);
+    m_actRedo->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/redo.svg")));
+    ui->mainToolBar->addAction(m_actRedo);
 
     m_menuEdit = menuBar()->addMenu(tr("&Edit"));
     m_menuEdit->addAction(m_actUndo);
@@ -278,12 +282,12 @@ void MainWindow::initTabs()
 {
     using namespace document;
 
-//    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
+    //    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
     m_docsManager->addDocument(TabDocumentFactory::createInterfaceTabDocument(this));
-//    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
-//    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
-//    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
-//    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
+    //    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
+    //    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
+    //    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
+    //    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
 }
 
 void MainWindow::initSettings()
@@ -316,7 +320,7 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         return true;
     }
     case CommandLineParser::Positional::OpenAADLXMLFile: {
-        if(!value.isEmpty())
+        if (!value.isEmpty())
             if (document::AbstractTabDocument *doc = m_docsManager->docById(TABDOC_ID_InterfaceView))
                 return doc->load(value);
 

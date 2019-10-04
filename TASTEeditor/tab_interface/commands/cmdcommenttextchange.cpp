@@ -15,32 +15,51 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "cmdcommenttextchange.h"
 
-#include <QPointer>
-#include <QRect>
-#include <QUndoCommand>
-#include <QVector>
+#include "cmdcommentitemcreate.h"
+
+#include "commandids.h"
+
+#include <tab_aadl/aadlobjectsmodel.h>
+#include <tab_aadl/aadlobjectcomment.h>
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectsModel;
 namespace cmd {
 
-class CmdConnectionItemCreate : public QUndoCommand
+CmdCommentTextChange::CmdCommentTextChange(AADLObjectComment *comment, const QString &text)
+    : QUndoCommand()
+    , m_entity(comment)
+    , m_prevText(comment->title())
+    , m_newText(text)
 {
-public:
-    explicit CmdConnectionItemCreate(AADLObjectsModel *model, const QVector<QPointF> &points);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+}
 
-private:
-    QPointer<AADLObjectsModel> m_model;
-    const QVector<QPointF> m_points;
-};
+void CmdCommentTextChange::redo()
+{
+    if (m_entity)
+        m_entity->setTitle(m_newText);
+}
+
+void CmdCommentTextChange::undo()
+{
+    if (m_entity)
+        m_entity->setTitle(m_prevText);
+}
+
+bool CmdCommentTextChange::mergeWith(const QUndoCommand *command)
+{
+    Q_UNUSED(command);
+
+    return false;
+}
+
+int CmdCommentTextChange::id() const
+{
+    return ChangeCommentText;
+}
 
 } // namespace cmd
 } // namespace aadl

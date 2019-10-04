@@ -291,7 +291,8 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
         if (it != collidedItems.constEnd())
             return;
     }
-    setRect(rect.normalized());
+    const QRectF normalized = rect.normalized();
+    setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
 
     rebuildLayout();
     updateGripPoints();
@@ -310,6 +311,8 @@ void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPo
 void InteractiveObject::onScenePositionChanged(const QPointF &scenePosition)
 {
     Q_UNUSED(scenePosition);
+
+    emit moved(this);
 }
 
 void InteractiveObject::hideGripPoints()
@@ -338,8 +341,7 @@ void InteractiveObject::initGripPoints()
 
     connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
         if (m_gripPoints && !m_gripPoints->isVisible())
-            delete m_gripPoints; // it's not a thing directly added to the scene, so just delete
-        // is enough
+            delete m_gripPoints; // it's not a thing directly added to the scene, so just delete is enough
     });
     if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
         gp->setGripType(GripPoint::GripType::Mover);
@@ -476,10 +478,12 @@ void InteractiveObject::instantLayoutUpdate()
 
 void InteractiveObject::setRect(const QRectF &geometry)
 {
-    setPos(geometry.topLeft());
+    const QPointF geometryPos = parentItem() ? parentItem()->mapFromScene(geometry.topLeft()) : geometry.topLeft();
+    setPos(geometryPos);
     prepareGeometryChange();
     m_boundingRect = { QPointF(0, 0), geometry.size() };
     instantLayoutUpdate();
+    updateGripPoints();
 }
 
 } // namespace taste3

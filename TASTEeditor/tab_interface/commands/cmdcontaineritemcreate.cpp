@@ -25,15 +25,39 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdContainerItemCreate::CmdContainerItemCreate(AADLObjectsModel *model, const QRectF &geometry)
-    : m_model(model)
+static int sCounter = 0;
+
+CmdContainerItemCreate::CmdContainerItemCreate(AADLObjectsModel *model, AADLObjectContainer *container, const QRectF &geometry)
+    : QUndoCommand()
+    , m_model(model)
     , m_geometry(geometry)
+    , m_entity(new AADLObjectContainer(QObject::tr("Function_interface_%1").arg(++sCounter), m_model))
+    , m_parent(container)
 {
 }
 
-void CmdContainerItemCreate::redo() {}
+void CmdContainerItemCreate::redo()
+{
+    const QVector<qint32> coordinates {
+        qRound(m_geometry.left()),
+        qRound(m_geometry.top()),
+        qRound(m_geometry.right()),
+        qRound(m_geometry.bottom()),
+    };
+    m_entity->setCoordinates(coordinates);
+    if (m_model)
+        m_model->addObject(m_entity);
+    if (m_parent)
+        m_parent->addChild(m_entity);
+}
 
-void CmdContainerItemCreate::undo() {}
+void CmdContainerItemCreate::undo()
+{
+    if (m_parent)
+        m_parent->removeChild(m_entity);
+    if (m_model)
+        m_model->removeObject(m_entity);
+}
 
 bool CmdContainerItemCreate::mergeWith(const QUndoCommand *command)
 {

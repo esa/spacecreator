@@ -68,6 +68,8 @@ public Q_SLOTS:
     void instantLayoutUpdate();
     void setRect(const QRectF &geometry);
 
+    virtual void updateGripPoints();
+
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
     void moved(InteractiveObject *item);
@@ -102,7 +104,6 @@ protected:
     virtual void hideGripPoints();
     virtual void showGripPoints();
     virtual void initGripPoints();
-    virtual void updateGripPoints();
     virtual void rebuildLayout();
 
     HighlightRectItem *createHighlighter();

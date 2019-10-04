@@ -15,36 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdconnectionitemcreate.h"
+#pragma once
 
-#include "commandids.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include <QPointer>
+#include <QVector>
+#include <QRect>
+#include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
+class AADLObject;
 namespace cmd {
 
-CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, const QVector<QPointF> &points)
-    : m_model(model)
-    , m_points(points)
+class CmdEntityGeometryChange : public QUndoCommand
 {
-}
+public:
+    explicit CmdEntityGeometryChange(AADLObject *object, const QVector<QPointF> &coordinates);
 
-void CmdConnectionItemCreate::redo() {}
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
-void CmdConnectionItemCreate::undo() {}
-
-bool CmdConnectionItemCreate::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
-}
-
-int CmdConnectionItemCreate::id() const
-{
-    return CreateConnectionEntity;
-}
+private:
+    QPointer<AADLObject> m_entity;
+    const QVector<qint32> m_prevCoordinates;
+    const QVector<qint32> m_newCoordinates;
+};
 
 } // namespace cmd
 } // namespace aadl
 } // namespace taste3
+

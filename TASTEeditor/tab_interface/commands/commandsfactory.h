@@ -38,7 +38,11 @@ private:
     static QUndoCommand *createCommentCommand(const QVariantList &params);
     static QUndoCommand *createProvidedInterfaceCommand(const QVariantList &params);
     static QUndoCommand *createRequiredInterfaceCommand(const QVariantList &params);
-    static QUndoCommand *createConnectionCommand(const QVariantList &params);
+    static QUndoCommand *createManualConnectionCommand(const QVariantList &params);
+    static QUndoCommand *createDirectConnectionCommand(const QVariantList &params);
+    static QUndoCommand *changeGeometryCommand(const QVariantList &params);
+    static QUndoCommand *changeCommentCommand(const QVariantList &params);
+    static QUndoCommand *removeEntityCommand(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

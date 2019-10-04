@@ -72,7 +72,7 @@ const QHash<QString, AADLXMLReader::Token> AADLXMLReader::m_tokens = {
     { "Taste::labelInheritance", AADLXMLReader::Token::labelInheritance }
 };
 
-AADLXMLReader::Token AADLXMLReader::token(const QString& fromString)
+AADLXMLReader::Token AADLXMLReader::token(const QString &fromString)
 {
     return m_tokens.value(fromString, Token::Unknown);
 }
@@ -93,10 +93,10 @@ AADLXMLReader::AADLXMLReader(QObject *parent)
 
 AADLXMLReader::~AADLXMLReader() {}
 
-QString AADLXMLReader::badTagWarningMessage(const QXmlStreamReader &xml, const QString& tag)
+QString AADLXMLReader::badTagWarningMessage(const QXmlStreamReader &xml, const QString &tag)
 {
     static const QString msg("The '%1' is unknown/unexpedted here: %2@%3 %4");
-    return msg.arg( tag, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
+    return msg.arg(tag, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
 }
 
 bool AADLXMLReader::handleError(const QXmlStreamReader &xml)
@@ -111,8 +111,12 @@ bool AADLXMLReader::handleError(const QXmlStreamReader &xml)
 bool AADLXMLReader::parse(const QString &file)
 {
     QFile in(file);
-    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
-        return parse(&in);
+    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text)) {
+        if (parse(&in)) {
+            emit objectsParsed(d->m_allObjects);
+            return true;
+        }
+    }
 
     const QString &errMsg = QString("Can't open file %1: %2").arg(file, in.errorString());
     qWarning() << errMsg;
@@ -169,6 +173,8 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
     if (!obj)
         return false;
 
+    d->m_allObjects.append(obj);
+
     while (xml.readNextStartElement()) {
         const QString &name = xml.name().toString();
         switch (token(name)) {
@@ -191,7 +197,6 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
     }
 
     d->m_functionNames.insert(obj->title(), obj);
-    d->m_allObjects.append(obj);
 
     return true;
 }
@@ -213,7 +218,7 @@ bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectContai
         const int coordsCount = strCoords.size();
         QVector<qint32> coords(coordsCount);
         for (int i = 0; i < coordsCount; ++i)
-            coords[i] = strCoords[i].toLong();
+            coords[i] = strCoords[i].toLong() / 100;
         obj->setCoordinates(coords);
         break;
     }
@@ -251,6 +256,7 @@ AADLObjectIface *AADLXMLReader::readInterface(QXmlStreamReader &xml, AADLObject 
         d->m_ifaceProvidedNames.insert(iface->title(), qobject_cast<AADLObjectIfaceProvided *>(iface));
     else
         d->m_ifaceRequiredNames.insert(iface->title(), qobject_cast<AADLObjectIfaceRequired *>(iface));
+    d->m_allObjects.append(iface);
 
     return iface;
 }
@@ -271,30 +277,30 @@ bool AADLXMLReader::readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *
     for (const QXmlStreamAttribute &attr : attrs) {
         const QString &attrName = attr.name().toString();
         switch (token(attrName)) {
-            case Token::name: {
-                iface->setTitle(attrs.value(attrName).toString());
-                break;
-            }
-            case Token::kind: {
-                iface->setKind(attrs.value(attrName).toString());
-                break;
-            }
-            case Token::period: {
-                iface->setPeriod(attrs.value(attrName).toLong());
-                break;
-            }
-            case Token::wcet: {
-                iface->setWcet(attrs.value(attrName).toLong());
-                break;
-            }
-            case Token::queue_size: {
-                iface->setQueueSize(attrs.value(attrName).toLong());
-                break;
-            }
-            default: {
-                qWarning() << badTagWarningMessage(xml, attrName);
-                return false;
-            }
+        case Token::name: {
+            iface->setTitle(attrs.value(attrName).toString());
+            break;
+        }
+        case Token::kind: {
+            iface->setKind(attrs.value(attrName).toString());
+            break;
+        }
+        case Token::period: {
+            iface->setPeriod(attrs.value(attrName).toLong());
+            break;
+        }
+        case Token::wcet: {
+            iface->setWcet(attrs.value(attrName).toLong());
+            break;
+        }
+        case Token::queue_size: {
+            iface->setQueueSize(attrs.value(attrName).toLong());
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, attrName);
+            return false;
+        }
         }
     }
 
@@ -344,7 +350,7 @@ bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *if
         const int coordsCount = strCoords.size();
         QVector<qint32> coords(coordsCount);
         for (int i = 0; i < coordsCount; ++i)
-            coords[i] = strCoords[i].toLong();
+            coords[i] = strCoords[i].toLong() / 100;
         iface->setCoordinates(coords);
         break;
     }
@@ -389,23 +395,23 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         const QString &attrValue = attr.value().toString();
 
         switch (token(attrName)) {
-            case AADLXMLReader::Token::name: {
-                param.m_name = attrValue;
-                break;
-            }
-            case AADLXMLReader::Token::type: {
-                param.m_type = attrValue;
-                break;
-            }
-            case AADLXMLReader::Token::encoding: {
-                param.m_encoding = attrValue;
-                break;
-            }
-            default: {
-                qWarning() << badTagWarningMessage(xml, attrName);
-                return false;
-            }
-            }
+        case AADLXMLReader::Token::name: {
+            param.m_name = attrValue;
+            break;
+        }
+        case AADLXMLReader::Token::type: {
+            param.m_type = attrValue;
+            break;
+        }
+        case AADLXMLReader::Token::encoding: {
+            param.m_encoding = attrValue;
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, attrName);
+            return false;
+        }
+        }
     }
 
     if (currParam == Token::Input_Parameter)
@@ -425,29 +431,29 @@ AADLObjectContainer *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLOb
                                                                       : new AADLObjectFunction(QString(), parent);
 
     for (const QXmlStreamAttribute &attr : attributes) {
-        const QString& attrName = attr.name().toString();
+        const QString &attrName = attr.name().toString();
         switch (token(attrName)) {
-            case AADLXMLReader::Token::name: {
-                currObj->setTitle(attr.value().toString());
-                break;
-            }
-            case AADLXMLReader::Token::language: {
-                currObj->setLanguage(attr.value().toString());
-                break;
-            }
-            case AADLXMLReader::Token::is_type: {
-                // provided by currObj's class, ignore here
-                break;
-            }
-            case AADLXMLReader::Token::instance_of: {
-                currObj->setInstanceOf(attr.value().toString());
-                break;
-            }
-            default: {
-                qWarning() << badTagWarningMessage(xml, attrName);
-                break;
-            }
-            }
+        case AADLXMLReader::Token::name: {
+            currObj->setTitle(attr.value().toString());
+            break;
+        }
+        case AADLXMLReader::Token::language: {
+            currObj->setLanguage(attr.value().toString());
+            break;
+        }
+        case AADLXMLReader::Token::is_type: {
+            // provided by currObj's class, ignore here
+            break;
+        }
+        case AADLXMLReader::Token::instance_of: {
+            currObj->setInstanceOf(attr.value().toString());
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, attrName);
+            break;
+        }
+        }
     }
 
     return currObj;
@@ -476,27 +482,42 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
         const QString &attrValue = attr.value().toString();
 
         switch (token(attrName)) {
-            case AADLXMLReader::Token::from: {
-                connectionInitParams.m_from = d->m_functionNames.value(attrValue, nullptr);
-                break;
-            }
-            case AADLXMLReader::Token::to: {
-                connectionInitParams.m_to = d->m_functionNames.value(attrValue, nullptr);
-                break;
-            }
-            case AADLXMLReader::Token::ri_name: {
-                connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
-                break;
-            }
-            case AADLXMLReader::Token::pi_name: {
-                connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
-                break;
-            }
-            default: {
-                qWarning() << badTagWarningMessage(xml, name);
-                return false;
-            }
-            }
+        case AADLXMLReader::Token::from: {
+            connectionInitParams.m_from = d->m_functionNames.value(attrValue, nullptr);
+            if (!connectionInitParams.m_from)
+                qCritical() << Q_FUNC_INFO << attrValue;
+            break;
+        }
+        case AADLXMLReader::Token::to: {
+            connectionInitParams.m_to = d->m_functionNames.value(attrValue, nullptr);
+            if (!connectionInitParams.m_to)
+                qCritical() << Q_FUNC_INFO << attrValue;
+            break;
+        }
+        case AADLXMLReader::Token::ri_name: {
+            connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
+            if (!connectionInitParams.m_ri)
+                qCritical() << Q_FUNC_INFO << attrValue;
+            break;
+        }
+        case AADLXMLReader::Token::pi_name: {
+            connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
+            if (!connectionInitParams.m_pi)
+                qCritical() << Q_FUNC_INFO << attrValue;
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, name);
+            return false;
+        }
+        }
+    }
+
+    /// TODO: remove this after discussions with critical warnings in the switch block
+    if (!connectionInitParams.m_from || !connectionInitParams.m_to || !connectionInitParams.m_ri
+        || !connectionInitParams.m_pi) {
+        qCritical("Skipping connection from/to ENV");
+        return true;
     }
 
     Q_ASSERT(connectionInitParams.m_from || connectionInitParams.m_to);
@@ -505,6 +526,7 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
     AADLObjectConnection *objConnection =
             new AADLObjectConnection(connectionInitParams.m_from, connectionInitParams.m_to, connectionInitParams.m_ri,
                                      connectionInitParams.m_pi);
+    d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
     d->m_allObjects.append(objConnection);
     return true;
 }

@@ -22,14 +22,20 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/grippoint.h"
+#include "commands/cmdentitygeometrychange.h"
+#include "commands/commandids.h"
+#include "commands/commandsfactory.h"
+#include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectiface.h"
 
 #include <QEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QPainter>
 #include <QPen>
 #include <QtDebug>
 #include <QtMath>
+#include <app/commandsstack.h>
 
 static const qreal kDefaulPenWidth = 2.0;
 static const QRectF kGripPointRect = { 0., 0., 12., 12. };
@@ -262,68 +268,86 @@ static inline QVector<QPointF> updatePoints(QGraphicsScene *scene, AADLInterface
     endDirection.translate(endPointAdjusted - endDirection.p1());
     endDirection.setLength(kConnectionMargin);
 
+    if (startItem->targetItem()->sceneBoundingRect().contains(endPointAdjusted))
+        startDirection.setAngle(180 + startDirection.angle());
+    if (endItem->targetItem()->sceneBoundingRect().contains(startPointAdjusted))
+        endDirection.setAngle(180 + endDirection.angle());
+
     const auto points = path(scene, startDirection, endDirection);
     return AADLConnectionGraphicsItem::simplify(points);
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(QGraphicsItem *parentItem)
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parentItem)
     : QGraphicsObject(parentItem)
     , m_item(new QGraphicsPathItem(this))
+    , m_connection(connection)
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemHasNoContents);
-    setFlag(QGraphicsItem::ItemIgnoresTransformations);
     m_item->setPen(QPen(Qt::black, kDefaulPenWidth));
+}
+
+AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
+{
+    clear();
+}
+
+void AADLConnectionGraphicsItem::setEndPoints(AADLInterfaceGraphicsItem *pi, AADLInterfaceGraphicsItem *ri)
+{
+    updateProvidedInterface(pi);
+    updateRequiredInterface(ri);
+    rebuildLayout();
+}
+
+void AADLConnectionGraphicsItem::scheduleLayoutUpdate()
+{
+    if (m_layoutDirty)
+        return;
+
+    m_layoutDirty = true;
+    QMetaObject::invokeMethod(this, "instantLayoutUpdate", Qt::QueuedConnection);
+}
+
+void AADLConnectionGraphicsItem::instantLayoutUpdate()
+{
+    rebuildLayout();
+    m_layoutDirty = false;
+
+    update();
 }
 
 void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 {
     Q_ASSERT(points.size() >= 2);
-    if (points.isEmpty())
+    if (points.isEmpty()) {
+        clear();
         return;
+    }
 
     m_points = points;
 
     auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
             utils::nearestItem(scene(), points.first(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-    if (startItem != m_startItem) {
-        if (m_startItem)
-            m_startItem->disconnect(this);
-
-        m_startItem = startItem;
-        connect(m_startItem, &InteractiveObject::moved, this, [this](InteractiveObject *iObj) {
-            if (m_points.size() < 2 || iObj != m_startItem)
-                return;
-
-            const QPointF offset = m_startItem->scenePos() - m_points.first();
-            m_points[0] = m_startItem->scenePos();
-            m_points[1] += offset;
-            rebuildLayout();
-        });
-    }
-    Q_ASSERT(m_startItem);
+    if (startItem)
+        updateProvidedInterface(startItem);
 
     auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
             utils::nearestItem(scene(), points.last(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-    if (endItem != m_endItem) {
-        if (m_endItem)
-            m_endItem->disconnect(this);
-
-        m_endItem = endItem;
-        connect(m_endItem, &InteractiveObject::moved, this, [this](InteractiveObject *iObj) {
-            if (m_points.size() < 2 || iObj != m_endItem)
-                return;
-
-            const QPointF offset = m_endItem->scenePos() - m_points.last();
-            m_points[m_points.size() - 1] = m_endItem->scenePos();
-            m_points[m_points.size() - 2] += offset;
-            rebuildLayout();
-        });
-    }
-    Q_ASSERT(m_endItem);
+    if (endItem)
+        updateRequiredInterface(endItem);
 
     updateBoundingRect();
+}
+
+QVector<QPointF> AADLConnectionGraphicsItem::points() const
+{
+    return m_points;
+}
+
+AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
+{
+    return m_connection;
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -372,9 +396,7 @@ bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent
 
 void AADLConnectionGraphicsItem::rebuildLayout()
 {
-    if (m_startItem && m_endItem && m_points.size() >= 2)
-        m_points = updatePoints(scene(), m_startItem, m_endItem);
-
+    m_points = updatePoints(scene(), m_startItem, m_endItem);
     updateBoundingRect();
 }
 
@@ -387,6 +409,26 @@ void AADLConnectionGraphicsItem::updateBoundingRect()
     m_item->setPath(pp);
     m_boundingRect = pp.boundingRect();
     updateGripPoints();
+}
+
+void AADLConnectionGraphicsItem::createCommand()
+{
+    auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QVariantList {
+        return { qVariantFromValue(item->entity()), qVariantFromValue<QVector<QPointF>>({ item->scenePos() }) };
+    };
+
+    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
+
+    const QVariantList params = { qVariantFromValue(m_connection), qVariantFromValue(m_points) };
+    taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params));
+
+    const auto ifaceStartCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, prepareParams(m_startItem));
+    taste3::cmd::CommandsStack::current()->push(ifaceStartCmd);
+
+    const auto ifaceEndCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, prepareParams(m_endItem));
+    taste3::cmd::CommandsStack::current()->push(ifaceEndCmd);
+
+    taste3::cmd::CommandsStack::current()->endMacro();
 };
 
 void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
@@ -395,14 +437,44 @@ void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
     if (m_points.isEmpty())
         return;
 
+    const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
+    const QTransform dt = deviceTransform(tr);
+    const QPointF currScale { dt.m11(), dt.m22() };
+
     for (int idx = 1; idx < m_points.size(); ++idx) {
         const QPointF point = utils::lineCenter(QLineF(m_points.value(idx - 1), m_points.value(idx)));
         if (QGraphicsRectItem *grip = m_grips.value(idx - 1)) {
+            const QPointF destination { mapFromScene(point) };
+            const QPointF destinationScaled { destination.x() * currScale.x(), destination.y() * currScale.y() };
             QRectF br = grip->rect();
-            br.moveCenter(point);
+            br.moveCenter(destinationScaled);
             grip->setRect(br);
             grip->setVisible(forceVisible || isSelected());
         }
+    }
+}
+
+void AADLConnectionGraphicsItem::updateProvidedInterface(AADLInterfaceGraphicsItem *pi)
+{
+    if (pi != m_startItem) {
+        if (m_startItem)
+            m_startItem->disconnect(this);
+
+        m_startItem = pi;
+        if (pi)
+            m_startItem->connect(this);
+    }
+}
+
+void AADLConnectionGraphicsItem::updateRequiredInterface(AADLInterfaceGraphicsItem *ri)
+{
+    if (ri != m_endItem) {
+        if (m_endItem)
+            m_endItem->disconnect(this);
+
+        m_endItem = ri;
+        if (ri)
+            m_endItem->connect(this);
     }
 }
 
@@ -514,13 +586,17 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
             m_startItem->setPos(m_startItem->parentItem()->mapFromScene(m_tmpPoints.first()));
             m_endItem->setPos(m_endItem->parentItem()->mapFromScene(m_tmpPoints.last()));
             setPoints(m_tmpPoints);
-            break;
+            m_tmpPoints.clear();
+            adjustGripPointCount();
+            return true;
         }
     }
 
     m_tmpPoints.clear();
     adjustGripPointCount();
     updateBoundingRect();
+
+    createCommand();
     return true;
 }
 
@@ -539,40 +615,6 @@ void AADLConnectionGraphicsItem::adjustGripPointCount()
     }
     while (m_grips.size() < m_points.size() - 1)
         m_grips.append(createGripPoint());
-}
-
-AADLConnectionGraphicsItem *
-AADLConnectionGraphicsItem::createConnection(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint)
-{
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
-    QGraphicsItem *startItem = utils::nearestItem(scene, startPoint, types);
-    QGraphicsItem *endItem = utils::nearestItem(scene, endPoint, types);
-    if (!startItem || !endItem)
-        return nullptr;
-
-    const QLineF connectionLine { startPoint, endPoint };
-
-    QPointF startPointAdjusted(startPoint);
-    if (!utils::intersects(startItem->sceneBoundingRect(), connectionLine, &startPointAdjusted))
-        return nullptr;
-
-    QPointF endPointAdjusted(endPoint);
-    if (!utils::intersects(endItem->sceneBoundingRect(), connectionLine, &endPointAdjusted))
-        return nullptr;
-
-    auto startIfaceItem =
-            new AADLInterfaceGraphicsItem(new AADLObjectIface(AADLObjectIface::IfaceType::Provided, tr("PI")));
-    startIfaceItem->setTargetItem(startItem, startPointAdjusted);
-
-    auto endIfaceItem =
-            new AADLInterfaceGraphicsItem(new AADLObjectIface(AADLObjectIface::IfaceType::Required, tr("RI")));
-    endIfaceItem->setTargetItem(endItem, endPointAdjusted);
-
-    auto connectionItem = new AADLConnectionGraphicsItem();
-    scene->addItem(connectionItem);
-    connectionItem->setPoints(updatePoints(scene, startIfaceItem, endIfaceItem));
-    connectionItem->rebuildLayout();
-    return connectionItem;
 }
 
 QGraphicsRectItem *AADLConnectionGraphicsItem::createGripPoint()
@@ -630,6 +672,13 @@ QVector<QPointF> AADLConnectionGraphicsItem::simplify(const QVector<QPointF> &po
         }
     }
     return simplifiedPoints;
+}
+
+void AADLConnectionGraphicsItem::clear()
+{
+    qDeleteAll(m_grips);
+    m_grips.clear();
+    m_points.clear();
 }
 
 } // namespace aadl

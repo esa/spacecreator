@@ -28,12 +28,26 @@ namespace cmd {
 CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, const QRectF &geometry)
     : m_model(model)
     , m_geometry(geometry)
+    , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_model))
 {
 }
 
-void CmdCommentItemCreate::redo() {}
+void CmdCommentItemCreate::redo()
+{
+    const QVector<qint32> coordinates {
+        qRound(m_geometry.left()),
+        qRound(m_geometry.top()),
+        qRound(m_geometry.right()),
+        qRound(m_geometry.bottom()),
+    };
+    m_entity->setCoordinates(coordinates);
+    m_model->addObject(m_entity);
+}
 
-void CmdCommentItemCreate::undo() {}
+void CmdCommentItemCreate::undo()
+{
+    m_model->removeObject(m_entity);
+}
 
 bool CmdCommentItemCreate::mergeWith(const QUndoCommand *command)
 {

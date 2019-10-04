@@ -34,6 +34,7 @@ class AADLObjectConnection : public AADLObject
 public:
     explicit AADLObjectConnection(AADLObject *from, AADLObject *to, AADLObjectIfaceRequired *ri,
                                   AADLObjectIfaceProvided *pi, QObject *parent = nullptr);
+    explicit AADLObjectConnection(AADLObject *from, AADLObject *to, QObject *parent = nullptr);
     explicit AADLObjectConnection(QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 

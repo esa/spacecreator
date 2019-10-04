@@ -25,11 +25,9 @@ struct AADLObjectContainerPrivate {
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
 
-    QString m_name;
     QString m_lang;
     QString m_instance_of;
     QStringList m_activeIfaces;
-    QVector<qint32> m_coords;
 };
 
 AADLObjectContainer::AADLObjectContainer(const QString &title, QObject *parent)
@@ -52,7 +50,8 @@ QVector<AADLObject *> AADLObjectContainer::children() const
 
 bool AADLObjectContainer::addChild(AADLObject *child)
 {
-    if (child && !children().contains(child)) {
+    if (child && !d->m_children.contains(child)) {
+        child->setParentObject(this);
         d->m_children.append(child);
         return true;
     }
@@ -62,8 +61,9 @@ bool AADLObjectContainer::addChild(AADLObject *child)
 
 bool AADLObjectContainer::removeChild(AADLObject *child)
 {
-    int id = children().indexOf(child);
-    if (id >= 0 && id < children().size()) {
+    int id = d->m_children.indexOf(child);
+    if (id >= 0 && id < d->m_children.size()) {
+        child->setParentObject(nullptr);
         d->m_children.remove(id);
         return true;
     }
@@ -79,6 +79,7 @@ QVector<AADLObjectIface *> AADLObjectContainer::ris() const
 bool AADLObjectContainer::addRI(AADLObjectIface *ri)
 {
     if (ri && !ris().contains(ri)) {
+        ri->setParentObject(this);
         d->m_ris.append(ri);
         return true;
     }
@@ -90,6 +91,7 @@ bool AADLObjectContainer::removeRI(AADLObjectIface *ri)
 {
     int id = ris().indexOf(ri);
     if (id >= 0 && id < ris().size()) {
+        ri->setParentObject(nullptr);
         d->m_ris.remove(id);
         return true;
     }
@@ -105,6 +107,7 @@ QVector<AADLObjectIface *> AADLObjectContainer::pis() const
 bool AADLObjectContainer::addPI(AADLObjectIface *pi)
 {
     if (pi && !pis().contains(pi)) {
+        pi->setParentObject(this);
         d->m_pis.append(pi);
         return true;
     }
@@ -116,6 +119,7 @@ bool AADLObjectContainer::removePI(AADLObjectIface *pi)
 {
     int id = pis().indexOf(pi);
     if (id >= 0 && id < pis().size()) {
+        pi->setParentObject(nullptr);
         d->m_pis.remove(id);
         return true;
     }
@@ -169,19 +173,6 @@ void AADLObjectContainer::setActiveInterfaces(const QStringList &ifaces)
     if (d->m_activeIfaces != ifaces) {
         d->m_activeIfaces = ifaces;
         emit activeInterfacesChanged(d->m_activeIfaces);
-    }
-}
-
-QVector<qint32> AADLObjectContainer::coordinates() const
-{
-    return d->m_coords;
-}
-
-void AADLObjectContainer::setCoordinates(const QVector<qint32> &coordinates)
-{
-    if (d->m_coords != coordinates) {
-        d->m_coords = coordinates;
-        emit coordinatesChanged(d->m_coords);
     }
 }
 

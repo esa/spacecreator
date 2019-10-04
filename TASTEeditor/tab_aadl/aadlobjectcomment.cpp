@@ -29,7 +29,7 @@ AADLObjectComment::~AADLObjectComment() {}
 
 AADLObject::AADLObjectType taste3::aadl::AADLObjectComment::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLFunctionContainer;
+    return AADLObject::AADLObjectType::AADLComment;
 }
 
 } // ns aadl

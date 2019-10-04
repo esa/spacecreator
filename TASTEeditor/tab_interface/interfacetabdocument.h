@@ -17,17 +17,28 @@
 
 #pragma once
 
+#include "app/common.h"
 #include "document/abstracttabdocument.h"
 
 #include <QGraphicsView>
 #include <QPointer>
+#include <baseitems/graphicsview.h>
 
 namespace taste3 {
+class InterfaceTabGraphicsScene;
+
 namespace aadl {
 class CreatorTool;
+class AADLObject;
 class AADLObjectsModel;
+
+class AADLCommentGraphicsItem;
+class AADLConnectionGraphicsItem;
+class AADLFunctionGraphicsItem;
+class AADLContainerGraphicsItem;
+class AADLInterfaceGraphicsItem;
+
 } // namespace aadl
-class InterfaceTabGraphicsScene;
 
 namespace document {
 
@@ -36,14 +47,14 @@ class InterfaceTabDocument : public AbstractTabDocument
     Q_OBJECT
 public:
     explicit InterfaceTabDocument(QObject *parent = nullptr);
-    virtual ~InterfaceTabDocument() override;
+    ~InterfaceTabDocument() override;
 
     QString title() const override;
 
 protected:
-    virtual bool loadImpl(const QString &path) override;
-    virtual bool saveImpl(const QString &path) override;
-    virtual QVector<QAction *> initActions() override;
+    bool loadImpl(const QString &path) override;
+    bool saveImpl(const QString &path) override;
+    QVector<QAction *> initActions() override;
 
     QWidget *createView() override;
     QGraphicsScene *createScene() override;
@@ -56,10 +67,23 @@ protected slots:
     void onActionCreateComment();
     void onActionGroupConnections();
     void onActionCreateConnection();
+    void onActionRemoveItem();
+    void onActionZoomIn();
+    void onActionZoomOut();
+
+private:
+    static QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
+    void updateItem(QGraphicsItem *item);
+
+    void updateComment(aadl::AADLCommentGraphicsItem *comment);
+    void updateInterface(aadl::AADLInterfaceGraphicsItem *iface);
+    void updateFunction(aadl::AADLFunctionGraphicsItem *function);
+    void updateContainer(aadl::AADLContainerGraphicsItem *container);
+    void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
-    QPointer<QGraphicsView> m_graphicsView { nullptr };
+    QPointer<GraphicsView> m_graphicsView { nullptr };
     aadl::AADLObjectsModel *m_model { nullptr };
     QActionGroup *m_actionGroup { nullptr };
     QAction *m_actCreateContainer { nullptr };
@@ -69,8 +93,12 @@ private:
     QAction *m_actCreateComment { nullptr };
     QAction *m_actGroupConnections { nullptr };
     QAction *m_actCreateConnection { nullptr };
+    QAction *m_actRemove { nullptr };
+    QAction *m_actZoomIn { nullptr };
+    QAction *m_actZoomOut { nullptr };
 
     aadl::CreatorTool *m_tool { nullptr };
+    QHash<common::Id, QGraphicsItem *> m_items;
 };
 
 } // ns document

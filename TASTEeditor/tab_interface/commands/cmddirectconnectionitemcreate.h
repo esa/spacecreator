@@ -20,17 +20,22 @@
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
+#include <QVector>
 
 namespace taste3 {
 namespace aadl {
+class AADLObjectIfaceRequired;
+class AADLObjectIfaceProvided;
+class AADLObjectConnection;
 class AADLObjectContainer;
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdContainerItemCreate : public QUndoCommand
+class CmdDirectConnectionItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdContainerItemCreate(AADLObjectsModel *model, AADLObjectContainer *container, const QRectF &geometry);
+    explicit CmdDirectConnectionItemCreate(AADLObjectsModel *model, AADLObjectContainer *startContainer, AADLObjectContainer *endContainer,
+                                           const QPointF &startPoint, const QPointF &endPoint);
 
     void redo() override;
     void undo() override;
@@ -39,11 +44,14 @@ public:
 
 private:
     QPointer<AADLObjectsModel> m_model;
-    const QRectF m_geometry;
-    QPointer<AADLObjectContainer> m_entity;
-    QPointer<AADLObjectContainer> m_parent;
+    QPointer<AADLObjectContainer> m_startContainer;
+    QPointer<AADLObjectContainer> m_endContainer;
+    QPointer<AADLObjectIfaceProvided> m_providedIface;
+    QPointer<AADLObjectIfaceRequired> m_requiredIface;
+    QPointer<AADLObjectConnection> m_entity;
 };
 
 } // namespace cmd
 } // namespace aadl
 } // namespace taste3
+

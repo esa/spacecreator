@@ -26,12 +26,14 @@ namespace aadl {
 
 struct AADLObjectConnectionPrivate {
     AADLObjectConnectionPrivate() {}
-    AADLObjectConnectionPrivate(AADLObject *source, AADLObject *target, AADLObjectIfaceRequired *reqIface, AADLObjectIfaceProvided *provIface)
+    AADLObjectConnectionPrivate(AADLObject *source, AADLObject *target, AADLObjectIfaceRequired *reqIface,
+                                AADLObjectIfaceProvided *provIface)
         : m_source(source)
         , m_target(target)
         , m_ri(reqIface)
         , m_pi(provIface)
-    {}
+    {
+    }
     QPointer<AADLObject> m_source { nullptr };
     QPointer<AADLObject> m_target { nullptr };
     QPointer<AADLObjectIfaceRequired> m_ri { nullptr };
