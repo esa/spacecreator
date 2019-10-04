@@ -31,6 +31,8 @@
 
 namespace taste3 {
 
+static const QMarginsF kMargins { 50, 50, 50, 50 };
+
 InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_entity(entity)
@@ -202,7 +204,6 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
     } else {
-        static const QMarginsF kMargins { 50, 50, 50, 50 };
         const QRectF newGeometry { newPos, boundingRect().size() };
         const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry.marginsAdded(kMargins));
         auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
@@ -284,7 +285,7 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
     }
 
     if (!parentItem()) {
-        const QList<QGraphicsItem *> collidedItems = scene()->items(rect.normalized());
+        const QList<QGraphicsItem *> collidedItems = scene()->items(rect.normalized().marginsAdded(kMargins));
         auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
             return dynamic_cast<const InteractiveObject *>(item) && item != this && !item->parentItem();
         });
