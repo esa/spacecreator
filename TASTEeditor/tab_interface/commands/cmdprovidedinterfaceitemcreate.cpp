@@ -8,13 +8,11 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-static int sCounter = 0;
-
 CmdProvidedInterfaceItemCreate::CmdProvidedInterfaceItemCreate(AADLObjectsModel *model, AADLObjectContainer *container,
                                                                const QPointF &pos)
     : m_model(model)
     , m_pos(pos)
-    , m_entity(new AADLObjectIfaceProvided(QObject::tr("PI_%1").arg(++sCounter), container))
+    , m_entity(new AADLObjectIfaceProvided(container))
     , m_parent(container)
 {
 }

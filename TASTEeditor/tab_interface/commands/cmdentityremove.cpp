@@ -20,9 +20,9 @@
 #include "commandids.h"
 
 #include <tab_aadl/aadlobject.h>
+#include <tab_aadl/aadlobjectconnection.h>
 #include <tab_aadl/aadlobjectiface.h>
 #include <tab_aadl/aadlobjectsmodel.h>
-#include <tab_aadl/aadlobjectconnection.h>
 
 namespace taste3 {
 namespace aadl {
@@ -34,13 +34,18 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
     , m_entity(entity)
 {
     if (auto container = qobject_cast<AADLObjectContainer *>(m_entity)) {
-        for (auto child: container->ris()) {
-            if (auto connection = m_model->getConnectionForIface(child->id()))
+        for (auto ri : container->ris()) {
+            if (auto connection = m_model->getConnectionForIface(ri->id()))
                 m_linkedEntities.append(connection);
-            m_linkedEntities.append(child);
+            m_linkedEntities.append(ri);
         }
-        for (auto child: container->pis()) {
-            if (auto connection = m_model->getConnectionForIface(child->id()))
+        for (auto pi : container->pis()) {
+            if (auto connection = m_model->getConnectionForIface(pi->id()))
+                m_linkedEntities.append(connection);
+            m_linkedEntities.append(pi);
+        }
+        for (auto child : container->children()) {
+            if (auto connection = m_model->getContainer(child->id()))
                 m_linkedEntities.append(connection);
             m_linkedEntities.append(child);
         }
