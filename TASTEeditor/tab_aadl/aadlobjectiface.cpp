@@ -16,10 +16,14 @@
 */
 
 #include "aadlobjectiface.h"
+
 #include "aadlcommonprops.h"
 
 namespace taste3 {
 namespace aadl {
+
+static int sProvidedCounter = 0;
+static int sRequiredCounter = 0;
 
 struct AADLObjectIfacePrivate {
     AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
@@ -217,7 +221,7 @@ bool AADLObjectIface::setLabelInheritance(bool label)
 }
 
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
-    : AADLObjectIface(IfaceType::Provided, QString(), parent)
+    : AADLObjectIface(IfaceType::Provided, tr("PI_%1").arg(++sProvidedCounter), parent)
 {
 }
 
@@ -227,7 +231,7 @@ AADLObjectIfaceProvided::AADLObjectIfaceProvided(const QString &title, AADLObjec
 }
 
 AADLObjectIfaceRequired::AADLObjectIfaceRequired(AADLObject *parent)
-    : AADLObjectIface(IfaceType::Required, QString(), parent)
+    : AADLObjectIface(IfaceType::Required, tr("RI_%1").arg(++sRequiredCounter), parent)
 {
 }
 

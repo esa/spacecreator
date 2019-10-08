@@ -33,7 +33,7 @@ GraphicsView::GraphicsView(QWidget *parent)
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
 
-    setDragMode(QGraphicsView::DragMode::NoDrag);
+    setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
 
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
