@@ -15,13 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-
 #include "aadlcommentgraphicsitem.h"
 
 #include "baseitems/textgraphicsitem.h"
-
-#include <app/commandsstack.h>
-
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
@@ -30,6 +26,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QtDebug>
+#include <app/commandsstack.h>
 
 static const qreal kBorderWidth = 2;
 static const qreal kMargins = 14 + kBorderWidth;
@@ -67,6 +64,11 @@ AADLObjectComment *AADLCommentGraphicsItem::entity() const
     return qobject_cast<AADLObjectComment *>(m_entity);
 }
 
+QSizeF AADLCommentGraphicsItem::defaultSize()
+{
+    return { 100, 100 };
+}
+
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualResizeProgress(grip, from, to);
@@ -81,12 +83,12 @@ void AADLCommentGraphicsItem::textEdited(const QString &text)
     taste3::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
 
     const QRectF geometry = sceneBoundingRect();
-    const QVector<QPointF> points{ geometry.topLeft(), geometry.bottomRight() };
-    const QVariantList geometryParams{ qVariantFromValue(entity()), qVariantFromValue(points) };
+    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
+    const QVariantList geometryParams { qVariantFromValue(entity()), qVariantFromValue(points) };
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams);
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
 
-    const QVariantList commentTextParams{ qVariantFromValue(entity()), qVariantFromValue(text) };
+    const QVariantList commentTextParams { qVariantFromValue(entity()), qVariantFromValue(text) };
     const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);
     taste3::cmd::CommandsStack::current()->push(commentTextCmd);
 
@@ -160,7 +162,8 @@ void AADLCommentGraphicsItem::rebuildLayout()
     m_textItem->setExplicitSize(m_boundingRect.size());
 }
 
-void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                                 const QPointF &releasedAt)
 {
     Q_UNUSED(grip);
     Q_UNUSED(pressedAt);
@@ -169,23 +172,29 @@ void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const
     createCommand();
 }
 
-void AADLCommentGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLCommentGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
+                                                   const QPointF &releasedAt)
 {
     Q_UNUSED(grip);
     Q_UNUSED(pressedAt);
     Q_UNUSED(releasedAt);
 
     createCommand();
+}
+
+QSizeF AADLCommentGraphicsItem::minimalSize() const
+{
+    return defaultSize();
 }
 
 void AADLCommentGraphicsItem::createCommand()
 {
     const QRectF geometry = sceneBoundingRect();
-    const QVector<QPointF> points{ geometry.topLeft(), geometry.bottomRight() };
-    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, { qVariantFromValue(entity()), qVariantFromValue(points) });
+    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
+    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry,
+                                                          { qVariantFromValue(entity()), qVariantFromValue(points) });
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
 }
-
 
 } // namespace aadl
 } // namespace taste3

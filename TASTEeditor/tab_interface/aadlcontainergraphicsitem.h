@@ -37,6 +37,8 @@ public:
 
     int type() const override { return Type; }
 
+    static QSizeF defaultSize();
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

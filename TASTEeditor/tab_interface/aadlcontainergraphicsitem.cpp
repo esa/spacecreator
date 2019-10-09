@@ -46,6 +46,11 @@ AADLObjectContainer *AADLContainerGraphicsItem::entity() const
     return qobject_cast<AADLObjectContainer *>(m_entity);
 }
 
+QSizeF AADLContainerGraphicsItem::defaultSize()
+{
+    return { 100, 80 };
+}
+
 void AADLContainerGraphicsItem::rebuildLayout()
 {
     if (auto graphicsItemParent = parentItem()) {

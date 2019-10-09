@@ -42,6 +42,8 @@ public:
 
     AADLObjectComment *entity() const;
 
+    static QSizeF defaultSize();
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -50,6 +52,8 @@ protected:
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+
+    QSizeF minimalSize() const override;
 
 private Q_SLOTS:
     void textEdited(const QString &newText);

@@ -84,6 +84,11 @@ void AADLFunctionGraphicsItem::createCommand()
     taste3::cmd::CommandsStack::current()->endMacro();
 }
 
+QSizeF AADLFunctionGraphicsItem::defaultSize()
+{
+    return { 200, 80 };
+}
+
 void AADLFunctionGraphicsItem::rebuildLayout()
 {
     if (auto graphicsItemParent = parentItem()) {
@@ -121,7 +126,9 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     const double scaleValue = scale() / painter->transform().m11();
     painter->scale(scaleValue, scaleValue);
     const QRectF br(QPointF(0, 0), boundingRect().size() / scaleValue);
-    painter->drawText(br, Qt::AlignCenter, entity()->title());
+    const QFontMetricsF fm(font());
+    const QString text = fm.elidedText(entity()->title(), Qt::ElideRight, br.width());
+    painter->drawText(br, Qt::AlignCenter, text);
     painter->restore();
 
     InteractiveObject::paint(painter, option, widget);
@@ -174,6 +181,11 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
                 connection->instantLayoutUpdate();
         }
     }
+}
+
+QSizeF AADLFunctionGraphicsItem::minimalSize() const
+{
+    return defaultSize();
 }
 
 void AADLFunctionGraphicsItem::updateColors()

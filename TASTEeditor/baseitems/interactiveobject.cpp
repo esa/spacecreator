@@ -133,6 +133,11 @@ void InteractiveObject::setFont(const QFont &font)
     m_font = font;
 }
 
+QSizeF InteractiveObject::minimalSize() const
+{
+    return QSizeF();
+}
+
 QBrush InteractiveObject::brush() const
 {
     return m_brush;
@@ -292,7 +297,12 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
         if (it != collidedItems.constEnd())
             return;
     }
-    const QRectF normalized = rect.normalized();
+    QRectF normalized = rect.normalized();
+    if (normalized.width() < minimalSize().width())
+        normalized.setWidth(minimalSize().width());
+    if (normalized.height() < minimalSize().height())
+        normalized.setHeight(minimalSize().height());
+
     setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
 
     rebuildLayout();

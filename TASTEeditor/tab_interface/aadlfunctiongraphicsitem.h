@@ -41,6 +41,8 @@ public:
     QList<QVariantList> prepareConnectionsParams() const;
     void createCommand();
 
+    static QSizeF defaultSize();
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -50,6 +52,8 @@ protected:
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+
+    QSizeF minimalSize() const override;
 
 private:
     void updateColors();
