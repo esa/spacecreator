@@ -230,7 +230,9 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
         }
         if (!results.isEmpty()) {
             std::sort(results.begin(), results.end(), [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
-                return distancePolygon(v1) < distancePolygon(v2);
+                if (v1.size() == v2.size())
+                    return distancePolygon(v1) < distancePolygon(v2);
+                return v1.size() < v2.size();
             });
 
             return results.first();

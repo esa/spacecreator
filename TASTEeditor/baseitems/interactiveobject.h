@@ -99,6 +99,8 @@ protected:
     virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
     virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
 
+    virtual QSizeF minimalSize() const;
+
     virtual void onScenePositionChanged(const QPointF &scenePosition);
 
     virtual void hideGripPoints();

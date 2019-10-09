@@ -324,8 +324,6 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
         return;
 
     const QPointF pos = cursorInScene();
-    const QRectF itemSceneRect = m_previewItem ? m_previewItem->mapRectToScene(m_previewItem->rect())
-                                               : adjustFromPoint(pos, kInterfaceTolerance);
     if (auto scene = m_view->scene()) {
 
         auto containerObject = [](QGraphicsItem *item) -> AADLObjectContainer * {
@@ -338,27 +336,50 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
 
         static const QList<int> containerTypes = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
 
+        auto adjustToSize = [](const QRectF &rect, const QSizeF &minSize) {
+            QRectF itemRect = rect;
+            if (itemRect.width() < minSize.width())
+                itemRect.setWidth(minSize.width());
+            if (itemRect.height() < minSize.height())
+                itemRect.setHeight(minSize.height());
+            return itemRect;
+        };
+
         switch (type) {
-        case ToolType::Comment: {
-            const QVariantList params = { qVariantFromValue(m_model.data()), itemSceneRect };
-            taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
-        } break;
-        case ToolType::Container: {
-            AADLObjectContainer *parentObject = m_previewItem ? containerObject(m_previewItem->parentItem()) : nullptr;
-            const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
-                                          itemSceneRect };
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateContainerEntity, params));
-        } break;
-        case ToolType::Function: {
-            AADLObjectContainer *parentObject = m_previewItem ? containerObject(m_previewItem->parentItem()) : nullptr;
-            const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
-                                          itemSceneRect };
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
-        } break;
+        case ToolType::Comment:
+            if (m_previewItem) {
+                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                          AADLCommentGraphicsItem::defaultSize());
+                const QVariantList params = { qVariantFromValue(m_model.data()), itemSceneRect };
+                taste3::cmd::CommandsStack::current()->push(
+                        cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
+            }
+            break;
+        case ToolType::Container:
+            if (m_previewItem) {
+                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                          AADLContainerGraphicsItem::defaultSize());
+                AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
+                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
+                                              itemSceneRect };
+                taste3::cmd::CommandsStack::current()->push(
+                        cmd::CommandsFactory::create(cmd::CreateContainerEntity, params));
+            }
+            break;
+        case ToolType::Function:
+            if (m_previewItem) {
+                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                          AADLFunctionGraphicsItem::defaultSize());
+                AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
+                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
+                                              itemSceneRect };
+                taste3::cmd::CommandsStack::current()->push(
+                        cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+            }
+            break;
         case ToolType::ProvidedInterface: {
-            if (QGraphicsItem *parentItem = utils::nearestItem(scene, itemSceneRect, containerTypes)) {
+            if (QGraphicsItem *parentItem =
+                        utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), containerTypes)) {
                 AADLObjectContainer *parentObject = containerObject(parentItem);
                 const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
                 taste3::cmd::CommandsStack::current()->push(
@@ -366,7 +387,8 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             }
         } break;
         case ToolType::RequiredInterface: {
-            if (auto parentItem = utils::nearestItem(scene, itemSceneRect, containerTypes)) {
+            if (auto parentItem =
+                        utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), containerTypes)) {
                 AADLObjectContainer *parentObject = containerObject(parentItem);
                 const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
                 taste3::cmd::CommandsStack::current()->push(
