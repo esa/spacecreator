@@ -103,7 +103,7 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
             removeSelectedItems();
         } break;
         case Qt::Key_Escape: {
-            if(toolType() == ToolType::Pointer) {
+            if (toolType() == ToolType::Pointer) {
                 if (auto scene = m_view->scene())
                     scene->clearSelection();
             } else {
@@ -201,18 +201,20 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
 
     const QPointF scenePos = cursorInScene(e->globalPos());
 
-    if(m_toolType == ToolType::Pointer) {
+    if (m_toolType == ToolType::Pointer) {
         if (e->button() & Qt::RightButton && e->buttons() == Qt::NoButton) {
             QMenu *menu = new QMenu(m_view);
             menu->setAttribute(Qt::WA_DeleteOnClose);
-//            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/container.svg")), tr("Container"), this,
-//                            [this]() { handleToolType(ToolType::Container); });
+            //            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/container.svg")),
+            //            tr("Container"), this,
+            //                            [this]() { handleToolType(ToolType::Container); });
             menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
                             [this]() { handleToolType(ToolType::Function); });
             menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
                             [this]() { handleToolType(ToolType::Comment); });
             connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
             menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
+            clearPreviewItem();
             return true;
         }
     } else {
@@ -380,19 +382,15 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                     utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, containerTypes));
             AADLObjectContainer *endObject = containerObject(
                     utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, containerTypes));
-            if (!startObject || !endObject) {
-                clearPreviewItem();
-                return;
-            }
+            if (!startObject || !endObject)
+                break;
 
             AADLInterfaceGraphicsItem *pi = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, ifaceTypes));
             AADLInterfaceGraphicsItem *ri = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
                     utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, ifaceTypes));
-            if (!pi || !ri) {
-                clearPreviewItem();
-                return;
-            }
+            if (!pi || !ri)
+                break;
 
             if (pi->entity()->isRequired() && ri->entity()->isProvided()) {
                 qSwap(startObject, endObject);
@@ -401,10 +399,8 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
             AADLObjectIfaceProvided *providedIface = qobject_cast<AADLObjectIfaceProvided *>(pi->entity());
             AADLObjectIfaceRequired *requiredIface = qobject_cast<AADLObjectIfaceRequired *>(ri->entity());
 
-            if (!providedIface || !requiredIface) {
-                clearPreviewItem();
-                return;
-            }
+            if (!providedIface || !requiredIface)
+                break;
 
             const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
                                           qVariantFromValue(endObject),      qVariantFromValue(providedIface),
@@ -414,7 +410,7 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
         } break;
         case ToolType::DirectConnection: {
             if (m_connectionPoints.size() < 1)
-                return;
+                break;
 
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
             const QLineF connectionLine { m_connectionPoints.first(), pos };
@@ -423,20 +419,20 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type)
                     utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.first(), kInterfaceTolerance), types);
             AADLObjectContainer *startObject = containerObject(itemAtStartPos);
             if (!startObject)
-                return;
+                break;
 
             QPointF startPointAdjusted(m_connectionPoints.first());
             if (!utils::intersects(itemAtStartPos->sceneBoundingRect(), connectionLine, &startPointAdjusted))
-                return;
+                break;
 
             auto itemAtEndPos = utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), types);
             AADLObjectContainer *endObject = containerObject(itemAtEndPos);
             if (!endObject)
-                return;
+                break;
 
             QPointF endPointAdjusted(pos);
             if (!utils::intersects(itemAtEndPos->sceneBoundingRect(), connectionLine, &endPointAdjusted))
-                return;
+                break;
 
             const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
                                           qVariantFromValue(endObject), startPointAdjusted, endPointAdjusted };
