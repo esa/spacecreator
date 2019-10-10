@@ -521,7 +521,8 @@ void CreatorTool::removeSelectedItems()
 
     if (auto scene = m_view->scene()) {
         taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
-        for (QGraphicsItem *item : scene->selectedItems()) {
+        while (!scene->selectedItems().isEmpty()) {
+            QGraphicsItem *item = scene->selectedItems().first();
             AADLObject *entity = nullptr;
             if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item))
                 entity = connectionItem->entity();
@@ -530,7 +531,8 @@ void CreatorTool::removeSelectedItems()
 
             if (entity) {
                 const QVariantList params = { qVariantFromValue(entity), qVariantFromValue(m_model.data()) };
-                taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::RemoveEntity, params));
+                if(QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                    taste3::cmd::CommandsStack::current()->push(cmdRm);
             }
         }
         taste3::cmd::CommandsStack::current()->endMacro();
