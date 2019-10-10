@@ -279,14 +279,27 @@ static inline QVector<QPointF> updatePoints(QGraphicsScene *scene, AADLInterface
     return AADLConnectionGraphicsItem::simplify(points);
 }
 
+AADLConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem* parent)
+    : QGraphicsPathItem(parent)
+{
+}
+
+QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
+{
+    QPainterPathStroker stroker;
+    stroker.setWidth(kSelectionOffset);
+    stroker.setJoinStyle(Qt::MiterJoin);
+
+    return stroker.createStroke(path()).simplified();
+}
+
 AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parentItem)
     : QGraphicsObject(parentItem)
-    , m_item(new QGraphicsPathItem(this))
+    , m_item(new GraphicsPathItem(this))
     , m_connection(connection)
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
-    setFlag(QGraphicsItem::ItemIsSelectable);
-    setFlag(QGraphicsItem::ItemHasNoContents);
+    setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemHasNoContents|QGraphicsItem::ItemClipsToShape|QGraphicsItem::ItemContainsChildrenInShape);
     m_item->setPen(QPen(Qt::black, kDefaulPenWidth));
 }
 
@@ -354,16 +367,12 @@ AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
 {
-    QPainterPath pp;
-    for (int idx = 1; idx < m_points.size(); ++idx)
-        pp.addPath(utils::lineShape(QLineF(m_points.value(idx - 1), m_points.value(idx)), kSelectionOffset));
-
-    return pp;
+    return m_item->shape();
 }
 
 QRectF AADLConnectionGraphicsItem::boundingRect() const
 {
-    return m_boundingRect;
+    return m_item->boundingRect();
 }
 
 void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
