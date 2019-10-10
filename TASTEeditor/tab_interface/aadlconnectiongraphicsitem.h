@@ -86,9 +86,17 @@ private:
     void createCommand();
 
 private:
+    class GraphicsPathItem : public QGraphicsPathItem
+    {
+    public:
+        explicit GraphicsPathItem(QGraphicsItem* parent = nullptr);
+        QPainterPath shape() const override;
+    };
+
+private:
     QPointer<AADLInterfaceGraphicsItem> m_startItem;
     QPointer<AADLInterfaceGraphicsItem> m_endItem;
-    QGraphicsPathItem *m_item = nullptr;
+    GraphicsPathItem *m_item = nullptr;
     AADLObjectConnection *m_connection = nullptr;
     QRectF m_boundingRect;
 
