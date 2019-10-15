@@ -25,6 +25,7 @@
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPen>
 #include <functional>
@@ -115,6 +116,72 @@ void InteractiveObject::handleSelectionChanged(bool isSelected)
     }
 }
 
+bool InteractiveObject::handlePositionChanged(const QPointF &from, const QPointF &to)
+{
+    const QPointF delta { to - from };
+    const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
+    auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
+        return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
+    });
+    // Fallback to previous geometry in case colliding with items at the same level
+    if (it != collidedItems.constEnd()) {
+        setPos(pos() - delta);
+        rebuildLayout();
+        updateGripPoints();
+        return false;
+    }
+
+    return true;
+}
+
+bool InteractiveObject::handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    const QPointF delta { to - from };
+    const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
+    auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
+        return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
+    });
+    // Fallback to previous geometry in case colliding with items at the same level
+    if (it != collidedItems.constEnd()) {
+        QRectF rect = mapRectToParent(boundingRect());
+        switch (grip) {
+        case GripPoint::Left: {
+            rect.setLeft(rect.left() - delta.x());
+        } break;
+        case GripPoint::Top: {
+            rect.setTop(rect.top() - delta.y());
+        } break;
+        case GripPoint::Right: {
+            rect.setRight(rect.right() - delta.x());
+        } break;
+        case GripPoint::Bottom: {
+            rect.setBottom(rect.bottom() - delta.y());
+        } break;
+        case GripPoint::TopLeft: {
+            rect.setTopLeft(rect.topLeft() - delta);
+        } break;
+        case GripPoint::TopRight: {
+            rect.setTopRight(rect.topRight() - delta);
+        } break;
+        case GripPoint::BottomLeft: {
+            rect.setBottomLeft(rect.bottomLeft() - delta);
+        } break;
+        case GripPoint::BottomRight: {
+            rect.setBottomRight(rect.bottomRight() - delta);
+        } break;
+        default:
+            qWarning() << "Update grip point handling";
+            break;
+        }
+        setRect(parentItem() ? parentItem()->mapRectToScene(rect) : rect);
+        rebuildLayout();
+        updateGripPoints();
+        return false;
+    }
+
+    return true;
+}
+
 void InteractiveObject::rebuildLayout()
 {
     for (auto item : childItems()) {
@@ -182,6 +249,28 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsObject::mouseDoubleClickEvent(event);
 }
 
+void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (!m_clickPos.isNull())
+        onManualMoveProgress(GripPoint::Center, mapToParent(event->lastPos()), mapToParent(event->pos()));
+    QGraphicsObject::mouseMoveEvent(event);
+}
+
+void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    m_clickPos = mapToParent(event->pos());
+    onManualMoveStart(GripPoint::Center, m_clickPos);
+    QGraphicsObject::mousePressEvent(event);
+}
+
+void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (!m_clickPos.isNull())
+        onManualMoveFinish(GripPoint::Center, m_clickPos, mapToParent(event->pos()));
+    m_clickPos = QPointF();
+    QGraphicsObject::mouseReleaseEvent(event);
+}
+
 void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
 {
     Q_UNUSED(grip);
@@ -208,14 +297,6 @@ void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPo
             newPos.setY(contentRect.top());
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
-    } else {
-        const QRectF newGeometry { newPos, boundingRect().size() };
-        const QList<QGraphicsItem *> collidedItems = scene()->items(newGeometry.marginsAdded(kMargins));
-        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-            return item && item != this && !item->parentItem() && dynamic_cast<const InteractiveObject *>(item);
-        });
-        if (it != collidedItems.constEnd())
-            return;
     }
     setPos(newPos);
 
@@ -289,21 +370,9 @@ void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const Q
         break;
     }
 
-    if (!parentItem()) {
-        const QList<QGraphicsItem *> collidedItems = scene()->items(rect.normalized().marginsAdded(kMargins));
-        auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-            return dynamic_cast<const InteractiveObject *>(item) && item != this && !item->parentItem();
-        });
-        if (it != collidedItems.constEnd())
-            return;
-    }
     QRectF normalized = rect.normalized();
-    if (normalized.width() < minimalSize().width())
-        normalized.setWidth(minimalSize().width());
-    if (normalized.height() < minimalSize().height())
-        normalized.setHeight(minimalSize().height());
-
-    setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
+    if (normalized.width() >= minimalSize().width() && normalized.height() >= minimalSize().height())
+        setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
 
     rebuildLayout();
     updateGripPoints();
@@ -317,13 +386,6 @@ void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPo
     Q_UNUSED(grip);
     Q_UNUSED(pressedAt);
     Q_UNUSED(releasedAt);
-}
-
-void InteractiveObject::onScenePositionChanged(const QPointF &scenePosition)
-{
-    Q_UNUSED(scenePosition);
-
-    emit moved(this);
 }
 
 void InteractiveObject::hideGripPoints()
@@ -372,9 +434,6 @@ QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant
         break;
     case QGraphicsItem::ItemPositionChange:
         m_prevPos = pos();
-        break;
-    case QGraphicsItem::ItemScenePositionHasChanged:
-        onScenePositionChanged(value.toPointF());
         break;
     case QGraphicsItem::ItemPositionHasChanged:
         Q_EMIT relocated(m_prevPos, pos());
