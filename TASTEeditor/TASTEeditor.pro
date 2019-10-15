@@ -77,7 +77,9 @@ SOURCES += \
         tab_interface/commands/cmdcommenttextchange.cpp \
         tab_interface/commands/cmdcontaineritemcreate.cpp \
         tab_interface/commands/cmddirectconnectionitemcreate.cpp \
+        tab_interface/commands/cmdentityattributechange.cpp \
         tab_interface/commands/cmdentitygeometrychange.cpp \
+        tab_interface/commands/cmdentitypropertychange.cpp \
         tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdmanualconnectionitemcreate.cpp \
@@ -138,7 +140,9 @@ HEADERS += \
         tab_interface/commands/cmdcommenttextchange.h \
         tab_interface/commands/cmdcontaineritemcreate.h \
         tab_interface/commands/cmddirectconnectionitemcreate.h \
+        tab_interface/commands/cmdentityattributechange.h \
         tab_interface/commands/cmdentitygeometrychange.h \
+        tab_interface/commands/cmdentitypropertychange.h \
         tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdmanualconnectionitemcreate.h \
