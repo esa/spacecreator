@@ -12,32 +12,37 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+   along with this program. If not, see
+   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
 
+#include <QPointer>
+#include <QRect>
+#include <QUndoCommand>
+
 namespace taste3 {
 namespace aadl {
+class AADLObject;
 namespace cmd {
 
-enum Id
+class CmdEntityPropertyChange : public QUndoCommand
 {
-    CreateContainerEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateDirectConnectionEntity,
-    CreateManualConnectionEntity,
-    ChangeEntityGeometry,
-    RemoveEntity,
-    ChangeCommentText,
-    ChangeEntityProperties,
-    ChangeEntityAttributes,
-    LastId
+public:
+    explicit CmdEntityPropertyChange(AADLObject *entity, const QVariantHash &props);
+
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
+
+private:
+    QPointer<AADLObject> m_entity;
+    const QVariantHash m_newProps;
+    const QVariantHash m_oldProps;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+} // namespace cmd
+} // namespace aadl
+} // namespace taste3

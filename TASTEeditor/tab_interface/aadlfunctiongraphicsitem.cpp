@@ -22,6 +22,7 @@
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
+#include "tab_aadl/aadlcommonprops.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectfunction.h"
@@ -30,7 +31,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPainter>
+#include <QtDebug>
 #include <app/commandsstack.h>
+#include <baseitems/textgraphicsitem.h>
 #include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2;
@@ -40,12 +43,34 @@ namespace aadl {
 
 AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
+    , m_textItem(new TextGraphicsItem(this))
 {
     setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
 
     updateColors();
-    setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
+
+    m_textItem->setEditable(true);
+    m_textItem->setPlainText(entity->title());
+    m_textItem->setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
+    m_textItem->setBackgroundColor(Qt::transparent);
+    m_textItem->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
+
+    connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
+        const QVariantMap attributess = { { meta::token(meta::Token::name), text } };
+        const auto attributesCmd = cmd::CommandsFactory::create(
+                cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
+        taste3::cmd::CommandsStack::current()->push(attributesCmd);
+    });
+    connect(entity, &AADLObjectFunction::attributesChanged, this, [this, entity]() {
+        if (m_textItem->toPlainText() != entity->title())
+            m_textItem->setPlainText(entity->title());
+        instantLayoutUpdate();
+    });
+    connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+        m_textItem->setPlainText(text);
+        instantLayoutUpdate();
+    });
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
@@ -109,6 +134,7 @@ void AADLFunctionGraphicsItem::rebuildLayout()
     }
     updateConnections();
     InteractiveObject::rebuildLayout();
+    updateTextPosition();
 }
 
 void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -122,13 +148,6 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     painter->setBrush(brush());
     painter->drawRoundedRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2), 10, 10);
-    painter->setFont(font());
-    const double scaleValue = scale() / painter->transform().m11();
-    painter->scale(scaleValue, scaleValue);
-    const QRectF br(QPointF(0, 0), boundingRect().size() / scaleValue);
-    const QFontMetricsF fm(font());
-    const QString text = fm.elidedText(entity()->title(), Qt::ElideRight, br.width());
-    painter->drawText(br, Qt::AlignCenter, text);
     painter->restore();
 
     InteractiveObject::paint(painter, option, widget);
@@ -138,6 +157,8 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
 {
     if (change == QGraphicsItem::ItemParentHasChanged)
         updateColors();
+    else if (change == QGraphicsItem::ItemTransformHasChanged)
+        updateTextPosition();
     return InteractiveObject::itemChange(change, value);
 }
 
@@ -180,7 +201,8 @@ void AADLFunctionGraphicsItem::initGripPoints()
 
 QSizeF AADLFunctionGraphicsItem::minimalSize() const
 {
-    return defaultSize();
+    return { qMax(m_textItem->boundingRect().width(), defaultSize().width()),
+             qMax(m_textItem->boundingRect().height(), defaultSize().height()) };
 }
 
 void AADLFunctionGraphicsItem::updateColors()
@@ -190,6 +212,18 @@ void AADLFunctionGraphicsItem::updateColors()
         brushColor = parentContainer->brush().color().darker(125);
     setBrush(brushColor);
     setPen(QPen(brushColor.darker(), 2));
+}
+
+void AADLFunctionGraphicsItem::updateTextPosition()
+{
+    const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
+    const QTransform dt = deviceTransform(tr);
+    const QPointF currScale { dt.m11(), dt.m22() };
+
+    QRectF textRect { 0, 0, m_textItem->boundingRect().width() / currScale.x(),
+                      m_textItem->boundingRect().height() / currScale.y() };
+    textRect.moveCenter(boundingRect().center());
+    m_textItem->setPos(textRect.topLeft());
 }
 
 void AADLFunctionGraphicsItem::updateConnections()

@@ -43,6 +43,8 @@ private:
     static QUndoCommand *changeGeometryCommand(const QVariantList &params);
     static QUndoCommand *changeCommentCommand(const QVariantList &params);
     static QUndoCommand *removeEntityCommand(const QVariantList &params);
+    static QUndoCommand *changeEntityPropertyCommand(const QVariantList &params);
+    static QUndoCommand *changeEntityAttributesCommand(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;
