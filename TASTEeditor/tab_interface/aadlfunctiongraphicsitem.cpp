@@ -31,6 +31,7 @@
 #include <QGraphicsView>
 #include <QPainter>
 #include <app/commandsstack.h>
+#include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2;
 
@@ -104,10 +105,9 @@ void AADLFunctionGraphicsItem::rebuildLayout()
             else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
                 newPos.setY(contentRect.bottom() - m_boundingRect.height());
             setPos(newPos);
-        } else {
-            setPos(newPos);
         }
     }
+    updateConnections();
     InteractiveObject::rebuildLayout();
 }
 
@@ -145,42 +145,37 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, cons
                                                   const QPointF &releasedAt)
 {
     Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
 
-    createCommand();
+    if (handlePositionChanged(pressedAt, releasedAt))
+        createCommand();
 }
 
 void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualMoveProgress(grip, from, to);
-    for (auto item : childItems()) {
-        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
-                connection->instantLayoutUpdate();
-        }
-    }
+    updateConnections();
 }
 
 void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
                                                     const QPointF &releasedAt)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
-
-    createCommand();
+    if (handleGeometryChanged(grip, pressedAt, releasedAt))
+        createCommand();
 }
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualResizeProgress(grip, from, to);
-    for (auto item : childItems()) {
-        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
-                connection->instantLayoutUpdate();
-        }
-    }
+    updateConnections();
+}
+
+void AADLFunctionGraphicsItem::initGripPoints()
+{
+    InteractiveObject::initGripPoints();
+    m_gripPoints->setUsedPoints({ GripPoint::Location::Top, GripPoint::Location::Left, GripPoint::Location::Bottom,
+                                  GripPoint::Location::Right, GripPoint::Location::TopLeft,
+                                  GripPoint::Location::BottomLeft, GripPoint::Location::TopRight,
+                                  GripPoint::Location::BottomRight });
 }
 
 QSizeF AADLFunctionGraphicsItem::minimalSize() const
@@ -195,6 +190,16 @@ void AADLFunctionGraphicsItem::updateColors()
         brushColor = parentContainer->brush().color().darker(125);
     setBrush(brushColor);
     setPen(QPen(brushColor.darker(), 2));
+}
+
+void AADLFunctionGraphicsItem::updateConnections()
+{
+    for (auto item : childItems()) {
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
+            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
+                connection->instantLayoutUpdate();
+        }
+    }
 }
 
 } // namespace aadl

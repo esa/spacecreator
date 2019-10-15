@@ -91,6 +91,10 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
     virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
     virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
     virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
@@ -101,12 +105,13 @@ protected:
 
     virtual QSizeF minimalSize() const;
 
-    virtual void onScenePositionChanged(const QPointF &scenePosition);
-
     virtual void hideGripPoints();
     virtual void showGripPoints();
     virtual void initGripPoints();
     virtual void rebuildLayout();
+
+    bool handlePositionChanged(const QPointF &from, const QPointF &to);
+    bool handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to);
 
     HighlightRectItem *createHighlighter();
 
@@ -116,6 +121,7 @@ protected:
     bool m_hovered = false;
     qreal m_storedZ = 0.;
     QPointF m_prevPos;
+    QPointF m_clickPos;
     bool m_layoutDirty = false;
 
     bool m_highlightable = false;

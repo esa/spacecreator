@@ -117,7 +117,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
 void AADLInterfaceGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+    m_gripPoints->setUsedPoints({});
 }
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

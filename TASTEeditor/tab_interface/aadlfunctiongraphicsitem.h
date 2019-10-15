@@ -55,8 +55,11 @@ protected:
 
     QSizeF minimalSize() const override;
 
+    void initGripPoints() override;
+
 private:
     void updateColors();
+    void updateConnections();
 };
 
 } // namespace aadl
