@@ -21,9 +21,8 @@
 #include "tab_aadl/aadlobject.h"
 
 namespace taste3 {
-class TextGraphicsItem;
-
 namespace aadl {
+class AADLFunctionNameGraphicsItem;
 class AADLObjectFunction;
 
 class AADLFunctionGraphicsItem : public InteractiveObject
@@ -63,9 +62,9 @@ private:
     void updateColors();
     void updateTextPosition();
     void updateConnections();
-    
+
 private:
-    TextGraphicsItem *m_textItem = nullptr;
+    AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };
 
 } // namespace aadl
