@@ -72,6 +72,7 @@ SOURCES += \
         tab_interface/aadlconnectiongraphicsitem.cpp \
         tab_interface/aadlcontainergraphicsitem.cpp \
         tab_interface/aadlfunctiongraphicsitem.cpp \
+        tab_interface/aadlfunctionnamegraphicsitem.cpp \
         tab_interface/aadlinterfacegraphicsitem.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
         tab_interface/commands/cmdcommenttextchange.cpp \
@@ -135,6 +136,7 @@ HEADERS += \
         tab_interface/aadlconnectiongraphicsitem.h \
         tab_interface/aadlcontainergraphicsitem.h \
         tab_interface/aadlfunctiongraphicsitem.h \
+        tab_interface/aadlfunctionnamegraphicsitem.h \
         tab_interface/aadlinterfacegraphicsitem.h \
         tab_interface/commands/cmdcommentitemcreate.h \
         tab_interface/commands/cmdcommenttextchange.h \

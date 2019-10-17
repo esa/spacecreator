@@ -18,6 +18,7 @@
 #include "aadlfunctiongraphicsitem.h"
 
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
@@ -33,7 +34,6 @@
 #include <QPainter>
 #include <QtDebug>
 #include <app/commandsstack.h>
-#include <baseitems/textgraphicsitem.h>
 #include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2;
@@ -43,14 +43,13 @@ namespace aadl {
 
 AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
-    , m_textItem(new TextGraphicsItem(this))
+    , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
     setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
 
     updateColors();
 
-    m_textItem->setEditable(true);
     m_textItem->setPlainText(entity->title());
     m_textItem->setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
     m_textItem->setBackgroundColor(Qt::transparent);
