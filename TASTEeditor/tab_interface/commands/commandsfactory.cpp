@@ -167,19 +167,23 @@ QUndoCommand *CommandsFactory::createManualConnectionCommand(const QVariantList 
 
 QUndoCommand *CommandsFactory::createDirectConnectionCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 5);
+    Q_ASSERT(params.size() == 7);
     const QVariant model = params.value(0);
     const QVariant start = params.value(1);
-    const QVariant end = params.value(2);
+    const QVariant prov = params.value(2);
     const QVariant startPoint = params.value(3);
-    const QVariant endPoint = params.value(4);
+    const QVariant end = params.value(4);
+    const QVariant req = params.value(5);
+    const QVariant endPoint = params.value(6);
     if (model.isValid() && model.canConvert<AADLObjectsModel *>() && start.isValid()
-        && start.canConvert<AADLObjectContainer *>() && end.isValid() && end.canConvert<AADLObjectContainer *>()
-        && startPoint.isValid() && startPoint.canConvert<QPointF>() && endPoint.isValid()
-        && endPoint.canConvert<QPointF>()) {
+        && start.canConvert<AADLObjectContainer *>() && prov.isValid() && prov.canConvert<AADLObjectIfaceProvided *>()
+        && startPoint.isValid() && startPoint.canConvert<QPointF>() && req.isValid()
+        && req.canConvert<AADLObjectIfaceRequired *>() && end.isValid() && end.canConvert<AADLObjectContainer *>()
+        && endPoint.isValid() && endPoint.canConvert<QPointF>()) {
         return new CmdDirectConnectionItemCreate(
                 model.value<AADLObjectsModel *>(), start.value<AADLObjectContainer *>(),
-                end.value<AADLObjectContainer *>(), startPoint.value<QPointF>(), endPoint.value<QPointF>());
+                prov.value<AADLObjectIfaceProvided *>(), startPoint.value<QPointF>(),
+                end.value<AADLObjectContainer *>(), req.value<AADLObjectIfaceRequired *>(), endPoint.value<QPointF>());
     }
 
     return nullptr;

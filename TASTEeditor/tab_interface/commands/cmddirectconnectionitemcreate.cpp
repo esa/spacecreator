@@ -26,26 +26,32 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdDirectConnectionItemCreate::CmdDirectConnectionItemCreate(AADLObjectsModel *model,
-                                                             AADLObjectContainer *startContainer,
-                                                             AADLObjectContainer *endContainer,
-                                                             const QPointF &startPoint, const QPointF &endPoint)
+CmdDirectConnectionItemCreate::CmdDirectConnectionItemCreate(
+        AADLObjectsModel *model, AADLObjectContainer *startContainer, AADLObjectIfaceProvided *providedIface,
+        const QPointF &startPoint, AADLObjectContainer *endContainer, AADLObjectIfaceRequired *requiredIface,
+        const QPointF &endPoint)
     : QUndoCommand()
     , m_model(model)
     , m_startContainer(startContainer)
     , m_endContainer(endContainer)
-    , m_providedIface(nullptr)
-    , m_requiredIface(nullptr)
+    , m_providedIface(providedIface)
+    , m_requiredIface(requiredIface)
     , m_entity(nullptr)
 {
     Q_ASSERT(m_startContainer);
     Q_ASSERT(m_endContainer);
 
-    m_providedIface = new AADLObjectIfaceProvided(m_startContainer);
-    m_providedIface->setCoordinates({ qRound(startPoint.x()), qRound(startPoint.y()) });
+    if (!m_providedIface)
+        m_providedIface = new AADLObjectIfaceProvided(m_startContainer);
 
-    m_requiredIface = new AADLObjectIfaceRequired(m_startContainer);
-    m_requiredIface->setCoordinates({ qRound(endPoint.x()), qRound(endPoint.y()) });
+    if (!startPoint.isNull())
+        m_providedIface->setCoordinates({ qRound(startPoint.x()), qRound(startPoint.y()) });
+
+    if (!m_requiredIface)
+        m_requiredIface = new AADLObjectIfaceRequired(m_startContainer);
+
+    if (!endPoint.isNull())
+        m_requiredIface->setCoordinates({ qRound(endPoint.x()), qRound(endPoint.y()) });
 
     m_entity = new AADLObjectConnection(m_startContainer, m_endContainer, m_requiredIface, m_providedIface, m_model);
 }

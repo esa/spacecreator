@@ -34,8 +34,10 @@ namespace cmd {
 class CmdDirectConnectionItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdDirectConnectionItemCreate(AADLObjectsModel *model, AADLObjectContainer *startContainer, AADLObjectContainer *endContainer,
-                                           const QPointF &startPoint, const QPointF &endPoint);
+    explicit CmdDirectConnectionItemCreate(AADLObjectsModel *model, AADLObjectContainer *startContainer,
+                                           AADLObjectIfaceProvided *providedIface, const QPointF &startPoint,
+                                           AADLObjectContainer *endContainer, AADLObjectIfaceRequired *requiredIface,
+                                           const QPointF &endPoint);
 
     void redo() override;
     void undo() override;
@@ -54,4 +56,3 @@ private:
 } // namespace cmd
 } // namespace aadl
 } // namespace taste3
-
