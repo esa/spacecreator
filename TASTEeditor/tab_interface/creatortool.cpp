@@ -47,6 +47,8 @@
 static const qreal kInterfaceTolerance = 20;
 static const qreal kConnectionTolerance = 20;
 static const QMarginsF kMargins { 50, 50, 50, 50 };
+static const QList<int> kContainerTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
+                                            taste3::aadl::AADLContainerGraphicsItem::Type };
 
 namespace taste3 {
 namespace aadl {
@@ -133,10 +135,10 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
     const QPointF scenePos = cursorInScene(e->globalPos());
     if (m_toolType == ToolType::DirectConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos,
-                                                 { AADLContainerGraphicsItem::Type, AADLFunctionGraphicsItem::Type });
-        if (!item)
-            return false;
+        if (!utils::nearestItem(scene, scenePos, { AADLContainerGraphicsItem::Type, AADLFunctionGraphicsItem::Type }))
+            if (!utils::nearestItem(scene, scenePos, kInterfaceTolerance / 2, { AADLFunctionGraphicsItem::Type }))
+                return false;
+
         if (m_previewConnectionItem) {
             m_connectionPoints.clear();
         } else {
@@ -209,16 +211,16 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
             //            tr("Container"), this,
             //                            [this]() { handleToolType(ToolType::Container); });
             menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
-                            [this]() { handleToolType(ToolType::Function); });
+                            [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
             menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
-                            [this]() { handleToolType(ToolType::Comment); });
+                            [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
             connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
             menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
             clearPreviewItem();
             return true;
         }
     } else {
-        handleToolType(m_toolType);
+        handleToolType(m_toolType, scenePos);
         return true;
     }
     return false;
@@ -287,7 +289,7 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
     return qgraphicsitem_cast<ItemType *>(*it);
 }
 
-bool alignPoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign)
+static inline bool alignToSidePoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign)
 {
     auto ifaceItem = itemAt<AADLInterfaceGraphicsItem>(scene, point);
     if (!ifaceItem)
@@ -318,150 +320,54 @@ static inline QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment
     return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
 }
 
-void CreatorTool::handleToolType(CreatorTool::ToolType type)
+static inline AADLObjectContainer *containerObject(QGraphicsItem *item)
+{
+    if (auto containerItem = qgraphicsitem_cast<aadl::AADLContainerGraphicsItem *>(item))
+        return containerItem->entity();
+    if (auto functionItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item))
+        return functionItem->entity();
+    return nullptr;
+};
+
+static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
+{
+    QRectF itemRect = rect;
+    if (itemRect.width() < minSize.width())
+        itemRect.setWidth(minSize.width());
+    if (itemRect.height() < minSize.height())
+        itemRect.setHeight(minSize.height());
+    return itemRect;
+};
+
+void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
 {
     if (!m_view)
         return;
 
-    const QPointF pos = cursorInScene();
     if (auto scene = m_view->scene()) {
-
-        auto containerObject = [](QGraphicsItem *item) -> AADLObjectContainer * {
-            if (auto containerItem = qgraphicsitem_cast<aadl::AADLContainerGraphicsItem *>(item))
-                return containerItem->entity();
-            if (auto functionItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item))
-                return functionItem->entity();
-            return nullptr;
-        };
-
-        static const QList<int> containerTypes = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
-
-        auto adjustToSize = [](const QRectF &rect, const QSizeF &minSize) {
-            QRectF itemRect = rect;
-            if (itemRect.width() < minSize.width())
-                itemRect.setWidth(minSize.width());
-            if (itemRect.height() < minSize.height())
-                itemRect.setHeight(minSize.height());
-            return itemRect;
-        };
-
         switch (type) {
         case ToolType::Comment:
-            if (m_previewItem) {
-                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
-                                                          AADLCommentGraphicsItem::defaultSize());
-                const QVariantList params = { qVariantFromValue(m_model.data()), itemSceneRect };
-                taste3::cmd::CommandsStack::current()->push(
-                        cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
-            }
+            handleCommentType(scene, pos);
             break;
         case ToolType::Container:
-            if (m_previewItem) {
-                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
-                                                          AADLContainerGraphicsItem::defaultSize());
-                AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
-                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
-                                              itemSceneRect };
-                taste3::cmd::CommandsStack::current()->push(
-                        cmd::CommandsFactory::create(cmd::CreateContainerEntity, params));
-            }
+            handleContainerType(scene, pos);
             break;
         case ToolType::Function:
-            if (m_previewItem) {
-                const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
-                                                          AADLFunctionGraphicsItem::defaultSize());
-                AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
-                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
-                                              itemSceneRect };
-                taste3::cmd::CommandsStack::current()->push(
-                        cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
-            }
+            handleFunctionType(scene, pos);
             break;
         case ToolType::ProvidedInterface: {
-            if (QGraphicsItem *parentItem =
-                        utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), containerTypes)) {
-                AADLObjectContainer *parentObject = containerObject(parentItem);
-                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
-                taste3::cmd::CommandsStack::current()->push(
-                        cmd::CommandsFactory::create(cmd::CreateProvidedInterfaceEntity, params));
-            }
+            handleProvidedInterfaceType(scene, pos);
         } break;
         case ToolType::RequiredInterface: {
-            if (auto parentItem =
-                        utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), containerTypes)) {
-                AADLObjectContainer *parentObject = containerObject(parentItem);
-                const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
-                taste3::cmd::CommandsStack::current()->push(
-                        cmd::CommandsFactory::create(cmd::CreateRequiredInterfaceEntity, params));
-            }
+            handleRequiredInterfaceType(scene, pos);
         } break;
         case ToolType::MultiPointConnection: {
             if (!handleConnectionCreate(scene, pos))
                 return;
-
-            const QList<int> ifaceTypes { AADLInterfaceGraphicsItem::Type };
-            AADLObjectContainer *startObject = containerObject(
-                    utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, containerTypes));
-            AADLObjectContainer *endObject = containerObject(
-                    utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, containerTypes));
-            if (!startObject || !endObject)
-                break;
-
-            AADLInterfaceGraphicsItem *pi = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                    utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, ifaceTypes));
-            AADLInterfaceGraphicsItem *ri = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                    utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, ifaceTypes));
-            if (!pi || !ri)
-                break;
-
-            if (pi->entity()->isRequired() && ri->entity()->isProvided()) {
-                qSwap(startObject, endObject);
-                qSwap(pi, ri);
-            }
-            AADLObjectIfaceProvided *providedIface = qobject_cast<AADLObjectIfaceProvided *>(pi->entity());
-            AADLObjectIfaceRequired *requiredIface = qobject_cast<AADLObjectIfaceRequired *>(ri->entity());
-
-            if (!providedIface || !requiredIface)
-                break;
-
-            const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
-                                          qVariantFromValue(endObject),      qVariantFromValue(providedIface),
-                                          qVariantFromValue(requiredIface),  qVariantFromValue(m_connectionPoints) };
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateManualConnectionEntity, params));
+            handleMultiPointConnectionType(scene, pos);
         } break;
         case ToolType::DirectConnection: {
-            if (m_connectionPoints.size() < 1)
-                break;
-
-            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
-            const QLineF connectionLine { m_connectionPoints.first(), pos };
-
-            auto itemAtStartPos =
-                    utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.first(), kInterfaceTolerance), types);
-            AADLObjectContainer *startObject = containerObject(itemAtStartPos);
-            if (!startObject)
-                break;
-
-            QPointF startPointAdjusted(m_connectionPoints.first());
-            if (!utils::intersects(itemAtStartPos->sceneBoundingRect(), connectionLine, &startPointAdjusted))
-                break;
-
-            auto itemAtEndPos = utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), types);
-            AADLObjectContainer *endObject = containerObject(itemAtEndPos);
-            if (!endObject)
-                break;
-
-            QPointF endPointAdjusted(pos);
-            if (!utils::intersects(itemAtEndPos->sceneBoundingRect(), connectionLine, &endPointAdjusted))
-                break;
-
-            const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
-                                          qVariantFromValue(endObject), startPointAdjusted, endPointAdjusted };
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateDirectConnectionEntity, params));
-
-            m_connectionPoints.append(pos);
+            handleDirectConnectionType(scene, pos);
         } break;
         default:
             break;
@@ -483,7 +389,7 @@ bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &p
             return false;
 
         const QPointF finishPoint = itemUnderCursor->sceneBoundingRect().center();
-        if (!alignPoint(scene, finishPoint, m_connectionPoints.last()))
+        if (!alignToSidePoint(scene, finishPoint, m_connectionPoints.last()))
             return false;
 
         m_connectionPoints.append(finishPoint);
@@ -492,19 +398,13 @@ bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &p
 
     QPointF alignedPos { pos };
     if (m_connectionPoints.size() == 1) {
-        if (!alignPoint(scene, m_connectionPoints.value(0), alignedPos))
+        if (!alignToSidePoint(scene, m_connectionPoints.value(0), alignedPos))
             return false;
-    } else if (m_connectionPoints.size() >= 2) {
-        const QLineF line { m_connectionPoints.last(), m_connectionPoints.value(m_connectionPoints.size() - 2) };
-        const QLineF current { m_connectionPoints.last(), pos };
-        const qreal length = current.length() * qSin(qDegreesToRadians(line.angleTo(current)));
-        QLineF normal = line.normalVector();
-        normal.setLength(qAbs(length));
-        if (length < 0)
-            normal.setAngle(normal.angle() + 180);
-        alignedPos = normal.p2();
+    } else {
+        QLineF currentPath { m_connectionPoints.last(), pos };
+        if (utils::alignedLine(currentPath))
+            alignedPos = currentPath.p2();
     }
-
     m_connectionPoints.append(alignedPos);
 
     QPainterPath pp;
@@ -512,6 +412,196 @@ bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &p
     pp.lineTo(pos);
     m_previewConnectionItem->setPath(pp);
     return false;
+}
+
+void CreatorTool::handleCommentType(QGraphicsScene *scene, const QPointF &pos)
+{
+    Q_UNUSED(scene);
+    Q_UNUSED(pos);
+
+    if (m_previewItem) {
+        const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                  AADLCommentGraphicsItem::defaultSize());
+        const QVariantList params = { qVariantFromValue(m_model.data()), itemSceneRect };
+        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateCommentEntity, params));
+    }
+}
+
+void CreatorTool::handleContainerType(QGraphicsScene *scene, const QPointF &pos)
+{
+    Q_UNUSED(scene);
+    Q_UNUSED(pos);
+
+    if (m_previewItem) {
+        const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                  AADLContainerGraphicsItem::defaultSize());
+        AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
+                                      itemSceneRect };
+        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateContainerEntity, params));
+    }
+}
+
+void CreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
+{
+    Q_UNUSED(scene);
+    Q_UNUSED(pos);
+
+    if (m_previewItem) {
+        const QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                                                  AADLFunctionGraphicsItem::defaultSize());
+        AADLObjectContainer *parentObject = containerObject(m_previewItem->parentItem());
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
+                                      itemSceneRect };
+        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
+    }
+}
+
+void CreatorTool::handleProvidedInterfaceType(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (QGraphicsItem *parentItem =
+                utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kContainerTypes)) {
+        AADLObjectContainer *parentObject = containerObject(parentItem);
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateProvidedInterfaceEntity, params));
+    }
+}
+
+void CreatorTool::handleRequiredInterfaceType(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (auto parentItem = utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kContainerTypes)) {
+        AADLObjectContainer *parentObject = containerObject(parentItem);
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateRequiredInterfaceEntity, params));
+    }
+}
+
+void CreatorTool::handleMultiPointConnectionType(QGraphicsScene *scene, const QPointF &pos)
+{
+    Q_UNUSED(pos);
+
+    const QList<int> ifaceTypes { AADLInterfaceGraphicsItem::Type };
+    AADLObjectContainer *startObject = containerObject(
+            utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, kContainerTypes));
+    AADLObjectContainer *endObject =
+            containerObject(utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, kContainerTypes));
+    if (!startObject || !endObject)
+        return;
+
+    AADLInterfaceGraphicsItem *pi = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+            utils::nearestItem(scene, m_connectionPoints.first(), kInterfaceTolerance, ifaceTypes));
+    AADLInterfaceGraphicsItem *ri = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+            utils::nearestItem(scene, m_connectionPoints.last(), kInterfaceTolerance, ifaceTypes));
+    if (!pi || !ri)
+        return;
+
+    if (pi->entity()->isRequired() && ri->entity()->isProvided()) {
+        qSwap(startObject, endObject);
+        qSwap(pi, ri);
+    }
+    AADLObjectIfaceProvided *providedIface = qobject_cast<AADLObjectIfaceProvided *>(pi->entity());
+    AADLObjectIfaceRequired *requiredIface = qobject_cast<AADLObjectIfaceRequired *>(ri->entity());
+
+    if (!providedIface || !requiredIface)
+        return;
+
+    const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
+                                  qVariantFromValue(endObject),      qVariantFromValue(providedIface),
+                                  qVariantFromValue(requiredIface),  qVariantFromValue(m_connectionPoints) };
+    taste3::cmd::CommandsStack::current()->push(
+            cmd::CommandsFactory::create(cmd::CreateManualConnectionEntity, params));
+}
+
+void CreatorTool::handleDirectConnectionType(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (m_connectionPoints.size() < 1)
+        return;
+
+    const QLineF connectionLine { m_connectionPoints.first(), pos };
+
+    AADLObjectIfaceProvided *providedIface { nullptr };
+    AADLObjectIfaceRequired *requiredIface { nullptr };
+    QPointF providedPoint;
+    QPointF requiredPoint;
+    QPointF startPointAdjusted;
+    QPointF endPointAdjusted;
+
+    auto itemAtStartPos = utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.first(), kInterfaceTolerance),
+                                             { AADLFunctionGraphicsItem::Type });
+    AADLObjectContainer *startObject = containerObject(itemAtStartPos);
+    if (!startObject)
+        return;
+
+    bool requiredAtStart = false;
+    if (auto startIfaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.first(), kInterfaceTolerance),
+                                   { AADLInterfaceGraphicsItem::Type }))) {
+        if (auto iface = startIfaceItem->entity()) {
+            requiredAtStart = iface->isRequired();
+            if (iface->isProvided()) {
+                if (providedIface)
+                    return;
+                providedIface = qobject_cast<AADLObjectIfaceProvided *>(iface);
+                providedPoint = startIfaceItem->scenePos();
+            } else if (iface->isRequired()) {
+                if (requiredIface)
+                    return;
+                requiredIface = qobject_cast<AADLObjectIfaceRequired *>(iface);
+                requiredPoint = startIfaceItem->scenePos();
+            }
+        } else {
+            return;
+        }
+    } else if (!utils::intersects(itemAtStartPos->sceneBoundingRect(), connectionLine, &startPointAdjusted)) {
+        return;
+    }
+
+    auto itemAtEndPos =
+            utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), { AADLFunctionGraphicsItem::Type });
+    AADLObjectContainer *endObject = containerObject(itemAtEndPos);
+    if (!endObject)
+        return;
+
+    if (auto endIfaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(utils::nearestItem(
+                scene, adjustFromPoint(pos, kInterfaceTolerance), { AADLInterfaceGraphicsItem::Type }))) {
+        if (auto iface = endIfaceItem->entity()) {
+            requiredAtStart = iface->isProvided();
+            if (iface->isProvided()) {
+                if (providedIface)
+                    return;
+                providedIface = qobject_cast<AADLObjectIfaceProvided *>(iface);
+                providedPoint = endIfaceItem->scenePos();
+            } else if (iface->isRequired()) {
+                if (requiredIface)
+                    return;
+                requiredIface = qobject_cast<AADLObjectIfaceRequired *>(iface);
+                requiredPoint = endIfaceItem->scenePos();
+            }
+        } else {
+            return;
+        }
+    } else if (!utils::intersects(itemAtEndPos->sceneBoundingRect(), connectionLine, &endPointAdjusted)) {
+        return;
+    }
+
+    if (providedPoint.isNull())
+        providedPoint = requiredAtStart ? endPointAdjusted : startPointAdjusted;
+    if (requiredPoint.isNull())
+        requiredPoint = requiredAtStart ? startPointAdjusted : endPointAdjusted;
+
+    const QVariantList params = { qVariantFromValue(m_model.data()),
+                                  qVariantFromValue(requiredAtStart ? endObject : startObject),
+                                  qVariantFromValue(providedIface),
+                                  providedPoint,
+                                  qVariantFromValue(requiredAtStart ? startObject : endObject),
+                                  qVariantFromValue(requiredIface),
+                                  requiredPoint };
+    taste3::cmd::CommandsStack::current()->push(
+            cmd::CommandsFactory::create(cmd::CreateDirectConnectionEntity, params));
+
+    m_connectionPoints.append(pos);
 }
 
 void CreatorTool::removeSelectedItems()
@@ -531,7 +621,7 @@ void CreatorTool::removeSelectedItems()
 
             if (entity) {
                 const QVariantList params = { qVariantFromValue(entity), qVariantFromValue(m_model.data()) };
-                if(QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
                     taste3::cmd::CommandsStack::current()->push(cmdRm);
             }
         }

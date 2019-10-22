@@ -279,7 +279,7 @@ static inline QVector<QPointF> updatePoints(QGraphicsScene *scene, AADLInterface
     return AADLConnectionGraphicsItem::simplify(points);
 }
 
-AADLConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem* parent)
+AADLConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent)
     : QGraphicsPathItem(parent)
 {
 }
@@ -299,7 +299,8 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
     , m_connection(connection)
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
-    setFlags(QGraphicsItem::ItemIsSelectable|QGraphicsItem::ItemHasNoContents|QGraphicsItem::ItemClipsToShape|QGraphicsItem::ItemContainsChildrenInShape);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
+             | QGraphicsItem::ItemContainsChildrenInShape);
     m_item->setPen(QPen(Qt::black, kDefaulPenWidth));
 }
 
@@ -452,9 +453,9 @@ void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
     const QTransform dt = deviceTransform(tr);
     const QPointF currScale { dt.m11(), dt.m22() };
 
-    for (int idx = 1; idx < m_points.size(); ++idx) {
-        const QPointF point = utils::lineCenter(QLineF(m_points.value(idx - 1), m_points.value(idx)));
-        if (QGraphicsRectItem *grip = m_grips.value(idx - 1)) {
+    for (int idx = 0; idx < m_points.size(); ++idx) {
+        const QPointF point = m_points.value(idx);
+        if (QGraphicsRectItem *grip = m_grips.value(idx)) {
             const QPointF destination { mapFromScene(point) };
             const QPointF destinationScaled { destination.x() * currScale.x(), destination.y() * currScale.y() };
             QRectF br = grip->rect();
@@ -518,66 +519,45 @@ bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle,
 
 bool AADLConnectionGraphicsItem::handleGripPointMove(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
 {
-    const int idx = m_grips.indexOf(handle);
+    int idx = m_grips.indexOf(handle);
     if (idx == -1)
         return false;
 
     const QVector<QPointF> points(m_points);
 
-    const QPointF p1 = m_points.value(idx);
-    const QPointF p2 = m_points.value(idx + 1);
-    const QLineF current { p1, p2 };
-    QLineF path { event->lastScenePos(), event->scenePos() };
-    const qreal length = path.length() * qSin(qDegreesToRadians(current.angleTo(path)));
-    path.setAngle(current.angle() + (length < 0 ? -90 : 90));
-    path.setLength(qAbs(length));
-    const QPointF delta = path.p2() - path.p1();
+    m_points[idx] = event->scenePos();
 
-    m_points[idx] += delta;
-    m_points[idx + 1] += delta;
-    auto updateEdgeItem = [&](InteractiveObject *item, bool isStart) {
-        QSignalBlocker sb(item);
-        item->setPos(item->parentItem()->mapFromScene(isStart ? m_points.first() : m_points.last()));
-        item->instantLayoutUpdate();
-        const QRectF itemSceneRect = item->sceneBoundingRect();
-        if (itemSceneRect.contains(isStart ? m_points.first() : m_points.last()))
-            return;
-
-        m_points.insert(isStart ? 0 : m_points.size(), item->scenePos());
-    };
-
-    updateEdgeItem(m_startItem, true);
-    updateEdgeItem(m_endItem, false);
-
-    const QRectF startSceneRect = m_startItem->sceneBoundingRect();
-    const QRectF endSceneRect = m_endItem->sceneBoundingRect();
-    int newStart = -1, newEnd = -1;
-    for (int idx = 1; idx < m_points.size() - 1; ++idx) {
-        const QPointF &point = m_points.at(idx);
-        if (startSceneRect.contains(point))
-            newStart = idx;
-        if (newEnd == -1 && endSceneRect.contains(point))
-            newEnd = idx;
-    }
-    if (newEnd != -1 && newStart != -1 && newEnd < newStart)
-        qSwap(newEnd, newStart);
-    if (newEnd != -1)
-        m_points.resize(newEnd + 1);
-    if (newStart != -1)
-        m_points.remove(0, newStart);
-
-    simplify();
-    if (m_points.size() != points.size() && m_grips.size() >= 2) {
-        const int gripIdx = m_grips.indexOf(handle);
-        if (gripIdx != -1) {
-            const auto iters = std::mismatch(points.constBegin(), points.constEnd(), m_points.constBegin());
-            const int idx = std::distance(points.constBegin(), iters.first);
-            if (!idx && m_points.size() > points.size())
-                m_grips.swap(gripIdx, 1);
-            else
-                m_grips.swap(gripIdx, qBound(0, idx, m_grips.size() - 1));
+    auto it = std::find_if(m_grips.begin(), m_grips.end(), [handle](const QGraphicsRectItem *const grip) {
+        return grip != handle && grip->sceneBoundingRect().intersects(handle->sceneBoundingRect());
+    });
+    if (it != m_grips.end()) {
+        const int intersectionIdx = std::distance(m_grips.begin(), it);
+        const int startIdx = intersectionIdx < idx ? intersectionIdx : idx + 1;
+        const int endIdx = intersectionIdx < idx ? idx : intersectionIdx + 1;
+        for (int i = endIdx - 1; i >= startIdx; --i) {
+            auto item = m_grips.takeAt(i);
+            scene()->removeItem(item);
+            delete item;
+            m_points.removeAt(i);
         }
+        idx = m_grips.indexOf(handle);
     }
+    if (idx == 0 || idx == m_points.size() - 1) {
+        auto updateEdgeItem = [&](InteractiveObject *item, bool isStart) {
+            QSignalBlocker sb(item);
+            item->setPos(item->parentItem()->mapFromScene(isStart ? m_points.first() : m_points.last()));
+            item->instantLayoutUpdate();
+            const QRectF itemSceneRect = item->sceneBoundingRect();
+            if (itemSceneRect.contains(isStart ? m_points.first() : m_points.last()))
+                return;
+
+            m_points.insert(isStart ? 0 : m_points.size(), item->scenePos());
+            m_grips.insert(isStart ? 0 : m_points.size(), createGripPoint());
+        };
+        updateEdgeItem(m_startItem, true);
+        updateEdgeItem(m_endItem, false);
+    }
+
     updateBoundingRect();
     return true;
 }
@@ -589,6 +569,18 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
     const int idx = m_grips.indexOf(handle);
     if (idx == -1)
         return false;
+
+    QPointF intersectionPoint { event->scenePos() };
+    if (idx > 0 && idx < m_points.size() - 1) {
+        QLineF prevLine = { m_points.value(idx - 1), intersectionPoint };
+        if (utils::alignedLine(prevLine))
+            intersectionPoint = prevLine.p2();
+
+        QLineF nextLine = { m_points.value(idx + 1), intersectionPoint };
+        if (utils::alignedLine(nextLine))
+            intersectionPoint = nextLine.p2();
+    }
+    m_points[idx] = intersectionPoint;
 
     static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
     for (auto item : scene()->items(m_points)) {
@@ -613,18 +605,18 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
 
 void AADLConnectionGraphicsItem::adjustGripPointCount()
 {
-    const int diff = m_points.isEmpty() ? 0 : m_points.size() - 1 - m_grips.size();
+    const int diff = m_points.isEmpty() ? 0 : m_points.size() - m_grips.size();
     if (diff == 0)
         return;
 
-    while (m_grips.size() > m_points.size() - 1) {
+    while (m_grips.size() > m_points.size()) {
         if (auto grip = m_grips.takeLast()) {
             if (auto scene = grip->scene())
                 scene->removeItem(grip);
             delete grip;
         }
     }
-    while (m_grips.size() < m_points.size() - 1)
+    while (m_grips.size() < m_points.size())
         m_grips.append(createGripPoint());
 }
 
@@ -682,6 +674,8 @@ QVector<QPointF> AADLConnectionGraphicsItem::simplify(const QVector<QPointF> &po
             simplifiedPoints.removeAt(idx);
         }
     }
+    if (simplifiedPoints.size() == 2)
+        return { points.first(), points.last() };
     return simplifiedPoints;
 }
 

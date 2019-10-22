@@ -50,5 +50,7 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QLis
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
                            const QList<int> &acceptableTypes = QList<int>());
 
+bool alignedLine(QLineF &line, int angleTolerance = 10);
+
 } // ns utils
 } // ns taste3

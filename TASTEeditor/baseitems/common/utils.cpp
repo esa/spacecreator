@@ -22,6 +22,7 @@
 #include <QGraphicsView>
 #include <QPropertyAnimation>
 #include <QtGlobal>
+#include <QtMath>
 
 namespace taste3 {
 namespace utils {
@@ -256,6 +257,26 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal o
 {
     const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
     return nearestItem(scene, area, acceptableTypes);
+}
+
+bool alignedLine(QLineF &line, int angleTolerance)
+{
+    if (line.isNull())
+        return false;
+
+    static const int kStep = 90;
+
+    auto isBounded = [](int straightAngle, int tolerance, int angle) {
+        return straightAngle - tolerance < angle && angle < straightAngle + tolerance;
+    };
+
+    for (int angle = 360; angle >= 0; angle -= kStep) {
+        if (isBounded(angle, angleTolerance, qCeil(line.angle()))) {
+            line.setAngle(angle);
+            return true;
+        }
+    }
+    return false;
 }
 
 } // ns utils

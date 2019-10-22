@@ -35,6 +35,7 @@
 #include <QtDebug>
 #include <app/commandsstack.h>
 #include <baseitems/grippointshandler.h>
+#include <baseitems/textgraphicsitem.h>
 
 static const qreal kBorderWidth = 2;
 
@@ -143,13 +144,11 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
 
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter->setPen(pen());
+    painter->setPen(isSelected() ? m_selectedPen : m_pen);
     painter->setBrush(brush());
     painter->drawRoundedRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2), 10, 10);
     painter->restore();
-
-    InteractiveObject::paint(painter, option, widget);
 }
 
 QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
