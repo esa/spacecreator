@@ -109,7 +109,7 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
                 if (auto scene = m_view->scene())
                     scene->clearSelection();
             } else {
-                setCurrentToolType(ToolType::Pointer);
+                clearPreviewItem();
             }
         } break;
         }
@@ -210,11 +210,16 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
             //            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/container.svg")),
             //            tr("Container"), this,
             //                            [this]() { handleToolType(ToolType::Container); });
-            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
-                            [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
-            menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
-                            [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
-            connect(menu, &QMenu::aboutToHide, this, [this]() { m_previewItem->setVisible(false); });
+            if (m_previewItem) {
+                menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
+                                [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+                menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+                                [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+            }
+            connect(menu, &QMenu::aboutToHide, this, [this]() {
+                if (m_previewItem)
+                    m_previewItem->setVisible(false);
+            });
             menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
             clearPreviewItem();
             return true;
@@ -613,11 +618,15 @@ void CreatorTool::removeSelectedItems()
         taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();
+            item->setSelected(false);
+
             AADLObject *entity = nullptr;
             if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item))
                 entity = connectionItem->entity();
             else if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))
                 entity = qobject_cast<AADLObject *>(iObj->modelEntity());
+            else if (item->type() == QGraphicsTextItem::Type)
+                continue;
 
             if (entity) {
                 const QVariantList params = { qVariantFromValue(entity), qVariantFromValue(m_model.data()) };
