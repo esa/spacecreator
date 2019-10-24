@@ -174,7 +174,6 @@ bool InteractiveObject::handleGeometryChanged(GripPoint::Location grip, const QP
             break;
         }
         setRect(parentItem() ? parentItem()->mapRectToScene(rect) : rect);
-        rebuildLayout();
         updateGripPoints();
         return false;
     }

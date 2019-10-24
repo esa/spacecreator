@@ -199,8 +199,12 @@ void AADLFunctionGraphicsItem::initGripPoints()
 
 QSizeF AADLFunctionGraphicsItem::minimalSize() const
 {
-    return { qMax(m_textItem->boundingRect().width(), defaultSize().width()),
-             qMax(m_textItem->boundingRect().height(), defaultSize().height()) };
+    QRectF br;
+    for (QGraphicsItem *item : childItems()) {
+        if (item->type() == AADLFunctionGraphicsItem::Type || item->type() == QGraphicsTextItem::Type)
+            br |= item->boundingRect();
+    }
+    return br.size();
 }
 
 void AADLFunctionGraphicsItem::updateColors()
