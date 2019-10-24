@@ -32,7 +32,7 @@
 
 namespace taste3 {
 
-static const QMarginsF kMargins { 50, 50, 50, 50 };
+static const QMarginsF kMargins { 25, 25, 25, 25 };
 
 InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
