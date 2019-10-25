@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectcontainer.h"
+#include "aadlobjectfunctiontype.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectconnection.h"
@@ -43,7 +43,7 @@ public:
 
     AADLObject* getObject( const common::Id& id ) const;
     AADLObjectFunction* getFunction(const common::Id& id) const;
-    AADLObjectContainer* getContainer(const common::Id& id) const;
+    AADLObjectFunctionType* getFunctionType(const common::Id& id) const;
     AADLObjectIfaceRequired* getRequiredInterface(const common::Id& id) const;
     AADLObjectIfaceProvided* getProvidedInterface(const common::Id& id) const;
     AADLObjectConnection* getConnection(const common::Id& id) const;

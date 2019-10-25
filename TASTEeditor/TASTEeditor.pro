@@ -59,8 +59,8 @@ SOURCES += \
         tab_aadl/aadlobject.cpp \
         tab_aadl/aadlobjectcomment.cpp \
         tab_aadl/aadlobjectconnection.cpp \
-        tab_aadl/aadlobjectcontainer.cpp \
         tab_aadl/aadlobjectfunction.cpp \
+        tab_aadl/aadlobjectfunctiontype.cpp \
         tab_aadl/aadlobjectiface.cpp \
         tab_aadl/aadlobjectsmodel.cpp \
         tab_aadl/aadltabdocument.cpp \
@@ -70,19 +70,19 @@ SOURCES += \
         tab_deployment/deploymenttabdocument.cpp \
         tab_interface/aadlcommentgraphicsitem.cpp \
         tab_interface/aadlconnectiongraphicsitem.cpp \
-        tab_interface/aadlcontainergraphicsitem.cpp \
         tab_interface/aadlfunctiongraphicsitem.cpp \
         tab_interface/aadlfunctionnamegraphicsitem.cpp \
+        tab_interface/aadlfunctiontypegraphicsitem.cpp \
         tab_interface/aadlinterfacegraphicsitem.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
         tab_interface/commands/cmdcommenttextchange.cpp \
-        tab_interface/commands/cmdcontaineritemcreate.cpp \
         tab_interface/commands/cmddirectconnectionitemcreate.cpp \
         tab_interface/commands/cmdentityattributechange.cpp \
         tab_interface/commands/cmdentitygeometrychange.cpp \
         tab_interface/commands/cmdentitypropertychange.cpp \
         tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
+        tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
         tab_interface/commands/cmdmanualconnectionitemcreate.cpp \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.cpp \
@@ -123,8 +123,8 @@ HEADERS += \
         tab_aadl/aadlobject.h \
         tab_aadl/aadlobjectcomment.h \
         tab_aadl/aadlobjectconnection.h \
-        tab_aadl/aadlobjectcontainer.h \
         tab_aadl/aadlobjectfunction.h \
+        tab_aadl/aadlobjectfunctiontype.h \
         tab_aadl/aadlobjectiface.h \
         tab_aadl/aadlobjectsmodel.h \
         tab_aadl/aadltabdocument.h \
@@ -134,19 +134,19 @@ HEADERS += \
         tab_deployment/deploymenttabdocument.h \
         tab_interface/aadlcommentgraphicsitem.h \
         tab_interface/aadlconnectiongraphicsitem.h \
-        tab_interface/aadlcontainergraphicsitem.h \
         tab_interface/aadlfunctiongraphicsitem.h \
         tab_interface/aadlfunctionnamegraphicsitem.h \
+        tab_interface/aadlfunctiontypegraphicsitem.h \
         tab_interface/aadlinterfacegraphicsitem.h \
         tab_interface/commands/cmdcommentitemcreate.h \
         tab_interface/commands/cmdcommenttextchange.h \
-        tab_interface/commands/cmdcontaineritemcreate.h \
         tab_interface/commands/cmddirectconnectionitemcreate.h \
         tab_interface/commands/cmdentityattributechange.h \
         tab_interface/commands/cmdentitygeometrychange.h \
         tab_interface/commands/cmdentitypropertychange.h \
         tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
+        tab_interface/commands/cmdfunctiontypeitemcreate.h \
         tab_interface/commands/cmdmanualconnectionitemcreate.h \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.h \

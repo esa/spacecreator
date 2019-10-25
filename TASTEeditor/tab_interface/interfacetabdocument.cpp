@@ -23,8 +23,8 @@
 #include "tab_aadl/aadlxmlreader.h"
 #include "tab_interface/aadlcommentgraphicsitem.h"
 #include "tab_interface/aadlconnectiongraphicsitem.h"
-#include "tab_interface/aadlcontainergraphicsitem.h"
 #include "tab_interface/aadlfunctiongraphicsitem.h"
+#include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
 
 #include <QDebug>
@@ -148,13 +148,13 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actionGroup->setExclusive(true);
     }
 
-    //    if (!m_actCreateContainer) {
-    //        m_actCreateContainer = new QAction(tr("Function Type"));
-    //        m_actCreateContainer->setCheckable(true);
-    //        m_actCreateContainer->setActionGroup(m_actionGroup);
-    //        connect(m_actCreateContainer, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateContainer);
-    //        m_actCreateContainer->setIcon(QIcon(":/tab_interface/toolbar/icns/container.svg"));
-    //    }
+    if (!m_actCreateFunctionType) {
+        m_actCreateFunctionType = new QAction(tr("Function Type"));
+        m_actCreateFunctionType->setCheckable(true);
+        m_actCreateFunctionType->setActionGroup(m_actionGroup);
+        connect(m_actCreateFunctionType, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunctionType);
+        m_actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/function_type.svg"));
+    }
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
@@ -229,14 +229,21 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         connect(m_actZoomOut, &QAction::triggered, this, &InterfaceTabDocument::onActionZoomOut);
     }
 
-    return { m_actCreateContainer, m_actCreateFunction,   m_actCreateProvidedInterface, m_actCreateRequiredInterface,
-             m_actCreateComment,   m_actGroupConnections, m_actCreateConnection,        m_actRemove,
-             m_actZoomIn,          m_actZoomOut };
+    return { m_actCreateFunctionType,
+             m_actCreateFunction,
+             m_actCreateProvidedInterface,
+             m_actCreateRequiredInterface,
+             m_actCreateComment,
+             m_actGroupConnections,
+             m_actCreateConnection,
+             m_actRemove,
+             m_actZoomIn,
+             m_actZoomOut };
 }
 
-void InterfaceTabDocument::onActionCreateContainer()
+void InterfaceTabDocument::onActionCreateFunctionType()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Container);
+    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::FunctionType);
     WARN_NOT_IMPLEMENTED;
 }
 
@@ -309,8 +316,8 @@ void InterfaceTabDocument::updateItem(QGraphicsItem *item)
     case aadl::AADLFunctionGraphicsItem::Type:
         updateFunction(qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item));
         break;
-    case aadl::AADLContainerGraphicsItem::Type:
-        updateContainer(qgraphicsitem_cast<aadl::AADLContainerGraphicsItem *>(item));
+    case aadl::AADLFunctionTypeGraphicsItem::Type:
+        updateFunctionType(qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item));
         break;
     case aadl::AADLInterfaceGraphicsItem::Type:
         updateInterface(qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(item));
@@ -369,32 +376,30 @@ void InterfaceTabDocument::updateFunction(aadl::AADLFunctionGraphicsItem *functi
         function->instantLayoutUpdate();
     } else {
         QGraphicsItem *parentItem = nullptr;
-        aadl::AADLObject *entityParentObject = entity->parentObject();
-        if (entityParentObject)
+        if (aadl::AADLObject *entityParentObject = entity->parentObject())
             parentItem = m_items.value(entityParentObject->id());
         function->setParentItem(parentItem);
         function->setRect({ QPointF(points.value(0), points.value(1)), QPointF(points.value(2), points.value(3)) });
     }
 }
 
-void InterfaceTabDocument::updateContainer(aadl::AADLContainerGraphicsItem *container)
+void InterfaceTabDocument::updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType)
 {
-    aadl::AADLObjectContainer *entity = container->entity();
+    aadl::AADLObjectFunctionType *entity = functionType->entity();
     Q_ASSERT(entity);
     if (!entity)
         return;
 
     const auto coordinates = entity->coordinates();
     if (coordinates.isEmpty()) {
-        container->instantLayoutUpdate();
+        functionType->instantLayoutUpdate();
     } else {
         QGraphicsItem *parentItem = nullptr;
-        aadl::AADLObject *entityParentObject = entity->parentObject();
-        if (entityParentObject)
+        if (aadl::AADLObject *entityParentObject = entity->parentObject())
             parentItem = m_items.value(entityParentObject->id());
-        container->setParentItem(parentItem);
-        container->setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
-                             QPointF(coordinates.value(2), coordinates.value(3)) });
+        functionType->setParentItem(parentItem);
+        functionType->setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
+                                QPointF(coordinates.value(2), coordinates.value(3)) });
     }
 }
 
@@ -442,8 +447,8 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
     case aadl::AADLObject::AADLObjectType::AADLFunction: {
         return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj));
     } break;
-    case aadl::AADLObject::AADLObjectType::AADLFunctionContainer: {
-        return new aadl::AADLContainerGraphicsItem(qobject_cast<aadl::AADLObjectContainer *>(obj));
+    case aadl::AADLObject::AADLObjectType::AADLFunctionType: {
+        return new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj));
     } break;
     case aadl::AADLObject::AADLObjectType::AADLUnknown:
         qCritical() << "Unknown object type!";

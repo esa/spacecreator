@@ -17,11 +17,13 @@
 
 #include "aadlobjectfunction.h"
 
+#include "aadlcommonprops.h"
+
 namespace taste3 {
 namespace aadl {
 
 AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
-    : AADLObjectContainer(title, parent)
+    : AADLObjectFunctionType(title, parent)
 {
 }
 
@@ -30,6 +32,17 @@ AADLObjectFunction::~AADLObjectFunction() {}
 AADLObject::AADLObjectType AADLObjectFunction::aadlType() const
 {
     return AADLObjectType::AADLFunction;
+}
+
+QString AADLObjectFunction::instanceOf() const
+{
+    return attr(meta::token(meta::Token::instance_of)).toString();
+}
+
+void AADLObjectFunction::setInstanceOf(const QString &instance)
+{
+    if (instanceOf() != instance)
+        setAttr(meta::token(meta::Token::instance_of), instance);
 }
 
 } // ns aadl

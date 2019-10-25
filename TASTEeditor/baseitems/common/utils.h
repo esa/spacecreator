@@ -30,6 +30,7 @@ namespace utils {
 
 static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
+static constexpr QSizeF DefaultGraphicsItemSize = { 200, 80 };
 
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);

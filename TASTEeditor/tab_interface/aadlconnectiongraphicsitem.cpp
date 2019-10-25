@@ -17,7 +17,7 @@
 
 #include "aadlconnectiongraphicsitem.h"
 
-#include "aadlcontainergraphicsitem.h"
+#include "aadlfunctiontypegraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "baseitems/common/utils.h"
@@ -161,7 +161,7 @@ static inline QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const 
 static inline QVector<QPointF> findPath(QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection,
                                         QRectF *intersectedRect)
 {
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
+    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
     QVector<QPointF> points = generateConnection(startDirection, endDirection);
     const QList<QGraphicsItem *> intersectedItems = scene->items(points);
 
@@ -208,7 +208,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
                 continue;
             }
             const auto subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
-            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
+            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
             for (auto subPath : subPaths) {
                 if (subPath.isEmpty())
                     continue;
@@ -582,7 +582,7 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
     }
     m_points[idx] = intersectionPoint;
 
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLContainerGraphicsItem::Type };
+    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
     for (auto item : scene()->items(m_points)) {
         if (types.contains(item->type())
             && utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {

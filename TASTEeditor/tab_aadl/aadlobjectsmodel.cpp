@@ -86,7 +86,7 @@ AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }
 
-AADLObjectContainer *AADLObjectsModel::getContainer(const common::Id &id) const
+AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const common::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }

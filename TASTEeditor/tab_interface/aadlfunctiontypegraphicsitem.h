@@ -22,26 +22,42 @@
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectContainer;
+class AADLFunctionNameGraphicsItem;
+class AADLObjectFunctionType;
 
-class AADLContainerGraphicsItem : public InteractiveObject
+class AADLFunctionTypeGraphicsItem : public InteractiveObject
 {
+    Q_OBJECT
 public:
-    explicit AADLContainerGraphicsItem(AADLObjectContainer *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLFunctionTypeGraphicsItem(AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLFunctionContainer)
+        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLFunctionType)
     };
 
-    AADLObjectContainer *entity() const;
+    AADLObjectFunctionType *entity() const;
 
     int type() const override { return Type; }
-
-    static QSizeF defaultSize();
 
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+
+    QSizeF minimalSize() const override;
+    virtual void updateTextPosition();
+
+    void initGripPoints() override;
+
+private:
+    void createCommand();
+    QList<QVariantList> prepareAdditionalParams() const;
+
+protected:
+    AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };
 
 } // namespace aadl

@@ -28,12 +28,13 @@ namespace cmd {
 
 static int sCounter = 0;
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectContainer *container,
+CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *function,
                                              const QRectF &geometry)
-    : m_model(model)
+    : QUndoCommand()
+    , m_model(model)
     , m_geometry(geometry)
     , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_model))
-    , m_parent(container)
+    , m_parent(function)
 {
 }
 

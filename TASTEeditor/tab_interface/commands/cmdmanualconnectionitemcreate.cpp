@@ -18,7 +18,7 @@
 #include "cmdmanualconnectionitemcreate.h"
 
 #include "commandids.h"
-#include "tab_aadl/aadlobjectcontainer.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectiface.h"
 #include "tab_aadl/aadlobjectsmodel.h"
 
@@ -28,20 +28,20 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdManualConnectionItemCreate::CmdManualConnectionItemCreate(AADLObjectsModel *model, AADLObjectContainer *start,
-                                                             AADLObjectContainer *end,
+CmdManualConnectionItemCreate::CmdManualConnectionItemCreate(AADLObjectsModel *model, AADLObjectFunction *startFunction,
+                                                             AADLObjectFunction *endFunction,
                                                              AADLObjectIfaceProvided *providedIface,
                                                              AADLObjectIfaceRequired *requiredIface,
                                                              const QVector<QPointF> &points)
     : m_model(model)
-    , m_startContainer(start)
-    , m_endContainer(end)
+    , m_startFunction(startFunction)
+    , m_endFunction(endFunction)
     , m_providedIface(providedIface)
     , m_requiredIface(requiredIface)
-    , m_entity(new AADLObjectConnection(m_startContainer, m_endContainer, m_requiredIface, m_providedIface, m_model))
+    , m_entity(new AADLObjectConnection(m_startFunction, m_endFunction, m_requiredIface, m_providedIface, m_model))
 {
-    Q_ASSERT(m_startContainer);
-    Q_ASSERT(m_endContainer);
+    Q_ASSERT(m_startFunction);
+    Q_ASSERT(m_endFunction);
     Q_ASSERT(m_providedIface);
     Q_ASSERT(m_requiredIface);
 

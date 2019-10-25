@@ -33,7 +33,7 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
     , m_model(model)
     , m_entity(entity)
 {
-    if (auto container = qobject_cast<AADLObjectContainer *>(m_entity)) {
+    if (auto container = qobject_cast<AADLObjectFunctionType *>(m_entity)) {
         for (auto ri : container->ris()) {
             if (auto connection = m_model->getConnectionForIface(ri->id()))
                 m_linkedEntities.append(connection);
@@ -45,7 +45,7 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
             m_linkedEntities.append(pi);
         }
         for (auto child : container->children()) {
-            if (auto connection = m_model->getContainer(child->id()))
+            if (auto connection = m_model->getFunctionType(child->id()))
                 m_linkedEntities.append(connection);
             m_linkedEntities.append(child);
         }
