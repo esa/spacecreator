@@ -42,8 +42,6 @@ public:
 
     AADLObjectComment *entity() const;
 
-    static QSizeF defaultSize();
-
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

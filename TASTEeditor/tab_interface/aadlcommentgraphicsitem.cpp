@@ -17,6 +17,7 @@
 
 #include "aadlcommentgraphicsitem.h"
 
+#include "baseitems/common/utils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
@@ -62,11 +63,6 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
 AADLObjectComment *AADLCommentGraphicsItem::entity() const
 {
     return qobject_cast<AADLObjectComment *>(m_entity);
-}
-
-QSizeF AADLCommentGraphicsItem::defaultSize()
-{
-    return { 100, 100 };
 }
 
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
@@ -184,7 +180,7 @@ void AADLCommentGraphicsItem::onManualResizeFinish(GripPoint::Location grip, con
 
 QSizeF AADLCommentGraphicsItem::minimalSize() const
 {
-    return defaultSize();
+    return utils::DefaultGraphicsItemSize;
 }
 
 void AADLCommentGraphicsItem::createCommand()

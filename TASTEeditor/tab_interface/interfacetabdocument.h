@@ -35,7 +35,7 @@ class AADLObjectsModel;
 class AADLCommentGraphicsItem;
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
-class AADLContainerGraphicsItem;
+class AADLFunctionTypeGraphicsItem;
 class AADLInterfaceGraphicsItem;
 
 } // namespace aadl
@@ -60,7 +60,7 @@ protected:
     QGraphicsScene *createScene() override;
 
 protected slots:
-    void onActionCreateContainer();
+    void onActionCreateFunctionType();
     void onActionCreateFunction();
     void onActionCreateProvidedInterface();
     void onActionCreateRequiredInterface();
@@ -78,7 +78,7 @@ private:
     void updateComment(aadl::AADLCommentGraphicsItem *comment);
     void updateInterface(aadl::AADLInterfaceGraphicsItem *iface);
     void updateFunction(aadl::AADLFunctionGraphicsItem *function);
-    void updateContainer(aadl::AADLContainerGraphicsItem *container);
+    void updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType);
     void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
 
 private:
@@ -86,7 +86,7 @@ private:
     QPointer<GraphicsView> m_graphicsView { nullptr };
     aadl::AADLObjectsModel *m_model { nullptr };
     QActionGroup *m_actionGroup { nullptr };
-    QAction *m_actCreateContainer { nullptr };
+    QAction *m_actCreateFunctionType { nullptr };
     QAction *m_actCreateFunction { nullptr };
     QAction *m_actCreateProvidedInterface { nullptr };
     QAction *m_actCreateRequiredInterface { nullptr };

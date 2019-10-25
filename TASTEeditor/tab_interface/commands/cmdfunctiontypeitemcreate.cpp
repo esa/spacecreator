@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdcontaineritemcreate.h"
+#include "cmdfunctiontypeitemcreate.h"
 
 #include "commandids.h"
 
@@ -27,16 +27,17 @@ namespace cmd {
 
 static int sCounter = 0;
 
-CmdContainerItemCreate::CmdContainerItemCreate(AADLObjectsModel *model, AADLObjectContainer *container, const QRectF &geometry)
+CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
+                                                     const QRectF &geometry)
     : QUndoCommand()
     , m_model(model)
     , m_geometry(geometry)
-    , m_entity(new AADLObjectContainer(QObject::tr("Function_interface_%1").arg(++sCounter), m_model))
-    , m_parent(container)
+    , m_entity(new AADLObjectFunctionType(QObject::tr("Function_type_%1").arg(++sCounter), m_model))
+    , m_parent(parent)
 {
 }
 
-void CmdContainerItemCreate::redo()
+void CmdFunctionTypeItemCreate::redo()
 {
     const QVector<qint32> coordinates {
         qRound(m_geometry.left()),
@@ -45,29 +46,29 @@ void CmdContainerItemCreate::redo()
         qRound(m_geometry.bottom()),
     };
     m_entity->setCoordinates(coordinates);
-    if (m_model)
-        m_model->addObject(m_entity);
     if (m_parent)
         m_parent->addChild(m_entity);
+    if (m_model)
+        m_model->addObject(m_entity);
 }
 
-void CmdContainerItemCreate::undo()
+void CmdFunctionTypeItemCreate::undo()
 {
-    if (m_parent)
-        m_parent->removeChild(m_entity);
     if (m_model)
         m_model->removeObject(m_entity);
+    if (m_parent)
+        m_parent->removeChild(m_entity);
 }
 
-bool CmdContainerItemCreate::mergeWith(const QUndoCommand *command)
+bool CmdFunctionTypeItemCreate::mergeWith(const QUndoCommand *command)
 {
     Q_UNUSED(command)
     return false;
 }
 
-int CmdContainerItemCreate::id() const
+int CmdFunctionTypeItemCreate::id() const
 {
-    return CreateContainerEntity;
+    return CreateFunctionTypeEntity;
 }
 
 } // namespace cmd

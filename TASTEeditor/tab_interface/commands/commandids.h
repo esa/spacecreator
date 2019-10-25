@@ -23,7 +23,7 @@ namespace cmd {
 
 enum Id
 {
-    CreateContainerEntity = 0,
+    CreateFunctionTypeEntity = 0,
     CreateCommentEntity,
     CreateFunctionEntity,
     CreateProvidedInterfaceEntity,

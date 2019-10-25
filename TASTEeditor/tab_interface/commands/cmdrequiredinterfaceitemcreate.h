@@ -23,7 +23,7 @@
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectContainer;
+class AADLObjectFunctionType;
 class AADLObjectIface;
 class AADLObjectsModel;
 namespace cmd {
@@ -31,7 +31,7 @@ namespace cmd {
 class CmdRequiredInterfaceItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdRequiredInterfaceItemCreate(AADLObjectsModel *model, AADLObjectContainer *container, const QPointF &pos);
+    explicit CmdRequiredInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function, const QPointF &pos);
 
     void redo() override;
     void undo() override;
@@ -42,7 +42,7 @@ private:
     QPointer<AADLObjectsModel> m_model;
     const QPointF m_pos;
     QPointer<AADLObjectIface> m_entity;
-    QPointer<AADLObjectContainer> m_parent;
+    QPointer<AADLObjectFunctionType> m_parent;
 };
 
 } // namespace cmd

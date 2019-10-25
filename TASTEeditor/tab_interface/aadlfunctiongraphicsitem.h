@@ -17,15 +17,13 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlfunctiontypegraphicsitem.h"
 
 namespace taste3 {
 namespace aadl {
-class AADLFunctionNameGraphicsItem;
 class AADLObjectFunction;
 
-class AADLFunctionGraphicsItem : public InteractiveObject
+class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem
 {
     Q_OBJECT
 public:
@@ -42,29 +40,20 @@ public:
     QList<QVariantList> prepareConnectionsParams() const;
     void createCommand();
 
-    static QSizeF defaultSize();
-
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
 
     QSizeF minimalSize() const override;
-
-    void initGripPoints() override;
+    void updateTextPosition() override;
 
 private:
     void updateColors();
-    void updateTextPosition();
     void updateConnections();
-
-private:
-    AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };
 
 } // namespace aadl

@@ -17,11 +17,11 @@
 
 #include "aadlxmlreader.h"
 
-#include "aadlobjectconnection.h"
-#include "aadlobjectcontainer.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
 #include "aadlcommonprops.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectiface.h"
 
 #include <QDebug>
 #include <QFile>
@@ -38,7 +38,7 @@ using namespace taste3::aadl::meta;
 
 struct AADLXMLReaderPrivate {
     QVector<AADLObject *> m_allObjects {};
-    QHash<QString, AADLObjectContainer *> m_functionNames {};
+    QHash<QString, AADLObjectFunctionType *> m_functionNames {};
     QHash<QString, AADLObjectIfaceRequired *> m_ifaceRequiredNames {};
     QHash<QString, AADLObjectIfaceProvided *> m_ifaceProvidedNames {};
     QHash<QString, AADLObjectConnection *> m_connectionNames {};
@@ -128,7 +128,7 @@ bool AADLXMLReader::readAADLObject(QXmlStreamReader &xml)
 
 bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
 {
-    AADLObjectContainer *obj = createFunction(xml, parent);
+    AADLObjectFunctionType *obj = createFunction(xml, parent);
     if (!obj)
         return false;
 
@@ -160,7 +160,7 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
     return true;
 }
 
-bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectContainer *obj)
+bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectFunctionType *obj)
 {
     if (!obj)
         return false;
@@ -286,7 +286,7 @@ bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *if
     case Token::RCMperiod:
     case Token::InterfaceName:
     case Token::labelInheritance: {
-        iface->setProp(name,propVal);
+        iface->setProp(name, propVal);
         break;
     }
     default: {
@@ -341,13 +341,14 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
     return true;
 }
 
-AADLObjectContainer *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
+AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
 {
-    static const QXmlStreamAttribute attrContainer(token(Token::is_type), "true");
+    static const QXmlStreamAttribute attrFunctionType(token(Token::is_type), "true");
     const QXmlStreamAttributes &attributes(xml.attributes());
 
-    AADLObjectContainer *currObj = attributes.contains(attrContainer) ? new AADLObjectContainer(QString(), parent)
-                                                                      : new AADLObjectFunction(QString(), parent);
+    AADLObjectFunctionType *currObj = attributes.contains(attrFunctionType)
+            ? new AADLObjectFunctionType(QString(), parent)
+            : new AADLObjectFunction(QString(), parent);
 
     for (const QXmlStreamAttribute &attr : attributes) {
         const QString &attrName = attr.name().toString();

@@ -27,13 +27,13 @@
 namespace taste3 {
 namespace aadl {
 
-struct AADLObjectContainerPrivate;
-class AADLObjectContainer : public AADLObject
+struct AADLObjectFunctionTypePrivate;
+class AADLObjectFunctionType : public AADLObject
 {
     Q_OBJECT
 public:
-    explicit AADLObjectContainer(const QString &title = QString(), QObject *parent = nullptr);
-    ~AADLObjectContainer() override;
+    explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
+    ~AADLObjectFunctionType() override;
 
     AADLObject::AADLObjectType aadlType() const override;
 
@@ -58,14 +58,11 @@ public:
     QStringList activeInterfaces() const;
     void setActiveInterfaces(const QStringList &ifaces);
 
-    QString instanceOf() const;
-    void setInstanceOf(const QString &instance);
-
 private:
-    const std::unique_ptr<AADLObjectContainerPrivate> d;
+    const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
 };
 
-typedef QVector<AADLObjectContainer *> AADLContainersVector;
+typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;
 
 } // ns aadl
 } // ns taste3

@@ -18,7 +18,7 @@
 #include "cmddirectconnectionitemcreate.h"
 
 #include "commandids.h"
-#include "tab_aadl/aadlobjectcontainer.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectiface.h"
 #include "tab_aadl/aadlobjectsmodel.h"
 
@@ -27,41 +27,41 @@ namespace aadl {
 namespace cmd {
 
 CmdDirectConnectionItemCreate::CmdDirectConnectionItemCreate(
-        AADLObjectsModel *model, AADLObjectContainer *startContainer, AADLObjectIfaceProvided *providedIface,
-        const QPointF &startPoint, AADLObjectContainer *endContainer, AADLObjectIfaceRequired *requiredIface,
+        AADLObjectsModel *model, AADLObjectFunctionType *startFunction, AADLObjectIfaceProvided *providedIface,
+        const QPointF &startPoint, AADLObjectFunctionType *endFunction, AADLObjectIfaceRequired *requiredIface,
         const QPointF &endPoint)
     : QUndoCommand()
     , m_model(model)
-    , m_startContainer(startContainer)
-    , m_endContainer(endContainer)
+    , m_startFunction(startFunction)
+    , m_endFunction(endFunction)
     , m_providedIface(providedIface)
     , m_requiredIface(requiredIface)
     , m_entity(nullptr)
 {
-    Q_ASSERT(m_startContainer);
-    Q_ASSERT(m_endContainer);
+    Q_ASSERT(m_startFunction);
+    Q_ASSERT(m_endFunction);
 
     if (!m_providedIface)
-        m_providedIface = new AADLObjectIfaceProvided(m_startContainer);
+        m_providedIface = new AADLObjectIfaceProvided(m_startFunction);
 
     if (!startPoint.isNull())
         m_providedIface->setCoordinates({ qRound(startPoint.x()), qRound(startPoint.y()) });
 
     if (!m_requiredIface)
-        m_requiredIface = new AADLObjectIfaceRequired(m_startContainer);
+        m_requiredIface = new AADLObjectIfaceRequired(m_startFunction);
 
     if (!endPoint.isNull())
         m_requiredIface->setCoordinates({ qRound(endPoint.x()), qRound(endPoint.y()) });
 
-    m_entity = new AADLObjectConnection(m_startContainer, m_endContainer, m_requiredIface, m_providedIface, m_model);
+    m_entity = new AADLObjectConnection(m_startFunction, m_endFunction, m_requiredIface, m_providedIface, m_model);
 }
 
 void CmdDirectConnectionItemCreate::redo()
 {
     m_entity->setCoordinates({});
 
-    m_startContainer->addPI(m_providedIface);
-    m_endContainer->addRI(m_requiredIface);
+    m_startFunction->addPI(m_providedIface);
+    m_endFunction->addRI(m_requiredIface);
 
     m_model->addObject(m_providedIface);
     m_model->addObject(m_requiredIface);
@@ -70,8 +70,8 @@ void CmdDirectConnectionItemCreate::redo()
 
 void CmdDirectConnectionItemCreate::undo()
 {
-    m_startContainer->removePI(m_providedIface);
-    m_endContainer->removeRI(m_requiredIface);
+    m_startFunction->removePI(m_providedIface);
+    m_endFunction->removeRI(m_requiredIface);
 
     m_model->removeObject(m_entity);
     m_model->removeObject(m_providedIface);

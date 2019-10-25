@@ -28,7 +28,7 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-class AADLObjectContainer;
+class AADLObjectFunctionType;
 class AADLObjectIface;
 struct AADLXMLReaderPrivate;
 class AADLXMLReader : public QObject
@@ -55,8 +55,8 @@ private:
     bool readInterfaceView(QXmlStreamReader &xml);
     bool readAADLObject(QXmlStreamReader &xml);
     bool readFunction(QXmlStreamReader &xml, AADLObject *parent = nullptr);
-    AADLObjectContainer *createFunction(QXmlStreamReader &xml, AADLObject *parent = nullptr);
-    bool readFunctionProperty(QXmlStreamReader &xml, AADLObjectContainer *obj);
+    AADLObjectFunctionType *createFunction(QXmlStreamReader &xml, AADLObject *parent = nullptr);
+    bool readFunctionProperty(QXmlStreamReader &xml, AADLObjectFunctionType *obj);
     AADLObjectIface *readInterface(QXmlStreamReader &xml, AADLObject *parent);
     bool readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *iface);
     bool readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *iface);

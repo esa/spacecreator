@@ -41,7 +41,7 @@ public:
     {
         Pointer = 0,
         Function,
-        Container,
+        FunctionType,
         Comment,
         ProvidedInterface,
         RequiredInterface,
@@ -80,13 +80,13 @@ private:
     void handleToolType(CreatorTool::ToolType type, const QPointF &pos);
     bool handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos);
 
-    void handleCommentType(QGraphicsScene *scene, const QPointF &pos);
-    void handleContainerType(QGraphicsScene *scene, const QPointF &pos);
+    void handleComment(QGraphicsScene *scene, const QPointF &pos);
     void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
-    void handleProvidedInterfaceType(QGraphicsScene *scene, const QPointF &pos);
-    void handleRequiredInterfaceType(QGraphicsScene *scene, const QPointF &pos);
-    void handleMultiPointConnectionType(QGraphicsScene *scene, const QPointF &pos);
-    void handleDirectConnectionType(QGraphicsScene *scene, const QPointF &pos);
+    void handleFunction(QGraphicsScene *scene, const QPointF &pos);
+    void handleProvidedInterface(QGraphicsScene *scene, const QPointF &pos);
+    void handleRequiredInterface(QGraphicsScene *scene, const QPointF &pos);
+    void handleMultiPointConnection(QGraphicsScene *scene, const QPointF &pos);
+    void handleDirectConnection(QGraphicsScene *scene, const QPointF &pos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

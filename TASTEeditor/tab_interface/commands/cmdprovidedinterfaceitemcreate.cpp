@@ -8,12 +8,12 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdProvidedInterfaceItemCreate::CmdProvidedInterfaceItemCreate(AADLObjectsModel *model, AADLObjectContainer *container,
-                                                               const QPointF &pos)
+CmdProvidedInterfaceItemCreate::CmdProvidedInterfaceItemCreate(AADLObjectsModel *model,
+                                                               AADLObjectFunctionType *function, const QPointF &pos)
     : m_model(model)
     , m_pos(pos)
-    , m_entity(new AADLObjectIfaceProvided(container))
-    , m_parent(container)
+    , m_entity(new AADLObjectIfaceProvided(function))
+    , m_parent(function)
 {
 }
 

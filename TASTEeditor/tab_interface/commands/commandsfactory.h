@@ -34,7 +34,7 @@ public:
 
 private:
     static QUndoCommand *createFunctionCommand(const QVariantList &params);
-    static QUndoCommand *createContainerCommand(const QVariantList &params);
+    static QUndoCommand *createFunctionTypeCommand(const QVariantList &params);
     static QUndoCommand *createCommentCommand(const QVariantList &params);
     static QUndoCommand *createProvidedInterfaceCommand(const QVariantList &params);
     static QUndoCommand *createRequiredInterfaceCommand(const QVariantList &params);

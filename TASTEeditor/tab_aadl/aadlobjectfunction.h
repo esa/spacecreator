@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "aadlobjectcontainer.h"
+#include "aadlobjectfunctiontype.h"
 
 #include <QObject>
 
 namespace taste3 {
 namespace aadl {
 
-class AADLObjectFunction : public AADLObjectContainer
+class AADLObjectFunction : public AADLObjectFunctionType
 {
     Q_OBJECT
 public:
@@ -33,10 +33,8 @@ public:
 
     AADLObject::AADLObjectType aadlType() const override;
 
-private:
-    QVector<AADLObject *> children() const;
-    bool addChild(AADLObject *child);
-    bool removeChild(AADLObject *child);
+    QString instanceOf() const;
+    void setInstanceOf(const QString &instance);
 };
 
 typedef QVector<AADLObjectFunction *> AADLFunctionsVector;

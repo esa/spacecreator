@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/tab_interface/toolbar">
         <file>icns/comment.svg</file>
-        <file>icns/container.svg</file>
         <file>icns/function.svg</file>
         <file>icns/group.svg</file>
         <file>icns/pi.svg</file>
@@ -12,5 +11,6 @@
         <file>icns/remove.svg</file>
         <file>icns/zoom_in.svg</file>
         <file>icns/zoom_out.svg</file>
+        <file>icns/function_type.svg</file>
     </qresource>
 </RCC>

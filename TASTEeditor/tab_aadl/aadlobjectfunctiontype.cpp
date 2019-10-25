@@ -15,37 +15,38 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectcontainer.h"
+#include "aadlobjectfunctiontype.h"
+
 #include "aadlcommonprops.h"
 
 namespace taste3 {
 namespace aadl {
 
-struct AADLObjectContainerPrivate {
+struct AADLObjectFunctionTypePrivate {
     QVector<AADLObject *> m_children {};
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
 };
 
-AADLObjectContainer::AADLObjectContainer(const QString &title, QObject *parent)
+AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
     : AADLObject(title, parent)
-    , d(new AADLObjectContainerPrivate)
+    , d(new AADLObjectFunctionTypePrivate)
 {
 }
 
-AADLObjectContainer::~AADLObjectContainer() {}
+AADLObjectFunctionType::~AADLObjectFunctionType() {}
 
-AADLObject::AADLObjectType AADLObjectContainer::aadlType() const
+AADLObject::AADLObjectType AADLObjectFunctionType::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLFunctionContainer;
+    return AADLObject::AADLObjectType::AADLFunctionType;
 }
 
-QVector<AADLObject *> AADLObjectContainer::children() const
+QVector<AADLObject *> AADLObjectFunctionType::children() const
 {
     return d->m_children;
 }
 
-bool AADLObjectContainer::addChild(AADLObject *child)
+bool AADLObjectFunctionType::addChild(AADLObject *child)
 {
     if (child && !d->m_children.contains(child)) {
         child->setParentObject(this);
@@ -56,7 +57,7 @@ bool AADLObjectContainer::addChild(AADLObject *child)
     return false;
 }
 
-bool AADLObjectContainer::removeChild(AADLObject *child)
+bool AADLObjectFunctionType::removeChild(AADLObject *child)
 {
     int id = d->m_children.indexOf(child);
     if (id >= 0 && id < d->m_children.size()) {
@@ -68,12 +69,12 @@ bool AADLObjectContainer::removeChild(AADLObject *child)
     return false;
 }
 
-QVector<AADLObjectIface *> AADLObjectContainer::ris() const
+QVector<AADLObjectIface *> AADLObjectFunctionType::ris() const
 {
     return d->m_ris;
 }
 
-bool AADLObjectContainer::addRI(AADLObjectIface *ri)
+bool AADLObjectFunctionType::addRI(AADLObjectIface *ri)
 {
     if (ri && !ris().contains(ri)) {
         ri->setParentObject(this);
@@ -84,7 +85,7 @@ bool AADLObjectContainer::addRI(AADLObjectIface *ri)
     return false;
 }
 
-bool AADLObjectContainer::removeRI(AADLObjectIface *ri)
+bool AADLObjectFunctionType::removeRI(AADLObjectIface *ri)
 {
     int id = ris().indexOf(ri);
     if (id >= 0 && id < ris().size()) {
@@ -96,12 +97,12 @@ bool AADLObjectContainer::removeRI(AADLObjectIface *ri)
     return false;
 }
 
-QVector<AADLObjectIface *> AADLObjectContainer::pis() const
+QVector<AADLObjectIface *> AADLObjectFunctionType::pis() const
 {
     return d->m_pis;
 }
 
-bool AADLObjectContainer::addPI(AADLObjectIface *pi)
+bool AADLObjectFunctionType::addPI(AADLObjectIface *pi)
 {
     if (pi && !pis().contains(pi)) {
         pi->setParentObject(this);
@@ -112,7 +113,7 @@ bool AADLObjectContainer::addPI(AADLObjectIface *pi)
     return false;
 }
 
-bool AADLObjectContainer::removePI(AADLObjectIface *pi)
+bool AADLObjectFunctionType::removePI(AADLObjectIface *pi)
 {
     int id = pis().indexOf(pi);
     if (id >= 0 && id < pis().size()) {
@@ -124,44 +125,33 @@ bool AADLObjectContainer::removePI(AADLObjectIface *pi)
     return false;
 }
 
-bool AADLObjectContainer::addInterface(AADLObjectIface *iface)
+bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
 {
     return iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
 }
 
-bool AADLObjectContainer::removeInterface(AADLObjectIface *iface)
+bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 {
     return iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
 }
 
-QString AADLObjectContainer::language() const
+QString AADLObjectFunctionType::language() const
 {
     return attr(meta::token(meta::Token::language)).toString();
 }
 
-void AADLObjectContainer::setLanguage(const QString &lang)
+void AADLObjectFunctionType::setLanguage(const QString &lang)
 {
     if (language() != lang)
         setAttr(meta::token(meta::Token::language), lang);
 }
 
-QString AADLObjectContainer::instanceOf() const
-{
-    return attr(meta::token(meta::Token::instance_of)).toString();
-}
-
-void AADLObjectContainer::setInstanceOf(const QString &instance)
-{
-    if (instanceOf() != instance)
-        setAttr(meta::token(meta::Token::instance_of), instance);
-}
-
-QStringList AADLObjectContainer::activeInterfaces() const
+QStringList AADLObjectFunctionType::activeInterfaces() const
 {
     return prop(meta::token(meta::Token::Active_Interfaces)).toStringList();
 }
 
-void AADLObjectContainer::setActiveInterfaces(const QStringList &ifaces)
+void AADLObjectFunctionType::setActiveInterfaces(const QStringList &ifaces)
 {
     if (activeInterfaces() != ifaces)
         setProp(meta::token(meta::Token::Active_Interfaces), ifaces);

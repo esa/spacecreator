@@ -27,15 +27,17 @@ namespace aadl {
 class AADLObjectIfaceRequired;
 class AADLObjectIfaceProvided;
 class AADLObjectConnection;
-class AADLObjectContainer;
+class AADLObjectFunction;
 class AADLObjectsModel;
 namespace cmd {
 
 class CmdManualConnectionItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdManualConnectionItemCreate(AADLObjectsModel *model, AADLObjectContainer *startContainer, AADLObjectContainer *endContainer,
-                                           AADLObjectIfaceProvided *providedIface, AADLObjectIfaceRequired *requiredIface, const QVector<QPointF> &points);
+    explicit CmdManualConnectionItemCreate(AADLObjectsModel *model, taste3::aadl::AADLObjectFunction *startFunction,
+                                           taste3::aadl::AADLObjectFunction *endFunction,
+                                           AADLObjectIfaceProvided *providedIface,
+                                           AADLObjectIfaceRequired *requiredIface, const QVector<QPointF> &points);
 
     void redo() override;
     void undo() override;
@@ -45,8 +47,8 @@ public:
 private:
     QPointer<AADLObjectsModel> m_model;
     QVector<qint32> m_coordinates;
-    QPointer<AADLObjectContainer> m_startContainer;
-    QPointer<AADLObjectContainer> m_endContainer;
+    QPointer<AADLObjectFunction> m_startFunction;
+    QPointer<AADLObjectFunction> m_endFunction;
     QPointer<AADLObjectIfaceProvided> m_providedIface;
     QPointer<AADLObjectIfaceRequired> m_requiredIface;
     QPointer<AADLObjectConnection> m_entity;
