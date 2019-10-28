@@ -17,6 +17,8 @@
 #include "interfacetabdocument.h"
 
 #include "baseitems/graphicsview.h"
+#include "baseitems/clicknotifieritem.h"
+
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
 #include "tab_aadl/aadlobjectsmodel.h"
@@ -26,6 +28,7 @@
 #include "tab_interface/aadlfunctiongraphicsitem.h"
 #include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
+#include "tab_interface/properties/propertiesdialog.h"
 
 #include <QDebug>
 #include <QFile>
@@ -42,24 +45,7 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
     , m_model(new aadl::AADLObjectsModel(this))
 {
-    connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, [this](aadl::AADLObject *object) {
-        auto propertyChanged = [this]() {
-            if (auto object = qobject_cast<aadl::AADLObject *>(sender())) {
-                if (auto item = m_items.value(object->id()))
-                    updateItem(item);
-            }
-        };
-
-        auto item = createItemForObject(object);
-        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
-        connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
-        Q_ASSERT(item);
-        m_items.insert(object->id(), item);
-        m_graphicsScene->addItem(item);
-        updateItem(item);
-        m_graphicsScene->clearSelection();
-        item->setSelected(true);
-    });
+    connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &InterfaceTabDocument::onAADLObjectAdded);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, [this](aadl::AADLObject *object) {
         auto item = m_items.take(object->id());
         m_graphicsScene->removeItem(item);
@@ -250,25 +236,21 @@ void InterfaceTabDocument::onActionCreateFunctionType()
 void InterfaceTabDocument::onActionCreateFunction()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Function);
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateProvidedInterface()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::ProvidedInterface);
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateRequiredInterface()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::RequiredInterface);
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateComment()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Comment);
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionGroupConnections()
@@ -279,25 +261,21 @@ void InterfaceTabDocument::onActionGroupConnections()
 void InterfaceTabDocument::onActionCreateConnection()
 {
     m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::MultiPointConnection);
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionRemoveItem()
 {
     m_tool->removeSelectedItems();
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionZoomIn()
 {
     m_graphicsView->setZoom(m_graphicsView->zoom() + m_graphicsView->zoomStepPercent());
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionZoomOut()
 {
     m_graphicsView->setZoom(m_graphicsView->zoom() - m_graphicsView->zoomStepPercent());
-    WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)
@@ -435,27 +413,70 @@ void InterfaceTabDocument::updateConnection(aadl::AADLConnectionGraphicsItem *co
 QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
 {
     switch (obj->aadlType()) {
-    case aadl::AADLObject::AADLObjectType::AADLComment: {
+    case aadl::AADLObject::AADLObjectType::AADLComment:
         return new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj));
-    } break;
-    case aadl::AADLObject::AADLObjectType::AADLIface: {
+    case aadl::AADLObject::AADLObjectType::AADLIface:
         return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj));
-    } break;
-    case aadl::AADLObject::AADLObjectType::AADLConnection: {
+    case aadl::AADLObject::AADLObjectType::AADLConnection:
         return new aadl::AADLConnectionGraphicsItem(qobject_cast<aadl::AADLObjectConnection *>(obj));
-    } break;
-    case aadl::AADLObject::AADLObjectType::AADLFunction: {
+    case aadl::AADLObject::AADLObjectType::AADLFunction:
         return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj));
-    } break;
-    case aadl::AADLObject::AADLObjectType::AADLFunctionType: {
+    case aadl::AADLObject::AADLObjectType::AADLFunctionType:
         return new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj));
-    } break;
-    case aadl::AADLObject::AADLObjectType::AADLUnknown:
-        qCritical() << "Unknown object type!";
     default:
+    {
+        qCritical() << "Unknown object type:" << obj->aadlType();
         break;
     }
+    }
+
     return nullptr;
+}
+
+void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
+{
+    auto propertyChanged = [this]() {
+        if (auto object = qobject_cast<aadl::AADLObject *>(sender())) {
+            if (auto item = m_items.value(object->id()))
+                updateItem(item);
+        }
+    };
+
+    if(auto item = createItemForObject(object))
+    {
+        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
+        connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
+        Q_ASSERT(item);
+        m_items.insert(object->id(), item);
+        m_graphicsScene->addItem(item);
+        updateItem(item);
+        m_graphicsScene->clearSelection();
+        item->setSelected(true);
+
+        if( auto clickable = qobject_cast<ClickNotifierItem*>(item->toGraphicsObject()))
+        {
+            connect(clickable, &ClickNotifierItem::clicked, this, &InterfaceTabDocument::onItemClicked);
+            connect(clickable, &ClickNotifierItem::doubleClicked, this, &InterfaceTabDocument::onItemDoublelicked);
+        }
+    }
+}
+
+void InterfaceTabDocument::onItemClicked()
+{
+}
+
+void InterfaceTabDocument::onItemDoublelicked()
+{
+    if( auto clickedItem = qobject_cast<ClickNotifierItem*>(sender()))
+        if( auto clickedEntity = qobject_cast<aadl::AADLObject*>(clickedItem->dataObject()))
+            showPropertyEditor(clickedEntity);
+}
+
+void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject* obj)
+{
+    aadl::PropertiesDialog* dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget*>(parent()));
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
 }
 
 } // ns document

@@ -45,7 +45,6 @@ public:
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;

@@ -33,7 +33,10 @@ enum Id
     ChangeEntityGeometry,
     RemoveEntity,
     ChangeCommentText,
-    ChangeEntityProperties,
+    CreateEntityProperty,
+    ChangeEntityProperty,
+    RenameEntityProperty,
+    RemoveEntityProperty,
     ChangeEntityAttributes,
     LastId
 };

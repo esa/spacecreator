@@ -16,10 +16,12 @@
 */
 
 #include "aadlobjectconnection.h"
-
 #include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
+#include "tab_aadl/aadlcommonprops.h"
 
 #include <QPointer>
+#include <QDebug>
 
 namespace taste3 {
 namespace aadl {
@@ -45,12 +47,14 @@ AADLObjectConnection::AADLObjectConnection(AADLObject *from, AADLObject *to, AAD
     : AADLObject(QString(), parent)
     , d(new AADLObjectConnectionPrivate { from, to, ri, pi })
 {
+    updateAttributes();
 }
 
 AADLObjectConnection::AADLObjectConnection(QObject *parent)
     : AADLObject(QString(), parent)
     , d(new AADLObjectConnectionPrivate)
 {
+    updateAttributes();
 }
 
 AADLObjectConnection::~AADLObjectConnection() {}
@@ -88,6 +92,108 @@ AADLObjectIfaceProvided *AADLObjectConnection::providedInterface() const
 QString AADLObjectConnection::providedInterfaceName() const
 {
     return providedInterface() ? providedInterface()->title() : QString();
+}
+
+void AADLObjectConnection::updateAttributes()
+{
+    AADLObject::setAttr(meta::token(meta::Token::from), source() ? source()->title() : QString());
+    AADLObject::setAttr(meta::token(meta::Token::ri_name), requiredInterfaceName());
+    AADLObject::setAttr(meta::token(meta::Token::to), target() ? target()->title() : QString());
+    AADLObject::setAttr(meta::token(meta::Token::pi_name), providedInterfaceName());
+}
+
+void AADLObjectConnection::setAttr( const QString& name, const QVariant& val)
+{
+    bool attrUpdated(false);
+    const meta::Token attr = meta::token(name);
+    switch(attr)
+    {
+    case meta::Token::from:
+    {
+        if(auto src = objectsModel()->getObjectByName(val.toString()))
+        {
+            if(src != d->m_source)
+            {
+                attrUpdated = true;
+                d->m_source = src;
+            }
+        }
+        else
+        {
+            qWarning() << "Object not found:" << name << val;
+            return;
+        }
+        break;
+    }
+    case meta::Token::ri_name:
+    {
+        if(auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Required))
+        {
+            if(auto ri = qobject_cast<AADLObjectIfaceRequired*>(iface))
+            {
+                if(ri != d->m_ri)
+                {
+                    attrUpdated = true;
+                    d->m_ri = ri;
+                }
+            }
+        }
+        else
+        {
+            qWarning() << "Object not found:" << name << val;
+            return;
+        }
+        break;
+    }
+    case meta::Token::to:
+    {
+        if(auto dst = objectsModel()->getObjectByName(val.toString()))
+        {
+            if(dst != d->m_target)
+            {
+                attrUpdated = true;
+                d->m_target = dst;
+            }
+        }
+        else
+        {
+            qWarning() << "Object not found:" << name << val;
+            return;
+        }
+        break;
+    }
+    case meta::Token::pi_name:
+    {
+        if(auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Provided))
+        {
+            if(auto pi = qobject_cast<AADLObjectIfaceProvided*>(iface))
+            {
+                if(pi != d->m_pi)
+                {
+                    attrUpdated = true;
+                    d->m_pi = pi;
+                }
+            }
+        }
+        else
+        {
+            qWarning() << "Object not found:" << name << val;
+            return;
+        }
+        break;
+    }
+    case meta::Token::Unknown:
+    {
+        qWarning() << "Unknow connection property:" << name << val;
+        return;
+    }
+    default:
+        break;
+    }
+
+    AADLObject::setAttr(name, val);
+    if(attrUpdated)
+        updateAttributes();
 }
 
 } // ns aadl

@@ -41,7 +41,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
 {
-    return qobject_cast<AADLObjectFunction *>(m_entity);
+    return qobject_cast<AADLObjectFunction *>(dataObject());
 }
 
 void AADLFunctionGraphicsItem::rebuildLayout()

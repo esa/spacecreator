@@ -57,6 +57,8 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
     if (!obj->parent())
         obj->setParent(this);
 
+    obj->setObjectsModel(this);
+
     d->m_objects.insert(id, obj);
     emit aadlObjectAdded(obj);
     return true;
@@ -79,6 +81,32 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
 {
     return d->m_objects.value(id, nullptr);
+}
+
+AADLObject* AADLObjectsModel::getObjectByName( const QString& name, AADLObject::AADLObjectType type) const
+{
+    if(name.isEmpty() )
+        return nullptr;
+
+    for(auto obj : d->m_objects)
+        if((type == AADLObject::AADLObjectType::AADLUnknown || type == obj->aadlType()) && obj->title() == name)
+            return obj;
+    return nullptr;
+}
+
+AADLObjectIface* AADLObjectsModel::getIfaceByName( const QString& name, AADLObjectIface::IfaceType direction) const
+{
+    if(name.isEmpty() )
+        return nullptr;
+
+    for(auto obj : d->m_objects)
+        if(AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
+            if(auto iface = qobject_cast<AADLObjectIface*>(obj))
+                if(iface->direction() == direction)
+                    return iface;
+
+    return nullptr;
+
 }
 
 AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
@@ -124,6 +152,12 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     }
     return nullptr;
 }
+
+const QHash<common::Id, AADLObject *>& AADLObjectsModel::objects() const
+{
+    return d->m_objects;
+}
+
 
 } // ns aadl
 

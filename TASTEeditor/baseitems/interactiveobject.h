@@ -19,6 +19,7 @@
 #pragma once
 
 #include "grippoint.h"
+#include "clicknotifieritem.h"
 
 #include <QFont>
 #include <QGraphicsObject>
@@ -28,7 +29,7 @@ namespace taste3 {
 
 class HighlightRectItem;
 
-class InteractiveObject : public QGraphicsObject
+class InteractiveObject : public ClickNotifierItem
 {
     Q_OBJECT
 public:
@@ -75,7 +76,6 @@ Q_SIGNALS:
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
     void needUpdateLayout() const;
-    void doubleClicked();
 
 private Q_SLOTS:
     virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
@@ -89,7 +89,6 @@ protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -115,7 +114,6 @@ protected:
 
     HighlightRectItem *createHighlighter();
 
-    QPointer<QObject> m_entity;
     QPointer<GripPointsHandler> m_gripPoints;
     QRectF m_boundingRect;
     bool m_hovered = false;

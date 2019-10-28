@@ -71,6 +71,10 @@ protected slots:
     void onActionZoomIn();
     void onActionZoomOut();
 
+    void onAADLObjectAdded(aadl::AADLObject *object);
+    void onItemClicked();
+    void onItemDoublelicked();
+
 private:
     static QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
     void updateItem(QGraphicsItem *item);
@@ -80,6 +84,8 @@ private:
     void updateFunction(aadl::AADLFunctionGraphicsItem *function);
     void updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType);
     void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
+
+    void showPropertyEditor(aadl::AADLObject* obj);
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
