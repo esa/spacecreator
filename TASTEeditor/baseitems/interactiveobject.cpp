@@ -35,8 +35,7 @@ namespace taste3 {
 static const QMarginsF kMargins { 25, 25, 25, 25 };
 
 InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
-    : QGraphicsObject(parent)
-    , m_entity(entity)
+    : ClickNotifierItem(entity, parent)
     , m_selectedPen(Qt::black, 4, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
@@ -48,7 +47,7 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
 
 QObject *InteractiveObject::modelEntity() const
 {
-    return m_entity;
+    return dataObject();
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -230,7 +229,7 @@ void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     m_storedZ = zValue();
     //    setZValue(m_storedZ + 1.);
 
-    QGraphicsObject::hoverEnterEvent(event);
+    ClickNotifierItem::hoverEnterEvent(event);
 }
 
 void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -238,28 +237,21 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     m_hovered = false;
     setZValue(m_storedZ);
 
-    QGraphicsObject::hoverLeaveEvent(event);
-}
-
-void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit doubleClicked();
-
-    QGraphicsObject::mouseDoubleClickEvent(event);
+    ClickNotifierItem::hoverLeaveEvent(event);
 }
 
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!m_clickPos.isNull())
         onManualMoveProgress(GripPoint::Center, mapToParent(event->lastPos()), mapToParent(event->pos()));
-    QGraphicsObject::mouseMoveEvent(event);
+    ClickNotifierItem::mouseMoveEvent(event);
 }
 
 void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     m_clickPos = mapToParent(event->pos());
     onManualMoveStart(GripPoint::Center, m_clickPos);
-    QGraphicsObject::mousePressEvent(event);
+    ClickNotifierItem::mousePressEvent(event);
 }
 
 void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -267,7 +259,7 @@ void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!m_clickPos.isNull())
         onManualMoveFinish(GripPoint::Center, m_clickPos, mapToParent(event->pos()));
     m_clickPos = QPointF();
-    QGraphicsObject::mouseReleaseEvent(event);
+    ClickNotifierItem::mouseReleaseEvent(event);
 }
 
 void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
@@ -441,7 +433,7 @@ QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant
         break;
     }
 
-    return QGraphicsObject::itemChange(change, value);
+    return ClickNotifierItem::itemChange(change, value);
 }
 
 bool InteractiveObject::isHovered() const

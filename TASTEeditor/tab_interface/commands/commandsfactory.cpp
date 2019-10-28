@@ -22,6 +22,9 @@
 #include "cmdentityattributechange.h"
 #include "cmdentitygeometrychange.h"
 #include "cmdentitypropertychange.h"
+#include "cmdentitypropertyrename.h"
+#include "cmdentitypropertyremove.h"
+#include "cmdentitypropertycreate.h"
 #include "cmdentityremove.h"
 #include "cmdfunctionitemcreate.h"
 #include "cmdfunctiontypeitemcreate.h"
@@ -62,8 +65,14 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::changeCommentCommand(params);
     case cmd::RemoveEntity:
         return cmd::CommandsFactory::removeEntityCommand(params);
-    case cmd::ChangeEntityProperties:
+    case cmd::CreateEntityProperty:
+        return cmd::CommandsFactory::addEntityPropertyCommand(params);
+    case cmd::ChangeEntityProperty:
         return cmd::CommandsFactory::changeEntityPropertyCommand(params);
+    case cmd::RenameEntityProperty:
+        return cmd::CommandsFactory::renameEntityPropertyCommand(params);
+    case cmd::RemoveEntityProperty:
+        return cmd::CommandsFactory::removeEntityPropertyCommand(params);
     case cmd::ChangeEntityAttributes:
         return cmd::CommandsFactory::changeEntityAttributesCommand(params);
 
@@ -229,6 +238,17 @@ QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)
     return nullptr;
 }
 
+QUndoCommand *CommandsFactory::addEntityPropertyCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const QVariantHash properties = params.value(1).toHash();
+    if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyCreate(entity.value<AADLObject *>(), properties);
+
+    return nullptr;
+}
+
 QUndoCommand *CommandsFactory::changeEntityPropertyCommand(const QVariantList &params)
 {
     Q_ASSERT(params.size() == 2);
@@ -236,6 +256,28 @@ QUndoCommand *CommandsFactory::changeEntityPropertyCommand(const QVariantList &p
     const QVariantHash properties = params.value(1).toHash();
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty())
         return new CmdEntityPropertyChange(entity.value<AADLObject *>(), properties);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::renameEntityPropertyCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const QHash<QString,QString> properties = params.value(1).value<QHash<QString,QString>>();
+    if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyRename(entity.value<AADLObject *>(), properties);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::removeEntityPropertyCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const QStringList properties = params.value(1).toStringList();
+    if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty())
+        return new CmdEntityPropertyRemove(entity.value<AADLObject *>(), properties);
 
     return nullptr;
 }

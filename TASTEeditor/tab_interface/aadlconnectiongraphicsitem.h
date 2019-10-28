@@ -18,6 +18,7 @@
 #pragma once
 
 #include "baseitems/common/abstractinteractiveobject.h"
+#include "baseitems/clicknotifieritem.h"
 #include "tab_aadl/aadlobject.h"
 
 #include <QGraphicsObject>
@@ -29,7 +30,7 @@ namespace aadl {
 class AADLObjectConnection;
 class AADLInterfaceGraphicsItem;
 
-class AADLConnectionGraphicsItem : public QGraphicsObject
+class AADLConnectionGraphicsItem : public ClickNotifierItem
 {
     Q_OBJECT
 public:
@@ -97,7 +98,6 @@ private:
     QPointer<AADLInterfaceGraphicsItem> m_startItem;
     QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
-    AADLObjectConnection *m_connection = nullptr;
     QRectF m_boundingRect;
 
     QVector<QPointF> m_points;

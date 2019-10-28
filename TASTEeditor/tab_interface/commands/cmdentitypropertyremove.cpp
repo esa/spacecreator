@@ -16,7 +16,7 @@
    <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentitypropertychange.h"
+#include "cmdentitypropertyremove.h"
 
 #include "commandids.h"
 
@@ -26,43 +26,46 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(AADLObject *entity, const QVariantHash &props)
+static inline QVariantHash getCurrentProperties(AADLObject *entity, const QStringList &props)
 {
     QVariantHash result;
-    for (auto it = props.constBegin(); it != props.constEnd(); ++it)
-        result.insert(it.key(), entity->prop(it.key()));
+    for (const QString& prop : props)
+        result.insert(prop, entity->prop(prop));
     return result;
 }
 
-CmdEntityPropertyChange::CmdEntityPropertyChange(AADLObject *entity, const QVariantHash &props)
+CmdEntityPropertyRemove::CmdEntityPropertyRemove(AADLObject *entity, const QStringList &props)
     : QUndoCommand()
     , m_entity(entity)
-    , m_newProps(props)
-    , m_oldProps(getCurrentProperties(entity, props))
+    , m_names(props)
+    , m_props(getCurrentProperties(entity, props))
 {
 }
 
-void CmdEntityPropertyChange::redo()
+void CmdEntityPropertyRemove::redo()
 {
-    for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it)
-        m_entity->setProp(it.key(), it.value());
+    QVariantHash props = m_entity->props();
+    for (const QString &name : m_names)
+        props.remove(name);
+    m_entity->setProps(props);
 }
 
-void CmdEntityPropertyChange::undo()
+void CmdEntityPropertyRemove::undo()
 {
-    for (auto it = m_oldProps.constBegin(); it != m_oldProps.constEnd(); ++it)
-        m_entity->setProp(it.key(), it.value());
+    QVariantHash props = m_entity->props();
+    for (auto it = m_props.constBegin(); it != m_props.constEnd(); ++it)
+        props[it.key()] = it.value();
+    m_entity->setProps(props);
 }
 
-bool CmdEntityPropertyChange::mergeWith(const QUndoCommand *command)
+bool CmdEntityPropertyRemove::mergeWith(const QUndoCommand *)
 {
-    Q_UNUSED(command)
     return false;
 }
 
-int CmdEntityPropertyChange::id() const
+int CmdEntityPropertyRemove::id() const
 {
-    return ChangeEntityProperty;
+    return RemoveEntityProperty;
 }
 
 } // namespace cmd

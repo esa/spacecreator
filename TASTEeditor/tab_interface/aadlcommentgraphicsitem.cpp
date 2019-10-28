@@ -48,6 +48,8 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
     m_textItem->setBackgroundColor(Qt::transparent);
     m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    m_textItem->setFlag(QGraphicsItem::ItemIsSelectable);
+
     connect(m_textItem, &TextGraphicsItem::edited, this, &AADLCommentGraphicsItem::textEdited);
     connect(m_textItem, &TextGraphicsItem::textChanged, this, &AADLCommentGraphicsItem::textChanged);
 
@@ -62,7 +64,7 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
 
 AADLObjectComment *AADLCommentGraphicsItem::entity() const
 {
-    return qobject_cast<AADLObjectComment *>(m_entity);
+    return qobject_cast<AADLObjectComment *>(dataObject());
 }
 
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
@@ -96,12 +98,6 @@ void AADLCommentGraphicsItem::textChanged()
     prepareGeometryChange();
     m_boundingRect = m_textItem->boundingRect();
     updateGripPoints();
-}
-
-void AADLCommentGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    m_textItem->enableEditMode();
-    InteractiveObject::mouseDoubleClickEvent(event);
 }
 
 void AADLCommentGraphicsItem::setText(const QString &text)

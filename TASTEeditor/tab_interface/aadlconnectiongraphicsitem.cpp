@@ -294,9 +294,8 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
 }
 
 AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parentItem)
-    : QGraphicsObject(parentItem)
+    : ClickNotifierItem(connection, parentItem)
     , m_item(new GraphicsPathItem(this))
-    , m_connection(connection)
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
@@ -363,7 +362,7 @@ QVector<QPointF> AADLConnectionGraphicsItem::points() const
 
 AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
 {
-    return m_connection;
+    return qobject_cast<AADLObjectConnection *>(dataObject());
 }
 
 QPainterPath AADLConnectionGraphicsItem::shape() const
@@ -388,7 +387,7 @@ QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChang
     if (change == ItemSelectedChange)
         handleSelectionChanged(value.toBool());
 
-    return QGraphicsItem::itemChange(change, value);
+    return ClickNotifierItem::itemChange(change, value);
 }
 
 bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent *event)
@@ -403,7 +402,7 @@ bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent
         if (auto grip = qgraphicsitem_cast<QGraphicsRectItem *>(watched))
             return handleGripPointMove(grip, static_cast<QGraphicsSceneMouseEvent *>(event));
     }
-    return QGraphicsObject::sceneEventFilter(watched, event);
+    return ClickNotifierItem::sceneEventFilter(watched, event);
 }
 
 void AADLConnectionGraphicsItem::rebuildLayout()
@@ -431,7 +430,7 @@ void AADLConnectionGraphicsItem::createCommand()
 
     taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
 
-    const QVariantList params = { qVariantFromValue(m_connection), qVariantFromValue(m_points) };
+    const QVariantList params = { qVariantFromValue(dataObject()), qVariantFromValue(m_points) };
     taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params));
 
     const auto ifaceStartCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, prepareParams(m_startItem));

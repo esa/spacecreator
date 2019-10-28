@@ -27,6 +27,7 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate;
+class AADLObjectsModel;
 class AADLObject : public QObject
 {
     Q_OBJECT
@@ -66,7 +67,7 @@ public:
     QHash<QString, QVariant> attrs() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
-    void setAttr(const QString &name, const QVariant &val);
+    virtual void setAttr(const QString &name, const QVariant &val);
     void removeAttr(const QString &name);
 
     // "properties" - XML children <Property>
@@ -75,6 +76,9 @@ public:
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     void setProp(const QString &name, const QVariant &val);
     void removeProp(const QString &name);
+
+    void setObjectsModel(AADLObjectsModel* model);
+    AADLObjectsModel* objectsModel() const;
 
 signals:
     void titleChanged(const QString &title);

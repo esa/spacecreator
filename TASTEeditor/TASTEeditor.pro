@@ -35,6 +35,7 @@ SOURCES += \
         app/commandsstack.cpp \
         app/common.cpp \
         app/mainwindow.cpp \
+        baseitems/clicknotifieritem.cpp \
         baseitems/common/arrowsign.cpp \
         baseitems/common/drawrectinfo.cpp \
         baseitems/common/highlightrectitem.cpp \
@@ -80,6 +81,9 @@ SOURCES += \
         tab_interface/commands/cmdentityattributechange.cpp \
         tab_interface/commands/cmdentitygeometrychange.cpp \
         tab_interface/commands/cmdentitypropertychange.cpp \
+        tab_interface/commands/cmdentitypropertycreate.cpp \
+        tab_interface/commands/cmdentitypropertyremove.cpp \
+        tab_interface/commands/cmdentitypropertyrename.cpp \
         tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
@@ -90,6 +94,9 @@ SOURCES += \
         tab_interface/creatortool.cpp \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
+        tab_interface/properties/propertiesdialog.cpp \
+        tab_interface/properties/propertieslistmodel.cpp \
+        tab_interface/properties/propertiesview.cpp \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
@@ -97,6 +104,7 @@ HEADERS += \
         app/commandsstack.h \
         app/common.h \
         app/mainwindow.h \
+        baseitems/clicknotifieritem.h \
         baseitems/common/abstractinteractiveobject.h \
         baseitems/common/arrowsign.h \
         baseitems/common/drawrectinfo.h \
@@ -144,6 +152,9 @@ HEADERS += \
         tab_interface/commands/cmdentityattributechange.h \
         tab_interface/commands/cmdentitygeometrychange.h \
         tab_interface/commands/cmdentitypropertychange.h \
+        tab_interface/commands/cmdentitypropertycreate.h \
+        tab_interface/commands/cmdentitypropertyremove.h \
+        tab_interface/commands/cmdentitypropertyrename.h \
         tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdfunctiontypeitemcreate.h \
@@ -155,11 +166,16 @@ HEADERS += \
         tab_interface/creatortool.h \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
+        tab_interface/properties/propertiesdialog.h \
+        tab_interface/properties/propertieslistmodel.h \
+        tab_interface/properties/propertiesview.h \
         tab_msc/msctabdocument.h
 
 FORMS += \
     app/mainwindow.ui \
-    reports/bugreportdialog.ui
+    reports/bugreportdialog.ui \
+    tab_interface/properties/propertiesdialog.ui \
+    tab_interface/properties/propertiesview.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -48,11 +48,21 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setBrush(QColor(Qt::blue));
     m_iface->setPath(pp);
     m_text->setPlainText(entity->interfaceName());
+
+    QObject::connect(entity, &AADLObject::attributesChanged, [this,entity]() {
+        if (m_text->toPlainText() != entity->title())
+            m_text->setPlainText(entity->title());
+        instantLayoutUpdate();
+    });
+    QObject::connect(entity, &AADLObjectIface::titleChanged, [this](const QString &text) {
+        m_text->setPlainText(text);
+        instantLayoutUpdate();
+    });
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
-    return qobject_cast<AADLObjectIface *>(m_entity);
+    return qobject_cast<AADLObjectIface *>(dataObject());
 }
 
 void AADLInterfaceGraphicsItem::connect(AADLConnectionGraphicsItem *item)

@@ -16,7 +16,7 @@
 */
 
 #include "aadlobject.h"
-
+#include "aadlobjectsmodel.h"
 #include "aadlcommonprops.h"
 
 #include <QPointer>
@@ -29,13 +29,15 @@ struct AADLObjectPrivate {
     common::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
+    AADLObjectsModel* m_model;
 };
 
 AADLObject::AADLObject(const QString &title, QObject *parent)
     : QObject(parent)
     , d(new AADLObjectPrivate {
               common::createId(), QHash<QString, QVariant> { { meta::token(meta::Token::name), title } }, // attrs
-              QHash<QString, QVariant> {} // props
+              QHash<QString, QVariant> {}, // props
+              nullptr
       })
 {
 }
@@ -183,6 +185,16 @@ void AADLObject::removeProp(const QString &name)
 {
     if (!name.isEmpty() && d->m_props.remove(name))
         emit propertiesChanged();
+}
+
+void AADLObject::setObjectsModel(AADLObjectsModel* model)
+{
+    d->m_model = model;
+}
+
+AADLObjectsModel* AADLObject::objectsModel() const
+{
+    return d->m_model;
 }
 
 } // ns aadl

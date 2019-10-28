@@ -16,7 +16,7 @@
    <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdentitypropertychange.h"
+#include "cmdentitypropertycreate.h"
 
 #include "commandids.h"
 
@@ -34,7 +34,7 @@ static inline QVariantHash getCurrentProperties(AADLObject *entity, const QVaria
     return result;
 }
 
-CmdEntityPropertyChange::CmdEntityPropertyChange(AADLObject *entity, const QVariantHash &props)
+CmdEntityPropertyCreate::CmdEntityPropertyCreate(AADLObject *entity, const QVariantHash &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)
@@ -42,27 +42,36 @@ CmdEntityPropertyChange::CmdEntityPropertyChange(AADLObject *entity, const QVari
 {
 }
 
-void CmdEntityPropertyChange::redo()
+void CmdEntityPropertyCreate::redo()
 {
     for (auto it = m_newProps.constBegin(); it != m_newProps.constEnd(); ++it)
         m_entity->setProp(it.key(), it.value());
 }
 
-void CmdEntityPropertyChange::undo()
+void CmdEntityPropertyCreate::undo()
 {
     for (auto it = m_oldProps.constBegin(); it != m_oldProps.constEnd(); ++it)
-        m_entity->setProp(it.key(), it.value());
+        m_entity->removeProp(it.key());
 }
 
-bool CmdEntityPropertyChange::mergeWith(const QUndoCommand *command)
+bool CmdEntityPropertyCreate::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command)
+    if(command->id() == id())
+    {
+        const QVariantHash &update = static_cast<const CmdEntityPropertyCreate*>(command)->m_newProps;
+        QVariantHash::const_iterator i = update.constBegin();
+        while (i != update.constEnd()) {
+            m_newProps[i.key()] = i.value();
+            ++i;
+        }
+        return true;
+    }
     return false;
 }
 
-int CmdEntityPropertyChange::id() const
+int CmdEntityPropertyCreate::id() const
 {
-    return ChangeEntityProperty;
+    return CreateEntityProperty;
 }
 
 } // namespace cmd

@@ -42,6 +42,8 @@ public:
     bool removeObject(AADLObject* obj);
 
     AADLObject* getObject( const common::Id& id ) const;
+    AADLObject* getObjectByName( const QString& name, AADLObject::AADLObjectType type = AADLObject::AADLObjectType::AADLUnknown) const;
+    AADLObjectIface* getIfaceByName( const QString& name, AADLObjectIface::IfaceType direction) const;
     AADLObjectFunction* getFunction(const common::Id& id) const;
     AADLObjectFunctionType* getFunctionType(const common::Id& id) const;
     AADLObjectIfaceRequired* getRequiredInterface(const common::Id& id) const;
@@ -50,6 +52,8 @@ public:
     AADLObjectComment* getCommentById(const common::Id& id) const;
 
     AADLObjectConnection* getConnectionForIface(const common::Id& id) const;
+
+    const QHash<common::Id, AADLObject *>& objects() const;
 
 signals:
     void aadlObjectAdded(AADLObject *object);
