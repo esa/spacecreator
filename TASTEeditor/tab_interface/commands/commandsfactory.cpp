@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+
 #include "commandsfactory.h"
 
 #include "cmdcommentitemcreate.h"
@@ -22,9 +23,9 @@
 #include "cmdentityattributechange.h"
 #include "cmdentitygeometrychange.h"
 #include "cmdentitypropertychange.h"
-#include "cmdentitypropertyrename.h"
-#include "cmdentitypropertyremove.h"
 #include "cmdentitypropertycreate.h"
+#include "cmdentitypropertyremove.h"
+#include "cmdentitypropertyrename.h"
 #include "cmdentityremove.h"
 #include "cmdfunctionitemcreate.h"
 #include "cmdfunctiontypeitemcreate.h"
@@ -264,7 +265,7 @@ QUndoCommand *CommandsFactory::renameEntityPropertyCommand(const QVariantList &p
 {
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
-    const QHash<QString,QString> properties = params.value(1).value<QHash<QString,QString>>();
+    const QHash<QString, QString> properties = params.value(1).value<QHash<QString, QString>>();
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty())
         return new CmdEntityPropertyRename(entity.value<AADLObject *>(), properties);
 

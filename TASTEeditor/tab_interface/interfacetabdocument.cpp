@@ -1,24 +1,24 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+  You should have received a copy of the GNU Library General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+
 #include "interfacetabdocument.h"
 
-#include "baseitems/graphicsview.h"
 #include "baseitems/clicknotifieritem.h"
-
+#include "baseitems/graphicsview.h"
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
 #include "tab_aadl/aadlobjectsmodel.h"
@@ -423,8 +423,7 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj));
     case aadl::AADLObject::AADLObjectType::AADLFunctionType:
         return new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj));
-    default:
-    {
+    default: {
         qCritical() << "Unknown object type:" << obj->aadlType();
         break;
     }
@@ -442,8 +441,7 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
         }
     };
 
-    if(auto item = createItemForObject(object))
-    {
+    if (auto item = createItemForObject(object)) {
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
         connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
         Q_ASSERT(item);
@@ -453,28 +451,25 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
         m_graphicsScene->clearSelection();
         item->setSelected(true);
 
-        if( auto clickable = qobject_cast<ClickNotifierItem*>(item->toGraphicsObject()))
-        {
+        if (auto clickable = qobject_cast<ClickNotifierItem *>(item->toGraphicsObject())) {
             connect(clickable, &ClickNotifierItem::clicked, this, &InterfaceTabDocument::onItemClicked);
             connect(clickable, &ClickNotifierItem::doubleClicked, this, &InterfaceTabDocument::onItemDoublelicked);
         }
     }
 }
 
-void InterfaceTabDocument::onItemClicked()
-{
-}
+void InterfaceTabDocument::onItemClicked() {}
 
 void InterfaceTabDocument::onItemDoublelicked()
 {
-    if( auto clickedItem = qobject_cast<ClickNotifierItem*>(sender()))
-        if( auto clickedEntity = qobject_cast<aadl::AADLObject*>(clickedItem->dataObject()))
+    if (auto clickedItem = qobject_cast<ClickNotifierItem *>(sender()))
+        if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->dataObject()))
             showPropertyEditor(clickedEntity);
 }
 
-void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject* obj)
+void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadl::PropertiesDialog* dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget*>(parent()));
+    aadl::PropertiesDialog *dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

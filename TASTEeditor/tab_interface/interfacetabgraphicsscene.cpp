@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
+
 #include "interfacetabgraphicsscene.h"
 
 namespace taste3 {

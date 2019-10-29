@@ -1,27 +1,28 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+  You should have received a copy of the GNU Library General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #include "aadlobjectconnection.h"
+
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "tab_aadl/aadlcommonprops.h"
 
-#include <QPointer>
 #include <QDebug>
+#include <QPointer>
 
 namespace taste3 {
 namespace aadl {
@@ -102,88 +103,64 @@ void AADLObjectConnection::updateAttributes()
     AADLObject::setAttr(meta::token(meta::Token::pi_name), providedInterfaceName());
 }
 
-void AADLObjectConnection::setAttr( const QString& name, const QVariant& val)
+void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
 {
     bool attrUpdated(false);
     const meta::Token attr = meta::token(name);
-    switch(attr)
-    {
-    case meta::Token::from:
-    {
-        if(auto src = objectsModel()->getObjectByName(val.toString()))
-        {
-            if(src != d->m_source)
-            {
+    switch (attr) {
+    case meta::Token::from: {
+        if (auto src = objectsModel()->getObjectByName(val.toString())) {
+            if (src != d->m_source) {
                 attrUpdated = true;
                 d->m_source = src;
             }
-        }
-        else
-        {
+        } else {
             qWarning() << "Object not found:" << name << val;
             return;
         }
         break;
     }
-    case meta::Token::ri_name:
-    {
-        if(auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Required))
-        {
-            if(auto ri = qobject_cast<AADLObjectIfaceRequired*>(iface))
-            {
-                if(ri != d->m_ri)
-                {
+    case meta::Token::ri_name: {
+        if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Required)) {
+            if (auto ri = qobject_cast<AADLObjectIfaceRequired *>(iface)) {
+                if (ri != d->m_ri) {
                     attrUpdated = true;
                     d->m_ri = ri;
                 }
             }
-        }
-        else
-        {
+        } else {
             qWarning() << "Object not found:" << name << val;
             return;
         }
         break;
     }
-    case meta::Token::to:
-    {
-        if(auto dst = objectsModel()->getObjectByName(val.toString()))
-        {
-            if(dst != d->m_target)
-            {
+    case meta::Token::to: {
+        if (auto dst = objectsModel()->getObjectByName(val.toString())) {
+            if (dst != d->m_target) {
                 attrUpdated = true;
                 d->m_target = dst;
             }
-        }
-        else
-        {
+        } else {
             qWarning() << "Object not found:" << name << val;
             return;
         }
         break;
     }
-    case meta::Token::pi_name:
-    {
-        if(auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Provided))
-        {
-            if(auto pi = qobject_cast<AADLObjectIfaceProvided*>(iface))
-            {
-                if(pi != d->m_pi)
-                {
+    case meta::Token::pi_name: {
+        if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Provided)) {
+            if (auto pi = qobject_cast<AADLObjectIfaceProvided *>(iface)) {
+                if (pi != d->m_pi) {
                     attrUpdated = true;
                     d->m_pi = pi;
                 }
             }
-        }
-        else
-        {
+        } else {
             qWarning() << "Object not found:" << name << val;
             return;
         }
         break;
     }
-    case meta::Token::Unknown:
-    {
+    case meta::Token::Unknown: {
         qWarning() << "Unknow connection property:" << name << val;
         return;
     }
@@ -192,7 +169,7 @@ void AADLObjectConnection::setAttr( const QString& name, const QVariant& val)
     }
 
     AADLObject::setAttr(name, val);
-    if(attrUpdated)
+    if (attrUpdated)
         updateAttributes();
 }
 
