@@ -57,6 +57,7 @@ SOURCES += \
         reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
         settings/settingsmanager.cpp \
+        tab_aadl/aadlcommonprops.cpp \
         tab_aadl/aadlobject.cpp \
         tab_aadl/aadlobjectcomment.cpp \
         tab_aadl/aadlobjectconnection.cpp \

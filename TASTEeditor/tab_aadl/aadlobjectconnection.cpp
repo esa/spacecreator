@@ -97,18 +97,18 @@ QString AADLObjectConnection::providedInterfaceName() const
 
 void AADLObjectConnection::updateAttributes()
 {
-    AADLObject::setAttr(meta::token(meta::Token::from), source() ? source()->title() : QString());
-    AADLObject::setAttr(meta::token(meta::Token::ri_name), requiredInterfaceName());
-    AADLObject::setAttr(meta::token(meta::Token::to), target() ? target()->title() : QString());
-    AADLObject::setAttr(meta::token(meta::Token::pi_name), providedInterfaceName());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::from), source() ? source()->title() : QString());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::ri_name), requiredInterfaceName());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::to), target() ? target()->title() : QString());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::pi_name), providedInterfaceName());
 }
 
 void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
 {
     bool attrUpdated(false);
-    const meta::Token attr = meta::token(name);
+    const meta::Props::Token attr = meta::Props::token(name);
     switch (attr) {
-    case meta::Token::from: {
+    case meta::Props::Token::from: {
         if (auto src = objectsModel()->getObjectByName(val.toString())) {
             if (src != d->m_source) {
                 attrUpdated = true;
@@ -120,7 +120,7 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Token::ri_name: {
+    case meta::Props::Token::ri_name: {
         if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Required)) {
             if (auto ri = qobject_cast<AADLObjectIfaceRequired *>(iface)) {
                 if (ri != d->m_ri) {
@@ -134,7 +134,7 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Token::to: {
+    case meta::Props::Token::to: {
         if (auto dst = objectsModel()->getObjectByName(val.toString())) {
             if (dst != d->m_target) {
                 attrUpdated = true;
@@ -146,7 +146,7 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Token::pi_name: {
+    case meta::Props::Token::pi_name: {
         if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Provided)) {
             if (auto pi = qobject_cast<AADLObjectIfaceProvided *>(iface)) {
                 if (pi != d->m_pi) {
@@ -160,7 +160,7 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Token::Unknown: {
+    case meta::Props::Token::Unknown: {
         qWarning() << "Unknow connection property:" << name << val;
         return;
     }

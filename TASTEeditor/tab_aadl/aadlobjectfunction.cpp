@@ -36,13 +36,13 @@ AADLObject::AADLObjectType AADLObjectFunction::aadlType() const
 
 QString AADLObjectFunction::instanceOf() const
 {
-    return attr(meta::token(meta::Token::instance_of)).toString();
+    return attr(meta::Props::token(meta::Props::Token::instance_of)).toString();
 }
 
 void AADLObjectFunction::setInstanceOf(const QString &instance)
 {
     if (instanceOf() != instance)
-        setAttr(meta::token(meta::Token::instance_of), instance);
+        setAttr(meta::Props::token(meta::Props::Token::instance_of), instance);
 }
 
 } // ns aadl
