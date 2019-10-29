@@ -137,24 +137,24 @@ bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 
 QString AADLObjectFunctionType::language() const
 {
-    return attr(meta::token(meta::Token::language)).toString();
+    return attr(meta::Props::token(meta::Props::Token::language)).toString();
 }
 
 void AADLObjectFunctionType::setLanguage(const QString &lang)
 {
     if (language() != lang)
-        setAttr(meta::token(meta::Token::language), lang);
+        setAttr(meta::Props::token(meta::Props::Token::language), lang);
 }
 
 QStringList AADLObjectFunctionType::activeInterfaces() const
 {
-    return prop(meta::token(meta::Token::Active_Interfaces)).toStringList();
+    return prop(meta::Props::token(meta::Props::Token::Active_Interfaces)).toStringList();
 }
 
 void AADLObjectFunctionType::setActiveInterfaces(const QStringList &ifaces)
 {
     if (activeInterfaces() != ifaces)
-        setProp(meta::token(meta::Token::Active_Interfaces), ifaces);
+        setProp(meta::Props::token(meta::Props::Token::Active_Interfaces), ifaces);
 }
 
 } // ns aadl

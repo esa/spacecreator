@@ -92,7 +92,7 @@ bool AADLXMLReader::parse(QIODevice *in)
     QXmlStreamReader xml(in);
     if (xml.readNext() == QXmlStreamReader::StartDocument)
         if (xml.readNext() == QXmlStreamReader::StartElement)
-            if (token(xml.name().toString()) == Token::InterfaceView)
+            if (Props::token(xml.name().toString()) == Props::Token::InterfaceView)
                 return readInterfaceView(xml);
 
     return false;
@@ -113,11 +113,11 @@ bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
 bool AADLXMLReader::readAADLObject(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
-    switch (token(tagName)) {
-    case Token::Function: {
+    switch (Props::token(tagName)) {
+    case Props::Token::Function: {
         return readFunction(xml);
     }
-    case Token::Connection: {
+    case Props::Token::Connection: {
         return readConnection(xml);
     }
     default:
@@ -136,14 +136,14 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
 
     while (xml.readNextStartElement()) {
         const QString &name = xml.name().toString();
-        switch (token(name)) {
-        case Token::Property: {
+        switch (Props::token(name)) {
+        case Props::Token::Property: {
             readFunctionProperty(xml, obj);
             xml.skipCurrentElement();
             break;
         }
-        case Token::Provided_Interface:
-        case Token::Required_Interface: {
+        case Props::Token::Provided_Interface:
+        case Props::Token::Required_Interface: {
             if (auto iface = readInterface(xml, obj))
                 obj->addInterface(iface);
             break;
@@ -165,11 +165,11 @@ bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectFuncti
     if (!obj)
         return false;
 
-    const QString &name = xml.attributes().value(token(Token::name)).toString();
-    const QString &valueString = xml.attributes().value(token(Token::value)).toString();
-    switch (token(name)) {
-    case Token::Active_Interfaces:
-    case Token::coordinates: {
+    const QString &name = xml.attributes().value(Props::token(Props::Token::name)).toString();
+    const QString &valueString = xml.attributes().value(Props::token(Props::Token::value)).toString();
+    switch (Props::token(name)) {
+    case Props::Token::Active_Interfaces:
+    case Props::Token::coordinates: {
         obj->setProp(name, valueString);
         break;
     }
@@ -184,9 +184,9 @@ bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectFuncti
 AADLObjectIface *AADLXMLReader::readInterface(QXmlStreamReader &xml, AADLObject *parent)
 {
     const QString &tagName = xml.name().toString();
-    Token ifaceType = token(tagName);
-    const bool isProvided = ifaceType == Token::Provided_Interface;
-    const bool isRequired = ifaceType == Token::Required_Interface;
+    Props::Token ifaceType = Props::token(tagName);
+    const bool isProvided = ifaceType == Props::Token::Provided_Interface;
+    const bool isRequired = ifaceType == Props::Token::Required_Interface;
     const bool isIface = isProvided || isRequired;
     if (!isIface) {
         qWarning() << badTagWarningMessage(xml, tagName);
@@ -218,7 +218,7 @@ bool AADLXMLReader::readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *
         return false;
 
     const QString &tagName = xml.name().toString();
-    if (token(tagName) == Token::Unknown) {
+    if (Props::token(tagName) == Props::Token::Unknown) {
         qWarning() << badTagWarningMessage(xml, tagName);
         return false;
     }
@@ -227,12 +227,12 @@ bool AADLXMLReader::readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *
 
     for (const QXmlStreamAttribute &attr : attrs) {
         const QString &attrName = attr.name().toString();
-        switch (token(attrName)) {
-        case Token::name:
-        case Token::kind:
-        case Token::period:
-        case Token::wcet:
-        case Token::queue_size: {
+        switch (Props::token(attrName)) {
+        case Props::Token::name:
+        case Props::Token::kind:
+        case Props::Token::period:
+        case Props::Token::wcet:
+        case Props::Token::queue_size: {
             iface->setAttr(attrName, attrs.value(attrName).toString());
             break;
         }
@@ -253,13 +253,13 @@ bool AADLXMLReader::readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *
             return false;
 
         const QString &name = xml.name().toString();
-        switch (token(name)) {
-        case Token::Property: {
+        switch (Props::token(name)) {
+        case Props::Token::Property: {
             readIfaceProperty(xml, iface);
             break;
         }
-        case Token::Input_Parameter:
-        case Token::Output_Parameter: {
+        case Props::Token::Input_Parameter:
+        case Props::Token::Output_Parameter: {
             readIfaceParameter(xml, iface);
             break;
         }
@@ -276,16 +276,16 @@ bool AADLXMLReader::readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *
 
 bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *iface)
 {
-    const QString &name = xml.attributes().value(token(Token::name)).toString();
+    const QString &name = xml.attributes().value(Props::token(Props::Token::name)).toString();
     const QXmlStreamAttributes &attrs = xml.attributes();
-    const QString &propVal = attrs.value(token(Token::value)).toString();
-    switch (token(name)) {
-    case Token::RCMoperationKind:
-    case Token::coordinates:
-    case Token::Deadline:
-    case Token::RCMperiod:
-    case Token::InterfaceName:
-    case Token::labelInheritance: {
+    const QString &propVal = attrs.value(Props::token(Props::Token::value)).toString();
+    switch (Props::token(name)) {
+    case Props::Token::RCMoperationKind:
+    case Props::Token::coordinates:
+    case Props::Token::Deadline:
+    case Props::Token::RCMperiod:
+    case Props::Token::InterfaceName:
+    case Props::Token::labelInheritance: {
         iface->setProp(name, propVal);
         break;
     }
@@ -300,8 +300,8 @@ bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *if
 bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *iface)
 {
     const QString &name = xml.name().toString();
-    const Token currParam = token(name);
-    if (currParam != Token::Input_Parameter && currParam != Token::Output_Parameter) {
+    const Props::Token currParam = Props::token(name);
+    if (currParam != Props::Token::Input_Parameter && currParam != Props::Token::Output_Parameter) {
         qWarning() << badTagWarningMessage(xml, name);
         return false;
     }
@@ -313,16 +313,16 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         const QString &attrName = attr.name().toString();
         const QString &attrValue = attr.value().toString();
 
-        switch (token(attrName)) {
-        case Token::name: {
+        switch (Props::token(attrName)) {
+        case Props::Token::name: {
             param.m_name = attrValue;
             break;
         }
-        case Token::type: {
+        case Props::Token::type: {
             param.m_type = attrValue;
             break;
         }
-        case Token::encoding: {
+        case Props::Token::encoding: {
             param.m_encoding = attrValue;
             break;
         }
@@ -333,7 +333,7 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         }
     }
 
-    if (currParam == Token::Input_Parameter)
+    if (currParam == Props::Token::Input_Parameter)
         iface->addParamIn(param);
     else
         iface->addParamOut(param);
@@ -343,7 +343,7 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
 
 AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
 {
-    static const QXmlStreamAttribute attrFunctionType(token(Token::is_type), "true");
+    static const QXmlStreamAttribute attrFunctionType(Props::token(Props::Token::is_type), "true");
     const QXmlStreamAttributes &attributes(xml.attributes());
 
     AADLObjectFunctionType *currObj = attributes.contains(attrFunctionType)
@@ -352,11 +352,11 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
 
     for (const QXmlStreamAttribute &attr : attributes) {
         const QString &attrName = attr.name().toString();
-        switch (token(attrName)) {
-        case Token::name:
-        case Token::language:
-        case Token::is_type:
-        case Token::instance_of: {
+        switch (Props::token(attrName)) {
+        case Props::Token::name:
+        case Props::Token::language:
+        case Props::Token::is_type:
+        case Props::Token::instance_of: {
             currObj->setAttr(attrName, attr.value().toString());
             break;
         }
@@ -380,8 +380,8 @@ struct ConnectionInitParamsHolderPrivate {
 bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
 {
     const QString &name = xml.name().toString();
-    const Token currParam = token(name);
-    if (currParam != Token::Connection) {
+    const Props::Token currParam = Props::token(name);
+    if (currParam != Props::Token::Connection) {
         qWarning() << badTagWarningMessage(xml, name);
         return false;
     }
@@ -392,26 +392,26 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
         const QString &attrName = attr.name().toString();
         const QString &attrValue = attr.value().toString();
 
-        switch (token(attrName)) {
-        case Token::from: {
+        switch (Props::token(attrName)) {
+        case Props::Token::from: {
             connectionInitParams.m_from = d->m_functionNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_from)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case Token::to: {
+        case Props::Token::to: {
             connectionInitParams.m_to = d->m_functionNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_to)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case Token::ri_name: {
+        case Props::Token::ri_name: {
             connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_ri)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
-        case Token::pi_name: {
+        case Props::Token::pi_name: {
             connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_pi)
                 qCritical() << Q_FUNC_INFO << attrValue;

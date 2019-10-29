@@ -151,8 +151,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = item =
-                utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
+        QGraphicsItem *item = utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
                 return false;
@@ -254,7 +253,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         m_previewItem->setRect(newGeometry);
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
-        if (auto scene = m_view->scene()) {
+        if (m_view->scene()) {
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
             pp.lineTo(cursorInScene(e->globalPos()));

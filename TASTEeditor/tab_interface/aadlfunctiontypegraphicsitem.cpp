@@ -57,7 +57,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
     m_textItem->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
 
     connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
-        const QVariantMap attributess = { { meta::token(meta::Token::name), text } };
+        const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
         const auto attributesCmd = cmd::CommandsFactory::create(
                 cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
         taste3::cmd::CommandsStack::current()->push(attributesCmd);

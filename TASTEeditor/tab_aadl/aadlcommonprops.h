@@ -24,6 +24,8 @@ namespace taste3 {
 namespace aadl {
 namespace meta {
 
+struct Props {
+
 enum class Token
 {
     Unknown = 0,
@@ -65,52 +67,13 @@ enum class Token
     labelInheritance
 };
 
-static const QHash<QString, Token> TokensByName = { { "InterfaceView", Token::InterfaceView },
+static const QHash<QString, Props::Token> TokensByName ;
 
-                                                    // tags:
-                                                    { "Function", Token::Function },
-                                                    { "Property", Token::Property },
-                                                    { "Provided_Interface", Token::Provided_Interface },
-                                                    { "Input_Parameter", Token::Input_Parameter },
-                                                    { "Output_Parameter", Token::Output_Parameter },
-                                                    { "Required_Interface", Token::Required_Interface },
-                                                    { "Connection", Token::Connection },
+static Props::Token token(const QString &fromString);
 
-                                                    // attrs:
-                                                    { "name", Token::name },
-                                                    { "language", Token::language },
-                                                    { "is_type", Token::is_type },
-                                                    { "instance_of", Token::instance_of },
-                                                    { "value", Token::value },
-                                                    { "kind", Token::kind },
-                                                    { "period", Token::period },
-                                                    { "wcet", Token::wcet },
-                                                    { "queue_size", Token::queue_size },
-                                                    { "type", Token::type },
-                                                    { "encoding", Token::encoding },
-                                                    { "from", Token::from },
-                                                    { "ri_name", Token::ri_name },
-                                                    { "to", Token::to },
-                                                    { "pi_name", Token::pi_name },
+static QString token(Props::Token tag);
 
-                                                    // TASTE props:
-                                                    { "Taste::Active_Interfaces", Token::Active_Interfaces },
-                                                    { "Taste::coordinates", Token::coordinates },
-                                                    { "Taste::Deadline", Token::Deadline },
-                                                    { "Taste::InterfaceName", Token::InterfaceName },
-                                                    { "Taste::RCMoperationKind", Token::RCMoperationKind },
-                                                    { "Taste::RCMperiod", Token::RCMperiod },
-                                                    { "Taste::labelInheritance", Token::labelInheritance } };
-
-static Token token(const QString &fromString)
-{
-    return TokensByName.value(fromString, Token::Unknown);
-}
-
-static QString token(Token tag)
-{
-    return TokensByName.key(tag);
-}
+};
 
 } // meta
 } // ns aadl

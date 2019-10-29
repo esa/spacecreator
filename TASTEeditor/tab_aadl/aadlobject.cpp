@@ -36,7 +36,7 @@ struct AADLObjectPrivate {
 AADLObject::AADLObject(const QString &title, QObject *parent)
     : QObject(parent)
     , d(new AADLObjectPrivate { common::createId(),
-                                QHash<QString, QVariant> { { meta::token(meta::Token::name), title } }, // attrs
+                                QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name), title } }, // attrs
                                 QHash<QString, QVariant> {}, // props
                                 nullptr })
 {
@@ -46,7 +46,7 @@ AADLObject::~AADLObject() {}
 
 QString AADLObject::title() const
 {
-    return attr(meta::token(meta::Token::name)).toString();
+    return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
 common::Id AADLObject::id() const
@@ -57,7 +57,7 @@ common::Id AADLObject::id() const
 bool AADLObject::setTitle(const QString &title)
 {
     if (title != this->title()) {
-        setAttr(meta::token(meta::Token::name), title);
+        setAttr(meta::Props::token(meta::Props::Token::name), title);
         emit titleChanged(title);
         return true;
     }
@@ -95,7 +95,7 @@ QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates)
 
 QVector<qint32> AADLObject::coordinates() const
 {
-    return coordinatesFromString(prop(meta::token(meta::Token::coordinates)).toString());
+    return coordinatesFromString(prop(meta::Props::token(meta::Props::Token::coordinates)).toString());
 }
 
 QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) const
@@ -113,7 +113,7 @@ QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) cons
 void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 {
     if (this->coordinates() != coordinates) {
-        setProp(meta::token(meta::Token::coordinates), coordinatesToString(coordinates));
+        setProp(meta::Props::token(meta::Props::Token::coordinates), coordinatesToString(coordinates));
         emit coordinatesChanged(coordinates);
     }
 }
