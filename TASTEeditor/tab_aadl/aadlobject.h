@@ -77,8 +77,8 @@ public:
     void setProp(const QString &name, const QVariant &val);
     void removeProp(const QString &name);
 
-    void setObjectsModel(AADLObjectsModel* model);
-    AADLObjectsModel* objectsModel() const;
+    void setObjectsModel(AADLObjectsModel *model);
+    AADLObjectsModel *objectsModel() const;
 
 signals:
     void titleChanged(const QString &title);

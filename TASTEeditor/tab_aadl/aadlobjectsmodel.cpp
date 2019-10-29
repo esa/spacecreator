@@ -1,18 +1,18 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+  You should have received a copy of the GNU Library General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #include "aadlobjectsmodel.h"
@@ -83,30 +83,29 @@ AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
     return d->m_objects.value(id, nullptr);
 }
 
-AADLObject* AADLObjectsModel::getObjectByName( const QString& name, AADLObject::AADLObjectType type) const
+AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::AADLObjectType type) const
 {
-    if(name.isEmpty() )
+    if (name.isEmpty())
         return nullptr;
 
-    for(auto obj : d->m_objects)
-        if((type == AADLObject::AADLObjectType::AADLUnknown || type == obj->aadlType()) && obj->title() == name)
+    for (auto obj : d->m_objects)
+        if ((type == AADLObject::AADLObjectType::AADLUnknown || type == obj->aadlType()) && obj->title() == name)
             return obj;
     return nullptr;
 }
 
-AADLObjectIface* AADLObjectsModel::getIfaceByName( const QString& name, AADLObjectIface::IfaceType direction) const
+AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType direction) const
 {
-    if(name.isEmpty() )
+    if (name.isEmpty())
         return nullptr;
 
-    for(auto obj : d->m_objects)
-        if(AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
-            if(auto iface = qobject_cast<AADLObjectIface*>(obj))
-                if(iface->direction() == direction)
+    for (auto obj : d->m_objects)
+        if (AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
+            if (auto iface = qobject_cast<AADLObjectIface *>(obj))
+                if (iface->direction() == direction)
                     return iface;
 
     return nullptr;
-
 }
 
 AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
@@ -153,11 +152,10 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     return nullptr;
 }
 
-const QHash<common::Id, AADLObject *>& AADLObjectsModel::objects() const
+const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
 {
     return d->m_objects;
 }
-
 
 } // ns aadl
 

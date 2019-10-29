@@ -1,23 +1,24 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+  You should have received a copy of the GNU Library General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #include "aadlobject.h"
-#include "aadlobjectsmodel.h"
+
 #include "aadlcommonprops.h"
+#include "aadlobjectsmodel.h"
 
 #include <QPointer>
 #include <QVector>
@@ -29,16 +30,15 @@ struct AADLObjectPrivate {
     common::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
-    AADLObjectsModel* m_model;
+    AADLObjectsModel *m_model;
 };
 
 AADLObject::AADLObject(const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate {
-              common::createId(), QHash<QString, QVariant> { { meta::token(meta::Token::name), title } }, // attrs
-              QHash<QString, QVariant> {}, // props
-              nullptr
-      })
+    , d(new AADLObjectPrivate { common::createId(),
+                                QHash<QString, QVariant> { { meta::token(meta::Token::name), title } }, // attrs
+                                QHash<QString, QVariant> {}, // props
+                                nullptr })
 {
 }
 
@@ -187,12 +187,12 @@ void AADLObject::removeProp(const QString &name)
         emit propertiesChanged();
 }
 
-void AADLObject::setObjectsModel(AADLObjectsModel* model)
+void AADLObject::setObjectsModel(AADLObjectsModel *model)
 {
     d->m_model = model;
 }
 
-AADLObjectsModel* AADLObject::objectsModel() const
+AADLObjectsModel *AADLObject::objectsModel() const
 {
     return d->m_model;
 }

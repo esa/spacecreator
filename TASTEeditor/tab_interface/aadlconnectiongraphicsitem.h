@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "baseitems/common/abstractinteractiveobject.h"
 #include "baseitems/clicknotifieritem.h"
+#include "baseitems/common/abstractinteractiveobject.h"
 #include "tab_aadl/aadlobject.h"
 
 #include <QGraphicsObject>
@@ -90,7 +90,7 @@ private:
     class GraphicsPathItem : public QGraphicsPathItem
     {
     public:
-        explicit GraphicsPathItem(QGraphicsItem* parent = nullptr);
+        explicit GraphicsPathItem(QGraphicsItem *parent = nullptr);
         QPainterPath shape() const override;
     };
 

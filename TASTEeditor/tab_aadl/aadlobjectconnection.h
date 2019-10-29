@@ -49,7 +49,7 @@ public:
     AADLObjectIfaceProvided *providedInterface() const;
     QString providedInterfaceName() const;
 
-    void setAttr( const QString& name, const QVariant& val) override;
+    void setAttr(const QString &name, const QVariant &val) override;
 
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;

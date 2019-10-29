@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "grippoint.h"
 #include "clicknotifieritem.h"
+#include "grippoint.h"
 
 #include <QFont>
 #include <QGraphicsObject>
