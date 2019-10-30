@@ -31,10 +31,6 @@
 namespace taste3 {
 namespace aadl {
 
-const int ItemTypeRole = Qt::UserRole + 2;
-const int ColumnTitle = 0;
-const int ColumnValue = 1;
-
 PropertiesListModel::PropertiesListModel(QObject *parent)
     : QStandardItemModel(parent)
 {

@@ -6,16 +6,40 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>640</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
-    <widget class="taste3::aadl::PropertiesView" name="viewAttrs" native="true"/>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabAttrs">
+      <attribute name="title">
+       <string>Attrs</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="taste3::aadl::PropertiesView" name="viewAttrs" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabProps">
+      <attribute name="title">
+       <string>Props</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="taste3::aadl::PropertiesView" name="viewProps" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item row="1" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">

@@ -34,7 +34,7 @@ class PropertiesDialog : public QDialog
 
 public:
     explicit PropertiesDialog(AADLObject *obj, QWidget *parent = nullptr);
-    ~PropertiesDialog();
+    ~PropertiesDialog() override;
 
 public slots:
     void open() override;
@@ -45,7 +45,6 @@ private:
     AADLObject *m_dataObject { nullptr };
     PropertiesListModel *m_modelAttrs;
 
-    void updateTitle();
     QString objectTypeName() const;
 };
 

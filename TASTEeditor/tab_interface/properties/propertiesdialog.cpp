@@ -37,30 +37,27 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
 {
     ui->setupUi(this);
 
+    m_modelAttrs->setDataObject(m_dataObject);
+
+    ui->viewAttrs->setPropType(PropertiesListModel::ItemType::Attribute);
+    ui->viewAttrs->setModel(m_modelAttrs);
+
+    ui->viewProps->setPropType(PropertiesListModel::ItemType::Property);
+    ui->viewProps->setModel(m_modelAttrs);
+
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    ui->viewAttrs->setModel(m_modelAttrs);
+    const QString attrsTitle(tr("Attributes"));
+    ui->tabWidget->setTabText(0, m_dataObject ? tr("%1 %2").arg(objectTypeName(), attrsTitle) : attrsTitle);
+    ui->tabWidget->setTabText(1, tr("Context Parameters"));
 
-    if (m_dataObject) {
-        updateTitle();
-        m_modelAttrs->setDataObject(m_dataObject);
-        ui->viewAttrs->tableView()->resizeColumnsToContents();
-    }
+    setWindowTitle(tr("Edit Data"));
 }
 
 PropertiesDialog::~PropertiesDialog()
 {
     delete ui;
-}
-
-void PropertiesDialog::updateTitle()
-{
-    QString title = tr("Properties");
-    if (m_dataObject)
-        title = tr("%1 %2").arg(objectTypeName(), title);
-
-    setWindowTitle(title);
 }
 
 QString PropertiesDialog::objectTypeName() const
