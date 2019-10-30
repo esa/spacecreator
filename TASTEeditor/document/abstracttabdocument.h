@@ -55,6 +55,10 @@ public:
 
     virtual QString title() const;
 
+    // A menu entry specific for current doc.
+    // Return nullptr if the doc does not need any menu
+    virtual QMenu *customMenu() const;
+
 signals:
     void dirtyChanged(bool dirty) const;
 

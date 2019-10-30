@@ -42,6 +42,8 @@ public:
     AbstractTabDocument *currentDoc() const;
     int docCount() const;
 
+    QVector<document::AbstractTabDocument *> documents() const;
+
 signals:
     void currentDocIdChanged(int currentDocId);
 

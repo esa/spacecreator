@@ -50,6 +50,7 @@ public:
     ~InterfaceTabDocument() override;
 
     QString title() const override;
+    QMenu *customMenu() const override;
 
 protected:
     bool loadImpl(const QString &path) override;
@@ -74,6 +75,9 @@ protected slots:
     void onAADLObjectAdded(aadl::AADLObject *object);
     void onItemClicked();
     void onItemDoublelicked();
+
+    void onUiMenuInvoked();
+    void onDataTypesMenuInvoked();
 
 private:
     static QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
@@ -105,6 +109,8 @@ private:
 
     aadl::CreatorTool *m_tool { nullptr };
     QHash<common::Id, QGraphicsItem *> m_items;
+
+    void showNIYGUI(const QString &title = QString());
 };
 
 } // ns document
