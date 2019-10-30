@@ -93,5 +93,10 @@ int DocumentsManager::docCount() const
     return m_documents.size();
 }
 
+QVector<document::AbstractTabDocument *> DocumentsManager::documents() const
+{
+    return m_documents;
+}
+
 } // ns document
 } // ns taste3

@@ -152,5 +152,10 @@ QString AbstractTabDocument::title() const
     return tr("Untitled");
 }
 
+QMenu *AbstractTabDocument::customMenu() const
+{
+    return nullptr;
+}
+
 } // ns document
 } // ns taste3

@@ -35,6 +35,8 @@
 #include <QFileInfo>
 #include <QGraphicsItem>
 #include <QGraphicsView>
+#include <QMenu>
+#include <QMessageBox>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
@@ -94,6 +96,16 @@ QGraphicsScene *InterfaceTabDocument::createScene()
 QString InterfaceTabDocument::title() const
 {
     return tr("Interface");
+}
+
+QMenu *InterfaceTabDocument::customMenu() const
+{
+    QMenu *root = new QMenu(title());
+    QAction *actDefaultUi = root->addAction(tr("UI scheme"));
+    connect(actDefaultUi, &QAction::triggered, this, &InterfaceTabDocument::onUiMenuInvoked);
+    QAction *actDataTypes = root->addAction(tr("Data types"));
+    connect(actDataTypes, &QAction::triggered, this, &InterfaceTabDocument::onDataTypesMenuInvoked);
+    return root;
 }
 
 bool InterfaceTabDocument::loadImpl(const QString &path)
@@ -472,6 +484,25 @@ void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
     aadl::PropertiesDialog *dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
+}
+
+void InterfaceTabDocument::onUiMenuInvoked()
+{
+    if (auto act = qobject_cast<QAction *>(sender()))
+        showNIYGUI(act->text());
+}
+
+void InterfaceTabDocument::onDataTypesMenuInvoked()
+{
+    if (auto act = qobject_cast<QAction *>(sender()))
+        showNIYGUI(act->text());
+}
+
+void InterfaceTabDocument::showNIYGUI(const QString &title)
+{
+    QString header = title.isEmpty() ? "NIY" : title;
+    QWidget *mainWindow = qobject_cast<QWidget *>(parent());
+    QMessageBox::information(mainWindow, header, "Not implemented yet!");
 }
 
 } // ns document
