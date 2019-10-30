@@ -28,6 +28,16 @@ class PropertiesListModel : public QStandardItemModel
     Q_OBJECT
 
 public:
+    static const int ItemTypeRole { Qt::UserRole + 2 };
+    static const int ColumnTitle { 0 };
+    static const int ColumnValue { 1 };
+
+    enum ItemType
+    {
+        Attribute = 0,
+        Property
+    };
+
     explicit PropertiesListModel(QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -51,12 +61,6 @@ public:
 private:
     AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
-
-    enum ItemType
-    {
-        Attribute = 0,
-        Property
-    };
 
     void createNewRow(const QString &title, const QVariant &value, ItemType type, int row);
 };

@@ -98,6 +98,7 @@ SOURCES += \
         tab_interface/properties/propertiesdialog.cpp \
         tab_interface/properties/propertieslistmodel.cpp \
         tab_interface/properties/propertiesview.cpp \
+        tab_interface/properties/propsfiltermodel.cpp \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
@@ -170,6 +171,7 @@ HEADERS += \
         tab_interface/properties/propertiesdialog.h \
         tab_interface/properties/propertieslistmodel.h \
         tab_interface/properties/propertiesview.h \
+        tab_interface/properties/propsfiltermodel.h \
         tab_msc/msctabdocument.h
 
 FORMS += \

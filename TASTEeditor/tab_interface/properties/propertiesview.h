@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "propertieslistmodel.h"
+
 #include <QWidget>
 
 namespace Ui {
@@ -28,7 +30,7 @@ class QTableView;
 namespace taste3 {
 namespace aadl {
 
-class PropertiesListModel;
+class PropsFilterModel;
 class PropertiesView : public QWidget
 {
     Q_OBJECT
@@ -40,14 +42,18 @@ public:
     void setModel(PropertiesListModel *model);
     QTableView *tableView() const;
 
+    void setPropType(PropertiesListModel::ItemType type);
+
 private slots:
     void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void on_btnAdd_clicked();
     void on_btnDel_clicked();
 
 private:
-    Ui::PropertiesView *ui;
-    PropertiesListModel *m_model;
+    Ui::PropertiesView *ui { nullptr };
+    PropertiesListModel *m_model { nullptr };
+    bool m_buttonsVisible { true };
+    PropsFilterModel *m_filter { nullptr };
 };
 
 } // namespace aadl
