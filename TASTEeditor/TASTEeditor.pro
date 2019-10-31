@@ -34,6 +34,8 @@ SOURCES += \
         app/commandlineparser.cpp \
         app/commandsstack.cpp \
         app/common.cpp \
+        app/datatypes/basicdatatype.cpp \
+        app/datatypes/datatypesstorage.cpp \
         app/mainwindow.cpp \
         baseitems/clicknotifieritem.cpp \
         baseitems/common/arrowsign.cpp \
@@ -105,6 +107,8 @@ HEADERS += \
         app/commandlineparser.h \
         app/commandsstack.h \
         app/common.h \
+        app/datatypes/basicdatatype.h \
+        app/datatypes/datatypesstorage.h \
         app/mainwindow.h \
         baseitems/clicknotifieritem.h \
         baseitems/common/abstractinteractiveobject.h \

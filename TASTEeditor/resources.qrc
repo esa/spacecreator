@@ -15,4 +15,7 @@
         <file alias="fonts/UbuntuMono-RI.ttf">app/resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
         <file alias="backgrounds/texture.png">app/resources/texture.png</file>
     </qresource>
+    <qresource prefix="/defaults">
+        <file>app/resources/taste-types.asn</file>
+    </qresource>
 </RCC>
