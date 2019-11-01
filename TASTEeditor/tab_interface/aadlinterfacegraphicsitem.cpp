@@ -170,7 +170,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     const QRectF parentRect = parentItem()->boundingRect();
 
     auto updateItem = [this](Qt::Alignment alignment) {
-        const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Provided;
+        const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
         switch (alignment) {
         case Qt::AlignLeft:
             m_iface->setRotation(insideOut ? 180 : 0);
