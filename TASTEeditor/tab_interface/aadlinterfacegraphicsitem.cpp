@@ -24,13 +24,15 @@
 #include <baseitems/grippointshandler.h>
 #include <tab_aadl/aadlobjectiface.h>
 
-static qreal kBase = 15;
-static qreal kHeight = 12;
+static const qreal kBase = 15;
+static const qreal kHeight = 12;
+static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
+static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
+static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 
 namespace taste3 {
 namespace aadl {
 
-static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 
 AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
@@ -39,13 +41,14 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    setFlag(QGraphicsItem::ItemIsSelectable);
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
-    m_iface->setBrush(QColor(Qt::blue));
+    m_iface->setBrush(kDefaultBackgroundColor);
     m_iface->setPath(pp);
     m_text->setPlainText(entity->interfaceName());
 
@@ -68,7 +71,6 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 void AADLInterfaceGraphicsItem::connect(AADLConnectionGraphicsItem *item)
 {
     m_connection = item;
-
     setFlag(QGraphicsItem::ItemIsSelectable, m_connection == nullptr);
 }
 
@@ -240,6 +242,11 @@ void AADLInterfaceGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
     m_gripPoints->setUsedPoints({});
+}
+
+void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
+{
+    m_iface->setBrush(isSelected ? kSelectedBackgroundColor : kDefaultBackgroundColor);
 }
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

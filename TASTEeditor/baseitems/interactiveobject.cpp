@@ -105,7 +105,7 @@ void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF 
     }
 }
 
-void InteractiveObject::handleSelectionChanged(bool isSelected)
+void InteractiveObject::onSelectionChanged(bool isSelected)
 {
     if (isSelected) {
         showGripPoints();
@@ -421,7 +421,7 @@ QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant
 {
     switch (change) {
     case QGraphicsItem::ItemSelectedChange:
-        handleSelectionChanged(value.toBool());
+        onSelectionChanged(value.toBool());
         break;
     case QGraphicsItem::ItemPositionChange:
         m_prevPos = pos();

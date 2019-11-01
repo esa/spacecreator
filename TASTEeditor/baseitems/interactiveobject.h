@@ -82,7 +82,6 @@ private Q_SLOTS:
     virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
 
-    void handleSelectionChanged(bool isSelected);
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -108,6 +107,8 @@ protected:
     virtual void showGripPoints();
     virtual void initGripPoints();
     virtual void rebuildLayout();
+
+    virtual void onSelectionChanged(bool isSelected);
 
     bool handlePositionChanged(const QPointF &from, const QPointF &to);
     bool handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to);
