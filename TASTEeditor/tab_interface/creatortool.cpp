@@ -336,6 +336,17 @@ static inline AADLObjectFunction *functionObject(QGraphicsItem *item)
     return nullptr;
 };
 
+static inline AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
+{
+    if (!item)
+        return nullptr;
+
+    if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
+        return function->entity();
+
+    return nullptr;
+};
+
 static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
 {
     QRectF itemRect = rect;
@@ -475,7 +486,7 @@ void CreatorTool::handleProvidedInterface(QGraphicsScene *scene, const QPointF &
 {
     if (QGraphicsItem *parentItem =
                 utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
-        AADLObjectFunction *parentObject = functionObject(parentItem);
+        AADLObjectFunctionType *parentObject = functionTypeObject(parentItem);
         const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateProvidedInterfaceEntity, params));
@@ -485,7 +496,7 @@ void CreatorTool::handleProvidedInterface(QGraphicsScene *scene, const QPointF &
 void CreatorTool::handleRequiredInterface(QGraphicsScene *scene, const QPointF &pos)
 {
     if (auto parentItem = utils::nearestItem(scene, adjustFromPoint(pos, kInterfaceTolerance), kFunctionTypes)) {
-        AADLObjectFunction *parentObject = functionObject(parentItem);
+        AADLObjectFunctionType *parentObject = functionTypeObject(parentItem);
         const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject), pos };
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateRequiredInterfaceEntity, params));
