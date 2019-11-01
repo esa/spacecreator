@@ -107,6 +107,7 @@ void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF 
 
 void InteractiveObject::onSelectionChanged(bool isSelected)
 {
+    setZValue(isSelected ? 1 : 0);
     if (isSelected) {
         showGripPoints();
         updateGripPoints();
