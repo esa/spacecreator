@@ -117,6 +117,7 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
 
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
+        m_graphicsScene->clear();
         if (m_model->initFromObjects(objects))
             m_graphicsView->setSceneRect(m_graphicsView->scene()->itemsBoundingRect());
     });

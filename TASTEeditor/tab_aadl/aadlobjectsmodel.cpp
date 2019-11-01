@@ -36,7 +36,9 @@ AADLObjectsModel::~AADLObjectsModel() {}
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
-    qDeleteAll(d->m_objects);
+    for (auto object: d->m_objects.values())
+        object->deleteLater();
+
     d->m_objects.clear();
 
     for (auto obj : objects)
