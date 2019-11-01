@@ -305,6 +305,9 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
 
 AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
 {
+    updateRequiredInterface(nullptr);
+    updateProvidedInterface(nullptr);
+
     clear();
 }
 
@@ -469,7 +472,7 @@ void AADLConnectionGraphicsItem::updateProvidedInterface(AADLInterfaceGraphicsIt
 {
     if (pi != m_startItem) {
         if (m_startItem)
-            m_startItem->disconnect(this);
+            m_startItem->connect(nullptr);
 
         m_startItem = pi;
         if (pi)
@@ -481,7 +484,7 @@ void AADLConnectionGraphicsItem::updateRequiredInterface(AADLInterfaceGraphicsIt
 {
     if (ri != m_endItem) {
         if (m_endItem)
-            m_endItem->disconnect(this);
+            m_endItem->connect(nullptr);
 
         m_endItem = ri;
         if (ri)

@@ -24,6 +24,8 @@
 #include <baseitems/grippointshandler.h>
 #include <tab_aadl/aadlobjectiface.h>
 
+#include "aadlconnectiongraphicsitem.h"
+
 static const qreal kBase = 15;
 static const qreal kHeight = 12;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
@@ -71,7 +73,8 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 void AADLInterfaceGraphicsItem::connect(AADLConnectionGraphicsItem *item)
 {
     m_connection = item;
-    setFlag(QGraphicsItem::ItemIsSelectable, m_connection == nullptr);
+
+    setFlag(QGraphicsItem::ItemIsSelectable, m_connection.isNull());
 }
 
 AADLConnectionGraphicsItem *AADLInterfaceGraphicsItem::connectedItem() const

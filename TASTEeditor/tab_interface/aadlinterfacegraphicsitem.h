@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QPointer>
 #include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
 
@@ -57,7 +58,7 @@ protected:
 private:
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
-    AADLConnectionGraphicsItem *m_connection = nullptr;
+    QPointer<AADLConnectionGraphicsItem> m_connection;
 };
 
 } // namespace aadl
