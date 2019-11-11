@@ -18,7 +18,6 @@
 #include "propertiesview.h"
 
 #include "propertieslistmodel.h"
-#include "propsfiltermodel.h"
 #include "ui_propertiesview.h"
 
 #include <QDebug>
@@ -30,7 +29,6 @@ namespace aadl {
 PropertiesView::PropertiesView(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PropertiesView)
-    , m_filter(new PropsFilterModel(this))
 {
     ui->setupUi(this);
 }
@@ -50,8 +48,7 @@ void PropertiesView::setModel(PropertiesListModel *model)
                    &PropertiesView::onCurrentRowChanged);
 
     m_model = model;
-    m_filter->setSourceModel(m_model);
-    ui->tableView->setModel(m_filter);
+    ui->tableView->setModel(m_model);
     ui->tableView->resizeColumnsToContents();
 
     if (ui->tableView->selectionModel())
@@ -92,15 +89,6 @@ void PropertiesView::on_btnDel_clicked()
 {
     if (m_model)
         m_model->removeProperty(ui->tableView->currentIndex());
-}
-
-void PropertiesView::setPropType(PropertiesListModel::ItemType type)
-{
-    m_filter->setTargetType(type);
-
-    const bool isProps = type == PropertiesListModel::Property;
-    ui->btnAdd->setVisible(isProps);
-    ui->btnDel->setVisible(isProps);
 }
 
 } // namespace aadl

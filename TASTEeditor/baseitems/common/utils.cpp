@@ -20,10 +20,15 @@
 #include "baseitems/interactiveobject.h"
 
 #include <QDebug>
+#include <QFile>
 #include <QGraphicsView>
 #include <QPropertyAnimation>
 #include <QtGlobal>
 #include <QtMath>
+
+#ifdef Q_OS_WIN
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+#endif
 
 namespace taste3 {
 namespace utils {
@@ -278,6 +283,38 @@ bool alignedLine(QLineF &line, int angleTolerance)
         }
     }
     return false;
+}
+
+bool copyResourceFile(const QString &source, const QString &target)
+{
+    bool result(false);
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup++;
+#endif
+    try {
+        if (QFile::copy(source, target)) {
+            QFile storedFile(target);
+            storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
+            result = true;
+        } else {
+            qWarning() << "Can't create default ASN datatypes file" << target;
+        }
+    } catch (...) {
+    }
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup--;
+#endif
+    return result;
+}
+
+void setWidgetFontColor(QWidget *widget, const QColor &color)
+{
+    if (!widget || !color.isValid())
+        return;
+
+    QPalette p(widget->palette());
+    p.setColor(QPalette::Text, color);
+    widget->setPalette(p);
 }
 
 } // ns utils

@@ -97,10 +97,13 @@ SOURCES += \
         tab_interface/creatortool.cpp \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
+        tab_interface/properties/adddynamicropertydialog.cpp \
+        tab_interface/properties/dynamicproperty.cpp \
+        tab_interface/properties/dynamicpropertyconfig.cpp \
+        tab_interface/properties/dynamicpropertymanager.cpp \
         tab_interface/properties/propertiesdialog.cpp \
         tab_interface/properties/propertieslistmodel.cpp \
         tab_interface/properties/propertiesview.cpp \
-        tab_interface/properties/propsfiltermodel.cpp \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
@@ -172,15 +175,20 @@ HEADERS += \
         tab_interface/creatortool.h \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
+        tab_interface/properties/adddynamicpropertydialog.h \
+        tab_interface/properties/dynamicproperty.h \
+        tab_interface/properties/dynamicpropertyconfig.h \
+        tab_interface/properties/dynamicpropertymanager.h \
         tab_interface/properties/propertiesdialog.h \
         tab_interface/properties/propertieslistmodel.h \
         tab_interface/properties/propertiesview.h \
-        tab_interface/properties/propsfiltermodel.h \
         tab_msc/msctabdocument.h
 
 FORMS += \
     app/mainwindow.ui \
     reports/bugreportdialog.ui \
+    tab_interface/properties/adddynamicpropertydialog.ui \
+    tab_interface/properties/dynamicpropertymanager.ui \
     tab_interface/properties/propertiesdialog.ui \
     tab_interface/properties/propertiesview.ui
 

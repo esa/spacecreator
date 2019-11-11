@@ -17,41 +17,36 @@
 
 #pragma once
 
-#include "propertieslistmodel.h"
-
-#include <QWidget>
+#include <QDialog>
 
 namespace Ui {
-class PropertiesView;
+class DynamicPropertyManager;
 }
-
-class QTableView;
 
 namespace taste3 {
 namespace aadl {
 
-class PropsFilterModel;
-class PropertiesView : public QWidget
+class DynamicPropertyManager : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesView(QWidget *parent = nullptr);
-    ~PropertiesView();
+    explicit DynamicPropertyManager(QWidget *parent = nullptr);
+    ~DynamicPropertyManager() override;
 
-    void setModel(PropertiesListModel *model);
-    QTableView *tableView() const;
+public slots:
+    void accept() override;
 
 private slots:
-    void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
-    void on_btnAdd_clicked();
-    void on_btnDel_clicked();
+    void updateErrorInfo();
+    void on_btnNewProp_clicked();
 
 private:
-    Ui::PropertiesView *ui { nullptr };
-    PropertiesListModel *m_model { nullptr };
-    bool m_buttonsVisible { true };
+    Ui::DynamicPropertyManager *ui;
+    QStringList m_usedNames;
+    bool readJson(const QString &from);
+    void setTextColor(const QColor &color);
 };
 
-} // namespace aadl
-} // namespace taste3
+} // ns aadl
+} // ns taste3

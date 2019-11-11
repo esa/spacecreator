@@ -18,6 +18,7 @@
 #include "datatypesstorage.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QStandardPaths>
@@ -37,6 +38,11 @@ QString ensureAsnFileExists()
 {
     static const QString asnFileName("taste-types.asn");
     const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+
+    QDir dir(targetDir);
+    if (!dir.exists(targetDir))
+        if (!dir.mkpath(targetDir))
+            qWarning() << "Failed to create path:" << targetDir;
 
     QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
 
