@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="tabAttrs">
       <attribute name="title">
-       <string>Attrs</string>
+       <string>Attributes</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
@@ -29,9 +29,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabProps">
+     <widget class="QWidget" name="tabParams">
       <attribute name="title">
-       <string>Props</string>
+       <string>Parameters</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">

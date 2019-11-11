@@ -72,11 +72,27 @@ private:
     static const QString localName() { return "GroupBugReport"; }
 };
 
+class GroupAadl
+{
+public:
+    GroupAadl();
+
+    const AppOption CustomPropertiesConfig;
+    const AppOption DataTypesConfig;
+
+private:
+    GroupAadl(const GroupBugReport &) = delete;
+    GroupAadl &operator=(const GroupBugReport &) = delete;
+
+    static const QString localName() { return "GroupAadl"; }
+};
+
 class AppOptions
 {
 public:
     static const GroupMainWindow MainWindow;
     static const GroupBugReport BugReport;
+    static const GroupAadl Aadl;
 
 private:
     AppOptions() = delete;

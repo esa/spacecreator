@@ -39,18 +39,15 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
 
     m_modelAttrs->setDataObject(m_dataObject);
 
-    ui->viewAttrs->setPropType(PropertiesListModel::ItemType::Attribute);
     ui->viewAttrs->setModel(m_modelAttrs);
 
-    ui->viewProps->setPropType(PropertiesListModel::ItemType::Property);
-    ui->viewProps->setModel(m_modelAttrs);
+    //    ui->viewProps->setModel(m_modelAttrs);
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     const QString attrsTitle(tr("Attributes"));
     ui->tabWidget->setTabText(0, m_dataObject ? tr("%1 %2").arg(objectTypeName(), attrsTitle) : attrsTitle);
-    ui->tabWidget->setTabText(1, tr("Context Parameters"));
 
     setWindowTitle(tr("Edit Data"));
 }
@@ -73,8 +70,8 @@ QString PropertiesDialog::objectTypeName() const
     case AADLObject::AADLObjectType::AADLIface: {
         QString ifaceDirection;
         if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
-            ifaceDirection = iface->isProvided() ? tr("Provided") : tr("Required");
-        return ifaceDirection.isEmpty() ? tr("Interface") : tr("%1 Interface").arg(ifaceDirection);
+            ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
+        return ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
     }
     case AADLObject::AADLObjectType::AADLComment:
         return tr("Comment");

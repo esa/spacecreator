@@ -17,41 +17,40 @@
 
 #pragma once
 
-#include "propertieslistmodel.h"
-
-#include <QWidget>
+#include <QDialog>
 
 namespace Ui {
-class PropertiesView;
+class AddDynamicPropertyDialog;
 }
-
-class QTableView;
 
 namespace taste3 {
 namespace aadl {
 
-class PropsFilterModel;
-class PropertiesView : public QWidget
+class DynamicProperty;
+class AddDynamicPropertyDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesView(QWidget *parent = nullptr);
-    ~PropertiesView();
+    explicit AddDynamicPropertyDialog(const QStringList &prohibitedNames, QWidget *parent = nullptr);
+    ~AddDynamicPropertyDialog() override;
 
-    void setModel(PropertiesListModel *model);
-    QTableView *tableView() const;
-
-private slots:
-    void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
-    void on_btnAdd_clicked();
-    void on_btnDel_clicked();
+    DynamicProperty *attribute() const;
+public slots:
+    void accept() override;
 
 private:
-    Ui::PropertiesView *ui { nullptr };
-    PropertiesListModel *m_model { nullptr };
-    bool m_buttonsVisible { true };
+    Ui::AddDynamicPropertyDialog *ui;
+    QStringList m_prohibitedNames;
+    QColor m_nameColorDefault;
+    DynamicProperty *m_attr;
+    bool validateName(bool showWarn);
+    bool validateType();
+    bool validateValuesList();
+    bool validateScope();
+
+    QStringList listValues() const;
 };
 
-} // namespace aadl
-} // namespace taste3
+} // ns aadl
+} // ns taste3

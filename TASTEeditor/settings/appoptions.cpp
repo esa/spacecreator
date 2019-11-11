@@ -18,6 +18,9 @@
 #include "appoptions.h"
 
 #include "settingsmanager.h"
+#include "tab_interface/properties/dynamicpropertyconfig.h"
+
+#include <QStandardPaths>
 
 namespace taste3 {
 
@@ -62,5 +65,13 @@ GroupBugReport::GroupBugReport()
 }
 
 const GroupBugReport AppOptions::BugReport = {};
+
+GroupAadl::GroupAadl()
+    : CustomPropertiesConfig(QString("%1/CustomPropsConf").arg(localName()))
+    , DataTypesConfig(QString("%1/DataTypesConf").arg(localName()))
+{
+}
+
+const GroupAadl AppOptions::Aadl = {};
 
 } // namespace taste3

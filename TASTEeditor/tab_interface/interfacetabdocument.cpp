@@ -28,6 +28,7 @@
 #include "tab_interface/aadlfunctiongraphicsitem.h"
 #include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
+#include "tab_interface/properties/dynamicpropertymanager.h"
 #include "tab_interface/properties/propertiesdialog.h"
 
 #include <QDebug>
@@ -101,10 +102,11 @@ QString InterfaceTabDocument::title() const
 QMenu *InterfaceTabDocument::customMenu() const
 {
     QMenu *root = new QMenu(title());
-    QAction *actDefaultUi = root->addAction(tr("UI scheme"));
-    connect(actDefaultUi, &QAction::triggered, this, &InterfaceTabDocument::onUiMenuInvoked);
+    QAction *actCommonProps = root->addAction(tr("Common Properties"));
+    connect(actCommonProps, &QAction::triggered, this, &InterfaceTabDocument::onAttributesManagerRequested);
     QAction *actDataTypes = root->addAction(tr("Data types"));
     connect(actDataTypes, &QAction::triggered, this, &InterfaceTabDocument::onDataTypesMenuInvoked);
+
     return root;
 }
 
@@ -487,10 +489,11 @@ void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
     dialog->open();
 }
 
-void InterfaceTabDocument::onUiMenuInvoked()
+void InterfaceTabDocument::onAttributesManagerRequested()
 {
-    if (auto act = qobject_cast<QAction *>(sender()))
-        showNIYGUI(act->text());
+    aadl::DynamicPropertyManager *dialog = new aadl::DynamicPropertyManager(qobject_cast<QWidget *>(parent()));
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
 }
 
 void InterfaceTabDocument::onDataTypesMenuInvoked()

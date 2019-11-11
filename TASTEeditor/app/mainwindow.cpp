@@ -289,7 +289,7 @@ void MainWindow::initTabs()
     //    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
     //    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
 
-    QMenu *tabsCustom = new QMenu(tr("Tabs"), this);
+    QMenu *tabsCustom = new QMenu(tr("&Tabs"), this);
     for (auto doc : m_docsManager->documents()) {
         if (QMenu *menu = doc->customMenu())
             tabsCustom->addMenu(menu);

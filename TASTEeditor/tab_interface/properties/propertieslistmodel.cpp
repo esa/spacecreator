@@ -24,6 +24,8 @@
 #include "tab_interface/commands/cmdentitypropertychange.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
 #include "tab_interface/commands/commandsfactory.h"
+#include "tab_interface/properties/dynamicproperty.h"
+#include "tab_interface/properties/dynamicpropertyconfig.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -66,8 +68,15 @@ void PropertiesListModel::setDataObject(AADLObject *obj)
     };
 
     beginInsertRows(QModelIndex(), 0, m_dataObject->attrs().size() + m_dataObject->props().size());
-    initRows(m_dataObject->attrs(), ItemType::Attribute, 0);
-    initRows(m_dataObject->props(), ItemType::Property, m_dataObject->attrs().size());
+    initRows(m_dataObject->attrs(), ItemType::Attribute, rowCount());
+    initRows(m_dataObject->props(), ItemType::Property, rowCount());
+
+    QHash<QString, QVariant> customProps;
+    for (auto attr : DynamicPropertyConfig::attributesForObject(m_dataObject)) {
+        if (!m_names.contains(attr->name()))
+            customProps.insert(attr->name(), QVariant::fromValue(attr));
+    }
+    initRows(customProps, ItemType::Property, rowCount());
     endInsertRows();
 }
 

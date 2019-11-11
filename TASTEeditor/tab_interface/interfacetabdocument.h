@@ -76,7 +76,7 @@ protected slots:
     void onItemClicked();
     void onItemDoublelicked();
 
-    void onUiMenuInvoked();
+    void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
 
 private:
