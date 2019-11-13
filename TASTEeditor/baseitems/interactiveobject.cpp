@@ -243,48 +243,44 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!m_clickPos.isNull())
-        onManualMoveProgress(GripPoint::Center, mapToParent(event->lastPos()), mapToParent(event->pos()));
+    onManualMoveProgress(GripPoint::Center, event->lastScenePos(), event->scenePos());
     ClickNotifierItem::mouseMoveEvent(event);
 }
 
 void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_clickPos = mapToParent(event->pos());
-    onManualMoveStart(GripPoint::Center, m_clickPos);
+    onManualMoveStart(GripPoint::Center, event->scenePos());
     ClickNotifierItem::mousePressEvent(event);
 }
 
 void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!m_clickPos.isNull())
-        onManualMoveFinish(GripPoint::Center, m_clickPos, mapToParent(event->pos()));
-    m_clickPos = QPointF();
+    onManualMoveFinish(GripPoint::Center, event->buttonDownScenePos(event->button()), event->scenePos());
     ClickNotifierItem::mouseReleaseEvent(event);
 }
 
 void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(at);
+    if (grip == GripPoint::Center)
+        m_clickPos = mapFromScene(at);
 }
 
 void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
-    if (!scene())
+    Q_UNUSED(from);
+
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
         return;
 
-    if (grip != GripPoint::Location::Center)
-        return;
-
-    const QPointF delta { to - from };
-    QPointF newPos = pos() + delta;
+    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
     if (parentItem()) {
         const QRectF contentRect = parentItem()->boundingRect();
+
         if (newPos.x() < contentRect.left())
             newPos.setX(contentRect.left());
         else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
             newPos.setX(contentRect.right() - m_boundingRect.width());
+
         if (newPos.y() < contentRect.top())
             newPos.setY(contentRect.top());
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
@@ -304,6 +300,8 @@ void InteractiveObject::onManualMoveFinish(GripPoint::Location grip, const QPoin
     Q_UNUSED(grip);
     Q_UNUSED(pressedAt);
     Q_UNUSED(releasedAt);
+
+    m_clickPos = QPointF();
 }
 
 void InteractiveObject::onManualResizeStart(GripPoint::Location grip, const QPointF &at)
