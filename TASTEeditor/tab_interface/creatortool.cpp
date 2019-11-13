@@ -635,7 +635,7 @@ void CreatorTool::removeSelectedItems()
         return;
 
     if (auto scene = m_view->scene()) {
-        taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
+        taste3::cmd::CommandsStack::current()->beginMacro(tr("Remove selected item(s)"));
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
