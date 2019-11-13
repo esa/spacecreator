@@ -54,6 +54,7 @@ protected:
     void onSelectionChanged(bool isSelected) override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
 
 private:
     QGraphicsPathItem *m_iface = nullptr;

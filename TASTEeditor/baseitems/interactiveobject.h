@@ -115,6 +115,7 @@ protected:
 
     HighlightRectItem *createHighlighter();
 
+protected:
     QPointer<GripPointsHandler> m_gripPoints;
     QRectF m_boundingRect;
     bool m_hovered = false;

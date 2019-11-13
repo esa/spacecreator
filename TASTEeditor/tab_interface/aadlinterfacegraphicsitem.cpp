@@ -35,7 +35,6 @@ static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::Ali
 namespace taste3 {
 namespace aadl {
 
-
 AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
     , m_iface(new QGraphicsPathItem(this))
@@ -257,6 +256,35 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
+}
+
+void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(from);
+
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
+        return;
+
+    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
+    if (parentItem()) {
+        const QRectF contentRect = parentItem()->boundingRect();
+
+        if (newPos.x() < contentRect.left())
+            newPos.setX(contentRect.left());
+        else if ((newPos.x()) > contentRect.right())
+            newPos.setX(contentRect.right());
+
+        if (newPos.y() < contentRect.top())
+            newPos.setY(contentRect.top());
+        else if ((newPos.y()) > contentRect.bottom())
+            newPos.setY(contentRect.bottom());
+    }
+    setPos(newPos);
+
+    rebuildLayout();
+    updateGripPoints();
+
+    Q_EMIT needUpdateLayout();
 }
 
 } // namespace aadl
