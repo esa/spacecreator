@@ -19,6 +19,9 @@
 
 #include "cmdcommentitemcreate.h"
 #include "cmdcommenttextchange.h"
+#include "cmdcontextparameterchange.h"
+#include "cmdcontextparametercreate.h"
+#include "cmdcontextparameterremove.h"
 #include "cmddirectconnectionitemcreate.h"
 #include "cmdentityattributechange.h"
 #include "cmdentitygeometrychange.h"
@@ -76,6 +79,13 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::removeEntityPropertyCommand(params);
     case cmd::ChangeEntityAttributes:
         return cmd::CommandsFactory::changeEntityAttributesCommand(params);
+
+    case cmd::CreateContextParameter:
+        return cmd::CommandsFactory::createContextParameterCommand(params);
+    case cmd::ChangeContextParameter:
+        return cmd::CommandsFactory::changeContextParameterCommand(params);
+    case cmd::RemoveContextParameter:
+        return cmd::CommandsFactory::removeContextParameterCommand(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -290,6 +300,40 @@ QUndoCommand *CommandsFactory::changeEntityAttributesCommand(const QVariantList 
     const QVariantHash attributess = params.value(1).toHash();
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !attributess.isEmpty())
         return new CmdEntityAttributeChange(entity.value<AADLObject *>(), attributess);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createContextParameterCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const ContextParameter &param = params.at(1).value<ContextParameter>();
+    if (entity.isValid() && entity.canConvert<AADLObjectFunctionType *>())
+        return new CmdContextParameterCreate(entity.value<AADLObjectFunctionType *>(), param);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::changeContextParameterCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+    const QVariant entity = params.value(0);
+    const ContextParameter &paramOld = params.at(1).value<ContextParameter>();
+    const ContextParameter &paramNew = params.at(2).value<ContextParameter>();
+    if (entity.isValid() && entity.canConvert<AADLObjectFunctionType *>())
+        return new CmdContextParameterChange(entity.value<AADLObjectFunctionType *>(), paramOld, paramNew);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::removeContextParameterCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const int id = params.at(1).toInt();
+    if (entity.isValid() && entity.canConvert<AADLObjectFunctionType *>())
+        return new CmdContextParameterRemove(entity.value<AADLObjectFunctionType *>(), id);
 
     return nullptr;
 }

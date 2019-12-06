@@ -306,7 +306,7 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         return false;
     }
 
-    IfaceParam param;
+    IfaceParameter param;
 
     const QXmlStreamAttributes &attributes = xml.attributes();
     for (const QXmlStreamAttribute &attr : attributes) {
@@ -315,15 +315,15 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
 
         switch (Props::token(attrName)) {
         case Props::Token::name: {
-            param.m_name = attrValue;
+            param.setName(attrValue);
             break;
         }
         case Props::Token::type: {
-            param.m_type = attrValue;
+            param.setParamTypeName(attrValue);
             break;
         }
         case Props::Token::encoding: {
-            param.m_encoding = attrValue;
+            param.setEncoding(attrValue);
             break;
         }
         default: {
@@ -333,10 +333,9 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
         }
     }
 
-    if (currParam == Props::Token::Input_Parameter)
-        iface->addParamIn(param);
-    else
-        iface->addParamOut(param);
+    param.setDirection(currParam == Props::Token::Input_Parameter ? IfaceParameter::Direction::In
+                                                                  : IfaceParameter::Direction::Out);
+    iface->addParam(param);
 
     return true;
 }

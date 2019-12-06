@@ -17,28 +17,8 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>-1</number>
      </property>
-     <widget class="QWidget" name="tabAttrs">
-      <attribute name="title">
-       <string>Attributes</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="taste3::aadl::PropertiesView" name="viewAttrs" native="true"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabParams">
-      <attribute name="title">
-       <string>Parameters</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="taste3::aadl::PropertiesView" name="viewProps" native="true"/>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item row="1" column="0">
@@ -50,14 +30,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>taste3::aadl::PropertiesView</class>
-   <extends>QWidget</extends>
-   <header>tab_interface/properties/propertiesview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

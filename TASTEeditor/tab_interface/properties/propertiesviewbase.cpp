@@ -15,10 +15,10 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "propertiesview.h"
+#include "propertiesviewbase.h"
 
 #include "propertieslistmodel.h"
-#include "ui_propertiesview.h"
+#include "ui_propertiesviewbase.h"
 
 #include <QDebug>
 #include <QSortFilterProxyModel>
@@ -26,48 +26,50 @@
 namespace taste3 {
 namespace aadl {
 
-PropertiesView::PropertiesView(QWidget *parent)
+PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::PropertiesView)
+    , ui(new Ui::PropertiesViewBase)
 {
     ui->setupUi(this);
 }
 
-PropertiesView::~PropertiesView()
+PropertiesViewBase::~PropertiesViewBase()
 {
     delete ui;
 }
 
-void PropertiesView::setModel(PropertiesListModel *model)
+void PropertiesViewBase::setModel(PropertiesModelBase *model)
 {
     if (model == m_model)
         return;
 
-    if (ui->tableView->selectionModel())
-        disconnect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                   &PropertiesView::onCurrentRowChanged);
+    if (tableView()->selectionModel())
+        disconnect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+                   &PropertiesViewBase::onCurrentRowChanged);
 
     m_model = model;
-    ui->tableView->setModel(m_model);
-    ui->tableView->resizeColumnsToContents();
+    tableView()->setModel(m_model);
+    if (m_model->rowCount())
+        tableView()->resizeColumnsToContents();
 
-    if (ui->tableView->selectionModel())
-        connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                &PropertiesView::onCurrentRowChanged);
+    if (tableView()->selectionModel())
+        connect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+                &PropertiesViewBase::onCurrentRowChanged);
 }
 
-QTableView *PropertiesView::tableView() const
+QTableView *PropertiesViewBase::tableView() const
 {
     return ui->tableView;
 }
 
-void PropertiesView::onCurrentRowChanged(const QModelIndex &current, const QModelIndex &)
+void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const QModelIndex &)
 {
-    if (m_model)
-        ui->btnDel->setEnabled(m_model->isProp(current));
+    if (m_model) {
+        ui->btnDel->setEnabled(current.isValid() && m_model->isProp(current));
+    }
 }
 
-void PropertiesView::on_btnAdd_clicked()
+void PropertiesViewBase::on_btnAdd_clicked()
 {
     if (m_model) {
         static const QString newNameTmp = tr("New property");
@@ -78,17 +80,18 @@ void PropertiesView::on_btnAdd_clicked()
 
         if (m_model->createProperty(newName)) {
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
-            //            ui->tableView->scrollTo(added, QAbstractItemView::EnsureVisible);
             ui->tableView->scrollToBottom();
             ui->tableView->edit(added);
         }
     }
 }
 
-void PropertiesView::on_btnDel_clicked()
+void PropertiesViewBase::on_btnDel_clicked()
 {
-    if (m_model)
+    if (m_model) {
         m_model->removeProperty(ui->tableView->currentIndex());
+        ui->tableView->update();
+    }
 }
 
 } // namespace aadl

@@ -17,36 +17,38 @@
 
 #pragma once
 
-#include <QDialog>
+#include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 
-namespace Ui {
-class PropertiesDialog;
-}
+#include <QPointer>
+#include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-class PropertiesDialog : public QDialog
+
+namespace cmd {
+
+class CmdContextParameterChange : public QUndoCommand
 {
-    Q_OBJECT
-
 public:
-    explicit PropertiesDialog(AADLObject *obj, QWidget *parent = nullptr);
-    ~PropertiesDialog() override;
+    explicit CmdContextParameterChange(AADLObjectFunctionType *entity, const ContextParameter &oldParam,
+                                       const ContextParameter &newParam);
 
-public slots:
-    void open() override;
-    void done(int r) override;
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
 private:
-    Ui::PropertiesDialog *ui;
-    AADLObject *m_dataObject { nullptr };
+    QPointer<AADLObjectFunctionType> m_entity;
+    ContextParameter m_newParam;
+    const ContextParameter m_oldParam;
 
-    QString objectTypeName() const;
-
-    void initTabs();
+    void swapParam(const ContextParameter &from, const ContextParameter &to);
 };
 
+} // namespace cmd
 } // namespace aadl
 } // namespace taste3

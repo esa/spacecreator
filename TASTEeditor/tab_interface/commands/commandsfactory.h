@@ -48,6 +48,9 @@ private:
     static QUndoCommand *renameEntityPropertyCommand(const QVariantList &params);
     static QUndoCommand *removeEntityPropertyCommand(const QVariantList &params);
     static QUndoCommand *changeEntityAttributesCommand(const QVariantList &params);
+    static QUndoCommand *createContextParameterCommand(const QVariantList &params);
+    static QUndoCommand *changeContextParameterCommand(const QVariantList &params);
+    static QUndoCommand *removeContextParameterCommand(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;
