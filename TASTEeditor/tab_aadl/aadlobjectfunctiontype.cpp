@@ -26,6 +26,7 @@ struct AADLObjectFunctionTypePrivate {
     QVector<AADLObject *> m_children {};
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
+    QVector<ContextParameter> m_contextParams {};
 };
 
 AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
@@ -155,6 +156,35 @@ void AADLObjectFunctionType::setActiveInterfaces(const QStringList &ifaces)
 {
     if (activeInterfaces() != ifaces)
         setProp(meta::Props::token(meta::Props::Token::Active_Interfaces), ifaces);
+}
+
+QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
+{
+    return d->m_contextParams;
+}
+
+void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
+{
+    if (!d->m_contextParams.contains(param))
+        d->m_contextParams.append(param);
+}
+
+bool AADLObjectFunctionType::removeContextParam(const ContextParameter &param)
+{
+    return d->m_contextParams.removeOne(param);
+}
+
+void AADLObjectFunctionType::clearContextParams()
+{
+    d->m_contextParams.clear();
+}
+
+void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &params)
+{
+    if (d->m_contextParams != params) {
+        clearContextParams();
+        d->m_contextParams = params;
+    }
 }
 
 } // ns aadl

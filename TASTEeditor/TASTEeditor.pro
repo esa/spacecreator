@@ -67,6 +67,7 @@ SOURCES += \
         tab_aadl/aadlobjectfunctiontype.cpp \
         tab_aadl/aadlobjectiface.cpp \
         tab_aadl/aadlobjectsmodel.cpp \
+        tab_aadl/aadlparameter.cpp \
         tab_aadl/aadltabdocument.cpp \
         tab_aadl/aadlxmlreader.cpp \
         tab_concurrency/concurrencytabdocument.cpp \
@@ -80,6 +81,9 @@ SOURCES += \
         tab_interface/aadlinterfacegraphicsitem.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
         tab_interface/commands/cmdcommenttextchange.cpp \
+        tab_interface/commands/cmdcontextparameterchange.cpp \
+        tab_interface/commands/cmdcontextparametercreate.cpp \
+        tab_interface/commands/cmdcontextparameterremove.cpp \
         tab_interface/commands/cmddirectconnectionitemcreate.cpp \
         tab_interface/commands/cmdentityattributechange.cpp \
         tab_interface/commands/cmdentitygeometrychange.cpp \
@@ -98,12 +102,14 @@ SOURCES += \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
         tab_interface/properties/adddynamicropertydialog.cpp \
+        tab_interface/properties/contextparametersmodel.cpp \
         tab_interface/properties/dynamicproperty.cpp \
         tab_interface/properties/dynamicpropertyconfig.cpp \
         tab_interface/properties/dynamicpropertymanager.cpp \
         tab_interface/properties/propertiesdialog.cpp \
         tab_interface/properties/propertieslistmodel.cpp \
-        tab_interface/properties/propertiesview.cpp \
+        tab_interface/properties/propertiesmodelbase.cpp \
+        tab_interface/properties/propertiesviewbase.cpp \
         tab_msc/msctabdocument.cpp
 
 HEADERS += \
@@ -144,6 +150,7 @@ HEADERS += \
         tab_aadl/aadlobjectfunctiontype.h \
         tab_aadl/aadlobjectiface.h \
         tab_aadl/aadlobjectsmodel.h \
+        tab_aadl/aadlparameter.h \
         tab_aadl/aadltabdocument.h \
         tab_aadl/aadlxmlreader.h \
         tab_concurrency/concurrencytabdocument.h \
@@ -157,6 +164,9 @@ HEADERS += \
         tab_interface/aadlinterfacegraphicsitem.h \
         tab_interface/commands/cmdcommentitemcreate.h \
         tab_interface/commands/cmdcommenttextchange.h \
+        tab_interface/commands/cmdcontextparameterchange.h \
+        tab_interface/commands/cmdcontextparametercreate.h \
+        tab_interface/commands/cmdcontextparameterremove.h \
         tab_interface/commands/cmddirectconnectionitemcreate.h \
         tab_interface/commands/cmdentityattributechange.h \
         tab_interface/commands/cmdentitygeometrychange.h \
@@ -176,12 +186,14 @@ HEADERS += \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
         tab_interface/properties/adddynamicpropertydialog.h \
+        tab_interface/properties/contextparametersmodel.h \
         tab_interface/properties/dynamicproperty.h \
         tab_interface/properties/dynamicpropertyconfig.h \
         tab_interface/properties/dynamicpropertymanager.h \
         tab_interface/properties/propertiesdialog.h \
         tab_interface/properties/propertieslistmodel.h \
-        tab_interface/properties/propertiesview.h \
+        tab_interface/properties/propertiesmodelbase.h \
+        tab_interface/properties/propertiesviewbase.h \
         tab_msc/msctabdocument.h
 
 FORMS += \
@@ -190,7 +202,7 @@ FORMS += \
     tab_interface/properties/adddynamicpropertydialog.ui \
     tab_interface/properties/dynamicpropertymanager.ui \
     tab_interface/properties/propertiesdialog.ui \
-    tab_interface/properties/propertiesview.ui
+    tab_interface/properties/propertiesviewbase.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

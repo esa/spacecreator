@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,36 +17,34 @@
 
 #pragma once
 
+#include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
+
+#include <QPointer>
+#include <QUndoCommand>
+
 namespace taste3 {
 namespace aadl {
+
+class AADLObject;
+
 namespace cmd {
 
-enum Id
+class CmdContextParameterRemove : public QUndoCommand
 {
-    CreateFunctionTypeEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateDirectConnectionEntity,
-    CreateManualConnectionEntity,
-    ChangeEntityGeometry,
-    RemoveEntity,
-    ChangeCommentText,
+public:
+    explicit CmdContextParameterRemove(AADLObjectFunctionType *entity, int at);
 
-    CreateEntityProperty,
-    ChangeEntityProperty,
-    RenameEntityProperty,
-    RemoveEntityProperty,
-    ChangeEntityAttributes,
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
-    CreateContextParameter,
-    ChangeContextParameter,
-    RemoveContextParameter,
-
-    LastId
+private:
+    QPointer<AADLObjectFunctionType> m_entity;
+    QHash<int, ContextParameter> m_params;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+} // namespace cmd
+} // namespace aadl
+} // namespace taste3

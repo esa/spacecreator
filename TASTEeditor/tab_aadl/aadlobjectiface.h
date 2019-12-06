@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlobject.h"
+#include "aadlparameter.h"
 
 #include <QMetaType>
 #include <QObject>
@@ -29,12 +30,6 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectIfacePrivate;
-
-struct IfaceParam {
-    QString m_name;
-    QString m_type;
-    QString m_encoding;
-};
 
 class AADLObjectIface : public AADLObject
 {
@@ -72,12 +67,13 @@ public:
     qint32 queueSize() const;
     bool setQueueSize(qint32 size);
 
-    QVector<IfaceParam> paramsIn() const;
-    void setParamsIn(const QVector<IfaceParam> &params) const;
-    void addParamIn(const IfaceParam &param) const;
-    QVector<IfaceParam> paramsOut() const;
-    void setParamsOut(const QVector<IfaceParam> &params) const; // TODO: use move?
-    void addParamOut(const IfaceParam &param) const;
+    QVector<IfaceParameter> paramsIn() const;
+    void setParamsIn(const QVector<IfaceParameter> &params) const;
+    void addParamIn(const IfaceParameter &param) const;
+    QVector<IfaceParameter> paramsOut() const;
+    void setParamsOut(const QVector<IfaceParameter> &params) const; // TODO: use move?
+    void addParamOut(const IfaceParameter &param) const;
+    void addParam(const IfaceParameter &param);
 
     QString rcmOperationKind() const;
     bool setRcmOperationKind(const QString &kind);

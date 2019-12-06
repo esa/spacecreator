@@ -17,35 +17,43 @@
 
 #pragma once
 
-#include <QDialog>
+#include "propertieslistmodel.h"
+
+#include <QWidget>
 
 namespace Ui {
-class PropertiesDialog;
+class PropertiesViewBase;
 }
+
+class QTableView;
+class QAbstractItemModel;
 
 namespace taste3 {
 namespace aadl {
 
-class AADLObject;
-class PropertiesDialog : public QDialog
+class PropertiesModelBase;
+class PropertiesViewBase : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(AADLObject *obj, QWidget *parent = nullptr);
-    ~PropertiesDialog() override;
+    explicit PropertiesViewBase(QWidget *parent = nullptr);
+    ~PropertiesViewBase();
 
-public slots:
-    void open() override;
-    void done(int r) override;
+    virtual void setModel(PropertiesModelBase *model);
+    QTableView *tableView() const;
+
+protected slots:
+    virtual void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    virtual void on_btnAdd_clicked();
+    virtual void on_btnDel_clicked();
+
+protected:
+    PropertiesModelBase *m_model { nullptr };
+    bool m_buttonsVisible { true };
 
 private:
-    Ui::PropertiesDialog *ui;
-    AADLObject *m_dataObject { nullptr };
-
-    QString objectTypeName() const;
-
-    void initTabs();
+    Ui::PropertiesViewBase *ui { nullptr };
 };
 
 } // namespace aadl

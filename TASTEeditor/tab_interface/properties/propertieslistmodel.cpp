@@ -34,9 +34,11 @@ namespace taste3 {
 namespace aadl {
 
 PropertiesListModel::PropertiesListModel(QObject *parent)
-    : QStandardItemModel(parent)
+    : PropertiesModelBase(parent)
 {
 }
+
+PropertiesListModel::~PropertiesListModel() {}
 
 void PropertiesListModel::createNewRow(const QString &title, const QVariant &value, ItemType type, int row)
 {

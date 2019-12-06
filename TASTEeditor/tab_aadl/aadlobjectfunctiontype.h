@@ -19,6 +19,7 @@
 
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
+#include "aadlparameter.h"
 
 #include <QObject>
 #include <QVector>
@@ -57,6 +58,12 @@ public:
 
     QStringList activeInterfaces() const;
     void setActiveInterfaces(const QStringList &ifaces);
+
+    QVector<ContextParameter> contextParams() const;
+    void addContextParam(const ContextParameter &param);
+    bool removeContextParam(const ContextParameter &param);
+    void clearContextParams();
+    void setContextParams(const QVector<ContextParameter> &params);
 
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;

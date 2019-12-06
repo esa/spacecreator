@@ -31,8 +31,8 @@ struct AADLObjectIfacePrivate {
     {
     }
     const AADLObjectIface::IfaceType m_direction;
-    QVector<IfaceParam> m_paramasIn = {};
-    QVector<IfaceParam> m_paramasOut = {};
+    QVector<IfaceParameter> m_paramasIn = {};
+    QVector<IfaceParameter> m_paramasOut = {};
 };
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
@@ -120,34 +120,42 @@ bool AADLObjectIface::setQueueSize(qint32 size)
     return false;
 }
 
-QVector<IfaceParam> AADLObjectIface::paramsIn() const
+QVector<IfaceParameter> AADLObjectIface::paramsIn() const
 {
     return d->m_paramasIn;
 }
 
-void AADLObjectIface::setParamsIn(const QVector<IfaceParam> &params) const
+void AADLObjectIface::setParamsIn(const QVector<IfaceParameter> &params) const
 {
     d->m_paramasIn = params;
 }
 
-void AADLObjectIface::addParamIn(const IfaceParam &param) const
+void AADLObjectIface::addParamIn(const IfaceParameter &param) const
 {
     d->m_paramasIn.append(param);
 }
 
-QVector<IfaceParam> AADLObjectIface::paramsOut() const
+QVector<IfaceParameter> AADLObjectIface::paramsOut() const
 {
     return d->m_paramasOut;
 }
 
-void AADLObjectIface::setParamsOut(const QVector<IfaceParam> &params) const
+void AADLObjectIface::setParamsOut(const QVector<IfaceParameter> &params) const
 {
     d->m_paramasOut = params;
 }
 
-void AADLObjectIface::addParamOut(const IfaceParam &param) const
+void AADLObjectIface::addParamOut(const IfaceParameter &param) const
 {
     d->m_paramasOut.append(param);
+}
+
+void AADLObjectIface::addParam(const IfaceParameter &param)
+{
+    if (param.direction() == IfaceParameter::Direction::In)
+        addParamIn(param);
+    else
+        addParamOut(param);
 }
 
 QString AADLObjectIface::rcmOperationKind() const

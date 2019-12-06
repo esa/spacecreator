@@ -18,28 +18,25 @@
 #pragma once
 
 #include "propertiesmodelbase.h"
+#include "tab_aadl/aadlparameter.h"
 
 namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-class PropertiesListModel : public PropertiesModelBase
+struct ContextParameter;
+class ContextParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
 
 public:
     static const int ItemTypeRole { Qt::UserRole + 2 };
-    static const int ColumnTitle { 0 };
-    static const int ColumnValue { 1 };
+    static const int ColumnName { 0 };
+    static const int ColumnType { 1 };
+    static const int ColumnValue { 2 };
 
-    enum ItemType
-    {
-        Attribute = 0,
-        Property
-    };
-
-    explicit PropertiesListModel(QObject *parent = nullptr);
-    ~PropertiesListModel() override;
+    explicit ContextParametersModel(QObject *parent = nullptr);
+    ~ContextParametersModel() override;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -51,8 +48,6 @@ public:
 
     void setDataObject(AADLObject *obj);
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
 
@@ -61,9 +56,9 @@ public:
 
 private:
     AADLObject *m_dataObject { nullptr };
-    QVector<QString> m_names;
+    QVector<ContextParameter> m_params;
 
-    void createNewRow(const QString &title, const QVariant &value, ItemType type, int row);
+    void createNewRow(const ContextParameter &param, int row);
 };
 
 } // namespace aadl

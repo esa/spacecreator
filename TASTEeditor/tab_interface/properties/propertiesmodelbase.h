@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,36 +17,22 @@
 
 #pragma once
 
+#include <QStandardItemModel>
+
 namespace taste3 {
 namespace aadl {
-namespace cmd {
 
-enum Id
+class PropertiesModelBase : public QStandardItemModel
 {
-    CreateFunctionTypeEntity = 0,
-    CreateCommentEntity,
-    CreateFunctionEntity,
-    CreateProvidedInterfaceEntity,
-    CreateRequiredInterfaceEntity,
-    CreateDirectConnectionEntity,
-    CreateManualConnectionEntity,
-    ChangeEntityGeometry,
-    RemoveEntity,
-    ChangeCommentText,
+public:
+    explicit PropertiesModelBase(QObject *parent = nullptr);
+    ~PropertiesModelBase() override;
 
-    CreateEntityProperty,
-    ChangeEntityProperty,
-    RenameEntityProperty,
-    RemoveEntityProperty,
-    ChangeEntityAttributes,
+    virtual bool createProperty(const QString &propName) = 0;
+    virtual bool removeProperty(const QModelIndex &index) = 0;
 
-    CreateContextParameter,
-    ChangeContextParameter,
-    RemoveContextParameter,
-
-    LastId
+    virtual bool isAttr(const QModelIndex &id) const = 0;
+    virtual bool isProp(const QModelIndex &id) const = 0;
 };
-
-} // ns cmd
 } // ns aadl
 } // ns taste3

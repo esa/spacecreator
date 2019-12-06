@@ -18,7 +18,9 @@
 #include "propertiesdialog.h"
 
 #include "app/commandsstack.h"
+#include "contextparametersmodel.h"
 #include "propertieslistmodel.h"
+#include "propertiesviewbase.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectiface.h"
 #include "ui_propertiesdialog.h"
@@ -33,23 +35,15 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
-    , m_modelAttrs(new PropertiesListModel(this))
 {
     ui->setupUi(this);
-
-    m_modelAttrs->setDataObject(m_dataObject);
-
-    ui->viewAttrs->setModel(m_modelAttrs);
-
-    //    ui->viewProps->setModel(m_modelAttrs);
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    const QString attrsTitle(tr("Attributes"));
-    ui->tabWidget->setTabText(0, m_dataObject ? tr("%1 %2").arg(objectTypeName(), attrsTitle) : attrsTitle);
-
     setWindowTitle(tr("Edit Data"));
+
+    initTabs();
 }
 
 PropertiesDialog::~PropertiesDialog()
@@ -96,6 +90,65 @@ void PropertiesDialog::done(int r)
         taste3::cmd::CommandsStack::current()->undo();
 
     QDialog::done(r);
+}
+
+void PropertiesDialog::initTabs()
+{
+    if (!m_dataObject)
+        return;
+
+    auto initAttributesView = [this](const QString &title) {
+        PropertiesListModel *modelAttrs = new PropertiesListModel(this);
+        modelAttrs->setDataObject(m_dataObject);
+
+        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        viewAttrs->setModel(modelAttrs);
+        ui->tabWidget->insertTab(0, viewAttrs, tr("%1 Attributes").arg(title));
+    };
+
+    auto initContextParams = [this]() {
+        ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
+        modelCtxParams->setDataObject(m_dataObject);
+
+        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        viewAttrs->setModel(modelCtxParams);
+        ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
+    };
+
+    QString objectTypeLabel;
+
+    switch (m_dataObject->aadlType()) {
+    case AADLObject::AADLObjectType::AADLFunctionType: {
+        objectTypeLabel = tr("Function Type");
+        initContextParams();
+        break;
+    }
+    case AADLObject::AADLObjectType::AADLFunction: {
+        objectTypeLabel = tr("Function");
+        initContextParams();
+        break;
+    }
+    case AADLObject::AADLObjectType::AADLIface: {
+        QString ifaceDirection;
+        if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
+            ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
+        objectTypeLabel = ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
+        break;
+    }
+    case AADLObject::AADLObjectType::AADLComment: {
+        objectTypeLabel = tr("Comment");
+        break;
+    }
+    case AADLObject::AADLObjectType::AADLConnection: {
+        objectTypeLabel = tr("Connection");
+        break;
+    }
+    default:
+        break;
+    }
+
+    initAttributesView(objectTypeLabel);
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 } // namespace aadl
