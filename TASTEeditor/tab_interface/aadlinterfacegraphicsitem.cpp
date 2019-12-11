@@ -18,16 +18,16 @@
 
 #include "aadlinterfacegraphicsitem.h"
 
+#include "aadlconnectiongraphicsitem.h"
+
 #include <QPainter>
 #include <QtDebug>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
 #include <tab_aadl/aadlobjectiface.h>
 
-#include "aadlconnectiongraphicsitem.h"
-
 static const qreal kBase = 15;
-static const qreal kHeight = 12;
+static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
@@ -43,6 +43,38 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
     setFlag(QGraphicsItem::ItemIsSelectable);
+
+    QPainterPath kindPath;
+    const QString kind = entity->kind();
+    if (kind == QStringLiteral("CYCLIC_OPERATION")) {
+        const qreal kindBaseValue = kHeight;
+        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
+                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
+                       -90, -270);
+        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
+        kindPath.addPolygon(
+                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
+                                   kindPath.currentPosition(),
+                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
+        kindPath.translate(0, kindBaseValue / 2);
+    } else if (kind == QStringLiteral("SPORADIC_OPERATION")) {
+        const qreal kindBaseValue = kHeight;
+        kindPath.moveTo(-kindBaseValue / 2, 0);
+        kindPath.lineTo(0, -kindBaseValue / 4);
+        kindPath.lineTo(0, kindBaseValue / 4);
+        kindPath.lineTo(kindBaseValue / 2, 0);
+    } else if (kind == QStringLiteral("PROTECTED_OPERATION")) {
+        const qreal kindBaseValue = kHeight;
+        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
+        kindPath.addRoundedRect(rect, 2, 2);
+        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
+        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
+        kindPath.moveTo(arcRect.center());
+        kindPath.arcTo(arcRect, 0, 180);
+        kindPath.translate(0, rect.height() / 3);
+    }
+    m_type = new QGraphicsPathItem(kindPath, this);
+    m_type->setPen(QPen(kDefaultBackgroundColor, 2));
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
@@ -173,18 +205,23 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
 
     auto updateItem = [this](Qt::Alignment alignment) {
         const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
+        const qreal offset = kBase + 2;
         switch (alignment) {
         case Qt::AlignLeft:
             m_iface->setRotation(insideOut ? 180 : 0);
+            m_type->setPos(QPointF(-offset, 0));
             break;
         case Qt::AlignRight:
             m_iface->setRotation(insideOut ? 0 : 180);
+            m_type->setPos(QPointF(offset, 0));
             break;
         case Qt::AlignTop:
             m_iface->setRotation(insideOut ? 270 : 90);
+            m_type->setPos(QPointF(0, -offset));
             break;
         case Qt::AlignBottom:
             m_iface->setRotation(insideOut ? 90 : 270);
+            m_type->setPos(QPointF(0, offset));
             break;
         }
         return mapRectFromItem(m_iface, m_iface->boundingRect());
