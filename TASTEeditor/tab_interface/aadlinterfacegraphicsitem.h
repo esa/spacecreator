@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <QPointer>
 #include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
+
+#include <QPointer>
 
 namespace taste3 {
 namespace aadl {
@@ -57,6 +58,7 @@ protected:
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
 
 private:
+    QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
     QPointer<AADLConnectionGraphicsItem> m_connection;
