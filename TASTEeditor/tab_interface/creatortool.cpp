@@ -44,9 +44,10 @@
 #include <tab_aadl/aadlobjectiface.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
-static const qreal kInterfaceTolerance = 20;
-static const qreal kConnectionTolerance = 20;
-static const QMarginsF kMargins { 50, 50, 50, 50 };
+static const qreal kInterfaceTolerance = 20.;
+static const qreal kConnectionTolerance = 20.;
+static const qreal kContextMenuItemTolerance = 10.;
+static const QMarginsF kMargins { 50., 50., 50., 50. };
 static const QList<int> kFunctionTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
                                            taste3::aadl::AADLFunctionTypeGraphicsItem::Type };
 
@@ -714,7 +715,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPoint
 
     static const QList<int> &showProps = { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
                                            AADLFunctionGraphicsItem::Type };
-    QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kConnectionTolerance, showProps);
+    QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps);
     if (!gi)
         return;
 

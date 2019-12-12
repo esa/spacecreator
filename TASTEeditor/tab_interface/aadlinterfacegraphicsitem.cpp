@@ -274,7 +274,23 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     m_boundingRect = updateItem(alignment);
+
+    m_shape = QPainterPath();
+    m_shape.addPath(m_type->shape());
+    m_shape.addPath(m_iface->shape());
+    m_shape.addPath(m_text->shape());
+
+    m_boundingRect = childrenBoundingRect();
+
     setPos(stickyPos);
+}
+
+QPainterPath AADLInterfaceGraphicsItem::shape() const
+{
+    if (m_shape.isEmpty())
+        return InteractiveObject::shape();
+
+    return m_shape;
 }
 
 void AADLInterfaceGraphicsItem::initGripPoints()
