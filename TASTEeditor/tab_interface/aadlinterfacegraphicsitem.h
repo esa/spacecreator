@@ -49,6 +49,8 @@ public:
 
     void setInterfaceName(const QString &name);
 
+    QPainterPath shape() const override;
+
 protected:
     void rebuildLayout() override;
     void initGripPoints() override;
@@ -62,6 +64,7 @@ private:
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
     QPointer<AADLConnectionGraphicsItem> m_connection;
+    QPainterPath m_shape;
 };
 
 } // namespace aadl
