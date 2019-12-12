@@ -27,11 +27,12 @@ class QGraphicsView;
 class QGraphicsRectItem;
 class QGraphicsPathItem;
 class QGraphicsScene;
+class QMenu;
 
 namespace taste3 {
 namespace aadl {
 class AADLObjectsModel;
-
+class AADLObject;
 class CreatorTool : public QObject
 {
     Q_OBJECT
@@ -56,6 +57,7 @@ public:
 
 Q_SIGNALS:
     void created();
+    void propertyEditorRequest(AADLObject *entity) const;
 
 protected:
     QPointer<QGraphicsView> m_view;
@@ -87,6 +89,10 @@ private:
     void handleRequiredInterface(QGraphicsScene *scene, const QPointF &pos);
     void handleMultiPointConnection(QGraphicsScene *scene, const QPointF &pos);
     void handleDirectConnection(QGraphicsScene *scene, const QPointF &pos);
+
+    QMenu *populateContextMenu(const QPointF &scenePos);
+    void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
+    void populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
