@@ -93,11 +93,11 @@ int ContextParametersModel::columnCount(const QModelIndex &) const
 
 QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
 {
-    const QVariant& res = QStandardItemModel::data(index, role);
+    const QVariant &res = QStandardItemModel::data(index, role);
     if (!index.isValid())
         return res;
 
-    const ContextParameter& param = m_params.at(index.row());
+    const ContextParameter &param = m_params.at(index.row());
     switch (role) {
     case Qt::DisplayRole:
     case Qt::EditRole: {
@@ -163,6 +163,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
     bool res(false);
 
     ContextParameter param(propName);
+    param.setParamType(BasicParameter::Type::Timer);
+
     const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateContextParameter,
                                                        { qVariantFromValue(m_dataObject), qVariantFromValue(param) });
     if (propsCmd) {
@@ -207,6 +209,15 @@ bool ContextParametersModel::isAttr(const QModelIndex & /*id*/) const
 bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
 {
     return true;
+}
+
+Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = QStandardItemModel::flags(index);
+    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != BasicParameter::Type::Other)
+        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+
+    return flags;
 }
 
 } // namespace aadl

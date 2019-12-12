@@ -17,6 +17,8 @@
 
 #include "aadlparameter.h"
 
+#include "app/datatypes/datatypesstorage.h"
+
 namespace taste3 {
 namespace aadl {
 
@@ -48,6 +50,20 @@ BasicParameter::Type BasicParameter::paramType() const
     return m_paramType;
 }
 
+QString BasicParameter::typeName(const BasicParameter::Type &type)
+{
+    switch (type) {
+    case BasicParameter::Type::Timer: {
+        return QObject::tr("Timer");
+    }
+    case BasicParameter::Type::Directive: {
+        return QObject::tr("Directive");
+    }
+    default:
+        return QObject::tr("Other");
+    }
+}
+
 bool BasicParameter::setParamType(const BasicParameter::Type &type)
 {
     if (m_paramType == type)
@@ -55,18 +71,16 @@ bool BasicParameter::setParamType(const BasicParameter::Type &type)
 
     m_paramType = type;
 
-    switch (m_paramType) {
-    case BasicParameter::Type::Timer: {
-        setParamTypeName(QObject::tr("Timer"));
-        break;
-    }
-    case BasicParameter::Type::Directive: {
-        setParamTypeName(QObject::tr("Directive"));
-        break;
-    }
-    default:
-        break;
-    }
+    if (m_paramType != BasicParameter::Type::Other)
+        setParamTypeName(typeName(m_paramType));
+
+    m_basicDataType = nullptr;
+
+    const QMap<QString, datatypes::BasicDataType *> &types = datatypes::DataTypesStorage::dataTypes();
+    if (types.contains(m_typeName))
+        if (datatypes::BasicDataType *basicType = types.value(m_typeName))
+            m_basicDataType = basicType;
+
     return true;
 }
 
@@ -81,9 +95,9 @@ bool BasicParameter::setParamTypeName(const QString &typeName)
         return false;
 
     m_typeName = typeName;
-    if (m_typeName == QObject::tr("Timer"))
+    if (m_typeName == BasicParameter::typeName(BasicParameter::Type::Timer))
         setParamType(BasicParameter::Type::Timer);
-    else if (m_typeName == QObject::tr("Directive"))
+    else if (m_typeName == BasicParameter::typeName(BasicParameter::Type::Directive))
         setParamType(BasicParameter::Type::Directive);
     else
         setParamType(BasicParameter::Type::Other);
@@ -94,6 +108,41 @@ bool BasicParameter::setParamTypeName(const QString &typeName)
 bool BasicParameter::operator==(const BasicParameter &other) const
 {
     return m_paramName == other.m_paramName && m_paramType == other.m_paramType && m_typeName == other.m_typeName;
+}
+
+bool BasicParameter::isValidValue(const QVariant &value) const
+{
+    if (!m_basicDataType)
+        return true;
+
+    switch (m_basicDataType->dataType()) {
+    case datatypes::DataTypeName::Integer: {
+        if (datatypes::SignedIntegerDataType *signedData =
+                    dynamic_cast<datatypes::SignedIntegerDataType *>(m_basicDataType)) {
+            const qint64 v = value.toLongLong();
+            return v >= signedData->min() && v <= signedData->max();
+        }
+
+        if (datatypes::UnsignedIntegerDataType *unsignedData =
+                    dynamic_cast<datatypes::UnsignedIntegerDataType *>(m_basicDataType)) {
+            const quint64 v = value.toUInt();
+            return v >= unsignedData->min() && v <= unsignedData->max();
+        }
+
+        break;
+    }
+    case datatypes::DataTypeName::Real: {
+        if (datatypes::RealDataType *unsignedData = dynamic_cast<datatypes::RealDataType *>(m_basicDataType)) {
+            const qreal v = value.toReal();
+            return v >= unsignedData->min() && v <= unsignedData->max();
+        }
+        break;
+    }
+    default:
+        return true;
+    }
+
+    return false;
 }
 
 ContextParameter::ContextParameter(const QString &name, Type t, const QString &paramTypeName, const QVariant &val)
@@ -114,6 +163,9 @@ bool ContextParameter::setDefaultValue(const QVariant &value)
     if (paramType() == Type::Timer || m_defaultValue == value)
         return false;
 
+    if (!isValidValue(value))
+        return false;
+
     m_defaultValue = value;
     return true;
 }
@@ -121,6 +173,24 @@ bool ContextParameter::setDefaultValue(const QVariant &value)
 bool ContextParameter::operator==(const ContextParameter &other) const
 {
     return BasicParameter::operator==(other) && m_defaultValue == other.m_defaultValue;
+}
+
+bool ContextParameter::setParamType(const BasicParameter::Type &type)
+{
+    if (!BasicParameter::setParamType(type))
+        return false;
+
+    m_defaultValue.clear();
+    return true;
+}
+
+bool ContextParameter::setParamTypeName(const QString &typeName)
+{
+    if (!BasicParameter::setParamTypeName(typeName))
+        return false;
+
+    m_defaultValue.clear();
+    return true;
 }
 
 IfaceParameter::IfaceParameter(const QString &name, Type t, const QString &paramTypeName, const QString &encoding,

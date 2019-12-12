@@ -24,7 +24,7 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-struct ContextParameter;
+class ContextParameter;
 class ContextParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
@@ -53,6 +53,8 @@ public:
 
     bool isAttr(const QModelIndex &id) const override;
     bool isProp(const QModelIndex &id) const override;
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
     AADLObject *m_dataObject { nullptr };

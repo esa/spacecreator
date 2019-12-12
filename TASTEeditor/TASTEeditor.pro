@@ -103,6 +103,8 @@ SOURCES += \
         tab_interface/interfacetabgraphicsscene.cpp \
         tab_interface/properties/adddynamicropertydialog.cpp \
         tab_interface/properties/contextparametersmodel.cpp \
+        tab_interface/properties/delegates/comboboxdelegate.cpp \
+        tab_interface/properties/delegates/propertytypedelegate.cpp \
         tab_interface/properties/dynamicproperty.cpp \
         tab_interface/properties/dynamicpropertyconfig.cpp \
         tab_interface/properties/dynamicpropertymanager.cpp \
@@ -187,6 +189,8 @@ HEADERS += \
         tab_interface/interfacetabgraphicsscene.h \
         tab_interface/properties/adddynamicpropertydialog.h \
         tab_interface/properties/contextparametersmodel.h \
+        tab_interface/properties/delegates/comboboxdelegate.h \
+        tab_interface/properties/delegates/propertytypedelegate.h \
         tab_interface/properties/dynamicproperty.h \
         tab_interface/properties/dynamicpropertyconfig.h \
         tab_interface/properties/dynamicpropertymanager.h \
