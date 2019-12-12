@@ -142,6 +142,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
                 currentAction->setChecked(false);
             m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Pointer);
         });
+        connect(m_tool, &aadl::CreatorTool::propertyEditorRequest, this, &InterfaceTabDocument::showPropertyEditor);
     }
 
     if (!m_actionGroup) {
@@ -477,9 +478,9 @@ void InterfaceTabDocument::onItemClicked() {}
 
 void InterfaceTabDocument::onItemDoublelicked()
 {
-    if (auto clickedItem = qobject_cast<ClickNotifierItem *>(sender()))
-        if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->dataObject()))
-            showPropertyEditor(clickedEntity);
+    //    if (auto clickedItem = qobject_cast<ClickNotifierItem *>(sender()))
+    //        if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->dataObject()))
+    //            // switch to inner view
 }
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)

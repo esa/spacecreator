@@ -151,7 +151,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
+        QGraphicsItem *item =
+                utils::nearestItem(scene, scenePos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
                 return false;
@@ -205,24 +206,15 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
 
     if (m_toolType == ToolType::Pointer) {
         if (e->button() & Qt::RightButton && e->buttons() == Qt::NoButton) {
-            QMenu *menu = new QMenu(m_view);
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            if (m_previewItem) {
-                menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")),
-                                tr("Function Type"), this,
-                                [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
-                menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
-                                [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
-                menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
-                                [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+            if (QMenu *menu = populateContextMenu(scenePos)) {
+                connect(menu, &QMenu::aboutToHide, this, [this]() {
+                    if (m_previewItem)
+                        m_previewItem->setVisible(false);
+                });
+                menu->exec(e->globalPos());
+                clearPreviewItem();
+                return true;
             }
-            connect(menu, &QMenu::aboutToHide, this, [this]() {
-                if (m_previewItem)
-                    m_previewItem->setVisible(false);
-            });
-            menu->exec(m_view->mapToGlobal(m_view->mapFromScene(scenePos)));
-            clearPreviewItem();
-            return true;
         }
     } else {
         handleToolType(m_toolType, scenePos);
@@ -342,6 +334,17 @@ static inline AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
         return nullptr;
 
     if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject()))
+        return function->entity();
+
+    return nullptr;
+};
+
+static inline AADLObjectIface *interfaceObject(QGraphicsItem *item)
+{
+    if (!item)
+        return nullptr;
+
+    if (auto function = qobject_cast<AADLInterfaceGraphicsItem *>(item->toGraphicsObject()))
         return function->entity();
 
     return nullptr;
@@ -671,6 +674,71 @@ void CreatorTool::clearPreviewItem()
         m_previewItem->scene()->removeItem(m_previewItem);
         delete m_previewItem;
         m_previewItem = nullptr;
+    }
+}
+
+QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)
+{
+    QMenu *menu = new QMenu(m_view);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    populateContextMenu_commonCreate(menu, scenePos);
+    populateContextMenu_propertiesDialog(menu, scenePos);
+
+    if (menu->isEmpty()) {
+        delete menu;
+        menu = nullptr;
+    }
+
+    return menu;
+}
+
+void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
+{
+    if (m_previewItem) {
+
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")), tr("Function Type"),
+                        this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
+                        [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+                        [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+    }
+}
+
+void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos)
+{
+    QGraphicsScene *scene = m_view->scene();
+    if (!scene)
+        return;
+
+    static const QList<int> &showProps = { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
+                                           AADLFunctionGraphicsItem::Type };
+    QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kConnectionTolerance, showProps);
+    if (!gi)
+        return;
+
+    AADLObject *aadlObj { nullptr };
+    switch (gi->type()) {
+    case AADLFunctionTypeGraphicsItem::Type: {
+        aadlObj = functionTypeObject(gi);
+        break;
+    }
+    case AADLFunctionGraphicsItem::Type: {
+        aadlObj = functionObject(gi);
+        break;
+    }
+    case AADLInterfaceGraphicsItem::Type: {
+        aadlObj = interfaceObject(gi);
+        break;
+    }
+    default:
+        return;
+    }
+
+    if (aadlObj) {
+        menu->addSeparator();
+        menu->addAction(tr("Properties"), this, [this, aadlObj]() { emit propertyEditorRequest(aadlObj); });
     }
 }
 
