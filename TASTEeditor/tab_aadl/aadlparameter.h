@@ -17,13 +17,17 @@
 
 #pragma once
 
+#include "app/datatypes/basicdatatype.h"
+
 #include <QString>
 #include <QVariant>
 
 namespace taste3 {
 namespace aadl {
 
-struct BasicParameter {
+class BasicParameter
+{
+public:
     enum class Type
     {
         Other = 0,
@@ -39,20 +43,28 @@ struct BasicParameter {
     bool setName(const QString &name);
 
     Type paramType() const;
-    bool setParamType(const Type &type);
+    virtual bool setParamType(const Type &type);
 
     QString paramTypeName() const;
-    bool setParamTypeName(const QString &typeName);
+    virtual bool setParamTypeName(const QString &typeName);
 
     bool operator==(const BasicParameter &other) const;
+
+    static QString typeName(const Type &type);
 
 protected:
     QString m_paramName = {};
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
+
+    datatypes::BasicDataType *m_basicDataType { nullptr };
+
+    bool isValidValue(const QVariant &value) const;
 };
 
-struct ContextParameter : public BasicParameter {
+class ContextParameter : public BasicParameter
+{
+public:
     ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
                      const QString &paramTypeName = QString(), const QVariant &val = QVariant());
     ~ContextParameter() override;
@@ -61,6 +73,9 @@ struct ContextParameter : public BasicParameter {
     bool setDefaultValue(const QVariant &value);
 
     bool operator==(const ContextParameter &other) const;
+
+    bool setParamType(const Type &type) override;
+    bool setParamTypeName(const QString &typeName) override;
 
 protected:
     QVariant m_defaultValue = {};

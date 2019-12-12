@@ -19,6 +19,7 @@
 
 #include "app/commandsstack.h"
 #include "contextparametersmodel.h"
+#include "delegates/propertytypedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "tab_aadl/aadlobject.h"
@@ -111,6 +112,7 @@ void PropertiesDialog::initTabs()
         modelCtxParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        viewAttrs->tableView()->setItemDelegateForColumn(1, new PropertyTypeDelegate(viewAttrs->tableView()));
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
     };

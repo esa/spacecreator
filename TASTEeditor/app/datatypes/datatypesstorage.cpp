@@ -74,7 +74,7 @@ BasicDataType *datatypeFromString(const QString &line)
     if (line.isEmpty())
         return nullptr;
 
-    static const QRegularExpression rx("(\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
+    static const QRegularExpression rx("(.*\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
     const QStringList &matched = rx.match(line).capturedTexts();
     if (matched.size() >= 3) {
         const QString &dataName = matched[1];
