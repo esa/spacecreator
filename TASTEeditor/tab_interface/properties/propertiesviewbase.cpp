@@ -79,7 +79,13 @@ void PropertiesViewBase::on_btnAdd_clicked()
             newName = QString("%1 #%2").arg(newNameTmp, QString::number(++duplicateCounter));
 
         if (m_model->createProperty(newName)) {
+            auto updateColumnsWidth = [this]() { // #QTBUG-52307
+                ui->tableView->horizontalHeader()->setStretchLastSection(false);
+                ui->tableView->resizeColumnsToContents();
+                ui->tableView->horizontalHeader()->setStretchLastSection(true);
+            };
             const QModelIndex &added = m_model->index(m_model->rowCount() - 1, 0);
+            updateColumnsWidth();
             ui->tableView->scrollToBottom();
             ui->tableView->edit(added);
         }

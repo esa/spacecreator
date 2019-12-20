@@ -40,6 +40,7 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(AADLObject *entity, const QVa
     , m_newAttrs(attrs)
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
+    setText(QObject::tr("Change Attribute"));
 }
 
 void CmdEntityAttributeChange::redo()

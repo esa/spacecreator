@@ -47,6 +47,8 @@ CmdManualConnectionItemCreate::CmdManualConnectionItemCreate(AADLObjectsModel *m
 
     for (auto it = points.constBegin(); it != points.constEnd(); ++it)
         m_coordinates << qRound(it->x()) << qRound(it->y());
+
+    setText(QObject::tr("Create Connection"));
 }
 
 void CmdManualConnectionItemCreate::redo()

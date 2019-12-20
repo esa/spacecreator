@@ -35,6 +35,7 @@ CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(AADLObjectsModel *model, AA
     , m_entity(new AADLObjectFunctionType(QObject::tr("Function_type_%1").arg(++sCounter), m_model))
     , m_parent(parent)
 {
+    setText(QObject::tr("Create Function Type"));
 }
 
 void CmdFunctionTypeItemCreate::redo()

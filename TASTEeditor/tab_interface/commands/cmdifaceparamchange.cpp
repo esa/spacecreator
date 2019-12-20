@@ -16,59 +16,57 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdcontextparameterchange.h"
+#include "cmdifaceparamchange.h"
 
 #include "commandids.h"
 
-#include <QDebug>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdContextParameterChange::CmdContextParameterChange(AADLObjectFunctionType *entity, const ContextParameter &oldParam,
-                                                     const ContextParameter &newParam)
+CmdIfaceParamChange::CmdIfaceParamChange(AADLObject *entity, const IfaceParameter &from, const IfaceParameter &to)
     : QUndoCommand()
-    , m_entity(entity)
-    , m_newParam(newParam)
-    , m_oldParam(oldParam)
+    , m_iface(qobject_cast<AADLObjectIface *>(entity))
+    , m_newParam(to)
+    , m_oldParam(from)
 {
-    setText(QObject::tr("Change Context Parameter"));
+    setText(QObject::tr("Change Iface Parameter"));
 }
 
-void CmdContextParameterChange::swapParam(const ContextParameter &from, const ContextParameter &to)
+void CmdIfaceParamChange::swapParam(const IfaceParameter &from, const IfaceParameter &to)
 {
-    if (!m_entity)
+    if (!m_iface)
         return;
 
-    QVector<ContextParameter> params = m_entity->contextParams();
+    QVector<IfaceParameter> params = m_iface->params();
 
     const int id = params.indexOf(from);
     if (id >= 0 && id < params.size()) {
         params.replace(id, to);
-        m_entity->setContextParams(params);
+        m_iface->setParams(params);
     }
 }
 
-void CmdContextParameterChange::redo()
+void CmdIfaceParamChange::redo()
 {
     swapParam(m_oldParam, m_newParam);
 }
 
-void CmdContextParameterChange::undo()
+void CmdIfaceParamChange::undo()
 {
     swapParam(m_newParam, m_oldParam);
 }
 
-bool CmdContextParameterChange::mergeWith(const QUndoCommand * /*command*/)
+bool CmdIfaceParamChange::mergeWith(const QUndoCommand * /*command*/)
 {
     return false;
 }
 
-int CmdContextParameterChange::id() const
+int CmdIfaceParamChange::id() const
 {
-    return ChangeContextParameter;
+    return ChangeIfaceParam;
 }
 
 } // namespace cmd

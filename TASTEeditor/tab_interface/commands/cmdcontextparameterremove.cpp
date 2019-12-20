@@ -35,6 +35,8 @@ CmdContextParameterRemove::CmdContextParameterRemove(AADLObjectFunctionType *ent
     if (m_entity)
         if (at >= 0 && at < m_entity->contextParams().size())
             m_params.insert(at, m_entity->contextParams().at(at));
+
+    setText(QObject::tr("Remove Context Parameter"));
 }
 
 void CmdContextParameterRemove::redo()

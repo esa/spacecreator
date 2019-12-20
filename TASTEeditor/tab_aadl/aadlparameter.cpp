@@ -231,6 +231,26 @@ bool IfaceParameter::setDirection(IfaceParameter::Direction dir)
     return true;
 }
 
+QString IfaceParameter::directionName(IfaceParameter::Direction dir)
+{
+    static const QStringList names { QObject::tr("IN"), QObject::tr("OUT") };
+    switch (dir) {
+    case IfaceParameter::Direction::In:
+        return names.first();
+    default:
+        return names.last();
+    }
+}
+
+IfaceParameter::Direction IfaceParameter::directionFromName(const QString &dir)
+{
+    static const QMap<QString, IfaceParameter::Direction> names {
+        { QObject::tr("IN"), IfaceParameter::Direction::In }, { QObject::tr("OUT"), IfaceParameter::Direction::Out }
+    };
+    const QString &name = dir.toUpper();
+    return names.contains(name) ? names.value(name) : names.first();
+}
+
 bool IfaceParameter::operator==(const IfaceParameter &other) const
 {
     return BasicParameter::operator==(other) && m_encoding == other.m_encoding && m_direction == other.m_direction;

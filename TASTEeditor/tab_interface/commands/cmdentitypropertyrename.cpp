@@ -31,6 +31,7 @@ CmdEntityPropertyRename::CmdEntityPropertyRename(AADLObject *entity, const QHash
     , m_entity(entity)
     , m_newProps(props)
 {
+    setText(QObject::tr("Rename Property"));
 }
 
 void CmdEntityPropertyRename::redo()

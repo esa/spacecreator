@@ -18,6 +18,8 @@
 #pragma once
 #include <QStyledItemDelegate>
 
+class QStringListModel;
+
 namespace taste3 {
 namespace aadl {
 
@@ -34,6 +36,19 @@ public:
 
 protected:
     virtual QAbstractItemModel *editorModel(const QModelIndex &id) const = 0;
+};
+
+class StringListComboDelegate : public ComboBoxDelegate
+{
+    Q_OBJECT
+public:
+    StringListComboDelegate(const QStringList &data, QObject *parent = nullptr);
+    ~StringListComboDelegate() override;
+
+protected:
+    virtual QAbstractItemModel *editorModel(const QModelIndex &id) const;
+
+    QStringListModel *m_model { nullptr };
 };
 
 } // ns aadl

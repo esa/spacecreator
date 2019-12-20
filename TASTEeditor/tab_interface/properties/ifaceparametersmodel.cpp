@@ -15,14 +15,11 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "contextparametersmodel.h"
+#include "ifaceparametersmodel.h"
 
 #include "app/commandsstack.h"
-#include "tab_aadl/aadlcommonprops.h"
 #include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_interface/commands/cmdentityattributechange.h"
-#include "tab_interface/commands/cmdentitypropertychange.h"
+#include "tab_aadl/aadlobjectiface.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
 #include "tab_interface/commands/commandsfactory.h"
 #include "tab_interface/properties/dynamicproperty.h"
@@ -34,28 +31,29 @@
 namespace taste3 {
 namespace aadl {
 
-ContextParametersModel::ContextParametersModel(QObject *parent)
+IfaceParametersModel::IfaceParametersModel(QObject *parent)
     : PropertiesModelBase(parent)
 {
 }
 
-ContextParametersModel::~ContextParametersModel() {}
+IfaceParametersModel::~IfaceParametersModel() {}
 
-void ContextParametersModel::createNewRow(const ContextParameter &param, int row)
+void IfaceParametersModel::createNewRow(const IfaceParameter &param, int row)
 {
     QStandardItem *titleItem = new QStandardItem(param.name());
     QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
-    QStandardItem *valueItem = new QStandardItem();
-    valueItem->setData(param.defaultValue(), Qt::EditRole);
+    QStandardItem *encodingItem = new QStandardItem(param.encoding());
+    QStandardItem *directionItem = new QStandardItem(IfaceParameter::directionName(param.direction()));
 
     setItem(row, ColumnName, titleItem);
     setItem(row, ColumnType, typeItem);
-    setItem(row, ColumnValue, valueItem);
+    setItem(row, ColumnEncoding, encodingItem);
+    setItem(row, ColumnDirection, directionItem);
 
     m_params.insert(row, param);
 }
 
-void ContextParametersModel::setDataObject(AADLObject *obj)
+void IfaceParametersModel::setDataObject(AADLObject *obj)
 {
     clear();
     m_params.clear();
@@ -64,13 +62,14 @@ void ContextParametersModel::setDataObject(AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (AADLObjectFunctionType *func = qobject_cast<AADLObjectFunctionType *>(m_dataObject)) {
-        const int paramsCount = func->contextParams().size();
+    if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(m_dataObject)) {
+        const QVector<IfaceParameter> &params(iface->params());
+        const int paramsCount = params.size();
 
         beginInsertRows(QModelIndex(), 0, paramsCount);
 
         for (int i = 0; i < paramsCount; ++i) {
-            const ContextParameter &param = func->contextParams().at(i);
+            const IfaceParameter &param = params.at(i);
             createNewRow(param, i);
         }
 
@@ -78,7 +77,7 @@ void ContextParametersModel::setDataObject(AADLObject *obj)
     }
 }
 
-int ContextParametersModel::rowCount(const QModelIndex &parent) const
+int IfaceParametersModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -86,28 +85,30 @@ int ContextParametersModel::rowCount(const QModelIndex &parent) const
     return m_dataObject ? m_params.size() : 0;
 }
 
-int ContextParametersModel::columnCount(const QModelIndex &) const
+int IfaceParametersModel::columnCount(const QModelIndex &) const
 {
-    return 3;
+    return 4;
 }
 
-QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
+QVariant IfaceParametersModel::data(const QModelIndex &index, int role) const
 {
     const QVariant &res = QStandardItemModel::data(index, role);
     if (!index.isValid())
         return res;
 
-    const ContextParameter &param = m_params.at(index.row());
+    const IfaceParameter &param = m_params.at(index.row());
     switch (role) {
     case Qt::DisplayRole:
     case Qt::EditRole: {
         switch (index.column()) {
+        case ColumnName:
+            return param.name();
         case ColumnType:
             return param.paramTypeName();
-        case ColumnValue:
-            return param.defaultValue();
-        default:
-            return param.name();
+        case ColumnEncoding:
+            return param.encoding();
+        case ColumnDirection:
+            return IfaceParameter::directionName(param.direction());
         }
     }
     }
@@ -115,14 +116,14 @@ QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
     return res;
 }
 
-bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || data(index, role) == value)
         return false;
 
     if (role == Qt::EditRole) {
-        const ContextParameter &paramOld = m_params.at(index.row());
-        ContextParameter paramNew(paramOld);
+        const IfaceParameter &paramOld = m_params.at(index.row());
+        IfaceParameter paramNew(paramOld);
 
         switch (index.column()) {
         case ColumnName: {
@@ -135,8 +136,13 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
                 return false;
             break;
         }
-        case ColumnValue: {
-            if (!paramNew.setDefaultValue(value))
+        case ColumnEncoding: {
+            if (!paramNew.setEncoding(value.toString()))
+                return false;
+            break;
+        }
+        case ColumnDirection: {
+            if (!paramNew.setDirection(IfaceParameter::directionFromName(value.toString())))
                 return false;
             break;
         }
@@ -145,7 +151,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
         }
 
         if (const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeContextParameter,
+                    cmd::ChangeIfaceParam,
                     { qVariantFromValue(m_dataObject), qVariantFromValue(paramOld), qVariantFromValue(paramNew) })) {
 
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
@@ -158,14 +164,13 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
     return true;
 }
 
-bool ContextParametersModel::createProperty(const QString &propName)
+bool IfaceParametersModel::createProperty(const QString &propName)
 {
     bool res(false);
 
-    ContextParameter param(propName);
-    param.setParamType(BasicParameter::Type::Timer);
+    IfaceParameter param(propName);
 
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateContextParameter,
+    const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateIfaceParam,
                                                        { qVariantFromValue(m_dataObject), qVariantFromValue(param) });
     if (propsCmd) {
         const int rows = rowCount();
@@ -181,15 +186,15 @@ bool ContextParametersModel::createProperty(const QString &propName)
     return res;
 }
 
-bool ContextParametersModel::removeProperty(const QModelIndex &index)
+bool IfaceParametersModel::removeProperty(const QModelIndex &index)
 {
     bool res(false);
     if (!index.isValid())
         return res;
 
     const int row(index.row());
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveContextParameter,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(row) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::RemoveIfaceParam, { qVariantFromValue(m_dataObject), qVariantFromValue(m_params.value(row)) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);
@@ -201,26 +206,17 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
     return res;
 }
 
-bool ContextParametersModel::isAttr(const QModelIndex & /*id*/) const
+bool IfaceParametersModel::isAttr(const QModelIndex & /*id*/) const
 {
     return false;
 }
 
-bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
+bool IfaceParametersModel::isProp(const QModelIndex & /*id*/) const
 {
     return true;
 }
 
-Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
-{
-    Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != BasicParameter::Type::Other)
-        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-
-    return flags;
-}
-
-QVariant ContextParametersModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant IfaceParametersModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
@@ -228,11 +224,14 @@ QVariant ContextParametersModel::headerData(int section, Qt::Orientation orienta
             return tr("Name");
         case ColumnType:
             return tr("Type");
-        case ColumnValue:
-            return tr("Value");
+        case ColumnEncoding:
+            return tr("Encoding Protocol");
+        case ColumnDirection:
+            return tr("Direction");
         }
     }
     return QVariant();
 }
+
 } // namespace aadl
 } // namespace taste3

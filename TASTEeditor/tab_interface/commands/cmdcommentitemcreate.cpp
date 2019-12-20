@@ -30,6 +30,7 @@ CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, const QRectF
     , m_geometry(geometry)
     , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_model))
 {
+    setText(QObject::tr("Create Comment"));
 }
 
 void CmdCommentItemCreate::redo()

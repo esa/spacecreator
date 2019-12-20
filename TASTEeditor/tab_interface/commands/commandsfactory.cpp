@@ -32,6 +32,9 @@
 #include "cmdentityremove.h"
 #include "cmdfunctionitemcreate.h"
 #include "cmdfunctiontypeitemcreate.h"
+#include "cmdifaceparamchange.h"
+#include "cmdifaceparamcreate.h"
+#include "cmdifaceparamremove.h"
 #include "cmdmanualconnectionitemcreate.h"
 #include "cmdprovidedinterfaceitemcreate.h"
 #include "cmdrequiredinterfaceitemcreate.h"
@@ -86,6 +89,13 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::changeContextParameterCommand(params);
     case cmd::RemoveContextParameter:
         return cmd::CommandsFactory::removeContextParameterCommand(params);
+
+    case cmd::CreateIfaceParam:
+        return cmd::CommandsFactory::createIfaceParamCommand(params);
+    case cmd::RemoveIfaceParam:
+        return cmd::CommandsFactory::removeIfaceParamCommand(params);
+    case cmd::ChangeIfaceParam:
+        return cmd::CommandsFactory::changeIfaceParamCommand(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -334,6 +344,40 @@ QUndoCommand *CommandsFactory::removeContextParameterCommand(const QVariantList 
     const int id = params.at(1).toInt();
     if (entity.isValid() && entity.canConvert<AADLObjectFunctionType *>())
         return new CmdContextParameterRemove(entity.value<AADLObjectFunctionType *>(), id);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createIfaceParamCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const IfaceParameter param = params.at(1).value<IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<AADLObjectIface *>())
+        return new CmdIfaceParamCreate(entity.value<AADLObjectIface *>(), param);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::removeIfaceParamCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const IfaceParameter param = params.at(1).value<IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<AADLObjectIface *>())
+        return new CmdIfaceParamRemove(entity.value<AADLObjectIface *>(), param);
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::changeIfaceParamCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 3);
+    const QVariant entity = params.value(0);
+    const IfaceParameter paramOld = params.at(1).value<IfaceParameter>();
+    const IfaceParameter paramNew = params.at(2).value<IfaceParameter>();
+    if (entity.isValid() && entity.canConvert<AADLObjectIface *>())
+        return new CmdIfaceParamChange(entity.value<AADLObjectIface *>(), paramOld, paramNew);
 
     return nullptr;
 }

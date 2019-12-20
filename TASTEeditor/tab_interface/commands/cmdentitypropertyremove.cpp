@@ -40,6 +40,7 @@ CmdEntityPropertyRemove::CmdEntityPropertyRemove(AADLObject *entity, const QStri
     , m_names(props)
     , m_props(getCurrentProperties(entity, props))
 {
+    setText(QObject::tr("Remove Property"));
 }
 
 void CmdEntityPropertyRemove::redo()

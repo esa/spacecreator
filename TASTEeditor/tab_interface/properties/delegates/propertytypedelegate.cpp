@@ -26,9 +26,7 @@
 namespace taste3 {
 namespace aadl {
 
-PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
-    : ComboBoxDelegate(parent)
-    , m_model(new QStringListModel(this))
+static QStringList initNames()
 {
     const QMap<QString, datatypes::BasicDataType *> types = datatypes::DataTypesStorage::dataTypes();
     QStringList names;
@@ -38,15 +36,15 @@ PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
     names.append(BasicParameter::typeName(BasicParameter::Type::Timer));
     names.append(BasicParameter::typeName(BasicParameter::Type::Directive));
 
-    m_model->setStringList(names);
+    return names;
+}
+
+PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
+    : StringListComboDelegate(initNames(), parent)
+{
 }
 
 PropertyTypeDelegate::~PropertyTypeDelegate() {}
-
-QAbstractItemModel *PropertyTypeDelegate::editorModel(const QModelIndex & /*id*/) const
-{
-    return m_model;
-}
 
 } // ns aadl
 } // ns taste3

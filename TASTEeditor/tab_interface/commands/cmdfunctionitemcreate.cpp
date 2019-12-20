@@ -36,6 +36,7 @@ CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObject
     , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_model))
     , m_parent(function)
 {
+    setText(QObject::tr("Create Function"));
 }
 
 void CmdFunctionItemCreate::redo()

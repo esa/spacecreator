@@ -51,6 +51,9 @@ private:
     static QUndoCommand *createContextParameterCommand(const QVariantList &params);
     static QUndoCommand *changeContextParameterCommand(const QVariantList &params);
     static QUndoCommand *removeContextParameterCommand(const QVariantList &params);
+    static QUndoCommand *createIfaceParamCommand(const QVariantList &params);
+    static QUndoCommand *removeIfaceParamCommand(const QVariantList &params);
+    static QUndoCommand *changeIfaceParamCommand(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;

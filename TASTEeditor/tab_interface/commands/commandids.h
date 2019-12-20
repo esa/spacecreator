@@ -44,6 +44,10 @@ enum Id
     ChangeContextParameter,
     RemoveContextParameter,
 
+    CreateIfaceParam,
+    RemoveIfaceParam,
+    ChangeIfaceParam,
+
     LastId
 };
 
