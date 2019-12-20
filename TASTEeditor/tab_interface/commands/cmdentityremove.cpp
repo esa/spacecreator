@@ -53,6 +53,7 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
         if (auto connection = m_model->getConnectionForIface(iface->id()))
             m_linkedEntities.append(connection);
     }
+    setText(QObject::tr("Remove"));
 }
 
 void CmdEntityRemove::redo()

@@ -40,6 +40,7 @@ CmdEntityPropertyCreate::CmdEntityPropertyCreate(AADLObject *entity, const QVari
     , m_newProps(props)
     , m_oldProps(getCurrentProperties(entity, props))
 {
+    setText(QObject::tr("Create Property"));
 }
 
 void CmdEntityPropertyCreate::redo()

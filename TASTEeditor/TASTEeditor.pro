@@ -94,6 +94,9 @@ SOURCES += \
         tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
+        tab_interface/commands/cmdifaceparamchange.cpp \
+        tab_interface/commands/cmdifaceparamcreate.cpp \
+        tab_interface/commands/cmdifaceparamremove.cpp \
         tab_interface/commands/cmdmanualconnectionitemcreate.cpp \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.cpp \
@@ -108,6 +111,7 @@ SOURCES += \
         tab_interface/properties/dynamicproperty.cpp \
         tab_interface/properties/dynamicpropertyconfig.cpp \
         tab_interface/properties/dynamicpropertymanager.cpp \
+        tab_interface/properties/ifaceparametersmodel.cpp \
         tab_interface/properties/propertiesdialog.cpp \
         tab_interface/properties/propertieslistmodel.cpp \
         tab_interface/properties/propertiesmodelbase.cpp \
@@ -179,6 +183,9 @@ HEADERS += \
         tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdfunctiontypeitemcreate.h \
+        tab_interface/commands/cmdifaceparamchange.h \
+        tab_interface/commands/cmdifaceparamcreate.h \
+        tab_interface/commands/cmdifaceparamremove.h \
         tab_interface/commands/cmdmanualconnectionitemcreate.h \
         tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
         tab_interface/commands/cmdrequiredinterfaceitemcreate.h \
@@ -194,6 +201,7 @@ HEADERS += \
         tab_interface/properties/dynamicproperty.h \
         tab_interface/properties/dynamicpropertyconfig.h \
         tab_interface/properties/dynamicpropertymanager.h \
+        tab_interface/properties/ifaceparametersmodel.h \
         tab_interface/properties/propertiesdialog.h \
         tab_interface/properties/propertieslistmodel.h \
         tab_interface/properties/propertiesmodelbase.h \

@@ -16,54 +16,49 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdcontextparametercreate.h"
+#include "cmdifaceparamremove.h"
 
 #include "commandids.h"
 
-#include <QDebug>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdContextParameterCreate::CmdContextParameterCreate(AADLObjectFunctionType *entity, const ContextParameter &prop)
-    : QUndoCommand()
-    , m_entity(entity)
-    , m_newProps({ prop })
-    , m_oldProps(entity->contextParams())
+CmdIfaceParamRemove::CmdIfaceParamRemove(AADLObject *entity, const IfaceParameter &param)
+    : CmdIfaceParamCreate(entity, param)
 {
-    setText(QObject::tr("Create Context Parameter"));
+    setText(QObject::tr("Remove Iface Parameter"));
 }
 
-void CmdContextParameterCreate::redo()
+void CmdIfaceParamRemove::redo()
 {
-    if (!m_entity)
+    if (!m_iface)
         return;
 
-    QVector<ContextParameter> params = m_oldProps;
-    for (const ContextParameter &param : m_newProps)
-        params.append(param);
-    m_entity->setContextParams(params);
+    QVector<IfaceParameter> currParams = m_iface->params();
+    for (const IfaceParameter &param : m_targetParams)
+        currParams.removeAll(param);
+    m_iface->setParams(currParams);
 }
 
-void CmdContextParameterCreate::undo()
+void CmdIfaceParamRemove::undo()
 {
-    m_entity->setContextParams(m_oldProps);
+    if (!m_iface)
+        return;
+
+    m_iface->setParams(m_sourceParams);
 }
 
-bool CmdContextParameterCreate::mergeWith(const QUndoCommand *command)
+bool CmdIfaceParamRemove::mergeWith(const QUndoCommand *command)
 {
-    if (command->id() == id()) {
-        m_newProps += static_cast<const CmdContextParameterCreate *>(command)->m_newProps;
-        return true;
-    }
     return false;
 }
 
-int CmdContextParameterCreate::id() const
+int CmdIfaceParamRemove::id() const
 {
-    return CreateContextParameter;
+    return RemoveIfaceParam;
 }
 
 } // namespace cmd

@@ -54,6 +54,8 @@ CmdDirectConnectionItemCreate::CmdDirectConnectionItemCreate(
         m_requiredIface->setCoordinates({ qRound(endPoint.x()), qRound(endPoint.y()) });
 
     m_entity = new AADLObjectConnection(m_startFunction, m_endFunction, m_requiredIface, m_providedIface, m_model);
+
+    setText(QObject::tr("Create Connection"));
 }
 
 void CmdDirectConnectionItemCreate::redo()

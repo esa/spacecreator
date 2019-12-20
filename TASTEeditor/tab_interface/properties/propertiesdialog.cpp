@@ -19,7 +19,9 @@
 
 #include "app/commandsstack.h"
 #include "contextparametersmodel.h"
+#include "delegates/comboboxdelegate.h"
 #include "delegates/propertytypedelegate.h"
+#include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "tab_aadl/aadlobject.h"
@@ -27,6 +29,7 @@
 #include "ui_propertiesdialog.h"
 
 #include <QDebug>
+#include <QHeaderView>
 #include <QTableView>
 
 namespace taste3 {
@@ -112,9 +115,32 @@ void PropertiesDialog::initTabs()
         modelCtxParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(1, new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::ColumnType,
+                                                         new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
+    };
+
+    auto initIfaceParams = [this]() {
+        IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(this);
+        modelIfaceParams->setDataObject(m_dataObject);
+
+        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnType,
+                                                         new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                IfaceParametersModel::ColumnEncoding,
+                new StringListComboDelegate({ tr("NATIVE"), tr("UPPER"), tr("ACN") }, // TODO: is it configurable?
+                                            viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                IfaceParametersModel::ColumnDirection,
+                new StringListComboDelegate({ IfaceParameter::directionName(IfaceParameter::Direction::In),
+                                              IfaceParameter::directionName(IfaceParameter::Direction::Out) },
+                                            viewAttrs->tableView()));
+        viewAttrs->tableView()->horizontalHeader()->show();
+        viewAttrs->setModel(modelIfaceParams);
+        ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));
     };
 
     QString objectTypeLabel;
@@ -135,6 +161,7 @@ void PropertiesDialog::initTabs()
         if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
             ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
         objectTypeLabel = ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
+        initIfaceParams();
         break;
     }
     case AADLObject::AADLObjectType::AADLComment: {

@@ -39,6 +39,7 @@ CmdEntityGeometryChange::CmdEntityGeometryChange(AADLObject *object, const QVect
     , m_prevCoordinates(object->coordinates())
     , m_newCoordinates(convertCoordinates(points))
 {
+    setText(QObject::tr("Change Geometry"));
 }
 
 void CmdEntityGeometryChange::redo()

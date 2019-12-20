@@ -16,54 +16,56 @@
   <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdcontextparametercreate.h"
+#include "cmdifaceparamcreate.h"
 
 #include "commandids.h"
 
-#include <QDebug>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdContextParameterCreate::CmdContextParameterCreate(AADLObjectFunctionType *entity, const ContextParameter &prop)
+CmdIfaceParamCreate::CmdIfaceParamCreate(AADLObject *entity, const IfaceParameter &param)
     : QUndoCommand()
-    , m_entity(entity)
-    , m_newProps({ prop })
-    , m_oldProps(entity->contextParams())
+    , m_iface(qobject_cast<AADLObjectIface *>(entity))
+    , m_targetParams({ param })
+    , m_sourceParams(m_iface ? m_iface->params() : QVector<IfaceParameter>())
 {
-    setText(QObject::tr("Create Context Parameter"));
+    setText(QObject::tr("Create Iface Parameter"));
 }
 
-void CmdContextParameterCreate::redo()
+void CmdIfaceParamCreate::redo()
 {
-    if (!m_entity)
+    if (!m_iface)
         return;
 
-    QVector<ContextParameter> params = m_oldProps;
-    for (const ContextParameter &param : m_newProps)
-        params.append(param);
-    m_entity->setContextParams(params);
+    QVector<IfaceParameter> currParams = m_iface->params();
+    currParams.append(m_targetParams);
+    m_iface->setParams(currParams);
 }
 
-void CmdContextParameterCreate::undo()
+void CmdIfaceParamCreate::undo()
 {
-    m_entity->setContextParams(m_oldProps);
+    if (!m_iface)
+        return;
+
+    m_iface->setParams(m_sourceParams);
 }
 
-bool CmdContextParameterCreate::mergeWith(const QUndoCommand *command)
+bool CmdIfaceParamCreate::mergeWith(const QUndoCommand *command)
 {
     if (command->id() == id()) {
-        m_newProps += static_cast<const CmdContextParameterCreate *>(command)->m_newProps;
+        const QVector<IfaceParameter> &update = static_cast<const CmdIfaceParamCreate *>(command)->m_targetParams;
+        m_targetParams.append(update);
         return true;
     }
     return false;
 }
 
-int CmdContextParameterCreate::id() const
+int CmdIfaceParamCreate::id() const
 {
-    return CreateContextParameter;
+    return CreateIfaceParam;
 }
 
 } // namespace cmd

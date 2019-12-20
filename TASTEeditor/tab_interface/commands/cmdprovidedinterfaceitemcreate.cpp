@@ -32,6 +32,7 @@ CmdProvidedInterfaceItemCreate::CmdProvidedInterfaceItemCreate(AADLObjectsModel 
     , m_entity(new AADLObjectIfaceProvided(function))
     , m_parent(function)
 {
+    setText(QObject::tr("Create PI"));
 }
 
 void CmdProvidedInterfaceItemCreate::redo()

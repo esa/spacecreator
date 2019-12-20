@@ -18,6 +18,7 @@
 #include "comboboxdelegate.h"
 
 #include <QComboBox>
+#include <QStringListModel>
 
 namespace taste3 {
 namespace aadl {
@@ -51,6 +52,19 @@ void ComboBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 {
     if (QComboBox *cb = qobject_cast<QComboBox *>(editor))
         model->setData(index, cb->currentText(), Qt::EditRole);
+}
+
+StringListComboDelegate::StringListComboDelegate(const QStringList &data, QObject *parent)
+    : ComboBoxDelegate(parent)
+    , m_model(new QStringListModel(this))
+{
+    m_model->setStringList(data);
+}
+StringListComboDelegate::~StringListComboDelegate() {}
+
+QAbstractItemModel *StringListComboDelegate::editorModel(const QModelIndex &id) const
+{
+    return m_model;
 }
 
 } // ns aadl

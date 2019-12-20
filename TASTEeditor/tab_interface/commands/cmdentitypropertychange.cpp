@@ -40,6 +40,7 @@ CmdEntityPropertyChange::CmdEntityPropertyChange(AADLObject *entity, const QVari
     , m_newProps(props)
     , m_oldProps(getCurrentProperties(entity, props))
 {
+    setText(QObject::tr("Change Property"));
 }
 
 void CmdEntityPropertyChange::redo()

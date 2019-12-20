@@ -88,9 +88,9 @@ struct IfaceParameter : public BasicParameter {
         Out
     };
 
-    IfaceParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
-                   const QString &paramTypeName = QString(), const QString &encoding = QString(),
-                   Direction dir = IfaceParameter::Direction::In);
+    IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Timer,
+                   const QString &paramTypeName = BasicParameter::typeName(BasicParameter::Type::Timer),
+                   const QString &encoding = QObject::tr("NATIVE"), Direction dir = IfaceParameter::Direction::In);
     ~IfaceParameter() override;
 
     QString encoding() const;
@@ -98,6 +98,8 @@ struct IfaceParameter : public BasicParameter {
 
     Direction direction() const;
     bool setDirection(Direction dir);
+    static QString directionName(Direction dir);
+    static Direction directionFromName(const QString &dir);
 
     bool operator==(const IfaceParameter &other) const;
 

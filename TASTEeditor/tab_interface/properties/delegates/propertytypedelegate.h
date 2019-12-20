@@ -24,16 +24,12 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-class PropertyTypeDelegate : public ComboBoxDelegate
+class PropertyTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
     PropertyTypeDelegate(QObject *parent = nullptr);
     ~PropertyTypeDelegate() override;
-
-protected:
-    QAbstractItemModel *editorModel(const QModelIndex &id) const override;
-    QStringListModel *m_model = { nullptr };
 };
 
 } // ns aadl

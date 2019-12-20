@@ -32,6 +32,7 @@ CmdRequiredInterfaceItemCreate::CmdRequiredInterfaceItemCreate(AADLObjectsModel 
     , m_entity(new AADLObjectIfaceRequired(function))
     , m_parent(function)
 {
+    setText(QObject::tr("Create RI"));
 }
 
 void CmdRequiredInterfaceItemCreate::redo()
