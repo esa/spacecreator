@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,31 +15,29 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "clicknotifieritem.h"
+#pragma once
 
-namespace taste3 {
+#include <QToolButton>
 
-ClickNotifierItem::ClickNotifierItem(QObject *obj, QGraphicsItem *parent)
-    : SkinnableGraphicsObject(parent)
-    , m_dataObject(obj)
+class ColorSelectorButton : public QToolButton
 {
-}
+    Q_OBJECT
+public:
+    enum AcceptPolicy
+    {
+        AnyColors = 0,
+        ValidColors
+    };
+    ColorSelectorButton(QWidget *parent = nullptr);
+    QColor color() const;
+    void setColor(const QColor &color, AcceptPolicy accept = AcceptPolicy::AnyColors);
 
-QObject *ClickNotifierItem::dataObject() const
-{
-    return m_dataObject;
-}
+Q_SIGNALS:
+    void colorChanged(const QColor &c);
 
-void ClickNotifierItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit clicked();
-    QGraphicsObject::mouseReleaseEvent(event);
-}
+protected Q_SLOTS:
+    void onClicked();
 
-void ClickNotifierItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit doubleClicked();
-    QGraphicsObject::mouseDoubleClickEvent(event);
-}
-
-} // namespace taste3
+private:
+    QColor m_color { Qt::transparent };
+};

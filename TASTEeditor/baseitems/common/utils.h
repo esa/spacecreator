@@ -64,5 +64,7 @@ bool alignedLine(QLineF &line, int angleTolerance = 10);
 bool copyResourceFile(const QString &source, const QString &target);
 
 void setWidgetFontColor(QWidget *widget, const QColor &color);
+
+bool ensureDirExists(const QString &path);
 } // ns utils
 } // ns taste3

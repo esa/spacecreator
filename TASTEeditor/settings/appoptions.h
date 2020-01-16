@@ -79,6 +79,7 @@ public:
 
     const AppOption CustomPropertiesConfig;
     const AppOption DataTypesConfig;
+    const AppOption ColorSchemeFile;
 
 private:
     GroupAadl(const GroupBugReport &) = delete;

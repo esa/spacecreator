@@ -20,8 +20,10 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "colors/colormanager.h"
 #include "tab_aadl/aadlobjectfunction.h"
 
+#include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPainter>
@@ -36,7 +38,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
 {
     setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
 
-    updateColors();
+    colorSchemeUpdated();
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
@@ -62,13 +64,6 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     painter->drawRoundedRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2), 10, 10);
     painter->restore();
-}
-
-QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    if (change == QGraphicsItem::ItemParentHasChanged)
-        updateColors();
-    return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
 void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
@@ -98,7 +93,8 @@ void AADLFunctionGraphicsItem::updateColors()
 {
     QColor brushColor { QLatin1String("#ffd11a") };
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
-        brushColor = parentFunction->brush().color().darker(125);
+        if (!parentFunction->entity()->props().contains("color"))
+            brushColor = parentFunction->brush().color().darker(125);
     setBrush(brushColor);
     setPen(QPen(brushColor.darker(), 2));
 }
@@ -123,6 +119,26 @@ void AADLFunctionGraphicsItem::updateTextPosition()
                       m_textItem->boundingRect().height() / currScale.y() };
     textRect.moveCenter(boundingRect().center());
     m_textItem->setPos(textRect.topLeft());
+}
+
+ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
+{
+    // TODO: detect exact type - FunctionRegular|FunctionRoot|FunctionPartial
+
+    return ColorManager::HandledColors::FunctionRegular;
+}
+
+AADLObject *AADLFunctionGraphicsItem::aadlObject() const
+{
+    return entity();
+}
+
+void AADLFunctionGraphicsItem::colorSchemeUpdated()
+{
+    const ColorHandler &h = colorHandler();
+    setPen(h.pen());
+    setBrush(h.brush());
+    update();
 }
 
 } // namespace aadl

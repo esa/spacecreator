@@ -22,6 +22,7 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/grippoint.h"
+#include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
@@ -300,7 +301,8 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
-    m_item->setPen(QPen(Qt::black, kDefaulPenWidth));
+
+    colorSchemeUpdated();
 }
 
 AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
@@ -494,8 +496,9 @@ void AADLConnectionGraphicsItem::updateRequiredInterface(AADLInterfaceGraphicsIt
 
 void AADLConnectionGraphicsItem::handleSelectionChanged(bool isSelected)
 {
-    QPen pen = m_item->pen();
-    pen.setWidthF(isSelected ? 1.5 * kDefaulPenWidth : kDefaulPenWidth);
+    const ColorHandler h = colorHandler();
+    QPen pen = h.pen();
+    pen.setWidthF(isSelected ? 1.5 * pen.widthF() : pen.widthF());
     pen.setStyle(isSelected ? Qt::DotLine : Qt::SolidLine);
     m_item->setPen(pen);
 
@@ -686,6 +689,23 @@ void AADLConnectionGraphicsItem::clear()
     qDeleteAll(m_grips);
     m_grips.clear();
     m_points.clear();
+}
+
+ColorManager::HandledColors AADLConnectionGraphicsItem::handledColorType() const
+{
+    return ColorManager::HandledColors::Connection;
+}
+
+AADLObject *AADLConnectionGraphicsItem::aadlObject() const
+{
+    return entity();
+}
+
+void AADLConnectionGraphicsItem::colorSchemeUpdated()
+{
+    const ColorHandler &h = colorHandler();
+    m_item->setPen(h.pen());
+    update();
 }
 
 } // namespace aadl

@@ -20,6 +20,7 @@
 #include "baseitems/interactiveobject.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QGraphicsView>
 #include <QPropertyAnimation>
@@ -315,6 +316,18 @@ void setWidgetFontColor(QWidget *widget, const QColor &color)
     QPalette p(widget->palette());
     p.setColor(QPalette::Text, color);
     widget->setPalette(p);
+}
+
+bool ensureDirExists(const QString &path)
+{
+    QDir dir(path);
+    if (!dir.exists(path))
+        if (!dir.mkpath(path)) {
+            qWarning() << "Failed to create path:" << path;
+            return false;
+        }
+
+    return true;
 }
 
 } // ns utils

@@ -13,4 +13,7 @@
         <file>icns/zoom_out.svg</file>
         <file>icns/function_type.svg</file>
     </qresource>
+    <qresource prefix="/">
+        <file>colors/default_colors.json</file>
+    </qresource>
 </RCC>

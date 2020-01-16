@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,36 +16,43 @@
 */
 
 #pragma once
+#include "colormanager.h"
 
 #include <QDialog>
+#include <QMap>
+#include <QStringListModel>
 
 namespace Ui {
-class DynamicPropertyManager;
+class ColorManagerDialog;
 }
 
 namespace taste3 {
 namespace aadl {
 
-class DynamicPropertyManager : public QDialog
+class ColorManagerDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit DynamicPropertyManager(QWidget *parent = nullptr);
-    ~DynamicPropertyManager() override;
+    explicit ColorManagerDialog(QWidget *parent = nullptr);
+    ~ColorManagerDialog();
 
 public Q_SLOTS:
     void accept() override;
 
 private Q_SLOTS:
-    void updateErrorInfo();
-    void on_btnNewProp_clicked();
+    void onColorHandlerSelected(const QModelIndex &id);
+    void on_btnOpen_clicked();
+    void on_btnCreateNew_clicked();
 
 private:
-    Ui::DynamicPropertyManager *ui;
-    QStringList m_usedNames;
-    bool readJson(const QString &from);
-    void setTextColor(const QColor &color);
+    Ui::ColorManagerDialog *ui;
+    QMap<ColorManager::HandledColors, ColorHandler> m_colors;
+    QMap<QString, ColorManager::HandledColors> m_colorNames;
+    QStringListModel *m_namesModel { nullptr };
+    ColorHandler *m_color { nullptr };
+
+    void loadFile(const QString &path);
 };
 
 } // ns aadl

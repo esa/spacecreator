@@ -19,6 +19,7 @@
 
 #include "baseitems/common/utils.h"
 #include "baseitems/textgraphicsitem.h"
+#include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
@@ -54,12 +55,13 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
     connect(m_textItem, &TextGraphicsItem::textChanged, this, &AADLCommentGraphicsItem::textChanged);
 
     const QColor brushColor { 0xf9e29c };
-    setBrush(brushColor);
-    setPen(QPen(brushColor.darker(), kBorderWidth, Qt::SolidLine, Qt::FlatCap));
+    qDebug() << brushColor.name(QColor::HexArgb) << brushColor.darker().name(QColor::HexArgb);
+
     setFont(QFont(qApp->font()));
     m_textItem->setFont(font());
 
     setHighlightable(false);
+    colorSchemeUpdated();
 }
 
 AADLObjectComment *AADLCommentGraphicsItem::entity() const
@@ -186,6 +188,27 @@ void AADLCommentGraphicsItem::createCommand()
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry,
                                                           { qVariantFromValue(entity()), qVariantFromValue(points) });
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
+}
+
+ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
+{
+    return ColorManager::HandledColors::Comment;
+}
+
+AADLObject *AADLCommentGraphicsItem::aadlObject() const
+{
+    return entity();
+}
+
+void AADLCommentGraphicsItem::colorSchemeUpdated()
+{
+    const ColorHandler &h = colorHandler();
+    QPen pen = h.pen();
+    pen.setCapStyle(Qt::FlatCap);
+    pen.setStyle(Qt::SolidLine);
+    setPen(pen);
+    setBrush(h.brush());
+    update();
 }
 
 } // namespace aadl

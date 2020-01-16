@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <QGraphicsObject>
+#include "skinnablegraphicsobject.h"
 
 namespace taste3 {
 
-class ClickNotifierItem : public QGraphicsObject
+class ClickNotifierItem : public SkinnableGraphicsObject
 {
     Q_OBJECT
 public:
@@ -29,7 +29,7 @@ public:
 
     QObject *dataObject() const;
 
-signals:
+Q_SIGNALS:
     void clicked();
     void doubleClicked();
 

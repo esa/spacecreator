@@ -69,6 +69,7 @@ const GroupBugReport AppOptions::BugReport = {};
 GroupAadl::GroupAadl()
     : CustomPropertiesConfig(QString("%1/CustomPropsConf").arg(localName()))
     , DataTypesConfig(QString("%1/DataTypesConf").arg(localName()))
+    , ColorSchemeFile(QString("%1/ColorSchemeFile").arg(localName()))
 {
 }
 

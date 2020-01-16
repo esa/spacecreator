@@ -51,7 +51,7 @@ void CmdIfaceParamRemove::undo()
     m_iface->setParams(m_sourceParams);
 }
 
-bool CmdIfaceParamRemove::mergeWith(const QUndoCommand *command)
+bool CmdIfaceParamRemove::mergeWith(const QUndoCommand * /*command*/)
 {
     return false;
 }

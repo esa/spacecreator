@@ -86,11 +86,7 @@ DynamicPropertyConfig::DynamicPropertyConfig()
 QString DynamicPropertyConfig::defaultConfigPath()
 {
     const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    QDir dir(path);
-    if (!dir.exists(path))
-        if (!dir.mkpath(path))
-            qWarning() << "Failed to create path:" << path;
-
+    utils::ensureDirExists(path);
     return path + "/aadl_properties.json";
 }
 

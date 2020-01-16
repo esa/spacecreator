@@ -17,6 +17,8 @@
 
 #include "datatypesstorage.h"
 
+#include "baseitems/common/utils.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -39,10 +41,7 @@ QString ensureAsnFileExists()
     static const QString asnFileName("taste-types.asn");
     const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 
-    QDir dir(targetDir);
-    if (!dir.exists(targetDir))
-        if (!dir.mkpath(targetDir))
-            qWarning() << "Failed to create path:" << targetDir;
+    utils::ensureDirExists(targetDir);
 
     QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
 
@@ -50,7 +49,7 @@ QString ensureAsnFileExists()
         return asnFilePath;
 
     const QString &rscFilePath = QString(":/defaults/app/resources/%1").arg(asnFileName);
-    if (QFile::copy(rscFilePath, asnFilePath))
+    if (utils::copyResourceFile(rscFilePath, asnFilePath))
         return asnFilePath;
 
     qWarning() << "Can't create default ASN datatypes file" << asnFilePath;

@@ -80,14 +80,14 @@ public:
     void setObjectsModel(AADLObjectsModel *model);
     AADLObjectsModel *objectsModel() const;
 
-signals:
+Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
     void attributesChanged();
     void propertiesChanged();
 
-public slots:
+public Q_SLOTS:
     bool setTitle(const QString &title);
     bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);

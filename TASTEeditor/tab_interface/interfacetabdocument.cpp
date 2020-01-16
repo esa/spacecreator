@@ -28,6 +28,7 @@
 #include "tab_interface/aadlfunctiongraphicsitem.h"
 #include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
+#include "tab_interface/colors/colormanagerdialog.h"
 #include "tab_interface/properties/dynamicpropertymanager.h"
 #include "tab_interface/properties/propertiesdialog.h"
 
@@ -106,6 +107,8 @@ QMenu *InterfaceTabDocument::customMenu() const
     connect(actCommonProps, &QAction::triggered, this, &InterfaceTabDocument::onAttributesManagerRequested);
     QAction *actDataTypes = root->addAction(tr("Data types"));
     connect(actDataTypes, &QAction::triggered, this, &InterfaceTabDocument::onDataTypesMenuInvoked);
+    QAction *actColorScheme = root->addAction(tr("Color Scheme"));
+    connect(actColorScheme, &QAction::triggered, this, &InterfaceTabDocument::onColorSchemeMenuInvoked);
 
     return root;
 }
@@ -501,6 +504,13 @@ void InterfaceTabDocument::onDataTypesMenuInvoked()
 {
     if (auto act = qobject_cast<QAction *>(sender()))
         showNIYGUI(act->text());
+}
+
+void InterfaceTabDocument::onColorSchemeMenuInvoked()
+{
+    aadl::ColorManagerDialog *dialog = new aadl::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
 }
 
 void InterfaceTabDocument::showNIYGUI(const QString &title)

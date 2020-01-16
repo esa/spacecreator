@@ -59,10 +59,10 @@ public:
     // Return nullptr if the doc does not need any menu
     virtual QMenu *customMenu() const;
 
-signals:
+Q_SIGNALS:
     void dirtyChanged(bool dirty) const;
 
-protected slots:
+protected Q_SLOTS:
     void updateDirtyness();
 
 protected:

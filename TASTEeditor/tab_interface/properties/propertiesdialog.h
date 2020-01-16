@@ -35,7 +35,7 @@ public:
     explicit PropertiesDialog(AADLObject *obj, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
-public slots:
+public Q_SLOTS:
     void open() override;
     void done(int r) override;
 

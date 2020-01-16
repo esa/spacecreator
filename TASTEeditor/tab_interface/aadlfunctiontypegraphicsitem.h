@@ -52,6 +52,12 @@ protected:
 
     void initGripPoints() override;
 
+    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual AADLObject *aadlObject() const override;
+
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated() override;
+
 private:
     void createCommand();
     QList<QVariantList> prepareAdditionalParams() const;

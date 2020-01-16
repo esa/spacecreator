@@ -44,7 +44,7 @@ protected:
     QWidget *createView() override;
     QGraphicsScene *createScene() override;
 
-protected slots:
+protected Q_SLOTS:
     void onActionDummy();
 
 private:

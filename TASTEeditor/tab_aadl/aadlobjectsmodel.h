@@ -56,11 +56,11 @@ public:
 
     const QHash<common::Id, AADLObject *> &objects() const;
 
-signals:
+Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
 
-public slots:
+public Q_SLOTS:
     bool initFromObjects(const QVector<AADLObject *> &objects);
 
 private:
