@@ -66,6 +66,14 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
     painter->restore();
 }
 
+QVariant AADLFunctionGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemParentHasChanged)
+        colorSchemeUpdated();
+
+    return AADLFunctionTypeGraphicsItem::itemChange(change, value);
+}
+
 void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualMoveProgress(grip, from, to);
@@ -136,8 +144,18 @@ AADLObject *AADLFunctionGraphicsItem::aadlObject() const
 void AADLFunctionGraphicsItem::colorSchemeUpdated()
 {
     const ColorHandler &h = colorHandler();
-    setPen(h.pen());
-    setBrush(h.brush());
+    QPen p = h.pen();
+    QBrush b = h.brush();
+
+    if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
+        if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")) {
+            b.setColor(parentFunction->brush().color().darker(125));
+            p.setColor(parentFunction->pen().color().darker(125));
+        }
+
+    setPen(p);
+    setBrush(b);
+
     update();
 }
 
