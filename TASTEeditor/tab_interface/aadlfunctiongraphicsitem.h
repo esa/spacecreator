@@ -43,6 +43,7 @@ public:
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
