@@ -36,7 +36,7 @@ public:
     ~AddDynamicPropertyDialog() override;
 
     DynamicProperty *attribute() const;
-public slots:
+public Q_SLOTS:
     void accept() override;
 
 private:

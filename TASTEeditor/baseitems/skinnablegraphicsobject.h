@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,31 +15,31 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "clicknotifieritem.h"
+#pragma once
+
+#include "tab_interface/colors/colormanager.h"
+
+#include <QGraphicsObject>
 
 namespace taste3 {
 
-ClickNotifierItem::ClickNotifierItem(QObject *obj, QGraphicsItem *parent)
-    : SkinnableGraphicsObject(parent)
-    , m_dataObject(obj)
-{
+namespace aadl {
+class AADLObject;
 }
 
-QObject *ClickNotifierItem::dataObject() const
+class SkinnableGraphicsObject : public QGraphicsObject
 {
-    return m_dataObject;
-}
+    Q_OBJECT
+public:
+    SkinnableGraphicsObject(QGraphicsItem *parent = nullptr);
 
-void ClickNotifierItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit clicked();
-    QGraphicsObject::mouseReleaseEvent(event);
-}
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated();
 
-void ClickNotifierItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit doubleClicked();
-    QGraphicsObject::mouseDoubleClickEvent(event);
-}
+protected:
+    virtual aadl::ColorManager::HandledColors handledColorType() const = 0;
+    virtual aadl::AADLObject *aadlObject() const = 0;
+    virtual aadl::ColorHandler colorHandler() const;
+};
 
-} // namespace taste3
+} // ns taate3

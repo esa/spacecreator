@@ -62,7 +62,7 @@ StringListComboDelegate::StringListComboDelegate(const QStringList &data, QObjec
 }
 StringListComboDelegate::~StringListComboDelegate() {}
 
-QAbstractItemModel *StringListComboDelegate::editorModel(const QModelIndex &id) const
+QAbstractItemModel *StringListComboDelegate::editorModel(const QModelIndex & /*id*/) const
 {
     return m_model;
 }

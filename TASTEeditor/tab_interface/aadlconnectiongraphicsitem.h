@@ -79,6 +79,12 @@ protected:
     bool handleGripPointMove(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
     bool handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
 
+    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual AADLObject *aadlObject() const override;
+
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated() override;
+
 private:
     void adjustGripPointCount();
     QGraphicsRectItem *createGripPoint();

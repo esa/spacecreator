@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,35 +17,38 @@
 
 #pragma once
 
-#include <QDialog>
+#include "colormanager.h"
+
+#include <QWidget>
 
 namespace Ui {
-class DynamicPropertyManager;
+class ColorHandlerEditor;
 }
 
 namespace taste3 {
 namespace aadl {
 
-class DynamicPropertyManager : public QDialog
+class ColorHandlerEditor : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit DynamicPropertyManager(QWidget *parent = nullptr);
-    ~DynamicPropertyManager() override;
+    explicit ColorHandlerEditor(QWidget *parent = nullptr);
+    ~ColorHandlerEditor();
 
-public Q_SLOTS:
-    void accept() override;
+    void setColorHandler(ColorHandler *h);
+    ColorHandler *colorHandler() const;
 
 private Q_SLOTS:
-    void updateErrorInfo();
-    void on_btnNewProp_clicked();
+    void on_sbWidth_valueChanged(qreal v);
+    void on_btnColorStroke_colorChanged(const QColor &c);
+    void on_cbFillType_currentIndexChanged(int id);
+    void on_btnColor_colorChanged(const QColor &c);
+    void on_btnColorStop_colorChanged(const QColor &c);
 
 private:
-    Ui::DynamicPropertyManager *ui;
-    QStringList m_usedNames;
-    bool readJson(const QString &from);
-    void setTextColor(const QColor &color);
+    Ui::ColorHandlerEditor *ui;
+    ColorHandler *m_colorHandler { nullptr };
 };
 
 } // ns aadl

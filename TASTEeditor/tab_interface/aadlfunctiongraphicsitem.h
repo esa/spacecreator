@@ -43,13 +43,18 @@ public:
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
 
     QSizeF minimalSize() const override;
     void updateTextPosition() override;
+
+    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual AADLObject *aadlObject() const override;
+
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated() override;
 
 private:
     void updateColors();

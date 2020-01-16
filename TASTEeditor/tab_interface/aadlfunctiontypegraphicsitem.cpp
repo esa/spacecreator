@@ -20,6 +20,7 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
@@ -49,7 +50,6 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
 {
     setObjectName(QLatin1String("AADLFunctionTypeGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setBrush(QBrush(QLatin1String("#a8a8a8")));
 
     m_textItem->setPlainText(entity->title());
     m_textItem->setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
@@ -71,6 +71,8 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
         m_textItem->setPlainText(text);
         instantLayoutUpdate();
     });
+
+    colorSchemeUpdated();
 }
 
 AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
@@ -137,7 +139,7 @@ void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGr
 
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter->setPen(isSelected() ? m_selectedPen : m_pen);
+    painter->setPen(isSelected() ? m_selectedPen : pen());
     painter->setBrush(brush());
     painter->drawRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2));
@@ -198,6 +200,25 @@ void AADLFunctionTypeGraphicsItem::updateTextPosition()
                       m_textItem->boundingRect().height() / currScale.y() };
     textRect.moveTopLeft(boundingRect().marginsRemoved(kTextMargins).topLeft());
     m_textItem->setPos(textRect.topLeft());
+}
+
+ColorManager::HandledColors AADLFunctionTypeGraphicsItem::handledColorType() const
+{
+    return ColorManager::HandledColors::FunctionType;
+}
+
+AADLObject *AADLFunctionTypeGraphicsItem::aadlObject() const
+{
+    return entity();
+}
+
+void AADLFunctionTypeGraphicsItem::colorSchemeUpdated()
+{
+    const ColorHandler &h = colorHandler();
+    qDebug() << h.pen().color().name(QColor::HexArgb) << h.brush().color().name(QColor::HexArgb);
+    setPen(h.pen());
+    setBrush(h.brush());
+    update();
 }
 
 } // namespace aadl

@@ -41,7 +41,7 @@ public:
 
     bool parse(const QString &file);
 
-signals:
+Q_SIGNALS:
     void objectsParsed(const QVector<AADLObject *> &objects);
     void error(const QString &msg) const;
 

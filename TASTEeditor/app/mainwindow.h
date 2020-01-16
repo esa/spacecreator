@@ -65,7 +65,7 @@ protected:
     void updateActions();
     void saveSceneRender(const QString &filePath) const;
 
-protected slots:
+protected Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();

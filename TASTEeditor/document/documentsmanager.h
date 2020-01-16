@@ -44,7 +44,7 @@ public:
 
     QVector<document::AbstractTabDocument *> documents() const;
 
-signals:
+Q_SIGNALS:
     void currentDocIdChanged(int currentDocId);
 
 protected:

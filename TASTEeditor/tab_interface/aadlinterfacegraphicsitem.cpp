@@ -19,6 +19,7 @@
 #include "aadlinterfacegraphicsitem.h"
 
 #include "aadlconnectiongraphicsitem.h"
+#include "colors/colormanager.h"
 
 #include <QPainter>
 #include <QtDebug>
@@ -74,14 +75,14 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
         kindPath.translate(0, rect.height() / 3);
     }
     m_type = new QGraphicsPathItem(kindPath, this);
-    m_type->setPen(QPen(kDefaultBackgroundColor, 2));
+    //    m_type->setPen(QPen(kDefaultBackgroundColor, 2));
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
-    m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
-    m_iface->setBrush(kDefaultBackgroundColor);
+    //    m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+    //    m_iface->setBrush(kDefaultBackgroundColor);
     m_iface->setPath(pp);
     m_text->setPlainText(entity->interfaceName());
 
@@ -94,6 +95,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
         m_text->setPlainText(text);
         instantLayoutUpdate();
     });
+
+    colorSchemeUpdated();
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
@@ -301,7 +304,8 @@ void AADLInterfaceGraphicsItem::initGripPoints()
 
 void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
-    m_iface->setBrush(isSelected ? kSelectedBackgroundColor : kDefaultBackgroundColor);
+    const ColorHandler &h = colorHandler();
+    m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -338,6 +342,27 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, c
     updateGripPoints();
 
     Q_EMIT needUpdateLayout();
+}
+
+ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
+{
+    return ColorManager::HandledColors::Iface;
+}
+
+AADLObject *AADLInterfaceGraphicsItem::aadlObject() const
+{
+    return entity();
+}
+
+void AADLInterfaceGraphicsItem::colorSchemeUpdated()
+{
+    const ColorHandler &h = colorHandler();
+    QPen pen = h.pen();
+    m_type->setPen(pen);
+    pen.setWidthF(pen.widthF() / 2.);
+    m_iface->setPen(pen);
+    m_iface->setBrush(h.brush());
+    update();
 }
 
 } // namespace aadl

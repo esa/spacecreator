@@ -48,6 +48,7 @@ SOURCES += \
         baseitems/grippoint.cpp \
         baseitems/grippointshandler.cpp \
         baseitems/interactiveobject.cpp \
+        baseitems/skinnablegraphicsobject.cpp \
         baseitems/textgraphicsitem.cpp \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
@@ -79,6 +80,10 @@ SOURCES += \
         tab_interface/aadlfunctionnamegraphicsitem.cpp \
         tab_interface/aadlfunctiontypegraphicsitem.cpp \
         tab_interface/aadlinterfacegraphicsitem.cpp \
+        tab_interface/colors/colorhandlereditor.cpp \
+        tab_interface/colors/colormanager.cpp \
+        tab_interface/colors/colormanagerdialog.cpp \
+        tab_interface/colors/colorselectorbutton.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
         tab_interface/commands/cmdcommenttextchange.cpp \
         tab_interface/commands/cmdcontextparameterchange.cpp \
@@ -137,6 +142,7 @@ HEADERS += \
         baseitems/grippoint.h \
         baseitems/grippointshandler.h \
         baseitems/interactiveobject.h \
+        baseitems/skinnablegraphicsobject.h \
         baseitems/textgraphicsitem.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
@@ -168,6 +174,10 @@ HEADERS += \
         tab_interface/aadlfunctionnamegraphicsitem.h \
         tab_interface/aadlfunctiontypegraphicsitem.h \
         tab_interface/aadlinterfacegraphicsitem.h \
+        tab_interface/colors/colorhandlereditor.h \
+        tab_interface/colors/colormanager.h \
+        tab_interface/colors/colormanagerdialog.h \
+        tab_interface/colors/colorselectorbutton.h \
         tab_interface/commands/cmdcommentitemcreate.h \
         tab_interface/commands/cmdcommenttextchange.h \
         tab_interface/commands/cmdcontextparameterchange.h \
@@ -211,6 +221,8 @@ HEADERS += \
 FORMS += \
     app/mainwindow.ui \
     reports/bugreportdialog.ui \
+    tab_interface/colors/colorhandlereditor.ui \
+    tab_interface/colors/colormanagerdialog.ui \
     tab_interface/properties/adddynamicpropertydialog.ui \
     tab_interface/properties/dynamicpropertymanager.ui \
     tab_interface/properties/propertiesdialog.ui \

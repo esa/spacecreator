@@ -59,6 +59,12 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
 
+    virtual ColorManager::HandledColors handledColorType() const override;
+    virtual AADLObject *aadlObject() const override;
+
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated() override;
+
 private:
     QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;

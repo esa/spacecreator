@@ -43,7 +43,7 @@ public:
     virtual void setModel(PropertiesModelBase *model);
     QTableView *tableView() const;
 
-protected slots:
+protected Q_SLOTS:
     virtual void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     virtual void on_btnAdd_clicked();
     virtual void on_btnDel_clicked();

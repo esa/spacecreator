@@ -60,7 +60,7 @@ protected:
     QWidget *createView() override;
     QGraphicsScene *createScene() override;
 
-protected slots:
+protected Q_SLOTS:
     void onActionCreateFunctionType();
     void onActionCreateFunction();
     void onActionCreateProvidedInterface();
@@ -78,6 +78,7 @@ protected slots:
 
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
+    void onColorSchemeMenuInvoked();
 
     void showPropertyEditor(aadl::AADLObject *obj);
 

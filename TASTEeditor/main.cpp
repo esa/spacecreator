@@ -29,12 +29,13 @@
 
 int main(int argc, char *argv[])
 {
+    using namespace taste3;
     LogHandler logHandler;
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
-    taste3::datatypes::DataTypesStorage::init();
+    datatypes::DataTypesStorage::init();
 
     SettingsManager settings;
 
@@ -42,8 +43,6 @@ int main(int argc, char *argv[])
     while (dirIt.hasNext())
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
-
-    using namespace taste3;
 
     MainWindow w;
 
