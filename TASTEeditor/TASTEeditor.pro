@@ -34,6 +34,11 @@ SOURCES += \
         app/commandlineparser.cpp \
         app/commandsstack.cpp \
         app/common.cpp \
+        app/context/action/action.cpp \
+        app/context/action/actionsmanager.cpp \
+        app/context/action/attrhandler.cpp \
+        app/context/action/condition.cpp \
+        app/context/action/extprocmonitor.cpp \
         app/datatypes/basicdatatype.cpp \
         app/datatypes/datatypesstorage.cpp \
         app/mainwindow.cpp \
@@ -127,6 +132,11 @@ HEADERS += \
         app/commandlineparser.h \
         app/commandsstack.h \
         app/common.h \
+        app/context/action/action.h \
+        app/context/action/actionsmanager.h \
+        app/context/action/attrhandler.h \
+        app/context/action/condition.h \
+        app/context/action/extprocmonitor.h \
         app/datatypes/basicdatatype.h \
         app/datatypes/datatypesstorage.h \
         app/mainwindow.h \

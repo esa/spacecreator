@@ -1,0 +1,38 @@
+[
+    {
+        "conditions": [
+            {
+                "attributes": [
+                    {
+                        "title": "name",
+                        "value": "DeleteMe"
+                    }
+                ],
+                "itemType": "Function"
+            }
+        ],
+        "action": "Remove",
+        "title": "Delete \"DeleteMe\" FN",
+        "app": "",
+        "appArgs": [],
+        "appCwd": ""
+    },
+    {
+        "conditions": [
+            {
+                "attributes": [
+                    {
+                        "title": "name",
+                        "value": "*"
+                    }
+                ],
+                "itemType": "*"
+            }
+        ],
+        "action": "",
+        "app": "TASTEeditor",
+        "appArgs": [ "-l" ],
+        "appCwd": "TASTE3",
+        "title": "List scriptable actions"
+    }
+]

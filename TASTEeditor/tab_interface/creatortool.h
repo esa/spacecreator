@@ -93,6 +93,7 @@ private:
     QMenu *populateContextMenu(const QPointF &scenePos);
     void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
     void populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos);
+    void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

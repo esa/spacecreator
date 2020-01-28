@@ -17,6 +17,7 @@
 
 #include "dynamicpropertyconfig.h"
 
+#include "app/common.h"
 #include "baseitems/common/utils.h"
 #include "dynamicproperty.h"
 #include "settings/appoptions.h"
@@ -31,6 +32,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
+
 namespace taste3 {
 namespace aadl {
 
@@ -86,7 +88,7 @@ DynamicPropertyConfig::DynamicPropertyConfig()
 QString DynamicPropertyConfig::defaultConfigPath()
 {
     const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    utils::ensureDirExists(path);
+    common::ensureDirExists(path);
     return path + "/aadl_properties.json";
 }
 
@@ -123,7 +125,7 @@ QString ensureFileExists()
             storedFilePath = DynamicPropertyConfig::defaultConfigPath();
 
         const QString rscFilePath(":/defaults/tab_interface/properties/resources/aadl_properties.json");
-        if (!utils::copyResourceFile(rscFilePath, storedFilePath)) {
+        if (!common::copyResourceFile(rscFilePath, storedFilePath)) {
             qWarning() << "Can't create default ASN datatypes file" << storedFilePath;
             return QString();
         }

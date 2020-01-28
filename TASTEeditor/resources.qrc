@@ -18,5 +18,6 @@
     <qresource prefix="/defaults">
         <file>app/resources/taste-types.asn</file>
         <file>tab_interface/properties/resources/aadl_properties.json</file>
+        <file>app/resources/contextmenu.json</file>
     </qresource>
 </RCC>

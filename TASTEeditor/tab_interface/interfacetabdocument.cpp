@@ -110,6 +110,10 @@ QMenu *InterfaceTabDocument::customMenu() const
     QAction *actColorScheme = root->addAction(tr("Color Scheme"));
     connect(actColorScheme, &QAction::triggered, this, &InterfaceTabDocument::onColorSchemeMenuInvoked);
 
+    common::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
+    common::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
+    common::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
+
     return root;
 }
 
@@ -155,6 +159,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
+
         m_actCreateFunctionType->setCheckable(true);
         m_actCreateFunctionType->setActionGroup(m_actionGroup);
         connect(m_actCreateFunctionType, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunctionType);
@@ -163,6 +169,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
+
         m_actCreateFunction->setCheckable(true);
         m_actCreateFunction->setActionGroup(m_actionGroup);
         connect(m_actCreateFunction, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateFunction);
@@ -172,6 +180,9 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface",
+                               "Create Provided Interface object");
+
         m_actCreateProvidedInterface->setCheckable(true);
         m_actCreateProvidedInterface->setActionGroup(m_actionGroup);
         connect(m_actCreateProvidedInterface, &QAction::triggered, this,
@@ -181,6 +192,9 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface",
+                               "Create Required Interface object");
+
         m_actCreateRequiredInterface->setCheckable(true);
         m_actCreateRequiredInterface->setActionGroup(m_actionGroup);
         connect(m_actCreateRequiredInterface, &QAction::triggered, this,
@@ -190,6 +204,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
+
         m_actCreateComment->setCheckable(true);
         m_actCreateComment->setActionGroup(m_actionGroup);
         connect(m_actCreateComment, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateComment);
@@ -207,6 +223,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
+        common::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
+
         m_actCreateConnection->setCheckable(true);
         m_actCreateConnection->setActionGroup(m_actionGroup);
         connect(m_actCreateConnection, &QAction::triggered, this, &InterfaceTabDocument::onActionCreateConnection);
@@ -215,6 +233,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actRemove) {
         m_actRemove = new QAction(tr("Remove"));
+        common::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
+
         m_actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
         m_actRemove->setShortcut(QKeySequence::Delete);
         connect(m_actRemove, &QAction::triggered, this, &InterfaceTabDocument::onActionRemoveItem);
@@ -222,6 +242,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomIn) {
         m_actZoomIn = new QAction(tr("Zoom In"));
+        common::registerAction(Q_FUNC_INFO, m_actZoomIn, "Zoom In", "Scale up the current scene");
+
         m_actZoomIn->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_in.svg")));
         m_actZoomIn->setShortcut(QKeySequence::ZoomIn);
         connect(m_actZoomIn, &QAction::triggered, this, &InterfaceTabDocument::onActionZoomIn);
@@ -229,6 +251,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomOut) {
         m_actZoomOut = new QAction(tr("Zoom Out"));
+        common::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
+
         m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
         m_actZoomOut->setShortcut(QKeySequence::ZoomOut);
         connect(m_actZoomOut, &QAction::triggered, this, &InterfaceTabDocument::onActionZoomOut);
@@ -239,7 +263,6 @@ QVector<QAction *> InterfaceTabDocument::initActions()
              m_actCreateProvidedInterface,
              m_actCreateRequiredInterface,
              m_actCreateComment,
-             m_actGroupConnections,
              m_actCreateConnection,
              m_actRemove,
              m_actZoomIn,

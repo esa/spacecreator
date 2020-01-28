@@ -17,6 +17,7 @@
 
 #include "colormanager.h"
 
+#include "app/common.h"
 #include "baseitems/common/utils.h"
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
@@ -191,7 +192,7 @@ QString ColorManager::prepareDefaultSource() const
     const QString targetDir =
             QString("%1/colors").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
-    utils::ensureDirExists(targetDir);
+    common::ensureDirExists(targetDir);
 
     QString jsonFilePath = QString("%1/%2").arg(targetDir, jsonFileName);
 
@@ -199,7 +200,7 @@ QString ColorManager::prepareDefaultSource() const
         return jsonFilePath;
 
     const QString &rscFilePath = QString(":/colors/%1").arg(jsonFileName);
-    if (utils::copyResourceFile(rscFilePath, jsonFilePath))
+    if (common::copyResourceFile(rscFilePath, jsonFilePath))
         return jsonFilePath;
 
     qWarning() << "Can't create default colors file" << jsonFilePath;

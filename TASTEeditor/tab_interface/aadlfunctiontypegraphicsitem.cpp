@@ -215,7 +215,6 @@ AADLObject *AADLFunctionTypeGraphicsItem::aadlObject() const
 void AADLFunctionTypeGraphicsItem::colorSchemeUpdated()
 {
     const ColorHandler &h = colorHandler();
-    qDebug() << h.pen().color().name(QColor::HexArgb) << h.brush().color().name(QColor::HexArgb);
     setPen(h.pen());
     setBrush(h.brush());
     update();

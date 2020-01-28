@@ -17,6 +17,7 @@
 
 #include "colormanagerdialog.h"
 
+#include "app/common.h"
 #include "baseitems/common/utils.h"
 #include "ui_colormanagerdialog.h"
 
@@ -111,7 +112,7 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
 {
     const QString file =
             QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (!file.isEmpty() && utils::copyResourceFile(":/colors/default_colors.json", file))
+    if (!file.isEmpty() && common::copyResourceFile(":/colors/default_colors.json", file))
         loadFile(file);
 }
 
