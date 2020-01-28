@@ -32,6 +32,7 @@ public:
     {
         DropUnsavedChangesSilently,
         OpenAADLXMLFile,
+        ListScriptableActions,
 
         Unknown
     };

@@ -20,11 +20,29 @@
 #include <QMetaType>
 #include <QUuid>
 
+class QAction;
 namespace taste3 {
 namespace common {
 
 typedef QUuid Id;
 Id createId();
+
+/*!
+ * Copies the \a source file from resources to the \a target file.
+ * \Returns true if the \a source file copied succesfully and
+ * the QFile::WriteUser permission explicitly set for the \a target
+ * (otherwise it would be read-only as any file in qrc).
+ * If the \target file already exists, this function will not owervirite
+ * and return false;
+ */
+bool copyResourceFile(const QString &source, const QString &target);
+
+void setWidgetFontColor(QWidget *widget, const QColor &color);
+
+bool ensureDirExists(const QString &path);
+
+void registerAction(const QString &caller, QAction *action, const QString &title = QString(),
+                    const QString &description = QString());
 
 } // ns common
 } // ns taste3

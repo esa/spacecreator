@@ -22,6 +22,7 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "app/context/action/actionsmanager.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdfunctiontypeitemcreate.h"
@@ -188,7 +189,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             m_previewItem->setPen(QPen(Qt::blue, 2, Qt::SolidLine));
             m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
             m_previewItem->setZValue(1);
-            scene->addItem(m_previewItem);
+            if (!parentItem)
+                scene->addItem(m_previewItem);
         }
         const QPointF mappedScenePos = m_previewItem->mapFromScene(scenePos);
         m_previewItem->setRect({ mappedScenePos, mappedScenePos });
@@ -346,6 +348,28 @@ static inline AADLObjectIface *interfaceObject(QGraphicsItem *item)
         return nullptr;
 
     if (auto function = qobject_cast<AADLInterfaceGraphicsItem *>(item->toGraphicsObject()))
+        return function->entity();
+
+    return nullptr;
+};
+
+static inline AADLObjectComment *commentObject(QGraphicsItem *item)
+{
+    if (!item)
+        return nullptr;
+
+    if (auto function = qobject_cast<AADLCommentGraphicsItem *>(item->toGraphicsObject()))
+        return function->entity();
+
+    return nullptr;
+};
+
+static inline AADLObjectConnection *connectionObject(QGraphicsItem *item)
+{
+    if (!item)
+        return nullptr;
+
+    if (auto function = qobject_cast<AADLConnectionGraphicsItem *>(item->toGraphicsObject()))
         return function->entity();
 
     return nullptr;
@@ -641,6 +665,8 @@ void CreatorTool::removeSelectedItems()
     if (auto scene = m_view->scene()) {
         taste3::cmd::CommandsStack::current()->beginMacro(tr("Remove selected item(s)"));
         while (!scene->selectedItems().isEmpty()) {
+            clearPreviewItem();
+
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
 
@@ -685,6 +711,7 @@ QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)
 
     populateContextMenu_commonCreate(menu, scenePos);
     populateContextMenu_propertiesDialog(menu, scenePos);
+    populateContextMenu_user(menu, scenePos);
 
     if (menu->isEmpty()) {
         delete menu;
@@ -700,10 +727,18 @@ void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &s
 
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")), tr("Function Type"),
                         this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
+        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create FunctionType",
+                               "Activate the FunctionType creation mode");
+
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
                         [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create Function",
+                               "Activate the Function creation mode");
+
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
                         [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create Comment",
+                               "Activate the Comment creation mode");
     }
 }
 
@@ -740,7 +775,50 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPoint
     if (aadlObj) {
         menu->addSeparator();
         menu->addAction(tr("Properties"), this, [this, aadlObj]() { emit propertyEditorRequest(aadlObj); });
+        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
     }
+}
+
+void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
+{
+    QGraphicsScene *scene = m_view->scene();
+    if (!scene)
+        return;
+
+    static const QList<int> &showProps = { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
+                                           AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type,
+                                           AADLConnectionGraphicsItem::Type };
+
+    AADLObject *aadlObj { nullptr };
+    if (QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
+
+        switch (gi->type()) {
+        case AADLFunctionTypeGraphicsItem::Type: {
+            aadlObj = functionTypeObject(gi);
+            break;
+        }
+        case AADLFunctionGraphicsItem::Type: {
+            aadlObj = functionObject(gi);
+            break;
+        }
+        case AADLInterfaceGraphicsItem::Type: {
+            aadlObj = interfaceObject(gi);
+            break;
+        }
+        case AADLCommentGraphicsItem::Type: {
+            aadlObj = commentObject(gi);
+            break;
+        }
+        case AADLConnectionGraphicsItem::Type: {
+            aadlObj = connectionObject(gi);
+            break;
+        }
+        default:
+            return;
+        }
+    }
+
+    ctx::ActionsManager::populateMenu(menu, aadlObj);
 }
 
 } // namespace aadl

@@ -17,12 +17,90 @@
 
 #include "common.h"
 
+#include "app/context/action/actionsmanager.h"
+
+#include <QAction>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+
+#ifdef Q_OS_WIN
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+#endif
+
 namespace taste3 {
 namespace common {
 
 Id createId()
 {
     return QUuid::createUuid();
+}
+
+bool copyResourceFile(const QString &source, const QString &target)
+{
+    bool result(false);
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup++;
+#endif
+    try {
+        if (QFile::copy(source, target)) {
+            QFile storedFile(target);
+            storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
+            result = true;
+        } else {
+            qWarning() << "Can't copy resource file " << source << "-->" << target;
+        }
+    } catch (...) {
+    }
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup--;
+#endif
+    return result;
+}
+
+void setWidgetFontColor(QWidget *widget, const QColor &color)
+{
+    if (!widget || !color.isValid())
+        return;
+
+    QPalette p(widget->palette());
+    p.setColor(QPalette::Text, color);
+    widget->setPalette(p);
+}
+
+bool ensureDirExists(const QString &path)
+{
+    QDir dir(path);
+    if (!dir.exists(path))
+        if (!dir.mkpath(path)) {
+            qWarning() << "Failed to create path:" << path;
+            return false;
+        }
+
+    return true;
+}
+
+void registerAction(const QString &caller, QAction *action, const QString &title, const QString &description)
+{
+    if (!action) {
+        qWarning() << "Null action can not be registered" << caller;
+        return;
+    }
+
+    const QString &titleRef = title.isEmpty() ? action->text() : title;
+    if (titleRef.isEmpty()) {
+        qWarning() << "Action with no Title not be registered" << caller;
+        return;
+    }
+
+    if (description.isEmpty()) {
+        qWarning() << "Action with no Description not be registered" << caller;
+        return;
+    }
+
+    if (!taste3::ctx::ActionsManager::registerScriptableAction(action, title, description)) {
+        qWarning() << caller << "The registration of action failed; probably the duplicate key used:\n";
+    }
 }
 
 } // ns common

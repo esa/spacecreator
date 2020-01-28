@@ -16,6 +16,7 @@
 */
 
 #include "adddynamicpropertydialog.h"
+#include "app/common.h"
 #include "baseitems/common/utils.h"
 #include "dynamicproperty.h"
 #include "ui_adddynamicpropertydialog.h"
@@ -70,7 +71,7 @@ bool AddDynamicPropertyDialog::validateName(const bool showWarn)
         warn = tr("The name of new property must be unique.");
 
     const bool valid = warn.isEmpty();
-    utils::setWidgetFontColor(ui->leName, valid ? m_nameColorDefault : Qt::red);
+    common::setWidgetFontColor(ui->leName, valid ? m_nameColorDefault : Qt::red);
 
     if (!valid && showWarn)
         QMessageBox::warning(this, tr("Property name"), warn);

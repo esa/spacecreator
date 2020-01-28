@@ -18,6 +18,8 @@
 #include "mainwindow.h"
 
 #include "app/commandsstack.h"
+#include "app/common.h"
+#include "app/context/action/actionsmanager.h"
 #include "document/documentsmanager.h"
 #include "document/tabdocumentfactory.h"
 #include "logging/loghandler.h"
@@ -116,6 +118,12 @@ void MainWindow::initMenuFile()
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
+
+    common::registerAction(Q_FUNC_INFO, m_actOpenFile, "Open file", "Show Open File dialog");
+    common::registerAction(Q_FUNC_INFO, m_actCreateFile, "Create file", "Create new empty file");
+    common::registerAction(Q_FUNC_INFO, m_actCloseFile, "Close file", "Close current file");
+    common::registerAction(Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
+    common::registerAction(Q_FUNC_INFO, m_actQuit, "Quit", "Quite the application");
 }
 
 void MainWindow::initMenuEdit()
@@ -134,6 +142,9 @@ void MainWindow::initMenuEdit()
     m_menuEdit->addAction(m_actUndo);
     m_menuEdit->addAction(m_actRedo);
     m_menuEdit->addSeparator();
+
+    common::registerAction(Q_FUNC_INFO, m_actUndo, "Undo", "Undo the last operation");
+    common::registerAction(Q_FUNC_INFO, m_actRedo, "Redo", "Redo the last undone operation");
 }
 
 void MainWindow::initMenuHelp()
@@ -141,6 +152,9 @@ void MainWindow::initMenuHelp()
     m_menuHelp = menuBar()->addMenu(tr("&Help"));
     m_actReport = m_menuHelp->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
     m_actAbout = m_menuHelp->addAction(tr("About"), this, &MainWindow::onAboutRequested, QKeySequence::HelpContents);
+
+    common::registerAction(Q_FUNC_INFO, m_actReport, "Report", "Send the debug information");
+    common::registerAction(Q_FUNC_INFO, m_actAbout, "About", "Show About dialog");
 }
 
 void MainWindow::initConnections()
@@ -335,6 +349,11 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
                 return doc->load(value);
 
         return false;
+    }
+    case CommandLineParser::Positional::ListScriptableActions: {
+        ctx::ActionsManager::listRegisteredActions();
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return true;
     }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;

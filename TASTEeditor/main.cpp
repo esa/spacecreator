@@ -63,7 +63,8 @@ int main(int argc, char *argv[])
     for (auto arg : args)
         w.processCommandLineArg(arg, cmdParser.value(arg));
 
-    w.show();
+    if (!cmdParser.isSet(CommandLineParser::Positional::ListScriptableActions))
+        w.show();
 
     return a.exec();
 }

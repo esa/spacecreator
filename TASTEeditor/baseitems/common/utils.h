@@ -16,6 +16,7 @@
 */
 #pragma once
 
+#include <QAction>
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 #include <QPainterPath>
@@ -52,19 +53,5 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal o
                            const QList<int> &acceptableTypes = QList<int>());
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
-
-/*!
- * Copies the \a source file from resources to the \a target file.
- * \Returns true if the \a source file copied succesfully and
- * the QFile::WriteUser permission explicitly set for the \a target
- * (otherwise it would be read-only as any file in qrc).
- * If the \target file already exists, this function will not owervirite
- * and return false;
- */
-bool copyResourceFile(const QString &source, const QString &target);
-
-void setWidgetFontColor(QWidget *widget, const QColor &color);
-
-bool ensureDirExists(const QString &path);
 } // ns utils
 } // ns taste3
