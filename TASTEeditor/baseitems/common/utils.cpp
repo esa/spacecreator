@@ -282,50 +282,6 @@ bool alignedLine(QLineF &line, int angleTolerance)
     return false;
 }
 
-bool copyResourceFile(const QString &source, const QString &target)
-{
-    bool result(false);
-#ifdef Q_OS_WIN
-    qt_ntfs_permission_lookup++;
-#endif
-    try {
-        if (QFile::copy(source, target)) {
-            QFile storedFile(target);
-            storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
-            result = true;
-        } else {
-            qWarning() << "Can't create default ASN datatypes file" << target;
-        }
-    } catch (...) {
-    }
-#ifdef Q_OS_WIN
-    qt_ntfs_permission_lookup--;
-#endif
-    return result;
-}
-
-void setWidgetFontColor(QWidget *widget, const QColor &color)
-{
-    if (!widget || !color.isValid())
-        return;
-
-    QPalette p(widget->palette());
-    p.setColor(QPalette::Text, color);
-    widget->setPalette(p);
-}
-
-bool ensureDirExists(const QString &path)
-{
-    QDir dir(path);
-    if (!dir.exists(path))
-        if (!dir.mkpath(path)) {
-            qWarning() << "Failed to create path:" << path;
-            return false;
-        }
-
-    return true;
-}
-
 qreal distanceLine(const QPointF &p1, const QPointF &p2)
 {
     return std::sqrt(std::pow((p2.x() - p1.x()), 2) + std::pow((p2.y() - p1.y()), 2));
