@@ -1,0 +1,13 @@
+{% comment %}
+The following tags are available in this template:
+{% endcomment %}
+{% for func in Functions %}
+<Function name="{{ func.title }}" language="{{ func.language }}" is_type="{{ func.isType }}" instance_of="{{ func.istanceOf }}">
+{% for property in func.properties %}
+    <Property name="{{ property.name }}" value="{{ property.value }}"/>
+{% endfor %}
+{% for iface in func.interfaces %}
+    {% include "interface.tmplt" %}
+{% endfor %}
+</Function>
+{% endfor %}

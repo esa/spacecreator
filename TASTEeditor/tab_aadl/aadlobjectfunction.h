@@ -33,7 +33,7 @@ public:
 
     AADLObject::AADLObjectType aadlType() const override;
 
-    QString instanceOf() const;
+    QString instanceOf() const override;
     void setInstanceOf(const QString &instance);
 };
 

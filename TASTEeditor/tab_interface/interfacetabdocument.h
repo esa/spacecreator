@@ -52,6 +52,8 @@ public:
     QString title() const override;
     QMenu *customMenu() const override;
 
+    const QHash<common::Id, aadl::AADLObject *> &objects() const;
+
 protected:
     bool loadImpl(const QString &path) override;
     bool saveImpl(const QString &path) override;

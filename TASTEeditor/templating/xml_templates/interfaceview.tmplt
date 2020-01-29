@@ -1,0 +1,5 @@
+<InterfaceView>
+    {% include "functions.tmplt" %}
+    {% include "connections.tmplt" %}
+    {% include "comments.tmplt" %}
+</InterfaceView>
