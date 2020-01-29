@@ -7,7 +7,11 @@ Sources of Grantlee are avalable from here https://github.com/steveire/grantlee
 To build Grantlee, you need at least Qt5.3 (with development packages), CMake 3.1 and
 some additional packages:
 
+<<<<<<< HEAD
     sudo apt install lcov cccc doxygen
+=======
+    sudo apt install LCov Cccc doxygen
+>>>>>>> Initial integration of string template engine (Grantlee)
 
 To build Taste correctly Grantlee should be installed into QTDIR directory:
 
