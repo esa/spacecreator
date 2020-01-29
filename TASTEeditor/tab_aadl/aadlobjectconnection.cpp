@@ -70,9 +70,19 @@ AADLObject *AADLObjectConnection::source() const
     return d->m_source;
 }
 
+QString AADLObjectConnection::sourceName() const
+{
+    return source() ? source()->title() : QString();
+}
+
 AADLObject *AADLObjectConnection::target() const
 {
     return d->m_target;
+}
+
+QString AADLObjectConnection::targetName() const
+{
+    return target() ? target()->title() : QString();
 }
 
 AADLObjectIfaceRequired *AADLObjectConnection::requiredInterface() const

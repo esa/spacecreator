@@ -160,6 +160,14 @@ QHash<QString, QVariant> AADLObject::props() const
     return d->m_props;
 }
 
+QVariantList AADLObject::properties() const
+{
+    QVariantList propList;
+    for (auto it = d->m_props.cbegin(); it != d->m_props.cend(); ++it)
+        propList << QVariant::fromValue(AADLObjectProperty(it.key(), it.value()));
+    return propList;
+}
+
 void AADLObject::setProps(const QHash<QString, QVariant> &props)
 {
     if (props != d->m_props) {

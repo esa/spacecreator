@@ -30,6 +30,11 @@ macx {
     CONFIG -= app_bundle
 }
 
+GRANTLEE_LIB_DIR = $$[QT_INSTALL_LIBS]
+
+DEFINES += GRANTLEE_LIB_DIR='\\"$$GRANTLEE_LIB_DIR\\"'
+LIBS += -L/$$GRANTLEE_LIB_DIR -lGrantlee_Templates
+
 SOURCES += \
         app/commandlineparser.cpp \
         app/commandsstack.cpp \
@@ -55,6 +60,9 @@ SOURCES += \
         dummy/dummytabdocument.cpp \
         logging/loghandler.cpp \
         main.cpp \
+        templating/previewdialog.cpp \
+        templating/stringtemplate.cpp \
+        templating/xmlhighlighter.cpp \
         reports/bugreportdialog.cpp \
         reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
@@ -144,6 +152,9 @@ HEADERS += \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \
+        templating/previewdialog.h \
+        templating/stringtemplate.h \
+        templating/xmlhighlighter.h \
         reports/bugreportdialog.h \
         reports/bugreporthandler.h \
         settings/appoptions.h \
@@ -227,3 +238,17 @@ DISTFILES += \
 RESOURCES += \
     resources.qrc \
     tab_interface/tab_interface_resources.qrc
+
+OTHER_FILES += templating/xml_templates/*.tmplt
+
+SOURCE_DIR = $$absolute_path(templating/xml_templates)
+DEST_DIR = $$OUT_PWD
+
+message($$DEST_DIR)
+
+win32 {
+    SOURCE_DIR ~= s,/,\\,g
+    DEST_DIR ~= s,/,\\,g
+}
+
+QMAKE_POST_LINK += $$QMAKE_COPY_DIR $$shell_quote($$SOURCE_DIR) $$shell_quote($$DEST_DIR)

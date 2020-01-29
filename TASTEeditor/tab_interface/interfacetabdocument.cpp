@@ -110,6 +110,11 @@ QMenu *InterfaceTabDocument::customMenu() const
     return root;
 }
 
+const QHash<common::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() const
+{
+    return m_model->objects();
+}
+
 bool InterfaceTabDocument::loadImpl(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo(path).exists()) {
