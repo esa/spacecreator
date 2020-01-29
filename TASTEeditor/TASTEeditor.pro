@@ -59,6 +59,7 @@ SOURCES += \
         document/documentsmanager.cpp \
         document/tabdocumentfactory.cpp \
         dummy/dummytabdocument.cpp \
+        logging/logcategory.cpp \
         logging/loghandler.cpp \
         main.cpp \
         reports/bugreportdialog.cpp \
@@ -91,10 +92,10 @@ SOURCES += \
         tab_interface/colors/colorselectorbutton.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
         tab_interface/commands/cmdcommenttextchange.cpp \
+        tab_interface/commands/cmdconnectionitemcreate.cpp \
         tab_interface/commands/cmdcontextparameterchange.cpp \
         tab_interface/commands/cmdcontextparametercreate.cpp \
         tab_interface/commands/cmdcontextparameterremove.cpp \
-        tab_interface/commands/cmddirectconnectionitemcreate.cpp \
         tab_interface/commands/cmdentityattributechange.cpp \
         tab_interface/commands/cmdentitygeometrychange.cpp \
         tab_interface/commands/cmdentitypropertychange.cpp \
@@ -107,9 +108,7 @@ SOURCES += \
         tab_interface/commands/cmdifaceparamchange.cpp \
         tab_interface/commands/cmdifaceparamcreate.cpp \
         tab_interface/commands/cmdifaceparamremove.cpp \
-        tab_interface/commands/cmdmanualconnectionitemcreate.cpp \
-        tab_interface/commands/cmdprovidedinterfaceitemcreate.cpp \
-        tab_interface/commands/cmdrequiredinterfaceitemcreate.cpp \
+        tab_interface/commands/cmdinterfaceitemcreate.cpp \
         tab_interface/commands/commandsfactory.cpp \
         tab_interface/creatortool.cpp \
         tab_interface/interfacetabdocument.cpp \
@@ -190,10 +189,10 @@ HEADERS += \
         tab_interface/colors/colorselectorbutton.h \
         tab_interface/commands/cmdcommentitemcreate.h \
         tab_interface/commands/cmdcommenttextchange.h \
+        tab_interface/commands/cmdconnectionitemcreate.h \
         tab_interface/commands/cmdcontextparameterchange.h \
         tab_interface/commands/cmdcontextparametercreate.h \
         tab_interface/commands/cmdcontextparameterremove.h \
-        tab_interface/commands/cmddirectconnectionitemcreate.h \
         tab_interface/commands/cmdentityattributechange.h \
         tab_interface/commands/cmdentitygeometrychange.h \
         tab_interface/commands/cmdentitypropertychange.h \
@@ -206,9 +205,7 @@ HEADERS += \
         tab_interface/commands/cmdifaceparamchange.h \
         tab_interface/commands/cmdifaceparamcreate.h \
         tab_interface/commands/cmdifaceparamremove.h \
-        tab_interface/commands/cmdmanualconnectionitemcreate.h \
-        tab_interface/commands/cmdprovidedinterfaceitemcreate.h \
-        tab_interface/commands/cmdrequiredinterfaceitemcreate.h \
+        tab_interface/commands/cmdinterfaceitemcreate.h \
         tab_interface/commands/commandids.h \
         tab_interface/commands/commandsfactory.h \
         tab_interface/creatortool.h \

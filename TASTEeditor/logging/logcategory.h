@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2019-2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,6 +19,8 @@
 
 #include <QLoggingCategory>
 
-Q_LOGGING_CATEGORY(c_log, "log")
-Q_LOGGING_CATEGORY(c_esa, "esa")
-Q_LOGGING_CATEGORY(c_aadl, "aadl")
+Q_DECLARE_LOGGING_CATEGORY(c_log)
+Q_DECLARE_LOGGING_CATEGORY(c_esa)
+Q_DECLARE_LOGGING_CATEGORY(c_aadl)
+Q_DECLARE_LOGGING_CATEGORY(c_dbg)
+

@@ -31,7 +31,7 @@ namespace cmd {
 class CmdFunctionItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *function, const QRectF &geometry);
+    explicit CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent, const QRectF &geometry);
 
     void redo() override;
     void undo() override;
@@ -41,8 +41,8 @@ public:
 private:
     QPointer<AADLObjectsModel> m_model;
     const QRectF m_geometry;
-    QPointer<AADLObjectFunction> m_entity;
     QPointer<AADLObjectFunctionType> m_parent;
+    QPointer<AADLObjectFunction> m_entity;
 };
 
 } // namespace cmd

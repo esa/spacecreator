@@ -41,8 +41,9 @@ public:
     AADLObjectIface *entity() const;
 
     int type() const override { return Type; }
-    void connect(AADLConnectionGraphicsItem *item);
-    AADLConnectionGraphicsItem *connectedItem() const;
+    void addConnection(AADLConnectionGraphicsItem *item);
+    void removeConnection(AADLConnectionGraphicsItem *item);
+    QList<QPointer<AADLConnectionGraphicsItem>> connectionItems() const;
 
     QGraphicsItem *targetItem() const;
     void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
@@ -50,6 +51,8 @@ public:
     void setInterfaceName(const QString &name);
 
     QPainterPath shape() const override;
+
+    void updateFromEntity() override;
 
 protected:
     void rebuildLayout() override;
@@ -69,7 +72,7 @@ private:
     QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;
-    QPointer<AADLConnectionGraphicsItem> m_connection;
+    QList<QPointer<AADLConnectionGraphicsItem>> m_connections;
     QPainterPath m_shape;
 };
 

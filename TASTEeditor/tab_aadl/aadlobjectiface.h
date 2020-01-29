@@ -29,6 +29,7 @@
 namespace taste3 {
 namespace aadl {
 
+class AADLObjectFunction;
 struct AADLObjectIfacePrivate;
 
 class AADLObjectIface : public AADLObject
@@ -86,8 +87,11 @@ public:
     bool labelInheritance() const;
     bool setLabelInheritance(bool label);
 
+    AADLObjectFunction *function() const;
+
 protected:
-    explicit AADLObjectIface(AADLObjectIface::IfaceType direction = DefaultDirection, const QString &title = QString(),
+    explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
+    explicit AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
                              AADLObject *parent = nullptr);
 
 private:
@@ -100,6 +104,8 @@ class AADLObjectIfaceProvided : public AADLObjectIface
 public:
     explicit AADLObjectIfaceProvided(AADLObject *parent = nullptr);
     explicit AADLObjectIfaceProvided(const QString &title, AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceProvided(const common::Id &id, const QString &title = QString(),
+                                     AADLObject *parent = nullptr);
 };
 
 class AADLObjectIfaceRequired : public AADLObjectIface
@@ -108,7 +114,11 @@ class AADLObjectIfaceRequired : public AADLObjectIface
 public:
     explicit AADLObjectIfaceRequired(AADLObject *parent = nullptr);
     explicit AADLObjectIfaceRequired(const QString &title, AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceRequired(const common::Id &id, const QString &title = QString(),
+                                     AADLObject *parent = nullptr);
 };
+
+AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id);
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;
 

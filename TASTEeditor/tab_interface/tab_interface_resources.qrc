@@ -12,6 +12,8 @@
         <file>icns/zoom_in.svg</file>
         <file>icns/zoom_out.svg</file>
         <file>icns/function_type.svg</file>
+        <file>icns/exit.svg</file>
+        <file>icns/exit_parent.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>colors/default_colors.json</file>

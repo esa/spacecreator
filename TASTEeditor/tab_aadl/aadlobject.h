@@ -58,6 +58,9 @@ public:
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
 
+    QVector<qint32> innerCoordinates() const;
+    void setInnerCoordinates(const QVector<qint32> &coordinates);
+
     AADLObject *parentObject() const;
 
     // "attributes" - payload data in the opening XML tag,
@@ -80,10 +83,13 @@ public:
     void setObjectsModel(AADLObjectsModel *model);
     AADLObjectsModel *objectsModel() const;
 
+    bool isRootObject() const;
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
+    void innerCoordinatesChanged(const QVector<qint32> &coordinates);
     void attributesChanged();
     void propertiesChanged();
 
@@ -91,6 +97,9 @@ public Q_SLOTS:
     bool setTitle(const QString &title);
     bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);
+
+protected:
+    explicit AADLObject(const common::Id &id, const QString &title = QString(), QObject *parent = nullptr);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;

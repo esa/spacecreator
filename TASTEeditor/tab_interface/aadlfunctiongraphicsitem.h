@@ -37,29 +37,36 @@ public:
 
     int type() const override { return Type; }
 
-    QList<QVariantList> prepareConnectionsParams() const;
-    void createCommand();
+    QPainterPath shape() const override;
+
+    bool isRootItem() const;
+    QRectF nestedItemsSceneBoundingRect() const;
+
+    void updateFromEntity() override;
 
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    QSizeF minimalSize() const override;
     void updateTextPosition() override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
     virtual AADLObject *aadlObject() const override;
 
+    static void doAutoLayout(AADLFunctionGraphicsItem *function);
+
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
 
 private:
-    void updateColors();
-    void updateConnections();
+    void layoutConnections();
+    void layoutOuterConnections();
 };
 
 } // namespace aadl

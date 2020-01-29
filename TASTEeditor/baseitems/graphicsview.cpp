@@ -28,14 +28,13 @@ namespace taste3 {
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
 {
-    setBackgroundBrush(QImage(QLatin1String(":/backgrounds/texture.png")));
-
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
 
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 
+    setAlignment(Qt::AlignLeft | Qt::AlignTop);
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
@@ -142,6 +141,18 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     } else {
         QGraphicsView::keyPressEvent(event);
     }
+}
+
+void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    static const QImage brushImage { QLatin1String(":/backgrounds/texture.png") };
+    const QRectF scaleSceneRect { rect.topLeft() * m_zoomPercent / 100, rect.size() * m_zoomPercent / 100 };
+    painter->save();
+    painter->scale(100 / m_zoomPercent, 100 / m_zoomPercent);
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(brushImage);
+    painter->drawRect(scaleSceneRect);
+    painter->restore();
 }
 
 qreal GraphicsView::minZoomPercent() const

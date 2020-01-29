@@ -32,6 +32,9 @@ namespace utils {
 static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
 static constexpr QSizeF DefaultGraphicsItemSize = { 200, 80 };
+static const QMarginsF kContentMargins = { 30, 30, 30, 30 };
+static const QMarginsF kRootMargins = { 150, 150, 150, 150 };
+static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
@@ -43,6 +46,10 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = 
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
 QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
 
+qreal distanceLine(const QPointF &p1, const QPointF &p2);
+qreal distancePolygon(const QVector<QPointF> &polygon);
+QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2);
+
 QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
@@ -53,5 +60,50 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal o
                            const QList<int> &acceptableTypes = QList<int>());
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
+
+bool isOnEdge(const QRectF &rect, const QPointF &point);
+
+QPointF pos(const QVector<qint32> &coordinates);
+QRectF rect(const QVector<qint32> &coordinates);
+QVector<QPointF> polygon(const QVector<qint32> &coordinates);
+
+QVector<qint32> coordinates(const QPointF &point);
+QVector<qint32> coordinates(const QRectF &rect);
+QVector<qint32> coordinates(const QVector<QPointF> &points);
+
+template<typename T>
+bool isAncestorOf(const T *const parent, T *object)
+{
+    if (!parent || !object)
+        return false;
+
+    if (parent == object)
+        return true;
+
+    T *obj { object };
+    while (auto objParent = qobject_cast<T *>(obj->parent())) {
+        if (objParent == parent)
+            return true;
+
+        obj = objParent;
+    }
+
+    return false;
+}
+
+/*!
+ * Copies the \a source file from resources to the \a target file.
+ * \Returns true if the \a source file copied succesfully and
+ * the QFile::WriteUser permission explicitly set for the \a target
+ * (otherwise it would be read-only as any file in qrc).
+ * If the \target file already exists, this function will not owervirite
+ * and return false;
+ */
+bool copyResourceFile(const QString &source, const QString &target);
+
+void setWidgetFontColor(QWidget *widget, const QColor &color);
+
+bool ensureDirExists(const QString &path);
+
 } // ns utils
 } // ns taste3

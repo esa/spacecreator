@@ -42,6 +42,8 @@ public:
 
     AADLObjectComment *entity() const;
 
+    void updateFromEntity() override;
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -63,7 +65,7 @@ private Q_SLOTS:
     void textChanged();
 
 private:
-    void createCommand();
+    void createCommand() override;
 
 private:
     TextGraphicsItem *m_textItem = nullptr;

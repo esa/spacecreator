@@ -29,24 +29,24 @@ namespace aadl {
 
 struct AADLObjectConnectionPrivate {
     AADLObjectConnectionPrivate() {}
-    AADLObjectConnectionPrivate(AADLObject *source, AADLObject *target, AADLObjectIfaceRequired *reqIface,
-                                AADLObjectIfaceProvided *provIface)
+    AADLObjectConnectionPrivate(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
+                                AADLObjectIface *ifaceTarget)
         : m_source(source)
         , m_target(target)
-        , m_ri(reqIface)
-        , m_pi(provIface)
+        , m_ifaceSource(ifaceSource)
+        , m_ifaceTarget(ifaceTarget)
     {
     }
     QPointer<AADLObject> m_source { nullptr };
     QPointer<AADLObject> m_target { nullptr };
-    QPointer<AADLObjectIfaceRequired> m_ri { nullptr };
-    QPointer<AADLObjectIfaceProvided> m_pi { nullptr };
+    QPointer<AADLObjectIface> m_ifaceSource { nullptr };
+    QPointer<AADLObjectIface> m_ifaceTarget { nullptr };
 };
 
-AADLObjectConnection::AADLObjectConnection(AADLObject *from, AADLObject *to, AADLObjectIfaceRequired *ri,
-                                           AADLObjectIfaceProvided *pi, QObject *parent)
+AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
+                                           AADLObjectIface *ifaceTarget, QObject *parent)
     : AADLObject(QString(), parent)
-    , d(new AADLObjectConnectionPrivate { from, to, ri, pi })
+    , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
 {
     updateAttributes();
 }
@@ -70,37 +70,57 @@ AADLObject *AADLObjectConnection::source() const
     return d->m_source;
 }
 
+void AADLObjectConnection::setSource(AADLObject *source)
+{
+    setAttr(meta::Props::token(meta::Props::Token::from), source ? source->title() : QString());
+}
+
 AADLObject *AADLObjectConnection::target() const
 {
     return d->m_target;
 }
 
-AADLObjectIfaceRequired *AADLObjectConnection::requiredInterface() const
+void AADLObjectConnection::setTarget(AADLObject *target)
 {
-    return d->m_ri;
+    setAttr(meta::Props::token(meta::Props::Token::to), target ? target->title() : QString());
 }
 
-QString AADLObjectConnection::requiredInterfaceName() const
+AADLObjectIface *AADLObjectConnection::sourceInterface() const
 {
-    return requiredInterface() ? requiredInterface()->title() : QString();
+    return d->m_ifaceSource;
 }
 
-AADLObjectIfaceProvided *AADLObjectConnection::providedInterface() const
+void AADLObjectConnection::setSourceInterface(AADLObjectIface *iface)
 {
-    return d->m_pi;
+    setAttr(meta::Props::token(meta::Props::Token::si_name), iface->title());
 }
 
-QString AADLObjectConnection::providedInterfaceName() const
+QString AADLObjectConnection::sourceInterfaceName() const
 {
-    return providedInterface() ? providedInterface()->title() : QString();
+    return sourceInterface() ? sourceInterface()->title() : QString();
+}
+
+AADLObjectIface *AADLObjectConnection::targetInterface() const
+{
+    return d->m_ifaceTarget;
+}
+
+void AADLObjectConnection::setTargetInterface(AADLObjectIface *iface)
+{
+    setAttr(meta::Props::token(meta::Props::Token::ti_name), iface->title());
+}
+
+QString AADLObjectConnection::targetInterfaceName() const
+{
+    return targetInterface() ? targetInterface()->title() : QString();
 }
 
 void AADLObjectConnection::updateAttributes()
 {
     AADLObject::setAttr(meta::Props::token(meta::Props::Token::from), source() ? source()->title() : QString());
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::ri_name), requiredInterfaceName());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::si_name), sourceInterfaceName());
     AADLObject::setAttr(meta::Props::token(meta::Props::Token::to), target() ? target()->title() : QString());
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::pi_name), providedInterfaceName());
+    AADLObject::setAttr(meta::Props::token(meta::Props::Token::ti_name), targetInterfaceName());
 }
 
 void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
@@ -120,13 +140,11 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Props::Token::ri_name: {
-        if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Required)) {
-            if (auto ri = qobject_cast<AADLObjectIfaceRequired *>(iface)) {
-                if (ri != d->m_ri) {
-                    attrUpdated = true;
-                    d->m_ri = ri;
-                }
+    case meta::Props::Token::si_name: {
+        if (auto iface = objectsModel()->getIfaceByName(val.toString())) {
+            if (iface != d->m_ifaceSource) {
+                attrUpdated = true;
+                d->m_ifaceSource = iface;
             }
         } else {
             qWarning() << "Object not found:" << name << val;
@@ -146,13 +164,11 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
         }
         break;
     }
-    case meta::Props::Token::pi_name: {
-        if (auto iface = objectsModel()->getIfaceByName(val.toString(), AADLObjectIface::IfaceType::Provided)) {
-            if (auto pi = qobject_cast<AADLObjectIfaceProvided *>(iface)) {
-                if (pi != d->m_pi) {
-                    attrUpdated = true;
-                    d->m_pi = pi;
-                }
+    case meta::Props::Token::ti_name: {
+        if (auto iface = objectsModel()->getIfaceByName(val.toString())) {
+            if (iface != d->m_ifaceTarget) {
+                attrUpdated = true;
+                d->m_ifaceTarget = iface;
             }
         } else {
             qWarning() << "Object not found:" << name << val;

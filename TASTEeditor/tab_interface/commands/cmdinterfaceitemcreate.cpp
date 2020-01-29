@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "cmdrequiredinterfaceitemcreate.h"
+#include "cmdinterfaceitemcreate.h"
 
 #include "commandids.h"
 
@@ -25,17 +25,18 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdRequiredInterfaceItemCreate::CmdRequiredInterfaceItemCreate(AADLObjectsModel *model,
-                                                               AADLObjectFunctionType *function, const QPointF &pos)
+CmdInterfaceItemCreate::CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function,
+                                               const QPointF &pos, AADLObjectIface::IfaceType type,
+                                               const common::Id &id)
     : m_model(model)
-    , m_pos(pos)
-    , m_entity(new AADLObjectIfaceRequired(function))
+    , m_entity(createIface(type, id))
     , m_parent(function)
+    , m_pos(pos)
 {
-    setText(QObject::tr("Create RI"));
+    setText(type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI") : QObject::tr("Create RI"));
 }
 
-void CmdRequiredInterfaceItemCreate::redo()
+void CmdInterfaceItemCreate::redo()
 {
     m_entity->setCoordinates({ qRound(m_pos.x()), qRound(m_pos.y()) });
     if (m_parent)
@@ -44,7 +45,7 @@ void CmdRequiredInterfaceItemCreate::redo()
         m_model->addObject(m_entity);
 }
 
-void CmdRequiredInterfaceItemCreate::undo()
+void CmdInterfaceItemCreate::undo()
 {
     if (m_parent)
         m_parent->removeInterface(m_entity);
@@ -52,15 +53,15 @@ void CmdRequiredInterfaceItemCreate::undo()
         m_model->removeObject(m_entity);
 }
 
-bool CmdRequiredInterfaceItemCreate::mergeWith(const QUndoCommand *command)
+bool CmdInterfaceItemCreate::mergeWith(const QUndoCommand *command)
 {
     Q_UNUSED(command)
     return false;
 }
 
-int CmdRequiredInterfaceItemCreate::id() const
+int CmdInterfaceItemCreate::id() const
 {
-    return CreateRequiredInterfaceEntity;
+    return CreateInterfaceEntity;
 }
 
 } // namespace cmd

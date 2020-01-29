@@ -17,27 +17,23 @@
 
 #pragma once
 
+#include "tab_aadl/aadlobjectiface.h"
+
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
-#include <QVector>
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectIfaceRequired;
-class AADLObjectIfaceProvided;
-class AADLObjectConnection;
-class AADLObjectFunction;
+class AADLObjectFunctionType;
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdManualConnectionItemCreate : public QUndoCommand
+class CmdInterfaceItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdManualConnectionItemCreate(AADLObjectsModel *model, taste3::aadl::AADLObjectFunction *startFunction,
-                                           taste3::aadl::AADLObjectFunction *endFunction,
-                                           AADLObjectIfaceProvided *providedIface,
-                                           AADLObjectIfaceRequired *requiredIface, const QVector<QPointF> &points);
+    explicit CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function, const QPointF &pos,
+                                    AADLObjectIface::IfaceType type, const taste3::common::Id &id);
 
     void redo() override;
     void undo() override;
@@ -46,12 +42,9 @@ public:
 
 private:
     QPointer<AADLObjectsModel> m_model;
-    QVector<qint32> m_coordinates;
-    QPointer<AADLObjectFunction> m_startFunction;
-    QPointer<AADLObjectFunction> m_endFunction;
-    QPointer<AADLObjectIfaceProvided> m_providedIface;
-    QPointer<AADLObjectIfaceRequired> m_requiredIface;
-    QPointer<AADLObjectConnection> m_entity;
+    QPointer<AADLObjectIface> m_entity;
+    QPointer<AADLObjectFunctionType> m_parent;
+    const QPointF m_pos;
 };
 
 } // namespace cmd

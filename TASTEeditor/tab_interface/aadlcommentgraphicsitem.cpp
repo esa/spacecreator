@@ -69,6 +69,23 @@ AADLObjectComment *AADLCommentGraphicsItem::entity() const
     return qobject_cast<AADLObjectComment *>(dataObject());
 }
 
+void AADLCommentGraphicsItem::updateFromEntity()
+{
+    aadl::AADLObjectComment *obj = entity();
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    setText(obj->title());
+    const auto coordinates = obj->coordinates();
+    if (coordinates.isEmpty()) {
+        instantLayoutUpdate();
+    } else {
+        setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
+                  QPointF(coordinates.value(2), coordinates.value(3)) });
+    }
+}
+
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualResizeProgress(grip, from, to);

@@ -41,12 +41,16 @@ public:
     bool addObject(AADLObject *obj);
     bool removeObject(AADLObject *obj);
 
+    void setRootObject(common::Id id);
+    AADLObject *rootObject() const;
+
     AADLObject *getObject(const common::Id &id) const;
     AADLObject *getObjectByName(const QString &name,
                                 AADLObject::AADLObjectType type = AADLObject::AADLObjectType::AADLUnknown) const;
-    AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType direction) const;
+    AADLObjectIface *getIfaceByName(const QString &name) const;
     AADLObjectFunction *getFunction(const common::Id &id) const;
     AADLObjectFunctionType *getFunctionType(const common::Id &id) const;
+    AADLObjectIface *getInterface(const common::Id &id) const;
     AADLObjectIfaceRequired *getRequiredInterface(const common::Id &id) const;
     AADLObjectIfaceProvided *getProvidedInterface(const common::Id &id) const;
     AADLObjectConnection *getConnection(const common::Id &id) const;
@@ -59,6 +63,8 @@ public:
 Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
+    void modelReset();
+    void rootObjectChanged();
 
 public Q_SLOTS:
     bool initFromObjects(const QVector<AADLObject *> &objects);

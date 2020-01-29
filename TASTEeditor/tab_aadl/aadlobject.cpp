@@ -33,12 +33,17 @@ struct AADLObjectPrivate {
     AADLObjectsModel *m_model;
 };
 
-AADLObject::AADLObject(const QString &title, QObject *parent)
+AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate { common::createId(),
-                                QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name), title } }, // attrs
-                                QHash<QString, QVariant> {}, // props
-                                nullptr })
+    , d(new AADLObjectPrivate {
+              id, QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name), title } }, // attrs
+              QHash<QString, QVariant> {}, // props
+              nullptr })
+{
+}
+
+AADLObject::AADLObject(const QString &title, QObject *parent)
+    : AADLObject(common::createId(), title, parent)
 {
 }
 
@@ -85,7 +90,7 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
 
 QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates) const
 {
-    const QStringList &strCoords = strCoordinates.split(' ');
+    const QStringList &strCoords = strCoordinates.split(' ', QString::SkipEmptyParts);
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
     for (int i = 0; i < coordsCount; ++i)
@@ -115,6 +120,19 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
     if (this->coordinates() != coordinates) {
         setProp(meta::Props::token(meta::Props::Token::coordinates), coordinatesToString(coordinates));
         emit coordinatesChanged(coordinates);
+    }
+}
+
+QVector<qint32> AADLObject::innerCoordinates() const
+{
+    return coordinatesFromString(prop(meta::Props::token(meta::Props::Token::InnerCoordinates)).toString());
+}
+
+void AADLObject::setInnerCoordinates(const QVector<qint32> &coordinates)
+{
+    if (innerCoordinates() != coordinates) {
+        setProp(meta::Props::token(meta::Props::Token::InnerCoordinates), coordinatesToString(coordinates));
+        emit innerCoordinatesChanged(coordinates);
     }
 }
 
@@ -195,6 +213,11 @@ void AADLObject::setObjectsModel(AADLObjectsModel *model)
 AADLObjectsModel *AADLObject::objectsModel() const
 {
     return d->m_model;
+}
+
+bool AADLObject::isRootObject() const
+{
+    return d->m_model ? d->m_model->rootObject() == this : false;
 }
 
 } // ns aadl

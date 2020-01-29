@@ -46,7 +46,7 @@ public:
     ~StringListComboDelegate() override;
 
 protected:
-    virtual QAbstractItemModel *editorModel(const QModelIndex &id) const;
+    virtual QAbstractItemModel *editorModel(const QModelIndex &id) const override;
 
     QStringListModel *m_model { nullptr };
 };

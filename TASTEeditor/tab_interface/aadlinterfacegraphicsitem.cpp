@@ -75,14 +75,11 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
         kindPath.translate(0, rect.height() / 3);
     }
     m_type = new QGraphicsPathItem(kindPath, this);
-    //    m_type->setPen(QPen(kDefaultBackgroundColor, 2));
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
-    //    m_iface->setPen(QPen(Qt::black, 1, Qt::SolidLine));
-    //    m_iface->setBrush(kDefaultBackgroundColor);
     m_iface->setPath(pp);
     m_text->setPlainText(entity->interfaceName());
 
@@ -104,16 +101,27 @@ AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
     return qobject_cast<AADLObjectIface *>(dataObject());
 }
 
-void AADLInterfaceGraphicsItem::connect(AADLConnectionGraphicsItem *item)
+void AADLInterfaceGraphicsItem::addConnection(AADLConnectionGraphicsItem *item)
 {
-    m_connection = item;
+    if (!item || m_connections.contains(item))
+        return;
 
-    setFlag(QGraphicsItem::ItemIsSelectable, m_connection.isNull());
+    m_connections.append(item);
+    setFlag(QGraphicsItem::ItemIsSelectable, m_connections.isEmpty());
 }
 
-AADLConnectionGraphicsItem *AADLInterfaceGraphicsItem::connectedItem() const
+void AADLInterfaceGraphicsItem::removeConnection(AADLConnectionGraphicsItem *item)
 {
-    return m_connection;
+    if (!item)
+        return;
+
+    if (m_connections.removeAll(item))
+        setFlag(QGraphicsItem::ItemIsSelectable, m_connections.isEmpty());
+}
+
+QList<QPointer<AADLConnectionGraphicsItem>> AADLInterfaceGraphicsItem::connectionItems() const
+{
+    return m_connections;
 }
 
 QGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
@@ -296,6 +304,21 @@ QPainterPath AADLInterfaceGraphicsItem::shape() const
     return m_shape;
 }
 
+void AADLInterfaceGraphicsItem::updateFromEntity()
+{
+    aadl::AADLObjectIface *obj = entity();
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    setInterfaceName(obj->title());
+    const auto coordinates = obj->coordinates();
+    if (coordinates.isEmpty())
+        instantLayoutUpdate();
+    else
+        setTargetItem(parentItem(), QPointF(coordinates.value(0), coordinates.value(1)));
+}
+
 void AADLInterfaceGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
@@ -310,14 +333,14 @@ void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    Q_UNUSED(painter)
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
 }
 
 void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(from);
+    Q_UNUSED(from)
 
     if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
         return;

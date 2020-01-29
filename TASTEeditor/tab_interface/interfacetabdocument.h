@@ -71,10 +71,13 @@ protected Q_SLOTS:
     void onActionRemoveItem();
     void onActionZoomIn();
     void onActionZoomOut();
+    void onActionExitToRootFunction();
+    void onActionExitToParentFunction();
 
     void onAADLObjectAdded(aadl::AADLObject *object);
     void onItemClicked();
-    void onItemDoublelicked();
+    void onItemDoubleClicked();
+    void onRootItemChanged(const common::Id &id);
 
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
@@ -83,7 +86,8 @@ protected Q_SLOTS:
     void showPropertyEditor(aadl::AADLObject *obj);
 
 private:
-    static QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
+    QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
+    aadl::AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
 
     void updateComment(aadl::AADLCommentGraphicsItem *comment);
@@ -91,6 +95,8 @@ private:
     void updateFunction(aadl::AADLFunctionGraphicsItem *function);
     void updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType);
     void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
+
+    void clearScene();
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
@@ -107,6 +113,8 @@ private:
     QAction *m_actRemove { nullptr };
     QAction *m_actZoomIn { nullptr };
     QAction *m_actZoomOut { nullptr };
+    QAction *m_actExitToRoot { nullptr };
+    QAction *m_actExitToParent { nullptr };
 
     aadl::CreatorTool *m_tool { nullptr };
     QHash<common::Id, QGraphicsItem *> m_items;

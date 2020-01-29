@@ -36,7 +36,7 @@ static const QMarginsF kMargins { 25, 25, 25, 25 };
 
 InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
     : ClickNotifierItem(entity, parent)
-    , m_selectedPen(Qt::black, 4, Qt::DotLine)
+    , m_selectedPen(Qt::black, 2, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
@@ -116,9 +116,14 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     }
 }
 
+void InteractiveObject::createCommand() {}
+
 bool InteractiveObject::handlePositionChanged(const QPointF &from, const QPointF &to)
 {
     const QPointF delta { to - from };
+    if (delta.isNull())
+        return false;
+
     const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
     auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
         return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
@@ -137,6 +142,9 @@ bool InteractiveObject::handlePositionChanged(const QPointF &from, const QPointF
 bool InteractiveObject::handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     const QPointF delta { to - from };
+    if (delta.isNull())
+        return false;
+
     const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
     auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
         return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
@@ -267,31 +275,9 @@ void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPoint
 
 void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
+    Q_UNUSED(grip);
     Q_UNUSED(from);
-
-    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
-        return;
-
-    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
-    if (parentItem()) {
-        const QRectF contentRect = parentItem()->boundingRect();
-
-        if (newPos.x() < contentRect.left())
-            newPos.setX(contentRect.left());
-        else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
-            newPos.setX(contentRect.right() - m_boundingRect.width());
-
-        if (newPos.y() < contentRect.top())
-            newPos.setY(contentRect.top());
-        else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
-            newPos.setY(contentRect.bottom() - m_boundingRect.height());
-    }
-    setPos(newPos);
-
-    rebuildLayout();
-    updateGripPoints();
-
-    Q_EMIT needUpdateLayout();
+    Q_UNUSED(to);
 }
 
 void InteractiveObject::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
@@ -310,72 +296,19 @@ void InteractiveObject::onManualResizeStart(GripPoint::Location grip, const QPoi
     Q_UNUSED(at);
 }
 
-void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
-{
-    const QPointF shift = QPointF(to - from);
-    QRectF rect = mapRectToParent(boundingRect());
-    switch (grip) {
-    case GripPoint::Left: {
-        const qreal left = rect.left() + shift.x();
-        if (!parentItem() || left >= 0)
-            rect.setLeft(left);
-    } break;
-    case GripPoint::Top: {
-        const qreal top = rect.top() + shift.y();
-        if (!parentItem() || top >= 0)
-            rect.setTop(top);
-    } break;
-    case GripPoint::Right: {
-        const qreal right = rect.right() + shift.x();
-        if (!parentItem() || right <= parentItem()->boundingRect().right())
-            rect.setRight(right);
-    } break;
-    case GripPoint::Bottom: {
-        const qreal bottom = rect.bottom() + shift.y();
-        if (!parentItem() || bottom <= parentItem()->boundingRect().bottom())
-            rect.setBottom(bottom);
-    } break;
-    case GripPoint::TopLeft: {
-        const QPointF topLeft = rect.topLeft() + shift;
-        if (!parentItem() || parentItem()->boundingRect().contains(topLeft))
-            rect.setTopLeft(topLeft);
-    } break;
-    case GripPoint::TopRight: {
-        const QPointF topRight = rect.topRight() + shift;
-        if (!parentItem() || parentItem()->boundingRect().contains(topRight))
-            rect.setTopRight(topRight);
-    } break;
-    case GripPoint::BottomLeft: {
-        const QPointF bottomLeft = rect.bottomLeft() + shift;
-        if (!parentItem() || parentItem()->boundingRect().contains(bottomLeft))
-            rect.setBottomLeft(bottomLeft);
-    } break;
-    case GripPoint::BottomRight: {
-        const QPointF bottomRight = rect.bottomRight() + shift;
-        if (!parentItem() || parentItem()->boundingRect().contains(bottomRight))
-            rect.setBottomRight(bottomRight);
-    } break;
-    default:
-        qWarning() << "Update grip point handling";
-        break;
-    }
-
-    QRectF normalized = rect.normalized();
-    if (normalized.width() >= minimalSize().width() && normalized.height() >= minimalSize().height())
-        setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
-
-    rebuildLayout();
-    updateGripPoints();
-
-    Q_EMIT needUpdateLayout();
-}
-
 void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
                                              const QPointF &releasedAt)
 {
     Q_UNUSED(grip);
     Q_UNUSED(pressedAt);
     Q_UNUSED(releasedAt);
+}
+
+void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(grip);
+    Q_UNUSED(from);
+    Q_UNUSED(to);
 }
 
 void InteractiveObject::hideGripPoints()

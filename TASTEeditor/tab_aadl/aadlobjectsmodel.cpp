@@ -17,12 +17,18 @@
 
 #include "aadlobjectsmodel.h"
 
+#include "aadlobjectfunction.h"
 #include "app/common.h"
+#include "baseitems/common/utils.h"
+
+#include <QtDebug>
 
 namespace taste3 {
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
+    common::Id m_rootObjectId;
+    QList<common::Id> m_objectsOrder;
     QHash<common::Id, AADLObject *> m_objects;
 };
 
@@ -36,15 +42,16 @@ AADLObjectsModel::~AADLObjectsModel() {}
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
-    for (auto object: d->m_objects.values())
+    for (auto object : d->m_objects.values())
         object->deleteLater();
 
     d->m_objects.clear();
+    d->m_objectsOrder.clear();
 
     for (auto obj : objects)
         addObject(obj);
 
-    return d->m_objects.size() == objects.size();
+    return true;
 }
 
 bool AADLObjectsModel::addObject(AADLObject *obj)
@@ -62,6 +69,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
     obj->setObjectsModel(this);
 
     d->m_objects.insert(id, obj);
+    d->m_objectsOrder.append(id);
     emit aadlObjectAdded(obj);
     return true;
 }
@@ -76,12 +84,48 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
         return false;
 
     d->m_objects.remove(id);
+    d->m_objectsOrder.removeAll(id);
     emit aadlObjectRemoved(obj);
     return true;
 }
 
+void AADLObjectsModel::setRootObject(common::Id id)
+{
+    if (d->m_rootObjectId == id)
+        return;
+
+    d->m_rootObjectId = id;
+    emit modelReset();
+
+    auto rootObj = d->m_objects.value(id);
+    for (const auto &id : d->m_objectsOrder) {
+        if (auto obj = getObject(id)) {
+            if (obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection
+                && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
+                emit aadlObjectAdded(obj);
+            } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+                const bool sourceIfaceAncestor =
+                        utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
+                const bool targetIfaceAncestor =
+                        utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
+                if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
+                    emit aadlObjectAdded(obj);
+                }
+            }
+        }
+    }
+}
+
+AADLObject *AADLObjectsModel::rootObject() const
+{
+    return getObject(d->m_rootObjectId);
+}
+
 AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
 {
+    if (id.isNull())
+        return nullptr;
+
     return d->m_objects.value(id, nullptr);
 }
 
@@ -96,16 +140,15 @@ AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::A
     return nullptr;
 }
 
-AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType direction) const
+AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name) const
 {
     if (name.isEmpty())
         return nullptr;
 
-    for (auto obj : d->m_objects)
+    for (auto obj : d->m_objects) {
         if (AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
-            if (auto iface = qobject_cast<AADLObjectIface *>(obj))
-                if (iface->direction() == direction)
-                    return iface;
+            return qobject_cast<AADLObjectIface *>(obj);
+    }
 
     return nullptr;
 }
@@ -118,6 +161,11 @@ AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
 AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const common::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
+}
+
+AADLObjectIface *AADLObjectsModel::getInterface(const common::Id &id) const
+{
+    return qobject_cast<AADLObjectIface *>(getObject(id));
 }
 
 AADLObjectIfaceRequired *AADLObjectsModel::getRequiredInterface(const common::Id &id) const
@@ -147,16 +195,11 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
             continue;
 
         if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
-            if (connection->requiredInterface()->id() == id || connection->providedInterface()->id() == id)
+            if (connection->sourceInterface()->id() == id || connection->targetInterface()->id() == id)
                 return connection;
         }
     }
     return nullptr;
-}
-
-const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
-{
-    return d->m_objects;
 }
 
 } // ns aadl
