@@ -18,6 +18,7 @@
 #include "aadlobjectiface.h"
 
 #include "aadlcommonprops.h"
+#include "aadlobjectfunction.h"
 
 namespace taste3 {
 namespace aadl {
@@ -26,7 +27,7 @@ static int sProvidedCounter = 0;
 static int sRequiredCounter = 0;
 
 struct AADLObjectIfacePrivate {
-    AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
+    explicit AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
         : m_direction(dir)
     {
     }
@@ -36,6 +37,13 @@ struct AADLObjectIfacePrivate {
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
     : AADLObject(title, parent)
+    , d(new AADLObjectIfacePrivate(direction))
+{
+}
+
+AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
+                                 AADLObject *parent)
+    : AADLObject(id.isNull() ? common::createId() : id, title, parent)
     , d(new AADLObjectIfacePrivate(direction))
 {
 }
@@ -206,6 +214,11 @@ bool AADLObjectIface::setLabelInheritance(bool label)
     return false;
 }
 
+AADLObjectFunction *AADLObjectIface::function() const
+{
+    return qobject_cast<AADLObjectFunction *>(parent());
+}
+
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
     : AADLObjectIface(IfaceType::Provided, tr("PI_%1").arg(++sProvidedCounter), parent)
 {
@@ -213,6 +226,11 @@ AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
 
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(const QString &title, AADLObject *parent)
     : AADLObjectIface(IfaceType::Provided, title, parent)
+{
+}
+
+AADLObjectIfaceProvided::AADLObjectIfaceProvided(const common::Id &id, const QString &title, AADLObject *parent)
+    : AADLObjectIface(id, IfaceType::Provided, title, parent)
 {
 }
 
@@ -224,6 +242,19 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(AADLObject *parent)
 AADLObjectIfaceRequired::AADLObjectIfaceRequired(const QString &title, AADLObject *parent)
     : AADLObjectIface(IfaceType::Required, title, parent)
 {
+}
+
+AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QString &title, AADLObject *parent)
+    : AADLObjectIface(id, IfaceType::Required, title, parent)
+{
+}
+
+AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id)
+{
+    if (direction == AADLObjectIface::IfaceType::Provided)
+        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter));
+
+    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter));
 }
 
 } // ns aadl

@@ -18,6 +18,7 @@
 #include "aadlfunctiontypegraphicsitem.h"
 
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "colors/colormanager.h"
@@ -35,11 +36,11 @@
 #include <QPainter>
 #include <QtDebug>
 #include <app/commandsstack.h>
+#include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
 #include <baseitems/textgraphicsitem.h>
 
 static const qreal kBorderWidth = 2;
-static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 
 namespace taste3 {
 namespace aadl {
@@ -51,27 +52,28 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
     setObjectName(QLatin1String("AADLFunctionTypeGraphicsItem"));
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    m_textItem->setPlainText(entity->title());
-    m_textItem->setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
-    m_textItem->setBackgroundColor(Qt::transparent);
-    m_textItem->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
+    if (entity) {
+        m_textItem->setPlainText(entity->title());
+        m_textItem->setFont(QFont(qApp->font().family(), 16, QFont::Bold, true));
+        m_textItem->setBackgroundColor(Qt::transparent);
+        m_textItem->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
 
-    connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
-        const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
-        const auto attributesCmd = cmd::CommandsFactory::create(
-                cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
-        taste3::cmd::CommandsStack::current()->push(attributesCmd);
-    });
-    connect(entity, &AADLObjectFunction::attributesChanged, this, [this, entity]() {
-        if (m_textItem->toPlainText() != entity->title())
-            m_textItem->setPlainText(entity->title());
-        instantLayoutUpdate();
-    });
-    connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
-        m_textItem->setPlainText(text);
-        instantLayoutUpdate();
-    });
-
+        connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
+            const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
+            const auto attributesCmd = cmd::CommandsFactory::create(
+                    cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
+            taste3::cmd::CommandsStack::current()->push(attributesCmd);
+        });
+        connect(entity, &AADLObjectFunction::attributesChanged, this, [this, entity]() {
+            if (m_textItem->toPlainText() != entity->title())
+                m_textItem->setPlainText(entity->title());
+            instantLayoutUpdate();
+        });
+        connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+            m_textItem->setPlainText(text);
+            instantLayoutUpdate();
+        });
+    }
     colorSchemeUpdated();
 }
 
@@ -80,16 +82,50 @@ AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
     return qobject_cast<AADLObjectFunctionType *>(modelEntity());
 }
 
-QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareAdditionalParams() const
+void AADLFunctionTypeGraphicsItem::updateFromEntity()
+{
+    aadl::AADLObjectFunctionType *obj = entity();
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    const auto coordinates = obj->coordinates();
+    if (coordinates.isEmpty()) {
+        instantLayoutUpdate();
+    } else {
+        setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
+                  QPointF(coordinates.value(2), coordinates.value(3)) });
+    }
+}
+
+QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
 {
     QList<QVariantList> params;
+    const QRectF geometry = sceneBoundingRect();
+    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
+    params.append({ qVariantFromValue(qobject_cast<AADLObject *>(modelEntity())), qVariantFromValue(points) });
+
+    QList<QGraphicsItem *> items;
+    static const QList<int> acceptableItemTypes { AADLConnectionGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
+                                                  AADLFunctionTypeGraphicsItem::Type, AADLInterfaceGraphicsItem::Type };
     for (auto item : childItems()) {
+        if (acceptableItemTypes.contains(item->type()))
+            items.append(item);
+    }
+    std::sort(items.begin(), items.end(),
+              [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
+
+    for (auto item : items) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
-            if (AADLConnectionGraphicsItem *connection = iface->connectedItem())
-                params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->points()) });
             params.append(
                     { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
-        } /// CHECK: nested Funtion(Type) Items?
+        } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
+            params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->currentPoints()) });
+        } else if (auto functionType = qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item)) {
+            params.append(functionType->prepareCommandParams());
+        } else if (auto function = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item)) {
+            params.append(function->prepareCommandParams());
+        }
     }
     return params;
 }
@@ -98,38 +134,66 @@ void AADLFunctionTypeGraphicsItem::createCommand()
 {
     taste3::cmd::CommandsStack::current()->beginMacro(tr("Change item geometry/position"));
 
-    for (auto connectionParams : prepareAdditionalParams()) {
-        const auto linkedItemsGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, connectionParams);
-        taste3::cmd::CommandsStack::current()->push(linkedItemsGeometryCmd);
+    for (auto commandParam : prepareCommandParams()) {
+        const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, commandParam);
+        taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
     }
-
-    const QRectF geometry = sceneBoundingRect();
-    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-    const auto geometryCmd = cmd::CommandsFactory::create(
-            cmd::ChangeEntityGeometry,
-            { qVariantFromValue(qobject_cast<AADLObject *>(modelEntity())), qVariantFromValue(points) });
-    taste3::cmd::CommandsStack::current()->push(geometryCmd);
 
     taste3::cmd::CommandsStack::current()->endMacro();
 }
 
 void AADLFunctionTypeGraphicsItem::rebuildLayout()
 {
+    //    if (auto graphicsItemParent = parentItem()) {
+    //        QPointF newPos = pos();
+    //        const QRectF contentRect = graphicsItemParent->boundingRect();
+    //        if (newPos.x() < contentRect.left())
+    //            newPos.setX(contentRect.left());
+    //        else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+    //            newPos.setX(contentRect.right() - m_boundingRect.width());
+    //        if (newPos.y() < contentRect.top())
+    //            newPos.setY(contentRect.top());
+    //        else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+    //            newPos.setY(contentRect.bottom() - m_boundingRect.height());
+    //        setPos(newPos);
+    //    }
+
     if (auto graphicsItemParent = parentItem()) {
-        QPointF newPos = pos();
-        const QRectF contentRect = graphicsItemParent->boundingRect();
+        const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
+        setVisible(parentRect.contains(sceneBoundingRect()));
+    }
+    InteractiveObject::rebuildLayout();
+    updateTextPosition();
+}
+
+void AADLFunctionTypeGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from,
+                                                        const QPointF &to)
+{
+    Q_UNUSED(from)
+
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
+        return;
+
+    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
+    if (parentItem()) {
+        const QRectF contentRect = parentItem()->boundingRect().marginsRemoved(utils::kContentMargins);
+
         if (newPos.x() < contentRect.left())
             newPos.setX(contentRect.left());
         else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
             newPos.setX(contentRect.right() - m_boundingRect.width());
+
         if (newPos.y() < contentRect.top())
             newPos.setY(contentRect.top());
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
-        setPos(newPos);
     }
-    InteractiveObject::rebuildLayout();
-    updateTextPosition();
+    setPos(newPos);
+
+    //    rebuildLayout();
+    updateGripPoints();
+
+    //    Q_EMIT needUpdateLayout();
 }
 
 void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -156,7 +220,7 @@ QVariant AADLFunctionTypeGraphicsItem::itemChange(QGraphicsItem::GraphicsItemCha
 void AADLFunctionTypeGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
                                                       const QPointF &releasedAt)
 {
-    Q_UNUSED(grip);
+    Q_UNUSED(grip)
 
     if (handlePositionChanged(pressedAt, releasedAt))
         createCommand();
@@ -167,6 +231,69 @@ void AADLFunctionTypeGraphicsItem::onManualResizeFinish(GripPoint::Location grip
 {
     if (handleGeometryChanged(grip, pressedAt, releasedAt))
         createCommand();
+}
+
+void AADLFunctionTypeGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from,
+                                                          const QPointF &to)
+{
+    const QPointF shift = QPointF(to - from);
+    QRectF rect = mapRectToParent(boundingRect());
+    const QRectF contentRect =
+            parentItem() ? parentItem()->boundingRect().marginsRemoved(utils::kContentMargins) : QRectF();
+    switch (grip) {
+    case GripPoint::Left: {
+        const qreal left = rect.left() + shift.x();
+        if (contentRect.isNull() || left >= contentRect.left())
+            rect.setLeft(left);
+    } break;
+    case GripPoint::Top: {
+        const qreal top = rect.top() + shift.y();
+        if (contentRect.isNull() || top >= contentRect.top())
+            rect.setTop(top);
+    } break;
+    case GripPoint::Right: {
+        const qreal right = rect.right() + shift.x();
+        if (contentRect.isNull() || right <= contentRect.right())
+            rect.setRight(right);
+    } break;
+    case GripPoint::Bottom: {
+        const qreal bottom = rect.bottom() + shift.y();
+        if (contentRect.isNull() || bottom <= contentRect.bottom())
+            rect.setBottom(bottom);
+    } break;
+    case GripPoint::TopLeft: {
+        const QPointF topLeft = rect.topLeft() + shift;
+        if (contentRect.isNull() || contentRect.contains(topLeft))
+            rect.setTopLeft(topLeft);
+    } break;
+    case GripPoint::TopRight: {
+        const QPointF topRight = rect.topRight() + shift;
+        if (contentRect.isNull() || contentRect.contains(topRight))
+            rect.setTopRight(topRight);
+    } break;
+    case GripPoint::BottomLeft: {
+        const QPointF bottomLeft = rect.bottomLeft() + shift;
+        if (contentRect.isNull() || contentRect.contains(bottomLeft))
+            rect.setBottomLeft(bottomLeft);
+    } break;
+    case GripPoint::BottomRight: {
+        const QPointF bottomRight = rect.bottomRight() + shift;
+        if (contentRect.isNull() || contentRect.contains(bottomRight))
+            rect.setBottomRight(bottomRight);
+    } break;
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+
+    const QRectF normalized = rect.normalized();
+    if (normalized.width() >= minimalSize().width() && normalized.height() >= minimalSize().height())
+        setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
+
+    //    rebuildLayout();
+    updateGripPoints();
+
+    //    Q_EMIT needUpdateLayout();
 }
 
 void AADLFunctionTypeGraphicsItem::initGripPoints()
@@ -180,14 +307,9 @@ void AADLFunctionTypeGraphicsItem::initGripPoints()
 
 QSizeF AADLFunctionTypeGraphicsItem::minimalSize() const
 {
-    QRectF br;
-    for (QGraphicsItem *item : childItems()) {
-        if (item->type() == AADLFunctionTypeGraphicsItem::Type)
-            br |= item->boundingRect();
-        else if (item->type() == QGraphicsTextItem::Type)
-            br |= item->boundingRect().marginsAdded(kTextMargins);
-    }
-    return br.size();
+    const QSizeF textSize = m_textItem->boundingRect().size();
+    return { qMax(textSize.width(), utils::DefaultGraphicsItemSize.width()),
+             qMax(textSize.height(), utils::DefaultGraphicsItemSize.height()) };
 }
 
 void AADLFunctionTypeGraphicsItem::updateTextPosition()
@@ -198,7 +320,7 @@ void AADLFunctionTypeGraphicsItem::updateTextPosition()
 
     QRectF textRect { 0, 0, m_textItem->boundingRect().width() / currScale.x(),
                       m_textItem->boundingRect().height() / currScale.y() };
-    textRect.moveTopLeft(boundingRect().marginsRemoved(kTextMargins).topLeft());
+    textRect.moveTopLeft(boundingRect().marginsRemoved(utils::kTextMargins).topLeft());
     m_textItem->setPos(textRect.topLeft());
 }
 

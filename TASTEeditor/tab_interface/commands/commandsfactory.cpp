@@ -19,10 +19,10 @@
 
 #include "cmdcommentitemcreate.h"
 #include "cmdcommenttextchange.h"
+#include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"
 #include "cmdcontextparametercreate.h"
 #include "cmdcontextparameterremove.h"
-#include "cmddirectconnectionitemcreate.h"
 #include "cmdentityattributechange.h"
 #include "cmdentitygeometrychange.h"
 #include "cmdentitypropertychange.h"
@@ -35,9 +35,7 @@
 #include "cmdifaceparamchange.h"
 #include "cmdifaceparamcreate.h"
 #include "cmdifaceparamremove.h"
-#include "cmdmanualconnectionitemcreate.h"
-#include "cmdprovidedinterfaceitemcreate.h"
-#include "cmdrequiredinterfaceitemcreate.h"
+#include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 
 #include <QRect>
@@ -58,14 +56,10 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createFunctionCommand(params);
     case cmd::CreateCommentEntity:
         return cmd::CommandsFactory::createCommentCommand(params);
-    case cmd::CreateProvidedInterfaceEntity:
-        return cmd::CommandsFactory::createProvidedInterfaceCommand(params);
-    case cmd::CreateRequiredInterfaceEntity:
-        return cmd::CommandsFactory::createRequiredInterfaceCommand(params);
-    case cmd::CreateManualConnectionEntity:
-        return cmd::CommandsFactory::createManualConnectionCommand(params);
-    case cmd::CreateDirectConnectionEntity:
-        return cmd::CommandsFactory::createDirectConnectionCommand(params);
+    case cmd::CreateInterfaceEntity:
+        return cmd::CommandsFactory::createInterfaceCommand(params);
+    case cmd::CreateConnectionEntity:
+        return cmd::CommandsFactory::createConnectionCommand(params);
     case cmd::ChangeEntityGeometry:
         return cmd::CommandsFactory::changeGeometryCommand(params);
     case cmd::ChangeCommentText:
@@ -145,76 +139,40 @@ QUndoCommand *CommandsFactory::createCommentCommand(const QVariantList &params)
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::createProvidedInterfaceCommand(const QVariantList &params)
+QUndoCommand *CommandsFactory::createInterfaceCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 5);
     const QVariant model = params.value(0);
     const QVariant parent = params.value(1);
     const QVariant position = params.value(2);
+    const QVariant type = params.value(3);
+    const QVariant id = params.value(4);
     if (position.isValid() && position.canConvert<QPointF>() && model.isValid()
-        && model.canConvert<AADLObjectsModel *>() && parent.canConvert<AADLObjectFunctionType *>())
-        return new CmdProvidedInterfaceItemCreate(model.value<AADLObjectsModel *>(),
-                                                  parent.value<AADLObjectFunctionType *>(), position.value<QPointF>());
+        && model.canConvert<AADLObjectsModel *>() && parent.canConvert<AADLObjectFunctionType *>()
+        && type.canConvert<AADLObjectIface::IfaceType>() && type.isValid() && id.canConvert<common::Id>()
+        && id.isValid())
+        return new CmdInterfaceItemCreate(model.value<AADLObjectsModel *>(), parent.value<AADLObjectFunctionType *>(),
+                                          position.value<QPointF>(), type.value<aadl::AADLObjectIface::IfaceType>(),
+                                          id.value<common::Id>());
 
     return nullptr;
 }
 
-QUndoCommand *CommandsFactory::createRequiredInterfaceCommand(const QVariantList &params)
+QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 3);
+    Q_ASSERT(params.size() == 5);
     const QVariant model = params.value(0);
-    const QVariant parent = params.value(1);
-    const QVariant position = params.value(2);
-    if (position.isValid() && position.canConvert<QPointF>() && model.isValid()
-        && model.canConvert<AADLObjectsModel *>() && parent.canConvert<AADLObjectFunctionType *>())
-        return new CmdRequiredInterfaceItemCreate(model.value<AADLObjectsModel *>(),
-                                                  parent.value<AADLObjectFunctionType *>(), position.value<QPointF>());
-
-    return nullptr;
-}
-
-QUndoCommand *CommandsFactory::createManualConnectionCommand(const QVariantList &params)
-{
-    Q_ASSERT(params.size() == 6);
-    const QVariant model = params.value(0);
-    const QVariant start = params.value(1);
-    const QVariant end = params.value(2);
-    const QVariant pi = params.value(3);
-    const QVariant ri = params.value(4);
-    const QVariant points = params.value(5);
+    const QVariant parentFunction = params.value(1);
+    const QVariant startIfaceId = params.value(2);
+    const QVariant endIfaceId = params.value(3);
+    const QVariant points = params.value(4);
     if (points.isValid() && points.canConvert<QVector<QPointF>>() && model.isValid()
-        && model.canConvert<AADLObjectsModel *>() && start.isValid() && start.canConvert<AADLObjectFunction *>()
-        && end.isValid() && end.canConvert<AADLObjectFunction *>() && pi.isValid()
-        && pi.canConvert<AADLObjectIfaceProvided *>() && ri.isValid() && ri.canConvert<AADLObjectIfaceRequired *>()) {
-        return new CmdManualConnectionItemCreate(
-                model.value<AADLObjectsModel *>(), start.value<AADLObjectFunction *>(),
-                end.value<AADLObjectFunction *>(), pi.value<AADLObjectIfaceProvided *>(),
-                ri.value<AADLObjectIfaceRequired *>(), points.value<QVector<QPointF>>());
-    }
-
-    return nullptr;
-}
-
-QUndoCommand *CommandsFactory::createDirectConnectionCommand(const QVariantList &params)
-{
-    Q_ASSERT(params.size() == 7);
-    const QVariant model = params.value(0);
-    const QVariant start = params.value(1);
-    const QVariant prov = params.value(2);
-    const QVariant startPoint = params.value(3);
-    const QVariant end = params.value(4);
-    const QVariant req = params.value(5);
-    const QVariant endPoint = params.value(6);
-    if (model.isValid() && model.canConvert<AADLObjectsModel *>() && start.isValid()
-        && start.canConvert<AADLObjectFunctionType *>() && prov.isValid()
-        && prov.canConvert<AADLObjectIfaceProvided *>() && startPoint.isValid() && startPoint.canConvert<QPointF>()
-        && req.isValid() && req.canConvert<AADLObjectIfaceRequired *>() && end.isValid()
-        && end.canConvert<AADLObjectFunctionType *>() && endPoint.isValid() && endPoint.canConvert<QPointF>()) {
-        return new CmdDirectConnectionItemCreate(model.value<AADLObjectsModel *>(),
-                                                 start.value<AADLObjectFunctionType *>(),
-                                                 prov.value<AADLObjectIfaceProvided *>(), startPoint.value<QPointF>(),
-                                                 end.value<AADLObjectFunctionType *>(),
-                                                 req.value<AADLObjectIfaceRequired *>(), endPoint.value<QPointF>());
+        && model.canConvert<AADLObjectsModel *>() && parentFunction.isValid()
+        && parentFunction.canConvert<AADLObjectFunction *>() && startIfaceId.isValid()
+        && startIfaceId.canConvert<common::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<common::Id>()) {
+        return new CmdConnectionItemCreate(
+                model.value<AADLObjectsModel *>(), parentFunction.value<AADLObjectFunction *>(),
+                startIfaceId.value<common::Id>(), endIfaceId.value<common::Id>(), points.value<QVector<QPointF>>());
     }
 
     return nullptr;

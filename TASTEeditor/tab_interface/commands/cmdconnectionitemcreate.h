@@ -17,22 +17,27 @@
 
 #pragma once
 
+#include "app/common.h"
+
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
+#include <QVector>
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectFunctionType;
 class AADLObjectIface;
+class AADLObjectConnection;
+class AADLObjectFunction;
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdProvidedInterfaceItemCreate : public QUndoCommand
+class CmdConnectionItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdProvidedInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function,
-                                            const QPointF &pos);
+    explicit CmdConnectionItemCreate(taste3::aadl::AADLObjectsModel *model, taste3::aadl::AADLObjectFunction *parent,
+                                     const common::Id sourceIfaceId, const common::Id &targetIfaceId,
+                                     const QVector<QPointF> &points);
 
     void redo() override;
     void undo() override;
@@ -41,9 +46,7 @@ public:
 
 private:
     QPointer<AADLObjectsModel> m_model;
-    const QPointF m_pos;
-    QPointer<AADLObjectIface> m_entity;
-    QPointer<AADLObjectFunctionType> m_parent;
+    QPointer<AADLObjectConnection> m_entity;
 };
 
 } // namespace cmd

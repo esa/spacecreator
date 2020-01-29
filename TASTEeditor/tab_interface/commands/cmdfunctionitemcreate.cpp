@@ -20,6 +20,7 @@
 #include "commandids.h"
 
 #include <QtDebug>
+#include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
@@ -28,26 +29,24 @@ namespace cmd {
 
 static int sCounter = 0;
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *function,
+CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
                                              const QRectF &geometry)
     : QUndoCommand()
     , m_model(model)
     , m_geometry(geometry)
-    , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_model))
-    , m_parent(function)
+    , m_parent(parent)
+    , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_parent))
 {
     setText(QObject::tr("Create Function"));
 }
 
 void CmdFunctionItemCreate::redo()
 {
-    const QVector<qint32> coordinates {
-        qRound(m_geometry.left()),
-        qRound(m_geometry.top()),
-        qRound(m_geometry.right()),
-        qRound(m_geometry.bottom()),
-    };
-    m_entity->setCoordinates(coordinates);
+    if (m_parent && m_parent->isRootObject())
+        m_entity->setInnerCoordinates(utils::coordinates(m_geometry));
+    else
+        m_entity->setCoordinates(utils::coordinates(m_geometry));
+
     if (m_parent)
         m_parent->addChild(m_entity);
     if (m_model)

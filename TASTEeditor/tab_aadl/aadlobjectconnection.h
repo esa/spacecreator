@@ -25,15 +25,14 @@
 namespace taste3 {
 namespace aadl {
 
-class AADLObjectIfaceRequired;
-class AADLObjectIfaceProvided;
+class AADLObjectIface;
 struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
 {
     Q_OBJECT
 public:
-    explicit AADLObjectConnection(AADLObject *from, AADLObject *to, AADLObjectIfaceRequired *ri,
-                                  AADLObjectIfaceProvided *pi, QObject *parent = nullptr);
+    explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
+                                  AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     explicit AADLObjectConnection(AADLObject *from, AADLObject *to, QObject *parent = nullptr);
     explicit AADLObjectConnection(QObject *parent = nullptr);
     ~AADLObjectConnection() override;
@@ -41,13 +40,18 @@ public:
     AADLObjectType aadlType() const override;
 
     AADLObject *source() const;
+    void setSource(AADLObject *source);
+
     AADLObject *target() const;
+    void setTarget(AADLObject *target);
 
-    AADLObjectIfaceRequired *requiredInterface() const;
-    QString requiredInterfaceName() const;
+    QString sourceInterfaceName() const;
+    AADLObjectIface *sourceInterface() const;
+    void setSourceInterface(AADLObjectIface *iface);
 
-    AADLObjectIfaceProvided *providedInterface() const;
-    QString providedInterfaceName() const;
+    QString targetInterfaceName() const;
+    AADLObjectIface *targetInterface() const;
+    void setTargetInterface(AADLObjectIface *iface);
 
     void setAttr(const QString &name, const QVariant &val) override;
 

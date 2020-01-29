@@ -29,24 +29,28 @@ namespace taste3 {
 namespace aadl {
 class AADLObjectConnection;
 class AADLInterfaceGraphicsItem;
+class AADLFunctionGraphicsItem;
 
 class AADLConnectionGraphicsItem : public ClickNotifierItem
 {
     Q_OBJECT
 public:
-    explicit AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parent = nullptr);
+    explicit AADLConnectionGraphicsItem(AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+                                        AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
-    static AADLConnectionGraphicsItem *createConnection(QGraphicsScene *scene, const QPointF &startPoint,
-                                                        const QPointF &endPoint);
-    void setEndPoints(AADLInterfaceGraphicsItem *pi, AADLInterfaceGraphicsItem *ri);
+    static QVector<QPointF> connectionPath(AADLInterfaceGraphicsItem *ifaceStart, AADLInterfaceGraphicsItem *ifaceEnd);
+
     void setPoints(const QVector<QPointF> &points);
     QVector<QPointF> points() const;
+
+    QVector<QPointF> currentPoints() const;
 
     AADLObjectConnection *entity() const;
 
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();
+    void updateFromEntity();
 
     enum
     {
@@ -64,14 +68,17 @@ public:
     void clear();
     void updateGripPoints(bool forceVisible = false);
 
+    AADLInterfaceGraphicsItem *endItem() const;
+    AADLInterfaceGraphicsItem *startItem() const;
+
+    AADLFunctionGraphicsItem *sourceItem() const;
+    AADLFunctionGraphicsItem *targetItem() const;
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
     void rebuildLayout();
-
-    void updateProvidedInterface(AADLInterfaceGraphicsItem *pi);
-    void updateRequiredInterface(AADLInterfaceGraphicsItem *ri);
 
     void handleSelectionChanged(bool isSelected);
 
@@ -101,8 +108,8 @@ private:
     };
 
 private:
-    QPointer<AADLInterfaceGraphicsItem> m_startItem;
-    QPointer<AADLInterfaceGraphicsItem> m_endItem;
+    const QPointer<AADLInterfaceGraphicsItem> m_startItem;
+    const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
     QRectF m_boundingRect;
 

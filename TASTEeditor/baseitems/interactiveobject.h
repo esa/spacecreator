@@ -64,6 +64,8 @@ public:
     QFont font() const;
     void setFont(const QFont &font);
 
+    virtual void updateFromEntity() = 0;
+
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();
@@ -81,7 +83,6 @@ private Q_SLOTS:
     virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
     virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
-
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -109,6 +110,8 @@ protected:
     virtual void rebuildLayout();
 
     virtual void onSelectionChanged(bool isSelected);
+
+    virtual void createCommand();
 
     bool handlePositionChanged(const QPointF &from, const QPointF &to);
     bool handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to);

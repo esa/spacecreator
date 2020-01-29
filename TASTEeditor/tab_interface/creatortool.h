@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "tab_aadl/aadlobjectiface.h"
+
 #include <QCursor>
 #include <QObject>
 #include <QPointer>
@@ -85,9 +87,7 @@ private:
     void handleComment(QGraphicsScene *scene, const QPointF &pos);
     void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
     void handleFunction(QGraphicsScene *scene, const QPointF &pos);
-    void handleProvidedInterface(QGraphicsScene *scene, const QPointF &pos);
-    void handleRequiredInterface(QGraphicsScene *scene, const QPointF &pos);
-    void handleMultiPointConnection(QGraphicsScene *scene, const QPointF &pos);
+    void handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos);
     void handleDirectConnection(QGraphicsScene *scene, const QPointF &pos);
 
     QMenu *populateContextMenu(const QPointF &scenePos);

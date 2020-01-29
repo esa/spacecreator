@@ -39,12 +39,16 @@ public:
 
     int type() const override { return Type; }
 
+    void updateFromEntity() override;
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
+    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     QSizeF minimalSize() const override;
@@ -55,12 +59,13 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const override;
     virtual AADLObject *aadlObject() const override;
 
+    void createCommand() override;
+
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
 
-private:
-    void createCommand();
-    QList<QVariantList> prepareAdditionalParams() const;
+protected:
+    QList<QVariantList> prepareCommandParams() const;
 
 protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;

@@ -169,6 +169,7 @@ bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectFuncti
     const QString &valueString = xml.attributes().value(Props::token(Props::Token::value)).toString();
     switch (Props::token(name)) {
     case Props::Token::Active_Interfaces:
+    case Props::Token::InnerCoordinates:
     case Props::Token::coordinates: {
         obj->setProp(name, valueString);
         break;
@@ -281,6 +282,7 @@ bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *if
     const QString &propVal = attrs.value(Props::token(Props::Token::value)).toString();
     switch (Props::token(name)) {
     case Props::Token::RCMoperationKind:
+    case Props::Token::InnerCoordinates:
     case Props::Token::coordinates:
     case Props::Token::Deadline:
     case Props::Token::RCMperiod:
@@ -404,12 +406,14 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
+        case Props::Token::si_name:
         case Props::Token::ri_name: {
             connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_ri)
                 qCritical() << Q_FUNC_INFO << attrValue;
             break;
         }
+        case Props::Token::ti_name:
         case Props::Token::pi_name: {
             connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
             if (!connectionInitParams.m_pi)
@@ -426,7 +430,7 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
     /// TODO: remove this after discussions with critical warnings in the switch block
     if (!connectionInitParams.m_from || !connectionInitParams.m_to || !connectionInitParams.m_ri
         || !connectionInitParams.m_pi) {
-        qCritical("Skipping connection from/to ENV");
+        qCritical("Skipping item with both empty endpoints/functions");
         return true;
     }
 

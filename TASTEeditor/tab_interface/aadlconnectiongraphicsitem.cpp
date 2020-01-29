@@ -38,7 +38,6 @@
 #include <QtMath>
 #include <app/commandsstack.h>
 
-static const qreal kDefaulPenWidth = 2.0;
 static const QRectF kGripPointRect = { 0., 0., 12., 12. };
 static const QColor kGripPointBackground = QColor::fromRgbF(0, 0, 0.5, 0.75);
 static const QColor kGripPointBorder = Qt::red;
@@ -88,27 +87,6 @@ static inline QVector<QPointF> generateConnection(const QLineF &startDirection, 
     return connectionPoints;
 }
 
-static inline qreal distanceLine(const QPointF &p1, const QPointF &p2)
-{
-    return std::sqrt(std::pow((p2.x() - p1.x()), 2) + std::pow((p2.y() - p1.y()), 2));
-};
-
-static inline qreal distancePolygon(const QVector<QPointF> &polygon)
-{
-    qreal distance = 0;
-    for (auto it = std::next(polygon.constBegin()); it != polygon.constEnd(); ++it)
-        distance += distanceLine(*std::prev(it), *it);
-    return distance;
-};
-static inline QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2)
-{
-    QList<QPointF> rectPoints { area.topLeft(), area.topRight(), area.bottomLeft(), area.bottomRight() };
-    std::sort(rectPoints.begin(), rectPoints.end(), [=](const QPointF &p1, const QPointF &p2) {
-        return distancePolygon({ point1, p1, point2 }) < distancePolygon({ point1, p2, point2 });
-    });
-    return rectPoints;
-};
-
 static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
 {
     switch (utils::getNearestSide(sceneRect, point)) {
@@ -144,7 +122,7 @@ static inline QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const 
 
     const QRectF itemRectMargins =
             itemRect.adjusted(-kConnectionMargin, -kConnectionMargin, kConnectionMargin, kConnectionMargin);
-    const QList<QPointF> rectCorners = sortedCorners(itemRectMargins, startPoint, endPoint);
+    const QList<QPointF> rectCorners = utils::sortedCorners(itemRectMargins, startPoint, endPoint);
     QList<QVector<QPointF>> allPaths;
     for (const QPointF &p : rectCorners) {
         for (auto polygon : generateConnection(startPoint, p)) {
@@ -232,7 +210,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
         if (!results.isEmpty()) {
             std::sort(results.begin(), results.end(), [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
                 if (v1.size() == v2.size())
-                    return distancePolygon(v1) < distancePolygon(v2);
+                    return utils::distancePolygon(v1) < utils::distancePolygon(v2);
                 return v1.size() < v2.size();
             });
 
@@ -249,11 +227,14 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
     return {};
 }
 
-static inline QVector<QPointF> updatePoints(QGraphicsScene *scene, AADLInterfaceGraphicsItem *startItem,
-                                            AADLInterfaceGraphicsItem *endItem)
+QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(AADLInterfaceGraphicsItem *startItem,
+                                                            AADLInterfaceGraphicsItem *endItem)
 {
     if (!startItem || !endItem)
         return {};
+
+    QGraphicsScene *scene = startItem->scene();
+    Q_ASSERT(startItem->scene() == endItem->scene() && scene);
 
     const QPointF startPointAdjusted = startItem->scenePos();
     QLineF startDirection = getDirection(startItem->targetItem()->sceneBoundingRect(), startPointAdjusted);
@@ -294,30 +275,28 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection, QGraphicsItem *parentItem)
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection,
+                                                       AADLInterfaceGraphicsItem *startIface,
+                                                       AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : ClickNotifierItem(connection, parentItem)
+    , m_startItem(startIface)
+    , m_endItem(endIface)
     , m_item(new GraphicsPathItem(this))
 {
     setObjectName(QLatin1String("AADLConnectionGraphicsItem"));
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
+    setZValue(2);
 
     colorSchemeUpdated();
+
+    m_startItem->addConnection(this);
+    m_endItem->addConnection(this);
 }
 
 AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
 {
-    updateRequiredInterface(nullptr);
-    updateProvidedInterface(nullptr);
-
     clear();
-}
-
-void AADLConnectionGraphicsItem::setEndPoints(AADLInterfaceGraphicsItem *pi, AADLInterfaceGraphicsItem *ri)
-{
-    updateProvidedInterface(pi);
-    updateRequiredInterface(ri);
-    rebuildLayout();
 }
 
 void AADLConnectionGraphicsItem::scheduleLayoutUpdate()
@@ -337,25 +316,36 @@ void AADLConnectionGraphicsItem::instantLayoutUpdate()
     update();
 }
 
+void AADLConnectionGraphicsItem::updateFromEntity()
+{
+    aadl::AADLObjectConnection *obj = entity();
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    setPoints(utils::polygon(obj->coordinates()));
+}
+
 void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 {
-    Q_ASSERT(points.size() >= 2);
     if (points.isEmpty()) {
-        clear();
+        if (m_startItem && m_endItem)
+            instantLayoutUpdate();
+        else
+            clear();
         return;
     }
 
     m_points = points;
 
-    auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+    const auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
             utils::nearestItem(scene(), points.first(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-    if (startItem)
-        updateProvidedInterface(startItem);
 
-    auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+    const auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
             utils::nearestItem(scene(), points.last(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-    if (endItem)
-        updateRequiredInterface(endItem);
+
+    if (!startItem || !endItem)
+        instantLayoutUpdate();
 
     updateBoundingRect();
 }
@@ -363,6 +353,14 @@ void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 QVector<QPointF> AADLConnectionGraphicsItem::points() const
 {
     return m_points;
+}
+
+QVector<QPointF> AADLConnectionGraphicsItem::currentPoints() const
+{
+    QPolygonF polygon = m_item->path().toFillPolygon();
+    if (polygon.isClosed())
+        polygon.removeLast();
+    return mapToScene(polygon);
 }
 
 AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
@@ -380,12 +378,8 @@ QRectF AADLConnectionGraphicsItem::boundingRect() const
     return m_item->boundingRect();
 }
 
-void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-}
+void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                       QWidget *widget) { Q_UNUSED(painter) Q_UNUSED(option) Q_UNUSED(widget) }
 
 QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
@@ -412,7 +406,13 @@ bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent
 
 void AADLConnectionGraphicsItem::rebuildLayout()
 {
-    m_points = updatePoints(scene(), m_startItem, m_endItem);
+    if ((m_startItem && !m_startItem->isVisible()) || (m_endItem && !m_endItem->isVisible())) {
+        setVisible(false);
+        return;
+    }
+
+    setVisible(true);
+    m_points = connectionPath(m_startItem, m_endItem);
     updateBoundingRect();
 }
 
@@ -421,7 +421,7 @@ void AADLConnectionGraphicsItem::updateBoundingRect()
     prepareGeometryChange();
 
     QPainterPath pp;
-    pp.addPolygon(QPolygonF(m_points));
+    pp.addPolygon(mapFromScene(QPolygonF(m_points)));
     m_item->setPath(pp);
     m_boundingRect = pp.boundingRect();
     updateGripPoints();
@@ -447,50 +447,47 @@ void AADLConnectionGraphicsItem::createCommand()
     taste3::cmd::CommandsStack::current()->endMacro();
 };
 
+AADLInterfaceGraphicsItem *AADLConnectionGraphicsItem::endItem() const
+{
+    return m_endItem;
+}
+
+AADLInterfaceGraphicsItem *AADLConnectionGraphicsItem::startItem() const
+{
+    return m_startItem;
+}
+
+AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::sourceItem() const
+{
+    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_startItem ? m_startItem->targetItem() : nullptr);
+}
+
+AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
+{
+    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_endItem ? m_endItem->targetItem() : nullptr);
+}
+
 void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
 {
     adjustGripPointCount();
-    if (m_points.isEmpty())
+    const QVector<QPointF> points = currentPoints();
+    if (points.isEmpty())
         return;
 
     const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
     const QTransform dt = deviceTransform(tr);
     const QPointF currScale { dt.m11(), dt.m22() };
 
-    for (int idx = 0; idx < m_points.size(); ++idx) {
-        const QPointF point = m_points.value(idx);
+    for (int idx = 0; idx < points.size(); ++idx) {
+        const QPointF point = points.value(idx);
         if (QGraphicsRectItem *grip = m_grips.value(idx)) {
             const QPointF destination { mapFromScene(point) };
             const QPointF destinationScaled { destination.x() * currScale.x(), destination.y() * currScale.y() };
             QRectF br = grip->rect();
             br.moveCenter(destinationScaled);
-            grip->setRect(br);
+            grip->setRect(mapRectToScene(br));
             grip->setVisible(forceVisible || isSelected());
         }
-    }
-}
-
-void AADLConnectionGraphicsItem::updateProvidedInterface(AADLInterfaceGraphicsItem *pi)
-{
-    if (pi != m_startItem) {
-        if (m_startItem)
-            m_startItem->connect(nullptr);
-
-        m_startItem = pi;
-        if (pi)
-            m_startItem->connect(this);
-    }
-}
-
-void AADLConnectionGraphicsItem::updateRequiredInterface(AADLInterfaceGraphicsItem *ri)
-{
-    if (ri != m_endItem) {
-        if (m_endItem)
-            m_endItem->connect(nullptr);
-
-        m_endItem = ri;
-        if (ri)
-            m_endItem->connect(this);
     }
 }
 
@@ -512,7 +509,7 @@ void AADLConnectionGraphicsItem::handleSelectionChanged(bool isSelected)
 
 bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     const int idx = m_grips.indexOf(handle);
     if (idx == -1)
@@ -569,7 +566,7 @@ bool AADLConnectionGraphicsItem::handleGripPointMove(QGraphicsRectItem *handle, 
 
 bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     const int idx = m_grips.indexOf(handle);
     if (idx == -1)

@@ -20,6 +20,8 @@
 #include "baseitems/interactiveobject.h"
 
 #include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QGraphicsView>
 #include <QPropertyAnimation>
 #include <QtGlobal>
@@ -278,6 +280,146 @@ bool alignedLine(QLineF &line, int angleTolerance)
         }
     }
     return false;
+}
+
+bool copyResourceFile(const QString &source, const QString &target)
+{
+    bool result(false);
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup++;
+#endif
+    try {
+        if (QFile::copy(source, target)) {
+            QFile storedFile(target);
+            storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
+            result = true;
+        } else {
+            qWarning() << "Can't create default ASN datatypes file" << target;
+        }
+    } catch (...) {
+    }
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup--;
+#endif
+    return result;
+}
+
+void setWidgetFontColor(QWidget *widget, const QColor &color)
+{
+    if (!widget || !color.isValid())
+        return;
+
+    QPalette p(widget->palette());
+    p.setColor(QPalette::Text, color);
+    widget->setPalette(p);
+}
+
+bool ensureDirExists(const QString &path)
+{
+    QDir dir(path);
+    if (!dir.exists(path))
+        if (!dir.mkpath(path)) {
+            qWarning() << "Failed to create path:" << path;
+            return false;
+        }
+
+    return true;
+}
+
+qreal distanceLine(const QPointF &p1, const QPointF &p2)
+{
+    return std::sqrt(std::pow((p2.x() - p1.x()), 2) + std::pow((p2.y() - p1.y()), 2));
+}
+
+qreal distancePolygon(const QVector<QPointF> &polygon)
+{
+    qreal distance = 0;
+    for (auto it = std::next(polygon.constBegin()); it != polygon.constEnd(); ++it)
+        distance += distanceLine(*std::prev(it), *it);
+    return distance;
+}
+
+QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2)
+{
+    QList<QPointF> rectPoints { area.topLeft(), area.topRight(), area.bottomLeft(), area.bottomRight() };
+    std::sort(rectPoints.begin(), rectPoints.end(), [=](const QPointF &p1, const QPointF &p2) {
+        return distancePolygon({ point1, p1, point2 }) < distancePolygon({ point1, p2, point2 });
+    });
+    return rectPoints;
+}
+
+bool isOnEdge(const QRectF &rect, const QPointF &point)
+{
+    const bool isHorizontalEdge = qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y());
+    const bool isVericalEdge = qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x());
+
+    const bool isHorBounded = rect.left() < point.x() && rect.right() < point.x();
+    const bool isVerBounded = rect.top() < point.y() && rect.bottom() < point.y();
+
+    return (isHorizontalEdge && (isVericalEdge || isHorBounded))
+            || (isVericalEdge && (isHorizontalEdge || isVerBounded));
+}
+
+QPointF pos(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() == 2);
+    if (coordinates.size() != 2)
+        return {};
+
+    return QPointF(coordinates.first(), coordinates.last());
+}
+
+QRectF rect(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() == 4);
+    if (coordinates.size() != 4)
+        return {};
+
+    QList<QPointF> points;
+    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
+        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
+
+    return { points.first(), points.last() };
+}
+
+QVector<QPointF> polygon(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() % 2 == 0);
+    if (coordinates.size() % 2 != 0)
+        return {};
+
+    QVector<QPointF> points;
+    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
+        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
+
+    return points;
+}
+
+QVector<qint32> coordinates(const QPointF &point)
+{
+    return coordinates(QVector<QPointF> { point });
+}
+
+QVector<qint32> coordinates(const QRectF &rect)
+{
+    return coordinates(QVector<QPointF> { rect.topLeft(), rect.bottomRight() });
+}
+
+QVector<qint32> coordinates(const QVector<QPointF> &points)
+{
+    QVector<qint32> coordinates;
+    for (const QPointF &point : points)
+        coordinates << qRound(point.x()) << qRound(point.y());
+    return coordinates;
 }
 
 } // ns utils
