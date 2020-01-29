@@ -8,5 +8,5 @@ conn.target          : Target object name
 conn.piName          : Provided interface name
 {% endcomment %}
 {% for conn in Connections %}
-<Connection from="{{ conn.source }}" ri_name="{{ conn.riName }}" to="{{ conn.target }}" pi_name="{{ conn.piName }}"/>
+<Connection from="{{ conn.source }}" si_name="{{ conn.siName }}" to="{{ conn.target }}" ti_name="{{ conn.tiName }}"/>
 {% endfor %}

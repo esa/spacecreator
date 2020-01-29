@@ -202,6 +202,11 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     return nullptr;
 }
 
+const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
+{
+    return d->m_objects;
+}
+
 } // ns aadl
 
 } // ns taste3
