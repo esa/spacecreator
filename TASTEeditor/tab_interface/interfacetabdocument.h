@@ -82,6 +82,7 @@ protected Q_SLOTS:
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
     void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
     void showPropertyEditor(aadl::AADLObject *obj);
 

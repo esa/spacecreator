@@ -38,5 +38,10 @@ QJsonObject AttrHandler::toJson() const
     return { { JSON_FIELD_NAME_Title, m_title }, { JSON_FIELD_NAME_Value, QJsonValue::fromVariant(m_value) } };
 }
 
+bool AttrHandler::operator==(const AttrHandler &other) const
+{
+    return m_title == other.m_title && m_value == other.m_value;
+}
+
 } // ns ctx
 } // ns taste3

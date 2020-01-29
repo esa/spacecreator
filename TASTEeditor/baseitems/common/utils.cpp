@@ -20,8 +20,6 @@
 #include "baseitems/interactiveobject.h"
 
 #include <QDebug>
-#include <QDir>
-#include <QFile>
 #include <QGraphicsView>
 #include <QPropertyAnimation>
 #include <QtGlobal>

@@ -17,6 +17,7 @@
 
 #include "interfacetabdocument.h"
 
+#include "app/context/action/editor/dynactioneditor.h"
 #include "baseitems/clicknotifieritem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/graphicsview.h"
@@ -112,10 +113,14 @@ QMenu *InterfaceTabDocument::customMenu() const
     connect(actDataTypes, &QAction::triggered, this, &InterfaceTabDocument::onDataTypesMenuInvoked);
     QAction *actColorScheme = root->addAction(tr("Color Scheme"));
     connect(actColorScheme, &QAction::triggered, this, &InterfaceTabDocument::onColorSchemeMenuInvoked);
+    QAction *actDynContext = root->addAction(tr("Context Actions"));
+    connect(actDynContext, &QAction::triggered, this, &InterfaceTabDocument::onDynContextEditorMenuInvoked);
 
     common::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
     common::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
     common::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
+    common::registerAction(Q_FUNC_INFO, actDynContext, "Context actions",
+                           "Show editor for common custom context menu actions");
 
     return root;
 }
@@ -606,6 +611,16 @@ void InterfaceTabDocument::onColorSchemeMenuInvoked()
     aadl::ColorManagerDialog *dialog = new aadl::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
+}
+
+void InterfaceTabDocument::onDynContextEditorMenuInvoked()
+{
+    aadl::DynActionEditor *dialog = new aadl::DynActionEditor(qobject_cast<QWidget *>(parent()));
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    dialog->open();
+    if (!dialog->init())
+        dialog->close();
 }
 
 void InterfaceTabDocument::showNIYGUI(const QString &title)

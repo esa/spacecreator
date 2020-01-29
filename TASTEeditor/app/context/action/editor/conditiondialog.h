@@ -17,28 +17,38 @@
 
 #pragma once
 
-#include "attrhandler.h"
-#include "tab_aadl/aadlobject.h"
+#include "app/context/action/condition.h"
 
-#include <QJsonObject>
-#include <QString>
-#include <QVector>
+#include <QDialog>
+
+namespace Ui {
+class ConditionDialog;
+}
 
 namespace taste3 {
-namespace ctx {
+namespace aadl {
 
-struct Condition {
-    Condition(const QJsonObject &jObj = QJsonObject());
-    static Condition createGlobal();
-    QJsonObject toJson() const;
+class AttributesModel;
+class ConditionDialog : public QDialog
+{
+    Q_OBJECT
 
-    QString m_itemType;
-    QVector<AttrHandler> m_attrs;
+public:
+    explicit ConditionDialog(const ctx::Condition &cond, const QStringList &itemTypes, QWidget *parent = nullptr);
+    ~ConditionDialog();
 
-    static QStringList knownTypes();
+    ctx::Condition condition() const;
 
-    bool isAcceptable(aadl::AADLObject *obj) const;
+private Q_SLOTS:
+    void on_cbItemType_currentIndexChanged(const QString &text);
+    void on_btnAddAttr_clicked();
+    void on_btnRmAttr_clicked();
+
+private:
+    Ui::ConditionDialog *ui;
+    ctx::Condition m_condition;
+    AttributesModel *m_attrsModel { nullptr };
 };
 
-} // ns ctx
+} // ns aadl
 } // ns taste3

@@ -2,17 +2,12 @@
     {
         "conditions": [
             {
-                "attributes": [
-                    {
-                        "title": "name",
-                        "value": "DeleteMe"
-                    }
-                ],
-                "itemType": "Function"
+                "attributes": [],
+                "itemType": "*"
             }
         ],
-        "action": "Remove",
-        "title": "Delete \"DeleteMe\" FN",
+        "action": "Context actions",
+        "title": "Context menu customization",
         "app": "",
         "appArgs": [],
         "appCwd": ""

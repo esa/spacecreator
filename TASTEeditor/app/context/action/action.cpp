@@ -93,9 +93,6 @@ QJsonObject Action::toJson() const
 
 bool Action::isAcceptable(aadl::AADLObject *obj) const
 {
-    if (!obj)
-        return false;
-
     for (const Condition &condition : m_conditions)
         if (!condition.isAcceptable(obj))
             return false;

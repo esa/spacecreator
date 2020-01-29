@@ -39,6 +39,11 @@ public:
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static void listRegisteredActions();
     static ActionsManager *instance();
+    static QVector<Action> parseFile(const QString &filePath, QString *errorHandler = nullptr);
+    static QStringList listUserFiles();
+    static QString storagePath();
+    static QStringList scriptableActionNames();
+    static void reload();
 
 private:
     struct ScriptableActionHandler {
