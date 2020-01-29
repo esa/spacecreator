@@ -44,6 +44,13 @@ namespace ctx {
 
 ActionsManager *ActionsManager::m_instance = nullptr;
 
+QString ActionsManager::storagePath()
+{
+    static const QString targetDir =
+            QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    return targetDir;
+};
+
 void ActionsManager::populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj)
 {
     if (!menu)
@@ -89,57 +96,11 @@ void ActionsManager::init()
 {
     deployDefaults();
     loadFiles();
-
-    /*{
-        Action act;
-        act.m_title = "Delete \"DeleteMe\" FN";
-        act.m_scope = Action::Scope::Internal;
-        act.m_payload = "Save";
-
-        Condition cond;
-        cond.m_itemType = "function";
-        ctx::AttrHandler attr;
-        attr.m_title = "name";
-        attr.m_value = "DeleteMe";
-        cond.m_attrs.append(attr);
-        act.m_conditions.append(cond);
-        m_actions.append(act);
-    }
-
-    {
-        Action act;
-        act.m_title = "Echo name";
-        act.m_scope = Action::Scope::External;
-        act.m_payload = "Save";
-
-        Condition cond;
-        cond.m_itemType = "*";
-        ctx::AttrHandler attr;
-        attr.m_title = "name";
-        attr.m_value = "*";
-        cond.m_attrs.append(attr);
-        act.m_conditions.append(cond);
-        m_actions.append(act);
-    }
-
-    QJsonArray jArr;
-    for (const Action &act : m_actions)
-        jArr.append(act.toJson());
-
-    const QString targetDir =
-            QString("%1/contextMenu.json").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-
-    QFile f(targetDir);
-    f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
-    f.write(QJsonDocument(jArr).toJson());
-
-    qDebug() << QFileInfo(f).absoluteFilePath();*/
 }
 
 void ActionsManager::deployDefaults()
 {
-    static const QString targetDir =
-            QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    static const QString &targetDir = storagePath();
     static const QString targetFile("contextmenu.json");
     static const QString targetFilePath(targetDir + targetFile);
 
@@ -149,40 +110,68 @@ void ActionsManager::deployDefaults()
         common::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
 }
 
-void ActionsManager::loadFiles()
+QStringList ActionsManager::listUserFiles()
 {
-    const QString targetDir =
-            QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    QStringList res;
+    const QString &targetDir = storagePath();
+
     QDir dir(targetDir);
     if (!dir.exists())
-        return;
+        return res;
 
-    const QStringList files = dir.entryList({ "*.json" }, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-    if (files.isEmpty())
-        return;
+    const QStringList &names = dir.entryList({ "*.json" }, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+    for (const QString &name : names)
+        res.append(targetDir + name);
 
+    return res;
+}
+
+void ActionsManager::loadFiles()
+{
     m_actions.clear();
-    for (const QString &file : files)
-        loadActions(targetDir + file);
+    for (const QString &file : ActionsManager::listUserFiles())
+        loadActions(file);
+}
+
+void ActionsManager::reload()
+{
+    instance()->loadFiles();
 }
 
 void ActionsManager::loadActions(const QString &fromFile)
 {
-    QFile f(fromFile);
+    const QVector<Action> &actions = parseFile(fromFile);
+    if (!actions.isEmpty())
+        m_actions.append(actions);
+}
+
+QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *errorHandler)
+{
+    QVector<Action> res;
+
+    QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Can't open file" << fromFile << "-" << f.errorString();
-        return;
+        const QString &msg = QString("Can't open file %1 - %2").arg(filePath, f.errorString());
+        qWarning() << msg;
+        if (errorHandler)
+            *errorHandler = msg;
+        return res;
     }
     QJsonParseError err;
     const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
     if (err.error != QJsonParseError::NoError) {
-        qWarning() << "JSON parsing failed:" << err.errorString() << fromFile;
-        return;
+        const QString &msg = QString("JSON parsing %1 failed: %2").arg(err.errorString(), filePath);
+        qWarning() << msg;
+        if (errorHandler)
+            *errorHandler = msg;
+        return res;
     }
 
-    QJsonArray root = doc.array();
+    const QJsonArray &root = doc.array();
     for (auto obj : root)
-        m_actions.append(Action(obj.toObject()));
+        res.append(Action(obj.toObject()));
+
+    return res;
 }
 
 bool ActionsManager::registerScriptableAction(QAction *action, const QString &key, const QString &description)
@@ -215,6 +204,11 @@ void ActionsManager::listRegisteredActions()
 QMap<QString, ActionsManager::ScriptableActionHandler> ActionsManager::scriptableActions()
 {
     return instance()->m_qactions;
+}
+
+QStringList ActionsManager::scriptableActionNames()
+{
+    return scriptableActions().keys();
 }
 
 void ActionsManager::triggerActionInternal(const Action &act)

@@ -31,12 +31,27 @@ namespace ctx {
 static const QString JSON_FIELD_NAME_ItemType = "itemType";
 static const QString JSON_FIELD_NAME_Attributes = "attributes";
 
-Condition::Condition(const QJsonObject &jObj)
-    : m_itemType(jObj[JSON_FIELD_NAME_ItemType].toString())
+QVector<AttrHandler> attrsFromJson(const QJsonObject &jObj)
 {
+    QVector<AttrHandler> res;
     const QJsonArray &jArr = jObj[JSON_FIELD_NAME_Attributes].toArray();
     for (auto jObj : jArr)
-        m_attrs.append(AttrHandler(jObj.toObject()));
+        res.append(AttrHandler(jObj.toObject()));
+    return res;
+}
+
+Condition::Condition(const QJsonObject &jObj)
+    : m_itemType(jObj[JSON_FIELD_NAME_ItemType].toString())
+    , m_attrs(attrsFromJson(jObj))
+{
+}
+
+Condition Condition::createGlobal()
+{
+    Condition c;
+    c.m_itemType = "*";
+
+    return c;
 }
 
 QJsonObject Condition::toJson() const
@@ -48,30 +63,29 @@ QJsonObject Condition::toJson() const
     return { { JSON_FIELD_NAME_ItemType, m_itemType }, { JSON_FIELD_NAME_Attributes, jAttrs } };
 }
 
-QStringList knownTypes()
+QStringList Condition::knownTypes()
 {
     QStringList res;
     QMetaEnum me = QMetaEnum::fromType<taste3::aadl::AADLObject::AADLObjectType>();
     for (int i = 0; i < me.keyCount(); ++i)
-        res.append(me.key(i));
+        if (taste3::aadl::AADLObject::AADLObjectType(me.value(i))
+            != taste3::aadl::AADLObject::AADLObjectType::AADLUnknown)
+            res.append(me.key(i));
     return res;
 }
 
 bool Condition::isAcceptable(aadl::AADLObject *obj) const
 {
-    if (!obj)
-        return false;
-
     if (m_itemType != "*") {
         static const QStringList &names = knownTypes();
-        const QString name = QString("AADL%1").arg(m_itemType);
+        const QString name(m_itemType);
         if (!names.contains(name))
             return false;
     }
 
     for (const AttrHandler &attr : m_attrs) {
         if (attr.m_value != "*")
-            if (obj->attr(attr.m_title, QString()).toString() != attr.m_value)
+            if (obj && obj->attr(attr.m_title, QString()).toString() != attr.m_value)
                 return false;
     }
 

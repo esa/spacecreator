@@ -38,6 +38,11 @@ SOURCES += \
         app/context/action/actionsmanager.cpp \
         app/context/action/attrhandler.cpp \
         app/context/action/condition.cpp \
+        app/context/action/editor/actionsmodel.cpp \
+        app/context/action/editor/attributesmodel.cpp \
+        app/context/action/editor/conditiondialog.cpp \
+        app/context/action/editor/conditionsmodel.cpp \
+        app/context/action/editor/dynactioneditor.cpp \
         app/context/action/extprocmonitor.cpp \
         app/datatypes/basicdatatype.cpp \
         app/datatypes/datatypesstorage.cpp \
@@ -135,6 +140,11 @@ HEADERS += \
         app/context/action/actionsmanager.h \
         app/context/action/attrhandler.h \
         app/context/action/condition.h \
+        app/context/action/editor/actionsmodel.h \
+        app/context/action/editor/attributesmodel.h \
+        app/context/action/editor/conditiondialog.h \
+        app/context/action/editor/conditionsmodel.h \
+        app/context/action/editor/dynactioneditor.h \
         app/context/action/extprocmonitor.h \
         app/datatypes/basicdatatype.h \
         app/datatypes/datatypesstorage.h \
@@ -226,6 +236,8 @@ HEADERS += \
         tab_msc/msctabdocument.h
 
 FORMS += \
+    app/context/action/editor/conditiondialog.ui \
+    app/context/action/editor/dynactioneditor.ui \
     app/mainwindow.ui \
     reports/bugreportdialog.ui \
     tab_interface/colors/colorhandlereditor.ui \

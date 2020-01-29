@@ -29,6 +29,8 @@ struct AttrHandler {
 
     QString m_title;
     QVariant m_value;
+
+    bool operator==(const AttrHandler &other) const;
 };
 
 } // ns ctx
