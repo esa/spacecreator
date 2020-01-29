@@ -1,4 +1,4 @@
-/*
+﻿/*
   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
@@ -27,11 +27,13 @@
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
+#include "tab_aadl/aadlobject.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "tab_msc/msctabdocument.h"
+#include "templating/previewdialog.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
@@ -116,6 +118,8 @@ void MainWindow::initMenuFile()
     m_actCloseFile = m_menuFile->addAction(tr("Close"), this, &MainWindow::onCloseFileRequested, QKeySequence::Close);
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
+    m_menuFile->addSeparator();
+    m_actExportByTemplate = m_menuFile->addAction(tr("Export by template..."), this, &MainWindow::onExportByTemplateRequested);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
@@ -208,6 +212,55 @@ void MainWindow::onSaveRenderRequested()
             fileName.append(".png");
 
         saveSceneRender(fileName);
+    }
+}
+
+void MainWindow::onExportByTemplateRequested()
+{
+    QString templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
+                                                            QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
+    if (templateFileName.isEmpty())
+        return;
+
+    if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
+        QHash<QString, QVariantList> grouppedObjects;
+        for (const auto aadlObject : doc->objects()) {
+            QString aadlGroupType;
+            switch (aadlObject->aadlType()) {
+            case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+            case aadl::AADLObject::AADLObjectType::AADLFunction:
+                aadlGroupType = QStringLiteral("Functions");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLIface:
+                aadlGroupType = QStringLiteral("Interfaces");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLComment:
+                aadlGroupType = QStringLiteral("Comments");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLConnection:
+                aadlGroupType = QStringLiteral("Connections");
+                break;
+            default:
+                continue;
+            }
+            grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
+        }
+
+        if (!m_previewDialog)
+            m_previewDialog = new templating::PreviewDialog(this);
+
+        QString output = m_previewDialog->parse(grouppedObjects, templateFileName);
+        if (!output.isEmpty()) {
+            QString outputFileName = QFileDialog::getSaveFileName(this, tr("Save file"), QString(), QStringLiteral("*.xml"));
+            if (outputFileName.isEmpty())
+                return;
+
+            QFile outputFile(outputFileName);
+            if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+                QTextStream stream(&outputFile);
+                stream << output;
+            }
+        }
     }
 }
 

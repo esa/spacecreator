@@ -65,6 +65,11 @@ AADLObject::AADLObjectType AADLObjectConnection::aadlType() const
     return AADLObject::AADLObjectType::AADLConnection;
 }
 
+QString AADLObjectConnection::sourceName() const
+{
+    return source() ? source()->title() : QString();
+}
+
 AADLObject *AADLObjectConnection::source() const
 {
     return d->m_source;
@@ -83,6 +88,11 @@ AADLObject *AADLObjectConnection::target() const
 void AADLObjectConnection::setTarget(AADLObject *target)
 {
     setAttr(meta::Props::token(meta::Props::Token::to), target ? target->title() : QString());
+}
+
+QString AADLObjectConnection::targetName() const
+{
+    return target() ? target()->title() : QString();
 }
 
 AADLObjectIface *AADLObjectConnection::sourceInterface() const

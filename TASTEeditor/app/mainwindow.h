@@ -39,6 +39,10 @@ namespace document {
 class DocumentsManager;
 }
 
+namespace templating {
+class PreviewDialog;
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -70,6 +74,7 @@ protected Q_SLOTS:
     void onCreateFileRequested();
     bool onCloseFileRequested();
     void onSaveRenderRequested();
+    void onExportByTemplateRequested();
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
@@ -83,6 +88,7 @@ private:
     QPointer<QToolBar> m_docToolbar;
     document::DocumentsManager *m_docsManager;
     QPointer<document::AbstractTabDocument> m_currentDocument;
+    templating::PreviewDialog *m_previewDialog = nullptr;
     QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };
 
@@ -94,6 +100,7 @@ private:
     QAction *m_actCreateFile { nullptr };
     QAction *m_actCloseFile { nullptr };
     QAction *m_actSaveSceneRender { nullptr };
+    QAction *m_actExportByTemplate { nullptr };
     QAction *m_actQuit { nullptr };
 
     QAction *m_actUndo { nullptr };

@@ -132,6 +132,14 @@ QVector<IfaceParameter> AADLObjectIface::params() const
     return d->m_params;
 }
 
+QVariantList AADLObjectIface::paramList() const
+{
+    QVariantList list;
+    for (const auto &param : d->m_params)
+        list << QVariant::fromValue(param);
+    return list;
+}
+
 void AADLObjectIface::setParams(const QVector<IfaceParameter> &params)
 {
     if (d->m_params != params)

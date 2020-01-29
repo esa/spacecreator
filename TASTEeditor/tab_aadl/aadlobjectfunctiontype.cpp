@@ -42,6 +42,16 @@ AADLObject::AADLObjectType AADLObjectFunctionType::aadlType() const
     return AADLObject::AADLObjectType::AADLFunctionType;
 }
 
+QString AADLObjectFunctionType::isType() const
+{
+    return aadlType() == AADLObjectType::AADLFunctionType ? QStringLiteral("YES") : QStringLiteral("NO");
+}
+
+QString AADLObjectFunctionType::instanceOf() const
+{
+    return QString();
+}
+
 QVector<AADLObject *> AADLObjectFunctionType::children() const
 {
     return d->m_children;
@@ -126,6 +136,19 @@ bool AADLObjectFunctionType::removePI(AADLObjectIface *pi)
     return false;
 }
 
+QVariantList AADLObjectFunctionType::interfaces() const
+{
+    QVariantList ifaceList;
+
+    for (AADLObjectIface *iface : ris())
+        ifaceList << QVariant::fromValue(iface);
+
+    for (AADLObjectIface *iface : pis())
+        ifaceList << QVariant::fromValue(iface);
+
+    return ifaceList;
+}
+
 bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
 {
     return iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
@@ -134,6 +157,18 @@ bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
 bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 {
     return iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
+}
+
+QVariantList AADLObjectFunctionType::functions() const
+{
+    QVariantList functionList;
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
+            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+            functionList << QVariant::fromValue(child);
+        }
+    }
+    return functionList;
 }
 
 QString AADLObjectFunctionType::language() const

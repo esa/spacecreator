@@ -26,6 +26,39 @@
 namespace taste3 {
 namespace aadl {
 
+/**
+ * @brief The AADLObjectProperty class is needed for string templates only.
+ * It seems Grantlee doesn't fully support Django syntax like
+ * @code
+ *  {% for key, value in iface.properties %}
+ *      <Property name="{{ key }}" value="{{ value }}"/>
+ *  {% endfor %}
+ * @endcode
+ * Therefore AADLObject has a property "properties" which is list of AADLObjectProperty
+ * and thus it's possible to write like this:
+ * @code
+ *  {% for property in iface.properties %}
+ *      <Property name="{{ property.name }}" value="{{ property.value }}"/>
+ *  {% endfor %}
+ * @endcode
+ */
+class AADLObjectProperty
+{
+    Q_GADGET
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QVariant value READ value)
+public:
+    AADLObjectProperty(const QString &name = QString(), const QVariant &value = QVariant())
+        : m_name(name), m_value(value) {}
+
+    inline QString name() const { return m_name; }
+    inline QVariant value() const { return m_value; }
+
+private:
+    const QString m_name;
+    const QVariant m_value;
+};
+
 struct AADLObjectPrivate;
 class AADLObjectsModel;
 class AADLObject : public QObject
@@ -33,6 +66,7 @@ class AADLObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QVariantList properties READ properties)
 
 public:
     enum class AADLObjectType
@@ -75,6 +109,7 @@ public:
 
     // "properties" - XML children <Property>
     QHash<QString, QVariant> props() const;
+    QVariantList properties() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     void setProp(const QString &name, const QVariant &val);
@@ -109,3 +144,5 @@ private:
 
 } // ns aadl
 } // ns taste3
+
+Q_DECLARE_METATYPE(taste3::aadl::AADLObjectProperty)

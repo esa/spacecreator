@@ -35,7 +35,15 @@ struct AADLObjectIfacePrivate;
 class AADLObjectIface : public AADLObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ interfaceName)
     Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction)
+    Q_PROPERTY(bool isProvided READ isProvided)
+    Q_PROPERTY(bool isRequired READ isRequired)
+    Q_PROPERTY(QString kind READ kind)
+    Q_PROPERTY(qint32 period READ period)
+    Q_PROPERTY(qint32 wcet READ wcet)
+    Q_PROPERTY(qint32 queueSize READ queueSize)
+    Q_PROPERTY(QVariantList params READ paramList)
 
 public:
     enum class IfaceType
@@ -69,6 +77,7 @@ public:
     bool setQueueSize(qint32 size);
 
     QVector<IfaceParameter> params() const;
+    QVariantList paramList() const;
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
 

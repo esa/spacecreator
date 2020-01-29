@@ -30,6 +30,10 @@ struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString source READ sourceName)
+    Q_PROPERTY(QString target READ targetName)
+    Q_PROPERTY(QString riName READ requiredInterfaceName)
+    Q_PROPERTY(QString piName READ providedInterfaceName)
 public:
     explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
                                   AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
@@ -39,9 +43,11 @@ public:
 
     AADLObjectType aadlType() const override;
 
+    QString sourceName() const;
     AADLObject *source() const;
     void setSource(AADLObject *source);
 
+    QString targetName() const;
     AADLObject *target() const;
     void setTarget(AADLObject *target);
 
