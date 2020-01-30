@@ -39,6 +39,7 @@ struct Props {
         Output_Parameter,
         Required_Interface,
         Connection,
+        EndPoint,
 
         // attrs:
         name,
@@ -58,6 +59,8 @@ struct Props {
         to,
         pi_name,
         ti_name,
+        func_name,
+        location,
 
         // TASTE props:
         Active_Interfaces,

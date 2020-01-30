@@ -61,6 +61,7 @@ QString AADLXMLReader::badTagWarningMessage(const QXmlStreamReader &xml, const Q
 bool AADLXMLReader::handleError(const QXmlStreamReader &xml)
 {
     if (xml.hasError()) {
+        qWarning() << xml.errorString();
         emit error(xml.errorString());
         return true;
     }
@@ -371,11 +372,24 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
     return currObj;
 }
 
-struct ConnectionInitParamsHolderPrivate {
-    AADLObject *m_from { nullptr };
-    AADLObject *m_to { nullptr };
-    AADLObjectIfaceRequired *m_ri { nullptr };
-    AADLObjectIfaceProvided *m_pi { nullptr };
+struct ConnectionEndPoint {
+    enum Location
+    {
+        Begin = 0,
+        End
+    };
+
+    AADLObject *m_function { nullptr };
+    AADLObjectIface *m_interface { nullptr };
+    Location m_location { Location::Begin };
+    bool isReady() const { return m_function && m_interface; }
+};
+
+struct ConnectionHolder {
+    ConnectionEndPoint m_from;
+    ConnectionEndPoint m_to;
+
+    bool isValid() const { return m_from.isReady() && m_to.isReady(); }
 };
 
 bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
@@ -387,62 +401,104 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
         return false;
     }
 
-    ConnectionInitParamsHolderPrivate connectionInitParams;
-    const QXmlStreamAttributes &attributes = xml.attributes();
-    for (const QXmlStreamAttribute &attr : attributes) {
+    auto readEndpointAttribute = [this](ConnectionEndPoint &endpoint, const QXmlStreamAttribute &attr) {
         const QString &attrName = attr.name().toString();
         const QString &attrValue = attr.value().toString();
 
         switch (Props::token(attrName)) {
-        case Props::Token::from: {
-            connectionInitParams.m_from = d->m_functionNames.value(attrValue, nullptr);
-            if (!connectionInitParams.m_from)
-                qCritical() << Q_FUNC_INFO << attrValue;
-            break;
-        }
-        case Props::Token::to: {
-            connectionInitParams.m_to = d->m_functionNames.value(attrValue, nullptr);
-            if (!connectionInitParams.m_to)
-                qCritical() << Q_FUNC_INFO << attrValue;
+        case Props::Token::func_name: {
+            endpoint.m_function = d->m_functionNames.value(attrValue, nullptr);
             break;
         }
         case Props::Token::si_name:
         case Props::Token::ri_name: {
-            connectionInitParams.m_ri = d->m_ifaceRequiredNames.value(attrValue, nullptr);
-            if (!connectionInitParams.m_ri)
-                qCritical() << Q_FUNC_INFO << attrValue;
+            endpoint.m_interface = d->m_ifaceRequiredNames.value(attrValue, nullptr);
             break;
         }
         case Props::Token::ti_name:
         case Props::Token::pi_name: {
-            connectionInitParams.m_pi = d->m_ifaceProvidedNames.value(attrValue, nullptr);
-            if (!connectionInitParams.m_pi)
-                qCritical() << Q_FUNC_INFO << attrValue;
+            endpoint.m_interface = d->m_ifaceProvidedNames.value(attrValue, nullptr);
+            break;
+        }
+
+        case Props::Token::location: {
+            const int loc = attr.value().toInt();
+            switch (loc) {
+            case ConnectionEndPoint::Location::Begin:
+            case ConnectionEndPoint::Location::End: {
+                endpoint.m_location = ConnectionEndPoint::Location(loc);
+                break;
+            }
+            default: {
+                QString wrn("Unknown location of endpoint: %1 (expected %2 or %3)");
+                qWarning() << wrn.arg(loc).arg(ConnectionEndPoint::Begin).arg(ConnectionEndPoint::End);
+                break;
+            }
+            }
+
             break;
         }
         default: {
-            qWarning() << badTagWarningMessage(xml, name);
             return false;
         }
         }
-    }
+        return true;
+    };
 
-    /// TODO: remove this after discussions with critical warnings in the switch block
-    if (!connectionInitParams.m_from || !connectionInitParams.m_to || !connectionInitParams.m_ri
-        || !connectionInitParams.m_pi) {
-        qCritical("Skipping item with both empty endpoints/functions");
+    auto readEndpoint = [readEndpointAttribute, &xml](ConnectionEndPoint &endpoint) {
+        switch (Props::token(xml.name().toString())) {
+        case Props::Token::EndPoint: {
+            const QXmlStreamAttributes &attrs = xml.attributes();
+            for (const QXmlStreamAttribute &attr : attrs) {
+                if (!readEndpointAttribute(endpoint, attr)) {
+                    qWarning() << "Unknown endpoint attribute found:" << attr.name() << attr.value().toString();
+                    return false;
+                }
+            }
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, xml.name().toString());
+            return false;
+        }
+        }
+        return true;
+    };
+
+    auto readConnectionPart = [&readEndpoint, &xml](ConnectionHolder &connection) {
+        if (!xml.readNextStartElement())
+            return false;
+
+        ConnectionEndPoint endpoint;
+        if (readEndpoint(endpoint)) {
+            if (endpoint.m_location == ConnectionEndPoint::Location::Begin)
+                connection.m_from = endpoint;
+            else
+                connection.m_to = endpoint;
+            xml.skipCurrentElement();
+            return true;
+        }
+        return false;
+    };
+
+    ConnectionHolder connection;
+
+    if (!readConnectionPart(connection)) // read the first one (From or To)
+        return false;
+    if (!readConnectionPart(connection)) // read the second one (To or From)
+        return false;
+
+    if (connection.isValid()) {
+        AADLObjectConnection *objConnection =
+                new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
+                                         connection.m_from.m_interface, connection.m_to.m_interface);
+        d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
+        d->m_allObjects.append(objConnection);
+        xml.skipCurrentElement();
         return true;
     }
 
-    Q_ASSERT(connectionInitParams.m_from || connectionInitParams.m_to);
-    Q_ASSERT(connectionInitParams.m_ri || connectionInitParams.m_pi);
-
-    AADLObjectConnection *objConnection =
-            new AADLObjectConnection(connectionInitParams.m_from, connectionInitParams.m_to, connectionInitParams.m_ri,
-                                     connectionInitParams.m_pi);
-    d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
-    d->m_allObjects.append(objConnection);
-    return true;
+    return false;
 }
 
 } // ns aadl
