@@ -31,6 +31,7 @@ const QHash<QString, Props::Token> Props::TokensByName = { { "InterfaceView", To
                                                            { "Output_Parameter", Token::Output_Parameter },
                                                            { "Required_Interface", Token::Required_Interface },
                                                            { "Connection", Token::Connection },
+                                                           { "EndPoint", Token::EndPoint },
 
                                                            // attrs:
                                                            { "name", Token::name },
@@ -50,6 +51,8 @@ const QHash<QString, Props::Token> Props::TokensByName = { { "InterfaceView", To
                                                            { "to", Token::to },
                                                            { "pi_name", Token::pi_name },
                                                            { "ti_name", Token::ti_name },
+                                                           { "func_name", Token::func_name },
+                                                           { "location", Token::location },
 
                                                            // TASTE props:
                                                            { "Taste::Active_Interfaces", Token::Active_Interfaces },
