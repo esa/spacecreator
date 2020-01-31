@@ -159,16 +159,16 @@ bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
     return iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
 }
 
-QVariantList AADLObjectFunctionType::functions() const
+QVariantList AADLObjectFunctionType::nestedFunctions() const
 {
-    QVariantList functionList;
-    for (const auto child : d->m_children) {
-        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
-            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
-            functionList << QVariant::fromValue(child);
-        }
+    QVariantList functions;
+    for (const auto child : findChildren<AADLObjectFunctionType*>()) { // TODO: wrong way, it must be revised!
+//        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
+//            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+        functions << QVariant::fromValue(child);
+//        }
     }
-    return functionList;
+    return functions;
 }
 
 QString AADLObjectFunctionType::language() const

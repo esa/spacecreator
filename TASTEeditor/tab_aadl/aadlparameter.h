@@ -91,6 +91,7 @@ class IfaceParameter : public BasicParameter
     Q_GADGET
     Q_PROPERTY(bool isIn READ isInDirection)
     Q_PROPERTY(bool isOut READ isOutDirection)
+    Q_PROPERTY(QString encoding READ encoding)
 public:
     enum class Direction
     {

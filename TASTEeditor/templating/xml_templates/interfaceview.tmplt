@@ -1,5 +1,7 @@
 <InterfaceView>
-    {% include "functions.tmplt" %}
+{% for func in Functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
     {% include "connections.tmplt" %}
     {% include "comments.tmplt" %}
 </InterfaceView>

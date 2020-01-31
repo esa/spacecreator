@@ -1,3 +1,4 @@
+{# This template is test purposes only #}
 <Interfaces>
 {% for iface in Interfaces %}
     {% include "interface.tmplt" %}

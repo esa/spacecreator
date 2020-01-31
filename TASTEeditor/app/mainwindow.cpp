@@ -228,9 +228,15 @@ void MainWindow::onExportByTemplateRequested()
             QString aadlGroupType;
             switch (aadlObject->aadlType()) {
             case aadl::AADLObject::AADLObjectType::AADLFunctionType:
-            case aadl::AADLObject::AADLObjectType::AADLFunction:
+            case aadl::AADLObject::AADLObjectType::AADLFunction: {
+                aadl::AADLObject *parentObject = aadlObject->parentObject();
+                if (parentObject &&
+                    (parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction ||
+                    parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunctionType))
+                    continue;
                 aadlGroupType = QStringLiteral("Functions");
                 break;
+            }
             case aadl::AADLObject::AADLObjectType::AADLIface:
                 aadlGroupType = QStringLiteral("Interfaces");
                 break;
