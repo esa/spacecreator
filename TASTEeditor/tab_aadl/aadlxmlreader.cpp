@@ -149,6 +149,10 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
                 obj->addInterface(iface);
             break;
         }
+        case Props::Token::Connection: {
+            readConnection(xml, obj);
+            break;
+        }
         default: {
             qWarning() << badTagWarningMessage(xml, name);
             return false;
@@ -392,7 +396,7 @@ struct ConnectionHolder {
     bool isValid() const { return m_from.isReady() && m_to.isReady(); }
 };
 
-bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
+bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
 {
     const QString &name = xml.name().toString();
     const Props::Token currParam = Props::token(name);
@@ -491,7 +495,8 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml)
     if (connection.isValid()) {
         AADLObjectConnection *objConnection =
                 new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
-                                         connection.m_from.m_interface, connection.m_to.m_interface);
+                                         connection.m_from.m_interface, connection.m_to.m_interface, parent);
+
         d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
         d->m_allObjects.append(objConnection);
         xml.skipCurrentElement();
