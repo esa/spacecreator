@@ -18,6 +18,7 @@
 #include "aadlxmlreader.h"
 
 #include "aadlcommonprops.h"
+#include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
@@ -121,6 +122,9 @@ bool AADLXMLReader::readAADLObject(QXmlStreamReader &xml)
     case Props::Token::Connection: {
         return readConnection(xml);
     }
+    case Props::Token::Comment: {
+        return readComment(xml);
+    }
     default:
         qWarning() << badTagWarningMessage(xml, tagName);
         return false;
@@ -157,8 +161,14 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
             readConnection(xml, obj);
             break;
         }
+        case Props::Token::Comment: {
+            readComment(xml, obj);
+            break;
+        }
         default: {
             qWarning() << badTagWarningMessage(xml, name);
+            d->m_allObjects.removeAll(obj);
+            delete obj;
             return false;
         }
         }
@@ -508,6 +518,69 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
     }
 
     return false;
+}
+
+bool AADLXMLReader::readComment(QXmlStreamReader &xml, AADLObject *parent)
+{
+    const QString &name = xml.name().toString();
+    const Props::Token currParam = Props::token(name);
+    if (currParam != Props::Token::Comment) {
+        qWarning() << badTagWarningMessage(xml, name);
+        return false;
+    }
+
+    AADLObjectComment *obj = new AADLObjectComment(QString(), parent);
+    d->m_allObjects.append(obj);
+
+    for (const QXmlStreamAttribute &attr : xml.attributes()) {
+        const QString &attrName = attr.name().toString();
+        const QString &attrValue = attr.value().toString();
+
+        switch (Props::token(attrName)) {
+        case Props::Token::name: {
+            obj->setAttr(attrName, attrValue);
+            break;
+        }
+        default:
+            qWarning() << "Unexpected Comment's attribute found:" << attrName << attrValue;
+            break;
+        }
+    }
+
+    auto readCommentProperty = [&xml, &obj]() {
+        const QXmlStreamAttributes &attrs = xml.attributes();
+        const QString &propName = attrs.value(Props::token(Props::Token::name)).toString();
+        const QString &propVal = attrs.value(Props::token(Props::Token::value)).toString();
+        switch (Props::token(propName)) {
+        case Props::Token::coordinates: {
+            obj->setProp(propName, propVal);
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, xml.name().toString());
+            return false;
+        }
+        }
+        return true;
+    };
+
+    if (xml.readNextStartElement()) {
+        switch (Props::token(xml.name().toString())) {
+        case Props::Token::Property: {
+            if (readCommentProperty())
+                xml.skipCurrentElement();
+            else
+                return false;
+            break;
+        }
+        default: {
+            qWarning() << badTagWarningMessage(xml, xml.name().toString());
+            return false;
+        }
+        }
+    }
+
+    return true;
 }
 
 } // ns aadl
