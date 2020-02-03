@@ -164,8 +164,12 @@ bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 QVariantList AADLObjectFunctionType::nestedFunctions() const
 {
     QVariantList functions;
-    for (const auto child : findChildren<AADLObjectFunctionType*>(QString(), Qt::FindDirectChildrenOnly))
-        functions << QVariant::fromValue(child);
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
+            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+            functions << QVariant::fromValue(child);
+        }
+    }
 
     return functions;
 }
