@@ -93,6 +93,7 @@ protected:
     explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
     explicit AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
                              AADLObject *parent = nullptr);
+    void setupInitialAttrs();
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;

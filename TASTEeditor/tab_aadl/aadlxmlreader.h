@@ -64,6 +64,7 @@ private:
     bool readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *iface);
 
     bool readConnection(QXmlStreamReader &xml, AADLObject *parent = nullptr);
+    bool readComment(QXmlStreamReader &xml, AADLObject *parent = nullptr);
 };
 
 } // ns aadl
