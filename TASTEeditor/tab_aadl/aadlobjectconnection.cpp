@@ -80,6 +80,11 @@ void AADLObjectConnection::setSource(AADLObject *source)
     setAttr(meta::Props::token(meta::Props::Token::from), source ? source->title() : QString());
 }
 
+QString AADLObjectConnection::targetName() const
+{
+    return target() ? target()->title() : QString();
+}
+
 AADLObject *AADLObjectConnection::target() const
 {
     return d->m_target;
@@ -88,11 +93,6 @@ AADLObject *AADLObjectConnection::target() const
 void AADLObjectConnection::setTarget(AADLObject *target)
 {
     setAttr(meta::Props::token(meta::Props::Token::to), target ? target->title() : QString());
-}
-
-QString AADLObjectConnection::targetName() const
-{
-    return target() ? target()->title() : QString();
 }
 
 AADLObjectIface *AADLObjectConnection::sourceInterface() const
