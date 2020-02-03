@@ -39,11 +39,11 @@ private:
         QRegExp pattern;
         QTextCharFormat format;
     };
-    QVector<HighlightingRule> highlightingRules;
+    QVector<HighlightingRule> m_highlightingRules;
 
-    QTextCharFormat valueFormat;
-    QRegExp valueStartExpression;
-    QRegExp valueEndExpression;
+    QTextCharFormat m_valueFormat;
+    QRegExp m_valueStartExpression;
+    QRegExp m_valueEndExpression;
 };
 
 } // ns processing
