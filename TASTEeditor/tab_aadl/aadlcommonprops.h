@@ -72,7 +72,6 @@ struct Props {
         RCMoperationKind,
         RCMperiod,
         labelInheritance,
-        text,
     };
 
     static const QHash<QString, Props::Token> TokensByName;
