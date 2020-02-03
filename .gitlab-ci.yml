@@ -5,7 +5,7 @@ build_debian10_gcc:
   stage: build
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/debian_10_cpp:latest
+  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
   script:
     - mkdir -p build; cd build
     - qmake -recursive ..
