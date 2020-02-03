@@ -33,6 +33,8 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
     : AADLObject(title, parent)
     , d(new AADLObjectFunctionTypePrivate)
 {
+    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
+        root->addChild(this);
 }
 
 AADLObjectFunctionType::~AADLObjectFunctionType() {}

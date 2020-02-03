@@ -138,6 +138,10 @@ bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
     while (xml.readNextStartElement()) {
         const QString &name = xml.name().toString();
         switch (Props::token(name)) {
+        case Props::Token::Function: {
+            readFunction(xml, obj);
+            break;
+        }
         case Props::Token::Property: {
             readFunctionProperty(xml, obj);
             xml.skipCurrentElement();
