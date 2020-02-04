@@ -54,9 +54,6 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
     connect(m_textItem, &TextGraphicsItem::edited, this, &AADLCommentGraphicsItem::textEdited);
     connect(m_textItem, &TextGraphicsItem::textChanged, this, &AADLCommentGraphicsItem::textChanged);
 
-    const QColor brushColor { 0xf9e29c };
-    qDebug() << brushColor.name(QColor::HexArgb) << brushColor.darker().name(QColor::HexArgb);
-
     setFont(QFont(qApp->font()));
     m_textItem->setFont(font());
 

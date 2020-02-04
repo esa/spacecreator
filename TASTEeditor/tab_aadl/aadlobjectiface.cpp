@@ -39,6 +39,7 @@ AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QSt
     : AADLObject(title, parent)
     , d(new AADLObjectIfacePrivate(direction))
 {
+    setupInitialAttrs();
 }
 
 AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
@@ -46,10 +47,22 @@ AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceTyp
     : AADLObject(id.isNull() ? common::createId() : id, title, parent)
     , d(new AADLObjectIfacePrivate(direction))
 {
+    setupInitialAttrs();
 }
 
 AADLObjectIface::~AADLObjectIface() {}
 
+void AADLObjectIface::setupInitialAttrs()
+{
+    if (isProvided()) {
+        setAttr(meta::Props::token(meta::Props::Token::kind), QVariant());
+        setAttr(meta::Props::token(meta::Props::Token::period), QVariant());
+        setAttr(meta::Props::token(meta::Props::Token::wcet), QVariant());
+        setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
+    } else {
+        setAttr(meta::Props::token(meta::Props::Token::kind), QVariant());
+    }
+}
 AADLObject::AADLObjectType AADLObjectIface::aadlType() const
 {
     return AADLObjectType::AADLIface;

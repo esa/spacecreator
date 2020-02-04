@@ -40,6 +40,7 @@ struct Props {
         Required_Interface,
         Connection,
         EndPoint,
+        Comment,
 
         // attrs:
         name,
@@ -70,7 +71,7 @@ struct Props {
         InterfaceName,
         RCMoperationKind,
         RCMperiod,
-        labelInheritance
+        labelInheritance,
     };
 
     static const QHash<QString, Props::Token> TokensByName;
