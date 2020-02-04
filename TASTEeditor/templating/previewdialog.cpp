@@ -37,6 +37,9 @@ PreviewDialog::PreviewDialog(QWidget *parent)
     , m_stringTemplate(new templating::StringTemplate(this))
     , m_textEdit(new QTextEdit(this))
 {
+    setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
+    setWindowState(Qt::WindowMaximized);
+
     new XMLHighlighter(m_textEdit->document());
 
     QDesktopWidget *desktop = QApplication::desktop();
@@ -70,11 +73,16 @@ PreviewDialog::PreviewDialog(QWidget *parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &PreviewDialog::reject);
 }
 
-QString PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
+void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
 {
     QString result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
     m_textEdit->setText(result);
-    return exec() ? m_textEdit->toPlainText() : QString();
+    open();
+}
+
+QString PreviewDialog::text() const
+{
+    return m_textEdit->toPlainText();
 }
 
 void PreviewDialog::onErrorOccurred(const QString &error)

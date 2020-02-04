@@ -34,7 +34,9 @@ class PreviewDialog : public QDialog
 public:
     PreviewDialog(QWidget *parent = nullptr);
 
-    QString parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+    void parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+
+    QString text() const;
 
 private slots:
     void onErrorOccurred(const QString &error);

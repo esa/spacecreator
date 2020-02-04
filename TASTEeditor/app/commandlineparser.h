@@ -32,6 +32,8 @@ public:
     {
         DropUnsavedChangesSilently,
         OpenAADLXMLFile,
+        OpenStringTemplateFile,
+        ExportToXMLFile,
         ListScriptableActions,
 
         Unknown

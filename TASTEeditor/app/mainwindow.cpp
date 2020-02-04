@@ -222,52 +222,7 @@ void MainWindow::onExportByTemplateRequested()
     if (templateFileName.isEmpty())
         return;
 
-    if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
-        QHash<QString, QVariantList> grouppedObjects;
-        for (const auto aadlObject : doc->objects()) {
-            QString aadlGroupType;
-            switch (aadlObject->aadlType()) {
-            case aadl::AADLObject::AADLObjectType::AADLFunctionType:
-            case aadl::AADLObject::AADLObjectType::AADLFunction: {
-                aadl::AADLObject *parentObject = aadlObject->parentObject();
-                if (parentObject &&
-                    (parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction ||
-                    parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunctionType))
-                    continue;
-                aadlGroupType = QStringLiteral("Functions");
-                break;
-            }
-            case aadl::AADLObject::AADLObjectType::AADLIface:
-                aadlGroupType = QStringLiteral("Interfaces");
-                break;
-            case aadl::AADLObject::AADLObjectType::AADLComment:
-                aadlGroupType = QStringLiteral("Comments");
-                break;
-            case aadl::AADLObject::AADLObjectType::AADLConnection:
-                aadlGroupType = QStringLiteral("Connections");
-                break;
-            default:
-                continue;
-            }
-            grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
-        }
-
-        if (!m_previewDialog)
-            m_previewDialog = new templating::PreviewDialog(this);
-
-        QString output = m_previewDialog->parse(grouppedObjects, templateFileName);
-        if (!output.isEmpty()) {
-            QString outputFileName = QFileDialog::getSaveFileName(this, tr("Save file"), QString(), QStringLiteral("*.xml"));
-            if (outputFileName.isEmpty())
-                return;
-
-            QFile outputFile(outputFileName);
-            if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
-                QTextStream stream(&outputFile);
-                stream << output;
-            }
-        }
-    }
+    parseTemplateFile(templateFileName);
 }
 
 void MainWindow::onQuitRequested()
@@ -351,6 +306,15 @@ void MainWindow::onReportRequested()
     dialog->exec();
 }
 
+void MainWindow::onSaveParsedTemplateToFile()
+{
+    QString outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
+    if (outputFileName.isEmpty())
+        return;
+
+    exportToXMLFile(outputFileName);
+}
+
 void MainWindow::initTabs()
 {
     using namespace document;
@@ -391,6 +355,73 @@ void MainWindow::updateActions()
     m_actSaveSceneRender->setEnabled(renderAvailable);
 }
 
+bool MainWindow::parseTemplateFile(const QString &templateFileName)
+{
+    QFileInfo fileInfo(templateFileName);
+    if (!fileInfo.exists())
+        return false;
+
+    if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
+        QHash<QString, QVariantList> grouppedObjects;
+        for (const auto aadlObject : doc->objects()) {
+            QString aadlGroupType;
+            switch (aadlObject->aadlType()) {
+            case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+            case aadl::AADLObject::AADLObjectType::AADLFunction: {
+                aadl::AADLObject *parentObject = aadlObject->parentObject();
+                if (parentObject &&
+                    (parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction ||
+                    parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunctionType))
+                    continue;
+                aadlGroupType = QStringLiteral("Functions");
+                break;
+            }
+            case aadl::AADLObject::AADLObjectType::AADLIface:
+                aadlGroupType = QStringLiteral("Interfaces");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLComment:
+                aadlGroupType = QStringLiteral("Comments");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLConnection:
+                aadlGroupType = QStringLiteral("Connections");
+                break;
+            default:
+                continue;
+            }
+            grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
+        }
+
+        if (!m_previewDialog) {
+            m_previewDialog = new templating::PreviewDialog(this);
+            connect(m_previewDialog, &templating::PreviewDialog::accepted, this, &MainWindow::onSaveParsedTemplateToFile);
+        }
+
+        m_previewDialog->parse(grouppedObjects, templateFileName);
+        QString output = m_previewDialog->text();
+        return !output.isEmpty();
+    }
+
+    return false;
+}
+
+bool MainWindow::exportToXMLFile(const QString &outputXmlFileName)
+{
+    if (!m_previewDialog)
+        return false;
+
+    const QString text = m_previewDialog->text();
+    if (text.isEmpty())
+        return false;;
+
+    QFile outputFile(outputXmlFileName);
+    if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+        QTextStream stream(&outputFile);
+        stream << text;
+        return true;
+    }
+    return false;
+}
+
 /*!
  * \brief MainWindow::processCommandLineArg handles initial option from command line
  * \returns true if an option is handled
@@ -409,6 +440,14 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
 
         return false;
     }
+    case CommandLineParser::Positional::OpenStringTemplateFile:
+        if (!value.isEmpty())
+            return parseTemplateFile(value);
+        return false;
+    case CommandLineParser::Positional::ExportToXMLFile:
+        if (!value.isEmpty())
+            return exportToXMLFile(value);
+        return false;
     case CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
