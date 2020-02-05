@@ -49,8 +49,9 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     QSizeF minimalSize() const override;
 
