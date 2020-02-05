@@ -32,19 +32,14 @@ struct AADLObjectFunctionTypePrivate;
 class AADLObjectFunctionType : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString language READ language WRITE setLanguage)
-    Q_PROPERTY(QString isType READ isType)
-    Q_PROPERTY(QString instanceOf READ instanceOf)
     Q_PROPERTY(QVariantList interfaces READ interfaces)
     Q_PROPERTY(QVariantList functions READ nestedFunctions)
+    Q_PROPERTY(QVariantList comments READ nestedComments)
 public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
 
     AADLObject::AADLObjectType aadlType() const override;
-
-    QString isType() const;
-    virtual QString instanceOf() const;
 
     QVector<AADLObject *> children() const;
     bool addChild(AADLObject *child);
@@ -63,6 +58,7 @@ public:
     bool removeInterface(AADLObjectIface *iface);
 
     QVariantList nestedFunctions() const;
+    QVariantList nestedComments() const;
 
     QString language() const;
     void setLanguage(const QString &lang);

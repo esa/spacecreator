@@ -34,7 +34,7 @@ namespace aadl {
  *      <Property name="{{ key }}" value="{{ value }}"/>
  *  {% endfor %}
  * @endcode
- * Therefore AADLObject has a property "properties" which is list of AADLObjectProperty
+ * Therefore AADLObject has a property "properties" and "attributes" which are lists of AADLObjectProperty
  * and thus it's possible to write like this:
  * @code
  *  {% for property in iface.properties %}
@@ -67,6 +67,7 @@ class AADLObject : public QObject
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QVariantList properties READ properties)
+    Q_PROPERTY(QVariantList attributes READ attributes)
 
 public:
     enum class AADLObjectType
@@ -102,6 +103,7 @@ public:
     // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
 
     QHash<QString, QVariant> attrs() const;
+    QVariantList attributes() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setAttr(const QString &name, const QVariant &val);
@@ -140,6 +142,7 @@ private:
     const std::unique_ptr<AADLObjectPrivate> d;
     QVector<qint32> coordinatesFromString(const QString &strCoordinates) const;
     QString coordinatesToString(const QVector<qint32> &coordinates) const;
+    static QVariantList generateSortedList(const QHash<QString, QVariant> &props);
 };
 
 } // ns aadl

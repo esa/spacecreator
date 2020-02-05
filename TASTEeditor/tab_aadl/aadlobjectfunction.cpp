@@ -25,7 +25,7 @@ namespace aadl {
 AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
     : AADLObjectFunctionType(title, parent)
 {
-    setAttr(meta::Props::token(meta::Props::Token::is_type), "NO");
+    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
 }
 
 AADLObjectFunction::~AADLObjectFunction() {}

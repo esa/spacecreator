@@ -275,8 +275,6 @@ OTHER_FILES += templating/xml_templates/*.tmplt
 SOURCE_DIR = $$absolute_path(templating/xml_templates)
 DEST_DIR = $$OUT_PWD
 
-message($$DEST_DIR)
-
 win32 {
     SOURCE_DIR ~= s,/,\\,g
     DEST_DIR ~= s,/,\\,g

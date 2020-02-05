@@ -34,7 +34,7 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
     , d(new AADLObjectFunctionTypePrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
-    setAttr(meta::Props::token(meta::Props::Token::is_type), "YES");
+    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 
     if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
@@ -46,16 +46,6 @@ AADLObjectFunctionType::~AADLObjectFunctionType() {}
 AADLObject::AADLObjectType AADLObjectFunctionType::aadlType() const
 {
     return AADLObject::AADLObjectType::AADLFunctionType;
-}
-
-QString AADLObjectFunctionType::isType() const
-{
-    return aadlType() == AADLObjectType::AADLFunctionType ? QStringLiteral("YES") : QStringLiteral("NO");
-}
-
-QString AADLObjectFunctionType::instanceOf() const
-{
-    return QString();
 }
 
 QVector<AADLObject *> AADLObjectFunctionType::children() const
@@ -174,8 +164,17 @@ QVariantList AADLObjectFunctionType::nestedFunctions() const
             functions << QVariant::fromValue(child);
         }
     }
-
     return functions;
+}
+
+QVariantList AADLObjectFunctionType::nestedComments() const
+{
+    QVariantList comments;
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLComment)
+            comments << QVariant::fromValue(child);
+    }
+    return comments;
 }
 
 QString AADLObjectFunctionType::language() const

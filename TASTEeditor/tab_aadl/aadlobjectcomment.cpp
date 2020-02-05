@@ -17,12 +17,16 @@
 
 #include "aadlobjectcomment.h"
 
+#include "aadlobjectfunctiontype.h"
+
 namespace taste3 {
 namespace aadl {
 
 AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
     : AADLObject(title, parent)
 {
+    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
+        root->addChild(this);
 }
 
 AADLObjectComment::~AADLObjectComment() {}

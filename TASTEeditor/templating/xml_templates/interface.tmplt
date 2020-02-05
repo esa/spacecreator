@@ -12,9 +12,9 @@ period, wcet, queueSize : Properties of the interface #}
 IF_Property_Names, Values : User-defined properties (vector tag) #}
 {% endcomment %}
 {% if iface.isProvided %}
-<Provided_Interface name="{{ iface.name }}" kind="{{ iface.kind }}" period="{{ iface.period }}" wcet="{{ iface.wcet }}" queue_size="{{ iface.queueSize }}">
+<Provided_Interface {% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}" {% endfor %}>
 {% else %}
-<Required_Interface name="{{ iface.name }}" kind="{{ iface.kind }}">
+<Required_Interface {% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}" {% endfor %}>
 {% endif %}
 {% for param in iface.params %}
 {% if param.isIn %}

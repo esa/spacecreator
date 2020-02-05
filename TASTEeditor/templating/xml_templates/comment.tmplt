@@ -1,0 +1,6 @@
+{# TODO: template for comment #}
+<Comment {% for attr in comm.attributes %} {{ attr.name }}="{{ attr.value }}" {% endfor %}>
+{% for property in comm.properties %}
+    <Property name="{{ property.name }}" value="{{ property.value }}"/>
+{% endfor %}
+</Comment>

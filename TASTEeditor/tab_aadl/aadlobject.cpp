@@ -117,6 +117,34 @@ QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) cons
     return coordString;
 }
 
+/**
+ * @brief AADLObject::generateSortedList generates a variant list sorted by meta::Props::Token.
+ * @param props can be internal hash of attributes or properties.
+ * @return sorted QVariantList which can be used in string templates
+ */
+QVariantList AADLObject::generateSortedList(const QHash<QString, QVariant> &props)
+{
+    QVariantList result;
+    for (auto it = props.cbegin(); it != props.cend(); ++it)
+        result << QVariant::fromValue(AADLObjectProperty(it.key(), it.value()));
+
+    std::sort(result.begin(), result.end(), [] (const QVariant &left_val, const QVariant &right_val) {
+        const AADLObjectProperty r = right_val.value<AADLObjectProperty>();
+        meta::Props::Token right_token = meta::Props::token(r.name());
+        if (right_token == meta::Props::Token::Unknown)
+            return true;
+
+        const AADLObjectProperty l = left_val.value<AADLObjectProperty>();
+        meta::Props::Token left_token = meta::Props::token(l.name());
+        if (left_token == meta::Props::Token::Unknown)
+            return false;
+
+        return left_token < right_token;
+    });
+
+    return result;
+}
+
 void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 {
     if (this->coordinates() != coordinates) {
@@ -146,6 +174,11 @@ AADLObject *AADLObject::parentObject() const
 QHash<QString, QVariant> AADLObject::attrs() const
 {
     return d->m_attrs;
+}
+
+QVariantList AADLObject::attributes() const
+{
+    return generateSortedList(d->m_attrs);
 }
 
 void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
@@ -182,10 +215,7 @@ QHash<QString, QVariant> AADLObject::props() const
 
 QVariantList AADLObject::properties() const
 {
-    QVariantList propList;
-    for (auto it = d->m_props.cbegin(); it != d->m_props.cend(); ++it)
-        propList << QVariant::fromValue(AADLObjectProperty(it.key(), it.value()));
-    return propList;
+    return generateSortedList(d->m_props);
 }
 
 void AADLObject::setProps(const QHash<QString, QVariant> &props)

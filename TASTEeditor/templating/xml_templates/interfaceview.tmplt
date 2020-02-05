@@ -3,5 +3,7 @@
     {% include "function.tmplt" %}
 {% endfor %}
     {% include "connections.tmplt" %}
-    {% include "comments.tmplt" %}
+{% for comm in Comments %}
+    {% include "comment.tmplt" %}
+{% endfor %}
 </InterfaceView>

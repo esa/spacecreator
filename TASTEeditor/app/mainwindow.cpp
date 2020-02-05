@@ -27,7 +27,7 @@
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
-#include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
@@ -368,10 +368,7 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
             switch (aadlObject->aadlType()) {
             case aadl::AADLObject::AADLObjectType::AADLFunctionType:
             case aadl::AADLObject::AADLObjectType::AADLFunction: {
-                aadl::AADLObject *parentObject = aadlObject->parentObject();
-                if (parentObject &&
-                    (parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction ||
-                    parentObject->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunctionType))
+                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
                     continue;
                 aadlGroupType = QStringLiteral("Functions");
                 break;
@@ -379,9 +376,12 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
             case aadl::AADLObject::AADLObjectType::AADLIface:
                 aadlGroupType = QStringLiteral("Interfaces");
                 break;
-            case aadl::AADLObject::AADLObjectType::AADLComment:
+            case aadl::AADLObject::AADLObjectType::AADLComment: {
+                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
+                    continue;
                 aadlGroupType = QStringLiteral("Comments");
                 break;
+            }
             case aadl::AADLObject::AADLObjectType::AADLConnection:
                 aadlGroupType = QStringLiteral("Connections");
                 break;

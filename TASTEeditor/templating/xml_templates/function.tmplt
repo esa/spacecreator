@@ -1,7 +1,7 @@
 {% comment %}
 The following tags are available in this template:
 {% endcomment %}
-<Function name="{{ func.title }}" language="{{ func.language }}" is_type="{{ func.isType }}" instance_of="{{ func.istanceOf }}">
+<Function {% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}" {% endfor %}>
 {% for property in func.properties %}
     <Property name="{{ property.name }}" value="{{ property.value }}"/>
 {% endfor %}
@@ -10,5 +10,8 @@ The following tags are available in this template:
 {% endfor %}
 {% for func in func.functions %}
     {% include "function.tmplt" %}
+{% endfor %}
+{% for comm in func.comments %}
+    {% include "comment.tmplt" %}
 {% endfor %}
 </Function>
