@@ -567,7 +567,8 @@ void InterfaceTabDocument::onItemDoubleClicked()
                     }
                 }
             }
-            showPropertyEditor(clickedEntity);
+            if (clickedEntity->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection)
+                showPropertyEditor(clickedEntity);
         }
     }
 }
