@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QTextDocument>
 #include <QtDebug>
 #include <app/commandsstack.h>
 
@@ -86,7 +87,65 @@ void AADLCommentGraphicsItem::updateFromEntity()
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
 {
     InteractiveObject::onManualResizeProgress(grip, from, to);
-    m_textItem->setExplicitSize(m_boundingRect.size());
+
+    const QPointF shift = QPointF(to - from);
+    QRectF rect = mapRectToParent(boundingRect());
+    const QRectF contentRect =
+            parentItem() ? parentItem()->boundingRect().marginsRemoved(utils::kContentMargins) : QRectF();
+    switch (grip) {
+    case GripPoint::Left: {
+        const qreal left = rect.left() + shift.x();
+        if (contentRect.isNull() || left >= contentRect.left())
+            rect.setLeft(left);
+    } break;
+    case GripPoint::Top: {
+        const qreal top = rect.top() + shift.y();
+        if (contentRect.isNull() || top >= contentRect.top())
+            rect.setTop(top);
+    } break;
+    case GripPoint::Right: {
+        const qreal right = rect.right() + shift.x();
+        if (contentRect.isNull() || right <= contentRect.right())
+            rect.setRight(right);
+    } break;
+    case GripPoint::Bottom: {
+        const qreal bottom = rect.bottom() + shift.y();
+        if (contentRect.isNull() || bottom <= contentRect.bottom())
+            rect.setBottom(bottom);
+    } break;
+    case GripPoint::TopLeft: {
+        const QPointF topLeft = rect.topLeft() + shift;
+        if (contentRect.isNull() || contentRect.contains(topLeft))
+            rect.setTopLeft(topLeft);
+    } break;
+    case GripPoint::TopRight: {
+        const QPointF topRight = rect.topRight() + shift;
+        if (contentRect.isNull() || contentRect.contains(topRight))
+            rect.setTopRight(topRight);
+    } break;
+    case GripPoint::BottomLeft: {
+        const QPointF bottomLeft = rect.bottomLeft() + shift;
+        if (contentRect.isNull() || contentRect.contains(bottomLeft))
+            rect.setBottomLeft(bottomLeft);
+    } break;
+    case GripPoint::BottomRight: {
+        const QPointF bottomRight = rect.bottomRight() + shift;
+        if (contentRect.isNull() || contentRect.contains(bottomRight))
+            rect.setBottomRight(bottomRight);
+    } break;
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+
+    rect = rect.normalized();
+    m_textItem->setExplicitSize(rect.size());
+    const QSizeF &docSize = m_textItem->document()->size();
+    const QSizeF &itemSize = m_textItem->boundingRect().size();
+    if (docSize.width() > itemSize.width() || docSize.height() > itemSize.height())
+        m_textItem->setExplicitSize(m_boundingRect.size());
+    else
+        setRect(rect);
 }
 
 void AADLCommentGraphicsItem::textEdited(const QString &text)
@@ -168,6 +227,31 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 void AADLCommentGraphicsItem::rebuildLayout()
 {
     m_textItem->setExplicitSize(m_boundingRect.size());
+}
+
+void AADLCommentGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF & /*from*/,
+                                                   const QPointF &to)
+{
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
+        return;
+
+    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
+    if (parentItem()) {
+        const QRectF contentRect = parentItem()->boundingRect().marginsRemoved(utils::kContentMargins);
+
+        if (newPos.x() < contentRect.left())
+            newPos.setX(contentRect.left());
+        else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
+            newPos.setX(contentRect.right() - m_boundingRect.width());
+
+        if (newPos.y() < contentRect.top())
+            newPos.setY(contentRect.top());
+        else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
+            newPos.setY(contentRect.bottom() - m_boundingRect.height());
+    }
+
+    setPos(newPos);
+    updateGripPoints();
 }
 
 void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
