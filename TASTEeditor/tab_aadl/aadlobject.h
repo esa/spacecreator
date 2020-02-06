@@ -18,6 +18,7 @@
 #pragma once
 
 #include "app/common.h"
+#include "tab_aadl/aadlcommonprops.h"
 
 #include <QObject>
 #include <QVariant>
@@ -85,13 +86,18 @@ public:
 
     bool isRootObject() const;
 
+    virtual void postInit();
+
+    void notifyRemoved();
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
     void innerCoordinatesChanged(const QVector<qint32> &coordinates);
-    void attributesChanged();
-    void propertiesChanged();
+    void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown);
+    void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown);
+    void removed();
 
 public Q_SLOTS:
     bool setTitle(const QString &title);

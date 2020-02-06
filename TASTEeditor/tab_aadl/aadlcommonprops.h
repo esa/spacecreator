@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QHash>
+#include <QObject>
 #include <QString>
 
 namespace taste3 {
@@ -25,7 +26,8 @@ namespace aadl {
 namespace meta {
 
 struct Props {
-
+    Q_GADGET
+public:
     enum class Token
     {
         Unknown = 0,
@@ -73,6 +75,7 @@ struct Props {
         RCMperiod,
         labelInheritance,
     };
+    Q_ENUM(Token)
 
     static const QHash<QString, Props::Token> TokensByName;
 

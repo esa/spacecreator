@@ -50,6 +50,7 @@ public:
     AADLObjectIface *getIfaceByName(const QString &name) const;
     AADLObjectFunction *getFunction(const common::Id &id) const;
     AADLObjectFunctionType *getFunctionType(const common::Id &id) const;
+    QHash<QString, const AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;
     AADLObjectIface *getInterface(const common::Id &id) const;
     AADLObjectIfaceRequired *getRequiredInterface(const common::Id &id) const;
     AADLObjectIfaceProvided *getProvidedInterface(const common::Id &id) const;
@@ -57,8 +58,6 @@ public:
     AADLObjectComment *getCommentById(const common::Id &id) const;
 
     AADLObjectConnection *getConnectionForIface(const common::Id &id) const;
-
-    const QHash<common::Id, AADLObject *> &objects() const;
 
 Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);

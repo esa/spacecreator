@@ -24,6 +24,7 @@
 namespace taste3 {
 namespace aadl {
 
+struct AADLObjectFunctionPrivate;
 class AADLObjectFunction : public AADLObjectFunctionType
 {
     Q_OBJECT
@@ -33,8 +34,22 @@ public:
 
     AADLObject::AADLObjectType aadlType() const override;
 
-    QString instanceOf() const;
-    void setInstanceOf(const QString &instance);
+    void setAttr(const QString &name, const QVariant &val) override;
+    void postInit() override;
+
+Q_SIGNALS:
+    void attrChanged_instanceOf(const QString &functionType);
+
+private Q_SLOTS:
+    void onFunctionTypeRemoved();
+    void onFunctionTypeUntyped(bool nowIsType);
+    void onFunctionTypeRenamed(const QString &newName);
+
+private:
+    const std::unique_ptr<AADLObjectFunctionPrivate> d;
+
+    void setFunctionType(const QString &functionTypeName);
+    void setFunctionTypeAttr(const QString &functionTypeName);
 };
 
 typedef QVector<AADLObjectFunction *> AADLFunctionsVector;

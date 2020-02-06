@@ -64,11 +64,14 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
                     cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
         });
-        connect(entity, &AADLObjectFunction::attributesChanged, this, [this, entity]() {
-            if (m_textItem->toPlainText() != entity->title())
-                m_textItem->setPlainText(entity->title());
-            instantLayoutUpdate();
-        });
+        connect(entity, &AADLObjectFunction::attributeChanged, this,
+                [this, entity](taste3::aadl::meta::Props::Token attr) {
+                    if (attr == taste3::aadl::meta::Props::Token::name) {
+                        if (m_textItem->toPlainText() != entity->title())
+                            m_textItem->setPlainText(entity->title());
+                        instantLayoutUpdate();
+                    }
+                });
         connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
             m_textItem->setPlainText(text);
             instantLayoutUpdate();

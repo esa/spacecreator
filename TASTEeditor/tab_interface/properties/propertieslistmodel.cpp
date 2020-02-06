@@ -82,6 +82,11 @@ void PropertiesListModel::setDataObject(AADLObject *obj)
     endInsertRows();
 }
 
+const AADLObject *PropertiesListModel::dataObject() const
+{
+    return m_dataObject;
+}
+
 int PropertiesListModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())

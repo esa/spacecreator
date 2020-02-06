@@ -83,10 +83,12 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPath(pp);
     m_text->setPlainText(entity->interfaceName());
 
-    QObject::connect(entity, &AADLObject::attributesChanged, [this, entity]() {
-        if (m_text->toPlainText() != entity->title())
-            m_text->setPlainText(entity->title());
-        instantLayoutUpdate();
+    QObject::connect(entity, &AADLObject::attributeChanged, [this, entity](taste3::aadl::meta::Props::Token attr) {
+        if (attr == taste3::aadl::meta::Props::Token::name) {
+            if (m_text->toPlainText() != entity->title())
+                m_text->setPlainText(entity->title());
+            instantLayoutUpdate();
+        }
     });
     QObject::connect(entity, &AADLObjectIface::titleChanged, [this](const QString &text) {
         m_text->setPlainText(text);
