@@ -363,13 +363,9 @@ bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *i
 
 AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
 {
-    static const QXmlStreamAttribute attrFunctionType(Props::token(Props::Token::is_type), "true");
     const QXmlStreamAttributes &attributes(xml.attributes());
 
-    AADLObjectFunctionType *currObj = attributes.contains(attrFunctionType)
-            ? new AADLObjectFunctionType(QString(), parent)
-            : new AADLObjectFunction(QString(), parent);
-
+    QHash<QString, QString> attrs;
     for (const QXmlStreamAttribute &attr : attributes) {
         const QString &attrName = attr.name().toString();
         switch (Props::token(attrName)) {
@@ -377,7 +373,7 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
         case Props::Token::language:
         case Props::Token::is_type:
         case Props::Token::instance_of: {
-            currObj->setAttr(attrName, attr.value().toString());
+            attrs.insert(attrName, attr.value().toString());
             break;
         }
         default: {
@@ -385,6 +381,20 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
             break;
         }
         }
+    }
+
+    static const QString attrName_isType = Props::token(Props::Token::is_type);
+    bool isFunctionType(false);
+    if (attrs.contains(attrName_isType))
+        isFunctionType = attrs.take(attrName_isType).toLower() == "yes";
+
+    AADLObjectFunctionType *currObj =
+            isFunctionType ? new AADLObjectFunctionType(QString(), parent) : new AADLObjectFunction(QString(), parent);
+
+    QHash<QString, QString>::const_iterator i = attrs.constBegin();
+    while (i != attrs.constEnd()) {
+        currObj->setAttr(i.key(), i.value());
+        ++i;
     }
 
     return currObj;
