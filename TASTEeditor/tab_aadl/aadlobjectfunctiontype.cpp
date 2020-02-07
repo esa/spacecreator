@@ -228,5 +228,19 @@ void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &p
     }
 }
 
+void AADLObjectFunctionType::setAttr(const QString &name, const QVariant &val)
+{
+    AADLObject::setAttr(name, val);
+    switch (meta::Props::token(name)) {
+    case meta::Props::Token::is_type: {
+        const bool isType = val.toString().toLower().simplified() == "yes";
+        emit attrChanged_isType(isType);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 } // ns aadl
 } // ns taste3

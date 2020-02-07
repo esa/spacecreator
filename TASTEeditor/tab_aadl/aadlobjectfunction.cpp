@@ -18,12 +18,19 @@
 #include "aadlobjectfunction.h"
 
 #include "aadlcommonprops.h"
+#include "aadlobject.h"
+#include "aadlobjectsmodel.h"
 
 namespace taste3 {
 namespace aadl {
 
+struct AADLObjectFunctionPrivate {
+    QPointer<const AADLObjectFunctionType> m_fnType;
+};
+
 AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
     : AADLObjectFunctionType(title, parent)
+    , d(new AADLObjectFunctionPrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
 }
@@ -35,15 +42,83 @@ AADLObject::AADLObjectType AADLObjectFunction::aadlType() const
     return AADLObjectType::AADLFunction;
 }
 
-QString AADLObjectFunction::instanceOf() const
+void AADLObjectFunction::setAttr(const QString &name, const QVariant &val)
 {
-    return attr(meta::Props::token(meta::Props::Token::instance_of)).toString();
+    AADLObjectFunctionType::setAttr(name, val);
+
+    switch (meta::Props::token(name)) {
+    case meta::Props::Token::instance_of: {
+        setFunctionType(val.toString());
+        break;
+    }
+    default:
+        break;
+    }
 }
 
-void AADLObjectFunction::setInstanceOf(const QString &instance)
+void AADLObjectFunction::setFunctionType(const QString &functionTypeName)
 {
-    if (instanceOf() != instance)
-        setAttr(meta::Props::token(meta::Props::Token::instance_of), instance);
+    if (!objectsModel())
+        return;
+
+    if (d->m_fnType && d->m_fnType->title() == functionTypeName)
+        return;
+
+    QPointer<const AADLObjectFunctionType> newFnType;
+    if (!functionTypeName.isEmpty()) {
+        const QHash<QString, const AADLObjectFunctionType *> &availableFnTypes =
+                objectsModel()->getAvailableFunctionTypes(this);
+
+        if (const AADLObjectFunctionType *fnType = availableFnTypes.value(functionTypeName, nullptr)) {
+            if (fnType == d->m_fnType)
+                return;
+            newFnType = fnType;
+        } else {
+            setFunctionTypeAttr(QString());
+        }
+    }
+
+    if (d->m_fnType) {
+        disconnect(d->m_fnType, nullptr, this, nullptr);
+    }
+
+    d->m_fnType = newFnType;
+
+    if (d->m_fnType) {
+        connect(d->m_fnType, &AADLObject::removed, this, &AADLObjectFunction::onFunctionTypeRemoved);
+        connect(d->m_fnType, &AADLObjectFunctionType::attrChanged_isType, this,
+                &AADLObjectFunction::onFunctionTypeUntyped);
+        connect(d->m_fnType, &AADLObject::titleChanged, this, &AADLObjectFunction::onFunctionTypeRenamed);
+    }
+
+    emit attrChanged_instanceOf(d->m_fnType ? d->m_fnType->title() : QString());
+}
+
+void AADLObjectFunction::onFunctionTypeRemoved()
+{
+    setFunctionTypeAttr(QString());
+}
+
+void AADLObjectFunction::onFunctionTypeUntyped(bool nowIsType)
+{
+    if (!nowIsType)
+        setFunctionTypeAttr(QString());
+}
+
+void AADLObjectFunction::onFunctionTypeRenamed(const QString &newName)
+{
+    setFunctionTypeAttr(newName);
+}
+
+void AADLObjectFunction::setFunctionTypeAttr(const QString &functionTypeName)
+{
+    setAttr(meta::Props::token(meta::Props::Token::instance_of), functionTypeName);
+}
+
+void AADLObjectFunction::postInit()
+{
+    static const QString tokenName = meta::Props::token(meta::Props::Token::instance_of);
+    setAttr(tokenName, attr(tokenName, QVariant()));
 }
 
 } // ns aadl

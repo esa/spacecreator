@@ -20,6 +20,7 @@
 #include "app/commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/comboboxdelegate.h"
+#include "delegates/functionattrdelegate.h"
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
@@ -107,6 +108,17 @@ void PropertiesDialog::initTabs()
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
         viewAttrs->setModel(modelAttrs);
+
+        switch (m_dataObject->aadlType()) {
+        case AADLObject::AADLObjectType::AADLFunction: {
+            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
+                                                             new FunctionAttrDelegate(viewAttrs->tableView()));
+            break;
+        }
+        default:
+            break;
+        }
+
         ui->tabWidget->insertTab(0, viewAttrs, tr("%1 Attributes").arg(title));
     };
 

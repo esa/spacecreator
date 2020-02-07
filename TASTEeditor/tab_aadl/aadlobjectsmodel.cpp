@@ -51,6 +51,9 @@ bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
     for (auto obj : objects)
         addObject(obj);
 
+    for (auto obj : objects)
+        obj->postInit();
+
     return true;
 }
 
@@ -85,6 +88,8 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
+
+    obj->notifyRemoved();
     emit aadlObjectRemoved(obj);
     return true;
 }
@@ -161,6 +166,37 @@ AADLObjectFunction *AADLObjectsModel::getFunction(const common::Id &id) const
 AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const common::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
+}
+
+QHash<QString, const AADLObjectFunctionType *>
+AADLObjectsModel::getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const
+{
+    QHash<QString, const AADLObjectFunctionType *> result;
+    if (!fnObj)
+        return result;
+
+    auto isValid = [](const AADLObjectFunctionType *objFnType, const AADLObjectFunction *objFn) {
+        AADLObject *objFnTypeParent = objFnType->parentObject();
+
+        if (!objFnTypeParent) // it's a global FunctionType
+            return true;
+
+        AADLObject *objFnParent = objFn->parentObject();
+        while (objFnParent) {
+            if (objFnParent == objFnTypeParent)
+                return true;
+            objFnParent = objFnParent->parentObject();
+        }
+        return false;
+    };
+
+    for (const AADLObject *obj : d->m_objects)
+        if (obj->aadlType() == AADLObject::AADLObjectType::AADLFunctionType)
+            if (const AADLObjectFunctionType *objFnType = qobject_cast<const AADLObjectFunctionType *>(obj))
+                if (isValid(objFnType, fnObj))
+                    result.insert(objFnType->title(), objFnType);
+
+    return result;
 }
 
 AADLObjectIface *AADLObjectsModel::getInterface(const common::Id &id) const

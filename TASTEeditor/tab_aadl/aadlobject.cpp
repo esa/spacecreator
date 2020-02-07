@@ -56,6 +56,13 @@ QString AADLObject::title() const
     return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
+void AADLObject::postInit() {}
+
+void AADLObject::notifyRemoved()
+{
+    emit removed();
+}
+
 common::Id AADLObject::id() const
 {
     return d->m_id;
@@ -65,7 +72,6 @@ bool AADLObject::setTitle(const QString &title)
 {
     if (title != this->title()) {
         setAttr(meta::Props::token(meta::Props::Token::name), title);
-        emit titleChanged(title);
         return true;
     }
     return false;
@@ -185,7 +191,7 @@ void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
 {
     if (d->m_attrs != attrs) {
         d->m_attrs = attrs;
-        emit attributesChanged();
+        emit attributeChanged();
     }
 }
 
@@ -198,14 +204,24 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
 {
     if (!name.isEmpty() && val != d->m_attrs[name]) {
         d->m_attrs[name] = val;
-        emit attributesChanged();
+
+        const meta::Props::Token t = meta::Props::token(name);
+        switch (t) {
+        case meta::Props::Token::name: {
+            emit titleChanged(val.toString());
+            break;
+        }
+        default:
+            break;
+        }
+        emit attributeChanged(meta::Props::token(name));
     }
 }
 
 void AADLObject::removeAttr(const QString &name)
 {
     if (!name.isEmpty() && d->m_attrs.remove(name))
-        emit attributesChanged();
+        emit attributeChanged(meta::Props::token(name));
 }
 
 QHash<QString, QVariant> AADLObject::props() const
@@ -222,7 +238,7 @@ void AADLObject::setProps(const QHash<QString, QVariant> &props)
 {
     if (props != d->m_props) {
         d->m_props = props;
-        emit propertiesChanged();
+        emit propertyChanged();
     }
 }
 
@@ -235,14 +251,14 @@ void AADLObject::setProp(const QString &name, const QVariant &val)
 {
     if (!name.isEmpty() && val != d->m_props[name]) {
         d->m_props[name] = val;
-        emit propertiesChanged();
+        emit propertyChanged(meta::Props::token(name));
     }
 }
 
 void AADLObject::removeProp(const QString &name)
 {
     if (!name.isEmpty() && d->m_props.remove(name))
-        emit propertiesChanged();
+        emit propertyChanged(meta::Props::token(name));
 }
 
 void AADLObject::setObjectsModel(AADLObjectsModel *model)

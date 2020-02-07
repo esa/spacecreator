@@ -72,6 +72,11 @@ public:
     void clearContextParams();
     void setContextParams(const QVector<ContextParameter> &params);
 
+    void setAttr(const QString &name, const QVariant &val) override;
+
+Q_SIGNALS:
+    void attrChanged_isType(bool isType);
+
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
 };
