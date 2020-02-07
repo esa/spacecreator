@@ -32,6 +32,12 @@ namespace aadl {
 
 namespace templating {
 
+/**
+ * @brief The StringTemplate class generates XML document from string template
+ * which is based on Django syntax. Also it validates and formtats XML schema.
+ * Internally it uses Grantlee libary: https://github.com/steveire/grantlee
+ * To build and install Grantlee, please read README.md.
+ */
 class StringTemplate : public QObject
 {
     Q_OBJECT

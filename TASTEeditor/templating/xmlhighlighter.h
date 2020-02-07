@@ -23,6 +23,9 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief The XMLHighlighter class makes highlighting of XML document
+ */
 class XMLHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT

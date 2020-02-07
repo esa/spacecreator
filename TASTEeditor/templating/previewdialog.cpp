@@ -73,6 +73,11 @@ PreviewDialog::PreviewDialog(QWidget *parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &PreviewDialog::reject);
 }
 
+/**
+ * @brief PreviewDialog::parse generates ahd shows XML text document
+ * @param grouppedObjects groupped objects which are used as replacement in template
+ * @param templateFileName name of template file
+ */
 void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
 {
     QString result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
@@ -80,16 +85,29 @@ void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, c
     open();
 }
 
+/**
+ * @brief PreviewDialog::text returns generated and formatted XML text document
+ * @return
+ */
 QString PreviewDialog::text() const
 {
     return m_textEdit->toPlainText();
 }
 
+/**
+ * @brief PreviewDialog::onErrorOccurred shows error message
+ * if any error is occurred during generating of XML document
+ * @param error
+ */
 void PreviewDialog::onErrorOccurred(const QString &error)
 {
     QMessageBox::warning(this, tr("Error occurred"), error);
 }
 
+/**
+ * @brief PreviewDialog::onIndentChanged sets a new indent and reformats XML text document
+ * @param value new indent value
+ */
 void PreviewDialog::onIndentChanged(int value)
 {
     m_stringTemplate->setAutoFormattingIndent(value);

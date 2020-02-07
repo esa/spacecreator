@@ -28,6 +28,9 @@ namespace templating {
 
 class StringTemplate;
 
+/**
+ * @brief The PreviewDialog class generates XML document from string template file and shows it.
+ */
 class PreviewDialog : public QDialog
 {
     Q_OBJECT

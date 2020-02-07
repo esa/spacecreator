@@ -39,6 +39,13 @@ StringTemplate::StringTemplate(QObject *parent)
     m_engine->setSmartTrimEnabled(true);
 }
 
+/**
+ * @brief StringTemplate::parseFile parses template file
+ * @param grouppedObjects objects which are groupped by type name.
+ *  Type names can be Functions, Connections, Comments and etc.
+ * @param templateFileName name of template file
+ * @return generated and formatted XML text document
+ */
 QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
 {
     QFileInfo fileInfo(templateFileName);
@@ -64,6 +71,12 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
     return formatText(result);
 }
 
+/**
+ * @brief StringTemplate::formatText formats XML text to good preview
+ * It uses autoFormattingIndent() for XML indentation
+ * @param text input text
+ * @return formatted text
+ */
 QString StringTemplate::formatText(const QString &text)
 {
     QString formattedText;
@@ -90,11 +103,19 @@ QString StringTemplate::formatText(const QString &text)
     return formattedText.trimmed();
 }
 
+/**
+ * @brief StringTemplate::autoFormattingIndent returns the current indent for XML formatting
+ * @return indent
+ */
 int StringTemplate::autoFormattingIndent() const
 {
     return m_autoFormattingIndent;
 }
 
+/**
+ * @brief StringTemplate::setAutoFormattingIndent sets a new indent for XML formatting
+ * @param autoFormattingIndent
+ */
 void StringTemplate::setAutoFormattingIndent(int autoFormattingIndent)
 {
     m_autoFormattingIndent = autoFormattingIndent;
