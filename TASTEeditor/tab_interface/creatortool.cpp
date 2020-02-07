@@ -692,7 +692,6 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
         AADLObjectFunction *parentObject = functionObject(m_previewItem->parentItem());
-
         const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(parentObject),
                                       itemSceneRect };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));

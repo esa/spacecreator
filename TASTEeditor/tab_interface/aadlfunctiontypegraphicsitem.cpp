@@ -92,13 +92,11 @@ void AADLFunctionTypeGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    const auto coordinates = obj->coordinates();
-    if (coordinates.isEmpty()) {
+    const QRectF itemSceneRect { utils::rect(obj->coordinates()) };
+    if (!itemSceneRect.isValid())
         instantLayoutUpdate();
-    } else {
-        setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
-                  QPointF(coordinates.value(2), coordinates.value(3)) });
-    }
+    else
+        setRect(itemSceneRect);
 }
 
 QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
@@ -123,7 +121,7 @@ QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
             params.append(
                     { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
         } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
-            params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->currentPoints()) });
+            params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->graphicsPoints()) });
         } else if (auto functionType = qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item)) {
             params.append(functionType->prepareCommandParams());
         } else if (auto function = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item)) {

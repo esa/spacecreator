@@ -35,29 +35,28 @@ class AADLConnectionGraphicsItem : public ClickNotifierItem
 {
     Q_OBJECT
 public:
+    enum
+    {
+        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLConnection)
+    };
+    int type() const override { return Type; }
+
     explicit AADLConnectionGraphicsItem(AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
                                         AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
     static QVector<QPointF> connectionPath(AADLInterfaceGraphicsItem *ifaceStart, AADLInterfaceGraphicsItem *ifaceEnd);
+    static QVector<QPointF> connectionPath(QGraphicsScene *scene, const QPointF &startIfacePos,
+                                           const QRectF &sourceRect, const QPointF &endIfacePos,
+                                           const QRectF &targetRect);
 
     void setPoints(const QVector<QPointF> &points);
     QVector<QPointF> points() const;
 
-    QVector<QPointF> currentPoints() const;
+    QVector<QPointF> graphicsPoints() const;
 
     AADLObjectConnection *entity() const;
-
-    void scheduleLayoutUpdate();
-    void instantLayoutUpdate();
     void updateFromEntity();
-
-    enum
-    {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLConnection)
-    };
-
-    int type() const override { return Type; }
 
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
@@ -74,11 +73,13 @@ public:
     AADLFunctionGraphicsItem *sourceItem() const;
     AADLFunctionGraphicsItem *targetItem() const;
 
+public Q_SLOTS:
+    void scheduleLayoutUpdate();
+    void instantLayoutUpdate();
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
-
-    void rebuildLayout();
 
     void handleSelectionChanged(bool isSelected);
 
@@ -91,6 +92,7 @@ protected:
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
+    void rebuildLayout();
 
 private:
     void adjustGripPointCount();
@@ -107,14 +109,12 @@ private:
         QPainterPath shape() const override;
     };
 
-private:
     const QPointer<AADLInterfaceGraphicsItem> m_startItem;
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
     QRectF m_boundingRect;
 
     QVector<QPointF> m_points;
-    QVector<QPointF> m_tmpPoints;
     QList<QGraphicsRectItem *> m_grips;
     bool m_layoutDirty = false;
 };

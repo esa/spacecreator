@@ -40,8 +40,8 @@ public:
     {
         AADLUnknown = 0,
 
-        AADLFunctionType,
         AADLFunction,
+        AADLFunctionType,
         AADLIface,
         AADLComment,
         AADLConnection,

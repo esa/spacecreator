@@ -19,12 +19,14 @@
 #include "aadlinterfacegraphicsitem.h"
 
 #include "aadlconnectiongraphicsitem.h"
+#include "aadlfunctiongraphicsitem.h"
 #include "colors/colormanager.h"
 
 #include <QPainter>
 #include <QtDebug>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
+#include <tab_aadl/aadlobjectfunction.h>
 #include <tab_aadl/aadlobjectiface.h>
 
 static const qreal kBase = 15;
@@ -126,9 +128,9 @@ QList<QPointer<AADLConnectionGraphicsItem>> AADLInterfaceGraphicsItem::connectio
     return m_connections;
 }
 
-QGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
+AADLFunctionGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
 {
-    return parentItem();
+    return qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
 }
 
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &scenePos)
@@ -214,9 +216,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
         return;
     }
 
-    const QRectF parentRect = parentItem()->boundingRect();
-
-    auto updateItem = [this](Qt::Alignment alignment) {
+    auto updateInternalItems = [this](Qt::Alignment alignment) {
         const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
         const qreal offset = kBase + 2;
         switch (alignment) {
@@ -240,20 +240,39 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
         return mapRectFromItem(m_iface, m_iface->boundingRect());
     };
 
-    Qt::Alignment alignment = utils::getNearestSide(parentRect, pos());
+    const QPointF ifacePos = pos();
+    if (ifacePos.isNull() && utils::pos(entity()->coordinates()).isNull() && !m_connections.isEmpty()) {
+        if (auto connection = m_connections.front()) {
+            auto otherItem = connection->startItem() == this ? connection->targetItem() : connection->sourceItem();
+            if (otherItem && otherItem->sceneBoundingRect().isValid()) {
+                const QPointF otherCenter = otherItem->sceneBoundingRect().center();
+                const Qt::Alignment side = utils::getNearestSide(targetItem()->sceneBoundingRect(), otherCenter);
+                const QPointF sidePos = utils::getSidePosition(targetItem()->sceneBoundingRect(),
+                                                               targetItem()->sceneBoundingRect().center(), side);
+                updateInternalItems(side);
+                entity()->setCoordinates(utils::coordinates(sidePos));
+            }
+            return;
+        }
+    }
+
+    const QRectF parentRect = parentItem()->boundingRect();
+
+    Qt::Alignment alignment = utils::getNearestSide(parentRect, ifacePos);
     const int initialAlignment = sides.indexOf(alignment);
 
-    m_boundingRect = updateItem(alignment);
-    QRectF br = m_boundingRect;
-    QPointF stickyPos = utils::getSidePosition(parentRect, pos(), alignment);
+    QPointF stickyPos = utils::getSidePosition(parentRect, ifacePos, alignment);
+
+    QRectF br = updateInternalItems(alignment);
     br.moveTo(stickyPos + br.topLeft());
 
-    auto isInterfaceItemLambda = [this](const QGraphicsItem *item) {
-        return item->type() == aadl::AADLInterfaceGraphicsItem::Type && parentItem() == item->parentItem()
-                && item != this;
-    };
+    auto checkCollision = [this](const QRectF &parentRect, const QRectF &rect, QRectF &intersectedRect,
+                                 Qt::Alignment &alignment, QPointF &stickyPos) {
+        auto isInterfaceItemLambda = [this](const QGraphicsItem *item) {
+            return item->type() == aadl::AADLInterfaceGraphicsItem::Type && parentItem() == item->parentItem()
+                    && item != this;
+        };
 
-    auto checkCollision = [&](const QRectF &rect, QRectF &intersectedRect) {
         const QList<QGraphicsItem *> collidedItems = scene()->items(parentItem()->mapRectToScene(rect));
         auto collidedIt = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), isInterfaceItemLambda);
         if (collidedIt == collidedItems.constEnd()) {
@@ -266,7 +285,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     };
 
     QRectF intersectedRect;
-    if (checkCollision(br, intersectedRect)) {
+    if (checkCollision(parentRect, br, intersectedRect, alignment, stickyPos)) {
         QRectF cIntersectedRect { intersectedRect };
         QRectF ccIntersectedRect { intersectedRect };
         QRectF cbr { br };
@@ -277,23 +296,25 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
         while ((ccAlignmentIdx / sides.size() == 0 || ccAlignmentIdx % sides.size() != initialAlignment)
                && (cAlignmentIdx / sides.size() == 0 || cAlignmentIdx % sides.size() != initialAlignment)) {
             moveClockwise(cIntersectedRect, cbr, cAlignmentIdx, parentRect);
-            if (!checkCollision(cbr, cIntersectedRect))
+            if (!checkCollision(parentRect, cbr, cIntersectedRect, alignment, stickyPos))
                 break;
 
             moveCounterClockwise(ccIntersectedRect, ccbr, ccAlignmentIdx, parentRect);
-            if (!checkCollision(ccbr, ccIntersectedRect))
+            if (!checkCollision(parentRect, ccbr, ccIntersectedRect, alignment, stickyPos))
                 break;
         }
     }
 
-    m_boundingRect = updateItem(alignment);
+    m_boundingRect = updateInternalItems(alignment);
 
     m_shape = QPainterPath();
     m_shape.addPath(m_type->shape());
     m_shape.addPath(m_iface->shape());
     m_shape.addPath(m_text->shape());
 
-    m_boundingRect = childrenBoundingRect();
+    /// TODO:
+    if (flags() & QGraphicsItem::ItemIsSelectable)
+        m_boundingRect = childrenBoundingRect();
 
     setPos(stickyPos);
 }
@@ -314,11 +335,12 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
         return;
 
     setInterfaceName(obj->title());
-    const auto coordinates = obj->coordinates();
-    if (coordinates.isEmpty())
+
+    const QPointF coordinates = utils::pos(obj->coordinates());
+    if (coordinates.isNull())
         instantLayoutUpdate();
     else
-        setTargetItem(parentItem(), QPointF(coordinates.value(0), coordinates.value(1)));
+        setTargetItem(parentItem(), coordinates);
 }
 
 void AADLInterfaceGraphicsItem::initGripPoints()
