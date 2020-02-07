@@ -201,13 +201,15 @@ bool AADLObjectIface::setRcmPeriod(const QString &period)
 
 QString AADLObjectIface::interfaceName() const
 {
-    return prop(meta::Props::token(meta::Props::Token::InterfaceName)).toString();
+    /// TODO: talk about (props TASTE::) InterfaceName
+    return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
 bool AADLObjectIface::setInterfaceName(const QString &name)
 {
+    /// TODO: talk about (props TASTE::) InterfaceName
     if (interfaceName() != name) {
-        setProp(meta::Props::token(meta::Props::Token::InterfaceName), name);
+        setAttr(meta::Props::token(meta::Props::Token::name), name);
         return true;
     }
     return false;
@@ -262,12 +264,12 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QSt
 {
 }
 
-AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id)
+AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent)
 {
     if (direction == AADLObjectIface::IfaceType::Provided)
-        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter));
+        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);
 
-    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter));
+    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter), parent);
 }
 
 } // ns aadl

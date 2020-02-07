@@ -56,17 +56,23 @@ protected:
 
     void updateTextPosition() override;
 
+    void scheduleUpdateNestedItems();
+
     virtual ColorManager::HandledColors handledColorType() const override;
     virtual AADLObject *aadlObject() const override;
 
-    static void doAutoLayout(AADLFunctionGraphicsItem *function);
+    void doAutoLayout();
 
 protected Q_SLOTS:
+    void updateNestedItems();
     virtual void colorSchemeUpdated() override;
 
 private:
     void layoutConnections();
     void layoutOuterConnections();
+
+private:
+    bool m_pendingLayout { false };
 };
 
 } // namespace aadl

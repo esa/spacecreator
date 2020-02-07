@@ -19,6 +19,7 @@
 
 #include "commandids.h"
 
+#include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
@@ -40,13 +41,7 @@ CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(AADLObjectsModel *model, AA
 
 void CmdFunctionTypeItemCreate::redo()
 {
-    const QVector<qint32> coordinates {
-        qRound(m_geometry.left()),
-        qRound(m_geometry.top()),
-        qRound(m_geometry.right()),
-        qRound(m_geometry.bottom()),
-    };
-    m_entity->setCoordinates(coordinates);
+    m_entity->setCoordinates(utils::coordinates(m_geometry));
     if (m_parent)
         m_parent->addChild(m_entity);
     if (m_model)

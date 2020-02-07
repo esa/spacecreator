@@ -42,11 +42,7 @@ CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObject
 
 void CmdFunctionItemCreate::redo()
 {
-    if (m_parent && m_parent->isRootObject())
-        m_entity->setInnerCoordinates(utils::coordinates(m_geometry));
-    else
-        m_entity->setCoordinates(utils::coordinates(m_geometry));
-
+    m_entity->setCoordinates(utils::coordinates(m_geometry));
     if (m_parent)
         m_parent->addChild(m_entity);
     if (m_model)

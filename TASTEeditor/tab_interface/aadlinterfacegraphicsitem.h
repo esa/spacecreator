@@ -27,6 +27,7 @@ namespace taste3 {
 namespace aadl {
 class AADLObjectIface;
 class AADLConnectionGraphicsItem;
+class AADLFunctionGraphicsItem;
 
 class AADLInterfaceGraphicsItem : public InteractiveObject
 {
@@ -45,7 +46,7 @@ public:
     void removeConnection(AADLConnectionGraphicsItem *item);
     QList<QPointer<AADLConnectionGraphicsItem>> connectionItems() const;
 
-    QGraphicsItem *targetItem() const;
+    AADLFunctionGraphicsItem *targetItem() const;
     void setTargetItem(QGraphicsItem *item, const QPointF &globalPos);
 
     void setInterfaceName(const QString &name);

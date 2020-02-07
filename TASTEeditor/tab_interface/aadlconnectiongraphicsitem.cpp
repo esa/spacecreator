@@ -236,25 +236,34 @@ QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(AADLInterfaceGraphic
     QGraphicsScene *scene = startItem->scene();
     Q_ASSERT(startItem->scene() == endItem->scene() && scene);
 
-    const QPointF startPointAdjusted = startItem->scenePos();
-    QLineF startDirection = getDirection(startItem->targetItem()->sceneBoundingRect(), startPointAdjusted);
+    return AADLConnectionGraphicsItem::connectionPath(scene, startItem->scenePos(),
+                                                      startItem->targetItem()->sceneBoundingRect(), endItem->scenePos(),
+                                                      endItem->targetItem()->sceneBoundingRect());
+}
+
+QVector<QPointF> AADLConnectionGraphicsItem::connectionPath(QGraphicsScene *scene, const QPointF &startIfacePos,
+                                                            const QRectF &sourceRect, const QPointF &endIfacePos,
+                                                            const QRectF &targetRect)
+{
+    Q_ASSERT(scene);
+
+    QLineF startDirection = getDirection(sourceRect, startIfacePos);
     if (startDirection.isNull())
         return {};
 
-    startDirection.translate(startPointAdjusted - startDirection.p1());
+    startDirection.translate(startIfacePos - startDirection.p1());
     startDirection.setLength(kConnectionMargin);
 
-    const QPointF endPointAdjusted = endItem->scenePos();
-    QLineF endDirection = getDirection(endItem->targetItem()->sceneBoundingRect(), endPointAdjusted);
+    QLineF endDirection = getDirection(targetRect, endIfacePos);
     if (endDirection.isNull())
         return {};
 
-    endDirection.translate(endPointAdjusted - endDirection.p1());
+    endDirection.translate(endIfacePos - endDirection.p1());
     endDirection.setLength(kConnectionMargin);
 
-    if (startItem->targetItem()->sceneBoundingRect().contains(endPointAdjusted))
+    if (sourceRect.contains(endIfacePos))
         startDirection.setAngle(180 + startDirection.angle());
-    if (endItem->targetItem()->sceneBoundingRect().contains(startPointAdjusted))
+    if (targetRect.contains(startIfacePos))
         endDirection.setAngle(180 + endDirection.angle());
 
     const auto points = path(scene, startDirection, endDirection);
@@ -355,7 +364,7 @@ QVector<QPointF> AADLConnectionGraphicsItem::points() const
     return m_points;
 }
 
-QVector<QPointF> AADLConnectionGraphicsItem::currentPoints() const
+QVector<QPointF> AADLConnectionGraphicsItem::graphicsPoints() const
 {
     QPolygonF polygon = m_item->path().toFillPolygon();
     if (polygon.isClosed())
@@ -406,9 +415,17 @@ bool AADLConnectionGraphicsItem::sceneEventFilter(QGraphicsItem *watched, QEvent
 
 void AADLConnectionGraphicsItem::rebuildLayout()
 {
-    if ((m_startItem && !m_startItem->isVisible()) || (m_endItem && !m_endItem->isVisible())) {
+    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);
         return;
+    } else {
+        if (utils::pos(m_startItem->entity()->coordinates()).isNull())
+            m_startItem->instantLayoutUpdate();
+        if (utils::pos(m_endItem->entity()->coordinates()).isNull())
+            m_endItem->instantLayoutUpdate();
+        if (utils::polygon(entity()->coordinates()).isEmpty()) {
+            entity()->setCoordinates(utils::coordinates(connectionPath(m_startItem, m_endItem)));
+        }
     }
 
     setVisible(true);
@@ -470,7 +487,7 @@ AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
 void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
 {
     adjustGripPointCount();
-    const QVector<QPointF> points = currentPoints();
+    const QVector<QPointF> points = graphicsPoints();
     if (points.isEmpty())
         return;
 
@@ -515,7 +532,6 @@ bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle,
     if (idx == -1)
         return false;
 
-    m_tmpPoints = m_points;
     return true;
 }
 
@@ -588,16 +604,14 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
     for (auto item : scene()->items(m_points)) {
         if (types.contains(item->type())
             && utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
-            m_startItem->setPos(m_startItem->parentItem()->mapFromScene(m_tmpPoints.first()));
-            m_endItem->setPos(m_endItem->parentItem()->mapFromScene(m_tmpPoints.last()));
-            setPoints(m_tmpPoints);
-            m_tmpPoints.clear();
+            m_startItem->updateFromEntity();
+            m_endItem->updateFromEntity();
+            updateFromEntity();
             adjustGripPointCount();
             return true;
         }
     }
 
-    m_tmpPoints.clear();
     adjustGripPointCount();
     updateBoundingRect();
 

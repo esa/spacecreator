@@ -119,7 +119,7 @@ public:
                                      AADLObject *parent = nullptr);
 };
 
-AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id);
+AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent);
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;
 
