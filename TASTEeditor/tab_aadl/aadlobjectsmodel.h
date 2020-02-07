@@ -59,6 +59,8 @@ public:
 
     AADLObjectConnection *getConnectionForIface(const common::Id &id) const;
 
+    const QHash<common::Id, AADLObject *> &objects() const;
+
 Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
