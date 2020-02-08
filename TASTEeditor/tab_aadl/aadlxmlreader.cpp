@@ -388,8 +388,15 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
     if (attrs.contains(attrName_isType))
         isFunctionType = attrs.take(attrName_isType).toLower() == "yes";
 
+    const bool parentIsFunctionType = parent && parent->aadlType() == AADLObject::AADLObjectType::AADLFunctionType;
+    const bool nestingAllowd = !(parentIsFunctionType && isFunctionType); // direct FnT->FnT nesting is not allowed
+    AADLObject* usedPArent = nestingAllowd ? parent : nullptr;
     AADLObjectFunctionType *currObj =
-            isFunctionType ? new AADLObjectFunctionType(QString(), parent) : new AADLObjectFunction(QString(), parent);
+            isFunctionType ? new AADLObjectFunctionType(QString(), usedPArent) : new AADLObjectFunction(QString(), usedPArent);
+    if (nestingAllowd) {
+        if (AADLObjectFunctionType *parentFunction = qobject_cast<AADLObjectFunctionType *>(parent))
+            parentFunction->addChild(currObj);
+    }
 
     QHash<QString, QString>::const_iterator i = attrs.cbegin();
     while (i != attrs.cend()) {
@@ -540,6 +547,8 @@ bool AADLXMLReader::readComment(QXmlStreamReader &xml, AADLObject *parent)
     }
 
     AADLObjectComment *obj = new AADLObjectComment(QString(), parent);
+    if (AADLObjectFunctionType *fn = qobject_cast<AADLObjectFunctionType *>(obj->parentObject()))
+        fn->addChild(obj);
     d->m_allObjects.append(obj);
 
     for (const QXmlStreamAttribute &attr : xml.attributes()) {
