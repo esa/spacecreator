@@ -37,10 +37,6 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
     setAttr(meta::Props::token(meta::Props::Token::is_type), "YES");
-    setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
-
-    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
-        root->addChild(this);
 }
 
 AADLObjectFunctionType::~AADLObjectFunctionType() {}

@@ -26,10 +26,12 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, const QRectF &geometry)
+CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *parent,
+                                           const QRectF &geometry)
     : m_model(model)
     , m_geometry(geometry)
     , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_model))
+    , m_parent(parent)
 {
     setText(QObject::tr("Create Comment"));
 }
@@ -37,12 +39,19 @@ CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, const QRectF
 void CmdCommentItemCreate::redo()
 {
     m_entity->setCoordinates(utils::coordinates(m_geometry));
-    m_model->addObject(m_entity);
+
+    if (m_parent)
+        m_parent->addChild(m_entity);
+    if (m_model)
+        m_model->addObject(m_entity);
 }
 
 void CmdCommentItemCreate::undo()
 {
-    m_model->removeObject(m_entity);
+    if (m_model)
+        m_model->removeObject(m_entity);
+    if (m_parent)
+        m_parent->removeChild(m_entity);
 }
 
 bool CmdCommentItemCreate::mergeWith(const QUndoCommand *command)
