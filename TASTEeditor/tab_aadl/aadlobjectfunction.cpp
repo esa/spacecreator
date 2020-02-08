@@ -19,13 +19,23 @@
 
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
+#include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 
 namespace taste3 {
 namespace aadl {
 
+bool isSameIface(const AADLObjectIface *a, const AADLObjectIface *b)
+{
+    const bool sameType = a->aadlType() == b->aadlType();
+    const bool sameDir = a->direction() == b->direction();
+    const bool sameName = a->title() == b->title();
+    // TODO: check params?
+    return sameType && sameDir && sameName;
+}
+
 struct AADLObjectFunctionPrivate {
-    QPointer<const AADLObjectFunctionType> m_fnType;
+    QPointer<AADLObjectFunctionType> m_fnType;
 };
 
 AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
@@ -64,12 +74,12 @@ void AADLObjectFunction::setFunctionType(const QString &functionTypeName)
     if (d->m_fnType && d->m_fnType->title() == functionTypeName)
         return;
 
-    QPointer<const AADLObjectFunctionType> newFnType;
+    QPointer<AADLObjectFunctionType> newFnType;
     if (!functionTypeName.isEmpty()) {
-        const QHash<QString, const AADLObjectFunctionType *> &availableFnTypes =
+        const QHash<QString, AADLObjectFunctionType *> &availableFnTypes =
                 objectsModel()->getAvailableFunctionTypes(this);
 
-        if (const AADLObjectFunctionType *fnType = availableFnTypes.value(functionTypeName, nullptr)) {
+        if (AADLObjectFunctionType *fnType = availableFnTypes.value(functionTypeName, nullptr)) {
             if (fnType == d->m_fnType)
                 return;
             newFnType = fnType;
@@ -78,20 +88,84 @@ void AADLObjectFunction::setFunctionType(const QString &functionTypeName)
         }
     }
 
-    if (d->m_fnType) {
-        disconnect(d->m_fnType, nullptr, this, nullptr);
+    setInstanceOf(newFnType);
+}
+
+void AADLObjectFunction::connectToFunctionType()
+{
+    if (!d->m_fnType)
+        return;
+
+    d->m_fnType->rememberInstance(this);
+
+    connect(d->m_fnType, &AADLObjectFunctionType::attrChanged_isType, this, &AADLObjectFunction::onFunctionTypeUntyped);
+    connect(d->m_fnType, &AADLObjectFunctionType::titleChanged, this, &AADLObjectFunction::onFunctionTypeRenamed);
+    connect(d->m_fnType, &AADLObjectFunctionType::ifaceAdded, this, &AADLObjectFunction::cloneInterface);
+    //    it's handled by CmdEntityRemove:
+    //    connect(d->m_fnType, &AADLObjectFunctionType::ifaceRemoved, this, &AADLObjectFunction::uncloneInterface); //
+
+    cloneInterfaces();
+}
+
+void AADLObjectFunction::cloneInterfaces()
+{
+    if (!d->m_fnType)
+        return;
+
+    const QVector<AADLObjectIface *> &theirInterfaces = d->m_fnType->interfaces();
+    for (AADLObjectIface *theirIface : theirInterfaces)
+        cloneInterface(theirIface);
+}
+
+void AADLObjectFunction::cloneInterface(AADLObjectIface *theirIface)
+{
+    if (!d->m_fnType || !theirIface)
+        return;
+
+    const QVector<AADLObjectIface *> &myInterfaces = interfaces();
+    auto found = std::find_if(myInterfaces.cbegin(), myInterfaces.cend(),
+                              [theirIface](AADLObjectIface *myIface) { return isSameIface(myIface, theirIface); });
+
+    const bool notFound = found == myInterfaces.cend();
+    if (notFound) {
+        if (AADLObjectIface *myNewIface = AADLObjectIface::cloneIface(theirIface, this)) {
+            connect(theirIface, &AADLObjectIface::attributeChanged, myNewIface, &AADLObjectIface::handleClonedAttr,
+                    Qt::UniqueConnection);
+            connect(theirIface, &AADLObjectIface::propertyChanged, myNewIface, &AADLObjectIface::handleClonedProp,
+                    Qt::UniqueConnection);
+        }
     }
+}
 
-    d->m_fnType = newFnType;
+void AADLObjectFunction::uncloneInterfaces(ClonedIfacesPolicy killClones)
+{
+    if (!d->m_fnType)
+        return;
 
-    if (d->m_fnType) {
-        connect(d->m_fnType, &AADLObject::removed, this, &AADLObjectFunction::onFunctionTypeRemoved);
-        connect(d->m_fnType, &AADLObjectFunctionType::attrChanged_isType, this,
-                &AADLObjectFunction::onFunctionTypeUntyped);
-        connect(d->m_fnType, &AADLObject::titleChanged, this, &AADLObjectFunction::onFunctionTypeRenamed);
+    for (AADLObjectIface *theirIface : d->m_fnType->interfaces())
+        uncloneInterface(theirIface, killClones);
+}
+
+void AADLObjectFunction::uncloneInterface(AADLObjectIface *theirIface, ClonedIfacesPolicy killClones)
+{
+    if (!d->m_fnType || !theirIface)
+        return;
+
+    const QVector<AADLObjectIface *> &myInterfaces = interfaces();
+    auto found = std::find_if(myInterfaces.cbegin(), myInterfaces.cend(),
+                              [theirIface](AADLObjectIface *myIface) { return isSameIface(myIface, theirIface); });
+
+    if (found != myInterfaces.cend()) {
+        disconnect(theirIface, &AADLObjectIface::attributeChanged, theirIface, &AADLObjectIface::handleClonedAttr);
+        disconnect(theirIface, &AADLObjectIface::propertyChanged, theirIface, &AADLObjectIface::handleClonedProp);
+
+        if (killClones == ClonedIfacesPolicy::Kill) {
+            AADLObjectIface *myIface = *found;
+            removeInterface(myIface);
+            if (theirIface->objectsModel())
+                theirIface->objectsModel()->removeObject(myIface);
+        }
     }
-
-    emit attrChanged_instanceOf(d->m_fnType ? d->m_fnType->title() : QString());
 }
 
 void AADLObjectFunction::onFunctionTypeRemoved()
@@ -113,6 +187,31 @@ void AADLObjectFunction::onFunctionTypeRenamed(const QString &newName)
 void AADLObjectFunction::setFunctionTypeAttr(const QString &functionTypeName)
 {
     setAttr(meta::Props::token(meta::Props::Token::instance_of), functionTypeName);
+}
+
+void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones)
+{
+    const AADLObjectFunctionType *prevFunctionType = d->m_fnType;
+
+    if (d->m_fnType) {
+        d->m_fnType->forgetInstance(this);
+        disconnect(d->m_fnType, nullptr, this, nullptr);
+
+        uncloneInterfaces(killClones);
+    }
+
+    d->m_fnType = fnType;
+
+    if (d->m_fnType)
+        connectToFunctionType();
+
+    const QString prevName = attr(meta::Props::token(meta::Props::Token::instance_of), QString()).toString();
+    const QString newName = d->m_fnType ? d->m_fnType->title() : QString();
+
+    if (prevName != newName) {
+        setFunctionTypeAttr(newName);
+    } else if (prevFunctionType != d->m_fnType)
+        emit attrChanged_instanceOf(d->m_fnType ? d->m_fnType->title() : QString());
 }
 
 void AADLObjectFunction::postInit()

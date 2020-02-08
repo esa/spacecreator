@@ -89,11 +89,21 @@ public:
 
     AADLObjectFunction *function() const;
 
+    bool isCloned() const;
+    QVector<QPointer<AADLObjectIface>> clones() const;
+
+    static AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent);
+    static AADLObjectIface *cloneIface(AADLObjectIface *source, AADLObjectFunction *parent);
+
 protected:
     explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
     explicit AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
                              AADLObject *parent = nullptr);
     void setupInitialAttrs();
+
+    void setCloneOrigin(AADLObjectIface *source);
+    void rememberClone(AADLObjectIface *clone);
+    void forgetClone(AADLObjectIface *clone);
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
@@ -118,8 +128,6 @@ public:
     explicit AADLObjectIfaceRequired(const common::Id &id, const QString &title = QString(),
                                      AADLObject *parent = nullptr);
 };
-
-AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent);
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;
 
