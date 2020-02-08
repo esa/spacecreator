@@ -26,6 +26,8 @@ namespace taste3 {
 namespace aadl {
 class AADLObject;
 class AADLObjectsModel;
+class AADLObjectFunction;
+class AADLObjectFunctionType;
 namespace cmd {
 
 class CmdEntityRemove : public QUndoCommand
@@ -41,7 +43,13 @@ public:
 private:
     QPointer<AADLObjectsModel> m_model;
     QPointer<AADLObject> m_entity;
-    QVector<QPointer<AADLObject>> m_linkedEntities;
+    QVector<QPointer<AADLObject>> m_relatedEntities;
+    QVector<QPointer<AADLObject>> m_relatedConnections;
+    QVector<QPointer<AADLObject>> m_relatedIfaces;
+    QHash<AADLObjectFunction *, AADLObjectFunctionType *> m_typedFunctions;
+
+    void collectRelatedItems(AADLObject *toBeRemoved);
+    void storeLinkedEntity(AADLObject *linkedEntity);
 };
 
 } // namespace cmd

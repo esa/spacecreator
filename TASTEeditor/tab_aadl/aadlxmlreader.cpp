@@ -391,8 +391,8 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
     AADLObjectFunctionType *currObj =
             isFunctionType ? new AADLObjectFunctionType(QString(), parent) : new AADLObjectFunction(QString(), parent);
 
-    QHash<QString, QString>::const_iterator i = attrs.constBegin();
-    while (i != attrs.constEnd()) {
+    QHash<QString, QString>::const_iterator i = attrs.cbegin();
+    while (i != attrs.cend()) {
         currObj->setAttr(i.key(), i.value());
         ++i;
     }

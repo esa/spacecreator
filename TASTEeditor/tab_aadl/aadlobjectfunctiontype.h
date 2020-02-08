@@ -28,6 +28,7 @@
 namespace taste3 {
 namespace aadl {
 
+class AADLObjectFunction;
 struct AADLObjectFunctionTypePrivate;
 class AADLObjectFunctionType : public AADLObject
 {
@@ -52,6 +53,7 @@ public:
 
     bool addInterface(AADLObjectIface *iface);
     bool removeInterface(AADLObjectIface *iface);
+    QVector<AADLObjectIface *> interfaces() const;
 
     QString language() const;
     void setLanguage(const QString &lang);
@@ -67,8 +69,14 @@ public:
 
     void setAttr(const QString &name, const QVariant &val) override;
 
+    QVector<QPointer<AADLObjectFunction>> instances() const;
+    void rememberInstance(AADLObjectFunction *function);
+    void forgetInstance(AADLObjectFunction *function);
+
 Q_SIGNALS:
     void attrChanged_isType(bool isType);
+    void ifaceAdded(AADLObjectIface *iface);
+    void ifaceRemoved(AADLObjectIface *iface);
 
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;

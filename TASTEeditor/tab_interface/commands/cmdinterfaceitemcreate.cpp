@@ -30,7 +30,7 @@ CmdInterfaceItemCreate::CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObje
                                                const QPointF &pos, AADLObjectIface::IfaceType type,
                                                const common::Id &id)
     : m_model(model)
-    , m_entity(createIface(type, id, function))
+    , m_entity(AADLObjectIface::createIface(type, id, function))
     , m_parent(function)
     , m_pos(pos)
 {

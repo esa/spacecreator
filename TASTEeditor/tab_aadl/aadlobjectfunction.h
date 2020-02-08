@@ -37,6 +37,13 @@ public:
     void setAttr(const QString &name, const QVariant &val) override;
     void postInit() override;
 
+    enum class ClonedIfacesPolicy
+    {
+        Keep = 0,
+        Kill
+    };
+    void setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones = ClonedIfacesPolicy::Kill);
+
 Q_SIGNALS:
     void attrChanged_instanceOf(const QString &functionType);
 
@@ -50,6 +57,15 @@ private:
 
     void setFunctionType(const QString &functionTypeName);
     void setFunctionTypeAttr(const QString &functionTypeName);
+
+    void connectToFunctionType();
+    void disconnectFromFunctionType();
+
+    void cloneInterfaces();
+    void uncloneInterfaces(ClonedIfacesPolicy killClones);
+
+    void cloneInterface(AADLObjectIface *iface);
+    void uncloneInterface(AADLObjectIface *iface, ClonedIfacesPolicy killClones);
 };
 
 typedef QVector<AADLObjectFunction *> AADLFunctionsVector;

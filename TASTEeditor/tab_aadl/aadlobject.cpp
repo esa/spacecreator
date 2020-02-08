@@ -58,11 +58,6 @@ QString AADLObject::title() const
 
 void AADLObject::postInit() {}
 
-void AADLObject::notifyRemoved()
-{
-    emit removed();
-}
-
 common::Id AADLObject::id() const
 {
     return d->m_id;
@@ -95,6 +90,10 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
     setParent(parentObject);
     return true;
 }
+
+void AADLObject::handleClonedAttr(taste3::aadl::meta::Props::Token attr) {}
+
+void AADLObject::handleClonedProp(taste3::aadl::meta::Props::Token prop) {}
 
 QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates) const
 {

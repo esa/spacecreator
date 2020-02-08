@@ -12,9 +12,27 @@
 
 			<Function name="FnType" language="" is_type="Yes" instance_of="">
 				<Property name="Taste::coordinates" value="9000 30000 24000 45000"/>
+
+				<Provided_Interface name="FnType.PI1" kind="SPORADIC_OPERATION" period=" 0" wcet=" 0" queue_size=" 1">
+					<Input_Parameter name="p" type="T-UInt32" encoding="UPER"/>
+					<Property name="Taste::coordinates" value="14000 30000"/>
+					<Property name="Taste::Deadline" value="0 ms"/>
+					<Property name="Taste::InterfaceName" value="result"/>
+					<Property name="Taste::RCMoperationKind" value="sporadic"/>
+					<Property name="Taste::RCMperiod" value="0 ms"/>
+				</Provided_Interface>
+				
+				<Required_Interface name="FnType.RI1" kind="SPORADIC_OPERATION">
+					<Input_Parameter name="a" type="T-Boolean" encoding="UPER"/>
+					<Property name="Taste::coordinates" value="14000 45000"/>
+					<Property name="Taste::InterfaceName" value="run_forrest"/>
+					<Property name="Taste::labelInheritance" value="true"/>
+					<Property name="Taste::RCMoperationKind" value="any"/>
+				</Required_Interface>
+
 			</Function>
 
-			<Function name="Top-SouthEast" language="C" is_type="NO" instance_of="">
+			<Function name="Top-SouthEast" language="C" is_type="NO" instance_of="FnType">
 				<Property name="Taste::coordinates" value="27000 30000 47000 45000"/>
 			</Function>
 
@@ -25,6 +43,13 @@
 
 			<Function name="Top-NorthWest" language="C" is_type="NO" instance_of="">
 				<Property name="Taste::coordinates" value="53000 56000 73000 73000"/>
+				<Required_Interface name="Top-NorthWest.RI1" kind="SPORADIC_OPERATION">
+					<Input_Parameter name="a" type="T-Boolean" encoding="UPER"/>
+					<Property name="Taste::coordinates" value="53000 60000"/>
+					<Property name="Taste::InterfaceName" value="run_forrest"/>
+					<Property name="Taste::labelInheritance" value="true"/>
+					<Property name="Taste::RCMoperationKind" value="any"/>
+				</Required_Interface>
 			</Function>
 
 			<Function name="Top-South" language="C" is_type="NO" instance_of="">
