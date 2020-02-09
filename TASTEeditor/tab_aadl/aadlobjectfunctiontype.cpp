@@ -133,19 +133,6 @@ bool AADLObjectFunctionType::removePI(AADLObjectIface *pi)
     return false;
 }
 
-QVariantList AADLObjectFunctionType::interfaces() const
-{
-    QVariantList ifaceList;
-
-    for (AADLObjectIface *iface : ris())
-        ifaceList << QVariant::fromValue(iface);
-
-    for (AADLObjectIface *iface : pis())
-        ifaceList << QVariant::fromValue(iface);
-
-    return ifaceList;
-}
-
 bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
 {
     const bool added = iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
@@ -167,6 +154,19 @@ bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
 {
     return ris() + pis();
+}
+
+QVariantList AADLObjectFunctionType::interfaceList() const
+{
+    QVariantList ifaceList;
+
+    for (AADLObjectIface *iface : ris())
+        ifaceList << QVariant::fromValue(iface);
+
+    for (AADLObjectIface *iface : pis())
+        ifaceList << QVariant::fromValue(iface);
+
+    return ifaceList;
 }
 
 QVariantList AADLObjectFunctionType::nestedFunctions() const
