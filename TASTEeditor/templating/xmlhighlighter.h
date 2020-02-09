@@ -19,6 +19,7 @@
 #define XMLHIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
+#include <QRegularExpression>
 
 namespace taste3 {
 namespace templating {
@@ -39,14 +40,14 @@ protected:
 private:
     struct HighlightingRule
     {
-        QRegExp pattern;
+        QRegularExpression pattern;
         QTextCharFormat format;
     };
     QVector<HighlightingRule> m_highlightingRules;
 
     QTextCharFormat m_valueFormat;
-    QRegExp m_valueStartExpression;
-    QRegExp m_valueEndExpression;
+    QRegularExpression m_valueStartExpression;
+    QRegularExpression m_valueEndExpression;
 };
 
 } // ns processing

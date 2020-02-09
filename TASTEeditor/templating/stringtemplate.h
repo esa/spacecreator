@@ -49,6 +49,7 @@ public:
     QString formatText(const QString &text);
 
     int autoFormattingIndent() const;
+    bool isXml() const;
 
 public slots:
     void setAutoFormattingIndent(int autoFormattingIndent);
@@ -59,6 +60,7 @@ signals:
 private:
     Grantlee::Engine *m_engine;
     int m_autoFormattingIndent;
+    bool m_isXmlText;
 };
 
 } // ns processing

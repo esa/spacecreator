@@ -48,6 +48,7 @@ private slots:
 private:
     templating::StringTemplate *m_stringTemplate;
     QTextEdit *m_textEdit;
+    QWidget *m_indentWidget;
 };
 
 } // ns processing

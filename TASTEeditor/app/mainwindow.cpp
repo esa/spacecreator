@@ -312,7 +312,7 @@ void MainWindow::onSaveParsedTemplateToFile()
     if (outputFileName.isEmpty())
         return;
 
-    exportToXMLFile(outputFileName);
+    exportToFile(outputFileName);
 }
 
 void MainWindow::initTabs()
@@ -404,7 +404,7 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
     return false;
 }
 
-bool MainWindow::exportToXMLFile(const QString &outputXmlFileName)
+bool MainWindow::exportToFile(const QString &outputFileName)
 {
     if (!m_previewDialog)
         return false;
@@ -413,7 +413,7 @@ bool MainWindow::exportToXMLFile(const QString &outputXmlFileName)
     if (text.isEmpty())
         return false;;
 
-    QFile outputFile(outputXmlFileName);
+    QFile outputFile(outputFileName);
     if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
         QTextStream stream(&outputFile);
         stream << text;
@@ -444,9 +444,9 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         if (!value.isEmpty())
             return parseTemplateFile(value);
         return false;
-    case CommandLineParser::Positional::ExportToXMLFile:
+    case CommandLineParser::Positional::ExportToFile:
         if (!value.isEmpty())
-            return exportToXMLFile(value);
+            return exportToFile(value);
         return false;
     case CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();

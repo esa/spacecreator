@@ -70,7 +70,7 @@ protected:
     void saveSceneRender(const QString &filePath) const;
 
     bool parseTemplateFile(const QString &templateFileName);
-    bool exportToXMLFile(const QString &outputXmlFileName);
+    bool exportToFile(const QString &outputFileName);
 
 protected Q_SLOTS:
     void onOpenFileRequested();

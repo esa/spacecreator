@@ -29,46 +29,46 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat xmlValueElementFormat;
     xmlValueElementFormat.setForeground(Qt::black);
     xmlValueElementFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegExp(QLatin1String(">[^\n]*<"));
+    rule.pattern = QRegularExpression(QLatin1String(">[^\n]*<"));
     rule.format = xmlValueElementFormat;
     m_highlightingRules.append(rule);
 
     // keywords
     QTextCharFormat keywordFormat;
-    keywordFormat.setForeground(Qt::blue);
+    keywordFormat.setForeground(Qt::red);
     keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywords;
     keywords << QLatin1String("\\b?xml\\b") << QLatin1String("/>")
-             << QLatin1String(">") << QLatin1String("<");
+             << QLatin1String("</") << QLatin1String(">") << QLatin1String("<");
     foreach (const QString &keyword, keywords) {
-        rule.pattern = QRegExp(keyword);
+        rule.pattern = QRegularExpression(keyword);
         rule.format = keywordFormat;
         m_highlightingRules.append(rule);
     }
 
     // <Text> </Text>
     QTextCharFormat xmlElementFormat;
-    xmlElementFormat.setForeground(Qt::magenta);
-    rule.pattern = QRegExp(QLatin1String("\\b[A-Za-z0-9_]+(?=[\\/>])"));
+    xmlElementFormat.setForeground(Qt::darkGreen);
+    rule.pattern = QRegularExpression(QLatin1String("(?<=[<\\/])\\b[A-Za-z0-9_]+"));
     rule.format = xmlElementFormat;
     m_highlightingRules.append(rule);
 
     // < Text= >
     QTextCharFormat xmlAttributeFormat;
-    xmlAttributeFormat.setForeground(Qt::red);
-    rule.pattern = QRegExp(QLatin1String("\\b[A-Za-z0-9_]+(?=\\=)"));
+    xmlAttributeFormat.setForeground(Qt::blue);
+    rule.pattern = QRegularExpression(QLatin1String("\\b[A-Za-z0-9_]+(?=\\=)"));
     rule.format = xmlAttributeFormat;
     m_highlightingRules.append(rule);
 
     // <!-- Text -->
     QTextCharFormat singleLineCommentFormat;
     singleLineCommentFormat.setForeground(Qt::gray);
-    rule.pattern = QRegExp(QLatin1String("<!--[^\n]*-->"));
+    rule.pattern = QRegularExpression(QLatin1String("<!--[^\n]*-->"));
     rule.format = singleLineCommentFormat;
     m_highlightingRules.append(rule);
 
     // = "Text"
-    QColor valueColor(128, 0, 255);
+    QColor valueColor(Qt::magenta);
     m_valueFormat.setForeground(valueColor);
     m_valueFormat.setFontWeight(QFont::Bold);
     m_valueStartExpression.setPattern(QLatin1String("\""));
@@ -80,37 +80,38 @@ void taste3::templating::XMLHighlighter::highlightBlock(const QString &text)
     //for every pattern
     foreach (const HighlightingRule &rule, m_highlightingRules)
     {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
+        QRegularExpression expression(rule.pattern);
+        QRegularExpressionMatchIterator it = expression.globalMatch(text);
 
-        while (index >= 0) {
-            int length = expression.matchedLength();
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            int index = match.capturedStart();
+            int length = match.capturedLength();
             this->setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
         }
     }
 
-    this->setCurrentBlockState(0);
+    setCurrentBlockState(0);
     int startIndex = 0;
 
-    if (this->previousBlockState() != 1)
-        startIndex = m_valueStartExpression.indexIn(text);
+    if (previousBlockState() != 1)
+        startIndex = text.indexOf(m_valueStartExpression);
 
     while (startIndex >= 0)
     {
-        int endIndex = m_valueEndExpression.indexIn(text, startIndex);
+        QRegularExpressionMatch endMatch;
+        int endIndex = text.indexOf(m_valueEndExpression, startIndex, &endMatch);
         int commentLength;
 
         if (endIndex == -1) {
-            this->setCurrentBlockState(1);
+            setCurrentBlockState(1);
             commentLength = text.length() - startIndex;
-        }
-        else {
-            commentLength = endIndex - startIndex + m_valueEndExpression.matchedLength();
+        } else {
+            commentLength = endIndex - startIndex + endMatch.capturedLength();
         }
 
-        this->setFormat(startIndex, commentLength, m_valueFormat);
-        startIndex = m_valueStartExpression.indexIn(text, startIndex + commentLength);
+        setFormat(startIndex, commentLength, m_valueFormat);
+        startIndex = text.indexOf(m_valueStartExpression, startIndex + commentLength);
     }
 }
 

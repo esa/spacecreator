@@ -33,7 +33,7 @@ public:
         DropUnsavedChangesSilently,
         OpenAADLXMLFile,
         OpenStringTemplateFile,
-        ExportToXMLFile,
+        ExportToFile,
         ListScriptableActions,
 
         Unknown
