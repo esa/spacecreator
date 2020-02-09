@@ -75,8 +75,8 @@ public:
     {
         AADLUnknown = 0,
 
-        AADLFunctionType,
         AADLFunction,
+        AADLFunctionType,
         AADLIface,
         AADLComment,
         AADLConnection,
@@ -125,8 +125,6 @@ public:
 
     virtual void postInit();
 
-    void notifyRemoved();
-
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
@@ -134,12 +132,14 @@ Q_SIGNALS:
     void innerCoordinatesChanged(const QVector<qint32> &coordinates);
     void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown);
     void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown);
-    void removed();
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
     bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);
+
+    void handleClonedAttr(taste3::aadl::meta::Props::Token attr);
+    void handleClonedProp(taste3::aadl::meta::Props::Token prop);
 
 protected:
     explicit AADLObject(const common::Id &id, const QString &title = QString(), QObject *parent = nullptr);

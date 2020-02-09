@@ -19,6 +19,7 @@
 
 #include "aadlcommonprops.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
 
 namespace taste3 {
 namespace aadl {
@@ -33,6 +34,8 @@ struct AADLObjectIfacePrivate {
     }
     const AADLObjectIface::IfaceType m_direction;
     QVector<IfaceParameter> m_params = {};
+    QPointer<AADLObjectIface> m_cloneOf { nullptr };
+    QVector<QPointer<AADLObjectIface>> m_clones {};
 };
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
@@ -50,7 +53,11 @@ AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceTyp
     setupInitialAttrs();
 }
 
-AADLObjectIface::~AADLObjectIface() {}
+AADLObjectIface::~AADLObjectIface()
+{
+    if (d->m_cloneOf)
+        d->m_cloneOf->forgetClone(this);
+}
 
 void AADLObjectIface::setupInitialAttrs()
 {
@@ -209,13 +216,15 @@ bool AADLObjectIface::setRcmPeriod(const QString &period)
 
 QString AADLObjectIface::interfaceName() const
 {
-    return prop(meta::Props::token(meta::Props::Token::InterfaceName)).toString();
+    /// TODO: talk about (props TASTE::) InterfaceName
+    return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
 bool AADLObjectIface::setInterfaceName(const QString &name)
 {
+    /// TODO: talk about (props TASTE::) InterfaceName
     if (interfaceName() != name) {
-        setProp(meta::Props::token(meta::Props::Token::InterfaceName), name);
+        setAttr(meta::Props::token(meta::Props::Token::name), name);
         return true;
     }
     return false;
@@ -238,6 +247,35 @@ bool AADLObjectIface::setLabelInheritance(bool label)
 AADLObjectFunction *AADLObjectIface::function() const
 {
     return qobject_cast<AADLObjectFunction *>(parent());
+}
+
+bool AADLObjectIface::isCloned() const
+{
+    return d->m_clones.size();
+}
+
+QVector<QPointer<AADLObjectIface>> AADLObjectIface::clones() const
+{
+    return d->m_clones;
+}
+
+void AADLObjectIface::setCloneOrigin(AADLObjectIface *source)
+{
+    if (d->m_cloneOf != source) {
+        d->m_cloneOf = source;
+        d->m_cloneOf->rememberClone(this);
+    }
+}
+
+void AADLObjectIface::rememberClone(AADLObjectIface *clone)
+{
+    if (clone && !d->m_clones.contains(clone))
+        d->m_clones.append(clone);
+}
+
+void AADLObjectIface::forgetClone(AADLObjectIface *clone)
+{
+    d->m_clones.removeAll(clone);
 }
 
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
@@ -270,12 +308,40 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QSt
 {
 }
 
-AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id)
+AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent)
 {
     if (direction == AADLObjectIface::IfaceType::Provided)
-        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter));
+        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);
 
-    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter));
+    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter), parent);
+}
+
+AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObjectFunction *parent)
+{
+    if (!source)
+        return nullptr;
+
+    AADLObjectIface *target = AADLObjectIface::createIface(source->direction(), common::createId(), parent);
+    target->setCloneOrigin(source);
+
+    auto cloneInternals = [target](void (AADLObject::*fp)(const QString &, const QVariant &),
+                                   const QHash<QString, QVariant> &collection) {
+        QHash<QString, QVariant>::const_iterator i = collection.cbegin();
+        while (i != collection.cend()) {
+            (target->*fp)(i.key(), i.value());
+            ++i;
+        }
+    };
+
+    cloneInternals(&AADLObject::setAttr, source->attrs());
+    cloneInternals(&AADLObject::setProp, source->props());
+
+    if (parent)
+        parent->addInterface(target);
+    if (AADLObjectsModel *model = parent->objectsModel())
+        model->addObject(target);
+
+    return target;
 }
 
 } // ns aadl

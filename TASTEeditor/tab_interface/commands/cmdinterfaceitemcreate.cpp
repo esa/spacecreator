@@ -19,6 +19,7 @@
 
 #include "commandids.h"
 
+#include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
 namespace taste3 {
@@ -29,7 +30,7 @@ CmdInterfaceItemCreate::CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObje
                                                const QPointF &pos, AADLObjectIface::IfaceType type,
                                                const common::Id &id)
     : m_model(model)
-    , m_entity(createIface(type, id))
+    , m_entity(AADLObjectIface::createIface(type, id, function))
     , m_parent(function)
     , m_pos(pos)
 {
@@ -38,7 +39,7 @@ CmdInterfaceItemCreate::CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObje
 
 void CmdInterfaceItemCreate::redo()
 {
-    m_entity->setCoordinates({ qRound(m_pos.x()), qRound(m_pos.y()) });
+    m_entity->setCoordinates(utils::coordinates(m_pos));
     if (m_parent)
         m_parent->addInterface(m_entity);
     if (m_model)

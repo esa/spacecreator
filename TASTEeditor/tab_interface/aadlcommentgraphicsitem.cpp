@@ -75,13 +75,11 @@ void AADLCommentGraphicsItem::updateFromEntity()
         return;
 
     setText(obj->title());
-    const auto coordinates = obj->coordinates();
-    if (coordinates.isEmpty()) {
+    const QRectF itemSceneRect { utils::rect(obj->coordinates()) };
+    if (!itemSceneRect.isValid())
         instantLayoutUpdate();
-    } else {
-        setRect({ QPointF(coordinates.value(0), coordinates.value(1)),
-                  QPointF(coordinates.value(2), coordinates.value(3)) });
-    }
+    else
+        setRect(itemSceneRect);
 }
 
 void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)

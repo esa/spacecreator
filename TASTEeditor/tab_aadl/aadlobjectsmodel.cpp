@@ -89,7 +89,6 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
 
-    obj->notifyRemoved();
     emit aadlObjectRemoved(obj);
     return true;
 }
@@ -168,10 +167,10 @@ AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const common::Id &id) 
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }
 
-QHash<QString, const AADLObjectFunctionType *>
+QHash<QString, AADLObjectFunctionType *>
 AADLObjectsModel::getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const
 {
-    QHash<QString, const AADLObjectFunctionType *> result;
+    QHash<QString, AADLObjectFunctionType *> result;
     if (!fnObj)
         return result;
 
@@ -190,9 +189,9 @@ AADLObjectsModel::getAvailableFunctionTypes(const AADLObjectFunction *fnObj) con
         return false;
     };
 
-    for (const AADLObject *obj : d->m_objects)
+    for (AADLObject *obj : d->m_objects)
         if (obj->aadlType() == AADLObject::AADLObjectType::AADLFunctionType)
-            if (const AADLObjectFunctionType *objFnType = qobject_cast<const AADLObjectFunctionType *>(obj))
+            if (AADLObjectFunctionType *objFnType = qobject_cast<AADLObjectFunctionType *>(obj))
                 if (isValid(objFnType, fnObj))
                     result.insert(objFnType->title(), objFnType);
 

@@ -41,6 +41,8 @@ public:
 
     void updateFromEntity() override;
 
+    QSizeF minimalSize() const override;
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -51,7 +53,6 @@ protected:
     void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    QSizeF minimalSize() const override;
     virtual void updateTextPosition();
 
     void initGripPoints() override;

@@ -33,27 +33,9 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
     , m_model(model)
     , m_entity(entity)
 {
-    if (auto container = qobject_cast<AADLObjectFunctionType *>(m_entity)) {
-        for (auto ri : container->ris()) {
-            if (auto connection = m_model->getConnectionForIface(ri->id()))
-                m_linkedEntities.append(connection);
-            m_linkedEntities.append(ri);
-        }
-        for (auto pi : container->pis()) {
-            if (auto connection = m_model->getConnectionForIface(pi->id()))
-                m_linkedEntities.append(connection);
-            m_linkedEntities.append(pi);
-        }
-        for (auto child : container->children()) {
-            if (auto connection = m_model->getFunctionType(child->id()))
-                m_linkedEntities.append(connection);
-            m_linkedEntities.append(child);
-        }
-    } else if (auto iface = qobject_cast<AADLObjectIface *>(m_entity)) {
-        if (auto connection = m_model->getConnectionForIface(iface->id()))
-            m_linkedEntities.append(connection);
-    }
     setText(QObject::tr("Remove"));
+
+    collectRelatedItems(m_entity);
 }
 
 void CmdEntityRemove::redo()
@@ -61,11 +43,20 @@ void CmdEntityRemove::redo()
     if (!m_model)
         return;
 
-    for (auto it = m_linkedEntities.cbegin(); it != m_linkedEntities.cend(); ++it)
-        m_model->removeObject(*it);
+    auto removeAadlObjects = [this](const QVector<QPointer<AADLObject>> &collection) {
+        for (auto it = collection.cbegin(); it != collection.cend(); ++it)
+            m_model->removeObject(*it);
+    };
+
+    removeAadlObjects(m_relatedIfaces);
+    removeAadlObjects(m_relatedConnections);
+    removeAadlObjects(m_relatedEntities);
 
     if (m_entity)
         m_model->removeObject(m_entity);
+
+    for (auto function : m_typedFunctions.keys())
+        function->setInstanceOf(nullptr, AADLObjectFunction::ClonedIfacesPolicy::Keep);
 }
 
 void CmdEntityRemove::undo()
@@ -76,8 +67,18 @@ void CmdEntityRemove::undo()
     if (m_entity)
         m_model->addObject(m_entity);
 
-    for (auto it = m_linkedEntities.crbegin(); it != m_linkedEntities.crend(); ++it)
-        m_model->addObject(*it);
+    auto restoreAadlObjects = [this](const QVector<QPointer<AADLObject>> &collection) {
+        for (auto it = collection.crbegin(); it != collection.crend(); ++it)
+            m_model->addObject(*it);
+    };
+
+    restoreAadlObjects(m_relatedEntities);
+    restoreAadlObjects(m_relatedIfaces);
+    restoreAadlObjects(m_relatedConnections);
+
+    static const QString instanceOfAttr = meta::Props::token(meta::Props::Token::instance_of);
+    for (auto function : m_typedFunctions.keys())
+        function->setInstanceOf(m_typedFunctions.value(function), AADLObjectFunction::ClonedIfacesPolicy::Keep);
 }
 
 bool CmdEntityRemove::mergeWith(const QUndoCommand *command)
@@ -89,6 +90,69 @@ bool CmdEntityRemove::mergeWith(const QUndoCommand *command)
 int CmdEntityRemove::id() const
 {
     return RemoveEntity;
+}
+
+void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
+{
+    if (!toBeRemoved)
+        return;
+
+    switch (toBeRemoved->aadlType()) {
+    case AADLObject::AADLObjectType::AADLIface: {
+        if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(toBeRemoved)) {
+            for (auto clone : iface->clones())
+                collectRelatedItems(clone);
+            if (auto connection = m_model->getConnectionForIface(iface->id()))
+                storeLinkedEntity(connection);
+        }
+        break;
+    }
+    case AADLObject::AADLObjectType::AADLFunction:
+    case AADLObject::AADLObjectType::AADLFunctionType: {
+        if (AADLObjectFunctionType *fnType = qobject_cast<AADLObjectFunctionType *>(toBeRemoved)) {
+            for (auto iface : fnType->interfaces())
+                collectRelatedItems(iface);
+
+            for (auto child : toBeRemoved->findChildren<AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
+                collectRelatedItems(child);
+
+            if (fnType->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+                for (AADLObjectFunction *function : fnType->instances())
+                    m_typedFunctions.insert(function, fnType);
+            }
+        }
+        break;
+    }
+    default: {
+        for (auto child : toBeRemoved->findChildren<AADLObject *>(QString(), Qt::FindDirectChildrenOnly))
+            collectRelatedItems(child);
+        break;
+    }
+    }
+
+    storeLinkedEntity(toBeRemoved);
+}
+
+void CmdEntityRemove::storeLinkedEntity(AADLObject *linkedEntity)
+{
+    auto storeObject = [](AADLObject *obj, QVector<QPointer<AADLObject>> *collection) {
+        if (obj && !collection->contains(obj))
+            collection->append(obj);
+    };
+
+    QVector<QPointer<AADLObject>> *pCollection { nullptr };
+    switch (linkedEntity->aadlType()) {
+    case AADLObject::AADLObjectType::AADLConnection:
+        pCollection = &m_relatedConnections;
+        break;
+    case AADLObject::AADLObjectType::AADLIface:
+        pCollection = &m_relatedIfaces;
+        break;
+    default:
+        pCollection = &m_relatedEntities;
+        break;
+    }
+    storeObject(linkedEntity, pCollection);
 }
 
 } // namespace cmd

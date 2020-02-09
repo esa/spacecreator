@@ -58,11 +58,6 @@ QString AADLObject::title() const
 
 void AADLObject::postInit() {}
 
-void AADLObject::notifyRemoved()
-{
-    emit removed();
-}
-
 common::Id AADLObject::id() const
 {
     return d->m_id;
@@ -96,6 +91,10 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
     return true;
 }
 
+void AADLObject::handleClonedAttr(taste3::aadl::meta::Props::Token attr) {}
+
+void AADLObject::handleClonedProp(taste3::aadl::meta::Props::Token prop) {}
+
 QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates) const
 {
     const QStringList &strCoords = strCoordinates.split(' ', QString::SkipEmptyParts);
@@ -108,7 +107,17 @@ QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates)
 
 QVector<qint32> AADLObject::coordinates() const
 {
-    return coordinatesFromString(prop(meta::Props::token(meta::Props::Token::coordinates)).toString());
+    meta::Props::Token token = meta::Props::Token::coordinates;
+    if (auto parentItem = parentObject()) {
+        if (parentObject()->isRootObject()) {
+            token = meta::Props::Token::InnerCoordinates;
+        } else if (auto grandParent = parentItem->parentObject()) {
+            if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
+                token = meta::Props::Token::InnerCoordinates;
+        }
+    }
+
+    return coordinatesFromString(prop(meta::Props::token(token)).toString());
 }
 
 QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) const
@@ -153,10 +162,21 @@ QVariantList AADLObject::generateSortedList(const QHash<QString, QVariant> &prop
 
 void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
 {
-    if (this->coordinates() != coordinates) {
-        setProp(meta::Props::token(meta::Props::Token::coordinates), coordinatesToString(coordinates));
-        emit coordinatesChanged(coordinates);
+    if (this->coordinates() == coordinates)
+        return;
+
+    meta::Props::Token token = meta::Props::Token::coordinates;
+    if (auto parentItem = parentObject()) {
+        if (parentObject()->isRootObject()) {
+            token = meta::Props::Token::InnerCoordinates;
+        } else if (auto grandParent = parentItem->parentObject()) {
+            if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
+                token = meta::Props::Token::InnerCoordinates;
+        }
     }
+
+    setProp(meta::Props::token(token), coordinatesToString(coordinates));
+    emit coordinatesChanged(coordinates);
 }
 
 QVector<qint32> AADLObject::innerCoordinates() const

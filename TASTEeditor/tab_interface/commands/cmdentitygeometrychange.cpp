@@ -40,12 +40,7 @@ void CmdEntityGeometryChange::redo()
     if (!m_entity)
         return;
 
-    if (m_entity->aadlType() == AADLObject::AADLObjectType::AADLFunction && m_entity->parentObject()
-        && m_entity->parentObject()->isRootObject()) {
-        m_entity->setInnerCoordinates(m_newCoordinates);
-    } else {
-        m_entity->setCoordinates(m_newCoordinates);
-    }
+    m_entity->setCoordinates(m_newCoordinates);
 }
 
 void CmdEntityGeometryChange::undo()
@@ -53,12 +48,7 @@ void CmdEntityGeometryChange::undo()
     if (!m_entity)
         return;
 
-    if (m_entity->aadlType() == AADLObject::AADLObjectType::AADLFunction && m_entity->parentObject()
-        && m_entity->parentObject()->isRootObject()) {
-        m_entity->setInnerCoordinates(m_prevCoordinates);
-    } else {
-        m_entity->setCoordinates(m_prevCoordinates);
-    }
+    m_entity->setCoordinates(m_prevCoordinates);
 }
 
 bool CmdEntityGeometryChange::mergeWith(const QUndoCommand *command)

@@ -18,6 +18,7 @@
 #include "aadlobjectfunctiontype.h"
 
 #include "aadlcommonprops.h"
+#include "aadlobjectfunction.h"
 
 namespace taste3 {
 namespace aadl {
@@ -27,6 +28,7 @@ struct AADLObjectFunctionTypePrivate {
     QVector<AADLObjectIface *> m_ris {};
     QVector<AADLObjectIface *> m_pis {};
     QVector<ContextParameter> m_contextParams {};
+    QVector<QPointer<AADLObjectFunction>> m_instances {};
 };
 
 AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
@@ -35,7 +37,6 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
-    setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 
     if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
         root->addChild(this);
@@ -147,12 +148,25 @@ QVariantList AADLObjectFunctionType::interfaces() const
 
 bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
 {
-    return iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
+    const bool added = iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
+    if (added)
+        emit ifaceAdded(iface);
+
+    return added;
 }
 
 bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 {
-    return iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
+    const bool removed = iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
+    if (removed)
+        emit ifaceRemoved(iface);
+
+    return removed;
+}
+
+QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
+{
+    return ris() + pis();
 }
 
 QVariantList AADLObjectFunctionType::nestedFunctions() const
@@ -240,6 +254,23 @@ void AADLObjectFunctionType::setAttr(const QString &name, const QVariant &val)
     default:
         break;
     }
+}
+
+QVector<QPointer<AADLObjectFunction>> AADLObjectFunctionType::instances() const
+{
+    return d->m_instances;
+}
+
+void AADLObjectFunctionType::rememberInstance(AADLObjectFunction *function)
+{
+    if (function && !instances().contains(function))
+        d->m_instances.append(function);
+}
+
+void AADLObjectFunctionType::forgetInstance(AADLObjectFunction *function)
+{
+    if (function)
+        d->m_instances.removeAll(function);
 }
 
 } // ns aadl

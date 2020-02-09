@@ -129,12 +129,14 @@ QUndoCommand *CommandsFactory::createFunctionTypeCommand(const QVariantList &par
 
 QUndoCommand *CommandsFactory::createCommentCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
+    Q_ASSERT(params.size() == 3);
     const QVariant model = params.value(0);
-    const QVariant geometry = params.value(1);
+    const QVariant parent = params.value(1);
+    const QVariant geometry = params.value(2);
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
         && model.canConvert<AADLObjectsModel *>())
-        return new CmdCommentItemCreate(model.value<AADLObjectsModel *>(), geometry.value<QRectF>());
+        return new CmdCommentItemCreate(model.value<AADLObjectsModel *>(), parent.value<AADLObjectFunctionType *>(),
+                                        geometry.value<QRectF>());
 
     return nullptr;
 }
