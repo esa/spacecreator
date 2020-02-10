@@ -33,7 +33,6 @@ StringTemplate::StringTemplate(QObject *parent)
     : QObject(parent)
     , m_engine(new Grantlee::Engine(this))
     , m_autoFormattingIndent(4)
-    , m_isXmlText(false)
 {
     QSharedPointer<Grantlee::FileSystemTemplateLoader> loader(new Grantlee::FileSystemTemplateLoader());
     m_engine->addTemplateLoader(loader);
@@ -96,12 +95,11 @@ QString StringTemplate::formatText(const QString &text) const
     }
 
     if (xmlReader.hasError()) {
-        m_isXmlText = false;
 //        emit errorOccurred(tr("Error: %1, error line: %2:%3").arg(xmlReader.errorString())
 //                           .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()));
         return text;
     }
-    m_isXmlText = true;
+
     return formattedText.trimmed();
 }
 
@@ -112,15 +110,6 @@ QString StringTemplate::formatText(const QString &text) const
 int StringTemplate::autoFormattingIndent() const
 {
     return m_autoFormattingIndent;
-}
-
-/**
- * @brief StringTemplate::isXml returns whether text is XML
- * @return whether text has XML format
- */
-bool StringTemplate::isXml() const
-{
-    return m_isXmlText;
 }
 
 /**

@@ -46,24 +46,18 @@ PreviewDialog::PreviewDialog(QWidget *parent)
     QRect geometry = desktop->availableGeometry(this);
     setMinimumSize(geometry.width() * 0.8, geometry.height() * 0.8);
 
-    m_indentWidget = new QWidget(this);
+    QLabel *indentLabel = new QLabel(tr("XML Auto-formatting Indent:"), this);
 
-    QLabel *indentLabel = new QLabel(tr("Auto-formatting Indent:"), m_indentWidget);
-
-    QSpinBox *indentSpinBox = new QSpinBox(m_indentWidget);
+    QSpinBox *indentSpinBox = new QSpinBox(this);
     indentSpinBox->setRange(0, 10);
     indentSpinBox->setValue(m_stringTemplate->autoFormattingIndent());
-
-    QHBoxLayout *indentLayout = new QHBoxLayout();
-    indentLayout->addWidget(indentLabel);
-    indentLayout->addWidget(indentSpinBox);
-    m_indentWidget->setLayout(indentLayout);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
     buttonBox->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Close);
 
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
-    hBoxLayout->addWidget(m_indentWidget);
+    hBoxLayout->addWidget(indentLabel);
+    hBoxLayout->addWidget(indentSpinBox);
     hBoxLayout->addStretch();
     hBoxLayout->addWidget(buttonBox);
 
@@ -87,7 +81,6 @@ void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, c
 {
     const QString& result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
     m_textEdit->setText(result);
-    m_indentWidget->setVisible(m_stringTemplate->isXml());
     open();
 }
 
