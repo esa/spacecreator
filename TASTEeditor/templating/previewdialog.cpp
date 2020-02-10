@@ -85,7 +85,7 @@ PreviewDialog::PreviewDialog(QWidget *parent)
  */
 void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
 {
-    QString result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
+    const QString& result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
     m_textEdit->setText(result);
     m_indentWidget->setVisible(m_stringTemplate->isXml());
     open();
