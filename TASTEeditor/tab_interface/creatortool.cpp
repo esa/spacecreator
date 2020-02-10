@@ -446,8 +446,9 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
 
     if (startIface && !endIface) {
         startRequired = startIface->isRequired();
-        const AADLObjectIface::IfaceType type = startRequired && isSameType ? AADLObjectIface::IfaceType::Required
-                                                                            : AADLObjectIface::IfaceType::Provided;
+        const AADLObjectIface::IfaceType type = (startRequired && isSameType) || (!startRequired && !isSameType)
+                ? AADLObjectIface::IfaceType::Required
+                : AADLObjectIface::IfaceType::Provided;
         const QVariantList params = { qVariantFromValue(model), qVariantFromValue(endObject), endPointAdjusted,
                                       qVariantFromValue(type), endIfaceId };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
