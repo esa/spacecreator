@@ -67,8 +67,8 @@ class AADLObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
-    Q_PROPERTY(QVariantList properties READ properties)
-    Q_PROPERTY(QVariantList attributes READ attributes)
+    Q_PROPERTY(QVariantList properties READ propList)
+    Q_PROPERTY(QVariantList attributes READ attrList)
 
 public:
     enum class AADLObjectType
@@ -104,7 +104,7 @@ public:
     // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
 
     QHash<QString, QVariant> attrs() const;
-    QVariantList attributes() const;
+    QVariantList attrList() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setAttr(const QString &name, const QVariant &val);
@@ -112,7 +112,7 @@ public:
 
     // "properties" - XML children <Property>
     QHash<QString, QVariant> props() const;
-    QVariantList properties() const;
+    QVariantList propList() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     void setProp(const QString &name, const QVariant &val);

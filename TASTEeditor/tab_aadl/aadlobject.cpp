@@ -202,7 +202,12 @@ QHash<QString, QVariant> AADLObject::attrs() const
     return d->m_attrs;
 }
 
-QVariantList AADLObject::attributes() const
+/**
+ * @brief AADLObject::attrList returns attribute list which sorted by name
+ * according to meta::Props::Token order.
+ * @return sorted attribute list.
+ */
+QVariantList AADLObject::attrList() const
 {
     return generateSortedList(d->m_attrs);
 }
@@ -249,7 +254,12 @@ QHash<QString, QVariant> AADLObject::props() const
     return d->m_props;
 }
 
-QVariantList AADLObject::properties() const
+/**
+ * @brief AADLObject::propList returns property list which sorted by name
+ * according to meta::Props::Token order.
+ * @return sorted property list.
+ */
+QVariantList AADLObject::propList() const
 {
     return generateSortedList(d->m_props);
 }
