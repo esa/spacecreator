@@ -387,8 +387,12 @@ QRectF AADLConnectionGraphicsItem::boundingRect() const
     return m_item->boundingRect();
 }
 
-void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                                       QWidget *widget) { Q_UNUSED(painter) Q_UNUSED(option) Q_UNUSED(widget) }
+void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(painter)
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+}
 
 QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
@@ -641,6 +645,7 @@ QGraphicsRectItem *AADLConnectionGraphicsItem::createGripPoint()
     QGraphicsRectItem *gripPoint =
             scene()->addRect(kGripPointRect, QPen(kGripPointBorder), QBrush(kGripPointBackground));
     gripPoint->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIgnoresTransformations);
+    gripPoint->setZValue(zValue() + 1);
     gripPoint->installSceneEventFilter(this);
     return gripPoint;
 }
