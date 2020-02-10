@@ -117,7 +117,7 @@ void PreviewDialog::onErrorOccurred(const QString &error)
 void PreviewDialog::onIndentChanged(int value)
 {
     m_stringTemplate->setAutoFormattingIndent(value);
-    QString result = m_stringTemplate->formatText(m_textEdit->toPlainText());
+    const QString& result = m_stringTemplate->formatText(m_textEdit->toPlainText());
     m_textEdit->setText(result);
 }
 
