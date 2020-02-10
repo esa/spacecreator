@@ -1,64 +1,9 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-<g>
-	<g>
-		<path d="M0,0v512h512V0H0z M477.867,477.867H34.133V34.133h443.733V477.867z"/>
-	</g>
-</g>
-<g>
-	<g>
-		<polygon points="126.533,102.4 199.111,102.4 199.111,68.267 68.267,68.267 68.267,199.111 102.4,199.111 102.4,126.538 
-			198.422,222.558 222.556,198.423 		"/>
-	</g>
-</g>
-<g>
-	<g>
-		<polygon points="222.557,313.581 198.422,289.445 102.4,385.467 102.4,312.889 68.267,312.889 68.267,443.733 199.111,443.733 
-			199.111,409.6 126.538,409.6 		"/>
-	</g>
-</g>
-<g>
-	<g>
-		<polygon points="409.6,312.889 409.6,385.467 313.578,289.444 289.444,313.578 385.462,409.6 312.889,409.6 312.889,443.733 
-			443.733,443.733 443.733,312.889 		"/>
-	</g>
-</g>
-<g>
-	<g>
-		<polygon points="312.889,68.267 312.889,102.4 385.467,102.4 289.444,198.423 313.578,222.558 409.6,126.538 409.6,199.111 
-			443.733,199.111 443.733,68.267 		"/>
-	</g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
+<?xml version="1.0" encoding="utf-8"?>
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.722222, 0, 0, 0.75, 3.333336, 3)">
+    <path d="M 21 15 L 21 19 C 21 20.105 20.105 21 19 21 L 5 21 C 3.895 21 3 20.105 3 19 L 3 15" style="stroke: rgb(47, 47, 47);"/>
+    <polyline points="17 8 12 3 7 8" style="stroke: rgb(47, 47, 47);"/>
+    <line x1="12" x2="12" y1="3" y2="15" style="stroke: rgb(47, 47, 47);"/>
+  </g>
+  <rect x="1.5" y="1.5" width="21" height="21" style="paint-order: stroke; stroke: rgb(47, 47, 47);"/>
 </svg>

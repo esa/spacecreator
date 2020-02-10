@@ -1,7 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Svg Vector Icons : http://www.onlinewebfonts.com/icon -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
-<metadata> Svg Vector Icons : http://www.onlinewebfonts.com/icon </metadata>
-<g><path d="M355.2,24.2H10v332.8h56V119l202.9,202.9l39.6-39.6l-202.1-202h248.8V24.2z"/><path d="M644.8,24.2H990v332.8h-56V119L731.1,321.8l-39.6-39.6l202.1-202H644.8V24.2z"/><path d="M644.8,975.8H990V643.1h-56v238L731.1,678.2l-39.6,39.6l202.1,202H644.8V975.8z"/><path d="M355.2,975.8H10V643.1h56v238l202.9-202.9l39.6,39.6l-202.1,202h248.8V975.8z"/></g>
-</svg>
+<?xml version="1.0" ?><svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
