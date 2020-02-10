@@ -60,15 +60,16 @@ public:
     AADLObjectConnection *getConnectionForIface(const common::Id &id) const;
 
     const QHash<common::Id, AADLObject *> &objects() const;
+    QList<AADLObject *> visibleObjects() const;
 
 Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);
     void modelReset();
-    void rootObjectChanged();
+    void rootObjectChanged(common::Id rootId);
 
 public Q_SLOTS:
-    bool initFromObjects(const QVector<AADLObject *> &objects);
+    bool initFromObjects(const QVector<AADLObject *> &visibleObjects);
 
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;

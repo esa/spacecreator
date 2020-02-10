@@ -94,9 +94,6 @@ public:
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
 
-    QVector<qint32> innerCoordinates() const;
-    void setInnerCoordinates(const QVector<qint32> &coordinates);
-
     AADLObject *parentObject() const;
 
     // "attributes" - payload data in the opening XML tag,
@@ -129,7 +126,6 @@ Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
-    void innerCoordinatesChanged(const QVector<qint32> &coordinates);
     void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown);
     void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown);
 

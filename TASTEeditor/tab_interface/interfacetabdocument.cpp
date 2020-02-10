@@ -52,6 +52,7 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     , m_model(new aadl::AADLObjectsModel(this))
 {
     connect(m_model, &aadl::AADLObjectsModel::modelReset, this, &InterfaceTabDocument::clearScene);
+    connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &InterfaceTabDocument::onAADLObjectAdded);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, [this](aadl::AADLObject *object) {
         auto item = m_items.take(object->id());
@@ -139,9 +140,8 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
 
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
-        clearScene();
         if (m_model->initFromObjects(objects))
-            onRootItemChanged({});
+            m_model->setRootObject({});
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
@@ -353,13 +353,13 @@ void InterfaceTabDocument::onActionZoomOut()
 
 void InterfaceTabDocument::onActionExitToRootFunction()
 {
-    onRootItemChanged({});
+    m_model->setRootObject({});
 }
 
 void InterfaceTabDocument::onActionExitToParentFunction()
 {
     aadl::AADLObject *parentObject = m_model->rootObject() ? m_model->rootObject()->parentObject() : nullptr;
-    onRootItemChanged(parentObject ? parentObject->id() : common::Id());
+    m_model->setRootObject(parentObject ? parentObject->id() : common::Id());
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)
@@ -473,7 +473,6 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
     if (!item) {
         item = createItemForObject(object);
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
-        connect(object, &aadl::AADLObject::innerCoordinatesChanged, this, propertyChanged);
         connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<ClickNotifierItem *>(item->toGraphicsObject())) {
             connect(clickable, &ClickNotifierItem::clicked, this, &InterfaceTabDocument::onItemClicked);
@@ -548,7 +547,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
             if (clickedEntity->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
                     if (!function->children().isEmpty() && !function->isRootObject()) {
-                        onRootItemChanged(function->id());
+                        m_model->setRootObject(function->id());
                         return;
                     }
                 }
@@ -559,35 +558,30 @@ void InterfaceTabDocument::onItemDoubleClicked()
     }
 }
 
-void InterfaceTabDocument::onRootItemChanged(const common::Id &id)
+void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
 {
-    m_model->setRootObject(id);
+    Q_UNUSED(rootId)
+
     m_actExitToRoot->setVisible(nullptr != m_model->rootObject());
     m_actExitToParent->setVisible(nullptr != m_model->rootObject());
-    const QRect viewportGeometry =
-            m_graphicsView->viewport()->geometry().marginsRemoved(utils::kContentMargins.toMargins());
 
-    if (auto rootItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(m_items.value(id))) {
-        QRectF rootRect = rootItem->nestedItemsSceneBoundingRect();
-        if (rootRect.isValid()) {
-            rootRect = rootRect.marginsAdded(utils::kRootMargins);
-            QRectF vpRect { viewportGeometry };
-            vpRect.moveCenter(rootRect.center());
-            rootRect = rootRect.united(vpRect);
-        } else {
-            rootRect = QRectF(m_graphicsView->mapToScene(viewportGeometry.topLeft()),
-                              m_graphicsView->mapToScene(viewportGeometry.bottomRight()));
-        }
-        rootItem->setRect(rootRect);
-        for (auto innerItem : rootItem->childItems()) {
-            if (auto innerFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(innerItem))
-                innerFunction->updateFromEntity();
-            if (auto innerConnection = qgraphicsitem_cast<aadl::AADLConnectionGraphicsItem *>(innerItem))
-                innerConnection->updateFromEntity();
-        }
-        m_graphicsView->centerOn(rootRect.center());
-        return;
-    }
+    QList<aadl::AADLObject *> objects = m_model->visibleObjects();
+    std::sort(objects.begin(), objects.end(),
+              [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
+
+    auto firstNonFunctionEntity = std::find_if(objects.cbegin(), objects.cend(), [](aadl::AADLObject *obj) {
+        return obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLFunction
+                && obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLFunctionType;
+    });
+
+    for (auto it = objects.cbegin(); it != firstNonFunctionEntity; ++it)
+        onAADLObjectAdded(*it);
+
+    if (auto rootGraphicsItem = rootItem())
+        rootGraphicsItem->instantLayoutUpdate();
+
+    for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
+        onAADLObjectAdded(*it);
 
     m_graphicsView->centerOn(m_graphicsScene->sceneRect().center());
 }

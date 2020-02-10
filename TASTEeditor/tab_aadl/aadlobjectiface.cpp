@@ -308,7 +308,8 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QSt
 {
 }
 
-AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent)
+AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType direction, const common::Id &id,
+                                              AADLObject *parent)
 {
     if (direction == AADLObjectIface::IfaceType::Provided)
         return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);

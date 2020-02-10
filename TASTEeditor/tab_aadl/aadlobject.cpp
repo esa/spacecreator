@@ -179,19 +179,6 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
     emit coordinatesChanged(coordinates);
 }
 
-QVector<qint32> AADLObject::innerCoordinates() const
-{
-    return coordinatesFromString(prop(meta::Props::token(meta::Props::Token::InnerCoordinates)).toString());
-}
-
-void AADLObject::setInnerCoordinates(const QVector<qint32> &coordinates)
-{
-    if (innerCoordinates() != coordinates) {
-        setProp(meta::Props::token(meta::Props::Token::InnerCoordinates), coordinatesToString(coordinates));
-        emit innerCoordinatesChanged(coordinates);
-    }
-}
-
 AADLObject *AADLObject::parentObject() const
 {
     return qobject_cast<AADLObject *>(parent());

@@ -70,6 +70,56 @@ bool AADLFunctionGraphicsItem::isRootItem() const
 
 void AADLFunctionGraphicsItem::rebuildLayout()
 {
+    QRectF nestedItemsInternalRect;
+    bool needRelayout = false;
+    for (QGraphicsItem *item : childItems()) {
+        if (auto iObj = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject())) {
+            if (auto entity = qobject_cast<aadl::AADLObject *>(iObj->modelEntity())) {
+                const QRectF objRect = utils::rect(entity->coordinates());
+                if (objRect.isValid())
+                    nestedItemsInternalRect |= objRect;
+                else
+                    needRelayout = true;
+            }
+        }
+    }
+    if (isRootItem()) {
+        QRectF itemRect;
+        QRectF viewportRect;
+        auto view = scene()->views().value(0);
+        if (view) {
+            const QRect viewportGeometry =
+                    view->viewport()->geometry().marginsRemoved(utils::kContentMargins.toMargins());
+            viewportRect = QRectF(view->mapToScene(viewportGeometry.topLeft()),
+                                  view->mapToScene(viewportGeometry.bottomRight()));
+        }
+        const QRectF nestedRect = nestedItemsInternalRect.isValid()
+                ? nestedItemsInternalRect.marginsAdded(utils::kRootMargins)
+                : QRectF();
+        if (nestedRect.isValid()) {
+            viewportRect.moveCenter(nestedRect.center());
+            itemRect = viewportRect.united(nestedRect);
+        } else {
+            itemRect = viewportRect;
+        }
+
+        const QPointF offset = scenePos() - itemRect.topLeft();
+        if (itemRect != sceneBoundingRect())
+            setGeometry(itemRect);
+
+        if (nestedItemsInternalRect.isValid()) {
+            for (QGraphicsItem *child : childItems()) {
+                if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(child->toGraphicsObject()))
+                    function->moveBy(offset.x(), offset.y());
+            }
+            scene()->setSceneRect({});
+        }
+        if (view)
+            view->centerOn(itemRect.center());
+    }
+    if (needRelayout)
+        doAutoLayout();
+
     AADLFunctionTypeGraphicsItem::rebuildLayout();
 
     colorSchemeUpdated();
@@ -126,8 +176,12 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
 {
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
-    const QRectF contentRect =
-            parentItem() ? parentItem()->boundingRect().marginsRemoved(utils::kContentMargins) : QRectF();
+
+    auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
+    const QRectF contentRect = parentFunction
+            ? parentFunction->boundingRect().marginsRemoved(parentFunction->isRootItem() ? utils::kRootMargins
+                                                                                         : utils::kContentMargins)
+            : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -175,16 +229,20 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
     }
 
     const QRectF normalized = rect.normalized();
-    if (isRootItem() && !normalized.marginsRemoved(utils::kContentMargins).contains(nestedItemsSceneBoundingRect()))
+    if (isRootItem() && !normalized.marginsRemoved(utils::kRootMargins).contains(nestedItemsSceneBoundingRect()))
         return;
 
     if (normalized.width() >= minimalSize().width() && normalized.height() >= minimalSize().height()) {
         const QPointF offset = parentItem()
                 ? (sceneBoundingRect().topLeft() - parentItem()->mapRectToScene(normalized).topLeft())
                 : sceneBoundingRect().topLeft() - normalized.topLeft();
-        setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
+        if (isRootItem())
+            setGeometry(normalized);
+        else
+            setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
+
         for (QGraphicsItem *child : childItems()) {
-            if (auto function = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(child))
+            if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(child->toGraphicsObject()))
                 function->moveBy(offset.x(), offset.y());
         }
     }
@@ -203,7 +261,8 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint::Location grip, co
         const QRectF nestedRect = nestedItemsSceneBoundingRect();
         if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect))
             doAutoLayout();
-        createCommand();
+        else
+            createCommand();
     }
 }
 
@@ -247,6 +306,14 @@ void AADLFunctionGraphicsItem::layoutOuterConnections()
     }
 }
 
+void AADLFunctionGraphicsItem::setGeometry(const QRectF &sceneGeometry)
+{
+    /// Silent geometry change without relayouting
+    setPos(sceneGeometry.topLeft());
+    prepareGeometryChange();
+    m_boundingRect.setSize(sceneGeometry.size());
+}
+
 void AADLFunctionGraphicsItem::updateTextPosition()
 {
     const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
@@ -267,9 +334,8 @@ void AADLFunctionGraphicsItem::updateNestedItems()
         if (item->type() == AADLFunctionTypeGraphicsItem::Type || item->type() == AADLFunctionGraphicsItem::Type) {
             const QRectF nestedRect = item->sceneBoundingRect();
 
-            if (nestedRect.isEmpty() || !sceneRect.contains(nestedRect)) {
+            if (nestedRect.isEmpty() || !sceneRect.contains(nestedRect.marginsAdded(utils::kContentMargins))) {
                 doAutoLayout();
-                createCommand();
                 break;
             }
 
@@ -279,7 +345,6 @@ void AADLFunctionGraphicsItem::updateNestedItems()
                                    });
             if (it != nestedRects.constEnd()) {
                 doAutoLayout();
-                createCommand();
                 break;
             }
 
@@ -378,7 +443,8 @@ void AADLFunctionGraphicsItem::doAutoLayout()
 
     const int columnCount = qCeil(qSqrt(nestedFunctions.size()));
     const int rowCount = qCeil(qreal(nestedFunctions.size()) / columnCount);
-    const QRectF itemRect = sceneBoundingRect();
+    const QRectF itemRect =
+            sceneBoundingRect().marginsRemoved(isRootItem() ? utils::kRootMargins : utils::kContentMargins);
     const QSizeF nestedSize = QSizeF { itemRect.width() / columnCount, itemRect.height() / rowCount };
     if (nestedSize.width() < minSize.width() || nestedSize.height() < minSize.height())
         return;
@@ -403,6 +469,7 @@ void AADLFunctionGraphicsItem::doAutoLayout()
     //        nestedItem->colorSchemeUpdated();
 
     layoutConnections();
+    createCommand();
 }
 
 } // namespace aadl
