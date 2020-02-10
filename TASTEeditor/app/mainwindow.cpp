@@ -397,7 +397,7 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
         }
 
         m_previewDialog->parse(grouppedObjects, templateFileName);
-        QString output = m_previewDialog->text();
+        const QString& output = m_previewDialog->text();
         return !output.isEmpty();
     }
 
