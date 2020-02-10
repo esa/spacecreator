@@ -29,7 +29,7 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat xmlValueElementFormat;
     xmlValueElementFormat.setForeground(Qt::black);
     xmlValueElementFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QLatin1String(">[^\n]*<"));
+    rule.pattern = QRegularExpression(QLatin1String(">[^\n]*</"));
     rule.format = xmlValueElementFormat;
     m_highlightingRules.append(rule);
 
@@ -48,14 +48,14 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
 
     // <Text> </Text>
     QTextCharFormat xmlElementFormat;
-    xmlElementFormat.setForeground(Qt::darkGreen);
+    xmlElementFormat.setForeground(Qt::blue);
     rule.pattern = QRegularExpression(QLatin1String("(?<=[<\\/])\\b[A-Za-z0-9_]+"));
     rule.format = xmlElementFormat;
     m_highlightingRules.append(rule);
 
     // < Text= >
     QTextCharFormat xmlAttributeFormat;
-    xmlAttributeFormat.setForeground(Qt::blue);
+    xmlAttributeFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegularExpression(QLatin1String("\\b[A-Za-z0-9_]+(?=\\=)"));
     rule.format = xmlAttributeFormat;
     m_highlightingRules.append(rule);
@@ -68,8 +68,7 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     m_highlightingRules.append(rule);
 
     // = "Text"
-    QColor valueColor(Qt::magenta);
-    m_valueFormat.setForeground(valueColor);
+    m_valueFormat.setForeground(Qt::magenta);
     m_valueFormat.setFontWeight(QFont::Bold);
     m_valueStartExpression.setPattern(QLatin1String("\""));
     m_valueEndExpression.setPattern(QLatin1String("\"(?=[\\s></])"));

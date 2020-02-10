@@ -15,46 +15,42 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef PREVIEWDIALOG_H
-#define PREVIEWDIALOG_H
+#ifndef TEMPLATEHIGHLIGHTER_H
+#define TEMPLATEHIGHLIGHTER_H
 
-#include <QDialog>
-
-class QSpinBox;
-class QTextEdit;
+#include <QRegularExpression>
+#include <QSyntaxHighlighter>
 
 namespace taste3 {
 namespace templating {
 
-class StringTemplate;
-
 /**
- * @brief The PreviewDialog class generates XML document from string template file and shows it.
+ * @brief The TemplateHighlighter class makes highlighting for template text
  */
-class PreviewDialog : public QDialog
+class TemplateHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
-    PreviewDialog(QWidget *parent = nullptr);
+    TemplateHighlighter(QTextDocument *parent);
 
-    void parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
-
-    QString text() const;
-
-private slots:
-    void onApplyTemplate();
-    void onSaveTemplate();
-    void onOpenTemplate();
-    void onErrorOccurred(const QString &error);
-    void onIndentChanged(int value);
+    // QSyntaxHighlighter interface
+protected:
+    void highlightBlock(const QString &text) override;
 
 private:
-    templating::StringTemplate *m_stringTemplate;
-    QTextEdit *m_templateTextEdit;
-    QTextEdit *m_resultTextEdit;
+    struct HighlightingRule
+    {
+        QRegularExpression pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> m_highlightingRules;
+
+    QTextCharFormat m_commentFormat;
+    QRegularExpression m_commentStartExpression;
+    QRegularExpression m_commentEndExpression;
 };
 
 } // ns processing
 } // ns taste3
 
-#endif // PREVIEWDIALOG_H
+#endif // TEMPLATEHIGHLIGHTER_H

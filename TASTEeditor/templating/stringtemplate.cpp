@@ -50,7 +50,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
 {
     QFileInfo fileInfo(templateFileName);
 
-    QSharedPointer<Grantlee::FileSystemTemplateLoader> loader = m_engine->templateLoaders().first().staticCast<Grantlee::FileSystemTemplateLoader>();
+    auto loader = m_engine->templateLoaders().first().staticCast<Grantlee::FileSystemTemplateLoader>();
     loader->setTemplateDirs({ fileInfo.absolutePath() });
 
     m_engine->setPluginPaths({ GRANTLEE_LIB_DIR, QApplication::applicationDirPath() });

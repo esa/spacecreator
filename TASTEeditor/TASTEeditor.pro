@@ -74,6 +74,7 @@ SOURCES += \
         main.cpp \
         templating/previewdialog.cpp \
         templating/stringtemplate.cpp \
+        templating/templatehighlighter.cpp \
         templating/xmlhighlighter.cpp \
         reports/bugreportdialog.cpp \
         reports/bugreporthandler.cpp \
@@ -180,6 +181,7 @@ HEADERS += \
         logging/loghandler.h \
         templating/previewdialog.h \
         templating/stringtemplate.h \
+        templating/templatehighlighter.h \
         templating/xmlhighlighter.h \
         reports/bugreportdialog.h \
         reports/bugreporthandler.h \
