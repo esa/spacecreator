@@ -68,7 +68,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
         return QString();
     }
 
-    QString result = stringTemplate->render(&context).trimmed();
+    const QString& result = stringTemplate->render(&context).trimmed();
     return formatText(result);
 }
 
