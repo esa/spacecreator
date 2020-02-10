@@ -217,7 +217,7 @@ void MainWindow::onSaveRenderRequested()
 
 void MainWindow::onExportByTemplateRequested()
 {
-    QString templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
+    const QString& templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
                                                             QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
     if (templateFileName.isEmpty())
         return;
@@ -308,7 +308,7 @@ void MainWindow::onReportRequested()
 
 void MainWindow::onSaveParsedTemplateToFile()
 {
-    QString outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
+    const QString& outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
     if (outputFileName.isEmpty())
         return;
 
@@ -397,7 +397,7 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
         }
 
         m_previewDialog->parse(grouppedObjects, templateFileName);
-        QString output = m_previewDialog->text();
+        const QString& output = m_previewDialog->text();
         return !output.isEmpty();
     }
 
@@ -409,7 +409,7 @@ bool MainWindow::exportToFile(const QString &outputFileName)
     if (!m_previewDialog)
         return false;
 
-    const QString text = m_previewDialog->text();
+    const QString& text = m_previewDialog->text();
     if (text.isEmpty())
         return false;;
 

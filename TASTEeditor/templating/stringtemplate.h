@@ -46,7 +46,7 @@ public:
 
     QString parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
 
-    QString formatText(const QString &text);
+    QString formatText(const QString &text) const;
 
     int autoFormattingIndent() const;
     bool isXml() const;

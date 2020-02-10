@@ -68,7 +68,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
         return QString();
     }
 
-    QString result = stringTemplate->render(&context).trimmed();
+    const QString& result = stringTemplate->render(&context).trimmed();
     return formatText(result);
 }
 
@@ -78,7 +78,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
  * @param text input text
  * @return formatted text
  */
-QString StringTemplate::formatText(const QString &text)
+QString StringTemplate::formatText(const QString &text) const
 {
     QString formattedText;
     QXmlStreamWriter xmlWriter(&formattedText);

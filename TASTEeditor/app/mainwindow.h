@@ -88,11 +88,12 @@ private:
     static constexpr int TABDOC_ID_InterfaceView { 0 };
 
     Ui::MainWindow *ui { nullptr };
-    QTabWidget *m_tabWidget;
+    QTabWidget *m_tabWidget { nullptr };
     QPointer<QToolBar> m_docToolbar;
-    document::DocumentsManager *m_docsManager;
+    document::DocumentsManager *m_docsManager { nullptr };
     QPointer<document::AbstractTabDocument> m_currentDocument;
-    templating::PreviewDialog *m_previewDialog = nullptr;
+    templating::PreviewDialog *m_previewDialog { nullptr };
+
     QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };
 
