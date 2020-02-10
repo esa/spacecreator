@@ -94,9 +94,18 @@ QWidget *InterfaceTabDocument::createView()
 
 QGraphicsScene *InterfaceTabDocument::createScene()
 {
-    if (!m_graphicsScene)
+    if (!m_graphicsScene) {
         m_graphicsScene = new InterfaceTabGraphicsScene(this);
-
+        connect(m_graphicsScene, &QGraphicsScene::selectionChanged, [this]() {
+            const QList<QGraphicsItem *> selectedItems = m_graphicsScene->selectedItems();
+            auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(), [](QGraphicsItem *item) {
+                if (item->type() == aadl::AADLConnectionGraphicsItem::Type)
+                    return true;
+                return qobject_cast<taste3::InteractiveObject *>(item->toGraphicsObject()) != nullptr;
+            });
+            m_actRemove->setEnabled(it != selectedItems.cend());
+        });
+    }
     return m_graphicsScene;
 }
 
@@ -244,6 +253,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         common::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
 
         m_actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
+        m_actRemove->setEnabled(false);
         m_actRemove->setShortcut(QKeySequence::Delete);
         connect(m_actRemove, &QAction::triggered, this, &InterfaceTabDocument::onActionRemoveItem);
     }
@@ -269,7 +279,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
     if (!m_actExitToRoot) {
         m_actExitToRoot = new QAction(tr("Exit to root funtion"));
         m_actExitToRoot->setActionGroup(m_actionGroup);
-        m_actExitToRoot->setVisible(false);
+        m_actExitToRoot->setEnabled(false);
         connect(m_actExitToRoot, &QAction::triggered, this, &InterfaceTabDocument::onActionExitToRootFunction);
         m_actExitToRoot->setIcon(QIcon(":/tab_interface/toolbar/icns/exit.svg"));
     }
@@ -277,7 +287,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
     if (!m_actExitToParent) {
         m_actExitToParent = new QAction(tr("Exit to parent function"));
         m_actExitToParent->setActionGroup(m_actionGroup);
-        m_actExitToParent->setVisible(false);
+        m_actExitToParent->setEnabled(false);
         connect(m_actExitToParent, &QAction::triggered, this, &InterfaceTabDocument::onActionExitToParentFunction);
         m_actExitToParent->setIcon(QIcon(":/tab_interface/toolbar/icns/exit_parent.svg"));
     }
@@ -557,8 +567,8 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
 {
     Q_UNUSED(rootId)
 
-    m_actExitToRoot->setVisible(nullptr != m_model->rootObject());
-    m_actExitToParent->setVisible(nullptr != m_model->rootObject());
+    m_actExitToRoot->setEnabled(nullptr != m_model->rootObject());
+    m_actExitToParent->setEnabled(nullptr != m_model->rootObject());
 
     QList<aadl::AADLObject *> objects = m_model->visibleObjects();
     std::sort(objects.begin(), objects.end(),
