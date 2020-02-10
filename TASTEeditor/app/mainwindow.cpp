@@ -308,7 +308,7 @@ void MainWindow::onReportRequested()
 
 void MainWindow::onSaveParsedTemplateToFile()
 {
-    QString outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
+    const QString& outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
     if (outputFileName.isEmpty())
         return;
 
