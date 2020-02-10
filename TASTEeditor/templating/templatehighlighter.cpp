@@ -37,7 +37,7 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     // brackets
     QTextCharFormat bracketsFormat;
     bracketsFormat.setForeground(Qt::red);
-    const QString brackets = QStringLiteral("({{|}}|{%|%})");
+    const QString brackets = QStringLiteral("({{|}}|{%|%}|{#|#})");
     rule.pattern = QRegularExpression(brackets);
     rule.format = bracketsFormat;
     m_highlightingRules.append(rule);
@@ -52,6 +52,10 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
 
     // Comment
     m_commentFormat.setForeground(Qt::darkGray);
+    rule.pattern = QRegularExpression(QLatin1String("(?<={#).+(?=#})"));
+    rule.format = m_commentFormat;
+    m_highlightingRules.append(rule);
+
     m_commentStartExpression.setPattern(QLatin1String("{%\\s*comment\\s*%}"));
     m_commentEndExpression.setPattern(QLatin1String("{%\\s*endcomment\\s*%}"));
 }
