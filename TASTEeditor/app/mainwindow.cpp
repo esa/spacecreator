@@ -409,7 +409,7 @@ bool MainWindow::exportToFile(const QString &outputFileName)
     if (!m_previewDialog)
         return false;
 
-    const QString text = m_previewDialog->text();
+    const QString& text = m_previewDialog->text();
     if (text.isEmpty())
         return false;;
 
