@@ -217,7 +217,7 @@ void MainWindow::onSaveRenderRequested()
 
 void MainWindow::onExportByTemplateRequested()
 {
-    QString templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
+    const QString& templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
                                                             QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
     if (templateFileName.isEmpty())
         return;
