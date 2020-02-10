@@ -102,9 +102,12 @@ void AADLFunctionTypeGraphicsItem::updateFromEntity()
 QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
 {
     QList<QVariantList> params;
-    const QRectF geometry = sceneBoundingRect();
-    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-    params.append({ qVariantFromValue(qobject_cast<AADLObject *>(modelEntity())), qVariantFromValue(points) });
+    AADLObject *obj = qobject_cast<AADLObject *>(modelEntity());
+    if (!obj->isRootObject()) {
+        const QRectF geometry = sceneBoundingRect();
+        const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
+        params.append({ qVariantFromValue(obj), qVariantFromValue(points) });
+    }
 
     QList<QGraphicsItem *> items;
     static const QList<int> acceptableItemTypes { AADLConnectionGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
@@ -120,6 +123,12 @@ QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
             params.append(
                     { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
+            for (auto outerConnection : iface->connectionItems()) {
+                if (outerConnection->parentItem() != this) {
+                    params.append({ qVariantFromValue(outerConnection->entity()),
+                                    qVariantFromValue(outerConnection->graphicsPoints()) });
+                }
+            }
         } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
             params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->graphicsPoints()) });
         } else if (auto functionType = qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item)) {
@@ -176,8 +185,9 @@ void AADLFunctionTypeGraphicsItem::onManualMoveProgress(GripPoint::Location grip
         return;
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
-    if (parentItem()) {
-        const QRectF contentRect = parentItem()->boundingRect().marginsRemoved(utils::kContentMargins);
+    if (auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem())) {
+        const QRectF contentRect = parentFunction->boundingRect().marginsRemoved(
+                parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins);
 
         if (newPos.x() < contentRect.left())
             newPos.setX(contentRect.left());
@@ -239,8 +249,11 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(GripPoint::Location gr
 {
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
-    const QRectF contentRect =
-            parentItem() ? parentItem()->boundingRect().marginsRemoved(utils::kContentMargins) : QRectF();
+    auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
+    const QRectF contentRect = parentFunction
+            ? parentFunction->boundingRect().marginsRemoved(parentFunction->isRootItem() ? utils::kRootMargins
+                                                                                         : utils::kContentMargins)
+            : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();

@@ -30,6 +30,7 @@ struct AADLObjectsModelPrivate {
     common::Id m_rootObjectId;
     QList<common::Id> m_objectsOrder;
     QHash<common::Id, AADLObject *> m_objects;
+    QList<AADLObject *> m_visibleObjects;
 };
 
 AADLObjectsModel::AADLObjectsModel(QObject *parent)
@@ -42,17 +43,28 @@ AADLObjectsModel::~AADLObjectsModel() {}
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
+    emit modelReset();
+
     for (auto object : d->m_objects.values())
         object->deleteLater();
 
     d->m_objects.clear();
     d->m_objectsOrder.clear();
+    d->m_visibleObjects.clear();
+
+    d->m_rootObjectId = common::Id();
+
+    const bool currentState = blockSignals(true);
 
     for (auto obj : objects)
         addObject(obj);
 
     for (auto obj : objects)
         obj->postInit();
+
+    blockSignals(currentState);
+
+    emit rootObjectChanged(d->m_rootObjectId);
 
     return true;
 }
@@ -73,6 +85,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
 
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
+    d->m_visibleObjects.append(obj);
     emit aadlObjectAdded(obj);
     return true;
 }
@@ -88,36 +101,44 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
+    d->m_visibleObjects.removeAll(obj);
 
     emit aadlObjectRemoved(obj);
     return true;
 }
 
-void AADLObjectsModel::setRootObject(common::Id id)
+void AADLObjectsModel::setRootObject(common::Id rootId)
 {
-    if (d->m_rootObjectId == id)
+    if (d->m_rootObjectId == rootId)
         return;
 
-    d->m_rootObjectId = id;
+    d->m_rootObjectId = rootId;
+    d->m_visibleObjects.clear();
     emit modelReset();
 
-    auto rootObj = d->m_objects.value(id);
+    auto rootObj = d->m_objects.value(rootId);
     for (const auto &id : d->m_objectsOrder) {
         if (auto obj = getObject(id)) {
+            if (rootId.isNull()) {
+                d->m_visibleObjects.append(obj);
+                continue;
+            }
+
             if (obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection
                 && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
-                emit aadlObjectAdded(obj);
+                d->m_visibleObjects.append(obj);
             } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
                 const bool sourceIfaceAncestor =
                         utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
                 const bool targetIfaceAncestor =
                         utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
                 if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
-                    emit aadlObjectAdded(obj);
+                    d->m_visibleObjects.append(obj);
                 }
             }
         }
     }
+    emit rootObjectChanged(d->m_rootObjectId);
 }
 
 AADLObject *AADLObjectsModel::rootObject() const
@@ -235,6 +256,11 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
         }
     }
     return nullptr;
+}
+
+QList<AADLObject *> AADLObjectsModel::visibleObjects() const
+{
+    return d->m_visibleObjects;
 }
 
 } // ns aadl

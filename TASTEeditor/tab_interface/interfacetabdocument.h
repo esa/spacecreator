@@ -77,7 +77,7 @@ protected Q_SLOTS:
     void onAADLObjectAdded(aadl::AADLObject *object);
     void onItemClicked();
     void onItemDoubleClicked();
-    void onRootItemChanged(const common::Id &id);
+    void onRootObjectChanged(common::Id rootId);
 
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();

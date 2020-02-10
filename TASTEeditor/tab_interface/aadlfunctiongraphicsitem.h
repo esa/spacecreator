@@ -70,6 +70,7 @@ protected Q_SLOTS:
 private:
     void layoutConnections();
     void layoutOuterConnections();
+    void setGeometry(const QRectF &sceneGeometry);
 
 private:
     bool m_pendingLayout { false };
