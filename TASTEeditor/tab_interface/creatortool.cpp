@@ -811,39 +811,38 @@ void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &s
     }
 }
 
-void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos)
+void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPointF & /*scenePos*/)
 {
     QGraphicsScene *scene = m_view->scene();
     if (!scene)
         return;
 
-    static const QList<int> &showProps = { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
-                                           AADLFunctionGraphicsItem::Type };
-    QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps);
-    if (!gi)
-        return;
-
     AADLObject *aadlObj { nullptr };
-    switch (gi->type()) {
-    case AADLFunctionTypeGraphicsItem::Type: {
-        aadlObj = functionTypeObject(gi);
-        break;
+    if (QGraphicsItem *gi = scene->selectedItems().isEmpty() ? nullptr : scene->selectedItems().first()) {
+        switch (gi->type()) {
+        case AADLFunctionTypeGraphicsItem::Type: {
+            aadlObj = functionTypeObject(gi);
+            break;
+        }
+        case AADLFunctionGraphicsItem::Type: {
+            aadlObj = functionObject(gi);
+            break;
+        }
+        case AADLInterfaceGraphicsItem::Type: {
+            aadlObj = interfaceObject(gi);
+            break;
+        }
+        default:
+            break;
+        }
     }
-    case AADLFunctionGraphicsItem::Type: {
-        aadlObj = functionObject(gi);
-        break;
-    }
-    case AADLInterfaceGraphicsItem::Type: {
-        aadlObj = interfaceObject(gi);
-        break;
-    }
-    default:
-        return;
-    }
+
+    menu->addSeparator();
+    QAction *action = menu->addAction(tr("Properties"));
+    action->setEnabled(aadlObj);
 
     if (aadlObj) {
-        menu->addSeparator();
-        menu->addAction(tr("Properties"), this, [this, aadlObj]() { emit propertyEditorRequest(aadlObj); });
+        connect(action, &QAction::triggered, [this, aadlObj]() { emit propertyEditorRequest(aadlObj); });
         common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
     }
 }
