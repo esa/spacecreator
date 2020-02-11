@@ -118,7 +118,6 @@ void AADLInterfaceGraphicsItem::addConnection(AADLConnectionGraphicsItem *item)
         return;
 
     m_connections.append(item);
-    setFlag(QGraphicsItem::ItemIsSelectable, m_connections.isEmpty());
 }
 
 void AADLInterfaceGraphicsItem::removeConnection(AADLConnectionGraphicsItem *item)
@@ -398,7 +397,7 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, c
 {
     Q_UNUSED(from)
 
-    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
         return;
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
