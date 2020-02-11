@@ -509,11 +509,10 @@ void InterfaceTabDocument::onItemClicked()
                  << connection->graphicsPoints() << "\n";
         qDebug() << "\nInternal Connection data:"
                  << "\n"
-                 << (connection->entity()->title().isEmpty()
-                             ? QStringLiteral("Connection %1<>%2")
-                                       .arg(connection->startItem()->entity()->interfaceName(),
-                                            connection->endItem()->entity()->interfaceName())
-                             : connection->entity()->title())
+                 << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection %1<>%2")
+                                                                       .arg(connection->startItem()->entity()->title(),
+                                                                            connection->endItem()->entity()->title())
+                                                             : connection->entity()->title())
                  << "\n"
                  << utils::polygon(connection->entity()->coordinates()) << "\n";
     } else if (auto function = qobject_cast<aadl::AADLFunctionGraphicsItem *>(sender())) {

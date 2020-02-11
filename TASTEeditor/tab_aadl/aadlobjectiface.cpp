@@ -21,6 +21,8 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 
+#include <QMetaEnum>
+
 namespace taste3 {
 namespace aadl {
 
@@ -89,61 +91,45 @@ bool AADLObjectIface::isRequired() const
     return direction() == IfaceType::Required;
 }
 
-QString AADLObjectIface::kind() const
+QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::xmlKindNames()
 {
-    return attr(meta::Props::token(meta::Props::Token::kind)).toString();
+    static QMap<AADLObjectIface::OperationKind, QString> result;
+    if (result.isEmpty()) {
+        const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObjectIface::OperationKind>();
+        for (int i = 0; i < me.keyCount(); ++i) {
+            const AADLObjectIface::OperationKind k = static_cast<AADLObjectIface::OperationKind>(me.value(i));
+            result.insert(k, QString(me.key(i)).toUpper() + QLatin1Literal("_OPERATION"));
+        }
+    }
+    return result;
 }
 
-bool AADLObjectIface::setKind(const QString &kind)
+QString AADLObjectIface::kindToString(AADLObjectIface::OperationKind k)
 {
-    if (this->kind() != kind) {
-        setAttr(meta::Props::token(meta::Props::Token::kind), kind);
+    static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = xmlKindNames();
+    return kindNamesXml.contains(k) ? kindNamesXml.value(k) : QString();
+}
+
+AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k)
+{
+    static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = AADLObjectIface::xmlKindNames();
+    static const QStringList &names = kindNamesXml.values();
+
+    return names.contains(k) ? kindNamesXml.key(k) : AADLObjectIface::OperationKind::Any;
+}
+
+AADLObjectIface::OperationKind AADLObjectIface::kind() const
+{
+    return kindFromString(attr(meta::Props::token(meta::Props::Token::kind)).toString());
+}
+
+bool AADLObjectIface::setKind(AADLObjectIface::OperationKind k)
+{
+    if (this->kind() != k) {
+        setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(k));
         return true;
     }
 
-    return false;
-}
-
-qint32 AADLObjectIface::period() const
-{
-    return attr(meta::Props::token(meta::Props::Token::period)).toInt();
-}
-
-bool AADLObjectIface::setPeriod(qint32 period)
-{
-    if (this->period() != period) {
-        setAttr(meta::Props::token(meta::Props::Token::period), period);
-        return true;
-    }
-
-    return false;
-}
-
-qint32 AADLObjectIface::wcet() const
-{
-    return attr(meta::Props::token(meta::Props::Token::wcet)).toInt();
-}
-
-bool AADLObjectIface::setWcet(qint32 wcet)
-{
-    if (this->wcet() != wcet) {
-        setAttr(meta::Props::token(meta::Props::Token::wcet), wcet);
-        return true;
-    }
-    return false;
-}
-
-qint32 AADLObjectIface::queueSize() const
-{
-    return attr(meta::Props::token(meta::Props::Token::queue_size)).toInt();
-}
-
-bool AADLObjectIface::setQueueSize(qint32 size)
-{
-    if (queueSize() != size) {
-        setAttr(meta::Props::token(meta::Props::Token::queue_size), size);
-        return true;
-    }
     return false;
 }
 
@@ -162,64 +148,6 @@ void AADLObjectIface::addParam(const IfaceParameter &param)
 {
     if (!d->m_params.contains(param))
         d->m_params.append(param);
-}
-
-QString AADLObjectIface::rcmOperationKind() const
-{
-    return prop(meta::Props::token(meta::Props::Token::RCMoperationKind)).toString();
-}
-
-bool AADLObjectIface::setRcmOperationKind(const QString &kind)
-{
-    if (rcmOperationKind() != kind) {
-        setProp(meta::Props::token(meta::Props::Token::RCMoperationKind), kind);
-        return true;
-    }
-    return false;
-}
-
-QString AADLObjectIface::deadline() const
-{
-    return prop(meta::Props::token(meta::Props::Token::Deadline)).toString();
-}
-
-bool AADLObjectIface::setDeadline(const QString &deadline)
-{
-    if (this->deadline() != deadline) {
-        setProp(meta::Props::token(meta::Props::Token::Deadline), deadline);
-        return true;
-    }
-    return false;
-}
-
-QString AADLObjectIface::rcmPeriod() const
-{
-    return prop(meta::Props::token(meta::Props::Token::RCMperiod)).toString();
-}
-
-bool AADLObjectIface::setRcmPeriod(const QString &period)
-{
-    if (rcmPeriod() != period) {
-        setProp(meta::Props::token(meta::Props::Token::RCMperiod), period);
-        return true;
-    }
-    return false;
-}
-
-QString AADLObjectIface::interfaceName() const
-{
-    /// TODO: talk about (props TASTE::) InterfaceName
-    return attr(meta::Props::token(meta::Props::Token::name)).toString();
-}
-
-bool AADLObjectIface::setInterfaceName(const QString &name)
-{
-    /// TODO: talk about (props TASTE::) InterfaceName
-    if (interfaceName() != name) {
-        setAttr(meta::Props::token(meta::Props::Token::name), name);
-        return true;
-    }
-    return false;
 }
 
 bool AADLObjectIface::labelInheritance() const
