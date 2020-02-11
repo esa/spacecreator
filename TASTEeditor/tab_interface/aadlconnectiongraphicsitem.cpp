@@ -496,17 +496,17 @@ void AADLConnectionGraphicsItem::updateGripPoints(bool forceVisible)
         return;
 
     const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
-    const QTransform dt = deviceTransform(tr);
+    const QTransform dt = parentItem() ? parentItem()->deviceTransform(tr) : tr;
     const QPointF currScale { dt.m11(), dt.m22() };
 
     for (int idx = 0; idx < points.size(); ++idx) {
         const QPointF point = points.value(idx);
         if (QGraphicsRectItem *grip = m_grips.value(idx)) {
-            const QPointF destination { mapFromScene(point) };
+            const QPointF destination { point };
             const QPointF destinationScaled { destination.x() * currScale.x(), destination.y() * currScale.y() };
             QRectF br = grip->rect();
             br.moveCenter(destinationScaled);
-            grip->setRect(mapRectToScene(br));
+            grip->setRect(br);
             grip->setVisible(forceVisible || isSelected());
         }
     }
