@@ -527,7 +527,7 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
         const QVector<QPointF> intersectionPoints =
                 utils::intersectionPoints(item->sceneBoundingRect(), connectionPolygon);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
-            Q_ASSERT(parentForConnection == item);
+            Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
             break;
         }
