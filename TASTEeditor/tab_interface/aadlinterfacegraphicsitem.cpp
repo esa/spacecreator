@@ -48,8 +48,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     setFlag(QGraphicsItem::ItemIsSelectable);
 
     QPainterPath kindPath;
-    const QString kind = entity->kind();
-    if (kind == QStringLiteral("CYCLIC_OPERATION")) {
+    switch (entity->kind()) {
+    case AADLObjectIface::OperationKind::Cyclic: {
         const qreal kindBaseValue = kHeight;
         kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
                          kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
@@ -60,13 +60,17 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
                                    kindPath.currentPosition(),
                                    kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
         kindPath.translate(0, kindBaseValue / 2);
-    } else if (kind == QStringLiteral("SPORADIC_OPERATION")) {
+        break;
+    }
+    case AADLObjectIface::OperationKind::Sporadic: {
         const qreal kindBaseValue = kHeight;
         kindPath.moveTo(-kindBaseValue / 2, 0);
         kindPath.lineTo(0, -kindBaseValue / 4);
         kindPath.lineTo(0, kindBaseValue / 4);
         kindPath.lineTo(kindBaseValue / 2, 0);
-    } else if (kind == QStringLiteral("PROTECTED_OPERATION")) {
+        break;
+    }
+    case AADLObjectIface::OperationKind::Protetcted: {
         const qreal kindBaseValue = kHeight;
         const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
         kindPath.addRoundedRect(rect, 2, 2);
@@ -76,6 +80,9 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
         kindPath.arcTo(arcRect, 0, 180);
         kindPath.translate(0, rect.height() / 3);
     }
+    default:
+        break;
+    }
     m_type = new QGraphicsPathItem(kindPath, this);
 
     QPainterPath pp;
@@ -83,7 +90,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
-    m_text->setPlainText(entity->interfaceName());
+    m_text->setPlainText(entity->title());
 
     QObject::connect(entity, &AADLObject::attributeChanged, [this, entity](taste3::aadl::meta::Props::Token attr) {
         if (attr == taste3::aadl::meta::Props::Token::name) {

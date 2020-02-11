@@ -21,6 +21,7 @@
 #include "contextparametersmodel.h"
 #include "delegates/comboboxdelegate.h"
 #include "delegates/functionattrdelegate.h"
+#include "delegates/interfaceattrdelegate.h"
 #include "delegates/propertytypedelegate.h"
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
@@ -115,6 +116,12 @@ void PropertiesDialog::initTabs()
                                                              new FunctionAttrDelegate(viewAttrs->tableView()));
             break;
         }
+        case AADLObject::AADLObjectType::AADLIface: {
+            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
+                                                             new InterfaceAttrDelegate(viewAttrs->tableView()));
+            break;
+        }
+
         default:
             break;
         }

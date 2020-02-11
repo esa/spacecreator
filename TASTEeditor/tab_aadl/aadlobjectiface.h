@@ -44,8 +44,21 @@ public:
         Provided
     };
     Q_ENUM(IfaceType)
-
     static constexpr IfaceType DefaultDirection { IfaceType::Required };
+
+    enum class OperationKind
+    {
+        Any = 0,
+        Cyclic, // period, deadline, wcet
+        Sporadic, // min interval t,deadline, wcet,queuesize
+        Protetcted, // deadline, wcet
+        Unprotected, // deadline, wcet
+    };
+    Q_ENUM(OperationKind)
+
+    static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
+    static QString kindToString(AADLObjectIface::OperationKind k);
+    static AADLObjectIface::OperationKind kindFromString(const QString &k);
 
     ~AADLObjectIface() override;
 
@@ -56,33 +69,12 @@ public:
     bool isProvided() const;
     bool isRequired() const;
 
-    QString kind() const;
-    bool setKind(const QString &kind);
-
-    qint32 period() const;
-    bool setPeriod(qint32 period);
-
-    qint32 wcet() const;
-    bool setWcet(qint32 wcet);
-
-    qint32 queueSize() const;
-    bool setQueueSize(qint32 size);
+    OperationKind kind() const;
+    bool setKind(OperationKind k);
 
     QVector<IfaceParameter> params() const;
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
-
-    QString rcmOperationKind() const;
-    bool setRcmOperationKind(const QString &kind);
-
-    QString deadline() const;
-    bool setDeadline(const QString &deadline);
-
-    QString rcmPeriod() const;
-    bool setRcmPeriod(const QString &period);
-
-    QString interfaceName() const;
-    bool setInterfaceName(const QString &name);
 
     bool labelInheritance() const;
     bool setLabelInheritance(bool label);
