@@ -17,6 +17,7 @@
 
 #include "aadlfunctiongraphicsitem.h"
 
+#include "aadlcommentgraphicsitem.h"
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
@@ -178,10 +179,9 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
-    const QRectF contentRect = parentFunction
-            ? parentFunction->boundingRect().marginsRemoved(parentFunction->isRootItem() ? utils::kRootMargins
-                                                                                         : utils::kContentMargins)
-            : QRectF();
+    const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
+                                       parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
+                                              : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -242,8 +242,10 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
             setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
 
         for (QGraphicsItem *child : childItems()) {
-            if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(child->toGraphicsObject()))
-                function->moveBy(offset.x(), offset.y());
+            static const QList<int> kNestedTypes { AADLFunctionTypeGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
+                                                   AADLCommentGraphicsItem::Type };
+            if (kNestedTypes.contains(child->type()))
+                child->moveBy(offset.x(), offset.y());
         }
     }
 
