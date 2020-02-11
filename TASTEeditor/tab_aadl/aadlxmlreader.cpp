@@ -390,9 +390,9 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
 
     const bool parentIsFunctionType = parent && parent->aadlType() == AADLObject::AADLObjectType::AADLFunctionType;
     const bool nestingAllowd = !(parentIsFunctionType && isFunctionType); // direct FnT->FnT nesting is not allowed
-    AADLObject* usedPArent = nestingAllowd ? parent : nullptr;
-    AADLObjectFunctionType *currObj =
-            isFunctionType ? new AADLObjectFunctionType(QString(), usedPArent) : new AADLObjectFunction(QString(), usedPArent);
+    AADLObject *usedPArent = nestingAllowd ? parent : nullptr;
+    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(QString(), usedPArent)
+                                                     : new AADLObjectFunction(QString(), usedPArent);
     if (nestingAllowd) {
         if (AADLObjectFunctionType *parentFunction = qobject_cast<AADLObjectFunctionType *>(parent))
             parentFunction->addChild(currObj);
@@ -436,60 +436,42 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         return false;
     }
 
-    auto readEndpointAttribute = [this](ConnectionEndPoint &endpoint, const QXmlStreamAttribute &attr) {
-        const QString &attrName = attr.name().toString();
-        const QString &attrValue = attr.value().toString();
+    auto readEndpointAttributes = [this](ConnectionEndPoint &endpoint, const QXmlStreamAttributes &attrs) {
+        for (const QXmlStreamAttribute &attr : attrs) {
 
-        switch (Props::token(attrName)) {
-        case Props::Token::func_name: {
-            endpoint.m_function = d->m_functionNames.value(attrValue, nullptr);
-            break;
-        }
-        case Props::Token::si_name:
-        case Props::Token::ri_name: {
-            endpoint.m_interface = d->m_ifaceRequiredNames.value(attrValue, nullptr);
-            break;
-        }
-        case Props::Token::ti_name:
-        case Props::Token::pi_name: {
-            endpoint.m_interface = d->m_ifaceProvidedNames.value(attrValue, nullptr);
-            break;
-        }
+            const QString &attrName = attr.name().toString();
+            const QString &attrValue = attr.value().toString();
 
-        case Props::Token::location: {
-            const int loc = attr.value().toInt();
-            switch (loc) {
-            case ConnectionEndPoint::Location::Begin:
-            case ConnectionEndPoint::Location::End: {
-                endpoint.m_location = ConnectionEndPoint::Location(loc);
+            switch (Props::token(attrName)) {
+            case Props::Token::func_name: {
+                endpoint.m_function = d->m_functionNames.value(attrValue, nullptr);
+                break;
+            }
+            case Props::Token::si_name:
+            case Props::Token::ri_name: {
+                endpoint.m_interface = d->m_ifaceRequiredNames.value(attrValue, nullptr);
+                break;
+            }
+            case Props::Token::ti_name:
+            case Props::Token::pi_name: {
+                endpoint.m_interface = d->m_ifaceProvidedNames.value(attrValue, nullptr);
                 break;
             }
             default: {
-                QString wrn("Unknown location of endpoint: %1 (expected %2 or %3)");
-                qWarning() << wrn.arg(loc).arg(ConnectionEndPoint::Begin).arg(ConnectionEndPoint::End);
+                qWarning() << "Unexeptected Connection attribute:" << attrName << attrValue;
                 break;
             }
             }
-
-            break;
         }
-        default: {
-            return false;
-        }
-        }
-        return true;
     };
 
-    auto readEndpoint = [readEndpointAttribute, &xml](ConnectionEndPoint &endpoint) {
-        switch (Props::token(xml.name().toString())) {
-        case Props::Token::EndPoint: {
-            const QXmlStreamAttributes &attrs = xml.attributes();
-            for (const QXmlStreamAttribute &attr : attrs) {
-                if (!readEndpointAttribute(endpoint, attr)) {
-                    qWarning() << "Unknown endpoint attribute found:" << attr.name() << attr.value().toString();
-                    return false;
-                }
-            }
+    auto readEndpoint = [readEndpointAttributes, &xml](ConnectionHolder &connection) {
+        const Props::Token t = Props::token(xml.name().toString());
+        switch (t) {
+        case Props::Token::Source:
+        case Props::Token::Target: {
+            const bool isSrc = t == Props::Token::Source;
+            readEndpointAttributes(isSrc ? connection.m_from : connection.m_to, xml.attributes());
             break;
         }
         default: {
@@ -504,12 +486,7 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         if (!xml.readNextStartElement())
             return false;
 
-        ConnectionEndPoint endpoint;
-        if (readEndpoint(endpoint)) {
-            if (endpoint.m_location == ConnectionEndPoint::Location::Begin)
-                connection.m_from = endpoint;
-            else
-                connection.m_to = endpoint;
+        if (readEndpoint(connection)) {
             xml.skipCurrentElement();
             return true;
         }
@@ -518,9 +495,9 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
 
     ConnectionHolder connection;
 
-    if (!readConnectionPart(connection)) // read the first one (From or To)
+    if (!readConnectionPart(connection)) // read the first one (Source or Target)
         return false;
-    if (!readConnectionPart(connection)) // read the second one (To or From)
+    if (!readConnectionPart(connection)) // read the second one (Target or Source)
         return false;
 
     if (connection.isValid()) {
