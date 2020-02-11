@@ -61,7 +61,7 @@ ColorHandler ColorHandler::fromJson(const QJsonObject &jObj)
     h.m_fillType = ColorHandler::FillType(jObj["fill_type"].toInt(ColorHandler::FillType::Color));
     h.m_penWidth = jObj["pen_width"].toDouble(1.);
     h.m_penColor = QColor(jObj["pen_color"].toString("black"));
-    h.m_brushColor0 = QColor(jObj["brush_color0"].toString("black"));
+    h.m_brushColor0 = QColor(jObj["brush_color0"].toString("lightGray"));
     h.m_brushColor1 = QColor(jObj["brush_color1"].toString("white"));
     return h;
 }
