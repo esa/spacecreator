@@ -79,9 +79,6 @@ QWidget *InterfaceTabDocument::createView()
                     iObj->updateGripPoints();
                 }
             }
-            for (auto item : m_graphicsScene->items())
-                if (auto function = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item))
-                    function->instantLayoutUpdate();
             m_actZoomIn->setEnabled(!qFuzzyCompare(percent, m_graphicsView->maxZoomPercent()));
             m_actZoomOut->setEnabled(!qFuzzyCompare(percent, m_graphicsView->minZoomPercent()));
         });
