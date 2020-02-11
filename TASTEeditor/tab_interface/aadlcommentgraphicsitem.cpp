@@ -224,6 +224,10 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 
 void AADLCommentGraphicsItem::rebuildLayout()
 {
+    if (auto graphicsItemParent = parentItem()) {
+        const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
+        setVisible(parentRect.contains(sceneBoundingRect()));
+    }
     m_textItem->setExplicitSize(m_boundingRect.size());
 }
 
