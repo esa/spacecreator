@@ -169,8 +169,18 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, cons
 {
     Q_UNUSED(grip)
 
-    if (handlePositionChanged(pressedAt, releasedAt) && !isRootItem())
+    if (handlePositionChanged(pressedAt, releasedAt) && !isRootItem()) {
         createCommand();
+    } else {
+        for (auto child : childItems()) {
+            if (auto interface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
+                for (auto connection : interface->connectionItems()) {
+                    if (connection->parent() != this) // outer connections
+                        connection->updateFromEntity();
+                }
+            }
+        }
+    }
 }
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
