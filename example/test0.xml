@@ -31,20 +31,20 @@
    </Function>
    
 	<Connection>
-		<EndPoint func_name="B" pi_name="B_PI2" location="0"/>
-		<EndPoint func_name="A" pi_name="A_PI2" location="1"/>
+		<Source func_name="B" pi_name="B_PI2"/>
+		<Target func_name="A" pi_name="A_PI2"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="A" ri_name="A_RI1" location="0"/>
-		<EndPoint func_name="B" pi_name="B_PI1" location="1"/>
+		<Source func_name="A" ri_name="A_RI1"/>
+		<Target func_name="B" pi_name="B_PI1"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="A" ri_name="A_RI2" location="0"/>
-		<EndPoint func_name="B" ri_name="B_RI2" location="1"/>
+		<Source func_name="A" ri_name="A_RI2"/>
+		<Target func_name="B" ri_name="B_RI2"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="B" ri_name="B_RI1" location="0"/>
-		<EndPoint func_name="A" pi_name="A_PI1" location="1"/>
+		<Source func_name="B" ri_name="B_RI1"/>
+		<Target func_name="A" pi_name="A_PI1"/>
 	</Connection>
 	
 	<Comment name="Some comment text" >
@@ -69,8 +69,8 @@
 		</Function>
 		
 		<Connection>
-			<EndPoint func_name="D" ri_name="D_RI1" location="0"/>
-			<EndPoint func_name="E" pi_name="E_PI1" location="1"/>
+			<Source func_name="D" ri_name="D_RI1"/>
+			<Target func_name="E" pi_name="E_PI1"/>
 		</Connection>
 			
 		<Comment name="Nested comment" >
@@ -136,38 +136,38 @@
 	</Function>
 	
 	<Connection>
-		<EndPoint func_name="I" ri_name="I_RI1" location="0"/>
-		<EndPoint func_name="F" pi_name="F_PI1" location="1"/>
+		<Source func_name="I" ri_name="I_RI1"/>
+		<Target func_name="F" pi_name="F_PI1"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="F" pi_name="F_PI1" location="0"/>
-		<EndPoint func_name="G" pi_name="G_PI1" location="1"/>
+		<Source func_name="F" pi_name="F_PI1"/>
+		<Target func_name="G" pi_name="G_PI1"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="G" pi_name="G_PI1" location="0"/>
-		<EndPoint func_name="H" pi_name="H_PI1" location="1"/>
-	</Connection>
-	
-	<Connection>
-		<EndPoint func_name="I" pi_name="I_PI1" location="0"/>
-		<EndPoint func_name="F" ri_name="F_RI1" location="1"/>
-	</Connection>
-	<Connection>
-		<EndPoint func_name="F" ri_name="F_RI1" location="0"/>
-		<EndPoint func_name="G" ri_name="G_RI1" location="1"/>
-	</Connection>
-	<Connection>
-		<EndPoint func_name="G" ri_name="G_RI1" location="0"/>
-		<EndPoint func_name="H" ri_name="H_RI1" location="1"/>
+		<Source func_name="G" pi_name="G_PI1"/>
+		<Target func_name="H" pi_name="H_PI1"/>
 	</Connection>
 	
 	<Connection>
-		<EndPoint func_name="I" ri_name="I_RI2" location="0"/>
-		<EndPoint func_name="H" pi_name="H_PI2" location="1"/>
+		<Source func_name="I" pi_name="I_PI1"/>
+		<Target func_name="F" ri_name="F_RI1"/>
 	</Connection>
 	<Connection>
-		<EndPoint func_name="H" ri_name="H_RI2" location="0"/>
-		<EndPoint func_name="I" pi_name="I_PI2" location="1"/>
+		<Source func_name="F" ri_name="F_RI1"/>
+		<Target func_name="G" ri_name="G_RI1"/>
+	</Connection>
+	<Connection>
+		<Source func_name="G" ri_name="G_RI1"/>
+		<Target func_name="H" ri_name="H_RI1"/>
+	</Connection>
+	
+	<Connection>
+		<Source func_name="I" ri_name="I_RI2"/>
+		<Target func_name="H" pi_name="H_PI2"/>
+	</Connection>
+	<Connection>
+		<Source func_name="H" ri_name="H_RI2"/>
+		<Target func_name="I" pi_name="I_PI2"/>
 	</Connection>
 	
 </InterfaceView>

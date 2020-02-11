@@ -41,8 +41,9 @@ public:
         Output_Parameter,
         Required_Interface,
         Connection,
-        EndPoint,
         Comment,
+        Source,
+        Target,
 
         // attrs:
         name,
@@ -63,7 +64,6 @@ public:
         pi_name,
         ti_name,
         func_name,
-        location,
 
         // TASTE props:
         Active_Interfaces,
