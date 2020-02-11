@@ -426,7 +426,7 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
         return;
     }
 
-    bool startRequired = false;
+    bool startRequired = true;
     const bool isSameType =
             functionAtStartPos->isAncestorOf(functionAtEndPos) || functionAtEndPos->isAncestorOf(functionAtStartPos);
 
