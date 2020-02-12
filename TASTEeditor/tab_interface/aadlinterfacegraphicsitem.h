@@ -69,6 +69,7 @@ protected:
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
     void updateLabel();
+    void updateKind();
 
 private:
     QGraphicsPathItem *m_type = nullptr;

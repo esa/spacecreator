@@ -212,16 +212,17 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
     if (rmLabel) {
         disconnect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this, nullptr);
         disconnect(pi, &AADLObjectIface::titleChanged, this, nullptr);
-        ri->updateInheritedLabel(pi, QString());
+        ri->unsetPrototype(pi);
         return;
     }
 
-    ri->updateInheritedLabel(pi, pi->title());
+    ri->updatePrototype(pi);
+
     connect(
             pi, &AADLObjectIface::titleChanged, this,
             [pi, ri](const QString &title) {
                 if (ri->labelInherited())
-                    ri->updateInheritedLabel(pi, title);
+                    ri->updatePrototype(pi);
             },
             Qt::UniqueConnection);
     connect(
