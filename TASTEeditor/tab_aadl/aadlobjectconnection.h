@@ -53,17 +53,18 @@ public:
 
     void setAttr(const QString &name, const QVariant &val) override;
 
-    enum class LabelInheritancePolicy
-    {
-        Set = 0,
-        Unset
-    };
     void inheritLabel();
     void uninheritLabel();
 
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
     void updateAttributes();
+
+    enum class LabelInheritancePolicy
+    {
+        Set = 0,
+        Unset
+    };
     void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
 };
 

@@ -40,6 +40,7 @@ namespace aadl {
 
 AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
+    , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
     , m_text(new QGraphicsTextItem(this))
 {
@@ -47,43 +48,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    QPainterPath kindPath;
-    switch (entity->kind()) {
-    case AADLObjectIface::OperationKind::Cyclic: {
-        const qreal kindBaseValue = kHeight;
-        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
-                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
-                       -90, -270);
-        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
-        kindPath.addPolygon(
-                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
-                                   kindPath.currentPosition(),
-                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
-        kindPath.translate(0, kindBaseValue / 2);
-        break;
-    }
-    case AADLObjectIface::OperationKind::Sporadic: {
-        const qreal kindBaseValue = kHeight;
-        kindPath.moveTo(-kindBaseValue / 2, 0);
-        kindPath.lineTo(0, -kindBaseValue / 4);
-        kindPath.lineTo(0, kindBaseValue / 4);
-        kindPath.lineTo(kindBaseValue / 2, 0);
-        break;
-    }
-    case AADLObjectIface::OperationKind::Protetcted: {
-        const qreal kindBaseValue = kHeight;
-        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
-        kindPath.addRoundedRect(rect, 2, 2);
-        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
-        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
-        kindPath.moveTo(arcRect.center());
-        kindPath.arcTo(arcRect, 0, 180);
-        kindPath.translate(0, rect.height() / 3);
-    }
-    default:
-        break;
-    }
-    m_type = new QGraphicsPathItem(kindPath, this);
+    updateKind();
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
@@ -93,9 +58,17 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_text->setPlainText(ifaceLabel());
 
     QObject::connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
-        if (attr == taste3::aadl::meta::Props::Token::name
-            || attr == taste3::aadl::meta::Props::Token::labelInheritance) {
+        switch (attr) {
+        case taste3::aadl::meta::Props::Token::name:
+        case taste3::aadl::meta::Props::Token::labelInheritance: {
             updateLabel();
+            break;
+        }
+        case taste3::aadl::meta::Props::Token::kind:
+            updateKind();
+            break;
+        default:
+            break;
         }
     });
     QObject::connect(entity, &AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
@@ -449,6 +422,51 @@ void AADLInterfaceGraphicsItem::updateLabel()
         m_text->setPlainText(label);
         instantLayoutUpdate();
     }
+}
+
+void AADLInterfaceGraphicsItem::updateKind()
+{
+    AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(aadlObject());
+    if (!iface)
+        return;
+
+    QPainterPath kindPath;
+    switch (iface->kind()) {
+    case AADLObjectIface::OperationKind::Cyclic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
+                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
+                       -90, -270);
+        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
+        kindPath.addPolygon(
+                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
+                                   kindPath.currentPosition(),
+                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
+        kindPath.translate(0, kindBaseValue / 2);
+        break;
+    }
+    case AADLObjectIface::OperationKind::Sporadic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.moveTo(-kindBaseValue / 2, 0);
+        kindPath.lineTo(0, -kindBaseValue / 4);
+        kindPath.lineTo(0, kindBaseValue / 4);
+        kindPath.lineTo(kindBaseValue / 2, 0);
+        break;
+    }
+    case AADLObjectIface::OperationKind::Protetcted: {
+        const qreal kindBaseValue = kHeight;
+        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
+        kindPath.addRoundedRect(rect, 2, 2);
+        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
+        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
+        kindPath.moveTo(arcRect.center());
+        kindPath.arcTo(arcRect, 0, 180);
+        kindPath.translate(0, rect.height() / 3);
+    }
+    default:
+        break;
+    }
+    m_type->setPath(kindPath);
 }
 
 QString AADLInterfaceGraphicsItem::ifaceLabel() const

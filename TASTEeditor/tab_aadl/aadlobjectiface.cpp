@@ -64,16 +64,16 @@ AADLObjectIface::~AADLObjectIface()
 
 void AADLObjectIface::setupInitialAttrs()
 {
+    setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Sporadic));
     if (isProvided()) {
-        setAttr(meta::Props::token(meta::Props::Token::kind), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::period), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::wcet), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
     } else {
-        setAttr(meta::Props::token(meta::Props::Token::kind), QVariant());
         setProp(meta::Props::token(meta::Props::Token::labelInheritance), true);
     }
 }
+
 AADLObject::AADLObjectType AADLObjectIface::aadlType() const
 {
     return AADLObjectType::AADLIface;
@@ -186,6 +186,23 @@ void AADLObjectIface::forgetClone(AADLObjectIface *clone)
     d->m_clones.removeAll(clone);
 }
 
+void AADLObjectIface::setAttr(const QString &name, const QVariant &val)
+{
+    switch (meta::Props::token(name)) {
+    case meta::Props::Token::kind: {
+        const AADLObjectIface::OperationKind k = kindFromString(val.toString());
+        if (k != kind()) {
+            AADLObject::setAttr(name, val);
+            emit attrChanged_kind(k);
+        }
+        break;
+    }
+    default:
+        AADLObject::setAttr(name, val);
+        break;
+    }
+}
+
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
     : AADLObjectIface(IfaceType::Provided, tr("PI_%1").arg(++sProvidedCounter), parent)
 {
@@ -263,7 +280,7 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
         case meta::Props::Token::labelInheritance: {
             const bool inherited = val.toBool();
             if (!inherited)
-                m_inheritedLables.clear();
+                m_prototypes.clear();
             emit propChanged_labelInheritance(inherited);
             emit inheritedLabelsChanged(inheritedLables());
             break;
@@ -277,33 +294,113 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
 QStringList AADLObjectIfaceRequired::inheritedLables() const
 {
     QStringList result;
-    const QStringList &titles = m_inheritedLables.values();
+    if (labelInherited()) {
+        result = collectInheritedLabels();
 
-    QHash<const AADLObjectIfaceProvided *, QString>::const_iterator i = m_inheritedLables.cbegin();
-    while (i != m_inheritedLables.cend()) {
-        const AADLObjectIfaceProvided *pi = i.key();
+        // append suffix for connection to the same named PIs with same parent (Function.PI becames Funtcion.PI#N)
+        namesForRIToPIs(result);
+
+        // if 2+ FnA.RI connected to the same FnB.PI, populate the inherited name with number suffix
+        // (based on the index of the Connection among related connections)
+        namesForRIsToPI(result);
+    }
+
+    if (result.isEmpty())
+        result.append(title());
+
+    return result;
+}
+
+QStringList AADLObjectIfaceRequired::collectInheritedLabels() const
+{
+    QStringList result, titles;
+    std::transform(m_prototypes.cbegin(), m_prototypes.cend(), std::back_inserter(titles),
+                   [](const AADLObjectIfaceProvided *pi) { return pi->title(); });
+
+    for (const AADLObjectIfaceProvided *pi : m_prototypes) {
         QString label = pi->title();
         if (titles.count(label) > 1) {
             Q_ASSERT(pi->parentObject());
+            // if PIs have same name, prepend it with parent's name
             label = pi->parentObject()->title() + "." + label;
         }
-
-        result.append(label);
-
-        ++i;
+        result.prepend(label);
     }
     return result;
 }
 
-void AADLObjectIfaceRequired::updateInheritedLabel(const AADLObjectIfaceProvided *pi, const QString &label)
+void AADLObjectIfaceRequired::namesForRIToPIs(QStringList &result) const
+{
+    for (const QString label : result) {
+        int count = result.count(label);
+        if (count > 1)
+            while (count >= 1) {
+                const int pos = result.indexOf(label);
+                if (pos != -1)
+                    result.replace(pos, label + "#" + QString::number(count));
+                count = result.count(label);
+            }
+    }
+}
+
+void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
+{
+    AADLObjectFunction *parentFn = function();
+    if (!parentFn)
+        return;
+
+    auto findRI = [](const AADLObjectConnection *in, const AADLObjectIfaceProvided *pi) -> AADLObjectIfaceRequired * {
+        if (in && pi)
+            for (AADLObjectIface *iface : { in->sourceInterface(), in->targetInterface() })
+                if (iface && iface != pi && iface->isRequired())
+                    return qobject_cast<AADLObjectIfaceRequired *>(iface);
+        return nullptr;
+    };
+
+    const common::Id &parentId = parentFn->id();
+    for (const AADLObjectIfaceProvided *pi : m_prototypes) {
+        const QVector<AADLObjectConnection *> &relatedConnecions = objectsModel()->getConnectionsForIface(pi->id());
+        QVector<AADLObjectConnection *>::const_reverse_iterator i = relatedConnecions.crbegin();
+        while (i != relatedConnecions.crend()) {
+            AADLObjectConnection *c = *i;
+            const bool sameSrcFn = c->source() && c->source()->id() == parentId;
+            const bool sameDstFn = c->target() && c->target()->id() == parentId;
+            const bool sameFn = sameSrcFn || sameDstFn;
+            const bool isMeSrc = sameFn && c->sourceInterface() == this;
+            const bool isMeDst = sameFn && c->targetInterface() == this;
+            const bool toSibling = !isMeSrc && !isMeDst;
+            if (toSibling)
+                if (AADLObjectIfaceRequired *otherRI = findRI(c, pi)) {
+                    if (!otherRI->labelInherited())
+                        continue;
+
+                    const QString &oldLabel = pi->title();
+                    const int labelPos = result.indexOf(oldLabel);
+                    if (labelPos >= 0) {
+                        result.replace(labelPos, oldLabel + "#" + QString::number(relatedConnecions.indexOf(c)));
+                    }
+                }
+            ++i;
+        }
+    }
+}
+
+void AADLObjectIfaceRequired::updatePrototype(const AADLObjectIfaceProvided *pi)
 {
     if (!pi)
         return;
 
-    if (label.isEmpty())
-        m_inheritedLables.take(pi);
-    else
-        m_inheritedLables[pi] = label;
+    if (!m_prototypes.contains(pi))
+        m_prototypes.append(pi);
+    emit inheritedLabelsChanged(inheritedLables());
+}
+
+void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
+{
+    if (!pi)
+        return;
+
+    m_prototypes.removeAll(pi);
     emit inheritedLabelsChanged(inheritedLables());
 }
 

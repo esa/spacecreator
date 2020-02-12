@@ -84,6 +84,11 @@ public:
     static AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent);
     static AADLObjectIface *cloneIface(AADLObjectIface *source, AADLObjectFunction *parent);
 
+    void setAttr(const QString &name, const QVariant &val) override;
+
+Q_SIGNALS:
+    void attrChanged_kind(AADLObjectIface::OperationKind kind);
+
 protected:
     explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
     explicit AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
@@ -122,14 +127,20 @@ public:
     bool labelInherited() const;
 
     QStringList inheritedLables() const;
-    void updateInheritedLabel(const AADLObjectIfaceProvided *pi, const QString &label);
+    void updatePrototype(const AADLObjectIfaceProvided *pi);
+    void unsetPrototype(const AADLObjectIfaceProvided *pi);
 
 Q_SIGNALS:
     void propChanged_labelInheritance(bool inheritance);
     void inheritedLabelsChanged(const QStringList &labels);
 
 protected:
-    QHash<const AADLObjectIfaceProvided *, QString> m_inheritedLables;
+    QVector<const AADLObjectIfaceProvided *> m_prototypes;
+
+private:
+    QStringList collectInheritedLabels() const;
+    void namesForRIToPIs(QStringList &result) const;
+    void namesForRIsToPI(QStringList &result) const;
 };
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;

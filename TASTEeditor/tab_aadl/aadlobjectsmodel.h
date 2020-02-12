@@ -58,6 +58,7 @@ public:
     AADLObjectComment *getCommentById(const common::Id &id) const;
 
     AADLObjectConnection *getConnectionForIface(const common::Id &id) const;
+    QVector<AADLObjectConnection *> getConnectionsForIface(const common::Id &id) const;
 
     QList<AADLObject *> visibleObjects() const;
 
