@@ -249,7 +249,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         m_previewItem->setRect(newGeometry);
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
-        if (m_view->scene()) {
+        if (m_view->scene() && isConnectable(m_view->scene(), cursorInScene(e->globalPos()))) {
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
             pp.lineTo(cursorInScene(e->globalPos()));
@@ -602,12 +602,15 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
             handleInterface(scene, AADLObjectIface::IfaceType::Required, pos);
             break;
         case ToolType::MultiPointConnection:
-            if (!handleConnectionCreate(scene, pos))
-                return;
-            handleConnection(scene, m_connectionPoints, m_model);
+            if (isConnectable(scene, pos)) {
+                if (!handleConnectionCreate(scene, pos))
+                    return;
+                handleConnection(scene, m_connectionPoints, m_model);
+            }
             break;
         case ToolType::DirectConnection:
-            handleDirectConnection(scene, pos);
+            if (isConnectable(scene, pos))
+                handleDirectConnection(scene, pos);
             break;
         default:
             break;
@@ -887,6 +890,35 @@ void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
     }
 
     ctx::ActionsManager::populateMenu(menu, aadlObj);
+}
+
+bool CreatorTool::isConnectable(QGraphicsScene *scene, const QPointF &pos) const
+{
+    if (QGraphicsItem *item =
+                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionGraphicsItem::Type })) {
+        if (AADLObjectFunction *fun = functionObject(item))
+            if (fun->isFunctionType())
+                return false;
+    }
+
+    if (QGraphicsItem *item =
+                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionTypeGraphicsItem::Type })) {
+        if (AADLObjectFunctionType *fun = functionTypeObject(item))
+            if (fun->isFunctionType())
+                return false;
+    }
+
+    if (QGraphicsItem *item =
+                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
+        if (AADLObjectIface *iface = interfaceObject(item))
+            if (AADLObjectFunctionType *parentFun = qobject_cast<AADLObjectFunctionType *>(iface->parentObject()))
+                if (parentFun->isFunctionType())
+                    return false;
+    }
+
+    // TODO: check if interfaces are acceptable in terms of inheritance
+
+    return true;
 }
 
 } // namespace aadl

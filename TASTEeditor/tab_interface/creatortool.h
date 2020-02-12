@@ -95,6 +95,8 @@ private:
     void populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos);
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
 
+    bool isConnectable(QGraphicsScene *scene, const QPointF &pos) const;
+
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
 };
