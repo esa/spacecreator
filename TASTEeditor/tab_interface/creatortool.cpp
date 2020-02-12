@@ -152,6 +152,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             scene->addItem(m_previewConnectionItem);
         }
         m_connectionPoints.append(scenePos);
+        warnConnectionPreview(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
         QGraphicsItem *item =
@@ -166,6 +167,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             m_previewConnectionItem->setZValue(1);
             scene->addItem(m_previewConnectionItem);
             m_connectionPoints.append(startPoint);
+            warnConnectionPreview(startPoint);
             return true;
         }
         return !m_connectionPoints.contains(scenePos);
@@ -232,8 +234,9 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
     if (!m_view)
         return false;
 
+    const QPointF &scenePos = cursorInScene(e->globalPos());
     if (m_previewItem && m_previewItem->isVisible()) {
-        const QPointF eventPos = m_previewItem->mapFromScene(cursorInScene(e->globalPos()));
+        const QPointF eventPos = m_previewItem->mapFromScene(scenePos);
         const QRectF newGeometry { m_previewItem->rect().topLeft(), eventPos };
         if (m_previewItem->parentItem()) {
             if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
@@ -249,11 +252,12 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         m_previewItem->setRect(newGeometry);
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
-        if (m_view->scene() && isConnectable(m_view->scene(), cursorInScene(e->globalPos()))) {
+        if (m_view->scene()) {
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
-            pp.lineTo(cursorInScene(e->globalPos()));
+            pp.lineTo(scenePos);
             m_previewConnectionItem->setPath(pp);
+            warnConnectionPreview(scenePos);
             return true;
         }
     }
@@ -386,24 +390,30 @@ static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
     return itemRect;
 };
 
-static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF> &connectionPolygon,
-                                    AADLObjectsModel *model)
+void CreatorTool::handleConnection()
 { // TODO: split it
+    if (warnConnectionPreview(m_connectionPoints.back()))
+        return;
+    QGraphicsScene *scene = m_view ? m_view->scene() : nullptr;
+    if (!scene)
+        return;
+
     AADLObjectIface *startIface { nullptr };
     AADLObjectIface *endIface { nullptr };
     QPointF startPointAdjusted;
     QPointF endPointAdjusted;
-    const QLineF connectionLine { connectionPolygon.front(), connectionPolygon.last() };
+    const QLineF connectionLine { m_connectionPoints.front(), m_connectionPoints.last() };
 
-    auto functionAtStartPos = utils::nearestItem(scene, adjustFromPoint(connectionPolygon.front(), kInterfaceTolerance),
-                                                 { AADLFunctionGraphicsItem::Type });
+    auto functionAtStartPos =
+            utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.front(), kInterfaceTolerance),
+                               { AADLFunctionGraphicsItem::Type });
 
     AADLObjectFunction *startObject = functionObject(functionAtStartPos);
     if (!startObject)
         return;
 
     if (auto startIfaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                utils::nearestItem(scene, adjustFromPoint(connectionPolygon.front(), kInterfaceTolerance),
+                utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.front(), kInterfaceTolerance),
                                    { AADLInterfaceGraphicsItem::Type }))) {
         startIface = startIfaceItem->entity();
         startPointAdjusted = startIfaceItem->scenePos();
@@ -411,14 +421,14 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
         return;
     }
 
-    auto functionAtEndPos = utils::nearestItem(scene, adjustFromPoint(connectionPolygon.last(), kInterfaceTolerance),
+    auto functionAtEndPos = utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.last(), kInterfaceTolerance),
                                                { AADLFunctionGraphicsItem::Type });
     AADLObjectFunction *endObject = functionObject(functionAtEndPos);
     if (!endObject)
         return;
 
     if (auto endIfaceItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                utils::nearestItem(scene, adjustFromPoint(connectionPolygon.last(), kInterfaceTolerance),
+                utils::nearestItem(scene, adjustFromPoint(m_connectionPoints.last(), kInterfaceTolerance),
                                    { AADLInterfaceGraphicsItem::Type }))) {
         endIface = endIfaceItem->entity();
         endPointAdjusted = endIfaceItem->scenePos();
@@ -449,46 +459,47 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
         const AADLObjectIface::IfaceType type = (startRequired && isSameType) || (!startRequired && !isSameType)
                 ? AADLObjectIface::IfaceType::Required
                 : AADLObjectIface::IfaceType::Provided;
-        const QVariantList params = { qVariantFromValue(model), qVariantFromValue(endObject), endPointAdjusted,
+
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(endObject), endPointAdjusted,
                                       qVariantFromValue(type), endIfaceId };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
     } else if (endIface && !startIface) {
         startRequired = (endIface->isRequired() && isSameType) || (endIface->isProvided() && !isSameType);
         const AADLObjectIface::IfaceType type =
                 startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
-        const QVariantList params = { qVariantFromValue(model), qVariantFromValue(startObject), startPointAdjusted,
-                                      qVariantFromValue(type), startIfaceId };
+        const QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject),
+                                      startPointAdjusted, qVariantFromValue(type), startIfaceId };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
     } else if (!startIface && !endIface) {
         AADLObjectIface::IfaceType type =
                 startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
-        QVariantList params = { qVariantFromValue(model), qVariantFromValue(startObject), startPointAdjusted,
+        QVariantList params = { qVariantFromValue(m_model.data()), qVariantFromValue(startObject), startPointAdjusted,
                                 qVariantFromValue(type), startIfaceId };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
 
         type = (startRequired && isSameType) || (!startRequired && !isSameType) ? AADLObjectIface::IfaceType::Required
                                                                                 : AADLObjectIface::IfaceType::Provided;
-        params = { qVariantFromValue(model), qVariantFromValue(endObject), endPointAdjusted, qVariantFromValue(type),
-                   endIfaceId };
+        params = { qVariantFromValue(m_model.data()), qVariantFromValue(endObject), endPointAdjusted,
+                   qVariantFromValue(type), endIfaceId };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
     }
 
     AADLFunctionGraphicsItem *prevStartItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(functionAtStartPos);
-    QPointF firstExcludedPoint = *std::next(connectionPolygon.constBegin());
+    QPointF firstExcludedPoint = *std::next(m_connectionPoints.constBegin());
     common::Id prevStartIfaceId = startIfaceId;
     /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
-                utils::intersectionPoints(item->sceneBoundingRect(), connectionPolygon);
+                utils::intersectionPoints(item->sceneBoundingRect(), m_connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             parentForConnection = item;
             break;
         }
 
-        auto beginIt = std::find(connectionPolygon.constBegin(), connectionPolygon.constEnd(), firstExcludedPoint);
+        auto beginIt = std::find(m_connectionPoints.constBegin(), m_connectionPoints.constEnd(), firstExcludedPoint);
         auto endIt = std::find_if(
-                connectionPolygon.constBegin(), connectionPolygon.constEnd(),
+                m_connectionPoints.constBegin(), m_connectionPoints.constEnd(),
                 [rect = item->sceneBoundingRect()](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { startInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
@@ -503,37 +514,37 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
             ifaceId = endIfaceId;
         } else {
             ifaceId = common::createId();
-            params = { qVariantFromValue(model), qVariantFromValue(item->entity()), intersectionPoints.last(),
+            params = { qVariantFromValue(m_model.data()), qVariantFromValue(item->entity()), intersectionPoints.last(),
                        qVariantFromValue(type), ifaceId };
             taste3::cmd::CommandsStack::current()->push(
                     cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
         }
 
-        params = { qVariantFromValue(model), qVariantFromValue(item->entity()), prevStartIfaceId, ifaceId,
+        params = { qVariantFromValue(m_model.data()), qVariantFromValue(item->entity()), prevStartIfaceId, ifaceId,
                    qVariantFromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
-        firstExcludedPoint = endIt != connectionPolygon.constEnd() ? *endIt : QPointF();
+        firstExcludedPoint = endIt != m_connectionPoints.constEnd() ? *endIt : QPointF();
         startInterfacePoint = intersectionPoints.last();
         prevStartItem = item;
         prevStartIfaceId = ifaceId;
     }
 
-    QPointF lastExcludedPoint = *std::next(connectionPolygon.crbegin());
+    QPointF lastExcludedPoint = *std::next(m_connectionPoints.crbegin());
     AADLFunctionGraphicsItem *prevEndItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(functionAtEndPos);
     common::Id prevEndIfaceId = endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
-                utils::intersectionPoints(item->sceneBoundingRect(), connectionPolygon);
+                utils::intersectionPoints(item->sceneBoundingRect(), m_connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
             break;
         }
-        auto beginIt = std::find(connectionPolygon.crbegin(), connectionPolygon.crend(), lastExcludedPoint);
+        auto beginIt = std::find(m_connectionPoints.crbegin(), m_connectionPoints.crend(), lastExcludedPoint);
         auto endIt = std::find_if(
-                connectionPolygon.crbegin(), connectionPolygon.crend(),
+                m_connectionPoints.crbegin(), m_connectionPoints.crend(),
                 [rect = item->sceneBoundingRect()](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { endInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
@@ -547,31 +558,31 @@ static inline void handleConnection(QGraphicsScene *scene, const QVector<QPointF
             ifaceId = startIfaceId;
         } else {
             ifaceId = common::createId();
-            params = { qVariantFromValue(model), qVariantFromValue(item->entity()), intersectionPoints.last(),
+            params = { qVariantFromValue(m_model.data()), qVariantFromValue(item->entity()), intersectionPoints.last(),
                        qVariantFromValue(type), ifaceId };
             taste3::cmd::CommandsStack::current()->push(
                     cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
         }
-        params = { qVariantFromValue(model), qVariantFromValue(item->entity()), prevEndIfaceId, ifaceId,
+        params = { qVariantFromValue(m_model.data()), qVariantFromValue(item->entity()), prevEndIfaceId, ifaceId,
                    qVariantFromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
-        lastExcludedPoint = endIt != connectionPolygon.crend() ? *endIt : QPointF();
+        lastExcludedPoint = endIt != m_connectionPoints.crend() ? *endIt : QPointF();
         endInterfacePoint = intersectionPoints.last();
         prevEndItem = item;
         prevEndIfaceId = ifaceId;
     }
 
-    auto beginIt = std::find(connectionPolygon.constBegin(), connectionPolygon.constEnd(), firstExcludedPoint);
-    auto endIt = std::find(beginIt, connectionPolygon.constEnd(), lastExcludedPoint);
+    auto beginIt = std::find(m_connectionPoints.constBegin(), m_connectionPoints.constEnd(), firstExcludedPoint);
+    auto endIt = std::find(beginIt, m_connectionPoints.constEnd(), lastExcludedPoint);
     QVector<QPointF> points { startInterfacePoint };
-    if (endIt != connectionPolygon.constEnd()) {
+    if (endIt != m_connectionPoints.constEnd()) {
         std::advance(endIt, 1);
         std::copy(beginIt, endIt, std::back_inserter(points));
     }
     points.append(endInterfacePoint);
 
-    const QVariantList params = { qVariantFromValue(model),
+    const QVariantList params = { qVariantFromValue(m_model.data()),
                                   qVariantFromValue(parentForConnection ? parentForConnection->entity() : nullptr),
                                   prevStartIfaceId, prevEndIfaceId, qVariantFromValue(points) };
     taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
@@ -602,15 +613,12 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
             handleInterface(scene, AADLObjectIface::IfaceType::Required, pos);
             break;
         case ToolType::MultiPointConnection:
-            if (isConnectable(scene, pos)) {
-                if (!handleConnectionCreate(scene, pos))
-                    return;
-                handleConnection(scene, m_connectionPoints, m_model);
-            }
+            if (!handleConnectionCreate(pos))
+                return;
+            handleConnection();
             break;
         case ToolType::DirectConnection:
-            if (isConnectable(scene, pos))
-                handleDirectConnection(scene, pos);
+            handleDirectConnection(pos);
             break;
         default:
             break;
@@ -621,8 +629,12 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
     emit created();
 }
 
-bool CreatorTool::handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos)
+bool CreatorTool::handleConnectionCreate(const QPointF &pos)
 {
+    QGraphicsScene *scene = m_view ? m_view->scene() : nullptr;
+    if (!scene)
+        return false;
+
     if (!m_previewConnectionItem)
         return false;
 
@@ -718,13 +730,13 @@ void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceT
     }
 }
 
-void CreatorTool::handleDirectConnection(QGraphicsScene *scene, const QPointF &pos)
+void CreatorTool::handleDirectConnection(const QPointF &pos)
 {
     if (m_connectionPoints.size() < 1)
         return;
 
     m_connectionPoints.append(pos);
-    handleConnection(scene, m_connectionPoints, m_model);
+    handleConnection();
 }
 
 void CreatorTool::removeSelectedItems()
@@ -892,31 +904,103 @@ void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
     ctx::ActionsManager::populateMenu(menu, aadlObj);
 }
 
-bool CreatorTool::isConnectable(QGraphicsScene *scene, const QPointF &pos) const
+bool CreatorTool::warnConnectionPreview(const QPointF &pos)
 {
-    if (QGraphicsItem *item =
-                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionGraphicsItem::Type })) {
-        if (AADLObjectFunction *fun = functionObject(item))
-            if (fun->isFunctionType())
-                return false;
+    const bool warn = !canConnect(pos);
+
+    if (m_previewConnectionItem) {
+        QPen p = m_previewConnectionItem->pen();
+        p.setColor(warn ? Qt::red : Qt::black);
+        m_previewConnectionItem->setPen(p);
     }
 
-    if (QGraphicsItem *item =
-                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionTypeGraphicsItem::Type })) {
-        if (AADLObjectFunctionType *fun = functionTypeObject(item))
-            if (fun->isFunctionType())
-                return false;
-    }
+    return warn;
+}
 
-    if (QGraphicsItem *item =
-                utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
-        if (AADLObjectIface *iface = interfaceObject(item))
-            if (AADLObjectFunctionType *parentFun = qobject_cast<AADLObjectFunctionType *>(iface->parentObject()))
-                if (parentFun->isFunctionType())
+bool CreatorTool::canConnect(const QPointF &pos) const
+{
+    if (!m_previewConnectionItem)
+        return false;
+
+    QGraphicsScene *scene = m_previewConnectionItem->scene();
+
+    // Ensure that:
+    // [1] - the pos is not in a FunctionType
+    // [2] - the pos is not in an Iface which is in Function type
+    // [3] - the pos is not in an Iface which kind is Cyclic
+    // [4] - parent of the source and target interface differs
+    // [5] - if one iface is RI, another should be PI with different name only
+
+    auto ifaceAt = [scene](const QPointF &pos) -> AADLObjectIface * {
+        if (QGraphicsItem *item =
+                    utils::nearestItem(scene, pos, kConnectionTolerance, { AADLInterfaceGraphicsItem::Type }))
+            return interfaceObject(item);
+        return nullptr;
+    };
+
+    auto functionIn = [scene](const QPointF &pos) -> AADLObjectFunctionType * {
+        if (QGraphicsItem *item =
+                    utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionGraphicsItem::Type }))
+            return functionObject(item);
+        return nullptr;
+    };
+
+    // [1]
+    auto isFunctionType = [scene, functionIn](const QPointF &pos) {
+        if (AADLObjectFunctionType *fun = functionIn(pos))
+            if (fun->isFunctionType())
+                return true;
+
+        if (QGraphicsItem *item =
+                    utils::nearestItem(scene, pos, kConnectionTolerance, { AADLFunctionTypeGraphicsItem::Type })) {
+            if (AADLObjectFunctionType *fun = functionTypeObject(item))
+                if (fun->isFunctionType())
+                    return true;
+        }
+
+        return false;
+    };
+
+    auto ifacesConnectable = [functionIn, &pos, this](AADLObjectIface *source, AADLObjectIface *target) {
+        auto validIface = [](AADLObjectIface *iface, AADLObjectFunctionType *ifaceParent) {
+            if (iface) {
+                // [2]
+                if (ifaceParent && ifaceParent->isFunctionType())
                     return false;
-    }
+                // [3]
+                if (iface->kind() == AADLObjectIface::OperationKind::Cyclic)
+                    return false;
+            }
+            return true;
+        };
 
-    // TODO: check if interfaces are acceptable in terms of inheritance
+        AADLObjectFunctionType *targetParent =
+                target ? qobject_cast<AADLObjectFunctionType *>(target->parent()) : functionIn(pos);
+        AADLObjectFunctionType *sourceParent = source ? qobject_cast<AADLObjectFunctionType *>(source->parent())
+                                                      : functionIn(m_connectionPoints.front());
+
+        if (!validIface(target, targetParent))
+            return false;
+        if (!validIface(source, sourceParent))
+            return false;
+
+        // [4]
+        if (sourceParent == targetParent)
+            return false;
+
+        // [5]
+        // TODO: check if interfaces are acceptable in terms of RI/PI inheritance
+        return true;
+    };
+
+    if (isFunctionType(pos))
+        return false;
+
+    AADLObjectIface *targetIface = ifaceAt(pos);
+    AADLObjectIface *sourceIface = ifaceAt(m_connectionPoints.front());
+
+    if (!ifacesConnectable(sourceIface, targetIface))
+        return false;
 
     return true;
 }
