@@ -90,19 +90,18 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
-    m_text->setPlainText(entity->title());
+    m_text->setPlainText(ifaceLabel());
 
-    QObject::connect(entity, &AADLObject::attributeChanged, [this, entity](taste3::aadl::meta::Props::Token attr) {
-        if (attr == taste3::aadl::meta::Props::Token::name) {
-            if (m_text->toPlainText() != entity->title())
-                m_text->setPlainText(entity->title());
-            instantLayoutUpdate();
+    QObject::connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
+        if (attr == taste3::aadl::meta::Props::Token::name
+            || attr == taste3::aadl::meta::Props::Token::labelInheritance) {
+            updateLabel();
         }
     });
-    QObject::connect(entity, &AADLObjectIface::titleChanged, [this](const QString &text) {
-        m_text->setPlainText(text);
-        instantLayoutUpdate();
-    });
+    QObject::connect(entity, &AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity))
+        QObject::connect(ri, &AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+                         &AADLInterfaceGraphicsItem::updateLabel);
 
     colorSchemeUpdated();
 }
@@ -365,7 +364,7 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    setInterfaceName(obj->title());
+    setInterfaceName(ifaceLabel());
 
     const QPointF coordinates = utils::pos(obj->coordinates());
     if (coordinates.isNull())
@@ -441,6 +440,27 @@ void AADLInterfaceGraphicsItem::colorSchemeUpdated()
     m_iface->setPen(pen);
     m_iface->setBrush(h.brush());
     update();
+}
+
+void AADLInterfaceGraphicsItem::updateLabel()
+{
+    const QString &label = ifaceLabel();
+    if (label != m_text->toPlainText()) {
+        m_text->setPlainText(label);
+        instantLayoutUpdate();
+    }
+}
+
+QString AADLInterfaceGraphicsItem::ifaceLabel() const
+{
+    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
+        if (ri->labelInherited()) {
+            const QStringList &labels = ri->inheritedLables();
+            if (labels.size())
+                return labels.join(", ");
+        }
+    }
+    return entity()->title();
 }
 
 } // namespace aadl

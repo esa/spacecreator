@@ -33,8 +33,6 @@ class AADLObjectConnection : public AADLObject
 public:
     explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
                                   AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
-    explicit AADLObjectConnection(AADLObject *from, AADLObject *to, QObject *parent = nullptr);
-    explicit AADLObjectConnection(QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
     AADLObjectType aadlType() const override;
@@ -55,9 +53,18 @@ public:
 
     void setAttr(const QString &name, const QVariant &val) override;
 
+    enum class LabelInheritancePolicy
+    {
+        Set = 0,
+        Unset
+    };
+    void inheritLabel();
+    void uninheritLabel();
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
     void updateAttributes();
+    void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
 };
 
 } // ns aadl

@@ -124,7 +124,7 @@ QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
             params.append(
                     { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
             for (auto outerConnection : iface->connectionItems()) {
-                if (outerConnection->parentItem() != this) {
+                if (outerConnection && outerConnection->parentItem() != this) {
                     params.append({ qVariantFromValue(outerConnection->entity()),
                                     qVariantFromValue(outerConnection->graphicsPoints()) });
                 }
@@ -250,10 +250,9 @@ void AADLFunctionTypeGraphicsItem::onManualResizeProgress(GripPoint::Location gr
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
     auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
-    const QRectF contentRect = parentFunction
-            ? parentFunction->boundingRect().marginsRemoved(parentFunction->isRootItem() ? utils::kRootMargins
-                                                                                         : utils::kContentMargins)
-            : QRectF();
+    const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
+                                       parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
+                                              : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();

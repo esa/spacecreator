@@ -22,6 +22,7 @@
 #include "aadlobjectsmodel.h"
 
 #include <QMetaEnum>
+#include <QSet>
 
 namespace taste3 {
 namespace aadl {
@@ -70,6 +71,7 @@ void AADLObjectIface::setupInitialAttrs()
         setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
     } else {
         setAttr(meta::Props::token(meta::Props::Token::kind), QVariant());
+        setProp(meta::Props::token(meta::Props::Token::labelInheritance), true);
     }
 }
 AADLObject::AADLObjectType AADLObjectIface::aadlType() const
@@ -150,23 +152,9 @@ void AADLObjectIface::addParam(const IfaceParameter &param)
         d->m_params.append(param);
 }
 
-bool AADLObjectIface::labelInheritance() const
-{
-    return prop(meta::Props::token(meta::Props::Token::labelInheritance)).toBool();
-}
-
-bool AADLObjectIface::setLabelInheritance(bool label)
-{
-    if (labelInheritance() != label) {
-        setProp(meta::Props::token(meta::Props::Token::labelInheritance), label);
-        return true;
-    }
-    return false;
-}
-
 AADLObjectFunction *AADLObjectIface::function() const
 {
-    return qobject_cast<AADLObjectFunction *>(parent());
+    return qobject_cast<AADLObjectFunction *>(parentObject());
 }
 
 bool AADLObjectIface::isCloned() const
@@ -263,6 +251,65 @@ AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObject
         model->addObject(target);
 
     return target;
+}
+
+void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
+{
+    AADLObject::setProp(name, val);
+
+    if (!name.isEmpty()) {
+        const meta::Props::Token t = meta::Props::token(name);
+        switch (t) {
+        case meta::Props::Token::labelInheritance: {
+            const bool inherited = val.toBool();
+            if (!inherited)
+                m_inheritedLables.clear();
+            emit propChanged_labelInheritance(inherited);
+            emit inheritedLabelsChanged(inheritedLables());
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
+QStringList AADLObjectIfaceRequired::inheritedLables() const
+{
+    QStringList result;
+    const QStringList &titles = m_inheritedLables.values();
+
+    QHash<const AADLObjectIfaceProvided *, QString>::const_iterator i = m_inheritedLables.cbegin();
+    while (i != m_inheritedLables.cend()) {
+        const AADLObjectIfaceProvided *pi = i.key();
+        QString label = pi->title();
+        if (titles.count(label) > 1) {
+            Q_ASSERT(pi->parentObject());
+            label = pi->parentObject()->title() + "." + label;
+        }
+
+        result.append(label);
+
+        ++i;
+    }
+    return result;
+}
+
+void AADLObjectIfaceRequired::updateInheritedLabel(const AADLObjectIfaceProvided *pi, const QString &label)
+{
+    if (!pi)
+        return;
+
+    if (label.isEmpty())
+        m_inheritedLables.take(pi);
+    else
+        m_inheritedLables[pi] = label;
+    emit inheritedLabelsChanged(inheritedLables());
+}
+
+bool AADLObjectIfaceRequired::labelInherited() const
+{
+    return prop(meta::Props::token(meta::Props::Token::labelInheritance)).toBool();
 }
 
 } // ns aadl

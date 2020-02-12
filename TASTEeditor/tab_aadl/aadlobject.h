@@ -75,7 +75,7 @@ public:
     QHash<QString, QVariant> props() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
-    void setProp(const QString &name, const QVariant &val);
+    virtual void setProp(const QString &name, const QVariant &val);
     void removeProp(const QString &name);
 
     void setObjectsModel(AADLObjectsModel *model);
