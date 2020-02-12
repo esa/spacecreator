@@ -218,6 +218,12 @@ void AADLObjectFunctionType::setAttr(const QString &name, const QVariant &val)
     }
 }
 
+bool AADLObjectFunctionType::isFunctionType() const
+{
+    return attr(meta::Props::token(meta::Props::Token::is_type), QLatin1Literal("NO")).toString().toLower()
+            == QLatin1Literal("yes");
+}
+
 QVector<QPointer<AADLObjectFunction>> AADLObjectFunctionType::instances() const
 {
     return d->m_instances;
