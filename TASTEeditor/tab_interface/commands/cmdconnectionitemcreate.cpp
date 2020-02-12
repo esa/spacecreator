@@ -50,11 +50,13 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLOb
 void CmdConnectionItemCreate::redo()
 {
     m_model->addObject(m_entity);
+    m_entity->inheritLabel();
 }
 
 void CmdConnectionItemCreate::undo()
 {
     m_model->removeObject(m_entity);
+    m_entity->uninheritLabel();
 }
 
 bool CmdConnectionItemCreate::mergeWith(const QUndoCommand *command)

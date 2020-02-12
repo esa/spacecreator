@@ -76,9 +76,6 @@ public:
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
 
-    bool labelInheritance() const;
-    bool setLabelInheritance(bool label);
-
     AADLObjectFunction *function() const;
 
     bool isCloned() const;
@@ -119,6 +116,20 @@ public:
     explicit AADLObjectIfaceRequired(const QString &title, AADLObject *parent = nullptr);
     explicit AADLObjectIfaceRequired(const common::Id &id, const QString &title = QString(),
                                      AADLObject *parent = nullptr);
+
+    virtual void setProp(const QString &name, const QVariant &val) override;
+
+    bool labelInherited() const;
+
+    QStringList inheritedLables() const;
+    void updateInheritedLabel(const AADLObjectIfaceProvided *pi, const QString &label);
+
+Q_SIGNALS:
+    void propChanged_labelInheritance(bool inheritance);
+    void inheritedLabelsChanged(const QStringList &labels);
+
+protected:
+    QHash<const AADLObjectIfaceProvided *, QString> m_inheritedLables;
 };
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;

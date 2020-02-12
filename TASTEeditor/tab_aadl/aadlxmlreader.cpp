@@ -390,9 +390,9 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
 
     const bool parentIsFunctionType = parent && parent->aadlType() == AADLObject::AADLObjectType::AADLFunctionType;
     const bool nestingAllowd = !(parentIsFunctionType && isFunctionType); // direct FnT->FnT nesting is not allowed
-    AADLObject *usedPArent = nestingAllowd ? parent : nullptr;
-    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(QString(), usedPArent)
-                                                     : new AADLObjectFunction(QString(), usedPArent);
+    AADLObject *usedParent = nestingAllowd ? parent : nullptr;
+    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(QString(), usedParent)
+                                                     : new AADLObjectFunction(QString(), usedParent);
     if (nestingAllowd) {
         if (AADLObjectFunctionType *parentFunction = qobject_cast<AADLObjectFunctionType *>(parent))
             parentFunction->addChild(currObj);
@@ -504,6 +504,7 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         AADLObjectConnection *objConnection =
                 new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
                                          connection.m_from.m_interface, connection.m_to.m_interface, parent);
+        objConnection->inheritLabel();
 
         d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
         d->m_allObjects.append(objConnection);
