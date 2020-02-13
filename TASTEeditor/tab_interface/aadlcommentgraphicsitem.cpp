@@ -155,11 +155,11 @@ void AADLCommentGraphicsItem::textEdited(const QString &text)
 
     const QRectF geometry = sceneBoundingRect();
     const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-    const QVariantList geometryParams { qVariantFromValue(entity()), qVariantFromValue(points) };
+    const QVariantList geometryParams { QVariant::fromValue(entity()), QVariant::fromValue(points) };
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams);
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
 
-    const QVariantList commentTextParams { qVariantFromValue(entity()), qVariantFromValue(text) };
+    const QVariantList commentTextParams { QVariant::fromValue(entity()), QVariant::fromValue(text) };
     const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);
     taste3::cmd::CommandsStack::current()->push(commentTextCmd);
 
@@ -286,7 +286,7 @@ void AADLCommentGraphicsItem::createCommand()
     const QRectF geometry = sceneBoundingRect();
     const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
     const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry,
-                                                          { qVariantFromValue(entity()), qVariantFromValue(points) });
+                                                          { QVariant::fromValue(entity()), QVariant::fromValue(points) });
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
 }
 
