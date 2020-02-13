@@ -152,7 +152,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
 
         if (const auto attributesCmd = cmd::CommandsFactory::create(
                     cmd::ChangeIfaceParam,
-                    { qVariantFromValue(m_dataObject), qVariantFromValue(paramOld), qVariantFromValue(paramNew) })) {
+                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld), QVariant::fromValue(paramNew) })) {
 
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -171,7 +171,7 @@ bool IfaceParametersModel::createProperty(const QString &propName)
     IfaceParameter param(propName);
 
     const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateIfaceParam,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(param) });
+                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
     if (propsCmd) {
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
@@ -194,7 +194,7 @@ bool IfaceParametersModel::removeProperty(const QModelIndex &index)
 
     const int row(index.row());
     const auto propsCmd = cmd::CommandsFactory::create(
-            cmd::RemoveIfaceParam, { qVariantFromValue(m_dataObject), qVariantFromValue(m_params.value(row)) });
+            cmd::RemoveIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(m_params.value(row)) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);

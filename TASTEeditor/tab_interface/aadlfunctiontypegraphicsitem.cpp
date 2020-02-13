@@ -61,7 +61,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
         connect(m_textItem, &TextGraphicsItem::edited, this, [this](const QString &text) {
             const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
             const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes, { qVariantFromValue(modelEntity()), qVariantFromValue(attributess) });
+                    cmd::ChangeEntityAttributes, { QVariant::fromValue(modelEntity()), QVariant::fromValue(attributess) });
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
         });
         connect(entity, &AADLObjectFunction::attributeChanged, this,
@@ -106,7 +106,7 @@ QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
     if (!obj->isRootObject()) {
         const QRectF geometry = sceneBoundingRect();
         const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-        params.append({ qVariantFromValue(obj), qVariantFromValue(points) });
+        params.append({ QVariant::fromValue(obj), QVariant::fromValue(points) });
     }
 
     QList<QGraphicsItem *> items;
@@ -122,15 +122,15 @@ QList<QVariantList> AADLFunctionTypeGraphicsItem::prepareCommandParams() const
     for (auto item : items) {
         if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item)) {
             params.append(
-                    { qVariantFromValue(iface->entity()), qVariantFromValue<QVector<QPointF>>({ iface->scenePos() }) });
+                    { QVariant::fromValue(iface->entity()), QVariant::fromValue<QVector<QPointF>>({ iface->scenePos() }) });
             for (auto outerConnection : iface->connectionItems()) {
                 if (outerConnection && outerConnection->parentItem() != this) {
-                    params.append({ qVariantFromValue(outerConnection->entity()),
-                                    qVariantFromValue(outerConnection->graphicsPoints()) });
+                    params.append({ QVariant::fromValue(outerConnection->entity()),
+                                    QVariant::fromValue(outerConnection->graphicsPoints()) });
                 }
             }
         } else if (auto connection = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item)) {
-            params.append({ qVariantFromValue(connection->entity()), qVariantFromValue(connection->graphicsPoints()) });
+            params.append({ QVariant::fromValue(connection->entity()), QVariant::fromValue(connection->graphicsPoints()) });
         } else if (auto functionType = qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item)) {
             params.append(functionType->prepareCommandParams());
         } else if (auto function = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item)) {

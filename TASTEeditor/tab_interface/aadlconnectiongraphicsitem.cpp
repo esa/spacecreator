@@ -452,12 +452,12 @@ void AADLConnectionGraphicsItem::updateBoundingRect()
 void AADLConnectionGraphicsItem::createCommand()
 {
     auto prepareParams = [](AADLInterfaceGraphicsItem *item) -> QVariantList {
-        return { qVariantFromValue(item->entity()), qVariantFromValue<QVector<QPointF>>({ item->scenePos() }) };
+        return { QVariant::fromValue(item->entity()), QVariant::fromValue<QVector<QPointF>>({ item->scenePos() }) };
     };
 
     taste3::cmd::CommandsStack::current()->beginMacro(tr("Change connection"));
 
-    const QVariantList params = { qVariantFromValue(dataObject()), qVariantFromValue(m_points) };
+    const QVariantList params = { QVariant::fromValue(dataObject()), QVariant::fromValue(m_points) };
     taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params));
 
     const auto ifaceStartCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, prepareParams(m_startItem));
