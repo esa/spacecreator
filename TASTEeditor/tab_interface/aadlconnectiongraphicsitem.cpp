@@ -17,6 +17,7 @@
 
 #include "aadlconnectiongraphicsitem.h"
 
+#include "aadlcommentgraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
@@ -466,6 +467,30 @@ void AADLConnectionGraphicsItem::createCommand()
     taste3::cmd::CommandsStack::current()->push(ifaceEndCmd);
 
     taste3::cmd::CommandsStack::current()->endMacro();
+}
+
+bool AADLConnectionGraphicsItem::removeCollidedGrips(QGraphicsRectItem *handle)
+{
+    const int idx = m_grips.indexOf(handle);
+    if (idx == -1)
+        return false;
+
+    auto it = std::find_if(m_grips.begin(), m_grips.end(), [handle](const QGraphicsRectItem *const grip) {
+        return grip != handle && grip->sceneBoundingRect().intersects(handle->sceneBoundingRect());
+    });
+    if (it != m_grips.end()) {
+        const int intersectionIdx = std::distance(m_grips.begin(), it);
+        const int startIdx = intersectionIdx < idx ? intersectionIdx : idx + 1;
+        const int endIdx = intersectionIdx < idx ? idx : intersectionIdx + 1;
+        for (int i = endIdx - 1; i >= startIdx; --i) {
+            auto item = m_grips.takeAt(i);
+            scene()->removeItem(item);
+            delete item;
+            m_points.removeAt(i);
+        }
+        return true;
+    }
+    return false;
 };
 
 AADLInterfaceGraphicsItem *AADLConnectionGraphicsItem::endItem() const
@@ -536,6 +561,15 @@ bool AADLConnectionGraphicsItem::handleGripPointPress(QGraphicsRectItem *handle,
     if (idx == -1)
         return false;
 
+    if (event->modifiers().testFlag(Qt::ControlModifier)) {
+        m_points.insert(idx, event->scenePos());
+        auto grip = createGripPoint();
+        grip->stackBefore(handle);
+        m_grips.insert(idx, grip);
+        updateBoundingRect();
+        updateGripPoints();
+    }
+
     return true;
 }
 
@@ -545,39 +579,23 @@ bool AADLConnectionGraphicsItem::handleGripPointMove(QGraphicsRectItem *handle, 
     if (idx == -1)
         return false;
 
-    const QVector<QPointF> points(m_points);
-
     m_points[idx] = event->scenePos();
 
-    auto it = std::find_if(m_grips.begin(), m_grips.end(), [handle](const QGraphicsRectItem *const grip) {
-        return grip != handle && grip->sceneBoundingRect().intersects(handle->sceneBoundingRect());
-    });
-    if (it != m_grips.end()) {
-        const int intersectionIdx = std::distance(m_grips.begin(), it);
-        const int startIdx = intersectionIdx < idx ? intersectionIdx : idx + 1;
-        const int endIdx = intersectionIdx < idx ? idx : intersectionIdx + 1;
-        for (int i = endIdx - 1; i >= startIdx; --i) {
-            auto item = m_grips.takeAt(i);
-            scene()->removeItem(item);
-            delete item;
-            m_points.removeAt(i);
+    if (!event->modifiers().testFlag(Qt::ControlModifier)) {
+        if (removeCollidedGrips(handle)) {
+            idx = m_grips.indexOf(handle);
+            if (idx == -1)
+                return false;
         }
-        idx = m_grips.indexOf(handle);
-    }
-    if (idx == 0 || idx == m_points.size() - 1) {
-        auto updateEdgeItem = [&](InteractiveObject *item, bool isStart) {
-            QSignalBlocker sb(item);
-            item->setPos(item->parentItem()->mapFromScene(isStart ? m_points.first() : m_points.last()));
-            item->instantLayoutUpdate();
-            const QRectF itemSceneRect = item->sceneBoundingRect();
-            if (itemSceneRect.contains(isStart ? m_points.first() : m_points.last()))
-                return;
 
-            m_points.insert(isStart ? 0 : m_points.size(), item->scenePos());
-            m_grips.insert(isStart ? 0 : m_points.size(), createGripPoint());
+        auto updateEdgeItem = [&](InteractiveObject *item) {
+            QSignalBlocker sb(item);
+            item->setPos(item->parentItem()->mapFromScene(event->scenePos()));
         };
-        updateEdgeItem(m_startItem, true);
-        updateEdgeItem(m_endItem, false);
+        if (idx == 0)
+            updateEdgeItem(m_startItem);
+        else if (idx == m_grips.size() - 1)
+            updateEdgeItem(m_endItem);
     }
 
     updateBoundingRect();
@@ -604,31 +622,32 @@ bool AADLConnectionGraphicsItem::handleGripPointRelease(QGraphicsRectItem *handl
     }
     m_points[idx] = intersectionPoint;
 
-    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
+    if (idx == 0) {
+        m_startItem->instantLayoutUpdate();
+        m_points[idx] = m_startItem->scenePos();
+    } else if (idx == m_grips.size() - 1) {
+        m_endItem->instantLayoutUpdate();
+        m_points[idx] = m_endItem->scenePos();
+    }
+
+    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
+                                      AADLCommentGraphicsItem::Type };
     for (auto item : scene()->items(m_points)) {
         if (types.contains(item->type())
             && utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
-            m_startItem->updateFromEntity();
-            m_endItem->updateFromEntity();
-            updateFromEntity();
-            adjustGripPointCount();
+            rebuildLayout();
+            createCommand();
             return true;
         }
     }
 
-    adjustGripPointCount();
     updateBoundingRect();
-
     createCommand();
     return true;
 }
 
 void AADLConnectionGraphicsItem::adjustGripPointCount()
 {
-    const int diff = m_points.isEmpty() ? 0 : m_points.size() - m_grips.size();
-    if (diff == 0)
-        return;
-
     while (m_grips.size() > m_points.size()) {
         if (auto grip = m_grips.takeLast()) {
             if (auto scene = grip->scene())

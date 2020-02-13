@@ -100,6 +100,7 @@ private:
     void simplify();
     void updateBoundingRect();
     void createCommand();
+    bool removeCollidedGrips(QGraphicsRectItem *handle);
 
 private:
     class GraphicsPathItem : public QGraphicsPathItem
