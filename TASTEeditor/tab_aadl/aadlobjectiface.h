@@ -124,7 +124,7 @@ public:
 
     virtual void setProp(const QString &name, const QVariant &val) override;
 
-    bool labelInherited() const;
+    bool inheritPi() const;
 
     QStringList inheritedLables() const;
     void updatePrototype(const AADLObjectIfaceProvided *pi);

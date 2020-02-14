@@ -100,7 +100,7 @@ QMap<AADLObjectIface::OperationKind, QString> AADLObjectIface::xmlKindNames()
         const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObjectIface::OperationKind>();
         for (int i = 0; i < me.keyCount(); ++i) {
             const AADLObjectIface::OperationKind k = static_cast<AADLObjectIface::OperationKind>(me.value(i));
-            result.insert(k, QString(me.key(i)).toUpper() + QLatin1Literal("_OPERATION"));
+            result.insert(k, QString(me.key(i)).toUpper() + QLatin1String("_OPERATION"));
         }
     }
     return result;
@@ -294,7 +294,7 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
 QStringList AADLObjectIfaceRequired::inheritedLables() const
 {
     QStringList result;
-    if (labelInherited()) {
+    if (inheritPi()) {
         result = collectInheritedLabels();
 
         // append suffix for connection to the same named PIs with same parent (Function.PI becames Funtcion.PI#N)
@@ -371,7 +371,7 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
             const bool toSibling = !isMeSrc && !isMeDst;
             if (toSibling)
                 if (AADLObjectIfaceRequired *otherRI = findRI(c, pi)) {
-                    if (!otherRI->labelInherited())
+                    if (!otherRI->inheritPi())
                         continue;
 
                     const QString &oldLabel = pi->title();
@@ -404,7 +404,7 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
     emit inheritedLabelsChanged(inheritedLables());
 }
 
-bool AADLObjectIfaceRequired::labelInherited() const
+bool AADLObjectIfaceRequired::inheritPi() const
 {
     return prop(meta::Props::token(meta::Props::Token::labelInheritance)).toBool();
 }

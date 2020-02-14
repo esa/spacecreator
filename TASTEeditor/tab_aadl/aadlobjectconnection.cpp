@@ -205,7 +205,7 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
     if (!pi || !ri)
         return;
 
-    if (!ri->labelInherited())
+    if (!ri->inheritPi())
         return;
 
     const bool rmLabel = inheritance == AADLObjectConnection::LabelInheritancePolicy::Unset;
@@ -220,8 +220,8 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
 
     connect(
             pi, &AADLObjectIface::titleChanged, this,
-            [pi, ri](const QString &title) {
-                if (ri->labelInherited())
+            [pi, ri](const QString & /*title*/) {
+                if (ri->inheritPi())
                     ri->updatePrototype(pi);
             },
             Qt::UniqueConnection);

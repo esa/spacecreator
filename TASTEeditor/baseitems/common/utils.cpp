@@ -375,5 +375,11 @@ QVector<qint32> coordinates(const QVector<QPointF> &points)
     return coordinates;
 }
 
+QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
+{
+    const QPointF adjustmentPoint { adjustment / 2, adjustment / 2 };
+    return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
+}
+
 } // ns utils
 } // ns taste3
