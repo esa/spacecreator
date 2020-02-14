@@ -40,9 +40,9 @@ public:
 
 private:
     QPointer<AADLObjectsModel> m_model;
-    const QRectF m_geometry;
-    QPointer<AADLObjectComment> m_entity;
     QPointer<AADLObjectFunctionType> m_parent;
+    QPointer<AADLObjectComment> m_entity;
+    const QRectF m_geometry;
 };
 
 } // namespace cmd

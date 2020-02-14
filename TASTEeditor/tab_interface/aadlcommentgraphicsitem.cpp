@@ -17,6 +17,7 @@
 
 #include "aadlcommentgraphicsitem.h"
 
+#include "aadlfunctiongraphicsitem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
@@ -88,8 +89,10 @@ void AADLCommentGraphicsItem::onManualResizeProgress(GripPoint::Location grip, c
 
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
-    const QRectF contentRect =
-            parentItem() ? parentItem()->boundingRect().marginsRemoved(utils::kContentMargins) : QRectF();
+    AADLFunctionGraphicsItem *parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
+    const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
+                                       parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
+                                              : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -239,7 +242,10 @@ void AADLCommentGraphicsItem::onManualMoveProgress(GripPoint::Location grip, con
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
     if (parentItem()) {
-        const QRectF contentRect = parentItem()->boundingRect().marginsRemoved(utils::kContentMargins);
+        AADLFunctionGraphicsItem *parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
+        const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
+                                           parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
+                                                  : QRectF();
 
         if (newPos.x() < contentRect.left())
             newPos.setX(contentRect.left());
@@ -259,9 +265,9 @@ void AADLCommentGraphicsItem::onManualMoveProgress(GripPoint::Location grip, con
 void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
                                                  const QPointF &releasedAt)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
+    Q_UNUSED(grip)
+    Q_UNUSED(pressedAt)
+    Q_UNUSED(releasedAt)
 
     createCommand();
 }
@@ -269,9 +275,9 @@ void AADLCommentGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const
 void AADLCommentGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
                                                    const QPointF &releasedAt)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
+    Q_UNUSED(grip)
+    Q_UNUSED(pressedAt)
+    Q_UNUSED(releasedAt)
 
     createCommand();
 }
@@ -285,8 +291,8 @@ void AADLCommentGraphicsItem::createCommand()
 {
     const QRectF geometry = sceneBoundingRect();
     const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry,
-                                                          { QVariant::fromValue(entity()), QVariant::fromValue(points) });
+    const auto geometryCmd = cmd::CommandsFactory::create(
+            cmd::ChangeEntityGeometry, { QVariant::fromValue(entity()), QVariant::fromValue(points) });
     taste3::cmd::CommandsStack::current()->push(geometryCmd);
 }
 
