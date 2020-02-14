@@ -65,6 +65,7 @@ public:
     void setFont(const QFont &font);
 
     virtual void updateFromEntity() = 0;
+    virtual QSizeF minimalSize() const;
 
 public Q_SLOTS:
     void scheduleLayoutUpdate();
@@ -101,8 +102,6 @@ protected:
     virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at);
     virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
     virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
-
-    virtual QSizeF minimalSize() const;
 
     virtual void hideGripPoints();
     virtual void showGripPoints();
