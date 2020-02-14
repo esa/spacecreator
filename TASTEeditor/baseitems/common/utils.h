@@ -91,5 +91,7 @@ bool isAncestorOf(const T *const parent, T *object)
     return false;
 }
 
+QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
+
 } // ns utils
 } // ns taste3

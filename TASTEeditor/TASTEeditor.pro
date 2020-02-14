@@ -115,7 +115,9 @@ SOURCES += \
         tab_interface/commands/cmdifaceparamremove.cpp \
         tab_interface/commands/cmdinterfaceitemcreate.cpp \
         tab_interface/commands/commandsfactory.cpp \
+        tab_interface/connectioncreationvalidator.cpp \
         tab_interface/creatortool.cpp \
+        tab_interface/graphicsitemhelpers.cpp \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
         tab_interface/properties/adddynamicropertydialog.cpp \
@@ -220,7 +222,9 @@ HEADERS += \
         tab_interface/commands/cmdinterfaceitemcreate.h \
         tab_interface/commands/commandids.h \
         tab_interface/commands/commandsfactory.h \
+        tab_interface/connectioncreationvalidator.h \
         tab_interface/creatortool.h \
+        tab_interface/graphicsitemhelpers.h \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
         tab_interface/properties/adddynamicpropertydialog.h \

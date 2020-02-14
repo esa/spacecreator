@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlobject.h"
+#include "aadlobjectiface.h"
 
 #include <QObject>
 #include <memory>
@@ -25,7 +26,6 @@
 namespace taste3 {
 namespace aadl {
 
-class AADLObjectIface;
 struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
 {
@@ -55,6 +55,24 @@ public:
 
     void inheritLabel();
     void uninheritLabel();
+
+    template<class T>
+    static inline const T selectIface(const AADLObjectIface *a, const AADLObjectIface *b)
+    {
+        T ptr { nullptr };
+        if (a)
+            ptr = a->as<T>();
+        if (!ptr && b)
+            ptr = b->as<T>();
+
+        return ptr;
+    }
+
+    template<class T>
+    inline const T selectIface() const
+    {
+        return selectIface<T>(sourceInterface(), targetInterface());
+    }
 
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;

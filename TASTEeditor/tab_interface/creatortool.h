@@ -89,7 +89,7 @@ private:
     void handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos);
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
-    void handleConnection();
+    void handleConnection(const QVector<QPointF> &connectionPoints) const;
 
     QMenu *populateContextMenu(const QPointF &scenePos);
     void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
@@ -97,7 +97,6 @@ private:
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
 
     bool warnConnectionPreview(const QPointF &pos);
-    bool canConnect(const QPointF &pos) const;
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

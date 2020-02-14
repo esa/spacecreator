@@ -85,6 +85,18 @@ public:
 
     virtual void postInit();
 
+    template<class T>
+    inline T as()
+    {
+        return qobject_cast<T>(this);
+    }
+
+    template<class T>
+    inline const T as() const
+    {
+        return qobject_cast<const T>(this);
+    }
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);

@@ -57,7 +57,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPath(pp);
     m_text->setPlainText(ifaceLabel());
 
-    QObject::connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
+    connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
         switch (attr) {
         case taste3::aadl::meta::Props::Token::name:
         case taste3::aadl::meta::Props::Token::labelInheritance: {
@@ -472,7 +472,7 @@ void AADLInterfaceGraphicsItem::updateKind()
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
 {
     if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
-        if (ri->labelInherited()) {
+        if (ri->inheritPi()) {
             const QStringList &labels = ri->inheritedLables();
             if (labels.size())
                 return labels.join(", ");
