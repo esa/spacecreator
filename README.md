@@ -9,6 +9,13 @@ some additional packages:
 
     sudo apt install lcov cccc doxygen cmake
 
+The current Grantlee release (v.5.2.0) has a problem with escape sequences.
+Therefore you must apply a patch before:
+
+    cp <TASTE_DIR>/grantlee/fix_escape.diff <GRANTLEE_DIR>
+    cd <GRANTLEE_DIR>
+    git apply grantlee.diff
+
 To build Taste correctly Grantlee should be installed into QTDIR directory:
 
     export QTDIR=$(qmake -query QT_INSTALL_PREFIX)

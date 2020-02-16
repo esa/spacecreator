@@ -1,0 +1,12 @@
+diff --git a/templates/lib/outputstream.cpp b/templates/lib/outputstream.cpp
+index ef39deb..71444f0 100644
+--- a/templates/lib/outputstream.cpp
++++ b/templates/lib/outputstream.cpp
+@@ -37,6 +37,7 @@ QString OutputStream::escape(const QString &input) const
+   temp.replace(QLatin1Char('<'), QStringLiteral("&lt;"));
+   temp.replace(QLatin1Char('>'), QStringLiteral("&gt;"));
+   temp.replace(QLatin1Char('\''), QStringLiteral("&#39;"));
++  temp.replace(QLatin1Char('"'), QStringLiteral("&quot;"));
+   return temp;
+ }
+ 
