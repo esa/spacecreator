@@ -19,9 +19,11 @@
 #define PREVIEWDIALOG_H
 
 #include <QDialog>
+#include <QVariant>
 
 class QSpinBox;
-class QTextEdit;
+class QTabWidget;
+class QPlainTextEdit;
 
 namespace taste3 {
 namespace templating {
@@ -37,21 +39,32 @@ class PreviewDialog : public QDialog
 public:
     PreviewDialog(QWidget *parent = nullptr);
 
-    void parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+    bool parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+    bool saveResultToFile(const QString &fileName);
 
-    QString text() const;
+    QString resultText() const;
 
 private slots:
     void onApplyTemplate();
-    void onSaveTemplate();
+    void onSaveTemplateAs();
     void onOpenTemplate();
-    void onErrorOccurred(const QString &error);
+    void onSaveResult();
+    void onErrorOccurred(const QString &errorString);
+    void onValidateXMLToggled(bool validate);
     void onIndentChanged(int value);
 
 private:
+    QPlainTextEdit *addTemplateEditor(const QString &tabLabel = QString());
+    bool parseTemplate();
+    void openIncludedTemplates(const QPlainTextEdit *templateTextEdit);
+
+private:
     templating::StringTemplate *m_stringTemplate;
-    QTextEdit *m_templateTextEdit;
-    QTextEdit *m_resultTextEdit;
+    QTabWidget *m_templatesTabWidget;
+    QPlainTextEdit *m_resultTextEdit;
+    QHash<QString, QVariantList> m_grouppedObjects;
+    QString m_templateFileName;
+    QHash<QString, QString> m_openedTemplates; // key: file name, value: full path
 };
 
 } // ns processing

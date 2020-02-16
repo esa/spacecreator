@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<Connections>
+{% for conn in Connections %}
+    {% include "connection.tmplt" %}
+{% endfor %}
+</Connections>

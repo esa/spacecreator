@@ -17,6 +17,8 @@
 
 #include "xmlhighlighter.h"
 
+#include <QDebug>
+
 namespace taste3 {
 namespace templating {
 
@@ -29,7 +31,8 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat xmlValueElementFormat;
     xmlValueElementFormat.setForeground(Qt::black);
     xmlValueElementFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QLatin1String(">[^\n]*</"));
+    rule.pattern = QRegularExpression(QStringLiteral(">[^\n]*</"),
+                                      QRegularExpression::InvertedGreedinessOption);
     rule.format = xmlValueElementFormat;
     m_highlightingRules.append(rule);
 
@@ -37,49 +40,51 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat keywordFormat;
     keywordFormat.setForeground(Qt::red);
     keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywords;
-    keywords << QLatin1String("\\b?xml\\b") << QLatin1String("/>")
-             << QLatin1String("</") << QLatin1String(">") << QLatin1String("<");
-    foreach (const QString &keyword, keywords) {
-        rule.pattern = QRegularExpression(keyword);
-        rule.format = keywordFormat;
-        m_highlightingRules.append(rule);
-    }
+    const QString keywords = QStringLiteral("(<\\?xml\\b|\\?>|</?|/?>)");
+    rule.pattern = QRegularExpression(keywords);
+    rule.format = keywordFormat;
+    m_highlightingRules.append(rule);
 
     // <Text> </Text>
     QTextCharFormat xmlElementFormat;
     xmlElementFormat.setForeground(Qt::blue);
-    rule.pattern = QRegularExpression(QLatin1String("(?<=[<\\/])\\b[A-Za-z0-9_]+"));
+    rule.pattern = QRegularExpression(QStringLiteral("(?<=[<\\/])\\b[A-Za-z0-9_]+"));
     rule.format = xmlElementFormat;
     m_highlightingRules.append(rule);
 
     // < Text= >
     QTextCharFormat xmlAttributeFormat;
     xmlAttributeFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegularExpression(QLatin1String("\\b[A-Za-z0-9_]+(?=\\=)"));
+    rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\=)"));
     rule.format = xmlAttributeFormat;
     m_highlightingRules.append(rule);
 
     // <!-- Text -->
     QTextCharFormat singleLineCommentFormat;
     singleLineCommentFormat.setForeground(Qt::gray);
-    rule.pattern = QRegularExpression(QLatin1String("<!--[^\n]*-->"));
+    rule.pattern = QRegularExpression(QStringLiteral("<!--[^\n]*-->"));
     rule.format = singleLineCommentFormat;
     m_highlightingRules.append(rule);
 
     // = "Text"
-    m_valueFormat.setForeground(Qt::magenta);
-    m_valueFormat.setFontWeight(QFont::Bold);
-    m_valueStartExpression.setPattern(QLatin1String("\""));
-    m_valueEndExpression.setPattern(QLatin1String("\"(?=[\\s></])"));
+    QTextCharFormat valueFormat;
+    valueFormat.setForeground(Qt::magenta);
+    valueFormat.setFontWeight(QFont::Bold);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<=[=>])\".*\""),
+                                      QRegularExpression::InvertedGreedinessOption);
+    rule.format = valueFormat;
+    m_highlightingRules.append(rule);
 }
 
-void taste3::templating::XMLHighlighter::highlightBlock(const QString &text)
+void XMLHighlighter::highlightBlock(const QString &text)
 {
     //for every pattern
-    foreach (const HighlightingRule &rule, m_highlightingRules)
-    {
+    for (const HighlightingRule &rule : m_highlightingRules) {
         QRegularExpression expression(rule.pattern);
+        if (!expression.isValid()) {
+            qWarning() << Q_FUNC_INFO << expression.errorString() << expression.pattern();;
+            continue;
+        }
         QRegularExpressionMatchIterator it = expression.globalMatch(text);
 
         while (it.hasNext()) {
@@ -88,29 +93,6 @@ void taste3::templating::XMLHighlighter::highlightBlock(const QString &text)
             int length = match.capturedLength();
             this->setFormat(index, length, rule.format);
         }
-    }
-
-    setCurrentBlockState(0);
-    int startIndex = 0;
-
-    if (previousBlockState() != 1)
-        startIndex = text.indexOf(m_valueStartExpression);
-
-    while (startIndex >= 0)
-    {
-        QRegularExpressionMatch endMatch;
-        int endIndex = text.indexOf(m_valueEndExpression, startIndex, &endMatch);
-        int commentLength;
-
-        if (endIndex == -1) {
-            setCurrentBlockState(1);
-            commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex + endMatch.capturedLength();
-        }
-
-        setFormat(startIndex, commentLength, m_valueFormat);
-        startIndex = text.indexOf(m_valueStartExpression, startIndex + commentLength);
     }
 }
 

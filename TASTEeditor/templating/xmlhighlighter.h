@@ -44,10 +44,6 @@ private:
         QTextCharFormat format;
     };
     QVector<HighlightingRule> m_highlightingRules;
-
-    QTextCharFormat m_valueFormat;
-    QRegularExpression m_valueStartExpression;
-    QRegularExpression m_valueEndExpression;
 };
 
 } // ns processing

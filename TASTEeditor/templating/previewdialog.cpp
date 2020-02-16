@@ -21,7 +21,7 @@
 #include "templatehighlighter.h"
 #include "xmlhighlighter.h"
 
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QDialogButtonBox>
 #include <QBoxLayout>
 #include <QApplication>
@@ -32,6 +32,11 @@
 #include <QSplitter>
 #include <QPushButton>
 #include <QTextStream>
+#include <QFileDialog>
+#include <QTabWidget>
+#include <QDebug>
+#include <QCheckBox>
+#include <QGroupBox>
 
 namespace taste3 {
 namespace templating {
@@ -39,33 +44,38 @@ namespace templating {
 PreviewDialog::PreviewDialog(QWidget *parent)
     : QDialog(parent)
     , m_stringTemplate(new templating::StringTemplate(this))
-    , m_templateTextEdit(new QTextEdit(this))
-    , m_resultTextEdit(new QTextEdit(this))
+    , m_templatesTabWidget(new QTabWidget(this))
+    , m_resultTextEdit(new QPlainTextEdit(this))
 {
     setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
     setWindowState(Qt::WindowMaximized);
-
-    QFont textFont(QStringLiteral("Courier"));
-    m_templateTextEdit->setFont(textFont);
-    m_resultTextEdit->setFont(textFont);
-
-    new TemplateHighlighter(m_templateTextEdit->document());
-    new XMLHighlighter(m_resultTextEdit->document());
 
     QDesktopWidget *desktop = QApplication::desktop();
     QRect geometry = desktop->availableGeometry(this);
     setMinimumSize(geometry.width() * 0.8, geometry.height() * 0.8);
 
+    QFont textFont(QStringLiteral("Courier"));
+    m_resultTextEdit->setFont(textFont);
+    m_resultTextEdit->setWordWrapMode(QTextOption::NoWrap);
+    new XMLHighlighter(m_resultTextEdit->document());
+
+    m_templatesTabWidget->setTabPosition(QTabWidget::South);
+    addTemplateEditor();
+
     QSplitter *splitter = new QSplitter(this);
-    splitter->addWidget(m_templateTextEdit);
+    splitter->addWidget(m_templatesTabWidget);
     splitter->addWidget(m_resultTextEdit);
 
     QDialogButtonBox *templateButtonBox = new QDialogButtonBox(this);
     templateButtonBox->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Open | QDialogButtonBox::Apply);
-    templateButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save &Template"));
+    templateButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save &Template As.."));
     templateButtonBox->button(QDialogButtonBox::Open)->setText(tr("&Open Template"));
+    templateButtonBox->button(QDialogButtonBox::Apply)->setText(tr("&Apply and Save"));
 
-    QLabel *indentLabel = new QLabel(tr("XML Auto-formatting Indent:"), this);
+    QCheckBox *validateXMLCheckBox = new QCheckBox(tr("Validate and Format XML-document"), this);
+    validateXMLCheckBox->setChecked(true);
+
+    QLabel *indentLabel = new QLabel(tr("Auto-formatting Indent:"), this);
 
     QSpinBox *indentSpinBox = new QSpinBox(this);
     indentSpinBox->setRange(0, 10);
@@ -76,10 +86,10 @@ PreviewDialog::PreviewDialog(QWidget *parent)
 
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(templateButtonBox);
-    hBoxLayout->addStretch(2);
+    hBoxLayout->addStretch();
+    hBoxLayout->addWidget(validateXMLCheckBox);
     hBoxLayout->addWidget(indentLabel);
     hBoxLayout->addWidget(indentSpinBox);
-    hBoxLayout->addStretch(1);
     hBoxLayout->addWidget(resultButtonBox);
 
     QVBoxLayout *vLayout = new QVBoxLayout;
@@ -89,11 +99,12 @@ PreviewDialog::PreviewDialog(QWidget *parent)
 
     connect(m_stringTemplate, &StringTemplate::errorOccurred, this, &PreviewDialog::onErrorOccurred, Qt::QueuedConnection);
     connect(templateButtonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &PreviewDialog::onApplyTemplate);
-    connect(templateButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this, &PreviewDialog::onSaveTemplate);
+    connect(templateButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this, &PreviewDialog::onSaveTemplateAs);
     connect(templateButtonBox->button(QDialogButtonBox::Open), &QPushButton::clicked, this, &PreviewDialog::onOpenTemplate);
-    connect(templateButtonBox, &QDialogButtonBox::rejected, this, &PreviewDialog::reject);
+    connect(validateXMLCheckBox, &QCheckBox::toggled, this, &PreviewDialog::onValidateXMLToggled);
+    connect(validateXMLCheckBox, &QCheckBox::toggled, indentSpinBox, &QSpinBox::setEnabled);
     connect(indentSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &PreviewDialog::onIndentChanged);
-    connect(resultButtonBox, &QDialogButtonBox::accepted, this, &PreviewDialog::accept);
+    connect(resultButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this, &PreviewDialog::onSaveResult);
     connect(resultButtonBox, &QDialogButtonBox::rejected, this, &PreviewDialog::reject);
 }
 
@@ -102,47 +113,91 @@ PreviewDialog::PreviewDialog(QWidget *parent)
  * @param grouppedObjects groupped objects which are used as replacement in template
  * @param templateFileName name of template file
  */
-void PreviewDialog::parse(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
+bool PreviewDialog::parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
 {
-    QFile templateFile(templateFileName);
-    if (templateFile.open(QIODevice::ReadOnly)) {
-        QTextStream stream(&templateFile);
-        m_templateTextEdit->setText(stream.readAll());
-
-        const QString& result = m_stringTemplate->parseFile(grouppedObjects, templateFileName);
-        m_resultTextEdit->setText(result);
-    }
-    else {
-        m_templateTextEdit->clear();
-        m_resultTextEdit->clear();
-        onErrorOccurred(tr("Unable to open template file: %").arg(templateFileName));
-    }
+    m_grouppedObjects = grouppedObjects;
+    m_templateFileName = templateFileName;
 
     open();
+    return parseTemplate();
+}
+
+bool PreviewDialog::saveResultToFile(const QString &fileName)
+{
+    QFile outputFile(fileName);
+    if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+        QTextStream stream(&outputFile);
+        stream << resultText();
+        return true;
+    }
+    return false;
 }
 
 /**
  * @brief PreviewDialog::text returns generated and formatted XML text document
  * @return
  */
-QString PreviewDialog::text() const
+QString PreviewDialog::resultText() const
 {
     return m_resultTextEdit->toPlainText();
 }
 
 void PreviewDialog::onApplyTemplate()
 {
+    for (int tabIndex = 0; tabIndex < m_templatesTabWidget->count(); ++tabIndex) {
+        QPlainTextEdit *templateTextEdit = static_cast<QPlainTextEdit *>(m_templatesTabWidget->widget(tabIndex));
 
+        const QString &templateFileName = m_templatesTabWidget->tabText(tabIndex);
+        const QString &templateFilePath = m_openedTemplates.value(templateFileName);
+        QFile file(templateFilePath);
+        if (!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+            onErrorOccurred(tr("Unable to open template file: %1").arg(templateFilePath));
+            return;
+        }
+
+        QTextStream stream(&file);
+        stream << templateTextEdit->toPlainText();
+    }
+
+    parseTemplate();
 }
 
-void PreviewDialog::onSaveTemplate()
+void PreviewDialog::onSaveTemplateAs()
 {
+    const QString &templateFileName = m_templatesTabWidget->tabText(m_templatesTabWidget->currentIndex());
+    const QString &templateFilePath = m_openedTemplates.value(templateFileName);
 
+    const QString &newTemplateFileName = QFileDialog::getSaveFileName(this, tr("Save template as"), templateFilePath);
+    if (newTemplateFileName.isEmpty())
+        return;
+
+    QFile file(newTemplateFileName);
+    if (!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+        onErrorOccurred(tr("Unable to open template file: %").arg(newTemplateFileName));
+        return;
+    }
+
+    QPlainTextEdit *templateTextEdit = static_cast<QPlainTextEdit *>(m_templatesTabWidget->currentWidget());
+    QTextStream stream(&file);
+    stream << templateTextEdit->toPlainText();
 }
 
 void PreviewDialog::onOpenTemplate()
 {
+    const QString &newTemplateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file"), m_templateFileName);
+    if (newTemplateFileName.isEmpty())
+        return;
 
+    parseTemplate(m_grouppedObjects, newTemplateFileName);
+}
+
+void PreviewDialog::onSaveResult()
+{
+    const QString &outputFileName = QFileDialog::getSaveFileName(this, tr("Save result to file"), QString(), QStringLiteral("*.xml"));
+    if (outputFileName.isEmpty())
+        return;
+
+    saveResultToFile(outputFileName);
 }
 
 /**
@@ -150,9 +205,16 @@ void PreviewDialog::onOpenTemplate()
  * if any error is occurred during generating of XML document
  * @param error
  */
-void PreviewDialog::onErrorOccurred(const QString &error)
+void PreviewDialog::onErrorOccurred(const QString &errorString)
 {
-    QMessageBox::warning(this, tr("Error occurred"), error);
+    QMessageBox::warning(this, tr("Error occurred"), errorString);
+}
+
+void PreviewDialog::onValidateXMLToggled(bool validate)
+{
+    m_stringTemplate->setValidateXMLDocument(validate);
+    if (validate)
+        onApplyTemplate();
 }
 
 /**
@@ -163,7 +225,82 @@ void PreviewDialog::onIndentChanged(int value)
 {
     m_stringTemplate->setAutoFormattingIndent(value);
     const QString& result = m_stringTemplate->formatText(m_resultTextEdit->toPlainText());
-    m_resultTextEdit->setText(result);
+    m_resultTextEdit->setPlainText(result);
+}
+
+QPlainTextEdit *PreviewDialog::addTemplateEditor(const QString &tabLabel)
+{
+    QPlainTextEdit *templateTextEdit = new QPlainTextEdit();
+    templateTextEdit->setWordWrapMode(QTextOption::NoWrap);
+    templateTextEdit->setFont(m_resultTextEdit->font());
+
+    new TemplateHighlighter(templateTextEdit->document());
+
+    m_templatesTabWidget->addTab(templateTextEdit, tabLabel);
+    return templateTextEdit;
+}
+
+bool PreviewDialog::parseTemplate()
+{
+    m_openedTemplates.clear();
+
+    m_templatesTabWidget->setUpdatesEnabled(false);
+    int tabIndex = m_templatesTabWidget->count();
+    while (m_templatesTabWidget->count() > 1)
+        m_templatesTabWidget->removeTab(tabIndex--);
+
+    QFile templateFile(m_templateFileName);
+    if (templateFile.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream stream(&templateFile);
+        QPlainTextEdit *templateTextEdit = static_cast<QPlainTextEdit *>(m_templatesTabWidget->widget(0));
+        templateTextEdit->setPlainText(stream.readAll());
+
+        QFileInfo fileInfo(templateFile);
+
+        m_openedTemplates[fileInfo.fileName()] = fileInfo.absoluteFilePath();
+        m_templatesTabWidget->setTabText(0, fileInfo.fileName());
+
+        openIncludedTemplates(templateTextEdit);
+
+        m_templatesTabWidget->setUpdatesEnabled(true);
+
+        const QString &result = m_stringTemplate->parseFile(m_grouppedObjects, m_templateFileName);
+        m_resultTextEdit->setPlainText(result);
+        return !result.isEmpty();
+    }
+
+    m_templatesTabWidget->setUpdatesEnabled(true);
+
+    onErrorOccurred(tr("Unable to open template file: %").arg(m_templateFileName));
+    return false;
+}
+
+void PreviewDialog::openIncludedTemplates(const QPlainTextEdit *templateTextEdit)
+{
+    QFileInfo fileInfo(m_templateFileName);
+
+    const QString &text = templateTextEdit->toPlainText();
+
+    QRegularExpression expression(QStringLiteral("(?<=\\b(include|extends)\\s\")\\w+\\.?\\w*(?=\")"));
+    QRegularExpressionMatchIterator it = expression.globalMatch(text);
+
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        const QString templateName = match.captured();
+        if (m_openedTemplates.contains(templateName))
+            continue;
+
+        QFile file(fileInfo.absolutePath() + QLatin1Char('/') + templateName);
+        if (file.open(QFile::ReadOnly | QFile::Text)) {
+            m_openedTemplates[templateName] = file.fileName();
+            QPlainTextEdit *includedTemplateTextEdit = addTemplateEditor(templateName);
+            includedTemplateTextEdit->setPlainText(file.readAll());
+            openIncludedTemplates(includedTemplateTextEdit);
+        }
+        else {
+            onErrorOccurred(tr("Unable to open included template file: %").arg(templateName));
+        }
+    }
 }
 
 } // ns processing

@@ -32,17 +32,20 @@ namespace templating {
 StringTemplate::StringTemplate(QObject *parent)
     : QObject(parent)
     , m_engine(new Grantlee::Engine(this))
+    , m_fileLoader(QSharedPointer<Grantlee::FileSystemTemplateLoader>::create())
+    , m_validateXMLDocument(true)
     , m_autoFormattingIndent(4)
 {
-    QSharedPointer<Grantlee::FileSystemTemplateLoader> loader(new Grantlee::FileSystemTemplateLoader());
-    m_engine->addTemplateLoader(loader);
     m_engine->setSmartTrimEnabled(true);
+
+    auto cache = QSharedPointer<Grantlee::CachingLoaderDecorator>::create(m_fileLoader);
+    m_engine->addTemplateLoader(cache);
 }
 
 /**
  * @brief StringTemplate::parseFile parses template file
  * @param grouppedObjects objects which are groupped by type name.
- *  Type names can be Functions, Connections, Comments and etc.
+ * Type names can be Functions, Connections, Comments and etc.
  * @param templateFileName name of template file
  * @return generated and formatted XML text document
  */
@@ -50,8 +53,10 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
 {
     QFileInfo fileInfo(templateFileName);
 
-    auto loader = m_engine->templateLoaders().first().staticCast<Grantlee::FileSystemTemplateLoader>();
-    loader->setTemplateDirs({ fileInfo.absolutePath() });
+    auto cache = m_engine->templateLoaders().first().staticCast<Grantlee::CachingLoaderDecorator>();
+    cache->clear();
+
+    m_fileLoader->setTemplateDirs({ fileInfo.absolutePath() });
 
     m_engine->setPluginPaths({ GRANTLEE_LIB_DIR, QApplication::applicationDirPath() });
 
@@ -67,7 +72,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
         return QString();
     }
 
-    const QString& result = stringTemplate->render(&context).trimmed();
+    const QString &result = stringTemplate->render(&context).trimmed();
     return formatText(result);
 }
 
@@ -77,8 +82,11 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
  * @param text input text
  * @return formatted text
  */
-QString StringTemplate::formatText(const QString &text) const
+QString StringTemplate::formatText(const QString &text)
 {
+    if (!m_validateXMLDocument)
+        return text;
+
     QString formattedText;
     QXmlStreamWriter xmlWriter(&formattedText);
     xmlWriter.setAutoFormatting(true);
@@ -87,7 +95,7 @@ QString StringTemplate::formatText(const QString &text) const
     QXmlStreamReader xmlReader(text);
     while (!xmlReader.atEnd()) {
         xmlReader.readNext();
-        if (xmlReader.isWhitespace() || xmlReader.isStartDocument() || xmlReader.isEndDocument())
+        if (xmlReader.isWhitespace())
             continue;
         if (xmlReader.hasError())
             break;
@@ -95,12 +103,19 @@ QString StringTemplate::formatText(const QString &text) const
     }
 
     if (xmlReader.hasError()) {
-//        emit errorOccurred(tr("Error: %1, error line: %2:%3").arg(xmlReader.errorString())
-//                           .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()));
+        const QString &errorString = tr("Error: %1, error line: %2:%3").arg(xmlReader.errorString())
+                                   .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber());
+        qWarning() << Q_FUNC_INFO << errorString;
+        emit errorOccurred(errorString);
         return text;
     }
 
     return formattedText.trimmed();
+}
+
+bool StringTemplate::isValidateXMLDocument() const
+{
+    return m_validateXMLDocument;
 }
 
 /**
@@ -110,6 +125,11 @@ QString StringTemplate::formatText(const QString &text) const
 int StringTemplate::autoFormattingIndent() const
 {
     return m_autoFormattingIndent;
+}
+
+void StringTemplate::setValidateXMLDocument(bool validate)
+{
+    m_validateXMLDocument = validate;
 }
 
 /**

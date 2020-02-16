@@ -19,9 +19,11 @@
 #define STRINGTEMPLATE_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 namespace Grantlee {
     class Engine;
+    class FileSystemTemplateLoader;
 }
 
 namespace taste3 {
@@ -46,11 +48,13 @@ public:
 
     QString parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
 
-    QString formatText(const QString &text) const;
+    QString formatText(const QString &text);
 
+    bool isValidateXMLDocument() const;
     int autoFormattingIndent() const;
 
 public slots:
+    void setValidateXMLDocument(bool validate);
     void setAutoFormattingIndent(int autoFormattingIndent);
 
 signals:
@@ -58,6 +62,8 @@ signals:
 
 private:
     Grantlee::Engine *m_engine;
+    QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
+    bool m_validateXMLDocument;
     int m_autoFormattingIndent;
 };
 

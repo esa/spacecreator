@@ -70,7 +70,6 @@ protected:
     void saveSceneRender(const QString &filePath) const;
 
     bool parseTemplateFile(const QString &templateFileName);
-    bool exportToFile(const QString &outputFileName);
 
 protected Q_SLOTS:
     void onOpenFileRequested();
@@ -82,7 +81,6 @@ protected Q_SLOTS:
     void onAboutRequested();
     void onTabSwitched(int);
     void onReportRequested();
-    void onSaveParsedTemplateToFile();
 
 private:
     static constexpr int TABDOC_ID_InterfaceView { 0 };

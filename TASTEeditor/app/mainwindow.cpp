@@ -306,15 +306,6 @@ void MainWindow::onReportRequested()
     dialog->exec();
 }
 
-void MainWindow::onSaveParsedTemplateToFile()
-{
-    const QString& outputFileName = QFileDialog::getSaveFileName(m_previewDialog, tr("Save file"), QString(), QStringLiteral("*.xml"));
-    if (outputFileName.isEmpty())
-        return;
-
-    exportToFile(outputFileName);
-}
-
 void MainWindow::initTabs()
 {
     using namespace document;
@@ -391,34 +382,12 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
             grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
         }
 
-        if (!m_previewDialog) {
+        if (!m_previewDialog)
             m_previewDialog = new templating::PreviewDialog(this);
-            connect(m_previewDialog, &templating::PreviewDialog::accepted, this, &MainWindow::onSaveParsedTemplateToFile);
-        }
 
-        m_previewDialog->parse(grouppedObjects, templateFileName);
-        const QString& output = m_previewDialog->text();
-        return !output.isEmpty();
+        return m_previewDialog->parseTemplate(grouppedObjects, templateFileName);
     }
 
-    return false;
-}
-
-bool MainWindow::exportToFile(const QString &outputFileName)
-{
-    if (!m_previewDialog)
-        return false;
-
-    const QString& text = m_previewDialog->text();
-    if (text.isEmpty())
-        return false;;
-
-    QFile outputFile(outputFileName);
-    if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
-        QTextStream stream(&outputFile);
-        stream << text;
-        return true;
-    }
     return false;
 }
 
@@ -445,8 +414,8 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
             return parseTemplateFile(value);
         return false;
     case CommandLineParser::Positional::ExportToFile:
-        if (!value.isEmpty())
-            return exportToFile(value);
+        if (!value.isEmpty() && m_previewDialog)
+            return m_previewDialog->saveResultToFile(value);
         return false;
     case CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
