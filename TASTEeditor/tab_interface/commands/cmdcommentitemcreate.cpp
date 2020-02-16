@@ -29,9 +29,9 @@ namespace cmd {
 CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *parent,
                                            const QRectF &geometry)
     : m_model(model)
-    , m_geometry(geometry)
-    , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_model))
     , m_parent(parent)
+    , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_parent))
+    , m_geometry(geometry)
 {
     setText(QObject::tr("Create Comment"));
 }

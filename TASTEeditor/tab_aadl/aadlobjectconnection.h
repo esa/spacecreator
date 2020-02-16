@@ -18,6 +18,7 @@
 #pragma once
 
 #include "aadlobject.h"
+#include "aadlobjectiface.h"
 
 #include <QObject>
 #include <memory>
@@ -25,7 +26,6 @@
 namespace taste3 {
 namespace aadl {
 
-class AADLObjectIface;
 struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
 {
@@ -41,8 +41,6 @@ class AADLObjectConnection : public AADLObject
 public:
     explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
                                   AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
-    explicit AADLObjectConnection(AADLObject *from, AADLObject *to, QObject *parent = nullptr);
-    explicit AADLObjectConnection(QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
     AADLObjectType aadlType() const override;
@@ -70,9 +68,37 @@ public:
     bool targetInterfaceIsRequired() const;
     bool targetInterfaceIsProvided() const;
 
+    void inheritLabel();
+    void uninheritLabel();
+
+    template<class T>
+    static inline const T selectIface(const AADLObjectIface *a, const AADLObjectIface *b)
+    {
+        T ptr { nullptr };
+        if (a)
+            ptr = a->as<T>();
+        if (!ptr && b)
+            ptr = b->as<T>();
+
+        return ptr;
+    }
+
+    template<class T>
+    inline const T selectIface() const
+    {
+        return selectIface<T>(sourceInterface(), targetInterface());
+    }
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
     void updateAttributes();
+
+    enum class LabelInheritancePolicy
+    {
+        Set = 0,
+        Unset
+    };
+    void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
 };
 
 } // ns aadl

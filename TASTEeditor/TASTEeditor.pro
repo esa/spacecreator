@@ -124,13 +124,16 @@ SOURCES += \
         tab_interface/commands/cmdifaceparamremove.cpp \
         tab_interface/commands/cmdinterfaceitemcreate.cpp \
         tab_interface/commands/commandsfactory.cpp \
+        tab_interface/connectioncreationvalidator.cpp \
         tab_interface/creatortool.cpp \
+        tab_interface/graphicsitemhelpers.cpp \
         tab_interface/interfacetabdocument.cpp \
         tab_interface/interfacetabgraphicsscene.cpp \
         tab_interface/properties/adddynamicropertydialog.cpp \
         tab_interface/properties/contextparametersmodel.cpp \
         tab_interface/properties/delegates/comboboxdelegate.cpp \
         tab_interface/properties/delegates/functionattrdelegate.cpp \
+        tab_interface/properties/delegates/interfaceattrdelegate.cpp \
         tab_interface/properties/delegates/propertytypedelegate.cpp \
         tab_interface/properties/dynamicproperty.cpp \
         tab_interface/properties/dynamicpropertyconfig.cpp \
@@ -232,13 +235,16 @@ HEADERS += \
         tab_interface/commands/cmdinterfaceitemcreate.h \
         tab_interface/commands/commandids.h \
         tab_interface/commands/commandsfactory.h \
+        tab_interface/connectioncreationvalidator.h \
         tab_interface/creatortool.h \
+        tab_interface/graphicsitemhelpers.h \
         tab_interface/interfacetabdocument.h \
         tab_interface/interfacetabgraphicsscene.h \
         tab_interface/properties/adddynamicpropertydialog.h \
         tab_interface/properties/contextparametersmodel.h \
         tab_interface/properties/delegates/comboboxdelegate.h \
         tab_interface/properties/delegates/functionattrdelegate.h \
+        tab_interface/properties/delegates/interfaceattrdelegate.h \
         tab_interface/properties/delegates/propertytypedelegate.h \
         tab_interface/properties/dynamicproperty.h \
         tab_interface/properties/dynamicpropertyconfig.h \

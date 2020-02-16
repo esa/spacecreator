@@ -68,6 +68,8 @@ protected:
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
+    void updateLabel();
+    void updateKind();
 
 private:
     QGraphicsPathItem *m_type = nullptr;
@@ -75,6 +77,8 @@ private:
     QGraphicsTextItem *m_text = nullptr;
     QList<QPointer<AADLConnectionGraphicsItem>> m_connections;
     QPainterPath m_shape;
+
+    QString ifaceLabel() const;
 };
 
 } // namespace aadl

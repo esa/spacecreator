@@ -40,6 +40,7 @@ namespace aadl {
 
 AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
+    , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
     , m_text(new QGraphicsTextItem(this))
 {
@@ -47,55 +48,33 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    QPainterPath kindPath;
-    const QString kind = entity->kind();
-    if (kind == QStringLiteral("CYCLIC_OPERATION")) {
-        const qreal kindBaseValue = kHeight;
-        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
-                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
-                       -90, -270);
-        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
-        kindPath.addPolygon(
-                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
-                                   kindPath.currentPosition(),
-                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
-        kindPath.translate(0, kindBaseValue / 2);
-    } else if (kind == QStringLiteral("SPORADIC_OPERATION")) {
-        const qreal kindBaseValue = kHeight;
-        kindPath.moveTo(-kindBaseValue / 2, 0);
-        kindPath.lineTo(0, -kindBaseValue / 4);
-        kindPath.lineTo(0, kindBaseValue / 4);
-        kindPath.lineTo(kindBaseValue / 2, 0);
-    } else if (kind == QStringLiteral("PROTECTED_OPERATION")) {
-        const qreal kindBaseValue = kHeight;
-        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
-        kindPath.addRoundedRect(rect, 2, 2);
-        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
-        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
-        kindPath.moveTo(arcRect.center());
-        kindPath.arcTo(arcRect, 0, 180);
-        kindPath.translate(0, rect.height() / 3);
-    }
-    m_type = new QGraphicsPathItem(kindPath, this);
+    updateKind();
 
     QPainterPath pp;
     pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
-    m_text->setPlainText(entity->interfaceName());
+    m_text->setPlainText(ifaceLabel());
 
-    QObject::connect(entity, &AADLObject::attributeChanged, [this, entity](taste3::aadl::meta::Props::Token attr) {
-        if (attr == taste3::aadl::meta::Props::Token::name) {
-            if (m_text->toPlainText() != entity->title())
-                m_text->setPlainText(entity->title());
-            instantLayoutUpdate();
+    connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
+        switch (attr) {
+        case taste3::aadl::meta::Props::Token::name:
+        case taste3::aadl::meta::Props::Token::labelInheritance: {
+            updateLabel();
+            break;
+        }
+        case taste3::aadl::meta::Props::Token::kind:
+            updateKind();
+            break;
+        default:
+            break;
         }
     });
-    QObject::connect(entity, &AADLObjectIface::titleChanged, [this](const QString &text) {
-        m_text->setPlainText(text);
-        instantLayoutUpdate();
-    });
+    QObject::connect(entity, &AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity))
+        QObject::connect(ri, &AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+                         &AADLInterfaceGraphicsItem::updateLabel);
 
     colorSchemeUpdated();
 }
@@ -111,7 +90,6 @@ void AADLInterfaceGraphicsItem::addConnection(AADLConnectionGraphicsItem *item)
         return;
 
     m_connections.append(item);
-    setFlag(QGraphicsItem::ItemIsSelectable, m_connections.isEmpty());
 }
 
 void AADLInterfaceGraphicsItem::removeConnection(AADLConnectionGraphicsItem *item)
@@ -359,7 +337,7 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    setInterfaceName(obj->title());
+    setInterfaceName(ifaceLabel());
 
     const QPointF coordinates = utils::pos(obj->coordinates());
     if (coordinates.isNull())
@@ -391,7 +369,7 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, c
 {
     Q_UNUSED(from)
 
-    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull())
+    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
         return;
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
@@ -435,6 +413,72 @@ void AADLInterfaceGraphicsItem::colorSchemeUpdated()
     m_iface->setPen(pen);
     m_iface->setBrush(h.brush());
     update();
+}
+
+void AADLInterfaceGraphicsItem::updateLabel()
+{
+    const QString &label = ifaceLabel();
+    if (label != m_text->toPlainText()) {
+        m_text->setPlainText(label);
+        instantLayoutUpdate();
+    }
+}
+
+void AADLInterfaceGraphicsItem::updateKind()
+{
+    AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(aadlObject());
+    if (!iface)
+        return;
+
+    QPainterPath kindPath;
+    switch (iface->kind()) {
+    case AADLObjectIface::OperationKind::Cyclic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
+                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
+                       -90, -270);
+        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
+        kindPath.addPolygon(
+                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
+                                   kindPath.currentPosition(),
+                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
+        kindPath.translate(0, kindBaseValue / 2);
+        break;
+    }
+    case AADLObjectIface::OperationKind::Sporadic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.moveTo(-kindBaseValue / 2, 0);
+        kindPath.lineTo(0, -kindBaseValue / 4);
+        kindPath.lineTo(0, kindBaseValue / 4);
+        kindPath.lineTo(kindBaseValue / 2, 0);
+        break;
+    }
+    case AADLObjectIface::OperationKind::Protetcted: {
+        const qreal kindBaseValue = kHeight;
+        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
+        kindPath.addRoundedRect(rect, 2, 2);
+        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
+        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
+        kindPath.moveTo(arcRect.center());
+        kindPath.arcTo(arcRect, 0, 180);
+        kindPath.translate(0, rect.height() / 3);
+    }
+    default:
+        break;
+    }
+    m_type->setPath(kindPath);
+}
+
+QString AADLInterfaceGraphicsItem::ifaceLabel() const
+{
+    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
+        if (ri->inheritPi()) {
+            const QStringList &labels = ri->inheritedLables();
+            if (labels.size())
+                return labels.join(", ");
+        }
+    }
+    return entity()->title();
 }
 
 } // namespace aadl

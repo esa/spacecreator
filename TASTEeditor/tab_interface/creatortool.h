@@ -82,18 +82,21 @@ private:
     void clearPreviewItem();
 
     void handleToolType(CreatorTool::ToolType type, const QPointF &pos);
-    bool handleConnectionCreate(QGraphicsScene *scene, const QPointF &pos);
 
     void handleComment(QGraphicsScene *scene, const QPointF &pos);
     void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
     void handleFunction(QGraphicsScene *scene, const QPointF &pos);
     void handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos);
-    void handleDirectConnection(QGraphicsScene *scene, const QPointF &pos);
+    bool handleConnectionCreate(const QPointF &pos);
+    void handleDirectConnection(const QPointF &pos);
+    void handleConnection(const QVector<QPointF> &connectionPoints) const;
 
     QMenu *populateContextMenu(const QPointF &scenePos);
     void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
     void populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos);
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
+
+    bool warnConnectionPreview(const QPointF &pos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };

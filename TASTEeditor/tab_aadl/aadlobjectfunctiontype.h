@@ -75,7 +75,7 @@ public:
     void setContextParams(const QVector<ContextParameter> &params);
 
     void setAttr(const QString &name, const QVariant &val) override;
-
+    bool isFunctionType() const;
     QVector<QPointer<AADLObjectFunction>> instances() const;
     void rememberInstance(AADLObjectFunction *function);
     void forgetInstance(AADLObjectFunction *function);

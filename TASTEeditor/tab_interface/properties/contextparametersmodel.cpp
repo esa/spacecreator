@@ -146,7 +146,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
 
         if (const auto attributesCmd = cmd::CommandsFactory::create(
                     cmd::ChangeContextParameter,
-                    { qVariantFromValue(m_dataObject), qVariantFromValue(paramOld), qVariantFromValue(paramNew) })) {
+                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld), QVariant::fromValue(paramNew) })) {
 
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -166,7 +166,7 @@ bool ContextParametersModel::createProperty(const QString &propName)
     param.setParamType(BasicParameter::Type::Timer);
 
     const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateContextParameter,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(param) });
+                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
     if (propsCmd) {
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
@@ -189,7 +189,7 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
 
     const int row(index.row());
     const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveContextParameter,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(row) });
+                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);

@@ -142,14 +142,14 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         if (isAttr(index) && index.column() == ColumnValue) {
             const QVariantMap attributes = { { name, value } };
             const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes, { qVariantFromValue(m_dataObject), qVariantFromValue(attributes) });
+                    cmd::ChangeEntityAttributes, { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
                 const QVariantMap props = { { name, value } };
                 const auto propsCmd = cmd::CommandsFactory::create(
-                        cmd::ChangeEntityProperty, { qVariantFromValue(m_dataObject), qVariantFromValue(props) });
+                        cmd::ChangeEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
                 taste3::cmd::CommandsStack::current()->push(propsCmd);
 
                 break;
@@ -160,7 +160,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                     return false;
                 const QHash<QString, QString> props = { { name, newName } };
                 const auto propsCmd = cmd::CommandsFactory::create(
-                        cmd::RenameEntityProperty, { qVariantFromValue(m_dataObject), qVariantFromValue(props) });
+                        cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
                 taste3::cmd::CommandsStack::current()->push(propsCmd);
                 m_names.replace(m_names.indexOf(name), newName);
                 break;
@@ -188,7 +188,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
 
     const QVariantMap props = { { propName, QString() } };
     const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateEntityProperty,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(props) });
+                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         res = true;
@@ -215,7 +215,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     const QString &propName = propId.data().toString();
     const QStringList props { propName };
     const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveEntityProperty,
-                                                       { qVariantFromValue(m_dataObject), qVariantFromValue(props) });
+                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);

@@ -112,7 +112,7 @@ public:
     QVariantList propList() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
-    void setProp(const QString &name, const QVariant &val);
+    virtual void setProp(const QString &name, const QVariant &val);
     void removeProp(const QString &name);
 
     void setObjectsModel(AADLObjectsModel *model);
@@ -121,6 +121,18 @@ public:
     bool isRootObject() const;
 
     virtual void postInit();
+
+    template<class T>
+    inline T as()
+    {
+        return qobject_cast<T>(this);
+    }
+
+    template<class T>
+    inline const T as() const
+    {
+        return qobject_cast<const T>(this);
+    }
 
 Q_SIGNALS:
     void titleChanged(const QString &title);

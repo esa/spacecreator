@@ -49,7 +49,14 @@ void CmdEntityRemove::redo()
     };
 
     removeAadlObjects(m_relatedIfaces);
-    removeAadlObjects(m_relatedConnections);
+
+    for (auto it = m_relatedConnections.cbegin(); it != m_relatedConnections.cend(); ++it) {
+        if (auto *connection = qobject_cast<AADLObjectConnection *>(*it))
+            connection->uninheritLabel();
+
+        m_model->removeObject(*it);
+    }
+
     removeAadlObjects(m_relatedEntities);
 
     if (m_entity)
@@ -74,7 +81,12 @@ void CmdEntityRemove::undo()
 
     restoreAadlObjects(m_relatedEntities);
     restoreAadlObjects(m_relatedIfaces);
-    restoreAadlObjects(m_relatedConnections);
+
+    for (auto it = m_relatedConnections.crbegin(); it != m_relatedConnections.crend(); ++it)
+        if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(*it)) {
+            connection->inheritLabel();
+            m_model->addObject(connection);
+        }
 
     static const QString instanceOfAttr = meta::Props::token(meta::Props::Token::instance_of);
     for (auto function : m_typedFunctions.keys())

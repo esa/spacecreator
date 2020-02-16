@@ -17,6 +17,7 @@
 
 #include "aadlfunctiongraphicsitem.h"
 
+#include "aadlcommentgraphicsitem.h"
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
@@ -168,8 +169,18 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, cons
 {
     Q_UNUSED(grip)
 
-    if (handlePositionChanged(pressedAt, releasedAt) && !isRootItem())
+    if (handlePositionChanged(pressedAt, releasedAt) && !isRootItem()) {
         createCommand();
+    } else {
+        for (auto child : childItems()) {
+            if (auto interface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
+                for (auto connection : interface->connectionItems()) {
+                    if (connection->parent() != this) // outer connections
+                        connection->updateFromEntity();
+                }
+            }
+        }
+    }
 }
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
@@ -178,10 +189,9 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
-    const QRectF contentRect = parentFunction
-            ? parentFunction->boundingRect().marginsRemoved(parentFunction->isRootItem() ? utils::kRootMargins
-                                                                                         : utils::kContentMargins)
-            : QRectF();
+    const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
+                                       parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
+                                              : QRectF();
     switch (grip) {
     case GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -242,8 +252,10 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
             setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
 
         for (QGraphicsItem *child : childItems()) {
-            if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(child->toGraphicsObject()))
-                function->moveBy(offset.x(), offset.y());
+            static const QList<int> kNestedTypes { AADLFunctionTypeGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
+                                                   AADLCommentGraphicsItem::Type };
+            if (kNestedTypes.contains(child->type()))
+                child->moveBy(offset.x(), offset.y());
         }
     }
 
@@ -316,12 +328,7 @@ void AADLFunctionGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 
 void AADLFunctionGraphicsItem::updateTextPosition()
 {
-    const QTransform tr = scene()->views().isEmpty() ? QTransform() : scene()->views().front()->viewportTransform();
-    const QTransform dt = deviceTransform(tr);
-    const QPointF currScale { dt.m11(), dt.m22() };
-
-    QRectF textRect { 0, 0, m_textItem->boundingRect().width() / currScale.x(),
-                      m_textItem->boundingRect().height() / currScale.y() };
+    QRectF textRect { m_textItem->boundingRect() };
     textRect.moveCenter(boundingRect().center());
     m_textItem->setPos(textRect.topLeft());
 }
@@ -427,22 +434,24 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 void AADLFunctionGraphicsItem::doAutoLayout()
 {
     QSizeF minSize { std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max() };
-    QList<aadl::AADLFunctionTypeGraphicsItem *> nestedFunctions;
+    QList<InteractiveObject *> nestedInteractiveObjects;
     for (auto nestedItem : childItems()) {
-        if (auto function = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(nestedItem)) {
-            nestedFunctions.append(function);
-            minSize = minSize.boundedTo(function->minimalSize());
-        } else if (auto functionType = qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(nestedItem)) {
-            nestedFunctions.append(functionType);
-            minSize = minSize.boundedTo(functionType->minimalSize());
+        static const QSet<int> acceptedTypes { aadl::AADLFunctionGraphicsItem::Type,
+                                               aadl::AADLFunctionTypeGraphicsItem::Type,
+                                               aadl::AADLCommentGraphicsItem::Type };
+        if (acceptedTypes.contains(nestedItem->type())) {
+            if (auto iObj = qobject_cast<InteractiveObject *>(nestedItem->toGraphicsObject())) {
+                nestedInteractiveObjects.append(iObj);
+                minSize = minSize.boundedTo(iObj->minimalSize());
+            }
         }
     }
 
-    if (nestedFunctions.isEmpty())
+    if (nestedInteractiveObjects.isEmpty())
         return;
 
-    const int columnCount = qCeil(qSqrt(nestedFunctions.size()));
-    const int rowCount = qCeil(qreal(nestedFunctions.size()) / columnCount);
+    const int columnCount = qCeil(qSqrt(nestedInteractiveObjects.size()));
+    const int rowCount = qCeil(qreal(nestedInteractiveObjects.size()) / columnCount);
     const QRectF itemRect =
             sceneBoundingRect().marginsRemoved(isRootItem() ? utils::kRootMargins : utils::kContentMargins);
     const QSizeF nestedSize = QSizeF { itemRect.width() / columnCount, itemRect.height() / rowCount };
@@ -455,7 +464,7 @@ void AADLFunctionGraphicsItem::doAutoLayout()
             const QPointF nestedCenter { (column + 0.5) * nestedSize.width(), (row + 0.5) * nestedSize.height() };
             nestedRect.moveCenter(nestedCenter + itemRect.topLeft());
             const int idx = row * columnCount + column;
-            if (auto item = nestedFunctions.value(idx)) {
+            if (auto item = nestedInteractiveObjects.value(idx)) {
                 const bool isItemVisible = itemRect.contains(nestedRect);
                 item->setVisible(isItemVisible);
                 if (isItemVisible)

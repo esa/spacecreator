@@ -47,8 +47,21 @@ public:
         Provided
     };
     Q_ENUM(IfaceType)
-
     static constexpr IfaceType DefaultDirection { IfaceType::Required };
+
+    enum class OperationKind
+    {
+        Any = 0,
+        Cyclic, // period, deadline, wcet
+        Sporadic, // min interval t,deadline, wcet,queuesize
+        Protetcted, // deadline, wcet
+        Unprotected, // deadline, wcet
+    };
+    Q_ENUM(OperationKind)
+
+    static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
+    static QString kindToString(AADLObjectIface::OperationKind k);
+    static AADLObjectIface::OperationKind kindFromString(const QString &k);
 
     ~AADLObjectIface() override;
 
@@ -59,37 +72,13 @@ public:
     bool isProvided() const;
     bool isRequired() const;
 
-    QString kind() const;
-    bool setKind(const QString &kind);
-
-    qint32 period() const;
-    bool setPeriod(qint32 period);
-
-    qint32 wcet() const;
-    bool setWcet(qint32 wcet);
-
-    qint32 queueSize() const;
-    bool setQueueSize(qint32 size);
+    OperationKind kind() const;
+    bool setKind(OperationKind k);
 
     QVector<IfaceParameter> params() const;
     QVariantList paramList() const;
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
-
-    QString rcmOperationKind() const;
-    bool setRcmOperationKind(const QString &kind);
-
-    QString deadline() const;
-    bool setDeadline(const QString &deadline);
-
-    QString rcmPeriod() const;
-    bool setRcmPeriod(const QString &period);
-
-    QString interfaceName() const;
-    bool setInterfaceName(const QString &name);
-
-    bool labelInheritance() const;
-    bool setLabelInheritance(bool label);
 
     AADLObjectFunction *function() const;
 
@@ -98,6 +87,11 @@ public:
 
     static AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent);
     static AADLObjectIface *cloneIface(AADLObjectIface *source, AADLObjectFunction *parent);
+
+    void setAttr(const QString &name, const QVariant &val) override;
+
+Q_SIGNALS:
+    void attrChanged_kind(AADLObjectIface::OperationKind kind);
 
 protected:
     explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
@@ -131,6 +125,26 @@ public:
     explicit AADLObjectIfaceRequired(const QString &title, AADLObject *parent = nullptr);
     explicit AADLObjectIfaceRequired(const common::Id &id, const QString &title = QString(),
                                      AADLObject *parent = nullptr);
+
+    virtual void setProp(const QString &name, const QVariant &val) override;
+
+    bool inheritPi() const;
+
+    QStringList inheritedLables() const;
+    void updatePrototype(const AADLObjectIfaceProvided *pi);
+    void unsetPrototype(const AADLObjectIfaceProvided *pi);
+
+Q_SIGNALS:
+    void propChanged_labelInheritance(bool inheritance);
+    void inheritedLabelsChanged(const QStringList &labels);
+
+protected:
+    QVector<const AADLObjectIfaceProvided *> m_prototypes;
+
+private:
+    QStringList collectInheritedLabels() const;
+    void namesForRIToPIs(QStringList &result) const;
+    void namesForRIsToPI(QStringList &result) const;
 };
 
 typedef QVector<AADLObjectIface *> AADLIfacesVector;

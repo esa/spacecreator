@@ -258,9 +258,24 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     return nullptr;
 }
 
+
 const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
 {
     return d->m_objects;
+}
+
+QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const common::Id &id) const
+{
+    QVector<AADLObjectConnection *> result;
+
+    for (auto it = d->m_objects.cbegin(); it != d->m_objects.cend(); ++it)
+        if (it.value()->aadlType() == AADLObject::AADLObjectType::AADLConnection)
+            if (auto connection = qobject_cast<AADLObjectConnection *>(it.value()))
+                if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
+                    || (connection->targetInterface() && connection->targetInterface()->id() == id))
+                    result.append(connection);
+
+    return result;
 }
 
 QList<AADLObject *> AADLObjectsModel::visibleObjects() const
