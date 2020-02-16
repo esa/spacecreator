@@ -20,9 +20,9 @@ prop.name        :           |_ Name of property
 prop.value       :           |_ Value of property
 {% endcomment %}
 {% if iface.isProvided %}
-<Provided_Interface {% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Provided_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% else %}
-<Required_Interface {% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Required_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% endif %}
 {% for param in iface.params %}
 {% if param.isIn %}

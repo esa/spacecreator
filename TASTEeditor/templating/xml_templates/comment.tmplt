@@ -13,7 +13,7 @@ prop            :       |_ Instance of property
 prop.name       :           |_ Name of property
 prop.value      :           |_ Value of property
 {% endcomment %}
-<Comment {% for attr in comm.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Comment{% for attr in comm.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% for prop in comm.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
 {% endfor %}
