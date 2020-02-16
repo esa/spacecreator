@@ -72,6 +72,7 @@ SOURCES += \
         logging/logcategory.cpp \
         logging/loghandler.cpp \
         main.cpp \
+        templating/aadlobjecttemplateproperty.cpp \
         templating/previewdialog.cpp \
         templating/stringtemplate.cpp \
         templating/templatehighlighter.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \
+        templating/aadlobjecttemplateproperty.h \
         templating/previewdialog.h \
         templating/stringtemplate.h \
         templating/templatehighlighter.h \

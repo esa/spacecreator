@@ -25,7 +25,7 @@ namespace taste3 {
 namespace templating {
 
 /**
- * @brief The TemplateHighlighter class makes highlighting for template text
+ * @brief The TemplateHighlighter class makes highlighting of template text
  */
 class TemplateHighlighter : public QSyntaxHighlighter
 {
@@ -50,7 +50,7 @@ private:
     QRegularExpression m_commentEndExpression;
 };
 
-} // ns processing
+} // ns templating
 } // ns taste3
 
 #endif // TEMPLATEHIGHLIGHTER_H

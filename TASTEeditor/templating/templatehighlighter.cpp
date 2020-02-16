@@ -22,6 +22,10 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief TemplateHighlighter::TemplateHighlighter ctor
+ * @param parent
+ */
 TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
@@ -172,6 +176,10 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     m_commentEndExpression.setPattern(QStringLiteral("{%\\s*endcomment\\s*%}"));
 }
 
+/**
+ * @brief TemplateHighlighter::highlightBlock highlights text
+ * @param text
+ */
 void TemplateHighlighter::highlightBlock(const QString &text)
 {
     //for every pattern
@@ -219,5 +227,5 @@ void TemplateHighlighter::highlightBlock(const QString &text)
     }
 }
 
-} // ns processing
+} // ns templating
 } // ns taste3

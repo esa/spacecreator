@@ -156,7 +156,7 @@ QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
     return ris() + pis();
 }
 
-QVariantList AADLObjectFunctionType::interfaceList() const
+QVariantList AADLObjectFunctionType::templateInterfaces() const
 {
     QVariantList ifaceList;
 
@@ -169,7 +169,7 @@ QVariantList AADLObjectFunctionType::interfaceList() const
     return ifaceList;
 }
 
-QVariantList AADLObjectFunctionType::nestedFunctions() const
+QVariantList AADLObjectFunctionType::templateFunctions() const
 {
     QVariantList functions;
     for (const auto child : d->m_children) {
@@ -181,7 +181,7 @@ QVariantList AADLObjectFunctionType::nestedFunctions() const
     return functions;
 }
 
-QVariantList AADLObjectFunctionType::nestedComments() const
+QVariantList AADLObjectFunctionType::templateComments() const
 {
     QVariantList comments;
     for (const auto child : d->m_children) {

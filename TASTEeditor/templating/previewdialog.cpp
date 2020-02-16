@@ -41,6 +41,10 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief PreviewDialog::PreviewDialog ctor
+ * @param parent
+ */
 PreviewDialog::PreviewDialog(QWidget *parent)
     : QDialog(parent)
     , m_stringTemplate(new templating::StringTemplate(this))
@@ -122,6 +126,11 @@ bool PreviewDialog::parseTemplate(const QHash<QString, QVariantList> &grouppedOb
     return parseTemplate();
 }
 
+/**
+ * @brief PreviewDialog::saveResultToFile saves parsed text to a file
+ * @param fileName file name
+ * @return whether the file is saved
+ */
 bool PreviewDialog::saveResultToFile(const QString &fileName)
 {
     QFile outputFile(fileName);
@@ -134,14 +143,17 @@ bool PreviewDialog::saveResultToFile(const QString &fileName)
 }
 
 /**
- * @brief PreviewDialog::text returns generated and formatted XML text document
- * @return
+ * @brief PreviewDialog::text returns generated text (and can be formatted XML)
+ * @return result text
  */
 QString PreviewDialog::resultText() const
 {
     return m_resultTextEdit->toPlainText();
 }
 
+/**
+ * @brief PreviewDialog::onApplyTemplate saves template(s) and then parses them
+ */
 void PreviewDialog::onApplyTemplate()
 {
     for (int tabIndex = 0; tabIndex < m_templatesTabWidget->count(); ++tabIndex) {
@@ -162,6 +174,9 @@ void PreviewDialog::onApplyTemplate()
     parseTemplate();
 }
 
+/**
+ * @brief PreviewDialog::onSaveTemplateAs saves the current template into a new file
+ */
 void PreviewDialog::onSaveTemplateAs()
 {
     const QString &templateFileName = m_templatesTabWidget->tabText(m_templatesTabWidget->currentIndex());
@@ -182,6 +197,9 @@ void PreviewDialog::onSaveTemplateAs()
     stream << templateTextEdit->toPlainText();
 }
 
+/**
+ * @brief PreviewDialog::onOpenTemplate opens a new template file
+ */
 void PreviewDialog::onOpenTemplate()
 {
     const QString &newTemplateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file"), m_templateFileName);
@@ -191,6 +209,9 @@ void PreviewDialog::onOpenTemplate()
     parseTemplate(m_grouppedObjects, newTemplateFileName);
 }
 
+/**
+ * @brief PreviewDialog::onSaveResult saves result test into a file
+ */
 void PreviewDialog::onSaveResult()
 {
     const QString &outputFileName = QFileDialog::getSaveFileName(this, tr("Save result to file"), QString(), QStringLiteral("*.xml"));
@@ -210,6 +231,10 @@ void PreviewDialog::onErrorOccurred(const QString &errorString)
     QMessageBox::warning(this, tr("Error occurred"), errorString);
 }
 
+/**
+ * @brief PreviewDialog::onValidateXMLToggled sets validate XML flag and parses template text
+ * @param validate
+ */
 void PreviewDialog::onValidateXMLToggled(bool validate)
 {
     m_stringTemplate->setValidateXMLDocument(validate);
@@ -228,6 +253,11 @@ void PreviewDialog::onIndentChanged(int value)
     m_resultTextEdit->setPlainText(result);
 }
 
+/**
+ * @brief PreviewDialog::addTemplateEditor creates and adds a new template editor
+ * @param tabLabel label of tab
+ * @return a new template editor
+ */
 QPlainTextEdit *PreviewDialog::addTemplateEditor(const QString &tabLabel)
 {
     QPlainTextEdit *templateTextEdit = new QPlainTextEdit();
@@ -240,6 +270,10 @@ QPlainTextEdit *PreviewDialog::addTemplateEditor(const QString &tabLabel)
     return templateTextEdit;
 }
 
+/**
+ * @brief PreviewDialog::parseTemplate opens and parses template file
+ * @return whether file is parsed successfully
+ */
 bool PreviewDialog::parseTemplate()
 {
     m_openedTemplates.clear();
@@ -253,14 +287,15 @@ bool PreviewDialog::parseTemplate()
     if (templateFile.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&templateFile);
         QPlainTextEdit *templateTextEdit = static_cast<QPlainTextEdit *>(m_templatesTabWidget->widget(0));
-        templateTextEdit->setPlainText(stream.readAll());
+        const QString &templateText = stream.readAll();
+        templateTextEdit->setPlainText(templateText);
 
         QFileInfo fileInfo(templateFile);
 
         m_openedTemplates[fileInfo.fileName()] = fileInfo.absoluteFilePath();
         m_templatesTabWidget->setTabText(0, fileInfo.fileName());
 
-        openIncludedTemplates(templateTextEdit);
+        openIncludedTemplates(templateText);
 
         m_templatesTabWidget->setUpdatesEnabled(true);
 
@@ -275,14 +310,16 @@ bool PreviewDialog::parseTemplate()
     return false;
 }
 
-void PreviewDialog::openIncludedTemplates(const QPlainTextEdit *templateTextEdit)
+/**
+ * @brief PreviewDialog::openIncludedTemplates opens all included template files in template
+ * @param templateText template text
+ */
+void PreviewDialog::openIncludedTemplates(const QString &templateText)
 {
     QFileInfo fileInfo(m_templateFileName);
 
-    const QString &text = templateTextEdit->toPlainText();
-
     QRegularExpression expression(QStringLiteral("(?<=\\b(include|extends)\\s\")\\w+\\.?\\w*(?=\")"));
-    QRegularExpressionMatchIterator it = expression.globalMatch(text);
+    QRegularExpressionMatchIterator it = expression.globalMatch(templateText);
 
     while (it.hasNext()) {
         QRegularExpressionMatch match = it.next();
@@ -294,8 +331,9 @@ void PreviewDialog::openIncludedTemplates(const QPlainTextEdit *templateTextEdit
         if (file.open(QFile::ReadOnly | QFile::Text)) {
             m_openedTemplates[templateName] = file.fileName();
             QPlainTextEdit *includedTemplateTextEdit = addTemplateEditor(templateName);
-            includedTemplateTextEdit->setPlainText(file.readAll());
-            openIncludedTemplates(includedTemplateTextEdit);
+            const QString &includedTemplateText = file.readAll();
+            includedTemplateTextEdit->setPlainText(includedTemplateText);
+            openIncludedTemplates(includedTemplateText);
         }
         else {
             onErrorOccurred(tr("Unable to open included template file: %").arg(templateName));
@@ -303,5 +341,5 @@ void PreviewDialog::openIncludedTemplates(const QPlainTextEdit *templateTextEdit
     }
 }
 
-} // ns processing
+} // ns templating
 } // ns taste3

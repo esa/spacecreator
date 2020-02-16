@@ -33,9 +33,9 @@ struct AADLObjectFunctionTypePrivate;
 class AADLObjectFunctionType : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(QVariantList interfaces READ interfaceList)  //!< List of interfaces which can be used in string templates
-    Q_PROPERTY(QVariantList functions READ nestedFunctions) //!< List of functions which can be used in string templates
-    Q_PROPERTY(QVariantList comments READ nestedComments)   //!< List of comments which can be used in string templates
+    Q_PROPERTY(QVariantList interfaces READ templateInterfaces) //!< Iinterface list for string templates
+    Q_PROPERTY(QVariantList functions READ templateFunctions)   //!< Function list for string templates
+    Q_PROPERTY(QVariantList comments READ templateComments)     //!< Comment list for string templates
 public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
@@ -58,9 +58,9 @@ public:
     bool removeInterface(AADLObjectIface *iface);
     QVector<AADLObjectIface *> interfaces() const;
 
-    QVariantList interfaceList() const;
-    QVariantList nestedFunctions() const;
-    QVariantList nestedComments() const;
+    QVariantList templateInterfaces() const;
+    QVariantList templateFunctions() const;
+    QVariantList templateComments() const;
 
     QString language() const;
     void setLanguage(const QString &lang);

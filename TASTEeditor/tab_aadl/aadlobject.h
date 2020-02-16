@@ -27,39 +27,6 @@
 namespace taste3 {
 namespace aadl {
 
-/**
- * @brief The AADLObjectProperty class is needed for string templates only.
- * It seems Grantlee doesn't fully support Django syntax like
- * @code
- *  {% for key, value in iface.properties %}
- *      <Property name="{{ key }}" value="{{ value }}"/>
- *  {% endfor %}
- * @endcode
- * Therefore AADLObject has a property "properties" and "attributes" which are lists of AADLObjectProperty
- * and thus it's possible to write like this:
- * @code
- *  {% for property in iface.properties %}
- *      <Property name="{{ property.name }}" value="{{ property.value }}"/>
- *  {% endfor %}
- * @endcode
- */
-class AADLObjectProperty
-{
-    Q_GADGET
-    Q_PROPERTY(QString name READ name)
-    Q_PROPERTY(QVariant value READ value)
-public:
-    AADLObjectProperty(const QString &name = QString(), const QVariant &value = QVariant())
-        : m_name(name), m_value(value) {}
-
-    inline QString name() const { return m_name; }
-    inline QVariant value() const { return m_value; }
-
-private:
-    const QString m_name;
-    const QVariant m_value;
-};
-
 struct AADLObjectPrivate;
 class AADLObjectsModel;
 class AADLObject : public QObject
@@ -67,8 +34,8 @@ class AADLObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
-    Q_PROPERTY(QVariantList properties READ propList)
-    Q_PROPERTY(QVariantList attributes READ attrList)
+    Q_PROPERTY(QVariantList properties READ templateProperies)  //!< Property list for string templates
+    Q_PROPERTY(QVariantList attributes READ templateAttributes) //!< Attribute list for string templates
 
 public:
     enum class AADLObjectType
@@ -101,7 +68,7 @@ public:
     // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
 
     QHash<QString, QVariant> attrs() const;
-    QVariantList attrList() const;
+    QVariantList templateAttributes() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setAttr(const QString &name, const QVariant &val);
@@ -109,7 +76,7 @@ public:
 
     // "properties" - XML children <Property>
     QHash<QString, QVariant> props() const;
-    QVariantList propList() const;
+    QVariantList templateProperies() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setProp(const QString &name, const QVariant &val);
@@ -156,10 +123,7 @@ private:
     const std::unique_ptr<AADLObjectPrivate> d;
     QVector<qint32> coordinatesFromString(const QString &strCoordinates) const;
     QString coordinatesToString(const QVector<qint32> &coordinates) const;
-    static QVariantList generateSortedList(const QHash<QString, QVariant> &props);
 };
 
 } // ns aadl
 } // ns taste3
-
-Q_DECLARE_METATYPE(taste3::aadl::AADLObjectProperty)

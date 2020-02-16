@@ -46,7 +46,7 @@ private:
     QVector<HighlightingRule> m_highlightingRules;
 };
 
-} // ns processing
+} // ns templating
 } // ns taste3
 
 #endif // XMLHIGHLIGHTER_H

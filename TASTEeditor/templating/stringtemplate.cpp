@@ -29,6 +29,10 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief StringTemplate::StringTemplate ctor
+ * @param parent
+ */
 StringTemplate::StringTemplate(QObject *parent)
     : QObject(parent)
     , m_engine(new Grantlee::Engine(this))
@@ -67,7 +71,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
     Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());
     if (stringTemplate->error()) {
         // Tokenizing or parsing error, or couldn't find custom tags or filters.
-        qWarning() << stringTemplate->errorString();
+        qWarning() << Q_FUNC_INFO << stringTemplate->errorString();
         emit errorOccurred(stringTemplate->errorString());
         return QString();
     }
@@ -113,6 +117,10 @@ QString StringTemplate::formatText(const QString &text)
     return formattedText.trimmed();
 }
 
+/**
+ * @brief StringTemplate::isValidateXMLDocument returns whether XML is validated
+ * @return flag of validation XML
+ */
 bool StringTemplate::isValidateXMLDocument() const
 {
     return m_validateXMLDocument;
@@ -127,6 +135,10 @@ int StringTemplate::autoFormattingIndent() const
     return m_autoFormattingIndent;
 }
 
+/**
+ * @brief StringTemplate::setValidateXMLDocument sets validation flag
+ * @param validate
+ */
 void StringTemplate::setValidateXMLDocument(bool validate)
 {
     m_validateXMLDocument = validate;
@@ -141,5 +153,5 @@ void StringTemplate::setAutoFormattingIndent(int autoFormattingIndent)
     m_autoFormattingIndent = autoFormattingIndent;
 }
 
-} // ns processing
+} // ns templating
 } // ns taste3

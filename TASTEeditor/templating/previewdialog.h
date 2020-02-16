@@ -31,7 +31,8 @@ namespace templating {
 class StringTemplate;
 
 /**
- * @brief The PreviewDialog class generates XML document from string template file and shows it.
+ * @brief The PreviewDialog class generates XML document or another text from string template file and shows it.
+ * Also it possible to edit, open and save template(s)
  */
 class PreviewDialog : public QDialog
 {
@@ -56,7 +57,7 @@ private slots:
 private:
     QPlainTextEdit *addTemplateEditor(const QString &tabLabel = QString());
     bool parseTemplate();
-    void openIncludedTemplates(const QPlainTextEdit *templateTextEdit);
+    void openIncludedTemplates(const QString &templateText);
 
 private:
     templating::StringTemplate *m_stringTemplate;
@@ -67,7 +68,7 @@ private:
     QHash<QString, QString> m_openedTemplates; // key: file name, value: full path
 };
 
-} // ns processing
+} // ns templating
 } // ns taste3
 
 #endif // PREVIEWDIALOG_H

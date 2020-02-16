@@ -67,7 +67,7 @@ private:
     int m_autoFormattingIndent;
 };
 
-} // ns processing
+} // ns templating
 } // ns taste3
 
 #endif // STRINGTEMPLATE_H

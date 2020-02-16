@@ -22,6 +22,10 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief XMLHighlighter::XMLHighlighter ctor
+ * @param parent
+ */
 XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
@@ -76,6 +80,10 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     m_highlightingRules.append(rule);
 }
 
+/**
+ * @brief XMLHighlighter::highlightBlock highlights text
+ * @param text
+ */
 void XMLHighlighter::highlightBlock(const QString &text)
 {
     //for every pattern
@@ -96,5 +104,5 @@ void XMLHighlighter::highlightBlock(const QString &text)
     }
 }
 
-} // ns processing
+} // ns templating
 } // ns taste3

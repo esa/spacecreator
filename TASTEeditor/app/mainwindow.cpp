@@ -215,6 +215,9 @@ void MainWindow::onSaveRenderRequested()
     }
 }
 
+/**
+* @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
+*/
 void MainWindow::onExportByTemplateRequested()
 {
     const QString& templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
@@ -346,11 +349,19 @@ void MainWindow::updateActions()
     m_actSaveSceneRender->setEnabled(renderAvailable);
 }
 
+/**
+ * @brief MainWindow::parseTemplateFile parses teplate file by a string template engine
+ * and shows result in Preview dialog.
+ * @param templateFileName template file name
+ * @return whether template is parsed successfully
+ */
 bool MainWindow::parseTemplateFile(const QString &templateFileName)
 {
     QFileInfo fileInfo(templateFileName);
-    if (!fileInfo.exists())
+    if (!fileInfo.exists()) {
+        qWarning() << "File" << templateFileName << "does not exist";
         return false;
+    }
 
     if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
         QHash<QString, QVariantList> grouppedObjects;
