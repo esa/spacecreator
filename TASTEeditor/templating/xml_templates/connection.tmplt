@@ -12,6 +12,6 @@ conn.siIsProvided :   |_ Whether source interface is provided
 conn.tiIsProvided :   |_ Whether target interface is provided
 {% endcomment %}
 <Connection>
-    <EndPoint func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}" location="0"/>
-    <EndPoint func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}" location="1"/>
+    <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}"/>
+    <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}"/>
 </Connection>
