@@ -35,7 +35,7 @@ QVariantList generateTemplateProperties(const QHash<QString, QVariant> &props)
 
     std::sort(result.begin(), result.end(), [] (const QVariant &left_val, const QVariant &right_val) {
         const AADLObjectTemplateProperty r = right_val.value<AADLObjectTemplateProperty>();
-        aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
+        const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
         if (right_token == aadl::meta::Props::Token::Unknown)
             return true;
 
