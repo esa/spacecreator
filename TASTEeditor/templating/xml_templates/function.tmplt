@@ -1,0 +1,33 @@
+{% comment %}
+Template for generation of XML scheme of function.
+The following tags are available in this sub-template:
+func            : Instance of function (provided by a top level template)
+func.attributes :   |_ List of all attributes of function
+attr            :       |_ Instance of attriubute
+attr.name       :           |_ Name of attribute
+attr.value      :           |_ Value of attribute
+func.properties :   |_ List of all properties of function
+prop            :       |_ Instance of property
+prop.name       :           |_ Name of property
+prop.value      :           |_ Value of property
+func.interfaces :   |_ List of all interfaces of function
+iface           :       |_ Instance of interface
+func.functions  :   |_ List of all nested functions of function
+func            :       |_ Instance of nested function
+func.comments   :   |_ List of all nested comments of function
+comm            :       |_ Instance of nested comment
+{% endcomment %}
+<Function{% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+{% for prop in func.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+{% endfor %}
+{% for iface in func.interfaces %}
+    {% include "interface.tmplt" %}
+{% endfor %}
+{% for func in func.functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
+{% for comm in func.comments %}
+    {% include "comment.tmplt" %}
+{% endfor %}
+</Function>

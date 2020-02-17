@@ -27,6 +27,9 @@ namespace aadl {
 
 class BasicParameter
 {
+    Q_GADGET
+    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString type READ paramTypeName WRITE setParamTypeName)
 public:
     enum class Type
     {
@@ -64,6 +67,8 @@ protected:
 
 class ContextParameter : public BasicParameter
 {
+    Q_GADGET
+    Q_PROPERTY(QVariant defaultValue READ defaultValue WRITE setDefaultValue)
 public:
     ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
                      const QString &paramTypeName = QString(), const QVariant &val = QVariant());
@@ -81,12 +86,20 @@ protected:
     QVariant m_defaultValue = {};
 };
 
-struct IfaceParameter : public BasicParameter {
+class IfaceParameter : public BasicParameter
+{
+    Q_GADGET
+    Q_PROPERTY(bool isIn READ isInDirection)
+    Q_PROPERTY(bool isOut READ isOutDirection)
+    Q_PROPERTY(QString encoding READ encoding)
+public:
     enum class Direction
     {
         In = 0,
         Out
     };
+
+    Q_ENUM(Direction)
 
     IfaceParameter(const QString &name = QObject::tr("IfaceParam"), Type t = BasicParameter::Type::Timer,
                    const QString &paramTypeName = BasicParameter::typeName(BasicParameter::Type::Timer),
@@ -100,6 +113,9 @@ struct IfaceParameter : public BasicParameter {
     bool setDirection(Direction dir);
     static QString directionName(Direction dir);
     static Direction directionFromName(const QString &dir);
+
+    inline bool isInDirection() const { return direction() == Direction::In; }
+    inline bool isOutDirection() const { return direction() == Direction::Out; }
 
     bool operator==(const IfaceParameter &other) const;
 

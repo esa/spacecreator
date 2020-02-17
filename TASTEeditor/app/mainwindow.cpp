@@ -1,4 +1,4 @@
-/*
+﻿/*
   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
@@ -27,11 +27,13 @@
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
 #include "tab_aadl/aadltabdocument.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "tab_msc/msctabdocument.h"
+#include "templating/previewdialog.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
@@ -116,6 +118,8 @@ void MainWindow::initMenuFile()
     m_actCloseFile = m_menuFile->addAction(tr("Close"), this, &MainWindow::onCloseFileRequested, QKeySequence::Close);
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
+    m_menuFile->addSeparator();
+    m_actExportByTemplate = m_menuFile->addAction(tr("Export by template..."), this, &MainWindow::onExportByTemplateRequested);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
@@ -209,6 +213,19 @@ void MainWindow::onSaveRenderRequested()
 
         saveSceneRender(fileName);
     }
+}
+
+/**
+* @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
+*/
+void MainWindow::onExportByTemplateRequested()
+{
+    const QString& templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
+                                                            QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
+    if (templateFileName.isEmpty())
+        return;
+
+    parseTemplateFile(templateFileName);
 }
 
 void MainWindow::onQuitRequested()
@@ -332,6 +349,59 @@ void MainWindow::updateActions()
     m_actSaveSceneRender->setEnabled(renderAvailable);
 }
 
+/**
+ * @brief MainWindow::parseTemplateFile parses teplate file by a string template engine
+ * and shows result in Preview dialog.
+ * @param templateFileName template file name
+ * @return whether template is parsed successfully
+ */
+bool MainWindow::parseTemplateFile(const QString &templateFileName)
+{
+    QFileInfo fileInfo(templateFileName);
+    if (!fileInfo.exists()) {
+        qWarning() << "File" << templateFileName << "does not exist";
+        return false;
+    }
+
+    if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
+        QHash<QString, QVariantList> grouppedObjects;
+        for (const auto aadlObject : doc->objects()) {
+            QString aadlGroupType;
+            switch (aadlObject->aadlType()) {
+            case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+            case aadl::AADLObject::AADLObjectType::AADLFunction: {
+                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
+                    continue;
+                aadlGroupType = QStringLiteral("Functions");
+                break;
+            }
+            case aadl::AADLObject::AADLObjectType::AADLIface:
+                aadlGroupType = QStringLiteral("Interfaces");
+                break;
+            case aadl::AADLObject::AADLObjectType::AADLComment: {
+                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
+                    continue;
+                aadlGroupType = QStringLiteral("Comments");
+                break;
+            }
+            case aadl::AADLObject::AADLObjectType::AADLConnection:
+                aadlGroupType = QStringLiteral("Connections");
+                break;
+            default:
+                continue;
+            }
+            grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
+        }
+
+        if (!m_previewDialog)
+            m_previewDialog = new templating::PreviewDialog(this);
+
+        return m_previewDialog->parseTemplate(grouppedObjects, templateFileName);
+    }
+
+    return false;
+}
+
 /*!
  * \brief MainWindow::processCommandLineArg handles initial option from command line
  * \returns true if an option is handled
@@ -350,6 +420,14 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
 
         return false;
     }
+    case CommandLineParser::Positional::OpenStringTemplateFile:
+        if (!value.isEmpty())
+            return parseTemplateFile(value);
+        return false;
+    case CommandLineParser::Positional::ExportToFile:
+        if (!value.isEmpty() && m_previewDialog)
+            return m_previewDialog->saveResultToFile(value);
+        return false;
     case CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);

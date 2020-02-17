@@ -15,38 +15,42 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef TEMPLATEHIGHLIGHTER_H
+#define TEMPLATEHIGHLIGHTER_H
 
-#include <QCommandLineParser>
-#include <QObject>
+#include <QRegularExpression>
+#include <QSyntaxHighlighter>
 
 namespace taste3 {
+namespace templating {
 
-class CommandLineParser : public QCommandLineParser
+/**
+ * @brief The TemplateHighlighter class makes highlighting of template text
+ */
+class TemplateHighlighter : public QSyntaxHighlighter
 {
-    Q_GADGET
+    Q_OBJECT
 public:
-    CommandLineParser();
+    TemplateHighlighter(QTextDocument *parent);
 
-    enum class Positional
-    {
-        DropUnsavedChangesSilently,
-        OpenAADLXMLFile,
-        OpenStringTemplateFile,
-        ExportToFile,
-        ListScriptableActions,
-
-        Unknown
-    };
-    Q_ENUM(Positional)
-
-    bool isSet(CommandLineParser::Positional arg) const;
-    QString value(CommandLineParser::Positional arg) const;
-
-    static QCommandLineOption positionalArg(CommandLineParser::Positional arg);
+    // QSyntaxHighlighter interface
+protected:
+    void highlightBlock(const QString &text) override;
 
 private:
-    void populatePositionalArgs();
+    struct HighlightingRule
+    {
+        QRegularExpression pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> m_highlightingRules;
+
+    QTextCharFormat m_commentFormat;
+    QRegularExpression m_commentStartExpression;
+    QRegularExpression m_commentEndExpression;
 };
 
+} // ns templating
 } // ns taste3
+
+#endif // TEMPLATEHIGHLIGHTER_H

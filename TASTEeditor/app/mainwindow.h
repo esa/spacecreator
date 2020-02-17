@@ -39,6 +39,10 @@ namespace document {
 class DocumentsManager;
 }
 
+namespace templating {
+class PreviewDialog;
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -65,11 +69,14 @@ protected:
     void updateActions();
     void saveSceneRender(const QString &filePath) const;
 
+    bool parseTemplateFile(const QString &templateFileName);
+
 protected Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();
     void onSaveRenderRequested();
+    void onExportByTemplateRequested();
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
@@ -79,10 +86,12 @@ private:
     static constexpr int TABDOC_ID_InterfaceView { 0 };
 
     Ui::MainWindow *ui { nullptr };
-    QTabWidget *m_tabWidget;
+    QTabWidget *m_tabWidget { nullptr };
     QPointer<QToolBar> m_docToolbar;
-    document::DocumentsManager *m_docsManager;
+    document::DocumentsManager *m_docsManager { nullptr };
     QPointer<document::AbstractTabDocument> m_currentDocument;
+    templating::PreviewDialog *m_previewDialog { nullptr };
+
     QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };
 
@@ -94,6 +103,7 @@ private:
     QAction *m_actCreateFile { nullptr };
     QAction *m_actCloseFile { nullptr };
     QAction *m_actSaveSceneRender { nullptr };
+    QAction *m_actExportByTemplate { nullptr };
     QAction *m_actQuit { nullptr };
 
     QAction *m_actUndo { nullptr };

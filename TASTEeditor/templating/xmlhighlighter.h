@@ -15,38 +15,38 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#ifndef XMLHIGHLIGHTER_H
+#define XMLHIGHLIGHTER_H
 
-#include <QCommandLineParser>
-#include <QObject>
+#include <QSyntaxHighlighter>
+#include <QRegularExpression>
 
 namespace taste3 {
+namespace templating {
 
-class CommandLineParser : public QCommandLineParser
+/**
+ * @brief The XMLHighlighter class makes highlighting of XML document
+ */
+class XMLHighlighter : public QSyntaxHighlighter
 {
-    Q_GADGET
+    Q_OBJECT
 public:
-    CommandLineParser();
+    XMLHighlighter(QTextDocument *parent);
 
-    enum class Positional
-    {
-        DropUnsavedChangesSilently,
-        OpenAADLXMLFile,
-        OpenStringTemplateFile,
-        ExportToFile,
-        ListScriptableActions,
-
-        Unknown
-    };
-    Q_ENUM(Positional)
-
-    bool isSet(CommandLineParser::Positional arg) const;
-    QString value(CommandLineParser::Positional arg) const;
-
-    static QCommandLineOption positionalArg(CommandLineParser::Positional arg);
+    // QSyntaxHighlighter interface
+protected:
+    void highlightBlock(const QString &text) override;
 
 private:
-    void populatePositionalArgs();
+    struct HighlightingRule
+    {
+        QRegularExpression pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> m_highlightingRules;
 };
 
+} // ns templating
 } // ns taste3
+
+#endif // XMLHIGHLIGHTER_H

@@ -258,6 +258,12 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     return nullptr;
 }
 
+
+const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
+{
+    return d->m_objects;
+}
+
 QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const common::Id &id) const
 {
     QVector<AADLObjectConnection *> result;

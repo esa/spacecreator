@@ -36,7 +36,10 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
     , d(new AADLObjectFunctionTypePrivate)
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
-    setAttr(meta::Props::token(meta::Props::Token::is_type), "YES");
+    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));
+
+    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
+        root->addChild(this);
 }
 
 AADLObjectFunctionType::~AADLObjectFunctionType() {}
@@ -151,6 +154,38 @@ bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
 QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
 {
     return ris() + pis();
+}
+
+QVariantList AADLObjectFunctionType::templateInterfaces() const
+{
+    QVariantList ifaceList;
+
+    for (AADLObjectIface *iface : interfaces())
+        ifaceList << QVariant::fromValue(iface);
+
+    return ifaceList;
+}
+
+QVariantList AADLObjectFunctionType::templateFunctions() const
+{
+    QVariantList functions;
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
+            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+            functions << QVariant::fromValue(child);
+        }
+    }
+    return functions;
+}
+
+QVariantList AADLObjectFunctionType::templateComments() const
+{
+    QVariantList comments;
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLComment)
+            comments << QVariant::fromValue(child);
+    }
+    return comments;
 }
 
 QString AADLObjectFunctionType::language() const

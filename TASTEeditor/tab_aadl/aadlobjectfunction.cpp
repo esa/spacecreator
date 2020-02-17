@@ -42,7 +42,7 @@ AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
     : AADLObjectFunctionType(title, parent)
     , d(new AADLObjectFunctionPrivate)
 {
-    setAttr(meta::Props::token(meta::Props::Token::is_type), "NO");
+    setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("NO"));
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 

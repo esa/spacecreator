@@ -58,6 +58,11 @@ AADLObject::AADLObjectType AADLObjectConnection::aadlType() const
     return AADLObject::AADLObjectType::AADLConnection;
 }
 
+QString AADLObjectConnection::sourceName() const
+{
+    return source() ? source()->title() : QString();
+}
+
 AADLObject *AADLObjectConnection::source() const
 {
     return d->m_source;
@@ -66,6 +71,11 @@ AADLObject *AADLObjectConnection::source() const
 void AADLObjectConnection::setSource(AADLObject *source)
 {
     setAttr(meta::Props::token(meta::Props::Token::from), source ? source->title() : QString());
+}
+
+QString AADLObjectConnection::targetName() const
+{
+    return target() ? target()->title() : QString();
 }
 
 AADLObject *AADLObjectConnection::target() const
@@ -180,6 +190,26 @@ void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
     AADLObject::setAttr(name, val);
     if (attrUpdated)
         updateAttributes();
+}
+
+bool AADLObjectConnection::sourceInterfaceIsRequired() const
+{
+    return sourceInterface() ? sourceInterface()->isRequired() : false;
+}
+
+bool AADLObjectConnection::sourceInterfaceIsProvided() const
+{
+    return sourceInterface() ? sourceInterface()->isProvided() : false;
+}
+
+bool AADLObjectConnection::targetInterfaceIsRequired() const
+{
+    return targetInterface() ? targetInterface()->isRequired() : false;
+}
+
+bool AADLObjectConnection::targetInterfaceIsProvided() const
+{
+    return targetInterface() ? targetInterface()->isProvided() : false;
 }
 
 void AADLObjectConnection::inheritLabel()
