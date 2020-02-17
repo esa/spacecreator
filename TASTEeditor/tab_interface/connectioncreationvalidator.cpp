@@ -239,6 +239,9 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
         result.startRequired = result.startIface->isRequired();
     }
 
+    result.startIfaceId = result.startIface ? result.startIface->id() : common::createId();
+    result.endIfaceId = result.endIface ? result.endIface->id() : common::createId();
+
     result.setFailed(FailReason::NotFail);
     return result;
 }

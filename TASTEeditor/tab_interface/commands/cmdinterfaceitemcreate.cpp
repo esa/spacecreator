@@ -26,32 +26,30 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdInterfaceItemCreate::CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function,
-                                               const QPointF &pos, AADLObjectIface::IfaceType type,
-                                               const common::Id &id)
-    : m_model(model)
-    , m_entity(AADLObjectIface::createIface(type, id, function))
-    , m_parent(function)
-    , m_pos(pos)
+CmdInterfaceItemCreate::CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo)
+    : m_ifaceInfo(creationInfo)
+    , m_entity(AADLObjectIface::createIface(m_ifaceInfo.type, m_ifaceInfo.id, m_ifaceInfo.function,
+                                            m_ifaceInfo.parameters))
 {
-    setText(type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI") : QObject::tr("Create RI"));
+    setText(m_ifaceInfo.type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
+                                                                     : QObject::tr("Create RI"));
 }
 
 void CmdInterfaceItemCreate::redo()
 {
-    m_entity->setCoordinates(utils::coordinates(m_pos));
-    if (m_parent)
-        m_parent->addInterface(m_entity);
-    if (m_model)
-        m_model->addObject(m_entity);
+    m_entity->setCoordinates(utils::coordinates(m_ifaceInfo.position));
+    if (m_ifaceInfo.function)
+        m_ifaceInfo.function->addInterface(m_entity);
+    if (m_ifaceInfo.model)
+        m_ifaceInfo.model->addObject(m_entity);
 }
 
 void CmdInterfaceItemCreate::undo()
 {
-    if (m_parent)
-        m_parent->removeInterface(m_entity);
-    if (m_model)
-        m_model->removeObject(m_entity);
+    if (m_ifaceInfo.function)
+        m_ifaceInfo.function->removeInterface(m_entity);
+    if (m_ifaceInfo.model)
+        m_ifaceInfo.model->removeObject(m_entity);
 }
 
 bool CmdInterfaceItemCreate::mergeWith(const QUndoCommand *command)

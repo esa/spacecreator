@@ -337,49 +337,56 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     const AADLFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
-    common::Id startIfaceId = info.startIface ? info.startIface->id() : common::createId();
-    common::Id endIfaceId = info.endIface ? info.endIface->id() : common::createId();
-
+    QVector<IfaceParameter> commonParams;
     taste3::cmd::CommandsStack::current()->beginMacro(QObject::tr("Create connection"));
 
     if (info.startIface && !info.endIface) {
         info.startRequired = info.startIface->isRequired();
-        const AADLObjectIface::IfaceType type =
-                (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
-                ? AADLObjectIface::IfaceType::Required
-                : AADLObjectIface::IfaceType::Provided;
+        commonParams = info.startIface->params();
 
-        const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(info.endObject),
-                                      info.endPointAdjusted, QVariant::fromValue(type), endIfaceId };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), info.endObject, info.endPointAdjusted,
+                                                       (info.startRequired && info.isSameType)
+                                                                       || (!info.startRequired && !info.isSameType)
+                                                               ? AADLObjectIface::IfaceType::Required
+                                                               : AADLObjectIface::IfaceType::Provided,
+                                                       info.endIfaceId, commonParams);
+
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
     } else if (info.endIface && !info.startIface) {
         info.startRequired =
                 (info.endIface->isRequired() && info.isSameType) || (info.endIface->isProvided() && !info.isSameType);
-        const AADLObjectIface::IfaceType type =
-                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
-        const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(info.startObject),
-                                      info.startPointAdjusted, QVariant::fromValue(type), startIfaceId };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+        commonParams = info.endIface->params();
+
+        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), info.startObject, info.startPointAdjusted,
+                                                       info.startRequired ? AADLObjectIface::IfaceType::Required
+                                                                          : AADLObjectIface::IfaceType::Provided,
+                                                       info.startIfaceId, commonParams);
+
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
     } else if (!info.startIface && !info.endIface) {
-        AADLObjectIface::IfaceType type =
-                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        const AADLObjectIface::CreationInfo startIfaceDescr(m_model.data(), info.startObject, info.startPointAdjusted,
+                                                            info.startRequired ? AADLObjectIface::IfaceType::Required
+                                                                               : AADLObjectIface::IfaceType::Provided,
+                                                            info.startIfaceId, commonParams);
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, startIfaceDescr.toVarList()));
 
-        QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(info.startObject),
-                                info.startPointAdjusted, QVariant::fromValue(type), startIfaceId };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
-
-        type = (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
-                ? AADLObjectIface::IfaceType::Required
-                : AADLObjectIface::IfaceType::Provided;
-        params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(info.endObject), info.endPointAdjusted,
-                   QVariant::fromValue(type), endIfaceId };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+        const AADLObjectIface::CreationInfo endIfaceDescr(m_model.data(), info.endObject, info.endPointAdjusted,
+                                                          (info.startRequired && info.isSameType)
+                                                                          || (!info.startRequired && !info.isSameType)
+                                                                  ? AADLObjectIface::IfaceType::Required
+                                                                  : AADLObjectIface::IfaceType::Provided,
+                                                          info.endIfaceId, commonParams);
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, endIfaceDescr.toVarList()));
     }
 
     AADLFunctionGraphicsItem *prevStartItem =
             qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(connectionPoints.constBegin());
-    common::Id prevStartIfaceId = startIfaceId;
+    common::Id prevStartIfaceId = info.startIfaceId;
     /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
@@ -397,23 +404,23 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        const AADLObjectIface::IfaceType type =
+        const AADLObjectIface::IfaceType ifaceType =
                 info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
-        QVariantList params;
         common::Id ifaceId;
         if (item == info.functionAtEndPos) {
-            ifaceId = endIfaceId;
+            ifaceId = info.endIfaceId;
         } else {
             ifaceId = common::createId();
-            params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
-                       intersectionPoints.last(), QVariant::fromValue(type), ifaceId };
+            const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
+                                                           ifaceType, ifaceId, commonParams);
+
             taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
         }
 
-        params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()), prevStartIfaceId, ifaceId,
-                   QVariant::fromValue(points) };
+        const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
+                                      prevStartIfaceId, ifaceId, QVariant::fromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
         firstExcludedPoint = endIt != connectionPoints.constEnd() ? *endIt : QPointF();
@@ -424,7 +431,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
 
     QPointF lastExcludedPoint = *std::next(connectionPoints.crbegin());
     AADLFunctionGraphicsItem *prevEndItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
-    common::Id prevEndIfaceId = endIfaceId;
+    common::Id prevEndIfaceId = info.endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
@@ -442,21 +449,20 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        const AADLObjectIface::IfaceType type =
-                info.startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
-        QVariantList params;
         common::Id ifaceId;
         if (item == info.functionAtStartPos) {
-            ifaceId = startIfaceId;
+            ifaceId = info.startIfaceId;
         } else {
             ifaceId = common::createId();
-            params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
-                       intersectionPoints.last(), QVariant::fromValue(type), ifaceId };
+            const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
+                                                           info.startRequired ? AADLObjectIface::IfaceType::Provided
+                                                                              : AADLObjectIface::IfaceType::Required,
+                                                           ifaceId, commonParams);
             taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
         }
-        params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()), prevEndIfaceId, ifaceId,
-                   QVariant::fromValue(points) };
+        const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
+                                      prevEndIfaceId, ifaceId, QVariant::fromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
         lastExcludedPoint = endIt != connectionPoints.crend() ? *endIt : QPointF();
@@ -616,9 +622,10 @@ void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceT
     if (QGraphicsItem *parentItem = utils::nearestItem(
                 scene, utils::adjustFromPoint(pos, ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
         AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(parentObject), pos,
-                                      QVariant::fromValue(type), common::Id() };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, params));
+
+        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::Id());
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
     }
 }
 

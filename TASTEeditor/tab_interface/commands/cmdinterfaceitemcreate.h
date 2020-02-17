@@ -32,8 +32,7 @@ namespace cmd {
 class CmdInterfaceItemCreate : public QUndoCommand
 {
 public:
-    explicit CmdInterfaceItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *function, const QPointF &pos,
-                                    AADLObjectIface::IfaceType type, const taste3::common::Id &id);
+    explicit CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo);
 
     void redo() override;
     void undo() override;
@@ -41,10 +40,8 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
+    const AADLObjectIface::CreationInfo m_ifaceInfo;
     QPointer<AADLObjectIface> m_entity;
-    QPointer<AADLObjectFunctionType> m_parent;
-    const QPointF m_pos;
 };
 
 } // namespace cmd

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "app/common.h"
+
 #include <QLineF>
 #include <QObject>
 #include <QPointF>
@@ -60,6 +62,8 @@ public:
     struct ValidationResult {
         AADLObjectIface *startIface { nullptr };
         AADLObjectIface *endIface { nullptr };
+        common::Id startIfaceId = {};
+        common::Id endIfaceId = {};
         QPointF startPointAdjusted {};
         QPointF endPointAdjusted {};
         QLineF connectionLine {};
