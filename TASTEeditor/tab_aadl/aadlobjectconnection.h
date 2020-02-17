@@ -74,6 +74,8 @@ public:
         return selectIface<T>(sourceInterface(), targetInterface());
     }
 
+    void postInit() override;
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
     void updateAttributes();
