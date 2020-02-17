@@ -160,10 +160,7 @@ QVariantList AADLObjectFunctionType::templateInterfaces() const
 {
     QVariantList ifaceList;
 
-    for (AADLObjectIface *iface : ris())
-        ifaceList << QVariant::fromValue(iface);
-
-    for (AADLObjectIface *iface : pis())
+    for (const AADLObjectIface *iface : interfaces())
         ifaceList << QVariant::fromValue(iface);
 
     return ifaceList;
