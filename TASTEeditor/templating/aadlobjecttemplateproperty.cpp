@@ -40,7 +40,7 @@ QVariantList generateTemplateProperties(const QHash<QString, QVariant> &props)
             return true;
 
         const AADLObjectTemplateProperty l = left_val.value<AADLObjectTemplateProperty>();
-        aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
+        const aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
         if (left_token == aadl::meta::Props::Token::Unknown)
             return false;
 
