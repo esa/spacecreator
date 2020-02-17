@@ -237,7 +237,7 @@ void PreviewDialog::onErrorOccurred(const QString &errorString)
  */
 void PreviewDialog::onValidateXMLToggled(bool validate)
 {
-    m_stringTemplate->setValidateXMLDocument(validate);
+    m_stringTemplate->setNeedValidateXMLDocument(validate);
     if (validate)
         onApplyTemplate();
 }

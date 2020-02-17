@@ -213,10 +213,10 @@ QHash<QString, QVariant> AADLObject::props() const
 }
 
 /**
- * @brief AADLObject::templateProperies returns list of properies for using in string templates.
- * @return list of properies.
+ * @brief AADLObject::templateProperties returns list of properties for using in string templates.
+ * @return list of properties.
  */
-QVariantList AADLObject::templateProperies() const
+QVariantList AADLObject::templateProperties() const
 {
     return templating::generateTemplateProperties(d->m_props);
 }

@@ -50,11 +50,11 @@ public:
 
     QString formatText(const QString &text);
 
-    bool isValidateXMLDocument() const;
+    bool needValidateXMLDocument() const;
     int autoFormattingIndent() const;
 
 public slots:
-    void setValidateXMLDocument(bool validate);
+    void setNeedValidateXMLDocument(bool validate);
     void setAutoFormattingIndent(int autoFormattingIndent);
 
 signals:

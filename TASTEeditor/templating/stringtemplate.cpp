@@ -118,10 +118,10 @@ QString StringTemplate::formatText(const QString &text)
 }
 
 /**
- * @brief StringTemplate::isValidateXMLDocument returns whether XML is validated
+ * @brief StringTemplate::needValidateXMLDocument returns whether XML needs to be validated
  * @return flag of validation XML
  */
-bool StringTemplate::isValidateXMLDocument() const
+bool StringTemplate::needValidateXMLDocument() const
 {
     return m_validateXMLDocument;
 }
@@ -139,7 +139,7 @@ int StringTemplate::autoFormattingIndent() const
  * @brief StringTemplate::setValidateXMLDocument sets validation flag
  * @param validate
  */
-void StringTemplate::setValidateXMLDocument(bool validate)
+void StringTemplate::setNeedValidateXMLDocument(bool validate)
 {
     m_validateXMLDocument = validate;
 }
