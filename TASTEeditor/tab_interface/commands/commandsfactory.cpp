@@ -143,19 +143,10 @@ QUndoCommand *CommandsFactory::createCommentCommand(const QVariantList &params)
 
 QUndoCommand *CommandsFactory::createInterfaceCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 5);
-    const QVariant model = params.value(0);
-    const QVariant parent = params.value(1);
-    const QVariant position = params.value(2);
-    const QVariant type = params.value(3);
-    const QVariant id = params.value(4);
-    if (position.isValid() && position.canConvert<QPointF>() && model.isValid()
-        && model.canConvert<AADLObjectsModel *>() && parent.canConvert<AADLObjectFunctionType *>()
-        && type.canConvert<AADLObjectIface::IfaceType>() && type.isValid() && id.canConvert<common::Id>()
-        && id.isValid())
-        return new CmdInterfaceItemCreate(model.value<AADLObjectsModel *>(), parent.value<AADLObjectFunctionType *>(),
-                                          position.value<QPointF>(), type.value<aadl::AADLObjectIface::IfaceType>(),
-                                          id.value<common::Id>());
+    Q_ASSERT(params.size() == 1);
+    const QVariant creationInfo = params.value(0);
+    if (creationInfo.isValid() && creationInfo.canConvert<AADLObjectIface::CreationInfo>())
+        return new CmdInterfaceItemCreate(creationInfo.value<AADLObjectIface::CreationInfo>());
 
     return nullptr;
 }

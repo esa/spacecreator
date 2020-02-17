@@ -234,12 +234,17 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QSt
 }
 
 AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType direction, const common::Id &id,
-                                              AADLObject *parent)
+                                              AADLObject *parent, const QVector<IfaceParameter> &params)
 {
+    AADLObjectIface *iface { nullptr };
     if (direction == AADLObjectIface::IfaceType::Provided)
-        return new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);
+        iface = new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);
+    else
+        iface = new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter), parent);
 
-    return new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter), parent);
+    iface->setParams(params);
+
+    return iface;
 }
 
 AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObjectFunction *parent)
