@@ -34,12 +34,12 @@ QVariantList generateTemplateProperties(const QHash<QString, QVariant> &props)
         result << QVariant::fromValue(AADLObjectTemplateProperty(it.key(), it.value()));
 
     std::sort(result.begin(), result.end(), [] (const QVariant &left_val, const QVariant &right_val) {
-        const AADLObjectTemplateProperty r = right_val.value<AADLObjectTemplateProperty>();
+        const AADLObjectTemplateProperty &r = right_val.value<AADLObjectTemplateProperty>();
         const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
         if (right_token == aadl::meta::Props::Token::Unknown)
             return true;
 
-        const AADLObjectTemplateProperty l = left_val.value<AADLObjectTemplateProperty>();
+        const AADLObjectTemplateProperty &l = left_val.value<AADLObjectTemplateProperty>();
         const aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
         if (left_token == aadl::meta::Props::Token::Unknown)
             return false;
