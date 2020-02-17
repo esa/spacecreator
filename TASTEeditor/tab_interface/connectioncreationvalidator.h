@@ -86,10 +86,14 @@ public:
     static ConnectionCreationValidator::ValidationResult validate(QGraphicsScene *scene,
                                                                   const QVector<QPointF> &connectionPoints);
 
+    static ConnectionCreationValidator::FailReason canConnect(AADLObjectFunction *sourceFunction,
+                                                              AADLObjectFunction *targetFunction,
+                                                              AADLObjectIface *sourceIource,
+                                                              AADLObjectIface *targetIface);
+
 private:
     ConnectionCreationValidator();
 
-    static FailReason validatePreview(QGraphicsScene *scene, const QVector<QPointF> &connectionPoints);
     static ConnectionCreationValidator::ValidationResult validateCreate(QGraphicsScene *scene,
                                                                         const QVector<QPointF> &connectionPoints);
 };
