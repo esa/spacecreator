@@ -23,6 +23,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "tab_interface/connectioncreationvalidator.h"
 
 #include <QDebug>
 #include <QFile>
@@ -408,15 +409,8 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
 }
 
 struct ConnectionEndPoint {
-    enum Location
-    {
-        Begin = 0,
-        End
-    };
-
     AADLObject *m_function { nullptr };
     AADLObjectIface *m_interface { nullptr };
-    Location m_location { Location::Begin };
     bool isReady() const { return m_function && m_interface; }
 };
 
@@ -501,14 +495,32 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         return false;
 
     if (connection.isValid()) {
-        AADLObjectConnection *objConnection =
-                new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
-                                         connection.m_from.m_interface, connection.m_to.m_interface, parent);
-
-        d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
-        d->m_allObjects.append(objConnection);
         xml.skipCurrentElement();
-        return true;
+        const ConnectionCreationValidator::FailReason status =
+                ConnectionCreationValidator::canConnect(connection.m_from.m_function->as<AADLObjectFunction *>(),
+                                                        connection.m_to.m_function->as<AADLObjectFunction *>(),
+                                                        connection.m_from.m_interface, connection.m_to.m_interface);
+        if (status == ConnectionCreationValidator::FailReason::NotFail) {
+            AADLObjectConnection *objConnection =
+                    new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
+                                             connection.m_from.m_interface, connection.m_to.m_interface, parent);
+
+            d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
+            d->m_allObjects.append(objConnection);
+            return true;
+        } else {
+            auto edgeName = [](const ConnectionEndPoint &edge) {
+                static const QString nameTemplate("%1.%2");
+                static const QLatin1String strNull("null");
+                return nameTemplate.arg((edge.m_function ? edge.m_function->title() : strNull),
+                                        (edge.m_interface ? edge.m_interface->title() : strNull));
+            };
+
+            const QString connectionName =
+                    QString("%1->%2").arg(edgeName(connection.m_from), edgeName(connection.m_to));
+            qWarning() << "Can't perform connection" << connectionName << status;
+            return false;
+        }
     }
 
     return false;
