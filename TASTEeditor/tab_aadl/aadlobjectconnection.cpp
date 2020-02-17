@@ -266,5 +266,10 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
             Qt::UniqueConnection);
 }
 
+void AADLObjectConnection::postInit()
+{
+    inheritLabel();
+}
+
 } // ns aadl
 } // ns taste3
