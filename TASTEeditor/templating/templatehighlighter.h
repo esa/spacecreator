@@ -43,7 +43,14 @@ private:
         QRegularExpression pattern;
         QTextCharFormat format;
     };
-    QVector<HighlightingRule> m_highlightingRules;
+    struct Highlighting
+    {
+        QRegularExpression basePattern;
+        QTextCharFormat baseFormat;
+        QVector<HighlightingRule> highlightingRules;
+    };
+
+    QVector<Highlighting> m_highlightings;
 
     QTextCharFormat m_commentFormat;
     QRegularExpression m_commentStartExpression;

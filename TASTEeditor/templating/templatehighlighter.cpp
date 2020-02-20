@@ -29,151 +29,85 @@ namespace templating {
 TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
-    HighlightingRule rule;
-
-    // variables
-    QTextCharFormat variableFormat;
-    variableFormat.setForeground(Qt::darkGreen);
-    variableFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={{)\\s*[a-zA-Z_]\\w*(\\.\\w+)*(\\|[a-zA-Z_]\\w*)*(:\".+\")?\\s*(?=}})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // for variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sfor)\\s+[a-zA-Z_]\\w*\\s+(?:in)\\s+[a-zA-Z_]\\w*.?[a-zA-Z_]\\w*\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // if variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sif|elif)\\s+[a-zA-Z_]\\w*.?[a-zA-Z_]\\w*\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // block variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sblock)\\s+[a-zA-Z_]\\w*\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // cycle variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\scycle)\\s+(\'?[a-zA-Z_]\\w*\'?\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // filter variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sfilter)\\s+[a-zA-Z_]\\w*(\\.\\w+)*(\\|[a-zA-Z_]\\w*)*(:\".+\")?\\s*(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // firstof variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sfirstof)\\s+(([a-zA-Z_]\\w*|(\'|\").*(\'|\"))(\\|[a-zA-Z_]\\w*)?\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // ifchanged variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sifchanged)\\s+([a-zA-Z_]\\w*(\\.\\w+)*\\s+)*(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // ifequal and ifnotequal variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sifequal|ifnotequal)\\s+([a-zA-Z_]\\w*(\\.\\w+)*\\s+){2,2}(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // load variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sload)\\s+([a-zA-Z_]\\w*(\\.[a-zA-Z_]\\w+)*\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // now variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\snow)\\s+(\".*\"\\s+)?(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // range variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\srange)\\s+([a-zA-Z_]\\w*\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // regroup variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\sregroup)\\s+([a-zA-Z_]\\w*\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // templatetag variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\stemplatetag)\\s+(openblock|closeblock|openvariable|closevariable|openbrace|closebrace|opencomment|closecomment)\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // widthratio variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\swidthratio)\\s+([a-zA-Z_]\\w*\\s+)+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // with variables
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={%\\swith)\\s+[a-zA-Z_]\\w*=[a-zA-Z_]\\w*(.[a-zA-Z_]\\w*)*\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = variableFormat;
-    m_highlightingRules.append(rule);
-
-    // keywords
-    QTextCharFormat keywordFormat;
-    keywordFormat.setForeground(Qt::blue);
-    keywordFormat.setFontWeight(QFont::Bold);
-    const QString keywords = QStringLiteral("\\s+(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block(.super)?|endblock|"
+    // keyword rule
+    HighlightingRule keywordRule;
+    keywordRule.format.setForeground(Qt::blue);
+    keywordRule.format.setFontWeight(QFont::Bold);
+    const QString keywords = QStringLiteral("\\b(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block|endblock|"
                                             "autoescape\\s+(on|off)|endautoescape|cycle|as|silent|filter|endfilter|debug|ifchanged|endifchanged|"
                                             "ifequal|endifequal|ifnotequal|endifnotequal|load|from|media_finder|now|range|endrange|by|regroup|"
-                                            "spaceless|endspaceless|templatetag|widthratio|with|endwith)\\s+");
-    rule.pattern = QRegularExpression(keywords, QRegularExpression::InvertedGreedinessOption);
-    rule.format = keywordFormat;
-    m_highlightingRules.append(rule);
+                                            "spaceless|endspaceless|templatetag|widthratio|with|endwith)\\b");
+    keywordRule.pattern = QRegularExpression(keywords, QRegularExpression::InvertedGreedinessOption);
 
-    // brackets
-    QTextCharFormat bracketsFormat;
-    bracketsFormat.setForeground(Qt::red);
-    const QString brackets = QStringLiteral("({{|}}|{%|%}|{#|#})");
-    rule.pattern = QRegularExpression(brackets);
-    rule.format = bracketsFormat;
-    m_highlightingRules.append(rule);
+    // block.super keyword rule
+    HighlightingRule blockSuperKeywordRule;
+    blockSuperKeywordRule.format = keywordRule.format;
+    blockSuperKeywordRule.pattern = QRegularExpression(QStringLiteral("\\bblock.super\\b"), QRegularExpression::InvertedGreedinessOption);
 
-    // include
-    QTextCharFormat includeFormat;
-    includeFormat.setForeground(Qt::magenta);
-    includeFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<=\\b(include|extends)\\b)\\s+\"[a-zA-Z_].*\"\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = includeFormat;
-    m_highlightingRules.append(rule);
+    // variable rule
+    HighlightingRule variableRule;
+    variableRule.format.setForeground(Qt::darkGreen);
+    variableRule.format.setFontWeight(QFont::Bold);
+    variableRule.pattern = QRegularExpression(QStringLiteral("(?<!\\|)\\b[a-zA-Z_]\\w*(\\.\\w+)*\\b"));
 
-    // media_finder
-    rule.pattern = QRegularExpression(QStringLiteral("(?<=\\bmedia_finder\\b)\\s+\"[a-zA-Z_].*\"\\s+(?=%})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = includeFormat;
-    m_highlightingRules.append(rule);
+    // filter rule
+    HighlightingRule filterRule;
+    filterRule.format.setForeground(Qt::darkRed);
+    filterRule.format.setFontWeight(QFont::Bold);
+    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\b(add|addslashes|capfirst|center|cut|date|default|default_if_none|dictsort|divisibleby|"
+                                           "escape|escapejs|first|fix_ampersands|floatformat|force_escape|get_digit|join|last|"
+                                           "length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|lower|make_list|random|"
+                                           "removetags|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|timesince|"
+                                           "timeuntil|title|truncatewords|unordered_list|upper|wordcount|wordwrap|yesno)\\b");
+    filterRule.pattern = QRegularExpression(filters, QRegularExpression::InvertedGreedinessOption);
 
-    // Comment
+    // filter delimiter rule
+    HighlightingRule filterDelimiterRule;
+    filterDelimiterRule.format = filterRule.format;
+    filterDelimiterRule.format.setFontWeight(QFont::Bold);
+    filterDelimiterRule.pattern = QRegularExpression(QStringLiteral("(?<=\\w)(\\||:)"));
+
+    // string rule
+    HighlightingRule stringRule;
+    stringRule.format.setForeground(Qt::magenta);
+    stringRule.format.setFontWeight(QFont::Bold);
+    stringRule.pattern = QRegularExpression(QStringLiteral("(\".*\")|(\'.*\')"), QRegularExpression::InvertedGreedinessOption);
+
+    // brackets highlighting
+    Highlighting bracketHighlighting;
+    bracketHighlighting.baseFormat.setForeground(Qt::red);
+    bracketHighlighting.basePattern = QRegularExpression(QStringLiteral("({{|}}|{%|%}|{#|#})"));
+    m_highlightings.append(bracketHighlighting);
+
+    // keywords highlighting
+    Highlighting keywordHighlighting;
+    keywordHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={%).*(?=%})"), QRegularExpression::InvertedGreedinessOption);
+    keywordHighlighting.highlightingRules.append(variableRule);
+    keywordHighlighting.highlightingRules.append(filterRule);
+    keywordHighlighting.highlightingRules.append(filterDelimiterRule);
+    keywordHighlighting.highlightingRules.append(keywordRule);
+    keywordHighlighting.highlightingRules.append(stringRule);
+    m_highlightings.append(keywordHighlighting);
+
+    // variables highlighting
+    Highlighting variableHighlighting;
+    variableHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={{).*(?=}})"), QRegularExpression::InvertedGreedinessOption);
+    variableHighlighting.highlightingRules.append(variableRule);
+    variableHighlighting.highlightingRules.append(blockSuperKeywordRule);
+    variableHighlighting.highlightingRules.append(filterRule);
+    variableHighlighting.highlightingRules.append(filterDelimiterRule);
+    variableHighlighting.highlightingRules.append(stringRule);
+    m_highlightings.append(variableHighlighting);
+
+    // comments highlighting
     m_commentFormat.setForeground(Qt::darkGray);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<={#).+(?=#})"),
-                                      QRegularExpression::InvertedGreedinessOption);
-    rule.format = m_commentFormat;
-    m_highlightingRules.append(rule);
-
     m_commentStartExpression.setPattern(QStringLiteral("{%\\s*comment\\s*%}"));
     m_commentEndExpression.setPattern(QStringLiteral("{%\\s*endcomment\\s*%}"));
+
+    Highlighting commentHighlighting;
+    commentHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={#).+(?=#})"), QRegularExpression::InvertedGreedinessOption);
+    commentHighlighting.baseFormat = m_commentFormat;
+    m_highlightings.append(commentHighlighting);
 }
 
 /**
@@ -182,21 +116,38 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
  */
 void TemplateHighlighter::highlightBlock(const QString &text)
 {
-    //for every pattern
-    for (const HighlightingRule &rule : m_highlightingRules) {
-        QRegularExpression expression(rule.pattern);
+    for (const Highlighting &highlighting : m_highlightings) {
+        QRegularExpression expression = highlighting.basePattern;
         if (!expression.isValid()) {
             qWarning() << Q_FUNC_INFO << expression.errorString() << expression.pattern();
             continue;
         }
 
         QRegularExpressionMatchIterator it = expression.globalMatch(text);
-
         while (it.hasNext()) {
             QRegularExpressionMatch match = it.next();
-            int index = match.capturedStart();
-            int length = match.capturedLength();
-            setFormat(index, length, rule.format);
+            int startIndex = match.capturedStart();
+            if (highlighting.highlightingRules.isEmpty()) {
+                int length = match.capturedLength();
+                setFormat(startIndex, length, highlighting.baseFormat);
+                continue;
+            }
+
+            const QString &captured = match.captured();
+            for (const HighlightingRule &rule : highlighting.highlightingRules) {
+                QRegularExpression pattern = rule.pattern;
+                if (!pattern.isValid()) {
+                    qWarning() << Q_FUNC_INFO << pattern.errorString() << pattern.pattern();
+                    continue;
+                }
+                QRegularExpressionMatchIterator i = pattern.globalMatch(captured);
+                while (i.hasNext()) {
+                    QRegularExpressionMatch m = i.next();
+                    int index = m.capturedStart();
+                    int length = m.capturedLength();
+                    setFormat(startIndex + index, length, rule.format);
+                }
+            }
         }
     }
 
