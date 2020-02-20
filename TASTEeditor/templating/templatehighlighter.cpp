@@ -54,7 +54,7 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule filterRule;
     filterRule.format.setForeground(Qt::darkRed);
     filterRule.format.setFontWeight(QFont::Bold);
-    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\b(add|addslashes|capfirst|center|cut|date|default|default_if_none|dictsort|divisibleby|"
+    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\s*\\b(add|addslashes|capfirst|center|cut|date|default|default_if_none|dictsort|divisibleby|"
                                            "escape|escapejs|first|fix_ampersands|floatformat|force_escape|get_digit|join|last|"
                                            "length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|lower|make_list|random|"
                                            "removetags|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|timesince|"
@@ -65,7 +65,7 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule filterDelimiterRule;
     filterDelimiterRule.format = filterRule.format;
     filterDelimiterRule.format.setFontWeight(QFont::Bold);
-    filterDelimiterRule.pattern = QRegularExpression(QStringLiteral("(?<=\\w)(\\||:)"));
+    filterDelimiterRule.pattern = QRegularExpression(QStringLiteral("(?<=\\w)\\s*(\\||:)\\s*"));
 
     // string rule
     HighlightingRule stringRule;
