@@ -22,7 +22,6 @@
 #include "aadlobjectsmodel.h"
 
 #include <QMetaEnum>
-#include <QSet>
 
 namespace taste3 {
 namespace aadl {
@@ -150,14 +149,18 @@ QVariantList AADLObjectIface::paramList() const
 
 void AADLObjectIface::setParams(const QVector<IfaceParameter> &params)
 {
-    if (d->m_params != params)
+    if (d->m_params != params) {
         d->m_params = params;
+        emit paramsChanged();
+    }
 }
 
 void AADLObjectIface::addParam(const IfaceParameter &param)
 {
-    if (!d->m_params.contains(param))
+    if (!d->m_params.contains(param)) {
         d->m_params.append(param);
+        emit paramsChanged();
+    }
 }
 
 AADLObjectFunction *AADLObjectIface::function() const
@@ -179,18 +182,24 @@ void AADLObjectIface::setCloneOrigin(AADLObjectIface *source)
 {
     if (d->m_cloneOf != source) {
         d->m_cloneOf = source;
-        d->m_cloneOf->rememberClone(this);
+        if (d->m_cloneOf) {
+            d->m_cloneOf->rememberClone(this);
+        }
     }
 }
 
 void AADLObjectIface::rememberClone(AADLObjectIface *clone)
 {
-    if (clone && !d->m_clones.contains(clone))
+    if (clone && !d->m_clones.contains(clone)) {
+        clone->cloneInternals(this);
         d->m_clones.append(clone);
+    }
 }
 
 void AADLObjectIface::forgetClone(AADLObjectIface *clone)
 {
+    if (clone)
+        clone->restoreInternals(this);
     d->m_clones.removeAll(clone);
 }
 
@@ -255,25 +264,62 @@ AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType directi
     return iface;
 }
 
+void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
+{
+    if (!from)
+        return;
+
+    m_original.name = title();
+    m_original.attrs = attrs();
+    m_original.props = props();
+    m_original.params = params();
+
+    reflectAttrs(from);
+    reflectProps(from);
+    reflectParams(from);
+
+    connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
+            Qt::UniqueConnection);
+    connect(from, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged,
+            Qt::UniqueConnection);
+    connect(from, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged,
+            Qt::UniqueConnection);
+}
+
+void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
+{
+    disconnect(disconnectMe, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged);
+    disconnect(disconnectMe, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged);
+    disconnect(disconnectMe, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged);
+
+    setAttrs(m_original.attrs);
+    setProps(m_original.props);
+    setParams(m_original.params);
+}
+
+QVariant AADLObjectIface::originalAttr(const QString &name) const
+{
+    return m_original.attrs.value(name, QVariant());
+}
+
+QVariant AADLObjectIface::originalProp(const QString &name) const
+{
+    return m_original.props.value(name, QVariant());
+}
+
+QVector<IfaceParameter> AADLObjectIface::originalParams() const
+{
+    return m_original.params;
+}
+
 AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObjectFunction *parent)
 {
     if (!source)
         return nullptr;
 
     AADLObjectIface *target = AADLObjectIface::createIface(source->direction(), common::createId(), parent);
+
     target->setCloneOrigin(source);
-
-    auto cloneInternals = [target](void (AADLObject::*fp)(const QString &, const QVariant &),
-                                   const QHash<QString, QVariant> &collection) {
-        QHash<QString, QVariant>::const_iterator i = collection.cbegin();
-        while (i != collection.cend()) {
-            (target->*fp)(i.key(), i.value());
-            ++i;
-        }
-    };
-
-    cloneInternals(&AADLObject::setAttr, source->attrs());
-    cloneInternals(&AADLObject::setProp, source->props());
 
     if (parent)
         parent->addInterface(target);
@@ -283,22 +329,100 @@ AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObject
     return target;
 }
 
+void AADLObjectIface::onReflectedAttrChanged(taste3::aadl::meta::Props::Token /*attr*/)
+{
+    if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(sender()))
+        reflectAttrs(iface);
+}
+
+void AADLObjectIface::onReflectedPropChanged(taste3::aadl::meta::Props::Token /*prop*/)
+{
+    if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(sender()))
+        reflectProps(iface);
+}
+
+void AADLObjectIface::onReflectedParamsChanged()
+{
+    if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(sender()))
+        reflectParams(iface);
+}
+
+void AADLObjectIface::reflectAttrs(const AADLObjectIface *from)
+{
+    if (!from)
+        return;
+
+    auto revertAttribute = [](const QString &name, QHash<QString, QVariant> &attrs,
+                              const QHash<QString, QVariant> &attrsOriginal) {
+        const QVariant &value = attrsOriginal.value(name);
+        if (value.isValid())
+            attrs[name] = value;
+    };
+
+    QHash<QString, QVariant> newAttrs = from->attrs();
+
+    const bool isFunctionTypeInherited =
+            from->parent() && from->parentObject()->as<const AADLObjectFunctionType *>()->isFunctionType();
+    const bool keepName = !isFunctionTypeInherited && isRequired() && from->isProvided();
+    if (keepName)
+        revertAttribute(meta::Props::token(meta::Props::Token::name), newAttrs, m_original.attrs);
+
+    setAttrs(newAttrs);
+}
+
+void AADLObjectIface::reflectProps(const AADLObjectIface *from)
+{
+    if (!from)
+        return;
+
+    auto revertProperty = [](meta::Props::Token t, QHash<QString, QVariant> &props,
+                             const QHash<QString, QVariant> &propsOriginal) {
+        const QString &name = meta::Props::token(t);
+        const QVariant &value = propsOriginal.value(name);
+        if (value.isValid())
+            props[name] = value;
+    };
+
+    const QHash<QString, QVariant> &currProps = props();
+    QHash<QString, QVariant> newProps = from->props();
+    const bool isFunctionTypeInherited =
+            from->parent() && from->parentObject()->as<const AADLObjectFunctionType *>()->isFunctionType();
+
+    for (auto t : { meta::Props::Token::labelInheritance, meta::Props::Token::coordinates,
+                    meta::Props::Token::InnerCoordinates }) {
+        const bool isLabelInheritanceFlag = t == meta::Props::Token::labelInheritance;
+        const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
+        if (!isLabelInheritanceFlag || isInheritedPI)
+            revertProperty(t, newProps, currProps);
+    }
+
+    setProps(newProps);
+}
+
+void AADLObjectIface::reflectParams(const AADLObjectIface *from)
+{
+    if (!from)
+        return;
+
+    setParams(from->params());
+}
+
 void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
 {
-    AADLObject::setProp(name, val);
-
     if (!name.isEmpty()) {
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::labelInheritance: {
-            const bool inherited = val.toBool();
-            if (!inherited)
-                m_prototypes.clear();
-            emit propChanged_labelInheritance(inherited);
-            emit inheritedLabelsChanged(inheritedLables());
+            const bool newVal = val.toBool();
+            if (prop(meta::Props::token(meta::Props::Token::labelInheritance)) != newVal) {
+                AADLObject::setProp(name, val);
+                emit propChanged_labelInheritance(newVal);
+                emit inheritedLabelsChanged(inheritedLables());
+            }
             break;
         }
         default:
+            AADLObject::setProp(name, val);
             break;
         }
     }
@@ -398,13 +522,20 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
     }
 }
 
-void AADLObjectIfaceRequired::updatePrototype(const AADLObjectIfaceProvided *pi)
+void AADLObjectIfaceRequired::setPrototype(const AADLObjectIfaceProvided *pi)
 {
-    if (!pi)
+    if (!pi || !inheritPi())
         return;
 
-    if (!m_prototypes.contains(pi))
+    if (!m_prototypes.contains(pi)) {
+        if (m_prototypes.isEmpty())
+            cloneInternals(pi);
+
         m_prototypes.append(pi);
+        connect(pi, &AADLObjectIfaceProvided::attrChanged_kind, this, [this](AADLObjectIface::OperationKind kind) {
+            setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(kind));
+        });
+    }
     emit inheritedLabelsChanged(inheritedLables());
 }
 
@@ -413,7 +544,12 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
     if (!pi)
         return;
 
+    disconnect(pi, &AADLObjectIfaceProvided::attrChanged_kind, this, nullptr);
+
     m_prototypes.removeAll(pi);
+    if (m_prototypes.isEmpty())
+        restoreInternals(pi);
+
     emit inheritedLabelsChanged(inheritedLables());
 }
 

@@ -246,13 +246,13 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
         return;
     }
 
-    ri->updatePrototype(pi);
+    ri->setPrototype(pi);
 
     connect(
             pi, &AADLObjectIface::titleChanged, this,
             [pi, ri](const QString & /*title*/) {
                 if (ri->inheritPi())
-                    ri->updatePrototype(pi);
+                    ri->setPrototype(pi);
             },
             Qt::UniqueConnection);
     connect(

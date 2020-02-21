@@ -453,7 +453,7 @@ void AADLInterfaceGraphicsItem::updateKind()
         kindPath.lineTo(kindBaseValue / 2, 0);
         break;
     }
-    case AADLObjectIface::OperationKind::Protetcted: {
+    case AADLObjectIface::OperationKind::Protected: {
         const qreal kindBaseValue = kHeight;
         const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
         kindPath.addRoundedRect(rect, 2, 2);

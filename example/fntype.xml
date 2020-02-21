@@ -40,12 +40,20 @@
 
 		<Function name="Middle-SouthEast" language="C" is_type="NO" instance_of="">
 			<Property name="Taste::coordinates" value="50000 53000 96000 96000"/>
-
+			
+			<Provided_Interface name="Middle-SouthEast.PR" kind="PROTECTED_OPERATION" period=" 1000" wcet=" 0" queue_size=" 1">
+				<Property name="Taste::coordinates" value="73000 53000"/>
+				<Property name="Taste::Deadline" value="12 ms"/>
+				<Property name="Taste::InterfaceName" value="Middle-SouthEast.PR"/>
+				<Property name="Taste::RCMoperationKind" value="protected"/>
+				<Property name="Taste::RCMperiod" value="1000 ms"/>
+			</Provided_Interface>
+	   
 			<Function name="Top-NorthWest" language="C" is_type="NO" instance_of="">
 				<Property name="Taste::coordinates" value="53000 56000 73000 73000"/>
 				<Required_Interface name="Top-NorthWest.RI1" kind="SPORADIC_OPERATION">
 					<Input_Parameter name="a" type="T-Boolean" encoding="UPER"/>
-					<Property name="Taste::coordinates" value="53000 60000"/>
+					<Property name="Taste::coordinates" value="53000 62000"/>
 					<Property name="Taste::InterfaceName" value="run_forrest"/>
 					<Property name="Taste::labelInheritance" value="true"/>
 					<Property name="Taste::RCMoperationKind" value="any"/>

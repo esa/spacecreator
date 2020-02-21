@@ -124,6 +124,7 @@ SOURCES += \
         tab_interface/commands/cmdifaceparamcreate.cpp \
         tab_interface/commands/cmdifaceparamremove.cpp \
         tab_interface/commands/cmdinterfaceitemcreate.cpp \
+        tab_interface/commands/cmdrequiredifacepropertychange.cpp \
         tab_interface/commands/commandsfactory.cpp \
         tab_interface/connectioncreationvalidator.cpp \
         tab_interface/creatortool.cpp \
@@ -235,6 +236,7 @@ HEADERS += \
         tab_interface/commands/cmdifaceparamcreate.h \
         tab_interface/commands/cmdifaceparamremove.h \
         tab_interface/commands/cmdinterfaceitemcreate.h \
+        tab_interface/commands/cmdrequiredifacepropertychange.h \
         tab_interface/commands/commandids.h \
         tab_interface/commands/commandsfactory.h \
         tab_interface/connectioncreationvalidator.h \
