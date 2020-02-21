@@ -22,6 +22,7 @@
 namespace taste3 {
 namespace aadl {
 
+class AADLObject;
 class PropertiesModelBase : public QStandardItemModel
 {
 public:
@@ -33,6 +34,8 @@ public:
 
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
+
+    virtual const AADLObject *dataObject() const = 0;
 };
 } // ns aadl
 } // ns taste3

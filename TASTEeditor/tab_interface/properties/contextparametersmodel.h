@@ -47,6 +47,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     void setDataObject(AADLObject *obj);
+    const AADLObject *dataObject() const override;
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;

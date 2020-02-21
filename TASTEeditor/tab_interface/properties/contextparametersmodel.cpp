@@ -20,7 +20,7 @@
 #include "app/commandsstack.h"
 #include "tab_aadl/aadlcommonprops.h"
 #include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
+#include "tab_aadl/aadlobjectfunction.h"
 #include "tab_interface/commands/cmdentityattributechange.h"
 #include "tab_interface/commands/cmdentitypropertychange.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
@@ -76,6 +76,11 @@ void ContextParametersModel::setDataObject(AADLObject *obj)
 
         endInsertRows();
     }
+}
+
+const AADLObject *ContextParametersModel::dataObject() const
+{
+    return m_dataObject;
 }
 
 int ContextParametersModel::rowCount(const QModelIndex &parent) const
@@ -144,9 +149,10 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             return false;
         }
 
-        if (const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeContextParameter,
-                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld), QVariant::fromValue(paramNew) })) {
+        if (const auto attributesCmd =
+                    cmd::CommandsFactory::create(cmd::ChangeContextParameter,
+                                                 { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
+                                                   QVariant::fromValue(paramNew) })) {
 
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -165,8 +171,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
     ContextParameter param(propName);
     param.setParamType(BasicParameter::Type::Timer);
 
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateContextParameter,
-                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::CreateContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
     if (propsCmd) {
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
@@ -216,6 +222,23 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
     if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != BasicParameter::Type::Other)
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+
+    if (!m_dataObject)
+        return flags;
+
+    if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
+        switch (m_dataObject->aadlType()) {
+        case aadl::AADLObject::AADLObjectType::AADLFunction: {
+            if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
+                if (fn->inheritsFunctionType())
+                    flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+
+            break;
+        }
+        default:
+            break;
+        }
+    }
 
     return flags;
 }

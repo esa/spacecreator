@@ -43,6 +43,7 @@ public:
         Kill
     };
     void setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones = ClonedIfacesPolicy::Kill);
+    bool inheritsFunctionType() const;
 
 Q_SIGNALS:
     void attrChanged_instanceOf(const QString &functionType);

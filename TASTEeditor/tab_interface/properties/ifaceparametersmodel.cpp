@@ -77,6 +77,11 @@ void IfaceParametersModel::setDataObject(AADLObject *obj)
     }
 }
 
+const AADLObject *IfaceParametersModel::dataObject() const
+{
+    return m_dataObject;
+}
+
 int IfaceParametersModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
@@ -150,9 +155,10 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             return false;
         }
 
-        if (const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeIfaceParam,
-                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld), QVariant::fromValue(paramNew) })) {
+        if (const auto attributesCmd =
+                    cmd::CommandsFactory::create(cmd::ChangeIfaceParam,
+                                                 { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
+                                                   QVariant::fromValue(paramNew) })) {
 
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -170,8 +176,8 @@ bool IfaceParametersModel::createProperty(const QString &propName)
 
     IfaceParameter param(propName);
 
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateIfaceParam,
-                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::CreateIfaceParam, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
     if (propsCmd) {
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
@@ -231,6 +237,21 @@ QVariant IfaceParametersModel::headerData(int section, Qt::Orientation orientati
         }
     }
     return QVariant();
+}
+
+Qt::ItemFlags IfaceParametersModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = PropertiesModelBase::flags(index);
+    if (m_dataObject)
+        if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
+            if (iface->isClone()) {
+                flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+            } else if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>()) {
+                if (ri->hasPrototypePi())
+                    flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+            }
+        }
+    return flags;
 }
 
 } // namespace aadl

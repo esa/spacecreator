@@ -20,6 +20,7 @@
 #include "app/commandsstack.h"
 #include "tab_aadl/aadlcommonprops.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunction.h"
 #include "tab_interface/commands/cmdentityattributechange.h"
 #include "tab_interface/commands/cmdentitypropertychange.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
@@ -119,13 +120,12 @@ QVariant PropertiesListModel::data(const QModelIndex &index, int role) const
     }
     case Qt::DisplayRole:
     case Qt::EditRole: {
-        const bool itsAttr = isAttr(index);
         const QString &title = m_names.at(index.row());
 
         if (index.column() == ColumnTitle)
             return title;
 
-        return itsAttr ? m_dataObject->attr(title) : m_dataObject->prop(title);
+        return isAttr(index) ? m_dataObject->attr(title) : m_dataObject->prop(title);
     }
     }
 
@@ -142,7 +142,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         if (isAttr(index) && index.column() == ColumnValue) {
             const QVariantMap attributes = { { name, value } };
             const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes, { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
+                    cmd::ChangeEntityAttributes,
+                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
             taste3::cmd::CommandsStack::current()->push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
@@ -187,8 +188,8 @@ bool PropertiesListModel::createProperty(const QString &propName)
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
     const QVariantMap props = { { propName, QString() } };
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::CreateEntityProperty,
-                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::CreateEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         res = true;
@@ -214,8 +215,8 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
 
     const QString &propName = propId.data().toString();
     const QStringList props { propName };
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveEntityProperty,
-                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::RemoveEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
         taste3::cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);
@@ -237,6 +238,15 @@ bool PropertiesListModel::isProp(const QModelIndex &id) const
     return id.isValid() && ItemType::Property == id.data(ItemTypeRole).toInt();
 }
 
+meta::Props::Token tokenFromIndex(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return meta::Props::Token::Unknown;
+
+    const QString name = index.model()->index(index.row(), PropertiesListModel::ColumnTitle).data().toString();
+    return meta::Props::token(name);
+}
+
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
@@ -244,7 +254,65 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
     }
 
+    switch (tokenFromIndex(index)) {
+    case meta::Props::Token::InnerCoordinates:
+    case meta::Props::Token::coordinates: {
+        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (!m_dataObject)
+        return flags;
+
+    if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
+        switch (m_dataObject->aadlType()) {
+        case aadl::AADLObject::AADLObjectType::AADLFunction:
+            processFlagsFunction(index, flags);
+            break;
+        case aadl::AADLObject::AADLObjectType::AADLIface:
+            processFlagsIface(index, flags);
+            break;
+        default:
+            break;
+        }
+    }
     return flags;
+}
+
+void PropertiesListModel::processFlagsFunction(const QModelIndex & /*index*/, Qt::ItemFlags &flags) const
+{
+    if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
+        if (fn->inheritsFunctionType())
+            flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+}
+
+void PropertiesListModel::processFlagsIface(const QModelIndex &index, Qt::ItemFlags &flags) const
+{
+    if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
+        if (iface->isClone()) {
+            flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+            return;
+        }
+
+        if (iface->isRequired()) {
+            if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>()) {
+                if (ri->hasPrototypePi()) {
+                    switch (tokenFromIndex(index)) {
+                    case meta::Props::Token::name:
+                    case meta::Props::Token::labelInheritance:
+                        return;
+                    default: {
+                        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+                        return;
+                    }
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace aadl
