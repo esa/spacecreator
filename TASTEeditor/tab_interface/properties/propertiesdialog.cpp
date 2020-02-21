@@ -92,7 +92,7 @@ void PropertiesDialog::done(int r)
 {
     taste3::cmd::CommandsStack::current()->endMacro();
 
-    if (QDialog::Rejected == r)
+    if (QDialog::Rejected == r && !taste3::cmd::CommandsStack::current()->isClean())
         taste3::cmd::CommandsStack::current()->undo();
 
     QDialog::done(r);
@@ -150,7 +150,7 @@ void PropertiesDialog::initTabs()
                                                          new PropertyTypeDelegate(viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
                 IfaceParametersModel::ColumnEncoding,
-                new StringListComboDelegate({ tr("NATIVE"), tr("UPPER"), tr("ACN") }, // TODO: is it configurable?
+                new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
                                             viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
                 IfaceParametersModel::ColumnDirection,

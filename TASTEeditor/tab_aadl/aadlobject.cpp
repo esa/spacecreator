@@ -91,10 +91,6 @@ bool AADLObject::setParentObject(AADLObject *parentObject)
     return true;
 }
 
-void AADLObject::handleClonedAttr(taste3::aadl::meta::Props::Token attr) {}
-
-void AADLObject::handleClonedProp(taste3::aadl::meta::Props::Token prop) {}
-
 QVector<qint32> AADLObject::coordinatesFromString(const QString &strCoordinates) const
 {
     const QStringList &strCoords = strCoordinates.split(' ', QString::SkipEmptyParts);
@@ -173,8 +169,10 @@ QVariantList AADLObject::templateAttributes() const
 void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
 {
     if (d->m_attrs != attrs) {
-        d->m_attrs = attrs;
-        emit attributeChanged();
+        d->m_attrs.clear();
+
+        for (auto i = attrs.cbegin(); i != attrs.cend(); ++i)
+            setAttr(i.key(), i.value());
     }
 }
 
@@ -224,8 +222,10 @@ QVariantList AADLObject::templateProperties() const
 void AADLObject::setProps(const QHash<QString, QVariant> &props)
 {
     if (props != d->m_props) {
-        d->m_props = props;
-        emit propertyChanged();
+        d->m_props.clear();
+
+        for (auto i = props.cbegin(); i != props.cend(); ++i)
+            setProp(i.key(), i.value());
     }
 }
 

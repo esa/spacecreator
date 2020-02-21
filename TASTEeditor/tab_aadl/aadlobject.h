@@ -113,9 +113,6 @@ public Q_SLOTS:
     bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);
 
-    void handleClonedAttr(taste3::aadl::meta::Props::Token attr);
-    void handleClonedProp(taste3::aadl::meta::Props::Token prop);
-
 protected:
     explicit AADLObject(const common::Id &id, const QString &title = QString(), QObject *parent = nullptr);
 

@@ -56,7 +56,7 @@ public:
         Any = 0,
         Cyclic, // period, deadline, wcet
         Sporadic, // min interval t,deadline, wcet,queuesize
-        Protetcted, // deadline, wcet
+        Protected, // deadline, wcet
         Unprotected, // deadline, wcet
     };
     Q_ENUM(OperationKind)
@@ -117,8 +117,18 @@ public:
 
     void setAttr(const QString &name, const QVariant &val) override;
 
+    QVariant originalAttr(const QString &name) const;
+    QVariant originalProp(const QString &name) const;
+    QVector<IfaceParameter> originalParams() const;
+
 Q_SIGNALS:
     void attrChanged_kind(AADLObjectIface::OperationKind kind);
+    void paramsChanged();
+
+protected Q_SLOTS:
+    void onReflectedAttrChanged(taste3::aadl::meta::Props::Token attr);
+    void onReflectedPropChanged(taste3::aadl::meta::Props::Token prop);
+    void onReflectedParamsChanged();
 
 protected:
     explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr);
@@ -129,6 +139,21 @@ protected:
     void setCloneOrigin(AADLObjectIface *source);
     void rememberClone(AADLObjectIface *clone);
     void forgetClone(AADLObjectIface *clone);
+
+    void cloneInternals(const AADLObjectIface *from);
+    void restoreInternals(const AADLObjectIface *disconnectMe);
+
+    void reflectAttrs(const AADLObjectIface *from);
+    void reflectProps(const AADLObjectIface *from);
+    void reflectParams(const AADLObjectIface *from);
+
+protected:
+    struct OriginalPropsHolder {
+        QString name;
+        QHash<QString, QVariant> attrs;
+        QHash<QString, QVariant> props;
+        QVector<IfaceParameter> params;
+    } m_original;
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
@@ -158,7 +183,7 @@ public:
     bool inheritPi() const;
 
     QStringList inheritedLables() const;
-    void updatePrototype(const AADLObjectIfaceProvided *pi);
+    void setPrototype(const AADLObjectIfaceProvided *pi);
     void unsetPrototype(const AADLObjectIfaceProvided *pi);
 
 Q_SIGNALS:

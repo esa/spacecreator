@@ -129,12 +129,7 @@ void AADLObjectFunction::cloneInterface(AADLObjectIface *theirIface)
 
     const bool notFound = found == myInterfaces.cend();
     if (notFound) {
-        if (AADLObjectIface *myNewIface = AADLObjectIface::cloneIface(theirIface, this)) {
-            connect(theirIface, &AADLObjectIface::attributeChanged, myNewIface, &AADLObjectIface::handleClonedAttr,
-                    Qt::UniqueConnection);
-            connect(theirIface, &AADLObjectIface::propertyChanged, myNewIface, &AADLObjectIface::handleClonedProp,
-                    Qt::UniqueConnection);
-        }
+        /*AADLObjectIface *myNewIface =*/AADLObjectIface::cloneIface(theirIface, this);
     }
 }
 
@@ -157,9 +152,6 @@ void AADLObjectFunction::uncloneInterface(AADLObjectIface *theirIface, ClonedIfa
                               [theirIface](AADLObjectIface *myIface) { return isSameIface(myIface, theirIface); });
 
     if (found != myInterfaces.cend()) {
-        disconnect(theirIface, &AADLObjectIface::attributeChanged, theirIface, &AADLObjectIface::handleClonedAttr);
-        disconnect(theirIface, &AADLObjectIface::propertyChanged, theirIface, &AADLObjectIface::handleClonedProp);
-
         if (killClones == ClonedIfacesPolicy::Kill) {
             AADLObjectIface *myIface = *found;
             removeInterface(myIface);
