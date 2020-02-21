@@ -21,11 +21,16 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "colors/colormanager.h"
+#include "commands/cmdentitygeometrychange.h"
+#include "commands/commandids.h"
+#include "commands/commandsfactory.h"
 
 #include <QPainter>
 #include <QtDebug>
+#include <app/commandsstack.h>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
+#include <tab_aadl/aadlobjectconnection.h>
 #include <tab_aadl/aadlobjectfunction.h>
 #include <tab_aadl/aadlobjectiface.h>
 
@@ -81,7 +86,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
-    return qobject_cast<AADLObjectIface *>(dataObject());
+    return qobject_cast<aadl::AADLObjectIface *>(aadlObject());
 }
 
 void AADLInterfaceGraphicsItem::addConnection(AADLConnectionGraphicsItem *item)
@@ -346,16 +351,27 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
         setTargetItem(parentItem(), coordinates);
 }
 
-void AADLInterfaceGraphicsItem::initGripPoints()
-{
-    InteractiveObject::initGripPoints();
-    m_gripPoints->setUsedPoints({});
-}
-
 void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
     const ColorHandler &h = colorHandler();
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
+}
+
+QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
+{
+    QList<QVariantList> params = { { QVariant::fromValue(entity()),
+                                     QVariant::fromValue(QVector<QPointF> { scenePos() }) } };
+    for (auto connection : connectionItems()) {
+        if (connection) {
+            params.append(
+                    { QVariant::fromValue(connection->entity()),
+                      QVariant::fromValue(
+                              connection->graphicsPoints()) }); // connection->prepareChangeCoordinatesCommandParams()
+                                                                // - will be fixed during work on Undo/Redo issues
+        }
+    }
+
+    return params;
 }
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -365,11 +381,11 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(widget)
 }
 
-void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(from)
 
-    if (!scene() || grip != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
+    if (!scene() || grip->location() != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
         return;
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
@@ -399,11 +415,6 @@ ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
     return ColorManager::HandledColors::Iface;
 }
 
-AADLObject *AADLInterfaceGraphicsItem::aadlObject() const
-{
-    return entity();
-}
-
 void AADLInterfaceGraphicsItem::colorSchemeUpdated()
 {
     const ColorHandler &h = colorHandler();
@@ -426,7 +437,7 @@ void AADLInterfaceGraphicsItem::updateLabel()
 
 void AADLInterfaceGraphicsItem::updateKind()
 {
-    AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(aadlObject());
+    AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(entity());
     if (!iface)
         return;
 
@@ -462,6 +473,7 @@ void AADLInterfaceGraphicsItem::updateKind()
         kindPath.moveTo(arcRect.center());
         kindPath.arcTo(arcRect, 0, 180);
         kindPath.translate(0, rect.height() / 3);
+        break;
     }
     default:
         break;

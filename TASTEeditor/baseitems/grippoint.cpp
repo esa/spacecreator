@@ -70,11 +70,10 @@ QColor GripPoint::bodyColor()
     return m_uiDescr.bodyColor();
 }
 
-GripPoint::GripPoint(Location pos, GripPointsHandler *parent, GripPoint::GripType gpType)
+GripPoint::GripPoint(Location pos, GripPointsHandler *parent)
     : QGraphicsItem(parent)
     , m_listener(parent)
     , m_location(pos)
-    , m_type(gpType)
     , m_boundRect(QPointF(-m_uiDescr.rectSize().width() / 2., -m_uiDescr.rectSize().height() / 2.),
                   m_uiDescr.rectSize())
 {
@@ -127,6 +126,9 @@ void GripPoint::updateLayout()
             destination = targetRect.center();
             c = Qt::SizeAllCursor;
             break;
+        case Absolute:
+            c = Qt::SizeAllCursor;
+            break;
         }
 
         if (!isMover() || m_location == Center) {
@@ -153,16 +155,7 @@ bool GripPoint::isMover() const
 
 GripPoint::GripType GripPoint::gripType() const
 {
-    return m_type;
-}
-
-void GripPoint::setGripType(GripPoint::GripType gpType)
-{
-    if (gripType() == gpType)
-        return;
-
-    m_type = gpType;
-    updateLayout();
+    return m_location == Center || m_location == Absolute ? GripType::Mover : GripType::Resizer;
 }
 
 bool GripPoint::isUsed() const
@@ -181,8 +174,8 @@ void GripPoint::setIsUsed(bool used)
 
 void GripPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
 
     painter->fillPath(m_path, m_uiDescr.body());
     painter->strokePath(m_path, m_uiDescr.border());
@@ -197,7 +190,6 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_posStart = m_posFinish = event->scenePos();
         if (m_listener)
             m_listener->handleGripPointPress(this, event->scenePos());
         event->accept();
@@ -207,11 +199,8 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_posFinish = event->scenePos();
     if (m_listener)
-        m_listener->handleGripPointRelease(this, m_posStart, m_posFinish);
-
-    m_posStart = m_posFinish = QPointF();
+        m_listener->handleGripPointRelease(this, event->buttonDownScenePos(event->button()), event->scenePos());
 }
 
 } // namespace taste3

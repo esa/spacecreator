@@ -43,14 +43,13 @@ namespace aadl {
 AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent)
     : AADLFunctionTypeGraphicsItem(entity, parent)
 {
-    setObjectName(QLatin1String("AADLFunctionGraphicsItem"));
     m_textItem->setVisible(!isRootItem());
     colorSchemeUpdated();
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
 {
-    return qobject_cast<AADLObjectFunction *>(dataObject());
+    return qobject_cast<aadl::AADLObjectFunction *>(aadlObject());
 }
 
 QPainterPath AADLFunctionGraphicsItem::shape() const
@@ -74,8 +73,8 @@ void AADLFunctionGraphicsItem::rebuildLayout()
     QRectF nestedItemsInternalRect;
     bool needRelayout = false;
     for (QGraphicsItem *item : childItems()) {
-        if (auto iObj = qobject_cast<AADLFunctionTypeGraphicsItem *>(item->toGraphicsObject())) {
-            if (auto entity = qobject_cast<aadl::AADLObject *>(iObj->modelEntity())) {
+        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+            if (auto entity = iObj->aadlObject()) {
                 const QRectF objRect = utils::rect(entity->coordinates());
                 if (objRect.isValid())
                     nestedItemsInternalRect |= objRect;
@@ -110,7 +109,7 @@ void AADLFunctionGraphicsItem::rebuildLayout()
 
         if (nestedItemsInternalRect.isValid()) {
             for (QGraphicsItem *child : childItems()) {
-                if (auto function = qobject_cast<AADLFunctionTypeGraphicsItem *>(child->toGraphicsObject()))
+                if (auto function = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject()))
                     function->moveBy(offset.x(), offset.y());
             }
             scene()->setSceneRect({});
@@ -155,7 +154,7 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
-void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     if (isRootItem())
         return;
@@ -164,13 +163,12 @@ void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint::Location grip, co
     layoutOuterConnections();
 }
 
-void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
-                                                  const QPointF &releasedAt)
+void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
 
-    if (handlePositionChanged(pressedAt, releasedAt) && !isRootItem()) {
-        createCommand();
+    if (allowGeometryChange(pressedAt, releasedAt) && !isRootItem()) {
+        updateEntity();
     } else {
         for (auto child : childItems()) {
             if (auto interface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child)) {
@@ -183,79 +181,25 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint::Location grip, cons
     }
 }
 
-void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    const QPointF shift = QPointF(to - from);
-    QRectF rect = mapRectToParent(boundingRect());
+    const QRectF rect = adjustRectToParent(grip, from, to);
 
-    auto parentFunction = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
-    const QRectF contentRect = parentFunction ? parentFunction->boundingRect().marginsRemoved(
-                                       parentFunction->isRootItem() ? utils::kRootMargins : utils::kContentMargins)
-                                              : QRectF();
-    switch (grip) {
-    case GripPoint::Left: {
-        const qreal left = rect.left() + shift.x();
-        if (contentRect.isNull() || left >= contentRect.left())
-            rect.setLeft(left);
-    } break;
-    case GripPoint::Top: {
-        const qreal top = rect.top() + shift.y();
-        if (contentRect.isNull() || top >= contentRect.top())
-            rect.setTop(top);
-    } break;
-    case GripPoint::Right: {
-        const qreal right = rect.right() + shift.x();
-        if (contentRect.isNull() || right <= contentRect.right())
-            rect.setRight(right);
-    } break;
-    case GripPoint::Bottom: {
-        const qreal bottom = rect.bottom() + shift.y();
-        if (contentRect.isNull() || bottom <= contentRect.bottom())
-            rect.setBottom(bottom);
-    } break;
-    case GripPoint::TopLeft: {
-        const QPointF topLeft = rect.topLeft() + shift;
-        if (contentRect.isNull() || contentRect.contains(topLeft))
-            rect.setTopLeft(topLeft);
-    } break;
-    case GripPoint::TopRight: {
-        const QPointF topRight = rect.topRight() + shift;
-        if (contentRect.isNull() || contentRect.contains(topRight))
-            rect.setTopRight(topRight);
-    } break;
-    case GripPoint::BottomLeft: {
-        const QPointF bottomLeft = rect.bottomLeft() + shift;
-        if (contentRect.isNull() || contentRect.contains(bottomLeft))
-            rect.setBottomLeft(bottomLeft);
-    } break;
-    case GripPoint::BottomRight: {
-        const QPointF bottomRight = rect.bottomRight() + shift;
-        if (contentRect.isNull() || contentRect.contains(bottomRight))
-            rect.setBottomRight(bottomRight);
-    } break;
-    default:
-        qWarning() << "Update grip point handling";
-        break;
-    }
-
-    const QRectF normalized = rect.normalized();
-    if (isRootItem() && !normalized.marginsRemoved(utils::kRootMargins).contains(nestedItemsSceneBoundingRect()))
+    if (isRootItem() && !rect.marginsRemoved(utils::kRootMargins).contains(nestedItemsSceneBoundingRect()))
         return;
 
-    if (normalized.width() >= minimalSize().width() && normalized.height() >= minimalSize().height()) {
+    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()) {
         const QPointF offset = parentItem()
-                ? (sceneBoundingRect().topLeft() - parentItem()->mapRectToScene(normalized).topLeft())
-                : sceneBoundingRect().topLeft() - normalized.topLeft();
+                ? (sceneBoundingRect().topLeft() - parentItem()->mapRectToScene(rect).topLeft())
+                : sceneBoundingRect().topLeft() - rect.topLeft();
         if (isRootItem())
-            setGeometry(normalized);
+            setGeometry(rect);
         else
-            setRect(parentItem() ? parentItem()->mapRectToScene(normalized) : normalized);
+            setRect(parentItem() ? parentItem()->mapRectToScene(rect) : rect);
 
         for (QGraphicsItem *child : childItems()) {
-            static const QList<int> kNestedTypes { AADLFunctionTypeGraphicsItem::Type, AADLFunctionGraphicsItem::Type,
-                                                   AADLCommentGraphicsItem::Type };
-            if (kNestedTypes.contains(child->type()))
-                child->moveBy(offset.x(), offset.y());
+            if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject()))
+                iObj->moveBy(offset.x(), offset.y());
         }
     }
 
@@ -266,15 +210,17 @@ void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint::Location grip, 
     //    Q_EMIT needUpdateLayout();
 }
 
-void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
+void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt,
                                                     const QPointF &releasedAt)
 {
-    if (handleGeometryChanged(grip, pressedAt, releasedAt) && !isRootItem()) {
+    Q_UNUSED(grip)
+
+    if (allowGeometryChange(pressedAt, releasedAt) && !isRootItem()) {
         const QRectF nestedRect = nestedItemsSceneBoundingRect();
         if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect))
             doAutoLayout();
         else
-            createCommand();
+            updateEntity();
     }
 }
 
@@ -338,7 +284,7 @@ void AADLFunctionGraphicsItem::updateNestedItems()
     const QRectF sceneRect = sceneBoundingRect();
     QList<QRectF> nestedRects;
     for (auto item : childItems()) {
-        if (item->type() == AADLFunctionTypeGraphicsItem::Type || item->type() == AADLFunctionGraphicsItem::Type) {
+        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
             const QRectF nestedRect = item->sceneBoundingRect();
 
             if (nestedRect.isEmpty() || !sceneRect.contains(nestedRect.marginsAdded(utils::kContentMargins))) {
@@ -373,27 +319,13 @@ QRectF AADLFunctionGraphicsItem::nestedItemsSceneBoundingRect() const
 {
     QRectF nestedItemsBoundingRect;
     for (auto item : childItems()) {
-        if (item->type() == AADLFunctionTypeGraphicsItem::Type || item->type() == AADLFunctionGraphicsItem::Type) {
+        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
             const QRectF nestedRect = item->sceneBoundingRect();
             if (nestedRect.isValid())
                 nestedItemsBoundingRect |= nestedRect;
         }
     }
     return nestedItemsBoundingRect;
-}
-
-void AADLFunctionGraphicsItem::updateFromEntity()
-{
-    aadl::AADLObjectFunction *obj = entity();
-    Q_ASSERT(obj);
-    if (!obj)
-        return;
-
-    const QRectF itemSceneRect { utils::rect(obj->coordinates()) };
-    if (!itemSceneRect.isValid())
-        instantLayoutUpdate();
-    else
-        setRect(itemSceneRect);
 }
 
 ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
@@ -406,11 +338,6 @@ ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
         return ColorManager::HandledColors::FunctionPartial;
 
     return ColorManager::HandledColors::FunctionRegular;
-}
-
-AADLObject *AADLFunctionGraphicsItem::aadlObject() const
-{
-    return entity();
 }
 
 void AADLFunctionGraphicsItem::colorSchemeUpdated()
@@ -434,16 +361,11 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 void AADLFunctionGraphicsItem::doAutoLayout()
 {
     QSizeF minSize { std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max() };
-    QList<InteractiveObject *> nestedInteractiveObjects;
-    for (auto nestedItem : childItems()) {
-        static const QSet<int> acceptedTypes { aadl::AADLFunctionGraphicsItem::Type,
-                                               aadl::AADLFunctionTypeGraphicsItem::Type,
-                                               aadl::AADLCommentGraphicsItem::Type };
-        if (acceptedTypes.contains(nestedItem->type())) {
-            if (auto iObj = qobject_cast<InteractiveObject *>(nestedItem->toGraphicsObject())) {
-                nestedInteractiveObjects.append(iObj);
-                minSize = minSize.boundedTo(iObj->minimalSize());
-            }
+    QList<AADLRectGraphicsItem *> nestedInteractiveObjects;
+    for (auto item : childItems()) {
+        if (auto nestedItem = qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+            nestedInteractiveObjects.append(nestedItem);
+            minSize = minSize.boundedTo(nestedItem->minimalSize());
         }
     }
 
@@ -478,7 +400,7 @@ void AADLFunctionGraphicsItem::doAutoLayout()
     //        nestedItem->colorSchemeUpdated();
 
     layoutConnections();
-    createCommand();
+    updateEntity();
 }
 
 } // namespace aadl
