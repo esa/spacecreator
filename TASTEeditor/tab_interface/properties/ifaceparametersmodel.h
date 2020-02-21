@@ -24,7 +24,7 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObject;
-struct IfaceParameter;
+class IfaceParameter;
 class IfaceParametersModel : public PropertiesModelBase
 {
     Q_OBJECT

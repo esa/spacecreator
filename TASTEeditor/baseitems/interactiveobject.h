@@ -18,27 +18,29 @@
 
 #pragma once
 
-#include "clicknotifieritem.h"
 #include "grippoint.h"
+#include "tab_interface/colors/colormanager.h"
 
 #include <QFont>
 #include <QGraphicsObject>
 #include <QPointer>
 
 namespace taste3 {
-
 class HighlightRectItem;
+namespace aadl {
 
-class InteractiveObject : public ClickNotifierItem
+class AADLObject;
+
+class InteractiveObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    InteractiveObject(QObject *entity, QGraphicsItem *parent = nullptr);
-
-    QObject *modelEntity() const;
+    InteractiveObject(AADLObject *entity, QGraphicsItem *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
+
+    AADLObject *aadlObject() const;
 
     bool isHovered() const;
 
@@ -64,66 +66,70 @@ public:
     QFont font() const;
     void setFont(const QFont &font);
 
+    virtual void updateEntity();
     virtual void updateFromEntity() = 0;
-    virtual QSizeF minimalSize() const;
+    virtual QList<QVariantList> prepareChangeCoordinatesCommandParams() const;
+    virtual void updateGripPoints();
 
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();
-    void setRect(const QRectF &geometry);
-
-    virtual void updateGripPoints();
 
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
     void moved(InteractiveObject *item);
     void boundingBoxChanged();
     void needUpdateLayout() const;
+    void clicked();
+    void doubleClicked();
 
-private Q_SLOTS:
-    virtual void gripPointPressed(GripPoint::Location pos, const QPointF &at);
-    virtual void gripPointMoved(GripPoint::Location pos, const QPointF &from, const QPointF &to);
-    virtual void gripPointReleased(GripPoint::Location pos, const QPointF &pressedAt, const QPointF &releasedAt);
+protected Q_SLOTS:
+    virtual void colorSchemeUpdated() = 0;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    virtual void onManualMoveStart(GripPoint::Location grip, const QPointF &at);
-    virtual void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
-    virtual void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
+    virtual void onManualMoveStart(GripPoint *gp, const QPointF &at);
+    virtual void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to);
+    virtual void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt);
+    virtual void onManualGripPointAdd(GripPoint *gp);
+    virtual void onManualGripPointRemove(GripPoint *gp);
 
-    virtual void onManualResizeStart(GripPoint::Location grip, const QPointF &at);
-    virtual void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to);
-    virtual void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt);
+    virtual void onManualResizeStart(GripPoint *gp, const QPointF &at);
+    virtual void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to);
+    virtual void onManualResizeFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt);
 
     virtual void hideGripPoints();
     virtual void showGripPoints();
     virtual void initGripPoints();
+
     virtual void rebuildLayout();
 
     virtual void onSelectionChanged(bool isSelected);
 
-    virtual void createCommand();
-
-    bool handlePositionChanged(const QPointF &from, const QPointF &to);
-    bool handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to);
-
     HighlightRectItem *createHighlighter();
 
+    virtual ColorManager::HandledColors handledColorType() const = 0;
+    virtual ColorHandler colorHandler() const;
+
+private Q_SLOTS:
+    virtual void gripPointPressed(GripPoint *pos, const QPointF &at);
+    virtual void gripPointMoved(GripPoint *gp, const QPointF &from, const QPointF &to);
+    virtual void gripPointReleased(GripPoint *pos, const QPointF &pressedAt, const QPointF &releasedAt);
+
 protected:
-    QPointer<GripPointsHandler> m_gripPoints;
+    const QPointer<AADLObject> m_dataObject;
+    QPointer<GripPointsHandler> m_gripPointsHandler;
     QRectF m_boundingRect;
     bool m_hovered = false;
     qreal m_storedZ = 0.;
     QPointF m_prevPos;
-    QPointF m_clickPos;
+    QPointF m_clickPos; // TODO: check ?
     bool m_layoutDirty = false;
 
     bool m_highlightable = false;
@@ -135,4 +141,5 @@ protected:
     QFont m_font;
 };
 
+} // namespace aadl
 } // namespace taste3

@@ -20,12 +20,10 @@
 
 #include "common/drawrectinfo.h"
 
-#include <QBrush>
 #include <QCursor>
 #include <QGraphicsItem>
-#include <QObject>
 #include <QPainterPath>
-#include <QPen>
+#include <QPointer>
 
 namespace taste3 {
 
@@ -45,7 +43,8 @@ public:
         TopLeft,
         BottomLeft,
         TopRight,
-        BottomRight
+        BottomRight,
+        Absolute,
     };
     Q_ENUM(Location)
     typedef QSet<GripPoint::Location> Locations;
@@ -56,8 +55,7 @@ public:
         Resizer
     };
 
-    GripPoint(Location pos, GripPointsHandler *parent = nullptr,
-              GripPoint::GripType gpType = GripPoint::GripType::Resizer);
+    explicit GripPoint(Location pos, GripPointsHandler *parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -89,15 +87,12 @@ protected:
 
     AbstractInteractiveObject *const m_listener;
     Location m_location;
-    GripPoint::GripType m_type;
 
-    QRectF m_boundRect;
+    const QRectF m_boundRect;
     QCursor m_cursor;
     QPainterPath m_path;
 
     bool m_used = true;
-
-    QPointF m_posStart, m_posFinish;
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;

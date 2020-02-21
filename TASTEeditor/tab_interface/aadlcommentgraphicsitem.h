@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "baseitems/interactiveobject.h"
+#include "aadlrectgraphicsitem.h"
 #include "tab_aadl/aadlobjectcomment.h"
 
 namespace taste3 {
@@ -24,8 +24,7 @@ class TextGraphicsItem;
 
 namespace aadl {
 
-/// TODO: create base comment item for all libraries
-class AADLCommentGraphicsItem : public InteractiveObject
+class AADLCommentGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
@@ -34,39 +33,26 @@ public:
     {
         Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLComment)
     };
-
     int type() const override { return Type; }
 
     void setText(const QString &text);
     QString text() const;
 
     AADLObjectComment *entity() const;
-
-    void updateFromEntity() override;
-
-protected:
-    void rebuildLayout() override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-
     QSizeF minimalSize() const override;
-
-    virtual ColorManager::HandledColors handledColorType() const override;
-    virtual AADLObject *aadlObject() const override;
+    void updateFromEntity() override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
 
+protected:
+    void rebuildLayout() override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual ColorManager::HandledColors handledColorType() const override;
+
 private Q_SLOTS:
     void textEdited(const QString &newText);
     void textChanged();
-
-private:
-    void createCommand() override;
 
 private:
     TextGraphicsItem *m_textItem = nullptr;

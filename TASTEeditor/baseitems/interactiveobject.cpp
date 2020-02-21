@@ -18,9 +18,13 @@
 
 #include "interactiveobject.h"
 
+#include "app/commandsstack.h"
+#include "baseitems/common/highlightrectitem.h"
 #include "baseitems/common/utils.h"
-#include "common/highlightrectitem.h"
 #include "grippointshandler.h"
+#include "tab_aadl/aadlobject.h"
+#include "tab_interface/commands/commandids.h"
+#include "tab_interface/commands/commandsfactory.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -31,11 +35,13 @@
 #include <functional>
 
 namespace taste3 {
+namespace aadl {
 
 static const QMarginsF kMargins { 25, 25, 25, 25 };
 
-InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
-    : ClickNotifierItem(entity, parent)
+InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
+    : QGraphicsObject(parent)
+    , m_dataObject(entity)
     , m_selectedPen(Qt::black, 2, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
@@ -43,17 +49,14 @@ InteractiveObject::InteractiveObject(QObject *entity, QGraphicsItem *parent)
              | QGraphicsItem::ItemIsSelectable);
 
     setCursor(Qt::ArrowCursor);
-}
 
-QObject *InteractiveObject::modelEntity() const
-{
-    return dataObject();
+    connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::colorSchemeUpdated);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
 
     if (isSelected()) {
         painter->save();
@@ -69,40 +72,42 @@ QRectF InteractiveObject::boundingRect() const
     return m_boundingRect;
 }
 
-void InteractiveObject::gripPointPressed(GripPoint::Location gp, const QPointF &at)
+AADLObject *InteractiveObject::aadlObject() const
 {
-    if (m_gripPoints) {
-        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
-            if (gripPnt->isMover())
-                onManualMoveStart(gripPnt->location(), at);
-            else
-                onManualResizeStart(gripPnt->location(), at);
-        }
-    }
+    return m_dataObject;
 }
 
-void InteractiveObject::gripPointMoved(GripPoint::Location gripPos, const QPointF &from, const QPointF &to)
+void InteractiveObject::gripPointPressed(GripPoint *gp, const QPointF &at)
 {
-    if (m_gripPoints) {
-        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gripPos)) {
-            if (gripPnt->isMover())
-                onManualMoveProgress(gripPnt->location(), from, to);
-            else
-                onManualResizeProgress(gripPnt->location(), from, to);
-        }
-    }
+    if (!gp)
+        return;
+
+    if (gp->isMover())
+        onManualMoveStart(gp, at);
+    else
+        onManualResizeStart(gp, at);
 }
 
-void InteractiveObject::gripPointReleased(GripPoint::Location gp, const QPointF &pressedAt, const QPointF &releasedAt)
+void InteractiveObject::gripPointMoved(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (m_gripPoints) {
-        if (GripPoint *gripPnt = m_gripPoints->gripPoint(gp)) {
-            if (gripPnt->isMover())
-                onManualMoveFinish(gripPnt->location(), pressedAt, releasedAt);
-            else
-                onManualResizeFinish(gripPnt->location(), pressedAt, releasedAt);
-        }
-    }
+    if (!gp)
+        return;
+
+    if (gp->isMover())
+        onManualMoveProgress(gp, from, to);
+    else
+        onManualResizeProgress(gp, from, to);
+}
+
+void InteractiveObject::gripPointReleased(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    if (!gp)
+        return;
+
+    if (gp->isMover())
+        onManualMoveFinish(gp, pressedAt, releasedAt);
+    else
+        onManualResizeFinish(gp, pressedAt, releasedAt);
 }
 
 void InteractiveObject::onSelectionChanged(bool isSelected)
@@ -114,79 +119,6 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     } else {
         hideGripPoints();
     }
-}
-
-void InteractiveObject::createCommand() {}
-
-bool InteractiveObject::handlePositionChanged(const QPointF &from, const QPointF &to)
-{
-    const QPointF delta { to - from };
-    if (delta.isNull())
-        return false;
-
-    const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
-    auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-        return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
-    });
-    // Fallback to previous geometry in case colliding with items at the same level
-    if (it != collidedItems.constEnd()) {
-        setPos(pos() - delta);
-        rebuildLayout();
-        updateGripPoints();
-        return false;
-    }
-
-    return true;
-}
-
-bool InteractiveObject::handleGeometryChanged(GripPoint::Location grip, const QPointF &from, const QPointF &to)
-{
-    const QPointF delta { to - from };
-    if (delta.isNull())
-        return false;
-
-    const QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(kMargins));
-    auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-        return dynamic_cast<const InteractiveObject *>(item) && item != this && item->parentItem() == parentItem();
-    });
-    // Fallback to previous geometry in case colliding with items at the same level
-    if (it != collidedItems.constEnd()) {
-        QRectF rect = mapRectToParent(boundingRect());
-        switch (grip) {
-        case GripPoint::Left: {
-            rect.setLeft(rect.left() - delta.x());
-        } break;
-        case GripPoint::Top: {
-            rect.setTop(rect.top() - delta.y());
-        } break;
-        case GripPoint::Right: {
-            rect.setRight(rect.right() - delta.x());
-        } break;
-        case GripPoint::Bottom: {
-            rect.setBottom(rect.bottom() - delta.y());
-        } break;
-        case GripPoint::TopLeft: {
-            rect.setTopLeft(rect.topLeft() - delta);
-        } break;
-        case GripPoint::TopRight: {
-            rect.setTopRight(rect.topRight() - delta);
-        } break;
-        case GripPoint::BottomLeft: {
-            rect.setBottomLeft(rect.bottomLeft() - delta);
-        } break;
-        case GripPoint::BottomRight: {
-            rect.setBottomRight(rect.bottomRight() - delta);
-        } break;
-        default:
-            qWarning() << "Update grip point handling";
-            break;
-        }
-        setRect(parentItem() ? parentItem()->mapRectToScene(rect) : rect);
-        updateGripPoints();
-        return false;
-    }
-
-    return true;
 }
 
 void InteractiveObject::rebuildLayout()
@@ -207,9 +139,30 @@ void InteractiveObject::setFont(const QFont &font)
     m_font = font;
 }
 
-QSizeF InteractiveObject::minimalSize() const
+void InteractiveObject::updateEntity()
 {
-    return QSizeF();
+    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change item geometry/position"));
+
+    for (auto commandParam : prepareChangeCoordinatesCommandParams()) {
+        const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, commandParam);
+        taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
+    }
+
+    taste3::cmd::CommandsStack::current()->endMacro();
+}
+
+QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() const
+{
+    QList<QVariantList> params;
+    auto children = childItems();
+    std::sort(children.begin(), children.end(),
+              [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
+
+    for (auto item : children) {
+        if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))
+            params.append(iObj->prepareChangeCoordinatesCommandParams());
+    }
+    return params;
 }
 
 QBrush InteractiveObject::brush() const
@@ -232,121 +185,121 @@ void InteractiveObject::setPen(const QPen &pen)
     m_pen = pen;
 }
 
-void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    m_hovered = true;
-    m_storedZ = zValue();
-    //    setZValue(m_storedZ + 1.);
-
-    ClickNotifierItem::hoverEnterEvent(event);
-}
-
-void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    m_hovered = false;
-    setZValue(m_storedZ);
-
-    ClickNotifierItem::hoverLeaveEvent(event);
-}
-
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    onManualMoveProgress(GripPoint::Center, event->lastScenePos(), event->scenePos());
-    ClickNotifierItem::mouseMoveEvent(event);
+    QGraphicsObject::mouseMoveEvent(event);
+    onManualMoveProgress(nullptr, event->lastScenePos(), event->scenePos());
 }
 
 void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    onManualMoveStart(GripPoint::Center, event->scenePos());
-    ClickNotifierItem::mousePressEvent(event);
+    QGraphicsObject::mousePressEvent(event);
+    onManualMoveStart(nullptr, event->scenePos());
 }
 
 void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    onManualMoveFinish(GripPoint::Center, event->buttonDownScenePos(event->button()), event->scenePos());
-    ClickNotifierItem::mouseReleaseEvent(event);
+    onManualMoveFinish(nullptr, event->buttonDownScenePos(event->button()), event->scenePos());
+    emit clicked();
+    QGraphicsObject::mouseReleaseEvent(event);
 }
 
-void InteractiveObject::onManualMoveStart(GripPoint::Location grip, const QPointF &at)
+void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (grip == GripPoint::Center)
-        m_clickPos = mapFromScene(at);
+    emit doubleClicked();
+    QGraphicsObject::mouseDoubleClickEvent(event);
 }
 
-void InteractiveObject::onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+void InteractiveObject::onManualMoveStart(GripPoint *gp, const QPointF &at)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    Q_UNUSED(gp)
+
+    m_clickPos = mapFromScene(at);
 }
 
-void InteractiveObject::onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt,
-                                           const QPointF &releasedAt)
+void InteractiveObject::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
+    Q_UNUSED(gp)
+    Q_UNUSED(from)
+    Q_UNUSED(to)
+}
+
+void InteractiveObject::onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(gp)
+    Q_UNUSED(pressedAt)
+    Q_UNUSED(releasedAt)
 
     m_clickPos = QPointF();
 }
 
-void InteractiveObject::onManualResizeStart(GripPoint::Location grip, const QPointF &at)
+void InteractiveObject::onManualGripPointAdd(GripPoint *gp)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(at);
+    Q_UNUSED(gp)
 }
 
-void InteractiveObject::onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt,
-                                             const QPointF &releasedAt)
+void InteractiveObject::onManualGripPointRemove(GripPoint *gp)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(pressedAt);
-    Q_UNUSED(releasedAt);
+    Q_UNUSED(gp)
 }
 
-void InteractiveObject::onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to)
+void InteractiveObject::onManualResizeStart(GripPoint *gp, const QPointF &at)
 {
-    Q_UNUSED(grip);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    Q_UNUSED(gp)
+    Q_UNUSED(at)
+}
+
+void InteractiveObject::onManualResizeFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(gp)
+    Q_UNUSED(pressedAt)
+    Q_UNUSED(releasedAt)
+}
+
+void InteractiveObject::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(gp)
+    Q_UNUSED(from)
+    Q_UNUSED(to)
 }
 
 void InteractiveObject::hideGripPoints()
 {
-    if (m_gripPoints)
-        m_gripPoints->hideAnimated();
+    if (m_gripPointsHandler)
+        m_gripPointsHandler->hideAnimated();
 }
 
 void InteractiveObject::showGripPoints()
 {
     initGripPoints();
-    m_gripPoints->showAnimated();
+    m_gripPointsHandler->showAnimated();
 }
 
 void InteractiveObject::initGripPoints()
 {
-    if (m_gripPoints)
+    if (m_gripPointsHandler)
         return;
 
-    m_gripPoints = new GripPointsHandler(this);
-    m_gripPoints->setZValue(0);
+    m_gripPointsHandler = new GripPointsHandler(this);
+    m_gripPointsHandler->setZValue(0);
 
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeStart, this, &InteractiveObject::gripPointPressed);
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this, &InteractiveObject::gripPointMoved);
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this, &InteractiveObject::gripPointReleased);
+    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,
+            &InteractiveObject::gripPointPressed);
+    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeProgress, this,
+            &InteractiveObject::gripPointMoved);
+    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &InteractiveObject::gripPointReleased);
 
-    connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
-        if (m_gripPoints && !m_gripPoints->isVisible())
-            delete m_gripPoints; // it's not a thing directly added to the scene, so just delete is enough
+    connect(m_gripPointsHandler, &GripPointsHandler::visibleChanged, this, [this]() {
+        if (m_gripPointsHandler && !m_gripPointsHandler->isVisible())
+            delete m_gripPointsHandler; // it's not a thing directly added to the scene, so just delete is enough
     });
-    if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
-        gp->setGripType(GripPoint::GripType::Mover);
 }
 
 void InteractiveObject::updateGripPoints()
 {
-    if (m_gripPoints)
-        m_gripPoints->updateLayout();
+    if (m_gripPointsHandler)
+        m_gripPointsHandler->updateLayout();
 }
 
 QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -365,7 +318,7 @@ QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant
         break;
     }
 
-    return ClickNotifierItem::itemChange(change, value);
+    return QGraphicsObject::itemChange(change, value);
 }
 
 bool InteractiveObject::isHovered() const
@@ -373,7 +326,7 @@ bool InteractiveObject::isHovered() const
     if (!isUnderMouse())
         return false;
 
-    return m_gripPoints && m_gripPoints->isVisible();
+    return m_gripPointsHandler && m_gripPointsHandler->isVisible();
 }
 
 HighlightRectItem *InteractiveObject::createHighlighter()
@@ -452,8 +405,7 @@ void InteractiveObject::scheduleLayoutUpdate()
     if (m_layoutDirty)
         return;
 
-    m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "instantLayoutUpdate", Qt::QueuedConnection);
+    m_layoutDirty = QMetaObject::invokeMethod(this, "instantLayoutUpdate", Qt::QueuedConnection);
 }
 
 void InteractiveObject::instantLayoutUpdate()
@@ -469,14 +421,18 @@ void InteractiveObject::instantLayoutUpdate()
     update();
 }
 
-void InteractiveObject::setRect(const QRectF &geometry)
+aadl::ColorHandler InteractiveObject::colorHandler() const
 {
-    const QPointF geometryPos = parentItem() ? parentItem()->mapFromScene(geometry.topLeft()) : geometry.topLeft();
-    setPos(geometryPos);
-    prepareGeometryChange();
-    m_boundingRect = { QPointF(0, 0), geometry.size() };
-    instantLayoutUpdate();
-    updateGripPoints();
+    ColorHandler h = ColorManager::colorsForItem(handledColorType());
+    if (AADLObject *aadlObj = aadlObject()) {
+        if (aadlObj->props().contains("color")) { // keep single custom color
+            h.m_fillType = ColorHandler::Color;
+            h.m_brushColor0 = QColor(aadlObj->props().value("color").toString());
+        }
+    }
+
+    return h;
 }
 
+} // namespace aadl
 } // namespace taste3

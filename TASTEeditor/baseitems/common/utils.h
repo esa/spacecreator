@@ -33,7 +33,7 @@ static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
 static constexpr QSizeF DefaultGraphicsItemSize = { 200, 80 };
 static const QMarginsF kContentMargins = { 30, 30, 30, 30 };
-static const QMarginsF kRootMargins = { 150, 150, 150, 150 };
+static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 
 QPainterPath lineShape(const QLineF &line, qreal span);

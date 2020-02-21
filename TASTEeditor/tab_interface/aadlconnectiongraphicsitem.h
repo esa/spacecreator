@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "baseitems/clicknotifieritem.h"
-#include "baseitems/common/abstractinteractiveobject.h"
+#include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
 
 #include <QGraphicsObject>
@@ -31,7 +30,7 @@ class AADLObjectConnection;
 class AADLInterfaceGraphicsItem;
 class AADLFunctionGraphicsItem;
 
-class AADLConnectionGraphicsItem : public ClickNotifierItem
+class AADLConnectionGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
@@ -56,7 +55,7 @@ public:
     QVector<QPointF> graphicsPoints() const;
 
     AADLObjectConnection *entity() const;
-    void updateFromEntity();
+    void updateFromEntity() override;
 
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
@@ -64,8 +63,8 @@ public:
 
     static QVector<QPointF> simplify(const QVector<QPointF> &points);
 
-    void clear();
-    void updateGripPoints(bool forceVisible = false);
+    void initGripPoints() override;
+    void updateGripPoints() override;
 
     AADLInterfaceGraphicsItem *endItem() const;
     AADLInterfaceGraphicsItem *startItem() const;
@@ -73,34 +72,25 @@ public:
     AADLFunctionGraphicsItem *sourceItem() const;
     AADLFunctionGraphicsItem *targetItem() const;
 
-public Q_SLOTS:
-    void scheduleLayoutUpdate();
-    void instantLayoutUpdate();
+    QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
 protected:
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
-
-    void handleSelectionChanged(bool isSelected);
-
-    bool handleGripPointPress(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
-    bool handleGripPointMove(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
-    bool handleGripPointRelease(QGraphicsRectItem *handle, QGraphicsSceneMouseEvent *event);
+    void onManualMoveStart(GripPoint *gp, const QPointF &at) override;
+    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
-    virtual AADLObject *aadlObject() const override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
-    void rebuildLayout();
+    void rebuildLayout() override;
+    void onSelectionChanged(bool isSelected) override;
 
 private:
-    void adjustGripPointCount();
-    QGraphicsRectItem *createGripPoint();
+    //    void adjustGripPointCount();
+    bool removeCollidedGrips(GripPoint *gp);
     void simplify();
     void updateBoundingRect();
-    void createCommand();
-    bool removeCollidedGrips(QGraphicsRectItem *handle);
 
 private:
     class GraphicsPathItem : public QGraphicsPathItem
@@ -113,11 +103,8 @@ private:
     const QPointer<AADLInterfaceGraphicsItem> m_startItem;
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
-    QRectF m_boundingRect;
 
     QVector<QPointF> m_points;
-    QList<QGraphicsRectItem *> m_grips;
-    bool m_layoutDirty = false;
 };
 
 } // namespace aadl

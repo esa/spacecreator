@@ -18,7 +18,6 @@
 #include "interfacetabdocument.h"
 
 #include "app/context/action/editor/dynactioneditor.h"
-#include "baseitems/clicknotifieritem.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/graphicsview.h"
 #include "creatortool.h"
@@ -73,9 +72,7 @@ QWidget *InterfaceTabDocument::createView()
         m_graphicsView = new GraphicsView;
         connect(m_graphicsView, &GraphicsView::zoomChanged, this, [this](qreal percent) {
             for (auto item : m_graphicsScene->selectedItems()) {
-                if (auto connection = qgraphicsitem_cast<aadl::AADLConnectionGraphicsItem *>(item)) {
-                    connection->updateGripPoints();
-                } else if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+                if (auto iObj = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
                     iObj->updateGripPoints();
                 }
             }
@@ -96,9 +93,7 @@ QGraphicsScene *InterfaceTabDocument::createScene()
         connect(m_graphicsScene, &QGraphicsScene::selectionChanged, [this]() {
             const QList<QGraphicsItem *> selectedItems = m_graphicsScene->selectedItems();
             auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(), [](QGraphicsItem *item) {
-                if (item->type() == aadl::AADLConnectionGraphicsItem::Type)
-                    return true;
-                return qobject_cast<taste3::InteractiveObject *>(item->toGraphicsObject()) != nullptr;
+                return qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject()) != nullptr;
             });
             m_actRemove->setEnabled(it != selectedItems.cend());
         });
@@ -481,10 +476,10 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
         item = createItemForObject(object);
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
         connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
-        if (auto clickable = qobject_cast<ClickNotifierItem *>(item->toGraphicsObject())) {
-            connect(clickable, &ClickNotifierItem::clicked, this, &InterfaceTabDocument::onItemClicked);
-            connect(clickable, &ClickNotifierItem::doubleClicked, this, &InterfaceTabDocument::onItemDoubleClicked,
-                    Qt::QueuedConnection);
+        if (auto clickable = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
+            connect(clickable, &aadl::InteractiveObject::clicked, this, &InterfaceTabDocument::onItemClicked);
+            connect(clickable, &aadl::InteractiveObject::doubleClicked, this,
+                    &InterfaceTabDocument::onItemDoubleClicked, Qt::QueuedConnection);
         }
         m_items.insert(object->id(), item);
         if (m_graphicsScene != item->scene())
@@ -548,8 +543,8 @@ void InterfaceTabDocument::onItemClicked()
 
 void InterfaceTabDocument::onItemDoubleClicked()
 {
-    if (auto clickedItem = qobject_cast<ClickNotifierItem *>(sender())) {
-        if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->dataObject())) {
+    if (auto clickedItem = qobject_cast<aadl::InteractiveObject *>(sender())) {
+        if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->aadlObject())) {
             if (clickedEntity->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
                     if (!function->children().isEmpty() && !function->isRootObject()) {

@@ -19,6 +19,7 @@
 
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
+#include "tab_aadl/aadlobject.h"
 
 #include <QGraphicsItem>
 #include <QMouseEvent>
@@ -90,11 +91,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
-        /// TODO: replace with switch by type + graphicsitem_cast<>()
-        if (auto iObj = dynamic_cast<InteractiveObject *>(item)) {
-            info.append(
-                    coordinatesInfo(item->mapFromScene(scenePos),
-                                    iObj->modelEntity() ? iObj->modelEntity()->objectName() : QLatin1String("None")));
+        if (auto iObj = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
+            info.append(coordinatesInfo(item->mapFromScene(scenePos),
+                                        iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None")));
         }
     }
 

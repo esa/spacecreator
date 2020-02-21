@@ -42,24 +42,21 @@ public:
     bool isRootItem() const;
     QRectF nestedItemsSceneBoundingRect() const;
 
-    void updateFromEntity() override;
-
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
-    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     void updateTextPosition() override;
 
     void scheduleUpdateNestedItems();
 
     virtual ColorManager::HandledColors handledColorType() const override;
-    virtual AADLObject *aadlObject() const override;
 
     void doAutoLayout();
 

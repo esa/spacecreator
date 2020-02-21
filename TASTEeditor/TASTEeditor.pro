@@ -52,18 +52,13 @@ SOURCES += \
         app/datatypes/basicdatatype.cpp \
         app/datatypes/datatypesstorage.cpp \
         app/mainwindow.cpp \
-        baseitems/clicknotifieritem.cpp \
-        baseitems/common/arrowsign.cpp \
         baseitems/common/drawrectinfo.cpp \
         baseitems/common/highlightrectitem.cpp \
-        baseitems/common/objectanchor.cpp \
-        baseitems/common/objectslink.cpp \
         baseitems/common/utils.cpp \
         baseitems/graphicsview.cpp \
         baseitems/grippoint.cpp \
         baseitems/grippointshandler.cpp \
         baseitems/interactiveobject.cpp \
-        baseitems/skinnablegraphicsobject.cpp \
         baseitems/textgraphicsitem.cpp \
         document/abstracttabdocument.cpp \
         document/documentsmanager.cpp \
@@ -101,6 +96,7 @@ SOURCES += \
         tab_interface/aadlfunctionnamegraphicsitem.cpp \
         tab_interface/aadlfunctiontypegraphicsitem.cpp \
         tab_interface/aadlinterfacegraphicsitem.cpp \
+        tab_interface/aadlrectgraphicsitem.cpp \
         tab_interface/colors/colorhandlereditor.cpp \
         tab_interface/colors/colormanager.cpp \
         tab_interface/colors/colormanagerdialog.cpp \
@@ -164,19 +160,14 @@ HEADERS += \
         app/datatypes/basicdatatype.h \
         app/datatypes/datatypesstorage.h \
         app/mainwindow.h \
-        baseitems/clicknotifieritem.h \
         baseitems/common/abstractinteractiveobject.h \
-        baseitems/common/arrowsign.h \
         baseitems/common/drawrectinfo.h \
         baseitems/common/highlightrectitem.h \
-        baseitems/common/objectanchor.h \
-        baseitems/common/objectslink.h \
         baseitems/common/utils.h \
         baseitems/graphicsview.h \
         baseitems/grippoint.h \
         baseitems/grippointshandler.h \
         baseitems/interactiveobject.h \
-        baseitems/skinnablegraphicsobject.h \
         baseitems/textgraphicsitem.h \
         document/abstracttabdocument.h \
         document/documentsmanager.h \
@@ -213,6 +204,7 @@ HEADERS += \
         tab_interface/aadlfunctionnamegraphicsitem.h \
         tab_interface/aadlfunctiontypegraphicsitem.h \
         tab_interface/aadlinterfacegraphicsitem.h \
+        tab_interface/aadlrectgraphicsitem.h \
         tab_interface/colors/colorhandlereditor.h \
         tab_interface/colors/colormanager.h \
         tab_interface/colors/colormanagerdialog.h \

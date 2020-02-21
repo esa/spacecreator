@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
+#include "aadlrectgraphicsitem.h"
 #include "tab_aadl/aadlobject.h"
 
 namespace taste3 {
@@ -25,7 +25,7 @@ namespace aadl {
 class AADLFunctionNameGraphicsItem;
 class AADLObjectFunctionType;
 
-class AADLFunctionTypeGraphicsItem : public InteractiveObject
+class AADLFunctionTypeGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
@@ -34,39 +34,21 @@ public:
     {
         Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLFunctionType)
     };
+    int type() const override { return Type; }
 
     AADLObjectFunctionType *entity() const;
 
-    int type() const override { return Type; }
-
-    void updateFromEntity() override;
-
     QSizeF minimalSize() const override;
+
+protected Q_SLOTS:
+    void colorSchemeUpdated() override;
 
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-
-    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualResizeProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(GripPoint::Location grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    ColorManager::HandledColors handledColorType() const override;
 
     virtual void updateTextPosition();
-
-    void initGripPoints() override;
-
-    virtual ColorManager::HandledColors handledColorType() const override;
-    virtual AADLObject *aadlObject() const override;
-
-    void createCommand() override;
-
-protected Q_SLOTS:
-    virtual void colorSchemeUpdated() override;
-
-protected:
-    QList<QVariantList> prepareCommandParams() const;
 
 protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;

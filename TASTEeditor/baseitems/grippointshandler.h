@@ -33,6 +33,9 @@ class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObje
 public:
     explicit GripPointsHandler(QGraphicsItem *parent = nullptr);
 
+    GripPoint *createGripPoint(GripPoint::Location location, int idx = -1);
+    void removeGripPoint(GripPoint *handle);
+
     void handleGripPointPress(GripPoint *handle, const QPointF &at) override;
     void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) override;
     void handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt) override;
@@ -40,16 +43,14 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    QVector<GripPoint *> gripPoints() const;
-    GripPoint *gripPoint(GripPoint::Location pnt) const;
+    QList<GripPoint *> gripPoints() const;
     void updateLayout();
 
     QSizeF minSize() const;
 
-    void setUsedPoints(GripPoint::Locations points);
     GripPoint::Locations usedPoints() const;
 
-    void setGripPointPos(GripPoint::Location location, const QPointF &pos);
+    void setGripPointPos(GripPoint *grip, const QPointF &pos);
 
 public Q_SLOTS:
     void showAnimated();
@@ -59,21 +60,12 @@ protected Q_SLOTS:
     void onOpacityAnimationFinished();
 
 Q_SIGNALS:
-    void manualGeometryChangeStart(GripPoint::Location pos, const QPointF &at);
-    void manualGeometryChangeProgress(GripPoint::Location pos, const QPointF &from, const QPointF &to);
-    void manualGeometryChangeFinish(GripPoint::Location pos, const QPointF &startedAt, const QPointF &releasedAt);
+    void manualGeometryChangeStart(GripPoint *gripPoint, const QPointF &at);
+    void manualGeometryChangeProgress(GripPoint *gripPoint, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeFinish(GripPoint *gripPoint, const QPointF &startedAt, const QPointF &releasedAt);
 
 protected:
     void changeVisibilityAnimated(bool appear);
-
-    const QMap<GripPoint::Location, GripPoint *> m_gripPoints;
-    DrawRectInfo m_highlighter;
-    QPainterPath m_borderPath, m_bodyPath;
-    bool m_visible = false;
-    QBrush m_bodyBrush = QBrush(QColor::fromRgbF(0., 0., 0., 0.25), Qt::Dense4Pattern);
-
-    GripPoint::Locations m_usedPoints;
-
     /*
      * To keep the selection frame and its grippoints unscaled,
      * the QGraphicsItem::ItemIgnoresTransformations flag is used.
@@ -86,6 +78,13 @@ protected:
      * For now it seems enough, but it might need refactoring afterwhile.
      */
     QPointF viewScale() const;
+
+protected:
+    QList<GripPoint *> m_gripPoints;
+    DrawRectInfo m_highlighter;
+    bool m_visible = false;
+
+    GripPoint::Locations m_usedPoints;
 };
 
 } // namespace taste3

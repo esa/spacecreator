@@ -184,6 +184,8 @@ QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
     if (entity.isValid() && entity.canConvert<AADLObject *>() && points.isValid()
         && points.canConvert<QVector<QPointF>>()) {
         return new CmdEntityGeometryChange(entity.value<AADLObject *>(), points.value<QVector<QPointF>>());
+    } else {
+        qDebug() << entity.value<AADLObject *>() << points.value<QVector<QPointF>>();
     }
 
     return nullptr;

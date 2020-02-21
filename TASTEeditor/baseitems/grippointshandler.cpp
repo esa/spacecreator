@@ -28,45 +28,26 @@
 
 namespace taste3 {
 
-const QMap<GripPoint::Location, GripPoint *> createGripPoints(GripPointsHandler *parent)
-{
-    QMap<GripPoint::Location, GripPoint *> result;
-
-    const QMetaEnum &e = QMetaEnum::fromType<taste3::GripPoint::Location>();
-    for (int i = 0; i < e.keyCount(); ++i)
-        result.insert(GripPoint::Location(e.value(i)), new GripPoint(GripPoint::Location(e.value(i)), parent));
-
-    return result;
-}
-
-GripPoint::Locations initUsedPoints()
-{
-    GripPoint::Locations result;
-
-    const QMetaEnum &e = QMetaEnum::fromType<taste3::GripPoint::Location>();
-    for (int i = 0; i < e.keyCount(); ++i)
-        result.insert(GripPoint::Location(e.value(i)));
-
-    return result;
-}
-
 GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , AbstractInteractiveObject()
-    , m_gripPoints(createGripPoints(this))
-    , m_usedPoints(initUsedPoints())
 {
     setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemSendsGeometryChanges);
     hide();
 }
 
-void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
+GripPoint *GripPointsHandler::createGripPoint(GripPoint::Location location, int idx)
 {
-    if (m_usedPoints == points)
-        return;
+    auto grip = new GripPoint(location, this);
+    m_usedPoints.insert(grip->location());
+    m_gripPoints.insert(idx == -1 ? m_gripPoints.size() : idx, grip);
+    return grip;
+}
 
-    m_usedPoints = points;
-    updateLayout();
+void GripPointsHandler::removeGripPoint(GripPoint *handle)
+{
+    m_gripPoints.removeOne(handle);
+    delete handle;
 }
 
 GripPoint::Locations GripPointsHandler::usedPoints() const
@@ -74,34 +55,19 @@ GripPoint::Locations GripPointsHandler::usedPoints() const
     return m_usedPoints;
 }
 
-QVector<GripPoint *> GripPointsHandler::gripPoints() const
+QList<GripPoint *> GripPointsHandler::gripPoints() const
 {
-    return m_gripPoints.values().toVector();
-}
-
-GripPoint *GripPointsHandler::gripPoint(GripPoint::Location pnt) const
-{
-    return m_gripPoints.contains(pnt) ? m_gripPoints.value(pnt) : nullptr;
+    return m_gripPoints;
 }
 
 void GripPointsHandler::updateLayout()
 {
-    for (GripPoint *gp : m_gripPoints) {
-        const bool used = m_usedPoints.contains(gp->location());
-        gp->setIsUsed(used);
+    for (GripPoint *handle : m_gripPoints) {
+        const bool used = m_usedPoints.contains(handle->location());
+        handle->setIsUsed(used);
         if (used)
-            gp->updateLayout();
+            handle->updateLayout();
     }
-
-    const QRectF &bounds = boundingRect();
-    m_borderPath = QPainterPath();
-    m_borderPath.addRect(bounds);
-    const qreal clip = m_highlighter.borderWidth() * 2.;
-    const QRectF bodyRect = bounds.adjusted(clip, clip, -clip, -clip);
-    m_borderPath.addRect(bodyRect);
-
-    m_bodyPath = QPainterPath();
-    m_bodyPath.addRect(bodyRect);
 }
 
 QRectF GripPointsHandler::boundingRect() const
@@ -119,28 +85,24 @@ QRectF GripPointsHandler::boundingRect() const
 
 void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    //    painter->fillPath(m_bodyPath, m_bodyBrush);
-    //    painter->fillPath(m_borderPath, m_highlighter.bodyColor());
-    //    painter->strokePath(m_borderPath, m_highlighter.borderColor());
+    Q_UNUSED(painter)
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
 }
 
 void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &at)
 {
-    Q_EMIT manualGeometryChangeStart(handle->location(), at);
+    Q_EMIT manualGeometryChangeStart(handle, at);
 }
 
 void GripPointsHandler::handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to)
 {
-    Q_EMIT manualGeometryChangeProgress(handle->location(), from, to);
+    Q_EMIT manualGeometryChangeProgress(handle, from, to);
 }
 
 void GripPointsHandler::handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_EMIT manualGeometryChangeFinish(handle->location(), pressedAt, releasedAt);
+    Q_EMIT manualGeometryChangeFinish(handle, pressedAt, releasedAt);
 }
 
 void GripPointsHandler::showAnimated()
@@ -168,8 +130,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     setVisible(true);
 
     if (QPropertyAnimation *anim = utils::createLinearAnimation(this, "opacity", from, to, duration)) {
-        if (m_visible)
-            connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::onOpacityAnimationFinished);
+        connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::onOpacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 }
@@ -200,13 +161,13 @@ QPointF GripPointsHandler::viewScale() const
     return { 1., 1. };
 }
 
-void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &pos)
+void GripPointsHandler::setGripPointPos(GripPoint *grip, const QPointF &pos)
 {
-    if (GripPoint *gp = gripPoint(location)) {
+    if (grip) {
         const QPointF &currScale(viewScale());
         const QPointF &destination(mapFromScene(pos));
         const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
-        gp->setPos(destinationScaled);
+        grip->setPos(destinationScaled);
     }
 }
 

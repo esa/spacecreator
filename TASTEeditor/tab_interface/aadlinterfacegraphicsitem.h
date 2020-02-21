@@ -54,17 +54,16 @@ public:
     QPainterPath shape() const override;
 
     void updateFromEntity() override;
+    QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
 protected:
     void rebuildLayout() override;
-    void initGripPoints() override;
     void onSelectionChanged(bool isSelected) override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    void onManualMoveProgress(GripPoint::Location grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
-    virtual AADLObject *aadlObject() const override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;

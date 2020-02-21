@@ -61,8 +61,6 @@ CreatorTool::CreatorTool(QGraphicsView *view, AADLObjectsModel *model, QObject *
     , m_view(view)
     , m_model(model)
 {
-    setObjectName(QLatin1String("CreatorTool"));
-
     Q_ASSERT(view);
     Q_ASSERT(model);
 
@@ -652,18 +650,12 @@ void CreatorTool::removeSelectedItems()
             QGraphicsItem *item = scene->selectedItems().first();
             item->setSelected(false);
 
-            AADLObject *entity = nullptr;
-            if (auto connectionItem = qgraphicsitem_cast<AADLConnectionGraphicsItem *>(item))
-                entity = connectionItem->entity();
-            else if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))
-                entity = qobject_cast<AADLObject *>(iObj->modelEntity());
-            else if (item->type() == QGraphicsTextItem::Type)
-                continue;
-
-            if (entity) {
-                const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(m_model.data()) };
-                if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                    taste3::cmd::CommandsStack::current()->push(cmdRm);
+            if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
+                if (auto entity = iObj->aadlObject()) {
+                    const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(m_model.data()) };
+                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                        taste3::cmd::CommandsStack::current()->push(cmdRm);
+                }
             }
         }
         taste3::cmd::CommandsStack::current()->endMacro();
@@ -768,9 +760,9 @@ void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
     if (!scene)
         return;
 
-    static const QList<int> &showProps = { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
-                                           AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type,
-                                           AADLConnectionGraphicsItem::Type };
+    static const QList<int> showProps { AADLInterfaceGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type,
+                                        AADLFunctionGraphicsItem::Type, AADLCommentGraphicsItem::Type,
+                                        AADLConnectionGraphicsItem::Type };
 
     AADLObject *aadlObj { nullptr };
     if (QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
