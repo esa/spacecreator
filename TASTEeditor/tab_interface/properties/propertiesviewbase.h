@@ -52,6 +52,8 @@ protected:
     PropertiesModelBase *m_model { nullptr };
     bool m_buttonsVisible { true };
 
+    bool setButtonsDisabled();
+
 private:
     Ui::PropertiesViewBase *ui { nullptr };
 };

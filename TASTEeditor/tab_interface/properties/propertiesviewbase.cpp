@@ -18,6 +18,8 @@
 #include "propertiesviewbase.h"
 
 #include "propertieslistmodel.h"
+#include "tab_aadl/aadlobjectfunction.h"
+#include "tab_aadl/aadlobjectiface.h"
 #include "ui_propertiesviewbase.h"
 
 #include <QDebug>
@@ -31,6 +33,7 @@ PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     , ui(new Ui::PropertiesViewBase)
 {
     ui->setupUi(this);
+    setButtonsDisabled();
 }
 
 PropertiesViewBase::~PropertiesViewBase()
@@ -55,6 +58,8 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
     if (tableView()->selectionModel())
         connect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
                 &PropertiesViewBase::onCurrentRowChanged);
+
+    setButtonsDisabled();
 }
 
 QTableView *PropertiesViewBase::tableView() const
@@ -64,7 +69,7 @@ QTableView *PropertiesViewBase::tableView() const
 
 void PropertiesViewBase::onCurrentRowChanged(const QModelIndex &current, const QModelIndex &)
 {
-    if (m_model) {
+    if (m_model && !setButtonsDisabled()) {
         ui->btnDel->setEnabled(current.isValid() && m_model->isProp(current));
     }
 }
@@ -98,6 +103,44 @@ void PropertiesViewBase::on_btnDel_clicked()
         m_model->removeProperty(ui->tableView->currentIndex());
         ui->tableView->update();
     }
+}
+
+bool PropertiesViewBase::setButtonsDisabled()
+{
+    if (!m_model)
+        return false;
+
+    bool disabled = false;
+
+    if (const AADLObject *dataObject = m_model->dataObject()) {
+        switch (dataObject->aadlType()) {
+        case AADLObject::AADLObjectType::AADLFunction: {
+            if (const AADLObjectFunction *fn = dataObject->as<const AADLObjectFunction *>())
+                disabled = fn->inheritsFunctionType();
+            break;
+        }
+        case AADLObject::AADLObjectType::AADLIface: {
+            if (const AADLObjectIface *iface = dataObject->as<const AADLObjectIface *>()) {
+                disabled = iface->isClone();
+                if (!disabled && iface->isRequired()) {
+                    if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>())
+                        disabled = ri->hasPrototypePi();
+                }
+            }
+
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    if (disabled) {
+        ui->btnAdd->setDisabled(disabled);
+        ui->btnDel->setDisabled(disabled);
+    }
+
+    return disabled;
 }
 
 } // namespace aadl

@@ -108,6 +108,7 @@ public:
 
     AADLObjectFunction *function() const;
 
+    bool isClone() const;
     bool isCloned() const;
     QVector<QPointer<AADLObjectIface>> clones() const;
 
@@ -181,6 +182,7 @@ public:
     virtual void setProp(const QString &name, const QVariant &val) override;
 
     bool inheritPi() const;
+    bool hasPrototypePi() const;
 
     QStringList inheritedLables() const;
     void setPrototype(const AADLObjectIfaceProvided *pi);

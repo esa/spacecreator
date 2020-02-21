@@ -182,6 +182,11 @@ void AADLObjectFunction::setFunctionTypeAttr(const QString &functionTypeName)
     setAttr(meta::Props::token(meta::Props::Token::instance_of), functionTypeName);
 }
 
+bool AADLObjectFunction::inheritsFunctionType() const
+{
+    return d->m_fnType;
+}
+
 void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones)
 {
     const AADLObjectFunctionType *prevFunctionType = d->m_fnType;

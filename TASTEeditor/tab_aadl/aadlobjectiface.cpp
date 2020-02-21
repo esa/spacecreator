@@ -168,6 +168,11 @@ AADLObjectFunction *AADLObjectIface::function() const
     return qobject_cast<AADLObjectFunction *>(parentObject());
 }
 
+bool AADLObjectIface::isClone() const
+{
+    return d->m_cloneOf;
+}
+
 bool AADLObjectIface::isCloned() const
 {
     return d->m_clones.size();
@@ -556,6 +561,11 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
 bool AADLObjectIfaceRequired::inheritPi() const
 {
     return prop(meta::Props::token(meta::Props::Token::labelInheritance)).toBool();
+}
+
+bool AADLObjectIfaceRequired::hasPrototypePi() const
+{
+    return m_prototypes.size();
 }
 
 } // ns aadl
