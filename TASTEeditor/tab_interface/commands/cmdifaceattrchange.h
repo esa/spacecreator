@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,41 +17,46 @@
 
 #pragma once
 
+#include "tab_aadl/aadlcommonprops.h"
+#include "tab_aadl/aadlobjectsmodel.h"
+
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
-#include <QVector>
+#include <QVariant>
 
 namespace taste3 {
 namespace aadl {
-class AADLObject;
-class AADLObjectsModel;
-class AADLObjectFunction;
-class AADLObjectFunctionType;
+
+class AADLObjectConnection;
 namespace cmd {
 
-class CmdEntityRemove : public QUndoCommand
+class CmdIfaceAttrChange : public QUndoCommand
 {
 public:
-    explicit CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model);
+    explicit CmdIfaceAttrChange(AADLObjectIface *entity, const QString &attrName, const QVariant &value);
+    ~CmdIfaceAttrChange();
 
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
-    AADLObject *entity() const;
+private:
+    QPointer<AADLObjectIface> m_iface;
+    QPointer<AADLObjectsModel> m_model;
+    QVector<AADLObjectConnection *> m_relatedConnections;
+    const QString m_attrName;
+    const meta::Props::Token m_attrToken;
+    const QVariant m_oldValue, m_newValue;
+    QVector<QUndoCommand *> m_cmdRmConnection;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObject> m_entity;
-    QVector<QPointer<AADLObject>> m_relatedEntities;
-    QVector<QPointer<AADLObject>> m_relatedConnections;
-    QVector<QPointer<AADLObject>> m_relatedIfaces;
-    QHash<AADLObjectFunction *, AADLObjectFunctionType *> m_typedFunctions;
+    void setKind(const QVariant &kind);
+    void removeConnections();
+    void restoreConnections();
 
-    void collectRelatedItems(AADLObject *toBeRemoved);
-    void storeLinkedEntity(AADLObject *linkedEntity);
+    void prepareRemoveConnectionCommands();
 };
 
 } // namespace cmd

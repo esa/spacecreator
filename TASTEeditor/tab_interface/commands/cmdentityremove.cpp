@@ -104,6 +104,11 @@ int CmdEntityRemove::id() const
     return RemoveEntity;
 }
 
+AADLObject *CmdEntityRemove::entity() const
+{
+    return m_entity;
+}
+
 void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
 {
     if (!toBeRemoved)

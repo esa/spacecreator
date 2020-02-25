@@ -32,6 +32,7 @@
 #include "cmdentityremove.h"
 #include "cmdfunctionitemcreate.h"
 #include "cmdfunctiontypeitemcreate.h"
+#include "cmdifaceattrchange.h"
 #include "cmdifaceparamchange.h"
 #include "cmdifaceparamcreate.h"
 #include "cmdifaceparamremove.h"
@@ -94,7 +95,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 
     case cmd::ChangeRequiredIfaceProperty:
         return cmd::CommandsFactory::changeRiPropertyCommand(params);
-        break;
+    case cmd::ChangeIfaceAttribute:
+        return cmd::CommandsFactory::changeIfaceAttributeCommand(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -278,8 +280,14 @@ QUndoCommand *CommandsFactory::changeEntityAttributesCommand(const QVariantList 
     Q_ASSERT(params.size() == 2);
     const QVariant entity = params.value(0);
     const QVariantHash attributess = params.value(1).toHash();
-    if (entity.isValid() && entity.canConvert<AADLObject *>() && !attributess.isEmpty())
-        return new CmdEntityAttributeChange(entity.value<AADLObject *>(), attributess);
+    if (entity.isValid() && entity.canConvert<AADLObject *>() && !attributess.isEmpty()) {
+        if (AADLObject *aadlObject = entity.value<AADLObject *>()) {
+            if (aadlObject->aadlType() == AADLObject::AADLObjectType::AADLIface)
+                return changeIfaceAttributeCommand(params);
+
+            return new CmdEntityAttributeChange(aadlObject, attributess);
+        }
+    }
 
     return nullptr;
 }
@@ -361,6 +369,20 @@ QUndoCommand *CommandsFactory::changeRiPropertyCommand(const QVariantList &param
         if (AADLObjectIfaceRequired *ri = entity.value<AADLObjectIfaceRequired *>()) {
             const QString propName = properties.keys().first();
             return new CmdRequiredIfacePropertyChange(ri, propName, properties.value(propName));
+        }
+    }
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::changeIfaceAttributeCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant entity = params.value(0);
+    const QVariantHash attrs = params.value(1).toHash();
+    if (entity.isValid() && entity.canConvert<AADLObjectIface *>() && !attrs.isEmpty()) {
+        if (AADLObjectIface *iface = entity.value<AADLObjectIface *>()) {
+            const QString attrName = attrs.keys().first();
+            return new CmdIfaceAttrChange(iface, attrName, attrs.value(attrName));
         }
     }
     return nullptr;

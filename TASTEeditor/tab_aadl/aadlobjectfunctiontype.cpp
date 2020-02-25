@@ -170,8 +170,8 @@ QVariantList AADLObjectFunctionType::templateFunctions() const
 {
     QVariantList functions;
     for (const auto child : d->m_children) {
-        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction ||
-            child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction
+            || child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
             functions << QVariant::fromValue(child);
         }
     }
@@ -255,8 +255,8 @@ void AADLObjectFunctionType::setAttr(const QString &name, const QVariant &val)
 
 bool AADLObjectFunctionType::isFunctionType() const
 {
-    return attr(meta::Props::token(meta::Props::Token::is_type), QLatin1Literal("NO")).toString().toLower()
-            == QLatin1Literal("yes");
+    return attr(meta::Props::token(meta::Props::Token::is_type), QLatin1String("NO")).toString().toLower()
+            == QLatin1String("yes");
 }
 
 QVector<QPointer<AADLObjectFunction>> AADLObjectFunctionType::instances() const

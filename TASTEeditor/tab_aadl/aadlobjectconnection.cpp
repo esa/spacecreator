@@ -222,17 +222,10 @@ void AADLObjectConnection::uninheritLabel()
     handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy::Unset);
 }
 
-template<typename T>
-T detectIface(AADLObjectIface *a, AADLObjectIface *b, bool (AADLObjectIface::*checkMethod)() const)
-{
-    return qobject_cast<T>((a && (a->*checkMethod)()) ? a : ((b && (b->*checkMethod)()) ? b : nullptr));
-};
-
 void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance)
 {
-    auto ri = detectIface<AADLObjectIfaceRequired *>(d->m_ifaceSource, d->m_ifaceTarget, &AADLObjectIface::isRequired);
-    const auto pi = detectIface<const AADLObjectIfaceProvided *>(d->m_ifaceTarget, d->m_ifaceSource,
-                                                                 &AADLObjectIface::isProvided);
+    auto ri = selectIface<AADLObjectIfaceRequired *>();
+    const auto pi = selectIface<const AADLObjectIfaceProvided *>();
 
     if (!pi || !ri)
         return;
@@ -260,11 +253,9 @@ void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
 
-    if (auto ri = detectIface<AADLObjectIfaceRequired *>(d->m_ifaceSource, d->m_ifaceTarget,
-                                                         &AADLObjectIface::isRequired)) {
+    if (auto ri = selectIface<AADLObjectIfaceRequired *>()) {
         if (ri->inheritPi()) {
-            const auto pi = detectIface<const AADLObjectIfaceProvided *>(d->m_ifaceTarget, d->m_ifaceSource,
-                                                                         &AADLObjectIface::isProvided);
+            const auto pi = selectIface<const AADLObjectIfaceProvided *>();
             ri->setPrototype(pi);
         }
     }

@@ -72,7 +72,7 @@ public:
     void uninheritLabel();
 
     template<class T>
-    static inline const T selectIface(const AADLObjectIface *a, const AADLObjectIface *b)
+    static inline T selectIface(AADLObjectIface *a, AADLObjectIface *b)
     {
         T ptr { nullptr };
         if (a)
@@ -84,7 +84,7 @@ public:
     }
 
     template<class T>
-    inline const T selectIface() const
+    inline T selectIface() const
     {
         return selectIface<T>(sourceInterface(), targetInterface());
     }

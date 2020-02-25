@@ -47,6 +47,7 @@ enum Id
     ChangeIfaceParam,
 
     ChangeRequiredIfaceProperty,
+    ChangeIfaceAttribute,
 
     LastId
 };
