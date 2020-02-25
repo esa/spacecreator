@@ -17,6 +17,7 @@
 
 #include "cmdrequiredifacepropertychange.h"
 
+#include "cmdentityremove.h"
 #include "commandids.h"
 #include "commandsfactory.h"
 
@@ -24,25 +25,36 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-static inline QVariant getCurrentProperty(AADLObjectIfaceRequired *entity, const QString &name)
+static inline QVariant getCurrentProperty(const AADLObjectIfaceRequired *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
+static QVector<QPointer<AADLObjectIfaceRequired>> getRelatedIfaces(AADLObjectIfaceRequired *ri)
+{
+    QVector<QPointer<AADLObjectIfaceRequired>> ifaces;
+    ifaces.append(ri);
+    if (ri->isCloned())
+        for (AADLObjectIface *iface : ri->clones())
+            if (AADLObjectIfaceRequired *ifaceRequired = iface->as<AADLObjectIfaceRequired *>())
+                ifaces.append(ifaceRequired);
+    return ifaces;
+}
 
-static inline QVector<AADLObjectConnection *> getAffectedConnections(const AADLObjectIfaceRequired *ri)
+static inline QVector<AADLObjectConnection *> getRelatedConnections(const QPointer<AADLObjectIfaceRequired> iface)
 {
     QVector<AADLObjectConnection *> affected;
 
-    if (!ri)
+    if (!iface)
         return affected;
 
-    const AADLObjectsModel *model = ri->objectsModel();
+    const AADLObjectsModel *model = iface->objectsModel();
     if (!model)
         return affected;
 
-    for (AADLObjectConnection *connection : model->getConnectionsForIface(ri->id()))
-        if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>())
-            affected.append(connection);
+    for (AADLObjectIfaceRequired *ri : getRelatedIfaces(iface))
+        for (AADLObjectConnection *connection : model->getConnectionsForIface(ri->id()))
+            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>())
+                affected.append(connection);
 
     return affected;
 }
@@ -52,7 +64,7 @@ CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(AADLObjectIfaceRe
     : QUndoCommand()
     , m_ri(entity)
     , m_model(m_ri ? m_ri->objectsModel() : nullptr)
-    , m_affectedConenctions(getAffectedConnections(m_ri))
+    , m_relatedConnections()
     , m_propertyName(propName)
     , m_propertyToken(meta::Props::token(m_propertyName))
     , m_oldValue(getCurrentProperty(entity, m_propertyName))
@@ -60,9 +72,12 @@ CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(AADLObjectIfaceRe
 {
     setText(QObject::tr("Change RI inheritance"));
 
-    const bool lostInheritance = !m_newValue.toBool();
-    if (lostInheritance)
-        prepareRemoveConnectionCommands();
+    if (m_propertyToken == meta::Props::Token::labelInheritance) {
+        m_relatedConnections = getRelatedConnections(m_ri);
+        const bool lostInheritance = !m_newValue.toBool();
+        if (lostInheritance)
+            prepareRemoveConnectionCommands();
+    }
 }
 
 CmdRequiredIfacePropertyChange::~CmdRequiredIfacePropertyChange()
@@ -74,7 +89,7 @@ void CmdRequiredIfacePropertyChange::redo()
 {
     switch (m_propertyToken) {
     case meta::Props::Token::labelInheritance: {
-        updateConnections(m_newValue);
+        setPropLabelInherited(m_newValue);
         break;
     }
     default:
@@ -87,7 +102,7 @@ void CmdRequiredIfacePropertyChange::undo()
 {
     switch (m_propertyToken) {
     case meta::Props::Token::labelInheritance: {
-        updateConnections(m_oldValue);
+        setPropLabelInherited(m_oldValue);
         break;
     }
     default:
@@ -107,7 +122,7 @@ int CmdRequiredIfacePropertyChange::id() const
     return ChangeRequiredIfaceProperty;
 }
 
-void CmdRequiredIfacePropertyChange::updateConnections(const QVariant &labelInherited)
+void CmdRequiredIfacePropertyChange::setPropLabelInherited(const QVariant &labelInherited)
 {
     if (!m_ri || !m_model)
         return;
@@ -124,27 +139,39 @@ void CmdRequiredIfacePropertyChange::updateConnections(const QVariant &labelInhe
 
 void CmdRequiredIfacePropertyChange::removeConnections()
 {
-    for (auto cmd : m_cmdRmConnection)
+    for (auto cmd : m_cmdRmConnection) {
+        if (CmdEntityRemove *rmCmd = dynamic_cast<CmdEntityRemove *>(cmd))
+            if (AADLObjectConnection *connection = rmCmd->entity()->as<AADLObjectConnection *>())
+                connection->uninheritLabel();
+
         cmd->redo();
+    }
 }
 
 void CmdRequiredIfacePropertyChange::restoreConnections()
 {
-    for (auto cmd : m_cmdRmConnection)
+    for (auto cmd : m_cmdRmConnection) {
         cmd->undo();
+
+        if (CmdEntityRemove *rmCmd = dynamic_cast<CmdEntityRemove *>(cmd))
+            if (AADLObjectConnection *connection = rmCmd->entity()->as<AADLObjectConnection *>())
+                connection->inheritLabel();
+    }
 }
 
 void CmdRequiredIfacePropertyChange::prepareRemoveConnectionCommands()
 {
-    const QString riOriginalKind = m_ri->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString();
-
-    for (AADLObjectConnection *connection : m_affectedConenctions) {
-        if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>()) {
-
-            if (m_ri->kindFromString(riOriginalKind) != pi->kind() || m_ri->originalParams() != pi->params()) {
-                const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(m_model.data()) };
-                if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                    m_cmdRmConnection.append(cmdRm);
+    for (AADLObjectConnection *connection : m_relatedConnections) {
+        if (const AADLObjectIfaceRequired *ri = connection->selectIface<const AADLObjectIfaceRequired *>()) {
+            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>()) {
+                const QString riOriginalKind =
+                        ri->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString();
+                if (ri->kindFromString(riOriginalKind) != pi->kind() || ri->originalParams() != pi->params()) {
+                    const QVariantList params = { QVariant::fromValue(connection),
+                                                  QVariant::fromValue(m_model.data()) };
+                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                        m_cmdRmConnection.append(cmdRm);
+                }
             }
         }
     }

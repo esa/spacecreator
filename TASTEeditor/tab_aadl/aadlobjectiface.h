@@ -141,8 +141,8 @@ protected:
     void rememberClone(AADLObjectIface *clone);
     void forgetClone(AADLObjectIface *clone);
 
-    void cloneInternals(const AADLObjectIface *from);
-    void restoreInternals(const AADLObjectIface *disconnectMe);
+    virtual void cloneInternals(const AADLObjectIface *from);
+    virtual void restoreInternals(const AADLObjectIface *disconnectMe);
 
     void reflectAttrs(const AADLObjectIface *from);
     void reflectProps(const AADLObjectIface *from);
@@ -154,7 +154,25 @@ protected:
         QHash<QString, QVariant> attrs;
         QHash<QString, QVariant> props;
         QVector<IfaceParameter> params;
-    } m_original;
+
+        inline bool collected() const { return m_collected; }
+
+        inline void collect(const AADLObjectIface *src)
+        {
+            if (m_collected || !src)
+                return;
+
+            name = src->title();
+            attrs = src->attrs();
+            props = src->props();
+            params = src->params();
+
+            m_collected = true;
+        }
+
+    private:
+        bool m_collected { false };
+    } m_originalFields;
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
@@ -194,6 +212,9 @@ Q_SIGNALS:
 
 protected:
     QVector<const AADLObjectIfaceProvided *> m_prototypes;
+
+    void cloneInternals(const AADLObjectIface *from) override;
+    void restoreInternals(const AADLObjectIface *disconnectMe) override;
 
 private:
     QStringList collectInheritedLabels() const;

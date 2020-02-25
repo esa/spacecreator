@@ -47,14 +47,14 @@ public:
 private:
     QPointer<AADLObjectIfaceRequired> m_ri;
     QPointer<AADLObjectsModel> m_model;
-    QVector<AADLObjectConnection *> m_affectedConenctions;
+    QVector<AADLObjectConnection *> m_relatedConnections;
     const QString m_propertyName;
     const meta::Props::Token m_propertyToken;
     const QVariant m_oldValue, m_newValue;
     QVector<QUndoCommand *> m_cmdRmConnection;
 
 private:
-    void updateConnections(const QVariant &labelInherited);
+    void setPropLabelInherited(const QVariant &labelInherited);
     void removeConnections();
     void restoreConnections();
 

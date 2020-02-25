@@ -385,6 +385,9 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPoi
 {
     Q_UNUSED(from)
 
+    if (!grip)
+        return;
+
     if (!scene() || grip->location() != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
         return;
 

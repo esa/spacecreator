@@ -117,6 +117,7 @@ SOURCES += \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
         tab_interface/commands/cmdifaceparamchange.cpp \
+        tab_interface/commands/cmdifaceattrchange.cpp \
         tab_interface/commands/cmdifaceparamcreate.cpp \
         tab_interface/commands/cmdifaceparamremove.cpp \
         tab_interface/commands/cmdinterfaceitemcreate.cpp \
@@ -225,6 +226,7 @@ HEADERS += \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdfunctiontypeitemcreate.h \
         tab_interface/commands/cmdifaceparamchange.h \
+        tab_interface/commands/cmdifaceattrchange.h \
         tab_interface/commands/cmdifaceparamcreate.h \
         tab_interface/commands/cmdifaceparamremove.h \
         tab_interface/commands/cmdinterfaceitemcreate.h \

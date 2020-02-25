@@ -53,6 +53,7 @@ private:
     static QUndoCommand *removeIfaceParamCommand(const QVariantList &params);
     static QUndoCommand *changeIfaceParamCommand(const QVariantList &params);
     static QUndoCommand *changeRiPropertyCommand(const QVariantList &params);
+    static QUndoCommand *changeIfaceAttributeCommand(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;
