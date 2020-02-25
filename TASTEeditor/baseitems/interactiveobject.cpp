@@ -143,10 +143,12 @@ void InteractiveObject::updateEntity()
 {
     taste3::cmd::CommandsStack::current()->beginMacro(tr("Change item geometry/position"));
 
-    for (auto commandParam : prepareChangeCoordinatesCommandParams()) {
-        const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, commandParam);
-        taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
-    }
+    QList<QVariant> params;
+    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
+    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
+                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+    const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
+    taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
 
     taste3::cmd::CommandsStack::current()->endMacro();
 }

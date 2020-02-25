@@ -55,8 +55,8 @@ void CmdConnectionItemCreate::redo()
 
 void CmdConnectionItemCreate::undo()
 {
-    m_model->removeObject(m_entity);
     m_entity->uninheritLabel();
+    m_model->removeObject(m_entity);
 }
 
 bool CmdConnectionItemCreate::mergeWith(const QUndoCommand *command)

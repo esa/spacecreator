@@ -178,17 +178,23 @@ QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &param
 
 QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
 {
-    Q_ASSERT(params.size() == 2);
-    const QVariant entity = params.value(0);
-    const QVariant points = params.value(1);
-    if (entity.isValid() && entity.canConvert<AADLObject *>() && points.isValid()
-        && points.canConvert<QVector<QPointF>>()) {
-        return new CmdEntityGeometryChange(entity.value<AADLObject *>(), points.value<QVector<QPointF>>());
-    } else {
-        qDebug() << entity.value<AADLObject *>() << points.value<QVector<QPointF>>();
-    }
+    QList<QPair<AADLObject *, QVector<QPointF>>> objectsData;
+    for (const auto &param : params) {
+        const QVariantList objectDataList = param.toList();
+        if (objectDataList.isEmpty())
+            return nullptr;
 
-    return nullptr;
+        Q_ASSERT(objectDataList.size() == 2);
+        const QVariant entity = objectDataList.value(0);
+        const QVariant points = objectDataList.value(1);
+        if (entity.isValid() && entity.canConvert<AADLObject *>() && points.isValid()
+            && points.canConvert<QVector<QPointF>>()) {
+            objectsData.append(qMakePair(entity.value<AADLObject *>(), points.value<QVector<QPointF>>()));
+        } else {
+            return nullptr;
+        }
+    }
+    return new CmdEntityGeometryChange(objectsData);
 }
 
 QUndoCommand *CommandsFactory::changeCommentCommand(const QVariantList &params)

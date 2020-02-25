@@ -101,6 +101,8 @@ private:
         Unset
     };
     void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
+    void handleProvidedTitleChanged(const QString &title);
+    void handleRequiredInheritancePropertyChanged(bool enabled);
 };
 
 } // ns aadl
