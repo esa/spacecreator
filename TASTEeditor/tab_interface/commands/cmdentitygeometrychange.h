@@ -29,8 +29,14 @@ namespace cmd {
 
 class CmdEntityGeometryChange : public QUndoCommand
 {
+    struct ObjectData {
+        QPointer<AADLObject> entity;
+        QVector<qint32> prevCoordinates;
+        QVector<qint32> newCoordinates;
+    };
+
 public:
-    explicit CmdEntityGeometryChange(AADLObject *object, const QVector<QPointF> &coordinates);
+    explicit CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
 
     void redo() override;
     void undo() override;
@@ -38,9 +44,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObject> m_entity;
-    const QVector<qint32> m_prevCoordinates;
-    const QVector<qint32> m_newCoordinates;
+    static QList<ObjectData> convertData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
+
+private:
+    const QList<ObjectData> m_data;
 };
 
 } // namespace cmd

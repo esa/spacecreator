@@ -62,7 +62,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPath(pp);
     m_text->setPlainText(ifaceLabel());
 
-    connect(entity, &AADLObject::attributeChanged, [this](taste3::aadl::meta::Props::Token attr) {
+    connect(entity, &AADLObject::attributeChanged, this, [this](taste3::aadl::meta::Props::Token attr) {
         switch (attr) {
         case taste3::aadl::meta::Props::Token::name:
         case taste3::aadl::meta::Props::Token::labelInheritance: {

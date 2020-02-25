@@ -222,15 +222,17 @@ void AADLObjectConnection::uninheritLabel()
     handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy::Unset);
 }
 
+template<typename T>
+T detectIface(AADLObjectIface *a, AADLObjectIface *b, bool (AADLObjectIface::*checkMethod)() const)
+{
+    return qobject_cast<T>((a && (a->*checkMethod)()) ? a : ((b && (b->*checkMethod)()) ? b : nullptr));
+};
+
 void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance)
 {
-    auto detectIface = [](AADLObjectIface *a, AADLObjectIface *b, bool (AADLObjectIface::*checkMethod)() const) {
-        return (a && (a->*checkMethod)()) ? a : b;
-    };
-    auto ri = qobject_cast<AADLObjectIfaceRequired *>(
-            detectIface(d->m_ifaceSource, d->m_ifaceTarget, &AADLObjectIface::isRequired));
-    const auto pi = qobject_cast<const AADLObjectIfaceProvided *>(
-            detectIface(d->m_ifaceTarget, d->m_ifaceSource, &AADLObjectIface::isProvided));
+    auto ri = detectIface<AADLObjectIfaceRequired *>(d->m_ifaceSource, d->m_ifaceTarget, &AADLObjectIface::isRequired);
+    const auto pi = detectIface<const AADLObjectIfaceProvided *>(d->m_ifaceTarget, d->m_ifaceSource,
+                                                                 &AADLObjectIface::isProvided);
 
     if (!pi || !ri)
         return;
@@ -248,22 +250,32 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
 
     ri->setPrototype(pi);
 
-    connect(
-            pi, &AADLObjectIface::titleChanged, this,
-            [pi, ri](const QString & /*title*/) {
-                if (ri->inheritPi())
-                    ri->setPrototype(pi);
-            },
+    connect(pi, &AADLObjectIface::titleChanged, this, &AADLObjectConnection::handleProvidedTitleChanged,
             Qt::UniqueConnection);
-    connect(
-            ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this,
-            [this](bool enabled) {
-                if (enabled)
-                    inheritLabel();
-                else
-                    uninheritLabel();
-            },
-            Qt::UniqueConnection);
+    connect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this,
+            &AADLObjectConnection::handleRequiredInheritancePropertyChanged, Qt::UniqueConnection);
+}
+
+void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
+{
+    Q_UNUSED(title)
+
+    if (auto ri = detectIface<AADLObjectIfaceRequired *>(d->m_ifaceSource, d->m_ifaceTarget,
+                                                         &AADLObjectIface::isRequired)) {
+        if (ri->inheritPi()) {
+            const auto pi = detectIface<const AADLObjectIfaceProvided *>(d->m_ifaceTarget, d->m_ifaceSource,
+                                                                         &AADLObjectIface::isProvided);
+            ri->setPrototype(pi);
+        }
+    }
+}
+
+void AADLObjectConnection::handleRequiredInheritancePropertyChanged(bool enabled)
+{
+    if (enabled)
+        inheritLabel();
+    else
+        uninheritLabel();
 }
 
 void AADLObjectConnection::postInit()
