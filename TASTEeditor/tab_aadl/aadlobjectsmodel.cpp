@@ -119,7 +119,7 @@ void AADLObjectsModel::setRootObject(common::Id rootId)
     auto rootObj = d->m_objects.value(rootId);
     for (const auto &id : d->m_objectsOrder) {
         if (auto obj = getObject(id)) {
-            if (!rootObj) {
+            if (rootObj == nullptr) {
                 d->m_visibleObjects.append(obj);
                 continue;
             }
