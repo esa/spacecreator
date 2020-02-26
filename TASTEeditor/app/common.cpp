@@ -103,5 +103,16 @@ void registerAction(const QString &caller, QAction *action, const QString &title
     }
 }
 
+QString validatedName(const QString &objectName)
+{
+    if (objectName.isEmpty())
+        return {};
+
+    QString result;
+    std::transform(objectName.begin(), objectName.end(), std::back_inserter(result),
+                   [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
+    return result;
+}
+
 } // ns common
 } // ns taste3

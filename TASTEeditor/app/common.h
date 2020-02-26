@@ -44,6 +44,8 @@ bool ensureDirExists(const QString &path);
 void registerAction(const QString &caller, QAction *action, const QString &title = QString(),
                     const QString &description = QString());
 
+QString validatedName(const QString &objectName);
+
 } // ns common
 } // ns taste3
 

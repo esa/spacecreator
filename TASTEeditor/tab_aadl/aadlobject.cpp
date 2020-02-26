@@ -35,10 +35,11 @@ struct AADLObjectPrivate {
 
 AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate {
-              id, QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name), title } }, // attrs
-              QHash<QString, QVariant> {}, // props
-              nullptr })
+    , d(new AADLObjectPrivate { id,
+                                QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name),
+                                                             common::validatedName(title) } }, // attrs
+                                QHash<QString, QVariant> {}, // props
+                                nullptr })
 {
 }
 
@@ -184,15 +185,16 @@ QVariant AADLObject::attr(const QString &name, const QVariant &defaultValue) con
 void AADLObject::setAttr(const QString &name, const QVariant &val)
 {
     if (!name.isEmpty() && val != d->m_attrs[name]) {
-        d->m_attrs[name] = val;
-
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::name: {
-            emit titleChanged(val.toString());
+            const QString title = common::validatedName(val.toString());
+            d->m_attrs[name] = title;
+            emit titleChanged(title);
             break;
         }
         default:
+            d->m_attrs[name] = val;
             break;
         }
         emit attributeChanged(meta::Props::token(name));
