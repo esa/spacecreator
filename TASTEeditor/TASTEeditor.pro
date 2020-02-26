@@ -33,7 +33,7 @@ macx {
 GRANTLEE_LIB_DIR = $$[QT_INSTALL_LIBS]
 
 DEFINES += GRANTLEE_LIB_DIR='\\"$$GRANTLEE_LIB_DIR\\"'
-LIBS += -L/$$GRANTLEE_LIB_DIR -lGrantlee_Templates
+LIBS += -L$$GRANTLEE_LIB_DIR -lGrantlee_Templates
 
 SOURCES += \
         app/commandlineparser.cpp \
@@ -67,7 +67,6 @@ SOURCES += \
         logging/logcategory.cpp \
         logging/loghandler.cpp \
         main.cpp \
-        tab_interface/commands/cmdrootentitychange.cpp \
         templating/aadlobjecttemplateproperty.cpp \
         templating/previewdialog.cpp \
         templating/stringtemplate.cpp \
@@ -117,12 +116,14 @@ SOURCES += \
         tab_interface/commands/cmdentityremove.cpp \
         tab_interface/commands/cmdfunctionitemcreate.cpp \
         tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
-        tab_interface/commands/cmdifaceparamchange.cpp \
-        tab_interface/commands/cmdifaceattrchange.cpp \
+        tab_interface/commands/cmdifaceparambase.cpp \
         tab_interface/commands/cmdifaceparamcreate.cpp \
         tab_interface/commands/cmdifaceparamremove.cpp \
+        tab_interface/commands/cmdifaceparamchange.cpp \
+        tab_interface/commands/cmdifaceattrchange.cpp \
         tab_interface/commands/cmdinterfaceitemcreate.cpp \
         tab_interface/commands/cmdrequiredifacepropertychange.cpp \
+        tab_interface/commands/cmdrootentitychange.cpp \
         tab_interface/commands/commandsfactory.cpp \
         tab_interface/connectioncreationvalidator.cpp \
         tab_interface/creatortool.cpp \
@@ -177,7 +178,6 @@ HEADERS += \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \
-        tab_interface/commands/cmdrootentitychange.h \
         templating/aadlobjecttemplateproperty.h \
         templating/previewdialog.h \
         templating/stringtemplate.h \
@@ -227,12 +227,14 @@ HEADERS += \
         tab_interface/commands/cmdentityremove.h \
         tab_interface/commands/cmdfunctionitemcreate.h \
         tab_interface/commands/cmdfunctiontypeitemcreate.h \
-        tab_interface/commands/cmdifaceparamchange.h \
-        tab_interface/commands/cmdifaceattrchange.h \
+        tab_interface/commands/cmdifaceparambase.h \
         tab_interface/commands/cmdifaceparamcreate.h \
         tab_interface/commands/cmdifaceparamremove.h \
+        tab_interface/commands/cmdifaceparamchange.h \
+        tab_interface/commands/cmdifaceattrchange.h \
         tab_interface/commands/cmdinterfaceitemcreate.h \
         tab_interface/commands/cmdrequiredifacepropertychange.h \
+        tab_interface/commands/cmdrootentitychange.h \
         tab_interface/commands/commandids.h \
         tab_interface/commands/commandsfactory.h \
         tab_interface/connectioncreationvalidator.h \

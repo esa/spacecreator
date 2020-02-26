@@ -27,8 +27,7 @@ namespace aadl {
 namespace cmd {
 
 CmdIfaceParamChange::CmdIfaceParamChange(AADLObject *entity, const IfaceParameter &from, const IfaceParameter &to)
-    : QUndoCommand()
-    , m_iface(qobject_cast<AADLObjectIface *>(entity))
+    : CmdIfaceParamBase(entity ? entity->as<AADLObjectIface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)
 {
@@ -52,16 +51,15 @@ void CmdIfaceParamChange::swapParam(const IfaceParameter &from, const IfaceParam
 void CmdIfaceParamChange::redo()
 {
     swapParam(m_oldParam, m_newParam);
+
+    CmdIfaceParamBase::redo();
 }
 
 void CmdIfaceParamChange::undo()
 {
     swapParam(m_newParam, m_oldParam);
-}
 
-bool CmdIfaceParamChange::mergeWith(const QUndoCommand * /*command*/)
-{
-    return false;
+    CmdIfaceParamBase::undo();
 }
 
 int CmdIfaceParamChange::id() const

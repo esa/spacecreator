@@ -41,6 +41,8 @@ void CmdIfaceParamRemove::redo()
     for (const IfaceParameter &param : m_targetParams)
         currParams.removeAll(param);
     m_iface->setParams(currParams);
+
+    CmdIfaceParamBase::redo();
 }
 
 void CmdIfaceParamRemove::undo()
@@ -49,11 +51,8 @@ void CmdIfaceParamRemove::undo()
         return;
 
     m_iface->setParams(m_sourceParams);
-}
 
-bool CmdIfaceParamRemove::mergeWith(const QUndoCommand * /*command*/)
-{
-    return false;
+    CmdIfaceParamBase::undo();
 }
 
 int CmdIfaceParamRemove::id() const

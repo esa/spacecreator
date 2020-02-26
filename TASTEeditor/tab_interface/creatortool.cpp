@@ -339,50 +339,62 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     const AADLFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
-    QVector<IfaceParameter> commonParams;
     taste3::cmd::CommandsStack::current()->beginMacro(QObject::tr("Create connection"));
+    AADLObjectIface::CreationInfo ifaceCommons;
 
     if (info.startIface && !info.endIface) {
         info.startRequired = info.startIface->isRequired();
-        commonParams = info.startIface->params();
 
-        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), info.endObject, info.endPointAdjusted,
-                                                       (info.startRequired && info.isSameType)
-                                                                       || (!info.startRequired && !info.isSameType)
-                                                               ? AADLObjectIface::IfaceType::Required
-                                                               : AADLObjectIface::IfaceType::Provided,
-                                                       info.endIfaceId, commonParams);
+        ifaceCommons = AADLObjectIface::CreationInfo::fromIface(info.startIface);
+        ifaceCommons.function = info.endObject;
+        ifaceCommons.position = info.endPointAdjusted;
+        ifaceCommons.type = (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
+                ? AADLObjectIface::IfaceType::Required
+                : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.id = info.endIfaceId;
 
         taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
     } else if (info.endIface && !info.startIface) {
         info.startRequired =
                 (info.endIface->isRequired() && info.isSameType) || (info.endIface->isProvided() && !info.isSameType);
-        commonParams = info.endIface->params();
 
-        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), info.startObject, info.startPointAdjusted,
-                                                       info.startRequired ? AADLObjectIface::IfaceType::Required
-                                                                          : AADLObjectIface::IfaceType::Provided,
-                                                       info.startIfaceId, commonParams);
+        ifaceCommons = AADLObjectIface::CreationInfo::fromIface(info.endIface);
+        ifaceCommons.function = info.startObject;
+        ifaceCommons.position = info.startPointAdjusted;
+        ifaceCommons.type =
+                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.id = info.startIfaceId;
 
         taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
     } else if (!info.startIface && !info.endIface) {
-        const AADLObjectIface::CreationInfo startIfaceDescr(m_model.data(), info.startObject, info.startPointAdjusted,
-                                                            info.startRequired ? AADLObjectIface::IfaceType::Required
-                                                                               : AADLObjectIface::IfaceType::Provided,
-                                                            info.startIfaceId, commonParams);
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, startIfaceDescr.toVarList()));
+        ifaceCommons.model = m_model.data();
+        ifaceCommons.function = info.startObject;
+        ifaceCommons.position = info.startPointAdjusted;
+        ifaceCommons.type =
+                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.id = info.startIfaceId;
 
-        const AADLObjectIface::CreationInfo endIfaceDescr(m_model.data(), info.endObject, info.endPointAdjusted,
-                                                          (info.startRequired && info.isSameType)
-                                                                          || (!info.startRequired && !info.isSameType)
-                                                                  ? AADLObjectIface::IfaceType::Required
-                                                                  : AADLObjectIface::IfaceType::Provided,
-                                                          info.endIfaceId, commonParams);
         taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, endIfaceDescr.toVarList()));
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+
+        ifaceCommons.function = info.endObject;
+        ifaceCommons.position = info.endPointAdjusted;
+        ifaceCommons.type = (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
+                ? AADLObjectIface::IfaceType::Required
+                : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.id = info.endIfaceId;
+
+        taste3::cmd::CommandsStack::current()->push(
+                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+    } else {
+        AADLObjectIface *pi =
+                AADLObjectConnection::selectIface<AADLObjectIfaceProvided *>(info.startIface, info.endIface);
+        if (!pi)
+            pi = info.startIface;
+        ifaceCommons = AADLObjectIface::CreationInfo::fromIface(pi);
+        ifaceCommons.name.clear();
     }
 
     AADLFunctionGraphicsItem *prevStartItem =
@@ -406,29 +418,28 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        const AADLObjectIface::IfaceType ifaceType =
+        ifaceCommons.type =
                 info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
-        common::Id ifaceId;
         if (item == info.functionAtEndPos) {
-            ifaceId = info.endIfaceId;
+            ifaceCommons.id = info.endIfaceId;
         } else {
-            ifaceId = common::createId();
-            const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
-                                                           ifaceType, ifaceId, commonParams);
+            ifaceCommons.function = item->entity();
+            ifaceCommons.position = intersectionPoints.last();
+            ifaceCommons.id = common::createId();
 
             taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
         }
 
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
-                                      prevStartIfaceId, ifaceId, QVariant::fromValue(points) };
+                                      prevStartIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
         firstExcludedPoint = endIt != connectionPoints.constEnd() ? *endIt : QPointF();
         startInterfacePoint = intersectionPoints.last();
         prevStartItem = item;
-        prevStartIfaceId = ifaceId;
+        prevStartIfaceId = ifaceCommons.id;
     }
 
     QPointF lastExcludedPoint = *std::next(connectionPoints.crbegin());
@@ -451,26 +462,28 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        common::Id ifaceId;
         if (item == info.functionAtStartPos) {
-            ifaceId = info.startIfaceId;
+            ifaceCommons.id = info.startIfaceId;
         } else {
-            ifaceId = common::createId();
-            const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
-                                                           info.startRequired ? AADLObjectIface::IfaceType::Provided
-                                                                              : AADLObjectIface::IfaceType::Required,
-                                                           ifaceId, commonParams);
+            ifaceCommons.id = common::createId();
+
+            ifaceCommons.function = item->entity();
+            ifaceCommons.position = intersectionPoints.last();
+            ifaceCommons.type =
+                    info.startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
+            ifaceCommons.id = ifaceCommons.id;
+
             taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
         }
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
-                                      prevEndIfaceId, ifaceId, QVariant::fromValue(points) };
+                                      prevEndIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
 
         lastExcludedPoint = endIt != connectionPoints.crend() ? *endIt : QPointF();
         endInterfacePoint = intersectionPoints.last();
         prevEndItem = item;
-        prevEndIfaceId = ifaceId;
+        prevEndIfaceId = ifaceCommons.id;
     }
 
     auto beginIt = std::find(connectionPoints.constBegin(), connectionPoints.constEnd(), firstExcludedPoint);

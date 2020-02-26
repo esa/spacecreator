@@ -17,30 +17,22 @@
 
 #pragma once
 
-#include "tab_aadl/aadlobjectiface.h"
-
-#include <QPointer>
-#include <QUndoCommand>
+#include "cmdifaceparambase.h"
 
 namespace taste3 {
 namespace aadl {
-
-class AADLObject;
-
 namespace cmd {
 
-class CmdIfaceParamCreate : public QUndoCommand
+class CmdIfaceParamCreate : public CmdIfaceParamBase
 {
 public:
     explicit CmdIfaceParamCreate(AADLObject *entity, const IfaceParameter &param);
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 protected:
-    QPointer<AADLObjectIface> m_iface;
     QVector<IfaceParameter> m_targetParams;
     const QVector<IfaceParameter> m_sourceParams;
 };

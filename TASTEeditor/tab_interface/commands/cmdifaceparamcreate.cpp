@@ -27,8 +27,7 @@ namespace aadl {
 namespace cmd {
 
 CmdIfaceParamCreate::CmdIfaceParamCreate(AADLObject *entity, const IfaceParameter &param)
-    : QUndoCommand()
-    , m_iface(qobject_cast<AADLObjectIface *>(entity))
+    : CmdIfaceParamBase(entity ? entity->as<AADLObjectIface *>() : nullptr)
     , m_targetParams({ param })
     , m_sourceParams(m_iface ? m_iface->params() : QVector<IfaceParameter>())
 {
@@ -43,6 +42,8 @@ void CmdIfaceParamCreate::redo()
     QVector<IfaceParameter> currParams = m_iface->params();
     currParams.append(m_targetParams);
     m_iface->setParams(currParams);
+
+    CmdIfaceParamBase::redo();
 }
 
 void CmdIfaceParamCreate::undo()
@@ -51,16 +52,8 @@ void CmdIfaceParamCreate::undo()
         return;
 
     m_iface->setParams(m_sourceParams);
-}
 
-bool CmdIfaceParamCreate::mergeWith(const QUndoCommand *command)
-{
-    if (command->id() == id()) {
-        const QVector<IfaceParameter> &update = static_cast<const CmdIfaceParamCreate *>(command)->m_targetParams;
-        m_targetParams.append(update);
-        return true;
-    }
-    return false;
+    CmdIfaceParamBase::undo();
 }
 
 int CmdIfaceParamCreate::id() const
