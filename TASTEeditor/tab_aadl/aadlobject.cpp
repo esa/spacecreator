@@ -43,7 +43,7 @@ AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *pare
 }
 
 AADLObject::AADLObject(const QString &title, QObject *parent)
-    : AADLObject(common::createId(), title, parent)
+    : AADLObject(common::Id::create(), title, parent)
 {
     if (!title.isEmpty())
         setAttr(meta::Props::token(meta::Props::Token::name), title);

@@ -109,8 +109,8 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
         result.startRequired = result.startIface->isRequired();
     }
 
-    result.startIfaceId = result.startIface ? result.startIface->id() : common::createId();
-    result.endIfaceId = result.endIface ? result.endIface->id() : common::createId();
+    result.startIfaceId = result.startIface ? result.startIface->id() : common::Id::create();
+    result.endIfaceId = result.endIface ? result.endIface->id() : common::Id::create();
 
     result.status = canConnect(result.startObject, result.endObject, result.startIface, result.endIface);
     return result;

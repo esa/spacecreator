@@ -409,7 +409,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         if (item == info.functionAtEndPos) {
             ifaceId = info.endIfaceId;
         } else {
-            ifaceId = common::createId();
+            ifaceId = common::Id::create();
             const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
                                                            ifaceType, ifaceId, commonParams);
 
@@ -451,7 +451,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         if (item == info.functionAtStartPos) {
             ifaceId = info.startIfaceId;
         } else {
-            ifaceId = common::createId();
+            ifaceId = common::Id::create();
             const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), item->entity(), intersectionPoints.last(),
                                                            info.startRequired ? AADLObjectIface::IfaceType::Provided
                                                                               : AADLObjectIface::IfaceType::Required,

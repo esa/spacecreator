@@ -49,7 +49,7 @@ AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QSt
 
 AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
                                  AADLObject *parent)
-    : AADLObject(id.isNull() ? common::createId() : id, title, parent)
+    : AADLObject(id.isNull() ? common::Id::create() : id, title, parent)
     , d(new AADLObjectIfacePrivate(direction))
 {
     setupInitialAttrs();
@@ -328,7 +328,7 @@ AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObject
     if (!source)
         return nullptr;
 
-    AADLObjectIface *target = AADLObjectIface::createIface(source->direction(), common::createId(), parent);
+    AADLObjectIface *target = AADLObjectIface::createIface(source->direction(), common::Id::create(), parent);
 
     target->setCloneOrigin(source);
 
