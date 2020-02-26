@@ -92,6 +92,13 @@ private:
     void simplify();
     void updateBoundingRect();
 
+    enum class IfaceConnectionReference
+    {
+        Set = 0,
+        Remove
+    };
+    void updateInterfaceConnectionsReference(IfaceConnectionReference action);
+
 private:
     class GraphicsPathItem : public QGraphicsPathItem
     {
