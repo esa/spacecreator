@@ -100,6 +100,7 @@ private:
     void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
 
     void clearScene();
+    void changeRootItem(common::Id id);
 
 private:
     InterfaceTabGraphicsScene *m_graphicsScene { nullptr };

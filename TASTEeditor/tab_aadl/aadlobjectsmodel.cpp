@@ -146,6 +146,11 @@ AADLObject *AADLObjectsModel::rootObject() const
     return getObject(d->m_rootObjectId);
 }
 
+common::Id AADLObjectsModel::rootObjectId() const
+{
+    return d->m_rootObjectId;
+}
+
 AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
 {
     if (id.isNull())
@@ -257,7 +262,6 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
     }
     return nullptr;
 }
-
 
 const QHash<common::Id, AADLObject *> &AADLObjectsModel::objects() const
 {

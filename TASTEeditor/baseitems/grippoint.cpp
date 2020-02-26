@@ -193,8 +193,9 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if (m_listener)
             m_listener->handleGripPointPress(this, event->scenePos());
         event->accept();
-    } else
+    } else {
         event->ignore();
+    }
 }
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

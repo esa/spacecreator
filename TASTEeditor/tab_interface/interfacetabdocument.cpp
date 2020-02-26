@@ -17,9 +17,12 @@
 
 #include "interfacetabdocument.h"
 
+#include "app/commandsstack.h"
 #include "app/context/action/editor/dynactioneditor.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/graphicsview.h"
+#include "commands/commandids.h"
+#include "commands/commandsfactory.h"
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
 #include "tab_aadl/aadlobjectsmodel.h"
@@ -355,13 +358,13 @@ void InterfaceTabDocument::onActionZoomOut()
 
 void InterfaceTabDocument::onActionExitToRootFunction()
 {
-    m_model->setRootObject({});
+    changeRootItem({});
 }
 
 void InterfaceTabDocument::onActionExitToParentFunction()
 {
     aadl::AADLObject *parentObject = m_model->rootObject() ? m_model->rootObject()->parentObject() : nullptr;
-    m_model->setRootObject(parentObject ? parentObject->id() : common::Id());
+    changeRootItem(parentObject ? parentObject->id() : common::Id());
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)
@@ -548,7 +551,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
             if (clickedEntity->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
                     if (!function->children().isEmpty() && !function->isRootObject()) {
-                        m_model->setRootObject(function->id());
+                        changeRootItem(function->id());
                         return;
                     }
                 }
@@ -598,6 +601,17 @@ void InterfaceTabDocument::clearScene()
 {
     m_graphicsScene->clear();
     m_items.clear();
+}
+
+void InterfaceTabDocument::changeRootItem(common::Id id)
+{
+    if (m_model->rootObjectId() == id)
+        return;
+
+    const QVariantList rootEntityParams { QVariant::fromValue(m_model), QVariant::fromValue(id) };
+    const auto geometryCmd =
+            taste3::aadl::cmd::CommandsFactory::create(taste3::aadl::cmd::ChangeRootEntity, rootEntityParams);
+    taste3::cmd::CommandsStack::current()->push(geometryCmd);
 }
 
 void InterfaceTabDocument::onAttributesManagerRequested()
