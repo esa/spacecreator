@@ -24,14 +24,8 @@ class QAction;
 namespace taste3 {
 namespace common {
 
-class Id : public QUuid
-{
-public:
-    Id(const QUuid &other = QUuid());
-
-    static Id create();
-    static const Id NoObject;
-};
+typedef QUuid Id;
+Id createId();
 
 /*!
  * Copies the \a source file from resources to the \a target file.
