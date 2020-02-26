@@ -29,6 +29,44 @@ namespace aadl {
 static int sProvidedCounter = 0;
 static int sRequiredCounter = 0;
 
+AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
+                                            const QPointF &position, AADLObjectIface::IfaceType type,
+                                            const taste3::common::Id &id, const QVector<IfaceParameter> parameters,
+                                            OperationKind kind, const QString &name)
+    : model(model)
+    , function(function)
+    , position(position)
+    , type(type)
+    , id(id)
+    , parameters(parameters)
+    , kind(kind)
+    , name(name)
+{
+}
+
+QVariantList AADLObjectIface::CreationInfo::toVarList() const
+{
+    return { QVariant::fromValue(*this) };
+}
+
+AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::fromIface(const AADLObjectIface *iface)
+{
+    if (!iface)
+        return {};
+
+    CreationInfo descr;
+    descr.model = iface->objectsModel();
+    descr.function = (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr);
+    //    descr.position = iface->coordinates();
+    descr.type = iface->direction();
+    descr.id = iface->id();
+    descr.parameters = iface->params();
+    descr.kind = iface->kind();
+    descr.name = iface->title();
+
+    return descr;
+}
+
 struct AADLObjectIfacePrivate {
     explicit AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
         : m_direction(dir)
@@ -255,16 +293,19 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QSt
 {
 }
 
-AADLObjectIface *AADLObjectIface::createIface(AADLObjectIface::IfaceType direction, const common::Id &id,
-                                              AADLObject *parent, const QVector<IfaceParameter> &params)
+AADLObjectIface *AADLObjectIface::createIface(const CreationInfo &descr)
 {
     AADLObjectIface *iface { nullptr };
-    if (direction == AADLObjectIface::IfaceType::Provided)
-        iface = new AADLObjectIfaceProvided(id, QObject::tr("PI_%1").arg(++sProvidedCounter), parent);
+    const bool isProvided = descr.type == AADLObjectIface::IfaceType::Provided;
+    const QString title = descr.name.isEmpty()
+            ? (isProvided ? QObject::tr("PI_%1").arg(++sProvidedCounter) : QObject::tr("RI_%1").arg(++sRequiredCounter))
+            : descr.name;
+    if (isProvided)
+        iface = new AADLObjectIfaceProvided(descr.id, title, descr.function);
     else
-        iface = new AADLObjectIfaceRequired(id, QObject::tr("RI_%1").arg(++sRequiredCounter), parent);
-
-    iface->setParams(params);
+        iface = new AADLObjectIfaceRequired(descr.id, title, descr.function);
+    iface->setKind(descr.kind);
+    iface->setParams(descr.parameters);
 
     return iface;
 }
@@ -328,7 +369,11 @@ AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObject
     if (!source)
         return nullptr;
 
-    AADLObjectIface *target = AADLObjectIface::createIface(source->direction(), common::createId(), parent);
+    CreationInfo descr = CreationInfo::fromIface(source);
+    descr.id = common::createId();
+    descr.function = parent;
+
+    AADLObjectIface *target = AADLObjectIface::createIface(descr);
 
     target->setCloneOrigin(source);
 

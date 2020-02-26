@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,20 +17,41 @@
 
 #pragma once
 
-#include "cmdifaceparamcreate.h"
+#include "tab_aadl/aadlobjectiface.h"
+
+#include <QPointer>
+#include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
+
+class AADLObjectIface;
+class AADLObjectConnection;
+
 namespace cmd {
 
-class CmdIfaceParamRemove : public CmdIfaceParamCreate
+class CmdIfaceParamBase : public QUndoCommand
 {
 public:
-    explicit CmdIfaceParamRemove(AADLObject *entity, const IfaceParameter &param);
+    ~CmdIfaceParamBase() override;
 
     void redo() override;
     void undo() override;
-    int id() const override;
+    bool mergeWith(const QUndoCommand *command) override;
+
+protected:
+    // NOT to be instantiated directly!
+    explicit CmdIfaceParamBase(AADLObjectIface *iface);
+    int id() const override = 0;
+
+protected:
+    QPointer<AADLObjectIface> m_iface;
+    QVector<AADLObjectConnection *> m_connections;
+    QVector<QUndoCommand *> m_cmdRmConnections;
+
+private:
+    bool m_rmCommandsPrepared { false };
+    void prepareRmCommands();
 };
 
 } // namespace cmd

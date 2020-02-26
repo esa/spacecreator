@@ -65,24 +65,19 @@ public:
         CreationInfo(AADLObjectsModel *model = nullptr, AADLObjectFunctionType *function = nullptr,
                      const QPointF &position = QPointF(), AADLObjectIface::IfaceType type = DefaultDirection,
                      const taste3::common::Id &id = common::createId(),
-                     const QVector<IfaceParameter> parameters = QVector<IfaceParameter>())
-            : model(model)
-            , function(function)
-            , position(position)
-            , type(type)
-            , id(id)
-            , parameters(parameters)
-        {
-        }
-
+                     const QVector<IfaceParameter> parameters = QVector<IfaceParameter>(),
+                     OperationKind kind = OperationKind::Sporadic, const QString &name = QString());
         AADLObjectsModel *model { nullptr };
         AADLObjectFunctionType *function { nullptr };
         QPointF position = {};
         AADLObjectIface::IfaceType type { DefaultDirection };
         taste3::common::Id id = {};
-        QVector<IfaceParameter> parameters;
+        QVector<IfaceParameter> parameters = {};
+        OperationKind kind = { OperationKind::Sporadic };
+        QString name {};
 
-        inline QVariantList toVarList() const { return { QVariant::fromValue(*this) }; };
+        QVariantList toVarList() const;
+        static CreationInfo fromIface(const AADLObjectIface *iface);
     };
 
     static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
@@ -112,8 +107,7 @@ public:
     bool isCloned() const;
     QVector<QPointer<AADLObjectIface>> clones() const;
 
-    static AADLObjectIface *createIface(AADLObjectIface::IfaceType direction, const common::Id &id, AADLObject *parent,
-                                        const QVector<IfaceParameter> &params = QVector<IfaceParameter>());
+    static AADLObjectIface *createIface(const CreationInfo &descr);
     static AADLObjectIface *cloneIface(AADLObjectIface *source, AADLObjectFunction *parent);
 
     void setAttr(const QString &name, const QVariant &val) override;

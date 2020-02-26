@@ -28,8 +28,7 @@ namespace cmd {
 
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo)
     : m_ifaceInfo(creationInfo)
-    , m_entity(AADLObjectIface::createIface(m_ifaceInfo.type, m_ifaceInfo.id, m_ifaceInfo.function,
-                                            m_ifaceInfo.parameters))
+    , m_entity(AADLObjectIface::createIface(m_ifaceInfo))
 {
     setText(m_ifaceInfo.type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
                                                                      : QObject::tr("Create RI"));
