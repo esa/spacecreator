@@ -298,13 +298,26 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
 
     colorSchemeUpdated();
 
-    m_startItem->addConnection(this);
-    m_endItem->addConnection(this);
+    updateInterfaceConnectionsReference(IfaceConnectionReference::Set);
 }
 
 AADLConnectionGraphicsItem::~AADLConnectionGraphicsItem()
 {
     m_points.clear();
+
+    updateInterfaceConnectionsReference(IfaceConnectionReference::Remove);
+}
+
+void AADLConnectionGraphicsItem::updateInterfaceConnectionsReference(IfaceConnectionReference action)
+{
+    for (AADLInterfaceGraphicsItem *iface : { startItem(), endItem() }) {
+        if (iface) {
+            if (action == IfaceConnectionReference::Remove)
+                iface->removeConnection(this);
+            else
+                iface->addConnection(this);
+        }
+    }
 }
 
 void AADLConnectionGraphicsItem::updateFromEntity()
