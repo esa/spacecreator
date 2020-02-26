@@ -64,7 +64,7 @@ public:
     struct CreationInfo {
         CreationInfo(AADLObjectsModel *model = nullptr, AADLObjectFunctionType *function = nullptr,
                      const QPointF &position = QPointF(), AADLObjectIface::IfaceType type = DefaultDirection,
-                     const taste3::common::Id &id = common::Id::create(),
+                     const taste3::common::Id &id = common::createId(),
                      const QVector<IfaceParameter> parameters = QVector<IfaceParameter>())
             : model(model)
             , function(function)

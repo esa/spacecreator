@@ -31,16 +31,9 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 namespace taste3 {
 namespace common {
 
-const Id Id::NoObject = Id(QString());
-
-Id Id::create()
+Id createId()
 {
-    return Id::createUuid();
-}
-
-Id::Id(const QUuid &other)
-    : QUuid(other.toByteArray())
-{
+    return QUuid::createUuid();
 }
 
 bool copyResourceFile(const QString &source, const QString &target)

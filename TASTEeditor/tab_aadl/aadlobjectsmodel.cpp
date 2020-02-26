@@ -119,20 +119,20 @@ void AADLObjectsModel::setRootObject(common::Id rootId)
     auto rootObj = d->m_objects.value(rootId);
     for (const auto &id : d->m_objectsOrder) {
         if (auto obj = getObject(id)) {
-            if (rootObj == nullptr) {
+            if (rootId.isNull()) {
                 d->m_visibleObjects.append(obj);
                 continue;
             }
 
             if (obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection
-                && utils::isAncestorOf(rootObj, obj)) {
+                && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 d->m_visibleObjects.append(obj);
-            } else if (auto connection = obj->as<const aadl::AADLObjectConnection *>()) {
-                const bool sourceIncluded =
+            } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+                const bool sourceIfaceAncestor =
                         utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
-                const bool bothIncluded =
-                        sourceIncluded && utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
-                if (bothIncluded) {
+                const bool targetIfaceAncestor =
+                        utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
+                if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
                     d->m_visibleObjects.append(obj);
                 }
             }

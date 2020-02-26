@@ -145,7 +145,7 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
         if (m_model->initFromObjects(objects))
-            m_model->setRootObject(common::Id::NoObject);
+            m_model->setRootObject({});
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
