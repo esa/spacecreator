@@ -219,9 +219,13 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
                 return true;
             }
         }
-    } else if (m_previewItem || m_previewConnectionItem) {
-        handleToolType(m_toolType, scenePos);
-        return true;
+    } else {
+        const bool hasPreview = m_previewItem || m_previewConnectionItem;
+        const bool isIface = m_toolType == ToolType::ProvidedInterface || m_toolType == ToolType::RequiredInterface;
+        if (hasPreview || isIface) {
+            handleToolType(m_toolType, scenePos);
+            return true;
+        }
     }
     return false;
 }
