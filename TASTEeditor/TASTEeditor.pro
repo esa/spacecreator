@@ -67,6 +67,7 @@ SOURCES += \
         logging/logcategory.cpp \
         logging/loghandler.cpp \
         main.cpp \
+        tab_interface/commands/cmdrootentitychange.cpp \
         templating/aadlobjecttemplateproperty.cpp \
         templating/previewdialog.cpp \
         templating/stringtemplate.cpp \
@@ -176,6 +177,7 @@ HEADERS += \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \
+        tab_interface/commands/cmdrootentitychange.h \
         templating/aadlobjecttemplateproperty.h \
         templating/previewdialog.h \
         templating/stringtemplate.h \

@@ -219,7 +219,7 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
                 return true;
             }
         }
-    } else {
+    } else if (m_previewItem || m_previewConnectionItem) {
         handleToolType(m_toolType, scenePos);
         return true;
     }

@@ -31,6 +31,7 @@ enum Id
     ChangeEntityGeometry,
     RemoveEntity,
     ChangeCommentText,
+    ChangeRootEntity,
 
     CreateEntityProperty,
     ChangeEntityProperty,

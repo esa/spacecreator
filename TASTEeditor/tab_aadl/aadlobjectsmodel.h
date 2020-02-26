@@ -43,6 +43,7 @@ public:
 
     void setRootObject(common::Id id);
     AADLObject *rootObject() const;
+    common::Id rootObjectId() const;
 
     AADLObject *getObject(const common::Id &id) const;
     AADLObject *getObjectByName(const QString &name,

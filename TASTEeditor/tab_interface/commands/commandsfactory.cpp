@@ -38,6 +38,7 @@
 #include "cmdifaceparamremove.h"
 #include "cmdinterfaceitemcreate.h"
 #include "cmdrequiredifacepropertychange.h"
+#include "cmdrootentitychange.h"
 #include "commandids.h"
 
 #include <QRect>
@@ -68,6 +69,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::changeCommentCommand(params);
     case cmd::RemoveEntity:
         return cmd::CommandsFactory::removeEntityCommand(params);
+    case cmd::ChangeRootEntity:
+        return cmd::CommandsFactory::changeRootEntityCommand(params);
     case cmd::CreateEntityProperty:
         return cmd::CommandsFactory::addEntityPropertyCommand(params);
     case cmd::ChangeEntityProperty:
@@ -385,6 +388,18 @@ QUndoCommand *CommandsFactory::changeIfaceAttributeCommand(const QVariantList &p
             return new CmdIfaceAttrChange(iface, attrName, attrs.value(attrName));
         }
     }
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::changeRootEntityCommand(const QVariantList &params)
+{
+    Q_ASSERT(params.size() == 2);
+    const QVariant model = params.value(0);
+    const QVariant id = params.value(1);
+    if (id.isValid() && id.canConvert<common::Id>() && model.isValid() && model.canConvert<AADLObjectsModel *>()) {
+        return new CmdRootEntityChange(model.value<AADLObjectsModel *>(), id.value<common::Id>());
+    }
+
     return nullptr;
 }
 
