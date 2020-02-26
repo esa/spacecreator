@@ -383,12 +383,10 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
 
 void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
+    Q_UNUSED(grip)
     Q_UNUSED(from)
 
-    if (!grip)
-        return;
-
-    if (!scene() || grip->location() != GripPoint::Location::Center || m_clickPos.isNull() || !m_connections.isEmpty())
+    if (!scene() || m_clickPos.isNull() || !m_connections.isEmpty())
         return;
 
     QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
