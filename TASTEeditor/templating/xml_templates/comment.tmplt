@@ -1,6 +1,4 @@
 {% comment %}
-
-http://www.grantlee.org/apidox/for_themers.html
 Template for generation of XML scheme of comment.
 The following tags are available in this sub-template:
 comm            : Instance of comment (provided by a top level template)

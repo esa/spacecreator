@@ -29,20 +29,20 @@ namespace templating {
 TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
-    // keyword rule
-    HighlightingRule keywordRule;
-    keywordRule.format.setForeground(Qt::blue);
-    keywordRule.format.setFontWeight(QFont::Bold);
-    const QString keywords = QStringLiteral("\\b(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block|endblock|"
+    // tag rule
+    HighlightingRule tagRule;
+    tagRule.format.setForeground(Qt::blue);
+    tagRule.format.setFontWeight(QFont::Bold);
+    const QString tags = QStringLiteral("\\b(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block|endblock|"
                                             "autoescape\\s+(on|off)|endautoescape|cycle|as|silent|filter|endfilter|debug|ifchanged|endifchanged|"
                                             "ifequal|endifequal|ifnotequal|endifnotequal|load|from|media_finder|now|range|endrange|by|regroup|"
                                             "spaceless|endspaceless|templatetag|widthratio|with|endwith)\\b");
-    keywordRule.pattern = QRegularExpression(keywords, QRegularExpression::InvertedGreedinessOption);
+    tagRule.pattern = QRegularExpression(tags, QRegularExpression::InvertedGreedinessOption);
 
-    // block.super keyword rule
-    HighlightingRule blockSuperKeywordRule;
-    blockSuperKeywordRule.format = keywordRule.format;
-    blockSuperKeywordRule.pattern = QRegularExpression(QStringLiteral("\\bblock.super\\b"), QRegularExpression::InvertedGreedinessOption);
+    // block.super tag rule
+    HighlightingRule blockSuperTagRule;
+    blockSuperTagRule.format = tagRule.format;
+    blockSuperTagRule.pattern = QRegularExpression(QStringLiteral("\\bblock.super\\b"), QRegularExpression::InvertedGreedinessOption);
 
     // variable rule
     HighlightingRule variableRule;
@@ -54,11 +54,11 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule filterRule;
     filterRule.format.setForeground(Qt::darkRed);
     filterRule.format.setFontWeight(QFont::Bold);
-    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\s*\\b(add|addslashes|capfirst|center|cut|date|default|default_if_none|dictsort|divisibleby|"
-                                           "escape|escapejs|first|fix_ampersands|floatformat|force_escape|get_digit|join|last|"
-                                           "length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|lower|make_list|random|"
-                                           "removetags|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|timesince|"
-                                           "timeuntil|title|truncatewords|unordered_list|upper|wordcount|wordwrap|yesno)\\b");
+    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\s*\\b(add|addslashes|capfirst|center|cut|date|default|"
+                                           "default_if_none|dictsort|divisibleby|escape|escapejs|first|floatformat|force_escape|"
+                                           "get_digit|join|last|length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|"
+                                           "lower|make_list|random|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|"
+                                           "timesince|timeuntil|title|truncatewords|unordered_list|upper|wordcount|wordwrap|yesno)\\b");
     filterRule.pattern = QRegularExpression(filters, QRegularExpression::InvertedGreedinessOption);
 
     // filter delimiter rule
@@ -79,21 +79,21 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     bracketHighlighting.basePattern = QRegularExpression(QStringLiteral("({{|}}|{%|%}|{#|#})"));
     m_highlightings.append(bracketHighlighting);
 
-    // keywords highlighting
-    Highlighting keywordHighlighting;
-    keywordHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={%).*(?=%})"), QRegularExpression::InvertedGreedinessOption);
-    keywordHighlighting.highlightingRules.append(variableRule);
-    keywordHighlighting.highlightingRules.append(filterRule);
-    keywordHighlighting.highlightingRules.append(filterDelimiterRule);
-    keywordHighlighting.highlightingRules.append(keywordRule);
-    keywordHighlighting.highlightingRules.append(stringRule);
-    m_highlightings.append(keywordHighlighting);
+    // tags highlighting
+    Highlighting tagHighlighting;
+    tagHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={%).*(?=%})"), QRegularExpression::InvertedGreedinessOption);
+    tagHighlighting.highlightingRules.append(variableRule);
+    tagHighlighting.highlightingRules.append(filterRule);
+    tagHighlighting.highlightingRules.append(filterDelimiterRule);
+    tagHighlighting.highlightingRules.append(tagRule);
+    tagHighlighting.highlightingRules.append(stringRule);
+    m_highlightings.append(tagHighlighting);
 
     // variables highlighting
     Highlighting variableHighlighting;
     variableHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={{).*(?=}})"), QRegularExpression::InvertedGreedinessOption);
     variableHighlighting.highlightingRules.append(variableRule);
-    variableHighlighting.highlightingRules.append(blockSuperKeywordRule);
+    variableHighlighting.highlightingRules.append(blockSuperTagRule);
     variableHighlighting.highlightingRules.append(filterRule);
     variableHighlighting.highlightingRules.append(filterDelimiterRule);
     variableHighlighting.highlightingRules.append(stringRule);

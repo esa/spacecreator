@@ -33,7 +33,7 @@
 #include "tab_deployment/deploymenttabdocument.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "tab_msc/msctabdocument.h"
-#include "templating/previewdialog.h"
+#include "templating/templateeditor.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
@@ -394,7 +394,7 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
         }
 
         if (!m_previewDialog)
-            m_previewDialog = new templating::PreviewDialog(this);
+            m_previewDialog = new templating::TemplateEditor(this);
 
         return m_previewDialog->parseTemplate(grouppedObjects, templateFileName);
     }

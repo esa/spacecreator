@@ -40,7 +40,7 @@ class DocumentsManager;
 }
 
 namespace templating {
-class PreviewDialog;
+class TemplateEditor;
 }
 
 class MainWindow : public QMainWindow
@@ -90,7 +90,7 @@ private:
     QPointer<QToolBar> m_docToolbar;
     document::DocumentsManager *m_docsManager { nullptr };
     QPointer<document::AbstractTabDocument> m_currentDocument;
-    templating::PreviewDialog *m_previewDialog { nullptr };
+    templating::TemplateEditor *m_previewDialog { nullptr };
 
     QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };

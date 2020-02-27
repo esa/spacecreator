@@ -68,10 +68,11 @@ SOURCES += \
         logging/loghandler.cpp \
         main.cpp \
         templating/aadlobjecttemplateproperty.cpp \
-        templating/previewdialog.cpp \
         templating/stringtemplate.cpp \
+        templating/templateeditor.cpp \
         templating/templatehighlighter.cpp \
         templating/xmlhighlighter.cpp \
+        templating/templatesyntaxhelpdialog.cpp \
         reports/bugreportdialog.cpp \
         reports/bugreporthandler.cpp \
         settings/appoptions.cpp \
@@ -179,10 +180,11 @@ HEADERS += \
         logging/logcategory.h \
         logging/loghandler.h \
         templating/aadlobjecttemplateproperty.h \
-        templating/previewdialog.h \
         templating/stringtemplate.h \
+        templating/templateeditor.h \
         templating/templatehighlighter.h \
         templating/xmlhighlighter.h \
+        templating/templatesyntaxhelpdialog.h \
         reports/bugreportdialog.h \
         reports/bugreporthandler.h \
         settings/appoptions.h \
@@ -280,7 +282,8 @@ DISTFILES += \
 
 RESOURCES += \
     resources.qrc \
-    tab_interface/tab_interface_resources.qrc
+    tab_interface/tab_interface_resources.qrc \
+    templating/template_syntax_help.qrc
 
 OTHER_FILES += templating/xml_templates/*.tmplt
 
