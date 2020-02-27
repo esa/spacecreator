@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef PREVIEWDIALOG_H
-#define PREVIEWDIALOG_H
+#ifndef TEMPLATEEDITOR_H
+#define TEMPLATEEDITOR_H
 
 #include <QDialog>
 #include <QVariant>
@@ -29,16 +29,17 @@ namespace taste3 {
 namespace templating {
 
 class StringTemplate;
+class TemplateSyntaxHelpDialog;
 
 /**
  * @brief The PreviewDialog class generates XML document or another text from string template file and shows it.
  * Also it possible to edit, open and save template(s)
  */
-class PreviewDialog : public QDialog
+class TemplateEditor : public QDialog
 {
     Q_OBJECT
 public:
-    PreviewDialog(QWidget *parent = nullptr);
+    TemplateEditor(QWidget *parent = nullptr);
 
     bool parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
     bool saveResultToFile(const QString &fileName);
@@ -49,6 +50,7 @@ private slots:
     void onApplyTemplate();
     void onSaveTemplateAs();
     void onOpenTemplate();
+    void onHelpRequested();
     void onSaveResult();
     void onErrorOccurred(const QString &errorString);
     void onValidateXMLToggled(bool validate);
@@ -66,9 +68,10 @@ private:
     QHash<QString, QVariantList> m_grouppedObjects;
     QString m_templateFileName;
     QHash<QString, QString> m_openedTemplates; // key: file name, value: full path
+    TemplateSyntaxHelpDialog *m_helpDialog;
 };
 
 } // ns templating
 } // ns taste3
 
-#endif // PREVIEWDIALOG_H
+#endif // TEMPLATEEDITOR_H
