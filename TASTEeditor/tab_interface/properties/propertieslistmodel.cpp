@@ -249,70 +249,98 @@ meta::Props::Token tokenFromIndex(const QModelIndex &index)
 
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 {
-    Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (isAttr(index) && index.column() == ColumnTitle) {
-        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-    }
+    bool editable = true;
 
-    switch (tokenFromIndex(index)) {
-    case meta::Props::Token::InnerCoordinates:
-    case meta::Props::Token::coordinates: {
-        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-        break;
-    }
-    default:
-        break;
-    }
-
-    if (!m_dataObject)
-        return flags;
-
-    if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
+    if (m_dataObject) {
         switch (m_dataObject->aadlType()) {
         case aadl::AADLObject::AADLObjectType::AADLFunction:
-            processFlagsFunction(index, flags);
+        case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+            editable = isEditableCellFunction(index);
             break;
         case aadl::AADLObject::AADLObjectType::AADLIface:
-            processFlagsIface(index, flags);
+            editable = isEditableCellIface(index);
             break;
         default:
             break;
         }
     }
+
+    if (editable && index.column() == ColumnTitle && isAttr(index)) {
+        editable = false;
+    }
+
+    if (editable) {
+        switch (tokenFromIndex(index)) {
+        case meta::Props::Token::InnerCoordinates:
+        case meta::Props::Token::coordinates: {
+            editable = false;
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    Qt::ItemFlags flags = QStandardItemModel::flags(index);
+    for (Qt::ItemFlag f : { Qt::ItemIsEditable, Qt::ItemIsEnabled })
+        if (flags.testFlag(f) != editable)
+            flags.setFlag(f, editable);
+
     return flags;
 }
 
-void PropertiesListModel::processFlagsFunction(const QModelIndex & /*index*/, Qt::ItemFlags &flags) const
+bool PropertiesListModel::isEditableCellFunction(const QModelIndex &index) const
 {
-    if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
-        if (fn->inheritsFunctionType())
-            flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
+    bool editable = true;
+
+    switch (tokenFromIndex(index)) {
+    case meta::Props::Token::is_type: {
+        editable = false;
+        break;
+    }
+    case meta::Props::Token::name: {
+        editable = true;
+        break;
+    }
+    case meta::Props::Token::instance_of: {
+        editable = nullptr != m_dataObject->as<const AADLObjectFunction *>();
+        break;
+    }
+    default:
+        if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
+            editable = !fn->inheritsFunctionType();
+        break;
+    }
+
+    return editable;
 }
 
-void PropertiesListModel::processFlagsIface(const QModelIndex &index, Qt::ItemFlags &flags) const
+bool PropertiesListModel::isEditableCellIface(const QModelIndex &index) const
 {
-    if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
-        if (iface->isClone()) {
-            flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-            return;
-        }
+    if (!index.isValid())
+        return false;
 
-        if (iface->isRequired()) {
-            if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>()) {
-                if (ri->hasPrototypePi()) {
-                    switch (tokenFromIndex(index)) {
-                    case meta::Props::Token::name:
-                    case meta::Props::Token::labelInheritance:
-                        return;
-                    default: {
-                        flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
-                        return;
-                    }
-                    }
-                }
-            }
+    bool editable = true;
+    if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
+        const bool isClone = iface->isClone();
+        switch (tokenFromIndex(index)) {
+        case meta::Props::Token::name:
+        case meta::Props::Token::labelInheritance: {
+            editable = !isClone;
+            break;
+        }
+        default: {
+            bool isInheritedRI = false;
+            if (iface->isRequired())
+                if (auto ri = iface->as<const AADLObjectIfaceRequired *>())
+                    isInheritedRI = ri->hasPrototypePi();
+            editable = !isClone && !isInheritedRI;
+            break;
+        }
         }
     }
+
+    return editable;
 }
 
 } // namespace aadl

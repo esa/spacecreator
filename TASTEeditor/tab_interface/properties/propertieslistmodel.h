@@ -66,8 +66,8 @@ private:
 
     void createNewRow(const QString &title, const QVariant &value, ItemType type, int row);
 
-    void processFlagsFunction(const QModelIndex &index, Qt::ItemFlags &flags) const;
-    void processFlagsIface(const QModelIndex &index, Qt::ItemFlags &flags) const;
+    bool isEditableCellFunction(const QModelIndex &index) const;
+    bool isEditableCellIface(const QModelIndex &index) const;
 };
 
 } // namespace aadl

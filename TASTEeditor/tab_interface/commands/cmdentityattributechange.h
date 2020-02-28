@@ -18,19 +18,25 @@
 
 #pragma once
 
+#include "app/common.h"
+
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
+
 class AADLObject;
+class AADLObjectFunction;
+class AADLObjectFunctionType;
 namespace cmd {
 
 class CmdEntityAttributeChange : public QUndoCommand
 {
 public:
     explicit CmdEntityAttributeChange(AADLObject *entity, const QVariantHash &attrs);
+    ~CmdEntityAttributeChange() override;
 
     void redo() override;
     void undo() override;
@@ -39,8 +45,23 @@ public:
 
 private:
     QPointer<AADLObject> m_entity;
+    AADLObjectFunction *m_function { nullptr };
+
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
+
+    QHash<common::Id, QVector<QUndoCommand *>> m_cmdSet;
+    QHash<common::Id, QVector<QUndoCommand *>> m_cmdUnset;
+
+    void setAttrs(const QVariantHash &attrs, bool isRedo);
+    AADLObjectFunctionType *functionTypeByName(const QString &name) const;
+    void handleFunctionInstanceOf(const QVariant &attr, bool isRedo);
+
+    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsSetNewFunctionType(const AADLObjectFunctionType *fnType);
+
+    void prepareUnsetFunctionTypeCommands(const AADLObjectFunctionType *fnType);
+    void prepareSetFunctionTypeCommands(const AADLObjectFunctionType *fnType);
 };
 
 } // namespace cmd
