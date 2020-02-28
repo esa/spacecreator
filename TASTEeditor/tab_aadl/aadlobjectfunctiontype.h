@@ -34,8 +34,8 @@ class AADLObjectFunctionType : public AADLObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList interfaces READ templateInterfaces) //!< Iinterface list for string templates
-    Q_PROPERTY(QVariantList functions READ templateFunctions)   //!< Function list for string templates
-    Q_PROPERTY(QVariantList comments READ templateComments)     //!< Comment list for string templates
+    Q_PROPERTY(QVariantList functions READ templateFunctions) //!< Function list for string templates
+    Q_PROPERTY(QVariantList comments READ templateComments) //!< Comment list for string templates
 public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
@@ -62,28 +62,21 @@ public:
     QVariantList templateFunctions() const;
     QVariantList templateComments() const;
 
-    QString language() const;
-    void setLanguage(const QString &lang);
-
-    QStringList activeInterfaces() const;
-    void setActiveInterfaces(const QStringList &ifaces);
-
     QVector<ContextParameter> contextParams() const;
     void addContextParam(const ContextParameter &param);
     bool removeContextParam(const ContextParameter &param);
     void clearContextParams();
     void setContextParams(const QVector<ContextParameter> &params);
 
-    void setAttr(const QString &name, const QVariant &val) override;
     bool isFunctionType() const;
     QVector<QPointer<AADLObjectFunction>> instances() const;
     void rememberInstance(AADLObjectFunction *function);
     void forgetInstance(AADLObjectFunction *function);
 
 Q_SIGNALS:
-    void attrChanged_isType(bool isType);
     void ifaceAdded(AADLObjectIface *iface);
     void ifaceRemoved(AADLObjectIface *iface);
+    void contextParamsChanged();
 
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;

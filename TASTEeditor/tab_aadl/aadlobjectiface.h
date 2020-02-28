@@ -62,11 +62,18 @@ public:
     Q_ENUM(OperationKind)
 
     struct CreationInfo {
+        enum class Policy
+        {
+            Init = 0,
+            Clone
+        };
         CreationInfo(AADLObjectsModel *model = nullptr, AADLObjectFunctionType *function = nullptr,
                      const QPointF &position = QPointF(), AADLObjectIface::IfaceType type = DefaultDirection,
                      const taste3::common::Id &id = common::createId(),
                      const QVector<IfaceParameter> parameters = QVector<IfaceParameter>(),
-                     OperationKind kind = OperationKind::Sporadic, const QString &name = QString());
+                     OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
+                     const CreationInfo::Policy policy = CreationInfo::Policy::Init,
+                     AADLObjectIface *toBeCloned = nullptr);
         AADLObjectsModel *model { nullptr };
         AADLObjectFunctionType *function { nullptr };
         QPointF position = {};
@@ -75,9 +82,13 @@ public:
         QVector<IfaceParameter> parameters = {};
         OperationKind kind = { OperationKind::Sporadic };
         QString name {};
+        CreationInfo::Policy policy { CreationInfo::Policy::Init };
+        AADLObjectIface *toBeCloned { nullptr };
 
         QVariantList toVarList() const;
-        static CreationInfo fromIface(const AADLObjectIface *iface);
+        static CreationInfo initFromIface(AADLObjectIface *iface, const CreationInfo::Policy policy);
+        static CreationInfo fromIface(AADLObjectIface *iface);
+        static CreationInfo cloneIface(AADLObjectIface *iface, AADLObjectFunction *fn);
     };
 
     static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
@@ -108,7 +119,6 @@ public:
     QVector<QPointer<AADLObjectIface>> clones() const;
 
     static AADLObjectIface *createIface(const CreationInfo &descr);
-    static AADLObjectIface *cloneIface(AADLObjectIface *source, AADLObjectFunction *parent);
 
     void setAttr(const QString &name, const QVariant &val) override;
 
@@ -144,6 +154,8 @@ protected:
 
 protected:
     struct OriginalPropsHolder {
+        // TODO: unite with AADLObjectFunction::OriginalPropsHolder
+
         QString name;
         QHash<QString, QVariant> attrs;
         QHash<QString, QVariant> props;

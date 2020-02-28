@@ -34,39 +34,53 @@ public:
 
     AADLObject::AADLObjectType aadlType() const override;
 
-    void setAttr(const QString &name, const QVariant &val) override;
     void postInit() override;
 
-    enum class ClonedIfacesPolicy
-    {
-        Keep = 0,
-        Kill
-    };
-    void setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones = ClonedIfacesPolicy::Kill);
+    void setInstanceOf(AADLObjectFunctionType *fnType);
+    const AADLObjectFunctionType *instanceOf() const;
     bool inheritsFunctionType() const;
 
-Q_SIGNALS:
-    void attrChanged_instanceOf(const QString &functionType);
-
-private Q_SLOTS:
-    void onFunctionTypeRemoved();
-    void onFunctionTypeUntyped(bool nowIsType);
-    void onFunctionTypeRenamed(const QString &newName);
+protected Q_SLOTS:
+    void reflectAttr(taste3::aadl::meta::Props::Token attr);
+    void reflectProp(taste3::aadl::meta::Props::Token prop);
+    void reflectContextParam();
 
 private:
     const std::unique_ptr<AADLObjectFunctionPrivate> d;
 
-    void setFunctionType(const QString &functionTypeName);
-    void setFunctionTypeAttr(const QString &functionTypeName);
+    struct OriginalPropsHolder {
+        // TODO: unite with AADLObjectIface::OriginalPropsHolder
 
-    void connectToFunctionType();
-    void disconnectFromFunctionType();
+        QString name;
+        QHash<QString, QVariant> attrs;
+        QHash<QString, QVariant> props;
+        QVector<ContextParameter> params;
 
-    void cloneInterfaces();
-    void uncloneInterfaces(ClonedIfacesPolicy killClones);
+        inline bool collected() const { return m_collected; }
 
-    void cloneInterface(AADLObjectIface *iface);
-    void uncloneInterface(AADLObjectIface *iface, ClonedIfacesPolicy killClones);
+        inline void collect(const AADLObjectFunction *src)
+        {
+            if (m_collected || !src)
+                return;
+
+            name = src->title();
+            attrs = src->attrs();
+            props = src->props();
+            params = src->contextParams();
+
+            m_collected = true;
+        }
+
+    private:
+        bool m_collected { false };
+    } m_originalFields;
+
+    void cloneInternals();
+    void restoreInternals();
+
+    void reflectAttrs(const QHash<QString, QVariant> &attrs);
+    void reflectProps(const QHash<QString, QVariant> &props);
+    void reflectContextParams(const QVector<ContextParameter> &params);
 };
 
 typedef QVector<AADLObjectFunction *> AADLFunctionsVector;

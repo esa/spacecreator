@@ -21,18 +21,14 @@
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
+#include "tab_interface/commands/commandsfactory.h"
+
+#include <QDebug>
+#include <QScopedPointer>
+#include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
-
-bool isSameIface(const AADLObjectIface *a, const AADLObjectIface *b)
-{
-    const bool sameType = a->aadlType() == b->aadlType();
-    const bool sameDir = a->direction() == b->direction();
-    const bool sameName = a->title() == b->title();
-    // TODO: check params?
-    return sameType && sameDir && sameName;
-}
 
 struct AADLObjectFunctionPrivate {
     QPointer<AADLObjectFunctionType> m_fnType;
@@ -53,169 +49,171 @@ AADLObject::AADLObjectType AADLObjectFunction::aadlType() const
     return AADLObjectType::AADLFunction;
 }
 
-void AADLObjectFunction::setAttr(const QString &name, const QVariant &val)
+void AADLObjectFunction::postInit()
 {
-    AADLObjectFunctionType::setAttr(name, val);
-
-    switch (meta::Props::token(name)) {
-    case meta::Props::Token::instance_of: {
-        setFunctionType(val.toString());
-        break;
-    }
-    default:
-        break;
+    static const QString attrName = meta::Props::token(meta::Props::Token::instance_of);
+    const QString attrValue = attr(attrName, QVariant()).toString();
+    if (!attrValue.isEmpty()) {
+        const QVariantMap attributes = { { attrName, attrValue } };
+        const QVariantList cmdParams = { QVariant::fromValue(this), QVariant::fromValue(attributes) };
+        QScopedPointer<QUndoCommand> cmd(cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, cmdParams));
+        if (cmd)
+            cmd->redo();
     }
 }
 
-void AADLObjectFunction::setFunctionType(const QString &functionTypeName)
+void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
 {
-    if (!objectsModel())
-        return;
+    if (d->m_fnType != fnType) {
+        if (d->m_fnType) {
 
-    if (d->m_fnType && d->m_fnType->title() == functionTypeName)
-        return;
+            disconnect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
+                       &AADLObjectFunction::reflectContextParam);
+            disconnect(d->m_fnType, &AADLObjectFunction::propertyChanged, this, &AADLObjectFunction::reflectProp);
+            disconnect(d->m_fnType, &AADLObjectFunction::attributeChanged, this, &AADLObjectFunction::reflectAttr);
 
-    QPointer<AADLObjectFunctionType> newFnType;
-    if (!functionTypeName.isEmpty()) {
-        const QHash<QString, AADLObjectFunctionType *> &availableFnTypes =
-                objectsModel()->getAvailableFunctionTypes(this);
-
-        if (AADLObjectFunctionType *fnType = availableFnTypes.value(functionTypeName, nullptr)) {
-            if (fnType == d->m_fnType)
-                return;
-            newFnType = fnType;
-        } else {
-            setFunctionTypeAttr(QString());
+            restoreInternals();
         }
-    }
 
-    setInstanceOf(newFnType);
-}
+        d->m_fnType = fnType;
 
-void AADLObjectFunction::connectToFunctionType()
-{
-    if (!d->m_fnType)
-        return;
+        if (d->m_fnType) {
+            cloneInternals();
 
-    d->m_fnType->rememberInstance(this);
-
-    connect(d->m_fnType, &AADLObjectFunctionType::attrChanged_isType, this, &AADLObjectFunction::onFunctionTypeUntyped);
-    connect(d->m_fnType, &AADLObjectFunctionType::titleChanged, this, &AADLObjectFunction::onFunctionTypeRenamed);
-    connect(d->m_fnType, &AADLObjectFunctionType::ifaceAdded, this, &AADLObjectFunction::cloneInterface);
-    //    it's handled by CmdEntityRemove:
-    //    connect(d->m_fnType, &AADLObjectFunctionType::ifaceRemoved, this, &AADLObjectFunction::uncloneInterface); //
-
-    cloneInterfaces();
-}
-
-void AADLObjectFunction::cloneInterfaces()
-{
-    if (!d->m_fnType)
-        return;
-
-    const QVector<AADLObjectIface *> &theirInterfaces = d->m_fnType->interfaces();
-    for (AADLObjectIface *theirIface : theirInterfaces)
-        cloneInterface(theirIface);
-}
-
-void AADLObjectFunction::cloneInterface(AADLObjectIface *theirIface)
-{
-    if (!d->m_fnType || !theirIface)
-        return;
-
-    const QVector<AADLObjectIface *> &myInterfaces = interfaces();
-    auto found = std::find_if(myInterfaces.cbegin(), myInterfaces.cend(),
-                              [theirIface](AADLObjectIface *myIface) { return isSameIface(myIface, theirIface); });
-
-    const bool notFound = found == myInterfaces.cend();
-    if (notFound) {
-        /*AADLObjectIface *myNewIface =*/AADLObjectIface::cloneIface(theirIface, this);
-    }
-}
-
-void AADLObjectFunction::uncloneInterfaces(ClonedIfacesPolicy killClones)
-{
-    if (!d->m_fnType)
-        return;
-
-    for (AADLObjectIface *theirIface : d->m_fnType->interfaces())
-        uncloneInterface(theirIface, killClones);
-}
-
-void AADLObjectFunction::uncloneInterface(AADLObjectIface *theirIface, ClonedIfacesPolicy killClones)
-{
-    if (!d->m_fnType || !theirIface)
-        return;
-
-    const QVector<AADLObjectIface *> &myInterfaces = interfaces();
-    auto found = std::find_if(myInterfaces.cbegin(), myInterfaces.cend(),
-                              [theirIface](AADLObjectIface *myIface) { return isSameIface(myIface, theirIface); });
-
-    if (found != myInterfaces.cend()) {
-        if (killClones == ClonedIfacesPolicy::Kill) {
-            AADLObjectIface *myIface = *found;
-            removeInterface(myIface);
-            if (theirIface->objectsModel())
-                theirIface->objectsModel()->removeObject(myIface);
+            connect(d->m_fnType, &AADLObjectFunction::attributeChanged, this, &AADLObjectFunction::reflectAttr);
+            connect(d->m_fnType, &AADLObjectFunction::propertyChanged, this, &AADLObjectFunction::reflectProp);
+            connect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
+                    &AADLObjectFunction::reflectContextParam);
         }
     }
 }
 
-void AADLObjectFunction::onFunctionTypeRemoved()
+void AADLObjectFunction::cloneInternals()
 {
-    setFunctionTypeAttr(QString());
+    m_originalFields.collect(this);
+
+    if (d->m_fnType) {
+        d->m_fnType->rememberInstance(this);
+
+        reflectAttrs(d->m_fnType->attrs());
+        reflectProps(d->m_fnType->props());
+        reflectContextParams(d->m_fnType->contextParams());
+    }
 }
 
-void AADLObjectFunction::onFunctionTypeUntyped(bool nowIsType)
+void AADLObjectFunction::restoreInternals()
 {
-    if (!nowIsType)
-        setFunctionTypeAttr(QString());
+    if (d->m_fnType)
+        d->m_fnType->forgetInstance(this);
+
+    if (m_originalFields.collected()) {
+        reflectAttrs(m_originalFields.attrs);
+        reflectProps(m_originalFields.props);
+        reflectContextParams(m_originalFields.params);
+    }
 }
 
-void AADLObjectFunction::onFunctionTypeRenamed(const QString &newName)
-{
-    setFunctionTypeAttr(newName);
-}
-
-void AADLObjectFunction::setFunctionTypeAttr(const QString &functionTypeName)
-{
-    setAttr(meta::Props::token(meta::Props::Token::instance_of), functionTypeName);
-}
-
-bool AADLObjectFunction::inheritsFunctionType() const
+const AADLObjectFunctionType *AADLObjectFunction::instanceOf() const
 {
     return d->m_fnType;
 }
 
-void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType, ClonedIfacesPolicy killClones)
+bool AADLObjectFunction::inheritsFunctionType() const
 {
-    const AADLObjectFunctionType *prevFunctionType = d->m_fnType;
-
-    if (d->m_fnType) {
-        d->m_fnType->forgetInstance(this);
-        disconnect(d->m_fnType, nullptr, this, nullptr);
-
-        uncloneInterfaces(killClones);
-    }
-
-    d->m_fnType = fnType;
-
-    if (d->m_fnType)
-        connectToFunctionType();
-
-    const QString prevName = attr(meta::Props::token(meta::Props::Token::instance_of), QString()).toString();
-    const QString newName = d->m_fnType ? d->m_fnType->title() : QString();
-
-    if (prevName != newName) {
-        setFunctionTypeAttr(newName);
-    } else if (prevFunctionType != d->m_fnType)
-        emit attrChanged_instanceOf(d->m_fnType ? d->m_fnType->title() : QString());
+    return instanceOf();
 }
 
-void AADLObjectFunction::postInit()
+void AADLObjectFunction::reflectAttr(taste3::aadl::meta::Props::Token attr)
 {
-    static const QString tokenName = meta::Props::token(meta::Props::Token::instance_of);
-    setAttr(tokenName, attr(tokenName, QVariant()));
+    if (!d->m_fnType) {
+        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
+                                  .arg(fnType->title(), fnType->id().toString());
+        return;
+    }
+
+    switch (attr) {
+    case meta::Props::Token::is_type:
+    case meta::Props::Token::instance_of:
+    case meta::Props::Token::name:
+        break;
+    case meta::Props::Token::Unknown: {
+        reflectAttrs(d->m_fnType->attrs());
+        break;
+    }
+    default: {
+        const QString &attrName = meta::Props::token(attr);
+        setAttr(attrName, d->m_fnType->attr(attrName));
+        break;
+    }
+    }
+}
+
+void AADLObjectFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
+{
+    QHash<QString, QVariant> prepared(attrs);
+    for (meta::Props::Token t :
+         { meta::Props::Token::is_type, meta::Props::Token::instance_of, meta::Props::Token::name }) {
+        const QString name = meta::Props::token(t);
+        if (prepared.contains(name))
+            prepared.insert(name, attr(name));
+    }
+
+    setAttrs(prepared);
+}
+
+void AADLObjectFunction::reflectProp(taste3::aadl::meta::Props::Token prop)
+{
+    if (!d->m_fnType) {
+        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
+                                  .arg(fnType->title(), fnType->id().toString());
+        return;
+    }
+
+    switch (prop) {
+    case meta::Props::Token::Unknown: {
+        reflectProps(d->m_fnType->props());
+        break;
+    }
+    case meta::Props::Token::InnerCoordinates:
+    case meta::Props::Token::coordinates:
+        break;
+    default: {
+        const QString &propName = meta::Props::token(prop);
+        setProp(propName, d->m_fnType->prop(propName));
+        break;
+    }
+    }
+}
+
+void AADLObjectFunction::reflectProps(const QHash<QString, QVariant> &props)
+{
+    QHash<QString, QVariant> prepared(props);
+    for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
+        const QString name = meta::Props::token(t);
+        if (prepared.contains(name))
+            prepared.insert(name, prop(name));
+    }
+
+    setProps(prepared);
+}
+
+void AADLObjectFunction::reflectContextParam()
+{
+    if (!d->m_fnType) {
+        if (const AADLObjectFunctionType *fnType = dynamic_cast<const AADLObjectFunctionType *>(sender()))
+            qWarning() << QString("The Function type \"%1\" (%2) has not been disconnected, it seems")
+                                  .arg(fnType->title(), fnType->id().toString());
+        return;
+    }
+
+    reflectContextParams(d->m_fnType->contextParams());
+}
+
+void AADLObjectFunction::reflectContextParams(const QVector<ContextParameter> &params)
+{
+    setContextParams(params);
 }
 
 } // ns aadl

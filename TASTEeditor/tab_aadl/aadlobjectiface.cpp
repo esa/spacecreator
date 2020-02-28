@@ -21,6 +21,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 
+#include <QDebug>
 #include <QMetaEnum>
 
 namespace taste3 {
@@ -32,7 +33,8 @@ static int sRequiredCounter = 0;
 AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
                                             const QPointF &position, AADLObjectIface::IfaceType type,
                                             const taste3::common::Id &id, const QVector<IfaceParameter> parameters,
-                                            OperationKind kind, const QString &name)
+                                            OperationKind kind, const QString &name, const CreationInfo::Policy policy,
+                                            AADLObjectIface *source)
     : model(model)
     , function(function)
     , position(position)
@@ -41,6 +43,8 @@ AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectF
     , parameters(parameters)
     , kind(kind)
     , name(name)
+    , policy(policy)
+    , toBeCloned(policy == Policy::Clone ? source : nullptr)
 {
 }
 
@@ -49,21 +53,33 @@ QVariantList AADLObjectIface::CreationInfo::toVarList() const
     return { QVariant::fromValue(*this) };
 }
 
-AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::fromIface(const AADLObjectIface *iface)
+AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::initFromIface(AADLObjectIface *iface,
+                                                                           const CreationInfo::Policy policy)
 {
     if (!iface)
         return {};
 
-    CreationInfo descr;
-    descr.model = iface->objectsModel();
-    descr.function = (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr);
-    //    descr.position = iface->coordinates();
-    descr.type = iface->direction();
-    descr.id = iface->id();
-    descr.parameters = iface->params();
-    descr.kind = iface->kind();
-    descr.name = iface->title();
+    return { iface->objectsModel(),
+             (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr),
+             QPointF(),
+             iface->direction(),
+             iface->id(),
+             iface->params(),
+             iface->kind(),
+             iface->title(),
+             policy,
+             iface };
+}
 
+AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::fromIface(AADLObjectIface *iface)
+{
+    return initFromIface(iface, AADLObjectIface::CreationInfo::Policy::Init);
+}
+
+AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::cloneIface(AADLObjectIface *iface, AADLObjectFunction *fn)
+{
+    AADLObjectIface::CreationInfo descr = initFromIface(iface, AADLObjectIface::CreationInfo::Policy::Clone);
+    descr.function = fn;
     return descr;
 }
 
@@ -297,15 +313,19 @@ AADLObjectIface *AADLObjectIface::createIface(const CreationInfo &descr)
 {
     AADLObjectIface *iface { nullptr };
     const bool isProvided = descr.type == AADLObjectIface::IfaceType::Provided;
+    const common::Id newId = descr.toBeCloned ? common::createId() : descr.id;
     const QString title = descr.name.isEmpty()
             ? (isProvided ? QObject::tr("PI_%1").arg(++sProvidedCounter) : QObject::tr("RI_%1").arg(++sRequiredCounter))
             : descr.name;
     if (isProvided)
-        iface = new AADLObjectIfaceProvided(descr.id, title, descr.function);
+        iface = new AADLObjectIfaceProvided(newId, title, descr.function);
     else
-        iface = new AADLObjectIfaceRequired(descr.id, title, descr.function);
+        iface = new AADLObjectIfaceRequired(newId, title, descr.function);
     iface->setKind(descr.kind);
     iface->setParams(descr.parameters);
+
+    if (descr.toBeCloned)
+        iface->setCloneOrigin(descr.toBeCloned);
 
     return iface;
 }
@@ -362,27 +382,6 @@ QVariant AADLObjectIface::originalProp(const QString &name) const
 QVector<IfaceParameter> AADLObjectIface::originalParams() const
 {
     return m_originalFields.params;
-}
-
-AADLObjectIface *AADLObjectIface::cloneIface(AADLObjectIface *source, AADLObjectFunction *parent)
-{
-    if (!source)
-        return nullptr;
-
-    CreationInfo descr = CreationInfo::fromIface(source);
-    descr.id = common::createId();
-    descr.function = parent;
-
-    AADLObjectIface *target = AADLObjectIface::createIface(descr);
-
-    target->setCloneOrigin(source);
-
-    if (parent)
-        parent->addInterface(target);
-    if (AADLObjectsModel *model = parent->objectsModel())
-        model->addObject(target);
-
-    return target;
 }
 
 void AADLObjectIface::onReflectedAttrChanged(taste3::aadl::meta::Props::Token /*attr*/)

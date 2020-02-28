@@ -33,6 +33,7 @@ class CmdInterfaceItemCreate : public QUndoCommand
 {
 public:
     explicit CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo);
+    ~CmdInterfaceItemCreate() override;
 
     void redo() override;
     void undo() override;
@@ -42,6 +43,7 @@ public:
 private:
     const AADLObjectIface::CreationInfo m_ifaceInfo;
     QPointer<AADLObjectIface> m_entity;
+    QVector<QUndoCommand *> m_cmdClones;
 };
 
 } // namespace cmd

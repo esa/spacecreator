@@ -18,7 +18,9 @@
 #include "cmdinterfaceitemcreate.h"
 
 #include "commandids.h"
+#include "commandsfactory.h"
 
+#include <QDebug>
 #include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
@@ -26,12 +28,38 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
+QVector<QUndoCommand *> fillCloneCommands(AADLObjectIface *iface, const AADLObjectIface::CreationInfo &creationInfo)
+{
+    QVector<QUndoCommand *> clones;
+
+    if (!iface || !iface->parentObject())
+        return clones;
+
+    if (auto fnType = iface->parentObject()->as<const AADLObjectFunctionType *>())
+        for (auto fn : fnType->instances()) {
+            AADLObjectIface::CreationInfo clone = AADLObjectIface::CreationInfo::cloneIface(iface, fn);
+            // the clonned iface has not been stored yet,
+            // so it has invalid pointer to the model
+            clone.model = creationInfo.model;
+            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
+                clones.append(cmdRm);
+        }
+
+    return clones;
+}
+
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo)
     : m_ifaceInfo(creationInfo)
     , m_entity(AADLObjectIface::createIface(m_ifaceInfo))
+    , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))
 {
     setText(m_ifaceInfo.type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
                                                                      : QObject::tr("Create RI"));
+}
+
+CmdInterfaceItemCreate::~CmdInterfaceItemCreate()
+{
+    qDeleteAll(m_cmdClones);
 }
 
 void CmdInterfaceItemCreate::redo()
@@ -41,6 +69,9 @@ void CmdInterfaceItemCreate::redo()
         m_ifaceInfo.function->addInterface(m_entity);
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->addObject(m_entity);
+
+    for (QUndoCommand *clone : m_cmdClones)
+        clone->redo();
 }
 
 void CmdInterfaceItemCreate::undo()
@@ -49,6 +80,9 @@ void CmdInterfaceItemCreate::undo()
         m_ifaceInfo.function->removeInterface(m_entity);
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->removeObject(m_entity);
+
+    for (QUndoCommand *clone : m_cmdClones)
+        clone->undo();
 }
 
 bool CmdInterfaceItemCreate::mergeWith(const QUndoCommand *command)

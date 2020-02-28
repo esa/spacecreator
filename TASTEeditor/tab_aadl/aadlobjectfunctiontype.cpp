@@ -188,28 +188,6 @@ QVariantList AADLObjectFunctionType::templateComments() const
     return comments;
 }
 
-QString AADLObjectFunctionType::language() const
-{
-    return attr(meta::Props::token(meta::Props::Token::language)).toString();
-}
-
-void AADLObjectFunctionType::setLanguage(const QString &lang)
-{
-    if (language() != lang)
-        setAttr(meta::Props::token(meta::Props::Token::language), lang);
-}
-
-QStringList AADLObjectFunctionType::activeInterfaces() const
-{
-    return prop(meta::Props::token(meta::Props::Token::Active_Interfaces)).toStringList();
-}
-
-void AADLObjectFunctionType::setActiveInterfaces(const QStringList &ifaces)
-{
-    if (activeInterfaces() != ifaces)
-        setProp(meta::Props::token(meta::Props::Token::Active_Interfaces), ifaces);
-}
-
 QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
 {
     return d->m_contextParams;
@@ -217,39 +195,35 @@ QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
 
 void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
 {
-    if (!d->m_contextParams.contains(param))
+    if (!d->m_contextParams.contains(param)) {
         d->m_contextParams.append(param);
+        emit contextParamsChanged();
+    }
 }
 
 bool AADLObjectFunctionType::removeContextParam(const ContextParameter &param)
 {
-    return d->m_contextParams.removeOne(param);
+    const bool removed = d->m_contextParams.removeOne(param);
+    if (removed)
+        emit contextParamsChanged();
+    return removed;
 }
 
 void AADLObjectFunctionType::clearContextParams()
 {
+    const int prevSize = d->m_contextParams.size();
     d->m_contextParams.clear();
+    const int newSize = d->m_contextParams.size();
+
+    if (prevSize != newSize)
+        emit contextParamsChanged();
 }
 
 void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &params)
 {
     if (d->m_contextParams != params) {
-        clearContextParams();
         d->m_contextParams = params;
-    }
-}
-
-void AADLObjectFunctionType::setAttr(const QString &name, const QVariant &val)
-{
-    AADLObject::setAttr(name, val);
-    switch (meta::Props::token(name)) {
-    case meta::Props::Token::is_type: {
-        const bool isType = val.toString().toLower().simplified() == "yes";
-        emit attrChanged_isType(isType);
-        break;
-    }
-    default:
-        break;
+        emit contextParamsChanged();
     }
 }
 

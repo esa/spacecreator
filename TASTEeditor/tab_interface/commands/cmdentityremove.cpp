@@ -61,9 +61,6 @@ void CmdEntityRemove::redo()
 
     if (m_entity)
         m_model->removeObject(m_entity);
-
-    for (auto function : m_typedFunctions.keys())
-        function->setInstanceOf(nullptr, AADLObjectFunction::ClonedIfacesPolicy::Keep);
 }
 
 void CmdEntityRemove::undo()
@@ -87,10 +84,6 @@ void CmdEntityRemove::undo()
             connection->inheritLabel();
             m_model->addObject(connection);
         }
-
-    static const QString instanceOfAttr = meta::Props::token(meta::Props::Token::instance_of);
-    for (auto function : m_typedFunctions.keys())
-        function->setInstanceOf(m_typedFunctions.value(function), AADLObjectFunction::ClonedIfacesPolicy::Keep);
 }
 
 bool CmdEntityRemove::mergeWith(const QUndoCommand *command)
@@ -132,11 +125,6 @@ void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
 
             for (auto child : toBeRemoved->findChildren<AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
                 collectRelatedItems(child);
-
-            if (fnType->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
-                for (AADLObjectFunction *function : fnType->instances())
-                    m_typedFunctions.insert(function, fnType);
-            }
         }
         break;
     }
