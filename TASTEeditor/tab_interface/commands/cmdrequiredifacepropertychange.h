@@ -54,11 +54,7 @@ private:
     QVector<QUndoCommand *> m_cmdRmConnection;
 
 private:
-    void setPropLabelInherited(const QVariant &labelInherited);
-    void removeConnections();
-    void restoreConnections();
-
-    void prepareRemoveConnectionCommands();
+    void updateLabelInheritance(bool nowInherited);
 };
 
 } // namespace cmd

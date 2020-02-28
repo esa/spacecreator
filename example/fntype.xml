@@ -64,7 +64,7 @@
 					<Input_Parameter name="a" type="T-Boolean" encoding="UPER"/>
 					<Property name="Taste::coordinates" value="53000 62000"/>
 					<Property name="Taste::InterfaceName" value="run_forrest"/>
-					<Property name="Taste::labelInheritance" value="false"/>
+					<Property name="Taste::labelInheritance" value="true"/>
 					<Property name="Taste::RCMoperationKind" value="any"/>
 				</Required_Interface>
 			</Function>
