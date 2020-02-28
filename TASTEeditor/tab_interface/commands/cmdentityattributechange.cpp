@@ -30,6 +30,9 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
+typedef QVector<QUndoCommand *> Commands;
+typedef QHash<common::Id, Commands> CommandsStorage;
+
 static inline QVariantHash getCurrentAttributes(AADLObject *entity, const QVariantHash &attrs)
 {
     QVariantHash result;
@@ -51,9 +54,7 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(AADLObject *entity, const QVa
 CmdEntityAttributeChange::~CmdEntityAttributeChange()
 {
     for (const common::Id key : m_cmdSet.keys()) {
-        if (m_cmdUnset.contains(key))
-            m_cmdUnset.remove(key);
-
+        m_cmdUnset.remove(key);
         qDeleteAll(m_cmdSet.take(key));
     }
 
@@ -121,34 +122,28 @@ void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bo
     if (oldInstanceOf == newInstanceOf)
         return;
 
-    if (oldInstanceOf) {
-        for (QUndoCommand *cmd : commandsUnsetPrevFunctionType(oldInstanceOf)) {
+    auto performCommands = [isRedo](const Commands &cmds) {
+        for (QUndoCommand *cmd : cmds) {
             if (isRedo)
                 cmd->redo();
             else
                 cmd->undo();
         }
-    }
+    };
 
-    if (newInstanceOf) {
-        for (QUndoCommand *cmd : commandsSetNewFunctionType(newInstanceOf)) {
-            if (isRedo)
-                cmd->redo();
-            else
-                cmd->undo();
-        }
-    }
+    if (oldInstanceOf)
+        performCommands(commandsUnsetPrevFunctionType(oldInstanceOf));
+
+    if (newInstanceOf)
+        performCommands(commandsSetNewFunctionType(newInstanceOf));
 
     m_function->setInstanceOf(newInstanceOf);
     m_function->setAttr(meta::Props::token(meta::Props::Token::instance_of), attr);
 }
 
-typedef QHash<common::Id, QVector<QUndoCommand *>> CmdStorage;
-typedef QVector<QUndoCommand *> CmdSet;
-
-CmdSet getCommandsSet(const AADLObjectFunctionType *fnType, const CmdStorage &cmdStorage,
-                      CmdEntityAttributeChange *caller,
-                      void (CmdEntityAttributeChange::*prepareMethod)(const AADLObjectFunctionType *fn))
+Commands getCommands(const AADLObjectFunctionType *fnType, const CommandsStorage &cmdStorage,
+                     CmdEntityAttributeChange *caller,
+                     void (CmdEntityAttributeChange::*prepareMethod)(const AADLObjectFunctionType *fn))
 {
     if (!fnType || !caller || !prepareMethod)
         return {};
@@ -160,17 +155,17 @@ CmdSet getCommandsSet(const AADLObjectFunctionType *fnType, const CmdStorage &cm
     return cmdStorage.value(fnTypeId, {});
 }
 
-QVector<QUndoCommand *> CmdEntityAttributeChange::commandsUnsetPrevFunctionType(const AADLObjectFunctionType *fnType)
+Commands CmdEntityAttributeChange::commandsUnsetPrevFunctionType(const AADLObjectFunctionType *fnType)
 {
-    return getCommandsSet(fnType, m_cmdUnset, this, &CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands);
+    return getCommands(fnType, m_cmdUnset, this, &CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands);
 }
 
-QVector<QUndoCommand *> CmdEntityAttributeChange::commandsSetNewFunctionType(const AADLObjectFunctionType *fnType)
+Commands CmdEntityAttributeChange::commandsSetNewFunctionType(const AADLObjectFunctionType *fnType)
 {
-    return getCommandsSet(fnType, m_cmdSet, this, &CmdEntityAttributeChange::prepareSetFunctionTypeCommands);
+    return getCommands(fnType, m_cmdSet, this, &CmdEntityAttributeChange::prepareSetFunctionTypeCommands);
 }
 
-bool useOppositeCommands(CmdStorage &commands, const CmdStorage &oppositeCommands, const common::Id &fnTypeId)
+bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppositeCommands, const common::Id &fnTypeId)
 {
     if (oppositeCommands.contains(fnTypeId)) {
         commands[fnTypeId] = oppositeCommands.value(fnTypeId, {});
@@ -189,7 +184,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const AADLObject
     if (useOppositeCommands(m_cmdUnset, m_cmdSet, fnTypeId))
         return;
 
-    QVector<QUndoCommand *> &cmdStorage = m_cmdUnset[fnTypeId];
+    Commands &cmdStorage = m_cmdUnset[fnTypeId];
     const QVector<AADLObjectIface *> &fnIfaces = m_function->interfaces();
     const QVector<AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
@@ -216,7 +211,7 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const AADLObjectFu
     if (useOppositeCommands(m_cmdSet, m_cmdUnset, fnTypeId))
         return;
 
-    QVector<QUndoCommand *> &cmdStorage = m_cmdSet[fnTypeId];
+    Commands &cmdStorage = m_cmdSet[fnTypeId];
     const QVector<AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
         const AADLObjectIface::CreationInfo clone = AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
