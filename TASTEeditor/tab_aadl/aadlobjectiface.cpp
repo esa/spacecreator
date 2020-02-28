@@ -338,9 +338,12 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
     if (!m_originalFields.collected())
         m_originalFields.collect(isClone() ? d->m_cloneOf.data() : this);
 
-    reflectAttrs(from);
-    reflectProps(from);
-    reflectParams(from);
+    {
+        QSignalBlocker sb(this);
+        reflectAttrs(from);
+        reflectProps(from);
+        reflectParams(from);
+    }
 
     connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
             Qt::UniqueConnection);
@@ -355,6 +358,8 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
     disconnect(disconnectMe, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged);
     disconnect(disconnectMe, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged);
     disconnect(disconnectMe, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged);
+
+    setTitle(m_originalFields.name);
 
     setAttrs(m_originalFields.attrs);
 
@@ -488,7 +493,11 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
 QStringList AADLObjectIfaceRequired::inheritedLables() const
 {
     QStringList result;
-    if (inheritPi()) {
+
+    const QString &currentTitle = title();
+    if (currentTitle != m_originalFields.name)
+        result.append(currentTitle);
+    else if (inheritPi()) {
         result = collectInheritedLabels();
 
         // append suffix for connection to the same named PIs with same parent (Function.PI becames Funtcion.PI#N)
@@ -500,7 +509,7 @@ QStringList AADLObjectIfaceRequired::inheritedLables() const
     }
 
     if (result.isEmpty())
-        result.append(title());
+        result.append(currentTitle);
 
     return result;
 }
@@ -584,9 +593,8 @@ void AADLObjectIfaceRequired::setPrototype(const AADLObjectIfaceProvided *pi)
     if (!pi || !inheritPi())
         return;
 
-    if (!m_prototypes.contains(pi)) {
+    if (!m_prototypes.contains(pi))
         m_prototypes.append(pi);
-    }
 
     if (!m_prototypes.isEmpty())
         cloneInternals(pi);
@@ -600,7 +608,7 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
         return;
 
     m_prototypes.removeAll(pi);
-    if (m_prototypes.isEmpty())
+    if (m_prototypes.isEmpty() || !inheritPi())
         restoreInternals(pi);
 
     emit inheritedLabelsChanged(inheritedLables());
