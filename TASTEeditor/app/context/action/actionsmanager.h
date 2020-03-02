@@ -44,6 +44,7 @@ public:
     static QString storagePath();
     static QStringList scriptableActionNames();
     static void reload();
+    static QStringList externalArgsHoldersDescr();
 
 private:
     struct ScriptableActionHandler {
@@ -52,6 +53,21 @@ private:
         QString m_description;
     };
 
+    struct ExternalArgHolder {
+        enum Type
+        {
+            CWD,
+            Attr,
+            Prop,
+            Param
+        };
+
+        QString key;
+        QString description;
+        Type target;
+    };
+
+    static const QVector<ExternalArgHolder> externalArgs;
     static ActionsManager *m_instance;
 
     ActionsManager();
@@ -62,9 +78,11 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act);
+    static void triggerActionExternal(const Action &act, const taste3::aadl::AADLObject *aadlObj);
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
+
+    static QString replaceKeyHolder(const QString &text, const taste3::aadl::AADLObject *aadlObj);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;

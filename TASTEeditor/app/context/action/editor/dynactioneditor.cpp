@@ -46,6 +46,10 @@ DynActionEditor::DynActionEditor(QWidget *parent)
     ui->lvActions->setModel(m_actionsModel);
     ui->lvConditions->setModel(m_conditionsModel);
 
+    QStringList keyHolderes = ctx::ActionsManager::externalArgsHoldersDescr();
+    ui->leAppCwd->setToolTip(keyHolderes.takeFirst());
+    ui->leAppArgs->setToolTip(keyHolderes.join('\n'));
+
     connect(ui->lvActions->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &DynActionEditor::onActionActivated);
 
@@ -58,6 +62,8 @@ DynActionEditor::DynActionEditor(QWidget *parent)
 
     on_cbActType_currentIndexChanged(0);
     displayAction(nullptr);
+
+    setWindowTitle(tr("Context menu customization"));
 }
 
 DynActionEditor::~DynActionEditor()

@@ -108,6 +108,7 @@ public:
     bool setKind(OperationKind k);
 
     QVector<IfaceParameter> params() const;
+    IfaceParameter param(const QString &name) const;
     QVariantList paramList() const;
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
@@ -182,6 +183,8 @@ protected:
 
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
+
+    void notifyIfKindChanged() const;
 };
 
 class AADLObjectIfaceProvided : public AADLObjectIface

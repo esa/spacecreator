@@ -20,6 +20,8 @@
 #include "app/common.h"
 #include "extprocmonitor.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunction.h"
+#include "tab_aadl/aadlobjectiface.h"
 
 #include <QAction>
 #include <QApplication>
@@ -44,6 +46,14 @@ namespace ctx {
 
 ActionsManager *ActionsManager::m_instance = nullptr;
 
+const QVector<ActionsManager::ExternalArgHolder> ActionsManager::externalArgs = {
+    { "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD },
+    { "$attr_", QObject::tr("Value of the selected object's attribute [name]"), ExternalArgHolder::Type::Attr },
+    { "$prop_", QObject::tr("Value of the selected object's property [name]"), ExternalArgHolder::Type::Prop },
+    { "$param_", QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."),
+      ExternalArgHolder::Type::Param },
+};
+
 QString ActionsManager::storagePath()
 {
     static const QString targetDir =
@@ -60,15 +70,16 @@ void ActionsManager::populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj
 
     for (const Action &actHandler : instance()->m_actions) {
         QAction *act = new QAction(actHandler.m_title, menu);
+        act->setData(QVariant::fromValue(currObj));
         const bool enabled(actHandler.isAcceptable(currObj));
         act->setEnabled(enabled);
         if (enabled) {
-            QObject::connect(act, &QAction::triggered, [&actHandler]() {
+            QObject::connect(act, &QAction::triggered, [actHandler, act]() {
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
-                else if (!actHandler.m_externalApp.isEmpty())
-                    triggerActionExternal(actHandler);
-                else {
+                else if (!actHandler.m_externalApp.isEmpty()) {
+                    triggerActionExternal(actHandler, act ? act->data().value<taste3::aadl::AADLObject *>() : nullptr);
+                } else {
                     QMessageBox::warning(
                             nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or extrernal action provided by %1").arg(actHandler.m_title));
@@ -223,12 +234,76 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-void ActionsManager::triggerActionExternal(const Action &act)
+QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl::AADLObject *aadlObj)
+{
+    if (text.isEmpty() || !aadlObj)
+        return {};
+
+    if (text[0] != '$')
+        return text;
+
+    for (const ActionsManager::ExternalArgHolder &holder : externalArgs) {
+        const QString name = text.mid(holder.key.size());
+        switch (holder.target) {
+        case ActionsManager::ExternalArgHolder::CWD: {
+            if (text == holder.key)
+                return qApp->applicationDirPath();
+            break;
+        }
+        case ActionsManager::ExternalArgHolder::Attr: {
+            if (text.startsWith(holder.key)) {
+                return aadlObj->attr(name).toString();
+            }
+            break;
+        }
+        case ActionsManager::ExternalArgHolder::Prop: {
+            if (text.startsWith(holder.key)) {
+                return aadlObj->prop(name).toString();
+            }
+            break;
+        }
+        case ActionsManager::ExternalArgHolder::Param: {
+            if (text.startsWith(holder.key)) {
+                switch (aadlObj->aadlType()) {
+                case aadl::AADLObject::AADLObjectType::AADLIface: {
+                    if (const aadl::AADLObjectIface *iface = aadlObj->as<const aadl::AADLObjectIface *>()) {
+                        const aadl::IfaceParameter &ifaceParam = iface->param(name);
+                        if (!ifaceParam.isNull())
+                            return ifaceParam.toString();
+                    }
+                    break;
+                }
+                case aadl::AADLObject::AADLObjectType::AADLFunction:
+                case aadl::AADLObject::AADLObjectType::AADLFunctionType: {
+                    if (const aadl::AADLObjectFunctionType *fn = aadlObj->as<const aadl::AADLObjectFunctionType *>()) {
+                        const aadl::ContextParameter &ctxParam = fn->contextParam(name);
+                        if (!ctxParam.isNull())
+                            return ctxParam.toString();
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+            break;
+        }
+        }
+    }
+
+    return QString(); // clear the placeholder if no data found
+}
+
+void ActionsManager::triggerActionExternal(const Action &act, const taste3::aadl::AADLObject *aadlObj)
 {
     if (!act.m_externalApp.isEmpty()) {
-        QString cwd(act.m_externalAppCwd);
-        if (cwd == "TASTE3")
-            cwd = qApp->applicationDirPath();
+        QStringList params = act.m_externalAppParams;
+        params.prepend(act.m_externalAppCwd);
+
+        for (QString &param : params)
+            param = replaceKeyHolder(param, aadlObj);
+
+        const QString cwd = params.takeFirst();
 
         QWidget *mainWindow(nullptr);
         for (auto w : qApp->topLevelWidgets())
@@ -239,8 +314,20 @@ void ActionsManager::triggerActionExternal(const Action &act)
 
         ExtProcMonitor *mon = new ExtProcMonitor(mainWindow);
         mon->setAttribute(Qt::WA_DeleteOnClose);
-        mon->start(act.m_externalApp, act.m_externalAppParams, cwd);
+
+        mon->start(act.m_externalApp, params, cwd);
     }
+}
+
+QStringList ActionsManager::externalArgsHoldersDescr()
+{
+    QStringList result;
+    for (auto t : externalArgs) {
+        QString uiName = t.key;
+        uiName.replace(QLatin1String("_"), QLatin1String("_name"));
+        result.append(QString("%1 - %2").arg(uiName, t.description));
+    }
+    return result;
 }
 
 } // ns ctx

@@ -63,6 +63,7 @@ public:
     QVariantList templateComments() const;
 
     QVector<ContextParameter> contextParams() const;
+    ContextParameter contextParam(const QString &name) const;
     void addContextParam(const ContextParameter &param);
     bool removeContextParam(const ContextParameter &param);
     void clearContextParams();
