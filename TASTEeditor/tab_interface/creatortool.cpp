@@ -67,6 +67,7 @@ CreatorTool::CreatorTool(QGraphicsView *view, AADLObjectsModel *model, QObject *
     if (m_view && m_view->viewport()) {
         m_view->installEventFilter(this);
         m_view->viewport()->installEventFilter(this);
+        m_view->setFocus();
     }
 }
 
@@ -111,6 +112,7 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
                     scene->clearSelection();
             } else {
                 clearPreviewItem();
+                emit created();
             }
         } break;
         }
