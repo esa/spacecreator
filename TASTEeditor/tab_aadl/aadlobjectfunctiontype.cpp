@@ -193,6 +193,15 @@ QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
     return d->m_contextParams;
 }
 
+ContextParameter AADLObjectFunctionType::contextParam(const QString &name) const
+{
+    if (!name.isEmpty())
+        for (const ContextParameter &param : contextParams())
+            if (param.name() == name)
+                return param;
+    return {};
+}
+
 void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
 {
     if (!d->m_contextParams.contains(param)) {

@@ -55,7 +55,11 @@ public:
 
     static QString typeName(const Type &type);
 
+    QString toString() const;
+    bool isNull() const;
+
 protected:
+    static const QString ToStringDelemiter;
     QString m_paramName = {};
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
@@ -81,6 +85,9 @@ public:
 
     bool setParamType(const Type &type) override;
     bool setParamTypeName(const QString &typeName) override;
+
+    QString toString() const;
+    bool isNull() const;
 
 protected:
     QVariant m_defaultValue = {};
@@ -118,6 +125,9 @@ public:
     inline bool isOutDirection() const { return direction() == Direction::Out; }
 
     bool operator==(const IfaceParameter &other) const;
+
+    QString toString() const;
+    bool isNull() const;
 
 protected:
     QString m_encoding = {};

@@ -22,6 +22,8 @@
 namespace taste3 {
 namespace aadl {
 
+const QString BasicParameter::ToStringDelemiter = QString("::");
+
 BasicParameter::BasicParameter(const QString &name, Type t, const QString &paramTypeName)
     : m_paramName(name)
     , m_paramType(t)
@@ -145,6 +147,25 @@ bool BasicParameter::isValidValue(const QVariant &value) const
     return false;
 }
 
+QString BasicParameter::toString() const
+{
+    QString result;
+
+    const QStringList fields = { paramTypeName(), name() };
+    for (const QString &field : fields) {
+        if (!result.isEmpty())
+            result += ToStringDelemiter;
+        result += field;
+    }
+
+    return result;
+}
+
+bool BasicParameter::isNull() const
+{
+    return this->operator==({});
+}
+
 ContextParameter::ContextParameter(const QString &name, Type t, const QString &paramTypeName, const QVariant &val)
     : BasicParameter(name, t, paramTypeName)
     , m_defaultValue(val)
@@ -191,6 +212,26 @@ bool ContextParameter::setParamTypeName(const QString &typeName)
 
     m_defaultValue.clear();
     return true;
+}
+
+QString ContextParameter::toString() const
+{
+    QString result = BasicParameter::toString();
+
+    const QStringList fields = { defaultValue().toString() };
+    for (const QString &field : fields) {
+        if (!result.isEmpty())
+            result += ToStringDelemiter;
+
+        result += field;
+    }
+
+    return result;
+}
+
+bool ContextParameter::isNull() const
+{
+    return BasicParameter::isNull() || this->operator==({});
 }
 
 IfaceParameter::IfaceParameter(const QString &name, Type t, const QString &paramTypeName, const QString &encoding,
@@ -254,6 +295,26 @@ IfaceParameter::Direction IfaceParameter::directionFromName(const QString &dir)
 bool IfaceParameter::operator==(const IfaceParameter &other) const
 {
     return BasicParameter::operator==(other) && m_encoding == other.m_encoding && m_direction == other.m_direction;
+}
+
+QString IfaceParameter::toString() const
+{
+    QString result = BasicParameter::toString();
+
+    const QStringList fields = { directionName(direction()), encoding() };
+    for (const QString &field : fields) {
+        if (!result.isEmpty())
+            result += ToStringDelemiter;
+
+        result += field;
+    }
+
+    return result;
+}
+
+bool IfaceParameter::isNull() const
+{
+    return BasicParameter::isNull() || this->operator==({});
 }
 
 } // ns aadl

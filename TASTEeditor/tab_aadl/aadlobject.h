@@ -105,8 +105,8 @@ Q_SIGNALS:
     void titleChanged(const QString &title);
     void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
-    void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown);
-    void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown);
+    void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown) const;
+    void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown) const;
 
 public Q_SLOTS:
     bool setTitle(const QString &title);

@@ -193,6 +193,15 @@ QVector<IfaceParameter> AADLObjectIface::params() const
     return d->m_params;
 }
 
+IfaceParameter AADLObjectIface::param(const QString &name) const
+{
+    if (!name.isEmpty())
+        for (const IfaceParameter &param : params())
+            if (param.name() == name)
+                return param;
+    return {};
+}
+
 QVariantList AADLObjectIface::paramList() const
 {
     QVariantList list;
@@ -330,6 +339,13 @@ AADLObjectIface *AADLObjectIface::createIface(const CreationInfo &descr)
     return iface;
 }
 
+void AADLObjectIface::notifyIfKindChanged() const
+{
+    const QString nameKind = meta::Props::token(meta::Props::Token::kind);
+    if (m_originalFields.attrs.value(nameKind) != attr(nameKind))
+        emit attributeChanged(meta::Props::Token::kind);
+}
+
 void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
 {
     if (!from)
@@ -345,6 +361,8 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
         reflectParams(from);
     }
 
+    notifyIfKindChanged();
+
     connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
             Qt::UniqueConnection);
     connect(from, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged,
@@ -359,9 +377,8 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
     disconnect(disconnectMe, &AADLObjectIface::propertyChanged, this, &AADLObjectIface::onReflectedPropChanged);
     disconnect(disconnectMe, &AADLObjectIface::paramsChanged, this, &AADLObjectIface::onReflectedParamsChanged);
 
-    setTitle(m_originalFields.name);
-
-    setAttrs(m_originalFields.attrs);
+    if (!m_originalFields.collected())
+        return;
 
     // keep current coordinates:
     for (meta::Props::Token t : { meta::Props::Token::InnerCoordinates, meta::Props::Token::coordinates }) {
@@ -369,9 +386,19 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
         if (m_originalFields.props.contains(name))
             m_originalFields.props[name] = prop(name);
     }
-    setProps(m_originalFields.props);
 
-    setParams(m_originalFields.params);
+    {
+        QSignalBlocker sb(this);
+
+        setTitle(m_originalFields.name);
+        setAttrs(m_originalFields.attrs);
+        setProps(m_originalFields.props);
+        setParams(m_originalFields.params);
+    }
+
+    notifyIfKindChanged();
+
+    m_originalFields = {};
 }
 
 QVariant AADLObjectIface::originalAttr(const QString &name) const

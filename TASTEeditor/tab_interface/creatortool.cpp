@@ -67,7 +67,6 @@ CreatorTool::CreatorTool(QGraphicsView *view, AADLObjectsModel *model, QObject *
     if (m_view && m_view->viewport()) {
         m_view->installEventFilter(this);
         m_view->viewport()->installEventFilter(this);
-        m_view->setFocus();
     }
 }
 
@@ -84,6 +83,9 @@ void CreatorTool::setCurrentToolType(CreatorTool::ToolType type)
     m_toolType = type;
 
     clearPreviewItem();
+
+    if (m_view)
+        m_view->setFocus();
 }
 
 bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
@@ -722,18 +724,12 @@ void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &s
 
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")), tr("Function Type"),
                         this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
-        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create FunctionType",
-                               "Activate the FunctionType creation mode");
 
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
                         [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
-        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create Function",
-                               "Activate the Function creation mode");
 
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
                         [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
-        common::registerAction(Q_FUNC_INFO, menu->actions().last(), "Create Comment",
-                               "Activate the Comment creation mode");
     }
 }
 
@@ -784,7 +780,9 @@ void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
                                         AADLConnectionGraphicsItem::Type };
 
     AADLObject *aadlObj { nullptr };
-    if (QGraphicsItem *gi = utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
+    if (QGraphicsItem *gi = scene->selectedItems().size() == 1
+                ? scene->selectedItems().first()
+                : utils::nearestItem(scene, scenePos, kContextMenuItemTolerance, showProps)) {
 
         switch (gi->type()) {
         case AADLFunctionTypeGraphicsItem::Type: {
