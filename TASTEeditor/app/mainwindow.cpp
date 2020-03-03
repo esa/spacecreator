@@ -82,8 +82,10 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    e->ignore();
-    onQuitRequested();
+    if (prepareQuit())
+        QMainWindow::closeEvent(e);
+    else
+        e->ignore();
 }
 
 void MainWindow::init()
@@ -174,22 +176,56 @@ void MainWindow::initConnections()
 
 void MainWindow::onOpenFileRequested()
 {
-    const QString &fileName = QFileDialog::getOpenFileName(this, tr("Select a file"), QString(), "*.xml");
-    if (!fileName.isEmpty()) {
-        if (document::AbstractTabDocument *doc = m_docsManager->docById(m_tabWidget->currentIndex())) {
+    if (document::AbstractTabDocument *doc = currentDoc()) {
+        const QString prevPath(doc->path());
+        const QString &fileName =
+                QFileDialog::getOpenFileName(this, tr("Open file"), prevPath, doc->supportedFileExtensions());
+        if (!fileName.isEmpty() && onCloseFileRequested())
             doc->load(fileName);
-        }
     }
 }
 
 void MainWindow::onCreateFileRequested()
 {
-    showNIY(Q_FUNC_INFO);
+    onCloseFileRequested();
+    if (document::AbstractTabDocument *doc = currentDoc())
+        doc->create();
 }
 
 bool MainWindow::onCloseFileRequested()
 {
-    showNIY(Q_FUNC_INFO);
+    if (document::AbstractTabDocument *doc = currentDoc())
+        return closeTab(m_docsManager->docId(doc));
+
+    return true;
+}
+
+bool MainWindow::closeTab(int id)
+{
+    if (document::AbstractTabDocument *doc = m_docsManager->docById(id)) {
+        if (doc->isDirty() && !m_dropUnsavedChangesSilently) {
+            const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
+            const QMessageBox::StandardButton btn = QMessageBox::question(this, tr("Document closing"),
+                                                                          tr("There are unsaved changes.\n"
+                                                                             "Would you like to save the document?"),
+                                                                          btns);
+            switch (btn) {
+            case QMessageBox::Save: {
+                if (!onExportByTemplateRequested())
+                    return false;
+                break;
+            }
+            case QMessageBox::Cancel: {
+                return false;
+            }
+            default:
+                break;
+            }
+        }
+
+        doc->close();
+    }
+
     return true;
 }
 
@@ -224,28 +260,23 @@ void MainWindow::onSaveRenderRequested()
 /**
  * @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
  */
-void MainWindow::onExportByTemplateRequested()
+bool MainWindow::onExportByTemplateRequested()
 {
     const QString &templateFileName =
             QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
                                          QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
-    if (templateFileName.isEmpty())
-        return;
+    const bool res = parseTemplateFile(templateFileName);
+    if (res)
+        if (document::AbstractTabDocument *doc = currentDoc())
+            doc->resetDirtyness();
 
-    parseTemplateFile(templateFileName);
+    return res;
 }
 
 void MainWindow::onQuitRequested()
 {
-    AppOptions::MainWindow.State.write(saveState());
-    AppOptions::MainWindow.Geometry.write(saveGeometry());
-    AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
-
-    //    while(hasOpenDocs())
-    //        if(!onCloseFileRequested())
-    //            return;
-
-    qApp->quit();
+    if (prepareQuit())
+        qApp->quit();
 }
 
 void MainWindow::onAboutRequested()
@@ -332,6 +363,7 @@ void MainWindow::initTabs()
     for (auto doc : m_docsManager->documents()) {
         if (QMenu *menu = doc->customMenu())
             tabsCustom->addMenu(menu);
+        connect(doc, &AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
     }
     if (tabsCustom->children().size())
         menuBar()->addMenu(tabsCustom);
@@ -349,7 +381,7 @@ void MainWindow::initSettings()
 void MainWindow::updateActions()
 {
     bool renderAvailable(false);
-    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc()) {
+    if (document::AbstractTabDocument *doc = currentDoc()) {
         if (QGraphicsScene *scene = doc->scene()) {
             renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
         }
@@ -454,7 +486,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (document::AbstractTabDocument *doc = m_docsManager->currentDoc()) {
+    if (document::AbstractTabDocument *doc = currentDoc()) {
         if (QGraphicsScene *scene = doc->scene()) {
             QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
             img.fill(Qt::transparent);
@@ -465,4 +497,31 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     }
 }
 
+document::AbstractTabDocument *MainWindow::currentDoc() const
+{
+    return m_docsManager->currentDoc();
+}
+
+void MainWindow::onDocDirtyChanged(bool /*dirty*/)
+{
+    if (document::AbstractTabDocument *caller = qobject_cast<document::AbstractTabDocument *>(sender())) {
+        int docId = m_docsManager->docId(caller);
+        if (m_docsManager->isValidDocId(docId))
+            m_tabWidget->setTabText(docId, caller->title());
+    }
+    updateActions();
+}
+
+bool MainWindow::prepareQuit()
+{
+    for (int i = 0; i < m_tabWidget->count(); ++i)
+        if (!closeTab(i))
+            return false;
+
+    AppOptions::MainWindow.State.write(saveState());
+    AppOptions::MainWindow.Geometry.write(saveGeometry());
+    AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
+
+    return true;
+}
 } // ns taste3

@@ -96,6 +96,19 @@ void AbstractTabDocument::fillToolBar(QToolBar *toolBar)
     toolBar->setUpdatesEnabled(true);
 }
 
+bool AbstractTabDocument::create(const QString &path)
+{
+    const bool created = createImpl(path);
+    if (created)
+        resetDirtyness();
+    return created;
+}
+
+bool AbstractTabDocument::createImpl(const QString &path)
+{
+    return false;
+}
+
 bool AbstractTabDocument::load(const QString &path)
 {
     const bool loaded = loadImpl(path);
@@ -104,6 +117,7 @@ bool AbstractTabDocument::load(const QString &path)
         d->m_filePath = path;
         d->m_commandsStack->clear();
         resetDirtyness();
+        emit dirtyChanged(false);
     }
 
     return loaded;
@@ -121,9 +135,24 @@ bool AbstractTabDocument::save(const QString &path)
     return saved;
 }
 
+void AbstractTabDocument::close()
+{
+    closeImpl();
+    d->m_filePath.clear();
+    resetDirtyness();
+    emit dirtyChanged(false);
+}
+
+void AbstractTabDocument::closeImpl() {}
+
 QString AbstractTabDocument::path() const
 {
     return d->m_filePath;
+}
+
+QString AbstractTabDocument::supportedFileExtensions() const
+{
+    return { "*.*" };
 }
 
 void AbstractTabDocument::resetDirtyness()

@@ -46,10 +46,13 @@ public:
     QWidget *view() const;
     QUndoStack *commandsStack() const;
 
+    bool create(const QString &path = QString());
     bool load(const QString &path);
     bool save(const QString &path);
+    void close();
 
     QString path() const;
+    virtual QString supportedFileExtensions() const;
 
     bool isDirty() const;
 
@@ -59,6 +62,7 @@ public:
     // Return nullptr if the doc does not need any menu
     virtual QMenu *customMenu() const;
 
+    void resetDirtyness();
 Q_SIGNALS:
     void dirtyChanged(bool dirty) const;
 
@@ -66,8 +70,10 @@ protected Q_SLOTS:
     void updateDirtyness();
 
 protected:
+    virtual bool createImpl(const QString &path = QString());
     virtual bool loadImpl(const QString &path) = 0;
     virtual bool saveImpl(const QString &path) = 0;
+    virtual void closeImpl();
     virtual QVector<QAction *> initActions() = 0;
 
     void setupScene(QGraphicsScene *scene);
@@ -78,7 +84,6 @@ protected:
 
 private:
     std::unique_ptr<AbstractTabDocumentPrivate> const d;
-    void resetDirtyness();
 };
 
 } // ns document

@@ -41,8 +41,10 @@ public:
     int currentDocId() const;
     AbstractTabDocument *currentDoc() const;
     int docCount() const;
+    int docId(document::AbstractTabDocument *doc) const;
 
     QVector<document::AbstractTabDocument *> documents() const;
+    bool isValidDocId(int id) const;
 
 Q_SIGNALS:
     void currentDocIdChanged(int currentDocId);
@@ -52,9 +54,6 @@ protected:
     QPointer<QTabWidget> m_tabs;
     QVector<document::AbstractTabDocument *> m_documents;
     QMap<document::AbstractTabDocument *, QWidget *> m_views;
-
-    int docId(document::AbstractTabDocument *doc) const;
-    bool isValidDocId(int id) const;
 };
 
 } // ns document
