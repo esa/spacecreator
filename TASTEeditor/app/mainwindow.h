@@ -43,6 +43,7 @@ namespace templating {
 class TemplateEditor;
 }
 
+class ZoomController;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -88,6 +89,7 @@ private:
     Ui::MainWindow *ui { nullptr };
     QTabWidget *m_tabWidget { nullptr };
     QPointer<QToolBar> m_docToolbar;
+    ZoomController *m_zoomCtrl { nullptr };
     document::DocumentsManager *m_docsManager { nullptr };
     QPointer<document::AbstractTabDocument> m_currentDocument;
     templating::TemplateEditor *m_previewDialog { nullptr };

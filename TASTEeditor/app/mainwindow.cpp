@@ -20,14 +20,15 @@
 #include "app/commandsstack.h"
 #include "app/common.h"
 #include "app/context/action/actionsmanager.h"
+#include "app/zoomcontroller.h"
 #include "document/documentsmanager.h"
 #include "document/tabdocumentfactory.h"
 #include "logging/loghandler.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
-#include "tab_aadl/aadltabdocument.h"
 #include "tab_aadl/aadlobjectfunctiontype.h"
+#include "tab_aadl/aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
@@ -44,6 +45,7 @@
 #include <QGraphicsView>
 #include <QImageWriter>
 #include <QMessageBox>
+#include <QStatusBar>
 #include <QTabWidget>
 #include <QUndoGroup>
 
@@ -54,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_tabWidget(new QTabWidget(this))
     , m_docToolbar(new QToolBar(this))
+    , m_zoomCtrl(new ZoomController())
     , m_docsManager(new document::DocumentsManager(m_tabWidget, this))
     , m_undoGroup(new QUndoGroup(this))
 {
@@ -87,6 +90,8 @@ void MainWindow::init()
 {
     ui->setupUi(this);
 
+    statusBar()->addPermanentWidget(m_zoomCtrl);
+
     setCentralWidget(m_tabWidget);
     m_docToolbar->setObjectName("Document ToolBar");
     m_docToolbar->setAllowedAreas(Qt::AllToolBarAreas);
@@ -119,7 +124,8 @@ void MainWindow::initMenuFile()
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
-    m_actExportByTemplate = m_menuFile->addAction(tr("Export by template..."), this, &MainWindow::onExportByTemplateRequested);
+    m_actExportByTemplate =
+            m_menuFile->addAction(tr("Export by template..."), this, &MainWindow::onExportByTemplateRequested);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
@@ -216,12 +222,13 @@ void MainWindow::onSaveRenderRequested()
 }
 
 /**
-* @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
-*/
+ * @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
+ */
 void MainWindow::onExportByTemplateRequested()
 {
-    const QString& templateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
-                                                            QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
+    const QString &templateFileName =
+            QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
+                                         QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
     if (templateFileName.isEmpty())
         return;
 
@@ -266,6 +273,7 @@ void MainWindow::onTabSwitched(int tab)
         doc->fillToolBar(m_docToolbar);
         m_docToolbar->show();
         currentStack = doc->commandsStack();
+        m_zoomCtrl->setView(qobject_cast<GraphicsView *>(doc->view()));
     }
 
     if (currentStack) {
@@ -363,7 +371,8 @@ bool MainWindow::parseTemplateFile(const QString &templateFileName)
         return false;
     }
 
-    if (document::InterfaceTabDocument *doc = qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
+    if (document::InterfaceTabDocument *doc =
+                qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
         QHash<QString, QVariantList> grouppedObjects;
         for (const auto aadlObject : doc->objects()) {
             QString aadlGroupType;
