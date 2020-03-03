@@ -52,6 +52,7 @@ SOURCES += \
         app/datatypes/basicdatatype.cpp \
         app/datatypes/datatypesstorage.cpp \
         app/mainwindow.cpp \
+        app/zoomcontroller.cpp \
         baseitems/common/drawrectinfo.cpp \
         baseitems/common/highlightrectitem.cpp \
         baseitems/common/utils.cpp \
@@ -164,6 +165,7 @@ HEADERS += \
         app/datatypes/basicdatatype.h \
         app/datatypes/datatypesstorage.h \
         app/mainwindow.h \
+        app/zoomcontroller.h \
         baseitems/common/abstractinteractiveobject.h \
         baseitems/common/drawrectinfo.h \
         baseitems/common/highlightrectitem.h \

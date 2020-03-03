@@ -61,7 +61,7 @@ protected:
 private:
     qreal m_zoomPercent = 100.0;
 
-    qreal m_minZoomPercent = 50.0;
+    qreal m_minZoomPercent = 5.0;
     qreal m_zoomStepPercent = 25.0;
     qreal m_maxZoomPercent = 400.0;
 
