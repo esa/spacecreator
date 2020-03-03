@@ -106,7 +106,10 @@ QGraphicsScene *InterfaceTabDocument::createScene()
 
 QString InterfaceTabDocument::title() const
 {
-    return tr("Interface");
+    const QString fileName = QFileInfo(path()).fileName();
+    return tr("Interface [%1%2]")
+            .arg(fileName.isEmpty() ? AbstractTabDocument::title() : fileName,
+                 isDirty() ? QLatin1String("*") : QLatin1String(""));
 }
 
 QMenu *InterfaceTabDocument::customMenu() const
@@ -135,6 +138,16 @@ const QHash<common::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() con
     return m_model->objects();
 }
 
+bool InterfaceTabDocument::createImpl(const QString &path)
+{
+    if (!path.isEmpty())
+        return loadImpl(path);
+
+    const QRect r(0, 0, 1000, 1000);
+    m_graphicsScene->setSceneRect(m_graphicsView->mapToScene(r).boundingRect());
+    return true;
+}
+
 bool InterfaceTabDocument::loadImpl(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo(path).exists()) {
@@ -155,6 +168,15 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
 bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 {
     return false;
+}
+
+void InterfaceTabDocument::closeImpl()
+{
+    for (const common::Id &id : m_model->objects().keys()) {
+        if (aadl::AADLObject *obj = m_model->getObject(id))
+            if (obj->parent() == m_model)
+                m_model->removeObject(obj);
+    }
 }
 
 QVector<QAction *> InterfaceTabDocument::initActions()
@@ -649,6 +671,11 @@ void InterfaceTabDocument::showNIYGUI(const QString &title)
     QString header = title.isEmpty() ? "NIY" : title;
     QWidget *mainWindow = qobject_cast<QWidget *>(parent());
     QMessageBox::information(mainWindow, header, "Not implemented yet!");
+}
+
+QString InterfaceTabDocument::supportedFileExtensions() const
+{
+    return { "*.xml" };
 }
 
 } // ns document

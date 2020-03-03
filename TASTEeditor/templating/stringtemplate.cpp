@@ -17,14 +17,14 @@
 
 #include "stringtemplate.h"
 
+#include "tab_aadl/aadlobject.h"
+
 #include <QApplication>
-#include <QFileInfo>
 #include <QDebug>
+#include <QFileInfo>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <grantlee_templates.h>
-
-#include "tab_aadl/aadlobject.h"
 
 namespace taste3 {
 namespace templating {
@@ -76,7 +76,7 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
         return QString();
     }
 
-    const QString &result = stringTemplate->render(&context).trimmed();
+    const QString result = stringTemplate->render(&context).trimmed();
     return formatText(result);
 }
 
@@ -107,8 +107,10 @@ QString StringTemplate::formatText(const QString &text)
     }
 
     if (xmlReader.hasError()) {
-        const QString &errorString = tr("Error: %1, error line: %2:%3").arg(xmlReader.errorString())
-                                   .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber());
+        const QString &errorString = tr("Error: %1, error line: %2:%3")
+                                             .arg(xmlReader.errorString())
+                                             .arg(xmlReader.lineNumber())
+                                             .arg(xmlReader.columnNumber());
         qWarning() << Q_FUNC_INFO << errorString;
         emit errorOccurred(errorString);
         return text;

@@ -53,10 +53,14 @@ public:
     QMenu *customMenu() const override;
 
     const QHash<common::Id, aadl::AADLObject *> &objects() const;
+    QString supportedFileExtensions() const override;
 
 protected:
+    bool createImpl(const QString &path = QString()) override;
     bool loadImpl(const QString &path) override;
     bool saveImpl(const QString &path) override;
+    void closeImpl() override;
+
     QVector<QAction *> initActions() override;
 
     QWidget *createView() override;

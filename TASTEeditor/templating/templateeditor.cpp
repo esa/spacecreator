@@ -19,25 +19,25 @@
 
 #include "stringtemplate.h"
 #include "templatehighlighter.h"
-#include "xmlhighlighter.h"
 #include "templatesyntaxhelpdialog.h"
+#include "xmlhighlighter.h"
 
-#include <QPlainTextEdit>
-#include <QDialogButtonBox>
-#include <QBoxLayout>
 #include <QApplication>
-#include <QDesktopWidget>
-#include <QMessageBox>
-#include <QSpinBox>
-#include <QLabel>
-#include <QSplitter>
-#include <QPushButton>
-#include <QTextStream>
-#include <QFileDialog>
-#include <QTabWidget>
-#include <QDebug>
+#include <QBoxLayout>
 #include <QCheckBox>
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QGroupBox>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QSplitter>
+#include <QTabWidget>
+#include <QTextStream>
 
 namespace taste3 {
 namespace templating {
@@ -74,8 +74,8 @@ TemplateEditor::TemplateEditor(QWidget *parent)
     splitter->addWidget(m_resultTextEdit);
 
     QDialogButtonBox *templateButtonBox = new QDialogButtonBox(this);
-    templateButtonBox->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Open |
-                                          QDialogButtonBox::Apply | QDialogButtonBox::Help);
+    templateButtonBox->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Open | QDialogButtonBox::Apply
+                                          | QDialogButtonBox::Help);
     templateButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save &Template As.."));
     templateButtonBox->button(QDialogButtonBox::Open)->setText(tr("&Open Template"));
     templateButtonBox->button(QDialogButtonBox::Apply)->setText(tr("&Apply and Save"));
@@ -105,15 +105,21 @@ TemplateEditor::TemplateEditor(QWidget *parent)
     vLayout->addLayout(hBoxLayout);
     setLayout(vLayout);
 
-    connect(m_stringTemplate, &StringTemplate::errorOccurred, this, &TemplateEditor::onErrorOccurred, Qt::QueuedConnection);
-    connect(templateButtonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &TemplateEditor::onApplyTemplate);
-    connect(templateButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this, &TemplateEditor::onSaveTemplateAs);
-    connect(templateButtonBox->button(QDialogButtonBox::Open), &QPushButton::clicked, this, &TemplateEditor::onOpenTemplate);
-    connect(templateButtonBox->button(QDialogButtonBox::Help), &QPushButton::clicked, this, &TemplateEditor::onHelpRequested);
+    connect(m_stringTemplate, &StringTemplate::errorOccurred, this, &TemplateEditor::onErrorOccurred,
+            Qt::QueuedConnection);
+    connect(templateButtonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+            &TemplateEditor::onApplyTemplate);
+    connect(templateButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this,
+            &TemplateEditor::onSaveTemplateAs);
+    connect(templateButtonBox->button(QDialogButtonBox::Open), &QPushButton::clicked, this,
+            &TemplateEditor::onOpenTemplate);
+    connect(templateButtonBox->button(QDialogButtonBox::Help), &QPushButton::clicked, this,
+            &TemplateEditor::onHelpRequested);
     connect(validateXMLCheckBox, &QCheckBox::toggled, this, &TemplateEditor::onValidateXMLToggled);
     connect(validateXMLCheckBox, &QCheckBox::toggled, indentSpinBox, &QSpinBox::setEnabled);
     connect(indentSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &TemplateEditor::onIndentChanged);
-    connect(resultButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this, &TemplateEditor::onSaveResult);
+    connect(resultButtonBox->button(QDialogButtonBox::Save), &QPushButton::clicked, this,
+            &TemplateEditor::onSaveResult);
     connect(resultButtonBox, &QDialogButtonBox::rejected, this, &TemplateEditor::reject);
 }
 
@@ -207,7 +213,8 @@ void TemplateEditor::onSaveTemplateAs()
  */
 void TemplateEditor::onOpenTemplate()
 {
-    const QString &newTemplateFileName = QFileDialog::getOpenFileName(this, tr("Choose a template file"), m_templateFileName);
+    const QString &newTemplateFileName =
+            QFileDialog::getOpenFileName(this, tr("Choose a template file"), m_templateFileName);
     if (newTemplateFileName.isEmpty())
         return;
 
@@ -234,7 +241,8 @@ void TemplateEditor::onHelpRequested()
  */
 void TemplateEditor::onSaveResult()
 {
-    const QString &outputFileName = QFileDialog::getSaveFileName(this, tr("Save result to file"), QString(), QStringLiteral("*.xml"));
+    const QString &outputFileName =
+            QFileDialog::getSaveFileName(this, tr("Save result to file"), QString(), QStringLiteral("*.xml"));
     if (outputFileName.isEmpty())
         return;
 
@@ -269,7 +277,7 @@ void TemplateEditor::onValidateXMLToggled(bool validate)
 void TemplateEditor::onIndentChanged(int value)
 {
     m_stringTemplate->setAutoFormattingIndent(value);
-    const QString& result = m_stringTemplate->formatText(m_resultTextEdit->toPlainText());
+    const QString &result = m_stringTemplate->formatText(m_resultTextEdit->toPlainText());
     m_resultTextEdit->setPlainText(result);
 }
 
@@ -319,7 +327,7 @@ bool TemplateEditor::parseTemplate()
 
         m_templatesTabWidget->setUpdatesEnabled(true);
 
-        const QString &result = m_stringTemplate->parseFile(m_grouppedObjects, m_templateFileName);
+        const QString result = m_stringTemplate->parseFile(m_grouppedObjects, m_templateFileName);
         m_resultTextEdit->setPlainText(result);
         return !result.isEmpty();
     }
@@ -354,8 +362,7 @@ void TemplateEditor::openIncludedTemplates(const QString &templateText)
             const QString &includedTemplateText = file.readAll();
             includedTemplateTextEdit->setPlainText(includedTemplateText);
             openIncludedTemplates(includedTemplateText);
-        }
-        else {
+        } else {
             onErrorOccurred(tr("Unable to open included template file: %").arg(templateName));
         }
     }

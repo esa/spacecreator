@@ -77,11 +77,12 @@ protected Q_SLOTS:
     void onCreateFileRequested();
     bool onCloseFileRequested();
     void onSaveRenderRequested();
-    void onExportByTemplateRequested();
+    bool onExportByTemplateRequested();
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
     void onReportRequested();
+    void onDocDirtyChanged(bool dirty);
 
 private:
     static constexpr int TABDOC_ID_InterfaceView { 0 };
@@ -91,7 +92,6 @@ private:
     QPointer<QToolBar> m_docToolbar;
     ZoomController *m_zoomCtrl { nullptr };
     document::DocumentsManager *m_docsManager { nullptr };
-    QPointer<document::AbstractTabDocument> m_currentDocument;
     templating::TemplateEditor *m_previewDialog { nullptr };
 
     QUndoGroup *m_undoGroup { nullptr };
@@ -114,6 +114,9 @@ private:
     QAction *m_actAbout { nullptr };
     QAction *m_actReport { nullptr };
 
+    document::AbstractTabDocument *currentDoc() const;
+    bool closeTab(int id);
+    bool prepareQuit();
     void showNIY(const QString &caller);
 };
 
