@@ -555,28 +555,22 @@ bool CreatorTool::handleConnectionCreate(const QPointF &pos)
     if (!m_previewConnectionItem)
         return false;
 
-    if (QGraphicsItem *itemUnderCursor = utils::nearestItem(
-                scene, pos, ConnectionCreationValidator::kConnectionTolerance, { AADLInterfaceGraphicsItem::Type })) {
-        if (m_connectionPoints.size() < 2)
-            return false;
-
-        const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
-        if (!alignToSidePoint(scene, finishPoint, m_connectionPoints.last()))
-            return false;
-
-        m_connectionPoints.append(finishPoint);
-        return true;
-    }
-
     QPointF alignedPos { pos };
-    if (m_connectionPoints.size() == 1) {
-        if (!alignToSidePoint(scene, m_connectionPoints.value(0), alignedPos))
-            return false;
-    } else {
-        QLineF currentPath { m_connectionPoints.last(), pos };
-        if (utils::alignedLine(currentPath))
-            alignedPos = currentPath.p2();
-    }
+    if (m_connectionPoints.size() >= 2) {
+        if (QGraphicsItem *itemUnderCursor =
+                    utils::nearestItem(scene, pos, ConnectionCreationValidator::kConnectionTolerance,
+                                       { AADLInterfaceGraphicsItem::Type })) {
+
+            const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
+            if (!alignToSidePoint(scene, finishPoint, m_connectionPoints.last()))
+                return false;
+
+            m_connectionPoints.append(finishPoint);
+            return true;
+        }
+    } else if (!alignToSidePoint(scene, m_connectionPoints.value(0), alignedPos))
+        return false;
+
     m_connectionPoints.append(alignedPos);
 
     QPainterPath pp;
