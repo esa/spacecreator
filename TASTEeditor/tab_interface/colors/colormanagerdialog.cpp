@@ -28,9 +28,15 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
+#include <QPushButton>
 
 namespace taste3 {
 namespace aadl {
+
+QString defaultColorsResourceFile()
+{
+    return QStringLiteral(":/colors/default_colors.json");
+}
 
 ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)
@@ -40,8 +46,10 @@ ColorManagerDialog::ColorManagerDialog(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Color scheme"));
+    ui->listView->setModel(m_namesModel);
 
-    connect(ui->listView, &QListView::clicked, this, &ColorManagerDialog::onColorHandlerSelected);
+    connect(ui->listView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ColorManagerDialog::onColorHandlerSelected);
+    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &ColorManagerDialog::onDialogButtonClicked);
 
     loadFile(ColorManager::instance()->sourceFile());
 }
@@ -83,9 +91,12 @@ void ColorManagerDialog::loadFile(const QString &path)
         }
     }
 
+    int currentRow = ui->listView->currentIndex().isValid() ? ui->listView->currentIndex().row() : 0;
+
     m_namesModel->setStringList(m_colorNames.keys());
     ui->lePath->setText(ColorManager::instance()->sourceFile());
-    ui->listView->setModel(m_namesModel);
+
+    ui->listView->setCurrentIndex(ui->listView->model()->index(currentRow, 0));
 }
 
 void ColorManagerDialog::onColorHandlerSelected(const QModelIndex &id)
@@ -112,8 +123,14 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
 {
     const QString file =
             QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (!file.isEmpty() && common::copyResourceFile(":/colors/default_colors.json", file))
+    if (!file.isEmpty() && common::copyResourceFile(defaultColorsResourceFile(), file))
         loadFile(file);
+}
+
+void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
+{
+    if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button)
+        loadFile(defaultColorsResourceFile());
 }
 
 void ColorManagerDialog::accept()

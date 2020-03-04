@@ -22,6 +22,8 @@
 #include <QMap>
 #include <QStringListModel>
 
+class QAbstractButton;
+
 namespace Ui {
 class ColorManagerDialog;
 }
@@ -44,6 +46,7 @@ private Q_SLOTS:
     void onColorHandlerSelected(const QModelIndex &id);
     void on_btnOpen_clicked();
     void on_btnCreateNew_clicked();
+    void onDialogButtonClicked(QAbstractButton *button);
 
 private:
     Ui::ColorManagerDialog *ui;
