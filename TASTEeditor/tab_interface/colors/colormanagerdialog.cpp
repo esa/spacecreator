@@ -33,11 +33,6 @@
 namespace taste3 {
 namespace aadl {
 
-QString defaultColorsResourceFile()
-{
-    return QStringLiteral(":/colors/default_colors.json");
-}
-
 ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ColorManagerDialog)
@@ -131,6 +126,11 @@ void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
 {
     if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button)
         loadFile(defaultColorsResourceFile());
+}
+
+QString ColorManagerDialog::defaultColorsResourceFile()
+{
+    return QStringLiteral(":/colors/default_colors.json");
 }
 
 void ColorManagerDialog::accept()
