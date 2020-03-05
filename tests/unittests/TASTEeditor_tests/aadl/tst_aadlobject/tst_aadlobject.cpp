@@ -17,8 +17,9 @@
 
 #include "tab_aadl/aadlobject.h"
 
+#include <QSignalSpy>
+#include <QTest>
 #include <QVariant>
-#include <QtTest>
 
 class AADLObjectImp : public taste3::aadl::AADLObject
 {
@@ -43,10 +44,11 @@ private slots:
     void test_setId();
 
 private:
-    static const QString TestObjectTitle;
+    static const QString TestObjectTitleValid, TestObjectTitleInvalid;
 };
 
-const QString tst_AADLObject::TestObjectTitle = { "Test Object Title" };
+const QString tst_AADLObject::TestObjectTitleValid = { "Test_Object_Title" };
+const QString tst_AADLObject::TestObjectTitleInvalid = { "Test Object Title" };
 
 void tst_AADLObject::test_defaultConstructor()
 {
@@ -59,28 +61,40 @@ void tst_AADLObject::test_defaultConstructor()
 
 void tst_AADLObject::test_paramConstructor()
 {
-    AADLObjectImp obj(TestObjectTitle, this);
+    QVector<AADLObjectImp *> objects;
+    for (const QString &name : { TestObjectTitleValid, TestObjectTitleInvalid })
+        objects.append(new AADLObjectImp(name, this));
 
-    QCOMPARE(obj.parent(), this);
-    QCOMPARE(obj.title(), TestObjectTitle);
-    QVERIFY(!obj.id().toString().isEmpty());
+    for (int i = 0; i < objects.size(); ++i) {
+        const AADLObjectImp *obj = objects.at(i);
+        QCOMPARE(obj->parent(), this);
+        QCOMPARE(obj->title(), TestObjectTitleValid);
+        QVERIFY(obj->title() != TestObjectTitleInvalid);
+        QVERIFY(!obj->id().toString().isEmpty());
+    }
 }
 
 void tst_AADLObject::test_setTitle()
 {
     using namespace taste3::aadl;
-    AADLObjectImp obj;
-    QSignalSpy spy(&obj, &AADLObject::titleChanged);
 
-    QVERIFY(obj.title() != TestObjectTitle);
-    obj.setTitle(TestObjectTitle);
-    QCOMPARE(obj.title(), TestObjectTitle);
+    auto checkNaming = [](const QString &name) {
+        AADLObjectImp obj;
+        QSignalSpy spy(&obj, &AADLObject::titleChanged);
 
-    QVERIFY(spy.count() == 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.size() == 1);
-    QVERIFY(arguments.at(0).type() == QVariant::String);
-    QCOMPARE(arguments.at(0).value<QString>(), TestObjectTitle);
+        QVERIFY(obj.title() != name);
+        obj.setTitle(name);
+        QCOMPARE(obj.title(), TestObjectTitleValid);
+        QVERIFY(obj.title() != TestObjectTitleInvalid);
+        QVERIFY(spy.count() == 1);
+        const QList<QVariant> &arguments = spy.takeFirst();
+        QVERIFY(arguments.size() == 1);
+        QVERIFY(arguments.at(0).type() == QVariant::String);
+        QCOMPARE(arguments.at(0).value<QString>(), TestObjectTitleValid);
+    };
+
+    checkNaming(TestObjectTitleValid);
+    checkNaming(TestObjectTitleInvalid);
 }
 
 void tst_AADLObject::test_setId()

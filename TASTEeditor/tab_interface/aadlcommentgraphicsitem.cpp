@@ -78,8 +78,8 @@ void AADLCommentGraphicsItem::textEdited(const QString &text)
     const QRectF geometry = sceneBoundingRect();
     const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
     const QVariantList geometryParams { QVariant::fromValue(entity()), QVariant::fromValue(points) };
-    const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams);
-    taste3::cmd::CommandsStack::current()->push(geometryCmd);
+    if (const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams))
+        taste3::cmd::CommandsStack::current()->push(geometryCmd);
 
     const QVariantList commentTextParams { QVariant::fromValue(entity()), QVariant::fromValue(text) };
     const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);

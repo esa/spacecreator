@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
-    unittests/TASTEEditor
+    unittests/TASTEeditor_tests

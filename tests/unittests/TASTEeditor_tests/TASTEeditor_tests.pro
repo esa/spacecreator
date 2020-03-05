@@ -1,8 +1,8 @@
-TEMPLATE = subdirs
+include(tests_common.pri)
 
+TEMPLATE = subdirs
 SUBDIRS = \
     aadl/tst_aadlobject \
     aadl/tst_aadlobjectfunction\
-    aadl/tst_aadlobjectcontainer\
-    aadl/tst_aadlobjectiface\
+    aadl/tst_aadlobjectfunctiontype\
     aadl/tst_aadlobjectsmodel
