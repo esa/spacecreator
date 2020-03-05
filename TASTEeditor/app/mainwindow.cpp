@@ -126,8 +126,10 @@ void MainWindow::initMenuFile()
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
-    m_actExportXml = m_menuFile->addAction(tr("Save XML"), this, &MainWindow::onExportXml, QKeySequence::Save);
-    m_actExportAs = m_menuFile->addAction(tr("Save As..."), this, &MainWindow::onExportAs, QKeySequence::SaveAs);
+    m_actExportXml =
+            m_menuFile->addAction(tr("Export XML"), this, &MainWindow::onExportXml, QKeySequence(Qt::CTRL + Qt::Key_E));
+    m_actExportAs = m_menuFile->addAction(tr("Export As..."), this, &MainWindow::onExportAs,
+                                          QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_E));
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
