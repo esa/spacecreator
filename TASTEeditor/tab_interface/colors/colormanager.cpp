@@ -78,6 +78,7 @@ QJsonObject ColorHandler::toJson() const
 }
 
 ColorManager *ColorManager::m_instance = nullptr;
+const QString ColorManager::defaultColorschemeFileName = QStringLiteral("default_colors.json");
 
 ColorManager::ColorManager(QObject *parent)
     : QObject(parent)
@@ -116,7 +117,7 @@ ColorHandler ColorManager::colorsForItem(HandledColors t)
 
 QString ColorManager::defaultColorsResourceFile()
 {
-    return QStringLiteral(":/colors/default_colors.json");
+    return QStringLiteral(":/colors/%1").arg(defaultColorschemeFileName);
 }
 
 QString ColorManager::handledColorTypeName(HandledColors t)
@@ -193,19 +194,17 @@ QString ColorManager::sourceFile() const
 
 QString ColorManager::prepareDefaultSource() const
 {
-    static const QString jsonFileName("default_colors.json");
     const QString targetDir =
             QString("%1/colors").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
     common::ensureDirExists(targetDir);
 
-    QString jsonFilePath = QString("%1/%2").arg(targetDir, jsonFileName);
+    QString jsonFilePath = QString("%1/%2").arg(targetDir, defaultColorschemeFileName);
 
     if (QFile::exists(jsonFilePath))
         return jsonFilePath;
 
-    const QString &rscFilePath = QString(":/colors/%1").arg(jsonFileName);
-    if (common::copyResourceFile(rscFilePath, jsonFilePath))
+    if (common::copyResourceFile(defaultColorsResourceFile(), jsonFilePath))
         return jsonFilePath;
 
     qWarning() << "Can't create default colors file" << jsonFilePath;

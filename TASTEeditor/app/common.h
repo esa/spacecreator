@@ -35,7 +35,13 @@ Id createId();
  * If the \target file already exists, this function will not owervirite
  * and return false;
  */
-bool copyResourceFile(const QString &source, const QString &target);
+enum FileCopyingMode
+{
+    Keep,
+    Overwrite
+};
+bool copyResourceFile(const QString &source, const QString &target,
+                      FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
 void setWidgetFontColor(QWidget *widget, const QColor &color);
 

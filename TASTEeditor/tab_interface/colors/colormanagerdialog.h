@@ -41,6 +41,7 @@ public:
 
 public Q_SLOTS:
     void accept() override;
+    void reject() override;
 
 private Q_SLOTS:
     void onColorHandlerSelected(const QModelIndex &id);
@@ -54,8 +55,10 @@ private:
     QMap<QString, ColorManager::HandledColors> m_colorNames;
     QStringListModel *m_namesModel { nullptr };
     ColorHandler *m_color { nullptr };
+    QString m_originalFile;
 
-    void loadFile(const QString &path);
+    bool loadFile(const QString &path);
+    void openFile(const QString &path);
 };
 
 } // ns aadl
