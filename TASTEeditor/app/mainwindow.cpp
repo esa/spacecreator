@@ -20,6 +20,7 @@
 #include "app/commandsstack.h"
 #include "app/common.h"
 #include "app/context/action/actionsmanager.h"
+#include "app/xmldocexporter.h"
 #include "app/zoomcontroller.h"
 #include "document/documentsmanager.h"
 #include "document/tabdocumentfactory.h"
@@ -34,7 +35,6 @@
 #include "tab_deployment/deploymenttabdocument.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "tab_msc/msctabdocument.h"
-#include "templating/templateeditor.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
@@ -126,8 +126,8 @@ void MainWindow::initMenuFile()
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
-    m_actExportByTemplate =
-            m_menuFile->addAction(tr("Export by template..."), this, &MainWindow::onExportByTemplateRequested);
+    m_actExportXml = m_menuFile->addAction(tr("Save XML"), this, &MainWindow::onExportXml, QKeySequence::Save);
+    m_actExportAs = m_menuFile->addAction(tr("Save As..."), this, &MainWindow::onExportAs, QKeySequence::SaveAs);
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
@@ -211,8 +211,12 @@ bool MainWindow::closeTab(int id)
                                                                           btns);
             switch (btn) {
             case QMessageBox::Save: {
-                if (!onExportByTemplateRequested())
-                    return false;
+                if (app::XmlDocExporter::canExportXml(doc)) {
+                    if (!exportDocAsXml(doc))
+                        return false;
+                } else {
+                    qWarning() << "Not implemented yet";
+                }
                 break;
             }
             case QMessageBox::Cancel: {
@@ -258,19 +262,33 @@ void MainWindow::onSaveRenderRequested()
 }
 
 /**
- * @brief MainWindow::onExportByTemplateRequested handles "Export By Template" action
+ * @brief MainWindow::onExportAs slot to open Template Editor dialog
  */
-bool MainWindow::onExportByTemplateRequested()
+bool MainWindow::onExportAs()
 {
-    const QString &templateFileName =
-            QFileDialog::getOpenFileName(this, tr("Choose a template file for export"),
-                                         QStringLiteral("./xml_templates"), QStringLiteral("*.tmplt"));
-    const bool res = parseTemplateFile(templateFileName);
-    if (res)
-        if (document::AbstractTabDocument *doc = currentDoc())
-            doc->resetDirtyness();
+    return exportDocsAs();
+}
 
-    return res;
+/**
+ * @brief MainWindow::onExportXml slot to export the current document to XML
+ * with current/default values (the template and result file names)
+ */
+bool MainWindow::onExportXml()
+{
+    return exportCurrentDocAsXml();
+}
+
+bool MainWindow::exportCurrentDocAsXml(const QString &savePath, const QString &templatePath)
+{
+    return exportDocAsXml(currentDoc(), savePath, templatePath);
+}
+
+bool MainWindow::exportDocsAs(const QString &savePath, const QString &templatePath)
+{
+    for (int i = 0; i < m_tabWidget->count(); ++i)
+        if (!exportDocInteractive(m_docsManager->docById(i), savePath, templatePath))
+            return false;
+    return true;
 }
 
 void MainWindow::onQuitRequested()
@@ -288,13 +306,6 @@ void MainWindow::onAboutRequested()
 #endif
 
     QMessageBox::information(this, tr("About"), info);
-}
-
-void MainWindow::showNIY(const QString &caller)
-{
-    const QString &message = QString("Not implemented yet:\n%1").arg(caller);
-    qDebug() << message;
-    QMessageBox::information(this, "NIY", message);
 }
 
 void MainWindow::onTabSwitched(int tab)
@@ -385,62 +396,10 @@ void MainWindow::updateActions()
         if (QGraphicsScene *scene = doc->scene()) {
             renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
         }
+
+        m_actExportXml->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));
     }
     m_actSaveSceneRender->setEnabled(renderAvailable);
-}
-
-/**
- * @brief MainWindow::parseTemplateFile parses teplate file by a string template engine
- * and shows result in Preview dialog.
- * @param templateFileName template file name
- * @return whether template is parsed successfully
- */
-bool MainWindow::parseTemplateFile(const QString &templateFileName)
-{
-    QFileInfo fileInfo(templateFileName);
-    if (!fileInfo.exists()) {
-        qWarning() << "File" << templateFileName << "does not exist";
-        return false;
-    }
-
-    if (document::InterfaceTabDocument *doc =
-                qobject_cast<document::InterfaceTabDocument *>(m_docsManager->docById(TABDOC_ID_InterfaceView))) {
-        QHash<QString, QVariantList> grouppedObjects;
-        for (const auto aadlObject : doc->objects()) {
-            QString aadlGroupType;
-            switch (aadlObject->aadlType()) {
-            case aadl::AADLObject::AADLObjectType::AADLFunctionType:
-            case aadl::AADLObject::AADLObjectType::AADLFunction: {
-                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
-                    continue;
-                aadlGroupType = QStringLiteral("Functions");
-                break;
-            }
-            case aadl::AADLObject::AADLObjectType::AADLIface:
-                aadlGroupType = QStringLiteral("Interfaces");
-                break;
-            case aadl::AADLObject::AADLObjectType::AADLComment: {
-                if (qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject->parentObject()))
-                    continue;
-                aadlGroupType = QStringLiteral("Comments");
-                break;
-            }
-            case aadl::AADLObject::AADLObjectType::AADLConnection:
-                aadlGroupType = QStringLiteral("Connections");
-                break;
-            default:
-                continue;
-            }
-            grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
-        }
-
-        if (!m_previewDialog)
-            m_previewDialog = new templating::TemplateEditor(this);
-
-        return m_previewDialog->parseTemplate(grouppedObjects, templateFileName);
-    }
-
-    return false;
 }
 
 /*!
@@ -457,17 +416,20 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
     case CommandLineParser::Positional::OpenAADLXMLFile: {
         if (!value.isEmpty())
             if (document::AbstractTabDocument *doc = m_docsManager->docById(TABDOC_ID_InterfaceView))
-                return doc->load(value);
+                if (doc->load(value)) {
+                    m_tabWidget->setCurrentIndex(TABDOC_ID_InterfaceView);
+                    return true;
+                }
 
         return false;
     }
     case CommandLineParser::Positional::OpenStringTemplateFile:
         if (!value.isEmpty())
-            return parseTemplateFile(value);
+            return exportDocsAs(QString(), value);
         return false;
     case CommandLineParser::Positional::ExportToFile:
-        if (!value.isEmpty() && m_previewDialog)
-            return m_previewDialog->saveResultToFile(value);
+        if (!value.isEmpty())
+            return exportCurrentDocAsXml(value);
         return false;
     case CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
@@ -524,4 +486,23 @@ bool MainWindow::prepareQuit()
 
     return true;
 }
+
+bool MainWindow::exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave,
+                                const QString &templateToUse)
+{
+    if (!doc)
+        return false;
+
+    return app::XmlDocExporter::exportDocSilently(doc, pathToSave, templateToUse);
+}
+
+bool MainWindow::exportDocInteractive(document::AbstractTabDocument *doc, const QString &pathToSave,
+                                      const QString &templateToUse)
+{
+    if (!doc)
+        return false;
+
+    return app::XmlDocExporter::exportDocInteractive(doc, this, pathToSave, templateToUse);
+}
+
 } // ns taste3

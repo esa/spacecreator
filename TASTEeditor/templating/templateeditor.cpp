@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QBoxLayout>
+#include <QBuffer>
 #include <QCheckBox>
 #include <QDebug>
 #include <QDesktopWidget>
@@ -46,12 +47,13 @@ namespace templating {
  * @brief PreviewDialog::PreviewDialog ctor
  * @param parent
  */
-TemplateEditor::TemplateEditor(QWidget *parent)
+TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
     : QDialog(parent)
-    , m_stringTemplate(new templating::StringTemplate(this))
+    , m_stringTemplate(templating::StringTemplate::create(this))
     , m_templatesTabWidget(new QTabWidget(this))
     , m_resultTextEdit(new QPlainTextEdit(this))
     , m_helpDialog(nullptr)
+    , m_outFileName(saveHere)
 {
     setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
     setWindowState(Qt::WindowMaximized);
@@ -144,13 +146,19 @@ bool TemplateEditor::parseTemplate(const QHash<QString, QVariantList> &grouppedO
  */
 bool TemplateEditor::saveResultToFile(const QString &fileName)
 {
+    bool saved(false);
     QFile outputFile(fileName);
     if (outputFile.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
         QTextStream stream(&outputFile);
         stream << resultText();
-        return true;
+        m_outFileName = fileName;
+        saved = true;
+    } else {
+        qWarning() << "Can't open file for writing:" << fileName << outputFile.errorString();
     }
-    return false;
+
+    emit fileSaved(fileName, saved);
+    return saved;
 }
 
 /**
@@ -242,7 +250,7 @@ void TemplateEditor::onHelpRequested()
 void TemplateEditor::onSaveResult()
 {
     const QString &outputFileName =
-            QFileDialog::getSaveFileName(this, tr("Save result to file"), QString(), QStringLiteral("*.xml"));
+            QFileDialog::getSaveFileName(this, tr("Save result to file"), m_outFileName, QStringLiteral("*.xml"));
     if (outputFileName.isEmpty())
         return;
 
@@ -304,38 +312,47 @@ QPlainTextEdit *TemplateEditor::addTemplateEditor(const QString &tabLabel)
  */
 bool TemplateEditor::parseTemplate()
 {
+    bool parsed(false);
+
     m_openedTemplates.clear();
 
+    const bool updatesWereEnabled = m_templatesTabWidget->updatesEnabled();
     m_templatesTabWidget->setUpdatesEnabled(false);
+
     int tabIndex = m_templatesTabWidget->count();
     while (m_templatesTabWidget->count() > 1)
         m_templatesTabWidget->removeTab(tabIndex--);
 
     QFile templateFile(m_templateFileName);
-    if (templateFile.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream stream(&templateFile);
+    if (!templateFile.open(QFile::ReadOnly | QFile::Text)) {
+        const QString wrn =
+                tr("Unable to open template file: % - %2").arg(m_templateFileName, templateFile.errorString());
+        qWarning() << wrn;
+        onErrorOccurred(wrn);
+    } else {
         QPlainTextEdit *templateTextEdit = static_cast<QPlainTextEdit *>(m_templatesTabWidget->widget(0));
-        const QString &templateText = stream.readAll();
+        const QString templateText = templateFile.readAll();
         templateTextEdit->setPlainText(templateText);
 
-        QFileInfo fileInfo(templateFile);
-
+        const QFileInfo fileInfo(templateFile);
         m_openedTemplates[fileInfo.fileName()] = fileInfo.absoluteFilePath();
         m_templatesTabWidget->setTabText(0, fileInfo.fileName());
 
         openIncludedTemplates(templateText);
 
-        m_templatesTabWidget->setUpdatesEnabled(true);
+        QByteArray result;
+        QBuffer buffer(&result);
+        buffer.open(QIODevice::WriteOnly | QIODevice::Text);
 
-        const QString result = m_stringTemplate->parseFile(m_grouppedObjects, m_templateFileName);
-        m_resultTextEdit->setPlainText(result);
-        return !result.isEmpty();
+        if (m_stringTemplate->parseFile(m_grouppedObjects, m_templateFileName, &buffer)) {
+            m_resultTextEdit->setPlainText(QString::fromUtf8(result));
+            parsed = true;
+        }
     }
 
-    m_templatesTabWidget->setUpdatesEnabled(true);
+    m_templatesTabWidget->setUpdatesEnabled(updatesWereEnabled);
 
-    onErrorOccurred(tr("Unable to open template file: %").arg(m_templateFileName));
-    return false;
+    return parsed;
 }
 
 /**

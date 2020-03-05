@@ -29,18 +29,31 @@
 namespace taste3 {
 namespace templating {
 
+StringTemplate *StringTemplate::create(QObject *parent)
+{
+    StringTemplate *instance = new StringTemplate(parent);
+    instance->init();
+    return instance;
+}
+
 /**
  * @brief StringTemplate::StringTemplate ctor
  * @param parent
  */
 StringTemplate::StringTemplate(QObject *parent)
     : QObject(parent)
-    , m_engine(new Grantlee::Engine(this))
-    , m_fileLoader(QSharedPointer<Grantlee::FileSystemTemplateLoader>::create())
+    , m_engine(nullptr)
+    , m_fileLoader(nullptr)
     , m_validateXMLDocument(true)
     , m_autoFormattingIndent(4)
 {
+}
+
+void StringTemplate::init()
+{
+    m_engine = new Grantlee::Engine(this);
     m_engine->setSmartTrimEnabled(true);
+    m_fileLoader = QSharedPointer<Grantlee::FileSystemTemplateLoader>::create();
 
     auto cache = QSharedPointer<Grantlee::CachingLoaderDecorator>::create(m_fileLoader);
     m_engine->addTemplateLoader(cache);
@@ -51,14 +64,21 @@ StringTemplate::StringTemplate(QObject *parent)
  * @param grouppedObjects objects which are groupped by type name.
  * Type names can be Functions, Connections, Comments and etc.
  * @param templateFileName name of template file
- * @return generated and formatted XML text document
+ * @param openedOutFile a pointer to the buffer to store result
+ * @return false if data has not been written
  */
-QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
+bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName,
+                               QIODevice *out)
 {
-    QFileInfo fileInfo(templateFileName);
+    if (!out || templateFileName.isEmpty())
+        return false;
 
-    auto cache = m_engine->templateLoaders().first().staticCast<Grantlee::CachingLoaderDecorator>();
-    cache->clear();
+    const QFileInfo fileInfo(templateFileName);
+
+    if (auto cache = m_engine->templateLoaders().size()
+                ? m_engine->templateLoaders().first().staticCast<Grantlee::CachingLoaderDecorator>()
+                : nullptr)
+        cache->clear();
 
     m_fileLoader->setTemplateDirs({ fileInfo.absolutePath() });
 
@@ -68,16 +88,25 @@ QString StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedOb
     for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it)
         context.insert(it.key(), it.value());
 
-    Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());
+    const Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());
     if (stringTemplate->error()) {
         // Tokenizing or parsing error, or couldn't find custom tags or filters.
         qWarning() << Q_FUNC_INFO << stringTemplate->errorString();
         emit errorOccurred(stringTemplate->errorString());
-        return QString();
+        return false;
     }
 
     const QString result = stringTemplate->render(&context).trimmed();
-    return formatText(result);
+    const QString formatted = formatText(result);
+    if (!out->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Can't open device for writing:" << out->errorString();
+        emit errorOccurred(out->errorString());
+        return false;
+    }
+
+    out->write(formatted.toUtf8());
+    out->close();
+    return true;
 }
 
 /**

@@ -62,6 +62,11 @@ public:
     void setCoordinates(const QVector<qint32> &coordinates);
 
     AADLObject *parentObject() const;
+    bool isFunction() const;
+    bool isFunctionType() const;
+    bool isNestedInFunction() const;
+    bool isNestedInFunctionType() const;
+    bool isNested() const;
 
     // "attributes" - payload data in the opening XML tag,
     // like "name" and "kind" below:

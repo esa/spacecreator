@@ -236,12 +236,6 @@ void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &p
     }
 }
 
-bool AADLObjectFunctionType::isFunctionType() const
-{
-    return attr(meta::Props::token(meta::Props::Token::is_type), QLatin1String("NO")).toString().toLower()
-            == QLatin1String("yes");
-}
-
 QVector<QPointer<AADLObjectFunction>> AADLObjectFunctionType::instances() const
 {
     return d->m_instances;

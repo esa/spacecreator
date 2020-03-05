@@ -19,5 +19,14 @@
         <file>app/resources/taste-types.asn</file>
         <file>tab_interface/properties/resources/aadl_properties.json</file>
         <file>app/resources/contextmenu.json</file>
+        <file>templating/xml_templates/comment.tmplt</file>
+        <file>templating/xml_templates/comments.tmplt</file>
+        <file>templating/xml_templates/connection.tmplt</file>
+        <file>templating/xml_templates/connections.tmplt</file>
+        <file>templating/xml_templates/function.tmplt</file>
+        <file>templating/xml_templates/functions.tmplt</file>
+        <file>templating/xml_templates/interface.tmplt</file>
+        <file>templating/xml_templates/interfaces.tmplt</file>
+        <file>templating/xml_templates/interfaceview.tmplt</file>
     </qresource>
 </RCC>

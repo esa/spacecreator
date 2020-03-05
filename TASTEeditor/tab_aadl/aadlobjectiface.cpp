@@ -448,8 +448,7 @@ void AADLObjectIface::reflectAttrs(const AADLObjectIface *from)
 
     QHash<QString, QVariant> newAttrs = from->attrs();
 
-    const bool isFunctionTypeInherited =
-            from->parent() && from->parentObject()->as<const AADLObjectFunctionType *>()->isFunctionType();
+    const bool isFunctionTypeInherited = from->isNestedInFunctionType();
     const bool keepName = !isFunctionTypeInherited && isRequired() && from->isProvided();
     if (keepName)
         revertAttribute(meta::Props::token(meta::Props::Token::name), newAttrs, m_originalFields.attrs);
@@ -472,8 +471,7 @@ void AADLObjectIface::reflectProps(const AADLObjectIface *from)
 
     const QHash<QString, QVariant> &currProps = props();
     QHash<QString, QVariant> newProps = from->props();
-    const bool isFunctionTypeInherited =
-            from->parent() && from->parentObject()->as<const AADLObjectFunctionType *>()->isFunctionType();
+    const bool isFunctionTypeInherited = from->isNestedInFunctionType();
 
     for (auto t : { meta::Props::Token::labelInheritance, meta::Props::Token::coordinates,
                     meta::Props::Token::InnerCoordinates }) {

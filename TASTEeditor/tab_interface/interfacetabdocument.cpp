@@ -675,7 +675,7 @@ void InterfaceTabDocument::showNIYGUI(const QString &title)
 
 QString InterfaceTabDocument::supportedFileExtensions() const
 {
-    return { "*.xml" };
+    return QStringLiteral("*.xml");
 }
 
 } // ns document

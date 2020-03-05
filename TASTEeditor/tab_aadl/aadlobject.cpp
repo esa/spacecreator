@@ -153,6 +153,35 @@ AADLObject *AADLObject::parentObject() const
     return qobject_cast<AADLObject *>(parent());
 }
 
+bool AADLObject::isFunction() const
+{
+    return aadlType() == AADLObjectType::AADLFunction;
+}
+
+bool AADLObject::isFunctionType() const
+{
+    return aadlType() == AADLObjectType::AADLFunctionType;
+}
+
+bool AADLObject::isNestedInFunction() const
+{
+    if (const AADLObject *parent = parentObject())
+        return parent->isFunction();
+    return false;
+}
+
+bool AADLObject::isNestedInFunctionType() const
+{
+    if (const AADLObject *parent = parentObject())
+        return parent->isFunctionType();
+    return false;
+}
+
+bool AADLObject::isNested() const
+{
+    return isNestedInFunction() || isNestedInFunctionType();
+}
+
 QHash<QString, QVariant> AADLObject::attrs() const
 {
     return d->m_attrs;
