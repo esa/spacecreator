@@ -118,19 +118,14 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
 {
     const QString file =
             QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (!file.isEmpty() && common::copyResourceFile(defaultColorsResourceFile(), file))
+    if (!file.isEmpty() && common::copyResourceFile(ColorManager::defaultColorsResourceFile(), file))
         loadFile(file);
 }
 
 void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
 {
     if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button)
-        loadFile(defaultColorsResourceFile());
-}
-
-QString ColorManagerDialog::defaultColorsResourceFile()
-{
-    return QStringLiteral(":/colors/default_colors.json");
+        loadFile(ColorManager::defaultColorsResourceFile());
 }
 
 void ColorManagerDialog::accept()

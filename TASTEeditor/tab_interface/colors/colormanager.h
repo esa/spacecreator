@@ -68,6 +68,8 @@ public:
 
     static ColorHandler colorsForItem(HandledColors t);
 
+    static QString defaultColorsResourceFile();
+
 public:
     bool setSourceFile(const QString &from);
     QString sourceFile() const;

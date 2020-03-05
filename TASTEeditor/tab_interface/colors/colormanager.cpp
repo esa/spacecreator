@@ -114,6 +114,11 @@ ColorHandler ColorManager::colorsForItem(HandledColors t)
     return ColorHandler();
 }
 
+QString ColorManager::defaultColorsResourceFile()
+{
+    return QStringLiteral(":/colors/default_colors.json");
+}
+
 QString ColorManager::handledColorTypeName(HandledColors t)
 {
     switch (t) {

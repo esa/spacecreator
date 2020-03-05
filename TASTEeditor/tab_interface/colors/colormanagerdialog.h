@@ -49,9 +49,6 @@ private Q_SLOTS:
     void onDialogButtonClicked(QAbstractButton *button);
 
 private:
-    static QString defaultColorsResourceFile();
-
-private:
     Ui::ColorManagerDialog *ui;
     QMap<ColorManager::HandledColors, ColorHandler> m_colors;
     QMap<QString, ColorManager::HandledColors> m_colorNames;
