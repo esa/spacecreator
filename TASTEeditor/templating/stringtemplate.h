@@ -22,14 +22,16 @@
 #include <QSharedPointer>
 
 namespace Grantlee {
-    class Engine;
-    class FileSystemTemplateLoader;
+class Engine;
+class FileSystemTemplateLoader;
 }
+
+class QIODevice;
 
 namespace taste3 {
 
 namespace aadl {
-    class AADLObject;
+class AADLObject;
 }
 
 namespace templating {
@@ -44,9 +46,10 @@ class StringTemplate : public QObject
 {
     Q_OBJECT
 public:
-    explicit StringTemplate(QObject *parent = nullptr);
+    static StringTemplate *create(QObject *parent = nullptr);
 
-    QString parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+    bool parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName,
+                   QIODevice *out);
 
     QString formatText(const QString &text);
 
@@ -61,6 +64,8 @@ signals:
     void errorOccurred(const QString &errorString);
 
 private:
+    explicit StringTemplate(QObject *parent = nullptr);
+    void init();
     Grantlee::Engine *m_engine;
     QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
     bool m_validateXMLDocument;

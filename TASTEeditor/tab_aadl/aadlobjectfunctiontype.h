@@ -69,7 +69,6 @@ public:
     void clearContextParams();
     void setContextParams(const QVector<ContextParameter> &params);
 
-    bool isFunctionType() const;
     QVector<QPointer<AADLObjectFunction>> instances() const;
     void rememberInstance(AADLObjectFunction *function);
     void forgetInstance(AADLObjectFunction *function);

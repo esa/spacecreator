@@ -39,10 +39,6 @@ namespace document {
 class DocumentsManager;
 }
 
-namespace templating {
-class TemplateEditor;
-}
-
 class ZoomController;
 class MainWindow : public QMainWindow
 {
@@ -70,14 +66,13 @@ protected:
     void updateActions();
     void saveSceneRender(const QString &filePath) const;
 
-    bool parseTemplateFile(const QString &templateFileName);
-
 protected Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();
     void onSaveRenderRequested();
-    bool onExportByTemplateRequested();
+    bool onExportXml();
+    bool onExportAs();
     void onQuitRequested();
     void onAboutRequested();
     void onTabSwitched(int);
@@ -92,7 +87,6 @@ private:
     QPointer<QToolBar> m_docToolbar;
     ZoomController *m_zoomCtrl { nullptr };
     document::DocumentsManager *m_docsManager { nullptr };
-    templating::TemplateEditor *m_previewDialog { nullptr };
 
     QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };
@@ -105,7 +99,8 @@ private:
     QAction *m_actCreateFile { nullptr };
     QAction *m_actCloseFile { nullptr };
     QAction *m_actSaveSceneRender { nullptr };
-    QAction *m_actExportByTemplate { nullptr };
+    QAction *m_actExportXml { nullptr };
+    QAction *m_actExportAs { nullptr };
     QAction *m_actQuit { nullptr };
 
     QAction *m_actUndo { nullptr };
@@ -117,7 +112,14 @@ private:
     document::AbstractTabDocument *currentDoc() const;
     bool closeTab(int id);
     bool prepareQuit();
-    void showNIY(const QString &caller);
+
+    bool exportCurrentDocAsXml(const QString &savePath = QString(), const QString &templatePath = QString());
+    bool exportDocsAs(const QString &savePath = QString(), const QString &templatePath = QString());
+
+    bool exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
+                        const QString &templateToUse = QString());
+    bool exportDocInteractive(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
+                              const QString &templateToUse = QString());
 };
 
 } // ns taste3

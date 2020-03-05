@@ -186,5 +186,19 @@ QMenu *AbstractTabDocument::customMenu() const
     return nullptr;
 }
 
+void AbstractTabDocument::onSavedExternally(const QString &filePath, bool saved)
+{
+    if (saved) {
+        const bool forceTitleUpdate = d->m_filePath != filePath && !isDirty();
+
+        d->m_filePath = filePath;
+
+        if (forceTitleUpdate)
+            emit dirtyChanged(false);
+        else
+            resetDirtyness();
+    }
+}
+
 } // ns document
 } // ns taste3

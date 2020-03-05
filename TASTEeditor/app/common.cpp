@@ -43,6 +43,7 @@ bool copyResourceFile(const QString &source, const QString &target)
     qt_ntfs_permission_lookup++;
 #endif
     try {
+        ensureDirExists(QFileInfo(target).path());
         if (QFile::copy(source, target)) {
             QFile storedFile(target);
             storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);

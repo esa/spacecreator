@@ -39,7 +39,7 @@ class TemplateEditor : public QDialog
 {
     Q_OBJECT
 public:
-    TemplateEditor(QWidget *parent = nullptr);
+    TemplateEditor(const QString &saveHere, QWidget *parent = nullptr);
 
     bool parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
     bool saveResultToFile(const QString &fileName);
@@ -56,6 +56,9 @@ private slots:
     void onValidateXMLToggled(bool validate);
     void onIndentChanged(int value);
 
+Q_SIGNALS:
+    void fileSaved(const QString &filePath, bool ok) const;
+
 private:
     QPlainTextEdit *addTemplateEditor(const QString &tabLabel = QString());
     bool parseTemplate();
@@ -69,6 +72,7 @@ private:
     QString m_templateFileName;
     QHash<QString, QString> m_openedTemplates; // key: file name, value: full path
     TemplateSyntaxHelpDialog *m_helpDialog;
+    QString m_outFileName;
 };
 
 } // ns templating

@@ -38,7 +38,7 @@ QVector<QUndoCommand *> fillCloneCommands(AADLObjectIface *iface, const AADLObje
     if (auto fnType = iface->parentObject()->as<const AADLObjectFunctionType *>())
         for (auto fn : fnType->instances()) {
             AADLObjectIface::CreationInfo clone = AADLObjectIface::CreationInfo::cloneIface(iface, fn);
-            // the clonned iface has not been stored yet,
+            // the cloned iface has not been stored yet,
             // so it has invalid pointer to the model
             clone.model = creationInfo.model;
             if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))

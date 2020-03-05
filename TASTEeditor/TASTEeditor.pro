@@ -33,7 +33,10 @@ macx {
 GRANTLEE_LIB_DIR = $$[QT_INSTALL_LIBS]
 
 DEFINES += GRANTLEE_LIB_DIR='\\"$$GRANTLEE_LIB_DIR\\"'
-LIBS += -L$$GRANTLEE_LIB_DIR -lGrantlee_Templates
+GRANTLEE_LIB=Grantlee_Templates
+win32: CONFIG(debug, debug|release):GRANTLEE_LIB = $$join(GRANTLEE_LIB,,,d)
+
+LIBS += -L$$GRANTLEE_LIB_DIR -l$$GRANTLEE_LIB
 
 SOURCES += \
         app/commandlineparser.cpp \
@@ -52,6 +55,7 @@ SOURCES += \
         app/datatypes/basicdatatype.cpp \
         app/datatypes/datatypesstorage.cpp \
         app/mainwindow.cpp \
+        app/xmldocexporter.cpp \
         app/zoomcontroller.cpp \
         baseitems/common/drawrectinfo.cpp \
         baseitems/common/highlightrectitem.cpp \
@@ -165,6 +169,7 @@ HEADERS += \
         app/datatypes/basicdatatype.h \
         app/datatypes/datatypesstorage.h \
         app/mainwindow.h \
+        app/xmldocexporter.h \
         app/zoomcontroller.h \
         baseitems/common/abstractinteractiveobject.h \
         baseitems/common/drawrectinfo.h \

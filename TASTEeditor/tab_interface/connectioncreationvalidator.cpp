@@ -135,10 +135,8 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 
     // [2] - the edge interfaces parents are not FunctionType
     for (const AADLObjectIface *iface : { sourceIface, targetIface })
-        if (iface && iface->parentObject())
-            if (const AADLObjectFunctionType *fnType = iface->parentObject()->as<AADLObjectFunctionType *>())
-                if (fnType->isFunctionType())
-                    return FailReason::ParentIsFunctionType;
+        if (iface && iface->isNestedInFunctionType())
+            return FailReason::ParentIsFunctionType;
 
     // [3] - an iface kind is not Cyclic
     for (const AADLObjectIface *iface : { sourceIface, targetIface })
