@@ -36,8 +36,20 @@ Id createId()
     return QUuid::createUuid();
 }
 
-bool copyResourceFile(const QString &source, const QString &target)
+bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
 {
+
+    if (source.isEmpty() || target.isEmpty() || !QFile::exists(source))
+        return false;
+
+    if (QFile::exists(target)) {
+        if (FileCopyingMode::Overwrite == replaceMode) {
+            if (!QFile::remove(target))
+                return false;
+        } else
+            return false;
+    }
+
     bool result(false);
 #ifdef Q_OS_WIN
     qt_ntfs_permission_lookup++;

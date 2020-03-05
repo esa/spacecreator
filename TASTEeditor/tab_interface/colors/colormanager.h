@@ -85,6 +85,7 @@ private:
     QMap<HandledColors, ColorHandler> m_colors;
 
 private:
+    static const QString defaultColorschemeFileName;
     QString prepareDefaultSource() const;
 };
 
