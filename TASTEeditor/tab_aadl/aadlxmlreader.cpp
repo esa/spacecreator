@@ -38,11 +38,13 @@ namespace aadl {
 
 using namespace taste3::aadl::meta;
 
+typedef QHash<QString, QHash<QString, AADLObjectIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
+
 struct AADLXMLReaderPrivate {
     QVector<AADLObject *> m_allObjects {};
     QHash<QString, AADLObjectFunctionType *> m_functionNames {};
-    QHash<QString, AADLObjectIfaceRequired *> m_ifaceRequiredNames {};
-    QHash<QString, AADLObjectIfaceProvided *> m_ifaceProvidedNames {};
+    IfacesByFunction m_ifaceRequiredNames {};
+    IfacesByFunction m_ifaceProvidedNames {};
     QHash<QString, AADLObjectConnection *> m_connectionNames {};
 };
 
@@ -214,20 +216,22 @@ AADLObjectIface *AADLXMLReader::readInterface(QXmlStreamReader &xml, AADLObject 
         return nullptr;
     }
 
-    AADLObjectIface *iface(nullptr);
-    if (isProvided)
+    AADLObjectIface *iface { nullptr };
+    const QString &parentId = parent->id().toString();
+    if (isProvided) {
         iface = new AADLObjectIfaceProvided(parent);
-    else
+    } else {
         iface = new AADLObjectIfaceRequired(parent);
+    }
 
     readIfaceAttributes(xml, iface);
-
     readIfaceProperties(xml, iface);
 
     if (isProvided)
-        d->m_ifaceProvidedNames.insert(iface->title(), qobject_cast<AADLObjectIfaceProvided *>(iface));
+        d->m_ifaceProvidedNames[parentId].insert(iface->title(), iface);
     else
-        d->m_ifaceRequiredNames.insert(iface->title(), qobject_cast<AADLObjectIfaceRequired *>(iface));
+        d->m_ifaceRequiredNames[parentId].insert(iface->title(), iface);
+
     d->m_allObjects.append(iface);
 
     return iface;
@@ -385,19 +389,17 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
     }
 
     static const QString attrName_isType = Props::token(Props::Token::is_type);
-    bool isFunctionType(false);
-    if (attrs.contains(attrName_isType))
-        isFunctionType = attrs.take(attrName_isType).toLower() == "yes";
+    static const QString attrName_name = Props::token(Props::Token::name);
 
-    const bool parentIsFunctionType = parent && parent->aadlType() == AADLObject::AADLObjectType::AADLFunctionType;
-    const bool nestingAllowd = !(parentIsFunctionType && isFunctionType); // direct FnT->FnT nesting is not allowed
-    AADLObject *usedParent = nestingAllowd ? parent : nullptr;
-    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(QString(), usedParent)
-                                                     : new AADLObjectFunction(QString(), usedParent);
-    if (nestingAllowd) {
-        if (AADLObjectFunctionType *parentFunction = qobject_cast<AADLObjectFunctionType *>(parent))
-            parentFunction->addChild(currObj);
-    }
+    const bool isFunctionType =
+            attrs.contains(attrName_isType) ? attrs.take(attrName_isType).toLower() == QStringLiteral("yes") : false;
+    const QString fnName = attrs.contains(attrName_name) ? attrs.take(attrName_name) : QString();
+
+    AADLObjectFunction *parentFunction = qobject_cast<AADLObjectFunction *>(parent);
+    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(fnName, parentFunction)
+                                                     : new AADLObjectFunction(fnName, parentFunction);
+    if (parentFunction)
+        parentFunction->addChild(currObj);
 
     QHash<QString, QString>::const_iterator i = attrs.cbegin();
     while (i != attrs.cend()) {
@@ -411,14 +413,26 @@ AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AAD
 struct ConnectionEndPoint {
     AADLObject *m_function { nullptr };
     AADLObjectIface *m_interface { nullptr };
-    bool isReady() const { return m_function && m_interface; }
+    inline bool isReady() const { return m_function && m_interface; }
 };
 
 struct ConnectionHolder {
     ConnectionEndPoint m_from;
     ConnectionEndPoint m_to;
 
-    bool isValid() const { return m_from.isReady() && m_to.isReady(); }
+    inline bool isValid() const { return m_from.isReady() && m_to.isReady(); }
+    inline QString infoString() const
+    {
+        auto endPointToString = [](const ConnectionEndPoint &ep, const QString &marker) {
+            static const QString info("connection.%1: %2\n"
+                                      "connection.%1.iface: %3");
+            return info.arg(marker, ep.m_function ? ep.m_function->title() : QStringLiteral("none"),
+                            ep.m_interface ? ep.m_interface->title() : QStringLiteral("none"));
+        };
+
+        return QString("%1\n%2").arg(endPointToString(m_from, QStringLiteral("Source")),
+                                     endPointToString(m_to, QStringLiteral("Target")));
+    }
 };
 
 bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
@@ -443,12 +457,14 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
             }
             case Props::Token::si_name:
             case Props::Token::ri_name: {
-                endpoint.m_interface = d->m_ifaceRequiredNames.value(attrValue, nullptr);
+                endpoint.m_interface =
+                        d->m_ifaceRequiredNames.value(endpoint.m_function->id().toString()).value(attrValue, nullptr);
                 break;
             }
             case Props::Token::ti_name:
             case Props::Token::pi_name: {
-                endpoint.m_interface = d->m_ifaceProvidedNames.value(attrValue, nullptr);
+                endpoint.m_interface =
+                        d->m_ifaceProvidedNames.value(endpoint.m_function->id().toString()).value(attrValue, nullptr);
                 break;
             }
             default: {
@@ -522,6 +538,8 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
             return false;
         }
     }
+
+    qWarning() << QString("Invalid connection handler:\n%1").arg(connection.infoString());
 
     return false;
 }

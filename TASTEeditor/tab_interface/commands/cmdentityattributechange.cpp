@@ -211,12 +211,33 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const AADLObjectFu
     if (useOppositeCommands(m_cmdSet, m_cmdUnset, fnTypeId))
         return;
 
+    // Detect an iface which has been just created instead of being properly cloned (the XML file loading).
+    // For now it's only a name- and direction-based check. In case there are two or more ifaces with the same name,
+    // the first one found in AADLObjectFunctionType::interfaces is used.
+    auto findExistingClone = [this](AADLObjectIface *protoIface) -> AADLObjectIface * {
+        auto mayBeClone = [protoIface](const AADLObjectIface *iface) {
+            return iface->direction() == protoIface->direction() && iface->title() == protoIface->title();
+        };
+
+        if (protoIface)
+            for (auto iface : m_function->interfaces())
+                if (mayBeClone(iface))
+                    return iface;
+
+        return nullptr;
+    };
+
     Commands &cmdStorage = m_cmdSet[fnTypeId];
     const QVector<AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
-        const AADLObjectIface::CreationInfo clone = AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
-        if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
-            cmdStorage.append(cmdRm);
+        if (AADLObjectIface *existingIface = findExistingClone(fnTypeIface)) {
+            existingIface->setCloneOrigin(fnTypeIface);
+        } else {
+            const AADLObjectIface::CreationInfo clone =
+                    AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
+            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
+                cmdStorage.append(cmdRm);
+        }
     }
 }
 
