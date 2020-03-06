@@ -64,6 +64,8 @@ public:
     const QHash<common::Id, AADLObject *> &objects() const;
     QList<AADLObject *> visibleObjects() const;
 
+    void clear();
+
 Q_SIGNALS:
     void aadlObjectAdded(AADLObject *object);
     void aadlObjectRemoved(AADLObject *object);

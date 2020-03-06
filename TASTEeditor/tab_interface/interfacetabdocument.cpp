@@ -245,11 +245,7 @@ bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 
 void InterfaceTabDocument::closeImpl()
 {
-    for (const common::Id &id : m_model->objects().keys()) {
-        if (aadl::AADLObject *obj = m_model->getObject(id))
-            if (obj->parent() == m_model)
-                m_model->removeObject(obj);
-    }
+    m_model->clear();
 }
 
 QVector<QAction *> InterfaceTabDocument::initActions()
