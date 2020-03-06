@@ -127,6 +127,8 @@ public:
     QVariant originalProp(const QString &name) const;
     QVector<IfaceParameter> originalParams() const;
 
+    void setCloneOrigin(AADLObjectIface *source);
+
 Q_SIGNALS:
     void attrChanged_kind(AADLObjectIface::OperationKind kind);
     void paramsChanged();
@@ -142,7 +144,6 @@ protected:
                              AADLObject *parent = nullptr);
     void setupInitialAttrs();
 
-    void setCloneOrigin(AADLObjectIface *source);
     void rememberClone(AADLObjectIface *clone);
     void forgetClone(AADLObjectIface *clone);
 
