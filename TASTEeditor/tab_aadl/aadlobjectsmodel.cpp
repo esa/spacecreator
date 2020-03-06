@@ -43,16 +43,7 @@ AADLObjectsModel::~AADLObjectsModel() {}
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
-    emit modelReset();
-
-    for (auto object : d->m_objects.values())
-        object->deleteLater();
-
-    d->m_objects.clear();
-    d->m_objectsOrder.clear();
-    d->m_visibleObjects.clear();
-
-    d->m_rootObjectId = common::Id();
+    clear();
 
     const bool currentState = blockSignals(true);
 
@@ -285,6 +276,20 @@ QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const c
 QList<AADLObject *> AADLObjectsModel::visibleObjects() const
 {
     return d->m_visibleObjects;
+}
+
+void AADLObjectsModel::clear()
+{
+    emit modelReset();
+
+    for (auto object : d->m_objects.values())
+        object->deleteLater();
+
+    d->m_objects.clear();
+    d->m_objectsOrder.clear();
+    d->m_visibleObjects.clear();
+
+    d->m_rootObjectId = common::Id();
 }
 
 } // ns aadl
