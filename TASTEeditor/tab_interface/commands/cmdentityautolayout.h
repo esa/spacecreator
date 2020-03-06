@@ -28,7 +28,6 @@ class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
     explicit CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
-    void redo() override;
     int id() const override;
 };
 
