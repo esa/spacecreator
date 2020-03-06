@@ -31,18 +31,18 @@ static int sCounter = 0;
 
 CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
                                              const QRectF &geometry)
-    : QUndoCommand()
+    : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
-    , m_geometry(geometry)
     , m_parent(parent)
     , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_parent))
 {
-    setText(QObject::tr("Create Function"));
+    prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 
 void CmdFunctionItemCreate::redo()
 {
-    m_entity->setCoordinates(utils::coordinates(m_geometry));
+    CmdEntityGeometryChange::redo();
+
     if (m_parent)
         m_parent->addChild(m_entity);
     if (m_model)
@@ -51,16 +51,12 @@ void CmdFunctionItemCreate::redo()
 
 void CmdFunctionItemCreate::undo()
 {
+    CmdEntityGeometryChange::undo();
+
     if (m_model)
         m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removeChild(m_entity);
-}
-
-bool CmdFunctionItemCreate::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
 }
 
 int CmdFunctionItemCreate::id() const

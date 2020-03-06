@@ -24,6 +24,7 @@
 #include "cmdcontextparametercreate.h"
 #include "cmdcontextparameterremove.h"
 #include "cmdentityattributechange.h"
+#include "cmdentityautolayout.h"
 #include "cmdentitygeometrychange.h"
 #include "cmdentitypropertychange.h"
 #include "cmdentitypropertycreate.h"
@@ -71,6 +72,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::removeEntityCommand(params);
     case cmd::ChangeRootEntity:
         return cmd::CommandsFactory::changeRootEntityCommand(params);
+    case cmd::AutoLayoutEntity:
+        return cmd::CommandsFactory::autoLayoutEntityCommand(params);
     case cmd::CreateEntityProperty:
         return cmd::CommandsFactory::addEntityPropertyCommand(params);
     case cmd::ChangeEntityProperty:
@@ -185,6 +188,9 @@ QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
 {
     QList<QPair<AADLObject *, QVector<QPointF>>> objectsData;
     for (const auto &param : params) {
+        if (!param.isValid() || param.type() != QVariant::List)
+            return nullptr;
+
         const QVariantList objectDataList = param.toList();
         if (objectDataList.isEmpty())
             return nullptr;
@@ -401,6 +407,27 @@ QUndoCommand *CommandsFactory::changeRootEntityCommand(const QVariantList &param
     }
 
     return nullptr;
+}
+
+QUndoCommand *CommandsFactory::autoLayoutEntityCommand(const QVariantList &params)
+{
+    QList<QPair<AADLObject *, QVector<QPointF>>> objectsData;
+    for (const auto &param : params) {
+        const QVariantList objectDataList = param.toList();
+        if (objectDataList.isEmpty())
+            return nullptr;
+
+        Q_ASSERT(objectDataList.size() == 2);
+        const QVariant entity = objectDataList.value(0);
+        const QVariant points = objectDataList.value(1);
+        if (entity.isValid() && entity.canConvert<AADLObject *>() && points.isValid()
+            && points.canConvert<QVector<QPointF>>()) {
+            objectsData.append(qMakePair(entity.value<AADLObject *>(), points.value<QVector<QPointF>>()));
+        } else {
+            return nullptr;
+        }
+    }
+    return new CmdEntityAutoLayout(objectsData);
 }
 
 } // ns cmd

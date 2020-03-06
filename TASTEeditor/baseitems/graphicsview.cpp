@@ -35,7 +35,7 @@ GraphicsView::GraphicsView(QWidget *parent)
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 
-    setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    setAlignment(Qt::AlignAbsolute);
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 

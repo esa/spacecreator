@@ -69,6 +69,7 @@ public:
         Active_Interfaces,
         coordinates,
         InnerCoordinates,
+        RootCoordinates,
         Deadline,
         InterfaceName,
         RCMoperationKind,

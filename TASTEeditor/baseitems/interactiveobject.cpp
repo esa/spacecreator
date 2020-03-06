@@ -164,6 +164,7 @@ QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() c
         if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))
             params.append(iObj->prepareChangeCoordinatesCommandParams());
     }
+    params.erase(std::unique(params.begin(), params.end()), params.end());
     return params;
 }
 

@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include "cmdentitygeometrychange.h"
 #include "tab_aadl/aadlobjectiface.h"
 
 #include <QPointer>
 #include <QRect>
-#include <QUndoCommand>
 
 namespace taste3 {
 namespace aadl {
@@ -29,7 +29,7 @@ class AADLObjectFunctionType;
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdInterfaceItemCreate : public QUndoCommand
+class CmdInterfaceItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo);
@@ -37,7 +37,6 @@ public:
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 private:

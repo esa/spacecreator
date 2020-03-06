@@ -19,29 +19,17 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include <QPointer>
-#include <QRect>
-
 namespace taste3 {
 namespace aadl {
-class AADLObjectFunctionType;
-class AADLObjectComment;
-class AADLObjectsModel;
+class AADLObject;
 namespace cmd {
 
-class CmdCommentItemCreate : public CmdEntityGeometryChange
+class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *parent, const QRectF &geometry);
-
+    explicit CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
     void redo() override;
-    void undo() override;
     int id() const override;
-
-private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObjectFunctionType> m_parent;
-    QPointer<AADLObjectComment> m_entity;
 };
 
 } // namespace cmd

@@ -459,7 +459,7 @@ QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandP
     };
 
     QList<QVariantList> params;
-    params.append({ QVariant::fromValue(entity()), QVariant::fromValue(m_points) }); // ? graphicsPoints()
+    params.append({ QVariant::fromValue(entity()), QVariant::fromValue(graphicsPoints()) });
     params.append(prepareParams(m_startItem));
     params.append(prepareParams(m_endItem));
     return params;

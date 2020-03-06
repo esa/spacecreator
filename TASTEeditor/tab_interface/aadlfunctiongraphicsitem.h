@@ -62,7 +62,7 @@ protected:
 
 protected Q_SLOTS:
     void updateNestedItems();
-    virtual void colorSchemeUpdated() override;
+    void colorSchemeUpdated() override;
 
 private:
     void layoutConnections();

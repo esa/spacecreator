@@ -112,6 +112,8 @@ QVector<qint32> AADLObject::coordinates() const
             if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
+    } else if (isRootObject()) {
+        token = meta::Props::Token::RootCoordinates;
     }
 
     return coordinatesFromString(prop(meta::Props::token(token)).toString());
@@ -142,6 +144,8 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
             if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
+    } else if (isRootObject()) {
+        token = meta::Props::Token::RootCoordinates;
     }
 
     setProp(meta::Props::token(token), coordinatesToString(coordinates));

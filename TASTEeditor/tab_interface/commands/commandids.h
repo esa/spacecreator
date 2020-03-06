@@ -32,6 +32,7 @@ enum Id
     RemoveEntity,
     ChangeCommentText,
     ChangeRootEntity,
+    AutoLayoutEntity,
 
     CreateEntityProperty,
     ChangeEntityProperty,

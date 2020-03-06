@@ -43,11 +43,75 @@
 #include <QGraphicsView>
 #include <QMenu>
 #include <QMessageBox>
+#include <QShortcut>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
 namespace taste3 {
 namespace document {
+
+static inline void dumpItem(QObject *obj, bool strict = false)
+{
+    auto item = qobject_cast<aadl::InteractiveObject *>(obj);
+    if (!item)
+        return;
+
+    auto comparePolygones = [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
+        if (v1.size() != v2.size())
+            return false;
+
+        for (int idx = 0; idx < v1.size(); ++idx) {
+            if (v1.at(idx).toPoint() != v2.at(idx).toPoint())
+                return false;
+        }
+        return true;
+    };
+
+    qDebug() << item->metaObject()->className();
+
+    if (auto iface = qobject_cast<aadl::AADLInterfaceGraphicsItem *>(item)) {
+        qDebug() << "\nGraphics Iface geometry:"
+                 << "\n"
+                 << iface->scenePos() << "\n"
+                 << iface->sceneBoundingRect() << "\n";
+        qDebug() << "\nInternal Iface data:"
+                 << "\n"
+                 << iface->entity()->title() << "\n"
+                 << utils::pos(iface->entity()->coordinates()) << "\n";
+        Q_ASSERT(!strict || iface->scenePos().toPoint() == utils::pos(iface->entity()->coordinates()));
+    } else if (auto connection = qobject_cast<aadl::AADLConnectionGraphicsItem *>(item)) {
+        qDebug() << "\nGraphics Connection geometry:"
+                 << "\n"
+                 << connection->points() << "\n"
+                 << connection->graphicsPoints() << "\n";
+        qDebug() << "\nInternal Connection data:"
+                 << "\n"
+                 << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection %1<>%2")
+                                                                       .arg(connection->startItem()->entity()->title(),
+                                                                            connection->endItem()->entity()->title())
+                                                             : connection->entity()->title())
+                 << "\n"
+                 << utils::polygon(connection->entity()->coordinates()) << "\n";
+        Q_ASSERT(
+                !strict
+                || comparePolygones(connection->graphicsPoints(), utils::polygon(connection->entity()->coordinates())));
+        Q_ASSERT(!strict
+                 || comparePolygones(connection->points(), utils::polygon(connection->entity()->coordinates())));
+    } else if (auto rectItem = qobject_cast<aadl::AADLRectGraphicsItem *>(item)) {
+        qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:"
+                 << "\n"
+                 << rectItem->sceneBoundingRect() << "\n";
+        qDebug() << "\nInternal Function data:"
+                 << "\n"
+                 << rectItem->aadlObject()->title() << "\n"
+                 << utils::rect(rectItem->aadlObject()->coordinates()) << "\n";
+        Q_ASSERT(!strict
+                 || rectItem->sceneBoundingRect().toRect()
+                         == utils::rect(rectItem->aadlObject()->coordinates()).toRect());
+    } else {
+        qFatal("Not implemented trace");
+    }
+}
 
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
@@ -81,6 +145,15 @@ QWidget *InterfaceTabDocument::createView()
             }
             m_actZoomIn->setEnabled(!qFuzzyCompare(percent, m_graphicsView->maxZoomPercent()));
             m_actZoomOut->setEnabled(!qFuzzyCompare(percent, m_graphicsView->minZoomPercent()));
+        });
+
+        auto sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_D),
+                                qobject_cast<QWidget *>(m_graphicsView->window()));
+        sc->setContext(Qt::ApplicationShortcut);
+        connect(sc, &QShortcut::activated, this, [this]() {
+            for (auto item : m_graphicsScene->items()) {
+                dumpItem(item->toGraphicsObject(), true);
+            }
         });
     }
     m_graphicsView->setScene(m_graphicsScene);
@@ -515,55 +588,7 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
 
 void InterfaceTabDocument::onItemClicked()
 {
-    if (auto iface = qobject_cast<aadl::AADLInterfaceGraphicsItem *>(sender())) {
-        qDebug() << "\nGraphics Iface geometry:"
-                 << "\n"
-                 << iface->scenePos() << "\n"
-                 << iface->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal Iface data:"
-                 << "\n"
-                 << iface->entity()->title() << "\n"
-                 << utils::pos(iface->entity()->coordinates()) << "\n";
-    } else if (auto connection = qobject_cast<aadl::AADLConnectionGraphicsItem *>(sender())) {
-        qDebug() << "\nGraphics Connection geometry:"
-                 << "\n"
-                 << connection->points() << "\n"
-                 << connection->graphicsPoints() << "\n";
-        qDebug() << "\nInternal Connection data:"
-                 << "\n"
-                 << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection %1<>%2")
-                                                                       .arg(connection->startItem()->entity()->title(),
-                                                                            connection->endItem()->entity()->title())
-                                                             : connection->entity()->title())
-                 << "\n"
-                 << utils::polygon(connection->entity()->coordinates()) << "\n";
-    } else if (auto function = qobject_cast<aadl::AADLFunctionGraphicsItem *>(sender())) {
-        qDebug() << "\nGraphics Function geometry:"
-                 << "\n"
-                 << function->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal Function data:"
-                 << "\n"
-                 << function->entity()->title() << "\n"
-                 << utils::rect(function->entity()->coordinates()) << "\n";
-    } else if (auto functionType = qobject_cast<aadl::AADLFunctionTypeGraphicsItem *>(sender())) {
-        qDebug() << "\nGraphics FunctionType geometry:"
-                 << "\n"
-                 << functionType->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal FunctionType data:"
-                 << "\n"
-                 << functionType->entity()->title() << "\n"
-                 << utils::rect(functionType->entity()->coordinates()) << "\n";
-    } else if (auto comment = qobject_cast<aadl::AADLCommentGraphicsItem *>(sender())) {
-        qDebug() << "\nGraphics Comment geometry:"
-                 << "\n"
-                 << comment->sceneBoundingRect() << "\n";
-        qDebug() << "\nInternal Comment data:"
-                 << "\n"
-                 << comment->entity()->title() << "\n"
-                 << utils::rect(comment->entity()->coordinates()) << "\n";
-    } else {
-        qFatal("Not implemented trace");
-    }
+    dumpItem(sender());
 }
 
 void InterfaceTabDocument::onItemDoubleClicked()
@@ -609,7 +634,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
         onAADLObjectAdded(*it);
 
-    m_graphicsView->centerOn(m_graphicsScene->sceneRect().center());
+    m_graphicsView->setSceneRect({});
 }
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
