@@ -30,17 +30,6 @@ CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector
 {
 }
 
-void CmdEntityAutoLayout::redo()
-{
-    CmdEntityGeometryChange::redo();
-
-    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
-    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
-    const_cast<QUndoCommand *>(prevCmd)->mergeWith(this);
-
-    setObsolete(true);
-}
-
 int CmdEntityAutoLayout::id() const
 {
     return AutoLayoutEntity;
