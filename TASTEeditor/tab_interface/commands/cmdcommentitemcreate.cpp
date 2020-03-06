@@ -28,17 +28,17 @@ namespace cmd {
 
 CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *parent,
                                            const QRectF &geometry)
-    : m_model(model)
+    : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
+    , m_model(model)
     , m_parent(parent)
     , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_parent))
-    , m_geometry(geometry)
 {
-    setText(QObject::tr("Create Comment"));
+    prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
 
 void CmdCommentItemCreate::redo()
 {
-    m_entity->setCoordinates(utils::coordinates(m_geometry));
+    CmdEntityGeometryChange::redo();
 
     if (m_parent)
         m_parent->addChild(m_entity);
@@ -48,16 +48,12 @@ void CmdCommentItemCreate::redo()
 
 void CmdCommentItemCreate::undo()
 {
+    CmdEntityGeometryChange::undo();
+
     if (m_model)
         m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removeChild(m_entity);
-}
-
-bool CmdCommentItemCreate::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
 }
 
 int CmdCommentItemCreate::id() const

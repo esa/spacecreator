@@ -17,8 +17,9 @@
 
 #pragma once
 
+#include "cmdentitygeometrychange.h"
+
 #include <QPointer>
-#include <QUndoCommand>
 #include <app/common.h>
 
 namespace taste3 {
@@ -26,14 +27,13 @@ namespace aadl {
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdRootEntityChange : public QUndoCommand
+class CmdRootEntityChange : public CmdEntityGeometryChange
 {
 public:
     explicit CmdRootEntityChange(AADLObjectsModel *model, const common::Id &id);
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 private:

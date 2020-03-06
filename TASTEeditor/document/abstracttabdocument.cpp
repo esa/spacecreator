@@ -106,6 +106,7 @@ bool AbstractTabDocument::create(const QString &path)
 
 bool AbstractTabDocument::createImpl(const QString &path)
 {
+    Q_UNUSED(path)
     return false;
 }
 

@@ -25,12 +25,17 @@
 #include "colors/colormanager.h"
 #include "tab_aadl/aadlobjectfunction.h"
 #include "tab_aadl/aadlobjectsmodel.h"
+#include "tab_interface/commands/cmdentityautolayout.h"
+#include "tab_interface/commands/commandids.h"
+#include "tab_interface/commands/commandsfactory.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPainter>
+#include <QTimer>
 #include <QtDebug>
 #include <QtMath>
+#include <app/commandsstack.h>
 #include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2.0;
@@ -72,50 +77,39 @@ void AADLFunctionGraphicsItem::rebuildLayout()
 {
     QRectF nestedItemsInternalRect;
     bool needRelayout = false;
-    for (QGraphicsItem *item : childItems()) {
-        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-            if (auto entity = iObj->aadlObject()) {
-                const QRectF objRect = utils::rect(entity->coordinates());
-                if (objRect.isValid())
-                    nestedItemsInternalRect |= objRect;
-                else
-                    needRelayout = true;
-            }
+
+    for (QGraphicsItem *child : childItems()) {
+        if (auto childItem = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject())) {
+            const QRectF childRect = childItem->sceneBoundingRect();
+            if (childRect.isValid())
+                nestedItemsInternalRect |= childRect;
+            else
+                needRelayout = true;
         }
     }
+
     if (isRootItem()) {
         QRectF itemRect;
-        QRectF viewportRect;
         auto view = scene()->views().value(0);
-        if (view) {
-            const QRect viewportGeometry =
-                    view->viewport()->geometry().marginsRemoved(utils::kContentMargins.toMargins());
-            viewportRect = QRectF(view->mapToScene(viewportGeometry.topLeft()),
+        if (!sceneBoundingRect().isValid()) {
+            if (view) {
+                const QRect viewportGeometry =
+                        view->viewport()->geometry().marginsRemoved(utils::kContentMargins.toMargins());
+                itemRect = QRectF(view->mapToScene(viewportGeometry.topLeft()),
                                   view->mapToScene(viewportGeometry.bottomRight()));
-        }
-        const QRectF nestedRect = nestedItemsInternalRect.isValid()
-                ? nestedItemsInternalRect.marginsAdded(utils::kRootMargins)
-                : QRectF();
-        if (nestedRect.isValid()) {
-            viewportRect.moveCenter(nestedRect.center());
-            itemRect = viewportRect.united(nestedRect);
-        } else {
-            itemRect = viewportRect;
-        }
-
-        const QPointF offset = scenePos() - itemRect.topLeft();
-        if (itemRect != sceneBoundingRect())
-            setGeometry(itemRect);
-
-        if (nestedItemsInternalRect.isValid()) {
-            for (QGraphicsItem *child : childItems()) {
-                if (auto function = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject()))
-                    function->moveBy(offset.x(), offset.y());
             }
-            scene()->setSceneRect({});
+        } else {
+            itemRect = sceneBoundingRect();
+            if (itemRect.isNull() && nestedItemsInternalRect.isValid())
+                qFatal(Q_FUNC_INFO);
         }
-        if (view)
-            view->centerOn(itemRect.center());
+
+        if (itemRect != sceneBoundingRect()) {
+            setRect(itemRect);
+            if (view)
+                view->centerOn(itemRect.center());
+            updateEntity();
+        }
     }
     if (needRelayout)
         doAutoLayout();
@@ -215,7 +209,7 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPoin
 {
     Q_UNUSED(grip)
 
-    if (allowGeometryChange(pressedAt, releasedAt) && !isRootItem()) {
+    if (allowGeometryChange(pressedAt, releasedAt)) {
         const QRectF nestedRect = nestedItemsSceneBoundingRect();
         if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect))
             doAutoLayout();
@@ -396,11 +390,20 @@ void AADLFunctionGraphicsItem::doAutoLayout()
     }
     colorSchemeUpdated();
 
-    //    for (auto nestedItem : nestedFunctions)
-    //        nestedItem->colorSchemeUpdated();
-
     layoutConnections();
-    updateEntity();
+
+    QList<QVariant> params;
+    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
+    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
+                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+
+    QScopedPointer<QUndoCommand> autolayoutCmd(cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params));
+    autolayoutCmd->redo();
+
+    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
+    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
+    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
+        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeWith(autolayoutCmd.data());
 }
 
 } // namespace aadl

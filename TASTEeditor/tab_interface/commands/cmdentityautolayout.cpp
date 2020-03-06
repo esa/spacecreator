@@ -15,34 +15,36 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "cmdentityautolayout.h"
 
-#include "cmdentitygeometrychange.h"
+#include "app/commandsstack.h"
+#include "commandids.h"
 
-#include <QPointer>
-#include <QRect>
-
+#include <QtDebug>
 namespace taste3 {
 namespace aadl {
-class AADLObjectFunctionType;
-class AADLObjectFunction;
-class AADLObjectsModel;
 namespace cmd {
 
-class CmdFunctionTypeItemCreate : public CmdEntityGeometryChange
+CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
+    : CmdEntityGeometryChange(objectsData, QObject::tr("Auto layout items"))
 {
-public:
-    explicit CmdFunctionTypeItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent, const QRectF &geometry);
+}
 
-    void redo() override;
-    void undo() override;
-    int id() const override;
+void CmdEntityAutoLayout::redo()
+{
+    CmdEntityGeometryChange::redo();
 
-private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObjectFunctionType> m_entity;
-    QPointer<AADLObjectFunction> m_parent;
-};
+    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
+    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
+    const_cast<QUndoCommand *>(prevCmd)->mergeWith(this);
+
+    setObsolete(true);
+}
+
+int CmdEntityAutoLayout::id() const
+{
+    return AutoLayoutEntity;
+}
 
 } // namespace cmd
 } // namespace aadl

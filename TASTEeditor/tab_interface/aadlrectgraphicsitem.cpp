@@ -135,10 +135,8 @@ void AADLRectGraphicsItem::updateFromEntity()
 QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     QList<QVariantList> params;
-    if (!aadlObject()->isRootObject()) {
-        const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
-        params.append({ QVariant::fromValue(aadlObject()), QVariant::fromValue(sceneGeometry) });
-    }
+    const QVector<QPointF> sceneGeometry { sceneBoundingRect().topLeft(), sceneBoundingRect().bottomRight() };
+    params.append({ QVariant::fromValue(aadlObject()), QVariant::fromValue(sceneGeometry) });
     params.append(InteractiveObject::prepareChangeCoordinatesCommandParams());
     return params;
 }

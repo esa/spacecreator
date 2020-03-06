@@ -49,12 +49,14 @@ QVector<QUndoCommand *> fillCloneCommands(AADLObjectIface *iface, const AADLObje
 }
 
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo)
-    : m_ifaceInfo(creationInfo)
+    : CmdEntityGeometryChange({},
+                              creationInfo.type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
+                                                                                        : QObject::tr("Create RI"))
+    , m_ifaceInfo(creationInfo)
     , m_entity(AADLObjectIface::createIface(m_ifaceInfo))
     , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))
 {
-    setText(m_ifaceInfo.type == AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
-                                                                     : QObject::tr("Create RI"));
+    prepareData({ qMakePair(m_entity, QVector<QPointF> { m_ifaceInfo.position }) });
 }
 
 CmdInterfaceItemCreate::~CmdInterfaceItemCreate()
@@ -64,7 +66,8 @@ CmdInterfaceItemCreate::~CmdInterfaceItemCreate()
 
 void CmdInterfaceItemCreate::redo()
 {
-    m_entity->setCoordinates(utils::coordinates(m_ifaceInfo.position));
+    CmdEntityGeometryChange::redo();
+
     if (m_ifaceInfo.function)
         m_ifaceInfo.function->addInterface(m_entity);
     if (m_ifaceInfo.model)
@@ -76,6 +79,8 @@ void CmdInterfaceItemCreate::redo()
 
 void CmdInterfaceItemCreate::undo()
 {
+    CmdEntityGeometryChange::undo();
+
     if (m_ifaceInfo.function)
         m_ifaceInfo.function->removeInterface(m_entity);
     if (m_ifaceInfo.model)
@@ -83,12 +88,6 @@ void CmdInterfaceItemCreate::undo()
 
     for (QUndoCommand *clone : m_cmdClones)
         clone->undo();
-}
-
-bool CmdInterfaceItemCreate::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
 }
 
 int CmdInterfaceItemCreate::id() const

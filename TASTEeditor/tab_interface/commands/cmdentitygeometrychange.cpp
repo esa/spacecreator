@@ -17,8 +17,10 @@
 
 #include "cmdentitygeometrychange.h"
 
+#include "app/commandsstack.h"
 #include "commandids.h"
 
+#include <QtDebug>
 #include <baseitems/common/utils.h>
 #include <tab_aadl/aadlobjectsmodel.h>
 
@@ -26,11 +28,12 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
-    : QUndoCommand()
-    , m_data(convertData(objectsData))
+CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData,
+                                                 const QString &title)
+    : QUndoCommand(title.isEmpty() ? QObject::tr("Change Geometry") : title)
+    , m_internalData(objectsData)
+    , m_data(convertData(m_internalData))
 {
-    setText(QObject::tr("Change Geometry"));
 }
 
 void CmdEntityGeometryChange::redo()
@@ -55,8 +58,27 @@ void CmdEntityGeometryChange::undo()
 
 bool CmdEntityGeometryChange::mergeWith(const QUndoCommand *command)
 {
-    Q_UNUSED(command)
-    return false;
+    if (command->id() != AutoLayoutEntity)
+        return false;
+
+    auto cmd = static_cast<const CmdEntityGeometryChange *>(command);
+    QList<ObjectData> newEntries;
+    for (auto cmdData : cmd->m_data) {
+        Q_ASSERT(cmdData.entity);
+        if (!cmdData.entity)
+            continue;
+
+        const auto it =
+                std::find_if(m_data.begin(), m_data.end(), [id = cmdData.entity->id()](const ObjectData &objData) {
+                    return objData.entity->id() == id;
+                });
+        if (it == m_data.cend())
+            newEntries.append(cmdData);
+        else
+            it->newCoordinates = cmdData.newCoordinates;
+    }
+    m_data.append(newEntries);
+    return true;
 }
 
 int CmdEntityGeometryChange::id() const
@@ -77,7 +99,7 @@ static inline int parentLevel(AADLObject *object)
 QList<CmdEntityGeometryChange::ObjectData>
 CmdEntityGeometryChange::convertData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
 {
-    QList<CmdEntityGeometryChange::ObjectData> result;
+    QList<ObjectData> result;
     for (const auto &objectData : objectsData)
         result.append({ objectData.first, objectData.first->coordinates(), utils::coordinates(objectData.second) });
 
@@ -89,6 +111,11 @@ CmdEntityGeometryChange::convertData(const QList<QPair<AADLObject *, QVector<QPo
     });
 
     return result;
+}
+
+void CmdEntityGeometryChange::prepareData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
+{
+    m_data = convertData(objectsData);
 }
 
 } // namespace cmd

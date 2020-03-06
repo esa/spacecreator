@@ -498,11 +498,14 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
     }
     points.append(endInterfacePoint);
-
-    const QVariantList params = { QVariant::fromValue(m_model.data()),
-                                  QVariant::fromValue(parentForConnection ? parentForConnection->entity() : nullptr),
-                                  prevStartIfaceId, prevEndIfaceId, QVariant::fromValue(points) };
-    taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
+    Q_ASSERT(points.size() == 2);
+    if (points.first() != points.last()) {
+        const QVariantList params = { QVariant::fromValue(m_model.data()),
+                                      QVariant::fromValue(parentForConnection ? parentForConnection->entity()
+                                                                              : nullptr),
+                                      prevStartIfaceId, prevEndIfaceId, QVariant::fromValue(points) };
+        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
+    }
 
     taste3::cmd::CommandsStack::current()->endMacro();
 }
@@ -626,6 +629,7 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(parentObject),
                                       itemSceneRect };
+
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateFunctionEntity, params));
     }
 }

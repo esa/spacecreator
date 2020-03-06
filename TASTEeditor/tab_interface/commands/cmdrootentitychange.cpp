@@ -26,7 +26,7 @@ namespace aadl {
 namespace cmd {
 
 CmdRootEntityChange::CmdRootEntityChange(AADLObjectsModel *model, const common::Id &id)
-    : QUndoCommand(QObject::tr("Change root item"))
+    : CmdEntityGeometryChange({}, QObject::tr("Change root item"))
     , m_model(model)
     , m_newId(id)
     , m_prevId(model->rootObjectId())
@@ -44,12 +44,6 @@ void CmdRootEntityChange::undo()
 {
     if (m_model)
         m_model->setRootObject(m_prevId);
-}
-
-bool CmdRootEntityChange::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
 }
 
 int CmdRootEntityChange::id() const

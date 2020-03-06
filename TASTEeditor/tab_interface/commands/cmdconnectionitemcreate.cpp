@@ -32,37 +32,35 @@ namespace cmd {
 CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
                                                  const common::Id sourceIfaceId, const common::Id &targetIfaceId,
                                                  const QVector<QPointF> &points)
-    : m_model(model)
+    : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
+    , m_model(model)
 {
     Q_ASSERT(model);
     Q_ASSERT(!sourceIfaceId.isNull());
     Q_ASSERT(!targetIfaceId.isNull());
 
-    setText(QObject::tr("Create Connection"));
-
     AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
     AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
     m_entity = new AADLObjectConnection(sourceIface->function(), targetIface->function(), sourceIface, targetIface,
                                         parent);
-    m_entity->setCoordinates(utils::coordinates(points));
+
+    prepareData({ qMakePair(m_entity, points) });
 }
 
 void CmdConnectionItemCreate::redo()
 {
+    CmdEntityGeometryChange::redo();
+
     m_model->addObject(m_entity);
     m_entity->inheritLabel();
 }
 
 void CmdConnectionItemCreate::undo()
 {
+    CmdEntityGeometryChange::undo();
+
     m_entity->uninheritLabel();
     m_model->removeObject(m_entity);
-}
-
-bool CmdConnectionItemCreate::mergeWith(const QUndoCommand *command)
-{
-    Q_UNUSED(command)
-    return false;
 }
 
 int CmdConnectionItemCreate::id() const

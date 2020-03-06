@@ -18,10 +18,10 @@
 #pragma once
 
 #include "app/common.h"
+#include "cmdentitygeometrychange.h"
 
 #include <QPointer>
 #include <QRect>
-#include <QUndoCommand>
 #include <QVector>
 
 namespace taste3 {
@@ -32,7 +32,7 @@ class AADLObjectFunction;
 class AADLObjectsModel;
 namespace cmd {
 
-class CmdConnectionItemCreate : public QUndoCommand
+class CmdConnectionItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdConnectionItemCreate(taste3::aadl::AADLObjectsModel *model, taste3::aadl::AADLObjectFunction *parent,
@@ -41,7 +41,6 @@ public:
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
 private:
