@@ -49,7 +49,7 @@ Following instructions require git bash.
 
     cp <TASTE3_DIR>/grantlee/fix_escape.diff <GRANTLEE_DIR>
     cd <GRANTLEE_DIR>
-    git apply fix_escape.diff
+    git apply --ignore-space-change --ignore-whitespace fix_escape.diff
 
 To build Taste3 correctly Grantlee should be installed into QTDIR directory:
 
