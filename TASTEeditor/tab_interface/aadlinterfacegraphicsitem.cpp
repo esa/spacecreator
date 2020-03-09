@@ -39,6 +39,7 @@ static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
+static const qreal kInterfaceTitleMaxLength = 80;
 
 namespace taste3 {
 namespace aadl {
@@ -60,7 +61,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
-    m_text->setPlainText(ifaceLabel());
+    setInterfaceName(ifaceLabel());
 
     connect(entity, &AADLObject::attributeChanged, this, [this](taste3::aadl::meta::Props::Token attr) {
         switch (attr) {
@@ -128,7 +129,12 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 
 void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 {
-    m_text->setPlainText(name);
+    if (name != entity()->title()) {
+        const QFontMetrics fm(m_text->font());
+        m_text->setPlainText(fm.elidedText(name, Qt::ElideRight, kInterfaceTitleMaxLength));
+        m_text->setToolTip(name);
+        instantLayoutUpdate();
+    }
 }
 
 static inline void moveClockwise(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
@@ -429,11 +435,7 @@ void AADLInterfaceGraphicsItem::colorSchemeUpdated()
 
 void AADLInterfaceGraphicsItem::updateLabel()
 {
-    const QString &label = ifaceLabel();
-    if (label != m_text->toPlainText()) {
-        m_text->setPlainText(label);
-        instantLayoutUpdate();
-    }
+    setInterfaceName(ifaceLabel());
 }
 
 void AADLInterfaceGraphicsItem::updateKind()
