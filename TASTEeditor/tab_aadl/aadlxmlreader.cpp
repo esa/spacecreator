@@ -503,6 +503,32 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         return false;
     };
 
+    auto readConnectionProperties = [&xml, this]() {
+        QHash<QString, QVariant> props;
+        while (xml.readNextStartElement()) {
+            if (handleError(xml))
+                return props;
+
+            const QString &name = xml.name().toString();
+            switch (Props::token(name)) {
+            case Props::Token::Property: {
+                const QXmlStreamAttributes &attrs = xml.attributes();
+                const QString &propName = attrs.value(Props::token(Props::Token::name)).toString();
+                if (!propName.isEmpty())
+                    props[propName] = attrs.value(Props::token(Props::Token::value)).toString();
+                break;
+            }
+            default: {
+                qWarning() << badTagWarningMessage(xml, name);
+                return props;
+            }
+            }
+
+            xml.skipCurrentElement();
+        }
+        return props;
+    };
+
     ConnectionHolder connection;
 
     if (!readConnectionPart(connection)) // read the first one (Source or Target)
@@ -511,7 +537,6 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
         return false;
 
     if (connection.isValid()) {
-        xml.skipCurrentElement();
         const ConnectionCreationValidator::FailReason status =
                 ConnectionCreationValidator::canConnect(connection.m_from.m_function->as<AADLObjectFunction *>(),
                                                         connection.m_to.m_function->as<AADLObjectFunction *>(),
@@ -520,6 +545,10 @@ bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
             AADLObjectConnection *objConnection =
                     new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
                                              connection.m_from.m_interface, connection.m_to.m_interface, parent);
+
+            const QHash<QString, QVariant> props = readConnectionProperties();
+            if (!props.isEmpty())
+                objConnection->setProps(props);
 
             d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
             d->m_allObjects.append(objConnection);
