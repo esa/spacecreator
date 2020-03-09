@@ -10,8 +10,15 @@ conn.siIsRequired :   |_ Whether source interface is required
 conn.tiIsRequired :   |_ Whether target interface is required
 conn.siIsProvided :   |_ Whether source interface is provided
 conn.tiIsProvided :   |_ Whether target interface is provided
+conn.properties   :   |_ List of all available properties
+prop              :      |_ Instance of property
+prop.name         :          |_ Name of property
+prop.value        :          |_ Value of property
 {% endcomment %}
 <Connection>
     <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}"/>
     <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}"/>
+    {% for prop in conn.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+    {% endfor %}
 </Connection>
