@@ -1,0 +1,140 @@
+<InterfaceView>
+    <Function name="Function_1" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="600 -500 20600 7500"/>
+        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="Property_0" type="T-Boolean" encoding="NATIVE"/>
+            <Input_Parameter name="Property_1" type="T-Enum" encoding="NATIVE"/>
+            <Input_Parameter name="Property_2" type="T-Int31" encoding="NATIVE"/>
+            <Input_Parameter name="Property_3" type="T-Int7" encoding="NATIVE"/>
+            <Input_Parameter name="Property_4" type="T-Real" encoding="NATIVE"/>
+            <Input_Parameter name="Property_5" type="T-String" encoding="NATIVE"/>
+            <Input_Parameter name="Property_6" type="T-UInt31" encoding="NATIVE"/>
+            <Input_Parameter name="Property_7" type="T-UInt7" encoding="NATIVE"/>
+            <Input_Parameter name="Property_8" type="Timer" encoding="NATIVE"/>
+            <Input_Parameter name="Property_9" type="Directive" encoding="NATIVE"/>
+            <Input_Parameter name="Property_10" type="T-Boolean" encoding="UPER"/>
+            <Input_Parameter name="Property_11" type="T-Enum" encoding="UPER"/>
+            <Input_Parameter name="Property_12" type="T-Int31" encoding="UPER"/>
+            <Input_Parameter name="Property_13" type="T-Int7" encoding="UPER"/>
+            <Input_Parameter name="Property_14" type="T-Real" encoding="UPER"/>
+            <Input_Parameter name="Property_15" type="T-String" encoding="UPER"/>
+            <Input_Parameter name="Property_16" type="T-UInt31" encoding="UPER"/>
+            <Input_Parameter name="Property_17" type="T-UInt7" encoding="UPER"/>
+            <Input_Parameter name="Property_18" type="Timer" encoding="UPER"/>
+            <Input_Parameter name="Property_19" type="Directive" encoding="UPER"/>
+            <Input_Parameter name="Property_20" type="T-Boolean" encoding="ACN"/>
+            <Input_Parameter name="Property_21" type="T-Enum" encoding="ACN"/>
+            <Input_Parameter name="Property_22" type="T-Int31" encoding="ACN"/>
+            <Input_Parameter name="Property_23" type="T-Int7" encoding="ACN"/>
+            <Input_Parameter name="Property_24" type="T-Real" encoding="ACN"/>
+            <Input_Parameter name="Property_25" type="T-String" encoding="ACN"/>
+            <Input_Parameter name="Property_26" type="T-UInt31" encoding="ACN"/>
+            <Input_Parameter name="Property_27" type="T-UInt7" encoding="ACN"/>
+            <Input_Parameter name="Property_28" type="Timer" encoding="ACN"/>
+            <Input_Parameter name="Property_29" type="Directive" encoding="ACN"/>
+            <Output_Parameter name="Property_30" type="T-Boolean" encoding="NATIVE"/>
+            <Output_Parameter name="Property_31" type="T-Enum" encoding="NATIVE"/>
+            <Output_Parameter name="Property_32" type="T-Int31" encoding="NATIVE"/>
+            <Output_Parameter name="Property_33" type="T-Int7" encoding="NATIVE"/>
+            <Output_Parameter name="Property_34" type="T-Real" encoding="NATIVE"/>
+            <Output_Parameter name="Property_35" type="T-String" encoding="NATIVE"/>
+            <Output_Parameter name="Property_36" type="T-UInt31" encoding="NATIVE"/>
+            <Output_Parameter name="Property_37" type="T-UInt7" encoding="NATIVE"/>
+            <Output_Parameter name="Property_38" type="Timer" encoding="NATIVE"/>
+            <Output_Parameter name="Property_39" type="Directive" encoding="NATIVE"/>
+            <Output_Parameter name="Property_40" type="T-Boolean" encoding="UPER"/>
+            <Output_Parameter name="Property_41" type="T-Enum" encoding="UPER"/>
+            <Output_Parameter name="Property_42" type="T-Int31" encoding="UPER"/>
+            <Output_Parameter name="Property_43" type="T-Int7" encoding="UPER"/>
+            <Output_Parameter name="Property_44" type="T-Real" encoding="UPER"/>
+            <Output_Parameter name="Property_45" type="T-String" encoding="UPER"/>
+            <Output_Parameter name="Property_46" type="T-UInt31" encoding="UPER"/>
+            <Output_Parameter name="Property_47" type="T-UInt7" encoding="UPER"/>
+            <Output_Parameter name="Property_48" type="Timer" encoding="UPER"/>
+            <Output_Parameter name="Property_49" type="Directive" encoding="UPER"/>
+            <Output_Parameter name="Property_50" type="T-Boolean" encoding="ACN"/>
+            <Output_Parameter name="Property_51" type="T-Enum" encoding="ACN"/>
+            <Output_Parameter name="Property_52" type="T-Int31" encoding="ACN"/>
+            <Output_Parameter name="Property_53" type="T-Int7" encoding="ACN"/>
+            <Output_Parameter name="Property_54" type="T-Real" encoding="ACN"/>
+            <Output_Parameter name="Property_55" type="T-String" encoding="ACN"/>
+            <Output_Parameter name="Property_56" type="T-UInt31" encoding="ACN"/>
+            <Output_Parameter name="Property_57" type="T-UInt7" encoding="ACN"/>
+            <Output_Parameter name="Property_58" type="Timer" encoding="ACN"/>
+            <Output_Parameter name="Property_59" type="Directive" encoding="ACN"/>
+            <Property name="Taste::coordinates" value="20600 2300"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+    </Function>
+    <Function name="Function_2" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="33700 -100 53700 7900"/>
+        <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="Property_0" type="T-Boolean" encoding="NATIVE"/>
+            <Input_Parameter name="Property_1" type="T-Enum" encoding="NATIVE"/>
+            <Input_Parameter name="Property_2" type="T-Int31" encoding="NATIVE"/>
+            <Input_Parameter name="Property_3" type="T-Int7" encoding="NATIVE"/>
+            <Input_Parameter name="Property_4" type="T-Real" encoding="NATIVE"/>
+            <Input_Parameter name="Property_5" type="T-String" encoding="NATIVE"/>
+            <Input_Parameter name="Property_6" type="T-UInt31" encoding="NATIVE"/>
+            <Input_Parameter name="Property_7" type="T-UInt7" encoding="NATIVE"/>
+            <Input_Parameter name="Property_8" type="Timer" encoding="NATIVE"/>
+            <Input_Parameter name="Property_9" type="Directive" encoding="NATIVE"/>
+            <Input_Parameter name="Property_10" type="T-Boolean" encoding="UPER"/>
+            <Input_Parameter name="Property_11" type="T-Enum" encoding="UPER"/>
+            <Input_Parameter name="Property_12" type="T-Int31" encoding="UPER"/>
+            <Input_Parameter name="Property_13" type="T-Int7" encoding="UPER"/>
+            <Input_Parameter name="Property_14" type="T-Real" encoding="UPER"/>
+            <Input_Parameter name="Property_15" type="T-String" encoding="UPER"/>
+            <Input_Parameter name="Property_16" type="T-UInt31" encoding="UPER"/>
+            <Input_Parameter name="Property_17" type="T-UInt7" encoding="UPER"/>
+            <Input_Parameter name="Property_18" type="Timer" encoding="UPER"/>
+            <Input_Parameter name="Property_19" type="Directive" encoding="UPER"/>
+            <Input_Parameter name="Property_20" type="T-Boolean" encoding="ACN"/>
+            <Input_Parameter name="Property_21" type="T-Enum" encoding="ACN"/>
+            <Input_Parameter name="Property_22" type="T-Int31" encoding="ACN"/>
+            <Input_Parameter name="Property_23" type="T-Int7" encoding="ACN"/>
+            <Input_Parameter name="Property_24" type="T-Real" encoding="ACN"/>
+            <Input_Parameter name="Property_25" type="T-String" encoding="ACN"/>
+            <Input_Parameter name="Property_26" type="T-UInt31" encoding="ACN"/>
+            <Input_Parameter name="Property_27" type="T-UInt7" encoding="ACN"/>
+            <Input_Parameter name="Property_28" type="Timer" encoding="ACN"/>
+            <Input_Parameter name="Property_29" type="Directive" encoding="ACN"/>
+            <Output_Parameter name="Property_30" type="T-Boolean" encoding="NATIVE"/>
+            <Output_Parameter name="Property_31" type="T-Enum" encoding="NATIVE"/>
+            <Output_Parameter name="Property_32" type="T-Int31" encoding="NATIVE"/>
+            <Output_Parameter name="Property_33" type="T-Int7" encoding="NATIVE"/>
+            <Output_Parameter name="Property_34" type="T-Real" encoding="NATIVE"/>
+            <Output_Parameter name="Property_35" type="T-String" encoding="NATIVE"/>
+            <Output_Parameter name="Property_36" type="T-UInt31" encoding="NATIVE"/>
+            <Output_Parameter name="Property_37" type="T-UInt7" encoding="NATIVE"/>
+            <Output_Parameter name="Property_38" type="Timer" encoding="NATIVE"/>
+            <Output_Parameter name="Property_39" type="Directive" encoding="NATIVE"/>
+            <Output_Parameter name="Property_40" type="T-Boolean" encoding="UPER"/>
+            <Output_Parameter name="Property_41" type="T-Enum" encoding="UPER"/>
+            <Output_Parameter name="Property_42" type="T-Int31" encoding="UPER"/>
+            <Output_Parameter name="Property_43" type="T-Int7" encoding="UPER"/>
+            <Output_Parameter name="Property_44" type="T-Real" encoding="UPER"/>
+            <Output_Parameter name="Property_45" type="T-String" encoding="UPER"/>
+            <Output_Parameter name="Property_46" type="T-UInt31" encoding="UPER"/>
+            <Output_Parameter name="Property_47" type="T-UInt7" encoding="UPER"/>
+            <Output_Parameter name="Property_48" type="Timer" encoding="UPER"/>
+            <Output_Parameter name="Property_49" type="Directive" encoding="UPER"/>
+            <Output_Parameter name="Property_50" type="T-Boolean" encoding="ACN"/>
+            <Output_Parameter name="Property_51" type="T-Enum" encoding="ACN"/>
+            <Output_Parameter name="Property_52" type="T-Int31" encoding="ACN"/>
+            <Output_Parameter name="Property_53" type="T-Int7" encoding="ACN"/>
+            <Output_Parameter name="Property_54" type="T-Real" encoding="ACN"/>
+            <Output_Parameter name="Property_55" type="T-String" encoding="ACN"/>
+            <Output_Parameter name="Property_56" type="T-UInt31" encoding="ACN"/>
+            <Output_Parameter name="Property_57" type="T-UInt7" encoding="ACN"/>
+            <Output_Parameter name="Property_58" type="Timer" encoding="ACN"/>
+            <Output_Parameter name="Property_59" type="Directive" encoding="ACN"/>
+            <Property name="Taste::coordinates" value="33700 3500"/>
+        </Provided_Interface>
+    </Function>
+    <Connection>
+        <Source func_name="Function_1" ri_name="RI_1"/>
+        <Target func_name="Function_2" pi_name="PI_1"/>
+        <Property name="Taste::coordinates" value="20600 2300 33700 3500"/>
+    </Connection>
+</InterfaceView>

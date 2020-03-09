@@ -75,6 +75,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterchange.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparametercreate.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterremove.h \
+        $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityautolayout.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityattributechange.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentitygeometrychange.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentitypropertychange.h \
@@ -189,6 +190,7 @@ SOURCES += \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterchange.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparametercreate.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterremove.cpp \
+        $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityautolayout.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityattributechange.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentitygeometrychange.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentitypropertychange.cpp \
