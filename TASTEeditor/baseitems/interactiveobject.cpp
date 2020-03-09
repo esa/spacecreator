@@ -37,8 +37,6 @@
 namespace taste3 {
 namespace aadl {
 
-static const QMarginsF kMargins { 25, 25, 25, 25 };
-
 InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_dataObject(entity)
@@ -157,8 +155,8 @@ QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() c
 {
     QList<QVariantList> params;
     auto children = childItems();
-    std::sort(children.begin(), children.end(),
-              [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
+    std::stable_sort(children.begin(), children.end(),
+                     [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
 
     for (auto item : children) {
         if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))

@@ -103,7 +103,7 @@ CmdEntityGeometryChange::convertData(const QList<QPair<AADLObject *, QVector<QPo
     for (const auto &objectData : objectsData)
         result.append({ objectData.first, objectData.first->coordinates(), utils::coordinates(objectData.second) });
 
-    std::sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
+    std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
         if (data1.entity->aadlType() == data2.entity->aadlType())
             return parentLevel(data1.entity) < parentLevel(data2.entity);
 

@@ -613,8 +613,9 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     m_actExitToParent->setEnabled(nullptr != m_model->rootObject());
 
     QList<aadl::AADLObject *> objects = m_model->visibleObjects();
-    std::sort(objects.begin(), objects.end(),
-              [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
+    std::stable_sort(objects.begin(), objects.end(), [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) {
+        return obj1->aadlType() < obj2->aadlType();
+    });
 
     auto firstNonFunctionEntity = std::find_if(objects.cbegin(), objects.cend(), [](aadl::AADLObject *obj) {
         return obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLFunction
