@@ -161,14 +161,17 @@ AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::A
     return nullptr;
 }
 
-AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name) const
+AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
+                                                  AADLObjectFunctionType *parent) const
 {
     if (name.isEmpty())
         return nullptr;
 
     for (auto obj : d->m_objects) {
         if (AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
-            return qobject_cast<AADLObjectIface *>(obj);
+            if (AADLObjectIface *iface = obj->as<AADLObjectIface *>())
+                if (iface->direction() == dir && (!parent || iface->parentObject() == parent))
+                    return iface;
     }
 
     return nullptr;

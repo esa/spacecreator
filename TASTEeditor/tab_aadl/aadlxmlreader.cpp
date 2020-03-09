@@ -23,7 +23,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
-#include "tab_interface/connectioncreationvalidator.h"
+#include "aadlparameter.h"
 
 #include <QDebug>
 #include <QFile>
@@ -38,14 +38,96 @@ namespace aadl {
 
 using namespace taste3::aadl::meta;
 
-typedef QHash<QString, QHash<QString, AADLObjectIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
+struct XmlAttribute {
+    XmlAttribute(const QString &name = QString(), const QString &value = QString())
+        : m_name(name)
+        , m_token(meta::Props::token(m_name))
+        , m_value(value)
+    {
+    }
 
+    QString m_name;
+    meta::Props::Token m_token;
+    QString m_value;
+    static QHash<QString, XmlAttribute> wrapp(const QXmlStreamAttributes &attrs)
+    {
+        QHash<QString, XmlAttribute> result;
+
+        for (const QXmlStreamAttribute &attr : attrs) {
+            const QString &name = attr.name().toString();
+            result.insert(name, XmlAttribute(name, attr.value().toString()));
+        }
+
+        return result;
+    }
+};
+typedef QHash<QString, XmlAttribute> XmlAttributes;
+
+struct CurrentObjectHolder {
+    void set(AADLObject *object)
+    {
+        m_object = object;
+        m_function = m_object ? m_object->as<AADLObjectFunctionType *>() : nullptr;
+        m_iface = m_object ? m_object->as<AADLObjectIface *>() : nullptr;
+        m_comment = m_object ? m_object->as<AADLObjectComment *>() : nullptr;
+        m_connection = m_object ? m_object->as<AADLObjectConnection *>() : nullptr;
+    }
+
+    QPointer<AADLObject> get() { return m_object; }
+    QPointer<AADLObjectFunctionType> function() { return m_function; }
+    QPointer<AADLObjectIface> iface() { return m_iface; }
+    QPointer<AADLObjectComment> comment() { return m_comment; }
+    QPointer<AADLObjectConnection> connection() { return m_connection; }
+
+private:
+    QPointer<AADLObject> m_object { nullptr };
+    QPointer<AADLObjectFunctionType> m_function { nullptr };
+    QPointer<AADLObjectIface> m_iface { nullptr };
+    QPointer<AADLObjectComment> m_comment { nullptr };
+    QPointer<AADLObjectConnection> m_connection { nullptr };
+};
+
+typedef QHash<QString, QHash<QString, AADLObjectIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
 struct AADLXMLReaderPrivate {
     QVector<AADLObject *> m_allObjects {};
     QHash<QString, AADLObjectFunctionType *> m_functionNames {};
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
-    QHash<QString, AADLObjectConnection *> m_connectionNames {};
+    QHash<QString, AADLObjectConnection *> m_connectionsById {};
+
+    CurrentObjectHolder m_currentObject;
+    void setCurrentObject(AADLObject *obj)
+    {
+        m_currentObject.set(obj);
+        if (!m_currentObject.get())
+            return;
+
+        if (!m_allObjects.contains(m_currentObject.get()))
+            m_allObjects.append(m_currentObject.get());
+
+        if (AADLObjectFunctionType *fn = m_currentObject.function()) {
+            const QString &fnTitle = fn->title();
+            if (!m_functionNames.contains(fnTitle))
+                m_functionNames.insert(fnTitle, fn);
+        }
+
+        if (AADLObjectIface *iface = m_currentObject.iface()) {
+            Q_ASSERT(iface->parentObject() != nullptr);
+
+            const QString &parentId = iface->parentObject()->id().toString();
+            const QString &ifaceTitle = iface->title();
+            QHash<QString, AADLObjectIface *> &ifacesCollection =
+                    iface->isRequired() ? m_ifaceRequiredNames[parentId] : m_ifaceProvidedNames[parentId];
+            if (!ifacesCollection.contains(ifaceTitle))
+                ifacesCollection[ifaceTitle] = iface;
+        }
+
+        if (AADLObjectConnection *conn = m_currentObject.connection()) {
+            const QString connId = conn->id().toString();
+            if (!m_connectionsById.contains(connId))
+                m_connectionsById[connId] = conn;
+        }
+    }
 };
 
 AADLXMLReader::AADLXMLReader(QObject *parent)
@@ -56,31 +138,12 @@ AADLXMLReader::AADLXMLReader(QObject *parent)
 
 AADLXMLReader::~AADLXMLReader() {}
 
-QString AADLXMLReader::badTagWarningMessage(const QXmlStreamReader &xml, const QString &tag)
+bool AADLXMLReader::readFile(const QString &file)
 {
-    static const QString msg("The '%1' is unknown/unexpedted here: %2@%3 %4");
-    return msg.arg(tag, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
-}
-
-bool AADLXMLReader::handleError(const QXmlStreamReader &xml)
-{
-    if (xml.hasError()) {
-        qWarning() << xml.errorString();
-        emit error(xml.errorString());
-        return true;
-    }
-    return false;
-}
-
-bool AADLXMLReader::parse(const QString &file)
-{
+    qDebug() << file;
     QFile in(file);
-    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text)) {
-        if (parse(&in)) {
-            emit objectsParsed(d->m_allObjects);
-            return true;
-        }
-    }
+    if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
+        return read(&in);
 
     const QString &errMsg = QString("Can't open file %1: %2").arg(file, in.errorString());
     qWarning() << errMsg;
@@ -89,7 +152,19 @@ bool AADLXMLReader::parse(const QString &file)
     return false;
 }
 
-bool AADLXMLReader::parse(QIODevice *in)
+bool AADLXMLReader::read(QIODevice *openForRead)
+{
+    if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
+        if (readXml(openForRead)) {
+            emit objectsParsed(d->m_allObjects);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool AADLXMLReader::readXml(QIODevice *in)
 {
     if (!in)
         return false;
@@ -106,536 +181,207 @@ bool AADLXMLReader::parse(QIODevice *in)
 bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
-        if (handleError(xml))
-            return false;
-        if (xml.readNextStartElement())
-            readAADLObject(xml);
-    }
-
-    return true;
-}
-
-bool AADLXMLReader::readAADLObject(QXmlStreamReader &xml)
-{
-    const QString &tagName = xml.name().toString();
-    switch (Props::token(tagName)) {
-    case Props::Token::Function: {
-        return readFunction(xml);
-    }
-    case Props::Token::Connection: {
-        return readConnection(xml);
-    }
-    case Props::Token::Comment: {
-        return readComment(xml);
-    }
-    default:
-        qWarning() << badTagWarningMessage(xml, tagName);
-        return false;
-    }
-}
-
-bool AADLXMLReader::readFunction(QXmlStreamReader &xml, AADLObject *parent)
-{
-    AADLObjectFunctionType *obj = createFunction(xml, parent);
-    if (!obj)
-        return false;
-
-    d->m_allObjects.append(obj);
-
-    while (xml.readNextStartElement()) {
-        const QString &name = xml.name().toString();
-        switch (Props::token(name)) {
-        case Props::Token::Function: {
-            readFunction(xml, obj);
-            break;
-        }
-        case Props::Token::Property: {
-            readFunctionProperty(xml, obj);
-            xml.skipCurrentElement();
-            break;
-        }
-        case Props::Token::Provided_Interface:
-        case Props::Token::Required_Interface: {
-            if (auto iface = readInterface(xml, obj))
-                obj->addInterface(iface);
-            break;
-        }
-        case Props::Token::Connection: {
-            readConnection(xml, obj);
-            break;
-        }
-        case Props::Token::Comment: {
-            readComment(xml, obj);
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, name);
-            d->m_allObjects.removeAll(obj);
-            delete obj;
+        if (xml.hasError()) {
+            qWarning() << xml.errorString();
+            emit error(xml.errorString());
             return false;
         }
-        }
-    }
 
-    d->m_functionNames.insert(obj->title(), obj);
-
-    return true;
-}
-
-bool AADLXMLReader::readFunctionProperty(QXmlStreamReader &xml, AADLObjectFunctionType *obj)
-{
-    if (!obj)
-        return false;
-
-    const QString &name = xml.attributes().value(Props::token(Props::Token::name)).toString();
-    const QString &valueString = xml.attributes().value(Props::token(Props::Token::value)).toString();
-    switch (Props::token(name)) {
-    case Props::Token::Active_Interfaces:
-    case Props::Token::InnerCoordinates:
-    case Props::Token::coordinates: {
-        obj->setProp(name, valueString);
-        break;
-    }
-    default: {
-        qWarning() << badTagWarningMessage(xml, name);
-        return false;
-    }
-    }
-    return true;
-}
-
-AADLObjectIface *AADLXMLReader::readInterface(QXmlStreamReader &xml, AADLObject *parent)
-{
-    const QString &tagName = xml.name().toString();
-    Props::Token ifaceType = Props::token(tagName);
-    const bool isProvided = ifaceType == Props::Token::Provided_Interface;
-    const bool isRequired = ifaceType == Props::Token::Required_Interface;
-    const bool isIface = isProvided || isRequired;
-    if (!isIface) {
-        qWarning() << badTagWarningMessage(xml, tagName);
-        return nullptr;
-    }
-
-    AADLObjectIface *iface { nullptr };
-    const QString &parentId = parent->id().toString();
-    if (isProvided) {
-        iface = new AADLObjectIfaceProvided(parent);
-    } else {
-        iface = new AADLObjectIfaceRequired(parent);
-    }
-
-    readIfaceAttributes(xml, iface);
-    readIfaceProperties(xml, iface);
-
-    if (isProvided)
-        d->m_ifaceProvidedNames[parentId].insert(iface->title(), iface);
-    else
-        d->m_ifaceRequiredNames[parentId].insert(iface->title(), iface);
-
-    d->m_allObjects.append(iface);
-
-    return iface;
-}
-
-bool AADLXMLReader::readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *iface)
-{
-    if (!iface)
-        return false;
-
-    const QString &tagName = xml.name().toString();
-    if (Props::token(tagName) == Props::Token::Unknown) {
-        qWarning() << badTagWarningMessage(xml, tagName);
-        return false;
-    }
-
-    const QXmlStreamAttributes &attrs(xml.attributes());
-
-    for (const QXmlStreamAttribute &attr : attrs) {
-        const QString &attrName = attr.name().toString();
-        switch (Props::token(attrName)) {
-        case Props::Token::name:
-        case Props::Token::kind:
-        case Props::Token::period:
-        case Props::Token::wcet:
-        case Props::Token::queue_size: {
-            iface->setAttr(attrName, attrs.value(attrName).toString());
+        switch (xml.readNext()) {
+        case QXmlStreamReader::TokenType::StartElement:
+            processTagOpen(xml);
+            break;
+        case QXmlStreamReader::TokenType::EndElement:
+            processTagClose(xml);
+            break;
+        default:
             break;
         }
-        default: {
-            qWarning() << badTagWarningMessage(xml, attrName);
-            return false;
-        }
-        }
     }
 
-    return true;
-}
-
-bool AADLXMLReader::readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *iface)
-{
-    while (xml.readNextStartElement()) {
-        if (handleError(xml))
-            return false;
-
-        const QString &name = xml.name().toString();
-        switch (Props::token(name)) {
-        case Props::Token::Property: {
-            readIfaceProperty(xml, iface);
-            break;
-        }
-        case Props::Token::Input_Parameter:
-        case Props::Token::Output_Parameter: {
-            readIfaceParameter(xml, iface);
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, name);
-            return false;
-        }
-        }
-
-        xml.skipCurrentElement();
-    }
-    return true;
-}
-
-bool AADLXMLReader::readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *iface)
-{
-    const QString &name = xml.attributes().value(Props::token(Props::Token::name)).toString();
-    const QXmlStreamAttributes &attrs = xml.attributes();
-    const QString &propVal = attrs.value(Props::token(Props::Token::value)).toString();
-    switch (Props::token(name)) {
-    case Props::Token::RCMoperationKind:
-    case Props::Token::InnerCoordinates:
-    case Props::Token::coordinates:
-    case Props::Token::Deadline:
-    case Props::Token::RCMperiod:
-    case Props::Token::InterfaceName:
-    case Props::Token::labelInheritance: {
-        iface->setProp(name, propVal);
-        break;
-    }
-    default: {
-        qWarning() << badTagWarningMessage(xml, name);
-        return false;
-    }
-    }
-    return true;
-}
-
-bool AADLXMLReader::readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *iface)
-{
-    const QString &name = xml.name().toString();
-    const Props::Token currParam = Props::token(name);
-    if (currParam != Props::Token::Input_Parameter && currParam != Props::Token::Output_Parameter) {
-        qWarning() << badTagWarningMessage(xml, name);
+    if (xml.hasError()) {
+        qWarning() << xml.errorString();
+        emit error(xml.errorString());
         return false;
     }
 
+    return true;
+}
+
+IfaceParameter addIfaceParameter(const QString &name, const XmlAttributes &otherAttrs,
+                                 IfaceParameter::Direction direction)
+{
     IfaceParameter param;
 
-    const QXmlStreamAttributes &attributes = xml.attributes();
-    for (const QXmlStreamAttribute &attr : attributes) {
-        const QString &attrName = attr.name().toString();
-        const QString &attrValue = attr.value().toString();
-
-        switch (Props::token(attrName)) {
-        case Props::Token::name: {
-            param.setName(attrValue);
-            break;
-        }
+    for (const XmlAttribute &attr : otherAttrs) {
+        switch (attr.m_token) {
         case Props::Token::type: {
-            param.setParamTypeName(attrValue);
+            param.setParamTypeName(attr.m_value);
             break;
         }
         case Props::Token::encoding: {
-            param.setEncoding(attrValue);
+            param.setEncoding(attr.m_value);
             break;
         }
         default: {
-            qWarning() << badTagWarningMessage(xml, attrName);
-            return false;
+            qWarning() << QStringLiteral("Interface Parameter - unknow attribute: %1").arg(attr.m_name);
+            break;
         }
         }
     }
 
-    param.setDirection(currParam == Props::Token::Input_Parameter ? IfaceParameter::Direction::In
-                                                                  : IfaceParameter::Direction::Out);
-    iface->addParam(param);
+    param.setName(name);
+    param.setDirection(direction);
 
-    return true;
+    return param;
 }
 
-AADLObjectFunctionType *AADLXMLReader::createFunction(QXmlStreamReader &xml, AADLObject *parent)
+AADLObjectConnection::EndPointInfo *addConnectionPart(const XmlAttributes &otherAttrs)
 {
-    const QXmlStreamAttributes &attributes(xml.attributes());
+    const QString attrRiName = Props::token(Props::Token::ri_name);
+    const bool isRI = otherAttrs.contains(attrRiName);
 
-    QHash<QString, QString> attrs;
-    for (const QXmlStreamAttribute &attr : attributes) {
-        const QString &attrName = attr.name().toString();
-        switch (Props::token(attrName)) {
-        case Props::Token::name:
-        case Props::Token::language:
-        case Props::Token::is_type:
-        case Props::Token::instance_of: {
-            attrs.insert(attrName, attr.value().toString());
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, attrName);
-            break;
-        }
-        }
-    }
+    AADLObjectConnection::EndPointInfo *info = new AADLObjectConnection::EndPointInfo();
+    info->m_functionName = otherAttrs.value(Props::token(Props::Token::func_name)).m_value;
+    info->m_interfaceName =
+            isRI ? otherAttrs.value(attrRiName).m_value : otherAttrs.value(Props::token(Props::Token::pi_name)).m_value;
+    info->m_ifaceDirection = isRI ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
-    static const QString attrName_isType = Props::token(Props::Token::is_type);
-    static const QString attrName_name = Props::token(Props::Token::name);
-
-    const bool isFunctionType =
-            attrs.contains(attrName_isType) ? attrs.take(attrName_isType).toLower() == QStringLiteral("yes") : false;
-    const QString fnName = attrs.contains(attrName_name) ? attrs.take(attrName_name) : QString();
-
-    AADLObjectFunction *parentFunction = qobject_cast<AADLObjectFunction *>(parent);
-    AADLObjectFunctionType *currObj = isFunctionType ? new AADLObjectFunctionType(fnName, parentFunction)
-                                                     : new AADLObjectFunction(fnName, parentFunction);
-    if (parentFunction)
-        parentFunction->addChild(currObj);
-
-    QHash<QString, QString>::const_iterator i = attrs.cbegin();
-    while (i != attrs.cend()) {
-        currObj->setAttr(i.key(), i.value());
-        ++i;
-    }
-
-    return currObj;
+    return info;
 }
 
-struct ConnectionEndPoint {
-    AADLObject *m_function { nullptr };
-    AADLObjectIface *m_interface { nullptr };
-    inline bool isReady() const { return m_function && m_interface; }
-};
-
-struct ConnectionHolder {
-    ConnectionEndPoint m_from;
-    ConnectionEndPoint m_to;
-
-    inline bool isValid() const { return m_from.isReady() && m_to.isReady(); }
-    inline QString infoString() const
-    {
-        auto endPointToString = [](const ConnectionEndPoint &ep, const QString &marker) {
-            static const QString info("connection.%1: %2\n"
-                                      "connection.%1.iface: %3");
-            return info.arg(marker, ep.m_function ? ep.m_function->title() : QStringLiteral("none"),
-                            ep.m_interface ? ep.m_interface->title() : QStringLiteral("none"));
-        };
-
-        return QString("%1\n%2").arg(endPointToString(m_from, QStringLiteral("Source")),
-                                     endPointToString(m_to, QStringLiteral("Target")));
-    }
-};
-
-bool AADLXMLReader::readConnection(QXmlStreamReader &xml, AADLObject *parent)
+void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
-    const QString &name = xml.name().toString();
-    const Props::Token currParam = Props::token(name);
-    if (currParam != Props::Token::Connection) {
-        qWarning() << badTagWarningMessage(xml, name);
-        return false;
+    const QString &tagName = xml.name().toString();
+    const QString &attrName = Props::token(Props::Token::name);
+    XmlAttributes attrs = XmlAttribute::wrapp(xml.attributes());
+    const XmlAttribute &nameAttr = attrs.take(attrName);
+
+    AADLObject *obj { nullptr };
+    const Props::Token t = Props::token(tagName);
+    switch (t) {
+    case Props::Token::Function: {
+        const bool isFunctionType =
+                attrs.value(Props::token(Props::Token::is_type), QStringLiteral("no")).m_value.toLower()
+                == QStringLiteral("yes");
+
+        obj = addFunction(nameAttr.m_value,
+                          isFunctionType ? AADLObject::AADLObjectType::AADLFunctionType
+                                         : AADLObject::AADLObjectType::AADLFunction);
+        break;
+    }
+    case Props::Token::Provided_Interface:
+    case Props::Token::Required_Interface: {
+        Q_ASSERT(d->m_currentObject.function() != nullptr);
+
+        obj = addIface(nameAttr.m_value, Props::Token::Required_Interface == t);
+        break;
+    }
+    case Props::Token::Output_Parameter:
+    case Props::Token::Input_Parameter: {
+        Q_ASSERT(d->m_currentObject.iface() != nullptr);
+
+        const IfaceParameter param = addIfaceParameter(
+                nameAttr.m_value, attrs,
+                t == Props::Token::Input_Parameter ? IfaceParameter::Direction::In : IfaceParameter::Direction::Out);
+        d->m_currentObject.iface()->addParam(param);
+        break;
+    }
+    case Props::Token::Connection: {
+        obj = new AADLObjectConnection(nullptr, nullptr, nullptr, nullptr, d->m_currentObject.get());
+        break;
+    }
+    case Props::Token::Source:
+    case Props::Token::Target: {
+        Q_ASSERT(d->m_currentObject.connection() != nullptr);
+
+        if (AADLObjectConnection::EndPointInfo *info = addConnectionPart(attrs)) {
+            if (d->m_currentObject.connection()) {
+                if (t == Props::Token::Source)
+                    d->m_currentObject.connection()->setDelayedStart(info);
+                else
+                    d->m_currentObject.connection()->setDelayedEnd(info);
+            } else
+                delete info;
+        }
+        break;
+    }
+    case Props::Token::Comment: {
+        obj = addComment(nameAttr.m_value);
+        break;
+    }
+    case Props::Token::Property: {
+        d->m_currentObject.get()->setProp(nameAttr.m_value, attrs.value(Props::token(Props::Token::value)).m_value);
+        break;
+    }
+    default:
+        static const QString msg("The '%1' is unknown/unexpedted here: %2@%3 %4");
+        qWarning() << msg.arg(tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()),
+                              xml.tokenString());
+        break;
     }
 
-    auto readEndpointAttributes = [this](ConnectionEndPoint &endpoint, const QXmlStreamAttributes &attrs) {
-        for (const QXmlStreamAttribute &attr : attrs) {
+    if (obj) {
+        for (const XmlAttribute &xmlAttr : attrs)
+            obj->setAttr(xmlAttr.m_name, xmlAttr.m_value);
 
-            const QString &attrName = attr.name().toString();
-            const QString &attrValue = attr.value().toString();
-
-            switch (Props::token(attrName)) {
-            case Props::Token::func_name: {
-                endpoint.m_function = d->m_functionNames.value(attrValue, nullptr);
-                break;
-            }
-            case Props::Token::si_name:
-            case Props::Token::ri_name: {
-                endpoint.m_interface =
-                        d->m_ifaceRequiredNames.value(endpoint.m_function->id().toString()).value(attrValue, nullptr);
-                break;
-            }
-            case Props::Token::ti_name:
-            case Props::Token::pi_name: {
-                endpoint.m_interface =
-                        d->m_ifaceProvidedNames.value(endpoint.m_function->id().toString()).value(attrValue, nullptr);
-                break;
-            }
-            default: {
-                qWarning() << "Unexeptected Connection attribute:" << attrName << attrValue;
-                break;
-            }
-            }
-        }
-    };
-
-    auto readEndpoint = [readEndpointAttributes, &xml](ConnectionHolder &connection) {
-        const Props::Token t = Props::token(xml.name().toString());
-        switch (t) {
-        case Props::Token::Source:
-        case Props::Token::Target: {
-            const bool isSrc = t == Props::Token::Source;
-            readEndpointAttributes(isSrc ? connection.m_from : connection.m_to, xml.attributes());
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, xml.name().toString());
-            return false;
-        }
-        }
-        return true;
-    };
-
-    auto readConnectionPart = [&readEndpoint, &xml](ConnectionHolder &connection) {
-        if (!xml.readNextStartElement())
-            return false;
-
-        if (readEndpoint(connection)) {
-            xml.skipCurrentElement();
-            return true;
-        }
-        return false;
-    };
-
-    auto readConnectionProperties = [&xml, this]() {
-        QHash<QString, QVariant> props;
-        while (xml.readNextStartElement()) {
-            if (handleError(xml))
-                return props;
-
-            const QString &name = xml.name().toString();
-            switch (Props::token(name)) {
-            case Props::Token::Property: {
-                const QXmlStreamAttributes &attrs = xml.attributes();
-                const QString &propName = attrs.value(Props::token(Props::Token::name)).toString();
-                if (!propName.isEmpty())
-                    props[propName] = attrs.value(Props::token(Props::Token::value)).toString();
-                break;
-            }
-            default: {
-                qWarning() << badTagWarningMessage(xml, name);
-                return props;
-            }
-            }
-
-            xml.skipCurrentElement();
-        }
-        return props;
-    };
-
-    ConnectionHolder connection;
-
-    if (!readConnectionPart(connection)) // read the first one (Source or Target)
-        return false;
-    if (!readConnectionPart(connection)) // read the second one (Target or Source)
-        return false;
-
-    if (connection.isValid()) {
-        const ConnectionCreationValidator::FailReason status =
-                ConnectionCreationValidator::canConnect(connection.m_from.m_function->as<AADLObjectFunction *>(),
-                                                        connection.m_to.m_function->as<AADLObjectFunction *>(),
-                                                        connection.m_from.m_interface, connection.m_to.m_interface);
-        if (status == ConnectionCreationValidator::FailReason::NotFail) {
-            AADLObjectConnection *objConnection =
-                    new AADLObjectConnection(connection.m_from.m_function, connection.m_to.m_function,
-                                             connection.m_from.m_interface, connection.m_to.m_interface, parent);
-
-            const QHash<QString, QVariant> props = readConnectionProperties();
-            if (!props.isEmpty())
-                objConnection->setProps(props);
-
-            d->m_connectionNames.insert(objConnection->id().toString(), objConnection);
-            d->m_allObjects.append(objConnection);
-            return true;
-        } else {
-            auto edgeName = [](const ConnectionEndPoint &edge) {
-                static const QString nameTemplate("%1.%2");
-                static const QLatin1String strNull("null");
-                return nameTemplate.arg((edge.m_function ? edge.m_function->title() : strNull),
-                                        (edge.m_interface ? edge.m_interface->title() : strNull));
-            };
-
-            const QString connectionName =
-                    QString("%1->%2").arg(edgeName(connection.m_from), edgeName(connection.m_to));
-            qWarning() << "Can't perform connection" << connectionName << status;
-            return false;
-        }
+        d->setCurrentObject(obj);
     }
-
-    qWarning() << QString("Invalid connection handler:\n%1").arg(connection.infoString());
-
-    return false;
 }
 
-bool AADLXMLReader::readComment(QXmlStreamReader &xml, AADLObject *parent)
+void AADLXMLReader::processTagClose(QXmlStreamReader &xml)
 {
-    const QString &name = xml.name().toString();
-    const Props::Token currParam = Props::token(name);
-    if (currParam != Props::Token::Comment) {
-        qWarning() << badTagWarningMessage(xml, name);
-        return false;
+    const QString &tagName = xml.name().toString();
+    switch (Props::token(tagName)) {
+    case Props::Token::Function:
+    case Props::Token::Required_Interface:
+    case Props::Token::Provided_Interface:
+    case Props::Token::Connection:
+    case Props::Token::Comment: {
+        d->setCurrentObject(d->m_currentObject.get() ? d->m_currentObject.get()->parentObject() : nullptr);
+        break;
     }
-
-    AADLObjectComment *obj = new AADLObjectComment(QString(), parent);
-    if (AADLObjectFunctionType *fn = qobject_cast<AADLObjectFunctionType *>(obj->parentObject()))
-        fn->addChild(obj);
-    d->m_allObjects.append(obj);
-
-    for (const QXmlStreamAttribute &attr : xml.attributes()) {
-        const QString &attrName = attr.name().toString();
-        const QString &attrValue = attr.value().toString();
-
-        switch (Props::token(attrName)) {
-        case Props::Token::name: {
-            obj->setAttr(attrName, attrValue);
-            break;
-        }
-        default:
-            qWarning() << "Unexpected Comment's attribute found:" << attrName << attrValue;
-            break;
-        }
+    default:
+        break;
     }
+}
 
-    auto readCommentProperty = [&xml, &obj]() {
-        const QXmlStreamAttributes &attrs = xml.attributes();
-        const QString &propName = attrs.value(Props::token(Props::Token::name)).toString();
-        const QString &propVal = attrs.value(Props::token(Props::Token::value)).toString();
-        switch (Props::token(propName)) {
-        case Props::Token::coordinates: {
-            obj->setProp(propName, propVal);
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, xml.name().toString());
-            return false;
-        }
-        }
-        return true;
-    };
+AADLObjectFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::AADLObjectType fnType)
+{
+    const bool isFunctionType = fnType == AADLObject::AADLObjectType::AADLFunctionType;
 
-    if (xml.readNextStartElement()) {
-        switch (Props::token(xml.name().toString())) {
-        case Props::Token::Property: {
-            if (readCommentProperty())
-                xml.skipCurrentElement();
-            else
-                return false;
-            break;
-        }
-        default: {
-            qWarning() << badTagWarningMessage(xml, xml.name().toString());
-            return false;
-        }
-        }
+    AADLObjectFunctionType *fn = isFunctionType ? new AADLObjectFunctionType(name, d->m_currentObject.get())
+                                                : new AADLObjectFunction(name, d->m_currentObject.get());
+
+    if (d->m_currentObject.function())
+        d->m_currentObject.function()->addChild(fn);
+
+    return fn;
+}
+
+AADLObjectIface *AADLXMLReader::addIface(const QString &name, bool isRI)
+{
+    Q_ASSERT(d->m_currentObject.function() != nullptr);
+
+    AADLObjectIface *iface { nullptr };
+    if (d->m_currentObject.function()) {
+        if (isRI)
+            iface = new AADLObjectIfaceRequired(name, d->m_currentObject.get());
+        else
+            iface = new AADLObjectIfaceProvided(name, d->m_currentObject.get());
+
+        d->m_currentObject.function()->addInterface(iface);
     }
+    return iface;
+}
 
-    return true;
+AADLObjectComment *AADLXMLReader::addComment(const QString &text)
+{
+    AADLObjectComment *comment = new AADLObjectComment(text, d->m_currentObject.get());
+    if (d->m_currentObject.function())
+        d->m_currentObject.function()->addChild(comment);
+
+    return comment;
 }
 
 } // ns aadl

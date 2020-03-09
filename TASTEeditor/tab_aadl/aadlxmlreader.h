@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "aadlobject.h"
+
 #include <QHash>
 #include <QObject>
 #include <QXmlStreamReader>
@@ -27,9 +29,9 @@ class QIODevice;
 namespace taste3 {
 namespace aadl {
 
-class AADLObject;
-class AADLObjectFunctionType;
 class AADLObjectIface;
+class AADLObjectFunctionType;
+class AADLObjectComment;
 struct AADLXMLReaderPrivate;
 class AADLXMLReader : public QObject
 {
@@ -39,7 +41,8 @@ public:
     explicit AADLXMLReader(QObject *parent = nullptr);
     ~AADLXMLReader() override;
 
-    bool parse(const QString &file);
+    bool readFile(const QString &file);
+    bool read(QIODevice *openForRead);
 
 Q_SIGNALS:
     void objectsParsed(const QVector<AADLObject *> &objects);
@@ -48,23 +51,15 @@ Q_SIGNALS:
 private:
     const std::unique_ptr<AADLXMLReaderPrivate> d;
 
-    static QString badTagWarningMessage(const QXmlStreamReader &xml, const QString &tag);
-    bool handleError(const QXmlStreamReader &xml);
-    bool parse(QIODevice *in);
+    bool readXml(QIODevice *in);
 
     bool readInterfaceView(QXmlStreamReader &xml);
-    bool readAADLObject(QXmlStreamReader &xml);
-    bool readFunction(QXmlStreamReader &xml, AADLObject *parent = nullptr);
-    AADLObjectFunctionType *createFunction(QXmlStreamReader &xml, AADLObject *parent = nullptr);
-    bool readFunctionProperty(QXmlStreamReader &xml, AADLObjectFunctionType *obj);
-    AADLObjectIface *readInterface(QXmlStreamReader &xml, AADLObject *parent);
-    bool readIfaceAttributes(QXmlStreamReader &xml, AADLObjectIface *iface);
-    bool readIfaceProperties(QXmlStreamReader &xml, AADLObjectIface *iface);
-    bool readIfaceProperty(QXmlStreamReader &xml, AADLObjectIface *iface);
-    bool readIfaceParameter(QXmlStreamReader &xml, AADLObjectIface *iface);
+    void processTagOpen(QXmlStreamReader &xml);
+    void processTagClose(QXmlStreamReader &xml);
 
-    bool readConnection(QXmlStreamReader &xml, AADLObject *parent = nullptr);
-    bool readComment(QXmlStreamReader &xml, AADLObject *parent = nullptr);
+    AADLObjectFunctionType *addFunction(const QString &name, AADLObject::AADLObjectType fnType);
+    AADLObjectIface *addIface(const QString &name, bool isRI);
+    AADLObjectComment *addComment(const QString &text);
 };
 
 } // ns aadl

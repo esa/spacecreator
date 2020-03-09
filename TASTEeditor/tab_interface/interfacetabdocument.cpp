@@ -235,7 +235,7 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
     });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
-    return parser.parse(path);
+    return parser.readFile(path);
 }
 
 bool InterfaceTabDocument::saveImpl(const QString & /*path*/)

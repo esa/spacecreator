@@ -48,7 +48,8 @@ public:
     AADLObject *getObject(const common::Id &id) const;
     AADLObject *getObjectByName(const QString &name,
                                 AADLObject::AADLObjectType type = AADLObject::AADLObjectType::AADLUnknown) const;
-    AADLObjectIface *getIfaceByName(const QString &name) const;
+    AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
+                                    AADLObjectFunctionType *parent = nullptr) const;
     AADLObjectFunction *getFunction(const common::Id &id) const;
     AADLObjectFunctionType *getFunctionType(const common::Id &id) const;
     QHash<QString, AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;

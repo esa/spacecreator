@@ -19,13 +19,18 @@
 
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
-#include "tab_aadl/aadlcommonprops.h"
+#include "tab_interface/connectioncreationvalidator.h"
 
 #include <QDebug>
 #include <QPointer>
 
 namespace taste3 {
 namespace aadl {
+
+struct ConnectionHolder {
+    AADLObjectConnection::EndPointInfo *m_from { nullptr };
+    AADLObjectConnection::EndPointInfo *m_to { nullptr };
+};
 
 struct AADLObjectConnectionPrivate {
     AADLObjectConnectionPrivate() {}
@@ -41,6 +46,8 @@ struct AADLObjectConnectionPrivate {
     QPointer<AADLObject> m_target { nullptr };
     QPointer<AADLObjectIface> m_ifaceSource { nullptr };
     QPointer<AADLObjectIface> m_ifaceTarget { nullptr };
+
+    ConnectionHolder m_delayedInit;
 };
 
 AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
@@ -48,10 +55,12 @@ AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *targe
     : AADLObject(QString(), parent)
     , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
 {
-    updateAttributes();
 }
 
-AADLObjectConnection::~AADLObjectConnection() {}
+AADLObjectConnection::~AADLObjectConnection()
+{
+    clearPostponedEndpoints();
+}
 
 AADLObject::AADLObjectType AADLObjectConnection::aadlType() const
 {
@@ -68,11 +77,6 @@ AADLObject *AADLObjectConnection::source() const
     return d->m_source;
 }
 
-void AADLObjectConnection::setSource(AADLObject *source)
-{
-    setAttr(meta::Props::token(meta::Props::Token::from), source ? source->title() : QString());
-}
-
 QString AADLObjectConnection::targetName() const
 {
     return target() ? target()->title() : QString();
@@ -83,19 +87,9 @@ AADLObject *AADLObjectConnection::target() const
     return d->m_target;
 }
 
-void AADLObjectConnection::setTarget(AADLObject *target)
-{
-    setAttr(meta::Props::token(meta::Props::Token::to), target ? target->title() : QString());
-}
-
 AADLObjectIface *AADLObjectConnection::sourceInterface() const
 {
     return d->m_ifaceSource;
-}
-
-void AADLObjectConnection::setSourceInterface(AADLObjectIface *iface)
-{
-    setAttr(meta::Props::token(meta::Props::Token::si_name), iface->title());
 }
 
 QString AADLObjectConnection::sourceInterfaceName() const
@@ -108,88 +102,9 @@ AADLObjectIface *AADLObjectConnection::targetInterface() const
     return d->m_ifaceTarget;
 }
 
-void AADLObjectConnection::setTargetInterface(AADLObjectIface *iface)
-{
-    setAttr(meta::Props::token(meta::Props::Token::ti_name), iface->title());
-}
-
 QString AADLObjectConnection::targetInterfaceName() const
 {
     return targetInterface() ? targetInterface()->title() : QString();
-}
-
-void AADLObjectConnection::updateAttributes()
-{
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::from), source() ? source()->title() : QString());
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::si_name), sourceInterfaceName());
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::to), target() ? target()->title() : QString());
-    AADLObject::setAttr(meta::Props::token(meta::Props::Token::ti_name), targetInterfaceName());
-}
-
-void AADLObjectConnection::setAttr(const QString &name, const QVariant &val)
-{
-    bool attrUpdated(false);
-    const meta::Props::Token attr = meta::Props::token(name);
-    switch (attr) {
-    case meta::Props::Token::from: {
-        if (auto src = objectsModel()->getObjectByName(val.toString())) {
-            if (src != d->m_source) {
-                attrUpdated = true;
-                d->m_source = src;
-            }
-        } else {
-            qWarning() << "Object not found:" << name << val;
-            return;
-        }
-        break;
-    }
-    case meta::Props::Token::si_name: {
-        if (auto iface = objectsModel()->getIfaceByName(val.toString())) {
-            if (iface != d->m_ifaceSource) {
-                attrUpdated = true;
-                d->m_ifaceSource = iface;
-            }
-        } else {
-            qWarning() << "Object not found:" << name << val;
-            return;
-        }
-        break;
-    }
-    case meta::Props::Token::to: {
-        if (auto dst = objectsModel()->getObjectByName(val.toString())) {
-            if (dst != d->m_target) {
-                attrUpdated = true;
-                d->m_target = dst;
-            }
-        } else {
-            qWarning() << "Object not found:" << name << val;
-            return;
-        }
-        break;
-    }
-    case meta::Props::Token::ti_name: {
-        if (auto iface = objectsModel()->getIfaceByName(val.toString())) {
-            if (iface != d->m_ifaceTarget) {
-                attrUpdated = true;
-                d->m_ifaceTarget = iface;
-            }
-        } else {
-            qWarning() << "Object not found:" << name << val;
-            return;
-        }
-        break;
-    }
-    case meta::Props::Token::Unknown: {
-        qWarning() << "Unknow connection property:" << name << val;
-        return;
-    }
-    default:
-        break;
-    }
-
-    AADLObject::setAttr(name, val);
-    if (attrUpdated)
-        updateAttributes();
 }
 
 bool AADLObjectConnection::sourceInterfaceIsRequired() const
@@ -269,8 +184,73 @@ void AADLObjectConnection::handleRequiredInheritancePropertyChanged(bool enabled
         uninheritLabel();
 }
 
+void AADLObjectConnection::setDelayedStart(AADLObjectConnection::EndPointInfo *start)
+{
+    d->m_delayedInit.m_from = start;
+}
+
+void AADLObjectConnection::setDelayedEnd(AADLObjectConnection::EndPointInfo *end)
+{
+    d->m_delayedInit.m_to = end;
+}
+
+bool AADLObjectConnection::lookupEndpointsPostponed()
+{
+    if (!d->m_delayedInit.m_from || !d->m_delayedInit.m_to)
+        return true;
+
+    AADLObject *objFrom = objectsModel()->getObjectByName(d->m_delayedInit.m_from->m_functionName);
+    AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(
+            d->m_delayedInit.m_from->m_interfaceName, d->m_delayedInit.m_from->m_ifaceDirection,
+            objFrom ? objFrom->as<AADLObjectFunctionType *>() : nullptr);
+
+    AADLObject *objTo = objectsModel()->getObjectByName(d->m_delayedInit.m_to->m_functionName);
+    AADLObjectIface *ifaceTo = objectsModel()->getIfaceByName(d->m_delayedInit.m_to->m_interfaceName,
+                                                              d->m_delayedInit.m_to->m_ifaceDirection,
+                                                              objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
+
+    if (!objFrom || !ifaceFrom || !objTo || !ifaceTo)
+        return false;
+
+    const ConnectionCreationValidator::FailReason status = ConnectionCreationValidator::canConnect(
+            objFrom->as<AADLObjectFunction *>(), objTo->as<AADLObjectFunction *>(), ifaceFrom, ifaceTo);
+
+    if (status != ConnectionCreationValidator::FailReason::NotFail) {
+        qWarning() << QString("Can't connect %1.%2->%3.%4 - ")
+                              .arg(objFrom->title(), ifaceFrom->title(), objTo->title(), ifaceTo->title())
+                   << status;
+        qWarning() << objFrom;
+        qWarning() << ifaceFrom << ifaceFrom->parentObject();
+        qWarning() << objTo;
+        qWarning() << ifaceTo << ifaceTo->parentObject();
+
+        return false;
+    }
+
+    d->m_source = objFrom;
+    d->m_target = objTo;
+    d->m_ifaceSource = ifaceFrom;
+    d->m_ifaceTarget = ifaceTo;
+
+    clearPostponedEndpoints();
+    return true;
+}
+
+void AADLObjectConnection::clearPostponedEndpoints()
+{
+    delete d->m_delayedInit.m_from;
+    d->m_delayedInit.m_from = nullptr;
+
+    delete d->m_delayedInit.m_to;
+    d->m_delayedInit.m_to = nullptr;
+}
+
 void AADLObjectConnection::postInit()
 {
+    if (!lookupEndpointsPostponed()) {
+        qWarning() << "Postponed Connection initialization failed";
+        return;
+    }
     inheritLabel();
 }
 

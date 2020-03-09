@@ -47,21 +47,15 @@ public:
 
     QString sourceName() const;
     AADLObject *source() const;
-    void setSource(AADLObject *source);
 
     QString targetName() const;
     AADLObject *target() const;
-    void setTarget(AADLObject *target);
 
     QString sourceInterfaceName() const;
     AADLObjectIface *sourceInterface() const;
-    void setSourceInterface(AADLObjectIface *iface);
 
     QString targetInterfaceName() const;
     AADLObjectIface *targetInterface() const;
-    void setTargetInterface(AADLObjectIface *iface);
-
-    void setAttr(const QString &name, const QVariant &val) override;
 
     bool sourceInterfaceIsRequired() const;
     bool sourceInterfaceIsProvided() const;
@@ -91,9 +85,18 @@ public:
 
     void postInit() override;
 
+    struct EndPointInfo {
+        QString m_functionName;
+        QString m_interfaceName;
+        AADLObjectIface::IfaceType m_ifaceDirection;
+        inline bool isReady() const { return m_functionName.isEmpty() && m_interfaceName.isEmpty(); }
+    };
+
+    void setDelayedStart(AADLObjectConnection::EndPointInfo *start);
+    void setDelayedEnd(AADLObjectConnection::EndPointInfo *end);
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
-    void updateAttributes();
 
     enum class LabelInheritancePolicy
     {
@@ -103,6 +106,9 @@ private:
     void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
     void handleProvidedTitleChanged(const QString &title);
     void handleRequiredInheritancePropertyChanged(bool enabled);
+
+    bool lookupEndpointsPostponed();
+    void clearPostponedEndpoints();
 };
 
 } // ns aadl
