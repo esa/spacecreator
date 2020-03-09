@@ -129,7 +129,7 @@ void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF
 
 void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 {
-    if (name != entity()->title()) {
+    if (name != m_text->toPlainText()) {
         const QFontMetrics fm(m_text->font());
         m_text->setPlainText(fm.elidedText(name, Qt::ElideRight, kInterfaceTitleMaxLength));
         m_text->setToolTip(name);
