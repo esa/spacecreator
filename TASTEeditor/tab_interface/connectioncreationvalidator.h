@@ -71,8 +71,7 @@ public:
         AADLObjectFunction *startObject { nullptr };
         QGraphicsItem *functionAtEndPos { nullptr };
         AADLObjectFunction *endObject { nullptr };
-        bool startRequired { true };
-        bool isSameType { false };
+        bool isToOrFromNested { false };
 
         FailReason status { FailReason::NoScene };
         inline bool failed() const { return status != ConnectionCreationValidator::FailReason::NotFail; }

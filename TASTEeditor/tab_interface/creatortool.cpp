@@ -346,13 +346,14 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     taste3::cmd::CommandsStack::current()->beginMacro(QObject::tr("Create connection"));
     AADLObjectIface::CreationInfo ifaceCommons;
 
+    bool startRequired = true;
     if (info.startIface && !info.endIface) {
-        info.startRequired = info.startIface->isRequired();
+        startRequired = info.startIface->isRequired();
 
         ifaceCommons = AADLObjectIface::CreationInfo::fromIface(info.startIface);
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
-        ifaceCommons.type = (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
+        ifaceCommons.type = (startRequired && info.isToOrFromNested) || (!startRequired && !info.isToOrFromNested)
                 ? AADLObjectIface::IfaceType::Required
                 : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
@@ -360,35 +361,45 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
     } else if (info.endIface && !info.startIface) {
-        info.startRequired =
-                (info.endIface->isRequired() && info.isSameType) || (info.endIface->isProvided() && !info.isSameType);
+        startRequired = (info.endIface->isRequired() && info.isToOrFromNested)
+                || (info.endIface->isProvided() && !info.isToOrFromNested);
 
         ifaceCommons = AADLObjectIface::CreationInfo::fromIface(info.endIface);
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
-        ifaceCommons.type =
-                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.type = startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.startIfaceId;
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
     } else if (!info.startIface && !info.endIface) {
         ifaceCommons.model = m_model.data();
+
         ifaceCommons.function = info.startObject;
         ifaceCommons.position = info.startPointAdjusted;
-        ifaceCommons.type =
-                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.startIfaceId;
+
+        const bool isToNested = info.isToOrFromNested && info.functionAtEndPos->isAncestorOf(info.functionAtStartPos);
+        if (info.isToOrFromNested)
+            ifaceCommons.type =
+                    (isToNested) ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        else
+            ifaceCommons.type =
+                    (startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided);
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
 
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
-        ifaceCommons.type = (info.startRequired && info.isSameType) || (!info.startRequired && !info.isSameType)
-                ? AADLObjectIface::IfaceType::Required
-                : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
+
+        if (info.isToOrFromNested)
+            ifaceCommons.type =
+                    (isToNested) ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        else
+            ifaceCommons.type =
+                    startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
@@ -422,8 +433,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
 
-        ifaceCommons.type =
-                info.startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
+        ifaceCommons.type = startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
 
         if (item == info.functionAtEndPos) {
             ifaceCommons.id = info.endIfaceId;
@@ -474,7 +484,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.last();
             ifaceCommons.type =
-                    info.startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
+                    startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
             ifaceCommons.id = ifaceCommons.id;
 
             taste3::cmd::CommandsStack::current()->push(

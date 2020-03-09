@@ -64,8 +64,8 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
                                { AADLFunctionGraphicsItem::Type });
     result.startObject = gi::functionObject(result.functionAtStartPos);
     result.endObject = gi::functionObject(result.functionAtEndPos);
-    result.startRequired = true;
-    result.isSameType = (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
+    result.isToOrFromNested =
+            (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
             || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
 
     if (!result.startObject) {
@@ -101,12 +101,10 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
     }
 
     if (result.startIface && result.endIface) {
-        if (result.startIface->direction() == result.endIface->direction() && !result.isSameType) {
+        if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
             result.setFailed(FailReason::SameDirectionIfaceWrongParents);
             return result;
         }
-
-        result.startRequired = result.startIface->isRequired();
     }
 
     result.startIfaceId = result.startIface ? result.startIface->id() : common::createId();
