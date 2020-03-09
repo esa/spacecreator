@@ -48,12 +48,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "queue_size", Token::queue_size },
     { "type", Token::type },
     { "encoding", Token::encoding },
-    { "from", Token::from },
     { "ri_name", Token::ri_name },
-    { "si_name", Token::si_name },
-    { "to", Token::to },
     { "pi_name", Token::pi_name },
-    { "ti_name", Token::ti_name },
     { "func_name", Token::func_name },
 
     // TASTE props:

@@ -57,12 +57,8 @@ public:
         queue_size,
         type,
         encoding,
-        from,
         ri_name,
-        si_name,
-        to,
         pi_name,
-        ti_name,
         func_name,
 
         // TASTE props:
