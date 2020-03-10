@@ -29,6 +29,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "tab_aadl/aadlobjectconnection.h"
+#include "tab_aadl/aadlobjectfunction.h"
 #include "tab_aadl/aadlobjectiface.h"
 
 #include <QGuiApplication>
@@ -671,6 +672,15 @@ bool AADLConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
     }
     return false;
 };
+
+QString AADLConnectionGraphicsItem::prepareTooltip() const
+{
+    const QString sign = entity()->sourceInterface()->isRequired() ? "->" : "<-";
+    const QString tooltip = QString("%1.%2 %3 %4.%5")
+                                    .arg(entity()->sourceName(), entity()->sourceInterfaceName(), sign,
+                                         entity()->targetName(), entity()->targetInterfaceName());
+    return tooltip;
+}
 
 } // namespace aadl
 } // namespace taste3
