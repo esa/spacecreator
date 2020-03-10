@@ -443,8 +443,8 @@ aadl::ColorHandler InteractiveObject::colorHandler() const
     ColorHandler h = ColorManager::colorsForItem(handledColorType());
     if (AADLObject *aadlObj = aadlObject()) {
         if (aadlObj->props().contains("color")) { // keep single custom color
-            h.m_fillType = ColorHandler::Color;
-            h.m_brushColor0 = QColor(aadlObj->props().value("color").toString());
+            h.setFillType(ColorHandler::Color);
+            h.setBrushColor0(QColor(aadlObj->props().value("color").toString()));
         }
     }
 

@@ -32,48 +32,104 @@
 namespace taste3 {
 namespace aadl {
 
+ColorHandler::ColorHandler()
+    : d(new ColorHandlerData()) {}
+
+ColorHandler::ColorHandler(const ColorHandler &other)
+    : d(other.d) {}
+
 QPen ColorHandler::pen() const
 {
-    return { m_penColor, m_penWidth };
+    return { penColor(), penWidth() };
 }
 
 QBrush ColorHandler::brush() const
 {
-    switch (m_fillType) {
+    switch (fillType()) {
     case FillType::Gradient: {
         QLinearGradient gradient;
         gradient.setCoordinateMode(QLinearGradient::ObjectBoundingMode);
         gradient.setStart(0., 0.);
         gradient.setFinalStop(0., 1.);
-        gradient.setColorAt(0., m_brushColor0);
-        gradient.setColorAt(1., m_brushColor1);
+        gradient.setColorAt(0., brushColor0());
+        gradient.setColorAt(1., brushColor1());
 
         return QBrush(gradient);
     }
     default:
-        return QBrush(m_brushColor0);
+        return QBrush(brushColor0());
     }
+}
+
+ColorHandler::FillType ColorHandler::fillType() const
+{
+    return d->fillType;
+}
+
+void ColorHandler::setFillType(ColorHandler::FillType fillType)
+{
+    d->fillType = fillType;
+}
+
+qreal ColorHandler::penWidth() const
+{
+    return d->penWidth;
+}
+
+void ColorHandler::setPenWidth(qreal width)
+{
+    d->penWidth = width;
+}
+
+QColor ColorHandler::penColor() const
+{
+    return d->penColor;
+}
+
+void ColorHandler::setPenColor(const QColor &color)
+{
+    d->penColor = color;
+}
+
+QColor ColorHandler::brushColor0() const
+{
+    return d->brushColor0;
+}
+
+void ColorHandler::setBrushColor0(const QColor &color)
+{
+    d->brushColor0 = color;
+}
+
+QColor ColorHandler::brushColor1() const
+{
+    return d->brushColor1;
+}
+
+void ColorHandler::setBrushColor1(const QColor &color)
+{
+    d->brushColor1 = color;
 }
 
 ColorHandler ColorHandler::fromJson(const QJsonObject &jObj)
 {
     ColorHandler h;
-    h.m_fillType = ColorHandler::FillType(jObj["fill_type"].toInt(ColorHandler::FillType::Color));
-    h.m_penWidth = jObj["pen_width"].toDouble(1.);
-    h.m_penColor = QColor(jObj["pen_color"].toString("black"));
-    h.m_brushColor0 = QColor(jObj["brush_color0"].toString("lightGray"));
-    h.m_brushColor1 = QColor(jObj["brush_color1"].toString("white"));
+    h.setFillType(ColorHandler::FillType(jObj["fill_type"].toInt(ColorHandler::FillType::Color)));
+    h.setPenWidth(jObj["pen_width"].toDouble(1.));
+    h.setPenColor(QColor(jObj["pen_color"].toString("black")));
+    h.setBrushColor0(QColor(jObj["brush_color0"].toString("lightGray")));
+    h.setBrushColor1(QColor(jObj["brush_color1"].toString("white")));
     return h;
 }
 
 QJsonObject ColorHandler::toJson() const
 {
     return {
-        { "fill_type", m_fillType },
-        { "pen_width", m_penWidth },
-        { "pen_color", m_penColor.name(QColor::HexArgb) },
-        { "brush_color0", m_brushColor0.name(QColor::HexArgb) },
-        { "brush_color1", m_brushColor1.name(QColor::HexArgb) },
+        { "fill_type", fillType() },
+        { "pen_width", penWidth() },
+        { "pen_color", penColor().name(QColor::HexArgb) },
+        { "brush_color0", brushColor0().name(QColor::HexArgb) },
+        { "brush_color1", brushColor1().name(QColor::HexArgb) },
     };
 }
 
@@ -97,7 +153,10 @@ ColorManager::ColorManager(QObject *parent)
     if (!QFile::exists(sourcePath))
         sourcePath = defaultSourcePath;
 
-    setSourceFile(sourcePath);
+    if (!setSourceFile(sourcePath)) { // source file can be corrupted
+        common::copyResourceFile(defaultColorsResourceFile(), sourcePath, common::FileCopyingMode::Overwrite);
+        setSourceFile(sourcePath);
+    }
 }
 
 ColorManager *ColorManager::instance()
@@ -110,9 +169,7 @@ ColorManager *ColorManager::instance()
 
 ColorHandler ColorManager::colorsForItem(HandledColors t)
 {
-    if (instance()->m_colors.contains(t))
-        return instance()->m_colors.value(t);
-    return ColorHandler();
+    return instance()->m_colors.value(t);
 }
 
 QString ColorManager::defaultColorsResourceFile()
@@ -190,6 +247,11 @@ bool ColorManager::setSourceFile(const QString &from)
 QString ColorManager::sourceFile() const
 {
     return m_filePath;
+}
+
+QList<ColorManager::HandledColors> ColorManager::handledColors() const
+{
+    return m_colors.keys();
 }
 
 QString ColorManager::prepareDefaultSource() const

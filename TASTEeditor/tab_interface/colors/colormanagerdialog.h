@@ -51,10 +51,9 @@ private Q_SLOTS:
 
 private:
     Ui::ColorManagerDialog *ui;
-    QMap<ColorManager::HandledColors, ColorHandler> m_colors;
     QMap<QString, ColorManager::HandledColors> m_colorNames;
     QStringListModel *m_namesModel { nullptr };
-    ColorHandler *m_color { nullptr };
+    ColorHandler m_color;
     QString m_originalFile;
 
     bool loadFile(const QString &path);

@@ -39,6 +39,9 @@ public:
     void setColorHandler(ColorHandler *h);
     ColorHandler *colorHandler() const;
 
+Q_SIGNALS:
+    void colorHandlerValueChanged();
+
 private Q_SLOTS:
     void on_sbWidth_valueChanged(qreal v);
     void on_btnColorStroke_colorChanged(const QColor &c);

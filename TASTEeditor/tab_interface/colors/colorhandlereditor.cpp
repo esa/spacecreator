@@ -47,11 +47,12 @@ void ColorHandlerEditor::setColorHandler(ColorHandler *h)
     if (!m_colorHandler)
         return;
 
-    ui->sbWidth->setValue(m_colorHandler->m_penWidth);
-    ui->btnColorStroke->setColor(m_colorHandler->m_penColor);
-    ui->cbFillType->setCurrentIndex(m_colorHandler->m_fillType == ColorHandler::FillType::Color ? 0 : 1);
-    ui->btnColor->setColor(m_colorHandler->m_brushColor0);
-    ui->btnColorStop->setColor(m_colorHandler->m_brushColor1);
+    QSignalBlocker block(this);
+    ui->sbWidth->setValue(m_colorHandler->penWidth());
+    ui->btnColorStroke->setColor(m_colorHandler->penColor());
+    ui->cbFillType->setCurrentIndex(m_colorHandler->fillType() == ColorHandler::FillType::Color ? 0 : 1);
+    ui->btnColor->setColor(m_colorHandler->brushColor0());
+    ui->btnColorStop->setColor(m_colorHandler->brushColor1());
 }
 
 ColorHandler *ColorHandlerEditor::colorHandler() const
@@ -61,14 +62,18 @@ ColorHandler *ColorHandlerEditor::colorHandler() const
 
 void ColorHandlerEditor::on_sbWidth_valueChanged(qreal v)
 {
-    if (m_colorHandler)
-        m_colorHandler->m_penWidth = v;
+    if (m_colorHandler) {
+        m_colorHandler->setPenWidth(v);
+        emit colorHandlerValueChanged();
+    }
 }
 
 void ColorHandlerEditor::on_btnColorStroke_colorChanged(const QColor &c)
 {
-    if (m_colorHandler)
-        m_colorHandler->m_penColor = c;
+    if (m_colorHandler) {
+        m_colorHandler->setPenColor(c);
+        emit colorHandlerValueChanged();
+    }
 }
 
 void ColorHandlerEditor::on_cbFillType_currentIndexChanged(int id)
@@ -79,20 +84,26 @@ void ColorHandlerEditor::on_cbFillType_currentIndexChanged(int id)
     ui->labelColorStop->setVisible(stopColorShown);
     ui->btnColorStop->setVisible(stopColorShown);
 
-    if (m_colorHandler)
-        m_colorHandler->m_fillType = ft;
+    if (m_colorHandler) {
+        m_colorHandler->setFillType(ft);
+        emit colorHandlerValueChanged();
+    }
 }
 
 void ColorHandlerEditor::on_btnColor_colorChanged(const QColor &c)
 {
-    if (m_colorHandler)
-        m_colorHandler->m_brushColor0 = c;
+    if (m_colorHandler) {
+        m_colorHandler->setBrushColor0(c);
+        emit colorHandlerValueChanged();
+    }
 }
 
 void ColorHandlerEditor::on_btnColorStop_colorChanged(const QColor &c)
 {
-    if (m_colorHandler)
-        m_colorHandler->m_brushColor1 = c;
+    if (m_colorHandler) {
+        m_colorHandler->setBrushColor1(c);
+        emit colorHandlerValueChanged();
+    }
 }
 
 } // ns aadl
