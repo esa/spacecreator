@@ -212,11 +212,11 @@ QVector<DynamicProperty *> DynamicPropertyConfig::readAttrs(const QByteArray &da
 QVector<DynamicProperty *> DynamicPropertyConfig::attributesForObject(AADLObject *obj)
 {
     switch (obj->aadlType()) {
-    case AADLObject::AADLObjectType::AADLFunctionType:
+    case AADLObject::Type::FunctionType:
         return attributesForFunctionType();
-    case AADLObject::AADLObjectType::AADLFunction:
+    case AADLObject::Type::Function:
         return attributesForFunction();
-    case AADLObject::AADLObjectType::AADLIface:
+    case AADLObject::Type::Interface:
         return attributesForIface();
     default:
         return {};

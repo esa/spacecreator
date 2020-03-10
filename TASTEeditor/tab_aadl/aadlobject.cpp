@@ -109,7 +109,7 @@ QVector<qint32> AADLObject::coordinates() const
         if (parentObject()->isRootObject()) {
             token = meta::Props::Token::InnerCoordinates;
         } else if (auto grandParent = parentItem->parentObject()) {
-            if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
+            if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
     } else if (isRootObject()) {
@@ -141,7 +141,7 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
         if (parentObject()->isRootObject()) {
             token = meta::Props::Token::InnerCoordinates;
         } else if (auto grandParent = parentItem->parentObject()) {
-            if (aadlType() == AADLObject::AADLObjectType::AADLIface && grandParent->isRootObject())
+            if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
     } else if (isRootObject()) {
@@ -159,12 +159,27 @@ AADLObject *AADLObject::parentObject() const
 
 bool AADLObject::isFunction() const
 {
-    return aadlType() == AADLObjectType::AADLFunction;
+    return aadlType() == Type::Function;
 }
 
 bool AADLObject::isFunctionType() const
 {
-    return aadlType() == AADLObjectType::AADLFunctionType;
+    return aadlType() == Type::FunctionType;
+}
+
+bool AADLObject::isInterface() const
+{
+    return aadlType() == Type::Interface;
+}
+
+bool AADLObject::isComment() const
+{
+    return aadlType() == Type::Comment;
+}
+
+bool AADLObject::isConnection() const
+{
+    return aadlType() == Type::Connection;
 }
 
 bool AADLObject::isNestedInFunction() const

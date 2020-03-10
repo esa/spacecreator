@@ -192,27 +192,22 @@ static const QVector<QString> availableAADLObjectTypeNames()
 {
     QVector<QString> keys;
 
-    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
 
         QString key;
-        switch (static_cast<aadl::AADLObject::AADLObjectType>(me.value(i))) {
-        case aadl::AADLObject::AADLObjectType::AADLIface:
-            key = QStringLiteral("Interfaces");
-            break;
+        switch (static_cast<aadl::AADLObject::Type>(me.value(i))) {
 
-            // Function and FunctionType should be stored separately
-            // to allow quering both keys[Function] and keys[FunctionType]
-        case aadl::AADLObject::AADLObjectType::AADLFunctionType:
-            key = QStringLiteral("Functions");
-            break;
-        case aadl::AADLObject::AADLObjectType::AADLFunction:
+        // Despite the same key "Functions" shared between Function and FunctionType,
+        // each should be stored separately to allow queries like
+        // keys[AADLObject::Type::Function] and keys[AADLObject::Type::FunctionType]
+        case aadl::AADLObject::Type::FunctionType:
+        case aadl::AADLObject::Type::Function:
             key = QStringLiteral("Functions");
             break;
 
         default:
             key = me.key(i);
-            key.remove(QStringLiteral("AADL"));
             key.append(QStringLiteral("s"));
             break;
         }
@@ -228,14 +223,14 @@ QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(document::I
 
     QHash<QString, QVariantList> grouppedObjects;
     for (const auto aadlObject : doc->objects()) {
-        const aadl::AADLObject::AADLObjectType t = aadlObject->aadlType();
+        const aadl::AADLObject::Type t = aadlObject->aadlType();
         switch (t) {
-        case aadl::AADLObject::AADLObjectType::AADLFunctionType:
-        case aadl::AADLObject::AADLObjectType::AADLFunction:
-        case aadl::AADLObject::AADLObjectType::AADLComment:
-        case aadl::AADLObject::AADLObjectType::AADLConnection:
-        case aadl::AADLObject::AADLObjectType::AADLUnknown: {
-            if (t == aadl::AADLObject::AADLObjectType::AADLUnknown || aadlObject->isNested())
+        case aadl::AADLObject::Type::FunctionType:
+        case aadl::AADLObject::Type::Function:
+        case aadl::AADLObject::Type::Comment:
+        case aadl::AADLObject::Type::Connection:
+        case aadl::AADLObject::Type::Unknown: {
+            if (t == aadl::AADLObject::Type::Unknown || aadlObject->isNested())
                 continue;
             break;
         }

@@ -41,7 +41,7 @@ public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
 
-    AADLObject::AADLObjectType aadlType() const override;
+    AADLObject::Type aadlType() const override;
 
     QVector<AADLObject *> children() const;
     bool addChild(AADLObject *child);

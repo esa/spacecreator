@@ -32,7 +32,7 @@ public:
     explicit AADLFunctionTypeGraphicsItem(AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLFunctionType)
+        Type = UserType + static_cast<int>(AADLObject::Type::FunctionType)
     };
     int type() const override { return Type; }
 

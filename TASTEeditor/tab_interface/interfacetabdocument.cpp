@@ -517,11 +517,11 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
 
     switch (obj->aadlType()) {
-    case aadl::AADLObject::AADLObjectType::AADLComment:
+    case aadl::AADLObject::Type::Comment:
         return new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
-    case aadl::AADLObject::AADLObjectType::AADLIface:
+    case aadl::AADLObject::Type::Interface:
         return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
-    case aadl::AADLObject::AADLObjectType::AADLConnection:
+    case aadl::AADLObject::Type::Connection:
         if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
             aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
             auto startItem = qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(
@@ -534,9 +534,9 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
             return new aadl::AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
-    case aadl::AADLObject::AADLObjectType::AADLFunction:
+    case aadl::AADLObject::Type::Function:
         return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
-    case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+    case aadl::AADLObject::Type::FunctionType:
         return new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
     default: {
         qCritical() << "Unknown object type:" << obj->aadlType();
@@ -589,7 +589,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
 {
     if (auto clickedItem = qobject_cast<aadl::InteractiveObject *>(sender())) {
         if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->aadlObject())) {
-            if (clickedEntity->aadlType() == aadl::AADLObject::AADLObjectType::AADLFunction) {
+            if (clickedEntity->aadlType() == aadl::AADLObject::Type::Function) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
                     if (!function->children().isEmpty() && !function->isRootObject()) {
                         changeRootItem(function->id());
@@ -597,7 +597,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
                     }
                 }
             }
-            if (clickedEntity->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection)
+            if (clickedEntity->aadlType() != aadl::AADLObject::Type::Connection)
                 showPropertyEditor(clickedEntity);
         }
     }
@@ -616,8 +616,8 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     });
 
     auto firstNonFunctionEntity = std::find_if(objects.cbegin(), objects.cend(), [](aadl::AADLObject *obj) {
-        return obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLFunction
-                && obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLFunctionType;
+        return obj->aadlType() != aadl::AADLObject::Type::Function
+                && obj->aadlType() != aadl::AADLObject::Type::FunctionType;
     });
 
     for (auto it = objects.cbegin(); it != firstNonFunctionEntity; ++it)

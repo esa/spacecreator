@@ -115,8 +115,7 @@ void AADLObjectsModel::setRootObject(common::Id rootId)
                 continue;
             }
 
-            if (obj->aadlType() != aadl::AADLObject::AADLObjectType::AADLConnection
-                && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
+            if (!obj->isConnection() && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 d->m_visibleObjects.append(obj);
             } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
                 const bool sourceIfaceAncestor =
@@ -150,13 +149,13 @@ AADLObject *AADLObjectsModel::getObject(const common::Id &id) const
     return d->m_objects.value(id, nullptr);
 }
 
-AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::AADLObjectType type) const
+AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::Type type) const
 {
     if (name.isEmpty())
         return nullptr;
 
     for (auto obj : d->m_objects)
-        if ((type == AADLObject::AADLObjectType::AADLUnknown || type == obj->aadlType()) && obj->title() == name)
+        if ((type == AADLObject::Type::Unknown || type == obj->aadlType()) && obj->title() == name)
             return obj;
     return nullptr;
 }
@@ -168,7 +167,7 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjec
         return nullptr;
 
     for (auto obj : d->m_objects) {
-        if (AADLObject::AADLObjectType::AADLIface == obj->aadlType() && obj->title() == name)
+        if (obj->isInterface() && obj->title() == name)
             if (AADLObjectIface *iface = obj->as<AADLObjectIface *>())
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent))
                     return iface;
@@ -210,7 +209,7 @@ AADLObjectsModel::getAvailableFunctionTypes(const AADLObjectFunction *fnObj) con
     };
 
     for (AADLObject *obj : d->m_objects)
-        if (obj->aadlType() == AADLObject::AADLObjectType::AADLFunctionType)
+        if (obj->isFunctionType())
             if (AADLObjectFunctionType *objFnType = qobject_cast<AADLObjectFunctionType *>(obj))
                 if (isValid(objFnType, fnObj))
                     result.insert(objFnType->title(), objFnType);
@@ -246,7 +245,7 @@ AADLObjectComment *AADLObjectsModel::getCommentById(const common::Id &id) const
 AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &id) const
 {
     for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
-        if (it.value()->aadlType() != AADLObject::AADLObjectType::AADLConnection)
+        if (it.value()->aadlType() != AADLObject::Type::Connection)
             continue;
 
         if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
@@ -267,7 +266,7 @@ QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const c
     QVector<AADLObjectConnection *> result;
 
     for (auto it = d->m_objects.cbegin(); it != d->m_objects.cend(); ++it)
-        if (it.value()->aadlType() == AADLObject::AADLObjectType::AADLConnection)
+        if (it.value()->aadlType() == AADLObject::Type::Connection)
             if (auto connection = qobject_cast<AADLObjectConnection *>(it.value()))
                 if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
                     || (connection->targetInterface() && connection->targetInterface()->id() == id))

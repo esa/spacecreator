@@ -38,7 +38,7 @@ void tst_AADLObjectFunction::testAadlType()
     using namespace taste3::aadl;
     AADLObjectFunction obj;
 
-    QCOMPARE(obj.aadlType(), AADLObject::AADLObjectType::AADLFunction);
+    QCOMPARE(obj.aadlType(), AADLObject::Type::Function);
 }
 
 void tst_AADLObjectFunction::testRequiredInterfacesManagement() const

@@ -38,17 +38,17 @@ class AADLObject : public QObject
     Q_PROPERTY(QVariantList attributes READ templateAttributes) //!< Attribute list for string templates
 
 public:
-    enum class AADLObjectType
+    enum class Type
     {
-        AADLUnknown = 0,
+        Unknown = 0,
 
-        AADLFunction,
-        AADLFunctionType,
-        AADLIface,
-        AADLComment,
-        AADLConnection,
+        Function,
+        FunctionType,
+        Interface,
+        Comment,
+        Connection,
     };
-    Q_ENUM(AADLObjectType)
+    Q_ENUM(Type)
 
     explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr);
     virtual ~AADLObject();
@@ -56,7 +56,7 @@ public:
     QString title() const;
     common::Id id() const;
 
-    virtual AADLObjectType aadlType() const = 0;
+    virtual AADLObject::Type aadlType() const = 0;
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
@@ -64,6 +64,9 @@ public:
     AADLObject *parentObject() const;
     bool isFunction() const;
     bool isFunctionType() const;
+    bool isInterface() const;
+    bool isComment() const;
+    bool isConnection() const;
     bool isNestedInFunction() const;
     bool isNestedInFunctionType() const;
     bool isNested() const;

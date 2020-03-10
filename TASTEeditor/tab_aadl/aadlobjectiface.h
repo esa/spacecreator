@@ -97,7 +97,7 @@ public:
 
     ~AADLObjectIface() override;
 
-    AADLObject::AADLObjectType aadlType() const override;
+    AADLObject::Type aadlType() const override;
 
     AADLObjectIface::IfaceType direction() const;
 

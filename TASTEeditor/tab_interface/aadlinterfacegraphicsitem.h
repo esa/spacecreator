@@ -36,7 +36,7 @@ public:
     explicit AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLIface)
+        Type = UserType + static_cast<int>(AADLObject::Type::Interface)
     };
 
     AADLObjectIface *entity() const;

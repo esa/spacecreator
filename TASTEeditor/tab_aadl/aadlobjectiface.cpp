@@ -127,9 +127,9 @@ void AADLObjectIface::setupInitialAttrs()
     }
 }
 
-AADLObject::AADLObjectType AADLObjectIface::aadlType() const
+AADLObject::Type AADLObjectIface::aadlType() const
 {
-    return AADLObjectType::AADLIface;
+    return Type::Interface;
 }
 
 AADLObjectIface::IfaceType AADLObjectIface::direction() const

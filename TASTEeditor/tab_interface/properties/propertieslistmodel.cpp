@@ -253,11 +253,11 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 
     if (m_dataObject) {
         switch (m_dataObject->aadlType()) {
-        case aadl::AADLObject::AADLObjectType::AADLFunction:
-        case aadl::AADLObject::AADLObjectType::AADLFunctionType:
+        case aadl::AADLObject::Type::Function:
+        case aadl::AADLObject::Type::FunctionType:
             editable = isEditableCellFunction(index);
             break;
-        case aadl::AADLObject::AADLObjectType::AADLIface:
+        case aadl::AADLObject::Type::Interface:
             editable = isEditableCellIface(index);
             break;
         default:
