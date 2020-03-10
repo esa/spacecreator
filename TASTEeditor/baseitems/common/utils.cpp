@@ -19,7 +19,13 @@
 
 #include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_interface/aadlcommentgraphicsitem.h"
+#include "tab_interface/aadlconnectiongraphicsitem.h"
+#include "tab_interface/aadlfunctiongraphicsitem.h"
+#include "tab_interface/aadlfunctiontypegraphicsitem.h"
+#include "tab_interface/aadlinterfacegraphicsitem.h"
 
+#include <QDebug>
 #include <QGraphicsView>
 #include <QMetaEnum>
 #include <QPropertyAnimation>
@@ -388,11 +394,41 @@ QList<int> knownGraphicsItemTypes()
     static QList<int> result;
 
     if (result.isEmpty()) {
-        const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::AADLObjectType>();
-        for (int i = 0; i < me.keyCount(); ++i)
-            if (static_cast<aadl::AADLObject::AADLObjectType>(me.value(i))
-                != aadl::AADLObject::AADLObjectType::AADLUnknown)
-                result.append(QGraphicsItem::UserType + me.value(i));
+        const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
+        for (int i = 0; i < me.keyCount(); ++i) {
+            int itemType = 0;
+            const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
+            switch (objectType) {
+            case aadl::AADLObject::Type::Function: {
+                itemType = aadl::AADLFunctionGraphicsItem::Type;
+                break;
+            }
+            case aadl::AADLObject::Type::FunctionType: {
+                itemType = aadl::AADLFunctionTypeGraphicsItem::Type;
+                break;
+            }
+            case aadl::AADLObject::Type::Interface: {
+                itemType = aadl::AADLInterfaceGraphicsItem::Type;
+                break;
+            }
+            case aadl::AADLObject::Type::Comment: {
+                itemType = aadl::AADLCommentGraphicsItem::Type;
+                break;
+            }
+            case aadl::AADLObject::Type::Connection: {
+                itemType = aadl::AADLConnectionGraphicsItem::Type;
+                break;
+            }
+            case aadl::AADLObject::Type::Unknown:
+                continue;
+            default: {
+                qWarning() << "Unhandled graphics item:" << objectType;
+                continue;
+            }
+            }
+            if (itemType)
+                result.append(itemType);
+        }
     }
 
     return result;
