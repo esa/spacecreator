@@ -23,6 +23,7 @@
 #include "baseitems/common/utils.h"
 #include "grippointshandler.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_interface/commands/cmdentityautolayout.h"
 #include "tab_interface/commands/commandids.h"
 #include "tab_interface/commands/commandsfactory.h"
 
@@ -32,6 +33,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPen>
+#include <app/commandsstack.h>
 #include <functional>
 
 namespace taste3 {
@@ -139,16 +141,30 @@ void InteractiveObject::setFont(const QFont &font)
 
 void InteractiveObject::updateEntity()
 {
-    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change item geometry/position"));
-
     QList<QVariant> params;
     const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
                    [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
     const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
     taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
+}
 
-    taste3::cmd::CommandsStack::current()->endMacro();
+void InteractiveObject::mergeGeometry()
+{
+    QList<QVariant> params;
+    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
+    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
+                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+
+    QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
+    autolayoutCmd->redo();
+
+    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
+    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
+    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
+        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeWith(autolayoutCmd);
+    else
+        delete autolayoutCmd;
 }
 
 QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() const

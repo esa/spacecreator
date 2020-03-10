@@ -37,6 +37,7 @@ GRANTLEE_LIB=Grantlee_Templates
 win32: CONFIG(debug, debug|release):GRANTLEE_LIB = $$join(GRANTLEE_LIB,,,d)
 
 LIBS += -L$$GRANTLEE_LIB_DIR -l$$GRANTLEE_LIB
+macx: INCLUDEPATH += $$[QT_INSTALL_HEADERS]
 
 SOURCES += \
         app/commandlineparser.cpp \

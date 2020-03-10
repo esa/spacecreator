@@ -196,6 +196,31 @@ static inline void moveCounterClockwise(const QRectF &intersectedItemRect, QRect
         rect = counterClockwiseRect;
 };
 
+QRectF AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
+{
+    const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
+    const qreal offset = kBase + 2;
+    switch (alignment) {
+    case Qt::AlignLeft:
+        m_iface->setRotation(insideOut ? 180 : 0);
+        m_type->setPos(QPointF(-offset, 0));
+        break;
+    case Qt::AlignRight:
+        m_iface->setRotation(insideOut ? 0 : 180);
+        m_type->setPos(QPointF(offset, 0));
+        break;
+    case Qt::AlignTop:
+        m_iface->setRotation(insideOut ? 270 : 90);
+        m_type->setPos(QPointF(0, -offset));
+        break;
+    case Qt::AlignBottom:
+        m_iface->setRotation(insideOut ? 90 : 270);
+        m_type->setPos(QPointF(0, offset));
+        break;
+    }
+    return mapRectFromItem(m_iface, m_iface->boundingRect());
+};
+
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
     prepareGeometryChange();
@@ -204,69 +229,10 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
         return;
     }
 
-    auto updateInternalItems = [this](Qt::Alignment alignment) {
-        const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
-        const qreal offset = kBase + 2;
-        switch (alignment) {
-        case Qt::AlignLeft:
-            m_iface->setRotation(insideOut ? 180 : 0);
-            m_type->setPos(QPointF(-offset, 0));
-            break;
-        case Qt::AlignRight:
-            m_iface->setRotation(insideOut ? 0 : 180);
-            m_type->setPos(QPointF(offset, 0));
-            break;
-        case Qt::AlignTop:
-            m_iface->setRotation(insideOut ? 270 : 90);
-            m_type->setPos(QPointF(0, -offset));
-            break;
-        case Qt::AlignBottom:
-            m_iface->setRotation(insideOut ? 90 : 270);
-            m_type->setPos(QPointF(0, offset));
-            break;
-        }
-        return mapRectFromItem(m_iface, m_iface->boundingRect());
-    };
-
     const QPointF ifacePos = pos();
     if (utils::pos(entity()->coordinates()).isNull()) {
-        if (auto connection = m_connections.value(0)) {
-            auto theirIface = connection->startItem() == this ? connection->endItem() : connection->startItem();
-            if (auto theirItem = theirIface->targetItem()) {
-                const QRectF theirRect = theirItem->sceneBoundingRect();
-                const QRectF ourRect = targetItem()->sceneBoundingRect();
-                const QPointF theirPos = utils::pos(theirIface->entity()->coordinates());
-                const QPointF ourPos = ourRect.center();
-                Qt::Alignment side = Qt::AlignAbsolute;
-                QPointF sidePos;
-                if (theirItem->isRootItem()) {
-                    if (theirPos.isNull()) {
-                        side = utils::getNearestSide(theirRect, ourPos);
-                        sidePos = utils::getSidePosition(theirRect, ourPos, side);
-                    } else {
-                        side = utils::getNearestSide(ourRect, theirPos);
-                        sidePos = utils::getSidePosition(ourRect, ourPos, side);
-                    }
-                } else if (targetItem()->isRootItem()) {
-                    side = utils::getNearestSide(ourRect, theirRect.center());
-                    sidePos = utils::getSidePosition(ourRect, theirRect.center(), side);
-                } else if (theirRect.isValid()) {
-                    if (theirPos.isNull())
-                        side = utils::getNearestSide(ourRect, theirRect.center());
-                    else
-                        side = utils::getNearestSide(ourRect, theirPos);
-                    sidePos = utils::getSidePosition(ourRect, ourRect.center(), side);
-                }
-                if (side != Qt::AlignAbsolute) {
-                    updateInternalItems(side);
-                    entity()->setCoordinates(utils::coordinates(sidePos));
-                }
-            }
-            return;
-        } else {
-            /// NOTE: iface items without connections are put close to top left corner
-            /// because of null pos
-        }
+        doAutoLayout();
+        return;
     }
 
     const QRectF parentRect = parentItem()->boundingRect();
@@ -377,6 +343,48 @@ QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandPa
     }
 
     return params;
+}
+
+void AADLInterfaceGraphicsItem::doAutoLayout()
+{
+    if (auto connection = m_connections.value(0)) {
+        auto theirIface = connection->startItem() == this ? connection->endItem() : connection->startItem();
+        if (auto theirItem = theirIface->targetItem()) {
+            const QRectF theirRect = theirItem->sceneBoundingRect();
+            const QRectF ourRect = targetItem()->sceneBoundingRect();
+            const QPointF theirPos = utils::pos(theirIface->entity()->coordinates());
+            const QPointF ourPos = ourRect.center();
+            Qt::Alignment side = Qt::AlignAbsolute;
+            QPointF sidePos;
+            if (theirItem->isRootItem()) {
+                if (theirPos.isNull()) {
+                    side = utils::getNearestSide(theirRect, ourPos);
+                    sidePos = utils::getSidePosition(theirRect, ourPos, side);
+                } else {
+                    side = utils::getNearestSide(ourRect, theirPos);
+                    sidePos = utils::getSidePosition(ourRect, ourPos, side);
+                }
+            } else if (targetItem()->isRootItem()) {
+                side = utils::getNearestSide(ourRect, theirRect.center());
+                sidePos = utils::getSidePosition(ourRect, theirRect.center(), side);
+            } else if (theirRect.isValid()) {
+                if (theirPos.isNull())
+                    side = utils::getNearestSide(ourRect, theirRect.center());
+                else
+                    side = utils::getNearestSide(ourRect, theirPos);
+                sidePos = utils::getSidePosition(ourRect, ourRect.center(), side);
+            }
+            if (side != Qt::AlignAbsolute) {
+                updateInternalItems(side);
+                //                    entity()->setCoordinates(utils::coordinates(sidePos));
+                setPos(parentItem()->mapFromScene(sidePos));
+                mergeGeometry();
+            }
+        }
+    } else {
+        /// NOTE: iface items without connections are put close to top left corner
+        /// because of null pos
+    }
 }
 
 void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

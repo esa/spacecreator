@@ -38,10 +38,14 @@ void CmdRootEntityChange::redo()
 {
     if (m_model)
         m_model->setRootObject(m_newId);
+
+    CmdEntityGeometryChange::redo();
 }
 
 void CmdRootEntityChange::undo()
 {
+    CmdEntityGeometryChange::undo();
+
     if (m_model)
         m_model->setRootObject(m_prevId);
 }

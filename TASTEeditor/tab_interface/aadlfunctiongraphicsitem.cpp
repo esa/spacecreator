@@ -25,7 +25,6 @@
 #include "colors/colormanager.h"
 #include "tab_aadl/aadlobjectfunction.h"
 #include "tab_aadl/aadlobjectsmodel.h"
-#include "tab_interface/commands/cmdentityautolayout.h"
 #include "tab_interface/commands/commandids.h"
 #include "tab_interface/commands/commandsfactory.h"
 
@@ -35,7 +34,6 @@
 #include <QTimer>
 #include <QtDebug>
 #include <QtMath>
-#include <app/commandsstack.h>
 #include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2.0;
@@ -108,7 +106,8 @@ void AADLFunctionGraphicsItem::rebuildLayout()
             setRect(itemRect);
             if (view)
                 view->centerOn(itemRect.center());
-            updateEntity();
+            if (!needRelayout)
+                mergeGeometry();
         }
     }
     if (needRelayout)
@@ -286,10 +285,9 @@ void AADLFunctionGraphicsItem::updateNestedItems()
                 break;
             }
 
-            auto it = std::find_if(nestedRects.constBegin(), nestedRects.constEnd(),
-                                   [nestedRect, margins = utils::kContentMargins](const QRectF &rect) {
-                                       return rect.marginsAdded(margins).intersects(nestedRect);
-                                   });
+            auto it = std::find_if(nestedRects.constBegin(), nestedRects.constEnd(), [nestedRect](const QRectF &rect) {
+                return rect.marginsAdded(utils::kContentMargins).intersects(nestedRect);
+            });
             if (it != nestedRects.constEnd()) {
                 doAutoLayout();
                 break;
@@ -392,18 +390,7 @@ void AADLFunctionGraphicsItem::doAutoLayout()
 
     layoutConnections();
 
-    QList<QVariant> params;
-    const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
-    std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
-
-    QScopedPointer<QUndoCommand> autolayoutCmd(cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params));
-    autolayoutCmd->redo();
-
-    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
-    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
-    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
-        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeWith(autolayoutCmd.data());
+    mergeGeometry();
 }
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const

@@ -59,12 +59,14 @@ public:
     QString prepareTooltip() const override;
 
 protected:
+    void doAutoLayout();
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
+    QRectF updateInternalItems(Qt::Alignment alignment);
     virtual ColorManager::HandledColors handledColorType() const override;
 
 protected Q_SLOTS:
