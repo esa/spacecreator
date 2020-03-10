@@ -266,8 +266,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
                 == QStringLiteral("yes");
 
         obj = addFunction(nameAttr.m_value,
-                          isFunctionType ? AADLObject::AADLObjectType::AADLFunctionType
-                                         : AADLObject::AADLObjectType::AADLFunction);
+                          isFunctionType ? AADLObject::Type::FunctionType : AADLObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
@@ -346,9 +345,9 @@ void AADLXMLReader::processTagClose(QXmlStreamReader &xml)
     }
 }
 
-AADLObjectFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::AADLObjectType fnType)
+AADLObjectFunctionType *AADLXMLReader::addFunction(const QString &name, AADLObject::Type fnType)
 {
-    const bool isFunctionType = fnType == AADLObject::AADLObjectType::AADLFunctionType;
+    const bool isFunctionType = fnType == AADLObject::Type::FunctionType;
 
     AADLObjectFunctionType *fn = isFunctionType ? new AADLObjectFunctionType(name, d->m_currentObject.get())
                                                 : new AADLObjectFunction(name, d->m_currentObject.get());

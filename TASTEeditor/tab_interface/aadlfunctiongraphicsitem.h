@@ -30,7 +30,7 @@ public:
     explicit AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLFunction)
+        Type = UserType + static_cast<int>(AADLObject::Type::Function)
     };
 
     AADLObjectFunction *entity() const;

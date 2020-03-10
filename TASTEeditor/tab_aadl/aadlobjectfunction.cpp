@@ -44,9 +44,9 @@ AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
 
 AADLObjectFunction::~AADLObjectFunction() {}
 
-AADLObject::AADLObjectType AADLObjectFunction::aadlType() const
+AADLObject::Type AADLObjectFunction::aadlType() const
 {
-    return AADLObjectType::AADLFunction;
+    return Type::Function;
 }
 
 void AADLObjectFunction::postInit()

@@ -30,7 +30,7 @@ public:
     {
     }
 
-    AADLObjectType aadlType() const override { return AADLObjectType::AADLUnknown; }
+    AADLObject::Type aadlType() const override { return Type::Unknown; }
 };
 
 class tst_AADLObject : public QObject

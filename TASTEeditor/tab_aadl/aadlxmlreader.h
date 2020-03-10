@@ -58,7 +58,7 @@ private:
     void processTagOpen(QXmlStreamReader &xml);
     void processTagClose(QXmlStreamReader &xml);
 
-    AADLObjectFunctionType *addFunction(const QString &name, AADLObject::AADLObjectType fnType);
+    AADLObjectFunctionType *addFunction(const QString &name, AADLObject::Type fnType);
     AADLObjectIface *addIface(const QString &name, bool isRI);
     AADLObjectComment *addComment(const QString &text);
     AADLObjectConnection *addConnection();

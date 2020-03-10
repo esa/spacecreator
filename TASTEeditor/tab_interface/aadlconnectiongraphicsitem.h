@@ -36,7 +36,7 @@ class AADLConnectionGraphicsItem : public InteractiveObject
 public:
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLConnection)
+        Type = UserType + static_cast<int>(AADLObject::Type::Connection)
     };
     int type() const override { return Type; }
 

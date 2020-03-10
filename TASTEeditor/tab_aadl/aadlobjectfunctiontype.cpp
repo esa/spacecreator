@@ -44,9 +44,9 @@ AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *pa
 
 AADLObjectFunctionType::~AADLObjectFunctionType() {}
 
-AADLObject::AADLObjectType AADLObjectFunctionType::aadlType() const
+AADLObject::Type AADLObjectFunctionType::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLFunctionType;
+    return AADLObject::Type::FunctionType;
 }
 
 QVector<AADLObject *> AADLObjectFunctionType::children() const
@@ -170,8 +170,7 @@ QVariantList AADLObjectFunctionType::templateFunctions() const
 {
     QVariantList functions;
     for (const auto child : d->m_children) {
-        if (child->aadlType() == AADLObject::AADLObjectType::AADLFunction
-            || child->aadlType() == AADLObject::AADLObjectType::AADLFunctionType) {
+        if (child->isFunction() || child->isFunctionType()) {
             functions << QVariant::fromValue(child);
         }
     }
@@ -182,7 +181,7 @@ QVariantList AADLObjectFunctionType::templateComments() const
 {
     QVariantList comments;
     for (const auto child : d->m_children) {
-        if (child->aadlType() == AADLObject::AADLObjectType::AADLComment)
+        if (child->isComment())
             comments << QVariant::fromValue(child);
     }
     return comments;
@@ -192,7 +191,7 @@ QVariantList AADLObjectFunctionType::templateConnections() const
 {
     QVariantList connections;
     for (const auto child : d->m_children) {
-        if (child->aadlType() == AADLObject::AADLObjectType::AADLConnection)
+        if (child->isConnection())
             connections << QVariant::fromValue(child);
     }
     return connections;

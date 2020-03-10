@@ -228,7 +228,7 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (m_dataObject->aadlType()) {
-        case aadl::AADLObject::AADLObjectType::AADLFunction: {
+        case aadl::AADLObject::Type::Function: {
             if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
                 if (fn->inheritsFunctionType())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;

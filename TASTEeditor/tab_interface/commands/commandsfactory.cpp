@@ -252,7 +252,7 @@ QUndoCommand *CommandsFactory::changeEntityPropertyCommand(const QVariantList &p
     const QVariantHash properties = params.value(1).toHash();
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty()) {
         if (AADLObject *aadlObject = entity.value<AADLObject *>()) {
-            if (aadlObject->aadlType() == AADLObject::AADLObjectType::AADLIface)
+            if (aadlObject->isInterface())
                 if (AADLObjectIfaceRequired *ri = aadlObject->as<AADLObjectIfaceRequired *>()) {
                     return changeRiPropertyCommand(params);
                 }
@@ -291,7 +291,7 @@ QUndoCommand *CommandsFactory::changeEntityAttributesCommand(const QVariantList 
     const QVariantHash attributess = params.value(1).toHash();
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !attributess.isEmpty()) {
         if (AADLObject *aadlObject = entity.value<AADLObject *>()) {
-            if (aadlObject->aadlType() == AADLObject::AADLObjectType::AADLIface)
+            if (aadlObject->isInterface())
                 return changeIfaceAttributeCommand(params);
 
             return new CmdEntityAttributeChange(aadlObject, attributess);
