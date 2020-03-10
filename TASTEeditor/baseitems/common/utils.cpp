@@ -18,8 +18,10 @@
 #include "utils.h"
 
 #include "baseitems/interactiveobject.h"
+#include "tab_aadl/aadlobject.h"
 
 #include <QGraphicsView>
+#include <QMetaEnum>
 #include <QPropertyAnimation>
 #include <QtGlobal>
 #include <QtMath>
@@ -379,6 +381,21 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
 {
     const QPointF adjustmentPoint { adjustment / 2, adjustment / 2 };
     return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
+}
+
+QList<int> knownGraphicsItemTypes()
+{
+    static QList<int> result;
+
+    if (result.isEmpty()) {
+        const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::AADLObjectType>();
+        for (int i = 0; i < me.keyCount(); ++i)
+            if (static_cast<aadl::AADLObject::AADLObjectType>(me.value(i))
+                != aadl::AADLObject::AADLObjectType::AADLUnknown)
+                result.append(QGraphicsItem::UserType + me.value(i));
+    }
+
+    return result;
 }
 
 } // ns utils

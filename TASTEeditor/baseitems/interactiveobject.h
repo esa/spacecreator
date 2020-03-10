@@ -71,6 +71,8 @@ public:
     virtual QList<QVariantList> prepareChangeCoordinatesCommandParams() const;
     virtual void updateGripPoints();
 
+    virtual QString prepareTooltip() const;
+
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();

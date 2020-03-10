@@ -31,9 +31,6 @@
 #include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectiface.h"
 
-#include <QEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsView>
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPen>

@@ -93,5 +93,7 @@ bool isAncestorOf(const T *const parent, T *object)
 
 QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 
+QList<int> knownGraphicsItemTypes();
+
 } // ns utils
 } // ns taste3

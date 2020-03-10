@@ -17,11 +17,33 @@
 
 #include "interfacetabgraphicsscene.h"
 
+#include "baseitems/common/utils.h"
+#include "baseitems/interactiveobject.h"
+
+#include <QGraphicsSceneHelpEvent>
+#include <QToolTip>
+
 namespace taste3 {
 
 InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
     : QGraphicsScene(parent)
 {
+}
+
+void InterfaceTabGraphicsScene::helpEvent(QGraphicsSceneHelpEvent *event)
+{
+    if (QGraphicsItem *hovered = utils::nearestItem(this, event->scenePos(), utils::knownGraphicsItemTypes())) {
+        if (aadl::InteractiveObject *item = qobject_cast<aadl::InteractiveObject *>(hovered->toGraphicsObject())) {
+            const QString &tooltip = item->prepareTooltip();
+            if (!tooltip.isEmpty()) {
+                QToolTip::showText(event->screenPos(), tooltip, event->widget());
+                event->accept();
+                return;
+            }
+        }
+    }
+
+    QGraphicsScene::helpEvent(event);
 }
 
 } // ns taste3
