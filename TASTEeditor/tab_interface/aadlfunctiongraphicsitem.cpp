@@ -408,17 +408,13 @@ void AADLFunctionGraphicsItem::doAutoLayout()
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
 {
-    QString tooltip = AADLFunctionTypeGraphicsItem::prepareTooltip();
-
+    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
     const QString prototype =
-            entity()->instanceOf() ? tr("Instance of: <i>%1</i>").arg(entity()->instanceOf()->title()) : QString();
-    if (!prototype.isEmpty()) {
-        if (!tooltip.isEmpty())
-            tooltip += QStringLiteral("<br>");
-        tooltip += prototype;
-    }
+            uniteNames<const AADLObjectFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
-    return tooltip;
+    return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
 }
 
 } // namespace aadl
