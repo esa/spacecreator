@@ -29,7 +29,7 @@ public:
     explicit AADLObjectComment(const QString &comment = QString(), QObject *parent = nullptr);
     ~AADLObjectComment() override;
 
-    AADLObject::AADLObjectType aadlType() const override;
+    AADLObject::Type aadlType() const override;
 };
 
 } // ns aadl

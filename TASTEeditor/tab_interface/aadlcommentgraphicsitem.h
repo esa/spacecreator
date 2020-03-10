@@ -31,7 +31,7 @@ public:
     explicit AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::AADLObjectType::AADLComment)
+        Type = UserType + static_cast<int>(AADLObject::Type::Comment)
     };
     int type() const override { return Type; }
 

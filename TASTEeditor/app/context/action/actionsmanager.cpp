@@ -265,7 +265,7 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl
         case ActionsManager::ExternalArgHolder::Param: {
             if (text.startsWith(holder.key)) {
                 switch (aadlObj->aadlType()) {
-                case aadl::AADLObject::AADLObjectType::AADLIface: {
+                case aadl::AADLObject::Type::Interface: {
                     if (const aadl::AADLObjectIface *iface = aadlObj->as<const aadl::AADLObjectIface *>()) {
                         const aadl::IfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
@@ -273,8 +273,8 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl
                     }
                     break;
                 }
-                case aadl::AADLObject::AADLObjectType::AADLFunction:
-                case aadl::AADLObject::AADLObjectType::AADLFunctionType: {
+                case aadl::AADLObject::Type::Function:
+                case aadl::AADLObject::Type::FunctionType: {
                     if (const aadl::AADLObjectFunctionType *fn = aadlObj->as<const aadl::AADLObjectFunctionType *>()) {
                         const aadl::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())

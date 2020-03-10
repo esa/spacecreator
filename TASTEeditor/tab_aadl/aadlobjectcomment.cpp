@@ -31,9 +31,9 @@ AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
 
 AADLObjectComment::~AADLObjectComment() {}
 
-AADLObject::AADLObjectType taste3::aadl::AADLObjectComment::aadlType() const
+AADLObject::Type taste3::aadl::AADLObjectComment::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLComment;
+    return AADLObject::Type::Comment;
 }
 
 } // ns aadl

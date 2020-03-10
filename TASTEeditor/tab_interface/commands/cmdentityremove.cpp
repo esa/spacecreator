@@ -108,7 +108,7 @@ void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
         return;
 
     switch (toBeRemoved->aadlType()) {
-    case AADLObject::AADLObjectType::AADLIface: {
+    case AADLObject::Type::Interface: {
         if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(toBeRemoved)) {
             for (auto clone : iface->clones())
                 collectRelatedItems(clone);
@@ -117,8 +117,8 @@ void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
         }
         break;
     }
-    case AADLObject::AADLObjectType::AADLFunction:
-    case AADLObject::AADLObjectType::AADLFunctionType: {
+    case AADLObject::Type::Function:
+    case AADLObject::Type::FunctionType: {
         if (AADLObjectFunctionType *fnType = qobject_cast<AADLObjectFunctionType *>(toBeRemoved)) {
             for (auto iface : fnType->interfaces())
                 collectRelatedItems(iface);
@@ -147,10 +147,10 @@ void CmdEntityRemove::storeLinkedEntity(AADLObject *linkedEntity)
 
     QVector<QPointer<AADLObject>> *pCollection { nullptr };
     switch (linkedEntity->aadlType()) {
-    case AADLObject::AADLObjectType::AADLConnection:
+    case AADLObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;
-    case AADLObject::AADLObjectType::AADLIface:
+    case AADLObject::Type::Interface:
         pCollection = &m_relatedIfaces;
         break;
     default:

@@ -30,10 +30,10 @@ XmlFileMock::XmlFileMock(const QString &content, int expectedErrors, bool canBeP
 {
 }
 
-int XmlFileMock::expectedObjectCount(AADLObject::AADLObjectType t) const
+int XmlFileMock::expectedObjectCount(AADLObject::Type t) const
 {
     int result = 0;
-    if (AADLObject::AADLObjectType::AADLUnknown == t) {
+    if (AADLObject::Type::Unknown == t) {
         for (int count : m_objectCountByType)
             result += count;
         return result;
@@ -42,9 +42,9 @@ int XmlFileMock::expectedObjectCount(AADLObject::AADLObjectType t) const
     return m_objectCountByType.value(t);
 }
 
-void XmlFileMock::setExpectedObjectCount(AADLObject::AADLObjectType t, int count)
+void XmlFileMock::setExpectedObjectCount(AADLObject::Type t, int count)
 {
-    if (AADLObject::AADLObjectType::AADLUnknown != t && count >= 0)
+    if (AADLObject::Type::Unknown != t && count >= 0)
         m_objectCountByType[t] = count;
 }
 
@@ -52,9 +52,9 @@ XmlFileMock XmlFileMock::createEmptyFile()
 {
     XmlFileMock file(QString(), 0, false);
 
-    const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         file.setExpectedObjectCount(t, 0);
     }
 
@@ -67,9 +67,9 @@ XmlFileMock XmlFileMock::createEmptyDoc()
                                     "</InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         file.setExpectedObjectCount(t, 0);
     }
 
@@ -86,11 +86,11 @@ XmlFileMock XmlFileMock::createSingleFunction()
                                     </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -113,11 +113,11 @@ XmlFileMock XmlFileMock::createSingleFunctionType()
                                     </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunctionType:
+        case AADLObject::Type::FunctionType:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -140,11 +140,11 @@ XmlFileMock XmlFileMock::createSingleComment()
                                     </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLComment:
+        case AADLObject::Type::Comment:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -183,14 +183,14 @@ XmlFileMock XmlFileMock::createSingleIfaceValid()
                                     </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 1);
             break;
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -217,17 +217,17 @@ XmlFileMock XmlFileMock::createParametrizedIfaces()
 
     XmlFileMock file(content);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -250,7 +250,7 @@ XmlFileMock XmlFileMock::createSingleConnectionOrphan()
                                     </InterfaceView>"),
                      0, true);
 
-    file.setExpectedObjectCount(AADLObject::AADLObjectType::AADLConnection, 1);
+    file.setExpectedObjectCount(AADLObject::Type::Connection, 1);
 
     return file;
 }
@@ -278,17 +278,17 @@ XmlFileMock XmlFileMock::createSingleConnectionValid()
                                 </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -325,17 +325,17 @@ XmlFileMock XmlFileMock::createSingleConnectionValidMultipoint()
                                 </InterfaceView>"),
                      0, true);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -371,20 +371,20 @@ XmlFileMock XmlFileMock::createAllItems()
 
     XmlFileMock file(content);
 
-    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::AADLObjectType>();
+    const QMetaEnum &me = QMetaEnum::fromType<AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
-        const AADLObject::AADLObjectType t = static_cast<AADLObject::AADLObjectType>(me.value(i));
+        const AADLObject::Type t = static_cast<AADLObject::Type>(me.value(i));
         switch (t) {
-        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 9);
             break;
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             file.setExpectedObjectCount(t, 27);
             break;
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 13);
             break;
-        case AADLObject::AADLObjectType::AADLComment:
+        case AADLObject::Type::Comment:
             file.setExpectedObjectCount(t, 2);
             break;
 

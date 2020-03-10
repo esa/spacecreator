@@ -63,19 +63,19 @@ QString PropertiesDialog::objectTypeName() const
         return QString();
 
     switch (m_dataObject->aadlType()) {
-    case AADLObject::AADLObjectType::AADLFunctionType:
+    case AADLObject::Type::FunctionType:
         return tr("Function Type");
-    case AADLObject::AADLObjectType::AADLFunction:
+    case AADLObject::Type::Function:
         return tr("Function");
-    case AADLObject::AADLObjectType::AADLIface: {
+    case AADLObject::Type::Interface: {
         QString ifaceDirection;
         if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
             ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
         return ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
     }
-    case AADLObject::AADLObjectType::AADLComment:
+    case AADLObject::Type::Comment:
         return tr("Comment");
-    case AADLObject::AADLObjectType::AADLConnection:
+    case AADLObject::Type::Connection:
         return tr("Connection");
     default:
         return QString();
@@ -111,12 +111,12 @@ void PropertiesDialog::initTabs()
         viewAttrs->setModel(modelAttrs);
 
         switch (m_dataObject->aadlType()) {
-        case AADLObject::AADLObjectType::AADLFunction: {
+        case AADLObject::Type::Function: {
             viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
                                                              new FunctionAttrDelegate(viewAttrs->tableView()));
             break;
         }
-        case AADLObject::AADLObjectType::AADLIface: {
+        case AADLObject::Type::Interface: {
             viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
                                                              new InterfaceAttrDelegate(viewAttrs->tableView()));
             break;
@@ -165,17 +165,17 @@ void PropertiesDialog::initTabs()
     QString objectTypeLabel;
 
     switch (m_dataObject->aadlType()) {
-    case AADLObject::AADLObjectType::AADLFunctionType: {
+    case AADLObject::Type::FunctionType: {
         objectTypeLabel = tr("Function Type");
         initContextParams();
         break;
     }
-    case AADLObject::AADLObjectType::AADLFunction: {
+    case AADLObject::Type::Function: {
         objectTypeLabel = tr("Function");
         initContextParams();
         break;
     }
-    case AADLObject::AADLObjectType::AADLIface: {
+    case AADLObject::Type::Interface: {
         QString ifaceDirection;
         if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
             ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
@@ -183,11 +183,11 @@ void PropertiesDialog::initTabs()
         initIfaceParams();
         break;
     }
-    case AADLObject::AADLObjectType::AADLComment: {
+    case AADLObject::Type::Comment: {
         objectTypeLabel = tr("Comment");
         break;
     }
-    case AADLObject::AADLObjectType::AADLConnection: {
+    case AADLObject::Type::Connection: {
         objectTypeLabel = tr("Connection");
         break;
     }

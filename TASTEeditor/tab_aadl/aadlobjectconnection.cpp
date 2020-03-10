@@ -62,9 +62,9 @@ AADLObjectConnection::~AADLObjectConnection()
     clearPostponedEndpoints();
 }
 
-AADLObject::AADLObjectType AADLObjectConnection::aadlType() const
+AADLObject::Type AADLObjectConnection::aadlType() const
 {
-    return AADLObject::AADLObjectType::AADLConnection;
+    return AADLObject::Type::Connection;
 }
 
 QString AADLObjectConnection::sourceName() const

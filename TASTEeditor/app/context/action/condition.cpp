@@ -66,10 +66,10 @@ QJsonObject Condition::toJson() const
 QStringList Condition::knownTypes()
 {
     QStringList res;
-    QMetaEnum me = QMetaEnum::fromType<taste3::aadl::AADLObject::AADLObjectType>();
+    QMetaEnum me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i)
-        if (taste3::aadl::AADLObject::AADLObjectType(me.value(i))
-            != taste3::aadl::AADLObject::AADLObjectType::AADLUnknown)
+        if (taste3::aadl::AADLObject::Type(me.value(i))
+            != taste3::aadl::AADLObject::Type::Unknown)
             res.append(me.key(i));
     return res;
 }
