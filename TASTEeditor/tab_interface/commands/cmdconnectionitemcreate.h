@@ -26,7 +26,6 @@
 
 namespace taste3 {
 namespace aadl {
-class AADLObjectIface;
 class AADLObjectConnection;
 class AADLObjectFunction;
 class AADLObjectsModel;
@@ -46,6 +45,7 @@ public:
 private:
     QPointer<AADLObjectsModel> m_model;
     QPointer<AADLObjectConnection> m_entity;
+    QPointer<AADLObjectFunction> m_parent;
 };
 
 } // namespace cmd

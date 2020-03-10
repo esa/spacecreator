@@ -188,6 +188,16 @@ QVariantList AADLObjectFunctionType::templateComments() const
     return comments;
 }
 
+QVariantList AADLObjectFunctionType::templateConnections() const
+{
+    QVariantList connections;
+    for (const auto child : d->m_children) {
+        if (child->aadlType() == AADLObject::AADLObjectType::AADLConnection)
+            connections << QVariant::fromValue(child);
+    }
+    return connections;
+}
+
 QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
 {
     return d->m_contextParams;

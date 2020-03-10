@@ -36,6 +36,7 @@ class AADLObjectFunctionType : public AADLObject
     Q_PROPERTY(QVariantList interfaces READ templateInterfaces) //!< Iinterface list for string templates
     Q_PROPERTY(QVariantList functions READ templateFunctions) //!< Function list for string templates
     Q_PROPERTY(QVariantList comments READ templateComments) //!< Comment list for string templates
+    Q_PROPERTY(QVariantList connections READ templateConnections) //!< Connection list for string templates
 public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
@@ -61,6 +62,7 @@ public:
     QVariantList templateInterfaces() const;
     QVariantList templateFunctions() const;
     QVariantList templateComments() const;
+    QVariantList templateConnections() const;
 
     QVector<ContextParameter> contextParams() const;
     ContextParameter contextParam(const QString &name) const;

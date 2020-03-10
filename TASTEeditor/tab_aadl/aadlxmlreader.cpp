@@ -288,7 +288,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Connection: {
-        obj = new AADLObjectConnection(nullptr, nullptr, nullptr, nullptr, d->m_currentObject.get());
+        obj = addConnection();
         break;
     }
     case Props::Token::Source:
@@ -382,6 +382,16 @@ AADLObjectComment *AADLXMLReader::addComment(const QString &text)
         d->m_currentObject.function()->addChild(comment);
 
     return comment;
+}
+
+AADLObjectConnection *AADLXMLReader::addConnection()
+{
+    AADLObjectConnection *connection =
+            new AADLObjectConnection(nullptr, nullptr, nullptr, nullptr, d->m_currentObject.get());
+    if (d->m_currentObject.function())
+        d->m_currentObject.function()->addChild(connection);
+
+    return connection;
 }
 
 } // ns aadl

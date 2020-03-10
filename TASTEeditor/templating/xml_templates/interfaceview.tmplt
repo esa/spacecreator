@@ -3,7 +3,7 @@ Template for generation of XML scheme of the whole interface view.
 The following tags are available in this template:
 Functions   : List of all available NON-nested functions (provided by application)
 func        :   |_ Instance of function
-Connections : List of all available connections (provided by application)
+Connections : List of all available NON-nested connections (provided by application). Connections between top-level functions;
 conn        :   |_ Instance of connection
 Comments    : List of all available NON-nested comments (provided by application)
 comm        :   |_ Instance of comment

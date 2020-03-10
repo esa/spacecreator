@@ -32,6 +32,7 @@ namespace aadl {
 class AADLObjectIface;
 class AADLObjectFunctionType;
 class AADLObjectComment;
+class AADLObjectConnection;
 struct AADLXMLReaderPrivate;
 class AADLXMLReader : public QObject
 {
@@ -60,6 +61,7 @@ private:
     AADLObjectFunctionType *addFunction(const QString &name, AADLObject::AADLObjectType fnType);
     AADLObjectIface *addIface(const QString &name, bool isRI);
     AADLObjectComment *addComment(const QString &text);
+    AADLObjectConnection *addConnection();
 };
 
 } // ns aadl

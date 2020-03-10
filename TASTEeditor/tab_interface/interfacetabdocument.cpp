@@ -216,8 +216,6 @@ bool InterfaceTabDocument::createImpl(const QString &path)
     if (!path.isEmpty())
         return loadImpl(path);
 
-    const QRect r(0, 0, 1000, 1000);
-    m_graphicsScene->setSceneRect(m_graphicsView->mapToScene(r).boundingRect());
     return true;
 }
 
