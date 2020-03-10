@@ -249,8 +249,9 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
             continue;
 
         if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
-            if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
-                || (connection->targetInterface() && connection->targetInterface()->id() == id))
+            Q_ASSERT(connection->sourceInterface() != nullptr);
+            Q_ASSERT(connection->targetInterface() != nullptr);
+            if (connection->sourceInterface()->id() == id || connection->targetInterface()->id() == id)
                 return connection;
         }
     }
