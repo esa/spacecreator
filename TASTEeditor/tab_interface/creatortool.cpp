@@ -705,8 +705,8 @@ void CreatorTool::clearPreviewItem()
         delete m_previewItem;
         m_previewItem = nullptr;
     }
-    if (m_view && m_view->sceneRect() != m_view->scene()->sceneRect())
-        m_view->setSceneRect({});
+    //    if (m_view && m_view->sceneRect() != m_view->scene()->sceneRect())
+    //        m_view->setSceneRect({});
 }
 
 QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)

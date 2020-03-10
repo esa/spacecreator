@@ -33,11 +33,13 @@ class CmdEntityGeometryChange : public QUndoCommand
 public:
     explicit CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData,
                                      const QString &title = {});
+    ~CmdEntityGeometryChange() override;
 
     void redo() override;
     void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
+
+    void mergeWith(QUndoCommand *command);
 
 protected:
     struct ObjectData {
@@ -54,6 +56,7 @@ private:
 private:
     QList<QPair<AADLObject *, QVector<QPointF>>> m_internalData;
     QList<ObjectData> m_data;
+    QList<QUndoCommand *> m_mergedCmds;
 };
 
 } // namespace cmd

@@ -71,7 +71,9 @@ static inline void dumpItem(QObject *obj, bool strict = false)
         return true;
     };
 
-    qDebug() << item->metaObject()->className();
+    qDebug() << item->metaObject()->className() << "\n"
+             << item->aadlObject()->props() << "\n"
+             << item->aadlObject()->attrs();
 
     if (auto iface = qobject_cast<aadl::AADLInterfaceGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Iface geometry:"
@@ -122,7 +124,8 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     , m_model(new aadl::AADLObjectsModel(this))
 {
     connect(m_model, &aadl::AADLObjectsModel::modelReset, this, &InterfaceTabDocument::clearScene);
-    connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged);
+    connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged,
+            Qt::QueuedConnection);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &InterfaceTabDocument::onAADLObjectAdded);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, [this](aadl::AADLObject *object) {
         auto item = m_items.take(object->id());
@@ -151,8 +154,7 @@ QWidget *InterfaceTabDocument::createView()
             m_actZoomOut->setEnabled(!qFuzzyCompare(percent, m_graphicsView->minZoomPercent()));
         });
 
-        auto sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_D),
-                                qobject_cast<QWidget *>(m_graphicsView->window()));
+        auto sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_D), qobject_cast<QWidget *>(m_graphicsView->window()));
         sc->setContext(Qt::ApplicationShortcut);
         connect(sc, &QShortcut::activated, this, [this]() {
             for (auto item : m_graphicsScene->items()) {
@@ -160,9 +162,9 @@ QWidget *InterfaceTabDocument::createView()
             }
         });
     }
+    m_graphicsScene->setSceneRect(
+            QRectF(QPointF(0, 0), m_graphicsView->size() * m_graphicsView->maxZoomPercent() / 100 * 4));
     m_graphicsView->setScene(m_graphicsScene);
-    m_graphicsView->setSceneRect(
-            QRectF(QPointF(0, 0), m_graphicsView->size() * m_graphicsView->maxZoomPercent() / 100));
     return m_graphicsView;
 }
 
@@ -633,7 +635,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
         onAADLObjectAdded(*it);
 
-    m_graphicsView->setSceneRect({});
+    //    m_graphicsView->setSceneRect({});
 }
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)

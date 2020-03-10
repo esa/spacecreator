@@ -29,13 +29,13 @@ namespace taste3 {
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
 {
-    setTransformationAnchor(QGraphicsView::NoAnchor);
-    setResizeAnchor(QGraphicsView::NoAnchor);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    setResizeAnchor(QGraphicsView::AnchorUnderMouse);
 
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 
-    setAlignment(Qt::AlignAbsolute);
+    //    setAlignment(Qt::AlignCenter);
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 

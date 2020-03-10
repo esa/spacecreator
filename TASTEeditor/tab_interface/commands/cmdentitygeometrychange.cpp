@@ -30,10 +30,15 @@ namespace cmd {
 
 CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData,
                                                  const QString &title)
-    : QUndoCommand(title.isEmpty() ? QObject::tr("Change Geometry") : title)
+    : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
 {
+}
+
+CmdEntityGeometryChange::~CmdEntityGeometryChange()
+{
+    qDeleteAll(m_mergedCmds);
 }
 
 void CmdEntityGeometryChange::redo()
@@ -44,10 +49,16 @@ void CmdEntityGeometryChange::redo()
 
         it->entity->setCoordinates(it->newCoordinates);
     }
+
+    for (auto it = m_mergedCmds.cbegin(); it != m_mergedCmds.cend(); ++it)
+        (*it)->redo();
 }
 
 void CmdEntityGeometryChange::undo()
 {
+    for (auto it = m_mergedCmds.crbegin(); it != m_mergedCmds.crend(); ++it)
+        (*it)->undo();
+
     for (auto it = m_data.cbegin(); it != m_data.cend(); ++it) {
         if (!it->entity)
             continue;
@@ -56,34 +67,17 @@ void CmdEntityGeometryChange::undo()
     }
 }
 
-bool CmdEntityGeometryChange::mergeWith(const QUndoCommand *command)
-{
-    if (command->id() != AutoLayoutEntity)
-        return false;
-
-    auto cmd = static_cast<const CmdEntityGeometryChange *>(command);
-    QList<ObjectData> newEntries;
-    for (auto cmdData : cmd->m_data) {
-        Q_ASSERT(cmdData.entity);
-        if (!cmdData.entity)
-            continue;
-
-        const auto it =
-                std::find_if(m_data.begin(), m_data.end(), [id = cmdData.entity->id()](const ObjectData &objData) {
-                    return objData.entity->id() == id;
-                });
-        if (it == m_data.cend())
-            newEntries.append(cmdData);
-        else
-            it->newCoordinates = cmdData.newCoordinates;
-    }
-    m_data.append(newEntries);
-    return true;
-}
-
 int CmdEntityGeometryChange::id() const
 {
     return ChangeEntityGeometry;
+}
+
+void CmdEntityGeometryChange::mergeWith(QUndoCommand *command)
+{
+    if (command->id() != AutoLayoutEntity)
+        return;
+
+    m_mergedCmds.append(command);
 }
 
 static inline int parentLevel(AADLObject *object)

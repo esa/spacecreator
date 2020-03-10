@@ -111,10 +111,10 @@ protected:
     virtual void initGripPoints();
 
     virtual void rebuildLayout();
-
     virtual void onSelectionChanged(bool isSelected);
 
     HighlightRectItem *createHighlighter();
+    void mergeGeometry();
 
     virtual ColorManager::HandledColors handledColorType() const = 0;
     virtual ColorHandler colorHandler() const;
