@@ -132,7 +132,6 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
     if (name != m_text->toPlainText()) {
         const QFontMetrics fm(m_text->font());
         m_text->setPlainText(fm.elidedText(name, Qt::ElideRight, kInterfaceTitleMaxLength));
-        m_text->setToolTip(name);
         instantLayoutUpdate();
     }
 }
@@ -486,14 +485,32 @@ void AADLInterfaceGraphicsItem::updateKind()
 
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
 {
-    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
-        if (ri->inheritPi()) {
-            const QStringList &labels = ri->inheritedLables();
-            if (labels.size())
-                return labels.join(", ");
+    if (entity()->isRequired())
+        if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
+            if (ri->inheritPi()) {
+                const QStringList &labels = ri->inheritedLables();
+                if (labels.size())
+                    return labels.join(", ");
+            }
         }
-    }
     return entity()->title();
+}
+
+QString AADLInterfaceGraphicsItem::prepareTooltip() const
+{
+    QString toolTip = InteractiveObject::prepareTooltip();
+    if (entity()->isProvided())
+        return toolTip;
+
+    const AADLObjectIfaceRequired *ri = entity()->as<const AADLObjectIfaceRequired *>();
+    if (!ri)
+        return toolTip;
+
+    const QString label = ifaceLabel();
+    if (toolTip != label)
+        toolTip = QString("%1<br><i><b>%2</b></i>").arg(label, toolTip);
+
+    return toolTip;
 }
 
 } // namespace aadl
