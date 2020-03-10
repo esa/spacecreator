@@ -134,32 +134,12 @@ void AADLFunctionTypeGraphicsItem::colorSchemeUpdated()
 
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
 {
-    auto objectNames = [](const auto &collection, const QString &prefix) {
-        QString result;
-        for (const auto i : collection) {
-            if (!result.isEmpty())
-                result += QStringLiteral(", ");
-            result += i->title();
-        }
+    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
+    const QString instances = uniteNames<QPointer<AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
-        return result.isEmpty() ? QString() : QString("%1<i>%2</i>").arg(prefix, result);
-    };
-
-    const QString title = QString("<b>%1</b>").arg(entity()->title());
-    const QString instances = objectNames(entity()->instances(), tr("Instances: "));
-    const QString ris = objectNames(entity()->ris(), tr("RI: "));
-    const QString pis = objectNames(entity()->pis(), tr("PI: "));
-
-    QString tooltip;
-    for (const QString &s : { title, instances, ris, pis }) {
-        if (s.isEmpty())
-            continue;
-        if (!tooltip.isEmpty())
-            tooltip += QStringLiteral("<br>");
-        tooltip += s;
-    }
-
-    return tooltip;
+    return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }
 
 } // namespace aadl
