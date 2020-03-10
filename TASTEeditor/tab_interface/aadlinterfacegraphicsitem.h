@@ -56,6 +56,8 @@ public:
     void updateFromEntity() override;
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
+    QString prepareTooltip() const override;
+
 protected:
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;

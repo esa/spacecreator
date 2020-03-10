@@ -40,6 +40,8 @@ public:
 
     QSizeF minimalSize() const override;
 
+    QString prepareTooltip() const override;
+
 protected Q_SLOTS:
     void colorSchemeUpdated() override;
 
@@ -49,6 +51,23 @@ protected:
     ColorManager::HandledColors handledColorType() const override;
 
     virtual void updateTextPosition();
+
+    template<class AADLType>
+    static QString uniteNames(const QVector<AADLType> &collection, const QString &prefix)
+    {
+        QStringList result;
+        std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
+                       [](AADLType obj) { return obj ? obj->title() : QString(); });
+        const QString line = joinNonEmpty(result, QStringLiteral(", "));
+        return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
+    };
+
+    static QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
+    {
+        QStringList filtered(values);
+        filtered.removeAll(QString());
+        return filtered.join(lineBreak);
+    }
 
 protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;

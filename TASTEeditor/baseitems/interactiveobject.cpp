@@ -435,5 +435,10 @@ aadl::ColorHandler InteractiveObject::colorHandler() const
     return h;
 }
 
+QString InteractiveObject::prepareTooltip() const
+{
+    return aadlObject() ? aadlObject()->title() : QString();
+}
+
 } // namespace aadl
 } // namespace taste3

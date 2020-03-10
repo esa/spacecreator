@@ -132,5 +132,15 @@ void AADLFunctionTypeGraphicsItem::colorSchemeUpdated()
     update();
 }
 
+QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
+{
+    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
+    const QString instances = uniteNames<QPointer<AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
+
+    return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
+}
+
 } // namespace aadl
 } // namespace taste3

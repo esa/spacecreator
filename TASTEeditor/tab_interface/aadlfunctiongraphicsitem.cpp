@@ -406,5 +406,16 @@ void AADLFunctionGraphicsItem::doAutoLayout()
         const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeWith(autolayoutCmd.data());
 }
 
+QString AADLFunctionGraphicsItem::prepareTooltip() const
+{
+    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
+    const QString prototype =
+            uniteNames<const AADLObjectFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
+
+    return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
+}
+
 } // namespace aadl
 } // namespace taste3

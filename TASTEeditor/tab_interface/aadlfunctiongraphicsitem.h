@@ -42,6 +42,8 @@ public:
     bool isRootItem() const;
     QRectF nestedItemsSceneBoundingRect() const;
 
+    QString prepareTooltip() const override;
+
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
