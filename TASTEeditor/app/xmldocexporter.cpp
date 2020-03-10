@@ -233,6 +233,7 @@ QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(document::I
         case aadl::AADLObject::AADLObjectType::AADLFunctionType:
         case aadl::AADLObject::AADLObjectType::AADLFunction:
         case aadl::AADLObject::AADLObjectType::AADLComment:
+        case aadl::AADLObject::AADLObjectType::AADLConnection:
         case aadl::AADLObject::AADLObjectType::AADLUnknown: {
             if (t == aadl::AADLObject::AADLObjectType::AADLUnknown || aadlObject->isNested())
                 continue;

@@ -34,6 +34,7 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLOb
                                                  const QVector<QPointF> &points)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
+    , m_parent(parent)
 {
     Q_ASSERT(model);
     Q_ASSERT(!sourceIfaceId.isNull());
@@ -43,7 +44,6 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLOb
     AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
     m_entity = new AADLObjectConnection(sourceIface->function(), targetIface->function(), sourceIface, targetIface,
                                         parent);
-
     prepareData({ qMakePair(m_entity, points) });
 }
 
@@ -51,6 +51,8 @@ void CmdConnectionItemCreate::redo()
 {
     CmdEntityGeometryChange::redo();
 
+    if (m_parent)
+        m_parent->addChild(m_entity);
     m_model->addObject(m_entity);
     m_entity->inheritLabel();
 }
@@ -61,6 +63,8 @@ void CmdConnectionItemCreate::undo()
 
     m_entity->uninheritLabel();
     m_model->removeObject(m_entity);
+    if (m_parent)
+        m_parent->removeChild(m_entity);
 }
 
 int CmdConnectionItemCreate::id() const
