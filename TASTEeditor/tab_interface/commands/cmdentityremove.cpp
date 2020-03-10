@@ -70,13 +70,13 @@ void CmdEntityRemove::advancedRemove(AADLObject *obj)
 
     if (AADLObjectFunctionType *fn = putParentFunctionFor(obj))
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             fn->removeInterface(obj->as<AADLObjectIface *>());
             break;
-        case AADLObject::AADLObjectType::AADLFunction:
-        case AADLObject::AADLObjectType::AADLFunctionType:
-        case AADLObject::AADLObjectType::AADLComment:
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Function:
+        case AADLObject::Type::FunctionType:
+        case AADLObject::Type::Comment:
+        case AADLObject::Type::Connection:
             if (!fn->isFunctionType())
                 fn->removeChild(obj);
             break;
@@ -95,13 +95,13 @@ void CmdEntityRemove::advancedRestore(AADLObject *obj)
 
     if (AADLObjectFunctionType *fn = popParentFunctionFor(obj))
         switch (obj->aadlType()) {
-        case AADLObject::AADLObjectType::AADLIface:
+        case AADLObject::Type::Interface:
             fn->addInterface(obj->as<AADLObjectIface *>());
             break;
-        case AADLObject::AADLObjectType::AADLFunction:
-        case AADLObject::AADLObjectType::AADLFunctionType:
-        case AADLObject::AADLObjectType::AADLComment:
-        case AADLObject::AADLObjectType::AADLConnection:
+        case AADLObject::Type::Function:
+        case AADLObject::Type::FunctionType:
+        case AADLObject::Type::Comment:
+        case AADLObject::Type::Connection:
             if (!fn->isFunctionType())
                 fn->addChild(obj);
             break;
