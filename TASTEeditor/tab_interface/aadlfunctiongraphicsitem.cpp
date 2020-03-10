@@ -408,30 +408,14 @@ void AADLFunctionGraphicsItem::doAutoLayout()
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
 {
-    auto ifaces = [](const QVector<AADLObjectIface *> &collection) {
-        QString result;
-        for (const auto i : collection) {
-            if (!result.isEmpty())
-                result += QStringLiteral(", ");
-            result += i->title();
-        }
+    QString tooltip = AADLFunctionTypeGraphicsItem::prepareTooltip();
 
-        return result;
-    };
-
-    const QString title = entity()->title();
     const QString prototype =
-            entity()->instanceOf() ? QString("Instance of: %1").arg(entity()->instanceOf()->title()) : QString();
-    const QString ris = entity()->ris().isEmpty() ? QString() : tr("RI: %1").arg(ifaces(entity()->ris()));
-    const QString pis = entity()->pis().isEmpty() ? QString() : tr("PI: %1").arg(ifaces(entity()->pis()));
-
-    QString tooltip;
-    for (const QString &s : { title, prototype, ris, pis }) {
-        if (s.isEmpty())
-            continue;
+            entity()->instanceOf() ? tr("Instance of: <i>%1</i>").arg(entity()->instanceOf()->title()) : QString();
+    if (!prototype.isEmpty()) {
         if (!tooltip.isEmpty())
-            tooltip += QStringLiteral("\n");
-        tooltip += s;
+            tooltip += QStringLiteral("<br>");
+        tooltip += prototype;
     }
 
     return tooltip;

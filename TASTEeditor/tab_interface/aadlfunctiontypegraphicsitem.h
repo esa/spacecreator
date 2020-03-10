@@ -40,6 +40,8 @@ public:
 
     QSizeF minimalSize() const override;
 
+    QString prepareTooltip() const override;
+
 protected Q_SLOTS:
     void colorSchemeUpdated() override;
 
