@@ -52,6 +52,10 @@ namespace document {
 
 static inline void dumpItem(QObject *obj, bool strict = false)
 {
+#ifdef NO_AADL_ITEM_DUMP
+    return;
+#endif
+
     auto item = qobject_cast<aadl::InteractiveObject *>(obj);
     if (!item)
         return;

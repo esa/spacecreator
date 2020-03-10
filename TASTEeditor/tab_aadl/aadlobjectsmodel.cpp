@@ -250,7 +250,8 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const common::Id &
             continue;
 
         if (auto connection = qobject_cast<AADLObjectConnection *>(it.value())) {
-            if (connection->sourceInterface()->id() == id || connection->targetInterface()->id() == id)
+            if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
+                || (connection->targetInterface() && connection->targetInterface()->id() == id))
                 return connection;
         }
     }

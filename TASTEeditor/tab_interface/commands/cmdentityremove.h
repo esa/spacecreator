@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "app/common.h"
+
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
@@ -34,6 +36,7 @@ class CmdEntityRemove : public QUndoCommand
 {
 public:
     explicit CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model);
+    ~CmdEntityRemove() override;
 
     void redo() override;
     void undo() override;
@@ -48,9 +51,15 @@ private:
     QVector<QPointer<AADLObject>> m_relatedEntities;
     QVector<QPointer<AADLObject>> m_relatedConnections;
     QVector<QPointer<AADLObject>> m_relatedIfaces;
+    QHash<common::Id, QPointer<AADLObjectFunctionType>> m_parentFunctions;
 
     void collectRelatedItems(AADLObject *toBeRemoved);
     void storeLinkedEntity(AADLObject *linkedEntity);
+
+    AADLObjectFunctionType *putParentFunctionFor(const AADLObject *obj);
+    AADLObjectFunctionType *popParentFunctionFor(const AADLObject *obj);
+    void advancedRemove(AADLObject *obj);
+    void advancedRestore(AADLObject *obj);
 };
 
 } // namespace cmd

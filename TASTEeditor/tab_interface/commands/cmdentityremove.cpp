@@ -38,6 +38,81 @@ CmdEntityRemove::CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model)
     collectRelatedItems(m_entity);
 }
 
+CmdEntityRemove::~CmdEntityRemove()
+{
+    const QVector<QPointer<AADLObject>> &objects = m_relatedIfaces + m_relatedConnections + m_relatedEntities;
+    for (AADLObject *obj : objects)
+        if (obj && !obj->parent())
+            delete obj;
+}
+
+AADLObjectFunctionType *CmdEntityRemove::putParentFunctionFor(const AADLObject *obj)
+{
+    if (!obj || !obj->parentObject())
+        return nullptr;
+
+    const common::Id &objId = obj->id();
+    if (AADLObjectFunctionType *fn = obj->parentObject()->as<AADLObjectFunctionType *>())
+        m_parentFunctions[objId] = fn;
+
+    return m_parentFunctions[objId];
+}
+
+AADLObjectFunctionType *CmdEntityRemove::popParentFunctionFor(const AADLObject *obj)
+{
+    return obj ? m_parentFunctions.take(obj->id()) : nullptr;
+}
+
+void CmdEntityRemove::advancedRemove(AADLObject *obj)
+{
+    if (!obj)
+        return;
+
+    if (AADLObjectFunctionType *fn = putParentFunctionFor(obj))
+        switch (obj->aadlType()) {
+        case AADLObject::AADLObjectType::AADLIface:
+            fn->removeInterface(obj->as<AADLObjectIface *>());
+            break;
+        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::AADLObjectType::AADLFunctionType:
+        case AADLObject::AADLObjectType::AADLComment:
+        case AADLObject::AADLObjectType::AADLConnection:
+            if (!fn->isFunctionType())
+                fn->removeChild(obj);
+            break;
+        default:
+            break;
+        }
+
+    if (m_model)
+        m_model->removeObject(obj);
+}
+
+void CmdEntityRemove::advancedRestore(AADLObject *obj)
+{
+    if (!obj)
+        return;
+
+    if (AADLObjectFunctionType *fn = popParentFunctionFor(obj))
+        switch (obj->aadlType()) {
+        case AADLObject::AADLObjectType::AADLIface:
+            fn->addInterface(obj->as<AADLObjectIface *>());
+            break;
+        case AADLObject::AADLObjectType::AADLFunction:
+        case AADLObject::AADLObjectType::AADLFunctionType:
+        case AADLObject::AADLObjectType::AADLComment:
+        case AADLObject::AADLObjectType::AADLConnection:
+            if (!fn->isFunctionType())
+                fn->addChild(obj);
+            break;
+        default:
+            break;
+        }
+
+    if (m_model)
+        m_model->addObject(obj);
+}
+
 void CmdEntityRemove::redo()
 {
     if (!m_model)
@@ -45,7 +120,7 @@ void CmdEntityRemove::redo()
 
     auto removeAadlObjects = [this](const QVector<QPointer<AADLObject>> &collection) {
         for (auto it = collection.cbegin(); it != collection.cend(); ++it)
-            m_model->removeObject(*it);
+            advancedRemove(*it);
     };
 
     removeAadlObjects(m_relatedIfaces);
@@ -54,13 +129,13 @@ void CmdEntityRemove::redo()
         if (auto *connection = qobject_cast<AADLObjectConnection *>(*it))
             connection->uninheritLabel();
 
-        m_model->removeObject(*it);
+        advancedRemove(*it);
     }
 
     removeAadlObjects(m_relatedEntities);
 
     if (m_entity)
-        m_model->removeObject(m_entity);
+        advancedRemove(m_entity);
 }
 
 void CmdEntityRemove::undo()
@@ -69,21 +144,22 @@ void CmdEntityRemove::undo()
         return;
 
     if (m_entity)
-        m_model->addObject(m_entity);
+        advancedRestore(m_entity);
 
     auto restoreAadlObjects = [this](const QVector<QPointer<AADLObject>> &collection) {
         for (auto it = collection.crbegin(); it != collection.crend(); ++it)
-            m_model->addObject(*it);
+            advancedRestore(*it);
     };
 
     restoreAadlObjects(m_relatedEntities);
     restoreAadlObjects(m_relatedIfaces);
 
-    for (auto it = m_relatedConnections.crbegin(); it != m_relatedConnections.crend(); ++it)
-        if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(*it)) {
+    for (auto it = m_relatedConnections.crbegin(); it != m_relatedConnections.crend(); ++it) {
+        if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(*it))
             connection->inheritLabel();
-            m_model->addObject(connection);
-        }
+
+        advancedRestore(*it);
+    }
 }
 
 bool CmdEntityRemove::mergeWith(const QUndoCommand *command)
