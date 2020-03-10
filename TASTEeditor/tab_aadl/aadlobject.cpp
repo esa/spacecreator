@@ -35,11 +35,13 @@ struct AADLObjectPrivate {
 
 AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *parent)
     : QObject(parent)
-    , d(new AADLObjectPrivate { id,
-                                QHash<QString, QVariant> { { meta::Props::token(meta::Props::Token::name),
-                                                             common::validatedName(title) } }, // attrs
-                                QHash<QString, QVariant> {}, // props
-                                nullptr })
+    , d(new AADLObjectPrivate {
+              id,
+              QHash<QString, QVariant> {
+                      { meta::Props::token(meta::Props::Token::name), common::validatedName(title) } }, // attrs
+              QHash<QString, QVariant> {}, // props
+              nullptr, // model
+      })
 {
 }
 
