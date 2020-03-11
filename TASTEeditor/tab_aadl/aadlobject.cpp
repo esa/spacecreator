@@ -17,6 +17,7 @@
 
 #include "aadlobject.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectsmodel.h"
 #include "templating/aadlobjecttemplateproperty.h"
 
@@ -232,7 +233,7 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::name: {
-            const QString title = common::validatedName(val.toString());
+            const QString title = AADLNameValidator::validateName(this->aadlType(), val.toString());
             d->m_attrs[name] = title;
             emit titleChanged(title);
             break;
