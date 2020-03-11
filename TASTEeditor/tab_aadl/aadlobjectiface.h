@@ -97,8 +97,6 @@ public:
 
     ~AADLObjectIface() override;
 
-    AADLObject::Type aadlType() const override;
-
     AADLObjectIface::IfaceType direction() const;
 
     bool isProvided() const;

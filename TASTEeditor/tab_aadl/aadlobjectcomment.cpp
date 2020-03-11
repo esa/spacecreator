@@ -23,18 +23,13 @@ namespace taste3 {
 namespace aadl {
 
 AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
-    : AADLObject(title, parent)
+    : AADLObject(AADLObject::Type::Comment, title, parent)
 {
     if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
         root->addChild(this);
 }
 
 AADLObjectComment::~AADLObjectComment() {}
-
-AADLObject::Type taste3::aadl::AADLObjectComment::aadlType() const
-{
-    return AADLObject::Type::Comment;
-}
 
 } // ns aadl
 } // ns taste3

@@ -96,7 +96,7 @@ struct AADLObjectIfacePrivate {
 
 AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent,
                                  const common::Id &id)
-    : AADLObject(title, parent, id)
+    : AADLObject(AADLObject::Type::Interface, title, parent, id)
     , d(new AADLObjectIfacePrivate(direction))
 {
     setupInitialAttrs();
@@ -118,11 +118,6 @@ void AADLObjectIface::setupInitialAttrs()
     } else {
         setProp(meta::Props::token(meta::Props::Token::labelInheritance), true);
     }
-}
-
-AADLObject::Type AADLObjectIface::aadlType() const
-{
-    return Type::Interface;
 }
 
 AADLObjectIface::IfaceType AADLObjectIface::direction() const

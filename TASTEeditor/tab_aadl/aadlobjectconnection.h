@@ -43,8 +43,6 @@ public:
                                   AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
-    AADLObject::Type aadlType() const override;
-
     QString sourceName() const;
     AADLObject *source() const;
 

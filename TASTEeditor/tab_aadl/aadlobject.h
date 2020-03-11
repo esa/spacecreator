@@ -50,14 +50,14 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr,
+    explicit AADLObject(const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
                         const common::Id &id = common::InvalidId);
     virtual ~AADLObject();
 
     QString title() const;
     common::Id id() const;
 
-    virtual AADLObject::Type aadlType() const = 0;
+    AADLObject::Type aadlType() const;
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
@@ -121,9 +121,6 @@ public Q_SLOTS:
     bool setTitle(const QString &title);
     bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);
-
-protected:
-    void init(const common::Id &id, const QString &title);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;

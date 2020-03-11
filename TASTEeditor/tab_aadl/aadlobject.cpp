@@ -28,22 +28,26 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate {
-    common::Id m_id { common::InvalidId };
-    QHash<QString, QVariant> m_attrs {};
-    QHash<QString, QVariant> m_props {};
-    AADLObjectsModel *m_model { nullptr };
+    AADLObjectPrivate(const common::Id &id, const AADLObject::Type t)
+        : m_id(id == common::InvalidId ? common::createId() : id)
+        , m_attrs()
+        , m_props()
+        , m_model(nullptr)
+        , m_type(t)
+    {
+    }
+
+    common::Id m_id;
+    QHash<QString, QVariant> m_attrs;
+    QHash<QString, QVariant> m_props;
+    AADLObjectsModel *m_model;
+    const AADLObject::Type m_type;
 };
 
-AADLObject::AADLObject(const QString &title, QObject *parent, const common::Id &id)
+AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *parent, const common::Id &id)
     : QObject(parent)
-    , d(new AADLObjectPrivate)
+    , d(new AADLObjectPrivate(id, t))
 {
-    init(id, title);
-}
-
-void AADLObject::init(const common::Id &id, const QString &title)
-{
-    d->m_id = id == common::InvalidId ? common::createId() : id;
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
@@ -59,6 +63,11 @@ void AADLObject::postInit() {}
 common::Id AADLObject::id() const
 {
     return d->m_id;
+}
+
+AADLObject::Type AADLObject::aadlType() const
+{
+    return d->m_type;
 }
 
 bool AADLObject::setTitle(const QString &title)

@@ -52,7 +52,7 @@ struct AADLObjectConnectionPrivate {
 
 AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
                                            AADLObjectIface *ifaceTarget, QObject *parent)
-    : AADLObject(QString(), parent)
+    : AADLObject(AADLObject::Type::Connection, QString(), parent)
     , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
 {
 }
@@ -60,11 +60,6 @@ AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *targe
 AADLObjectConnection::~AADLObjectConnection()
 {
     clearPostponedEndpoints();
-}
-
-AADLObject::Type AADLObjectConnection::aadlType() const
-{
-    return AADLObject::Type::Connection;
 }
 
 QString AADLObjectConnection::sourceName() const
