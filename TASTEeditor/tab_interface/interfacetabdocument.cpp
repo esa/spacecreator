@@ -43,6 +43,8 @@
 #include <QGraphicsView>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QShortcut>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
@@ -122,6 +124,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
     , m_model(new aadl::AADLObjectsModel(this))
+    , m_mutex(new QMutex(QMutex::NonRecursive))
 {
     connect(m_model, &aadl::AADLObjectsModel::modelReset, this, &InterfaceTabDocument::clearScene);
     connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged,
@@ -138,6 +141,8 @@ InterfaceTabDocument::~InterfaceTabDocument()
 {
     if (m_graphicsView && !m_graphicsView->parent())
         delete m_graphicsView;
+
+    delete m_mutex;
 }
 
 QWidget *InterfaceTabDocument::createView()
@@ -584,6 +589,11 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
             m_graphicsScene->addItem(item);
     }
     updateItem(item);
+
+    if (m_mutex->tryLock()) {
+        m_graphicsScene->setSceneRect(m_graphicsScene->itemsBoundingRect());
+        m_mutex->unlock();
+    }
 }
 
 void InterfaceTabDocument::onItemClicked()
@@ -613,6 +623,8 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
 {
     Q_UNUSED(rootId)
 
+    QMutexLocker lockme(m_mutex);
+
     m_actExitToRoot->setEnabled(nullptr != m_model->rootObject());
     m_actExitToParent->setEnabled(nullptr != m_model->rootObject());
 
@@ -635,7 +647,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
         onAADLObjectAdded(*it);
 
-    //    m_graphicsView->setSceneRect({});
+    m_graphicsScene->setSceneRect(m_graphicsScene->itemsBoundingRect());
 }
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
