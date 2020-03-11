@@ -45,6 +45,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/settings/appoptions.h \
         $$TASTE_PRO_ROOT/settings/settingsmanager.h \
         $$TASTE_PRO_ROOT/tab_aadl/aadlcommonprops.h \
+        $$TASTE_PRO_ROOT/tab_aadl/aadlnamevalidator.h \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobject.h \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobjectcomment.h \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobjectconnection.h \
@@ -160,6 +161,7 @@ SOURCES += \
         $$TASTE_PRO_ROOT/settings/appoptions.cpp \
         $$TASTE_PRO_ROOT/settings/settingsmanager.cpp \
         $$TASTE_PRO_ROOT/tab_aadl/aadlcommonprops.cpp \
+        $$TASTE_PRO_ROOT/tab_aadl/aadlnamevalidator.cpp \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobject.cpp \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobjectcomment.cpp \
         $$TASTE_PRO_ROOT/tab_aadl/aadlobjectconnection.cpp \
