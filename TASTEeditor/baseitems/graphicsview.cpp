@@ -20,6 +20,7 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_interface/aadlrectgraphicsitem.h"
 
 #include <QGraphicsItem>
 #include <QMouseEvent>
@@ -137,9 +138,34 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
         setZoom(m_zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
         Q_EMIT zoomChanged(m_zoomPercent);
-    } else {
-        QGraphicsView::keyPressEvent(event);
+        event->accept();
+        return;
     }
+
+    bool keyHandled(false);
+    switch (event->key()) {
+    case Qt::Key_Left:
+    case Qt::Key_Right:
+    case Qt::Key_Up:
+    case Qt::Key_Down: {
+        for (QGraphicsItem *item : scene()->selectedItems()) {
+            if (aadl::AADLRectGraphicsItem *rectItem =
+                        // Not the qgraphicsitem_cast due its "successfull" cast of AADLFunctionName/Text Graphics Items
+                qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+                rectItem->singleStepMove(aadl::AADLRectGraphicsItem::MoveStep(event->key()));
+                keyHandled = true;
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (keyHandled)
+        event->accept();
+    else
+        QGraphicsView::keyPressEvent(event);
 }
 
 void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
