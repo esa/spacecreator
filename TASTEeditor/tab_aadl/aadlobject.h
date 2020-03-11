@@ -33,7 +33,7 @@ class AADLObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(common::Id id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(common::Id id READ id)
     Q_PROPERTY(QVariantList properties READ templateProperties) //!< Property list for string templates
     Q_PROPERTY(QVariantList attributes READ templateAttributes) //!< Attribute list for string templates
 
@@ -50,13 +50,14 @@ public:
     };
     Q_ENUM(Type)
 
-    explicit AADLObject(const QString &title = QString(), QObject *parent = nullptr);
+    explicit AADLObject(const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
+                        const common::Id &id = common::InvalidId);
     virtual ~AADLObject();
 
     QString title() const;
     common::Id id() const;
 
-    virtual AADLObject::Type aadlType() const = 0;
+    AADLObject::Type aadlType() const;
 
     QVector<qint32> coordinates() const;
     void setCoordinates(const QVector<qint32> &coordinates);
@@ -111,18 +112,13 @@ public:
 
 Q_SIGNALS:
     void titleChanged(const QString &title);
-    void idChanged(const taste3::common::Id &id);
     void coordinatesChanged(const QVector<qint32> &coordinates);
     void attributeChanged(taste3::aadl::meta::Props::Token attr = taste3::aadl::meta::Props::Token::Unknown) const;
     void propertyChanged(taste3::aadl::meta::Props::Token prop = taste3::aadl::meta::Props::Token::Unknown) const;
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setId(const common::Id &id);
     bool setParentObject(AADLObject *parentObject);
-
-protected:
-    explicit AADLObject(const common::Id &id, const QString &title = QString(), QObject *parent = nullptr);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;

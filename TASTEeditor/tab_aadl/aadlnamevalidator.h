@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -15,21 +15,24 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobjectcomment.h"
+#pragma once
 
-#include "aadlobjectfunctiontype.h"
+#include "aadlobject.h"
 
 namespace taste3 {
 namespace aadl {
 
-AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
-    : AADLObject(AADLObject::Type::Comment, title, parent)
+class AADLObject;
+class AADLNameValidator
 {
-    if (AADLObjectFunctionType *root = qobject_cast<AADLObjectFunctionType *>(parent))
-        root->addChild(this);
-}
+public:
+    static QString validateName(const AADLObject *object, const QString &name);
+    static QString validateName(const AADLObject::Type t, const QString &name);
 
-AADLObjectComment::~AADLObjectComment() {}
+private:
+    AADLNameValidator();
+    //    static AADLNameValidator* m_instance;
+};
 
 } // ns aadl
 } // ns taste3

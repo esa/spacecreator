@@ -25,6 +25,9 @@ namespace taste3 {
 namespace common {
 
 typedef QUuid Id;
+
+static const Id InvalidId = Id();
+
 Id createId();
 
 /*!
@@ -49,8 +52,6 @@ bool ensureDirExists(const QString &path);
 
 void registerAction(const QString &caller, QAction *action, const QString &title = QString(),
                     const QString &description = QString());
-
-QString validatedName(const QString &objectName);
 
 } // ns common
 } // ns taste3

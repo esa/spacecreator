@@ -17,6 +17,7 @@
 
 #include "aadlobject.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectsmodel.h"
 #include "templating/aadlobjecttemplateproperty.h"
 
@@ -27,29 +28,27 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate {
-    common::Id m_id;
+    AADLObjectPrivate(const common::Id &id, const AADLObject::Type t)
+        : m_id(id == common::InvalidId ? common::createId() : id)
+        , m_attrs()
+        , m_props()
+        , m_model(nullptr)
+        , m_type(t)
+    {
+    }
+
+    const common::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
     AADLObjectsModel *m_model;
+    const AADLObject::Type m_type;
 };
 
-AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *parent)
+AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *parent, const common::Id &id)
     : QObject(parent)
-    , d(new AADLObjectPrivate {
-              id,
-              QHash<QString, QVariant> {
-                      { meta::Props::token(meta::Props::Token::name), common::validatedName(title) } }, // attrs
-              QHash<QString, QVariant> {}, // props
-              nullptr, // model
-      })
+    , d(new AADLObjectPrivate(id, t))
 {
-}
-
-AADLObject::AADLObject(const QString &title, QObject *parent)
-    : AADLObject(common::createId(), title, parent)
-{
-    if (!title.isEmpty())
-        setAttr(meta::Props::token(meta::Props::Token::name), title);
+    setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
 AADLObject::~AADLObject() {}
@@ -66,20 +65,15 @@ common::Id AADLObject::id() const
     return d->m_id;
 }
 
+AADLObject::Type AADLObject::aadlType() const
+{
+    return d->m_type;
+}
+
 bool AADLObject::setTitle(const QString &title)
 {
     if (title != this->title()) {
         setAttr(meta::Props::token(meta::Props::Token::name), title);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObject::setId(const common::Id &id)
-{
-    if (id != d->m_id) {
-        d->m_id = id;
-        emit idChanged(this->id());
         return true;
     }
     return false;
@@ -238,7 +232,7 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::name: {
-            const QString title = common::validatedName(val.toString());
+            const QString title = AADLNameValidator::validateName(this->aadlType(), val.toString());
             d->m_attrs[name] = title;
             emit titleChanged(title);
             break;

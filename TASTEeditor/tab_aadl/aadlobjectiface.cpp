@@ -94,16 +94,9 @@ struct AADLObjectIfacePrivate {
     QVector<QPointer<AADLObjectIface>> m_clones {};
 };
 
-AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent)
-    : AADLObject(title, parent)
-    , d(new AADLObjectIfacePrivate(direction))
-{
-    setupInitialAttrs();
-}
-
-AADLObjectIface::AADLObjectIface(const common::Id &id, AADLObjectIface::IfaceType direction, const QString &title,
-                                 AADLObject *parent)
-    : AADLObject(id.isNull() ? common::createId() : id, title, parent)
+AADLObjectIface::AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent,
+                                 const common::Id &id)
+    : AADLObject(AADLObject::Type::Interface, title, parent, id)
     , d(new AADLObjectIfacePrivate(direction))
 {
     setupInitialAttrs();
@@ -125,11 +118,6 @@ void AADLObjectIface::setupInitialAttrs()
     } else {
         setProp(meta::Props::token(meta::Props::Token::labelInheritance), true);
     }
-}
-
-AADLObject::Type AADLObjectIface::aadlType() const
-{
-    return Type::Interface;
 }
 
 AADLObjectIface::IfaceType AADLObjectIface::direction() const
@@ -299,7 +287,7 @@ AADLObjectIfaceProvided::AADLObjectIfaceProvided(const QString &title, AADLObjec
 }
 
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(const common::Id &id, const QString &title, AADLObject *parent)
-    : AADLObjectIface(id, IfaceType::Provided, title, parent)
+    : AADLObjectIface(IfaceType::Provided, title, parent, id)
 {
 }
 
@@ -314,7 +302,7 @@ AADLObjectIfaceRequired::AADLObjectIfaceRequired(const QString &title, AADLObjec
 }
 
 AADLObjectIfaceRequired::AADLObjectIfaceRequired(const common::Id &id, const QString &title, AADLObject *parent)
-    : AADLObjectIface(id, IfaceType::Required, title, parent)
+    : AADLObjectIface(IfaceType::Required, title, parent, id)
 {
 }
 

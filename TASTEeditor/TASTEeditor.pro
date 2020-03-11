@@ -73,6 +73,7 @@ SOURCES += \
         logging/logcategory.cpp \
         logging/loghandler.cpp \
         main.cpp \
+        tab_aadl/aadlnamevalidator.cpp \
         tab_interface/commands/cmdentityautolayout.cpp \
         templating/aadlobjecttemplateproperty.cpp \
         templating/stringtemplate.cpp \
@@ -188,6 +189,7 @@ HEADERS += \
         dummy/dummytabdocument.h \
         logging/logcategory.h \
         logging/loghandler.h \
+        tab_aadl/aadlnamevalidator.h \
         tab_interface/commands/cmdentityautolayout.h \
         templating/aadlobjecttemplateproperty.h \
         templating/stringtemplate.h \

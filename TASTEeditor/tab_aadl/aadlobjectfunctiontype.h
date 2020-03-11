@@ -41,8 +41,6 @@ public:
     explicit AADLObjectFunctionType(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunctionType() override;
 
-    AADLObject::Type aadlType() const override;
-
     QVector<AADLObject *> children() const;
     bool addChild(AADLObject *child);
     bool removeChild(AADLObject *child);
@@ -80,8 +78,13 @@ Q_SIGNALS:
     void ifaceRemoved(AADLObjectIface *iface);
     void contextParamsChanged();
 
+protected:
+    explicit AADLObjectFunctionType(const AADLObject::Type t, const QString &title = QString(),
+                                    QObject *parent = nullptr);
+
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
+    void init();
 };
 
 typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;
