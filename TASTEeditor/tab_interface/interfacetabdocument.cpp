@@ -582,7 +582,7 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
     auto item = m_items.value(object->id());
     if (!item) {
         item = createItemForObject(object);
-        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged);
+        connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged, Qt::QueuedConnection);
         connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
             connect(clickable, &aadl::InteractiveObject::clicked, this, &InterfaceTabDocument::onItemClicked);
