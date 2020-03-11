@@ -27,29 +27,23 @@ namespace taste3 {
 namespace aadl {
 
 struct AADLObjectPrivate {
-    common::Id m_id;
-    QHash<QString, QVariant> m_attrs;
-    QHash<QString, QVariant> m_props;
-    AADLObjectsModel *m_model;
+    common::Id m_id { common::InvalidId };
+    QHash<QString, QVariant> m_attrs {};
+    QHash<QString, QVariant> m_props {};
+    AADLObjectsModel *m_model { nullptr };
 };
 
-AADLObject::AADLObject(const common::Id &id, const QString &title, QObject *parent)
+AADLObject::AADLObject(const QString &title, QObject *parent, const common::Id &id)
     : QObject(parent)
-    , d(new AADLObjectPrivate {
-              id,
-              QHash<QString, QVariant> {
-                      { meta::Props::token(meta::Props::Token::name), common::validatedName(title) } }, // attrs
-              QHash<QString, QVariant> {}, // props
-              nullptr, // model
-      })
+    , d(new AADLObjectPrivate)
 {
+    init(id, title);
 }
 
-AADLObject::AADLObject(const QString &title, QObject *parent)
-    : AADLObject(common::createId(), title, parent)
+void AADLObject::init(const common::Id &id, const QString &title)
 {
-    if (!title.isEmpty())
-        setAttr(meta::Props::token(meta::Props::Token::name), title);
+    d->m_id = id == common::InvalidId ? common::createId() : id;
+    setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
 AADLObject::~AADLObject() {}

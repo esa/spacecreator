@@ -25,6 +25,9 @@ namespace taste3 {
 namespace common {
 
 typedef QUuid Id;
+
+static const Id InvalidId = Id();
+
 Id createId();
 
 /*!
