@@ -35,7 +35,6 @@ ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ColorManagerDialog)
     , m_namesModel(new QStringListModel(this))
-    , m_color { nullptr }
     , m_originalFile(ColorManager::instance()->sourceFile())
 {
     ui->setupUi(this);
@@ -45,8 +44,10 @@ ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     connect(ui->listView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &ColorManagerDialog::onColorHandlerSelected);
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &ColorManagerDialog::onDialogButtonClicked);
+    connect(ui->colorHandlerEditor, &ColorHandlerEditor::colorHandlerValueChanged, ColorManager::instance(),
+            &ColorManager::colorsUpdated);
 
-    loadFile(ColorManager::instance()->sourceFile());
+    openFile(ColorManager::instance()->sourceFile());
 }
 
 ColorManagerDialog::~ColorManagerDialog()
@@ -61,54 +62,32 @@ bool ColorManagerDialog::loadFile(const QString &path)
         return false;
     }
 
-    QFile jsonFile(path);
-    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Open file filed:" << path << jsonFile.errorString();
+    if (!ColorManager::instance()->setSourceFile(path))
         return false;
-    }
 
-    const QByteArray &jsonData = jsonFile.readAll();
-    QJsonParseError jsonErrHandler;
-    const QJsonDocument &jsonDoc = QJsonDocument::fromJson(jsonData, &jsonErrHandler);
-    if (jsonErrHandler.error != QJsonParseError::NoError) {
-        qWarning() << "JSON parsing failed:" << jsonErrHandler.errorString();
-        return false;
-    }
-
-    m_colors.clear();
     m_colorNames.clear();
-    m_color = nullptr;
 
-    const QJsonArray &jArr = jsonDoc.array();
-    for (const QJsonValue &jsonVal : jArr) {
-        const QJsonObject &jsonObj = jsonVal.toObject();
-        const ColorManager::HandledColors colorType =
-                ColorManager::HandledColors(jsonObj["color_type"].toInt(ColorManager::HandledColors::Unhandled));
-        if (colorType != ColorManager::HandledColors::Unhandled) {
-            m_colors[colorType] = ColorHandler::fromJson(jsonObj);
-            m_colorNames[ColorManager::handledColorTypeName(colorType)] = colorType;
-        }
-    }
+    for (auto handledColor : ColorManager::instance()->handledColors())
+        m_colorNames[ColorManager::handledColorTypeName(handledColor)] = handledColor;
 
     const int currentRow = ui->listView->currentIndex().isValid() ? ui->listView->currentIndex().row() : 0;
 
     m_namesModel->setStringList(m_colorNames.keys());
-    ui->lePath->setText(ColorManager::instance()->sourceFile());
 
     ui->listView->setCurrentIndex(ui->listView->model()->index(currentRow, 0));
-    return m_colors.size();
+    return m_colorNames.size();
 }
 
 void ColorManagerDialog::onColorHandlerSelected(const QModelIndex &id)
 {
-    m_color = nullptr;
     if (id.isValid()) {
         const QString &name = id.data().toString();
-        if (m_colorNames.contains(name))
-            m_color = &m_colors[m_colorNames[name]];
+        m_color = ColorManager::instance()->colorsForItem(m_colorNames.value(name));
+        ui->colorHandlerEditor->setColorHandler(&m_color);
     }
-
-    ui->colorHandlerEditor->setColorHandler(m_color);
+    else {
+        ui->colorHandlerEditor->setColorHandler(nullptr);
+    }
 }
 
 void ColorManagerDialog::on_btnOpen_clicked()
@@ -126,18 +105,16 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
         openFile(file);
 }
 
-void ColorManagerDialog::openFile(const QString &path)
-{
-    if (loadFile(path)) {
-        ColorManager::instance()->setSourceFile(path);
-        ui->lePath->setText(path);
-    }
-}
-
 void ColorManagerDialog::onDialogButtonClicked(QAbstractButton *button)
 {
     if (ui->buttonBox->button(QDialogButtonBox::RestoreDefaults) == button)
         loadFile(ColorManager::defaultColorsResourceFile());
+}
+
+void ColorManagerDialog::openFile(const QString &path)
+{
+    if (loadFile(path))
+        ui->lePath->setText(path);
 }
 
 void ColorManagerDialog::accept()
@@ -145,8 +122,8 @@ void ColorManagerDialog::accept()
     const QString &filePath = ui->lePath->text();
 
     QJsonArray ja;
-    for (auto ct : m_colors.keys()) {
-        ColorHandler ch = m_colors[ct];
+    for (auto ct : ColorManager::instance()->handledColors()) {
+        ColorHandler ch = ColorManager::instance()->colorsForItem(ct);
         QJsonObject jObj = ch.toJson();
         jObj["color_type"] = ct;
         ja.append(jObj);
@@ -164,9 +141,7 @@ void ColorManagerDialog::accept()
 
 void ColorManagerDialog::reject()
 {
-    if (m_originalFile != ColorManager::instance()->sourceFile())
-        ColorManager::instance()->setSourceFile(m_originalFile);
-
+    ColorManager::instance()->setSourceFile(m_originalFile);
     QDialog::reject();
 }
 

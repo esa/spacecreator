@@ -25,25 +25,52 @@
 namespace taste3 {
 namespace aadl {
 
-struct ColorHandler {
+struct ColorHandlerData;
 
+class ColorHandler
+{
+public:
     enum FillType
     {
         Color = 0,
         Gradient
     };
 
-    static ColorHandler fromJson(const QJsonObject &jObj);
-    QJsonObject toJson() const;
+    ColorHandler();
+    ColorHandler(const ColorHandler &other);
 
     QPen pen() const;
     QBrush brush() const;
 
-    FillType m_fillType { FillType::Color };
-    qreal m_penWidth { 1.0 };
-    QColor m_penColor { Qt::black };
-    QColor m_brushColor0 { Qt::black };
-    QColor m_brushColor1 { Qt::white };
+    FillType fillType() const;
+    void setFillType(FillType fillType);
+
+    qreal penWidth() const;
+    void setPenWidth(qreal width);
+
+    QColor penColor() const;
+    void setPenColor(const QColor &color);
+
+    QColor brushColor0() const;
+    void setBrushColor0(const QColor &color);
+
+    QColor brushColor1() const;
+    void setBrushColor1(const QColor &color);
+
+    static ColorHandler fromJson(const QJsonObject &jObj);
+    QJsonObject toJson() const;
+
+private:
+    QExplicitlySharedDataPointer<ColorHandlerData> d;
+};
+
+struct ColorHandlerData : public QSharedData
+{
+    ColorHandler::FillType fillType { ColorHandler::FillType::Color };
+    qreal penWidth { 1.0 };
+    QColor penColor { Qt::black };
+    QColor brushColor0 { Qt::black };
+    QColor brushColor1 { Qt::white };
 };
 
 class ColorManager : public QObject
@@ -74,6 +101,8 @@ public:
     bool setSourceFile(const QString &from);
     QString sourceFile() const;
 
+    QList<HandledColors> handledColors() const;
+
 Q_SIGNALS:
     void colorsUpdated();
 
@@ -91,3 +120,5 @@ private:
 
 } // ns aadl
 } // ns taste3
+
+Q_DECLARE_TYPEINFO(taste3::aadl::ColorHandler, Q_MOVABLE_TYPE);
