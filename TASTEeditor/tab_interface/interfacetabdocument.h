@@ -24,6 +24,8 @@
 #include <QPointer>
 #include <baseitems/graphicsview.h>
 
+class QMutex;
+
 namespace taste3 {
 class InterfaceTabGraphicsScene;
 
@@ -127,7 +129,10 @@ private:
     aadl::CreatorTool *m_tool { nullptr };
     QHash<common::Id, QGraphicsItem *> m_items;
 
+    QMutex *m_mutex { nullptr };
+
     void showNIYGUI(const QString &title = QString());
+    void updateSceneRect();
 };
 
 } // ns document
