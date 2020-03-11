@@ -37,7 +37,7 @@ struct AADLObjectPrivate {
     {
     }
 
-    common::Id m_id;
+    const common::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
     AADLObjectsModel *m_model;
@@ -74,16 +74,6 @@ bool AADLObject::setTitle(const QString &title)
 {
     if (title != this->title()) {
         setAttr(meta::Props::token(meta::Props::Token::name), title);
-        return true;
-    }
-    return false;
-}
-
-bool AADLObject::setId(const common::Id &id)
-{
-    if (id != d->m_id) {
-        d->m_id = id;
-        emit idChanged(this->id());
         return true;
     }
     return false;

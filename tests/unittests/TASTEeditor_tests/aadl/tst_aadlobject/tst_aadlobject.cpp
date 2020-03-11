@@ -41,7 +41,6 @@ private slots:
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();
-    void test_setId();
 
 private:
     static const QString TestObjectTitleValid, TestObjectTitleInvalid;
@@ -95,28 +94,6 @@ void tst_AADLObject::test_setTitle()
 
     checkNaming(TestObjectTitleValid);
     checkNaming(TestObjectTitleInvalid);
-}
-
-void tst_AADLObject::test_setId()
-{
-    using namespace taste3::aadl;
-    using namespace taste3::common;
-
-    static const Id &testId = Id::createUuid();
-
-    AADLObjectImp obj;
-    qRegisterMetaType<Id>();
-    QSignalSpy spy(&obj, &AADLObject::idChanged);
-
-    QVERIFY(obj.id() != testId);
-    obj.setId(testId);
-    QCOMPARE(obj.id(), testId);
-
-    QVERIFY(spy.count() == 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.size() == 1);
-    QVERIFY(arguments.at(0).type() == QVariant::Uuid);
-    QCOMPARE(arguments.at(0).value<QUuid>(), testId);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObject)
