@@ -132,6 +132,7 @@ private:
     QMutex *m_mutex { nullptr };
 
     void showNIYGUI(const QString &title = QString());
+    void updateSceneRect();
 };
 
 } // ns document

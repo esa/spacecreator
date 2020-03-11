@@ -490,7 +490,12 @@ void InterfaceTabDocument::updateItem(QGraphicsItem *item)
         updateInterface(qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(item));
         break;
     default:
-        return;
+        break;
+    }
+
+    if (m_mutex->tryLock()) {
+        updateSceneRect();
+        m_mutex->unlock();
     }
 }
 
@@ -589,11 +594,6 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
             m_graphicsScene->addItem(item);
     }
     updateItem(item);
-
-    if (m_mutex->tryLock()) {
-        m_graphicsScene->setSceneRect(m_graphicsScene->itemsBoundingRect());
-        m_mutex->unlock();
-    }
 }
 
 void InterfaceTabDocument::onItemClicked()
@@ -647,7 +647,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
     for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
         onAADLObjectAdded(*it);
 
-    m_graphicsScene->setSceneRect(m_graphicsScene->itemsBoundingRect());
+    updateSceneRect();
 }
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
@@ -714,6 +714,13 @@ void InterfaceTabDocument::showNIYGUI(const QString &title)
 QString InterfaceTabDocument::supportedFileExtensions() const
 {
     return QStringLiteral("*.xml");
+}
+
+void InterfaceTabDocument::updateSceneRect()
+{
+    const QRectF itemsRect = m_graphicsScene->itemsBoundingRect();
+    if (m_graphicsScene->sceneRect() != itemsRect)
+        m_graphicsScene->setSceneRect(itemsRect);
 }
 
 } // ns document
