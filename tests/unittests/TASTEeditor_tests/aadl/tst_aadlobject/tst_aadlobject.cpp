@@ -26,11 +26,9 @@ class AADLObjectImp : public taste3::aadl::AADLObject
     Q_OBJECT
 public:
     explicit AADLObjectImp(const QString &title = QString(), QObject *parent = nullptr)
-        : AADLObject(title, parent)
+        : AADLObject(AADLObject::Type::Unknown, title, parent)
     {
     }
-
-    AADLObject::Type aadlType() const override { return Type::Unknown; }
 };
 
 class tst_AADLObject : public QObject
