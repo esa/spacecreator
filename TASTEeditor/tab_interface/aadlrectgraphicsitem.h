@@ -33,6 +33,15 @@ public:
     void updateFromEntity() override;
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
+    enum MoveStep
+    {
+        Left = Qt::Key_Left,
+        Right = Qt::Key_Right,
+        Up = Qt::Key_Up,
+        Down = Qt::Key_Down
+    };
+    void singleStepMove(MoveStep direction);
+
 protected:
     void rebuildLayout() override;
     void initGripPoints() override;
@@ -43,6 +52,7 @@ protected:
 
     QRectF adjustRectToParent(GripPoint *grip, const QPointF &from, const QPointF &to);
     bool allowGeometryChange(const QPointF &from, const QPointF &to);
+    void shiftBy(const QPointF &shift);
 };
 
 } // namespace aadl

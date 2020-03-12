@@ -22,7 +22,9 @@
 #include "baseitems/grippointshandler.h"
 #include "tab_aadl/aadlobject.h"
 
+#include <QKeyEvent>
 #include <QtDebug>
+
 namespace taste3 {
 namespace aadl {
 
@@ -232,6 +234,49 @@ void AADLRectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pr
         updateEntity();
     else
         updateFromEntity();
+}
+
+void AADLRectGraphicsItem::singleStepMove(MoveStep direction)
+{
+    static constexpr qreal delta = 1.;
+
+    QPointF shift;
+    switch (direction) {
+    case MoveStep::Left: {
+        shift.setX(-delta);
+        break;
+    }
+    case Right: {
+        shift.setX(delta);
+        break;
+    }
+    case MoveStep::Up: {
+        shift.setY(-delta);
+        break;
+    }
+    case MoveStep::Down: {
+        shift.setY(delta);
+        break;
+    }
+    default: {
+        return;
+    }
+    }
+
+    shiftBy(shift);
+}
+
+void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
+{
+    if (shift.isNull())
+        return;
+
+    const QPointF pressedAt = sceneBoundingRect().center();
+    const QPointF releasedAt = pressedAt + shift;
+
+    onManualMoveStart(nullptr, pressedAt);
+    onManualMoveProgress(nullptr, pressedAt, releasedAt);
+    onManualMoveFinish(nullptr, pressedAt, releasedAt);
 }
 
 } // namespace aadl
