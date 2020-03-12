@@ -67,6 +67,7 @@ protected:
     QGraphicsRectItem *m_previewItem = nullptr;
     QGraphicsPathItem *m_previewConnectionItem = nullptr;
     QVector<QPointF> m_connectionPoints;
+    QPointF m_clickScenePos;
     QCursor m_cursor;
 
     bool eventFilter(QObject *watched, QEvent *event) override;

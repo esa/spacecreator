@@ -193,6 +193,8 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             m_previewItem->setPen(QPen(Qt::blue, 2, Qt::SolidLine));
             m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
             m_previewItem->setZValue(1);
+            m_clickScenePos = scenePos;
+
             if (!parentItem)
                 scene->addItem(m_previewItem);
         }
@@ -242,12 +244,12 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
     const QPointF &scenePos = cursorInScene(e->globalPos());
     if (m_previewItem && m_previewItem->isVisible()) {
         const QPointF eventPos = m_previewItem->mapFromScene(scenePos);
-        const QRectF newGeometry { m_previewItem->rect().topLeft(), eventPos };
+        const QRectF newGeometry = QRectF(m_previewItem->mapFromScene(m_clickScenePos), eventPos).normalized();
         if (m_previewItem->parentItem()) {
             if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
                 return false;
         } else if (auto scene = m_view->scene()) {
-            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.normalized().marginsAdded(kMargins));
+            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.marginsAdded(kMargins));
             auto it = std::find_if(
                     collidedItems.constBegin(), collidedItems.constEnd(),
                     [this](const QGraphicsItem *item) { return item != m_previewItem && !item->parentItem(); });
@@ -693,6 +695,8 @@ void CreatorTool::removeSelectedItems()
 
 void CreatorTool::clearPreviewItem()
 {
+    m_clickScenePos = QPointF();
+
     m_connectionPoints.clear();
     if (m_previewConnectionItem) {
         m_previewConnectionItem->scene()->removeItem(m_previewConnectionItem);
