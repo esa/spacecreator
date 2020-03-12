@@ -89,11 +89,14 @@ public:
         static CreationInfo initFromIface(AADLObjectIface *iface, const CreationInfo::Policy policy);
         static CreationInfo fromIface(AADLObjectIface *iface);
         static CreationInfo cloneIface(AADLObjectIface *iface, AADLObjectFunction *fn);
+
+        void resetKind();
     };
 
     static QMap<AADLObjectIface::OperationKind, QString> xmlKindNames();
     static QString kindToString(AADLObjectIface::OperationKind k);
-    static AADLObjectIface::OperationKind kindFromString(const QString &k);
+    static AADLObjectIface::OperationKind kindFromString(const QString &k, AADLObjectIface::OperationKind defaultKind);
+    AADLObjectIface::OperationKind kindFromString(const QString &k) const;
 
     ~AADLObjectIface() override;
 
@@ -119,16 +122,15 @@ public:
 
     static AADLObjectIface *createIface(const CreationInfo &descr);
 
-    void setAttr(const QString &name, const QVariant &val) override;
-
     QVariant originalAttr(const QString &name) const;
     QVariant originalProp(const QString &name) const;
     QVector<IfaceParameter> originalParams() const;
 
     void setCloneOrigin(AADLObjectIface *source);
 
+    AADLObjectIface::OperationKind defaultKind() const;
+
 Q_SIGNALS:
-    void attrChanged_kind(AADLObjectIface::OperationKind kind);
     void paramsChanged();
 
 protected Q_SLOTS:
@@ -182,7 +184,7 @@ protected:
 private:
     const std::unique_ptr<AADLObjectIfacePrivate> d;
 
-    void notifyIfKindChanged() const;
+    bool storedKindDiffers() const;
 };
 
 class AADLObjectIfaceProvided : public AADLObjectIface

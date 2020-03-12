@@ -48,7 +48,12 @@ QWidget *InterfaceAttrDelegate::createEditor(QWidget *parent, const QStyleOption
 
                 switch (t) {
                 case meta::Props::Token::kind: {
-                    static const QMap<AADLObjectIface::OperationKind, QString> &names = AADLObjectIface::xmlKindNames();
+                    QMap<AADLObjectIface::OperationKind, QString> names = AADLObjectIface::xmlKindNames();
+                    if (auto model = qobject_cast<const PropertiesListModel *>(index.model()))
+                        if (auto iface = model->dataObject()->as<const AADLObjectIface *>())
+                            if (iface->isProvided())
+                                names.take(AADLObjectIface::OperationKind::Any);
+
                     QComboBox *cb = new QComboBox(parent);
                     QMap<AADLObjectIface::OperationKind, QString>::const_iterator i = names.cbegin();
                     while (i != names.cend()) {
