@@ -132,11 +132,14 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if (!scene)
         return false;
 
-    if (e->modifiers() & Qt::ControlModifier)
-        m_toolType = ToolType::DirectConnection;
-
-    if (!(e->button() & Qt::RightButton) && m_toolType == ToolType::Pointer)
+    if (e->modifiers() & Qt::ControlModifier) {
+        if (e->button() & Qt::MouseButton::LeftButton)
+            m_toolType = ToolType::DirectConnection;
+        else
+            return false;
+    } else if (!(e->button() & Qt::RightButton) && m_toolType == ToolType::Pointer) {
         return false;
+    }
 
     const QPointF scenePos = cursorInScene(e->globalPos());
     if (m_toolType == ToolType::DirectConnection) {
@@ -212,7 +215,7 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
     const QPointF scenePos = cursorInScene(e->globalPos());
 
     if (m_toolType == ToolType::Pointer) {
-        if (e->button() & Qt::RightButton && e->buttons() == Qt::NoButton) {
+        if ((e->button() & Qt::RightButton) && e->modifiers() == Qt::NoModifier) {
             if (QMenu *menu = populateContextMenu(scenePos)) {
                 connect(menu, &QMenu::aboutToHide, this, [this]() {
                     if (m_previewItem)
@@ -729,7 +732,6 @@ QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)
 void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
 {
     if (m_previewItem) {
-
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")), tr("Function Type"),
                         this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
 
@@ -738,6 +740,12 @@ void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &s
 
         menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
                         [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Required Interface"), this,
+                        [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
+
+        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Provided Interface"), this,
+                        [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
     }
 }
 
