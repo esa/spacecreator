@@ -64,14 +64,14 @@ void tst_AADLObjectFunctionType::testRequiredInterfacesManagement()
     for (int i = 0; i < ifacesCount; ++i) {
         ciRI.name = QString("test required iface #%1").arg(i);
         AADLObjectIface *ri = AADLObjectIface::createIface(ciRI);
-        const bool ok = obj.addRI(ri);
+        const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
     }
 
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *ri = obj.ris().first();
-        const bool ok = obj.removeRI(ri);
+        const bool ok = obj.removeChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), ifacesCount - i - 1);
         delete ri;
@@ -91,7 +91,7 @@ void tst_AADLObjectFunctionType::testProvidedInterfacesManagement()
     for (int i = 0; i < ifacesCount; ++i) {
         ciPI.name = QString("test provided iface #%1").arg(i);
         AADLObjectIface *pi = AADLObjectIface::createIface(ciPI);
-        const bool ok = obj.addPI(pi);
+        const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
     }
@@ -100,7 +100,7 @@ void tst_AADLObjectFunctionType::testProvidedInterfacesManagement()
 
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *pi = obj.pis().first();
-        const bool ok = obj.removePI(pi);
+        const bool ok = obj.removeChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), ifacesCount - i - 1);
         delete pi;
@@ -132,7 +132,7 @@ void tst_AADLObjectFunctionType::testCommonInterfacesManagement()
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);
 
     for (auto iface : ifaces) {
-        const bool ok = obj.addInterface(iface);
+        const bool ok = obj.addChild(iface);
         QVERIFY(ok);
     }
 
@@ -142,7 +142,7 @@ void tst_AADLObjectFunctionType::testCommonInterfacesManagement()
     while (ifaces.size()) {
         if (AADLObjectIface *iface = ifaces.takeLast()) {
             const int prevCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
-            const bool ok = obj.removeInterface(iface);
+            const bool ok = obj.removeChild(iface);
             QVERIFY(ok);
             const int currCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
             QVERIFY(prevCount != currCount);
@@ -164,12 +164,12 @@ void tst_AADLObjectFunctionType::testChildrenManagementFunction()
 
     AADLObjectFunction fn0("Fn0", &obj);
     AADLObjectFunction fn1("Fn1", &obj);
-    fn1.addInterface(TASTEtest::createIface(&fn1, itProvided));
+    fn1.addChild(TASTEtest::createIface(&fn1, itProvided));
     AADLObjectFunction fn2("Fn2", &obj);
-    fn2.addInterface(TASTEtest::createIface(&fn2, itRequired));
+    fn2.addChild(TASTEtest::createIface(&fn2, itRequired));
     AADLObjectFunction fn3("Fn3", &obj);
-    fn3.addInterface(TASTEtest::createIface(&fn3, itRequired));
-    fn3.addInterface(TASTEtest::createIface(&fn3, itProvided));
+    fn3.addChild(TASTEtest::createIface(&fn3, itRequired));
+    fn3.addChild(TASTEtest::createIface(&fn3, itProvided));
 
     const QVector<AADLObject *> functions { &fn0, &fn1, &fn2, &fn3 };
     testChildrenManagement(&obj, functions, functions.size());
@@ -237,16 +237,16 @@ void tst_AADLObjectFunctionType::testChildrenManagementContainer()
 
     AADLObjectFunctionType fnType1("FnType1", &obj);
     obj.addChild(&fnType1);
-    fnType1.addInterface(TASTEtest::createIface(&fnType1, itProvided));
+    fnType1.addChild(TASTEtest::createIface(&fnType1, itProvided));
 
     AADLObjectFunctionType fnType2("FnType2", &obj);
     obj.addChild(&fnType2);
-    fnType2.addInterface(TASTEtest::createIface(&fnType2, itRequired));
+    fnType2.addChild(TASTEtest::createIface(&fnType2, itRequired));
 
     AADLObjectFunctionType fnType3("FnType3", &obj);
     obj.addChild(&fnType3);
-    fnType3.addInterface(TASTEtest::createIface(&fnType3, itRequired));
-    fnType3.addInterface(TASTEtest::createIface(&fnType3, itProvided));
+    fnType3.addChild(TASTEtest::createIface(&fnType3, itRequired));
+    fnType3.addChild(TASTEtest::createIface(&fnType3, itProvided));
 
     const QVector<AADLObject *> functionTypes { &fnType0, &fnType1, &fnType2, &fnType3 };
     testChildrenManagement(&obj, functionTypes, functionTypes.size());
@@ -263,25 +263,25 @@ void tst_AADLObjectFunctionType::testChildrenManagementMixed()
 
     AADLObjectFunction fn0("Fn0", &obj);
     AADLObjectFunction fn1("Fn1", &obj);
-    fn1.addInterface(TASTEtest::createIface(&fn1, itProvided));
+    fn1.addChild(TASTEtest::createIface(&fn1, itProvided));
 
     AADLObjectFunction fn2("Fn2", &obj);
-    fn1.addInterface(TASTEtest::createIface(&fn2, itRequired));
+    fn1.addChild(TASTEtest::createIface(&fn2, itRequired));
 
     AADLObjectFunction fn3("Fn3", &obj);
-    fn3.addInterface(TASTEtest::createIface(&fn3, itRequired));
-    fn3.addInterface(TASTEtest::createIface(&fn3, itProvided));
+    fn3.addChild(TASTEtest::createIface(&fn3, itRequired));
+    fn3.addChild(TASTEtest::createIface(&fn3, itProvided));
 
     AADLObjectFunctionType fnType0("FnType0", &obj);
     AADLObjectFunctionType fnType1("FnType1", &obj);
-    fnType1.addInterface(TASTEtest::createIface(&fnType1, itProvided));
+    fnType1.addChild(TASTEtest::createIface(&fnType1, itProvided));
 
     AADLObjectFunctionType fnType2("FnType2", &obj);
-    fnType2.addInterface(TASTEtest::createIface(&fnType2, itRequired));
+    fnType2.addChild(TASTEtest::createIface(&fnType2, itRequired));
 
     AADLObjectFunctionType fnType3("FnType3", &obj);
-    fnType3.addInterface(TASTEtest::createIface(&fnType3, itRequired));
-    fnType3.addInterface(TASTEtest::createIface(&fnType3, itProvided));
+    fnType3.addChild(TASTEtest::createIface(&fnType3, itRequired));
+    fnType3.addChild(TASTEtest::createIface(&fnType3, itProvided));
 
     const QVector<AADLObject *> children { &fnType0, &fn0, &fnType1, &fn1, &fnType2, &fn3, &fnType3, &fn2 };
     testChildrenManagement(&obj, children, true);

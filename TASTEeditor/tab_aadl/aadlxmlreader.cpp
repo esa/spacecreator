@@ -369,7 +369,7 @@ AADLObjectIface *AADLXMLReader::addIface(const QString &name, bool isRI)
         else
             iface = new AADLObjectIfaceProvided(name, d->m_currentObject.get());
 
-        d->m_currentObject.function()->addInterface(iface);
+        d->m_currentObject.function()->addChild(iface);
     }
     return iface;
 }

@@ -69,20 +69,7 @@ void CmdEntityRemove::advancedRemove(AADLObject *obj)
         return;
 
     if (AADLObjectFunctionType *fn = putParentFunctionFor(obj))
-        switch (obj->aadlType()) {
-        case AADLObject::Type::Interface:
-            fn->removeInterface(obj->as<AADLObjectIface *>());
-            break;
-        case AADLObject::Type::Function:
-        case AADLObject::Type::FunctionType:
-        case AADLObject::Type::Comment:
-        case AADLObject::Type::Connection:
-            if (!fn->isFunctionType())
-                fn->removeChild(obj);
-            break;
-        default:
-            break;
-        }
+        fn->removeChild(obj);
 
     if (m_model)
         m_model->removeObject(obj);
@@ -94,20 +81,7 @@ void CmdEntityRemove::advancedRestore(AADLObject *obj)
         return;
 
     if (AADLObjectFunctionType *fn = popParentFunctionFor(obj))
-        switch (obj->aadlType()) {
-        case AADLObject::Type::Interface:
-            fn->addInterface(obj->as<AADLObjectIface *>());
-            break;
-        case AADLObject::Type::Function:
-        case AADLObject::Type::FunctionType:
-        case AADLObject::Type::Comment:
-        case AADLObject::Type::Connection:
-            if (!fn->isFunctionType())
-                fn->addChild(obj);
-            break;
-        default:
-            break;
-        }
+        fn->addChild(obj);
 
     if (m_model)
         m_model->addObject(obj);

@@ -69,7 +69,7 @@ void CmdInterfaceItemCreate::redo()
     CmdEntityGeometryChange::redo();
 
     if (m_ifaceInfo.function)
-        m_ifaceInfo.function->addInterface(m_entity);
+        m_ifaceInfo.function->addChild(m_entity);
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->addObject(m_entity);
 
@@ -82,7 +82,7 @@ void CmdInterfaceItemCreate::undo()
     CmdEntityGeometryChange::undo();
 
     if (m_ifaceInfo.function)
-        m_ifaceInfo.function->removeInterface(m_entity);
+        m_ifaceInfo.function->removeChild(m_entity);
     if (m_ifaceInfo.model)
         m_ifaceInfo.model->removeObject(m_entity);
 
