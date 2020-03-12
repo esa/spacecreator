@@ -96,7 +96,7 @@ public:
 
     bool isRootObject() const;
 
-    virtual void postInit();
+    virtual bool postInit();
 
     template<class T>
     inline T as()

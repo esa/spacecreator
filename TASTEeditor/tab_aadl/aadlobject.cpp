@@ -58,7 +58,10 @@ QString AADLObject::title() const
     return attr(meta::Props::token(meta::Props::Token::name)).toString();
 }
 
-void AADLObject::postInit() {}
+bool AADLObject::postInit()
+{
+    return true;
+}
 
 common::Id AADLObject::id() const
 {

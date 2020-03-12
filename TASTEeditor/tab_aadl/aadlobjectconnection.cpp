@@ -240,13 +240,15 @@ void AADLObjectConnection::clearPostponedEndpoints()
     d->m_delayedInit.m_to = nullptr;
 }
 
-void AADLObjectConnection::postInit()
+bool AADLObjectConnection::postInit()
 {
     if (!lookupEndpointsPostponed()) {
         qWarning() << "Postponed Connection initialization failed";
-        return;
+        return false;
     }
+
     inheritLabel();
+    return true;
 }
 
 } // ns aadl

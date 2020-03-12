@@ -81,7 +81,7 @@ public:
         return selectIface<T>(sourceInterface(), targetInterface());
     }
 
-    void postInit() override;
+    bool postInit() override;
 
     struct EndPointInfo {
         QString m_functionName;

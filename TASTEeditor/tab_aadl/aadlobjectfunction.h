@@ -32,7 +32,7 @@ public:
     explicit AADLObjectFunction(const QString &title = QString(), QObject *parent = nullptr);
     ~AADLObjectFunction() override;
 
-    void postInit() override;
+    bool postInit() override;
 
     void setInstanceOf(AADLObjectFunctionType *fnType);
     const AADLObjectFunctionType *instanceOf() const;

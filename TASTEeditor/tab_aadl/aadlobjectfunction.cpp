@@ -44,7 +44,7 @@ AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
 
 AADLObjectFunction::~AADLObjectFunction() {}
 
-void AADLObjectFunction::postInit()
+bool AADLObjectFunction::postInit()
 {
     static const QString attrName = meta::Props::token(meta::Props::Token::instance_of);
     const QString attrValue = attr(attrName, QVariant()).toString();
@@ -55,6 +55,7 @@ void AADLObjectFunction::postInit()
         if (cmd)
             cmd->redo();
     }
+    return true;
 }
 
 void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
