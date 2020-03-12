@@ -247,23 +247,14 @@ meta::Props::Token tokenFromIndex(const QModelIndex &index)
     return meta::Props::token(name);
 }
 
+bool PropertiesListModel::isEditable(const QModelIndex & /*index*/) const
+{
+    return true;
+}
+
 Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 {
-    bool editable = true;
-
-    if (m_dataObject) {
-        switch (m_dataObject->aadlType()) {
-        case aadl::AADLObject::Type::Function:
-        case aadl::AADLObject::Type::FunctionType:
-            editable = isEditableCellFunction(index);
-            break;
-        case aadl::AADLObject::Type::Interface:
-            editable = isEditableCellIface(index);
-            break;
-        default:
-            break;
-        }
-    }
+    bool editable = isEditable(index);
 
     if (editable && index.column() == ColumnTitle && isAttr(index)) {
         editable = false;
@@ -289,8 +280,16 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-bool PropertiesListModel::isEditableCellFunction(const QModelIndex &index) const
+FunctionPropertiesListModel::FunctionPropertiesListModel(QObject *parent)
+    : PropertiesListModel(parent)
 {
+}
+
+bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
+{
+    if (!dataObject() || !index.isValid())
+        return false;
+
     bool editable = true;
 
     switch (tokenFromIndex(index)) {
@@ -313,7 +312,7 @@ bool PropertiesListModel::isEditableCellFunction(const QModelIndex &index) const
         break;
     }
     default:
-        if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
+        if (const AADLObjectFunction *fn = dataObject()->as<const AADLObjectFunction *>())
             editable = !fn->inheritsFunctionType();
         break;
     }
@@ -321,9 +320,14 @@ bool PropertiesListModel::isEditableCellFunction(const QModelIndex &index) const
     return editable;
 }
 
-bool PropertiesListModel::isEditableCellIface(const QModelIndex &index) const
+InterfacePropertiesListModel::InterfacePropertiesListModel(QObject *parent)
+    : PropertiesListModel(parent)
 {
-    if (!index.isValid())
+}
+
+bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
+{
+    if (!dataObject() || !index.isValid())
         return false;
 
     bool editable = true;
