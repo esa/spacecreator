@@ -51,7 +51,19 @@ bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
         addObject(obj);
 
     for (auto obj : objects)
-        obj->postInit();
+        if (!obj->postInit()) {
+            switch (obj->aadlType()) {
+            case AADLObject::Type::Connection: {
+                if (AADLObjectFunction *parentFn = qobject_cast<AADLObjectFunction *>(obj->parentObject()))
+                    parentFn->removeChild(obj);
+                break;
+            }
+            default:
+                break;
+            }
+
+            removeObject(obj);
+        }
 
     blockSignals(currentState);
 
