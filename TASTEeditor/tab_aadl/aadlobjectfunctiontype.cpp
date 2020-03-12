@@ -25,8 +25,6 @@ namespace aadl {
 
 struct AADLObjectFunctionTypePrivate {
     QVector<AADLObject *> m_children {};
-    QVector<AADLObjectIface *> m_ris {};
-    QVector<AADLObjectIface *> m_pis {};
     QVector<ContextParameter> m_contextParams {};
     QVector<QPointer<AADLObjectFunction>> m_instances {};
 };
@@ -84,83 +82,35 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
     return false;
 }
 
+QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
+{
+    QVector<AADLObjectIface *> ifaces;
+    for (const auto child : d->m_children)
+        if (child->isInterface())
+            ifaces << child->as<AADLObjectIface *>();
+
+    return ifaces;
+}
+
 QVector<AADLObjectIface *> AADLObjectFunctionType::ris() const
 {
-    return d->m_ris;
-}
-
-bool AADLObjectFunctionType::addRI(AADLObjectIface *ri)
-{
-    if (ri && !ris().contains(ri)) {
-        ri->setParentObject(this);
-        d->m_ris.append(ri);
-        return true;
-    }
-
-    return false;
-}
-
-bool AADLObjectFunctionType::removeRI(AADLObjectIface *ri)
-{
-    int id = ris().indexOf(ri);
-    if (id >= 0 && id < ris().size()) {
-        ri->setParentObject(nullptr);
-        d->m_ris.remove(id);
-        return true;
-    }
-
-    return false;
+    return selecIfaces(AADLObjectIface::IfaceType::Required);
 }
 
 QVector<AADLObjectIface *> AADLObjectFunctionType::pis() const
 {
-    return d->m_pis;
+    return selecIfaces(AADLObjectIface::IfaceType::Provided);
 }
 
-bool AADLObjectFunctionType::addPI(AADLObjectIface *pi)
+QVector<AADLObjectIface *> AADLObjectFunctionType::selecIfaces(AADLObjectIface::IfaceType direction) const
 {
-    if (pi && !pis().contains(pi)) {
-        pi->setParentObject(this);
-        d->m_pis.append(pi);
-        return true;
-    }
+    QVector<AADLObjectIface *> ifaces;
 
-    return false;
-}
+    for (auto iface : interfaces())
+        if (iface->direction() == direction)
+            ifaces << iface;
 
-bool AADLObjectFunctionType::removePI(AADLObjectIface *pi)
-{
-    int id = pis().indexOf(pi);
-    if (id >= 0 && id < pis().size()) {
-        pi->setParentObject(nullptr);
-        d->m_pis.remove(id);
-        return true;
-    }
-
-    return false;
-}
-
-bool AADLObjectFunctionType::addInterface(AADLObjectIface *iface)
-{
-    const bool added = iface ? iface->isProvided() ? addPI(iface) : addRI(iface) : false;
-    if (added)
-        emit ifaceAdded(iface);
-
-    return added;
-}
-
-bool AADLObjectFunctionType::removeInterface(AADLObjectIface *iface)
-{
-    const bool removed = iface ? iface->isProvided() ? removePI(iface) : removeRI(iface) : false;
-    if (removed)
-        emit ifaceRemoved(iface);
-
-    return removed;
-}
-
-QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
-{
-    return ris() + pis();
+    return ifaces;
 }
 
 QVariantList AADLObjectFunctionType::templateInterfaces() const

@@ -199,7 +199,7 @@ void tst_AADLObjectsModel::testManageIfaces()
         AADLObjectIface::CreationInfo ci = ifaces.at(i);
         AADLObjectIface *iface = AADLObjectIface::createIface(ci);
         createdIfaces.append(iface);
-        const bool added1 = ci.function->addInterface(iface);
+        const bool added1 = ci.function->addChild(iface);
         QVERIFY(added1);
         const bool added2 = model.addObject(iface);
         QVERIFY(added2);

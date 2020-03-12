@@ -45,17 +45,9 @@ public:
     bool addChild(AADLObject *child);
     bool removeChild(AADLObject *child);
 
-    QVector<AADLObjectIface *> ris() const;
-    bool addRI(AADLObjectIface *ri);
-    bool removeRI(AADLObjectIface *ri);
-
-    QVector<AADLObjectIface *> pis() const;
-    bool addPI(AADLObjectIface *pi);
-    bool removePI(AADLObjectIface *pi);
-
-    bool addInterface(AADLObjectIface *iface);
-    bool removeInterface(AADLObjectIface *iface);
     QVector<AADLObjectIface *> interfaces() const;
+    QVector<AADLObjectIface *> ris() const;
+    QVector<AADLObjectIface *> pis() const;
 
     QVariantList templateInterfaces() const;
     QVariantList templateFunctions() const;
@@ -74,8 +66,6 @@ public:
     void forgetInstance(AADLObjectFunction *function);
 
 Q_SIGNALS:
-    void ifaceAdded(AADLObjectIface *iface);
-    void ifaceRemoved(AADLObjectIface *iface);
     void contextParamsChanged();
 
 protected:
@@ -85,6 +75,7 @@ protected:
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
     void init();
+    QVector<AADLObjectIface *> selecIfaces(AADLObjectIface::IfaceType direction) const;
 };
 
 typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;

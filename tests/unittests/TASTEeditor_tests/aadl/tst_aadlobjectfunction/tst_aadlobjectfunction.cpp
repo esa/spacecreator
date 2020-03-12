@@ -52,14 +52,14 @@ void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
     static constexpr int ifacesCount { 10 };
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *ri = TASTEtest::createIface(&obj, ifaceType);
-        const bool ok = obj.addRI(ri);
+        const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
     }
 
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *ri = obj.ris().first();
-        const bool ok = obj.removeRI(ri);
+        const bool ok = obj.removeChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), ifacesCount - i - 1);
         delete ri;
@@ -77,7 +77,7 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
     static constexpr int ifacesCount { 10 };
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *pi = TASTEtest::createIface(&obj, ifaceType);
-        const bool ok = obj.addPI(pi);
+        const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
     }
@@ -86,7 +86,7 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 
     for (int i = 0; i < ifacesCount; ++i) {
         AADLObjectIface *pi = obj.pis().first();
-        const bool ok = obj.removePI(pi);
+        const bool ok = obj.removeChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), ifacesCount - i - 1);
         delete pi;
@@ -114,7 +114,7 @@ void tst_AADLObjectFunction::testCommonInterfacesManagement() const
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);
 
     for (auto iface : ifaces) {
-        const bool ok = obj.addInterface(iface);
+        const bool ok = obj.addChild(iface);
         QVERIFY(ok);
     }
 
@@ -124,7 +124,7 @@ void tst_AADLObjectFunction::testCommonInterfacesManagement() const
     while (ifaces.size()) {
         if (AADLObjectIface *iface = ifaces.takeLast()) {
             const int prevCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
-            const bool ok = obj.removeInterface(iface);
+            const bool ok = obj.removeChild(iface);
             QVERIFY(ok);
             const int currCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
             QVERIFY(prevCount != currCount);
