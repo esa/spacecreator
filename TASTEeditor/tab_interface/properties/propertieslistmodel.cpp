@@ -303,7 +303,13 @@ bool PropertiesListModel::isEditableCellFunction(const QModelIndex &index) const
         break;
     }
     case meta::Props::Token::instance_of: {
-        editable = nullptr != m_dataObject->as<const AADLObjectFunction *>();
+        if (dataObject()->isFunctionType())
+            editable = false;
+        else {
+            if (auto fn = dataObject()->as<const AADLObjectFunction *>()) {
+                editable = fn->instanceOf() || fn->interfaces().isEmpty();
+            }
+        }
         break;
     }
     default:
