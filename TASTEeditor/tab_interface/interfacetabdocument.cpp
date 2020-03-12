@@ -464,7 +464,7 @@ void InterfaceTabDocument::onActionExitToRootFunction()
 void InterfaceTabDocument::onActionExitToParentFunction()
 {
     aadl::AADLObject *parentObject = m_model->rootObject() ? m_model->rootObject()->parentObject() : nullptr;
-    changeRootItem(parentObject ? parentObject->id() : common::Id());
+    changeRootItem(parentObject ? parentObject->id() : common::InvalidId);
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)

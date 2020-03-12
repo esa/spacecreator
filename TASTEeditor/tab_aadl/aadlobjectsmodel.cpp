@@ -305,7 +305,7 @@ void AADLObjectsModel::clear()
     d->m_objectsOrder.clear();
     d->m_visibleObjects.clear();
 
-    d->m_rootObjectId = common::Id();
+    d->m_rootObjectId = common::InvalidId;
 }
 
 } // ns aadl

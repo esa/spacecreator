@@ -362,6 +362,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                 ? AADLObjectIface::IfaceType::Required
                 : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
+        ifaceCommons.resetKind();
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
@@ -374,6 +375,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         ifaceCommons.position = info.startPointAdjusted;
         ifaceCommons.type = startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided;
         ifaceCommons.id = info.startIfaceId;
+        ifaceCommons.resetKind();
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
@@ -391,6 +393,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         else
             ifaceCommons.type =
                     (startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided);
+        ifaceCommons.resetKind();
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
@@ -405,6 +408,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         else
             ifaceCommons.type =
                     startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
+        ifaceCommons.resetKind();
 
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
@@ -414,6 +418,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         if (!pi)
             pi = info.startIface;
         ifaceCommons = AADLObjectIface::CreationInfo::fromIface(pi);
+        ifaceCommons.resetKind();
         ifaceCommons.name.clear();
     }
 
@@ -655,7 +660,8 @@ void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceT
                 scene, utils::adjustFromPoint(pos, ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
         AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
 
-        const AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::Id());
+        AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::InvalidId);
+        ifaceDescr.resetKind();
         taste3::cmd::CommandsStack::current()->push(
                 cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
     }

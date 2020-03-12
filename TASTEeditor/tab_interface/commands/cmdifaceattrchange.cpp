@@ -148,7 +148,8 @@ void CmdIfaceAttrChange::prepareRemoveConnectionCommands()
         return false;
     };
 
-    const AADLObjectIface::OperationKind k = AADLObjectIface::kindFromString(m_newValue.toString());
+    const AADLObjectIface::OperationKind k =
+            AADLObjectIface::kindFromString(m_newValue.toString(), m_iface->defaultKind());
     for (AADLObjectConnection *connection : m_relatedConnections) {
         if (const AADLObjectIface *srci = connection->sourceInterface()) {
             if (const AADLObjectIface *dsti = connection->targetInterface()) {

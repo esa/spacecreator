@@ -83,6 +83,16 @@ AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::cloneIface(AADLObje
     return descr;
 }
 
+void AADLObjectIface::CreationInfo::resetKind()
+{
+    if (AADLObjectIface::IfaceType::Required == type)
+        kind = AADLObjectIface::OperationKind::Any;
+    else {
+        if (AADLObjectIface::OperationKind::Any == kind)
+            kind = AADLObjectIface::OperationKind::Sporadic;
+    }
+}
+
 struct AADLObjectIfacePrivate {
     explicit AADLObjectIfacePrivate(AADLObjectIface::IfaceType dir)
         : m_direction(dir)
@@ -153,17 +163,28 @@ QString AADLObjectIface::kindToString(AADLObjectIface::OperationKind k)
     return kindNamesXml.contains(k) ? kindNamesXml.value(k) : QString();
 }
 
-AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k)
+AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k,
+                                                               AADLObjectIface::OperationKind defaultKind)
 {
     static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = AADLObjectIface::xmlKindNames();
     static const QStringList &names = kindNamesXml.values();
 
-    return names.contains(k) ? kindNamesXml.key(k) : AADLObjectIface::OperationKind::Any;
+    return names.contains(k) ? kindNamesXml.key(k) : defaultKind;
+}
+
+AADLObjectIface::OperationKind AADLObjectIface::defaultKind() const
+{
+    return isProvided() ? OperationKind::Sporadic : OperationKind::Any;
+}
+
+AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k) const
+{
+    return kindFromString(k, defaultKind());
 }
 
 AADLObjectIface::OperationKind AADLObjectIface::kind() const
 {
-    return kindFromString(attr(meta::Props::token(meta::Props::Token::kind)).toString());
+    return this->kindFromString(attr(meta::Props::token(meta::Props::Token::kind)).toString());
 }
 
 bool AADLObjectIface::setKind(AADLObjectIface::OperationKind k)
@@ -259,23 +280,6 @@ void AADLObjectIface::forgetClone(AADLObjectIface *clone)
     d->m_clones.removeAll(clone);
 }
 
-void AADLObjectIface::setAttr(const QString &name, const QVariant &val)
-{
-    switch (meta::Props::token(name)) {
-    case meta::Props::Token::kind: {
-        const AADLObjectIface::OperationKind k = kindFromString(val.toString());
-        if (k != kind()) {
-            AADLObject::setAttr(name, val);
-            emit attrChanged_kind(k);
-        }
-        break;
-    }
-    default:
-        AADLObject::setAttr(name, val);
-        break;
-    }
-}
-
 AADLObjectIfaceProvided::AADLObjectIfaceProvided(AADLObject *parent)
     : AADLObjectIface(IfaceType::Provided, tr("PI_%1").arg(++sProvidedCounter), parent)
 {
@@ -327,11 +331,10 @@ AADLObjectIface *AADLObjectIface::createIface(const CreationInfo &descr)
     return iface;
 }
 
-void AADLObjectIface::notifyIfKindChanged() const
+bool AADLObjectIface::storedKindDiffers() const
 {
     const QString nameKind = meta::Props::token(meta::Props::Token::kind);
-    if (m_originalFields.attrs.value(nameKind) != attr(nameKind))
-        emit attributeChanged(meta::Props::Token::kind);
+    return m_originalFields.attrs.value(nameKind) != attr(nameKind);
 }
 
 void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
@@ -349,7 +352,8 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
         reflectParams(from);
     }
 
-    notifyIfKindChanged();
+    if (storedKindDiffers())
+        emit attributeChanged(meta::Props::Token::kind);
 
     connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
             Qt::UniqueConnection);
@@ -375,6 +379,8 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
             m_originalFields.props[name] = prop(name);
     }
 
+    const bool kindChanged = storedKindDiffers();
+
     {
         QSignalBlocker sb(this);
 
@@ -384,7 +390,8 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
         setParams(m_originalFields.params);
     }
 
-    notifyIfKindChanged();
+    if (kindChanged)
+        emit attributeChanged(meta::Props::Token::kind);
 
     m_originalFields = {};
 }
