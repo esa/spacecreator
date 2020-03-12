@@ -51,7 +51,6 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     , m_text(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
-    setFlag(QGraphicsItem::ItemIgnoresTransformations);
     setFlag(QGraphicsItem::ItemIsSelectable);
 
     updateKind();
