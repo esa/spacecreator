@@ -150,16 +150,17 @@ void CmdIfaceAttrChange::prepareRemoveConnectionCommands()
 
     const AADLObjectIface::OperationKind k =
             AADLObjectIface::kindFromString(m_newValue.toString(), m_iface->defaultKind());
+    const bool oneIsCyclic = k == AADLObjectIface::OperationKind::Cyclic;
     for (AADLObjectConnection *connection : m_relatedConnections) {
         if (const AADLObjectIface *srci = connection->sourceInterface()) {
             if (const AADLObjectIface *dsti = connection->targetInterface()) {
                 if (srci->isRequired() || dsti->isRequired()) {
                     const bool inheritPI = isInheritedRI(srci) || isInheritedRI(dsti);
-                    if (inheritPI)
+                    if (inheritPI && !oneIsCyclic)
                         continue;
                 }
 
-                if (k != srci->kind() || k != dsti->kind()) {
+                if (k != srci->kind() || k != dsti->kind() || oneIsCyclic) {
                     const QVariantList params = { QVariant::fromValue(connection),
                                                   QVariant::fromValue(m_model.data()) };
                     if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
