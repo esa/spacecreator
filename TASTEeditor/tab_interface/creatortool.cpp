@@ -355,7 +355,7 @@ struct CommandsMacroWrapper {
                 macroCmd->undo(); // unperform all the stuff
                 macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
             }
-            taste3::cmd::CommandsStack::current()->undo(); // just remove the history record
+            taste3::cmd::CommandsStack::current()->undo(); // just removes the history record
         }
     }
 
