@@ -60,15 +60,30 @@ public:
     bool isAttr(const QModelIndex &id) const override;
     bool isProp(const QModelIndex &id) const override;
 
-private:
+protected:
     AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
+    virtual bool isEditable(const QModelIndex &index) const;
     void createNewRow(const QString &title, const QVariant &value, ItemType type, int row);
-
-    bool isEditableCellFunction(const QModelIndex &index) const;
-    bool isEditableCellIface(const QModelIndex &index) const;
 };
 
+class FunctionPropertiesListModel : public PropertiesListModel
+{
+public:
+    explicit FunctionPropertiesListModel(QObject *parent = nullptr);
+
+protected:
+    bool isEditable(const QModelIndex &index) const override;
+};
+
+class InterfacePropertiesListModel : public PropertiesListModel
+{
+public:
+    explicit InterfacePropertiesListModel(QObject *parent = nullptr);
+
+protected:
+    bool isEditable(const QModelIndex &index) const override;
+};
 } // namespace aadl
 } // namespace taste3
