@@ -349,6 +349,11 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
     taste3::cmd::CommandsStack::current()->beginMacro(QObject::tr("Create connection"));
+
+    const struct LastMacroFinisher {
+        ~LastMacroFinisher() { taste3::cmd::CommandsStack::current()->endMacro(); }
+    } macroFinisher;
+
     AADLObjectIface::CreationInfo ifaceCommons;
 
     bool startRequired = true;
@@ -364,8 +369,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         ifaceCommons.id = info.endIfaceId;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (auto cmd = createInterfaceCommand(ifaceCommons))
+            taste3::cmd::CommandsStack::current()->push(cmd);
+        else
+            return;
     } else if (info.endIface && !info.startIface) {
         startRequired = (info.endIface->isRequired() && info.isToOrFromNested)
                 || (info.endIface->isProvided() && !info.isToOrFromNested);
@@ -377,8 +384,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (auto cmd = createInterfaceCommand(ifaceCommons))
+            taste3::cmd::CommandsStack::current()->push(cmd);
+        else
+            return;
     } else if (!info.startIface && !info.endIface) {
         ifaceCommons.model = m_model.data();
 
@@ -395,8 +404,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     (startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided);
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (auto cmd = createInterfaceCommand(ifaceCommons))
+            taste3::cmd::CommandsStack::current()->push(cmd);
+        else
+            return;
 
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
@@ -410,8 +421,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (auto cmd = createInterfaceCommand(ifaceCommons))
+            taste3::cmd::CommandsStack::current()->push(cmd);
+        else
+            return;
     } else {
         AADLObjectIface *pi =
                 AADLObjectConnection::selectIface<AADLObjectIfaceProvided *>(info.startIface, info.endIface);
@@ -452,8 +465,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
             ifaceCommons.position = intersectionPoints.last();
             ifaceCommons.id = common::createId();
 
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+            if (auto cmd = createInterfaceCommand(ifaceCommons))
+                taste3::cmd::CommandsStack::current()->push(cmd);
+            else
+                return;
         }
 
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
@@ -497,8 +512,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
             ifaceCommons.id = ifaceCommons.id;
 
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+            if (auto cmd = createInterfaceCommand(ifaceCommons))
+                taste3::cmd::CommandsStack::current()->push(cmd);
+            else
+                return;
         }
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
                                       prevEndIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
@@ -526,8 +543,6 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                                       prevStartIfaceId, prevEndIfaceId, QVariant::fromValue(points) };
         taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
     }
-
-    taste3::cmd::CommandsStack::current()->endMacro();
 }
 
 void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
@@ -654,28 +669,36 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
     }
 }
 
+QUndoCommand *CreatorTool::createInterfaceCommand(const AADLObjectIface::CreationInfo &info) const
+{
+    if (!info.function)
+        return nullptr;
+
+    if (info.function->isFunction()) {
+        if (auto fn = info.function->as<const AADLObjectFunction *>()) {
+            if (const AADLObjectFunctionType *fnType = fn->instanceOf()) {
+                const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
+                                           "Please edit the related <b>%2</b> instead.")
+                                                .arg(fn->title(), fnType->title());
+                emit informUser(tr("Interface adding"), message);
+                return nullptr;
+            }
+        }
+    }
+
+    return cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, info.toVarList());
+}
+
 void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos)
 {
     if (QGraphicsItem *parentItem = utils::nearestItem(
                 scene, utils::adjustFromPoint(pos, ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
         AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
-
-        if (parentObject->isFunction()) {
-            if (auto fn = parentObject->as<const AADLObjectFunction *>()) {
-                if (const AADLObjectFunctionType *fnType = fn->instanceOf()) {
-                    const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
-                                               "Please edit the related <b>%2</b> instead.")
-                                                    .arg(fn->title(), fnType->title());
-                    emit informUser(tr("Interface adding"), message);
-                    return;
-                }
-            }
-        }
-
         AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::InvalidId);
         ifaceDescr.resetKind();
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+
+        if (auto cmd = createInterfaceCommand(ifaceDescr))
+            taste3::cmd::CommandsStack::current()->push(cmd);
     }
 }
 
