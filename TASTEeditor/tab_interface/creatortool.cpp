@@ -339,6 +339,37 @@ static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
     return itemRect;
 };
 
+struct CommandsMacroWrapper {
+    CommandsMacroWrapper(const QString &title) { taste3::cmd::CommandsStack::current()->beginMacro(title); }
+
+    ~CommandsMacroWrapper()
+    {
+        taste3::cmd::CommandsStack::current()->endMacro();
+
+        if (!m_keepMacro) {
+
+            // I found no other way to remove a macro from the stack:
+            const int posOfMacro = taste3::cmd::CommandsStack::current()->index() - 1;
+            if (auto macroCmd =
+                        const_cast<QUndoCommand *>(taste3::cmd::CommandsStack::current()->command(posOfMacro))) {
+                macroCmd->undo(); // unperform all the stuff
+                macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
+            }
+            taste3::cmd::CommandsStack::current()->undo(); // just removes the history record
+        }
+    }
+
+    bool addCommand(QUndoCommand *cmd)
+    {
+        if (!cmd)
+            return false;
+        taste3::cmd::CommandsStack::current()->push(cmd);
+        return true;
+    }
+
+    bool m_keepMacro { false };
+};
+
 void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) const
 {
     ConnectionInfo info = ConnectionCreationValidator::validate(m_view ? m_view->scene() : nullptr, connectionPoints);
@@ -348,8 +379,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     const AADLFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
     QPointF endInterfacePoint { info.endPointAdjusted };
-    taste3::cmd::CommandsStack::current()->beginMacro(QObject::tr("Create connection"));
     AADLObjectIface::CreationInfo ifaceCommons;
+    CommandsMacroWrapper cmdMacro(tr("Create connection"));
 
     bool startRequired = true;
     if (info.startIface && !info.endIface) {
@@ -364,8 +395,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         ifaceCommons.id = info.endIfaceId;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+            return;
     } else if (info.endIface && !info.startIface) {
         startRequired = (info.endIface->isRequired() && info.isToOrFromNested)
                 || (info.endIface->isProvided() && !info.isToOrFromNested);
@@ -377,8 +408,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         ifaceCommons.id = info.startIfaceId;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+            return;
     } else if (!info.startIface && !info.endIface) {
         ifaceCommons.model = m_model.data();
 
@@ -395,8 +426,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     (startRequired ? AADLObjectIface::IfaceType::Required : AADLObjectIface::IfaceType::Provided);
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+            return;
 
         ifaceCommons.function = info.endObject;
         ifaceCommons.position = info.endPointAdjusted;
@@ -410,8 +441,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
         ifaceCommons.resetKind();
 
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+        if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+            return;
     } else {
         AADLObjectIface *pi =
                 AADLObjectConnection::selectIface<AADLObjectIfaceProvided *>(info.startIface, info.endIface);
@@ -452,13 +483,14 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
             ifaceCommons.position = intersectionPoints.last();
             ifaceCommons.id = common::createId();
 
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+            if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+                return;
         }
 
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
                                       prevStartIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
+        if (!cmdMacro.addCommand(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+            return;
 
         firstExcludedPoint = endIt != connectionPoints.constEnd() ? *endIt : QPointF();
         startInterfacePoint = intersectionPoints.last();
@@ -497,12 +529,13 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                     startRequired ? AADLObjectIface::IfaceType::Provided : AADLObjectIface::IfaceType::Required;
             ifaceCommons.id = ifaceCommons.id;
 
-            taste3::cmd::CommandsStack::current()->push(
-                    cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceCommons.toVarList()));
+            if (!cmdMacro.addCommand(createInterfaceCommand(ifaceCommons)))
+                return;
         }
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(item->entity()),
                                       prevEndIfaceId, ifaceCommons.id, QVariant::fromValue(points) };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
+        if (!cmdMacro.addCommand(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+            return;
 
         lastExcludedPoint = endIt != connectionPoints.crend() ? *endIt : QPointF();
         endInterfacePoint = intersectionPoints.last();
@@ -524,10 +557,11 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
                                       QVariant::fromValue(parentForConnection ? parentForConnection->entity()
                                                                               : nullptr),
                                       prevStartIfaceId, prevEndIfaceId, QVariant::fromValue(points) };
-        taste3::cmd::CommandsStack::current()->push(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params));
+        if (!cmdMacro.addCommand(cmd::CommandsFactory::create(cmd::CreateConnectionEntity, params)))
+            return;
     }
 
-    taste3::cmd::CommandsStack::current()->endMacro();
+    cmdMacro.m_keepMacro = true;
 }
 
 void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
@@ -654,16 +688,36 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
     }
 }
 
+QUndoCommand *CreatorTool::createInterfaceCommand(const AADLObjectIface::CreationInfo &info) const
+{
+    if (!info.function)
+        return nullptr;
+
+    if (info.function->isFunction()) {
+        if (auto fn = info.function->as<const AADLObjectFunction *>()) {
+            if (const AADLObjectFunctionType *fnType = fn->instanceOf()) {
+                const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
+                                           "Please edit the related <b>%2</b> instead.")
+                                                .arg(fn->title(), fnType->title());
+                emit informUser(tr("Interface adding"), message);
+                return nullptr;
+            }
+        }
+    }
+
+    return cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, info.toVarList());
+}
+
 void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos)
 {
     if (QGraphicsItem *parentItem = utils::nearestItem(
                 scene, utils::adjustFromPoint(pos, ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
         AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
-
         AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::InvalidId);
         ifaceDescr.resetKind();
-        taste3::cmd::CommandsStack::current()->push(
-                cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, ifaceDescr.toVarList()));
+
+        if (auto cmd = createInterfaceCommand(ifaceDescr))
+            taste3::cmd::CommandsStack::current()->push(cmd);
     }
 }
 
@@ -683,6 +737,7 @@ void CreatorTool::removeSelectedItems()
         return;
 
     if (auto scene = m_view->scene()) {
+        QStringList clonedIfaces;
         taste3::cmd::CommandsStack::current()->beginMacro(tr("Remove selected item(s)"));
         while (!scene->selectedItems().isEmpty()) {
             clearPreviewItem();
@@ -692,6 +747,16 @@ void CreatorTool::removeSelectedItems()
 
             if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->aadlObject()) {
+                    if (entity->isInterface()) {
+                        if (auto iface = entity->as<const AADLObjectIface *>()) {
+                            if (const AADLObjectIface *srcIface = iface->cloneOf()) {
+                                clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
+                                                            .arg(iface->parentObject()->title(), iface->title(),
+                                                                 srcIface->parentObject()->title()));
+                                continue;
+                            }
+                        }
+                    }
                     const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(m_model.data()) };
                     if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
                         taste3::cmd::CommandsStack::current()->push(cmdRm);
@@ -699,6 +764,15 @@ void CreatorTool::removeSelectedItems()
             }
         }
         taste3::cmd::CommandsStack::current()->endMacro();
+
+        if (!clonedIfaces.isEmpty()) {
+            const QString names = clonedIfaces.join(QStringLiteral("<br>"));
+            const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
+                                   "<b>%1</b><br><br>"
+                                   "Please edit the related FunctionType.")
+                                        .arg(names);
+            emit informUser(tr("Interface removal"), msg);
+        }
     }
 }
 

@@ -30,6 +30,7 @@ class QGraphicsRectItem;
 class QGraphicsPathItem;
 class QGraphicsScene;
 class QMenu;
+class QUndoCommand;
 
 namespace taste3 {
 namespace aadl {
@@ -60,6 +61,7 @@ public:
 Q_SIGNALS:
     void created();
     void propertyEditorRequest(AADLObject *entity) const;
+    void informUser(const QString &title, const QString &message) const;
 
 protected:
     QPointer<QGraphicsView> m_view;
@@ -101,6 +103,8 @@ private:
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
+
+    QUndoCommand *createInterfaceCommand(const AADLObjectIface::CreationInfo &info) const;
 };
 
 } // namespace aadl

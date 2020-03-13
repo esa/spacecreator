@@ -267,6 +267,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
             m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Pointer);
         });
         connect(m_tool, &aadl::CreatorTool::propertyEditorRequest, this, &InterfaceTabDocument::showPropertyEditor);
+        connect(m_tool, &aadl::CreatorTool::informUser, this, &InterfaceTabDocument::showInfoMessage);
     }
 
     if (!m_actionGroup) {
@@ -655,6 +656,19 @@ void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
     aadl::PropertiesDialog *dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
+}
+
+void InterfaceTabDocument::showInfoMessage(const QString &title, const QString &message)
+{
+    // TODO: extend the AbstractTabDocument API for using QMessageBox in mainwindow, not here.
+    // Something like:
+    //
+    // MessageBoxHandler mb(title, message);
+    // mb.buttons = QMessageBox::Ok;
+    // mb.callback = &someCallbackToHandle(StandardButton);
+    // emit requestMessageBox(mb)
+
+    QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
 }
 
 void InterfaceTabDocument::clearScene()

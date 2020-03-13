@@ -94,6 +94,8 @@ protected Q_SLOTS:
 
     void showPropertyEditor(aadl::AADLObject *obj);
 
+    void showInfoMessage(const QString &title, const QString &message);
+
 private:
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
     aadl::AADLFunctionGraphicsItem *rootItem() const;
