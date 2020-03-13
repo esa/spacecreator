@@ -107,6 +107,22 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
         }
     }
 
+    if (!result.startIface) {
+        if (auto fn = result.startObject->as<const AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
+    if (!result.endIface) {
+        if (auto fn = result.endObject->as<const AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
     result.startIfaceId = result.startIface ? result.startIface->id() : common::createId();
     result.endIfaceId = result.endIface ? result.endIface->id() : common::createId();
 
