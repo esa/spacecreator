@@ -240,9 +240,14 @@ AADLObjectFunction *AADLObjectIface::function() const
     return qobject_cast<AADLObjectFunction *>(parentObject());
 }
 
-bool AADLObjectIface::isClone() const
+AADLObjectIface *AADLObjectIface::cloneOf() const
 {
     return d->m_cloneOf;
+}
+
+bool AADLObjectIface::isClone() const
+{
+    return nullptr != cloneOf();
 }
 
 bool AADLObjectIface::isCloned() const

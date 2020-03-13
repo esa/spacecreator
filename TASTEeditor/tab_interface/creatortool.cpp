@@ -707,8 +707,10 @@ void CreatorTool::removeSelectedItems()
                 if (auto entity = iObj->aadlObject()) {
                     if (entity->isInterface()) {
                         if (auto iface = entity->as<const AADLObjectIface *>()) {
-                            if (iface->isClone()) {
-                                clonedIfaces.append(iface->title());
+                            if (const AADLObjectIface *srcIface = iface->cloneOf()) {
+                                clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
+                                                            .arg(iface->parentObject()->title(), iface->title(),
+                                                                 srcIface->parentObject()->title()));
                                 continue;
                             }
                         }
@@ -722,10 +724,10 @@ void CreatorTool::removeSelectedItems()
         taste3::cmd::CommandsStack::current()->endMacro();
 
         if (!clonedIfaces.isEmpty()) {
-            const QString names = clonedIfaces.join(QStringLiteral("\n"));
-            const QString msg = tr("The following interfaces can not be removed directly:\n"
-                                   "%1\n"
-                                   "Please edit its related FunctionType.")
+            const QString names = clonedIfaces.join(QStringLiteral("<br>"));
+            const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
+                                   "<b>%1</b><br><br>"
+                                   "Please edit the related FunctionType.")
                                         .arg(names);
             emit informUser(tr("Interface removal"), msg);
         }

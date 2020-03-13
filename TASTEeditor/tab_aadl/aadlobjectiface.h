@@ -116,6 +116,7 @@ public:
 
     AADLObjectFunction *function() const;
 
+    AADLObjectIface *cloneOf() const;
     bool isClone() const;
     bool isCloned() const;
     QVector<QPointer<AADLObjectIface>> clones() const;
