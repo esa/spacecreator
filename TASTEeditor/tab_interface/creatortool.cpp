@@ -660,6 +660,18 @@ void CreatorTool::handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceT
                 scene, utils::adjustFromPoint(pos, ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
         AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
 
+        if (parentObject->isFunction()) {
+            if (auto fn = parentObject->as<const AADLObjectFunction *>()) {
+                if (const AADLObjectFunctionType *fnType = fn->instanceOf()) {
+                    const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
+                                               "Please edit the related <b>%2</b> instead.")
+                                                    .arg(fn->title(), fnType->title());
+                    emit informUser(tr("Interface adding"), message);
+                    return;
+                }
+            }
+        }
+
         AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, common::InvalidId);
         ifaceDescr.resetKind();
         taste3::cmd::CommandsStack::current()->push(
