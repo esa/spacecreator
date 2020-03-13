@@ -209,7 +209,7 @@ public:
 
     virtual void setProp(const QString &name, const QVariant &val) override;
 
-    bool inheritPi() const;
+    bool isInheritPI() const;
     bool hasPrototypePi() const;
 
     QStringList inheritedLables() const;
@@ -217,7 +217,7 @@ public:
     void unsetPrototype(const AADLObjectIfaceProvided *pi);
 
 Q_SIGNALS:
-    void propChanged_labelInheritance(bool inheritance);
+    void propChanged_InheritPI(bool inheritance);
     void inheritedLabelsChanged(const QStringList &labels);
 
 protected:

@@ -73,6 +73,7 @@ protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
     void updateLabel();
     void updateKind();
+    void onAttrOrPropChanged(taste3::aadl::meta::Props::Token t);
 
 private:
     QGraphicsPathItem *m_type = nullptr;

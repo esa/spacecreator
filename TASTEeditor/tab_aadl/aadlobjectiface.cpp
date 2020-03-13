@@ -120,13 +120,14 @@ AADLObjectIface::~AADLObjectIface()
 
 void AADLObjectIface::setupInitialAttrs()
 {
-    setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Sporadic));
     if (isProvided()) {
+        setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Sporadic));
         setAttr(meta::Props::token(meta::Props::Token::period), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::wcet), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
     } else {
-        setProp(meta::Props::token(meta::Props::Token::labelInheritance), true);
+        setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Any));
+        setProp(meta::Props::token(meta::Props::Token::InheritPI), true);
     }
 }
 
@@ -473,11 +474,11 @@ void AADLObjectIface::reflectProps(const AADLObjectIface *from)
     QHash<QString, QVariant> newProps = from->props();
     const bool isFunctionTypeInherited = from->isNestedInFunctionType();
 
-    for (auto t : { meta::Props::Token::labelInheritance, meta::Props::Token::coordinates,
-                    meta::Props::Token::InnerCoordinates }) {
-        const bool isLabelInheritanceFlag = t == meta::Props::Token::labelInheritance;
+    for (auto t :
+         { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::InnerCoordinates }) {
+        const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
         const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
-        if (!isLabelInheritanceFlag || isInheritedPI)
+        if (!isInheritPIFlag || isInheritedPI)
             revertProperty(t, newProps, currProps);
     }
 
@@ -497,14 +498,14 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
     if (!name.isEmpty()) {
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
-        case meta::Props::Token::labelInheritance: {
+        case meta::Props::Token::InheritPI: {
             const bool newVal = val.toBool();
-            if (prop(meta::Props::token(meta::Props::Token::labelInheritance)) != newVal) {
+            if (prop(meta::Props::token(meta::Props::Token::InheritPI)) != newVal) {
                 // should be handled in Connection _before_ the actual value change:
                 emit inheritedLabelsChanged(inheritedLables());
 
                 AADLObject::setProp(name, val);
-                emit propChanged_labelInheritance(newVal);
+                emit propChanged_InheritPI(newVal);
             }
             break;
         }
@@ -522,7 +523,7 @@ QStringList AADLObjectIfaceRequired::inheritedLables() const
     const QString &currentTitle = title();
     if (currentTitle != m_originalFields.name)
         result.append(currentTitle);
-    else if (inheritPi()) {
+    else if (isInheritPI()) {
         result = collectInheritedLabels();
 
         // append suffix for connection to the same named PIs with same parent (Function.PI becames Funtcion.PI#N)
@@ -599,7 +600,7 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
             const bool toSibling = !isMeSrc && !isMeDst;
             if (toSibling)
                 if (AADLObjectIfaceRequired *otherRI = findRI(c, pi)) {
-                    if (!otherRI->inheritPi())
+                    if (!otherRI->isInheritPI())
                         continue;
 
                     const QString &oldLabel = pi->title();
@@ -615,7 +616,7 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
 
 void AADLObjectIfaceRequired::setPrototype(const AADLObjectIfaceProvided *pi)
 {
-    if (!pi || !inheritPi())
+    if (!pi || !isInheritPI())
         return;
 
     if (!m_prototypes.contains(pi))
@@ -633,15 +634,15 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
         return;
 
     m_prototypes.removeAll(pi);
-    if (m_prototypes.isEmpty() || !inheritPi())
+    if (m_prototypes.isEmpty() || !isInheritPI())
         restoreInternals(pi);
 
     emit inheritedLabelsChanged(inheritedLables());
 }
 
-bool AADLObjectIfaceRequired::inheritPi() const
+bool AADLObjectIfaceRequired::isInheritPI() const
 {
-    return prop(meta::Props::token(meta::Props::Token::labelInheritance)).toBool();
+    return prop(meta::Props::token(meta::Props::Token::InheritPI)).toBool();
 }
 
 bool AADLObjectIfaceRequired::hasPrototypePi() const
@@ -654,16 +655,16 @@ void AADLObjectIfaceRequired::cloneInternals(const AADLObjectIface *from)
     AADLObjectIface::cloneInternals(from);
 
     if (const AADLObjectIfaceRequired *ri = from->as<const AADLObjectIfaceRequired *>())
-        connect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this,
-                &AADLObjectIfaceRequired::propChanged_labelInheritance, Qt::UniqueConnection);
+        connect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this,
+                &AADLObjectIfaceRequired::propChanged_InheritPI, Qt::UniqueConnection);
 }
 
 void AADLObjectIfaceRequired::restoreInternals(const AADLObjectIface *disconnectMe)
 {
     AADLObjectIface::restoreInternals(disconnectMe);
     if (const AADLObjectIfaceRequired *ri = disconnectMe->as<const AADLObjectIfaceRequired *>())
-        disconnect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this,
-                   &AADLObjectIfaceRequired::propChanged_labelInheritance);
+        disconnect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this,
+                   &AADLObjectIfaceRequired::propChanged_InheritPI);
 }
 
 } // ns aadl

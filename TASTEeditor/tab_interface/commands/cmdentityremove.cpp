@@ -101,7 +101,7 @@ void CmdEntityRemove::redo()
 
     for (auto it = m_relatedConnections.cbegin(); it != m_relatedConnections.cend(); ++it) {
         if (auto *connection = qobject_cast<AADLObjectConnection *>(*it))
-            connection->uninheritLabel();
+            connection->unsetInheritPI();
 
         advancedRemove(*it);
     }
@@ -130,7 +130,7 @@ void CmdEntityRemove::undo()
 
     for (auto it = m_relatedConnections.crbegin(); it != m_relatedConnections.crend(); ++it) {
         if (AADLObjectConnection *connection = qobject_cast<AADLObjectConnection *>(*it))
-            connection->inheritLabel();
+            connection->setInheritPI();
 
         advancedRestore(*it);
     }

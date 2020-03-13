@@ -63,7 +63,7 @@
             <Output_Parameter name="Property_58" type="Timer" encoding="ACN"/>
             <Output_Parameter name="Property_59" type="Directive" encoding="ACN"/>
             <Property name="Taste::coordinates" value="20600 2300"/>
-            <Property name="Taste::labelInheritance" value="true"/>
+            <Property name="Taste::InheritPI" value="true"/>
         </Required_Interface>
     </Function>
     <Function name="Function_2" language="" is_type="NO" instance_of="">
