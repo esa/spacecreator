@@ -683,6 +683,7 @@ void CreatorTool::removeSelectedItems()
         return;
 
     if (auto scene = m_view->scene()) {
+        QStringList clonedIfaces;
         taste3::cmd::CommandsStack::current()->beginMacro(tr("Remove selected item(s)"));
         while (!scene->selectedItems().isEmpty()) {
             clearPreviewItem();
@@ -692,6 +693,14 @@ void CreatorTool::removeSelectedItems()
 
             if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->aadlObject()) {
+                    if (entity->isInterface()) {
+                        if (auto iface = entity->as<const AADLObjectIface *>()) {
+                            if (iface->isClone()) {
+                                clonedIfaces.append(iface->title());
+                                continue;
+                            }
+                        }
+                    }
                     const QVariantList params = { QVariant::fromValue(entity), QVariant::fromValue(m_model.data()) };
                     if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
                         taste3::cmd::CommandsStack::current()->push(cmdRm);
@@ -699,6 +708,15 @@ void CreatorTool::removeSelectedItems()
             }
         }
         taste3::cmd::CommandsStack::current()->endMacro();
+
+        if (!clonedIfaces.isEmpty()) {
+            const QString names = clonedIfaces.join(QStringLiteral("\n"));
+            const QString msg = tr("The following interfaces can not be removed directly:\n"
+                                   "%1\n"
+                                   "Please edit its related FunctionType.")
+                                        .arg(names);
+            emit informUser(tr("Interface removal"), msg);
+        }
     }
 }
 

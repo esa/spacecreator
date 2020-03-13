@@ -60,6 +60,7 @@ public:
 Q_SIGNALS:
     void created();
     void propertyEditorRequest(AADLObject *entity) const;
+    void informUser(const QString &title, const QString &message) const;
 
 protected:
     QPointer<QGraphicsView> m_view;
