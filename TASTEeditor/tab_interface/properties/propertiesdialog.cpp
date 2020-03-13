@@ -104,27 +104,31 @@ void PropertiesDialog::initTabs()
         return;
 
     auto initAttributesView = [this](const QString &title) {
-        PropertiesListModel *modelAttrs = new PropertiesListModel(this);
-        modelAttrs->setDataObject(m_dataObject);
-
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->setModel(modelAttrs);
+        QStyledItemDelegate *modelDelegate { nullptr };
+        PropertiesListModel *modelAttrs { nullptr };
 
         switch (m_dataObject->aadlType()) {
         case AADLObject::Type::Function: {
-            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
-                                                             new FunctionAttrDelegate(viewAttrs->tableView()));
+            modelAttrs = new FunctionPropertiesListModel(this);
+            modelDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
             break;
         }
         case AADLObject::Type::Interface: {
-            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue,
-                                                             new InterfaceAttrDelegate(viewAttrs->tableView()));
+            modelAttrs = new InterfacePropertiesListModel(this);
+            modelDelegate = new InterfaceAttrDelegate(viewAttrs->tableView());
+            break;
+        }
+        default:
+            modelAttrs = new InterfacePropertiesListModel(this);
             break;
         }
 
-        default:
-            break;
-        }
+        modelAttrs->setDataObject(m_dataObject);
+        viewAttrs->setModel(modelAttrs);
+
+        if (modelDelegate)
+            viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, modelDelegate);
 
         ui->tabWidget->insertTab(0, viewAttrs, tr("%1 Attributes").arg(title));
     };

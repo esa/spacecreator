@@ -56,6 +56,7 @@ public:
         NoEndFunction,
         CannotCreateEndIface,
         SameDirectionIfaceWrongParents,
+        ToFromNestedDifferentDirection,
         DirectIfaceCreationInInstanceOfFunctionType,
     };
     Q_ENUM(FailReason)

@@ -100,6 +100,13 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QVector
         return result;
     }
 
+    if (result.startIface && result.endIface && result.isToOrFromNested) {
+        if (result.startIface->direction() != result.endIface->direction()) {
+            result.setFailed(FailReason::ToFromNestedDifferentDirection);
+            return result;
+        }
+    }
+
     if (result.startIface && result.endIface) {
         if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
             result.setFailed(FailReason::SameDirectionIfaceWrongParents);
