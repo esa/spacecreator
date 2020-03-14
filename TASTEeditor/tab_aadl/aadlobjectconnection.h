@@ -93,6 +93,16 @@ public:
     void setDelayedStart(AADLObjectConnection::EndPointInfo *start);
     void setDelayedEnd(AADLObjectConnection::EndPointInfo *end);
 
+    enum class ConnectionType
+    {
+        NotAConnection = 0,
+        RI2PI,
+        PI2RI,
+        RI2RI,
+        PI2PI
+    };
+    AADLObjectConnection::ConnectionType connectionType() const;
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
 
@@ -107,6 +117,8 @@ private:
 
     bool lookupEndpointsPostponed();
     void clearPostponedEndpoints();
+
+    bool isOneDirection() const;
 };
 
 } // ns aadl

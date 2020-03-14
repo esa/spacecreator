@@ -589,9 +589,9 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
     const common::Id &parentId = parentFn->id();
     for (const AADLObjectIfaceProvided *pi : m_prototypes) {
         const QVector<AADLObjectConnection *> &relatedConnecions = objectsModel()->getConnectionsForIface(pi->id());
-        QVector<AADLObjectConnection *>::const_reverse_iterator i = relatedConnecions.crbegin();
-        while (i != relatedConnecions.crend()) {
+        for (auto i = relatedConnecions.crbegin(); i != relatedConnecions.crend(); ++i) {
             AADLObjectConnection *c = *i;
+
             const bool sameSrcFn = c->source() && c->source()->id() == parentId;
             const bool sameDstFn = c->target() && c->target()->id() == parentId;
             const bool sameFn = sameSrcFn || sameDstFn;
@@ -609,7 +609,6 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
                         result.replace(labelPos, oldLabel + "#" + QString::number(relatedConnecions.indexOf(c)));
                     }
                 }
-            ++i;
         }
     }
 }
@@ -642,7 +641,8 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
 
 bool AADLObjectIfaceRequired::isInheritPI() const
 {
-    return prop(meta::Props::token(meta::Props::Token::InheritPI)).toBool();
+    return prop(meta::Props::token(meta::Props::Token::InheritPI)).toString().toLower().trimmed()
+            == QStringLiteral("true");
 }
 
 bool AADLObjectIfaceRequired::hasPrototypePi() const

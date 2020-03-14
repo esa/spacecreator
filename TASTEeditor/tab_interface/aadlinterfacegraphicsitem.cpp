@@ -511,6 +511,9 @@ void AADLInterfaceGraphicsItem::onAttrOrPropChanged(taste3::aadl::meta::Props::T
     switch (t) {
         //    case taste3::aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
     case taste3::aadl::meta::Props::Token::InheritPI: {
+#ifdef QT_DEBUG
+        qWarning() << "check for call duplication" << t;
+#endif
         updateLabel();
         break;
     }

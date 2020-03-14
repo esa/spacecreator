@@ -75,6 +75,7 @@ SOURCES += \
         main.cpp \
         tab_aadl/aadlnamevalidator.cpp \
         tab_interface/commands/cmdentityautolayout.cpp \
+        tab_interface/commands/cmdifacedatachangebase.cpp \
         templating/aadlobjecttemplateproperty.cpp \
         templating/stringtemplate.cpp \
         templating/templateeditor.cpp \
@@ -191,6 +192,7 @@ HEADERS += \
         logging/loghandler.h \
         tab_aadl/aadlnamevalidator.h \
         tab_interface/commands/cmdentityautolayout.h \
+        tab_interface/commands/cmdifacedatachangebase.h \
         templating/aadlobjecttemplateproperty.h \
         templating/stringtemplate.h \
         templating/templateeditor.h \

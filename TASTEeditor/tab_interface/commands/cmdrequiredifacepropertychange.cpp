@@ -30,104 +30,41 @@ QVariant getCurrentProperty(const AADLObjectIfaceRequired *entity, const QString
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
-QVector<QPointer<AADLObjectIfaceRequired>> getRelatedIfaces(AADLObjectIfaceRequired *ri)
-{
-    QVector<QPointer<AADLObjectIfaceRequired>> ifaces;
-    ifaces.append(ri);
-    if (ri->isCloned())
-        for (AADLObjectIface *iface : ri->clones())
-            if (AADLObjectIfaceRequired *ifaceRequired = iface->as<AADLObjectIfaceRequired *>())
-                ifaces.append(ifaceRequired);
-    return ifaces;
-}
-
-QVector<AADLObjectConnection *> getRelatedConnections(const QPointer<AADLObjectIfaceRequired> iface)
-{
-    QVector<AADLObjectConnection *> affected;
-
-    if (!iface)
-        return affected;
-
-    const AADLObjectsModel *model = iface->objectsModel();
-    if (!model)
-        return affected;
-
-    for (AADLObjectIfaceRequired *ri : getRelatedIfaces(iface))
-        for (AADLObjectConnection *connection : model->getConnectionsForIface(ri->id()))
-            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>())
-                affected.append(connection);
-
-    return affected;
-}
-
-QVector<QUndoCommand *> prepareRemoveConnectionCommands(const QVector<AADLObjectConnection *> &connections,
-                                                        AADLObjectsModel *model)
-{
-    QVector<QUndoCommand *> commands;
-    for (AADLObjectConnection *connection : connections) {
-        if (const AADLObjectIfaceRequired *ri = connection->selectIface<const AADLObjectIfaceRequired *>()) {
-            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>()) {
-                const QString riOriginalKind =
-                        ri->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString();
-                if (ri->kindFromString(riOriginalKind) != pi->kind() || ri->originalParams() != pi->params()) {
-                    const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(model) };
-                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        commands.append(cmdRm);
-                }
-            }
-        }
-    }
-    return commands;
-}
-
 CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(AADLObjectIfaceRequired *entity, const QString &propName,
                                                                const QVariant &value)
-    : QUndoCommand()
-    , m_ri(entity)
-    , m_model(m_ri ? m_ri->objectsModel() : nullptr)
-    , m_relatedConnections()
-    , m_propertyName(propName)
-    , m_propertyToken(meta::Props::token(m_propertyName))
-    , m_oldValue(getCurrentProperty(entity, m_propertyName))
-    , m_newValue(value)
+    : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
-    setText(QObject::tr("Change RI inheritance"));
-
-    if (m_propertyToken == meta::Props::Token::labelInheritance) {
-        m_relatedConnections = getRelatedConnections(m_ri);
+    if (m_targetToken == meta::Props::Token::InheritPI) {
         const bool lostInheritance = !m_newValue.toBool();
-        if (lostInheritance)
-            m_cmdRmConnection = prepareRemoveConnectionCommands(m_relatedConnections, m_model);
+        if (lostInheritance) {
+            m_relatedConnections = getRelatedConnections();
+            prepareRemoveConnectionCommands();
+        }
     }
-}
-
-CmdRequiredIfacePropertyChange::~CmdRequiredIfacePropertyChange()
-{
-    qDeleteAll(m_cmdRmConnection);
 }
 
 void CmdRequiredIfacePropertyChange::redo()
 {
-    switch (m_propertyToken) {
-    case meta::Props::Token::labelInheritance: {
-        updateLabelInheritance(m_newValue.toBool());
+    switch (m_targetToken) {
+    case meta::Props::Token::InheritPI: {
+        setInheritPI(m_newValue.toBool());
         break;
     }
     default:
-        m_ri->setProp(m_propertyName, m_newValue);
+        m_iface->setProp(m_targetName, m_newValue);
         break;
     }
 }
 
 void CmdRequiredIfacePropertyChange::undo()
 {
-    switch (m_propertyToken) {
-    case meta::Props::Token::labelInheritance: {
-        updateLabelInheritance(m_oldValue.toBool());
+    switch (m_targetToken) {
+    case meta::Props::Token::InheritPI: {
+        setInheritPI(m_oldValue.toBool());
         break;
     }
     default:
-        m_ri->setProp(m_propertyName, m_oldValue);
+        m_iface->setProp(m_targetName, m_oldValue);
         break;
     }
 }
@@ -143,25 +80,51 @@ int CmdRequiredIfacePropertyChange::id() const
     return ChangeRequiredIfaceProperty;
 }
 
-void CmdRequiredIfacePropertyChange::updateLabelInheritance(bool nowInherited)
+void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
 {
-    if (!m_ri || !m_model)
+    if (!m_iface || !m_model)
         return;
 
     if (nowInherited) {
-        m_ri->setProp(m_propertyName, nowInherited);
+        m_iface->setProp(m_targetName, nowInherited);
 
         for (auto cmd : m_cmdRmConnection)
             cmd->undo();
         for (auto connection : m_relatedConnections)
-            connection->inheritLabel();
+            connection->setInheritPI();
     } else {
         for (auto connection : m_relatedConnections)
-            connection->uninheritLabel();
+            connection->unsetInheritPI();
         for (auto cmd : m_cmdRmConnection)
             cmd->redo();
 
-        m_ri->setProp(m_propertyName, nowInherited);
+        m_iface->setProp(m_targetName, nowInherited);
+    }
+}
+
+bool CmdRequiredIfacePropertyChange::connectionMustDie(const AADLObjectConnection *connection) const
+{
+    return false;
+}
+
+void CmdRequiredIfacePropertyChange::prepareRemoveConnectionCommands()
+{
+    for (AADLObjectConnection *connection : m_relatedConnections) {
+        if (const AADLObjectIfaceRequired *ri = connection->selectIface<const AADLObjectIfaceRequired *>()) {
+            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>()) {
+                const QString riOriginalKind =
+                        ri->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString();
+                const AADLObjectIface::OperationKind riKind = ri->kindFromString(riOriginalKind);
+                const bool anyKind = riKind == AADLObjectIface::OperationKind::Any;
+                const bool sameKind = anyKind || ri->kind() == pi->kind();
+                const bool sameParams = ri->originalParams() == pi->params();
+                if (!sameKind || !sameParams) {
+                    const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(m_model) };
+                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                        m_cmdRmConnection.append(cmdRm);
+                }
+            }
+        }
     }
 }
 

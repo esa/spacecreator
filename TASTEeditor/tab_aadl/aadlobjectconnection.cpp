@@ -124,16 +124,25 @@ bool AADLObjectConnection::targetInterfaceIsProvided() const
 
 void AADLObjectConnection::setInheritPI()
 {
+    if (isOneDirection())
+        return;
+
     handleInheritPIChange(AADLObjectConnection::InheritPIChange::Inherit);
 }
 
 void AADLObjectConnection::unsetInheritPI()
 {
+    if (isOneDirection())
+        return;
+
     handleInheritPIChange(AADLObjectConnection::InheritPIChange::NotInherit);
 }
 
 void AADLObjectConnection::handleInheritPIChange(AADLObjectConnection::InheritPIChange inheritance)
 {
+    if (isOneDirection())
+        return;
+
     auto ri = selectIface<AADLObjectIfaceRequired *>();
     const auto pi = selectIface<const AADLObjectIfaceProvided *>();
 
@@ -163,6 +172,9 @@ void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
 
+    if (isOneDirection())
+        return;
+
     if (auto ri = selectIface<AADLObjectIfaceRequired *>()) {
         if (ri->isInheritPI()) {
             const auto pi = selectIface<const AADLObjectIfaceProvided *>();
@@ -173,6 +185,9 @@ void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
 
 void AADLObjectConnection::handleInheritPIChange(bool enabled)
 {
+    if (isOneDirection())
+        return;
+
     if (enabled)
         setInheritPI();
     else
@@ -249,6 +264,24 @@ bool AADLObjectConnection::postInit()
 
     setInheritPI();
     return true;
+}
+
+AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() const
+{
+    const AADLObjectIface *srcIface = sourceInterface();
+    const AADLObjectIface *dstIface = targetInterface();
+    if (!srcIface || !dstIface)
+        return ConnectionType::NotAConnection;
+
+    if (srcIface->isProvided())
+        return dstIface->isRequired() ? ConnectionType::PI2RI : ConnectionType::PI2PI;
+    else
+        return dstIface->isRequired() ? ConnectionType::RI2RI : ConnectionType::RI2PI;
+}
+
+bool AADLObjectConnection::isOneDirection() const
+{
+    return sourceInterface()->direction() == targetInterface()->direction();
 }
 
 } // ns aadl

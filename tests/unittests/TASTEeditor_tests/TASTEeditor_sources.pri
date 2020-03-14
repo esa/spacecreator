@@ -86,6 +86,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityremove.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdfunctionitemcreate.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdfunctiontypeitemcreate.h \
+        $$TASTE_PRO_ROOT/tab_interface/commands/cmdifacedatachangebase.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparambase.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparamcreate.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparamremove.h \
@@ -202,6 +203,7 @@ SOURCES += \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdentityremove.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdfunctionitemcreate.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdfunctiontypeitemcreate.cpp \
+        $$TASTE_PRO_ROOT/tab_interface/commands/cmdifacedatachangebase.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparambase.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparamcreate.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdifaceparamremove.cpp \
