@@ -46,7 +46,6 @@ private:
     void restoreConnections();
 
     bool connectionMustDie(const AADLObjectConnection *connection) const override;
-    void prepareRemoveConnectionCommands();
 };
 
 } // namespace cmd

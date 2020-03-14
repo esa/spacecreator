@@ -17,9 +17,6 @@
 
 #include "cmdifaceattrchange.h"
 
-#include "commandids.h"
-#include "commandsfactory.h"
-
 namespace taste3 {
 namespace aadl {
 namespace cmd {
@@ -105,7 +102,7 @@ bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connectio
     const AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
-        return false;
+        return true;
     }
 
     const AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
@@ -114,7 +111,7 @@ bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connectio
     if (AADLObjectIface::OperationKind::Any == newKind || AADLObjectIface::OperationKind::Any == otherIface->kind())
         return false;
 
-    if (m_iface->direction() != otherIface->direction()) {
+    if (!connection->isOneDirection()) {
         auto isInheritsPI = [](const AADLObjectIface *iface) {
             if (iface && iface->isRequired())
                 if (const auto ri = iface->as<const AADLObjectIfaceRequired *>())
@@ -127,17 +124,6 @@ bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connectio
     }
 
     return otherIface->kind() != newKind;
-}
-
-void CmdIfaceAttrChange::prepareRemoveConnectionCommands()
-{
-    for (const auto connection : m_relatedConnections) {
-        if (connectionMustDie(connection)) {
-            const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(m_model.data()) };
-            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                m_cmdRmConnection.append(cmdRm);
-        }
-    }
 }
 
 } // namespace cmd

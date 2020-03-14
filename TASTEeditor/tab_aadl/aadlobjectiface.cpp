@@ -120,13 +120,12 @@ AADLObjectIface::~AADLObjectIface()
 
 void AADLObjectIface::setupInitialAttrs()
 {
+    setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(defaultKind()));
     if (isProvided()) {
-        setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Sporadic));
         setAttr(meta::Props::token(meta::Props::Token::period), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::wcet), QVariant());
         setAttr(meta::Props::token(meta::Props::Token::queue_size), QVariant());
     } else {
-        setAttr(meta::Props::token(meta::Props::Token::kind), kindToString(AADLObjectIface::OperationKind::Any));
         setProp(meta::Props::token(meta::Props::Token::InheritPI), true);
     }
 }
@@ -641,8 +640,7 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
 
 bool AADLObjectIfaceRequired::isInheritPI() const
 {
-    return prop(meta::Props::token(meta::Props::Token::InheritPI)).toString().toLower().trimmed()
-            == QStringLiteral("true");
+    return prop(meta::Props::token(meta::Props::Token::InheritPI)).toBool();
 }
 
 bool AADLObjectIfaceRequired::hasPrototypePi() const

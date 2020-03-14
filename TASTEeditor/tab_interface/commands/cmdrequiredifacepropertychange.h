@@ -45,7 +45,6 @@ private:
     void setInheritPI(bool nowInherited);
 
     bool connectionMustDie(const AADLObjectConnection *connection) const override;
-    void prepareRemoveConnectionCommands();
 };
 
 } // namespace cmd

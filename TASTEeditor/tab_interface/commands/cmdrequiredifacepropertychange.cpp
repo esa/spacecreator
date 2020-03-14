@@ -104,28 +104,28 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
 
 bool CmdRequiredIfacePropertyChange::connectionMustDie(const AADLObjectConnection *connection) const
 {
-    return false;
-}
-
-void CmdRequiredIfacePropertyChange::prepareRemoveConnectionCommands()
-{
-    for (AADLObjectConnection *connection : m_relatedConnections) {
-        if (const AADLObjectIfaceRequired *ri = connection->selectIface<const AADLObjectIfaceRequired *>()) {
-            if (const AADLObjectIfaceProvided *pi = connection->selectIface<const AADLObjectIfaceProvided *>()) {
-                const QString riOriginalKind =
-                        ri->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString();
-                const AADLObjectIface::OperationKind riKind = ri->kindFromString(riOriginalKind);
-                const bool anyKind = riKind == AADLObjectIface::OperationKind::Any;
-                const bool sameKind = anyKind || ri->kind() == pi->kind();
-                const bool sameParams = ri->originalParams() == pi->params();
-                if (!sameKind || !sameParams) {
-                    const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(m_model) };
-                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        m_cmdRmConnection.append(cmdRm);
-                }
-            }
-        }
+    const AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    if (!otherIface) {
+        Q_UNREACHABLE();
+        return true;
     }
+
+    const bool sameParams = m_iface->originalParams() == otherIface->params();
+    if (!sameParams)
+        return true;
+
+    const AADLObjectIface::OperationKind newKind =
+            m_iface->kindFromString(m_iface->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString());
+    if (AADLObjectIface::OperationKind::Cyclic == newKind) {
+        Q_UNREACHABLE(); // m_iface is a RI
+        return true;
+    }
+
+    if (AADLObjectIface::OperationKind::Any != newKind && AADLObjectIface::OperationKind::Any != otherIface->kind()) {
+        return otherIface->kind() == newKind;
+    }
+
+    return false;
 }
 
 } // namespace cmd

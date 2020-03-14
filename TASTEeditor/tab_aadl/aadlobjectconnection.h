@@ -103,6 +103,8 @@ public:
     };
     AADLObjectConnection::ConnectionType connectionType() const;
 
+    bool isOneDirection() const;
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
 
@@ -117,8 +119,6 @@ private:
 
     bool lookupEndpointsPostponed();
     void clearPostponedEndpoints();
-
-    bool isOneDirection() const;
 };
 
 } // ns aadl

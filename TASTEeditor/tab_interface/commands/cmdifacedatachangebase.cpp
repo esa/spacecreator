@@ -17,6 +17,8 @@
 
 #include "cmdifacedatachangebase.h"
 
+#include "commandsfactory.h"
+
 namespace taste3 {
 namespace aadl {
 namespace cmd {
@@ -65,7 +67,7 @@ QVector<AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
     if (!m_iface || !m_model)
         return affected;
 
-    for (AADLObjectIface *i : getRelatedIfaces())
+    for (const AADLObjectIface *i : getRelatedIfaces())
         affected += m_model->getConnectionsForIface(i->id());
 
     return affected;
@@ -104,6 +106,17 @@ AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const AADLObject
     Q_UNREACHABLE();
 
     return nullptr;
+}
+
+void CmdIfaceDataChangeBase::prepareRemoveConnectionCommands()
+{
+    for (const auto connection : m_relatedConnections) {
+        if (connectionMustDie(connection)) {
+            const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(m_model.data()) };
+            if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
+                m_cmdRmConnection.append(cmdRm);
+        }
+    }
 }
 
 } // namespace cmd

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "commandids.h"
 #include "tab_aadl/aadlobjectsmodel.h"
 
 #include <QPointer>
@@ -51,6 +52,8 @@ protected:
     virtual bool connectionMustDie(const AADLObjectConnection *connection) const = 0;
     static AADLObjectIface *getConnectionOtherSide(const AADLObjectConnection *connection,
                                                    AADLObjectIface *changedIface);
+
+    void prepareRemoveConnectionCommands();
 };
 
 } // ns cmd
