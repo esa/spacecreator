@@ -48,14 +48,11 @@ QVector<QPointer<AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
 {
     QVector<QPointer<AADLObjectIface>> ifaces;
 
-    if (!m_iface)
-        return ifaces;
-
-    ifaces.append(m_iface);
-
-    if (m_iface->isCloned())
+    if (m_iface) {
+        ifaces.append(m_iface);
         for (AADLObjectIface *clone : m_iface->clones())
             ifaces.append(clone);
+    }
 
     return ifaces;
 }
