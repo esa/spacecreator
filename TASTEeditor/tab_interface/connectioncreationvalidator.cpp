@@ -192,8 +192,8 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
 
         if (pi) {
 
-            if (!ri->inheritPi()) {
-                if (ri->kind() != pi->kind())
+            if (!ri->isInheritPI()) {
+                if (ri->kind() != AADLObjectIface::OperationKind::Any && ri->kind() != pi->kind())
                     return FailReason::KindDiffer;
 
                 const QVector<IfaceParameter> &riParams = ri->params();

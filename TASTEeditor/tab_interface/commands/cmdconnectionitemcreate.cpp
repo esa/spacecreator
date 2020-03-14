@@ -54,14 +54,14 @@ void CmdConnectionItemCreate::redo()
     if (m_parent)
         m_parent->addChild(m_entity);
     m_model->addObject(m_entity);
-    m_entity->inheritLabel();
+    m_entity->setInheritPI();
 }
 
 void CmdConnectionItemCreate::undo()
 {
     CmdEntityGeometryChange::undo();
 
-    m_entity->uninheritLabel();
+    m_entity->unsetInheritPI();
     m_model->removeObject(m_entity);
     if (m_parent)
         m_parent->removeChild(m_entity);

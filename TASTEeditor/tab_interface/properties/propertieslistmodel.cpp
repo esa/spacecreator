@@ -335,7 +335,7 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
         case meta::Props::Token::name:
-        case meta::Props::Token::labelInheritance: {
+        case meta::Props::Token::InheritPI: {
             editable = !isClone;
             break;
         }

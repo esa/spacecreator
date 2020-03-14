@@ -60,8 +60,8 @@ public:
     bool targetInterfaceIsRequired() const;
     bool targetInterfaceIsProvided() const;
 
-    void inheritLabel();
-    void uninheritLabel();
+    void setInheritPI();
+    void unsetInheritPI();
 
     template<class T>
     static inline T selectIface(AADLObjectIface *a, AADLObjectIface *b)
@@ -93,17 +93,29 @@ public:
     void setDelayedStart(AADLObjectConnection::EndPointInfo *start);
     void setDelayedEnd(AADLObjectConnection::EndPointInfo *end);
 
+    enum class ConnectionType
+    {
+        NotAConnection = 0,
+        RI2PI,
+        PI2RI,
+        RI2RI,
+        PI2PI
+    };
+    AADLObjectConnection::ConnectionType connectionType() const;
+
+    bool isOneDirection() const;
+
 private:
     const std::unique_ptr<AADLObjectConnectionPrivate> d;
 
-    enum class LabelInheritancePolicy
+    enum class InheritPIChange
     {
-        Set = 0,
-        Unset
+        Inherit = 0,
+        NotInherit
     };
-    void handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance);
+    void handleInheritPIChange(AADLObjectConnection::InheritPIChange inheritance);
     void handleProvidedTitleChanged(const QString &title);
-    void handleRequiredInheritancePropertyChanged(bool enabled);
+    void handleInheritPIChange(bool enabled);
 
     bool lookupEndpointsPostponed();
     void clearPostponedEndpoints();

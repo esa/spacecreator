@@ -17,9 +17,6 @@
 
 #include "cmdifaceattrchange.h"
 
-#include "commandids.h"
-#include "commandsfactory.h"
-
 namespace taste3 {
 namespace aadl {
 namespace cmd {
@@ -28,78 +25,38 @@ static inline QVariant getCurrentAttribute(const AADLObjectIface *entity, const 
 {
     return (entity && !name.isEmpty()) ? entity->attr(name) : QVariant();
 }
-static QVector<QPointer<AADLObjectIface>> getRelatedIfaces(AADLObjectIface *iface)
-{
-    QVector<QPointer<AADLObjectIface>> ifaces;
-    ifaces.append(iface);
-    if (iface->isCloned())
-        for (AADLObjectIface *clone : iface->clones())
-            ifaces.append(clone);
-    return ifaces;
-}
-
-static inline QVector<AADLObjectConnection *> getRelatedConnections(const QPointer<AADLObjectIface> iface)
-{
-    QVector<AADLObjectConnection *> affected;
-
-    if (!iface)
-        return affected;
-
-    const AADLObjectsModel *model = iface->objectsModel();
-    if (!model)
-        return affected;
-
-    for (AADLObjectIface *i : getRelatedIfaces(iface))
-        affected += model->getConnectionsForIface(i->id());
-
-    return affected;
-}
 
 CmdIfaceAttrChange::CmdIfaceAttrChange(AADLObjectIface *entity, const QString &attrName, const QVariant &value)
-    : QUndoCommand()
-    , m_iface(entity)
-    , m_model(m_iface ? m_iface->objectsModel() : nullptr)
-    , m_relatedConnections()
-    , m_attrName(attrName)
-    , m_attrToken(meta::Props::token(m_attrName))
-    , m_oldValue(getCurrentAttribute(entity, m_attrName))
-    , m_newValue(value)
+    : CmdIfaceDataChangeBase(entity, attrName, value, getCurrentAttribute(entity, attrName))
 {
-    setText(QObject::tr("Change RI inheritance"));
-
-    if (m_attrToken == meta::Props::Token::kind) {
-        m_relatedConnections = getRelatedConnections(m_iface);
+    if (m_targetToken == meta::Props::Token::kind) {
+        m_relatedConnections = getRelatedConnections();
         prepareRemoveConnectionCommands();
     }
 }
 
-CmdIfaceAttrChange::~CmdIfaceAttrChange()
-{
-    qDeleteAll(m_cmdRmConnection);
-}
-
 void CmdIfaceAttrChange::redo()
 {
-    switch (m_attrToken) {
+    switch (m_targetToken) {
     case meta::Props::Token::kind: {
         setKind(m_newValue);
         break;
     }
     default:
-        m_iface->setAttr(m_attrName, m_newValue);
+        m_iface->setAttr(m_targetName, m_newValue);
         break;
     }
 }
 
 void CmdIfaceAttrChange::undo()
 {
-    switch (m_attrToken) {
+    switch (m_targetToken) {
     case meta::Props::Token::kind: {
         setKind(m_oldValue);
         break;
     }
     default:
-        m_iface->setAttr(m_attrName, m_oldValue);
+        m_iface->setAttr(m_targetName, m_oldValue);
         break;
     }
 }
@@ -125,7 +82,7 @@ void CmdIfaceAttrChange::setKind(const QVariant &kind)
     else
         restoreConnections();
 
-    m_iface->setAttr(m_attrName, kind);
+    m_iface->setAttr(m_targetName, kind);
 }
 
 void CmdIfaceAttrChange::removeConnections()
@@ -140,35 +97,33 @@ void CmdIfaceAttrChange::restoreConnections()
         cmd->undo();
 }
 
-void CmdIfaceAttrChange::prepareRemoveConnectionCommands()
+bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connection) const
 {
-    auto isInheritedRI = [](const AADLObjectIface *iface) {
-        if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>())
-            return ri->inheritPi();
-        return false;
-    };
-
-    const AADLObjectIface::OperationKind k =
-            AADLObjectIface::kindFromString(m_newValue.toString(), m_iface->defaultKind());
-    const bool oneIsCyclic = k == AADLObjectIface::OperationKind::Cyclic;
-    for (AADLObjectConnection *connection : m_relatedConnections) {
-        if (const AADLObjectIface *srci = connection->sourceInterface()) {
-            if (const AADLObjectIface *dsti = connection->targetInterface()) {
-                if (srci->isRequired() || dsti->isRequired()) {
-                    const bool inheritPI = isInheritedRI(srci) || isInheritedRI(dsti);
-                    if (inheritPI && !oneIsCyclic)
-                        continue;
-                }
-
-                if (k != srci->kind() || k != dsti->kind() || oneIsCyclic) {
-                    const QVariantList params = { QVariant::fromValue(connection),
-                                                  QVariant::fromValue(m_model.data()) };
-                    if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
-                        m_cmdRmConnection.append(cmdRm);
-                }
-            }
-        }
+    const AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    if (!otherIface) {
+        Q_UNREACHABLE();
+        return true;
     }
+
+    const AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
+    if (AADLObjectIface::OperationKind::Cyclic == newKind)
+        return true;
+    if (AADLObjectIface::OperationKind::Any == newKind || AADLObjectIface::OperationKind::Any == otherIface->kind())
+        return false;
+
+    if (!connection->isOneDirection()) {
+        auto isInheritsPI = [](const AADLObjectIface *iface) {
+            if (iface && iface->isRequired())
+                if (const auto ri = iface->as<const AADLObjectIfaceRequired *>())
+                    return ri->isInheritPI();
+            return false;
+        };
+
+        if (isInheritsPI(m_iface) || isInheritsPI(otherIface))
+            return false;
+    }
+
+    return otherIface->kind() != newKind;
 }
 
 } // namespace cmd

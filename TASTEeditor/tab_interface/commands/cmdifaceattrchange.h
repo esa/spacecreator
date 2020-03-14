@@ -17,12 +17,11 @@
 
 #pragma once
 
+#include "cmdifacedatachangebase.h"
 #include "tab_aadl/aadlcommonprops.h"
 #include "tab_aadl/aadlobjectsmodel.h"
 
 #include <QPointer>
-#include <QRect>
-#include <QUndoCommand>
 #include <QVariant>
 
 namespace taste3 {
@@ -31,11 +30,10 @@ namespace aadl {
 class AADLObjectConnection;
 namespace cmd {
 
-class CmdIfaceAttrChange : public QUndoCommand
+class CmdIfaceAttrChange : public CmdIfaceDataChangeBase
 {
 public:
     explicit CmdIfaceAttrChange(AADLObjectIface *entity, const QString &attrName, const QVariant &value);
-    ~CmdIfaceAttrChange();
 
     void redo() override;
     void undo() override;
@@ -43,20 +41,11 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObjectIface> m_iface;
-    QPointer<AADLObjectsModel> m_model;
-    QVector<AADLObjectConnection *> m_relatedConnections;
-    const QString m_attrName;
-    const meta::Props::Token m_attrToken;
-    const QVariant m_oldValue, m_newValue;
-    QVector<QUndoCommand *> m_cmdRmConnection;
-
-private:
     void setKind(const QVariant &kind);
     void removeConnections();
     void restoreConnections();
 
-    void prepareRemoveConnectionCommands();
+    bool connectionMustDie(const AADLObjectConnection *connection) const override;
 };
 
 } // namespace cmd

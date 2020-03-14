@@ -70,7 +70,7 @@ public:
         InterfaceName,
         RCMoperationKind,
         RCMperiod,
-        labelInheritance,
+        InheritPI,
     };
     Q_ENUM(Token)
 

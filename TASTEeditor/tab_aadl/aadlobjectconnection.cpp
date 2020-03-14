@@ -122,30 +122,39 @@ bool AADLObjectConnection::targetInterfaceIsProvided() const
     return targetInterface() ? targetInterface()->isProvided() : false;
 }
 
-void AADLObjectConnection::inheritLabel()
+void AADLObjectConnection::setInheritPI()
 {
-    handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy::Set);
+    if (isOneDirection())
+        return;
+
+    handleInheritPIChange(AADLObjectConnection::InheritPIChange::Inherit);
 }
 
-void AADLObjectConnection::uninheritLabel()
+void AADLObjectConnection::unsetInheritPI()
 {
-    handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy::Unset);
+    if (isOneDirection())
+        return;
+
+    handleInheritPIChange(AADLObjectConnection::InheritPIChange::NotInherit);
 }
 
-void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInheritancePolicy inheritance)
+void AADLObjectConnection::handleInheritPIChange(AADLObjectConnection::InheritPIChange inheritance)
 {
+    if (isOneDirection())
+        return;
+
     auto ri = selectIface<AADLObjectIfaceRequired *>();
     const auto pi = selectIface<const AADLObjectIfaceProvided *>();
 
     if (!pi || !ri)
         return;
 
-    if (!ri->inheritPi())
+    if (!ri->isInheritPI())
         return;
 
-    const bool rmLabel = inheritance == AADLObjectConnection::LabelInheritancePolicy::Unset;
+    const bool rmLabel = inheritance == AADLObjectConnection::InheritPIChange::NotInherit;
     if (rmLabel) {
-        disconnect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this, nullptr);
+        disconnect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this, nullptr);
         disconnect(pi, &AADLObjectIface::titleChanged, this, nullptr);
         ri->unsetPrototype(pi);
         return;
@@ -155,28 +164,34 @@ void AADLObjectConnection::handleLabelInheritance(AADLObjectConnection::LabelInh
 
     connect(pi, &AADLObjectIface::titleChanged, this, &AADLObjectConnection::handleProvidedTitleChanged,
             Qt::UniqueConnection);
-    connect(ri, &AADLObjectIfaceRequired::propChanged_labelInheritance, this,
-            &AADLObjectConnection::handleRequiredInheritancePropertyChanged, Qt::UniqueConnection);
+    connect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this,
+            QOverload<bool>::of(&AADLObjectConnection::handleInheritPIChange), Qt::UniqueConnection);
 }
 
 void AADLObjectConnection::handleProvidedTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
 
+    if (isOneDirection())
+        return;
+
     if (auto ri = selectIface<AADLObjectIfaceRequired *>()) {
-        if (ri->inheritPi()) {
+        if (ri->isInheritPI()) {
             const auto pi = selectIface<const AADLObjectIfaceProvided *>();
             ri->setPrototype(pi);
         }
     }
 }
 
-void AADLObjectConnection::handleRequiredInheritancePropertyChanged(bool enabled)
+void AADLObjectConnection::handleInheritPIChange(bool enabled)
 {
+    if (isOneDirection())
+        return;
+
     if (enabled)
-        inheritLabel();
+        setInheritPI();
     else
-        uninheritLabel();
+        unsetInheritPI();
 }
 
 void AADLObjectConnection::setDelayedStart(AADLObjectConnection::EndPointInfo *start)
@@ -247,8 +262,26 @@ bool AADLObjectConnection::postInit()
         return false;
     }
 
-    inheritLabel();
+    setInheritPI();
     return true;
+}
+
+AADLObjectConnection::ConnectionType AADLObjectConnection::connectionType() const
+{
+    const AADLObjectIface *srcIface = sourceInterface();
+    const AADLObjectIface *dstIface = targetInterface();
+    if (!srcIface || !dstIface)
+        return ConnectionType::NotAConnection;
+
+    if (srcIface->isProvided())
+        return dstIface->isRequired() ? ConnectionType::PI2RI : ConnectionType::PI2PI;
+    else
+        return dstIface->isRequired() ? ConnectionType::RI2RI : ConnectionType::RI2PI;
+}
+
+bool AADLObjectConnection::isOneDirection() const
+{
+    return sourceInterface()->direction() == targetInterface()->direction();
 }
 
 } // ns aadl
