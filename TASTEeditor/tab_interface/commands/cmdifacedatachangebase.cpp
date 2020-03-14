@@ -61,11 +61,9 @@ QVector<AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
 {
     QVector<AADLObjectConnection *> affected;
 
-    if (!m_iface || !m_model)
-        return affected;
-
-    for (const AADLObjectIface *i : getRelatedIfaces())
-        affected += m_model->getConnectionsForIface(i->id());
+    if (m_iface && m_model)
+        for (const AADLObjectIface *i : getRelatedIfaces())
+            affected += m_model->getConnectionsForIface(i->id());
 
     return affected;
 }
