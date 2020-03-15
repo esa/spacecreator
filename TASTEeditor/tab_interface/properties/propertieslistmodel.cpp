@@ -334,6 +334,10 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
     if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
+        case meta::Props::Token::Autonamed: {
+            editable = false;
+            break;
+        }
         case meta::Props::Token::name:
         case meta::Props::Token::InheritPI: {
             editable = !isClone;

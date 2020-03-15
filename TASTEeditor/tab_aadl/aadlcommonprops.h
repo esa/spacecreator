@@ -71,6 +71,7 @@ public:
         RCMoperationKind,
         RCMperiod,
         InheritPI,
+        Autonamed,
     };
     Q_ENUM(Token)
 
