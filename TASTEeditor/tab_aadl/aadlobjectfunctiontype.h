@@ -75,7 +75,6 @@ protected:
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
     void init();
-    QVector<AADLObjectIface *> selecIfaces(AADLObjectIface::IfaceType direction) const;
 };
 
 typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;
