@@ -62,6 +62,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Taste::RCMoperationKind", Token::RCMoperationKind },
     { "Taste::RCMperiod", Token::RCMperiod },
     { "Taste::InheritPI", Token::InheritPI },
+    { "Taste::Autonamed", Token::Autonamed },
 };
 
 Props::Token Props::token(const QString &fromString)
