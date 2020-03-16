@@ -38,9 +38,13 @@ CommentTextDialog::CommentTextDialog(AADLObjectComment *comment, QWidget *parent
         if (m_entity->title() == text)
             return;
 
-        const QVariantList commentTextParams { QVariant::fromValue(m_entity), QVariant::fromValue(text) };
-        const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);
-        taste3::cmd::CommandsStack::current()->push(commentTextCmd);
+        const QVariantMap textArg { { meta::Props::token(meta::Props::Token::name), text } };
+        const QVariantList commentTextParams { QVariant::fromValue(m_entity), QVariant::fromValue(textArg) };
+        auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
+        if (commentTextCmd) {
+            commentTextCmd->setText(QObject::tr("Edit Comment"));
+            taste3::cmd::CommandsStack::current()->push(commentTextCmd);
+        }
     });
     ui->plainTextEdit->setPlainText(comment->title());
 }
