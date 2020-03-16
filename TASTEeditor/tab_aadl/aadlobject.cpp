@@ -113,7 +113,7 @@ QVector<qint32> AADLObject::coordinates() const
         if (parentObject()->isRootObject()) {
             token = meta::Props::Token::InnerCoordinates;
         } else if (auto grandParent = parentItem->parentObject()) {
-            if (isRequiredInterface() && grandParent->isRootObject())
+            if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
     } else if (isRootObject()) {
@@ -145,7 +145,7 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
         if (parentObject()->isRootObject()) {
             token = meta::Props::Token::InnerCoordinates;
         } else if (auto grandParent = parentItem->parentObject()) {
-            if (isRequiredInterface() && grandParent->isRootObject())
+            if (isInterface() && grandParent->isRootObject())
                 token = meta::Props::Token::InnerCoordinates;
         }
     } else if (isRootObject()) {
@@ -179,6 +179,11 @@ bool AADLObject::isRequiredInterface() const
 bool AADLObject::isProvidedInterface() const
 {
     return aadlType() == Type::ProvidedInterface;
+}
+
+bool AADLObject::isInterface() const
+{
+    return isRequiredInterface() || isProvidedInterface();
 }
 
 bool AADLObject::isComment() const

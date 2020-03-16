@@ -68,6 +68,7 @@ public:
     bool isFunctionType() const;
     bool isRequiredInterface() const;
     bool isProvidedInterface() const;
+    bool isInterface() const;
     bool isComment() const;
     bool isConnection() const;
     bool isNestedInFunction() const;
