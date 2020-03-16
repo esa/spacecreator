@@ -364,10 +364,15 @@ AADLObjectIface *AADLXMLReader::addIface(const QString &name, bool isRI)
 
     AADLObjectIface *iface { nullptr };
     if (d->m_currentObject.function()) {
+
+        AADLObjectIface::CreationInfo ci;
+        ci.function = d->m_currentObject.function();
+        ci.name = name;
+
         if (isRI)
-            iface = new AADLObjectIfaceRequired(name, d->m_currentObject.get());
+            iface = new AADLObjectIfaceRequired(ci);
         else
-            iface = new AADLObjectIfaceProvided(name, d->m_currentObject.get());
+            iface = new AADLObjectIfaceProvided(ci);
 
         d->m_currentObject.function()->addChild(iface);
     }

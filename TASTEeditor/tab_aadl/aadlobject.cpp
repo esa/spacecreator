@@ -75,7 +75,7 @@ AADLObject::Type AADLObject::aadlType() const
 
 bool AADLObject::setTitle(const QString &title)
 {
-    if (title != this->title()) {
+    if (!title.isEmpty() && title != this->title()) {
         setAttr(meta::Props::token(meta::Props::Token::name), title);
         return true;
     }
@@ -240,7 +240,11 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::name: {
-            const QString title = AADLNameValidator::validateName(this->aadlType(), val.toString());
+            QString usedName = val.toString();
+            if (usedName.isEmpty())
+                usedName = AADLNameValidator::nextNameFor(aadlType(), parentObject());
+
+            const QString title = AADLNameValidator::validateName(this->aadlType(), usedName);
             d->m_attrs[name] = title;
             emit titleChanged(title);
             break;

@@ -143,8 +143,7 @@ protected Q_SLOTS:
     void onReflectedParamsChanged();
 
 protected:
-    explicit AADLObjectIface(AADLObject::Type ifaceType, const QString &title, AADLObject *parent = nullptr,
-                             const common::Id &id = common::InvalidId);
+    explicit AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci);
     void setupInitialAttrs();
 
     void rememberClone(AADLObjectIface *clone);
@@ -195,20 +194,14 @@ class AADLObjectIfaceProvided : public AADLObjectIface
 {
     Q_OBJECT
 public:
-    explicit AADLObjectIfaceProvided(AADLObject *parent = nullptr);
-    explicit AADLObjectIfaceProvided(const QString &title, AADLObject *parent = nullptr);
-    explicit AADLObjectIfaceProvided(const common::Id &id, const QString &title = QString(),
-                                     AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceProvided(const CreationInfo &ci);
 };
 
 class AADLObjectIfaceRequired : public AADLObjectIface
 {
     Q_OBJECT
 public:
-    explicit AADLObjectIfaceRequired(AADLObject *parent = nullptr);
-    explicit AADLObjectIfaceRequired(const QString &title, AADLObject *parent = nullptr);
-    explicit AADLObjectIfaceRequired(const common::Id &id, const QString &title = QString(),
-                                     AADLObject *parent = nullptr);
+    explicit AADLObjectIfaceRequired(const CreationInfo &ci);
 
     virtual void setAttr(const QString &name, const QVariant &val) override;
     virtual void setProp(const QString &name, const QVariant &val) override;

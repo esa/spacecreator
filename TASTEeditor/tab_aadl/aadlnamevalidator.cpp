@@ -24,6 +24,17 @@
 namespace taste3 {
 namespace aadl {
 
+AADLNameValidator *AADLNameValidator::m_instance = nullptr;
+
+AADLNameValidator::AADLNameValidator() {}
+
+AADLNameValidator *AADLNameValidator::instance()
+{
+    if (!m_instance)
+        m_instance = new AADLNameValidator;
+    return m_instance;
+}
+
 QString AADLNameValidator::validateName(const AADLObject *object, const QString &name)
 {
     if (!object || name.isEmpty())
@@ -64,6 +75,63 @@ QString AADLNameValidator::validateName(const AADLObject::Type t, const QString 
     }
 
     return name;
+}
+
+QString AADLNameValidator::nextNameFor(const AADLObject::Type t, const AADLObject *parent)
+{
+    return instance()->nextName(t, parent);
+}
+
+QString AADLNameValidator::nextName(const AADLObject::Type t, const AADLObject *parent) const
+{
+    if (t == AADLObject::Type::Unknown)
+        return QString();
+
+    if (!(parent->isFunction() || parent->isFunctionType()))
+        return QString();
+
+    switch (t) {
+    case AADLObject::Type::Function:
+        return nameFunction(parent);
+    case AADLObject::Type::FunctionType:
+        return nameFunctionType(parent);
+    case AADLObject::Type::RequiredInterface:
+        return nameRequiredInterface(parent);
+    case AADLObject::Type::ProvidedInterface:
+        return nameProvidedInterface(parent);
+    case AADLObject::Type::Comment:
+        return nameComment(parent);
+    default:
+        break;
+    }
+
+    qWarning() << "Unsupported object type:" << t;
+    return QString();
+}
+
+QString AADLNameValidator::nameFunctionType(const AADLObject *parent) const
+{
+    return QStringLiteral("Not implemented yet");
+}
+
+QString AADLNameValidator::nameFunction(const AADLObject *parent) const
+{
+    return QStringLiteral("Not implemented yet");
+}
+
+QString AADLNameValidator::nameRequiredInterface(const AADLObject *parent) const
+{
+    return QStringLiteral("Not implemented yet");
+}
+
+QString AADLNameValidator::nameProvidedInterface(const AADLObject *parent) const
+{
+    return QStringLiteral("Not implemented yet");
+}
+
+QString AADLNameValidator::nameComment(const AADLObject *parent) const
+{
+    return QStringLiteral("Not implemented yet");
 }
 
 } // ns aadl

@@ -23,15 +23,29 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObject;
+class AADLObjectsModel;
 class AADLNameValidator
 {
 public:
+    static AADLNameValidator *instance();
+
     static QString validateName(const AADLObject *object, const QString &name);
     static QString validateName(const AADLObject::Type t, const QString &name);
 
+    static QString nextNameFor(const AADLObject::Type t, const AADLObject *parent);
+
 private:
+    static AADLNameValidator *m_instance;
+
     AADLNameValidator();
-    //    static AADLNameValidator* m_instance;
+
+    QString nextName(const AADLObject::Type t, const AADLObject *parent) const;
+
+    QString nameFunctionType(const AADLObject *parent) const;
+    QString nameFunction(const AADLObject *parent) const;
+    QString nameRequiredInterface(const AADLObject *parent) const;
+    QString nameProvidedInterface(const AADLObject *parent) const;
+    QString nameComment(const AADLObject *parent) const;
 };
 
 } // ns aadl
