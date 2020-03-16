@@ -150,6 +150,7 @@ void AADLRectGraphicsItem::rebuildLayout()
         setVisible(parentRect.contains(sceneBoundingRect()));
     }
     InteractiveObject::rebuildLayout();
+    updateGripPoints();
 }
 
 bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)

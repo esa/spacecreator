@@ -19,9 +19,10 @@
 #include "aadlrectgraphicsitem.h"
 #include "tab_aadl/aadlobjectcomment.h"
 
-namespace taste3 {
-class TextGraphicsItem;
+#include <QScopedPointer>
+#include <QTextLayout>
 
+namespace taste3 {
 namespace aadl {
 
 class AADLCommentGraphicsItem : public AADLRectGraphicsItem
@@ -50,12 +51,12 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual ColorManager::HandledColors handledColorType() const override;
 
-private Q_SLOTS:
-    void textEdited(const QString &newText);
-    void textChanged();
+private:
+    void updateTextLayout(const QString &text);
 
 private:
-    TextGraphicsItem *m_textItem = nullptr;
+    QScopedPointer<QTextLayout> m_textLayout;
+    QString m_text;
 };
 
 } // namespace aadl
