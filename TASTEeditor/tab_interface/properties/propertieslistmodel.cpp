@@ -19,6 +19,7 @@
 
 #include "app/commandsstack.h"
 #include "tab_aadl/aadlcommonprops.h"
+#include "tab_aadl/aadlnamevalidator.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectfunction.h"
 #include "tab_interface/commands/cmdentityattributechange.h"
@@ -33,6 +34,15 @@
 
 namespace taste3 {
 namespace aadl {
+
+meta::Props::Token tokenFromIndex(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return meta::Props::Token::Unknown;
+
+    const QString name = index.model()->index(index.row(), PropertiesListModel::ColumnTitle).data().toString();
+    return meta::Props::token(name);
+}
 
 PropertiesListModel::PropertiesListModel(QObject *parent)
     : PropertiesModelBase(parent)
@@ -140,6 +150,17 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     if (role == Qt::EditRole) {
         const QString &name = this->index(index.row(), ColumnTitle).data().toString();
         if (isAttr(index) && index.column() == ColumnValue) {
+
+            switch (tokenFromIndex(index)) {
+            case meta::Props::Token::name: {
+                if (!AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
+                    return false; // TODO: move to editor's validator
+                break;
+            }
+            default:
+                break;
+            }
+
             const QVariantMap attributes = { { name, value } };
             const auto attributesCmd = cmd::CommandsFactory::create(
                     cmd::ChangeEntityAttributes,
@@ -236,15 +257,6 @@ bool PropertiesListModel::isAttr(const QModelIndex &id) const
 bool PropertiesListModel::isProp(const QModelIndex &id) const
 {
     return id.isValid() && ItemType::Property == id.data(ItemTypeRole).toInt();
-}
-
-meta::Props::Token tokenFromIndex(const QModelIndex &index)
-{
-    if (!index.isValid())
-        return meta::Props::Token::Unknown;
-
-    const QString name = index.model()->index(index.row(), PropertiesListModel::ColumnTitle).data().toString();
-    return meta::Props::token(name);
 }
 
 bool PropertiesListModel::isEditable(const QModelIndex & /*index*/) const

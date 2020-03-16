@@ -158,7 +158,8 @@ void CmdEntityRemove::collectRelatedItems(AADLObject *toBeRemoved)
         return;
 
     switch (toBeRemoved->aadlType()) {
-    case AADLObject::Type::Interface: {
+    case AADLObject::Type::RequiredInterface:
+    case AADLObject::Type::ProvidedInterface: {
         if (AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(toBeRemoved)) {
             for (auto clone : iface->clones())
                 collectRelatedItems(clone);
@@ -200,7 +201,8 @@ void CmdEntityRemove::storeLinkedEntity(AADLObject *linkedEntity)
     case AADLObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;
-    case AADLObject::Type::Interface:
+    case AADLObject::Type::RequiredInterface:
+    case AADLObject::Type::ProvidedInterface:
         pCollection = &m_relatedIfaces;
         break;
     default:

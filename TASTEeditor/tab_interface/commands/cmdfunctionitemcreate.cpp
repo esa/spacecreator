@@ -27,14 +27,13 @@ namespace taste3 {
 namespace aadl {
 namespace cmd {
 
-static int sCounter = 0;
-
 CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
                                              const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new AADLObjectFunction(QObject::tr("Function_%1").arg(++sCounter), m_parent))
+    , m_entity(new AADLObjectFunction(QString(),
+                                      m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

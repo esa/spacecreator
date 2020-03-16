@@ -119,7 +119,8 @@ bool PropertiesViewBase::setButtonsDisabled()
                 disabled = fn->inheritsFunctionType();
             break;
         }
-        case AADLObject::Type::Interface: {
+        case AADLObject::Type::RequiredInterface:
+        case aadl::AADLObject::Type::ProvidedInterface: {
             if (const AADLObjectIface *iface = dataObject->as<const AADLObjectIface *>()) {
                 disabled = iface->isClone();
                 if (!disabled && iface->isRequired()) {

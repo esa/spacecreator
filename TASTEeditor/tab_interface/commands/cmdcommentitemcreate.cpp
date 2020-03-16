@@ -31,7 +31,8 @@ CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFu
     : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new AADLObjectComment(QObject::tr("Comment"), m_parent))
+    , m_entity(new AADLObjectComment(QString(),
+                                     m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

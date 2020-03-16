@@ -44,7 +44,8 @@ public:
 
         Function,
         FunctionType,
-        Interface,
+        RequiredInterface,
+        ProvidedInterface,
         Comment,
         Connection,
     };
@@ -65,6 +66,8 @@ public:
     AADLObject *parentObject() const;
     bool isFunction() const;
     bool isFunctionType() const;
+    bool isRequiredInterface() const;
+    bool isProvidedInterface() const;
     bool isInterface() const;
     bool isComment() const;
     bool isConnection() const;

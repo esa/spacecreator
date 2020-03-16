@@ -407,7 +407,8 @@ QList<int> knownGraphicsItemTypes()
                 itemType = aadl::AADLFunctionTypeGraphicsItem::Type;
                 break;
             }
-            case aadl::AADLObject::Type::Interface: {
+            case aadl::AADLObject::Type::ProvidedInterface:
+            case aadl::AADLObject::Type::RequiredInterface: {
                 itemType = aadl::AADLInterfaceGraphicsItem::Type;
                 break;
             }

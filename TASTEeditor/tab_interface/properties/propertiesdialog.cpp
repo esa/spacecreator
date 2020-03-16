@@ -47,8 +47,6 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    setWindowTitle(tr("Edit Data"));
-
     initTabs();
 }
 
@@ -67,12 +65,10 @@ QString PropertiesDialog::objectTypeName() const
         return tr("Function Type");
     case AADLObject::Type::Function:
         return tr("Function");
-    case AADLObject::Type::Interface: {
-        QString ifaceDirection;
-        if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
-            ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
-        return ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
-    }
+    case AADLObject::Type::RequiredInterface:
+        return tr("RI");
+    case AADLObject::Type::ProvidedInterface:
+        return tr("PI");
     case AADLObject::Type::Comment:
         return tr("Comment");
     case AADLObject::Type::Connection:
@@ -103,7 +99,7 @@ void PropertiesDialog::initTabs()
     if (!m_dataObject)
         return;
 
-    auto initAttributesView = [this](const QString &title) {
+    auto initAttributesView = [this]() {
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
         QStyledItemDelegate *modelDelegate { nullptr };
         PropertiesListModel *modelAttrs { nullptr };
@@ -114,7 +110,8 @@ void PropertiesDialog::initTabs()
             modelDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
             break;
         }
-        case AADLObject::Type::Interface: {
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface: {
             modelAttrs = new InterfacePropertiesListModel(this);
             modelDelegate = new InterfaceAttrDelegate(viewAttrs->tableView());
             break;
@@ -130,7 +127,7 @@ void PropertiesDialog::initTabs()
         if (modelDelegate)
             viewAttrs->tableView()->setItemDelegateForColumn(PropertiesListModel::ColumnValue, modelDelegate);
 
-        ui->tabWidget->insertTab(0, viewAttrs, tr("%1 Attributes").arg(title));
+        ui->tabWidget->insertTab(0, viewAttrs, tr("Attributes"));
     };
 
     auto initContextParams = [this]() {
@@ -179,11 +176,13 @@ void PropertiesDialog::initTabs()
         initContextParams();
         break;
     }
-    case AADLObject::Type::Interface: {
-        QString ifaceDirection;
-        if (auto iface = qobject_cast<AADLObjectIface *>(m_dataObject))
-            ifaceDirection = iface->isProvided() ? tr("PI") : tr("RI");
-        objectTypeLabel = ifaceDirection.isEmpty() ? tr("Interface") : ifaceDirection;
+    case AADLObject::Type::RequiredInterface: {
+        objectTypeLabel = tr("RI");
+        initIfaceParams();
+        break;
+    }
+    case AADLObject::Type::ProvidedInterface: {
+        objectTypeLabel = tr("PI");
         initIfaceParams();
         break;
     }
@@ -199,7 +198,9 @@ void PropertiesDialog::initTabs()
         break;
     }
 
-    initAttributesView(objectTypeLabel);
+    setWindowTitle(tr("Edit %1").arg(objectTypeLabel));
+
+    initAttributesView();
     ui->tabWidget->setCurrentIndex(0);
 }
 

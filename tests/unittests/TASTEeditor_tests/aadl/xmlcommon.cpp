@@ -190,7 +190,8 @@ XmlFileMock XmlFileMock::createSingleIfaceValid()
         case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 1);
             break;
-        case AADLObject::Type::Interface:
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -224,7 +225,8 @@ XmlFileMock XmlFileMock::createParametrizedIfaces()
         case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::Type::Interface:
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 2);
             break;
         case AADLObject::Type::Connection:
@@ -285,7 +287,8 @@ XmlFileMock XmlFileMock::createSingleConnectionValid()
         case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::Type::Interface:
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 2);
             break;
         case AADLObject::Type::Connection:
@@ -332,7 +335,8 @@ XmlFileMock XmlFileMock::createSingleConnectionValidMultipoint()
         case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 2);
             break;
-        case AADLObject::Type::Interface:
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 2);
             break;
         case AADLObject::Type::Connection:
@@ -378,7 +382,8 @@ XmlFileMock XmlFileMock::createAllItems()
         case AADLObject::Type::Function:
             file.setExpectedObjectCount(t, 9);
             break;
-        case AADLObject::Type::Interface:
+        case AADLObject::Type::RequiredInterface:
+        case AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 27);
             break;
         case AADLObject::Type::Connection:

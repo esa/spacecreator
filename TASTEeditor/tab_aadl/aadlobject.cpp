@@ -48,6 +48,11 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     : QObject(parent)
     , d(new AADLObjectPrivate(id, t))
 {
+    if (const AADLObject *parentObject = qobject_cast<const AADLObject *>(parent))
+        setObjectsModel(parentObject->objectsModel());
+    else if (AADLObjectsModel *model = qobject_cast<AADLObjectsModel *>(parent))
+        setObjectsModel(model);
+
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
@@ -75,7 +80,7 @@ AADLObject::Type AADLObject::aadlType() const
 
 bool AADLObject::setTitle(const QString &title)
 {
-    if (title != this->title()) {
+    if (!title.isEmpty() && title != this->title()) {
         setAttr(meta::Props::token(meta::Props::Token::name), title);
         return true;
     }
@@ -166,9 +171,19 @@ bool AADLObject::isFunctionType() const
     return aadlType() == Type::FunctionType;
 }
 
+bool AADLObject::isRequiredInterface() const
+{
+    return aadlType() == Type::RequiredInterface;
+}
+
+bool AADLObject::isProvidedInterface() const
+{
+    return aadlType() == Type::ProvidedInterface;
+}
+
 bool AADLObject::isInterface() const
 {
-    return aadlType() == Type::Interface;
+    return isRequiredInterface() || isProvidedInterface();
 }
 
 bool AADLObject::isComment() const
@@ -226,7 +241,17 @@ void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
 
 QVariant AADLObject::attr(const QString &name, const QVariant &defaultValue) const
 {
-    return d->m_attrs.value(name, defaultValue);
+    QVariant val = d->m_attrs.value(name, defaultValue);
+    const meta::Props::Token t = meta::Props::token(name);
+    switch (t) {
+    case meta::Props::Token::name: {
+        val = AADLNameValidator::decodeName(aadlType(), val.toString());
+        break;
+    }
+    default:
+        break;
+    }
+    return val;
 }
 
 void AADLObject::setAttr(const QString &name, const QVariant &val)
@@ -235,9 +260,14 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         const meta::Props::Token t = meta::Props::token(name);
         switch (t) {
         case meta::Props::Token::name: {
-            const QString title = AADLNameValidator::validateName(this->aadlType(), val.toString());
-            d->m_attrs[name] = title;
-            emit titleChanged(title);
+            QString usedName = val.toString();
+            if (usedName.isEmpty())
+                usedName = AADLNameValidator::nextNameFor(this);
+            else
+                usedName = AADLNameValidator::encodeName(this->aadlType(), usedName);
+
+            d->m_attrs[name] = usedName;
+            emit titleChanged(usedName);
             break;
         }
         default:

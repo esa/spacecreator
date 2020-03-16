@@ -537,7 +537,8 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
     switch (obj->aadlType()) {
     case aadl::AADLObject::Type::Comment:
         return new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
-    case aadl::AADLObject::Type::Interface:
+    case aadl::AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::ProvidedInterface:
         return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
     case aadl::AADLObject::Type::Connection:
         if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {

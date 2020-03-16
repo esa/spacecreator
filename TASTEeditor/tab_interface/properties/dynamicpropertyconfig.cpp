@@ -216,7 +216,8 @@ QVector<DynamicProperty *> DynamicPropertyConfig::attributesForObject(AADLObject
         return attributesForFunctionType();
     case AADLObject::Type::Function:
         return attributesForFunction();
-    case AADLObject::Type::Interface:
+    case AADLObject::Type::RequiredInterface:
+    case AADLObject::Type::ProvidedInterface:
         return attributesForIface();
     default:
         return {};
