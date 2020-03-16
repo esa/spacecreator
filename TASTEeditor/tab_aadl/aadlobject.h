@@ -129,5 +129,10 @@ private:
     QString coordinatesToString(const QVector<qint32> &coordinates) const;
 };
 
+inline uint qHash(const AADLObject::Type &key, uint seed)
+{
+    return ::qHash(static_cast<uint>(key), seed);
+}
+
 } // ns aadl
 } // ns taste3
