@@ -19,9 +19,9 @@
 
 #include <QGraphicsObject>
 #include <QPointer>
-#include <QPropertyAnimation>
 
-class QGraphicsRectItem;
+class QGraphicsPathItem;
+class QPropertyAnimation;
 
 namespace taste3 {
 
@@ -29,13 +29,15 @@ class HighlightRectItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    HighlightRectItem(QGraphicsItem *parent);
-    ~HighlightRectItem();
+    explicit HighlightRectItem(QGraphicsItem *parent);
+    ~HighlightRectItem() override;
 
     // QGraphicsItem interface
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
+    QPainterPath shape() const override;
 
+    void setPath(const QPainterPath &path);
     void setRect(const QRectF &rect);
     void setPen(const QPen &pen);
     void setBrush(const QBrush &brush);
@@ -46,8 +48,8 @@ Q_SIGNALS:
     void highlighted() const;
 
 private:
-    QGraphicsRectItem *m_rectItem = new QGraphicsRectItem(this);
-    QPointer<QPropertyAnimation> m_lastAnimation = nullptr;
+    QGraphicsPathItem *m_pathItem = nullptr;
+    QPointer<QPropertyAnimation> m_lastAnimation;
 
     void clearAnimation();
 };
