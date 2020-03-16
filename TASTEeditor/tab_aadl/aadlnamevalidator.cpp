@@ -28,6 +28,7 @@ namespace aadl {
 
 static size_t s_counter_ri = 0;
 static size_t s_counter_pi = 0;
+static size_t s_counter_fn = 0;
 
 AADLNameValidator *AADLNameValidator::m_instance = nullptr;
 
@@ -87,22 +88,22 @@ bool AADLNameValidator::isAcceptableName(const AADLObject *object, const QString
     if (!object || name.isEmpty())
         return false;
 
-    return isAcceptableName(object->aadlType(), object->parentObject(), name);
-}
-
-bool AADLNameValidator::isAcceptableName(const AADLObject::Type t, const AADLObject *parent, const QString &name)
-{
-    if (t == AADLObject::Type::Unknown || name.isEmpty())
-        return false;
-
+    const AADLObject::Type t = object->aadlType();
     switch (t) {
+    case AADLObject::Type::Function: {
+        return instance()->isValidFunctionName(name, object);
+    }
     case AADLObject::Type::RequiredInterface: {
-        Q_ASSERT(parent);
-        return instance()->isValidRequiredInterfaceName(name, parent->as<const AADLObjectFunctionType *>());
+        auto parent = object->parentObject() ? object->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
+        return instance()->isValidRequiredInterfaceName(name, parent);
     }
     case AADLObject::Type::ProvidedInterface: {
-        Q_ASSERT(parent);
-        return instance()->isValidProvidedInterfaceName(name, parent->as<const AADLObjectFunctionType *>());
+        auto parent = object->parentObject() ? object->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
+        return instance()->isValidProvidedInterfaceName(name, parent);
+    }
+    case AADLObject::Type::Unknown: {
+        qWarning() << "Unsupported object type" << t;
+        return false;
     }
     default: {
         qWarning() << "Not implemented yet for" << t;
@@ -114,30 +115,31 @@ bool AADLNameValidator::isAcceptableName(const AADLObject::Type t, const AADLObj
     return false;
 }
 
-QString AADLNameValidator::nextNameFor(const AADLObject::Type t, const AADLObject *parent)
+QString AADLNameValidator::nextNameFor(const AADLObject *object)
 {
-    return instance()->nextName(t, parent);
+    return instance()->nextName(object);
 }
 
-QString AADLNameValidator::nextName(const AADLObject::Type t, const AADLObject *parent) const
+QString AADLNameValidator::nextName(const AADLObject *object) const
 {
-    if (t == AADLObject::Type::Unknown)
+    if (!object)
         return QString();
 
-    if (!(parent->isFunction() || parent->isFunctionType()))
+    const AADLObject::Type t = object->aadlType();
+    if (t == AADLObject::Type::Unknown)
         return QString();
 
     switch (t) {
     case AADLObject::Type::Function:
-        return nameFunction(parent);
+        return nameFunction(object);
     case AADLObject::Type::FunctionType:
-        return nameFunctionType(parent);
+        return nameFunctionType(object->as<const AADLObjectFunctionType *>());
     case AADLObject::Type::RequiredInterface:
-        return nameRequiredInterface(parent);
+        return nameRequiredInterface(object);
     case AADLObject::Type::ProvidedInterface:
-        return nameProvidedInterface(parent);
+        return nameProvidedInterface(object);
     case AADLObject::Type::Comment:
-        return nameComment(parent);
+        return nameComment(object->as<const AADLObjectComment *>());
     default:
         break;
     }
@@ -151,36 +153,53 @@ QString AADLNameValidator::nameFunctionType(const AADLObject *parent) const
     return QStringLiteral("Not implemented yet");
 }
 
-QString AADLNameValidator::nameFunction(const AADLObject *parent) const
+QString AADLNameValidator::nameFunction(const AADLObject *function) const
 {
-    return QStringLiteral("Not implemented yet");
-}
+    static const QString nameTemplate = QObject::tr("Function_%1");
 
-QString AADLNameValidator::nameRequiredInterface(const AADLObject *parent) const
-{
-    static const QString nameTemplate = QObject::tr("RI_%1");
-
-    const auto fn = parent ? parent->as<const AADLObjectFunctionType *>() : nullptr;
-    size_t counter = fn ? fn->ris().size() + 1 : ++s_counter_ri;
+    size_t counter = 0;
+    if (function && function->objectsModel()) {
+        for (const auto fn : function->objectsModel()->objects())
+            if (fn->isFunction())
+                ++counter;
+    } else
+        counter = ++s_counter_fn;
 
     QString name = nameTemplate.arg(counter);
-    if (fn)
-        while (!isAcceptableName(AADLObject::Type::RequiredInterface, fn, name))
+    while (!isAcceptableName(function, name))
+        name = nameTemplate.arg(++counter);
+
+    return name;
+}
+
+QString AADLNameValidator::nameRequiredInterface(const AADLObject *iface) const
+{
+    Q_ASSERT(iface);
+
+    static const QString nameTemplate = QObject::tr("RI_%1");
+
+    const auto parent = iface->parentObject()->as<const AADLObjectFunctionType *>();
+    size_t counter = parent ? parent->ris().size() + 1 : ++s_counter_ri;
+
+    QString name = nameTemplate.arg(counter);
+    if (parent)
+        while (!isAcceptableName(iface, name))
             name = nameTemplate.arg(++counter);
 
     return name;
 }
 
-QString AADLNameValidator::nameProvidedInterface(const AADLObject *parent) const
+QString AADLNameValidator::nameProvidedInterface(const AADLObject *iface) const
 {
     static const QString nameTemplate = QObject::tr("PI_%1");
 
-    const auto fn = parent ? parent->as<const AADLObjectFunctionType *>() : nullptr;
+    const auto fn =
+            (iface && iface->parentObject()) ? iface->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
     size_t counter = fn ? fn->pis().size() + 1 : ++s_counter_pi;
 
     QString name = nameTemplate.arg(counter);
     if (fn)
-        while (!isAcceptableName(AADLObject::Type::ProvidedInterface, fn, name))
+        while (!isAcceptableName(iface, name))
             name = nameTemplate.arg(++counter);
 
     return name;
@@ -189,6 +208,29 @@ QString AADLNameValidator::nameProvidedInterface(const AADLObject *parent) const
 QString AADLNameValidator::nameComment(const AADLObject *parent) const
 {
     return QStringLiteral("Not implemented yet");
+}
+
+bool AADLNameValidator::isValidFunctionName(const QString &name, const AADLObject *function) const
+{
+    if (name.isEmpty() || !function)
+        return false;
+
+    if (function->objectsModel()) {
+        for (const auto fn : function->objectsModel()->objects())
+            if (fn->isFunction())
+                if (fn->title() == name)
+                    return false;
+
+        return true;
+    }
+
+    if (auto fn = function->as<const AADLObjectFunction *>())
+        for (const auto c : fn->children())
+            if (c->isFunction())
+                if (c->title() == name)
+                    return false;
+
+    return false;
 }
 
 bool AADLNameValidator::isValidRequiredInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const

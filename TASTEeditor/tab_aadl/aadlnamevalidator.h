@@ -24,7 +24,10 @@ namespace aadl {
 
 class AADLObject;
 class AADLObjectsModel;
+class AADLObjectFunction;
 class AADLObjectFunctionType;
+class AADLObjectIfaceRequired;
+class AADLObjectIfaceProvided;
 class AADLNameValidator
 {
 public:
@@ -33,24 +36,24 @@ public:
     static QString encodeName(const AADLObject *object, const QString &name);
     static QString encodeName(const AADLObject::Type t, const QString &name);
 
-    static QString nextNameFor(const AADLObject::Type t, const AADLObject *parent);
+    static QString nextNameFor(const AADLObject *object);
 
     static bool isAcceptableName(const AADLObject *object, const QString &name);
-    static bool isAcceptableName(const AADLObject::Type t, const AADLObject *parent, const QString &name);
 
 private:
     static AADLNameValidator *m_instance;
 
     AADLNameValidator();
 
-    QString nextName(const AADLObject::Type t, const AADLObject *parent) const;
+    QString nextName(const AADLObject *object) const;
 
     QString nameFunctionType(const AADLObject *parent) const;
-    QString nameFunction(const AADLObject *parent) const;
-    QString nameRequiredInterface(const AADLObject *parent) const;
-    QString nameProvidedInterface(const AADLObject *parent) const;
+    QString nameFunction(const AADLObject *fn) const;
+    QString nameRequiredInterface(const AADLObject *iface) const;
+    QString nameProvidedInterface(const AADLObject *iface) const;
     QString nameComment(const AADLObject *parent) const;
 
+    bool isValidFunctionName(const QString &name, const AADLObject *fn) const;
     bool isValidRequiredInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const;
     bool isValidProvidedInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const;
 };

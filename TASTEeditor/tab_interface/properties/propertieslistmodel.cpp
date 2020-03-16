@@ -153,7 +153,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
 
             switch (tokenFromIndex(index)) {
             case meta::Props::Token::name: {
-                if (!AADLNameValidator::isAcceptableName(m_dataObject->parentObject(), value.toString()))
+                if (!AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
                     return false; // TODO: move to editor's validator
                 break;
             }

@@ -48,6 +48,11 @@ AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *
     : QObject(parent)
     , d(new AADLObjectPrivate(id, t))
 {
+    if (const AADLObject *parentObject = qobject_cast<const AADLObject *>(parent))
+        setObjectsModel(parentObject->objectsModel());
+    else if (AADLObjectsModel *model = qobject_cast<AADLObjectsModel *>(parent))
+        setObjectsModel(model);
+
     setAttr(meta::Props::token(meta::Props::Token::name), title);
 }
 
@@ -242,11 +247,12 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
         case meta::Props::Token::name: {
             QString usedName = val.toString();
             if (usedName.isEmpty())
-                usedName = AADLNameValidator::nextNameFor(aadlType(), parentObject());
+                usedName = AADLNameValidator::nextNameFor(this);
+            else
+                usedName = AADLNameValidator::encodeName(this->aadlType(), usedName);
 
-            const QString title = AADLNameValidator::encodeName(this->aadlType(), usedName);
-            d->m_attrs[name] = title;
-            emit titleChanged(title);
+            d->m_attrs[name] = usedName;
+            emit titleChanged(usedName);
             break;
         }
         default:
