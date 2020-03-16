@@ -26,6 +26,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "tab_aadl/aadlcommonprops.h"
+#include "tab_aadl/aadlnamevalidator.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectfunction.h"
@@ -57,7 +58,12 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
         m_textItem->setBackgroundColor(Qt::transparent);
         m_textItem->setFlags(QGraphicsItem::ItemIsSelectable);
 
-        connect(m_textItem, &TextGraphicsItem::edited, this, [entity](const QString &text) {
+        connect(m_textItem, &TextGraphicsItem::edited, this, [this, entity](const QString &text) {
+            if (!AADLNameValidator::isAcceptableName(entity, text)) {
+                m_textItem->setPlainText(entity->title());
+                return;
+            }
+
             const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
             const auto attributesCmd = cmd::CommandsFactory::create(
                     cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) });
