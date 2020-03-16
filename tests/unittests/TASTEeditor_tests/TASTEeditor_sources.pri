@@ -66,6 +66,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/tab_interface/aadlfunctiontypegraphicsitem.h \
         $$TASTE_PRO_ROOT/tab_interface/aadlinterfacegraphicsitem.h \
         $$TASTE_PRO_ROOT/tab_interface/aadlrectgraphicsitem.h \
+        $$TASTE_PRO_ROOT/tab_interface/commenttextdialog.h \
         $$TASTE_PRO_ROOT/tab_interface/colors/colorhandlereditor.h \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanager.h \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanagerdialog.h \
@@ -183,6 +184,7 @@ SOURCES += \
         $$TASTE_PRO_ROOT/tab_interface/aadlfunctiontypegraphicsitem.cpp \
         $$TASTE_PRO_ROOT/tab_interface/aadlinterfacegraphicsitem.cpp \
         $$TASTE_PRO_ROOT/tab_interface/aadlrectgraphicsitem.cpp \
+        $$TASTE_PRO_ROOT/tab_interface/commenttextdialog.cpp \
         $$TASTE_PRO_ROOT/tab_interface/colors/colorhandlereditor.cpp \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanager.cpp \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanagerdialog.cpp \
@@ -239,6 +241,7 @@ FORMS += \
         $$TASTE_PRO_ROOT/app/context/action/editor/dynactioneditor.ui \
 #        $$TASTE_PRO_ROOT/app/mainwindow.ui \
 #        $$TASTE_PRO_ROOT/reports/bugreportdialog.ui \
+        $$TASTE_PRO_ROOT/tab_interface/commenttextdialog.ui \
         $$TASTE_PRO_ROOT/tab_interface/colors/colorhandlereditor.ui \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanagerdialog.ui \
         $$TASTE_PRO_ROOT/tab_interface/properties/adddynamicpropertydialog.ui \

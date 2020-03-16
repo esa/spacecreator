@@ -27,7 +27,8 @@
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QPainter>
-#include <QTextDocument>
+#include <QTextLayout>
+#include <QTextLine>
 #include <QtDebug>
 #include <app/commandsstack.h>
 #include <baseitems/grippointshandler.h>
@@ -40,25 +41,11 @@ namespace aadl {
 
 AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)
-    , m_textItem(new TextGraphicsItem(this))
+    , m_textLayout(new QTextLayout)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-
-    m_textItem->setPlainText(comment->title());
-    m_textItem->setFramed(false);
-    m_textItem->setEditable(true);
-    m_textItem->setBackgroundColor(Qt::transparent);
-    m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_textItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-    m_textItem->setFlag(QGraphicsItem::ItemIsSelectable);
-
-    connect(m_textItem, &TextGraphicsItem::edited, this, &AADLCommentGraphicsItem::textEdited);
-    connect(m_textItem, &TextGraphicsItem::textChanged, this, &AADLCommentGraphicsItem::textChanged);
-
     setFont(QFont(qApp->font()));
-    m_textItem->setFont(font());
 
-    setHighlightable(false);
     colorSchemeUpdated();
 }
 
@@ -68,48 +55,20 @@ void AADLCommentGraphicsItem::updateFromEntity()
     setText(entity()->title());
 }
 
-void AADLCommentGraphicsItem::textEdited(const QString &text)
-{
-    if (entity()->title() == m_textItem->toPlainText())
-        return;
-
-    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
-
-    const QRectF geometry = sceneBoundingRect();
-    const QVector<QPointF> points { geometry.topLeft(), geometry.bottomRight() };
-    const QVariantList geometryParams { QVariant::fromValue(entity()), QVariant::fromValue(points) };
-    if (const auto geometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, geometryParams))
-        taste3::cmd::CommandsStack::current()->push(geometryCmd);
-
-    const QVariantList commentTextParams { QVariant::fromValue(entity()), QVariant::fromValue(text) };
-    const auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeCommentText, commentTextParams);
-    taste3::cmd::CommandsStack::current()->push(commentTextCmd);
-
-    taste3::cmd::CommandsStack::current()->endMacro();
-}
-
-void AADLCommentGraphicsItem::textChanged()
-{
-    prepareGeometryChange();
-    m_boundingRect = m_textItem->boundingRect();
-    updateGripPoints();
-}
-
 void AADLCommentGraphicsItem::setText(const QString &text)
 {
-    if (m_textItem->toPlainText() == text)
+    if (m_text == text)
         return;
 
-    m_textItem->setTextWidth(150);
-    m_textItem->setPlainText(text);
-    m_textItem->setTextWidth(m_textItem->idealWidth());
+    m_text = text;
+    updateTextLayout(text);
 
     instantLayoutUpdate();
 }
 
 QString AADLCommentGraphicsItem::text() const
 {
-    return m_textItem->toPlainText();
+    return m_text;
 }
 
 AADLObjectComment *AADLCommentGraphicsItem::entity() const
@@ -127,7 +86,7 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     painter->setPen(pen());
     painter->setBrush(brush());
 
-    const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
+    const QRectF br = boundingRect();
     auto preparePolygon = [](const QRectF &rect) {
         return QVector<QPointF> { rect.topRight() - QPointF(kMargins, 0),
                                   rect.topLeft(),
@@ -145,6 +104,8 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     };
     painter->drawPolyline(preparePolyline(br));
 
+    m_textLayout->draw(painter, QPointF(0, 0));
+
     painter->restore();
     AADLRectGraphicsItem::paint(painter, option, widget);
 }
@@ -152,7 +113,7 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 void AADLCommentGraphicsItem::rebuildLayout()
 {
     AADLRectGraphicsItem::rebuildLayout();
-    m_textItem->setExplicitSize(m_boundingRect.size());
+    updateTextLayout(m_text);
 }
 
 QSizeF AADLCommentGraphicsItem::minimalSize() const
@@ -163,6 +124,33 @@ QSizeF AADLCommentGraphicsItem::minimalSize() const
 ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
 {
     return ColorManager::HandledColors::Comment;
+}
+
+void AADLCommentGraphicsItem::updateTextLayout(const QString &text)
+{
+    static const QString ellipsis { QLatin1String("...") };
+    if (text.size() < ellipsis.size())
+        return;
+
+    m_textLayout->setText(text);
+    m_textLayout->setFont(font());
+    m_textLayout->beginLayout();
+    qreal y = kMargins;
+
+    QTextLine line = m_textLayout->createLine();
+    while (line.isValid()) {
+        line.setPosition(QPointF(kMargins, y));
+        line.setLineWidth(m_boundingRect.width() - 2 * kMargins);
+        y += line.height();
+        if (y > (m_boundingRect.height() - 2 * kMargins)) {
+            const QString sf(text.constData(), line.textStart() + line.textLength() - 2 * ellipsis.size());
+            m_textLayout->endLayout();
+            updateTextLayout(sf + ellipsis);
+            return;
+        }
+        line = m_textLayout->createLine();
+    }
+    m_textLayout->endLayout();
 }
 
 void AADLCommentGraphicsItem::colorSchemeUpdated()

@@ -18,6 +18,8 @@
 #pragma once
 
 #include "baseitems/interactiveobject.h"
+
+#include <QSet>
 namespace taste3 {
 namespace aadl {
 
@@ -42,6 +44,9 @@ public:
     };
     void singleStepMove(MoveStep direction);
 
+private Q_SLOTS:
+    void onGeometryChanged();
+
 protected:
     void rebuildLayout() override;
     void initGripPoints() override;
@@ -53,6 +58,9 @@ protected:
     QRectF adjustRectToParent(GripPoint *grip, const QPointF &from, const QPointF &to);
     bool allowGeometryChange(const QPointF &from, const QPointF &to);
     void shiftBy(const QPointF &shift);
+
+private:
+    QSet<InteractiveObject *> m_collidedItems;
 };
 
 } // namespace aadl

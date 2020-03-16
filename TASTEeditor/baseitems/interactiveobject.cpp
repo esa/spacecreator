@@ -354,7 +354,7 @@ HighlightRectItem *InteractiveObject::createHighlighter()
     connect(m_highlighter, &HighlightRectItem::highlighted, m_highlighter, &QObject::deleteLater);
     connect(m_highlighter, &QObject::destroyed, this, [this]() { m_highlighter = nullptr; });
 
-    m_highlighter->setRect(m_boundingRect);
+    m_highlighter->setPath(shape());
 
     return m_highlighter;
 }

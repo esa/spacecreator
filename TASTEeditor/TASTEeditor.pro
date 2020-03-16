@@ -76,6 +76,7 @@ SOURCES += \
         tab_aadl/aadlnamevalidator.cpp \
         tab_interface/commands/cmdentityautolayout.cpp \
         tab_interface/commands/cmdifacedatachangebase.cpp \
+        tab_interface/commenttextdialog.cpp \
         templating/aadlobjecttemplateproperty.cpp \
         templating/stringtemplate.cpp \
         templating/templateeditor.cpp \
@@ -193,6 +194,7 @@ HEADERS += \
         tab_aadl/aadlnamevalidator.h \
         tab_interface/commands/cmdentityautolayout.h \
         tab_interface/commands/cmdifacedatachangebase.h \
+        tab_interface/commenttextdialog.h \
         templating/aadlobjecttemplateproperty.h \
         templating/stringtemplate.h \
         templating/templateeditor.h \
@@ -281,6 +283,7 @@ FORMS += \
     reports/bugreportdialog.ui \
     tab_interface/colors/colorhandlereditor.ui \
     tab_interface/colors/colormanagerdialog.ui \
+    tab_interface/commenttextdialog.ui \
     tab_interface/properties/adddynamicpropertydialog.ui \
     tab_interface/properties/dynamicpropertymanager.ui \
     tab_interface/properties/propertiesdialog.ui \
