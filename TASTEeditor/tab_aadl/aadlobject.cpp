@@ -244,7 +244,7 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
             if (usedName.isEmpty())
                 usedName = AADLNameValidator::nextNameFor(aadlType(), parentObject());
 
-            const QString title = AADLNameValidator::validateName(this->aadlType(), usedName);
+            const QString title = AADLNameValidator::encodeName(this->aadlType(), usedName);
             d->m_attrs[name] = title;
             emit titleChanged(title);
             break;

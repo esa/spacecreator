@@ -179,7 +179,7 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjec
         return nullptr;
 
     for (auto obj : d->m_objects) {
-        if (obj->isRequiredInterface() && obj->title() == name)
+        if ((obj->isRequiredInterface() || obj->isProvidedInterface()) && obj->title() == name)
             if (AADLObjectIface *iface = obj->as<AADLObjectIface *>())
                 if (iface->direction() == dir && (!parent || iface->parentObject() == parent))
                     return iface;

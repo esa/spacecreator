@@ -24,15 +24,19 @@ namespace aadl {
 
 class AADLObject;
 class AADLObjectsModel;
+class AADLObjectFunctionType;
 class AADLNameValidator
 {
 public:
     static AADLNameValidator *instance();
 
-    static QString validateName(const AADLObject *object, const QString &name);
-    static QString validateName(const AADLObject::Type t, const QString &name);
+    static QString encodeName(const AADLObject *object, const QString &name);
+    static QString encodeName(const AADLObject::Type t, const QString &name);
 
     static QString nextNameFor(const AADLObject::Type t, const AADLObject *parent);
+
+    static bool isAcceptableName(const AADLObject *object, const QString &name);
+    static bool isAcceptableName(const AADLObject::Type t, const AADLObject *parent, const QString &name);
 
 private:
     static AADLNameValidator *m_instance;
@@ -46,6 +50,8 @@ private:
     QString nameRequiredInterface(const AADLObject *parent) const;
     QString nameProvidedInterface(const AADLObject *parent) const;
     QString nameComment(const AADLObject *parent) const;
+
+    bool isValidRequiredInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const;
 };
 
 } // ns aadl
