@@ -52,6 +52,7 @@ private:
     QString nameComment(const AADLObject *parent) const;
 
     bool isValidRequiredInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const;
+    bool isValidProvidedInterfaceName(const QString &name, const AADLObjectFunctionType *parent) const;
 };
 
 } // ns aadl
