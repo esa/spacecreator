@@ -60,8 +60,48 @@ QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &n
                        [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
         return result;
     }
-    case AADLObject::Type::Comment:
+    case AADLObject::Type::Comment: {
+        QString result(name);
+        result.replace('\n', "\\n");
+        return result;
+    }
+    case AADLObject::Type::Connection: {
+        qWarning() << "Connection does not support naming";
         break;
+    }
+    case AADLObject::Type::Unknown: {
+        qWarning() << "Unknown object does not support naming";
+        break;
+    }
+    default: {
+        qWarning() << "Unsupported object type" << t;
+        break;
+    }
+    }
+
+    return name;
+}
+
+QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &name)
+{
+    if (name.isEmpty())
+        return QString();
+
+    switch (t) {
+    case AADLObject::Type::Function:
+    case AADLObject::Type::FunctionType:
+    case aadl::AADLObject::Type::ProvidedInterface:
+    case aadl::AADLObject::Type::RequiredInterface: {
+        QString result;
+        std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
+                       [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
+        return result;
+    }
+    case AADLObject::Type::Comment: {
+        QString result(name);
+        result.replace("\\n", "\n");
+        return result;
+    }
     case AADLObject::Type::Connection: {
         qWarning() << "Connection does not support naming";
         break;
