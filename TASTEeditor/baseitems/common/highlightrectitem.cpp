@@ -26,6 +26,7 @@ namespace taste3 {
 
 HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
+    , m_pathItem(new QGraphicsPathItem(this))
 {
 }
 
@@ -43,22 +44,24 @@ void HighlightRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 QRectF HighlightRectItem::boundingRect() const
 {
-    return m_rectItem->boundingRect();
+    return m_pathItem->boundingRect();
 }
 
 void HighlightRectItem::setRect(const QRectF &rect)
 {
-    m_rectItem->setRect(rect);
+    QPainterPath pp;
+    pp.addRect(rect);
+    m_pathItem->setPath(pp);
 }
 
 void HighlightRectItem::setPen(const QPen &pen)
 {
-    m_rectItem->setPen(pen);
+    m_pathItem->setPen(pen);
 }
 
 void HighlightRectItem::setBrush(const QBrush &brush)
 {
-    m_rectItem->setBrush(brush);
+    m_pathItem->setBrush(brush);
 }
 
 void HighlightRectItem::highlight()
@@ -85,6 +88,16 @@ void HighlightRectItem::clearAnimation()
         m_lastAnimation->stop();
         delete m_lastAnimation;
     }
+}
+
+QPainterPath HighlightRectItem::shape() const
+{
+    return m_pathItem->shape();
+}
+
+void HighlightRectItem::setPath(const QPainterPath &path)
+{
+    return m_pathItem->setPath(path);
 }
 
 } // ns taste3

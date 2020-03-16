@@ -31,6 +31,9 @@ namespace aadl {
 AADLRectGraphicsItem::AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentItem)
     : InteractiveObject(entity, parentItem)
 {
+    connect(this, &InteractiveObject::relocated, this, &AADLRectGraphicsItem::onGeometryChanged);
+    connect(this, &InteractiveObject::boundingBoxChanged, this, &AADLRectGraphicsItem::onGeometryChanged);
+    setHighlightable(true);
 }
 
 QSizeF AADLRectGraphicsItem::minimalSize() const
@@ -278,6 +281,29 @@ void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
     onManualMoveStart(nullptr, pressedAt);
     onManualMoveProgress(nullptr, pressedAt, releasedAt);
     onManualMoveFinish(nullptr, pressedAt, releasedAt);
+}
+
+void AADLRectGraphicsItem::onGeometryChanged()
+{
+    QSet<InteractiveObject *> items;
+    QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(2 * utils::kContentMargins));
+    std::for_each(collidedItems.begin(), collidedItems.end(), [this, &items](QGraphicsItem *item) {
+        auto rectItem = qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject());
+        if (rectItem && item != this && item->parentItem() == parentItem())
+            items.insert(rectItem);
+    });
+    QSet<InteractiveObject *> newItems(items);
+    newItems.subtract(m_collidedItems);
+    for (auto item : newItems)
+        item->doHighlighting(Qt::red, true);
+
+    QSet<InteractiveObject *> oldItems(m_collidedItems);
+    oldItems.subtract(items);
+
+    for (auto item : oldItems)
+        item->doHighlighting(Qt::green, false);
+
+    m_collidedItems = items;
 }
 
 } // namespace aadl
