@@ -51,7 +51,7 @@ private:
     QString nameFunction(const AADLObject *fn) const;
     QString nameRequiredInterface(const AADLObject *iface) const;
     QString nameProvidedInterface(const AADLObject *iface) const;
-    QString nameComment(const AADLObject *parent) const;
+    QString nameComment(const AADLObject *comment) const;
 
     bool isValidFunctionTypeName(const QString &name, const AADLObject *fnType) const;
     bool isValidFunctionName(const QString &name, const AADLObject *fn) const;
