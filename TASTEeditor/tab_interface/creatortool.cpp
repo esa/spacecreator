@@ -747,7 +747,7 @@ void CreatorTool::removeSelectedItems()
 
             if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject())) {
                 if (auto entity = iObj->aadlObject()) {
-                    if (entity->isInterface()) {
+                    if (entity->isRequiredInterface() || entity->isProvidedInterface()) {
                         if (auto iface = entity->as<const AADLObjectIface *>()) {
                             if (const AADLObjectIface *srcIface = iface->cloneOf()) {
                                 clonedIfaces.append(QStringLiteral("%1's %2 is from %3")

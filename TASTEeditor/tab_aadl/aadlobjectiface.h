@@ -143,7 +143,7 @@ protected Q_SLOTS:
     void onReflectedParamsChanged();
 
 protected:
-    explicit AADLObjectIface(AADLObjectIface::IfaceType direction, const QString &title, AADLObject *parent = nullptr,
+    explicit AADLObjectIface(AADLObject::Type ifaceType, const QString &title, AADLObject *parent = nullptr,
                              const common::Id &id = common::InvalidId);
     void setupInitialAttrs();
 

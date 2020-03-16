@@ -86,13 +86,12 @@ bool AADLObjectFunctionType::addChild(AADLObject *child)
             d->m_functionTypes.append(child->as<AADLObjectFunction *>());
             break;
         }
-        case AADLObject::Type::Interface: {
-            if (AADLObjectIface *iface = child->as<AADLObjectIface *>()) {
-                if (iface->isRequired())
-                    d->m_ris.append(child->as<AADLObjectIfaceRequired *>());
-                else
-                    d->m_pis.append(child->as<AADLObjectIfaceProvided *>());
-            }
+        case AADLObject::Type::ProvidedInterface: {
+            d->m_pis.append(child->as<AADLObjectIfaceProvided *>());
+            break;
+        }
+        case AADLObject::Type::RequiredInterface: {
+            d->m_ris.append(child->as<AADLObjectIfaceRequired *>());
             break;
         }
         case AADLObject::Type::Comment: {
@@ -132,13 +131,12 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
             d->m_functionTypes.removeAll(child->as<AADLObjectFunction *>());
             break;
         }
-        case AADLObject::Type::Interface: {
-            if (AADLObjectIface *iface = child->as<AADLObjectIface *>()) {
-                if (iface->isRequired())
-                    d->m_ris.removeAll(child->as<AADLObjectIfaceRequired *>());
-                else
-                    d->m_pis.removeAll(child->as<AADLObjectIfaceProvided *>());
-            }
+        case AADLObject::Type::RequiredInterface: {
+            d->m_ris.removeAll(child->as<AADLObjectIfaceRequired *>());
+            break;
+        }
+        case AADLObject::Type::ProvidedInterface: {
+            d->m_pis.removeAll(child->as<AADLObjectIfaceProvided *>());
             break;
         }
         case AADLObject::Type::Comment: {

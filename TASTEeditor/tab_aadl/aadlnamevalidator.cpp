@@ -40,7 +40,8 @@ QString AADLNameValidator::validateName(const AADLObject::Type t, const QString 
     switch (t) {
     case AADLObject::Type::Function:
     case AADLObject::Type::FunctionType:
-    case AADLObject::Type::Interface: {
+    case aadl::AADLObject::Type::ProvidedInterface:
+    case aadl::AADLObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
                        [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
