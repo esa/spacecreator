@@ -33,7 +33,6 @@ class AADLNameValidator
 public:
     static AADLNameValidator *instance();
 
-    static QString encodeName(const AADLObject *object, const QString &name);
     static QString encodeName(const AADLObject::Type t, const QString &name);
     static QString decodeName(const AADLObject::Type t, const QString &name);
 

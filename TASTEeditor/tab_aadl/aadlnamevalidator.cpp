@@ -37,14 +37,6 @@ AADLNameValidator *AADLNameValidator::instance()
     return m_instance;
 }
 
-QString AADLNameValidator::encodeName(const AADLObject *object, const QString &name)
-{
-    if (!object || name.isEmpty())
-        return QString();
-
-    return encodeName(object->aadlType(), name);
-}
-
 QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &name)
 {
     if (name.isEmpty())
