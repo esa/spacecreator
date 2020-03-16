@@ -33,6 +33,7 @@
 #include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
 #include "tab_interface/colors/colormanagerdialog.h"
+#include "tab_interface/commenttextdialog.h"
 #include "tab_interface/properties/dynamicpropertymanager.h"
 #include "tab_interface/properties/propertiesdialog.h"
 
@@ -613,9 +614,16 @@ void InterfaceTabDocument::onItemDoubleClicked()
                         return;
                     }
                 }
-            }
-            if (clickedEntity->aadlType() != aadl::AADLObject::Type::Connection)
+            } else if (clickedEntity->aadlType() == aadl::AADLObject::Type::Comment) {
+                if (auto commentItem = qgraphicsitem_cast<aadl::AADLCommentGraphicsItem *>(clickedItem)) {
+                    auto dialog = new aadl::CommentTextDialog(qobject_cast<aadl::AADLObjectComment *>(clickedEntity),
+                                                              qobject_cast<QWidget *>(parent()));
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->open();
+                }
+            } else if (clickedEntity->aadlType() != aadl::AADLObject::Type::Connection) {
                 showPropertyEditor(clickedEntity);
+            }
         }
     }
 }

@@ -28,12 +28,11 @@ namespace aadl {
 namespace cmd {
 
 CmdCommentTextChange::CmdCommentTextChange(AADLObjectComment *comment, const QString &text)
-    : QUndoCommand()
+    : QUndoCommand(QObject::tr("Edit Comment"))
     , m_entity(comment)
     , m_prevText(comment->title())
     , m_newText(text)
 {
-    setText(QObject::tr("Edit Comment"));
 }
 
 void CmdCommentTextChange::redo()
