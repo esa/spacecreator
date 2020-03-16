@@ -26,10 +26,6 @@
 namespace taste3 {
 namespace aadl {
 
-static size_t s_counter_ri = 0;
-static size_t s_counter_pi = 0;
-static size_t s_counter_fn = 0;
-
 AADLNameValidator *AADLNameValidator::m_instance = nullptr;
 
 AADLNameValidator::AADLNameValidator() {}
@@ -90,6 +86,9 @@ bool AADLNameValidator::isAcceptableName(const AADLObject *object, const QString
 
     const AADLObject::Type t = object->aadlType();
     switch (t) {
+    case AADLObject::Type::FunctionType: {
+        return instance()->isValidFunctionTypeName(name, object);
+    }
     case AADLObject::Type::Function: {
         return instance()->isValidFunctionName(name, object);
     }
@@ -133,7 +132,7 @@ QString AADLNameValidator::nextName(const AADLObject *object) const
     case AADLObject::Type::Function:
         return nameFunction(object);
     case AADLObject::Type::FunctionType:
-        return nameFunctionType(object->as<const AADLObjectFunctionType *>());
+        return nameFunctionType(object);
     case AADLObject::Type::RequiredInterface:
         return nameRequiredInterface(object);
     case AADLObject::Type::ProvidedInterface:
@@ -148,9 +147,24 @@ QString AADLNameValidator::nextName(const AADLObject *object) const
     return QString();
 }
 
-QString AADLNameValidator::nameFunctionType(const AADLObject *parent) const
+QString AADLNameValidator::nameFunctionType(const AADLObject *function) const
 {
-    return QStringLiteral("Not implemented yet");
+    static const QString nameTemplate = QObject::tr("Function_Type_%1");
+
+    size_t counter = 0;
+    if (function && function->objectsModel()) {
+        for (const auto fn : function->objectsModel()->objects())
+            if (fn->isFunctionType())
+                ++counter;
+    } else
+        counter = 0;
+    ++counter;
+
+    QString name = nameTemplate.arg(counter);
+    while (!isAcceptableName(function, name))
+        name = nameTemplate.arg(++counter);
+
+    return name;
 }
 
 QString AADLNameValidator::nameFunction(const AADLObject *function) const
@@ -163,7 +177,8 @@ QString AADLNameValidator::nameFunction(const AADLObject *function) const
             if (fn->isFunction())
                 ++counter;
     } else
-        counter = ++s_counter_fn;
+        counter = 0;
+    ++counter;
 
     QString name = nameTemplate.arg(counter);
     while (!isAcceptableName(function, name))
@@ -179,7 +194,8 @@ QString AADLNameValidator::nameRequiredInterface(const AADLObject *iface) const
     static const QString nameTemplate = QObject::tr("RI_%1");
 
     const auto parent = iface->parentObject()->as<const AADLObjectFunctionType *>();
-    size_t counter = parent ? parent->ris().size() + 1 : ++s_counter_ri;
+    size_t counter = parent ? parent->ris().size() : 0;
+    ++counter;
 
     QString name = nameTemplate.arg(counter);
     if (parent)
@@ -195,7 +211,8 @@ QString AADLNameValidator::nameProvidedInterface(const AADLObject *iface) const
 
     const auto fn =
             (iface && iface->parentObject()) ? iface->parentObject()->as<const AADLObjectFunctionType *>() : nullptr;
-    size_t counter = fn ? fn->pis().size() + 1 : ++s_counter_pi;
+    size_t counter = fn ? fn->pis().size() : 0;
+    ++counter;
 
     QString name = nameTemplate.arg(counter);
     if (fn)
@@ -208,6 +225,30 @@ QString AADLNameValidator::nameProvidedInterface(const AADLObject *iface) const
 QString AADLNameValidator::nameComment(const AADLObject *parent) const
 {
     return QStringLiteral("Not implemented yet");
+}
+
+bool AADLNameValidator::isValidFunctionTypeName(const QString &name, const AADLObject *fnType) const
+{
+    if (name.isEmpty() || !fnType)
+        return false;
+
+    if (fnType->objectsModel()) {
+        for (const auto fn : fnType->objectsModel()->objects())
+            if (fn->isFunctionType())
+                if (fn->title() == name)
+                    return false;
+
+        return true;
+    }
+
+    if (fnType->parentObject())
+        if (const AADLObjectFunction *parent = fnType->parentObject()->as<const AADLObjectFunction *>())
+            for (const auto c : parent->children())
+                if (c->isFunctionType())
+                    if (c->title() == name)
+                        return false;
+
+    return false;
 }
 
 bool AADLNameValidator::isValidFunctionName(const QString &name, const AADLObject *function) const

@@ -40,8 +40,8 @@ public:
 
 private:
     QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObjectFunctionType> m_entity;
     QPointer<AADLObjectFunction> m_parent;
+    QPointer<AADLObjectFunctionType> m_entity;
 };
 
 } // namespace cmd
