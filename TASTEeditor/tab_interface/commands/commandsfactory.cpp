@@ -18,7 +18,6 @@
 #include "commandsfactory.h"
 
 #include "cmdcommentitemcreate.h"
-#include "cmdcommenttextchange.h"
 #include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"
 #include "cmdcontextparametercreate.h"
@@ -66,8 +65,6 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createConnectionCommand(params);
     case cmd::ChangeEntityGeometry:
         return cmd::CommandsFactory::changeGeometryCommand(params);
-    case cmd::ChangeCommentText:
-        return cmd::CommandsFactory::changeCommentCommand(params);
     case cmd::RemoveEntity:
         return cmd::CommandsFactory::removeEntityCommand(params);
     case cmd::ChangeRootEntity:
@@ -206,19 +203,6 @@ QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
         }
     }
     return new CmdEntityGeometryChange(objectsData);
-}
-
-QUndoCommand *CommandsFactory::changeCommentCommand(const QVariantList &params)
-{
-    Q_ASSERT(params.size() == 2);
-    const QVariant entity = params.value(0);
-    const QVariant comment = params.value(1);
-    if (entity.isValid() && entity.canConvert<AADLObjectComment *>() && comment.isValid()
-        && comment.canConvert<QString>()) {
-        return new CmdCommentTextChange(entity.value<AADLObjectComment *>(), comment.value<QString>());
-    }
-
-    return nullptr;
 }
 
 QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)

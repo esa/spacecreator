@@ -30,7 +30,6 @@ enum Id
     CreateConnectionEntity,
     ChangeEntityGeometry,
     RemoveEntity,
-    ChangeCommentText,
     ChangeRootEntity,
     AutoLayoutEntity,
 

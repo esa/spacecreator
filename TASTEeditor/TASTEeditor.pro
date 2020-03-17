@@ -113,7 +113,6 @@ SOURCES += \
         tab_interface/colors/colormanagerdialog.cpp \
         tab_interface/colors/colorselectorbutton.cpp \
         tab_interface/commands/cmdcommentitemcreate.cpp \
-        tab_interface/commands/cmdcommenttextchange.cpp \
         tab_interface/commands/cmdconnectionitemcreate.cpp \
         tab_interface/commands/cmdcontextparameterchange.cpp \
         tab_interface/commands/cmdcontextparametercreate.cpp \
@@ -231,7 +230,6 @@ HEADERS += \
         tab_interface/colors/colormanagerdialog.h \
         tab_interface/colors/colorselectorbutton.h \
         tab_interface/commands/cmdcommentitemcreate.h \
-        tab_interface/commands/cmdcommenttextchange.h \
         tab_interface/commands/cmdconnectionitemcreate.h \
         tab_interface/commands/cmdcontextparameterchange.h \
         tab_interface/commands/cmdcontextparametercreate.h \

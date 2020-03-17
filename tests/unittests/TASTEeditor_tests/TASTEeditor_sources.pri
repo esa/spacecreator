@@ -72,7 +72,6 @@ HEADERS += \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanagerdialog.h \
         $$TASTE_PRO_ROOT/tab_interface/colors/colorselectorbutton.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcommentitemcreate.h \
-        $$TASTE_PRO_ROOT/tab_interface/commands/cmdcommenttextchange.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdconnectionitemcreate.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterchange.h \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparametercreate.h \
@@ -190,7 +189,6 @@ SOURCES += \
         $$TASTE_PRO_ROOT/tab_interface/colors/colormanagerdialog.cpp \
         $$TASTE_PRO_ROOT/tab_interface/colors/colorselectorbutton.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcommentitemcreate.cpp \
-        $$TASTE_PRO_ROOT/tab_interface/commands/cmdcommenttextchange.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdconnectionitemcreate.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparameterchange.cpp \
         $$TASTE_PRO_ROOT/tab_interface/commands/cmdcontextparametercreate.cpp \
