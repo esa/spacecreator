@@ -92,7 +92,6 @@ void PropertiesDialog::open()
 void PropertiesDialog::done(int r)
 {
     m_cmdMacro->setComplete(r == QDialog::Accepted);
-    qDebug() << taste3::cmd::CommandsStack::current()->index();
     QDialog::done(r);
 }
 
