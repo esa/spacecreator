@@ -241,9 +241,6 @@ QString AADLNameValidator::nextName(const AADLObject *object) const
         return QString();
 
     const AADLObject::Type t = object->aadlType();
-    if (t == AADLObject::Type::Unknown)
-        return QString();
-
     switch (t) {
     case AADLObject::Type::Function:
         return nameFunction(object);
@@ -255,6 +252,9 @@ QString AADLNameValidator::nextName(const AADLObject *object) const
         return nameProvidedInterface(object);
     case AADLObject::Type::Comment:
         return nameComment(object);
+    case AADLObject::Type::Connection:
+    case AADLObject::Type::Unknown:
+        return QString();
     default:
         break;
     }

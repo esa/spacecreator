@@ -131,11 +131,7 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged,
             Qt::QueuedConnection);
     connect(m_model, &aadl::AADLObjectsModel::aadlObjectAdded, this, &InterfaceTabDocument::onAADLObjectAdded);
-    connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, [this](aadl::AADLObject *object) {
-        auto item = m_items.take(object->id());
-        m_graphicsScene->removeItem(item);
-        delete item;
-    });
+    connect(m_model, &aadl::AADLObjectsModel::aadlObjectRemoved, this, &InterfaceTabDocument::onAADLObjectRemoved);
 }
 
 InterfaceTabDocument::~InterfaceTabDocument()
@@ -597,6 +593,16 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
             m_graphicsScene->addItem(item);
     }
     updateItem(item);
+}
+
+void InterfaceTabDocument::onAADLObjectRemoved(aadl::AADLObject *object)
+{
+    QMutexLocker lock(m_mutex);
+
+    if (auto item = m_items.take(object->id())) {
+        m_graphicsScene->removeItem(item);
+        delete item;
+    }
 }
 
 void InterfaceTabDocument::onItemClicked()

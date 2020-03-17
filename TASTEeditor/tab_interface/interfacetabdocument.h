@@ -83,6 +83,7 @@ protected Q_SLOTS:
     void onActionExitToParentFunction();
 
     void onAADLObjectAdded(aadl::AADLObject *object);
+    void onAADLObjectRemoved(aadl::AADLObject *object);
     void onItemClicked();
     void onItemDoubleClicked();
     void onRootObjectChanged(common::Id rootId);
