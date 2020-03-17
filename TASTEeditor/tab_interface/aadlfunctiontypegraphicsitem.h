@@ -69,6 +69,8 @@ protected:
         return filtered.join(lineBreak);
     }
 
+    bool allowGeometryChange(const QPointF &from, const QPointF &to) override;
+
 protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };

@@ -56,7 +56,7 @@ protected:
     void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     QRectF adjustRectToParent(GripPoint *grip, const QPointF &from, const QPointF &to);
-    bool allowGeometryChange(const QPointF &from, const QPointF &to);
+    virtual bool allowGeometryChange(const QPointF &from, const QPointF &to);
     void shiftBy(const QPointF &shift);
 
 private:

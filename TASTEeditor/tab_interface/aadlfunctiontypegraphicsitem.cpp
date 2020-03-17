@@ -30,6 +30,7 @@
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectconnection.h"
 #include "tab_aadl/aadlobjectfunction.h"
+#include "tab_interface/graphicsitemhelpers.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -146,6 +147,18 @@ QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
     const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
+}
+
+bool AADLFunctionTypeGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)
+{
+    const QRectF upcomingRect = sceneBoundingRect(); //.translated(to - from); // it seems the rect has been already
+                                                     // updated by the moment we get here
+    if (gi::isOverConnection(scene(), upcomingRect, this)) {
+        updateFromEntity();
+        return false;
+    }
+
+    return AADLRectGraphicsItem::allowGeometryChange(from, to);
 }
 
 } // namespace aadl

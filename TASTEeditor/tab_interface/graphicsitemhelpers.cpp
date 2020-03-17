@@ -29,6 +29,8 @@
 #include "tab_interface/aadlfunctiontypegraphicsitem.h"
 #include "tab_interface/aadlinterfacegraphicsitem.h"
 
+#include <QGraphicsScene>
+
 namespace taste3 {
 namespace aadl {
 namespace gi {
@@ -88,6 +90,18 @@ AADLObjectConnection *connectionObject(QGraphicsItem *item)
     return nullptr;
 };
 
+bool isOverConnection(QGraphicsScene *scene, const QRectF &area, const QGraphicsItem *excludedItem)
+{
+    if (!scene || area.isEmpty())
+        return false;
+
+    for (auto item : scene->items(area)) {
+        if (item != excludedItem && AADLConnectionGraphicsItem::Type == item->type())
+            return true;
+    }
+
+    return false;
+}
 } // ns gi
 } // ns aadl
 } // ns taste3
