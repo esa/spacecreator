@@ -29,7 +29,12 @@ CommandsStack::Macro::~Macro()
 {
     taste3::cmd::CommandsStack::current()->endMacro();
 
-    if (!isComplete()) {
+    int count = 0;
+    if (const auto cmd =
+                taste3::cmd::CommandsStack::current()->command(taste3::cmd::CommandsStack::current()->index() - 1))
+        count = cmd->childCount();
+
+    if (!isComplete() || 0 == count) {
 
         // I found no other way to remove a macro from the stack:
         const int posOfMacro = taste3::cmd::CommandsStack::current()->index() - 1;
