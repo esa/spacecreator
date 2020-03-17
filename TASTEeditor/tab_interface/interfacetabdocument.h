@@ -22,6 +22,7 @@
 
 #include <QGraphicsView>
 #include <QPointer>
+#include <QQueue>
 #include <baseitems/graphicsview.h>
 
 class QMutex;
@@ -133,6 +134,7 @@ private:
     QHash<common::Id, QGraphicsItem *> m_items;
 
     QMutex *m_mutex { nullptr };
+    QQueue<aadl::AADLObject *> m_rmQueu;
 
     void showNIYGUI(const QString &title = QString());
     void updateSceneRect();

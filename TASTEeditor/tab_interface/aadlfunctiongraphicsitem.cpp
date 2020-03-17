@@ -47,6 +47,8 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
     : AADLFunctionTypeGraphicsItem(entity, parent)
 {
     m_textItem->setVisible(!isRootItem());
+    m_textItem->setTextAlignment(Qt::AlignCenter);
+
     colorSchemeUpdated();
 }
 
@@ -265,11 +267,9 @@ void AADLFunctionGraphicsItem::setGeometry(const QRectF &sceneGeometry)
     m_boundingRect.setSize(sceneGeometry.size());
 }
 
-void AADLFunctionGraphicsItem::updateTextPosition()
+void AADLFunctionGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
 {
-    QRectF textRect { m_textItem->boundingRect() };
-    textRect.moveCenter(boundingRect().center());
-    m_textItem->setPos(textRect.topLeft());
+    textRect.moveCenter(targetTextRect.center());
 }
 
 void AADLFunctionGraphicsItem::updateNestedItems()

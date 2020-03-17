@@ -18,6 +18,10 @@
 
 #include "aadlfunctionnamegraphicsitem.h"
 
+#include <QApplication>
+#include <QFont>
+#include <QTextDocument>
+
 namespace taste3 {
 namespace aadl {
 
@@ -25,6 +29,11 @@ AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent
     : TextGraphicsItem(parent)
 {
     setEditable(true);
+
+    setFont(QFont(qApp->font().family(), 11));
+    setBackgroundColor(Qt::transparent);
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setTextWrapMode(QTextOption::WrapAnywhere);
 }
 
 void AADLFunctionNameGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

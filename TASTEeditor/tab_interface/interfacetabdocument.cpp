@@ -597,11 +597,17 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
 
 void InterfaceTabDocument::onAADLObjectRemoved(aadl::AADLObject *object)
 {
-    QMutexLocker lock(m_mutex);
+    m_rmQueu.enqueue(object);
 
-    if (auto item = m_items.take(object->id())) {
-        m_graphicsScene->removeItem(item);
-        delete item;
+    while (m_rmQueu.size()) {
+        if (m_mutex->tryLock()) {
+            aadl::AADLObject *obj = m_rmQueu.dequeue();
+            if (auto item = m_items.take(obj->id())) {
+                m_graphicsScene->removeItem(item);
+                delete item;
+            }
+            m_mutex->unlock();
+        }
     }
 }
 
