@@ -46,7 +46,6 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
               tr("Edit %1 - %2")
                       .arg(AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(), m_dataObject->title())))
 {
-    qDebug() << taste3::cmd::CommandsStack::current()->index();
     ui->setupUi(this);
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
