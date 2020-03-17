@@ -26,6 +26,7 @@
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
+#include "tab_aadl/aadlnamevalidator.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectiface.h"
 #include "ui_propertiesdialog.h"
@@ -41,6 +42,9 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
+    , m_cmdMacro(new cmd::CommandsStack::Macro(
+              tr("Edit %1 - %2")
+                      .arg(AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(), m_dataObject->title())))
 {
     ui->setupUi(this);
 
@@ -52,6 +56,7 @@ PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
 
 PropertiesDialog::~PropertiesDialog()
 {
+    delete m_cmdMacro;
     delete ui;
 }
 
@@ -80,17 +85,12 @@ QString PropertiesDialog::objectTypeName() const
 
 void PropertiesDialog::open()
 {
-    taste3::cmd::CommandsStack::current()->beginMacro(tr("Change properties"));
     QDialog::open();
 }
 
 void PropertiesDialog::done(int r)
 {
-    taste3::cmd::CommandsStack::current()->endMacro();
-
-    if (QDialog::Rejected == r && !taste3::cmd::CommandsStack::current()->isClean())
-        taste3::cmd::CommandsStack::current()->undo();
-
+    m_cmdMacro->setComplete(r == QDialog::Accepted);
     QDialog::done(r);
 }
 

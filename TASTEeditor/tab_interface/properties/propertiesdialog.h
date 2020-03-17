@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "app/commandsstack.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -46,6 +48,8 @@ private:
     QString objectTypeName() const;
 
     void initTabs();
+
+    taste3::cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
 };
 
 } // namespace aadl

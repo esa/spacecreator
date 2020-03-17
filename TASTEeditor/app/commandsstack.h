@@ -28,6 +28,20 @@ class CommandsStack : public QObject
 {
     Q_OBJECT
 public:
+    struct Macro {
+        Macro(const QString &title = QString());
+        ~Macro();
+
+        bool push(QUndoCommand *cmd) const;
+
+        void setComplete(bool complete);
+        bool isComplete() const;
+
+    private:
+        bool m_keepMacro { false };
+        bool m_cleared { false };
+    };
+
     static CommandsStack *instance();
 
     static void setCurrent(QUndoStack *stack);
