@@ -54,9 +54,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
 
     if (entity) {
         m_textItem->setPlainText(entity->title());
-        m_textItem->setFont(QFont(qApp->font().family(), 11));
-        m_textItem->setBackgroundColor(Qt::transparent);
-        m_textItem->setFlags(QGraphicsItem::ItemIsSelectable);
+        m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
 
         connect(m_textItem, &TextGraphicsItem::edited, this, [this, entity](const QString &text) {
             if (!AADLNameValidator::isAcceptableName(entity, text)) {
@@ -65,22 +63,25 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
             }
 
             const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
-            const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) });
-            taste3::cmd::CommandsStack::current()->push(attributesCmd);
+            if (const auto attributesCmd = cmd::CommandsFactory::create(
+                        cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) }))
+                taste3::cmd::CommandsStack::current()->push(attributesCmd);
         });
         connect(entity, &AADLObjectFunction::attributeChanged, this,
                 [this, entity](taste3::aadl::meta::Props::Token attr) {
                     if (attr == taste3::aadl::meta::Props::Token::name) {
-                        if (m_textItem->toPlainText() != entity->title())
-                            m_textItem->setPlainText(entity->title());
-                        instantLayoutUpdate();
+                        const QString txt = entity->title();
+                        if (m_textItem->toPlainText() != txt) {
+                            m_textItem->setPlainText(txt);
+                            updateTextPosition();
+                        }
                     }
                 });
         connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
             m_textItem->setPlainText(text);
             instantLayoutUpdate();
         });
+        connect(m_textItem, &AADLFunctionNameGraphicsItem::editingModeOff, this, [this]() { updateTextPosition(); });
     }
     colorSchemeUpdated();
 }
@@ -120,8 +121,18 @@ QSizeF AADLFunctionTypeGraphicsItem::minimalSize() const
 void AADLFunctionTypeGraphicsItem::updateTextPosition()
 {
     m_textItem->adjustSize();
-    QRectF textRect { m_textItem->boundingRect() };
-    textRect.moveTopLeft(boundingRect().marginsRemoved(utils::kTextMargins).topLeft());
+
+    QRectF textRect = m_textItem->boundingRect();
+    const QRectF targetTextRect = boundingRect().marginsRemoved(utils::kTextMargins);
+
+    const QSizeF maxTxtSize = targetTextRect.size();
+    const QSizeF txtSize = textRect.size();
+    if (txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height()) {
+        m_textItem->setExplicitSize(maxTxtSize);
+        textRect = m_textItem->boundingRect();
+    }
+
+    prepareTextRect(textRect, targetTextRect);
     m_textItem->setPos(textRect.topLeft());
 }
 
@@ -146,6 +157,11 @@ QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
     const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
+}
+
+void AADLFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
+{
+    textRect.moveTopLeft(targetTextRect.topLeft());
 }
 
 } // namespace aadl

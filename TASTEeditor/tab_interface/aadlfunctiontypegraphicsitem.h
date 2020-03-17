@@ -69,6 +69,8 @@ protected:
         return filtered.join(lineBreak);
     }
 
+    virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
+
 protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };

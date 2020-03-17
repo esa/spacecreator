@@ -205,6 +205,7 @@ void TextGraphicsItem::disableEditMode()
     setTextInteractionFlags(Qt::NoTextInteraction);
 
     m_disableEditingGuard = false;
+    emit editingModeOff();
 }
 
 void TextGraphicsItem::focusOutEvent(QFocusEvent *event)

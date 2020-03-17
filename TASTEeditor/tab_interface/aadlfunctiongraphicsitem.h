@@ -54,7 +54,7 @@ protected:
     void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    void updateTextPosition() override;
+    void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
 
     void scheduleUpdateNestedItems();
 
