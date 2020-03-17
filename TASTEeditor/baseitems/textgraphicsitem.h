@@ -82,6 +82,7 @@ Q_SIGNALS:
        Send when setSendClickEvent() is set true, and the item was clicked.
      */
     void clicked();
+    void editingModeOff();
 
 protected Q_SLOTS:
     virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
