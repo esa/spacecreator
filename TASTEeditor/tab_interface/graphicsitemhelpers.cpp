@@ -90,14 +90,37 @@ AADLObjectConnection *connectionObject(QGraphicsItem *item)
     return nullptr;
 };
 
+bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection)
+{
+    if (!owner || !connection)
+        return false;
+
+    if (auto con = qobject_cast<const AADLConnectionGraphicsItem *>(connection->toGraphicsObject()))
+        for (auto item : owner->childItems())
+            if (AADLInterfaceGraphicsItem::Type == item->type())
+                if (con->startItem() == item || con->endItem() == item)
+                    return true;
+
+    return false;
+}
+
 bool isOverConnection(QGraphicsScene *scene, const QRectF &area, const QGraphicsItem *excludedItem)
 {
     if (!scene || area.isEmpty())
         return false;
 
+    const bool isFunction = excludedItem && AADLFunctionGraphicsItem::Type == excludedItem->type();
+
     for (auto item : scene->items(area)) {
-        if (item != excludedItem && AADLConnectionGraphicsItem::Type == item->type())
+        if (item == excludedItem)
+            continue;
+
+        if (AADLConnectionGraphicsItem::Type == item->type()) {
+            if (isFunction && isOwnConnection(excludedItem, item))
+                continue;
+
             return true;
+        }
     }
 
     return false;
