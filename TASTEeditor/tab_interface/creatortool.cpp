@@ -632,6 +632,10 @@ void CreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
     if (m_previewItem) {
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
+
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
+            return;
+
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
 
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(parentObject),
@@ -649,6 +653,10 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
     if (m_previewItem) {
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
+
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
+            return;
+
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         const QVariantList params = { QVariant::fromValue(m_model.data()), QVariant::fromValue(parentObject),
                                       itemSceneRect };

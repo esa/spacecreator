@@ -18,6 +18,8 @@
 #pragma once
 
 class QGraphicsItem;
+class QGraphicsScene;
+class QRectF;
 
 namespace taste3 {
 namespace aadl {
@@ -38,6 +40,8 @@ AADLObjectIface *interfaceObject(QGraphicsItem *item);
 AADLObjectComment *commentObject(QGraphicsItem *item);
 
 AADLObjectConnection *connectionObject(QGraphicsItem *item);
+
+bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
 } // ns gi
 } // ns aadl
