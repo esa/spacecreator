@@ -109,12 +109,11 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
     if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;
 
-    const bool isFunction = AADLFunctionGraphicsItem::Type == upcomingItem->type();
     for (auto item : scene->items(upcomingItemRect)) {
         if (item == upcomingItem)
             continue;
 
-        if (AADLConnectionGraphicsItem::Type == item->type() && isFunction && isOwnConnection(upcomingItem, item))
+        if (AADLConnectionGraphicsItem::Type == item->type() && isOwnConnection(upcomingItem, item))
             continue;
 
         if (upcomingItem->parentItem() == item->parentItem())
