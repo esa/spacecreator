@@ -41,7 +41,7 @@ AADLObjectComment *commentObject(QGraphicsItem *item);
 
 AADLObjectConnection *connectionObject(QGraphicsItem *item);
 
-bool isOverConnection(QGraphicsScene *scene, const QRectF &area, const QGraphicsItem *excludedItem = nullptr);
+bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
 } // ns gi
 } // ns aadl

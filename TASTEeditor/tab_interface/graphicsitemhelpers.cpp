@@ -104,26 +104,24 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
     return false;
 }
 
-bool isOverConnection(QGraphicsScene *scene, const QRectF &area, const QGraphicsItem *excludedItem)
+bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
 {
-    if (!scene || area.isEmpty())
+    if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;
 
-    const bool isFunction = excludedItem && AADLFunctionGraphicsItem::Type == excludedItem->type();
-
-    for (auto item : scene->items(area)) {
-        if (item == excludedItem)
+    const bool isFunction = AADLFunctionGraphicsItem::Type == upcomingItem->type();
+    for (auto item : scene->items(upcomingItemRect)) {
+        if (item == upcomingItem)
             continue;
 
-        if (AADLConnectionGraphicsItem::Type == item->type()) {
-            if (isFunction && isOwnConnection(excludedItem, item))
-                continue;
+        if (AADLConnectionGraphicsItem::Type == item->type() && isFunction && isOwnConnection(upcomingItem, item))
+            continue;
 
-            return true;
-        }
+        if (upcomingItem->parentItem() == item->parentItem())
+            return false;
     }
 
-    return false;
+    return true;
 }
 } // ns gi
 } // ns aadl

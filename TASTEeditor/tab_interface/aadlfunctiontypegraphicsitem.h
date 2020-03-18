@@ -69,7 +69,6 @@ protected:
         return filtered.join(lineBreak);
     }
 
-    bool allowGeometryChange(const QPointF &from, const QPointF &to) override;
     virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
 
 protected:

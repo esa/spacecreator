@@ -21,6 +21,7 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/grippointshandler.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_interface/graphicsitemhelpers.h"
 
 #include <QKeyEvent>
 #include <QtDebug>
@@ -162,14 +163,9 @@ bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPoint
     if (delta.isNull())
         return false;
 
-    const QList<QGraphicsItem *> collidedItems =
-            scene()->items(sceneBoundingRect().marginsAdded(2 * utils::kContentMargins));
-    auto it = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), [this](const QGraphicsItem *item) {
-        return qobject_cast<const AADLRectGraphicsItem *>(item->toGraphicsObject()) && item != this
-                && item->parentItem() == parentItem();
-    });
-    // Fallback to previous geometry in case colliding with items at the same level
-    if (it != collidedItems.constEnd()) {
+    const QRectF currentBounds = sceneBoundingRect().marginsAdded(utils::kContentMargins);
+    if (!gi::canPlaceRect(scene(), this, currentBounds)) {
+        // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
         return false;
     }
@@ -286,7 +282,7 @@ void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
 void AADLRectGraphicsItem::onGeometryChanged()
 {
     QSet<InteractiveObject *> items;
-    QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(2 * utils::kContentMargins));
+    QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(utils::kContentMargins));
     std::for_each(collidedItems.begin(), collidedItems.end(), [this, &items](QGraphicsItem *item) {
         auto rectItem = qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject());
         if (rectItem && item != this && item->parentItem() == parentItem())

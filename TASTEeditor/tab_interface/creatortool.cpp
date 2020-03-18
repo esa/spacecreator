@@ -633,7 +633,7 @@ void CreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
 
-        if (gi::isOverConnection(scene, itemSceneRect, m_previewItem))
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
             return;
 
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
@@ -654,7 +654,7 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
 
-        if (gi::isOverConnection(scene, itemSceneRect, m_previewItem))
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
             return;
 
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
