@@ -224,8 +224,10 @@ struct IfaceItemFlagsWorkaround {
     {
         if (m_scene) {
             for (auto item : m_scene->items()) {
-                m_storedFlags.insert(item, item->flags().testFlag(QGraphicsItem::ItemIgnoresTransformations));
-                item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+                if (item->type() == aadl::AADLInterfaceGraphicsItem::Type) {
+                    m_storedFlags.insert(item, item->flags().testFlag(QGraphicsItem::ItemIgnoresTransformations));
+                    item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+                }
             }
         }
     }
@@ -234,8 +236,10 @@ struct IfaceItemFlagsWorkaround {
     {
         if (m_scene) {
             for (auto item : m_scene->items()) {
-                const bool restoredValue = m_storedFlags.value(item, false);
-                item->setFlag(QGraphicsItem::ItemIgnoresTransformations, restoredValue);
+                if (item->type() == aadl::AADLInterfaceGraphicsItem::Type) {
+                    const bool restoredValue = m_storedFlags.value(item, false);
+                    item->setFlag(QGraphicsItem::ItemIgnoresTransformations, restoredValue);
+                }
             }
         }
     }
