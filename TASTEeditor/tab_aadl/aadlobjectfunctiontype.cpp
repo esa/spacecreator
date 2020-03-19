@@ -207,46 +207,6 @@ bool AADLObjectFunctionType::hasNestedChildren() const
     return functionTypes().size() || functions().size() || comments().size();
 }
 
-QVariantList AADLObjectFunctionType::templateInterfaces() const
-{
-    QVariantList ifaceList;
-
-    for (AADLObjectIface *iface : interfaces())
-        ifaceList << QVariant::fromValue(iface);
-
-    return ifaceList;
-}
-
-QVariantList AADLObjectFunctionType::templateFunctions() const
-{
-    QVariantList functions;
-
-    for (auto i : d->m_functionTypes)
-        functions.append(QVariant::fromValue(i));
-    for (auto i : d->m_functions)
-        functions.append(QVariant::fromValue(i));
-
-    return functions;
-}
-
-QVariantList AADLObjectFunctionType::templateComments() const
-{
-    QVariantList comments;
-    for (const auto child : d->m_comments) {
-        comments << QVariant::fromValue(child);
-    }
-    return comments;
-}
-
-QVariantList AADLObjectFunctionType::templateConnections() const
-{
-    QVariantList connections;
-    for (const auto child : d->m_connections) {
-        connections << QVariant::fromValue(child);
-    }
-    return connections;
-}
-
 QVector<ContextParameter> AADLObjectFunctionType::contextParams() const
 {
     return d->m_contextParams;

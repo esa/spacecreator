@@ -38,9 +38,6 @@ class AADLObjectIface : public AADLObject
 {
     Q_OBJECT
     Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction)
-    Q_PROPERTY(bool isProvided READ isProvided)
-    Q_PROPERTY(bool isRequired READ isRequired)
-    Q_PROPERTY(QVariantList params READ paramList)
 
 public:
     enum class IfaceType
@@ -110,7 +107,6 @@ public:
 
     QVector<IfaceParameter> params() const;
     IfaceParameter param(const QString &name) const;
-    QVariantList paramList() const;
     void setParams(const QVector<IfaceParameter> &params);
     void addParam(const IfaceParameter &param);
 
