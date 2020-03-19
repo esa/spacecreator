@@ -75,6 +75,7 @@ public:
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
+    void updateRelatedEdgePoint(const AADLFunctionGraphicsItem *function);
 
 protected:
     void onManualMoveStart(GripPoint *gp, const QPointF &at) override;

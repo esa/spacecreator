@@ -251,8 +251,7 @@ void AADLFunctionGraphicsItem::layoutOuterConnections()
                     continue;
                 }
                 if (!isAncestorOf(connection->startItem()) || !isAncestorOf(connection->endItem())) {
-                    connection->instantLayoutUpdate();
-                    //  connection->scheduleLayoutUpdate();
+                    connection->updateRelatedEdgePoint(this);
                 }
             }
         }

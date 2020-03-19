@@ -302,7 +302,7 @@ QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, qreal x, qreal y, const 
     return scene->itemAt(x, y, deviceTransform);
 }
 
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
 {
 
     for (QGraphicsItem *item : sceneItems(scene, pos)) {
@@ -312,7 +312,7 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QLis
     return nullptr;
 }
 
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
 {
     const QList<QGraphicsItem *> areaItems = sceneItems(scene, area);
     if (areaItems.isEmpty())
@@ -344,7 +344,7 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QLis
     return nearestToCenter;
 }
 
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
                            const QList<int> &acceptableTypes)
 {
     const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };

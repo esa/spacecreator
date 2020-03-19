@@ -79,9 +79,11 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, qreal x, qreal y,
 QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, const QPointF &pos, const QTransform &deviceTransform);
 QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, qreal x, qreal y, const QTransform &deviceTransform);
 
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes = QList<int>());
-QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos,
+                           const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area,
+                           const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
                            const QList<int> &acceptableTypes = QList<int>());
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
