@@ -159,6 +159,26 @@ bool AADLObjectFunctionType::removeChild(AADLObject *child)
     return false;
 }
 
+QVector<AADLObjectFunctionType *> AADLObjectFunctionType::functionTypes() const
+{
+    return d->m_functionTypes;
+}
+
+QVector<AADLObjectFunction *> AADLObjectFunctionType::functions() const
+{
+    return d->m_functions;
+}
+
+QVector<AADLObjectConnection *> AADLObjectFunctionType::connections() const
+{
+    return d->m_connections;
+}
+
+QVector<AADLObjectComment *> AADLObjectFunctionType::comments() const
+{
+    return d->m_comments;
+}
+
 QVector<AADLObjectIface *> AADLObjectFunctionType::interfaces() const
 {
     QVector<AADLObjectIface *> result;
@@ -180,6 +200,11 @@ QVector<AADLObjectIface *> AADLObjectFunctionType::ris() const
 QVector<AADLObjectIface *> AADLObjectFunctionType::pis() const
 {
     return d->m_pis;
+}
+
+bool AADLObjectFunctionType::hasNestedChildren() const
+{
+    return functionTypes().size() || functions().size() || comments().size();
 }
 
 QVariantList AADLObjectFunctionType::templateInterfaces() const

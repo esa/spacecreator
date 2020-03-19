@@ -622,13 +622,13 @@ void InterfaceTabDocument::onItemDoubleClicked()
         if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->aadlObject())) {
             if (clickedEntity->aadlType() == aadl::AADLObject::Type::Function) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
-                    if (!function->children().isEmpty() && !function->isRootObject()) {
+                    if (function->hasNestedChildren() && !function->isRootObject()) {
                         changeRootItem(function->id());
                         return;
                     }
                 }
             } else if (clickedEntity->aadlType() == aadl::AADLObject::Type::Comment) {
-                if (auto commentItem = qgraphicsitem_cast<aadl::AADLCommentGraphicsItem *>(clickedItem)) {
+                if (clickedItem->type() == aadl::AADLCommentGraphicsItem::Type) {
                     auto dialog = new aadl::CommentTextDialog(qobject_cast<aadl::AADLObjectComment *>(clickedEntity),
                                                               qobject_cast<QWidget *>(parent()));
                     dialog->setAttribute(Qt::WA_DeleteOnClose);

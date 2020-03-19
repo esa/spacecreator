@@ -29,6 +29,9 @@ namespace taste3 {
 namespace aadl {
 
 class AADLObjectFunction;
+class AADLObjectConnection;
+class AADLObjectComment;
+
 struct AADLObjectFunctionTypePrivate;
 class AADLObjectFunctionType : public AADLObject
 {
@@ -45,9 +48,14 @@ public:
     bool addChild(AADLObject *child);
     bool removeChild(AADLObject *child);
 
+    QVector<AADLObjectFunctionType *> functionTypes() const;
+    QVector<AADLObjectFunction *> functions() const;
+    QVector<AADLObjectConnection *> connections() const;
+    QVector<AADLObjectComment *> comments() const;
     QVector<AADLObjectIface *> interfaces() const;
     QVector<AADLObjectIface *> ris() const;
     QVector<AADLObjectIface *> pis() const;
+    bool hasNestedChildren() const;
 
     QVariantList templateInterfaces() const;
     QVariantList templateFunctions() const;

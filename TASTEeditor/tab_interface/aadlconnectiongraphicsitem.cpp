@@ -682,5 +682,21 @@ QString AADLConnectionGraphicsItem::prepareTooltip() const
     return tooltip;
 }
 
+void AADLConnectionGraphicsItem::updateRelatedEdgePoint(const AADLFunctionGraphicsItem *function)
+{
+    if (!function)
+        return;
+
+    QVector<QPointF> points = this->points();
+
+    if (function == sourceItem())
+        points.replace(0, startItem()->scenePos());
+    else
+        points.replace(points.size() - 1, endItem()->scenePos());
+
+    if (points != this->points())
+        setPoints(points);
+}
+
 } // namespace aadl
 } // namespace taste3

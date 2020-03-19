@@ -520,7 +520,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
     }
     points.append(endInterfacePoint);
-    Q_ASSERT(points.size() > 2);
+    Q_ASSERT(points.size() >= 2);
     if (points.first() != points.last()) {
         const QVariantList params = { QVariant::fromValue(m_model.data()),
                                       QVariant::fromValue(parentForConnection ? parentForConnection->entity()
