@@ -30,14 +30,7 @@ struct AADLObjectConnectionPrivate;
 class AADLObjectConnection : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString source READ sourceName)
-    Q_PROPERTY(QString target READ targetName)
-    Q_PROPERTY(QString siName READ sourceInterfaceName)
-    Q_PROPERTY(QString tiName READ targetInterfaceName)
-    Q_PROPERTY(bool siIsRequired READ sourceInterfaceIsRequired)
-    Q_PROPERTY(bool siIsProvided READ sourceInterfaceIsProvided)
-    Q_PROPERTY(bool tiIsRequired READ targetInterfaceIsRequired)
-    Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
+
 public:
     explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
                                   AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
@@ -54,11 +47,6 @@ public:
 
     QString targetInterfaceName() const;
     AADLObjectIface *targetInterface() const;
-
-    bool sourceInterfaceIsRequired() const;
-    bool sourceInterfaceIsProvided() const;
-    bool targetInterfaceIsRequired() const;
-    bool targetInterfaceIsProvided() const;
 
     void setInheritPI();
     void unsetInheritPI();

@@ -28,6 +28,7 @@
 #include "tab_interface/interfacetabdocument.h"
 #include "templating/stringtemplate.h"
 #include "templating/templateeditor.h"
+#include "templating/exportedaadlobject.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -238,7 +239,8 @@ QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(document::I
             break;
         }
         const QString aadlGroupType = keys[static_cast<int>(t)];
-        grouppedObjects[aadlGroupType] << QVariant::fromValue(aadlObject);
+        const QVariant &exportedObject = templating::ExportedAADLObject::createFrom(aadlObject);
+        grouppedObjects[aadlGroupType] << exportedObject;
     }
 
     return grouppedObjects;
