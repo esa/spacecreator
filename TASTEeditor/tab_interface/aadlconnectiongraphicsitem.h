@@ -83,6 +83,7 @@ protected:
     void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;

@@ -441,12 +441,12 @@ AADLInterfaceGraphicsItem *AADLConnectionGraphicsItem::startItem() const
 
 AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::sourceItem() const
 {
-    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_startItem ? m_startItem->targetItem() : nullptr);
+    return m_startItem ? m_startItem->targetItem() : nullptr;
 }
 
 AADLFunctionGraphicsItem *AADLConnectionGraphicsItem::targetItem() const
 {
-    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(m_endItem ? m_endItem->targetItem() : nullptr);
+    return m_endItem ? m_endItem->targetItem() : nullptr;
 }
 
 QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
@@ -696,6 +696,22 @@ void AADLConnectionGraphicsItem::updateRelatedEdgePoint(const AADLFunctionGraphi
 
     if (points != this->points())
         setPoints(points);
+}
+
+QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    switch (change) {
+    case QGraphicsItem::ItemSceneHasChanged: {
+        if (auto scene = value.value<QGraphicsScene *>())
+            for (auto fn : { sourceItem(), targetItem() })
+                if (fn)
+                    fn->instantLayoutUpdate();
+        break;
+    }
+    default:
+        break;
+    }
+    return InteractiveObject::itemChange(change, value);
 }
 
 } // namespace aadl

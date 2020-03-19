@@ -251,6 +251,9 @@ private:
 
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, Qt::SortOrder order)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(order);
 }
@@ -258,6 +261,9 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, Qt::SortOrder ord
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPointF &pos, Qt::ItemSelectionMode mode,
                                   Qt::SortOrder order, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(pos, mode, order, deviceTransform);
 }
@@ -265,6 +271,9 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPointF &po
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QRectF &rect, Qt::ItemSelectionMode mode,
                                   Qt::SortOrder order, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(rect, mode, order, deviceTransform);
 }
@@ -272,6 +281,9 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QRectF &rec
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPolygonF &polygon, Qt::ItemSelectionMode mode,
                                   Qt::SortOrder order, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(polygon, mode, order, deviceTransform);
 }
@@ -279,6 +291,9 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPolygonF &
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPainterPath &path, Qt::ItemSelectionMode mode,
                                   Qt::SortOrder order, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(path, mode, order, deviceTransform);
 }
@@ -286,25 +301,33 @@ QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPainterPat
 QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, qreal x, qreal y, qreal w, qreal h,
                                   Qt::ItemSelectionMode mode, Qt::SortOrder order, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->items(x, y, w, h, mode, order, deviceTransform);
 }
 
 QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, const QPointF &pos, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->itemAt(pos, deviceTransform);
 }
 
 QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, qreal x, qreal y, const QTransform &deviceTransform)
 {
+    if (!scene)
+        return {};
+
     IfaceItemFlagsWorkaround iwa(scene);
     return scene->itemAt(x, y, deviceTransform);
 }
 
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
 {
-
     for (QGraphicsItem *item : sceneItems(scene, pos)) {
         if (acceptableTypes.contains(item->type()))
             return item;
