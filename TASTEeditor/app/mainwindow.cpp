@@ -22,6 +22,7 @@
 #include "app/context/action/actionsmanager.h"
 #include "app/xmldocexporter.h"
 #include "app/zoomcontroller.h"
+#include "baseitems/common/utils.h"
 #include "document/documentsmanager.h"
 #include "document/tabdocumentfactory.h"
 #include "logging/loghandler.h"
@@ -396,7 +397,7 @@ void MainWindow::updateActions()
     bool renderAvailable(false);
     if (document::AbstractTabDocument *doc = currentDoc()) {
         if (QGraphicsScene *scene = doc->scene()) {
-            renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
+            renderAvailable = !scene->sceneRect().isEmpty() && !taste3::utils::sceneItems(scene).isEmpty();
         }
 
         m_actExportXml->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));

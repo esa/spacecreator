@@ -252,7 +252,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
             if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
                 return false;
         } else if (auto scene = m_view->scene()) {
-            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.marginsAdded(kMargins));
+            const QList<QGraphicsItem *> collidedItems = utils::sceneItems(scene, newGeometry.marginsAdded(kMargins));
             auto it = std::find_if(
                     collidedItems.constBegin(), collidedItems.constEnd(),
                     [this](const QGraphicsItem *item) { return item != m_previewItem && !item->parentItem(); });
@@ -293,7 +293,7 @@ QPointF CreatorTool::cursorInScene(const QPoint &globalPos) const
 template<typename ItemType>
 ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 {
-    QList<QGraphicsItem *> items = scene->items(point);
+    QList<QGraphicsItem *> items = utils::sceneItems(scene, point);
     if (items.isEmpty())
         return nullptr;
     auto it = std::find_if(items.constBegin(), items.constEnd(),
@@ -520,7 +520,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         std::copy(beginIt, endIt, std::back_inserter(points));
     }
     points.append(endInterfacePoint);
-    Q_ASSERT(points.size() == 2);
+    Q_ASSERT(points.size() > 2);
     if (points.first() != points.last()) {
         const QVariantList params = { QVariant::fromValue(m_model.data()),
                                       QVariant::fromValue(parentForConnection ? parentForConnection->entity()
@@ -582,7 +582,7 @@ bool CreatorTool::handleConnectionCreate(const QPointF &pos)
         return false;
 
     QPointF alignedPos { pos };
-    if (m_connectionPoints.size() >= 2) {
+    if (m_connectionPoints.size() > 2) {
         if (QGraphicsItem *itemUnderCursor =
                     utils::nearestItem(scene, pos, ConnectionCreationValidator::kConnectionTolerance,
                                        { AADLInterfaceGraphicsItem::Type })) {

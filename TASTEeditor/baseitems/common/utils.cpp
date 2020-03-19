@@ -218,10 +218,90 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
     return boundingArea.center();
 }
 
+struct IfaceItemFlagsWorkaround {
+    IfaceItemFlagsWorkaround(const QGraphicsScene *scene)
+        : m_scene(scene)
+    {
+        if (m_scene) {
+            for (auto item : m_scene->items()) {
+                m_storedFlags.insert(item, item->flags().testFlag(QGraphicsItem::ItemIgnoresTransformations));
+                item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+            }
+        }
+    }
+
+    ~IfaceItemFlagsWorkaround()
+    {
+        if (m_scene) {
+            for (auto item : m_scene->items()) {
+                const bool restoredValue = m_storedFlags.value(item, false);
+                item->setFlag(QGraphicsItem::ItemIgnoresTransformations, restoredValue);
+            }
+        }
+    }
+
+private:
+    const QGraphicsScene *m_scene;
+    QMap<QGraphicsItem *, bool> m_storedFlags;
+};
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, Qt::SortOrder order)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(order);
+}
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPointF &pos, Qt::ItemSelectionMode mode,
+                                  Qt::SortOrder order, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(pos, mode, order, deviceTransform);
+}
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QRectF &rect, Qt::ItemSelectionMode mode,
+                                  Qt::SortOrder order, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(rect, mode, order, deviceTransform);
+}
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPolygonF &polygon, Qt::ItemSelectionMode mode,
+                                  Qt::SortOrder order, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(polygon, mode, order, deviceTransform);
+}
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPainterPath &path, Qt::ItemSelectionMode mode,
+                                  Qt::SortOrder order, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(path, mode, order, deviceTransform);
+}
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, qreal x, qreal y, qreal w, qreal h,
+                                  Qt::ItemSelectionMode mode, Qt::SortOrder order, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->items(x, y, w, h, mode, order, deviceTransform);
+}
+
+QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, const QPointF &pos, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->itemAt(pos, deviceTransform);
+}
+
+QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, qreal x, qreal y, const QTransform &deviceTransform)
+{
+    IfaceItemFlagsWorkaround iwa(scene);
+    return scene->itemAt(x, y, deviceTransform);
+}
+
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
 {
 
-    for (QGraphicsItem *item : scene->items(pos)) {
+    for (QGraphicsItem *item : sceneItems(scene, pos)) {
         if (acceptableTypes.contains(item->type()))
             return item;
     }
@@ -230,7 +310,7 @@ QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QLis
 
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
 {
-    const QList<QGraphicsItem *> areaItems = scene->items(area);
+    const QList<QGraphicsItem *> areaItems = sceneItems(scene, area);
     if (areaItems.isEmpty())
         return nullptr;
 
