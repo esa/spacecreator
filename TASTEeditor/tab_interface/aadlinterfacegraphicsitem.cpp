@@ -237,7 +237,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
                     && item != this;
         };
 
-        const QList<QGraphicsItem *> collidedItems = scene()->items(parentItem()->mapRectToScene(rect));
+        const QList<QGraphicsItem *> collidedItems = utils::sceneItems(scene(), parentItem()->mapRectToScene(rect));
         auto collidedIt = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), isInterfaceItemLambda);
         if (collidedIt == collidedItems.constEnd()) {
             alignment = utils::getNearestSide(parentRect, rect.center());

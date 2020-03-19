@@ -17,6 +17,7 @@
 
 #include "graphicsitemhelpers.h"
 
+#include "baseitems/common/utils.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectcomment.h"
 #include "tab_aadl/aadlobjectconnection.h"
@@ -109,7 +110,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
     if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;
 
-    for (auto item : scene->items(upcomingItemRect)) {
+    for (auto item : utils::sceneItems(scene, upcomingItemRect)) {
         if (item == upcomingItem)
             continue;
 

@@ -54,6 +54,31 @@ QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
+
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, Qt::SortOrder order = Qt::DescendingOrder);
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPointF &pos,
+                                  Qt::ItemSelectionMode mode = Qt::IntersectsItemShape,
+                                  Qt::SortOrder order = Qt::DescendingOrder,
+                                  const QTransform &deviceTransform = QTransform());
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QRectF &rect,
+                                  Qt::ItemSelectionMode mode = Qt::IntersectsItemShape,
+                                  Qt::SortOrder order = Qt::DescendingOrder,
+                                  const QTransform &deviceTransform = QTransform());
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPolygonF &polygon,
+                                  Qt::ItemSelectionMode mode = Qt::IntersectsItemShape,
+                                  Qt::SortOrder order = Qt::DescendingOrder,
+                                  const QTransform &deviceTransform = QTransform());
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, const QPainterPath &path,
+                                  Qt::ItemSelectionMode mode = Qt::IntersectsItemShape,
+                                  Qt::SortOrder order = Qt::DescendingOrder,
+                                  const QTransform &deviceTransform = QTransform());
+QList<QGraphicsItem *> sceneItems(const QGraphicsScene *scene, qreal x, qreal y, qreal w, qreal h,
+                                  Qt::ItemSelectionMode mode, Qt::SortOrder order,
+                                  const QTransform &deviceTransform = QTransform());
+
+QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, const QPointF &pos, const QTransform &deviceTransform);
+QGraphicsItem *sceneItemAt(const QGraphicsScene *scene, qreal x, qreal y, const QTransform &deviceTransform);
+
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(QGraphicsScene *scene, const QPointF &center, qreal offset,
