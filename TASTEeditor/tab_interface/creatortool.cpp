@@ -52,6 +52,7 @@ static const qreal kContextMenuItemTolerance = 10.;
 static const QMarginsF kMargins { 50., 50., 50., 50. };
 static const QList<int> kFunctionTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
                                            taste3::aadl::AADLFunctionTypeGraphicsItem::Type };
+static const qreal kPreviewItemPenWidth = 2.;
 
 namespace taste3 {
 namespace aadl {
@@ -193,7 +194,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
             QGraphicsItem *parentItem = findParent(m_view->itemAt(e->localPos().toPoint()));
             m_previewItem = new QGraphicsRectItem(parentItem);
-            m_previewItem->setPen(QPen(Qt::blue, 2, Qt::SolidLine));
+            m_previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
             m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
             m_previewItem->setZValue(1);
             m_clickScenePos = scenePos;
@@ -633,7 +634,7 @@ void CreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos)
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect, gi::RectOperation::Create))
             return;
 
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
@@ -654,7 +655,7 @@ void CreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
         const QRectF itemSceneRect =
                 adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()), utils::DefaultGraphicsItemSize);
 
-        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect))
+        if (!gi::canPlaceRect(scene, m_previewItem, itemSceneRect, gi::RectOperation::Create))
             return;
 
         AADLObjectFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
@@ -793,20 +794,27 @@ QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)
 void CreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos)
 {
     if (m_previewItem) {
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")), tr("Function Type"),
-                        this, [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
+        static const QSizeF emptyPreviewItemSize = QSizeF(kPreviewItemPenWidth, kPreviewItemPenWidth);
+        const bool isRect = m_previewItem->boundingRect().size() != emptyPreviewItemSize;
+        // TODO: use a Fn/FnType/Comment's min size to disable related actions if the creation is impossible?
 
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"), this,
-                        [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
+        auto action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function_type.svg")),
+                                      tr("Function Type"), this,
+                                      [this, scenePos]() { handleToolType(ToolType::FunctionType, scenePos); });
 
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
-                        [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/function.svg")), tr("Function"),
+                                 this, [this, scenePos]() { handleToolType(ToolType::Function, scenePos); });
 
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Required Interface"), this,
-                        [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/comment.svg")), tr("Comment"), this,
+                                 [this, scenePos]() { handleToolType(ToolType::Comment, scenePos); });
 
-        menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Provided Interface"), this,
-                        [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/ri.svg")), tr("Required Interface"),
+                                 this, [this, scenePos]() { handleToolType(ToolType::RequiredInterface, scenePos); });
+        action->setEnabled(!isRect && m_previewItem->parentItem());
+
+        action = menu->addAction(QIcon(QLatin1String(":/tab_interface/toolbar/icns/pi.svg")), tr("Provided Interface"),
+                                 this, [this, scenePos]() { handleToolType(ToolType::ProvidedInterface, scenePos); });
+        action->setEnabled(!isRect && m_previewItem->parentItem());
     }
 }
 

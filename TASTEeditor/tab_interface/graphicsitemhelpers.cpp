@@ -105,7 +105,8 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
     return false;
 }
 
-bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
+bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
+                  const RectOperation action)
 {
     if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;
@@ -117,7 +118,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
         if (AADLConnectionGraphicsItem::Type == item->type() && isOwnConnection(upcomingItem, item))
             continue;
 
-        if (upcomingItem->parentItem() == item->parentItem())
+        if (action == RectOperation::Edit && upcomingItem->parentItem() == item->parentItem())
             return false;
     }
 
