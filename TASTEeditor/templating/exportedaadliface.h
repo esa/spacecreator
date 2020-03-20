@@ -22,6 +22,9 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief The TemplatedAADLIface is a class to export AADLObjectIface
+ */
 class TemplatedAADLIface : public ExportedAADLObject
 {
     Q_GADGET

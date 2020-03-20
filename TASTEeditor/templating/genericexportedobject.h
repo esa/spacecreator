@@ -23,6 +23,10 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief The GenericExportedObject class is a generic class
+ *        to export QObject's successors by the string template engine
+ */
 class GenericExportedObject
 {
 public:
@@ -30,6 +34,9 @@ public:
         : m_exportedObject(object) {}
 
 protected:
+    /**
+     *  @brief exportedObject() casts the internal exported object to required type
+     */
     template<class T>
     const T *exportedObject() const
     {

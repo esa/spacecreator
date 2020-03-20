@@ -29,6 +29,11 @@ namespace templating {
 ExportedAADLObject::ExportedAADLObject(const aadl::AADLObject *aadlObject)
     : GenericExportedObject(aadlObject) {}
 
+/**
+ * @brief ExportedAADLObject::createFrom creates appropriate exported class and casts to QVariant
+ * @param aadlObject exported object
+ * @return created exported object as QVariant
+ */
 QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 {
     switch (aadlObject->aadlType()) {
@@ -49,7 +54,7 @@ QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 }
 
 /**
- * @brief TemplatedAADLObject::attributes returns list of attribues for using in string templates.
+ * @brief ExportedAADLObject::attributes returns list of attribues for using in string templates.
  * @return list of attribues.
  */
 QVariantList ExportedAADLObject::attributes() const
@@ -58,7 +63,7 @@ QVariantList ExportedAADLObject::attributes() const
 }
 
 /**
- * @brief TemplatedAADLObject::properties returns list of properties for using in string templates.
+ * @brief ExportedAADLObject::properties returns list of properties for using in string templates.
  * @return list of properties.
  */
 QVariantList ExportedAADLObject::properties() const
@@ -67,7 +72,7 @@ QVariantList ExportedAADLObject::properties() const
 }
 
 /**
- * @brief TemplatedAADLObject::generateProperties generates a variant list sorted by meta::Props::Token.
+ * @brief ExportedAADLObject::generateProperties generates a variant list sorted by meta::Props::Token.
  * @param props can be hash of attributes or properties of AADLObject.
  * @return sorted QVariantList which can be used in string templates
  */
