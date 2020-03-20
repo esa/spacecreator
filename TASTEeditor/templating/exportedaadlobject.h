@@ -36,9 +36,9 @@ class ExportedAADLObject : public GenericExportedObject
     Q_PROPERTY(QVariantList attributes READ properties)
 
 public:
-    explicit ExportedAADLObject(aadl::AADLObject *aadlObject = nullptr);
+    explicit ExportedAADLObject(const aadl::AADLObject *aadlObject = nullptr);
 
-    static QVariant createFrom(aadl::AADLObject *aadlObject);
+    static QVariant createFrom(const aadl::AADLObject *aadlObject);
 
     QVariantList attributes() const;
     QVariantList properties() const;

@@ -26,19 +26,19 @@ namespace templating {
 class GenericExportedObject
 {
 public:
-    GenericExportedObject(QObject *object)
+    GenericExportedObject(const QObject *object)
         : m_sourceObject(object) {}
 
 protected:
     template<class T>
-    const T* sourceObject() const
+    const T *sourceObject() const
     {
-        const T* o = qobject_cast<const T*>(m_sourceObject);
+        const T *o = qobject_cast<const T *>(m_sourceObject);
         Q_ASSERT(o);
         return o;
     }
 private:
-    QPointer<QObject> m_sourceObject;
+    QPointer<const QObject> m_sourceObject;
 };
 
 } // ns templating
