@@ -54,7 +54,7 @@ QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
  */
 QVariantList ExportedAADLObject::attributes() const
 {
-    return generateProperties(sourceObject<aadl::AADLObject>()->attrs());
+    return generateProperties(exportedObject<aadl::AADLObject>()->attrs());
 }
 
 /**
@@ -63,7 +63,7 @@ QVariantList ExportedAADLObject::attributes() const
  */
 QVariantList ExportedAADLObject::properties() const
 {
-    return generateProperties(sourceObject<aadl::AADLObject>()->props());
+    return generateProperties(exportedObject<aadl::AADLObject>()->props());
 }
 
 /**

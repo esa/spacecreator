@@ -27,45 +27,45 @@ ExportedAADLConnection::ExportedAADLConnection(const aadl::AADLObject *connectio
 
 QString ExportedAADLConnection::sourceName() const
 {
-    return sourceObject<aadl::AADLObjectConnection>()->sourceName();
+    return exportedObject<aadl::AADLObjectConnection>()->sourceName();
 }
 
 QString ExportedAADLConnection::targetName() const
 {
-    return sourceObject<aadl::AADLObjectConnection>()->targetName();
+    return exportedObject<aadl::AADLObjectConnection>()->targetName();
 }
 
 QString ExportedAADLConnection::sourceInterfaceName() const
 {
-    return sourceObject<aadl::AADLObjectConnection>()->sourceInterfaceName();
+    return exportedObject<aadl::AADLObjectConnection>()->sourceInterfaceName();
 }
 
 QString ExportedAADLConnection::targetInterfaceName() const
 {
-    return sourceObject<aadl::AADLObjectConnection>()->targetInterfaceName();
+    return exportedObject<aadl::AADLObjectConnection>()->targetInterfaceName();
 }
 
 bool ExportedAADLConnection::sourceInterfaceIsRequired() const
 {
-    auto o = sourceObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLObjectConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isRequired() : false;
 }
 
 bool ExportedAADLConnection::sourceInterfaceIsProvided() const
 {
-    auto o = sourceObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLObjectConnection>();
     return o->sourceInterface() ? o->sourceInterface()->isProvided() : false;
 }
 
 bool ExportedAADLConnection::targetInterfaceIsRequired() const
 {
-    auto o = sourceObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLObjectConnection>();
     return o->targetInterface() ? o->targetInterface()->isRequired() : false;
 }
 
 bool ExportedAADLConnection::targetInterfaceIsProvided() const
 {
-    auto o = sourceObject<aadl::AADLObjectConnection>();
+    auto o = exportedObject<aadl::AADLObjectConnection>();
     return o->targetInterface() ? o->targetInterface()->isProvided() : false;
 }
 

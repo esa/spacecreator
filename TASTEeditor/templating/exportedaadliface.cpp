@@ -27,18 +27,18 @@ TemplatedAADLIface::TemplatedAADLIface(const aadl::AADLObject *iface)
 
 bool TemplatedAADLIface::isProvided() const
 {
-    return sourceObject<aadl::AADLObjectIface>()->isProvided();
+    return exportedObject<aadl::AADLObjectIface>()->isProvided();
 }
 
 bool TemplatedAADLIface::isRequired() const
 {
-    return sourceObject<aadl::AADLObjectIface>()->isRequired();
+    return exportedObject<aadl::AADLObjectIface>()->isRequired();
 }
 
 QVariantList TemplatedAADLIface::paramList() const
 {
     QVariantList list;
-    for (const auto &param : sourceObject<aadl::AADLObjectIface>()->params())
+    for (const auto &param : exportedObject<aadl::AADLObjectIface>()->params())
         list << QVariant::fromValue(param);
     return list;
 }
