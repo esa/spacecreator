@@ -20,6 +20,11 @@
 #include "exportedaadlobject.h"
 
 namespace taste3 {
+
+namespace aadl {
+    class AADLObjectIface;
+}
+
 namespace templating {
 
 /**
@@ -33,7 +38,7 @@ class TemplatedAADLIface : public ExportedAADLObject
     Q_PROPERTY(QVariantList params READ paramList)
 
 public:
-    explicit TemplatedAADLIface(const aadl::AADLObject *iface = nullptr);
+    explicit TemplatedAADLIface(const aadl::AADLObjectIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

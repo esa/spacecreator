@@ -26,7 +26,7 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObject *function)
+ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObjectFunctionType *function)
     : ExportedAADLObject(function) {}
 
 QVariantList ExportedAADLFunction::interfaces() const
