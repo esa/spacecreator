@@ -27,18 +27,18 @@ class GenericExportedObject
 {
 public:
     GenericExportedObject(const QObject *object)
-        : m_sourceObject(object) {}
+        : m_exportedObject(object) {}
 
 protected:
     template<class T>
-    const T *sourceObject() const
+    const T *exportedObject() const
     {
-        const T *o = qobject_cast<const T *>(m_sourceObject);
+        const T *o = qobject_cast<const T *>(m_exportedObject);
         Q_ASSERT(o);
         return o;
     }
 private:
-    QPointer<const QObject> m_sourceObject;
+    QPointer<const QObject> m_exportedObject;
 };
 
 } // ns templating

@@ -32,7 +32,7 @@ ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObject *function)
 QVariantList ExportedAADLFunction::interfaces() const
 {
     QVariantList ifaces;
-    for (const auto iface : sourceObject<aadl::AADLObjectFunctionType>()->interfaces())
+    for (const auto iface : exportedObject<aadl::AADLObjectFunctionType>()->interfaces())
         ifaces << createFrom(iface);
     return ifaces;
 }
@@ -40,7 +40,7 @@ QVariantList ExportedAADLFunction::interfaces() const
 QVariantList ExportedAADLFunction::functions() const
 {
     QVariantList functions;
-    const aadl::AADLObjectFunctionType *o = sourceObject<aadl::AADLObjectFunctionType>();
+    const aadl::AADLObjectFunctionType *o = exportedObject<aadl::AADLObjectFunctionType>();
     for (const auto function : o->functionTypes())
         functions << createFrom(function);
     for (const auto function : o->functions())
@@ -51,7 +51,7 @@ QVariantList ExportedAADLFunction::functions() const
 QVariantList ExportedAADLFunction::comments() const
 {
     QVariantList comments;
-    for (const auto comment : sourceObject<aadl::AADLObjectFunctionType>()->comments())
+    for (const auto comment : exportedObject<aadl::AADLObjectFunctionType>()->comments())
         comments << createFrom(comment);
     return comments;
 }
@@ -59,7 +59,7 @@ QVariantList ExportedAADLFunction::comments() const
 QVariantList ExportedAADLFunction::connections() const
 {
     QVariantList connections;
-    for (const auto connection : sourceObject<aadl::AADLObjectFunctionType>()->connections())
+    for (const auto connection : exportedObject<aadl::AADLObjectFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
 }
