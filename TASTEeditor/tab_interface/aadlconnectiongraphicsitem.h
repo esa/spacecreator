@@ -114,8 +114,8 @@ private:
     const QPointer<AADLInterfaceGraphicsItem> m_startItem;
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
-
     QVector<QPointF> m_points;
+    bool m_forceIfaceLayout;
 };
 
 } // namespace aadl

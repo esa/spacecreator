@@ -289,6 +289,8 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
     , m_startItem(startIface)
     , m_endItem(endIface)
     , m_item(new GraphicsPathItem(this))
+    , m_points()
+    , m_forceIfaceLayout(true)
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
@@ -689,10 +691,19 @@ void AADLConnectionGraphicsItem::updateRelatedEdgePoint(const AADLFunctionGraphi
 
     QVector<QPointF> points = this->points();
 
-    if (function == sourceItem())
-        points.replace(0, startItem()->scenePos());
-    else
-        points.replace(points.size() - 1, endItem()->scenePos());
+    if (function == sourceItem()) {
+        const QPointF pnt = startItem()->scenePos();
+        if (points.size())
+            points.replace(0, pnt);
+        else
+            points.append(pnt);
+    } else {
+        const QPointF pnt = endItem()->scenePos();
+        if (points.size() > 1)
+            points.replace(points.size() - 1, pnt);
+        else
+            points.append(pnt);
+    }
 
     if (points != this->points())
         setPoints(points);
@@ -702,10 +713,14 @@ QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChang
 {
     switch (change) {
     case QGraphicsItem::ItemSceneHasChanged: {
-        if (auto scene = value.value<QGraphicsScene *>())
-            for (auto fn : { sourceItem(), targetItem() })
-                if (fn)
-                    fn->instantLayoutUpdate();
+        if (auto scene = value.value<QGraphicsScene *>()) {
+            if (m_forceIfaceLayout) {
+                m_forceIfaceLayout = false;
+                for (auto fn : { sourceItem(), targetItem() })
+                    if (fn)
+                        fn->instantLayoutUpdate();
+            }
+        }
         break;
     }
     default:
