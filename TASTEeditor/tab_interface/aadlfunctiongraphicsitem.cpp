@@ -164,6 +164,9 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF
 {
     Q_UNUSED(grip)
 
+    if (pressedAt == releasedAt)
+        return;
+
     if (allowGeometryChange(pressedAt, releasedAt) && !isRootItem()) {
         updateEntity();
     } else {
