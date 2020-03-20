@@ -26,10 +26,10 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLObject::ExportedAADLObject(aadl::AADLObject *aadlObject)
+ExportedAADLObject::ExportedAADLObject(const aadl::AADLObject *aadlObject)
     : GenericExportedObject(aadlObject) {}
 
-QVariant ExportedAADLObject::createFrom(aadl::AADLObject *aadlObject)
+QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 {
     switch (aadlObject->aadlType()) {
     case aadl::AADLObject::Type::Function:

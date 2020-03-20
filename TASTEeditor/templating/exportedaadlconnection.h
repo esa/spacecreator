@@ -35,7 +35,7 @@ class ExportedAADLConnection : public ExportedAADLObject
     Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
 
 public:
-    explicit ExportedAADLConnection(aadl::AADLObject *connection = nullptr);
+    explicit ExportedAADLConnection(const aadl::AADLObject *connection = nullptr);
 
     QString sourceName() const;
     QString targetName() const;

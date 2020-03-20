@@ -30,7 +30,7 @@ class TemplatedAADLIface : public ExportedAADLObject
     Q_PROPERTY(QVariantList params READ paramList)
 
 public:
-    explicit TemplatedAADLIface(aadl::AADLObject *iface = nullptr);
+    explicit TemplatedAADLIface(const aadl::AADLObject *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;

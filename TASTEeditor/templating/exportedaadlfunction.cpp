@@ -26,13 +26,13 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLFunction::ExportedAADLFunction(aadl::AADLObject *function)
+ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObject *function)
     : ExportedAADLObject(function) {}
 
 QVariantList ExportedAADLFunction::interfaces() const
 {
     QVariantList ifaces;
-    for (auto iface : sourceObject<aadl::AADLObjectFunctionType>()->interfaces())
+    for (const auto iface : sourceObject<aadl::AADLObjectFunctionType>()->interfaces())
         ifaces << createFrom(iface);
     return ifaces;
 }
@@ -41,9 +41,9 @@ QVariantList ExportedAADLFunction::functions() const
 {
     QVariantList functions;
     const aadl::AADLObjectFunctionType *o = sourceObject<aadl::AADLObjectFunctionType>();
-    for (auto function : o->functionTypes())
+    for (const auto function : o->functionTypes())
         functions << createFrom(function);
-    for (auto function : o->functions())
+    for (const auto function : o->functions())
         functions << createFrom(function);
     return functions;
 }
@@ -51,7 +51,7 @@ QVariantList ExportedAADLFunction::functions() const
 QVariantList ExportedAADLFunction::comments() const
 {
     QVariantList comments;
-    for (auto comment : sourceObject<aadl::AADLObjectFunctionType>()->comments())
+    for (const auto comment : sourceObject<aadl::AADLObjectFunctionType>()->comments())
         comments << createFrom(comment);
     return comments;
 }
@@ -59,7 +59,7 @@ QVariantList ExportedAADLFunction::comments() const
 QVariantList ExportedAADLFunction::connections() const
 {
     QVariantList connections;
-    for (auto connection : sourceObject<aadl::AADLObjectFunctionType>()->connections())
+    for (const auto connection : sourceObject<aadl::AADLObjectFunctionType>()->connections())
         connections << createFrom(connection);
     return connections;
 }
