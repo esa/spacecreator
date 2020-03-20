@@ -115,7 +115,10 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
         if (item == upcomingItem)
             continue;
 
-        if (AADLConnectionGraphicsItem::Type == item->type() && isOwnConnection(upcomingItem, item))
+        const int itemType = item->type();
+        if (itemType <= QGraphicsItem::UserType)
+            continue;
+        if (AADLConnectionGraphicsItem::Type == itemType && isOwnConnection(upcomingItem, item))
             continue;
 
         if (action == RectOperation::Edit && upcomingItem->parentItem() == item->parentItem())
