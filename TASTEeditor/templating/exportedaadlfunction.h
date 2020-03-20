@@ -22,6 +22,9 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief The ExportedAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
+ */
 class ExportedAADLFunction : public ExportedAADLObject
 {
     Q_GADGET

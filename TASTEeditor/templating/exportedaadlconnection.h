@@ -22,6 +22,9 @@
 namespace taste3 {
 namespace templating {
 
+/**
+ * @brief The ExportedAADLConnection is a class to export AADLObjectConnection
+ */
 class ExportedAADLConnection : public ExportedAADLObject
 {
     Q_GADGET

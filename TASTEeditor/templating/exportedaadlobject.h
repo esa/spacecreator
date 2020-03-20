@@ -29,6 +29,9 @@ namespace aadl {
 
 namespace templating {
 
+/**
+ * @brief The ExportedAADLObject is a common class to export AADLObject and its successors
+ */
 class ExportedAADLObject : public GenericExportedObject
 {
     Q_GADGET
