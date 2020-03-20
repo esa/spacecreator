@@ -253,7 +253,7 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
             if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
                 return false;
         } else if (auto scene = m_view->scene()) {
-            const QList<QGraphicsItem *> collidedItems = utils::sceneItems(scene, newGeometry.marginsAdded(kMargins));
+            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.marginsAdded(kMargins));
             auto it = std::find_if(
                     collidedItems.constBegin(), collidedItems.constEnd(),
                     [this](const QGraphicsItem *item) { return item != m_previewItem && !item->parentItem(); });
@@ -294,7 +294,7 @@ QPointF CreatorTool::cursorInScene(const QPoint &globalPos) const
 template<typename ItemType>
 ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 {
-    QList<QGraphicsItem *> items = utils::sceneItems(scene, point);
+    QList<QGraphicsItem *> items = scene->items(point);
     if (items.isEmpty())
         return nullptr;
     auto it = std::find_if(items.constBegin(), items.constEnd(),

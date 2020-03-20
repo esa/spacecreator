@@ -140,7 +140,7 @@ static inline QVector<QPointF> findPath(QGraphicsScene *scene, const QLineF &sta
 {
     static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
     QVector<QPointF> points = generateConnection(startDirection, endDirection);
-    const QList<QGraphicsItem *> intersectedItems = utils::sceneItems(scene, points);
+    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
 
     qreal distance = std::numeric_limits<qreal>::max();
     QGraphicsItem *intersectionItem = nullptr;
@@ -190,7 +190,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
                 if (subPath.isEmpty())
                     continue;
 
-                const QList<QGraphicsItem *> intersectedItems = utils::sceneItems(scene, subPath);
+                const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
                 auto it = std::find_if(
                         intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
                             if (!types.contains(item->type()))
@@ -566,7 +566,7 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
         m_points[idx] = m_endItem->scenePos();
     }
 
-    for (auto item : utils::sceneItems(scene(), m_points)) {
+    for (auto item : scene()->items(m_points)) {
         if (auto nestedItem = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
             if (utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
                 rebuildLayout();

@@ -83,6 +83,8 @@ private:
     QPainterPath m_shape;
 
     QString ifaceLabel() const;
+
+    QPainterPath composeShape() const;
 };
 
 } // namespace aadl

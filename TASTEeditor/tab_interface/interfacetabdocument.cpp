@@ -159,7 +159,7 @@ QWidget *InterfaceTabDocument::createView()
         auto sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_D), qobject_cast<QWidget *>(m_graphicsView->window()));
         sc->setContext(Qt::ApplicationShortcut);
         connect(sc, &QShortcut::activated, this, [this]() {
-            for (auto item : taste3::utils::sceneItems(m_graphicsScene)) {
+            for (auto item : m_graphicsScene->items()) {
                 dumpItem(item->toGraphicsObject(), true);
             }
         });
