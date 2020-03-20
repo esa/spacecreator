@@ -537,7 +537,7 @@ QPainterPath AADLInterfaceGraphicsItem::composeShape() const
 {
     QPainterPath path = m_text->shape();
     for (auto sub : { m_type, m_iface }) {
-        QPainterPath path = sub->transform().map(sub->path().simplified()).simplified();
+        QPainterPath path = sub->transform().map(sub->path()).simplified();
         path.translate(sub->pos());
         path.addPath(path);
     }
