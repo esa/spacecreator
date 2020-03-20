@@ -32,8 +32,8 @@ namespace templating {
 class ExportedAADLObject : public GenericExportedObject
 {
     Q_GADGET
-    Q_PROPERTY(QVariantList properties READ attributes)
-    Q_PROPERTY(QVariantList attributes READ properties)
+    Q_PROPERTY(QVariantList attributes READ attributes)
+    Q_PROPERTY(QVariantList properties READ properties)
 
 public:
     explicit ExportedAADLObject(const aadl::AADLObject *aadlObject = nullptr);
