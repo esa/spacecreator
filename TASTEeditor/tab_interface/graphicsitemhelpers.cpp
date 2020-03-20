@@ -110,7 +110,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
     if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;
 
-    for (auto item : utils::sceneItems(scene, upcomingItemRect)) {
+    for (auto item : scene->items(upcomingItemRect)) {
         if (item == upcomingItem)
             continue;
 

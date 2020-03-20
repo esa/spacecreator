@@ -282,8 +282,7 @@ void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
 void AADLRectGraphicsItem::onGeometryChanged()
 {
     QSet<InteractiveObject *> items;
-    QList<QGraphicsItem *> collidedItems =
-            utils::sceneItems(scene(), sceneBoundingRect().marginsAdded(utils::kContentMargins));
+    QList<QGraphicsItem *> collidedItems = scene()->items(sceneBoundingRect().marginsAdded(utils::kContentMargins));
     std::for_each(collidedItems.begin(), collidedItems.end(), [this, &items](QGraphicsItem *item) {
         auto rectItem = qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject());
         if (rectItem && item != this && item->parentItem() == parentItem())

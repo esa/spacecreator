@@ -185,24 +185,34 @@ QRectF AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
     const qreal offset = kBase + 2;
+
+    qreal rotationDegree = 0.;
+    QPointF shift(0., 0.);
     switch (alignment) {
     case Qt::AlignLeft:
-        m_iface->setRotation(insideOut ? 180 : 0);
-        m_type->setPos(QPointF(-offset, 0));
+        rotationDegree = insideOut ? 180 : 0;
+        shift.setX(-offset);
         break;
     case Qt::AlignRight:
-        m_iface->setRotation(insideOut ? 0 : 180);
-        m_type->setPos(QPointF(offset, 0));
+        rotationDegree = insideOut ? 0 : 180;
+        shift.setX(offset);
         break;
     case Qt::AlignTop:
-        m_iface->setRotation(insideOut ? 270 : 90);
-        m_type->setPos(QPointF(0, -offset));
+        rotationDegree = insideOut ? 270 : 90;
+        shift.setY(-offset);
         break;
     case Qt::AlignBottom:
-        m_iface->setRotation(insideOut ? 90 : 270);
-        m_type->setPos(QPointF(0, offset));
+        rotationDegree = insideOut ? 90 : 270;
+        shift.setY(offset);
         break;
     }
+
+    QTransform t = m_iface->transform();
+    t.rotate(rotationDegree);
+    m_iface->setTransform(t);
+    m_type->setPos(shift);
+    m_shape = composeShape();
+
     return mapRectFromItem(m_iface, m_iface->boundingRect());
 };
 
@@ -237,7 +247,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
                     && item != this;
         };
 
-        const QList<QGraphicsItem *> collidedItems = utils::sceneItems(scene(), parentItem()->mapRectToScene(rect));
+        const QList<QGraphicsItem *> collidedItems = scene()->items(parentItem()->mapRectToScene(rect));
         auto collidedIt = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), isInterfaceItemLambda);
         if (collidedIt == collidedItems.constEnd()) {
             alignment = utils::getNearestSide(parentRect, rect.center());
@@ -271,10 +281,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
 
     m_boundingRect = updateInternalItems(alignment);
 
-    m_shape = QPainterPath();
-    m_shape.addPath(m_type->shape());
-    m_shape.addPath(m_iface->shape());
-    m_shape.addPath(m_text->shape());
+    m_shape = composeShape();
 
     /// TODO:
     if (flags() & QGraphicsItem::ItemIsSelectable)
@@ -286,7 +293,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
 QPainterPath AADLInterfaceGraphicsItem::shape() const
 {
     if (m_shape.isEmpty())
-        return InteractiveObject::shape();
+        return composeShape();
 
     return m_shape;
 }
@@ -474,6 +481,7 @@ void AADLInterfaceGraphicsItem::updateKind()
         break;
     }
     m_type->setPath(kindPath);
+    m_shape = composeShape();
 }
 
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
@@ -512,7 +520,7 @@ void AADLInterfaceGraphicsItem::onAttrOrPropChanged(taste3::aadl::meta::Props::T
         //    case taste3::aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
     case taste3::aadl::meta::Props::Token::InheritPI: {
 #ifdef QT_DEBUG
-        qWarning() << "check for call duplication" << t;
+        qWarning() << "check for a call duplication" << t;
 #endif
         updateLabel();
         break;
@@ -524,5 +532,17 @@ void AADLInterfaceGraphicsItem::onAttrOrPropChanged(taste3::aadl::meta::Props::T
         break;
     }
 }
+
+QPainterPath AADLInterfaceGraphicsItem::composeShape() const
+{
+    QPainterPath path = m_text->shape();
+    for (auto sub : { m_type, m_iface }) {
+        QPainterPath path = sub->transform().map(sub->path().simplified()).simplified();
+        path.translate(sub->pos());
+        path.addPath(path);
+    }
+    return path;
+}
+
 } // namespace aadl
 } // namespace taste3
