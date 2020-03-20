@@ -22,7 +22,7 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLConnection::ExportedAADLConnection(const aadl::AADLObject *connection)
+ExportedAADLConnection::ExportedAADLConnection(const aadl::AADLObjectConnection *connection)
     : ExportedAADLObject(connection) {}
 
 QString ExportedAADLConnection::sourceName() const

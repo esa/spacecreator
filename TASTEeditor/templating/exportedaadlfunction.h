@@ -20,6 +20,11 @@
 #include "exportedaadlobject.h"
 
 namespace taste3 {
+
+namespace aadl {
+    class AADLObjectFunctionType;
+}
+
 namespace templating {
 
 /**
@@ -34,7 +39,7 @@ class ExportedAADLFunction : public ExportedAADLObject
     Q_PROPERTY(QVariantList connections READ connections)
 
 public:
-    explicit ExportedAADLFunction(const aadl::AADLObject *function = nullptr);
+    explicit ExportedAADLFunction(const aadl::AADLObjectFunctionType *function = nullptr);
 
     QVariantList interfaces() const;
     QVariantList functions() const;

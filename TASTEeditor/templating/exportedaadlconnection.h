@@ -20,6 +20,11 @@
 #include "exportedaadlobject.h"
 
 namespace taste3 {
+
+namespace aadl {
+    class AADLObjectConnection;
+}
+
 namespace templating {
 
 /**
@@ -38,7 +43,7 @@ class ExportedAADLConnection : public ExportedAADLObject
     Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
 
 public:
-    explicit ExportedAADLConnection(const aadl::AADLObject *connection = nullptr);
+    explicit ExportedAADLConnection(const aadl::AADLObjectConnection *connection = nullptr);
 
     QString sourceName() const;
     QString targetName() const;

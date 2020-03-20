@@ -22,6 +22,8 @@
 #include "exportedaadliface.h"
 #include "exportedaadlconnection.h"
 #include "tab_aadl/aadlobject.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
+#include "tab_aadl/aadlobjectconnection.h"
 
 namespace taste3 {
 namespace templating {
@@ -39,14 +41,17 @@ QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
     switch (aadlObject->aadlType()) {
     case aadl::AADLObject::Type::Function:
     case aadl::AADLObject::Type::FunctionType:
-        return QVariant::fromValue(ExportedAADLFunction(aadlObject));
+        return QVariant::fromValue(ExportedAADLFunction(
+               static_cast<const aadl::AADLObjectFunctionType *>(aadlObject)));
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
-        return QVariant::fromValue(TemplatedAADLIface(aadlObject));
+        return QVariant::fromValue(TemplatedAADLIface(
+               static_cast<const aadl::AADLObjectIface *>(aadlObject)));
     case aadl::AADLObject::Type::Comment:
         return QVariant::fromValue(ExportedAADLObject(aadlObject));
     case aadl::AADLObject::Type::Connection:
-        return QVariant::fromValue(ExportedAADLConnection(aadlObject));
+        return QVariant::fromValue(ExportedAADLConnection(
+               static_cast<const aadl::AADLObjectConnection *>(aadlObject)));
     default:
         Q_UNREACHABLE();
     }
