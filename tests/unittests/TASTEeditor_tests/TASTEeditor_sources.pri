@@ -34,7 +34,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/dummy/dummytabdocument.h \
 #        $$TASTE_PRO_ROOT/logging/logcategory.h \
 #        $$TASTE_PRO_ROOT/logging/loghandler.h \
-        $$TASTE_PRO_ROOT/templating/abstracttemplatedobject.h \
+        $$TASTE_PRO_ROOT/templating/genericexportedobject.h \
         $$TASTE_PRO_ROOT/templating/stringtemplate.h \
         $$TASTE_PRO_ROOT/templating/exportedaadlconnection.h \
         $$TASTE_PRO_ROOT/templating/exportedaadlfunction.h \
