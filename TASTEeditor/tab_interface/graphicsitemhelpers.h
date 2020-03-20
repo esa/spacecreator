@@ -41,7 +41,13 @@ AADLObjectComment *commentObject(QGraphicsItem *item);
 
 AADLObjectConnection *connectionObject(QGraphicsItem *item);
 
-bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
+enum RectOperation
+{
+    Create,
+    Edit
+};
+bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
+                  const RectOperation action);
 
 } // ns gi
 } // ns aadl

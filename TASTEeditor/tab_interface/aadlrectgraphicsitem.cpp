@@ -164,7 +164,7 @@ bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPoint
         return false;
 
     const QRectF currentBounds = sceneBoundingRect().marginsAdded(utils::kContentMargins);
-    if (!gi::canPlaceRect(scene(), this, currentBounds)) {
+    if (!gi::canPlaceRect(scene(), this, currentBounds, gi::RectOperation::Edit)) {
         // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
         return false;
