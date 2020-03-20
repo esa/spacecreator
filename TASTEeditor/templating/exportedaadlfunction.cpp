@@ -40,9 +40,10 @@ QVariantList ExportedAADLFunction::interfaces() const
 QVariantList ExportedAADLFunction::functions() const
 {
     QVariantList functions;
-    for (auto function : sourceObject<aadl::AADLObjectFunctionType>()->functionTypes())
+    const aadl::AADLObjectFunctionType *o = sourceObject<aadl::AADLObjectFunctionType>();
+    for (auto function : o->functionTypes())
         functions << createFrom(function);
-    for (auto function : sourceObject<aadl::AADLObjectFunctionType>()->functions())
+    for (auto function : o->functions())
         functions << createFrom(function);
     return functions;
 }
