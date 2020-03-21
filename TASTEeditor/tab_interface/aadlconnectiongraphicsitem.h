@@ -75,7 +75,6 @@ public:
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
-    void updateRelatedEdgePoint(const AADLFunctionGraphicsItem *function);
 
 protected:
     void onManualMoveStart(GripPoint *gp, const QPointF &at) override;
@@ -83,7 +82,6 @@ protected:
     void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
@@ -114,7 +112,6 @@ private:
     const QPointer<AADLInterfaceGraphicsItem> m_startItem;
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
-
     QVector<QPointF> m_points;
 };
 

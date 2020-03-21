@@ -289,6 +289,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
     , m_startItem(startIface)
     , m_endItem(endIface)
     , m_item(new GraphicsPathItem(this))
+    , m_points()
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
@@ -680,38 +681,6 @@ QString AADLConnectionGraphicsItem::prepareTooltip() const
                                     .arg(entity()->sourceName(), entity()->sourceInterfaceName(), sign,
                                          entity()->targetName(), entity()->targetInterfaceName());
     return tooltip;
-}
-
-void AADLConnectionGraphicsItem::updateRelatedEdgePoint(const AADLFunctionGraphicsItem *function)
-{
-    if (!function)
-        return;
-
-    QVector<QPointF> points = this->points();
-
-    if (function == sourceItem())
-        points.replace(0, startItem()->scenePos());
-    else
-        points.replace(points.size() - 1, endItem()->scenePos());
-
-    if (points != this->points())
-        setPoints(points);
-}
-
-QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case QGraphicsItem::ItemSceneHasChanged: {
-        if (auto scene = value.value<QGraphicsScene *>())
-            for (auto fn : { sourceItem(), targetItem() })
-                if (fn)
-                    fn->instantLayoutUpdate();
-        break;
-    }
-    default:
-        break;
-    }
-    return InteractiveObject::itemChange(change, value);
 }
 
 } // namespace aadl

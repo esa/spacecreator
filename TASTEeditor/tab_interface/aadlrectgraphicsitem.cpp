@@ -230,6 +230,9 @@ void AADLRectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pr
 {
     Q_UNUSED(grip)
 
+    if (pressedAt == releasedAt)
+        return;
+
     if (allowGeometryChange(pressedAt, releasedAt))
         updateEntity();
     else
