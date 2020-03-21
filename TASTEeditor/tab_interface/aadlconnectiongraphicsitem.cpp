@@ -290,7 +290,6 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
     , m_endItem(endIface)
     , m_item(new GraphicsPathItem(this))
     , m_points()
-    , m_forceIfaceLayout(true)
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
@@ -707,26 +706,6 @@ void AADLConnectionGraphicsItem::updateRelatedEdgePoint(const AADLFunctionGraphi
 
     if (points != this->points())
         setPoints(points);
-}
-
-QVariant AADLConnectionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case QGraphicsItem::ItemSceneHasChanged: {
-        if (auto scene = value.value<QGraphicsScene *>()) {
-            if (m_forceIfaceLayout) {
-                m_forceIfaceLayout = false;
-                for (auto fn : { sourceItem(), targetItem() })
-                    if (fn)
-                        fn->instantLayoutUpdate();
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    return InteractiveObject::itemChange(change, value);
 }
 
 } // namespace aadl

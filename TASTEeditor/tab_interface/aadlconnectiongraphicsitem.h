@@ -83,7 +83,6 @@ protected:
     void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
 protected Q_SLOTS:
     virtual void colorSchemeUpdated() override;
@@ -115,7 +114,6 @@ private:
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
     QVector<QPointF> m_points;
-    bool m_forceIfaceLayout;
 };
 
 } // namespace aadl
