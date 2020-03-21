@@ -62,8 +62,6 @@ protected:
 
     void doAutoLayout();
 
-    Q_INVOKABLE void syncConnectionEndpoints();
-
 protected Q_SLOTS:
     void updateNestedItems();
     void colorSchemeUpdated() override;

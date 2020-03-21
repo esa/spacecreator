@@ -118,8 +118,6 @@ void AADLFunctionGraphicsItem::rebuildLayout()
     AADLFunctionTypeGraphicsItem::rebuildLayout();
 
     colorSchemeUpdated();
-
-    QMetaObject::invokeMethod(this, "syncConnectionEndpoints", Qt::QueuedConnection);
 }
 
 void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -256,7 +254,7 @@ void AADLFunctionGraphicsItem::layoutOuterConnections()
                     continue;
                 }
                 if (!isAncestorOf(connection->startItem()) || !isAncestorOf(connection->endItem())) {
-                    connection->updateRelatedEdgePoint(this);
+                    connection->instantLayoutUpdate();
                 }
             }
         }
@@ -406,16 +404,6 @@ QString AADLFunctionGraphicsItem::prepareTooltip() const
     const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
-}
-
-void AADLFunctionGraphicsItem::syncConnectionEndpoints()
-{
-    // TODO: update only connections affected by iface relayouting
-    for (auto item : childItems())
-        if (item->type() == AADLInterfaceGraphicsItem::Type)
-            if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(item))
-                for (AADLConnectionGraphicsItem *connection : iface->connectionItems())
-                    connection->updateRelatedEdgePoint(this);
 }
 
 } // namespace aadl
