@@ -135,6 +135,8 @@ private:
 
     QMutex *m_mutex { nullptr };
     QQueue<aadl::AADLObject *> m_rmQueu;
+    const QRectF m_desktopGeometry;
+    QRectF m_prevItemsRect;
 
     void showNIYGUI(const QString &title = QString());
     void updateSceneRect();
