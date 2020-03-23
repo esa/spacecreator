@@ -103,21 +103,27 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
             break;
         }
     }
-    if (m_view == watched && event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        switch (keyEvent->key()) {
-        case Qt::Key_Delete: {
-            removeSelectedItems();
-        } break;
-        case Qt::Key_Escape: {
-            if (toolType() == ToolType::Pointer) {
-                if (auto scene = m_view->scene())
-                    scene->clearSelection();
-            } else {
-                clearPreviewItem();
-                emit created();
+
+    if (m_view == watched) {
+        if (event->type() == QEvent::ContextMenu)
+            return onContextMenu(static_cast<QContextMenuEvent *>(event));
+
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            switch (keyEvent->key()) {
+            case Qt::Key_Delete: {
+                removeSelectedItems();
+            } break;
+            case Qt::Key_Escape: {
+                if (toolType() == ToolType::Pointer) {
+                    if (auto scene = m_view->scene())
+                        scene->clearSelection();
+                } else {
+                    clearPreviewItem();
+                    emit created();
+                }
+            } break;
             }
-        } break;
         }
     }
 
@@ -215,24 +221,11 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
     if (!m_view)
         return false;
 
-    const QPointF scenePos = cursorInScene(e->globalPos());
-
-    if (m_toolType == ToolType::Pointer) {
-        if ((e->button() & Qt::RightButton) && e->modifiers() == Qt::NoModifier) {
-            if (QMenu *menu = populateContextMenu(scenePos)) {
-                connect(menu, &QMenu::aboutToHide, this, [this]() {
-                    if (m_previewItem)
-                        m_previewItem->setVisible(false);
-                });
-                menu->exec(e->globalPos());
-                clearPreviewItem();
-                return true;
-            }
-        }
-    } else {
+    if (m_toolType != ToolType::Pointer) {
         const bool hasPreview = m_previewItem || m_previewConnectionItem;
         const bool isIface = m_toolType == ToolType::ProvidedInterface || m_toolType == ToolType::RequiredInterface;
         if (hasPreview || isIface) {
+            const QPointF &scenePos = cursorInScene(e->globalPos());
             handleToolType(m_toolType, scenePos);
             return true;
         }
@@ -273,6 +266,39 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         }
     }
 
+    return false;
+}
+
+bool CreatorTool::onContextMenu(QContextMenuEvent *e)
+{
+    if (!m_view || e->modifiers() != Qt::NoModifier) // TODO: Is Qt::NoModifier really needed?
+        return false;
+
+    QPointF scenePos;
+    QPoint globalPos;
+    if (e->reason() == QContextMenuEvent::Mouse) {
+        scenePos = cursorInScene(e->globalPos());
+        globalPos = e->globalPos();
+    }
+    else {
+        QGraphicsScene *scene = m_view->scene();
+        if (!scene)
+            return false;
+        scenePos = cursorInScene();
+        globalPos = QCursor::pos();
+        // onMousePress is needed to set an apppropriate m_previewItem
+        QMouseEvent mouseEvent(QEvent::MouseButtonPress, m_view->mapFromScene(scenePos), Qt::RightButton, Qt::RightButton, e->modifiers());
+        onMousePress(&mouseEvent);
+    }
+    if (QMenu *menu = populateContextMenu(scenePos)) {
+        connect(menu, &QMenu::aboutToHide, this, [this]() {
+            if (m_previewItem)
+                m_previewItem->setVisible(false);
+        });
+        menu->exec(globalPos);
+        clearPreviewItem();
+        return true;
+    }
     return false;
 }
 
