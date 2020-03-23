@@ -78,6 +78,7 @@ protected Q_SLOTS:
     void onTabSwitched(int);
     void onReportRequested();
     void onDocDirtyChanged(bool dirty);
+    void onGraphicsViewInfo(const QString &info);
 
 private:
     static constexpr int TABDOC_ID_InterfaceView { 0 };

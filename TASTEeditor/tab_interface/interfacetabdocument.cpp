@@ -42,10 +42,12 @@
 #include <QFileInfo>
 #include <QGraphicsItem>
 #include <QGraphicsView>
+#include <QGuiApplication>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QScreen>
 #include <QShortcut>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
@@ -126,6 +128,7 @@ InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
     , m_model(new aadl::AADLObjectsModel(this))
     , m_mutex(new QMutex(QMutex::NonRecursive))
+    , m_desktopGeometry(QGuiApplication::primaryScreen()->availableGeometry()) // TODO: use dynamic screen detection
 {
     connect(m_model, &aadl::AADLObjectsModel::modelReset, this, &InterfaceTabDocument::clearScene);
     connect(m_model, &aadl::AADLObjectsModel::rootObjectChanged, this, &InterfaceTabDocument::onRootObjectChanged,
@@ -164,9 +167,8 @@ QWidget *InterfaceTabDocument::createView()
             }
         });
     }
-    m_graphicsScene->setSceneRect(
-            QRectF(QPointF(0, 0), m_graphicsView->size() * m_graphicsView->maxZoomPercent() / 100 * 4));
     m_graphicsView->setScene(m_graphicsScene);
+    updateSceneRect();
     return m_graphicsView;
 }
 
@@ -252,6 +254,7 @@ bool InterfaceTabDocument::saveImpl(const QString & /*path*/)
 void InterfaceTabDocument::closeImpl()
 {
     m_model->clear();
+    updateSceneRect();
 }
 
 QVector<QAction *> InterfaceTabDocument::initActions()
@@ -582,7 +585,6 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
     if (!item) {
         item = createItemForObject(object);
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged, Qt::QueuedConnection);
-        connect(object, &aadl::AADLObject::titleChanged, this, propertyChanged);
         if (auto clickable = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
             connect(clickable, &aadl::InteractiveObject::clicked, this, &InterfaceTabDocument::onItemClicked);
             connect(clickable, &aadl::InteractiveObject::doubleClicked, this,
@@ -605,6 +607,7 @@ void InterfaceTabDocument::onAADLObjectRemoved(aadl::AADLObject *object)
             if (auto item = m_items.take(obj->id())) {
                 m_graphicsScene->removeItem(item);
                 delete item;
+                updateSceneRect();
             }
             m_mutex->unlock();
         }
@@ -754,8 +757,23 @@ QString InterfaceTabDocument::supportedFileExtensions() const
 void InterfaceTabDocument::updateSceneRect()
 {
     const QRectF itemsRect = m_graphicsScene->itemsBoundingRect();
-    if (m_graphicsScene->sceneRect() != itemsRect)
-        m_graphicsScene->setSceneRect(itemsRect);
+    if (itemsRect.isEmpty()) {
+        m_graphicsScene->setSceneRect(m_desktopGeometry);
+        return;
+    }
+
+    if (itemsRect != m_prevItemsRect) {
+        const QRectF sceneRect = m_graphicsScene->sceneRect();
+        const QRectF updated = m_desktopGeometry.united(itemsRect);
+        if (sceneRect != updated) {
+            m_graphicsView->setUpdatesEnabled(false);
+            m_graphicsScene->setSceneRect(updated);
+            m_graphicsView->ensureVisible(itemsRect);
+            m_graphicsView->setUpdatesEnabled(true);
+
+            m_prevItemsRect = itemsRect;
+        }
+    }
 }
 
 } // ns document

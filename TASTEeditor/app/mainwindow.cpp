@@ -318,7 +318,10 @@ void MainWindow::onTabSwitched(int tab)
         doc->fillToolBar(m_docToolbar);
         m_docToolbar->show();
         currentStack = doc->commandsStack();
-        m_zoomCtrl->setView(qobject_cast<GraphicsView *>(doc->view()));
+        if (auto view = qobject_cast<GraphicsView *>(doc->view())) {
+            m_zoomCtrl->setView(view);
+            connect(view, &GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
+        }
     }
 
     if (currentStack) {
@@ -475,6 +478,11 @@ void MainWindow::onDocDirtyChanged(bool /*dirty*/)
             m_tabWidget->setTabText(docId, caller->title());
     }
     updateActions();
+}
+
+void MainWindow::onGraphicsViewInfo(const QString &info)
+{
+    statusBar()->showMessage(info);
 }
 
 bool MainWindow::prepareQuit()
