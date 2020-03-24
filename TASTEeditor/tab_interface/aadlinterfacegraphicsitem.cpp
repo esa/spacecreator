@@ -52,7 +52,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIsSelectable);
-
+    setZValue(utils::kInterfaceZLevel);
     updateKind();
 
     QPainterPath pp;
@@ -60,7 +60,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
                                      QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
-    setInterfaceName(ifaceLabel());
+    //    setInterfaceName(ifaceLabel());
 
     connect(entity, &AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity, &AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
@@ -161,16 +161,16 @@ static inline void moveCounterClockwise(const QRectF &intersectedItemRect, QRect
     const int index = idx < 0 ? sides.size() - (qAbs(idx) % sides.size()) : idx % sides.size();
     switch (sides.value(index)) {
     case Qt::AlignLeft:
-        counterClockwiseRect.moveTop(intersectedItemRect.bottom() + 1);
+        counterClockwiseRect.moveTop(intersectedItemRect.bottom() + kBase);
         break;
     case Qt::AlignRight:
-        counterClockwiseRect.moveBottom(intersectedItemRect.top() - 1);
+        counterClockwiseRect.moveBottom(intersectedItemRect.top() - kBase);
         break;
     case Qt::AlignTop:
-        counterClockwiseRect.moveRight(intersectedItemRect.left() - 1);
+        counterClockwiseRect.moveRight(intersectedItemRect.left() - kBase);
         break;
     case Qt::AlignBottom:
-        counterClockwiseRect.moveLeft(intersectedItemRect.right() + 1);
+        counterClockwiseRect.moveLeft(intersectedItemRect.right() + kBase);
         break;
     default:
         return;
@@ -207,9 +207,7 @@ QRectF AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
         break;
     }
 
-    QTransform t = m_iface->transform();
-    t.rotate(rotationDegree);
-    m_iface->setTransform(t);
+    m_iface->setTransform(QTransform().rotate(rotationDegree));
     m_type->setPos(shift);
     m_shape = composeShape();
 
@@ -226,7 +224,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
 
     const QPointF ifacePos = pos();
     if (utils::pos(entity()->coordinates()).isNull()) {
-        doAutoLayout();
+        layout();
         return;
     }
 
@@ -280,12 +278,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     m_boundingRect = updateInternalItems(alignment);
-
     m_shape = composeShape();
-
-    /// TODO:
-    if (flags() & QGraphicsItem::ItemIsSelectable)
-        m_boundingRect = childrenBoundingRect();
 
     setPos(stickyPos);
 }
@@ -337,7 +330,7 @@ QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandPa
     return params;
 }
 
-void AADLInterfaceGraphicsItem::doAutoLayout()
+void AADLInterfaceGraphicsItem::layout()
 {
     if (auto connection = m_connections.value(0)) {
         auto theirIface = connection->startItem() == this ? connection->endItem() : connection->startItem();
@@ -391,24 +384,21 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPoi
     Q_UNUSED(grip)
     Q_UNUSED(from)
 
-    if (!scene() || m_clickPos.isNull() || !m_connections.isEmpty())
+    if (!scene() || !m_connections.isEmpty())
         return;
 
-    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
+    const QPointF shift = { to - from };
+    if (shift.isNull())
+        return;
+
+    QPointF newPos = scenePos() + shift;
     if (parentItem()) {
-        const QRectF contentRect = parentItem()->boundingRect();
+        const QRectF contentRect = parentItem()->sceneBoundingRect();
 
-        if (newPos.x() < contentRect.left())
-            newPos.setX(contentRect.left());
-        else if ((newPos.x()) > contentRect.right())
-            newPos.setX(contentRect.right());
-
-        if (newPos.y() < contentRect.top())
-            newPos.setY(contentRect.top());
-        else if ((newPos.y()) > contentRect.bottom())
-            newPos.setY(contentRect.bottom());
+        newPos.setX(qBound(contentRect.left(), newPos.x(), contentRect.right()));
+        newPos.setY(qBound(contentRect.top(), newPos.y(), contentRect.bottom()));
     }
-    setPos(newPos);
+    setPos(mapToParent(mapFromScene(newPos)));
 
     rebuildLayout();
     updateGripPoints();

@@ -22,6 +22,7 @@
 #include <QCursor>
 #include <QObject>
 #include <QPointer>
+#include <QSet>
 #include <QVector>
 
 class QMouseEvent;
@@ -37,6 +38,7 @@ namespace taste3 {
 namespace aadl {
 class AADLObjectsModel;
 class AADLObject;
+class InteractiveObject;
 class CreatorTool : public QObject
 {
     Q_OBJECT
@@ -105,6 +107,7 @@ private:
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
+    QSet<InteractiveObject *> m_collidedItems;
 
     QUndoCommand *createInterfaceCommand(const AADLObjectIface::CreationInfo &info) const;
 };

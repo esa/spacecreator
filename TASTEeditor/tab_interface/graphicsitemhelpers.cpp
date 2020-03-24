@@ -112,7 +112,7 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
         return false;
 
     for (auto item : scene->items(upcomingItemRect)) {
-        if (item == upcomingItem)
+        if (item == upcomingItem || item->type() < QGraphicsItem::UserType)
             continue;
 
         const int itemType = item->type();

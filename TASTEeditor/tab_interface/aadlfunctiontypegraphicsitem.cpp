@@ -51,6 +51,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
     , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setZValue(utils::kFunctionZLevel);
 
     if (entity) {
         m_textItem->setPlainText(entity->title());
@@ -95,6 +96,10 @@ void AADLFunctionTypeGraphicsItem::rebuildLayout()
 {
     AADLRectGraphicsItem::rebuildLayout();
     updateTextPosition();
+    for (auto child : childItems()) {
+        if (auto iface = qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(child))
+            iface->instantLayoutUpdate();
+    }
 }
 
 void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

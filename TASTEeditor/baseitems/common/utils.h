@@ -35,6 +35,11 @@ static constexpr QSizeF DefaultGraphicsItemSize = { 200, 80 };
 static const QMarginsF kContentMargins = { 30, 30, 30, 30 };
 static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
+static const int kFunctionZLevel = 0;
+static const int kConnectionZLevel = 1;
+static const int kInterfaceZLevel = 2;
+static const int kCommentZLevel = 3;
+static const int kGripZLevel = 4;
 
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);

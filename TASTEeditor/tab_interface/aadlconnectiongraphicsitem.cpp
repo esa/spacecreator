@@ -293,7 +293,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
-    setZValue(2);
+    setZValue(utils::kConnectionZLevel);
 
     colorSchemeUpdated();
 
@@ -339,18 +339,10 @@ void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
         return;
     }
 
-    m_points = points;
-
-    const auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-            utils::nearestItem(scene(), points.first(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-
-    const auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-            utils::nearestItem(scene(), points.last(), QList<int> { AADLInterfaceGraphicsItem::Type }));
-
-    if (!startItem || !endItem)
+    if (m_points != points) {
+        m_points = points;
         instantLayoutUpdate();
-
-    updateBoundingRect();
+    }
 }
 
 QVector<QPointF> AADLConnectionGraphicsItem::points() const
@@ -393,19 +385,23 @@ void AADLConnectionGraphicsItem::rebuildLayout()
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);
         return;
-    } else {
-        if (utils::pos(m_startItem->entity()->coordinates()).isNull())
-            m_startItem->instantLayoutUpdate();
-        if (utils::pos(m_endItem->entity()->coordinates()).isNull())
-            m_endItem->instantLayoutUpdate();
-        if (utils::polygon(entity()->coordinates()).isEmpty()) {
-            entity()->setCoordinates(utils::coordinates(connectionPath(m_startItem, m_endItem)));
-        }
     }
 
-    setVisible(true);
-    m_points = connectionPath(m_startItem, m_endItem);
+    bool pathObsolete(true);
+    if (m_points.size() >= 2) {
+        for (auto point : { m_points.first(), m_points.last() }) {
+            auto ifaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(
+                    utils::nearestItem(scene(), point, QList<int> { AADLInterfaceGraphicsItem::Type }));
+            pathObsolete = !ifaceItem || ifaceItem->scenePos() != point;
+            if (pathObsolete)
+                break;
+        }
+    }
+    if (pathObsolete)
+        m_points = connectionPath(m_startItem, m_endItem);
+
     updateBoundingRect();
+    setVisible(true);
 }
 
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)

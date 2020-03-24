@@ -19,6 +19,8 @@
 
 #include "aadlfunctiontypegraphicsitem.h"
 
+class QSvgRenderer;
+
 namespace taste3 {
 namespace aadl {
 class AADLObjectFunction;
@@ -40,7 +42,6 @@ public:
     QPainterPath shape() const override;
 
     bool isRootItem() const;
-    QRectF nestedItemsSceneBoundingRect() const;
 
     QString prepareTooltip() const override;
 
@@ -49,30 +50,26 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
-    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
 
-    void scheduleUpdateNestedItems();
-
     virtual ColorManager::HandledColors handledColorType() const override;
 
-    void doAutoLayout();
-
 protected Q_SLOTS:
-    void updateNestedItems();
     void colorSchemeUpdated() override;
 
 private:
+    Q_INVOKABLE void updateNestedIcon();
     void layoutConnections();
     void layoutOuterConnections();
-    void setGeometry(const QRectF &sceneGeometry);
 
 private:
-    bool m_pendingLayout { false };
+    static QPointer<QSvgRenderer> m_svgRenderer;
+    bool m_hasNestedItems = false;
 };
 
 } // namespace aadl

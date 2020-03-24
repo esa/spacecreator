@@ -119,7 +119,10 @@ QVector<qint32> AADLObject::coordinates() const
         token = meta::Props::Token::RootCoordinates;
     }
 
-    return coordinatesFromString(prop(meta::Props::token(token)).toString());
+    QVariant varCoord = prop(meta::Props::token(token));
+    if (!varCoord.isValid() && token == meta::Props::Token::InnerCoordinates)
+        varCoord = prop(meta::Props::token(meta::Props::Token::coordinates));
+    return coordinatesFromString(varCoord.toString());
 }
 
 QString AADLObject::coordinatesToString(const QVector<qint32> &coordinates) const
