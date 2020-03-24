@@ -105,12 +105,12 @@ void AADLFunctionGraphicsItem::rebuildLayout()
                 itemRect.moveCenter(nestedItemsInternalRect.center());
                 itemRect |= nestedItemsInternalRect.marginsAdded(utils::kRootMargins);
             }
+        } else {
+            itemRect |= nestedItemsInternalRect.marginsAdded(utils::kRootMargins);
         }
 
-        if (setGeometry(itemRect)) {
+        if (setGeometry(itemRect))
             mergeGeometry();
-            view->centerOn(itemRect.center());
-        }
     }
 
     AADLFunctionTypeGraphicsItem::rebuildLayout();
@@ -277,11 +277,13 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
     QPen p = h.pen();
     QBrush b = h.brush();
 
-    if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem()))
-        if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")) {
+    if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
+        if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")
+            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) {
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }
+    }
 
     setPen(p);
     setBrush(b);
