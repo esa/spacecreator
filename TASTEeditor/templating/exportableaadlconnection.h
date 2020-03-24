@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "exportedaadlobject.h"
+#include "exportableaadlobject.h"
 
 namespace taste3 {
 
@@ -28,9 +28,9 @@ namespace aadl {
 namespace templating {
 
 /**
- * @brief The ExportedAADLConnection is a class to export AADLObjectConnection
+ * @brief The ExportableAADLConnection is a class to export AADLObjectConnection
  */
-class ExportedAADLConnection : public ExportedAADLObject
+class ExportableAADLConnection : public ExportableAADLObject
 {
     Q_GADGET
     Q_PROPERTY(QString source READ sourceName)
@@ -43,7 +43,7 @@ class ExportedAADLConnection : public ExportedAADLObject
     Q_PROPERTY(bool tiIsProvided READ targetInterfaceIsProvided)
 
 public:
-    explicit ExportedAADLConnection(const aadl::AADLObjectConnection *connection = nullptr);
+    explicit ExportableAADLConnection(const aadl::AADLObjectConnection *connection = nullptr);
 
     QString sourceName() const;
     QString targetName() const;
@@ -58,4 +58,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportedAADLConnection)
+DECLARE_EXPORTED_TYPE(ExportableAADLConnection)

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "exportedaadlobject.h"
+#include "exportableaadlobject.h"
 
 namespace taste3 {
 
@@ -28,9 +28,9 @@ namespace aadl {
 namespace templating {
 
 /**
- * @brief The TemplatedAADLIface is a class to export AADLObjectIface
+ * @brief The ExportableAADLIface is a class to export AADLObjectIface
  */
-class TemplatedAADLIface : public ExportedAADLObject
+class ExportableAADLIface : public ExportableAADLObject
 {
     Q_GADGET
     Q_PROPERTY(bool isProvided READ isProvided)
@@ -38,7 +38,7 @@ class TemplatedAADLIface : public ExportedAADLObject
     Q_PROPERTY(QVariantList params READ paramList)
 
 public:
-    explicit TemplatedAADLIface(const aadl::AADLObjectIface *iface = nullptr);
+    explicit ExportableAADLIface(const aadl::AADLObjectIface *iface = nullptr);
 
     bool isProvided() const;
     bool isRequired() const;
@@ -48,4 +48,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(TemplatedAADLIface)
+DECLARE_EXPORTED_TYPE(ExportableAADLIface)

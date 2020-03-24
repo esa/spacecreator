@@ -28,7 +28,7 @@
 #include "tab_interface/interfacetabdocument.h"
 #include "templating/stringtemplate.h"
 #include "templating/templateeditor.h"
-#include "templating/exportedaadlobject.h"
+#include "templating/exportableaadlobject.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -189,39 +189,8 @@ bool XmlDocExporter::showExportDialog(document::InterfaceTabDocument *doc, QWidg
     return templateParsed;
 }
 
-static const QVector<QString> availableAADLObjectTypeNames()
-{
-    QVector<QString> keys;
-
-    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-
-        QString key;
-        switch (static_cast<aadl::AADLObject::Type>(me.value(i))) {
-
-        // Despite the same key "Functions" shared between Function and FunctionType,
-        // each should be stored separately to allow queries like
-        // keys[AADLObject::Type::Function] and keys[AADLObject::Type::FunctionType]
-        case aadl::AADLObject::Type::FunctionType:
-        case aadl::AADLObject::Type::Function:
-            key = QStringLiteral("Functions");
-            break;
-
-        default:
-            key = me.key(i);
-            key.append(QStringLiteral("s"));
-            break;
-        }
-        keys.append(key);
-    }
-
-    return keys;
-}
-
 QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(document::InterfaceTabDocument *doc)
 {
-    static const QVector<QString> keys = availableAADLObjectTypeNames();
-
     QHash<QString, QVariantList> grouppedObjects;
     for (const auto aadlObject : doc->objects()) {
         const aadl::AADLObject::Type t = aadlObject->aadlType();
@@ -238,9 +207,9 @@ QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(document::I
         default:
             break;
         }
-        const QString aadlGroupType = keys[static_cast<int>(t)];
-        const QVariant &exportedObject = templating::ExportedAADLObject::createFrom(aadlObject);
-        grouppedObjects[aadlGroupType] << exportedObject;
+        const QVariant &exportedObject = templating::ExportableAADLObject::createFrom(aadlObject);
+        const templating::ExportableAADLObject &o = exportedObject.value<templating::ExportableAADLObject>();
+        grouppedObjects[o.groupName()] << exportedObject;
     }
 
     return grouppedObjects;

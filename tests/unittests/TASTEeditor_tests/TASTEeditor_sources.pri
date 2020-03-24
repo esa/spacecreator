@@ -34,13 +34,13 @@ HEADERS += \
         $$TASTE_PRO_ROOT/dummy/dummytabdocument.h \
 #        $$TASTE_PRO_ROOT/logging/logcategory.h \
 #        $$TASTE_PRO_ROOT/logging/loghandler.h \
-        $$TASTE_PRO_ROOT/templating/genericexportedobject.h \
         $$TASTE_PRO_ROOT/templating/stringtemplate.h \
-        $$TASTE_PRO_ROOT/templating/exportedaadlconnection.h \
-        $$TASTE_PRO_ROOT/templating/exportedaadlfunction.h \
-        $$TASTE_PRO_ROOT/templating/exportedaadliface.h \
-        $$TASTE_PRO_ROOT/templating/exportedaadlobject.h \
-        $$TASTE_PRO_ROOT/templating/exportedaadlproperty.h \
+        $$TASTE_PRO_ROOT/templating/abstractexportableobject.h \
+        $$TASTE_PRO_ROOT/templating/exportableaadlconnection.h \
+        $$TASTE_PRO_ROOT/templating/exportableaadlfunction.h \
+        $$TASTE_PRO_ROOT/templating/exportableaadliface.h \
+        $$TASTE_PRO_ROOT/templating/exportableaadlobject.h \
+        $$TASTE_PRO_ROOT/templating/exportableaadlproperty.h \
         $$TASTE_PRO_ROOT/templating/templateeditor.h \
         $$TASTE_PRO_ROOT/templating/templatehighlighter.h \
         $$TASTE_PRO_ROOT/templating/xmlhighlighter.h \
@@ -157,10 +157,10 @@ SOURCES += \
 #        $$TASTE_PRO_ROOT/logging/logcategory.cpp \
 #        $$TASTE_PRO_ROOT/logging/loghandler.cpp \
         $$TASTE_PRO_ROOT/templating/stringtemplate.cpp \
-        $$TASTE_PRO_ROOT/templating/exportedaadlconnection.cpp \
-        $$TASTE_PRO_ROOT/templating/exportedaadlfunction.cpp \
-        $$TASTE_PRO_ROOT/templating/exportedaadliface.cpp \
-        $$TASTE_PRO_ROOT/templating/exportedaadlobject.cpp \
+        $$TASTE_PRO_ROOT/templating/exportableaadlconnection.cpp \
+        $$TASTE_PRO_ROOT/templating/exportableaadlfunction.cpp \
+        $$TASTE_PRO_ROOT/templating/exportableaadliface.cpp \
+        $$TASTE_PRO_ROOT/templating/exportableaadlobject.cpp \
         $$TASTE_PRO_ROOT/templating/templateeditor.cpp \
         $$TASTE_PRO_ROOT/templating/templatehighlighter.cpp \
         $$TASTE_PRO_ROOT/templating/xmlhighlighter.cpp \

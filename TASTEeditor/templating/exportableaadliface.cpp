@@ -15,42 +15,33 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "exportableaadliface.h"
 
-#include "genericexportedobject.h"
-
-#include <QVariant>
+#include "tab_aadl/aadlobjectiface.h"
 
 namespace taste3 {
-
-namespace aadl {
-    class AADLObject;
-}
-
 namespace templating {
 
-/**
- * @brief The ExportedAADLObject is a common class to export AADLObject and its successors
- */
-class ExportedAADLObject : public GenericExportedObject
+ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
+    : ExportableAADLObject(iface) {}
+
+bool ExportableAADLIface::isProvided() const
 {
-    Q_GADGET
-    Q_PROPERTY(QVariantList attributes READ attributes)
-    Q_PROPERTY(QVariantList properties READ properties)
+    return exportedObject<aadl::AADLObjectIface>()->isProvided();
+}
 
-public:
-    explicit ExportedAADLObject(const aadl::AADLObject *aadlObject = nullptr);
+bool ExportableAADLIface::isRequired() const
+{
+    return exportedObject<aadl::AADLObjectIface>()->isRequired();
+}
 
-    static QVariant createFrom(const aadl::AADLObject *aadlObject);
-
-    QVariantList attributes() const;
-    QVariantList properties() const;
-
-protected:
-    static QVariantList generateProperties(const QHash<QString, QVariant> &props);
-};
+QVariantList ExportableAADLIface::paramList() const
+{
+    QVariantList list;
+    for (const auto &param : exportedObject<aadl::AADLObjectIface>()->params())
+        list << QVariant::fromValue(param);
+    return list;
+}
 
 } // ns templating
 } // ns taste3
-
-DECLARE_EXPORTED_TYPE(ExportedAADLObject)

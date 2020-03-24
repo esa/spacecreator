@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "genericexportedobject.h"
+#include "abstractexportableobject.h"
 
 #include <QVariant>
 

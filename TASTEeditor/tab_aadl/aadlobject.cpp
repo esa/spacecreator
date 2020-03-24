@@ -19,7 +19,6 @@
 
 #include "aadlnamevalidator.h"
 #include "aadlobjectsmodel.h"
-#include "templating/exportedaadlproperty.h"
 
 #include <QPointer>
 #include <QVector>

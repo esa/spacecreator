@@ -24,14 +24,24 @@ namespace taste3 {
 namespace templating {
 
 /**
- * @brief The GenericExportedObject class is a generic class
- *        to export QObject's successors by the string template engine
+ * @brief The AbstractExportableObject class is a base class
+ *        for exporting of QObject's successors by the string template engine
  */
-class GenericExportedObject
+class AbstractExportableObject
 {
 public:
-    GenericExportedObject(const QObject *object)
-        : m_exportedObject(object) {}
+    AbstractExportableObject(const QObject *exportedObject)
+        : m_exportedObject(exportedObject) {}
+
+    virtual ~AbstractExportableObject() = default;
+
+    /**
+     * @brief groupName is a logical name of a group of objects which given object belongs to.
+     * Exportable objects are groupped by the group name and kept in QVariantList.
+     * Then the group name is used in the string template to retrive all groupped objects.
+     * @return name of the group
+     */
+    virtual QString groupName() const = 0;
 
 protected:
     /**

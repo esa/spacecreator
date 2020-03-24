@@ -15,12 +15,12 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "exportedaadlobject.h"
+#include "exportableaadlobject.h"
 
-#include "exportedaadlproperty.h"
-#include "exportedaadlfunction.h"
-#include "exportedaadliface.h"
-#include "exportedaadlconnection.h"
+#include "exportableaadlproperty.h"
+#include "exportableaadlfunction.h"
+#include "exportableaadliface.h"
+#include "exportableaadlconnection.h"
 #include "tab_aadl/aadlobject.h"
 #include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectconnection.h"
@@ -28,29 +28,49 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLObject::ExportedAADLObject(const aadl::AADLObject *aadlObject)
-    : GenericExportedObject(aadlObject) {}
+ExportableAADLObject::ExportableAADLObject(const aadl::AADLObject *aadlObject)
+    : AbstractExportableObject(aadlObject) {}
+
+QString ExportableAADLObject::groupName() const
+{
+    const aadl::AADLObject *aadlObject = exportedObject<aadl::AADLObject>();
+    switch (aadlObject->aadlType()) {
+    case aadl::AADLObject::Type::Function:
+    case aadl::AADLObject::Type::FunctionType:
+        return QStringLiteral("Functions");
+    case aadl::AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::ProvidedInterface:
+        return QStringLiteral("Interfaces");
+    case aadl::AADLObject::Type::Comment:
+        return QStringLiteral("Comments");
+    case aadl::AADLObject::Type::Connection:
+        return QStringLiteral("Connections");
+    default:
+        Q_UNREACHABLE();
+    }
+    return QString();
+}
 
 /**
- * @brief ExportedAADLObject::createFrom creates appropriate exported class and casts to QVariant
+ * @brief ExportableAADLObject::createFrom creates appropriate exported class and casts to QVariant
  * @param aadlObject exported object
  * @return created exported object as QVariant
  */
-QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
+QVariant ExportableAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 {
     switch (aadlObject->aadlType()) {
     case aadl::AADLObject::Type::Function:
     case aadl::AADLObject::Type::FunctionType:
-        return QVariant::fromValue(ExportedAADLFunction(
+        return QVariant::fromValue(ExportableAADLFunction(
                static_cast<const aadl::AADLObjectFunctionType *>(aadlObject)));
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
-        return QVariant::fromValue(TemplatedAADLIface(
+        return QVariant::fromValue(ExportableAADLIface(
                static_cast<const aadl::AADLObjectIface *>(aadlObject)));
     case aadl::AADLObject::Type::Comment:
-        return QVariant::fromValue(ExportedAADLObject(aadlObject));
+        return QVariant::fromValue(ExportableAADLObject(aadlObject));
     case aadl::AADLObject::Type::Connection:
-        return QVariant::fromValue(ExportedAADLConnection(
+        return QVariant::fromValue(ExportableAADLConnection(
                static_cast<const aadl::AADLObjectConnection *>(aadlObject)));
     default:
         Q_UNREACHABLE();
@@ -59,29 +79,29 @@ QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
 }
 
 /**
- * @brief ExportedAADLObject::attributes returns list of attribues for using in string templates.
+ * @brief ExportableAADLObject::attributes returns list of attribues for using in string templates.
  * @return list of attribues.
  */
-QVariantList ExportedAADLObject::attributes() const
+QVariantList ExportableAADLObject::attributes() const
 {
     return generateProperties(exportedObject<aadl::AADLObject>()->attrs());
 }
 
 /**
- * @brief ExportedAADLObject::properties returns list of properties for using in string templates.
+ * @brief ExportableAADLObject::properties returns list of properties for using in string templates.
  * @return list of properties.
  */
-QVariantList ExportedAADLObject::properties() const
+QVariantList ExportableAADLObject::properties() const
 {
     return generateProperties(exportedObject<aadl::AADLObject>()->props());
 }
 
 /**
- * @brief ExportedAADLObject::generateProperties generates a variant list sorted by meta::Props::Token.
+ * @brief ExportableAADLObject::generateProperties generates a variant list sorted by meta::Props::Token.
  * @param props can be hash of attributes or properties of AADLObject.
  * @return sorted QVariantList which can be used in string templates
  */
-QVariantList ExportedAADLObject::generateProperties(const QHash<QString, QVariant> &props)
+QVariantList ExportableAADLObject::generateProperties(const QHash<QString, QVariant> &props)
 {
     QVariantList result;
     for (auto it = props.cbegin(); it != props.cend(); ++it)

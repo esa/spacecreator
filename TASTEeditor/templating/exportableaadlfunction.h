@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "exportedaadlobject.h"
+#include "exportableaadlobject.h"
 
 namespace taste3 {
 
@@ -28,9 +28,9 @@ namespace aadl {
 namespace templating {
 
 /**
- * @brief The ExportedAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
+ * @brief The ExportableAADLFunction is a class to export AADLObjectFunctionType and AADLObjectFunction
  */
-class ExportedAADLFunction : public ExportedAADLObject
+class ExportableAADLFunction : public ExportableAADLObject
 {
     Q_GADGET
     Q_PROPERTY(QVariantList interfaces READ interfaces)
@@ -39,7 +39,7 @@ class ExportedAADLFunction : public ExportedAADLObject
     Q_PROPERTY(QVariantList connections READ connections)
 
 public:
-    explicit ExportedAADLFunction(const aadl::AADLObjectFunctionType *function = nullptr);
+    explicit ExportableAADLFunction(const aadl::AADLObjectFunctionType *function = nullptr);
 
     QVariantList interfaces() const;
     QVariantList functions() const;
@@ -50,4 +50,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportedAADLFunction)
+DECLARE_EXPORTED_TYPE(ExportableAADLFunction)

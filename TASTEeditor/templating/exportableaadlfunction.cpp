@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "exportedaadlfunction.h"
+#include "exportableaadlfunction.h"
 
 #include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectfunction.h"
@@ -26,10 +26,10 @@
 namespace taste3 {
 namespace templating {
 
-ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObjectFunctionType *function)
-    : ExportedAADLObject(function) {}
+ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionType *function)
+    : ExportableAADLObject(function) {}
 
-QVariantList ExportedAADLFunction::interfaces() const
+QVariantList ExportableAADLFunction::interfaces() const
 {
     QVariantList ifaces;
     for (const auto iface : exportedObject<aadl::AADLObjectFunctionType>()->interfaces())
@@ -37,7 +37,7 @@ QVariantList ExportedAADLFunction::interfaces() const
     return ifaces;
 }
 
-QVariantList ExportedAADLFunction::functions() const
+QVariantList ExportableAADLFunction::functions() const
 {
     QVariantList functions;
     const aadl::AADLObjectFunctionType *o = exportedObject<aadl::AADLObjectFunctionType>();
@@ -48,7 +48,7 @@ QVariantList ExportedAADLFunction::functions() const
     return functions;
 }
 
-QVariantList ExportedAADLFunction::comments() const
+QVariantList ExportableAADLFunction::comments() const
 {
     QVariantList comments;
     for (const auto comment : exportedObject<aadl::AADLObjectFunctionType>()->comments())
@@ -56,7 +56,7 @@ QVariantList ExportedAADLFunction::comments() const
     return comments;
 }
 
-QVariantList ExportedAADLFunction::connections() const
+QVariantList ExportableAADLFunction::connections() const
 {
     QVariantList connections;
     for (const auto connection : exportedObject<aadl::AADLObjectFunctionType>()->connections())
