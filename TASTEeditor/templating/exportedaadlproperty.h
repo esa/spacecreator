@@ -15,8 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef AADLOBJECTTEMPLATEPROPERTY_H
-#define AADLOBJECTTEMPLATEPROPERTY_H
+#pragma once
+
+#include "genericexportedobject.h"
 
 #include <QVariant>
 
@@ -24,7 +25,7 @@ namespace taste3 {
 namespace templating {
 
 /**
- * @brief The AADLObjectTemplateProperty class is needed for string templates only.
+ * @brief The ExportedAADLProperty class is needed for string templates only.
  * It seems Grantlee doesn't fully support Django syntax like
  * @code
  *  {% for key, value in iface.properties %}
@@ -32,7 +33,7 @@ namespace templating {
  *  {% endfor %}
  * @endcode
  * Therefore AADLObject has a property "properties" and "attributes"
- * which are lists of AADLObjectTemplateProperty
+ * which are lists of ExportedAADLProperty
  * and thus it's possible to write like this:
  * @code
  *  {% for property in iface.properties %}
@@ -41,13 +42,13 @@ namespace templating {
  * @endcode
  */
 
-class AADLObjectTemplateProperty
+class ExportedAADLProperty
 {
     Q_GADGET
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QVariant value READ value)
 public:
-    AADLObjectTemplateProperty(const QString &name = QString(), const QVariant &value = QVariant())
+    ExportedAADLProperty(const QString &name = QString(), const QVariant &value = QVariant())
         : m_name(name), m_value(value) {}
 
     inline QString name() const { return m_name; }
@@ -58,11 +59,7 @@ private:
     const QVariant m_value;
 };
 
-QVariantList generateTemplateProperties(const QHash<QString, QVariant> &props);
-
 } // ns templating
 } // ns taste3
 
-Q_DECLARE_METATYPE(taste3::templating::AADLObjectTemplateProperty)
-
-#endif // AADLOBJECTTEMPLATEPROPERTY_H
+DECLARE_EXPORTED_TYPE(ExportedAADLProperty)

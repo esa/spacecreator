@@ -34,8 +34,6 @@ class AADLObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(common::Id id READ id)
-    Q_PROPERTY(QVariantList properties READ templateProperties) //!< Property list for string templates
-    Q_PROPERTY(QVariantList attributes READ templateAttributes) //!< Attribute list for string templates
 
 public:
     enum class Type
@@ -80,7 +78,6 @@ public:
     // <Required_Interface name="run_forrest" kind="SPORADIC_OPERATION">
 
     QHash<QString, QVariant> attrs() const;
-    QVariantList templateAttributes() const;
     void setAttrs(const QHash<QString, QVariant> &attrs);
     QVariant attr(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setAttr(const QString &name, const QVariant &val);
@@ -88,7 +85,6 @@ public:
 
     // "properties" - XML children <Property>
     QHash<QString, QVariant> props() const;
-    QVariantList templateProperties() const;
     void setProps(const QHash<QString, QVariant> &props);
     QVariant prop(const QString &name, const QVariant &defaultValue = QVariant()) const;
     virtual void setProp(const QString &name, const QVariant &val);

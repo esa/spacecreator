@@ -77,7 +77,10 @@ SOURCES += \
         tab_interface/commands/cmdentityautolayout.cpp \
         tab_interface/commands/cmdifacedatachangebase.cpp \
         tab_interface/commenttextdialog.cpp \
-        templating/aadlobjecttemplateproperty.cpp \
+        templating/exportableaadlconnection.cpp \
+        templating/exportableaadlfunction.cpp \
+        templating/exportableaadliface.cpp \
+        templating/exportableaadlobject.cpp \
         templating/stringtemplate.cpp \
         templating/templateeditor.cpp \
         templating/templatehighlighter.cpp \
@@ -194,7 +197,12 @@ HEADERS += \
         tab_interface/commands/cmdentityautolayout.h \
         tab_interface/commands/cmdifacedatachangebase.h \
         tab_interface/commenttextdialog.h \
-        templating/aadlobjecttemplateproperty.h \
+        templating/abstractexportableobject.h \
+        templating/exportableaadlconnection.h \
+        templating/exportableaadlfunction.h \
+        templating/exportableaadliface.h \
+        templating/exportableaadlobject.h \
+        templating/exportableaadlproperty.h \
         templating/stringtemplate.h \
         templating/templateeditor.h \
         templating/templatehighlighter.h \

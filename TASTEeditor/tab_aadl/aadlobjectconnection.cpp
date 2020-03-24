@@ -102,26 +102,6 @@ QString AADLObjectConnection::targetInterfaceName() const
     return targetInterface() ? targetInterface()->title() : QString();
 }
 
-bool AADLObjectConnection::sourceInterfaceIsRequired() const
-{
-    return sourceInterface() ? sourceInterface()->isRequired() : false;
-}
-
-bool AADLObjectConnection::sourceInterfaceIsProvided() const
-{
-    return sourceInterface() ? sourceInterface()->isProvided() : false;
-}
-
-bool AADLObjectConnection::targetInterfaceIsRequired() const
-{
-    return targetInterface() ? targetInterface()->isRequired() : false;
-}
-
-bool AADLObjectConnection::targetInterfaceIsProvided() const
-{
-    return targetInterface() ? targetInterface()->isProvided() : false;
-}
-
 void AADLObjectConnection::setInheritPI()
 {
     if (isOneDirection())

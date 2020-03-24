@@ -19,7 +19,6 @@
 
 #include "aadlnamevalidator.h"
 #include "aadlobjectsmodel.h"
-#include "templating/aadlobjecttemplateproperty.h"
 
 #include <QPointer>
 #include <QVector>
@@ -220,15 +219,6 @@ QHash<QString, QVariant> AADLObject::attrs() const
     return d->m_attrs;
 }
 
-/**
- * @brief AADLObject::templateAttributes returns list of attribues for using in string templates.
- * @return list of attribues.
- */
-QVariantList AADLObject::templateAttributes() const
-{
-    return templating::generateTemplateProperties(d->m_attrs);
-}
-
 void AADLObject::setAttrs(const QHash<QString, QVariant> &attrs)
 {
     if (d->m_attrs != attrs) {
@@ -287,15 +277,6 @@ void AADLObject::removeAttr(const QString &name)
 QHash<QString, QVariant> AADLObject::props() const
 {
     return d->m_props;
-}
-
-/**
- * @brief AADLObject::templateProperties returns list of properties for using in string templates.
- * @return list of properties.
- */
-QVariantList AADLObject::templateProperties() const
-{
-    return templating::generateTemplateProperties(d->m_props);
 }
 
 void AADLObject::setProps(const QHash<QString, QVariant> &props)
