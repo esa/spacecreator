@@ -72,7 +72,7 @@ int CmdEntityGeometryChange::id() const
     return ChangeEntityGeometry;
 }
 
-void CmdEntityGeometryChange::mergeWith(QUndoCommand *command)
+void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
 {
     if (command->id() != AutoLayoutEntity)
         return;

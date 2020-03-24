@@ -39,7 +39,7 @@ public:
     void undo() override;
     int id() const override;
 
-    void mergeWith(QUndoCommand *command);
+    void mergeCommand(QUndoCommand *command);
 
 protected:
     struct ObjectData {

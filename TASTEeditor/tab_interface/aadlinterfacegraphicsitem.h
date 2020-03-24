@@ -59,7 +59,7 @@ public:
     QString prepareTooltip() const override;
 
 protected:
-    void doAutoLayout();
+    void layout();
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 

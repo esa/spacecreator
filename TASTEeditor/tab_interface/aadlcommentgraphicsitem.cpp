@@ -45,6 +45,7 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFont(QFont(qApp->font()));
+    setZValue(utils::kCommentZLevel);
 
     colorSchemeUpdated();
 }

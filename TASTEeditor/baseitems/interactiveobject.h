@@ -131,7 +131,6 @@ protected:
     bool m_hovered = false;
     qreal m_storedZ = 0.;
     QPointF m_prevPos;
-    QPointF m_clickPos; // TODO: check ?
     bool m_layoutDirty = false;
 
     bool m_highlightable = false;

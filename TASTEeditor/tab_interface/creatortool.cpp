@@ -49,7 +49,6 @@
 #include <tab_aadl/aadlobjectsmodel.h>
 
 static const qreal kContextMenuItemTolerance = 10.;
-static const QMarginsF kMargins { 50., 50., 50., 50. };
 static const QList<int> kFunctionTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
                                            taste3::aadl::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
@@ -235,25 +234,44 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
 
 bool CreatorTool::onMouseMove(QMouseEvent *e)
 {
-    if (!m_view)
+    if (!m_view || !m_view->scene())
         return false;
 
     const QPointF &scenePos = cursorInScene(e->globalPos());
     if (m_previewItem && m_previewItem->isVisible()) {
-        const QPointF eventPos = m_previewItem->mapFromScene(scenePos);
-        const QRectF newGeometry = QRectF(m_previewItem->mapFromScene(m_clickScenePos), eventPos).normalized();
-        if (m_previewItem->parentItem()) {
-            if (!m_previewItem->parentItem()->boundingRect().contains(newGeometry))
-                return false;
-        } else if (auto scene = m_view->scene()) {
-            const QList<QGraphicsItem *> collidedItems = scene->items(newGeometry.marginsAdded(kMargins));
-            auto it = std::find_if(
-                    collidedItems.constBegin(), collidedItems.constEnd(),
-                    [this](const QGraphicsItem *item) { return item != m_previewItem && !item->parentItem(); });
-            if (it != collidedItems.constEnd())
-                return false;
-        }
-        m_previewItem->setRect(newGeometry);
+        const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
+        if (!newGeometry.isValid())
+            return true;
+
+        QSet<InteractiveObject *> items;
+        const QRectF expandedGeometry { newGeometry.marginsAdded(utils::kContentMargins) };
+        QList<QGraphicsItem *> newCollidedItems = m_view->scene()->items(expandedGeometry);
+        std::for_each(newCollidedItems.begin(), newCollidedItems.end(), [this, &items, expandedGeometry](QGraphicsItem *item) {
+            if (item->type() == AADLInterfaceGraphicsItem::Type || item->type() == m_previewItem->type())
+                return;
+
+            auto iObjItem = qobject_cast<InteractiveObject *>(item->toGraphicsObject());
+            if (!iObjItem)
+                return;
+
+            if (item->parentItem() == m_previewItem->parentItem()
+                || (m_previewItem->parentItem() == item && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                items.insert(iObjItem);
+            }
+        });
+        QSet<InteractiveObject *> newItems(items);
+        newItems.subtract(m_collidedItems);
+        for (auto item : newItems)
+            item->doHighlighting(Qt::red, true);
+
+        QSet<InteractiveObject *> oldItems(m_collidedItems);
+        oldItems.subtract(items);
+
+        for (auto item : oldItems)
+            item->doHighlighting(Qt::green, false);
+
+        m_collidedItems = items;
+        m_previewItem->setRect(m_previewItem->mapRectFromScene(newGeometry));
         return true;
     } else if (m_previewConnectionItem && m_previewConnectionItem->isVisible() && !m_connectionPoints.isEmpty()) {
         if (m_view->scene()) {
@@ -782,6 +800,10 @@ void CreatorTool::removeSelectedItems()
 
 void CreatorTool::clearPreviewItem()
 {
+    for (auto iObj: m_collidedItems)
+        iObj->highlightConnected();
+    m_collidedItems.clear();
+
     m_clickScenePos = QPointF();
 
     m_connectionPoints.clear();
@@ -796,8 +818,6 @@ void CreatorTool::clearPreviewItem()
         delete m_previewItem;
         m_previewItem = nullptr;
     }
-    //    if (m_view && m_view->sceneRect() != m_view->scene()->sceneRect())
-    //        m_view->setSceneRect({});
 }
 
 QMenu *CreatorTool::populateContextMenu(const QPointF &scenePos)

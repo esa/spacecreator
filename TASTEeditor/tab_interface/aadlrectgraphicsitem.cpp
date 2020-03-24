@@ -29,8 +29,10 @@
 namespace taste3 {
 namespace aadl {
 
-AADLRectGraphicsItem::AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentItem)
-    : InteractiveObject(entity, parentItem)
+static const qreal kOffset = 2.0;
+
+AADLRectGraphicsItem::AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentGraphicsItem)
+    : InteractiveObject(entity, parentGraphicsItem)
 {
     connect(this, &InteractiveObject::relocated, this, &AADLRectGraphicsItem::onGeometryChanged);
     connect(this, &InteractiveObject::boundingBoxChanged, this, &AADLRectGraphicsItem::onGeometryChanged);
@@ -42,14 +44,47 @@ QSizeF AADLRectGraphicsItem::minimalSize() const
     return QSizeF();
 }
 
+static QPointF shiftChildren(const QRectF &sourceRect, const QRectF &destRect)
+{
+    if (!sourceRect.isValid() || !destRect.isValid())
+        return {};
+
+    const QPointF shift = sourceRect.topLeft() - destRect.topLeft();
+    if (destRect.translated(shift) == sourceRect)
+        return {};
+
+    return shift;
+}
+
+bool AADLRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
+{
+    if (sceneGeometry == sceneBoundingRect())
+        return false;
+
+    /// Silent geometry change without relayouting
+    const QPointF shift = shiftChildren(sceneBoundingRect(), sceneGeometry);
+    setPos(mapToParent(mapFromScene(sceneGeometry.topLeft())));
+    if (!shift.isNull()) {
+        for (QGraphicsItem *child : childItems()) {
+            if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject()))
+                iObj->moveBy(shift.x(), shift.y());
+        }
+    }
+
+    if (m_boundingRect.size() != sceneGeometry.size()) {
+        prepareGeometryChange();
+        m_boundingRect.setSize(sceneGeometry.size());
+        Q_EMIT boundingBoxChanged();
+    }
+
+    updateGripPoints();
+    return true;
+}
+
 void AADLRectGraphicsItem::setRect(const QRectF &geometry)
 {
-    const QPointF geometryPos = parentItem() ? parentItem()->mapFromScene(geometry.topLeft()) : geometry.topLeft();
-    setPos(geometryPos);
-    prepareGeometryChange();
-    m_boundingRect = { QPointF(0, 0), geometry.size() };
-    instantLayoutUpdate();
-    updateGripPoints();
+    if (setGeometry(geometry))
+        instantLayoutUpdate();
 }
 
 void AADLRectGraphicsItem::initGripPoints()
@@ -135,7 +170,8 @@ void AADLRectGraphicsItem::updateFromEntity()
     else
         setRect(itemSceneRect);
 
-    updateGripPoints();
+    if (itemNeedsToBeRelayout())
+        layout();
 }
 
 QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams() const
@@ -149,12 +185,17 @@ QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams(
 
 void AADLRectGraphicsItem::rebuildLayout()
 {
+    const QRectF sceneRect = sceneBoundingRect();
     if (auto graphicsItemParent = parentItem()) {
         const QRectF parentRect = graphicsItemParent->sceneBoundingRect();
-        setVisible(parentRect.contains(sceneBoundingRect()));
+        setVisible(parentRect.contains(sceneRect));
     }
-    InteractiveObject::rebuildLayout();
+    for (auto child : childItems()) {
+        if (auto rectItem = qobject_cast<aadl::AADLRectGraphicsItem *>(child->toGraphicsObject()))
+            rectItem->setVisible(sceneRect.contains(rectItem->sceneBoundingRect()));
+    }
     updateGripPoints();
+    colorSchemeUpdated();
 }
 
 bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)
@@ -164,26 +205,20 @@ bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPoint
         return false;
 
     const QRectF currentBounds = sceneBoundingRect().marginsAdded(utils::kContentMargins);
-    if (!gi::canPlaceRect(scene(), this, currentBounds, gi::RectOperation::Edit)) {
-        // Fallback to previous geometry in case colliding with items at the same level
-        updateFromEntity();
-        return false;
-    }
-
-    return true;
+    return gi::canPlaceRect(scene(), this, currentBounds, gi::RectOperation::Edit);
 }
 
 void AADLRectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(grip)
-    Q_UNUSED(from)
 
-    if (!scene() || m_clickPos.isNull())
+    if (!scene())
         return;
 
-    QPointF newPos = mapToParent(mapFromScene(to) - m_clickPos);
+    const QPointF shift = QPointF(to - from);
+    QPointF newPos = scenePos() + shift;
     if (auto parentObj = qobject_cast<InteractiveObject *>(parentObject())) {
-        const QRectF contentRect = parentObj->boundingRect().marginsRemoved(
+        const QRectF contentRect = parentObj->sceneBoundingRect().marginsRemoved(
                 parentObj->aadlObject()->isRootObject() ? utils::kRootMargins : utils::kContentMargins);
 
         if (newPos.x() < contentRect.left())
@@ -196,46 +231,36 @@ void AADLRectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &
         else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
             newPos.setY(contentRect.bottom() - m_boundingRect.height());
     }
-    setPos(newPos);
-
-    //    rebuildLayout();
-    updateGripPoints();
-
-    //    Q_EMIT needUpdateLayout();
+    setRect(QRectF(newPos, m_boundingRect.size()));
 }
 
 void AADLRectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QRectF rect = adjustRectToParent(grip, from, to);
     if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height())
-        setRect(parentItem() ? parentItem()->mapRectToScene(rect) : rect);
-
-    //    rebuildLayout();
-    updateGripPoints();
-
-    //    Q_EMIT needUpdateLayout();
+        setRect(mapRectToScene(mapRectFromParent(rect)));
 }
 
 void AADLRectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
-
-    if (allowGeometryChange(pressedAt, releasedAt))
-        updateEntity();
-    else
-        updateFromEntity();
+    handleGeometryChange(pressedAt, releasedAt);
 }
 
 void AADLRectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
+    handleGeometryChange(pressedAt, releasedAt);
+}
 
+void AADLRectGraphicsItem::handleGeometryChange(const QPointF &pressedAt, const QPointF &releasedAt)
+{
     if (pressedAt == releasedAt)
         return;
 
     if (allowGeometryChange(pressedAt, releasedAt))
         updateEntity();
-    else
+    else // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
 }
 
@@ -267,6 +292,21 @@ void AADLRectGraphicsItem::singleStepMove(MoveStep direction)
     }
 
     shiftBy(shift);
+}
+
+QRectF AADLRectGraphicsItem::nestedItemsSceneBoundingRect() const
+{
+    QRectF nestedItemsBoundingRect;
+    for (auto item : childItems()) {
+        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+            const QRectF nestedRect = iObj->sceneBoundingRect();
+            if (nestedRect.isValid())
+                nestedItemsBoundingRect |= nestedRect;
+            else
+                qWarning() << iObj->aadlObject()->title();
+        }
+    }
+    return nestedItemsBoundingRect;
 }
 
 void AADLRectGraphicsItem::shiftBy(const QPointF &shift)
@@ -303,6 +343,105 @@ void AADLRectGraphicsItem::onGeometryChanged()
         item->doHighlighting(Qt::green, false);
 
     m_collidedItems = items;
+}
+
+static inline QRectF collidingItemsBoundingRect(QGraphicsItem *item, const QRectF &rect)
+{
+    QList<QGraphicsItem *> collidingItems = item->scene()->items(rect);
+    if (collidingItems.isEmpty())
+        return {};
+
+    QRectF br;
+    for (auto collidingItem : collidingItems)
+        if (auto rectItem = qgraphicsitem_cast<aadl::AADLRectGraphicsItem *>(collidingItem)) {
+            if (rectItem->parentItem() == item->parentItem() && rectItem != item) {
+                br |= rectItem->sceneBoundingRect();
+            }
+        }
+
+    return br;
+}
+
+static inline void findGeometryForItem(QGraphicsItem *item, QRectF &itemRect, QRectF &boundedRect)
+{
+    const QRectF collidedRect = collidingItemsBoundingRect(item, itemRect);
+    if (!collidedRect.isValid())
+        return;
+
+    if (boundedRect.right() - collidedRect.right() > itemRect.width()) {
+        itemRect.moveLeft(collidedRect.right() + kOffset);
+    } else if (boundedRect.bottom() - collidedRect.bottom() > itemRect.height()) {
+        itemRect.moveLeft(boundedRect.left());
+        itemRect.moveTop(collidedRect.bottom() + kOffset);
+    } else if (boundedRect.width() <= boundedRect.height()) {
+        itemRect.moveLeft(collidedRect.right() + kOffset);
+        boundedRect.setRight(itemRect.right());
+    } else {
+        itemRect.moveLeft(boundedRect.left());
+        itemRect.moveTop(collidedRect.bottom() + kOffset);
+        boundedRect.setBottom(itemRect.bottom());
+    }
+
+    return findGeometryForItem(item, itemRect, boundedRect);
+}
+
+void AADLRectGraphicsItem::layout()
+{
+    const QRectF currentSceneRect = sceneBoundingRect();
+    if (currentSceneRect.isValid()) {
+        const QRectF collidingRect = collidingItemsBoundingRect(this, currentSceneRect);
+        if (!collidingRect.isValid())
+            return;
+    }
+
+    auto parentFunction = qobject_cast<aadl::AADLRectGraphicsItem *>(parentObject());
+
+    static const QMarginsF kItemMargins = utils::kContentMargins;
+
+    static const QMarginsF kCurrentMargins = parentFunction && parentFunction->aadlObject()->isRootObject()
+            ? utils::kRootMargins
+            : utils::kContentMargins;
+
+    QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect())
+                                 .marginsRemoved(kCurrentMargins);
+    QRectF itemRect = QRectF(QPointF(0, 0), utils::DefaultGraphicsItemSize).marginsAdded(kItemMargins);
+    itemRect.moveTopLeft(boundedRect.topLeft());
+
+    findGeometryForItem(this, itemRect, boundedRect);
+    setRect(itemRect.marginsRemoved(kItemMargins));
+    mergeGeometry();
+}
+
+bool AADLRectGraphicsItem::itemNeedsToBeRelayout() const
+{
+    const QRectF currentRect = sceneBoundingRect();
+    if (!currentRect.isValid())
+        return true;
+
+    const QRectF currentExpandedRect = currentRect.marginsAdded(utils::kContentMargins);
+
+    if (auto iObj = qobject_cast<aadl::InteractiveObject *>(parentObject())) {
+        Q_ASSERT(iObj->sceneBoundingRect().isValid());
+        if (!iObj->aadlObject()->isRootObject() && !iObj->sceneBoundingRect().contains(currentExpandedRect)) {
+            return true;
+        }
+    }
+
+    for (auto item : scene()->items(currentExpandedRect)) {
+        if (item == this || item->parentItem() != parentItem())
+            continue;
+
+        if (auto iObj = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+            const QRectF itemRect = iObj->sceneBoundingRect();
+            if (!itemRect.isValid())
+                continue;
+
+            if (currentExpandedRect.intersects(itemRect))
+                return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace aadl

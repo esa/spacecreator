@@ -121,13 +121,7 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     }
 }
 
-void InteractiveObject::rebuildLayout()
-{
-    for (auto item : childItems()) {
-        if (auto iObj = dynamic_cast<InteractiveObject *>(item))
-            iObj->instantLayoutUpdate();
-    }
-}
+void InteractiveObject::rebuildLayout() {}
 
 QFont InteractiveObject::font() const
 {
@@ -162,7 +156,7 @@ void InteractiveObject::mergeGeometry()
     const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
     const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
     if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
-        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeWith(autolayoutCmd);
+        const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
     else
         delete autolayoutCmd;
 }
@@ -230,8 +224,7 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void InteractiveObject::onManualMoveStart(GripPoint *gp, const QPointF &at)
 {
     Q_UNUSED(gp)
-
-    m_clickPos = mapFromScene(at);
+    Q_UNUSED(at)
 }
 
 void InteractiveObject::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
@@ -246,8 +239,6 @@ void InteractiveObject::onManualMoveFinish(GripPoint *gp, const QPointF &pressed
     Q_UNUSED(gp)
     Q_UNUSED(pressedAt)
     Q_UNUSED(releasedAt)
-
-    m_clickPos = QPointF();
 }
 
 void InteractiveObject::onManualGripPointAdd(GripPoint *gp)
@@ -298,7 +289,7 @@ void InteractiveObject::initGripPoints()
         return;
 
     m_gripPointsHandler = new GripPointsHandler(this);
-    m_gripPointsHandler->setZValue(0);
+    m_gripPointsHandler->setZValue(utils::kGripZLevel);
 
     connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,
             &InteractiveObject::gripPointPressed);
@@ -427,12 +418,12 @@ void InteractiveObject::scheduleLayoutUpdate()
 
 void InteractiveObject::instantLayoutUpdate()
 {
-    const QRectF oldBounds = boundingRect();
+    const QRectF oldBounds = sceneBoundingRect();
 
     rebuildLayout();
     m_layoutDirty = false;
 
-    if (oldBounds != boundingRect())
+    if (oldBounds != sceneBoundingRect())
         Q_EMIT boundingBoxChanged();
 
     update();

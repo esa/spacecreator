@@ -166,6 +166,15 @@ QWidget *InterfaceTabDocument::createView()
                 dumpItem(item->toGraphicsObject(), true);
             }
         });
+        sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_L), qobject_cast<QWidget *>(m_graphicsView->window()));
+        sc->setContext(Qt::ApplicationShortcut);
+        connect(sc, &QShortcut::activated, this, [this]() {
+            auto selectedItems = m_graphicsScene->selectedItems();
+            for (auto item : selectedItems) {
+                if (auto funcItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item))
+                    funcItem->layout();
+            }
+        });
     }
     m_graphicsView->setScene(m_graphicsScene);
     updateSceneRect();
@@ -532,10 +541,20 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         return nullptr;
 
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
+    auto nestedGeomtryConnect = [](QGraphicsItem *parentItem, aadl::InteractiveObject *child) {
+        if (parentItem) {
+            if (auto iObjParent = qobject_cast<aadl::InteractiveObject *>(parentItem->toGraphicsObject()))
+                connect(child, &aadl::InteractiveObject::boundingBoxChanged, iObjParent,
+                        &aadl::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+        }
+    };
 
     switch (obj->aadlType()) {
-    case aadl::AADLObject::Type::Comment:
-        return new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
+    case aadl::AADLObject::Type::Comment: {
+        auto comment = new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
+        nestedGeomtryConnect(parentItem, comment);
+        return comment;
+    } break;
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
         return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
@@ -552,10 +571,17 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
             return new aadl::AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
-    case aadl::AADLObject::Type::Function:
-        return new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
-    case aadl::AADLObject::Type::FunctionType:
-        return new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+    case aadl::AADLObject::Type::Function: {
+        auto function = new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+        nestedGeomtryConnect(parentItem, function);
+        return function;
+    } break;
+    case aadl::AADLObject::Type::FunctionType: {
+        auto functionType =
+                new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+        nestedGeomtryConnect(parentItem, functionType);
+        return functionType;
+    } break;
     default: {
         qCritical() << "Unknown object type:" << obj->aadlType();
         break;
@@ -658,18 +684,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
         return obj1->aadlType() < obj2->aadlType();
     });
 
-    auto firstNonFunctionEntity = std::find_if(objects.cbegin(), objects.cend(), [](aadl::AADLObject *obj) {
-        return obj->aadlType() != aadl::AADLObject::Type::Function
-                && obj->aadlType() != aadl::AADLObject::Type::FunctionType;
-    });
-
-    for (auto it = objects.cbegin(); it != firstNonFunctionEntity; ++it)
-        onAADLObjectAdded(*it);
-
-    if (auto rootGraphicsItem = rootItem())
-        rootGraphicsItem->instantLayoutUpdate();
-
-    for (auto it = firstNonFunctionEntity; it != objects.cend(); ++it)
+    for (auto it = objects.cbegin(); it != objects.cend(); ++it)
         onAADLObjectAdded(*it);
 
     updateSceneRect();

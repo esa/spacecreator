@@ -27,7 +27,7 @@ class AADLRectGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentItem = nullptr);
+    explicit AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);
@@ -43,9 +43,10 @@ public:
         Down = Qt::Key_Down
     };
     void singleStepMove(MoveStep direction);
-
-private Q_SLOTS:
-    void onGeometryChanged();
+    /// PUBLIC FOR TESTING PURPOSE, MOVE TO PRIVATE
+    QRectF nestedItemsSceneBoundingRect() const;
+    bool itemNeedsToBeRelayout() const;
+    void layout();
 
 protected:
     void rebuildLayout() override;
@@ -57,6 +58,12 @@ protected:
 
     QRectF adjustRectToParent(GripPoint *grip, const QPointF &from, const QPointF &to);
     bool allowGeometryChange(const QPointF &from, const QPointF &to);
+
+    bool setGeometry(const QRectF &sceneGeometry);
+    void handleGeometryChange(const QPointF &from, const QPointF &releasedAt);
+
+private Q_SLOTS:
+    void onGeometryChanged();
     void shiftBy(const QPointF &shift);
 
 private:
