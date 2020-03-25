@@ -14,6 +14,7 @@
         <file>icns/function_type.svg</file>
         <file>icns/exit.svg</file>
         <file>icns/exit_parent.svg</file>
+        <file>icns/change_root.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>colors/default_colors.json</file>

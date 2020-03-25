@@ -58,7 +58,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
 
     colorSchemeUpdated();
     if (!m_svgRenderer) // TODO: change icon
-        m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/exit_parent.svg"));
+        m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
 
 AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
