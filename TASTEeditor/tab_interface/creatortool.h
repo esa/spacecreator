@@ -26,6 +26,7 @@
 #include <QVector>
 
 class QMouseEvent;
+class QContextMenuEvent;
 class QGraphicsView;
 class QGraphicsRectItem;
 class QGraphicsPathItem;
@@ -79,6 +80,7 @@ protected:
     virtual bool onMousePress(QMouseEvent *e);
     virtual bool onMouseRelease(QMouseEvent *e);
     virtual bool onMouseMove(QMouseEvent *e);
+    virtual bool onContextMenu(QContextMenuEvent *e);
 
     QPointF cursorInScene() const;
     QPointF cursorInScene(const QPoint &screenPos) const;
@@ -102,6 +104,8 @@ private:
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
 
     bool warnConnectionPreview(const QPointF &pos);
+
+    bool showContextMenu(const QPoint &globalPos);
 
 private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
