@@ -56,7 +56,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
     m_textItem->setVisible(!isRootItem());
     m_textItem->setTextAlignment(Qt::AlignCenter);
 
-    colorSchemeUpdated();
+    applyColorScheme();
     if (!m_svgRenderer) // TODO: change icon
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
@@ -164,10 +164,10 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
     // NOTE: According to the documentation, a child might not be fully constructed, so
     // the UI doesn't need an immediate update of the "nested" icon. That's why the delayed invocation used here.
     if (needUpdateNestedIcon)
-        // the updateNestedIcon also calls the colorSchemeUpdated
+        // the updateNestedIcon also calls the applyColorScheme
         QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
     else if (needUpdateColor)
-        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::colorSchemeUpdated, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::applyColorScheme, Qt::QueuedConnection);
 
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
@@ -288,7 +288,7 @@ ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
     return ColorManager::HandledColors::FunctionRegular;
 }
 
-void AADLFunctionGraphicsItem::colorSchemeUpdated()
+void AADLFunctionGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     QPen p = h.pen();
@@ -315,7 +315,7 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
     for (auto child : childItems())
         if (child->type() == AADLFunctionGraphicsItem::Type)
             if (auto nestedFunction = qobject_cast<AADLFunctionGraphicsItem *>(child->toGraphicsObject()))
-                nestedFunction->colorSchemeUpdated();
+                nestedFunction->applyColorScheme();
 
     update();
 }
@@ -323,7 +323,7 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 void AADLFunctionGraphicsItem::updateNestedIcon()
 {
     m_hasNestedItems = entity() && entity()->hasNestedChildren();
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const

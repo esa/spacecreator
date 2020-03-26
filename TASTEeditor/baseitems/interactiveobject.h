@@ -86,7 +86,7 @@ Q_SIGNALS:
     void doubleClicked();
 
 public Q_SLOTS:
-    virtual void colorSchemeUpdated() = 0;
+    virtual void applyColorScheme() = 0;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;

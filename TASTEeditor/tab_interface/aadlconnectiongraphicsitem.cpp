@@ -295,7 +295,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
              | QGraphicsItem::ItemContainsChildrenInShape);
     setZValue(utils::kConnectionZLevel);
 
-    colorSchemeUpdated();
+    applyColorScheme();
 
     updateInterfaceConnectionsReference(IfaceConnectionReference::Set);
 }
@@ -639,7 +639,7 @@ ColorManager::HandledColors AADLConnectionGraphicsItem::handledColorType() const
     return ColorManager::HandledColors::Connection;
 }
 
-void AADLConnectionGraphicsItem::colorSchemeUpdated()
+void AADLConnectionGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     m_item->setPen(h.pen());

@@ -195,7 +195,7 @@ void AADLRectGraphicsItem::rebuildLayout()
             rectItem->setVisible(sceneRect.contains(rectItem->sceneBoundingRect()));
     }
     updateGripPoints();
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)

@@ -47,7 +47,7 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGr
     setFont(QFont(qApp->font()));
     setZValue(utils::kCommentZLevel);
 
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 void AADLCommentGraphicsItem::updateFromEntity()
@@ -154,7 +154,7 @@ void AADLCommentGraphicsItem::updateTextLayout(const QString &text)
     m_textLayout->endLayout();
 }
 
-void AADLCommentGraphicsItem::colorSchemeUpdated()
+void AADLCommentGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     QPen pen = h.pen();
