@@ -37,12 +37,10 @@ class ConnectionCreationValidator
 
 public:
     static const qreal kInterfaceTolerance;
-    static const qreal kConnectionTolerance;
 
     enum class FailReason
     {
         NotFail = 0,
-        NoPreviewItem,
         IsFunctionType,
         MulticastDisabled,
         KindDiffer,
@@ -95,8 +93,10 @@ public:
 private:
     ConnectionCreationValidator();
 
-    static ConnectionCreationValidator::ValidationResult validateCreate(QGraphicsScene *scene,
-                                                                        const QVector<QPointF> &connectionPoints);
+    static ConnectionCreationValidator::ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &startPos,
+                                                                        const QPointF &lastPos);
+    static ConnectionCreationValidator::FailReason checkKindAndParams(AADLObjectIface *sourceIface,
+                                                                      AADLObjectIface *targetIface);
 };
 
 typedef ConnectionCreationValidator::ValidationResult ConnectionInfo;
