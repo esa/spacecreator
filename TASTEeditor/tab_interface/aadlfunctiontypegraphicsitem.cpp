@@ -84,7 +84,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
         });
         connect(m_textItem, &AADLFunctionNameGraphicsItem::editingModeOff, this, [this]() { updateTextPosition(); });
     }
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
@@ -146,7 +146,7 @@ ColorManager::HandledColors AADLFunctionTypeGraphicsItem::handledColorType() con
     return ColorManager::HandledColors::FunctionType;
 }
 
-void AADLFunctionTypeGraphicsItem::colorSchemeUpdated()
+void AADLFunctionTypeGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     setPen(h.pen());

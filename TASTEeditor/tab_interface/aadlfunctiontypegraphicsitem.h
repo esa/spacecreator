@@ -43,7 +43,7 @@ public:
     QString prepareTooltip() const override;
 
 protected Q_SLOTS:
-    void colorSchemeUpdated() override;
+    void applyColorScheme() override;
 
 protected:
     void rebuildLayout() override;

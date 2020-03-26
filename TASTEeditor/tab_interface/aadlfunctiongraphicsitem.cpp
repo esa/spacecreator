@@ -56,7 +56,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
     m_textItem->setVisible(!isRootItem());
     m_textItem->setTextAlignment(Qt::AlignCenter);
 
-    colorSchemeUpdated();
+    applyColorScheme();
     if (!m_svgRenderer) // TODO: change icon
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
@@ -143,15 +143,32 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
 
 QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-    if (change == QGraphicsItem::ItemParentHasChanged) {
+    bool needUpdateColor(false);
+    bool needUpdateNestedIcon(false);
+    switch (change) {
+    case QGraphicsItem::ItemParentHasChanged: {
         m_textItem->setVisible(!isRootItem());
-        colorSchemeUpdated();
-    } else if ((change == QGraphicsItem::ItemChildAddedChange || change == QGraphicsItem::ItemChildRemovedChange)
-               && !isRootItem()) {
-        // NOTE: According to documentation child might not be fully constructed and
-        // UI doesn't need immidate update of nested icon. That's why delayed invokation is used here
-        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
+        needUpdateColor = true;
+        break;
     }
+    case QGraphicsItem::ItemChildAddedChange:
+    case QGraphicsItem::ItemChildRemovedChange: {
+        needUpdateColor = true;
+        needUpdateNestedIcon = !isRootItem();
+        break;
+    }
+    default:
+        break;
+    }
+
+    // NOTE: According to the documentation, a child might not be fully constructed, so
+    // the UI doesn't need an immediate update of the "nested" icon. That's why the delayed invocation used here.
+    if (needUpdateNestedIcon)
+        // the updateNestedIcon also calls the applyColorScheme
+        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
+    else if (needUpdateColor)
+        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::applyColorScheme, Qt::QueuedConnection);
+
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
@@ -271,7 +288,7 @@ ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
     return ColorManager::HandledColors::FunctionRegular;
 }
 
-void AADLFunctionGraphicsItem::colorSchemeUpdated()
+void AADLFunctionGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     QPen p = h.pen();
@@ -279,14 +296,26 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
         if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")
-            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) {
+            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }
     }
 
+    if (pen() == p && brush() == b)
+        return;
+
     setPen(p);
     setBrush(b);
+
+    // During undo, a child can be updated before its parent,
+    // so on the step marked as [Hm...] above, the parent is still of type FunctionPartial and not the FunctionRegular.
+    // Thus, the child gets the "default" colour, instead of "parent.darker".
+    // For now, I can't see a better way but just to update children colours manually:
+    for (auto child : childItems())
+        if (child->type() == AADLFunctionGraphicsItem::Type)
+            if (auto nestedFunction = qobject_cast<AADLFunctionGraphicsItem *>(child->toGraphicsObject()))
+                nestedFunction->applyColorScheme();
 
     update();
 }
@@ -294,7 +323,7 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 void AADLFunctionGraphicsItem::updateNestedIcon()
 {
     m_hasNestedItems = entity() && entity()->hasNestedChildren();
-    update();
+    applyColorScheme();
 }
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const

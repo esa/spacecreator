@@ -67,7 +67,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity))
         connect(ri, &AADLObjectIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
 
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
@@ -411,7 +411,7 @@ ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
     return ColorManager::HandledColors::Iface;
 }
 
-void AADLInterfaceGraphicsItem::colorSchemeUpdated()
+void AADLInterfaceGraphicsItem::applyColorScheme()
 {
     const ColorHandler &h = colorHandler();
     QPen pen = h.pen();

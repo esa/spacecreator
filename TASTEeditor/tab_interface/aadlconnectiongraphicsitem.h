@@ -84,7 +84,7 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const override;
 
 protected Q_SLOTS:
-    virtual void colorSchemeUpdated() override;
+    virtual void applyColorScheme() override;
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 

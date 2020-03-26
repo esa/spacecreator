@@ -50,7 +50,7 @@ InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
 
     setCursor(Qt::ArrowCursor);
 
-    connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::colorSchemeUpdated);
+    connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::applyColorScheme);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

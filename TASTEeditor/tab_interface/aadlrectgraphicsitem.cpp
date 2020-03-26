@@ -195,7 +195,7 @@ void AADLRectGraphicsItem::rebuildLayout()
             rectItem->setVisible(sceneRect.contains(rectItem->sceneBoundingRect()));
     }
     updateGripPoints();
-    colorSchemeUpdated();
+    applyColorScheme();
 }
 
 bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPointF &to)
@@ -303,7 +303,7 @@ QRectF AADLRectGraphicsItem::nestedItemsSceneBoundingRect() const
             if (nestedRect.isValid())
                 nestedItemsBoundingRect |= nestedRect;
             else
-                qWarning() << iObj->aadlObject()->title();
+                qWarning() << iObj->aadlObject()->title() << nestedRect;
         }
     }
     return nestedItemsBoundingRect;

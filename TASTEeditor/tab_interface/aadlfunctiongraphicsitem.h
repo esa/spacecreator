@@ -60,7 +60,7 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const override;
 
 protected Q_SLOTS:
-    void colorSchemeUpdated() override;
+    void applyColorScheme() override;
 
 private:
     Q_INVOKABLE void updateNestedIcon();

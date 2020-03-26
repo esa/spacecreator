@@ -44,7 +44,7 @@ public:
     void updateFromEntity() override;
 
 protected Q_SLOTS:
-    virtual void colorSchemeUpdated() override;
+    virtual void applyColorScheme() override;
 
 protected:
     void rebuildLayout() override;
