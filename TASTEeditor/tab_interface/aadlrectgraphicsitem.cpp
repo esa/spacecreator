@@ -303,7 +303,7 @@ QRectF AADLRectGraphicsItem::nestedItemsSceneBoundingRect() const
             if (nestedRect.isValid())
                 nestedItemsBoundingRect |= nestedRect;
             else
-                qWarning() << iObj->aadlObject()->title();
+                qWarning() << iObj->aadlObject()->title() << nestedRect;
         }
     }
     return nestedItemsBoundingRect;
