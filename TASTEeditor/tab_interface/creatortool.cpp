@@ -221,7 +221,7 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
         return false;
 
     if (m_toolType == ToolType::Pointer) {
-        if ((e->button() & Qt::RightButton) && e->modifiers() == Qt::NoModifier)
+        if ((e->button() & Qt::RightButton) && m_previewItem)
             return showContextMenu(e->globalPos());
     } else {
         const bool hasPreview = m_previewItem || m_previewConnectionItem;
