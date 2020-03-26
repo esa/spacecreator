@@ -85,7 +85,7 @@ Q_SIGNALS:
     void clicked();
     void doubleClicked();
 
-protected Q_SLOTS:
+public Q_SLOTS:
     virtual void colorSchemeUpdated() = 0;
 
 protected:

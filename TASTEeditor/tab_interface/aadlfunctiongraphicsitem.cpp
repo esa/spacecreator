@@ -296,14 +296,26 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
         if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")
-            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) {
+            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }
     }
 
+    if (pen() == p && brush() == b)
+        return;
+
     setPen(p);
     setBrush(b);
+
+    // During undo, a child can be updated before its parent,
+    // so on the step marked as [Hm...] above, the parent is still of type FunctionPartial and not the FunctionRegular.
+    // Thus, the child gets the "default" colour, instead of "parent.darker".
+    // For now, I can't see a better way but just to update children colours manually:
+    for (auto child : childItems())
+        if (child->type() == AADLFunctionGraphicsItem::Type)
+            if (auto nestedFunction = qobject_cast<AADLFunctionGraphicsItem *>(child->toGraphicsObject()))
+                nestedFunction->colorSchemeUpdated();
 
     update();
 }
