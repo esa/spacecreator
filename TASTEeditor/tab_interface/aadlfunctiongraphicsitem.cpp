@@ -143,15 +143,32 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
 
 QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-    if (change == QGraphicsItem::ItemParentHasChanged) {
+    bool needUpdateColor(false);
+    bool needUpdateNestedIcon(false);
+    switch (change) {
+    case QGraphicsItem::ItemParentHasChanged: {
         m_textItem->setVisible(!isRootItem());
-        colorSchemeUpdated();
-    } else if ((change == QGraphicsItem::ItemChildAddedChange || change == QGraphicsItem::ItemChildRemovedChange)
-               && !isRootItem()) {
-        // NOTE: According to documentation child might not be fully constructed and
-        // UI doesn't need immidate update of nested icon. That's why delayed invokation is used here
-        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
+        needUpdateColor = true;
+        break;
     }
+    case QGraphicsItem::ItemChildAddedChange:
+    case QGraphicsItem::ItemChildRemovedChange: {
+        needUpdateColor = true;
+        needUpdateNestedIcon = !isRootItem();
+        break;
+    }
+    default:
+        break;
+    }
+
+    // NOTE: According to the documentation, a child might not be fully constructed, so
+    // the UI doesn't need an immediate update of the "nested" icon. That's why the delayed invocation used here.
+    if (needUpdateNestedIcon)
+        // the updateNestedIcon also calls the colorSchemeUpdated
+        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::updateNestedIcon, Qt::QueuedConnection);
+    else if (needUpdateColor)
+        QMetaObject::invokeMethod(this, &AADLFunctionGraphicsItem::colorSchemeUpdated, Qt::QueuedConnection);
+
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
@@ -294,7 +311,7 @@ void AADLFunctionGraphicsItem::colorSchemeUpdated()
 void AADLFunctionGraphicsItem::updateNestedIcon()
 {
     m_hasNestedItems = entity() && entity()->hasNestedChildren();
-    update();
+    colorSchemeUpdated();
 }
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
