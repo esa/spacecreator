@@ -166,7 +166,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kConnectionTolerance,
+        QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance,
                                                  { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
             if (!item)
@@ -249,19 +249,21 @@ bool CreatorTool::onMouseMove(QMouseEvent *e)
         QSet<InteractiveObject *> items;
         const QRectF expandedGeometry { newGeometry.marginsAdded(utils::kContentMargins) };
         QList<QGraphicsItem *> newCollidedItems = m_view->scene()->items(expandedGeometry);
-        std::for_each(newCollidedItems.begin(), newCollidedItems.end(), [this, &items, expandedGeometry](QGraphicsItem *item) {
-            if (item->type() == AADLInterfaceGraphicsItem::Type || item->type() == m_previewItem->type())
-                return;
+        std::for_each(newCollidedItems.begin(), newCollidedItems.end(),
+                      [this, &items, expandedGeometry](QGraphicsItem *item) {
+                          if (item->type() == AADLInterfaceGraphicsItem::Type || item->type() == m_previewItem->type())
+                              return;
 
-            auto iObjItem = qobject_cast<InteractiveObject *>(item->toGraphicsObject());
-            if (!iObjItem)
-                return;
+                          auto iObjItem = qobject_cast<InteractiveObject *>(item->toGraphicsObject());
+                          if (!iObjItem)
+                              return;
 
-            if (item->parentItem() == m_previewItem->parentItem()
-                || (m_previewItem->parentItem() == item && !item->sceneBoundingRect().contains(expandedGeometry))) {
-                items.insert(iObjItem);
-            }
-        });
+                          if (item->parentItem() == m_previewItem->parentItem()
+                              || (m_previewItem->parentItem() == item
+                                  && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                              items.insert(iObjItem);
+                          }
+                      });
         QSet<InteractiveObject *> newItems(items);
         newItems.subtract(m_collidedItems);
         for (auto item : newItems)
@@ -626,7 +628,7 @@ bool CreatorTool::handleConnectionCreate(const QPointF &pos)
     QPointF alignedPos { pos };
     if (m_connectionPoints.size() > 2) {
         if (QGraphicsItem *itemUnderCursor =
-                    utils::nearestItem(scene, pos, ConnectionCreationValidator::kConnectionTolerance,
+                    utils::nearestItem(scene, pos, ConnectionCreationValidator::kInterfaceTolerance,
                                        { AADLInterfaceGraphicsItem::Type })) {
 
             const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
@@ -797,7 +799,7 @@ void CreatorTool::removeSelectedItems()
 
 void CreatorTool::clearPreviewItem()
 {
-    for (auto iObj: m_collidedItems)
+    for (auto iObj : m_collidedItems)
         iObj->highlightConnected();
     m_collidedItems.clear();
 
