@@ -30,7 +30,6 @@ namespace taste3 {
 namespace document {
 
 struct AbstractTabDocumentPrivate;
-
 class AbstractTabDocument : public QObject
 {
     Q_OBJECT
@@ -38,7 +37,7 @@ public:
     explicit AbstractTabDocument(QObject *parent = nullptr);
     virtual ~AbstractTabDocument();
 
-    void init();
+    virtual void init();
 
     void fillToolBar(QToolBar *toolBar);
 
@@ -62,7 +61,6 @@ public:
     // Return nullptr if the doc does not need any menu
     virtual QMenu *customMenu() const;
 
-    void resetDirtyness();
 Q_SIGNALS:
     void dirtyChanged(bool dirty) const;
 
@@ -73,14 +71,15 @@ protected Q_SLOTS:
     void updateDirtyness();
 
 protected:
+    void resetDirtyness();
+    void setupScene(QGraphicsScene *scene);
+    void setupView(QWidget *view);
+
     virtual bool createImpl(const QString &path = QString());
     virtual bool loadImpl(const QString &path) = 0;
     virtual bool saveImpl(const QString &path) = 0;
-    virtual void closeImpl();
+    virtual void closeImpl() = 0;
     virtual QVector<QAction *> initActions() = 0;
-
-    void setupScene(QGraphicsScene *scene);
-    void setupView(QWidget *view);
 
     virtual QWidget *createView() = 0;
     virtual QGraphicsScene *createScene() = 0;

@@ -28,6 +28,12 @@
 namespace taste3 {
 namespace ctx {
 
+/*!
+ * \class ExtProcMonitor
+ *
+ * \brief The GUI for external application, launched by scriptable taste3::ctx::Action.
+ */
+
 ExtProcMonitor::ExtProcMonitor(QWidget *parent)
     : QWidget(parent, Qt::Dialog)
     , m_display(new QTextBrowser(this))

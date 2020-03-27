@@ -25,6 +25,11 @@ namespace taste3 {
 
 const QLatin1Char ZoomValidator::ZoomSuffix = QLatin1Char('%');
 
+/*!
+ * \class taste3::ZoomValidator
+ * \brief validator used in ZoomController's combo box.
+ * \sa ZoomController
+ */
 ZoomValidator::ZoomValidator(QObject *parent)
     : QValidator(parent)
     , m_validator(new QIntValidator(this))
@@ -76,6 +81,11 @@ void ZoomValidator::setTop(int top)
     m_validator->setTop(top);
 }
 
+/*!
+ * \class taste3::ZoomController
+ * \brief Control to change, reset and display the zoom level of the graphics scene. Uses editable combo box.
+ * \sa ZoomValidator
+ */
 ZoomController::ZoomController(QWidget *parent)
     : QWidget(parent)
     , m_combo(new QComboBox(this))

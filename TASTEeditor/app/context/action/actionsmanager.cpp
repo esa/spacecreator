@@ -44,6 +44,12 @@
 namespace taste3 {
 namespace ctx {
 
+/*!
+ *\class taste3::ctx::ActionsManager
+ * \brief The application wide manager for sriptable actions.
+ * Used to: store action instances in runtime, deploy the default file from resources (if necessary), populate the
+ *context menu and to actually invoke the internal QAction or external application.
+ */
 ActionsManager *ActionsManager::m_instance = nullptr;
 
 const QVector<ActionsManager::ExternalArgHolder> ActionsManager::externalArgs = {
@@ -54,6 +60,10 @@ const QVector<ActionsManager::ExternalArgHolder> ActionsManager::externalArgs = 
       ExternalArgHolder::Type::Param },
 };
 
+/*!
+ * Returns path to a dir that contains custom actions descriptions.
+ * The value is something like ~/.local/share/TASTE Editor 3.0/contextMenu
+ */
 QString ActionsManager::storagePath()
 {
     static const QString targetDir =
@@ -61,6 +71,11 @@ QString ActionsManager::storagePath()
     return targetDir;
 };
 
+/*!
+ * \brief ActionsManager::populateMenu
+ * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
+ * Initiates connection from QAction to the related handler slot.
+ */
 void ActionsManager::populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj)
 {
     if (!menu)
@@ -185,6 +200,12 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
     return res;
 }
 
+/*!
+ * \brief ActionsManager::registerScriptableAction
+ * Marks the \a action as scriptable and makes it available by \a key.
+ * The \a description is optional.
+ * Returns \c false if \a action is null, the \a key is empty already used.
+ */
 bool ActionsManager::registerScriptableAction(QAction *action, const QString &key, const QString &description)
 {
     if (!action || key.isEmpty() || instance()->m_qactions.contains(key))
@@ -222,6 +243,11 @@ QStringList ActionsManager::scriptableActionNames()
     return scriptableActions().keys();
 }
 
+/*!
+ * \brief ActionsManager::triggerActionInternal
+ * Handler for "internal" actions. Triggers a QAction previousely registered with
+ * ActionsManager::registerScriptableAction()
+ */
 void ActionsManager::triggerActionInternal(const Action &act)
 {
     const QMap<QString, ctx::ActionsManager::ScriptableActionHandler> &actions =
@@ -295,6 +321,13 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl
     return QString(); // clear the placeholder if no data found
 }
 
+/*!
+ * \brief ActionsManager::triggerActionExternal
+ * Handler for "external" actions.
+ * Used to launch the external process with arguments, both are from \a act.
+ * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
+ * Creates and shows an instance of ExtProcMonitor.
+ */
 void ActionsManager::triggerActionExternal(const Action &act, const taste3::aadl::AADLObject *aadlObj)
 {
     if (!act.m_externalApp.isEmpty()) {

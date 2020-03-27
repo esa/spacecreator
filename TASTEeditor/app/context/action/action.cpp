@@ -24,6 +24,14 @@
 namespace taste3 {
 namespace ctx {
 
+/*!
+ * \class taste3::ctx::Action
+ * \brief Scriptable acction used to customize the context menu.
+ * Contains its UI title, the title of target applicaiton action or external application and its arguments,
+ * the list of conditions to detect if this action can be invoked or not.
+ * Stored in JSON.
+ */
+
 static const QString JSON_FIELD_NAME_Title = "title";
 // static const QString JSON_FIELD_NAME_Tabs = "tabs";
 static const QString JSON_FIELD_NAME_Conditions = "conditions";

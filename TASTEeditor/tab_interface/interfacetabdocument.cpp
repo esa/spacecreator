@@ -124,6 +124,13 @@ static inline void dumpItem(QObject *obj, bool strict = false)
     }
 }
 
+/*!
+\class taste3::document::InterfaceTabDocument
+\brief taste3::document::InterfaceTabDocument is the document for graphical AADL data (loaded from the XML).
+
+\sa taste3::document::AbstractTabDocument, taste3::document::TabDocumentFactory, taste3::document::DocumentsManager
+*/
+
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
     : AbstractTabDocument(parent)
     , m_model(new aadl::AADLObjectsModel(this))
@@ -541,11 +548,11 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         return nullptr;
 
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
-    auto nestedGeomtryConnect = [](QGraphicsItem *parentItem, aadl::InteractiveObject *child) {
+    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, aadl::InteractiveObject *child) {
         if (parentItem) {
             if (auto iObjParent = qobject_cast<aadl::InteractiveObject *>(parentItem->toGraphicsObject()))
-                connect(child, &aadl::InteractiveObject::boundingBoxChanged, iObjParent,
-                        &aadl::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+                this->connect(child, &aadl::InteractiveObject::boundingBoxChanged, iObjParent,
+                              &aadl::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
         }
     };
 

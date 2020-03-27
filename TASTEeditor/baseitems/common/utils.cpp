@@ -35,25 +35,15 @@
 namespace taste3 {
 namespace utils {
 
-QPainterPath lineShape(const QLineF &line, qreal span)
-{
-    QPainterPath result;
+/*!
+ * \namespace taste3::utils
+ * \brief   Graphical, math and other utils, shared among all submodules.
+ */
 
-    QLineF normalSpan(line.normalVector());
-    normalSpan.setLength(span);
-
-    const QPointF delta = line.p1() - normalSpan.p2();
-    const QLineF dec(line.translated(delta));
-    const QLineF inc(line.translated(-delta));
-
-    result.moveTo(dec.p1());
-    result.lineTo(dec.p2());
-    result.lineTo(inc.p2());
-    result.lineTo(inc.p1());
-
-    return result;
-}
-
+/*!
+ * \brief Helper to calc the center of the \a line to be used with Qt < 5.8
+ * Returns coordinates in the QPointF.
+ */
 QPointF lineCenter(const QLineF &line)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
@@ -63,16 +53,10 @@ QPointF lineCenter(const QLineF &line)
 #endif
 }
 
-QPointF pointFromPath(const QPainterPath &path, int num)
-{
-    QPointF result;
-    if (!path.isEmpty()) {
-        num = qBound(0, num, path.elementCount() - 1);
-        result = path.elementAt(num);
-    }
-    return result;
-}
-
+/*!
+ * \brief The animation creation helper.
+ * \sa HighlightRectItem
+ */
 QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
                                           const QVariant &to, const int durationMs)
 {
@@ -86,16 +70,11 @@ QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propNa
     return anim;
 }
 
-QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance)
-{
-    QPointF result(source);
-    const QLineF delta(source, target);
-    if (qAbs(delta.dx()) <= tolerance) {
-        result.rx() += delta.dx();
-    }
-    return result;
-}
-
+/*!
+ * \brief Helper to detect if the \a line intersects the \a rect.
+ * Coordinates of the intersection point stored in \a intersctPos.
+ * Returns \c true if \a rect and \a line are not null and intersected.
+ */
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
 {
     if (rect.isNull() || line.isNull())
@@ -116,6 +95,10 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
     return false;
 }
 
+/*!
+ * \brief Helper to detect if each sub segment of the \a polygon intersects the \a rect.
+ * Returns coordinates of intersection points.
+ */
 QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
 {
     if (rect.isNull() || polygon.isEmpty())
@@ -140,6 +123,14 @@ QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon
     return points;
 }
 
+/*!
+ * \brief Helper to detect if at least one sub segment of the \a polygon intersects the \a rect.
+ * Coordinates of the intersection point stored in \a intersctPos.
+ * Returns \c true if a sub segment of the \a polygon intersects the \a rect.
+ */
+/*!
+ * Returns coordinates of intersection points.
+ */
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
 {
     for (int idx = 1; idx < polygon.size(); ++idx) {
@@ -149,15 +140,9 @@ bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersect
     return false;
 }
 
-QRectF framedRect(const QRectF &rect, qreal frameWidth)
-{
-    if (qFuzzyIsNull(frameWidth))
-        return rect;
-
-    const qreal halfWidth = frameWidth / 2.;
-    return rect.adjusted(halfWidth, halfWidth, -halfWidth, -halfWidth);
-}
-
+/*!
+ * Returns the side type of \a boundingArea's which is most close to the \a pos.
+ */
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 {
     Qt::Alignment side = Qt::AlignCenter;
@@ -202,6 +187,10 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
     return side;
 }
 
+/*!
+ * \brief Adjusts appropriate coordinate of \a pos to the \a boundingArea side specificed by \a side.
+ * Returns the adjusted \a pos.
+ */
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
 {
     switch (side) {
@@ -218,6 +207,10 @@ QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alig
     return boundingArea.center();
 }
 
+/*!
+ * \brief Iterates over all \a scene items in the specificied \a pos and returns the first one which QGraphicsItem::type
+ * found in \a acceptableTypes list.
+ */
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes)
 {
     if (scene)
@@ -228,6 +221,10 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, cons
     return nullptr;
 }
 
+/*!
+ * \brief Iterates over all \a scene items in the specificied \a area and returns the first one which
+ * QGraphicsItem::type found in \a acceptableTypes list.
+ */
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
 {
     const QList<QGraphicsItem *> areaItems = scene->items(area);
@@ -260,6 +257,10 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, cons
     return nearestToCenter;
 }
 
+/*!
+ * \brief Iterates over all \a scene items in the square with center in \a center and the size of \a offset and returns
+ * the first one which QGraphicsItem::type found in \a acceptableTypes list.
+ */
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
                            const QList<int> &acceptableTypes)
 {
@@ -267,6 +268,11 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, q
     return nearestItem(scene, area, acceptableTypes);
 }
 
+/*!
+ * \fn taste3::utils::bool alignedLine(QLineF &line, int angleTolerance)
+ * \brief  Adjusts the angle of the \a line to the nearest x90 degrees ccw with \a angleTolerance.
+ * Returns true if the \a line's angle adjusted.
+ */
 bool alignedLine(QLineF &line, int angleTolerance)
 {
     if (line.isNull())
@@ -287,11 +293,17 @@ bool alignedLine(QLineF &line, int angleTolerance)
     return false;
 }
 
+/*!
+ * \brief Returns the distance between \a p1 and \a p2.
+ */
 qreal distanceLine(const QPointF &p1, const QPointF &p2)
 {
     return std::sqrt(std::pow((p2.x() - p1.x()), 2) + std::pow((p2.y() - p1.y()), 2));
 }
 
+/*!
+ * Returns the total length of all subsegments of \a polygon.
+ */
 qreal distancePolygon(const QVector<QPointF> &polygon)
 {
     qreal distance = 0;
@@ -300,6 +312,9 @@ qreal distancePolygon(const QVector<QPointF> &polygon)
     return distance;
 }
 
+/*!
+ * Returns the list of \a area corner points, sorted by minimal distance between the corner and \a point1 or \a point2.
+ */
 QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2)
 {
     QList<QPointF> rectPoints { area.topLeft(), area.topRight(), area.bottomLeft(), area.bottomRight() };
@@ -309,18 +324,10 @@ QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QP
     return rectPoints;
 }
 
-bool isOnEdge(const QRectF &rect, const QPointF &point)
-{
-    const bool isHorizontalEdge = qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y());
-    const bool isVericalEdge = qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x());
-
-    const bool isHorBounded = rect.left() < point.x() && rect.right() < point.x();
-    const bool isVerBounded = rect.top() < point.y() && rect.bottom() < point.y();
-
-    return (isHorizontalEdge && (isVericalEdge || isHorBounded))
-            || (isVericalEdge && (isHorizontalEdge || isVerBounded));
-}
-
+/*!
+ * Converts the AADL/XMl coordinates pair to the QPointF.
+ * If \a coordinates is empty or its size != 2 an empty point returned.
+ */
 QPointF pos(const QVector<qint32> &coordinates)
 {
     if (coordinates.isEmpty())
@@ -333,6 +340,10 @@ QPointF pos(const QVector<qint32> &coordinates)
     return QPointF(coordinates.first(), coordinates.last());
 }
 
+/*!
+ * Converts four coordinate numbers from AADL/XMl to the QRectF.
+ * If \a coordinates is empty or its size != 4 returns an empty rect.
+ */
 QRectF rect(const QVector<qint32> &coordinates)
 {
     if (coordinates.isEmpty())
@@ -348,6 +359,11 @@ QRectF rect(const QVector<qint32> &coordinates)
 
     return { points.first(), points.last() };
 }
+
+/*!
+ * Converts coordinate numbers from AADL/XMl to vector of QPointF.
+ * If \a coordinates is empty or its size is odd returns an empty vector.
+ */
 
 QVector<QPointF> polygon(const QVector<qint32> &coordinates)
 {

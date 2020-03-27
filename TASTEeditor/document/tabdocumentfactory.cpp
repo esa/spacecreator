@@ -28,6 +28,13 @@
 namespace taste3 {
 namespace document {
 
+/*!
+\class taste3::document::TabDocumentFactory
+\brief taste3::document::TabDocumentFactory is a factory to create particular data format documents.
+
+\sa taste3::document::AbstractTabDocument, taste3::document::DocumentsManager, taste3::document::InterfaceTabDocument
+*/
+
 AbstractTabDocument *TabDocumentFactory::initDoc(AbstractTabDocument *doc)
 {
     if (doc)

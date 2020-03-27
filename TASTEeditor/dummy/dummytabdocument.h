@@ -39,6 +39,7 @@ public:
 protected:
     virtual bool loadImpl(const QString &path) override;
     virtual bool saveImpl(const QString &path) override;
+    virtual void closeImpl() override;
     virtual QVector<QAction *> initActions() override;
 
     QWidget *createView() override;

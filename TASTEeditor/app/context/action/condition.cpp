@@ -28,6 +28,10 @@
 namespace taste3 {
 namespace ctx {
 
+/*!
+ * \class taste3::ctx::Condition
+ * \brief The serializable collection of taste3::ctx::AttrHandler.
+ */
 static const QString JSON_FIELD_NAME_ItemType = "itemType";
 static const QString JSON_FIELD_NAME_Attributes = "attributes";
 
@@ -68,8 +72,7 @@ QStringList Condition::knownTypes()
     QStringList res;
     QMetaEnum me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i)
-        if (taste3::aadl::AADLObject::Type(me.value(i))
-            != taste3::aadl::AADLObject::Type::Unknown)
+        if (taste3::aadl::AADLObject::Type(me.value(i)) != taste3::aadl::AADLObject::Type::Unknown)
             res.append(me.key(i));
     return res;
 }

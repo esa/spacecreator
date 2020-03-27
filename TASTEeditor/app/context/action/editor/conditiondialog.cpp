@@ -23,6 +23,11 @@
 namespace taste3 {
 namespace aadl {
 
+/*!
+ * \class taste3::aadl::ConditionDialog
+ * The UI for editing conditions of scriptable actions.
+ */
+
 ConditionDialog::ConditionDialog(const ctx::Condition &cond, const QStringList &itemTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ConditionDialog)

@@ -26,9 +26,9 @@
 #include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectiface.h"
 #include "tab_interface/interfacetabdocument.h"
+#include "templating/exportableaadlobject.h"
 #include "templating/stringtemplate.h"
 #include "templating/templateeditor.h"
-#include "templating/exportableaadlobject.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -39,6 +39,11 @@
 
 namespace taste3 {
 namespace app {
+
+/*!
+ * \class taste3::app::XmlDocExporter
+ * \brief The helper that incorporates templating::StringTemplate-related stuff.
+ */
 
 static const QString TemplateFileExtension = QString("tmplt");
 

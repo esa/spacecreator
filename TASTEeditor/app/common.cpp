@@ -31,10 +31,46 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 namespace taste3 {
 namespace common {
 
+/*!
+  \namespace taste3::common
+
+  \brief The collection of utilites shared among all submodules.
+*/
+
+/*!
+ * \typedef Id
+ * \brief The common Id used as internal objects referring.
+ */
+
+/*!
+ * \brief InvalidId
+ * Global constant representing the empty/invalid ID.
+ */
+
 Id createId()
 {
     return QUuid::createUuid();
 }
+
+/*!
+  \enum taste3::common::FileCopyingMode
+
+  This enum specifies a file overwriting policy:
+    \value Keep
+        Do not overwrite existing file.
+    \value Overwrite
+        Do overwrite existing file.
+ */
+
+/*!
+ * \brief Copies the \a source file from resources to the \a target file.
+
+ * Returns \c true if the \a source file copied succesfully and
+ * the QFile::WriteUser permission explicitly set for the \a target
+ * (otherwise it would be read-only as any file in qrc).
+ * If the \target file already exists, this function will not owervirite
+ * and return \c false;
+ */
 
 bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
 {
@@ -93,6 +129,10 @@ bool ensureDirExists(const QString &path)
     return true;
 }
 
+/*!
+  \brief Helper function for registering the \a action as scriptable, with key \a title and optional \a description.
+ * The \a caller argument is used to provide reasonable debug record.
+ */
 void registerAction(const QString &caller, QAction *action, const QString &title, const QString &description)
 {
     if (!action) {

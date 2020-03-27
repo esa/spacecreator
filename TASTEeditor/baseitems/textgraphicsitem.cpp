@@ -282,7 +282,7 @@ void TextGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 /*!
    \brief TextItem::selectText
-   \param select if true, the entire text will be selected. If false, the the selection will be cleared
+   \a select if true, the entire text will be selected. If false, the the selection will be cleared
  */
 void TextGraphicsItem::selectText(bool select)
 {

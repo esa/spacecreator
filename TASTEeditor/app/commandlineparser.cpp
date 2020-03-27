@@ -22,6 +22,10 @@
 
 namespace taste3 {
 
+/*!
+\class taste3::CommandLineParser
+\brief The processor of options passed as command line arguments.
+*/
 CommandLineParser::CommandLineParser()
     : QCommandLineParser()
 {
@@ -32,6 +36,29 @@ CommandLineParser::CommandLineParser()
     populatePositionalArgs();
 }
 
+/*!
+    \enum CommandLineParser::Positional
+
+    This enum type specifies a particular command line option:
+
+    \value DropUnsavedChangesSilently
+           Do not warn about unsaved changes on the document closing.
+    \value OpenAADLXMLFile
+           Automatically load the speceficied file on startup.
+    \value OpenStringTemplateFile
+           Load the specificied template file.
+    \value ExportToFile
+           Save the file opened by OpenAADLXMLFile using the template passed with OpenStringTemplateFile.
+    \value ListScriptableActions
+           List all the actions available for scripting and exit.
+*/
+
+/*!
+  \fn bool CommandLineParser::isSet(Positional arg) const
+ \brief checks the presence of the option \a arg.
+ \a arg - the option to be checked
+ Returns \c true if set.
+*/
 bool CommandLineParser::isSet(CommandLineParser::Positional arg) const
 {
     if (CommandLineParser::Positional::Unknown == arg)

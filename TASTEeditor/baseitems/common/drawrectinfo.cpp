@@ -19,11 +19,8 @@
 namespace taste3 {
 
 /*!
-  \class msc::DrawRectInfo
+  \class taste3::DrawRectInfo
   \brief Internal helper for rect drawing.
-
-  \inmodule MscWidgets
-
 */
 
 DrawRectInfo::DrawRectInfo()

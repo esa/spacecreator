@@ -22,6 +22,10 @@
 namespace taste3 {
 namespace aadl {
 
+/*!
+ * \class taste3::aadl::ConditionsModel
+ * \brief The model to store scriptable actions conditions in editor dialog.
+ */
 ConditionsModel::ConditionsModel(QObject *parent)
     : QStringListModel(parent)
     , m_conditions(nullptr)
@@ -118,5 +122,6 @@ bool ConditionsModel::removeRows(int row, int count, const QModelIndex &parent)
     endRemoveRows();
     return true;
 }
+
 } // ns aadl
 } // ns taste3

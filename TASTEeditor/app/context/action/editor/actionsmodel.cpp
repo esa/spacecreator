@@ -22,6 +22,10 @@
 namespace taste3 {
 namespace aadl {
 
+/*!
+ * \class taste3::aadl::ActionsModel
+ * \brief The model to store instances of scriptable actions in editor dialog.
+ */
 ActionsModel::ActionsModel(QObject *parent)
     : QStringListModel(parent)
 {

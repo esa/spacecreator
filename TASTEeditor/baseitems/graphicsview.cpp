@@ -27,6 +27,11 @@
 
 namespace taste3 {
 
+/*!
+  \class taste3::GraphicsView
+  \brief The QGraphicsView wrapper for displaying the AADL.
+*/
+
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent)
 {
@@ -36,14 +41,14 @@ GraphicsView::GraphicsView(QWidget *parent)
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 
-    //    setAlignment(Qt::AlignCenter);
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
 /*!
- * \brief GraphicsView::zoom Get the current zoom percentage
- * \return
- */
+\brief GraphicsView::zoom() Get the current zoom percentage.
+Returns the value of \c m_zoomPercent
+*/
+
 double GraphicsView::zoom() const
 {
     return m_zoomPercent;
@@ -51,7 +56,7 @@ double GraphicsView::zoom() const
 
 /*!
  * \brief GraphicsView::setZoom Set the current zoom percentage and update the view
- * \param percent
+ * \a percent
  */
 void GraphicsView::setZoom(double percent)
 {
