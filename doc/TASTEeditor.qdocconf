@@ -1,0 +1,28 @@
+#include($QT_INSTALL_DOCS/global/compat.qdocconf)
+#include($QT_INSTALL_DOCS/global/fileextensions.qdocconf)
+#include($QT_INSTALL_DOCS/global/qt-cpp-defines.qdocconf)
+#include($QT_INSTALL_DOCS/global/macros.qdocconf)
+
+Cpp.ignoretokens += Q_OBJECT \
+    Q_GADGET
+
+spurious = ".*No include paths passed to qdoc.*" \
+".*has no \inmodule command.*"
+
+sources.fileextensions += "*.cpp *.qdoc *.qml *.js"
+headers.fileextensions += "*.h"
+
+project     = "TASTE Editor"
+description = "TASTE Editor Reference Documentation"
+
+outputdir     = html
+outputformats = HTML
+
+HTML.postheader = "<a href=\"index.html\">Home</a>"
+
+headerdirs  = \
+    ../TASTEeditor
+sourcedirs  = . \
+    ../TASTEeditor
+
+moduleheader=../TASTEeditor/allheaders4qdoc.h

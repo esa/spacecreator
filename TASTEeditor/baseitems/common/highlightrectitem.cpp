@@ -24,6 +24,11 @@
 
 namespace taste3 {
 
+/*!
+ * \class taste3::HighlightRectItem
+ * \brief Helper class for graphics items to support animated color change.
+ */
+
 HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_pathItem(new QGraphicsPathItem(this))

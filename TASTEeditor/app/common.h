@@ -30,19 +30,12 @@ static const Id InvalidId = Id();
 
 Id createId();
 
-/*!
- * Copies the \a source file from resources to the \a target file.
- * \Returns true if the \a source file copied succesfully and
- * the QFile::WriteUser permission explicitly set for the \a target
- * (otherwise it would be read-only as any file in qrc).
- * If the \target file already exists, this function will not owervirite
- * and return false;
- */
 enum FileCopyingMode
 {
     Keep,
     Overwrite
 };
+
 bool copyResourceFile(const QString &source, const QString &target,
                       FileCopyingMode replaceMode = FileCopyingMode::Keep);
 

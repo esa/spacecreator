@@ -25,6 +25,20 @@
 namespace taste3 {
 namespace document {
 
+/*!
+\class taste3::document::AbstractTabDocument
+\brief taste3::document::AbstractTabDocument is the base interface to handle particular data format
+editing and displaying (AADL-graphics, AADL-text, same for the MSC, etc).
+It designed to be used in the multi-document editor, providing methods to handle
+data loading, saving and closing, document's dirtyness and operations stack management.
+It's the place to create and store related instances of QGraphicsScene and QGraphicasView.
+An descendant instances should be created via TabDocumentFactory.
+Currently it's used only to work with AADL (graphical) data, the other formats integration
+may need some API changes/polishing.
+
+\sa taste3::document::TabDocumentFactory, taste3::document::DocumentsManager, taste3::document::InterfaceTabDocument
+*/
+
 struct AbstractTabDocumentPrivate {
     explicit AbstractTabDocumentPrivate(QObject *parent)
         : m_commandsStack(new QUndoStack(parent))
@@ -143,8 +157,6 @@ void AbstractTabDocument::close()
     resetDirtyness();
     emit dirtyChanged(false);
 }
-
-void AbstractTabDocument::closeImpl() {}
 
 QString AbstractTabDocument::path() const
 {

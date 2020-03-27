@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    TASTEeditor
+    TASTEeditor \
+    doc
 
 !CONFIG(no_tests):SUBDIRS += tests

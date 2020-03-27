@@ -20,6 +20,14 @@
 namespace taste3 {
 namespace document {
 
+/*!
+\class taste3::document::DocumentsManager
+\brief taste3::document::DocumentsManager is a wrapper to manage particular document types.
+Used to bind the collection of all used document types with the tab widget in the taste3::MainWindow.
+
+\sa taste3::document::AbstractTabDocument, taste3::document::TabDocumentFactory, taste3::document::InterfaceTabDocument
+*/
+
 DocumentsManager::DocumentsManager(QTabWidget *tabWidget, QObject *parent)
     : QObject(parent)
     , m_tabs(tabWidget)

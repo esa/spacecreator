@@ -35,6 +35,11 @@
 namespace taste3 {
 namespace aadl {
 
+/*!
+ * \class taste3::aadl::DynActionEditor
+ * The UI for editing available scriptable actions.
+ */
+
 DynActionEditor::DynActionEditor(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DynActionEditor)

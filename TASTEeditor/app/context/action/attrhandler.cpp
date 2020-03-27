@@ -24,6 +24,10 @@
 namespace taste3 {
 namespace ctx {
 
+/*!
+ * \class taste3::ctx::AttrHandler
+ * \brief The serializable wrapper for AADLObject's attribute to be used with taste3::ctx::Action
+ */
 static const QString JSON_FIELD_NAME_Title = "title";
 static const QString JSON_FIELD_NAME_Value = "value";
 

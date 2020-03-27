@@ -70,6 +70,8 @@ bool DummyTabDocument::saveImpl(const QString & /*path*/)
     return false;
 }
 
+void DummyTabDocument::closeImpl() {}
+
 QVector<QAction *> DummyTabDocument::initActions()
 {
     if (!m_actDummy) {

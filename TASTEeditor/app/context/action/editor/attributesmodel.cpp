@@ -23,6 +23,10 @@ namespace aadl {
 const int COLUMN_ID_Name = 0;
 const int COLUMN_ID_Value = 1;
 
+/*!
+ * \class taste3::aadl::AttributesModel
+ * \brief The model to store scriptable actions attributes in editor dialog.
+ */
 AttributesModel::AttributesModel(QObject *parent)
     : QStringListModel(parent)
 {

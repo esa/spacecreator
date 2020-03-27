@@ -41,12 +41,9 @@ static const int kInterfaceZLevel = 2;
 static const int kCommentZLevel = 3;
 static const int kGripZLevel = 4;
 
-QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
-QPointF pointFromPath(const QPainterPath &path, int num);
 QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
                                           const QVariant &to, const int durationMs);
-QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
 QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
@@ -54,8 +51,6 @@ QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon
 qreal distanceLine(const QPointF &p1, const QPointF &p2);
 qreal distancePolygon(const QVector<QPointF> &polygon);
 QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2);
-
-QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
@@ -68,8 +63,6 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, q
                            const QList<int> &acceptableTypes = QList<int>());
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
-
-bool isOnEdge(const QRectF &rect, const QPointF &point);
 
 QPointF pos(const QVector<qint32> &coordinates);
 QRectF rect(const QVector<qint32> &coordinates);
