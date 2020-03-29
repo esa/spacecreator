@@ -69,15 +69,27 @@ static inline QVector<QPointF> generateConnection(const QLineF &startDirection, 
         midLine.setAngle(startDirection.angle() - 90);
 
         QPointF startLastPoint;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        midLine.intersects(startDirection, &startLastPoint);
+#else
         midLine.intersect(startDirection, &startLastPoint);
+#endif
         connectionPoints.insert(connectionPoints.size() - 1, startLastPoint);
 
         QPointF endLastPoint;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        midLine.intersects(endDirection, &endLastPoint);
+#else
         midLine.intersect(endDirection, &endLastPoint);
+#endif
         connectionPoints.insert(connectionPoints.size() - 1, endLastPoint);
     } else if (qAbs(qCos(qDegreesToRadians(angle))) <= tolerance) { // |_
         QPointF mid;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        startDirection.intersects(endDirection, &mid);
+#else
         startDirection.intersect(endDirection, &mid);
+#endif
         connectionPoints.insert(connectionPoints.size() - 1, mid);
     } else {
         qCritical() << startDirection << endDirection << angle;
@@ -564,7 +576,7 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     }
 
     for (auto item : scene()->items(m_points)) {
-        if (auto nestedItem = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+        if (qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
             if (utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
                 rebuildLayout();
                 updateEntity();
