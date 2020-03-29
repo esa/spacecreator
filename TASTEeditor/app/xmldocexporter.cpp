@@ -94,10 +94,7 @@ bool XmlDocExporter::canExportXml(document::AbstractTabDocument *doc)
     if (!doc)
         return false;
 
-    if (const document::InterfaceTabDocument *ifaceDoc = qobject_cast<const document::InterfaceTabDocument *>(doc))
-        return true;
-
-    return false;
+    return qobject_cast<const document::InterfaceTabDocument *>(doc);
 }
 
 bool XmlDocExporter::exportDocSilently(document::AbstractTabDocument *doc, const QString &outPath,

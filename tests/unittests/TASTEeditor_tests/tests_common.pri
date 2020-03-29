@@ -1,5 +1,5 @@
 QT += testlib core gui widgets svg
-CONFIG += qt console warn_on depend_includepath testcase c++11
+CONFIG += qt console warn_on depend_includepath testcase c++14
 mac:CONFIG -= app_bundle
 
 TEMPLATE = app

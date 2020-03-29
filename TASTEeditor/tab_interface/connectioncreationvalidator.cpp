@@ -255,7 +255,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
                                                                                         AADLObjectIface *targetIface)
 {
     if (auto ri = AADLObjectConnection::selectIface<const AADLObjectIfaceRequired *>(sourceIface, targetIface))
-        if (auto pi = AADLObjectConnection::selectIface<const AADLObjectIfaceProvided *>(sourceIface, targetIface)) {
+        if (AADLObjectConnection::selectIface<const AADLObjectIfaceProvided *>(sourceIface, targetIface)) {
 #ifndef AADL_MULTICAST_CONNECTION
             if (AADLObjectsModel *model = ri->objectsModel()) {
                 const QVector<AADLObjectConnection *> riConnections = model->getConnectionsForIface(ri->id());

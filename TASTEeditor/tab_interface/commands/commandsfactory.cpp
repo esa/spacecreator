@@ -237,7 +237,7 @@ QUndoCommand *CommandsFactory::changeEntityPropertyCommand(const QVariantList &p
     if (entity.isValid() && entity.canConvert<AADLObject *>() && !properties.isEmpty()) {
         if (AADLObject *aadlObject = entity.value<AADLObject *>()) {
             if (aadlObject->isInterface())
-                if (AADLObjectIfaceRequired *ri = aadlObject->as<AADLObjectIfaceRequired *>()) {
+                if (aadlObject->as<AADLObjectIfaceRequired *>()) {
                     return changeRiPropertyCommand(params);
                 }
             return new CmdEntityPropertyChange(aadlObject, properties);
