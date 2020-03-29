@@ -564,7 +564,7 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     }
 
     for (auto item : scene()->items(m_points)) {
-        if (qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+        if (auto nestedItem = qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
             if (utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
                 rebuildLayout();
                 updateEntity();
