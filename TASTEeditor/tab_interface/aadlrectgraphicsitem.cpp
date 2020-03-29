@@ -352,12 +352,13 @@ static inline QRectF collidingItemsBoundingRect(QGraphicsItem *item, const QRect
         return {};
 
     QRectF br;
-    for (auto collidingItem : collidingItems)
-        if (auto rectItem = qgraphicsitem_cast<aadl::AADLRectGraphicsItem *>(collidingItem)) {
+    for (auto collidingItem : collidingItems) {
+        if (auto rectItem = qobject_cast<aadl::AADLRectGraphicsItem *>(collidingItem->toGraphicsObject())) {
             if (rectItem->parentItem() == item->parentItem() && rectItem != item) {
                 br |= rectItem->sceneBoundingRect();
             }
         }
+    }
 
     return br;
 }
@@ -395,20 +396,17 @@ void AADLRectGraphicsItem::layout()
     }
 
     auto parentFunction = qobject_cast<aadl::AADLRectGraphicsItem *>(parentObject());
-
-    static const QMarginsF kItemMargins = utils::kContentMargins;
-
-    static const QMarginsF kCurrentMargins = parentFunction && parentFunction->aadlObject()->isRootObject()
+    const QMarginsF kCurrentMargins = parentFunction && parentFunction->aadlObject()->isRootObject()
             ? utils::kRootMargins
             : utils::kContentMargins;
 
-    QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect())
-                                 .marginsRemoved(kCurrentMargins);
-    QRectF itemRect = QRectF(QPointF(0, 0), utils::DefaultGraphicsItemSize).marginsAdded(kItemMargins);
+    QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect().marginsRemoved(kCurrentMargins)
+                                               : scene()->itemsBoundingRect());
+    QRectF itemRect = QRectF(QPointF(0, 0), utils::DefaultGraphicsItemSize).marginsAdded(utils::kContentMargins);
     itemRect.moveTopLeft(boundedRect.topLeft());
 
     findGeometryForItem(this, itemRect, boundedRect);
-    setRect(itemRect.marginsRemoved(kItemMargins));
+    setRect(itemRect.marginsRemoved(utils::kContentMargins));
     mergeGeometry();
 }
 
@@ -419,14 +417,6 @@ bool AADLRectGraphicsItem::itemNeedsToBeRelayout() const
         return true;
 
     const QRectF currentExpandedRect = currentRect.marginsAdded(utils::kContentMargins);
-
-    if (auto iObj = qobject_cast<aadl::InteractiveObject *>(parentObject())) {
-        Q_ASSERT(iObj->sceneBoundingRect().isValid());
-        if (!iObj->aadlObject()->isRootObject() && !iObj->sceneBoundingRect().contains(currentExpandedRect)) {
-            return true;
-        }
-    }
-
     for (auto item : scene()->items(currentExpandedRect)) {
         if (item == this || item->parentItem() != parentItem())
             continue;
