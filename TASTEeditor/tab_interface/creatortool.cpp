@@ -479,10 +479,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
             break;
         }
 
+        const QRectF rect = item->sceneBoundingRect();
         auto beginIt = std::find(connectionPoints.constBegin(), connectionPoints.constEnd(), firstExcludedPoint);
-        auto endIt = std::find_if(
-                connectionPoints.constBegin(), connectionPoints.constEnd(),
-                [rect = item->sceneBoundingRect()](const QPointF &point) { return !rect.contains(point); });
+        auto endIt = std::find_if(connectionPoints.constBegin(), connectionPoints.constEnd(),
+                                  [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { startInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());
@@ -523,10 +523,10 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
             parentForConnection = item;
             break;
         }
+        const QRectF rect = item->sceneBoundingRect();
         auto beginIt = std::find(connectionPoints.crbegin(), connectionPoints.crend(), lastExcludedPoint);
-        auto endIt = std::find_if(
-                connectionPoints.crbegin(), connectionPoints.crend(),
-                [rect = item->sceneBoundingRect()](const QPointF &point) { return !rect.contains(point); });
+        auto endIt = std::find_if(connectionPoints.crbegin(), connectionPoints.crend(),
+                                  [&rect](const QPointF &point) { return !rect.contains(point); });
         QVector<QPointF> points { endInterfacePoint };
         std::copy(beginIt, endIt, std::back_inserter(points));
         points.append(intersectionPoints.last());

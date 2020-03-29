@@ -275,7 +275,7 @@ QString AADLNameValidator::nameFunctionType(const AADLObject *functionType) cons
 {
     static const QString nameTemplate = m_typePrefixes[functionType->aadlType()];
 
-    size_t counter = 0;
+    int counter = 0;
     if (functionType && functionType->objectsModel()) {
         for (const auto fn : functionType->objectsModel()->objects())
             if (fn->isFunctionType())
@@ -291,7 +291,7 @@ QString AADLNameValidator::nameFunction(const AADLObject *function) const
 {
     static const QString nameTemplate = m_typePrefixes[function->aadlType()];
 
-    size_t counter = 0;
+    int counter = 0;
     if (function && function->objectsModel()) {
         for (const auto fn : function->objectsModel()->objects())
             if (fn->isFunction())
@@ -310,7 +310,7 @@ QString AADLNameValidator::nameRequiredInterface(const AADLObject *iface) const
     static const QString nameTemplate = m_typePrefixes[iface->aadlType()];
 
     const auto parent = iface->parentObject()->as<const AADLObjectFunctionType *>();
-    size_t counter = parent ? parent->ris().size() : 0;
+    int counter = parent ? parent->ris().size() : 0;
     ++counter;
 
     return makeCountedName(iface, nameTemplate, counter);
@@ -323,7 +323,7 @@ QString AADLNameValidator::nameProvidedInterface(const AADLObject *iface) const
     static const QString nameTemplate = m_typePrefixes[iface->aadlType()];
 
     const auto parent = iface->parentObject()->as<const AADLObjectFunctionType *>();
-    size_t counter = parent ? parent->pis().size() : 0;
+    int counter = parent ? parent->pis().size() : 0;
     ++counter;
 
     return makeCountedName(iface, nameTemplate, counter);
@@ -333,7 +333,7 @@ QString AADLNameValidator::nameComment(const AADLObject *comment) const
 {
     static const QString nameTemplate = m_typePrefixes[comment->aadlType()];
 
-    size_t counter = 0;
+    int counter = 0;
     if (comment && comment->objectsModel()) {
         for (const auto fn : comment->objectsModel()->objects())
             if (fn->isComment())

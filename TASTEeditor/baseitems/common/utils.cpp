@@ -88,7 +88,11 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
     };
 
     for (const QLineF &rectLine : rectLines) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        if (rectLine.intersects(line, intersectPos) == QLineF::BoundedIntersection)
+#else
         if (rectLine.intersect(line, intersectPos) == QLineF::BoundedIntersection)
+#endif
             return true;
     }
 
@@ -116,7 +120,11 @@ QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon
     for (int idx = 1; idx < polygon.size(); ++idx) {
         const QLineF line = { polygon.value(idx - 1), polygon.value(idx) };
         for (const QLineF &rectLine : rectLines) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+            if (rectLine.intersects(line, &intersectPos) == QLineF::BoundedIntersection)
+#else
             if (rectLine.intersect(line, &intersectPos) == QLineF::BoundedIntersection)
+#endif
                 points.append(intersectPos);
         }
     }
@@ -179,7 +187,11 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
         auto it = std::find_if(rectLines.constBegin(), rectLines.constEnd(),
                                [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
                                    QPointF dummyPoint;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+                                   return line.intersects(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
+#else
                                    return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
+#endif
                                });
         if (it != rectLines.constEnd())
             side = it->second;
