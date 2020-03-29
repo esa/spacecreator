@@ -65,9 +65,11 @@ protected:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
-    QRectF updateInternalItems(Qt::Alignment alignment);
+    void updateInternalItems(Qt::Alignment alignment);
     virtual ColorManager::HandledColors handledColorType() const override;
+    void adjustItem();
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;

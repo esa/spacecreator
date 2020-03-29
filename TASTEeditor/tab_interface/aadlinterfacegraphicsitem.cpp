@@ -38,7 +38,7 @@ static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
-static const QList<Qt::Alignment> sides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
+static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceTitleMaxLength = 80;
 
 namespace taste3 {
@@ -121,68 +121,42 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
     }
 }
 
-static inline void moveClockwise(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
-                                 const QRectF &parentBoundingRect)
+static inline void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
+                             const QRectF &parentBoundingRect, const QPointF &offset, bool invert)
 {
     if (!intersectedItemRect.isValid())
         return;
 
-    QRectF clockwiseRect { rect };
-    const int index = idx < 0 ? sides.size() - qAbs(idx) % sides.size() : idx % sides.size();
-    switch (sides.value(index % sides.size())) {
+    QRectF itemRect { rect };
+    const int currentIdx = invert ? idx + 2 : idx;
+    const int index =
+            idx < 0 ? kRectSides.size() - qAbs(currentIdx) % kRectSides.size() : currentIdx % kRectSides.size();
+    switch (kRectSides.value(index % kRectSides.size())) {
     case Qt::AlignLeft:
-        clockwiseRect.moveBottom(intersectedItemRect.top() - 1);
+        itemRect.moveBottom(intersectedItemRect.top() - kBase);
         break;
     case Qt::AlignRight:
-        clockwiseRect.moveTop(intersectedItemRect.bottom() + 1);
+        itemRect.moveTop(intersectedItemRect.bottom() + kBase);
         break;
     case Qt::AlignTop:
-        clockwiseRect.moveLeft(intersectedItemRect.right() + 1);
+        itemRect.moveLeft(intersectedItemRect.right() + kBase);
         break;
     case Qt::AlignBottom:
-        clockwiseRect.moveRight(intersectedItemRect.left() - 1);
+        itemRect.moveRight(intersectedItemRect.left() - kBase);
         break;
     default:
         return;
     }
-    if (!parentBoundingRect.intersects(clockwiseRect))
-        moveClockwise(intersectedItemRect, rect, ++idx, parentBoundingRect);
+    if (!parentBoundingRect.contains(itemRect.topLeft() - offset))
+        moveIface(intersectedItemRect, rect, invert ? ++idx : --idx, parentBoundingRect, offset, invert);
     else
-        rect = clockwiseRect;
-};
+        rect = itemRect;
+}
 
-static inline void moveCounterClockwise(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
-                                        const QRectF &parentBoundingRect)
+void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
-    if (!intersectedItemRect.isValid())
-        return;
+    prepareGeometryChange();
 
-    QRectF counterClockwiseRect { rect };
-    const int index = idx < 0 ? sides.size() - (qAbs(idx) % sides.size()) : idx % sides.size();
-    switch (sides.value(index)) {
-    case Qt::AlignLeft:
-        counterClockwiseRect.moveTop(intersectedItemRect.bottom() + kBase);
-        break;
-    case Qt::AlignRight:
-        counterClockwiseRect.moveBottom(intersectedItemRect.top() - kBase);
-        break;
-    case Qt::AlignTop:
-        counterClockwiseRect.moveRight(intersectedItemRect.left() - kBase);
-        break;
-    case Qt::AlignBottom:
-        counterClockwiseRect.moveLeft(intersectedItemRect.right() + kBase);
-        break;
-    default:
-        return;
-    }
-    if (!parentBoundingRect.intersects(counterClockwiseRect))
-        moveCounterClockwise(intersectedItemRect, rect, --idx, parentBoundingRect);
-    else
-        rect = counterClockwiseRect;
-};
-
-QRectF AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
-{
     const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
     const qreal offset = kBase + 2;
 
@@ -210,14 +184,13 @@ QRectF AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     m_iface->setTransform(QTransform().rotate(rotationDegree));
     m_type->setPos(shift);
     m_shape = composeShape();
-
-    return mapRectFromItem(m_iface, m_iface->boundingRect());
+    m_boundingRect = childrenBoundingRect();
 };
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
-    prepareGeometryChange();
     if (!parentItem()) {
+        prepareGeometryChange();
         m_boundingRect = QRectF();
         return;
     }
@@ -229,58 +202,13 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     const QRectF parentRect = parentItem()->boundingRect();
+    const Qt::Alignment alignment = utils::getNearestSide(parentRect, ifacePos);
 
-    Qt::Alignment alignment = utils::getNearestSide(parentRect, ifacePos);
-    const int initialAlignment = sides.indexOf(alignment);
-
-    QPointF stickyPos = utils::getSidePosition(parentRect, ifacePos, alignment);
-
-    QRectF br = updateInternalItems(alignment);
-    br.moveTo(stickyPos + br.topLeft());
-
-    auto checkCollision = [this](const QRectF &parentRect, const QRectF &rect, QRectF &intersectedRect,
-                                 Qt::Alignment &alignment, QPointF &stickyPos) {
-        auto isInterfaceItemLambda = [this](const QGraphicsItem *item) {
-            return item->type() == aadl::AADLInterfaceGraphicsItem::Type && parentItem() == item->parentItem()
-                    && item != this;
-        };
-
-        const QList<QGraphicsItem *> collidedItems = scene()->items(parentItem()->mapRectToScene(rect));
-        auto collidedIt = std::find_if(collidedItems.constBegin(), collidedItems.constEnd(), isInterfaceItemLambda);
-        if (collidedIt == collidedItems.constEnd()) {
-            alignment = utils::getNearestSide(parentRect, rect.center());
-            stickyPos = utils::getSidePosition(parentRect, rect.center(), alignment);
-            return false;
-        }
-        intersectedRect = parentItem()->mapRectFromScene((*collidedIt)->sceneBoundingRect());
-        return true;
-    };
-
-    QRectF intersectedRect;
-    if (checkCollision(parentRect, br, intersectedRect, alignment, stickyPos)) {
-        QRectF cIntersectedRect { intersectedRect };
-        QRectF ccIntersectedRect { intersectedRect };
-        QRectF cbr { br };
-        QRectF ccbr { br };
-        int cAlignmentIdx { initialAlignment };
-        int ccAlignmentIdx { initialAlignment };
-
-        while ((ccAlignmentIdx / sides.size() == 0 || ccAlignmentIdx % sides.size() != initialAlignment)
-               && (cAlignmentIdx / sides.size() == 0 || cAlignmentIdx % sides.size() != initialAlignment)) {
-            moveClockwise(cIntersectedRect, cbr, cAlignmentIdx, parentRect);
-            if (!checkCollision(parentRect, cbr, cIntersectedRect, alignment, stickyPos))
-                break;
-
-            moveCounterClockwise(ccIntersectedRect, ccbr, ccAlignmentIdx, parentRect);
-            if (!checkCollision(parentRect, ccbr, ccIntersectedRect, alignment, stickyPos))
-                break;
-        }
-    }
-
-    m_boundingRect = updateInternalItems(alignment);
-    m_shape = composeShape();
-
+    updateInternalItems(alignment);
+    const QPointF stickyPos = utils::getSidePosition(parentRect, ifacePos, alignment);
     setPos(stickyPos);
+    if (ifacePos != stickyPos)
+        mergeGeometry();
 }
 
 QPainterPath AADLInterfaceGraphicsItem::shape() const
@@ -298,13 +226,13 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    setInterfaceName(ifaceLabel());
-
     const QPointF coordinates = utils::pos(obj->coordinates());
     if (coordinates.isNull())
         instantLayoutUpdate();
     else
         setTargetItem(parentItem(), coordinates);
+    adjustItem();
+    setInterfaceName(ifaceLabel());
 }
 
 void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
@@ -361,7 +289,6 @@ void AADLInterfaceGraphicsItem::layout()
             }
             if (side != Qt::AlignAbsolute) {
                 updateInternalItems(side);
-                //                    entity()->setCoordinates(utils::coordinates(sidePos));
                 setPos(parentItem()->mapFromScene(sidePos));
                 mergeGeometry();
             }
@@ -382,7 +309,6 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
 void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(grip)
-    Q_UNUSED(from)
 
     if (!scene() || !m_connections.isEmpty())
         return;
@@ -406,9 +332,78 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPoi
     Q_EMIT needUpdateLayout();
 }
 
+void AADLInterfaceGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(grip)
+
+    const QPointF shift = { to - from };
+    if (shift.isNull())
+        return;
+
+    updateEntity();
+}
+
 ColorManager::HandledColors AADLInterfaceGraphicsItem::handledColorType() const
 {
     return ColorManager::HandledColors::Iface;
+}
+
+void AADLInterfaceGraphicsItem::adjustItem()
+{
+    QList<QRectF> siblingsRects;
+    const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
+    std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
+        if (sibling->type() == aadl::AADLInterfaceGraphicsItem::Type && sibling != this)
+            siblingsRects.append(sibling->mapRectToParent(sibling->boundingRect()));
+    });
+
+    auto checkCollision = [](const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF &collidingRect) {
+        auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
+                               [itemRect](const QRectF &siblibgRect) { return siblibgRect.intersects(itemRect); });
+        if (it != itemRects.cend()) {
+            collidingRect = *it;
+            return true;
+        }
+        return false;
+    };
+    const QRectF parentRect = parentItem()->boundingRect();
+    const Qt::Alignment alignment = utils::getNearestSide(parentRect, pos());
+    const int initialAlignment = kRectSides.indexOf(alignment);
+    const QPointF offset = m_boundingRect.topLeft();
+    const QRectF itemRect = mapRectToParent(m_boundingRect);
+
+    QRectF intersectedRect;
+    if (checkCollision(siblingsRects, itemRect, intersectedRect) && parentRect.isValid()) {
+        QRectF cIntersectedRect { intersectedRect };
+        QRectF ccIntersectedRect { intersectedRect };
+        QRectF br { itemRect };
+        QRectF cbr { itemRect };
+        QRectF ccbr { itemRect };
+        int alignmentIdx { initialAlignment };
+        int cAlignmentIdx { initialAlignment };
+        int ccAlignmentIdx { initialAlignment };
+
+        while (qAbs(cAlignmentIdx - initialAlignment) < kRectSides.size()
+               && qAbs(ccAlignmentIdx - initialAlignment) < kRectSides.size()) {
+            moveIface(cIntersectedRect, cbr, cAlignmentIdx, parentRect, offset, false);
+            if (!checkCollision(siblingsRects, cbr, cIntersectedRect)) {
+                alignmentIdx = cAlignmentIdx;
+                br = cbr;
+                break;
+            }
+
+            moveIface(ccIntersectedRect, ccbr, ccAlignmentIdx, parentRect, offset, true);
+            if (!checkCollision(siblingsRects, ccbr, ccIntersectedRect)) {
+                alignmentIdx = ccAlignmentIdx;
+                br = ccbr;
+                break;
+            }
+        }
+        if (alignmentIdx != initialAlignment)
+            updateInternalItems(kRectSides.value(alignmentIdx));
+        setPos(br.topLeft() - offset);
+        mergeGeometry();
+    }
 }
 
 void AADLInterfaceGraphicsItem::applyColorScheme()

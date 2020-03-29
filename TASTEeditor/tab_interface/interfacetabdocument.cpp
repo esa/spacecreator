@@ -173,15 +173,6 @@ QWidget *InterfaceTabDocument::createView()
                 dumpItem(item->toGraphicsObject(), true);
             }
         });
-        sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_L), qobject_cast<QWidget *>(m_graphicsView->window()));
-        sc->setContext(Qt::ApplicationShortcut);
-        connect(sc, &QShortcut::activated, this, [this]() {
-            auto selectedItems = m_graphicsScene->selectedItems();
-            for (auto item : selectedItems) {
-                if (auto funcItem = qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item))
-                    funcItem->layout();
-            }
-        });
     }
     m_graphicsView->setScene(m_graphicsScene);
     updateSceneRect();
