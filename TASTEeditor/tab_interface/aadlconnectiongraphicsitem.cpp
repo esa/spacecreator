@@ -400,20 +400,52 @@ void AADLConnectionGraphicsItem::rebuildLayout()
     }
 
     bool pathObsolete(true);
-    if (m_points.size() >= 2) {
-        for (auto point : { m_points.first(), m_points.last() }) {
-            auto ifaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(
-                    utils::nearestItem(scene(), point, QList<int> { AADLInterfaceGraphicsItem::Type }));
-            pathObsolete = !ifaceItem || ifaceItem->scenePos() != point;
-            if (pathObsolete)
-                break;
+    if (m_points.size() >= 2)
+        pathObsolete = (!startItem() || startItem()->scenePos() != m_points.first())
+                || (!endItem() || endItem()->scenePos() != m_points.last());
+
+    if (pathObsolete) {
+        if (m_points.size() <= 2) {
+            layOut();
+        } else if (m_firstUpdate) {
+            // perform the "second" update - when additional points are in place,
+            // yet the turn angles are weird due to interface autolayout, or whatever
+            m_firstUpdate = false;
+            layOut();
+        } else {
+            updateEdgePoint(m_startItem);
         }
     }
-    if (pathObsolete)
-        m_points = connectionPath(m_startItem, m_endItem);
 
     updateBoundingRect();
     setVisible(true);
+}
+
+void AADLConnectionGraphicsItem::updateEdgePoint(const AADLInterfaceGraphicsItem *iface)
+{
+    if (!iface || m_points.size() < 2)
+        return;
+
+    if (iface == startItem()) {
+        m_points.first() = iface->scenePos();
+        m_points.last() = endItem()->scenePos();
+    } else if (iface == endItem()) {
+        m_points.first() = startItem()->scenePos();
+        m_points.last() = iface->scenePos();
+    } else {
+        qWarning() << "Attempt to update from an unknown iterface";
+        return;
+    }
+    updateBoundingRect();
+}
+
+void AADLConnectionGraphicsItem::layOut()
+{
+    if (!m_startItem || !m_endItem)
+        return;
+
+    m_points = connectionPath(m_startItem, m_endItem);
+    updateBoundingRect();
 }
 
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)

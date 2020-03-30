@@ -76,6 +76,10 @@ public:
 
     QString prepareTooltip() const override;
 
+    void updateEdgePoint(const AADLInterfaceGraphicsItem *iface);
+
+    void layOut();
+
 protected:
     void onManualMoveStart(GripPoint *gp, const QPointF &at) override;
     void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -113,6 +117,7 @@ private:
     const QPointer<AADLInterfaceGraphicsItem> m_endItem;
     GraphicsPathItem *m_item = nullptr;
     QVector<QPointF> m_points;
+    bool m_firstUpdate { true };
 };
 
 } // namespace aadl
