@@ -56,7 +56,7 @@ protected:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportableAADLObject)
+DECLARE_EXPORTABLE_TYPE(ExportableAADLObject)
 
 template<> inline taste3::templating::ExportableAADLObject
 qvariant_cast<taste3::templating::ExportableAADLObject>(const QVariant &v)

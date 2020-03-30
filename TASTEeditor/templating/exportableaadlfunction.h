@@ -50,4 +50,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportableAADLFunction)
+DECLARE_EXPORTABLE_TYPE(ExportableAADLFunction)

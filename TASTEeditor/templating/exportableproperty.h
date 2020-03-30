@@ -25,7 +25,7 @@ namespace taste3 {
 namespace templating {
 
 /**
- * @brief The ExportedAADLProperty class is needed for string templates only.
+ * @brief The ExportableProperty class is needed for string templates only.
  * It seems Grantlee doesn't fully support Django syntax like
  * @code
  *  {% for key, value in iface.properties %}
@@ -42,13 +42,13 @@ namespace templating {
  * @endcode
  */
 
-class ExportedAADLProperty
+class ExportableProperty
 {
     Q_GADGET
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QVariant value READ value)
 public:
-    ExportedAADLProperty(const QString &name = QString(), const QVariant &value = QVariant())
+    ExportableProperty(const QString &name = QString(), const QVariant &value = QVariant())
         : m_name(name), m_value(value) {}
 
     inline QString name() const { return m_name; }
@@ -62,4 +62,4 @@ private:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportedAADLProperty)
+DECLARE_EXPORTABLE_TYPE(ExportableProperty)
