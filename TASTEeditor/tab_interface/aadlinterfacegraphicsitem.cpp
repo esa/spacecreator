@@ -221,7 +221,7 @@ QPainterPath AADLInterfaceGraphicsItem::shape() const
 
 void AADLInterfaceGraphicsItem::updateFromEntity()
 {
-    aadl::AADLObjectIface *obj = entity();
+    const aadl::AADLObjectIface *obj = entity();
     Q_ASSERT(obj);
     if (!obj)
         return;
