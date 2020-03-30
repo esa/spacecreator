@@ -17,7 +17,7 @@
 
 #include "exportableaadlobject.h"
 
-#include "exportableaadlproperty.h"
+#include "exportableproperty.h"
 #include "exportableaadlfunction.h"
 #include "exportableaadliface.h"
 #include "exportableaadlconnection.h"
@@ -105,15 +105,15 @@ QVariantList ExportableAADLObject::generateProperties(const QHash<QString, QVari
 {
     QVariantList result;
     for (auto it = props.cbegin(); it != props.cend(); ++it)
-        result << QVariant::fromValue(ExportedAADLProperty(it.key(), it.value()));
+        result << QVariant::fromValue(ExportableProperty(it.key(), it.value()));
 
     std::sort(result.begin(), result.end(), [] (const QVariant &left_val, const QVariant &right_val) {
-        const ExportedAADLProperty &r = right_val.value<ExportedAADLProperty>();
+        const ExportableProperty &r = right_val.value<ExportableProperty>();
         const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
         if (right_token == aadl::meta::Props::Token::Unknown)
             return true;
 
-        const ExportedAADLProperty &l = left_val.value<ExportedAADLProperty>();
+        const ExportableProperty &l = left_val.value<ExportableProperty>();
         const aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
         if (left_token == aadl::meta::Props::Token::Unknown)
             return false;

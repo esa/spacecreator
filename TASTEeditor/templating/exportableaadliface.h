@@ -48,4 +48,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportableAADLIface)
+DECLARE_EXPORTABLE_TYPE(ExportableAADLIface)

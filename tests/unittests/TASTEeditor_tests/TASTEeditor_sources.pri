@@ -40,7 +40,7 @@ HEADERS += \
         $$TASTE_PRO_ROOT/templating/exportableaadlfunction.h \
         $$TASTE_PRO_ROOT/templating/exportableaadliface.h \
         $$TASTE_PRO_ROOT/templating/exportableaadlobject.h \
-        $$TASTE_PRO_ROOT/templating/exportableaadlproperty.h \
+        $$TASTE_PRO_ROOT/templating/exportableproperty.h \
         $$TASTE_PRO_ROOT/templating/templateeditor.h \
         $$TASTE_PRO_ROOT/templating/templatehighlighter.h \
         $$TASTE_PRO_ROOT/templating/xmlhighlighter.h \

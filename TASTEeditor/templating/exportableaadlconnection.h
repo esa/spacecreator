@@ -58,4 +58,4 @@ public:
 } // ns templating
 } // ns taste3
 
-DECLARE_EXPORTED_TYPE(ExportableAADLConnection)
+DECLARE_EXPORTABLE_TYPE(ExportableAADLConnection)

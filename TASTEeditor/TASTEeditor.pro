@@ -202,7 +202,7 @@ HEADERS += \
         templating/exportableaadlfunction.h \
         templating/exportableaadliface.h \
         templating/exportableaadlobject.h \
-        templating/exportableaadlproperty.h \
+        templating/exportableproperty.h \
         templating/stringtemplate.h \
         templating/templateeditor.h \
         templating/templatehighlighter.h \
