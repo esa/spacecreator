@@ -57,9 +57,9 @@ public:
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
+    void layout();
 
 protected:
-    void layout();
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
