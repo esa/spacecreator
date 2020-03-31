@@ -453,7 +453,6 @@ void AADLConnectionGraphicsItem::layout()
 
     m_points = connectionPath(m_startItem, m_endItem);
     updateBoundingRect();
-    mergeGeometry();
 }
 
 void AADLConnectionGraphicsItem::onSelectionChanged(bool isSelected)
