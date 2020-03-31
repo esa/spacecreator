@@ -71,6 +71,8 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const override;
     void adjustItem();
 
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
     void updateLabel();

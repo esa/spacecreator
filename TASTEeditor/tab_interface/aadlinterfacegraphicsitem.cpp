@@ -206,8 +206,6 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     updateInternalItems(alignment);
     const QPointF stickyPos = utils::getSidePosition(parentRect, ifacePos, alignment);
     setPos(stickyPos);
-    if (ifacePos != stickyPos)
-        mergeGeometry();
 }
 
 QPainterPath AADLInterfaceGraphicsItem::shape() const
@@ -289,7 +287,6 @@ void AADLInterfaceGraphicsItem::layout()
             if (side != Qt::AlignAbsolute) {
                 updateInternalItems(side);
                 setPos(parentItem()->mapFromScene(sidePos));
-                mergeGeometry();
             }
         }
     } else {
@@ -401,7 +398,6 @@ void AADLInterfaceGraphicsItem::adjustItem()
         if (alignmentIdx != initialAlignment)
             updateInternalItems(kRectSides.value(alignmentIdx));
         setPos(br.topLeft() - offset);
-        mergeGeometry();
     }
 }
 
@@ -526,6 +522,20 @@ QPainterPath AADLInterfaceGraphicsItem::composeShape() const
         path.addPath(subPath);
     }
     return path;
+}
+
+QVariant AADLInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    switch (change) {
+    case QGraphicsItem::ItemVisibleHasChanged: {
+        for (auto connection : m_connections)
+            connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
+        break;
+    }
+    default:
+        break;
+    }
+    return InteractiveObject::itemChange(change, value);
 }
 
 } // namespace aadl
