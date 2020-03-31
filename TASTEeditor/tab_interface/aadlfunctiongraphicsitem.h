@@ -71,7 +71,7 @@ private:
         RebuildOnCollision
     };
     void layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy);
-    void layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy, const QPointF &itemOffset = QPointF());
+    void layoutConnectionsOnResize();
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
