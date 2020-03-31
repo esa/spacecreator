@@ -77,6 +77,8 @@ To build Taste3 correctly Grantlee should be installed into QTDIR directory (if 
     cmake -DCMAKE_INSTALL_PREFIX=%QTDIR% -A x64 ..
     cmake --build . --config Release
     cmake --build . --config Release --target install
+    cmake --build . --config Debug
+    cmake --build . --config Debug --target install
 
 Taste3 build
 ============
