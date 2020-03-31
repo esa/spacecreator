@@ -63,3 +63,25 @@ To build Taste3 correctly Grantlee should be installed into QTDIR directory:
     cmake --build . --config Release
     cmake --build . --config Release --target install
 
+Taste3 build
+============
+
+Install dependendcies
+---------------------
+Nothing to do if pre-built Qt is used.
+Otherwise it is required to install QtSvg module from debian packages.
+
+    sudo apt install libqt5svg5-dev
+
+Clone sources
+-------------
+
+    git clone ssh://git@git.vikingsoftware.com:2222/esa/taste3.git
+
+Build
+-----
+
+    mkdir build
+    cd build
+    qmake ../taste3
+    make -j<number_of_build_threads>
