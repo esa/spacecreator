@@ -51,15 +51,15 @@ Following instructions require git bash.
     cd <GRANTLEE_DIR>
     git apply --ignore-space-change --ignore-whitespace fix_escape.diff
 
-To build Taste3 correctly Grantlee should be installed into QTDIR directory:
+To build Taste3 correctly Grantlee should be installed into QTDIR directory (if CMAKE_PREFIX_PATH is already set, expand it instead of setting):
 
-    export QTDIR=$(qmake -query QT_INSTALL_PREFIX)
-    export CMAKE_PREFIX_PATH=$QTDIR:$CMAKE_PREFIX_PATH
+    set QTDIR=C:\Qt\5.14.1\msvc2017_64
+    set CMAKE_PREFIX_PATH=%QTDIR%
 
     mkdir build
     cd build
 
-    cmake -DCMAKE_INSTALL_PREFIX=$QTDIR -A x64 ..
+    cmake -DCMAKE_INSTALL_PREFIX=%QTDIR% -A x64 ..
     cmake --build . --config Release
     cmake --build . --config Release --target install
 
