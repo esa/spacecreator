@@ -174,24 +174,8 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
 
 void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    Q_ASSERT(grip);
-
-    QPointF itemOffset;
-    switch (grip->location()) {
-    case GripPoint::Location::Top:
-        itemOffset.setY(from.y() - to.y());
-        break;
-    case GripPoint::Location::Left:
-        itemOffset.setX(from.x() - to.x());
-        break;
-    case GripPoint::Location::TopLeft:
-        itemOffset = from - to;
-        break;
-    default:
-        break;
-    }
     AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
-    layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions, itemOffset);
+    layoutConnectionsOnResize();
 }
 
 void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt,
@@ -204,10 +188,10 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPoin
 
     if (allowGeometryChange(pressedAt, releasedAt)) {
         updateEntity();
-        layoutConnectionsOnResize(ConnectionLayoutPolicy::RebuildOnCollision);
+        layoutConnectionsOnResize();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
-        layoutConnectionsOnResize(ConnectionLayoutPolicy::IgnoreCollisions);
+        layoutConnectionsOnResize();
     }
 }
 
@@ -239,7 +223,7 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF
     }
 }
 
-void AADLFunctionGraphicsItem::layoutConnectionsOnResize(ConnectionLayoutPolicy layoutPolicy, const QPointF &itemOffset)
+void AADLFunctionGraphicsItem::layoutConnectionsOnResize()
 {
     /// Changing inner and outer connections bound to current function item
     for (auto item : childItems()) {

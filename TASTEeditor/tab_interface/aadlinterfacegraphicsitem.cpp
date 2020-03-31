@@ -88,8 +88,7 @@ void AADLInterfaceGraphicsItem::removeConnection(AADLConnectionGraphicsItem *ite
     if (!item)
         return;
 
-    if (m_connections.removeAll(item))
-        setFlag(QGraphicsItem::ItemIsSelectable, m_connections.isEmpty());
+    m_connections.removeAll(item);
 }
 
 QList<QPointer<AADLConnectionGraphicsItem>> AADLInterfaceGraphicsItem::connectionItems() const

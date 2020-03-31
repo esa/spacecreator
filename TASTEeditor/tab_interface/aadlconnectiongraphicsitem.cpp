@@ -577,6 +577,9 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPoin
 
         auto updateEdgeItem = [&](AADLInterfaceGraphicsItem *iface) {
             iface->setPos(iface->parentItem()->mapFromScene(to));
+            for (auto connection : iface->connectionItems())
+                if (connection != this)
+                    connection->updateEdgePoint(iface);
         };
         if (idx == 0)
             updateEdgeItem(m_startItem);
@@ -612,9 +615,15 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     if (idx == 0) {
         m_startItem->instantLayoutUpdate();
         m_points[idx] = m_startItem->scenePos();
+
+        for (auto connection : m_startItem->connectionItems())
+            connection->layout();
     } else if (idx == grips.size() - 1) {
         m_endItem->instantLayoutUpdate();
         m_points[idx] = m_endItem->scenePos();
+
+        for (auto connection : m_endItem->connectionItems())
+            connection->layout();
     }
 
     for (auto item : scene()->items(m_points)) {
