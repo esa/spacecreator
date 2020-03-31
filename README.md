@@ -2,6 +2,16 @@
 
 ESA's TASTE (https://taste.tools/) evolution (v3?)
 
+Dependency list
+===============
+
+This repository depends on these parts:
+
+* Qt (tested with 5.14.1, works with earlier as well)
+* The Qt SVG module
+* Grantlee (see below)
+
+
 Grantlee dependency
 ===================
 
