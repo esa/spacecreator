@@ -12,13 +12,18 @@ This repository depends on these parts:
 * Grantlee (see below)
 
 
-Grantlee dependency
-===================
+Grantlee templating engine
+==========================
 
-It is required Grantlee as a Qt implementation of string template engine of Django syntax.
+Grantlee is a Qt implementation of string template engine of Django syntax.
 Sources of Grantlee are avalable from here https://github.com/steveire/grantlee
 
     git clone https://github.com/steveire/grantlee.git
+
+Template engine documentation
+-----------------------------
+
+The best source of documentation is in the grantlee website http://www.grantlee.org. Examples of use are found here: http://www.grantlee.org/apidox/examples.html.
 
 Linux build
 -----------
