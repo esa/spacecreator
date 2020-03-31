@@ -777,11 +777,11 @@ void InterfaceTabDocument::updateSceneRect()
 
     if (itemsRect != m_prevItemsRect) {
         const QRectF sceneRect = m_graphicsScene->sceneRect();
-        const QRectF updated = m_desktopGeometry.united(itemsRect);
+        const QRectF updated = sceneRect.united(itemsRect);
+
         if (sceneRect != updated) {
             m_graphicsView->setUpdatesEnabled(false);
             m_graphicsScene->setSceneRect(updated);
-            m_graphicsView->ensureVisible(itemsRect);
             m_graphicsView->setUpdatesEnabled(true);
 
             m_prevItemsRect = itemsRect;
