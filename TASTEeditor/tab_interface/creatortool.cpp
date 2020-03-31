@@ -41,6 +41,7 @@
 #include <app/commandsstack.h>
 #include <baseitems/common/utils.h>
 #include <baseitems/graphicsview.h>
+#include <baseitems/grippoint.h>
 #include <limits>
 #include <tab_aadl/aadlobjectcomment.h>
 #include <tab_aadl/aadlobjectfunction.h>
@@ -49,6 +50,7 @@
 #include <tab_aadl/aadlobjectsmodel.h>
 
 static const qreal kContextMenuItemTolerance = 10.;
+static const qreal kGripPointTolerance = 4;
 static const QList<int> kFunctionTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
                                            taste3::aadl::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
@@ -138,8 +140,10 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if (!scene)
         return false;
 
+    const QPointF scenePos = cursorInScene(e->globalPos());
     if (e->modifiers() & Qt::ControlModifier) {
-        if (e->button() & Qt::MouseButton::LeftButton)
+        auto itemAtCursor = m_view->itemAt(e->pos());
+        if ((e->button() & Qt::MouseButton::LeftButton) && (!itemAtCursor || itemAtCursor->type() != GripPoint::Type))
             m_toolType = ToolType::DirectConnection;
         else
             return false;
@@ -147,13 +151,12 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = cursorInScene(e->globalPos());
     if (m_toolType == ToolType::DirectConnection) {
-        if (!utils::nearestItem(scene, scenePos,
-                                { AADLFunctionTypeGraphicsItem::Type, AADLFunctionGraphicsItem::Type }))
+        if (!utils::nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
             if (!utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance / 2,
                                     { AADLFunctionGraphicsItem::Type }))
                 return false;
+        }
 
         if (m_previewConnectionItem) {
             m_connectionPoints.clear();
@@ -166,9 +169,9 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance,
-                                                 { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
+            QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance,
+                                                     { AADLInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 

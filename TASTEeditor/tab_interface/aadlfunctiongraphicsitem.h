@@ -64,7 +64,6 @@ protected Q_SLOTS:
 
 private:
     Q_INVOKABLE void updateNestedIcon();
-    void layoutConnections();
 
     enum ConnectionLayoutPolicy
     {
@@ -72,6 +71,7 @@ private:
         RebuildOnCollision
     };
     void layoutOuterConnections(ConnectionLayoutPolicy layoutPolicy);
+    void layoutConnections(ConnectionLayoutPolicy layoutPolicy, const QPointF &itemOffset = QPointF());
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
