@@ -100,6 +100,12 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
             return onMouseRelease(static_cast<QMouseEvent *>(event));
         case QEvent::MouseMove:
             return onMouseMove(static_cast<QMouseEvent *>(event));
+        case QEvent::MouseButtonDblClick: {
+            QMouseEvent *e = static_cast<QMouseEvent *>(event);
+            if (e->button() & Qt::RightButton) // block double click for right click and handle it
+                return onMousePress(e);
+            return false;
+        }
         default:
             break;
         }
@@ -200,7 +206,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
                 return nullptr;
             };
 
-            QGraphicsItem *parentItem = findParent(m_view->itemAt(e->localPos().toPoint()));
+            QGraphicsItem *parentItem = findParent(m_view->itemAt(e->pos()));
             m_previewItem = new QGraphicsRectItem(parentItem);
             m_previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
             m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
@@ -209,6 +215,19 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
             if (!parentItem)
                 scene->addItem(m_previewItem);
+
+            if (!e->buttons().testFlag(Qt::MaxMouseButton)) {
+                auto items = m_view->items(e->pos());
+                for (auto item : items) {
+                    if (item->type() > QGraphicsItem::UserType) {
+                        if (!item->isSelected()) {
+                            scene->clearSelection();
+                            item->setSelected(true);
+                        }
+                        break;
+                    }
+                }
+            }
         }
         const QPointF mappedScenePos = m_previewItem->mapFromScene(scenePos);
         m_previewItem->setRect({ mappedScenePos, mappedScenePos });
@@ -316,7 +335,10 @@ bool CreatorTool::onContextMenu(QContextMenuEvent *e)
     }
 
     // onMousePress is needed to set an apppropriate m_previewItem
-    QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton, Qt::RightButton, 0);
+    QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton,
+                           Qt::RightButton | Qt::MaxMouseButton, 0); // Qt::MaxMouseButton is a fake button
+                                                                     // to distinguish this mouse event
+                                                                     // and thus avoid selecting of another object
     onMousePress(&mouseEvent);
 
     return showContextMenu(globalPos);
