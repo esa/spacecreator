@@ -353,7 +353,12 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 
 static inline bool alignToSidePoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign)
 {
-    auto ifaceItem = itemAt<AADLInterfaceGraphicsItem>(scene, point);
+    auto foundItem = utils::nearestItem(scene, point, ConnectionCreationValidator::kInterfaceTolerance / 2,
+                                        { AADLInterfaceGraphicsItem::Type });
+    if (!foundItem)
+        return false;
+
+    auto ifaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(foundItem);
     if (!ifaceItem)
         return false;
 
