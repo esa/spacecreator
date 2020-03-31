@@ -85,3 +85,36 @@ Build
     cd build
     qmake ../taste3
     make -j<number_of_build_threads>
+
+Grantlee notes
+==============
+
+**Steps to integrate the string template engine**<br>
+The current implementation is based on the [Grantlee string template library](https://github.com/steveire/grantlee).
+*  Build and install *Grantlee* (please look at README.md).
+*  Add the next lines into your *.pro file:<br>
+`GRANTLEE_LIB_DIR = $$[QT_INSTALL_LIBS]`<br>
+`DEFINES += GRANTLEE_LIB_DIR='\\"$$GRANTLEE_LIB_DIR\\"'`<br>
+`GRANTLEE_LIB=Grantlee_Templates`<br>
+`win32: CONFIG(debug, debug|release):GRANTLEE_LIB = $$join(GRANTLEE_LIB,,,d)`<br>
+`LIBS += -L$$GRANTLEE_LIB_DIR -l$$GRANTLEE_LIB`<br>
+`macx: INCLUDEPATH += $$[QT_INSTALL_HEADERS]`
+*  Add next files from *taste3/TASTEeditor/templating/* to your project and set them in *.pro file:<br>
+`HEADERS += \`<br>
+`        ...`<br>
+`        templating/abstractexportableobject.h \`<br>
+`        templating/exportableproperty.h \`<br>
+`        templating/stringtemplate.h \`<br>
+`        templating/templateeditor.h \`<br>
+`        templating/templatehighlighter.h \`<br>
+`        templating/xmlhighlighter.h \`<br>
+`        templating/templatesyntaxhelpdialog.h`<br>
+`SOURCES += \`<br>
+`        ...`<br>
+`        templating/stringtemplate.cpp \`<br>
+`        templating/templateeditor.cpp \`<br>
+`        templating/templatehighlighter.cpp \`<br>
+`        templating/xmlhighlighter.cpp \`<br>
+`        templating/templatesyntaxhelpdialog.cpp`
+*  Write a successor of `AbstractExportableObject` as a lightweight wrapper to export your QObject-derived objects. Use implementation of `ExportableAADLObject` and its successors as a reference.
+*  Create exportable an object, cast it to `QVariant` and append it in `QHash<QString, QVariantList>` by using a `groupName()` as a key. Then invoke `StringTemplate::parseFile()` for parsing a template. Use implementation of `XmlDocExporter` from *taste3/TASTEeditor/app/* as a reference.
