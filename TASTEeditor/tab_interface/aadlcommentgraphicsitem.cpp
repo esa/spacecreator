@@ -111,7 +111,7 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     AADLRectGraphicsItem::paint(painter, option, widget);
 }
 
-void AADLCommentGraphicsItem::rebuildLayout()
+void AADLCommentGraphicsItem::doRebuildLayout()
 {
     AADLRectGraphicsItem::rebuildLayout();
     updateTextLayout(m_text);

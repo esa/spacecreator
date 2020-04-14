@@ -32,15 +32,15 @@ namespace ctx {
  * \class taste3::ctx::Condition
  * \brief The serializable collection of taste3::ctx::AttrHandler.
  */
-static const QString JSON_FIELD_NAME_ItemType = "itemType";
-static const QString JSON_FIELD_NAME_Attributes = "attributes";
+static const char* JSON_FIELD_NAME_ItemType = "itemType";
+static const char* JSON_FIELD_NAME_Attributes = "attributes";
 
-QVector<AttrHandler> attrsFromJson(const QJsonObject &jObj)
+static QVector<AttrHandler> attrsFromJson(const QJsonObject &jasonObject)
 {
     QVector<AttrHandler> res;
-    const QJsonArray &jArr = jObj[JSON_FIELD_NAME_Attributes].toArray();
-    for (auto jObj : jArr)
-        res.append(AttrHandler(jObj.toObject()));
+    const QJsonArray &arr = jasonObject[JSON_FIELD_NAME_Attributes].toArray();
+    for (auto obj : arr)
+        res.append(AttrHandler(obj.toObject()));
     return res;
 }
 

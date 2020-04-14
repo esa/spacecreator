@@ -419,44 +419,34 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
 
 QList<int> knownGraphicsItemTypes()
 {
-    static QList<int> result;
+    QList<int> result;
 
-    if (result.isEmpty()) {
-        const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
-        for (int i = 0; i < me.keyCount(); ++i) {
-            int itemType = 0;
-            const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
-            switch (objectType) {
-            case aadl::AADLObject::Type::Function: {
-                itemType = aadl::AADLFunctionGraphicsItem::Type;
-                break;
-            }
-            case aadl::AADLObject::Type::FunctionType: {
-                itemType = aadl::AADLFunctionTypeGraphicsItem::Type;
-                break;
-            }
-            case aadl::AADLObject::Type::ProvidedInterface:
-            case aadl::AADLObject::Type::RequiredInterface: {
-                itemType = aadl::AADLInterfaceGraphicsItem::Type;
-                break;
-            }
-            case aadl::AADLObject::Type::Comment: {
-                itemType = aadl::AADLCommentGraphicsItem::Type;
-                break;
-            }
-            case aadl::AADLObject::Type::Connection: {
-                itemType = aadl::AADLConnectionGraphicsItem::Type;
-                break;
-            }
-            case aadl::AADLObject::Type::Unknown:
-                continue;
-            default: {
-                qWarning() << "Unhandled graphics item:" << objectType;
-                continue;
-            }
-            }
-            if (itemType)
-                result.append(itemType);
+    const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
+    for (int i = 0; i < me.keyCount(); ++i) {
+        int itemType = 0;
+        const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
+        switch (objectType) {
+        case aadl::AADLObject::Type::Function:
+            itemType = aadl::AADLFunctionGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::FunctionType:
+            itemType = aadl::AADLFunctionTypeGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::ProvidedInterface:
+        case aadl::AADLObject::Type::RequiredInterface:
+            itemType = aadl::AADLInterfaceGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::Comment:
+            itemType = aadl::AADLCommentGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::Connection:
+            itemType = aadl::AADLConnectionGraphicsItem::Type;
+            break;
+        case aadl::AADLObject::Type::Unknown:
+            continue;
+        }
+        if (itemType != 0) {
+            result.append(itemType);
         }
     }
 

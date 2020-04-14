@@ -46,7 +46,7 @@ protected Q_SLOTS:
     void applyColorScheme() override;
 
 protected:
-    void rebuildLayout() override;
+    void doRebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     ColorManager::HandledColors handledColorType() const override;
 
@@ -60,7 +60,7 @@ protected:
                        [](AADLType obj) { return obj ? obj->title() : QString(); });
         const QString line = joinNonEmpty(result, QStringLiteral(", "));
         return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
-    };
+    }
 
     static QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
     {

@@ -39,7 +39,7 @@ class DynActionEditor : public QDialog
 
 public:
     explicit DynActionEditor(QWidget *parent = nullptr);
-    ~DynActionEditor();
+    ~DynActionEditor() override;
 
     bool init();
 

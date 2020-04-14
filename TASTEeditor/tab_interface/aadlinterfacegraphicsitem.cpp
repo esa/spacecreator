@@ -187,7 +187,7 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     m_boundingRect = childrenBoundingRect();
 };
 
-void AADLInterfaceGraphicsItem::rebuildLayout()
+void AADLInterfaceGraphicsItem::doRebuildLayout()
 {
     if (!parentItem()) {
         prepareGeometryChange();

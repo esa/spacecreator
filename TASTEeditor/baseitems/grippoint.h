@@ -29,6 +29,7 @@ namespace taste3 {
 
 class AbstractInteractiveObject;
 class GripPointsHandler;
+
 class GripPoint : public QGraphicsItem
 {
     Q_GADGET
@@ -44,7 +45,7 @@ public:
         BottomLeft,
         TopRight,
         BottomRight,
-        Absolute,
+        Absolute
     };
     Q_ENUM(Location)
     typedef QSet<GripPoint::Location> Locations;

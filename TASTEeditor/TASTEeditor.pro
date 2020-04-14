@@ -157,7 +157,8 @@ SOURCES += \
         tab_interface/properties/propertieslistmodel.cpp \
         tab_interface/properties/propertiesmodelbase.cpp \
         tab_interface/properties/propertiesviewbase.cpp \
-        tab_msc/msctabdocument.cpp
+        tab_msc/msctabdocument.cpp \
+        util/delayedsignal.cpp
 
 HEADERS += \
         app/commandlineparser.h \
@@ -280,7 +281,8 @@ HEADERS += \
         tab_interface/properties/propertieslistmodel.h \
         tab_interface/properties/propertiesmodelbase.h \
         tab_interface/properties/propertiesviewbase.h \
-        tab_msc/msctabdocument.h
+        tab_msc/msctabdocument.h \
+        util/delayedsignal.h
 
 FORMS += \
     app/context/action/editor/conditiondialog.ui \

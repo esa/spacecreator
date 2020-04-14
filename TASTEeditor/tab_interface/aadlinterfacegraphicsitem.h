@@ -60,7 +60,7 @@ public:
 
 protected:
     void layout();
-    void rebuildLayout() override;
+    void doRebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

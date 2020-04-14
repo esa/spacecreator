@@ -53,21 +53,6 @@ private:
         QString m_description;
     };
 
-    struct ExternalArgHolder {
-        enum Type
-        {
-            CWD,
-            Attr,
-            Prop,
-            Param
-        };
-
-        QString key;
-        QString description;
-        Type target;
-    };
-
-    static const QVector<ExternalArgHolder> externalArgs;
     static ActionsManager *m_instance;
 
     ActionsManager();

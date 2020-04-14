@@ -392,7 +392,7 @@ void AADLConnectionGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
     Q_UNUSED(widget)
 }
 
-void AADLConnectionGraphicsItem::rebuildLayout()
+void AADLConnectionGraphicsItem::doRebuildLayout()
 {
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);

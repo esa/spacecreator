@@ -27,6 +27,8 @@
 
 namespace taste3 {
 class HighlightRectItem;
+namespace util { class DelayedSignal; }
+
 namespace aadl {
 
 class AADLObject;
@@ -110,7 +112,10 @@ protected:
     virtual void showGripPoints();
     virtual void initGripPoints();
 
-    virtual void rebuildLayout();
+    // Handle layout changes. This is deferred to happen once after all requests have been handled
+    // The actual work
+    void rebuildLayout();
+
     virtual void onSelectionChanged(bool isSelected);
 
     HighlightRectItem *createHighlighter();
@@ -118,6 +123,10 @@ protected:
 
     virtual ColorManager::HandledColors handledColorType() const = 0;
     virtual ColorHandler colorHandler() const;
+
+protected Q_SLOTS:
+    // Handle the layout rebuild now
+    virtual void doRebuildLayout() = 0;
 
 private Q_SLOTS:
     virtual void gripPointPressed(GripPoint *pos, const QPointF &at);
@@ -140,6 +149,8 @@ protected:
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
+
+    util::DelayedSignal* m_rebuildLayoutSignal;
 };
 
 } // namespace aadl

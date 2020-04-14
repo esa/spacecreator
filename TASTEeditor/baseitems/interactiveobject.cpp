@@ -26,6 +26,7 @@
 #include "tab_interface/commands/cmdentityautolayout.h"
 #include "tab_interface/commands/commandids.h"
 #include "tab_interface/commands/commandsfactory.h"
+#include "util/delayedsignal.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -51,6 +52,9 @@ InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
     setCursor(Qt::ArrowCursor);
 
     connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::applyColorScheme);
+
+    m_rebuildLayoutSignal = new util::DelayedSignal(this);
+    connect(m_rebuildLayoutSignal, &util::DelayedSignal::triggered, this, &InteractiveObject::doRebuildLayout);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -121,7 +125,9 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     }
 }
 
-void InteractiveObject::rebuildLayout() {}
+void InteractiveObject::rebuildLayout() {
+    m_rebuildLayoutSignal->triggerSignal();
+}
 
 QFont InteractiveObject::font() const
 {

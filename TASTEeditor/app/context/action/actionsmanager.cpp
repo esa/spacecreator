@@ -41,6 +41,24 @@
 #include <iomanip>
 #include <iostream>
 
+struct ExternalArgHolder {
+    enum Type { CWD, Attr, Prop, Param };
+
+    QString key;
+    QString description;
+    Type target;
+};
+
+static QVector<ExternalArgHolder> externalArgs(bool namedKey) {
+    const QString name = namedKey ? "name" : "";
+    QVector<ExternalArgHolder> args;
+    args.append({ "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD });
+    args.append({ "$attr_" + name, QObject::tr("Value of the selected object's attribute [name]"), ExternalArgHolder::Type::Attr });
+    args.append({ "$prop_" + name, QObject::tr("Value of the selected object's property [name]"), ExternalArgHolder::Type::Prop });
+    args.append({ "$param_" + name, QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."), ExternalArgHolder::Type::Param });
+    return args;
+}
+
 namespace taste3 {
 namespace ctx {
 
@@ -52,13 +70,6 @@ namespace ctx {
  */
 ActionsManager *ActionsManager::m_instance = nullptr;
 
-const QVector<ActionsManager::ExternalArgHolder> ActionsManager::externalArgs = {
-    { "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD },
-    { "$attr_", QObject::tr("Value of the selected object's attribute [name]"), ExternalArgHolder::Type::Attr },
-    { "$prop_", QObject::tr("Value of the selected object's property [name]"), ExternalArgHolder::Type::Prop },
-    { "$param_", QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."),
-      ExternalArgHolder::Type::Param },
-};
 
 /*!
  * Returns path to a dir that contains custom actions descriptions.
@@ -66,10 +77,8 @@ const QVector<ActionsManager::ExternalArgHolder> ActionsManager::externalArgs = 
  */
 QString ActionsManager::storagePath()
 {
-    static const QString targetDir =
-            QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-    return targetDir;
-};
+    return QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+}
 
 /*!
  * \brief ActionsManager::populateMenu
@@ -126,14 +135,15 @@ void ActionsManager::init()
 
 void ActionsManager::deployDefaults()
 {
-    static const QString &targetDir = storagePath();
-    static const QString targetFile("contextmenu.json");
-    static const QString targetFilePath(targetDir + targetFile);
+    const QString targetDir = storagePath();
+    const QString targetFile("contextmenu.json");
+    const QString targetFilePath(targetDir + targetFile);
 
     common::ensureDirExists(targetDir);
 
-    if (!QFileInfo::exists(targetFilePath))
+    if (!QFileInfo::exists(targetFilePath)) {
         common::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
+    }
 }
 
 QStringList ActionsManager::listUserFiles()
@@ -146,8 +156,9 @@ QStringList ActionsManager::listUserFiles()
         return res;
 
     const QStringList &names = dir.entryList({ "*.json" }, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-    for (const QString &name : names)
+    for (const QString &name : names) {
         res.append(targetDir + name);
+    }
 
     return res;
 }
@@ -155,8 +166,9 @@ QStringList ActionsManager::listUserFiles()
 void ActionsManager::loadFiles()
 {
     m_actions.clear();
-    for (const QString &file : ActionsManager::listUserFiles())
+    for (const QString &file : ActionsManager::listUserFiles()) {
         loadActions(file);
+    }
 }
 
 void ActionsManager::reload()
@@ -167,8 +179,9 @@ void ActionsManager::reload()
 void ActionsManager::loadActions(const QString &fromFile)
 {
     const QVector<Action> &actions = parseFile(fromFile);
-    if (!actions.isEmpty())
+    if (!actions.isEmpty()) {
         m_actions.append(actions);
+    }
 }
 
 QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *errorHandler)
@@ -262,59 +275,55 @@ void ActionsManager::triggerActionInternal(const Action &act)
 
 QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl::AADLObject *aadlObj)
 {
-    if (text.isEmpty() || !aadlObj)
+    if (text.isEmpty() || !aadlObj) {
         return {};
+    }
 
-    if (text[0] != '$')
+    if (text[0] != '$') {
         return text;
+    }
 
-    for (const ActionsManager::ExternalArgHolder &holder : externalArgs) {
+    for (const ExternalArgHolder &holder : externalArgs(false)) {
         const QString name = text.mid(holder.key.size());
         switch (holder.target) {
-        case ActionsManager::ExternalArgHolder::CWD: {
+        case ExternalArgHolder::CWD:
             if (text == holder.key)
                 return qApp->applicationDirPath();
             break;
-        }
-        case ActionsManager::ExternalArgHolder::Attr: {
+        case ExternalArgHolder::Attr:
             if (text.startsWith(holder.key)) {
                 return aadlObj->attr(name).toString();
             }
             break;
-        }
-        case ActionsManager::ExternalArgHolder::Prop: {
+        case ExternalArgHolder::Prop:
             if (text.startsWith(holder.key)) {
                 return aadlObj->prop(name).toString();
             }
             break;
-        }
-        case ActionsManager::ExternalArgHolder::Param: {
+        case ExternalArgHolder::Param:
             if (text.startsWith(holder.key)) {
                 switch (aadlObj->aadlType()) {
                 case aadl::AADLObject::Type::RequiredInterface:
-                case aadl::AADLObject::Type::ProvidedInterface: {
+                case aadl::AADLObject::Type::ProvidedInterface:
                     if (const aadl::AADLObjectIface *iface = aadlObj->as<const aadl::AADLObjectIface *>()) {
                         const aadl::IfaceParameter &ifaceParam = iface->param(name);
                         if (!ifaceParam.isNull())
                             return ifaceParam.toString();
                     }
                     break;
-                }
                 case aadl::AADLObject::Type::Function:
-                case aadl::AADLObject::Type::FunctionType: {
+                case aadl::AADLObject::Type::FunctionType:
                     if (const aadl::AADLObjectFunctionType *fn = aadlObj->as<const aadl::AADLObjectFunctionType *>()) {
                         const aadl::ContextParameter &ctxParam = fn->contextParam(name);
                         if (!ctxParam.isNull())
                             return ctxParam.toString();
                     }
                     break;
-                }
                 default:
                     break;
                 }
             }
             break;
-        }
         }
     }
 
@@ -356,10 +365,8 @@ void ActionsManager::triggerActionExternal(const Action &act, const taste3::aadl
 QStringList ActionsManager::externalArgsHoldersDescr()
 {
     QStringList result;
-    for (auto t : externalArgs) {
-        QString uiName = t.key;
-        uiName.replace(QLatin1String("_"), QLatin1String("_name"));
-        result.append(QString("%1 - %2").arg(uiName, t.description));
+    for (auto t : externalArgs(true)) {
+        result.append(QString("%1 - %2").arg(t.key, t.description));
     }
     return result;
 }

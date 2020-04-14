@@ -89,7 +89,7 @@ protected:
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;
-    void rebuildLayout() override;
+    void doRebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
 private:

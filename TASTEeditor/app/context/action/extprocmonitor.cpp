@@ -95,23 +95,15 @@ void ExtProcMonitor::onReadyReadStandardOutput()
 void ExtProcMonitor::closeEvent(QCloseEvent *event)
 {
     if (m_process->state() == QProcess::Running) {
-        const QString msg("The process %1 [%2] is still running.");
-        const qint64 pid =
-#ifdef Q_OS_WIN
-                m_process->processId();
-#else
-                m_process->pid();
-#endif
-        switch (QMessageBox::question(this, tr("Closing"), msg.arg(m_process->program(), QString::number(pid)),
-                                      tr("Kill"), tr("Cancel"))) {
-        case 0: {
+        const QString msg = tr("The process %1 [%2] is still running.");
+        const qint64 pid = m_process->processId();
+        switch (QMessageBox::question(this, tr("Closing"), msg.arg(m_process->program(), QString::number(pid)), tr("Kill"), tr("Cancel closing"))) {
+        case 0:
             syncStop();
             break;
-        }
-        default: {
+        default:
             event->ignore();
             return;
-        }
         }
     }
 

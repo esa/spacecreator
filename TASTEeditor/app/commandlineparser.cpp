@@ -78,43 +78,37 @@ QString CommandLineParser::value(CommandLineParser::Positional arg) const
 QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positional arg)
 {
     switch (arg) {
-    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+    case CommandLineParser::Positional::DropUnsavedChangesSilently:
         return QCommandLineOption(
                 { "d", "drop-changes-silently" },
                 QCoreApplication::translate("CommandLineParser",
                                             "Do not propose to save changes when closing a document."));
-    }
-    case CommandLineParser::Positional::OpenAADLXMLFile: {
+    case CommandLineParser::Positional::OpenAADLXMLFile:
         return QCommandLineOption(
                 { "o", "open-aadl-xml" },
                 QCoreApplication::translate("CommandLineParser", "Open an AADL XML <file> on startup."),
                 QCoreApplication::translate("CommandLineParser", "file"));
-    }
-    case CommandLineParser::Positional::OpenStringTemplateFile: {
+    case CommandLineParser::Positional::OpenStringTemplateFile:
         return QCommandLineOption(
                 { "t", "open-template" },
                 QCoreApplication::translate("CommandLineParser",
                                             "Open a string template <file> on startup (-o option is required)."),
                 QCoreApplication::translate("CommandLineParser", "file"));
-    }
-    case CommandLineParser::Positional::ExportToFile: {
+    case CommandLineParser::Positional::ExportToFile:
         return QCommandLineOption(
                 { "e", "export-to-xml" },
                 QCoreApplication::translate(
                         "CommandLineParser",
                         "Export the doc to the <file> using default template (-o option is required)."),
                 QCoreApplication::translate("CommandLineParser", "file"));
-    }
-    case CommandLineParser::Positional::ListScriptableActions: {
+    case CommandLineParser::Positional::ListScriptableActions:
         return QCommandLineOption(
                 { "l", "list-actions" },
                 QCoreApplication::translate("CommandLineParser", "List scriptable actions and exit."));
-    }
 
-    default: {
+    case CommandLineParser::Positional::Unknown:
         Q_UNREACHABLE();
         break;
-    }
     }
 
     qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";

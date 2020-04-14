@@ -42,7 +42,6 @@ public:
     QString clearSuffix(QString &value) const;
 
 private:
-    static const QLatin1Char ZoomSuffix;
     QIntValidator *m_validator { nullptr };
 };
 

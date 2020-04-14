@@ -37,9 +37,9 @@ DataTypesStorage::DataTypesStorage(const QMap<QString, BasicDataType *> &dataTyp
 {
 }
 
-QString ensureAsnFileExists()
+static QString ensureAsnFileExists()
 {
-    static const QString asnFileName("taste-types.asn");
+    const QString asnFileName("taste-types.asn");
     const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 
     common::ensureDirExists(targetDir);
@@ -57,7 +57,7 @@ QString ensureAsnFileExists()
     return QString();
 }
 
-QStringList dataRangeFromString(const QString &data)
+static QStringList dataRangeFromString(const QString &data)
 {
     if (data.isEmpty())
         return {};
@@ -69,12 +69,12 @@ QStringList dataRangeFromString(const QString &data)
     return line.split(",", QString::SkipEmptyParts);
 }
 
-BasicDataType *datatypeFromString(const QString &line)
+static BasicDataType *datatypeFromString(const QString &line)
 {
     if (line.isEmpty())
         return nullptr;
 
-    static const QRegularExpression rx("(.*\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
+    const QRegularExpression rx("(.*\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
     const QStringList &matched = rx.match(line).capturedTexts();
     if (matched.size() >= 3) {
         const QString &dataName = matched[1];
@@ -101,15 +101,15 @@ BasicDataType *datatypeFromString(const QString &line)
             }
 
             if (dataType == "REAL") {
-                const QStringList &dataRange = dataRangeFromString(dataRangeStr);
+                const QStringList &dataRangeReal = dataRangeFromString(dataRangeStr);
                 RealDataType *data = new RealDataType(dataName);
-                data->setRange({ dataRange.first().toDouble(), dataRange.last().toDouble() });
+                data->setRange({ dataRangeReal.first().toDouble(), dataRangeReal.last().toDouble() });
                 return data;
             }
 
             if (dataType == "ENUMERATION") {
-                const QStringList &dataRange = dataRangeFromString(dataRangeStr);
-                return new EnumDataType(dataName, dataRange.toVector());
+                const QStringList &dataRangeEnumeration = dataRangeFromString(dataRangeStr);
+                return new EnumDataType(dataName, dataRangeEnumeration.toVector());
             }
         }
 

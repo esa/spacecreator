@@ -46,7 +46,7 @@ public:
     QString prepareTooltip() const override;
 
 protected:
-    void rebuildLayout() override;
+    void doRebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 

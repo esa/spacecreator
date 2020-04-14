@@ -121,7 +121,8 @@ HEADERS += \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertieslistmodel.h \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertiesmodelbase.h \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertiesviewbase.h \
-        $$TASTE_PRO_ROOT/tab_msc/msctabdocument.h
+        $$TASTE_PRO_ROOT/tab_msc/msctabdocument.h \
+        $$TASTE_PRO_ROOT/util/delayedsignal.h
 
 SOURCES += \
         $$TASTE_PRO_ROOT/app/commandlineparser.cpp \
@@ -240,7 +241,8 @@ SOURCES += \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertieslistmodel.cpp \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertiesmodelbase.cpp \
         $$TASTE_PRO_ROOT/tab_interface/properties/propertiesviewbase.cpp \
-        $$TASTE_PRO_ROOT/tab_msc/msctabdocument.cpp
+        $$TASTE_PRO_ROOT/tab_msc/msctabdocument.cpp \
+        $$TASTE_PRO_ROOT/util/delayedsignal.cpp
 
 FORMS += \
         $$TASTE_PRO_ROOT/app/context/action/editor/conditiondialog.ui \

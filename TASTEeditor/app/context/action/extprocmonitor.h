@@ -27,11 +27,10 @@ namespace ctx {
 class ExtProcMonitor : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit ExtProcMonitor(QWidget *parent = nullptr);
     bool start(const QString &app, const QStringList &args, const QString &workingDir);
-
-Q_SIGNALS:
 
 private Q_SLOTS:
     void onErrorOccurred(QProcess::ProcessError error);

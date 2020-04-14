@@ -87,12 +87,8 @@ MainWindow::~MainWindow()
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
+    if (e->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
-        break;
-    default:
-        break;
     }
 }
 
@@ -263,25 +259,16 @@ bool MainWindow::closeTab(int id)
     if (document::AbstractTabDocument *doc = m_docsManager->docById(id)) {
         if (doc->isDirty() && !m_dropUnsavedChangesSilently) {
             const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
-            const QMessageBox::StandardButton btn = QMessageBox::question(this, tr("Document closing"),
-                                                                          tr("There are unsaved changes.\n"
-                                                                             "Would you like to save the document?"),
-                                                                          btns);
-            switch (btn) {
-            case QMessageBox::Save: {
+            auto btn = QMessageBox::question(this, tr("Document closing"), tr("There are unsaved changes.\nWould you like to save the document?"), btns);
+            if (btn == QMessageBox::Save) {
                 if (app::XmlDocExporter::canExportXml(doc)) {
                     if (!exportDocAsXml(doc))
                         return false;
                 } else {
                     qWarning() << "Not implemented yet";
                 }
-                break;
-            }
-            case QMessageBox::Cancel: {
+            } else if (btn == QMessageBox::Cancel) {
                 return false;
-            }
-            default:
-                break;
             }
         }
 
@@ -294,14 +281,12 @@ bool MainWindow::closeTab(int id)
 /*!
  * \brief Return the list of image formats which the Qt is available to write.
  */
-QStringList supportedImgFileExtensions()
+static QStringList supportedImgFileExtensions()
 {
-    static QStringList extensions;
-    if (extensions.isEmpty()) {
-        const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
-        for (const QByteArray &format : formats)
-            extensions << ("*." + format.toLower());
-    }
+    QStringList extensions;
+    const QList<QByteArray> &formats = QImageWriter::supportedImageFormats();
+    for (const QByteArray &format : formats)
+        extensions << ("*." + format.toLower());
     return extensions;
 }
 
@@ -515,10 +500,10 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return true;
     }
-    default:
-        qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
+    case CommandLineParser::Positional::Unknown:
         break;
     }
+    qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
     return false;
 }
 

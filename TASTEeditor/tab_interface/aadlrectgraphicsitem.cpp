@@ -90,10 +90,11 @@ void AADLRectGraphicsItem::setRect(const QRectF &geometry)
 void AADLRectGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    static const GripPoint::Locations locations { GripPoint::Location::Top,      GripPoint::Location::Left,
-                                                  GripPoint::Location::Bottom,   GripPoint::Location::Right,
-                                                  GripPoint::Location::TopLeft,  GripPoint::Location::BottomLeft,
-                                                  GripPoint::Location::TopRight, GripPoint::Location::BottomRight };
+    const GripPoint::Locations locations {
+        GripPoint::Location::Top, GripPoint::Location::Left,
+        GripPoint::Location::Bottom, GripPoint::Location::Right,
+        GripPoint::Location::TopLeft, GripPoint::Location::BottomLeft,
+        GripPoint::Location::TopRight, GripPoint::Location::BottomRight };
     for (auto location : locations)
         m_gripPointsHandler->createGripPoint(location);
 }
@@ -183,7 +184,7 @@ QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams(
     return params;
 }
 
-void AADLRectGraphicsItem::rebuildLayout()
+void AADLRectGraphicsItem::doRebuildLayout()
 {
     const QRectF sceneRect = sceneBoundingRect();
     if (auto graphicsItemParent = parentItem()) {
@@ -286,9 +287,6 @@ void AADLRectGraphicsItem::singleStepMove(MoveStep direction)
         shift.setY(delta);
         break;
     }
-    default: {
-        return;
-    }
     }
 
     shiftBy(shift);
@@ -302,8 +300,6 @@ QRectF AADLRectGraphicsItem::nestedItemsSceneBoundingRect() const
             const QRectF nestedRect = iObj->sceneBoundingRect();
             if (nestedRect.isValid())
                 nestedItemsBoundingRect |= nestedRect;
-            else
-                qWarning() << iObj->aadlObject()->title() << nestedRect;
         }
     }
     return nestedItemsBoundingRect;

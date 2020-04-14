@@ -120,6 +120,6 @@ void DrawRectInfo::update()
     m_border.setColor(m_borderColor);
     m_border.setWidthF(m_borderWidth);
     m_body = QBrush(m_bodyColor);
-};
+}
 
 } // ns taste3

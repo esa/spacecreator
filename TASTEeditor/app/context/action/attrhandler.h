@@ -24,7 +24,7 @@ namespace taste3 {
 namespace ctx {
 
 struct AttrHandler {
-    AttrHandler(const QJsonObject &jObj = QJsonObject());
+    explicit AttrHandler(const QJsonObject &jObj = QJsonObject());
     QJsonObject toJson() const;
 
     QString m_title;

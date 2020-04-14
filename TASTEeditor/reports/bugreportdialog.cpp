@@ -24,8 +24,8 @@
 #include <QFile>
 #include <QPushButton>
 
-static const QString kDefaultHost = QLatin1String("https://git.vikingsoftware.com");
-static const QString kDefaultProjectID = QLatin1String("60");
+static const char *defaultHost = "https://git.vikingsoftware.com";
+static const int defaultProjectID = 60;
 
 BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &images, QWidget *parent)
     : QDialog(parent)
@@ -42,10 +42,10 @@ BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &i
     connect(m_ui->projectLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
 
     const QString settingsHost = taste3::AppOptions::BugReport.Host.read().toString();
-    m_ui->hostLineEdit->setText(settingsHost.isEmpty() ? kDefaultHost : settingsHost);
+    m_ui->hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
 
     const QString settingsProjectID = taste3::AppOptions::BugReport.ProjectID.read().toString();
-    m_ui->projectLineEdit->setText(settingsProjectID.isEmpty() ? kDefaultProjectID : settingsProjectID);
+    m_ui->projectLineEdit->setText(settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
 
     m_ui->accessTokenLineEdit->setText(taste3::AppOptions::BugReport.AccessToken.read().toByteArray());
 

@@ -87,8 +87,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     const QPoint &screenPos(event->pos());
     const QPointF &scenePos(mapToScene(screenPos));
 
-    auto coordinatesInfo = [](const QPointF &point, const QString &name) {
-        static const QString infoTemplate("%1: [%2;%3]; ");
+    const QString infoTemplate("%1: [%2;%3]; ");
+    auto coordinatesInfo = [infoTemplate](const QPointF &point, const QString &name) {
         return infoTemplate.arg(name, QString::number(point.x()), QString::number(point.y()));
     };
 

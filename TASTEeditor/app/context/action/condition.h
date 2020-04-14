@@ -28,8 +28,10 @@ namespace taste3 {
 namespace ctx {
 
 struct Condition {
-    Condition(const QJsonObject &jObj = QJsonObject());
+    explicit Condition(const QJsonObject &jObj = QJsonObject());
+
     static Condition createGlobal();
+
     QJsonObject toJson() const;
 
     QString m_itemType;

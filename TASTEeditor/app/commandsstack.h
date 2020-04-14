@@ -29,7 +29,7 @@ class CommandsStack : public QObject
     Q_OBJECT
 public:
     struct Macro {
-        Macro(const QString &title = QString());
+        explicit Macro(const QString &title = QString());
         ~Macro();
 
         bool push(QUndoCommand *cmd) const;
@@ -53,7 +53,7 @@ Q_SIGNALS:
     void currentStackChanged(QUndoStack *to);
 
 private:
-    CommandsStack(QObject *parent = nullptr);
+    explicit CommandsStack(QObject *parent = nullptr);
 
     void setCurrentStack(QUndoStack *stack);
     QUndoStack *currentStack() const;

@@ -23,8 +23,6 @@
 
 namespace taste3 {
 
-const QLatin1Char ZoomValidator::ZoomSuffix = QLatin1Char('%');
-
 /*!
  * \class taste3::ZoomValidator
  * \brief validator used in ZoomController's combo box.
@@ -38,13 +36,13 @@ ZoomValidator::ZoomValidator(QObject *parent)
 
 void ZoomValidator::addSuffix(QString &text) const
 {
-    if (!text.endsWith(ZoomSuffix))
-        text.append(ZoomSuffix);
+    if (!text.endsWith('%'))
+        text.append('%');
 }
 
 QString ZoomValidator::clearSuffix(QString &value) const
 {
-    value.remove(ZoomSuffix);
+    value.remove('%');
     return value;
 }
 
@@ -130,8 +128,8 @@ void ZoomController::setView(GraphicsView *view)
     if (!m_view)
         return;
 
-    m_validator->setBottom(m_view->minZoomPercent());
-    m_validator->setTop(m_view->maxZoomPercent());
+    m_validator->setBottom(qRound(m_view->minZoomPercent()));
+    m_validator->setTop(qRound(m_view->maxZoomPercent()));
 
     refill();
 

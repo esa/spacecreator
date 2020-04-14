@@ -32,15 +32,15 @@ namespace ctx {
  * Stored in JSON.
  */
 
-static const QString JSON_FIELD_NAME_Title = "title";
-// static const QString JSON_FIELD_NAME_Tabs = "tabs";
-static const QString JSON_FIELD_NAME_Conditions = "conditions";
-static const QString JSON_FIELD_NAME_Action = "action";
-static const QString JSON_FIELD_NAME_App = "app";
-static const QString JSON_FIELD_NAME_AppArgs = "appArgs";
-static const QString JSON_FIELD_NAME_AppCwd = "appCwd";
+static const char* JSON_FIELD_NAME_Title = "title";
+// static const char* JSON_FIELD_NAME_Tabs = "tabs";
+static const char* JSON_FIELD_NAME_Conditions = "conditions";
+static const char* JSON_FIELD_NAME_Action = "action";
+static const char* JSON_FIELD_NAME_App = "app";
+static const char* JSON_FIELD_NAME_AppArgs = "appArgs";
+static const char* JSON_FIELD_NAME_AppCwd = "appCwd";
 
-QStringList stringListFromJArray(const QJsonArray &jArr)
+static QStringList stringListFromJArray(const QJsonArray &jArr)
 {
     QStringList res;
     for (auto str : jArr)
@@ -48,7 +48,7 @@ QStringList stringListFromJArray(const QJsonArray &jArr)
     return res;
 }
 
-QVector<Condition> conditionsFromJArray(const QJsonArray &jArr)
+static QVector<Condition> conditionsFromJArray(const QJsonArray &jArr)
 {
     QVector<Condition> res;
     for (auto jObj : jArr)
@@ -81,17 +81,14 @@ Action::Action(const QJsonObject &jObj)
 
 QJsonObject Action::toJson() const
 {
-    auto conditionsToArray = [](const QVector<Condition> &conditions) {
-        QJsonArray res;
-        for (const Condition &condition : conditions)
-            res.append(condition.toJson());
-        return res;
-    };
+    QJsonArray res;
+    for (const Condition &condition : m_conditions)
+        res.append(condition.toJson());
 
     return {
         { JSON_FIELD_NAME_Title, m_title },
         //             { JSON_FIELD_NAME_Tabs, QJsonArray::fromStringList(m_tabsAllowed) },
-        { JSON_FIELD_NAME_Conditions, conditionsToArray(m_conditions) },
+        { JSON_FIELD_NAME_Conditions, res },
         { JSON_FIELD_NAME_Action, m_internalActName },
         { JSON_FIELD_NAME_App, m_externalApp },
         { JSON_FIELD_NAME_AppArgs, QJsonArray::fromStringList(m_externalAppParams) },

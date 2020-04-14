@@ -45,34 +45,29 @@ namespace app {
  * \brief The helper that incorporates templating::StringTemplate-related stuff.
  */
 
-static const QString TemplateFileExtension = QString("tmplt");
+const char* TemplateFileExtension = "tmplt";
 
 QString XmlDocExporter::templatesPath()
 {
-    static const QString path =
-            QString("%1/export_templates").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-    return path;
+    return QString("%1/export_templates").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 }
 
 QString XmlDocExporter::interfaceDefaultTemplate()
 {
-    static const QString interfaceTemplatePath =
-            QString("%1/aadl_xml/interfaceview.%2").arg(templatesPath(), TemplateFileExtension);
-    return interfaceTemplatePath;
+    return QString("%1/aadl_xml/interfaceview.%2").arg(templatesPath(), TemplateFileExtension);
 }
 
 void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy)
 {
-    static const QStringList fileNames { QStringLiteral("interfaceview"), QStringLiteral("interface"),
-                                         QStringLiteral("function"), QStringLiteral("connection"),
-                                         QStringLiteral("comment") };
+    const QStringList fileNames { QStringLiteral("interfaceview"), QStringLiteral("interface"),
+                QStringLiteral("function"), QStringLiteral("connection"), QStringLiteral("comment") };
 
-    static const QString sourceFile(":/defaults/templating/xml_templates/%1.%2");
-    static const QString targetFilePath = QFileInfo(interfaceDefaultTemplate()).path();
+    const QString sourceFile(":/defaults/templating/xml_templates/%1.%2");
+    const QString targetFilePath = QFileInfo(interfaceDefaultTemplate()).path();
 
     const bool forcedOverwrite = policy == RolloutDefaultsPolicy::Overwrite;
 
-    auto rollOutDefaultTemplate = [forcedOverwrite](const QString &fileName) {
+    auto rollOutDefaultTemplate = [forcedOverwrite, sourceFile, targetFilePath](const QString &fileName) {
         const QString fileFrom(sourceFile.arg(fileName, TemplateFileExtension));
         const QString fileTo(QString("%1/%2.%3").arg(targetFilePath, fileName, TemplateFileExtension));
         if (forcedOverwrite || !QFileInfo::exists(fileTo))

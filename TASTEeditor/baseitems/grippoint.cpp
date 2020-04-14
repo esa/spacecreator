@@ -80,7 +80,7 @@ GripPoint::GripPoint(Location pos, GripPointsHandler *parent)
     setFlags(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
     setVisible(true);
-};
+}
 
 void GripPoint::updateLayout()
 {
