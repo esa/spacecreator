@@ -399,6 +399,11 @@ void AADLConnectionGraphicsItem::doRebuildLayout()
         return;
     }
 
+    if (m_startItem->entity()->coordinates().isEmpty())
+        m_startItem->layout();
+    if (m_endItem->entity()->coordinates().isEmpty())
+        m_endItem->layout();
+
     bool pathObsolete(true);
     if (m_points.size() >= 2)
         pathObsolete = (!startItem() || startItem()->scenePos() != m_points.first())
@@ -406,12 +411,12 @@ void AADLConnectionGraphicsItem::doRebuildLayout()
 
     if (pathObsolete) {
         if (m_points.size() <= 2) {
-            layOut();
+            layout();
         } else if (m_firstUpdate) {
             // perform the "second" update - when additional points are in place,
             // yet the turn angles are weird due to interface autolayout, or whatever
             m_firstUpdate = false;
-            layOut();
+            layout();
         } else {
             updateEdgePoint(m_startItem);
         }
@@ -439,10 +444,12 @@ void AADLConnectionGraphicsItem::updateEdgePoint(const AADLInterfaceGraphicsItem
     updateBoundingRect();
 }
 
-void AADLConnectionGraphicsItem::layOut()
+void AADLConnectionGraphicsItem::layout()
 {
-    if (!m_startItem || !m_endItem)
+    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
+        setVisible(false);
         return;
+    }
 
     m_points = connectionPath(m_startItem, m_endItem);
     updateBoundingRect();
@@ -567,7 +574,12 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPoin
                 return;
         }
 
-        auto updateEdgeItem = [&](InteractiveObject *item) { item->setPos(item->parentItem()->mapFromScene(to)); };
+        auto updateEdgeItem = [&](AADLInterfaceGraphicsItem *iface) {
+            iface->setPos(iface->parentItem()->mapFromScene(to));
+            for (auto connection : iface->connectionItems())
+                if (connection != this)
+                    connection->updateEdgePoint(iface);
+        };
         if (idx == 0)
             updateEdgeItem(m_startItem);
         else if (idx == grips.size() - 1)
@@ -602,9 +614,15 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     if (idx == 0) {
         m_startItem->instantLayoutUpdate();
         m_points[idx] = m_startItem->scenePos();
+
+        for (auto connection : m_startItem->connectionItems())
+            connection->layout();
     } else if (idx == grips.size() - 1) {
         m_endItem->instantLayoutUpdate();
         m_points[idx] = m_endItem->scenePos();
+
+        for (auto connection : m_endItem->connectionItems())
+            connection->layout();
     }
 
     for (auto item : scene()->items(m_points)) {

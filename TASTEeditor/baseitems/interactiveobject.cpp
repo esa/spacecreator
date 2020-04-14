@@ -151,6 +151,12 @@ void InteractiveObject::updateEntity()
 
 void InteractiveObject::mergeGeometry()
 {
+    for (auto child : childItems()) {
+        if (auto io = qobject_cast<InteractiveObject *>(child->toGraphicsObject())) {
+            io->mergeGeometry();
+        }
+    }
+
     QList<QVariant> params;
     const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),

@@ -201,7 +201,8 @@ ConnectionCreationValidator::validateCreate(QGraphicsScene *scene, const QPointF
  * 2. interface parents are not the AADLFunctionTypeGraphicsItem
  * 3. an iface kind is not AADLObjectIface::OperationKind::Cyclic;
  * 4. parent of the source and target interface differs;
- * 5. both ifaces are either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true
+ * 5. both ifaces are either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true;
+ * 6. the RI is not connected to any other RIs;
  *
  * Returns the status of such check as ConnectionCreationValidator::FailReason.
  * Anything except the FailReason::NotFail means that the connection creation is prohibited.
@@ -233,6 +234,23 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
             targetFunction ? targetFunction : (targetIface ? targetIface->parentObject() : nullptr);
     if ((srcParent || dstParent) && srcParent == dstParent)
         return FailReason::SameParent;
+
+    // [6] - the RI is not connected to any other RIs
+    const bool maybeRiRi = !sourceIface || !targetIface
+            || (sourceIface && targetIface && sourceIface->direction() == targetIface->direction());
+    if (maybeRiRi)
+        for (auto iface : { sourceIface, targetIface }) {
+            if (iface) {
+                if (auto model = iface->objectsModel()) {
+                    for (auto connection : model->getConnectionsForIface(iface->id())) {
+                        if (connection->sourceInterface()->isRequired()
+                            && connection->targetInterface()->isRequired()) {
+                            return FailReason::MulticastDisabled;
+                        }
+                    }
+                }
+            }
+        }
 
     // [5] - both ifaces should be either (PI+RI|PI+PI|RI+RI) compatible by kind and params, or PI+RI.inheritPI=true
     if (sourceIface && targetIface)

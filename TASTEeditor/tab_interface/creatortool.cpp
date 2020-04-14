@@ -41,6 +41,7 @@
 #include <app/commandsstack.h>
 #include <baseitems/common/utils.h>
 #include <baseitems/graphicsview.h>
+#include <baseitems/grippoint.h>
 #include <limits>
 #include <tab_aadl/aadlobjectcomment.h>
 #include <tab_aadl/aadlobjectfunction.h>
@@ -49,6 +50,7 @@
 #include <tab_aadl/aadlobjectsmodel.h>
 
 static const qreal kContextMenuItemTolerance = 10.;
+static const qreal kGripPointTolerance = 4;
 static const QList<int> kFunctionTypes = { taste3::aadl::AADLFunctionGraphicsItem::Type,
                                            taste3::aadl::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
@@ -98,6 +100,12 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
             return onMouseRelease(static_cast<QMouseEvent *>(event));
         case QEvent::MouseMove:
             return onMouseMove(static_cast<QMouseEvent *>(event));
+        case QEvent::MouseButtonDblClick: {
+            QMouseEvent *e = static_cast<QMouseEvent *>(event);
+            if (e->button() & Qt::RightButton) // block double click for right click and handle it
+                return onMousePress(e);
+            return false;
+        }
         default:
             break;
         }
@@ -138,8 +146,10 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     if (!scene)
         return false;
 
+    const QPointF scenePos = cursorInScene(e->globalPos());
     if (e->modifiers() & Qt::ControlModifier) {
-        if (e->button() & Qt::MouseButton::LeftButton)
+        auto itemAtCursor = m_view->itemAt(e->pos());
+        if ((e->button() & Qt::MouseButton::LeftButton) && (!itemAtCursor || itemAtCursor->type() != GripPoint::Type))
             m_toolType = ToolType::DirectConnection;
         else
             return false;
@@ -147,13 +157,12 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = cursorInScene(e->globalPos());
     if (m_toolType == ToolType::DirectConnection) {
-        if (!utils::nearestItem(scene, scenePos,
-                                { AADLFunctionTypeGraphicsItem::Type, AADLFunctionGraphicsItem::Type }))
+        if (!utils::nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
             if (!utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance / 2,
                                     { AADLFunctionGraphicsItem::Type }))
                 return false;
+        }
 
         if (m_previewConnectionItem) {
             m_connectionPoints.clear();
@@ -166,9 +175,9 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         m_connectionPoints.append(scenePos);
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
-        QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance,
-                                                 { AADLInterfaceGraphicsItem::Type });
         if (!m_previewConnectionItem) {
+            QGraphicsItem *item = utils::nearestItem(scene, scenePos, ConnectionCreationValidator::kInterfaceTolerance,
+                                                     { AADLInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
@@ -197,7 +206,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
                 return nullptr;
             };
 
-            QGraphicsItem *parentItem = findParent(m_view->itemAt(e->localPos().toPoint()));
+            QGraphicsItem *parentItem = findParent(m_view->itemAt(e->pos()));
             m_previewItem = new QGraphicsRectItem(parentItem);
             m_previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
             m_previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
@@ -206,6 +215,19 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
             if (!parentItem)
                 scene->addItem(m_previewItem);
+
+            if (!e->buttons().testFlag(Qt::MaxMouseButton)) {
+                auto items = m_view->items(e->pos());
+                for (auto item : items) {
+                    if (item->type() > QGraphicsItem::UserType) {
+                        if (!item->isSelected()) {
+                            scene->clearSelection();
+                            item->setSelected(true);
+                        }
+                        break;
+                    }
+                }
+            }
         }
         const QPointF mappedScenePos = m_previewItem->mapFromScene(scenePos);
         m_previewItem->setRect({ mappedScenePos, mappedScenePos });
@@ -313,7 +335,10 @@ bool CreatorTool::onContextMenu(QContextMenuEvent *e)
     }
 
     // onMousePress is needed to set an apppropriate m_previewItem
-    QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton, Qt::RightButton, 0);
+    QMouseEvent mouseEvent(QEvent::MouseButtonPress, viewPos, Qt::RightButton,
+                           Qt::RightButton | Qt::MaxMouseButton, 0); // Qt::MaxMouseButton is a fake button
+                                                                     // to distinguish this mouse event
+                                                                     // and thus avoid selecting of another object
     onMousePress(&mouseEvent);
 
     return showContextMenu(globalPos);
@@ -350,7 +375,12 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 
 static inline bool alignToSidePoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign)
 {
-    auto ifaceItem = itemAt<AADLInterfaceGraphicsItem>(scene, point);
+    auto foundItem = utils::nearestItem(scene, point, ConnectionCreationValidator::kInterfaceTolerance / 2,
+                                        { AADLInterfaceGraphicsItem::Type });
+    if (!foundItem)
+        return false;
+
+    auto ifaceItem = qgraphicsitem_cast<const AADLInterfaceGraphicsItem *>(foundItem);
     if (!ifaceItem)
         return false;
 

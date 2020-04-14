@@ -57,9 +57,9 @@ public:
     QList<QVariantList> prepareChangeCoordinatesCommandParams() const override;
 
     QString prepareTooltip() const override;
+    void layout();
 
 protected:
-    void layout();
     void doRebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
 
@@ -70,6 +70,8 @@ protected:
     void updateInternalItems(Qt::Alignment alignment);
     virtual ColorManager::HandledColors handledColorType() const override;
     void adjustItem();
+
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 protected Q_SLOTS:
     virtual void applyColorScheme() override;

@@ -64,14 +64,14 @@ protected Q_SLOTS:
 
 private:
     Q_INVOKABLE void updateNestedIcon();
-    void layoutConnections();
 
     enum ConnectionLayoutPolicy
     {
         IgnoreCollisions = 0,
         RebuildOnCollision
     };
-    void layoutOuterConnections(ConnectionLayoutPolicy layoutPolicy);
+    void layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy);
+    void layoutConnectionsOnResize();
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;

@@ -78,7 +78,7 @@ public:
 
     void updateEdgePoint(const AADLInterfaceGraphicsItem *iface);
 
-    void layOut();
+    void layout();
 
 protected:
     void onManualMoveStart(GripPoint *gp, const QPointF &at) override;

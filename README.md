@@ -2,13 +2,28 @@
 
 ESA's TASTE (https://taste.tools/) evolution (v3?)
 
-Grantlee dependency
-===================
+Dependency list
+===============
 
-It is required Grantlee as a Qt implementation of string template engine of Django syntax.
+This repository depends on these parts:
+
+* Qt (tested with 5.14.1, works with earlier as well)
+* The Qt SVG module
+* Grantlee (see below)
+
+
+Grantlee templating engine
+==========================
+
+Grantlee is a Qt implementation of string template engine of Django syntax.
 Sources of Grantlee are avalable from here https://github.com/steveire/grantlee
 
     git clone https://github.com/steveire/grantlee.git
+
+Template engine documentation
+-----------------------------
+
+The best source of documentation is in the grantlee website http://www.grantlee.org. Examples of use are found here: http://www.grantlee.org/apidox/examples.html.
 
 Linux build
 -----------
@@ -51,17 +66,19 @@ Following instructions require git bash.
     cd <GRANTLEE_DIR>
     git apply --ignore-space-change --ignore-whitespace fix_escape.diff
 
-To build Taste3 correctly Grantlee should be installed into QTDIR directory:
+To build Taste3 correctly Grantlee should be installed into QTDIR directory (if CMAKE_PREFIX_PATH is already set, expand it instead of setting):
 
-    export QTDIR=$(qmake -query QT_INSTALL_PREFIX)
-    export CMAKE_PREFIX_PATH=$QTDIR:$CMAKE_PREFIX_PATH
+    set QTDIR=C:\Qt\5.14.1\msvc2017_64
+    set CMAKE_PREFIX_PATH=%QTDIR%
 
     mkdir build
     cd build
 
-    cmake -DCMAKE_INSTALL_PREFIX=$QTDIR -A x64 ..
+    cmake -DCMAKE_INSTALL_PREFIX=%QTDIR% -A x64 ..
     cmake --build . --config Release
     cmake --build . --config Release --target install
+    cmake --build . --config Debug
+    cmake --build . --config Debug --target install
 
 Taste3 build
 ============
