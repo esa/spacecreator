@@ -1,0 +1,33 @@
+[
+    {
+        "conditions": [
+            {
+                "attributes": [],
+                "itemType": "*"
+            }
+        ],
+        "action": "Context actions",
+        "title": "Context menu customization",
+        "app": "",
+        "appArgs": [],
+        "appCwd": ""
+    },
+    {
+        "conditions": [
+            {
+                "attributes": [
+                    {
+                        "title": "name",
+                        "value": "*"
+                    }
+                ],
+                "itemType": "*"
+            }
+        ],
+        "action": "",
+        "app": "TASTEeditor",
+        "appArgs": [ "-l" ],
+        "appCwd": "TASTE3",
+        "title": "List scriptable actions"
+    }
+]

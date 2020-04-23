@@ -1,0 +1,41 @@
+{% comment %} 
+The following tags are available in this sub-template:
+iface            : Instance of interface (provided by a top level template)
+iface.isProvided :   |_ Whether interface is provided
+iface.isRequired :   |_ Whether interface is required
+iface.attributes :   |_ List of all available attributes
+attr             :       |_ Instance of attriubute
+attr.name        :           |_ Name of attribute
+attr.value       :           |_ Value of attribute
+iface.params     :   |_ List of params of interface
+param            :       |_ Instance of param
+param.isIn       :           |_ Whether param is IN
+param.isOut      :           |_ Whether param is OUT
+param.name       :           |_ Name of param
+param.type       :           |_ Type of param
+param.encoding   :           |_ Encoding of param
+iface.properties :   |_ List of all available properties
+prop             :       |_ Instance of property
+prop.name        :           |_ Name of property
+prop.value       :           |_ Value of property
+{% endcomment %}
+{% if iface.isProvided %}
+<Provided_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+{% else %}
+<Required_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+{% endif %}
+{% for param in iface.params %}
+{% if param.isIn %}
+    <Input_Parameter name="{{ param.name }}" type="{{ param.type }}" encoding="{{ param.encoding }}"/>
+{% else %}
+    <Output_Parameter name="{{ param.name }}" type="{{ param.type }}" encoding="{{ param.encoding }}"/>
+{% endif %}
+{% endfor %}
+{% for prop in iface.properties %}
+    <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
+{% endfor %}
+{% if iface.isProvided %}
+</Provided_Interface>
+{% else %}
+</Required_Interface>
+{% endif %}
