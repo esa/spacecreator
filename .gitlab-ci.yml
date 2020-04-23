@@ -1,0 +1,14 @@
+stages:
+  - build
+
+##################
+# Build
+##################
+
+build_linux_gcc:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
+  script:
+    - echo "ok"
