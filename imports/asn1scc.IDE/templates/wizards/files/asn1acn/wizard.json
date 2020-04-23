@@ -1,0 +1,111 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "A.ASN1ACN",
+    "category": "R.Asn1Acn",
+    "trDescription": "Creates an ASN.1/ACN model.",
+    "trDisplayName": "ASN.1/ACN Model",
+    "trDisplayCategory": "ASN.1/ACN",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('ASN.1/ACN') >= 0}",
+
+    "options":
+    [
+        { "key": "AsnFilePath", "value": "%{TargetPath}/%{AsnSrcFileName}" },
+        { "key": "AcnFilePath", "value": "%{TargetPath}/%{AcnSrcFileName}" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Define ASN.1/ACN Model",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data":
+            [
+                {
+                    "name": "Model",
+                    "trDisplayName": "Model name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data":
+                    {
+                        "validator": "[A-Z]([a-zA-Z0-9]|-)*",
+                        "fixup": "%{JS: '%{INPUT}'.charAt(0).toUpperCase() + '%{INPUT}'.slice(1) }"
+                    }
+                },
+                {
+                    "name": "FileExtensionType",
+                    "type": "ComboBox",
+                    "trDisplayName": "ASN.1 Model file extension:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "items":
+                        [
+                            { "trKey": "asn", "value": ".asn" },
+                            { "trKey": "asn1", "value": ".asn1" }
+                        ]
+                    }
+                },
+                {
+                    "name": "AsnSrcFileName",
+                    "type": "LineEdit",
+                    "trDisplayName": "ASN.1 Model file:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "trText": "%{JS: Util.fileName('%{Model}', '%{FileExtensionType}')}"
+                    }
+                },
+                {
+                    "name": "AcnSrcFileName",
+                    "type": "LineEdit",
+                    "trDisplayName": "ACN Model file:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "trText": "%{JS: Util.fileName('%{Model}', '%{JS: Util.preferredSuffix('text/x-acn')}')}"
+                    }
+                },
+                {
+                    "name": "TargetPath",
+                    "type": "PathChooser",
+                    "trDisplayName": "Path:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "kind": "existingDirectory",
+                        "basePath": "%{InitialPath}",
+                        "path": "%{InitialPath}"
+                    }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "template.asn",
+                "target": "%{AsnFilePath}",
+                "openInEditor": true
+            }
+        },
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "template.acn",
+                "target": "%{AcnFilePath}",
+                "openInEditor": true
+            }
+        }
+    ]
+}
