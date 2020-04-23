@@ -1,0 +1,85 @@
+
+
+/* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+/* CIF TextMode 0 */
+/* CIF Modified */
+MSCDOCUMENT My_System
+/* CIF Specific Geode Version @(V) tool=geodedit V4.1.2 format=MSC92 cif=yes */
+/* CIF LastModified Thu Nov 08 14:17:30 2018 */ /* MSC IS */;
+
+  /* MSC GOAL SEARCH; */
+  /* MSC TIME GLOBAL */
+
+  /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+  /* CIF TextMode 0 */
+  /* CIF Modified */
+  MSCDOCUMENT Some_Sequence /* MSC AND */;
+
+
+    /* CIF MSCDOCUMENT (20, 20), (1500, 1090) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    /* CIF MscPageSize (2965, 2105) */
+    /* CIF Preview 0 0 0 */
+    MSCDOCUMENT connection;
+
+
+      MSC connection;
+      ENDMSC;
+      
+
+    ENDMSCDOCUMENT;
+
+    /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    /* CIF MscPageSize (2965, 2105) */
+    /* CIF Preview 0 0 0 */
+    MSCDOCUMENT ping;
+
+
+      MSC ping;
+      ENDMSC;
+      
+
+    ENDMSCDOCUMENT;
+
+    /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    /* CIF MscPageSize (2965, 2105) */
+    /* CIF Preview 0 0 0 */
+    MSCDOCUMENT disconnect;
+
+
+      MSC disconnect;
+      ENDMSC;
+      
+
+    ENDMSCDOCUMENT;
+
+    /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+    /* CIF TextMode 0 */
+    /* CIF Modified */
+    MSCDOCUMENT exception /* MSC EXCEPTION */;
+
+
+      /* CIF MSCDOCUMENT (0, 0), (1500, 890) */
+      /* CIF TextMode 0 */
+      /* CIF Modified */
+      /* CIF MscPageSize (2965, 2105) */
+      /* CIF Preview 0 0 0 */
+      MSCDOCUMENT major_failure;
+
+
+        MSC major_failure;
+        ENDMSC;
+        
+
+      ENDMSCDOCUMENT;
+
+    ENDMSCDOCUMENT;
+
+  ENDMSCDOCUMENT;
+
+ENDMSCDOCUMENT;

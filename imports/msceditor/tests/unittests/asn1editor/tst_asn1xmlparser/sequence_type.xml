@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ASN1AST>
+   <Asn1File FileName="test.asn">
+      <Asn1Module ID="ModuleTest">
+         <TypeAssignments>
+            <TypeAssignment Name="MySeq" Line="8" CharPositionInLine="0">
+               <Type Line="8" CharPositionInLine="10">
+                  <SequenceType>
+                     <SequenceOrSetChild VarName="foo" Optional="False" Line="8" CharPositionInLine="21">
+                        <Type Line="8" CharPositionInLine="25">
+                           <BooleanType />
+                        </Type>
+                     </SequenceOrSetChild>
+                     <SequenceOrSetChild VarName="int2Val" Optional="False" Line="26" CharPositionInLine="4">
+                        <Type Line="26" CharPositionInLine="12">
+                           <IntegerType Min="-10" Max="10" />
+                        </Type>
+                     </SequenceOrSetChild>
+                  </SequenceType>
+               </Type>
+            </TypeAssignment>
+         </TypeAssignments>
+      </Asn1Module>
+   </Asn1File>
+</ASN1AST>

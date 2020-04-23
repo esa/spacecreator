@@ -1,0 +1,14 @@
+project     = "MSC Editor"
+description = "MSC Editor Reference Documentation"
+
+outputdir     = html
+outputformats = HMTL
+
+headerdirs  = ../libs \
+    ../msceditor
+sourcedirs  = . \
+    ../libs \
+    ../msceditor
+
+sources.fileextensions = "*.cpp *.qdoc *.qml *.js"
+headers.fileextensions = "*.h"

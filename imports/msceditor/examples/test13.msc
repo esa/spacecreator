@@ -1,0 +1,11 @@
+mscdocument automade;
+inst mygui_GUI : process;
+msg gui_send_tm, pepe : (str, T-POS);
+msc recorded;
+gate out gui_send_tm,a("hello", b) to mygui_GUI;
+mygui_GUI : instance  process;
+in gui_send_tm,a("hello", b)  from env;
+
+endinstance;
+endmsc;
+endmscdocument;

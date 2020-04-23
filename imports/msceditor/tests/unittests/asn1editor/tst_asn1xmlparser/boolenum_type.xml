@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ASN1AST>
+   <Asn1File FileName="test.asn">
+      <Asn1Module ID="ModuleTest">
+         <TypeAssignments>
+            <TypeAssignment Name="MyBOOL" Line="6" CharPositionInLine="0">
+               <Type Line="6" CharPositionInLine="10">
+                  <BooleanType />
+               </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="TypeEnumerated" Line="11" CharPositionInLine="3">
+               <Type Line="11" CharPositionInLine="19">
+                  <EnumeratedType Extensible="False" ValuesAutoCalculated="False">
+                     <EnumValues>
+                        <EnumValue StringValue="red" IntValue="0" Line="17" CharPositionInLine="4" EnumID="red" />
+                        <EnumValue StringValue="green" IntValue="1" Line="18" CharPositionInLine="4" EnumID="green" />
+                        <EnumValue StringValue="blue" IntValue="2" Line="19" CharPositionInLine="4" EnumID="blue" />
+                     </EnumValues>
+                  </EnumeratedType>
+               </Type>
+            </TypeAssignment>
+         </TypeAssignments>
+      </Asn1Module>
+   </Asn1File>
+</ASN1AST>
+

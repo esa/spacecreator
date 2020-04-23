@@ -1,0 +1,29 @@
+MSCDOCUMENT CU_level;
+
+  MSCDOCUMENT run_unit /* MSC AND */;
+
+    MSCDOCUMENT init_operational;
+      MSC init_operational;
+        INSTANCE inst_1_cu_nominal.cu_controller : PROCESS;
+        ENDINSTANCE;
+      ENDMSC;
+    ENDMSCDOCUMENT;
+
+  ENDMSCDOCUMENT;
+
+  MSCDOCUMENT watchdog /* MSC REPEAT */;
+    MSCDOCUMENT run_software /* MSC EXCEPTION */;
+      MSC nominal;
+        INSTANCE inst_1;
+        ENDINSTANCE;
+        INSTANCE inst_2;
+        ENDINSTANCE;
+      ENDMSC;
+      MSC nominal2;
+        INSTANCE nononono;
+        ENDINSTANCE;
+      ENDMSC;
+    ENDMSCDOCUMENT;
+  ENDMSCDOCUMENT;
+
+ENDMSCDOCUMENT;

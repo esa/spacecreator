@@ -1,0 +1,176 @@
+stages:
+  - build
+  - test
+  - checks
+
+##################
+# Build
+##################
+
+# Docker based Linux build (because of tag docker - see CI runners tags)
+build_linux_gcc:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
+  before_script:
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache 
+    - export CCACHE_COMPILERCHECK=content
+    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
+    - export QTC_SOURCE=/opt/qtcreator/source
+    - export QTC_BUILD=/opt/qtcreator/build
+  script:
+    - scripts/build_antlr.sh
+    - mkdir -p build; cd build
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - make -j 8
+    # move plugin to an artifact dir
+    - cp /root/.local/share/data/QtProject/qtcreator/plugins/4.8.1/libMscPlugin.so .
+  artifacts:
+    paths:
+      - build
+      - libs/asn1editor/parser
+      - libs/msclibrary/parser
+    expire_in: 1 day
+  cache:
+    paths:
+      - ccache/
+
+#build_linux_clang:
+#  stage: build
+#  tags:
+#    - docker
+#  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
+#  before_script:
+#    # CCache Config
+#    - mkdir -p ccache
+#    - export CCACHE_BASEDIR=${PWD}
+#    - export CCACHE_DIR=${PWD}/ccache
+#    - export CCACHE_COMPILERCHECK=content
+#    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
+#  script:
+#    - scripts/build_antlr.sh
+#    - mkdir -p build_clang
+#    - cd build_clang
+#    - qmake QMAKE_CC="ccache clang" QMAKE_CXX="ccache clang++" -recursive ..
+#    - make -j 8
+#  cache:
+#    paths:
+#      - ccache/
+
+build_debian9_gcc:
+  stage: build
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/debian_9_cpp:latest
+  before_script:
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache 
+    - export CCACHE_COMPILERCHECK=content
+    - export CCACHE_SLOPPINESS="pch_defines,time_macros"
+  script:
+    - scripts/build_antlr.sh
+    - mkdir -p build; cd build
+    - qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - make -j 8
+  cache:
+    paths:
+      - ccache/
+
+# MacOS Shell (because of tag macOS - see CI runners tags)
+build_MacOS:
+  stage: build
+  tags:
+    - macOS
+  script:
+    - mkdir build_macos
+    - cd build_macos
+    - qmake ..
+    - make -j 8
+  only:
+    - master
+
+#build_Windows:
+#  stage: build
+#  tags:
+#    - win10
+#    - vs2017
+#    - x64
+#  script:
+#    - 'call scripts\build_windows.bat'
+#  cache:
+#    key: antlrRuntime
+#    paths:
+#      - 3rdparty/antlr/cpp_runtime/runtime/bin
+#      - 3rdparty/antlr/cpp_runtime/runtime/obj
+#  only:
+#    - master
+
+##################
+# TEST
+##################
+
+test_docker:
+  stage: test
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
+  script:
+    - cd build
+    - export QT_QPA_PLATFORM=offscreen
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake QMAKE_CC="ccache gcc" QMAKE_CXX="ccache g++" -recursive ..
+    - find . | xargs touch # Avoid rebuilding
+    - make -j 8 # make sure everything is build
+    - make check
+  dependencies:
+    - build_linux_gcc
+
+coverage_docker:
+  stage: test
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
+  script:
+    - mkdir -p build_coverage; cd build_coverage
+    - /opt/Qt/5.12.2/gcc_64/bin/qmake CONFIG+=debug CONFIG+=coverage -recursive ..
+    - make -j 8
+    - export QT_QPA_PLATFORM=offscreen
+    - make coverage-html
+  coverage: '/^ *lines\.*:\s+(\d+.\d+\%)/'
+  artifacts:
+    paths:
+      - build_coverage/coverage-html
+    expire_in: 1 week
+  only:
+    - master
+
+##################
+# CHECKS - static analyses
+##################
+
+cppcheck:
+  stage: checks
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
+  script:
+    - scripts/cppcheck_run.sh
+
+clang_analyze:
+  stage: checks
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_cosmic_qt5.11.1:latest
+  script:
+    - mkdir -p build_clang_analyze; cd build_clang_analyze
+    - qmake CONFIG+=no_tests ..
+    - /usr/share/clang/scan-build-7/bin/scan-build --status-bugs -o ../clang-analyze make -j8
+  artifacts:
+    paths:
+      - clang-analyze
+    expire_in: 1 week

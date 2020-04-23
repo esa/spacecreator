@@ -1,0 +1,47 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>resources/texture.png</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="document_and.png">resources/document_and.png</file>
+        <file alias="document_exception.png">resources/document_exception.png</file>
+        <file alias="document_is_scenario.png">resources/document_is_scenario.png</file>
+        <file alias="document_leaf.png">resources/document_leaf.png</file>
+        <file alias="document_or.png">resources/document_or.png</file>
+        <file alias="document_parallel.png">resources/document_parallel.png</file>
+        <file alias="document_repeat.png">resources/document_repeat.png</file>
+        <file alias="toolbar/action.svg">resources/icons/toolbar/action.svg</file>
+        <file alias="toolbar/comment.svg">resources/icons/toolbar/comment.svg</file>
+        <file alias="toolbar/condition.svg">resources/icons/toolbar/condition.svg</file>
+        <file alias="toolbar/condition_shared.svg">resources/icons/toolbar/condition_shared.svg</file>
+        <file alias="toolbar/delete.svg">resources/icons/toolbar/delete.svg</file>
+        <file alias="toolbar/document-icon.svg">resources/icons/toolbar/document-icon.svg</file>
+        <file alias="toolbar/instance.png">resources/icons/toolbar/instance.png</file>
+        <file alias="toolbar/message.png">resources/icons/toolbar/message.png</file>
+        <file alias="toolbar/pointer.png">resources/icons/toolbar/pointer.png</file>
+        <file alias="toolbar/redo.svg">resources/icons/toolbar/redo.svg</file>
+        <file alias="toolbar/starttimer.svg">resources/icons/toolbar/starttimer.svg</file>
+        <file alias="toolbar/stoptimer.svg">resources/icons/toolbar/stoptimer.svg</file>
+        <file alias="toolbar/timeouttimer.svg">resources/icons/toolbar/timeouttimer.svg</file>
+        <file alias="toolbar/undo.svg">resources/icons/toolbar/undo.svg</file>
+        <file alias="toolbar/instance_stop.svg">resources/icons/toolbar/instance_stop.svg</file>
+        <file alias="toolbar/create.svg">resources/icons/toolbar/create.svg</file>
+        <file alias="toolbar/global_comment.svg">resources/icons/toolbar/global_comment.svg</file>
+        <file alias="toolbar/coregion.svg">resources/icons/toolbar/coregion.svg</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="Ubuntu-B.ttf">resources/ubuntu-font-family-0.83/Ubuntu-B.ttf</file>
+        <file alias="Ubuntu-BI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-BI.ttf</file>
+        <file alias="Ubuntu-C.ttf">resources/ubuntu-font-family-0.83/Ubuntu-C.ttf</file>
+        <file alias="Ubuntu-L.ttf">resources/ubuntu-font-family-0.83/Ubuntu-L.ttf</file>
+        <file alias="Ubuntu-LI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-LI.ttf</file>
+        <file alias="Ubuntu-M.ttf">resources/ubuntu-font-family-0.83/Ubuntu-M.ttf</file>
+        <file alias="Ubuntu-MI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-MI.ttf</file>
+        <file alias="UbuntuMono-B.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-B.ttf</file>
+        <file alias="UbuntuMono-BI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-BI.ttf</file>
+        <file alias="UbuntuMono-R.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-R.ttf</file>
+        <file alias="UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
+        <file alias="Ubuntu-R.ttf">resources/ubuntu-font-family-0.83/Ubuntu-R.ttf</file>
+        <file alias="Ubuntu-RI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-RI.ttf</file>
+    </qresource>
+</RCC>

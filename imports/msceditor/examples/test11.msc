@@ -1,0 +1,12 @@
+mscdocument Untitled_Document;
+   msc Untitled_1 comment 'Example of Basic Msc';
+      instance Process;
+         out Send to Satellite comment 'Communication with satellite';
+         in Receiver from Satellite;
+      endinstance;
+      instance Satellite comment 'Instance are Satellite';
+         in Send from Process comment 'Communication with satellite';
+         out Receiver to Process;
+      endinstance;
+   endmsc;
+endmscdocument;
