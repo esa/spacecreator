@@ -37,6 +37,7 @@
 *.h.autosave
 *.cpp.autosave
 license.qtc.txt
+CMakeLists.txt.user
 
 # System files
 .directory

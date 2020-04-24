@@ -46,4 +46,6 @@ add_definitions(-DQT_DEPRECATED_WARNINGS)
 # Grantlee dependency
 find_package(Grantlee5 REQUIRED)
 
+enable_testing()
+
 add_subdirectory(imports/iveditor)

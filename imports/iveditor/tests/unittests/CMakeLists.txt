@@ -1,0 +1,1 @@
+add_subdirectory(TASTEeditor_tests)
