@@ -82,7 +82,8 @@ bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjec
 
     m_fileLoader->setTemplateDirs({ fileInfo.absolutePath() });
 
-    m_engine->setPluginPaths({ GRANTLEE_LIB_DIR, QApplication::applicationDirPath() });
+    //    m_engine->setPluginPaths({ GRANTLEE_LIB_DIR, QApplication::applicationDirPath() });
+    m_engine->addPluginPath(QApplication::applicationDirPath());
 
     Grantlee::Context context;
     for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it)
