@@ -36,7 +36,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Concurrent Core Gui Network Svg Test Widgets Xml REQUIRED)
+find_package(Qt5 COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
 
 # Do not use potentially conflicting Qt keywords
 #add_definitions(-DQT_NO_KEYWORDS)
@@ -49,3 +49,4 @@ find_package(Grantlee5 REQUIRED)
 enable_testing()
 
 add_subdirectory(imports/iveditor)
+add_subdirectory(imports/msceditor)
