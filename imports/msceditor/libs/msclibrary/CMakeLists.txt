@@ -2,20 +2,12 @@ set(LIB_NAME msclibrary)
 
 
 # Generate ANTL parser files
-# Check for better udage:
-# https://github.com/antlr/antlr4/blob/master/runtime/Cpp/cmake/FindANTLR.cmake
-# https://github.com/antlr/antlr4/tree/master/runtime/Cpp/cmake
-set(ANTLR_CPPRT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/antlr/cpp_runtime)
 set(ANTLR_RUNTIME_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/antlr/cpp_runtime/runtime)
 if (WIN32)
     set(ANTLR_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/create_msc_parser.bat)
-    set(ANTL_LIB antlr4-runtime)
 else()
     set(ANTLR_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/create_msc_parser.sh)
-    set(ANTL_LIB antlr4-runtime_linux_x64)
-    # for MacOS: antlr4-runtime_macos_x64
 endif()
-
 execute_process(COMMAND ${ANTLR_COMMAND}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../..
 )
@@ -102,21 +94,14 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME}
     PUBLIC .
     private cif
-    SYSTEM PRIVATE ${ANTLR_RUNTIME_PATH}/src
 )
-
-target_link_directories(${LIB_NAME}
-    PUBLIC ${ANTLR_CPPRT_PATH}/dist
-)
-
-message("${ANTLR_CPPRT_PATH}/dist")
 
 target_link_libraries(${LIB_NAME}
     asn1editor
     qobjectlistmodel
     Qt5::Core
     Qt5::Gui
-    ${ANTL_LIB}
+    antlr4_static
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC QT_NO_KEYWORDS)
