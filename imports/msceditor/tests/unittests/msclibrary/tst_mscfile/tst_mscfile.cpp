@@ -103,7 +103,7 @@ void tst_MscFile::testExampleFilesParsing_data()
 {
     QTest::addColumn<QString>("filename");
 
-    QString fileName = QFINDTESTDATA(EXAMPLES_DIR "test1.msc");
+    QString fileName = QString(EXAMPLES_DIR).append("test1.msc");
     QFileInfo fileInfo(fileName);
     QDir exampleDir = fileInfo.dir();
     QStringList fileList = exampleDir.entryList(QDir::Files);

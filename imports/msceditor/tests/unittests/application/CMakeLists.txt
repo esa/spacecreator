@@ -1,0 +1,3 @@
+add_subdirectory(tst_documentitemmodel)
+add_subdirectory(tst_remotecontrol)
+add_subdirectory(tst_settings)
