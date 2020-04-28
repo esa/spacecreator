@@ -2,7 +2,7 @@
 
 REM Creating MSC parser using ANTLR4
 
-SET ANTLR_JAR=%~dp0..\3rdparty\antlr\antlr-4.7.1-complete.jar
+SET ANTLR_JAR=%~dp0..\..\..\src\3rdparty\antlr\antlr-4.8-complete.jar
 REM Check if ANTLR4 is found
 if not exist %ANTLR_JAR% (
     echo Error: Did not find ANTLR4 jar file
@@ -10,17 +10,12 @@ if not exist %ANTLR_JAR% (
 )
 SET CLASSPATH=.;%ANTLR_JAR%;%CLASSPATH%
 
-SET JAVA="java.exe"
-REM Check if Java is found
+SET JAVA="C:\Program Files (x86)\Java\jre1.8.0_181\bin\java.exe"
 if not exist %JAVA% (
-    SET JAVA="C:\Program Files (x86)\Java\jre1.8.0_181\bin\java.exe"
-    if not exist %JAVA% (
-        SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath\java.exe"
-        if not exist %JAVA% (
-            echo Error: Did not find Java - using path
-            SET JAVA=java.exe
-        )
-    )
+	SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath\java.exe"
+	if not exist %JAVA% (
+		SET JAVA=java.exe
+	)
 )
 
 echo %cd%

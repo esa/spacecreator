@@ -2,7 +2,7 @@ set(LIB_NAME msclibrary)
 
 
 # Generate ANTL parser files
-set(ANTLR_RUNTIME_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/antlr/cpp_runtime/runtime)
+set(ANTLR_RUNTIME_PATH ${CMAKE_SOURCE_DIR}/src/3rdparty/antlr/cpp_runtime/runtime)
 if (WIN32)
     set(ANTLR_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/create_msc_parser.bat)
 else()
