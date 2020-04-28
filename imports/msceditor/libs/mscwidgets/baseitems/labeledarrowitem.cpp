@@ -158,7 +158,7 @@ QRectF LabeledArrowItem::textBoundingRect() const
 
 void LabeledArrowItem::updateLayout()
 {
-    const qreal textWidth = QFontMetrics(m_itemText->font()).width(m_itemText->toPlainText()) + TextMargin * 2;
+    const qreal textWidth = QFontMetrics(m_itemText->font()).horizontalAdvance(m_itemText->toPlainText()) + TextMargin * 2;
     const QLineF axis = startSignPos().x() < endSignPos().x() ? QLineF { startSignPos(), endSignPos() }
                                                               : QLineF { endSignPos(), startSignPos() };
     const qreal angle = axis.angle();

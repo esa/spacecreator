@@ -29,6 +29,9 @@ add_custom_command(
     DEPENDS ${PARSER_FILE}
 )
 
+# This is necessary to make Qt Creator happy
+include_directories (${CMAKE_CURRENT_BINARY_DIR})
+
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE

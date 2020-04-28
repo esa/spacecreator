@@ -113,7 +113,7 @@ private:
     void storePrecedingCif(antlr4::ParserRuleContext *ctx);
     static QString readCommentLine(const antlr4::Token *const token);
     static QString dropCommentBraces(const QString &line);
-    QStringList readComments(const QVector<antlr4::Token *> &tokens) const;
+    QStringList readComments(const std::vector<antlr4::Token *> &tokens) const;
     msc::MscEntity *cifTarget() const;
     std::vector<antlr4::Token *> getHiddenCommentTokensToLeft(int tokenIndex);
     msc::MscParameterList readParameterList(MscParser::ParameterListContext *parameterList);

@@ -142,7 +142,7 @@ bool intersects(const QRectF &rect, const QLineF &line)
 
     QPointF intersectionPoint;
     for (const QLineF &rectLine : rectLines)
-        if (rectLine.intersect(line, &intersectionPoint) == QLineF::BoundedIntersection)
+        if (rectLine.intersects(line, &intersectionPoint) == QLineF::BoundedIntersection)
             return true;
 
     return false;
