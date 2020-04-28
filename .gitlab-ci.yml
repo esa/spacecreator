@@ -5,10 +5,12 @@ stages:
 # Build
 ##################
 
-build_linux_gcc:
+build_debian10_gcc:
   stage: build
   tags:
     - docker
-  image: registry.git.vikingsoftware.com/vs/ci-images/ubuntu_bionic_qt5.12_qtcreator:latest
+  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
   script:
-    - echo "ok"
+    - mkdir -p build; cd build
+    - cmake -GNinja ..
+    - ninja
