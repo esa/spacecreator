@@ -17,19 +17,18 @@
 
 #include "cmdifaceattrchange.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-static inline QVariant getCurrentAttribute(const AADLObjectIface *entity, const QString &name)
+static inline QVariant getCurrentAttribute(const aadl::AADLObjectIface *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->attr(name) : QVariant();
 }
 
-CmdIfaceAttrChange::CmdIfaceAttrChange(AADLObjectIface *entity, const QString &attrName, const QVariant &value)
+CmdIfaceAttrChange::CmdIfaceAttrChange(aadl::AADLObjectIface *entity, const QString &attrName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, attrName, value, getCurrentAttribute(entity, attrName))
 {
-    if (m_targetToken == meta::Props::Token::kind) {
+    if (m_targetToken == aadl::meta::Props::Token::kind) {
         m_relatedConnections = getRelatedConnections();
         prepareRemoveConnectionCommands();
     }
@@ -38,7 +37,7 @@ CmdIfaceAttrChange::CmdIfaceAttrChange(AADLObjectIface *entity, const QString &a
 void CmdIfaceAttrChange::redo()
 {
     switch (m_targetToken) {
-    case meta::Props::Token::kind: {
+    case aadl::meta::Props::Token::kind: {
         setKind(m_newValue);
         break;
     }
@@ -51,7 +50,7 @@ void CmdIfaceAttrChange::redo()
 void CmdIfaceAttrChange::undo()
 {
     switch (m_targetToken) {
-    case meta::Props::Token::kind: {
+    case aadl::meta::Props::Token::kind: {
         setKind(m_oldValue);
         break;
     }
@@ -97,24 +96,24 @@ void CmdIfaceAttrChange::restoreConnections()
         cmd->undo();
 }
 
-bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connection) const
+bool CmdIfaceAttrChange::connectionMustDie(const aadl::AADLObjectConnection *connection) const
 {
-    const AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const aadl::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
     }
 
-    const AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
-    if (AADLObjectIface::OperationKind::Cyclic == newKind)
+    const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
+    if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind)
         return true;
-    if (AADLObjectIface::OperationKind::Any == newKind || AADLObjectIface::OperationKind::Any == otherIface->kind())
+    if (aadl::AADLObjectIface::OperationKind::Any == newKind || aadl::AADLObjectIface::OperationKind::Any == otherIface->kind())
         return false;
 
     if (!connection->isOneDirection()) {
-        auto isInheritsPI = [](const AADLObjectIface *iface) {
+        auto isInheritsPI = [](const aadl::AADLObjectIface *iface) {
             if (iface && iface->isRequired())
-                if (const auto ri = iface->as<const AADLObjectIfaceRequired *>())
+                if (const auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>())
                     return ri->isInheritPI();
             return false;
         };
@@ -126,6 +125,5 @@ bool CmdIfaceAttrChange::connectionMustDie(const AADLObjectConnection *connectio
     return otherIface->kind() != newKind;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

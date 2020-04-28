@@ -21,15 +21,17 @@
 #include <QVector>
 #include <memory>
 
-namespace taste3 {
 namespace aadl {
-
-class DynamicProperty;
 class AADLObject;
 class AADLObjectTemplate;
 class AADLObjectFunction;
 class AADLObjectInterface;
-struct DynamicPropertyConfigPrivate;
+}
+
+namespace aadlinterface {
+
+class DynamicProperty;
+
 class DynamicPropertyConfig
 {
 public:
@@ -37,7 +39,7 @@ public:
     static QVector<DynamicProperty *> parseAttributesList(const QByteArray &fromData);
     void init();
 
-    static QVector<DynamicProperty *> attributesForObject(AADLObject *obj);
+    static QVector<DynamicProperty *> attributesForObject(aadl::AADLObject *obj);
     static QVector<DynamicProperty *> attributesForFunctionType();
     static QVector<DynamicProperty *> attributesForFunction();
     static QVector<DynamicProperty *> attributesForIface();
@@ -50,12 +52,12 @@ private:
 
     DynamicPropertyConfig();
 
-    std::unique_ptr<DynamicPropertyConfigPrivate> d;
-
     static void generateSampleFile();
     QString configPath() const;
     QVector<DynamicProperty *> readAttrs(const QByteArray &data) const;
+
+    struct DynamicPropertyConfigPrivate;
+    std::unique_ptr<DynamicPropertyConfigPrivate> d;
 };
 
-} // ns aadl
-} // ns taste3
+}

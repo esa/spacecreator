@@ -23,8 +23,8 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "baseitems/common/utils.h"
 #include "colors/colormanager.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
 #include "tab_interface/commands/commandids.h"
 #include "tab_interface/commands/commandsfactory.h"
 
@@ -41,16 +41,15 @@
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
-static const QList<int> kNestedTypes { taste3::aadl::AADLFunctionGraphicsItem::Type,
-                                       taste3::aadl::AADLFunctionTypeGraphicsItem::Type,
-                                       taste3::aadl::AADLCommentGraphicsItem::Type };
+static const QList<int> kNestedTypes { aadlinterface::AADLFunctionGraphicsItem::Type,
+                                       aadlinterface::AADLFunctionTypeGraphicsItem::Type,
+                                       aadlinterface::AADLCommentGraphicsItem::Type };
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 QPointer<QSvgRenderer> AADLFunctionGraphicsItem::m_svgRenderer = {};
 
-AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent)
+AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(aadl::AADLObjectFunction *entity, QGraphicsItem *parent)
     : AADLFunctionTypeGraphicsItem(entity, parent)
 {
     m_textItem->setVisible(!isRootItem());
@@ -61,7 +60,7 @@ AADLFunctionGraphicsItem::AADLFunctionGraphicsItem(AADLObjectFunction *entity, Q
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/tab_interface/toolbar/icns/change_root.svg"));
 }
 
-AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
+aadl::AADLObjectFunction *AADLFunctionGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectFunction *>(aadlObject());
 }
@@ -93,7 +92,7 @@ void AADLFunctionGraphicsItem::doRebuildLayout()
     if (isRootItem()) {
         QRectF nestedItemsInternalRect = nestedItemsSceneBoundingRect();
 
-        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(utils::kContentMargins.toMargins());
+        const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(kContentMargins.toMargins());
         const QRectF mappedViewportGeometry =
                 QRectF(view->mapToScene(viewportGeometry.topLeft()), view->mapToScene(viewportGeometry.bottomRight()));
 
@@ -103,10 +102,10 @@ void AADLFunctionGraphicsItem::doRebuildLayout()
 
             if (nestedItemsInternalRect.isValid()) {
                 itemRect.moveCenter(nestedItemsInternalRect.center());
-                itemRect |= nestedItemsInternalRect.marginsAdded(utils::kRootMargins);
+                itemRect |= nestedItemsInternalRect.marginsAdded(kRootMargins);
             }
         } else {
-            itemRect |= nestedItemsInternalRect.marginsAdded(utils::kRootMargins);
+            itemRect |= nestedItemsInternalRect.marginsAdded(kRootMargins);
         }
 
         if (setGeometry(itemRect))
@@ -274,7 +273,7 @@ ColorManager::HandledColors AADLFunctionGraphicsItem::handledColorType() const
         return ColorManager::HandledColors::FunctionRoot;
 
     const QRectF nestedRect = nestedItemsSceneBoundingRect();
-    if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect.marginsAdded(utils::kContentMargins)))
+    if (nestedRect.isValid() && !sceneBoundingRect().contains(nestedRect.marginsAdded(kContentMargins)))
         return ColorManager::HandledColors::FunctionPartial;
 
     return ColorManager::HandledColors::FunctionRegular;
@@ -320,14 +319,13 @@ void AADLFunctionGraphicsItem::updateNestedIcon()
 
 QString AADLFunctionGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
+    const QString title = uniteNames<aadl::AADLObjectFunctionType *>({ entity() }, QString());
     const QString prototype =
-            uniteNames<const AADLObjectFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
-    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
+            uniteNames<const aadl::AADLObjectFunctionType *>({ entity()->instanceOf() }, tr("Instance of: "));
+    const QString ris = uniteNames<aadl::AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<aadl::AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, prototype, ris, pis }, QStringLiteral("<br>"));
 }
 
-} // namespace aadl
-} // namespace taste3
+}

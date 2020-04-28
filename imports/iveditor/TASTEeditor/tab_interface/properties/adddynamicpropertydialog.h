@@ -23,8 +23,7 @@ namespace Ui {
 class AddDynamicPropertyDialog;
 }
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class DynamicProperty;
 class AddDynamicPropertyDialog : public QDialog
@@ -52,5 +51,4 @@ private:
     QStringList listValues() const;
 };
 
-} // ns aadl
-} // ns taste3
+}

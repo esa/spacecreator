@@ -17,7 +17,7 @@
 
 #include "stringtemplate.h"
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -26,7 +26,6 @@
 #include <QXmlStreamWriter>
 #include <grantlee_templates.h>
 
-namespace taste3 {
 namespace templating {
 
 StringTemplate *StringTemplate::create(QObject *parent)
@@ -185,5 +184,4 @@ void StringTemplate::setAutoFormattingIndent(int autoFormattingIndent)
     m_autoFormattingIndent = autoFormattingIndent;
 }
 
-} // ns templating
-} // ns taste3
+}

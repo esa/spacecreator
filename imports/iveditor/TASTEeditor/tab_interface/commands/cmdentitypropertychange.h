@@ -22,15 +22,17 @@
 #include <QRect>
 #include <QUndoCommand>
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityPropertyChange : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyChange(AADLObject *entity, const QVariantHash &props);
+    explicit CmdEntityPropertyChange(aadl::AADLObject *entity, const QVariantHash &props);
 
     void redo() override;
     void undo() override;
@@ -38,11 +40,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObject> m_entity;
+    QPointer<aadl::AADLObject> m_entity;
     const QVariantHash m_newProps;
     const QVariantHash m_oldProps;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

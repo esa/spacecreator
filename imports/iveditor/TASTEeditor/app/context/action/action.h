@@ -21,10 +21,8 @@
 #include <QJsonObject>
 #include <QVariant>
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
-}
 }
 
 namespace taste3 {

@@ -23,28 +23,29 @@
 #include <QRect>
 #include <QUndoCommand>
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectFunctionType;
 class AADLObjectFunction;
 class AADLObjectsModel;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdFunctionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent, const QRectF &geometry);
+    explicit CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObjectFunctionType> m_parent;
-    QPointer<AADLObjectFunction> m_entity;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    QPointer<aadl::AADLObjectFunctionType> m_parent;
+    QPointer<aadl::AADLObjectFunction> m_entity;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

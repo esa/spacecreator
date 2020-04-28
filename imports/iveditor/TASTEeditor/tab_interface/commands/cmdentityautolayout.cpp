@@ -21,11 +21,11 @@
 #include "commandids.h"
 
 #include <QtDebug>
-namespace taste3 {
-namespace aadl {
+
+namespace aadlinterface {
 namespace cmd {
 
-CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
+CmdEntityAutoLayout::CmdEntityAutoLayout(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
     : CmdEntityGeometryChange(objectsData, QObject::tr("Auto layout items"))
 {
 }
@@ -35,6 +35,5 @@ int CmdEntityAutoLayout::id() const
     return AutoLayoutEntity;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

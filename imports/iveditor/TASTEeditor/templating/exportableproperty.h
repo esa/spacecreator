@@ -21,7 +21,6 @@
 
 #include <QVariant>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -59,7 +58,7 @@ private:
     const QVariant m_value;
 };
 
-} // ns templating
-} // ns taste3
+}
 
-DECLARE_EXPORTABLE_TYPE(ExportableProperty)
+Q_DECLARE_METATYPE(templating::ExportableProperty)
+Q_DECLARE_TYPEINFO(templating::ExportableProperty, Q_MOVABLE_TYPE);

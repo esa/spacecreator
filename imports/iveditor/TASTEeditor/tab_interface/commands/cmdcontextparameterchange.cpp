@@ -21,14 +21,13 @@
 #include "commandids.h"
 
 #include <QDebug>
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdContextParameterChange::CmdContextParameterChange(AADLObjectFunctionType *entity, const ContextParameter &oldParam,
-                                                     const ContextParameter &newParam)
+CmdContextParameterChange::CmdContextParameterChange(aadl::AADLObjectFunctionType *entity, const aadl::ContextParameter &oldParam,
+                                                     const aadl::ContextParameter &newParam)
     : QUndoCommand()
     , m_entity(entity)
     , m_newParam(newParam)
@@ -37,12 +36,12 @@ CmdContextParameterChange::CmdContextParameterChange(AADLObjectFunctionType *ent
     setText(QObject::tr("Change Context Parameter"));
 }
 
-void CmdContextParameterChange::swapParam(const ContextParameter &from, const ContextParameter &to)
+void CmdContextParameterChange::swapParam(const aadl::ContextParameter &from, const aadl::ContextParameter &to)
 {
     if (!m_entity)
         return;
 
-    QVector<ContextParameter> params = m_entity->contextParams();
+    QVector<aadl::ContextParameter> params = m_entity->contextParams();
 
     const int id = params.indexOf(from);
     if (id >= 0 && id < params.size()) {
@@ -71,6 +70,5 @@ int CmdContextParameterChange::id() const
     return ChangeContextParameter;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

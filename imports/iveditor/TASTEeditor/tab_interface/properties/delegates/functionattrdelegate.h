@@ -19,8 +19,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class FunctionAttrDelegate : public QStyledItemDelegate
 {
@@ -36,5 +35,4 @@ private:
     QStringList m_dataTypesAvailabel;
 };
 
-} // ns aadl
-} // ns taste3
+}

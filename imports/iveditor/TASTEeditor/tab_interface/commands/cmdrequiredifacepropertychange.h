@@ -18,23 +18,24 @@
 #pragma once
 
 #include "cmdifacedatachangebase.h"
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlcommonprops.h"
+#include "aadlobjectsmodel.h"
 
 #include <QPointer>
 #include <QVariant>
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObjectIfaceRequired;
 class AADLObjectConnection;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdRequiredIfacePropertyChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdRequiredIfacePropertyChange(AADLObjectIfaceRequired *entity, const QString &propName,
+    explicit CmdRequiredIfacePropertyChange(aadl::AADLObjectIfaceRequired *entity, const QString &propName,
                                             const QVariant &value);
     void redo() override;
     void undo() override;
@@ -44,9 +45,8 @@ public:
 private:
     void setInheritPI(bool nowInherited);
 
-    bool connectionMustDie(const AADLObjectConnection *connection) const override;
+    bool connectionMustDie(const aadl::AADLObjectConnection *connection) const override;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

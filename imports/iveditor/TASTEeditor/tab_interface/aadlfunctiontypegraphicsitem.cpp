@@ -25,11 +25,11 @@
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlnamevalidator.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectfunction.h"
+#include "aadlcommonprops.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -43,34 +43,33 @@
 
 static const qreal kBorderWidth = 2;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionType *entity, QGraphicsItem *parent)
+AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunctionType *entity, QGraphicsItem *parent)
     : AADLRectGraphicsItem(entity, parent)
     , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setZValue(utils::kFunctionZLevel);
+    setZValue(kFunctionZLevel);
 
     if (entity) {
         m_textItem->setPlainText(entity->title());
         m_textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
 
         connect(m_textItem, &TextGraphicsItem::edited, this, [this, entity](const QString &text) {
-            if (!AADLNameValidator::isAcceptableName(entity, text)) {
+            if (!aadl::AADLNameValidator::isAcceptableName(entity, text)) {
                 m_textItem->setPlainText(entity->title());
                 return;
             }
 
-            const QVariantMap attributess = { { meta::Props::token(meta::Props::Token::name), text } };
+            const QVariantMap attributess = { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
             if (const auto attributesCmd = cmd::CommandsFactory::create(
                         cmd::ChangeEntityAttributes, { QVariant::fromValue(entity), QVariant::fromValue(attributess) }))
-                taste3::cmd::CommandsStack::current()->push(attributesCmd);
+                cmd::CommandsStack::current()->push(attributesCmd);
         });
-        connect(entity, &AADLObjectFunction::attributeChanged, this,
-                [this, entity](taste3::aadl::meta::Props::Token attr) {
-                    if (attr == taste3::aadl::meta::Props::Token::name) {
+        connect(entity, &aadl::AADLObjectFunction::attributeChanged, this,
+                [this, entity](aadl::meta::Props::Token attr) {
+                    if (attr == aadl::meta::Props::Token::name) {
                         const QString txt = entity->title();
                         if (m_textItem->toPlainText() != txt) {
                             m_textItem->setPlainText(txt);
@@ -78,7 +77,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
                         }
                     }
                 });
-        connect(entity, &AADLObjectFunction::titleChanged, this, [this](const QString &text) {
+        connect(entity, &aadl::AADLObjectFunction::titleChanged, this, [this](const QString &text) {
             m_textItem->setPlainText(text);
             instantLayoutUpdate();
         });
@@ -87,7 +86,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(AADLObjectFunctionTyp
     applyColorScheme();
 }
 
-AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
+aadl::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject());
 }
@@ -97,7 +96,7 @@ void AADLFunctionTypeGraphicsItem::doRebuildLayout()
     AADLRectGraphicsItem::rebuildLayout();
     updateTextPosition();
     for (auto child : childItems()) {
-        if (auto iface = qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(child))
+        if (auto iface = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(child))
             iface->instantLayoutUpdate();
     }
 }
@@ -119,8 +118,8 @@ void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGr
 QSizeF AADLFunctionTypeGraphicsItem::minimalSize() const
 {
     const QSizeF textSize = m_textItem->boundingRect().size();
-    return { qMax(textSize.width(), utils::DefaultGraphicsItemSize.width()),
-             qMax(textSize.height(), utils::DefaultGraphicsItemSize.height()) };
+    return { qMax(textSize.width(), DefaultGraphicsItemSize.width()),
+             qMax(textSize.height(), DefaultGraphicsItemSize.height()) };
 }
 
 void AADLFunctionTypeGraphicsItem::updateTextPosition()
@@ -128,7 +127,7 @@ void AADLFunctionTypeGraphicsItem::updateTextPosition()
     m_textItem->adjustSize();
 
     QRectF textRect = m_textItem->boundingRect();
-    const QRectF targetTextRect = boundingRect().marginsRemoved(utils::kTextMargins);
+    const QRectF targetTextRect = boundingRect().marginsRemoved(kTextMargins);
 
     const QSizeF maxTxtSize = targetTextRect.size();
     const QSizeF txtSize = textRect.size();
@@ -156,10 +155,10 @@ void AADLFunctionTypeGraphicsItem::applyColorScheme()
 
 QString AADLFunctionTypeGraphicsItem::prepareTooltip() const
 {
-    const QString title = uniteNames<AADLObjectFunctionType *>({ entity() }, QString());
-    const QString instances = uniteNames<QPointer<AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
-    const QString ris = uniteNames<AADLObjectIface *>(entity()->ris(), tr("RI: "));
-    const QString pis = uniteNames<AADLObjectIface *>(entity()->pis(), tr("PI: "));
+    const QString title = uniteNames<aadl::AADLObjectFunctionType *>({ entity() }, QString());
+    const QString instances = uniteNames<QPointer<aadl::AADLObjectFunction>>(entity()->instances(), tr("Instances: "));
+    const QString ris = uniteNames<aadl::AADLObjectIface *>(entity()->ris(), tr("RI: "));
+    const QString pis = uniteNames<aadl::AADLObjectIface *>(entity()->pis(), tr("PI: "));
 
     return joinNonEmpty({ title, instances, ris, pis }, QStringLiteral("<br>"));
 }
@@ -169,5 +168,4 @@ void AADLFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRect
     textRect.moveTopLeft(targetTextRect.topLeft());
 }
 
-} // namespace aadl
-} // namespace taste3
+}

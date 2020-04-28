@@ -22,7 +22,7 @@
 #include <QGraphicsRectItem>
 #include <QPropertyAnimation>
 
-namespace taste3 {
+namespace aadlinterface {
 
 /*!
  * \class taste3::HighlightRectItem
@@ -79,7 +79,7 @@ void HighlightRectItem::highlight()
 
     clearAnimation();
 
-    m_lastAnimation = utils::createLinearAnimation(this, "opacity", from, to, duration);
+    m_lastAnimation = aadlinterface::createLinearAnimation(this, "opacity", from, to, duration);
     connect(m_lastAnimation, &QPropertyAnimation::finished, this, [this]() {
         hide();
         Q_EMIT highlighted();
@@ -105,4 +105,4 @@ void HighlightRectItem::setPath(const QPainterPath &path)
     return m_pathItem->setPath(path);
 }
 
-} // ns taste3
+}

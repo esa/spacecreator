@@ -19,8 +19,6 @@
 
 #include "exportableaadlobject.h"
 
-namespace taste3 {
-
 namespace aadl {
     class AADLObjectFunctionType;
 }
@@ -47,7 +45,7 @@ public:
     QVariantList connections() const;
 };
 
-} // ns templating
-} // ns taste3
+}
 
-DECLARE_EXPORTABLE_TYPE(ExportableAADLFunction)
+Q_DECLARE_METATYPE(templating::ExportableAADLFunction)
+Q_DECLARE_TYPEINFO(templating::ExportableAADLFunction, Q_MOVABLE_TYPE);

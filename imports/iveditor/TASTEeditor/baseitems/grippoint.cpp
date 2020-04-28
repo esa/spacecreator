@@ -26,7 +26,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-namespace taste3 {
+namespace aadlinterface {
 
 DrawRectInfo GripPoint::m_uiDescr = DrawRectInfo();
 

@@ -18,7 +18,7 @@
 #include "utils.h"
 
 #include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 #include "tab_interface/aadlcommentgraphicsitem.h"
 #include "tab_interface/aadlconnectiongraphicsitem.h"
 #include "tab_interface/aadlfunctiongraphicsitem.h"
@@ -32,8 +32,7 @@
 #include <QtGlobal>
 #include <QtMath>
 
-namespace taste3 {
-namespace utils {
+namespace aadlinterface {
 
 /*!
  * \namespace taste3::utils
@@ -281,7 +280,7 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, q
 }
 
 /*!
- * \fn taste3::utils::bool alignedLine(QLineF &line, int angleTolerance)
+ * \fn aadlinterface::bool alignedLine(QLineF &line, int angleTolerance)
  * \brief  Adjusts the angle of the \a line to the nearest x90 degrees ccw with \a angleTolerance.
  * Returns true if the \a line's angle adjusted.
  */
@@ -421,26 +420,26 @@ QList<int> knownGraphicsItemTypes()
 {
     QList<int> result;
 
-    const QMetaEnum &me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
+    const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
         int itemType = 0;
         const aadl::AADLObject::Type objectType = static_cast<aadl::AADLObject::Type>(me.value(i));
         switch (objectType) {
         case aadl::AADLObject::Type::Function:
-            itemType = aadl::AADLFunctionGraphicsItem::Type;
+            itemType = aadlinterface::AADLFunctionGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::FunctionType:
-            itemType = aadl::AADLFunctionTypeGraphicsItem::Type;
+            itemType = aadlinterface::AADLFunctionTypeGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::ProvidedInterface:
         case aadl::AADLObject::Type::RequiredInterface:
-            itemType = aadl::AADLInterfaceGraphicsItem::Type;
+            itemType = aadlinterface::AADLInterfaceGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Comment:
-            itemType = aadl::AADLCommentGraphicsItem::Type;
+            itemType = aadlinterface::AADLCommentGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Connection:
-            itemType = aadl::AADLConnectionGraphicsItem::Type;
+            itemType = aadlinterface::AADLConnectionGraphicsItem::Type;
             break;
         case aadl::AADLObject::Type::Unknown:
             continue;
@@ -453,5 +452,4 @@ QList<int> knownGraphicsItemTypes()
     return result;
 }
 
-} // ns utils
-} // ns taste3
+}

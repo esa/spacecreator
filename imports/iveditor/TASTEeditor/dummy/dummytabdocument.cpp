@@ -22,7 +22,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
-namespace taste3 {
 namespace document {
 
 DummyTabDocument::DummyTabDocument(QObject *parent)
@@ -84,5 +83,4 @@ QVector<QAction *> DummyTabDocument::initActions()
 
 void DummyTabDocument::onActionDummy() {}
 
-} // ns document
-} // ns taste3
+}

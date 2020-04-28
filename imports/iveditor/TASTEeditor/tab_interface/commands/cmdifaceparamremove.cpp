@@ -20,13 +20,12 @@
 
 #include "commandids.h"
 
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdIfaceParamRemove::CmdIfaceParamRemove(AADLObject *entity, const IfaceParameter &param)
+CmdIfaceParamRemove::CmdIfaceParamRemove(aadl::AADLObject *entity, const aadl::IfaceParameter &param)
     : CmdIfaceParamCreate(entity, param)
 {
     setText(QObject::tr("Remove Iface Parameter"));
@@ -37,8 +36,8 @@ void CmdIfaceParamRemove::redo()
     if (!m_iface)
         return;
 
-    QVector<IfaceParameter> currParams = m_iface->params();
-    for (const IfaceParameter &param : m_targetParams)
+    QVector<aadl::IfaceParameter> currParams = m_iface->params();
+    for (const aadl::IfaceParameter &param : m_targetParams)
         currParams.removeAll(param);
     m_iface->setParams(currParams);
 
@@ -60,6 +59,5 @@ int CmdIfaceParamRemove::id() const
     return RemoveIfaceParam;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

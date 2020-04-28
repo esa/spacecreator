@@ -17,7 +17,7 @@
 
 #include "colormanager.h"
 
-#include "app/common.h"
+#include "common.h"
 #include "baseitems/common/utils.h"
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
@@ -29,8 +29,7 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 ColorHandler::ColorHandler()
     : d(new ColorHandlerData()) {}
@@ -154,7 +153,7 @@ ColorManager::ColorManager(QObject *parent)
         sourcePath = defaultSourcePath;
 
     if (!setSourceFile(sourcePath)) { // source file can be corrupted
-        common::copyResourceFile(defaultColorsResourceFile(), sourcePath, common::FileCopyingMode::Overwrite);
+        utils::copyResourceFile(defaultColorsResourceFile(), sourcePath, utils::FileCopyingMode::Overwrite);
         setSourceFile(sourcePath);
     }
 }
@@ -259,19 +258,18 @@ QString ColorManager::prepareDefaultSource() const
     const QString targetDir =
             QString("%1/colors").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
-    common::ensureDirExists(targetDir);
+    utils::ensureDirExists(targetDir);
 
     QString jsonFilePath = QString("%1/%2").arg(targetDir, defaultColorschemeFileName);
 
     if (QFile::exists(jsonFilePath))
         return jsonFilePath;
 
-    if (common::copyResourceFile(defaultColorsResourceFile(), jsonFilePath))
+    if (utils::copyResourceFile(defaultColorsResourceFile(), jsonFilePath))
         return jsonFilePath;
 
     qWarning() << "Can't create default colors file" << jsonFilePath;
     return QString();
 }
 
-} // ns aadl
-} // ns taste3
+}

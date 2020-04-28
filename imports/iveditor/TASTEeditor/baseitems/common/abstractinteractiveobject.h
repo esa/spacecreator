@@ -19,7 +19,7 @@
 
 class QPointF;
 
-namespace taste3 {
+namespace aadlinterface {
 
 class GripPoint;
 class AbstractInteractiveObject
@@ -31,4 +31,4 @@ public:
     virtual void handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt) = 0;
 };
 
-} // ns taste3
+}

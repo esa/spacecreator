@@ -20,14 +20,14 @@
 #include "baseitems/interactiveobject.h"
 
 #include <QSet>
-namespace taste3 {
-namespace aadl {
+
+namespace aadlinterface {
 
 class AADLRectGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLRectGraphicsItem(AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
+    explicit AADLRectGraphicsItem(aadl::AADLObject *entity, QGraphicsItem *parentGraphicsItem = nullptr);
     virtual QSizeF minimalSize() const;
 
     void setRect(const QRectF &geometry);
@@ -70,5 +70,4 @@ private:
     QSet<InteractiveObject *> m_collidedItems;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -19,20 +19,18 @@
 
 #include "cmdifaceparamcreate.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceParamRemove : public CmdIfaceParamCreate
 {
 public:
-    explicit CmdIfaceParamRemove(AADLObject *entity, const IfaceParameter &param);
+    explicit CmdIfaceParamRemove(aadl::AADLObject *entity, const aadl::IfaceParameter &param);
 
     void redo() override;
     void undo() override;
     int id() const override;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

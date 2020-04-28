@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "baseitems/graphicsview.h"
+namespace aadlinterface {
+class GraphicsView;
+}
 
 #include <QComboBox>
 #include <QIntValidator>
@@ -51,7 +53,7 @@ class ZoomController : public QWidget
 public:
     explicit ZoomController(QWidget *parent = nullptr);
 
-    void setView(GraphicsView *view);
+    void setView(aadlinterface::GraphicsView *view);
 
 protected Q_SLOTS:
     void onCurrentIndexChanged(const QString &text);
@@ -63,7 +65,7 @@ Q_SIGNALS:
 private:
     QComboBox *m_combo { nullptr };
     ZoomValidator *m_validator { nullptr };
-    QPointer<GraphicsView> m_view;
+    QPointer<aadlinterface::GraphicsView> m_view;
 
     void refill();
 };

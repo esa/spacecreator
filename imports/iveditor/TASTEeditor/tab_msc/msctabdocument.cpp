@@ -17,7 +17,6 @@
 
 #include "msctabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 MSCTabDocument::MSCTabDocument(QObject *parent)
@@ -30,5 +29,4 @@ QString MSCTabDocument::title() const
     return tr("MSC");
 }
 
-} // ns document
-} // ns taste3
+}

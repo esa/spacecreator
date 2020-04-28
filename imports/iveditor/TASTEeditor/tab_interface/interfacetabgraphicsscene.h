@@ -19,7 +19,7 @@
 
 #include <QGraphicsScene>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class InterfaceTabGraphicsScene : public QGraphicsScene
 {
@@ -31,4 +31,4 @@ protected:
     void helpEvent(QGraphicsSceneHelpEvent *helpEvent) override;
 };
 
-} // ns taste3
+}

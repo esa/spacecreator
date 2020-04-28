@@ -19,7 +19,6 @@
 
 #include "dummy/dummytabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 class ConcurrencyTabDocument : public DummyTabDocument
@@ -30,5 +29,4 @@ public:
     QString title() const override;
 };
 
-} // ns document
-} // ns taste3
+}

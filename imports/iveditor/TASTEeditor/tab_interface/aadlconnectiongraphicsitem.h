@@ -18,15 +18,18 @@
 #pragma once
 
 #include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QGraphicsObject>
 #include <QGraphicsRectItem>
 #include <QPointer>
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectConnection;
+}
+
+namespace aadlinterface {
+
 class AADLInterfaceGraphicsItem;
 class AADLFunctionGraphicsItem;
 
@@ -36,11 +39,11 @@ class AADLConnectionGraphicsItem : public InteractiveObject
 public:
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::Type::Connection)
+        Type = UserType + static_cast<int>(aadl::AADLObject::Type::Connection)
     };
     int type() const override { return Type; }
 
-    explicit AADLConnectionGraphicsItem(AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
+    explicit AADLConnectionGraphicsItem(aadl::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
                                         AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
@@ -54,7 +57,7 @@ public:
 
     QVector<QPointF> graphicsPoints() const;
 
-    AADLObjectConnection *entity() const;
+    aadl::AADLObjectConnection *entity() const;
     void updateFromEntity() override;
 
     QPainterPath shape() const override;
@@ -120,5 +123,4 @@ private:
     bool m_firstUpdate { true };
 };
 
-} // namespace aadl
-} // namespace taste3
+}

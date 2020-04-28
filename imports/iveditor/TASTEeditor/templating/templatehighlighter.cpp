@@ -19,7 +19,6 @@
 
 #include <QDebug>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -178,5 +177,4 @@ void TemplateHighlighter::highlightBlock(const QString &text)
     }
 }
 
-} // ns templating
-} // ns taste3
+}

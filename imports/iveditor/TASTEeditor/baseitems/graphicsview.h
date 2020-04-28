@@ -20,7 +20,7 @@
 #include <QGraphicsView>
 #include <QPointF>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class GraphicsView : public QGraphicsView
 {
@@ -69,4 +69,4 @@ private:
     QPointF m_lastMousePosition;
 };
 
-} // namespace taste3
+}

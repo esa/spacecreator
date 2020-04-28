@@ -18,13 +18,15 @@
 #pragma once
 
 #include "propertiesmodelbase.h"
-#include "tab_aadl/aadlparameter.h"
+#include "aadlparameter.h"
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
 class ContextParameter;
+}
+
+namespace aadlinterface {
+
 class ContextParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
@@ -46,8 +48,8 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(AADLObject *obj);
-    const AADLObject *dataObject() const override;
+    void setDataObject(aadl::AADLObject *obj);
+    const aadl::AADLObject *dataObject() const override;
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -60,11 +62,10 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 private:
-    AADLObject *m_dataObject { nullptr };
-    QVector<ContextParameter> m_params;
+    aadl::AADLObject *m_dataObject { nullptr };
+    QVector<aadl::ContextParameter> m_params;
 
-    void createNewRow(const ContextParameter &param, int row);
+    void createNewRow(const aadl::ContextParameter &param, int row);
 };
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -41,13 +41,13 @@ BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &i
     connect(m_ui->accessTokenLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
     connect(m_ui->projectLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
 
-    const QString settingsHost = taste3::AppOptions::BugReport.Host.read().toString();
+    const QString settingsHost = aadlinterface::AppOptions::BugReport.Host.read().toString();
     m_ui->hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
 
-    const QString settingsProjectID = taste3::AppOptions::BugReport.ProjectID.read().toString();
+    const QString settingsProjectID = aadlinterface::AppOptions::BugReport.ProjectID.read().toString();
     m_ui->projectLineEdit->setText(settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
 
-    m_ui->accessTokenLineEdit->setText(taste3::AppOptions::BugReport.AccessToken.read().toByteArray());
+    m_ui->accessTokenLineEdit->setText(aadlinterface::AppOptions::BugReport.AccessToken.read().toByteArray());
 
     QFile file(logPath);
     if (file.open(QIODevice::ReadOnly)) {
@@ -100,9 +100,9 @@ void BugreportDialog::reportSent(const QString &msg)
     if (applyButton)
         applyButton->setDisabled(true);
 
-    taste3::AppOptions::BugReport.Host.write(m_ui->hostLineEdit->text());
-    taste3::AppOptions::BugReport.ProjectID.write(m_ui->projectLineEdit->text());
-    taste3::AppOptions::BugReport.AccessToken.write(m_ui->accessTokenLineEdit->text().toUtf8());
+    aadlinterface::AppOptions::BugReport.Host.write(m_ui->hostLineEdit->text());
+    aadlinterface::AppOptions::BugReport.ProjectID.write(m_ui->projectLineEdit->text());
+    aadlinterface::AppOptions::BugReport.AccessToken.write(m_ui->accessTokenLineEdit->text().toUtf8());
 }
 
 void BugreportDialog::updateButtonBox()

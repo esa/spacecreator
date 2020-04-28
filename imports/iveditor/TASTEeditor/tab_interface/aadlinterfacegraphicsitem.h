@@ -19,13 +19,15 @@
 #pragma once
 
 #include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QPointer>
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectIface;
+}
+
+namespace aadlinterface {
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
 
@@ -33,13 +35,13 @@ class AADLInterfaceGraphicsItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLInterfaceGraphicsItem(aadl::AADLObjectIface *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::Type::RequiredInterface) // provided?
+        Type = UserType + static_cast<int>(aadl::AADLObject::Type::RequiredInterface) // provided?
     };
 
-    AADLObjectIface *entity() const;
+    aadl::AADLObjectIface *entity() const;
 
     int type() const override { return Type; }
     void addConnection(AADLConnectionGraphicsItem *item);
@@ -77,7 +79,7 @@ protected Q_SLOTS:
     virtual void applyColorScheme() override;
     void updateLabel();
     void updateKind();
-    void onAttrOrPropChanged(taste3::aadl::meta::Props::Token t);
+    void onAttrOrPropChanged(aadl::meta::Props::Token t);
 
 private:
     QGraphicsPathItem *m_type = nullptr;
@@ -91,5 +93,4 @@ private:
     QPainterPath composeShape() const;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

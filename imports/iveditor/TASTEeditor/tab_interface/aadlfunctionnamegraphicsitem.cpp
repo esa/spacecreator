@@ -22,8 +22,7 @@
 #include <QFont>
 #include <QTextDocument>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 AADLFunctionNameGraphicsItem::AADLFunctionNameGraphicsItem(QGraphicsItem *parent)
     : TextGraphicsItem(parent)
@@ -49,5 +48,4 @@ void AADLFunctionNameGraphicsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEven
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
-} // ns aadl
-} // ns taste3
+}

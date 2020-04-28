@@ -17,9 +17,8 @@
 
 #include "exportableaadlconnection.h"
 
-#include "tab_aadl/aadlobjectconnection.h"
+#include "aadlobjectconnection.h"
 
-namespace taste3 {
 namespace templating {
 
 ExportableAADLConnection::ExportableAADLConnection(const aadl::AADLObjectConnection *connection)
@@ -69,5 +68,4 @@ bool ExportableAADLConnection::targetInterfaceIsProvided() const
     return o->targetInterface() ? o->targetInterface()->isProvided() : false;
 }
 
-} // ns templating
-} // ns taste3
+}

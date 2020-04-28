@@ -20,13 +20,12 @@
 
 #include "commandids.h"
 
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdEntityPropertyRename::CmdEntityPropertyRename(AADLObject *entity, const QHash<QString, QString> &props)
+CmdEntityPropertyRename::CmdEntityPropertyRename(aadl::AADLObject *entity, const QHash<QString, QString> &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_newProps(props)
@@ -68,6 +67,5 @@ int CmdEntityPropertyRename::id() const
     return RenameEntityProperty;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

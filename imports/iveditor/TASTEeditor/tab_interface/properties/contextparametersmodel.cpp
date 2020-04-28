@@ -18,9 +18,9 @@
 #include "contextparametersmodel.h"
 
 #include "app/commandsstack.h"
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunction.h"
+#include "aadlcommonprops.h"
+#include "aadlobject.h"
+#include "aadlobjectfunction.h"
 #include "tab_interface/commands/cmdentityattributechange.h"
 #include "tab_interface/commands/cmdentitypropertychange.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
@@ -31,8 +31,7 @@
 #include <QDebug>
 #include <algorithm>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 ContextParametersModel::ContextParametersModel(QObject *parent)
     : PropertiesModelBase(parent)
@@ -41,7 +40,7 @@ ContextParametersModel::ContextParametersModel(QObject *parent)
 
 ContextParametersModel::~ContextParametersModel() {}
 
-void ContextParametersModel::createNewRow(const ContextParameter &param, int row)
+void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, int row)
 {
     QStandardItem *titleItem = new QStandardItem(param.name());
     QStandardItem *typeItem = new QStandardItem(param.paramTypeName());
@@ -55,7 +54,7 @@ void ContextParametersModel::createNewRow(const ContextParameter &param, int row
     m_params.insert(row, param);
 }
 
-void ContextParametersModel::setDataObject(AADLObject *obj)
+void ContextParametersModel::setDataObject(aadl::AADLObject *obj)
 {
     clear();
     m_params.clear();
@@ -64,13 +63,13 @@ void ContextParametersModel::setDataObject(AADLObject *obj)
     if (!m_dataObject)
         return;
 
-    if (AADLObjectFunctionType *func = qobject_cast<AADLObjectFunctionType *>(m_dataObject)) {
+    if (auto func = qobject_cast<aadl::AADLObjectFunctionType *>(m_dataObject)) {
         const int paramsCount = func->contextParams().size();
 
         beginInsertRows(QModelIndex(), 0, paramsCount);
 
         for (int i = 0; i < paramsCount; ++i) {
-            const ContextParameter &param = func->contextParams().at(i);
+            auto param = func->contextParams().at(i);
             createNewRow(param, i);
         }
 
@@ -78,7 +77,7 @@ void ContextParametersModel::setDataObject(AADLObject *obj)
     }
 }
 
-const AADLObject *ContextParametersModel::dataObject() const
+const aadl::AADLObject *ContextParametersModel::dataObject() const
 {
     return m_dataObject;
 }
@@ -102,7 +101,7 @@ QVariant ContextParametersModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return res;
 
-    const ContextParameter &param = m_params.at(index.row());
+    auto param = m_params.at(index.row());
     switch (role) {
     case Qt::DisplayRole:
     case Qt::EditRole: {
@@ -126,8 +125,8 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
         return false;
 
     if (role == Qt::EditRole) {
-        const ContextParameter &paramOld = m_params.at(index.row());
-        ContextParameter paramNew(paramOld);
+        auto paramOld = m_params.at(index.row());
+        aadl::ContextParameter paramNew(paramOld);
 
         switch (index.column()) {
         case ColumnName: {
@@ -154,7 +153,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
                                                  { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
                                                    QVariant::fromValue(paramNew) })) {
 
-            taste3::cmd::CommandsStack::current()->push(attributesCmd);
+            cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
         }
     }
@@ -168,8 +167,8 @@ bool ContextParametersModel::createProperty(const QString &propName)
 {
     bool res(false);
 
-    ContextParameter param(propName);
-    param.setParamType(BasicParameter::Type::Timer);
+    aadl::ContextParameter param(propName);
+    param.setParamType(aadl::BasicParameter::Type::Timer);
 
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(param) });
@@ -177,7 +176,7 @@ bool ContextParametersModel::createProperty(const QString &propName)
         const int rows = rowCount();
         beginInsertRows(QModelIndex(), rows, rows);
 
-        taste3::cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::current()->push(propsCmd);
         createNewRow(param, rows);
         res = true;
 
@@ -197,7 +196,7 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveContextParameter,
                                                        { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
     if (propsCmd) {
-        taste3::cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);
         m_params.removeAt(row);
 
@@ -220,7 +219,7 @@ bool ContextParametersModel::isProp(const QModelIndex & /*id*/) const
 Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QStandardItemModel::flags(index);
-    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != BasicParameter::Type::Other)
+    if (index.column() == ColumnValue && m_params.at(index.row()).paramType() != aadl::BasicParameter::Type::Other)
         flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 
     if (!m_dataObject)
@@ -229,7 +228,7 @@ Qt::ItemFlags ContextParametersModel::flags(const QModelIndex &index) const
     if (flags.testFlag(Qt::ItemIsEditable) || flags.testFlag(Qt::ItemIsEnabled)) {
         switch (m_dataObject->aadlType()) {
         case aadl::AADLObject::Type::Function: {
-            if (const AADLObjectFunction *fn = m_dataObject->as<const AADLObjectFunction *>())
+            if (auto fn = m_dataObject->as<const aadl::AADLObjectFunction *>())
                 if (fn->inheritsFunctionType())
                     flags = flags & ~Qt::ItemIsEditable & ~Qt::ItemIsEnabled;
 
@@ -257,5 +256,5 @@ QVariant ContextParametersModel::headerData(int section, Qt::Orientation orienta
     }
     return QVariant();
 }
-} // namespace aadl
-} // namespace taste3
+
+}

@@ -18,24 +18,25 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "common.h"
 
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityAttributeChange : public QUndoCommand
 {
 public:
-    explicit CmdEntityAttributeChange(AADLObject *entity, const QVariantHash &attrs);
+    explicit CmdEntityAttributeChange(aadl::AADLObject *entity, const QVariantHash &attrs);
     ~CmdEntityAttributeChange() override;
 
     void redo() override;
@@ -44,26 +45,25 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObject> m_entity;
-    AADLObjectFunction *m_function { nullptr };
+    QPointer<aadl::AADLObject> m_entity;
+    aadl::AADLObjectFunction *m_function { nullptr };
 
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
 
-    QHash<common::Id, QVector<QUndoCommand *>> m_cmdSet;
-    QHash<common::Id, QVector<QUndoCommand *>> m_cmdUnset;
+    QHash<utils::Id, QVector<QUndoCommand *>> m_cmdSet;
+    QHash<utils::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
     void setAttrs(const QVariantHash &attrs, bool isRedo);
-    AADLObjectFunctionType *functionTypeByName(const QString &name) const;
+    aadl::AADLObjectFunctionType *functionTypeByName(const QString &name) const;
     void handleFunctionInstanceOf(const QVariant &attr, bool isRedo);
 
-    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const AADLObjectFunctionType *fnType);
-    QVector<QUndoCommand *> commandsSetNewFunctionType(const AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsUnsetPrevFunctionType(const aadl::AADLObjectFunctionType *fnType);
+    QVector<QUndoCommand *> commandsSetNewFunctionType(const aadl::AADLObjectFunctionType *fnType);
 
-    void prepareUnsetFunctionTypeCommands(const AADLObjectFunctionType *fnType);
-    void prepareSetFunctionTypeCommands(const AADLObjectFunctionType *fnType);
+    void prepareUnsetFunctionTypeCommands(const aadl::AADLObjectFunctionType *fnType);
+    void prepareSetFunctionTypeCommands(const aadl::AADLObjectFunctionType *fnType);
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

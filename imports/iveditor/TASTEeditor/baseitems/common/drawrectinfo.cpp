@@ -16,7 +16,7 @@
 */
 #include "drawrectinfo.h"
 
-namespace taste3 {
+namespace aadlinterface {
 
 /*!
   \class taste3::DrawRectInfo

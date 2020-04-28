@@ -23,7 +23,7 @@
 #include <QGraphicsSceneHelpEvent>
 #include <QToolTip>
 
-namespace taste3 {
+namespace aadlinterface {
 
 InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
     : QGraphicsScene(parent)
@@ -32,8 +32,8 @@ InterfaceTabGraphicsScene::InterfaceTabGraphicsScene(QObject *parent)
 
 void InterfaceTabGraphicsScene::helpEvent(QGraphicsSceneHelpEvent *event)
 {
-    if (QGraphicsItem *hovered = utils::nearestItem(this, event->scenePos(), utils::knownGraphicsItemTypes())) {
-        if (aadl::InteractiveObject *item = qobject_cast<aadl::InteractiveObject *>(hovered->toGraphicsObject())) {
+    if (QGraphicsItem *hovered = nearestItem(this, event->scenePos(), knownGraphicsItemTypes())) {
+        if (auto item = qobject_cast<InteractiveObject *>(hovered->toGraphicsObject())) {
             const QString &tooltip = item->prepareTooltip();
             if (!tooltip.isEmpty()) {
                 QToolTip::showText(event->screenPos(), tooltip, event->widget());
@@ -46,4 +46,4 @@ void InterfaceTabGraphicsScene::helpEvent(QGraphicsSceneHelpEvent *event)
     QGraphicsScene::helpEvent(event);
 }
 
-} // ns taste3
+}

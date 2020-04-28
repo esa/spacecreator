@@ -20,8 +20,7 @@
 #include "colormanager.h"
 #include "ui_colorhandlereditor.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 ColorHandlerEditor::ColorHandlerEditor(QWidget *parent)
     : QWidget(parent)
@@ -106,5 +105,4 @@ void ColorHandlerEditor::on_btnColorStop_colorChanged(const QColor &c)
     }
 }
 
-} // ns aadl
-} // ns taste3
+}

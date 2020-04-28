@@ -20,8 +20,7 @@
 
 class QStringListModel;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class ComboBoxDelegate : public QStyledItemDelegate
 {
@@ -51,5 +50,4 @@ protected:
     QStringListModel *m_model { nullptr };
 };
 
-} // ns aadl
-} // ns taste3
+}

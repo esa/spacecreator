@@ -22,12 +22,11 @@
 #include "ui_commenttextdialog.h"
 
 #include <app/commandsstack.h>
-#include <tab_aadl/aadlobjectcomment.h>
+#include <aadlobjectcomment.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-CommentTextDialog::CommentTextDialog(AADLObjectComment *comment, QWidget *parent)
+CommentTextDialog::CommentTextDialog(aadl::AADLObjectComment *comment, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::CommentTextDialog)
     , m_entity(comment)
@@ -38,12 +37,12 @@ CommentTextDialog::CommentTextDialog(AADLObjectComment *comment, QWidget *parent
         if (m_entity->title() == text)
             return;
 
-        const QVariantMap textArg { { meta::Props::token(meta::Props::Token::name), text } };
+        const QVariantMap textArg { { aadl::meta::Props::token(aadl::meta::Props::Token::name), text } };
         const QVariantList commentTextParams { QVariant::fromValue(m_entity), QVariant::fromValue(textArg) };
         auto commentTextCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes, commentTextParams);
         if (commentTextCmd) {
             commentTextCmd->setText(QObject::tr("Edit Comment"));
-            taste3::cmd::CommandsStack::current()->push(commentTextCmd);
+            cmd::CommandsStack::current()->push(commentTextCmd);
         }
     });
     ui->plainTextEdit->setPlainText(comment->title());
@@ -54,5 +53,4 @@ CommentTextDialog::~CommentTextDialog()
     delete ui;
 }
 
-} // namespace aadl
-} // namespace taste3
+}

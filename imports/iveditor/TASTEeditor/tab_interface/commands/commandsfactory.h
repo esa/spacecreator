@@ -23,8 +23,7 @@
 
 class QUndoCommand;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 class CommandsFactory
@@ -61,6 +60,5 @@ private:
     CommandsFactory(const CommandsFactory &other) = delete;
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+}
+}

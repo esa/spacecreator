@@ -28,8 +28,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMessageBox>
-namespace taste3 {
-namespace aadl {
+
+namespace aadlinterface {
 
 DynamicPropertyManager::DynamicPropertyManager(QWidget *parent)
     : QDialog(parent)
@@ -151,5 +151,4 @@ void DynamicPropertyManager::accept()
     QDialog::accept();
 }
 
-} // ns aadl
-} // ns taste3
+}

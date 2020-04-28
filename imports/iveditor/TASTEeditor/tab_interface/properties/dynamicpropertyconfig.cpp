@@ -17,11 +17,11 @@
 
 #include "dynamicpropertyconfig.h"
 
-#include "app/common.h"
+#include "common.h"
 #include "baseitems/common/utils.h"
 #include "dynamicproperty.h"
 #include "settings/appoptions.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QDebug>
 #include <QDir>
@@ -33,10 +33,9 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-struct DynamicPropertyConfigPrivate {
+struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
     DynamicPropertyConfigPrivate() {}
     ~DynamicPropertyConfigPrivate() {}
     void init(const QVector<DynamicProperty *> &attrs)
@@ -88,7 +87,7 @@ DynamicPropertyConfig::DynamicPropertyConfig()
 QString DynamicPropertyConfig::defaultConfigPath()
 {
     const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    common::ensureDirExists(path);
+    utils::ensureDirExists(path);
     return path + "/aadl_properties.json";
 }
 
@@ -125,7 +124,7 @@ QString ensureFileExists()
             storedFilePath = DynamicPropertyConfig::defaultConfigPath();
 
         const QString rscFilePath(":/defaults/tab_interface/properties/resources/aadl_properties.json");
-        if (!common::copyResourceFile(rscFilePath, storedFilePath)) {
+        if (!utils::copyResourceFile(rscFilePath, storedFilePath)) {
             qWarning() << "Can't create default ASN datatypes file" << storedFilePath;
             return QString();
         }
@@ -209,15 +208,15 @@ QVector<DynamicProperty *> DynamicPropertyConfig::readAttrs(const QByteArray &da
     return attrs;
 }
 
-QVector<DynamicProperty *> DynamicPropertyConfig::attributesForObject(AADLObject *obj)
+QVector<DynamicProperty *> DynamicPropertyConfig::attributesForObject(aadl::AADLObject *obj)
 {
     switch (obj->aadlType()) {
-    case AADLObject::Type::FunctionType:
+    case aadl::AADLObject::Type::FunctionType:
         return attributesForFunctionType();
-    case AADLObject::Type::Function:
+    case aadl::AADLObject::Type::Function:
         return attributesForFunction();
-    case AADLObject::Type::RequiredInterface:
-    case AADLObject::Type::ProvidedInterface:
+    case aadl::AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::ProvidedInterface:
         return attributesForIface();
     default:
         return {};
@@ -239,5 +238,4 @@ QVector<DynamicProperty *> DynamicPropertyConfig::attributesForIface()
     return instance()->d->m_iface.values().toVector();
 }
 
-} // ns aadl
-} // ns taste3
+}

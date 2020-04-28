@@ -19,8 +19,6 @@
 
 #include "exportableaadlobject.h"
 
-namespace taste3 {
-
 namespace aadl {
     class AADLObjectConnection;
 }
@@ -55,7 +53,7 @@ public:
     bool targetInterfaceIsProvided() const;
 };
 
-} // ns templating
-} // ns taste3
+}
 
-DECLARE_EXPORTABLE_TYPE(ExportableAADLConnection)
+Q_DECLARE_METATYPE(templating::ExportableAADLConnection)
+Q_DECLARE_TYPEINFO(templating::ExportableAADLConnection, Q_MOVABLE_TYPE);

@@ -18,7 +18,7 @@
     <widget class="QListView" name="listView"/>
    </item>
    <item row="1" column="1">
-    <widget class="taste3::aadl::ColorHandlerEditor" name="colorHandlerEditor" native="true"/>
+    <widget class="aadlinterface::ColorHandlerEditor" name="colorHandlerEditor" native="true"/>
    </item>
    <item row="2" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -66,7 +66,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>taste3::aadl::ColorHandlerEditor</class>
+   <class>aadlinterface::ColorHandlerEditor</class>
    <extends>QWidget</extends>
    <header>tab_interface/colors/colorhandlereditor.h</header>
    <container>1</container>

@@ -19,8 +19,6 @@
 
 #include "exportableaadlobject.h"
 
-namespace taste3 {
-
 namespace aadl {
     class AADLObjectIface;
 }
@@ -45,7 +43,7 @@ public:
     QVariantList paramList() const;
 };
 
-} // ns templating
-} // ns taste3
+}
 
-DECLARE_EXPORTABLE_TYPE(ExportableAADLIface)
+Q_DECLARE_METATYPE(templating::ExportableAADLIface)
+Q_DECLARE_TYPEINFO(templating::ExportableAADLIface, Q_MOVABLE_TYPE);

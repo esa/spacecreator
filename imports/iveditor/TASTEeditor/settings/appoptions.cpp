@@ -22,7 +22,7 @@
 
 #include <QStandardPaths>
 
-namespace taste3 {
+namespace aadlinterface {
 
 AppOption::AppOption(const QString &name, const QVariant &defaultValue)
     : Name(name)
@@ -75,4 +75,4 @@ GroupAadl::GroupAadl()
 
 const GroupAadl AppOptions::Aadl = {};
 
-} // namespace taste3
+}

@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "app/datatypes/datatypesstorage.h"
+#include "datatypesstorage.h"
 #include "app/mainwindow.h"
 #include "logging/loghandler.h"
 #include "reports/bugreporthandler.h"
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
-    datatypes::DataTypesStorage::init();
+    aadl::DataTypesStorage::init();
 
     SettingsManager settings;
 

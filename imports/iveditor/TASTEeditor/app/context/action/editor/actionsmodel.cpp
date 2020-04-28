@@ -20,7 +20,7 @@
 #include <QDebug>
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 /*!
  * \class taste3::aadl::ActionsModel
@@ -133,5 +133,5 @@ QModelIndex ActionsModel::createAction(const QString &name, const QString &targe
     return id;
 }
 
-} // namespace aadl
-} // namespace taste3
+}
+}

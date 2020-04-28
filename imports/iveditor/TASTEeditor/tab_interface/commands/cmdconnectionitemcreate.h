@@ -17,25 +17,27 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "common.h"
 #include "cmdentitygeometrychange.h"
 
 #include <QPointer>
 #include <QRect>
 #include <QVector>
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectConnection;
 class AADLObjectFunction;
 class AADLObjectsModel;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdConnectionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdConnectionItemCreate(taste3::aadl::AADLObjectsModel *model, taste3::aadl::AADLObjectFunction *parent,
-                                     const common::Id sourceIfaceId, const common::Id &targetIfaceId,
+    explicit CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
+                                     const utils::Id sourceIfaceId, const utils::Id &targetIfaceId,
                                      const QVector<QPointF> &points);
 
     void redo() override;
@@ -43,11 +45,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObjectConnection> m_entity;
-    QPointer<AADLObjectFunction> m_parent;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    QPointer<aadl::AADLObjectConnection> m_entity;
+    QPointer<aadl::AADLObjectFunction> m_parent;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

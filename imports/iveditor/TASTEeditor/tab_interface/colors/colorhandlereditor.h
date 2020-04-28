@@ -25,8 +25,7 @@ namespace Ui {
 class ColorHandlerEditor;
 }
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class ColorHandlerEditor : public QWidget
 {
@@ -54,5 +53,4 @@ private:
     ColorHandler *m_colorHandler { nullptr };
 };
 
-} // ns aadl
-} // ns taste3
+}

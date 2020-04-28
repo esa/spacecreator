@@ -23,7 +23,7 @@
 class QGraphicsPathItem;
 class QPropertyAnimation;
 
-namespace taste3 {
+namespace aadlinterface {
 
 class HighlightRectItem : public QGraphicsObject
 {
@@ -54,4 +54,4 @@ private:
     void clearAnimation();
 };
 
-} // ns taste3
+}

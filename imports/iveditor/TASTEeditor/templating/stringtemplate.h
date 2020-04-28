@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef STRINGTEMPLATE_H
-#define STRINGTEMPLATE_H
+#pragma once
 
 #include <QObject>
 #include <QSharedPointer>
@@ -27,8 +26,6 @@ class FileSystemTemplateLoader;
 }
 
 class QIODevice;
-
-namespace taste3 {
 
 namespace aadl {
 class AADLObject;
@@ -72,7 +69,4 @@ private:
     int m_autoFormattingIndent;
 };
 
-} // ns templating
-} // ns taste3
-
-#endif // STRINGTEMPLATE_H
+}

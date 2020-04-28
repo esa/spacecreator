@@ -18,10 +18,10 @@
 #include "propertieslistmodel.h"
 
 #include "app/commandsstack.h"
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlnamevalidator.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunction.h"
+#include "aadlcommonprops.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
+#include "aadlobjectfunction.h"
 #include "tab_interface/commands/cmdentityattributechange.h"
 #include "tab_interface/commands/cmdentitypropertychange.h"
 #include "tab_interface/commands/cmdentitypropertycreate.h"
@@ -32,16 +32,15 @@
 #include <QDebug>
 #include <algorithm>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-meta::Props::Token tokenFromIndex(const QModelIndex &index)
+aadl::meta::Props::Token tokenFromIndex(const QModelIndex &index)
 {
     if (!index.isValid())
-        return meta::Props::Token::Unknown;
+        return aadl::meta::Props::Token::Unknown;
 
     const QString name = index.model()->index(index.row(), PropertiesListModel::ColumnTitle).data().toString();
-    return meta::Props::token(name);
+    return aadl::meta::Props::token(name);
 }
 
 PropertiesListModel::PropertiesListModel(QObject *parent)
@@ -64,7 +63,7 @@ void PropertiesListModel::createNewRow(const QString &title, const QVariant &val
     setItem(row, ColumnValue, valueItem);
 }
 
-void PropertiesListModel::setDataObject(AADLObject *obj)
+void PropertiesListModel::setDataObject(aadl::AADLObject *obj)
 {
     clear();
     m_names.clear();
@@ -93,7 +92,7 @@ void PropertiesListModel::setDataObject(AADLObject *obj)
     endInsertRows();
 }
 
-const AADLObject *PropertiesListModel::dataObject() const
+const aadl::AADLObject *PropertiesListModel::dataObject() const
 {
     return m_dataObject;
 }
@@ -152,8 +151,8 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
         if (isAttr(index) && index.column() == ColumnValue) {
 
             switch (tokenFromIndex(index)) {
-            case meta::Props::Token::name: {
-                if (!AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
+            case aadl::meta::Props::Token::name: {
+                if (!aadl::AADLNameValidator::isAcceptableName(m_dataObject, value.toString()))
                     return false; // TODO: move to editor's validator
                 break;
             }
@@ -165,14 +164,14 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             const auto attributesCmd = cmd::CommandsFactory::create(
                     cmd::ChangeEntityAttributes,
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
-            taste3::cmd::CommandsStack::current()->push(attributesCmd);
+            cmd::CommandsStack::current()->push(attributesCmd);
         } else if (isProp(index)) {
             switch (index.column()) {
             case ColumnValue: {
                 const QVariantMap props = { { name, value } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::ChangeEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                taste3::cmd::CommandsStack::current()->push(propsCmd);
+                cmd::CommandsStack::current()->push(propsCmd);
 
                 break;
             }
@@ -183,7 +182,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 const QHash<QString, QString> props = { { name, newName } };
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
-                taste3::cmd::CommandsStack::current()->push(propsCmd);
+                cmd::CommandsStack::current()->push(propsCmd);
                 m_names.replace(m_names.indexOf(name), newName);
                 break;
             }
@@ -212,7 +211,7 @@ bool PropertiesListModel::createProperty(const QString &propName)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::CreateEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        taste3::cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::current()->push(propsCmd);
         res = true;
     }
 
@@ -239,7 +238,7 @@ bool PropertiesListModel::removeProperty(const QModelIndex &index)
     const auto propsCmd = cmd::CommandsFactory::create(
             cmd::RemoveEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
     if (propsCmd) {
-        taste3::cmd::CommandsStack::current()->push(propsCmd);
+        cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);
         m_names.removeAt(row);
 
@@ -274,8 +273,8 @@ Qt::ItemFlags PropertiesListModel::flags(const QModelIndex &index) const
 
     if (editable) {
         switch (tokenFromIndex(index)) {
-        case meta::Props::Token::InnerCoordinates:
-        case meta::Props::Token::coordinates: {
+        case aadl::meta::Props::Token::InnerCoordinates:
+        case aadl::meta::Props::Token::coordinates: {
             editable = false;
             break;
         }
@@ -305,26 +304,26 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
     bool editable = true;
 
     switch (tokenFromIndex(index)) {
-    case meta::Props::Token::is_type: {
+    case aadl::meta::Props::Token::is_type: {
         editable = false;
         break;
     }
-    case meta::Props::Token::name: {
+    case aadl::meta::Props::Token::name: {
         editable = true;
         break;
     }
-    case meta::Props::Token::instance_of: {
+    case aadl::meta::Props::Token::instance_of: {
         if (dataObject()->isFunctionType())
             editable = false;
         else {
-            if (auto fn = dataObject()->as<const AADLObjectFunction *>()) {
+            if (auto fn = dataObject()->as<const aadl::AADLObjectFunction *>()) {
                 editable = fn->instanceOf() || fn->interfaces().isEmpty();
             }
         }
         break;
     }
     default:
-        if (const AADLObjectFunction *fn = dataObject()->as<const AADLObjectFunction *>())
+        if (auto fn = dataObject()->as<const aadl::AADLObjectFunction *>())
             editable = !fn->inheritsFunctionType();
         break;
     }
@@ -343,22 +342,22 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
         return false;
 
     bool editable = true;
-    if (const AADLObjectIface *iface = m_dataObject->as<const AADLObjectIface *>()) {
+    if (auto iface = m_dataObject->as<const aadl::AADLObjectIface *>()) {
         const bool isClone = iface->isClone();
         switch (tokenFromIndex(index)) {
-        case meta::Props::Token::Autonamed: {
+        case aadl::meta::Props::Token::Autonamed: {
             editable = false;
             break;
         }
-        case meta::Props::Token::name:
-        case meta::Props::Token::InheritPI: {
+        case aadl::meta::Props::Token::name:
+        case aadl::meta::Props::Token::InheritPI: {
             editable = !isClone;
             break;
         }
         default: {
             bool isInheritedRI = false;
             if (iface->isRequired())
-                if (auto ri = iface->as<const AADLObjectIfaceRequired *>())
+                if (auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>())
                     isInheritedRI = ri->hasPrototypePi();
             editable = !isClone && !isInheritedRI;
             break;
@@ -369,5 +368,4 @@ bool InterfacePropertiesListModel::isEditable(const QModelIndex &index) const
     return editable;
 }
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -17,9 +17,8 @@
 
 #include "exportableaadliface.h"
 
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectiface.h"
 
-namespace taste3 {
 namespace templating {
 
 ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
@@ -43,5 +42,4 @@ QVariantList ExportableAADLIface::paramList() const
     return list;
 }
 
-} // ns templating
-} // ns taste3
+}

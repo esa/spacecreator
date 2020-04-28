@@ -15,13 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef TEMPLATEHIGHLIGHTER_H
-#define TEMPLATEHIGHLIGHTER_H
+#pragma once
 
 #include <QRegularExpression>
 #include <QSyntaxHighlighter>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -57,7 +55,4 @@ private:
     QRegularExpression m_commentEndExpression;
 };
 
-} // ns templating
-} // ns taste3
-
-#endif // TEMPLATEHIGHLIGHTER_H
+}

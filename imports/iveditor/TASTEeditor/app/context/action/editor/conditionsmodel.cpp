@@ -20,7 +20,7 @@
 #include "app/context/action/condition.h"
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 /*!
  * \class taste3::aadl::ConditionsModel
@@ -123,5 +123,5 @@ bool ConditionsModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-} // ns aadl
-} // ns taste3
+}
+}

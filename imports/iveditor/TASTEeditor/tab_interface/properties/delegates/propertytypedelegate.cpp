@@ -17,24 +17,23 @@
 
 #include "propertytypedelegate.h"
 
-#include "app/datatypes/datatypesstorage.h"
-#include "tab_aadl/aadlparameter.h"
+#include "datatypesstorage.h"
+#include "aadlparameter.h"
 
 #include <QComboBox>
 #include <QStringListModel>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 static QStringList initNames()
 {
-    const QMap<QString, datatypes::BasicDataType *> types = datatypes::DataTypesStorage::dataTypes();
+    auto types = aadl::DataTypesStorage::dataTypes();
     QStringList names;
     for (auto type : types)
         names.append(type->name());
 
-    names.append(BasicParameter::typeName(BasicParameter::Type::Timer));
-    names.append(BasicParameter::typeName(BasicParameter::Type::Directive));
+    names.append(aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Timer));
+    names.append(aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Directive));
 
     return names;
 }
@@ -46,5 +45,4 @@ PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
 
 PropertyTypeDelegate::~PropertyTypeDelegate() {}
 
-} // ns aadl
-} // ns taste3
+}
