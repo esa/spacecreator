@@ -36,8 +36,6 @@ class ConnectionCreationValidator
     Q_GADGET
 
 public:
-    static const qreal kInterfaceTolerance;
-
     enum class FailReason
     {
         NotFail = 0,
@@ -59,34 +57,6 @@ public:
     };
     Q_ENUM(FailReason)
 
-    struct ValidationResult {
-        AADLObjectIface *startIface { nullptr };
-        AADLObjectIface *endIface { nullptr };
-        utils::Id startIfaceId = {};
-        utils::Id endIfaceId = {};
-        QPointF startPointAdjusted {};
-        QPointF endPointAdjusted {};
-        QLineF connectionLine {};
-        QGraphicsItem *functionAtStartPos { nullptr };
-        AADLObjectFunction *startObject { nullptr };
-        QGraphicsItem *functionAtEndPos { nullptr };
-        AADLObjectFunction *endObject { nullptr };
-        bool isToOrFromNested { false };
-
-        FailReason status { FailReason::NoScene };
-        inline bool failed() const { return status != ConnectionCreationValidator::FailReason::NotFail; }
-        inline bool setFailed(ConnectionCreationValidator::FailReason s)
-        {
-            status = s;
-            return failed();
-        }
-    };
-
-#ifdef FIXME_BEFORE_MR
-    static ConnectionCreationValidator::ValidationResult validate(QGraphicsScene *scene,
-                                                                  const QVector<QPointF> &connectionPoints);
-#endif
-
     static ConnectionCreationValidator::FailReason canConnect(AADLObjectFunction *sourceFunction,
                                                               AADLObjectFunction *targetFunction,
                                                               AADLObjectIface *sourceIource,
@@ -95,12 +65,8 @@ public:
 private:
     ConnectionCreationValidator();
 
-    static ConnectionCreationValidator::ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &startPos,
-                                                                        const QPointF &lastPos);
     static ConnectionCreationValidator::FailReason checkKindAndParams(AADLObjectIface *sourceIface,
                                                                       AADLObjectIface *targetIface);
 };
-
-typedef ConnectionCreationValidator::ValidationResult ConnectionInfo;
 
 }
