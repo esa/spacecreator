@@ -21,7 +21,7 @@
 #include <QUndoStack>
 #include <QVariant>
 
-namespace taste3 {
+namespace aadlinterface {
 namespace cmd {
 
 class CommandsStack : public QObject
@@ -62,5 +62,5 @@ private:
     QUndoStack *m_current = nullptr;
 };
 
-} // namespace taste3
-} // ns taste3
+}
+}

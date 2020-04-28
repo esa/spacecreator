@@ -17,7 +17,6 @@
 
 #include "concurrencytabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 ConcurrencyTabDocument::ConcurrencyTabDocument(QObject *parent)
@@ -30,5 +29,4 @@ QString ConcurrencyTabDocument::title() const
     return tr("Concurrency");
 }
 
-} // ns document
-} // ns taste3
+}

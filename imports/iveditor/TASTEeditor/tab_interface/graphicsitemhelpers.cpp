@@ -18,12 +18,12 @@
 #include "graphicsitemhelpers.h"
 
 #include "baseitems/common/utils.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectcomment.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobject.h"
+#include "aadlobjectcomment.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectiface.h"
 #include "tab_interface/aadlcommentgraphicsitem.h"
 #include "tab_interface/aadlconnectiongraphicsitem.h"
 #include "tab_interface/aadlfunctiongraphicsitem.h"
@@ -32,11 +32,10 @@
 
 #include <QGraphicsScene>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace gi {
 
-AADLObjectFunction *functionObject(QGraphicsItem *item)
+aadl::AADLObjectFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -47,7 +46,7 @@ AADLObjectFunction *functionObject(QGraphicsItem *item)
     return nullptr;
 };
 
-AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
+aadl::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -58,7 +57,7 @@ AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item)
     return nullptr;
 };
 
-AADLObjectIface *interfaceObject(QGraphicsItem *item)
+aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -69,7 +68,7 @@ AADLObjectIface *interfaceObject(QGraphicsItem *item)
     return nullptr;
 };
 
-AADLObjectComment *commentObject(QGraphicsItem *item)
+aadl::AADLObjectComment *commentObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -80,7 +79,7 @@ AADLObjectComment *commentObject(QGraphicsItem *item)
     return nullptr;
 };
 
-AADLObjectConnection *connectionObject(QGraphicsItem *item)
+aadl::AADLObjectConnection *connectionObject(QGraphicsItem *item)
 {
     if (!item)
         return nullptr;
@@ -127,6 +126,6 @@ bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, cons
 
     return true;
 }
-} // ns gi
-} // ns aadl
-} // ns taste3
+
+}
+}

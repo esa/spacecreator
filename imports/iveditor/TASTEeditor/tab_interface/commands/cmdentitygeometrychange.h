@@ -22,16 +22,18 @@
 #include <QUndoCommand>
 #include <QVector>
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityGeometryChange : public QUndoCommand
 {
 
 public:
-    explicit CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData,
+    explicit CmdEntityGeometryChange(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData,
                                      const QString &title = {});
     ~CmdEntityGeometryChange() override;
 
@@ -43,22 +45,21 @@ public:
 
 protected:
     struct ObjectData {
-        QPointer<AADLObject> entity;
+        QPointer<aadl::AADLObject> entity;
         QVector<qint32> prevCoordinates;
         QVector<qint32> newCoordinates;
     };
 
-    void prepareData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
+    void prepareData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData);
 
 private:
-    static QList<ObjectData> convertData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
+    static QList<ObjectData> convertData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData);
 
 private:
-    QList<QPair<AADLObject *, QVector<QPointF>>> m_internalData;
+    QList<QPair<aadl::AADLObject *, QVector<QPointF>>> m_internalData;
     QList<ObjectData> m_data;
     QList<QUndoCommand *> m_mergedCmds;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

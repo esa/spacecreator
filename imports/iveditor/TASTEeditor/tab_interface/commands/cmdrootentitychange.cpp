@@ -19,13 +19,12 @@
 
 #include "commandids.h"
 
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdRootEntityChange::CmdRootEntityChange(AADLObjectsModel *model, const common::Id &id)
+CmdRootEntityChange::CmdRootEntityChange(aadl::AADLObjectsModel *model, const utils::Id &id)
     : CmdEntityGeometryChange({}, QObject::tr("Change root item"))
     , m_model(model)
     , m_newId(id)
@@ -55,6 +54,5 @@ int CmdRootEntityChange::id() const
     return ChangeRootEntity;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

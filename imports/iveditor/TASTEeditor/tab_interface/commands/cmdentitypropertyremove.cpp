@@ -20,13 +20,12 @@
 
 #include "commandids.h"
 
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-static inline QVariantHash getCurrentProperties(AADLObject *entity, const QStringList &props)
+static inline QVariantHash getCurrentProperties(aadl::AADLObject *entity, const QStringList &props)
 {
     QVariantHash result;
     for (const QString &prop : props)
@@ -34,7 +33,7 @@ static inline QVariantHash getCurrentProperties(AADLObject *entity, const QStrin
     return result;
 }
 
-CmdEntityPropertyRemove::CmdEntityPropertyRemove(AADLObject *entity, const QStringList &props)
+CmdEntityPropertyRemove::CmdEntityPropertyRemove(aadl::AADLObject *entity, const QStringList &props)
     : QUndoCommand()
     , m_entity(entity)
     , m_names(props)
@@ -69,6 +68,5 @@ int CmdEntityPropertyRemove::id() const
     return RemoveEntityProperty;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

@@ -28,8 +28,7 @@ class PropertiesViewBase;
 class QTableView;
 class QAbstractItemModel;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class PropertiesModelBase;
 class PropertiesViewBase : public QWidget
@@ -58,5 +57,4 @@ private:
     Ui::PropertiesViewBase *ui { nullptr };
 };
 
-} // namespace aadl
-} // namespace taste3
+}

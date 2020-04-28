@@ -17,22 +17,22 @@
 
 #pragma once
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
+}
 
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityPropertyCreate : public QUndoCommand
 {
 public:
-    explicit CmdEntityPropertyCreate(AADLObject *entity, const QVariantHash &props);
+    explicit CmdEntityPropertyCreate(aadl::AADLObject *entity, const QVariantHash &props);
 
     void redo() override;
     void undo() override;
@@ -40,11 +40,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<AADLObject> m_entity;
+    QPointer<aadl::AADLObject> m_entity;
     QVariantHash m_newProps;
     const QVariantHash m_oldProps;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

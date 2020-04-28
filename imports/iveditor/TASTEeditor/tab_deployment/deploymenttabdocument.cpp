@@ -17,7 +17,6 @@
 
 #include "deploymenttabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 DeploymentTabDocument::DeploymentTabDocument(QObject *parent)
@@ -30,5 +29,4 @@ QString DeploymentTabDocument::title() const
     return tr("Deployment");
 }
 
-} // ns document
-} // ns taste3
+}

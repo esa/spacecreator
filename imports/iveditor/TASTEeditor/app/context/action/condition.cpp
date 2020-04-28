@@ -17,7 +17,7 @@
 
 #include "condition.h"
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -70,9 +70,9 @@ QJsonObject Condition::toJson() const
 QStringList Condition::knownTypes()
 {
     QStringList res;
-    QMetaEnum me = QMetaEnum::fromType<taste3::aadl::AADLObject::Type>();
+    QMetaEnum me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i)
-        if (taste3::aadl::AADLObject::Type(me.value(i)) != taste3::aadl::AADLObject::Type::Unknown)
+        if (aadl::AADLObject::Type(me.value(i)) != aadl::AADLObject::Type::Unknown)
             res.append(me.key(i));
     return res;
 }

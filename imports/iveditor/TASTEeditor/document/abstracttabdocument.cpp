@@ -22,7 +22,6 @@
 #include <QToolBar>
 #include <QUndoStack>
 
-namespace taste3 {
 namespace document {
 
 /*!
@@ -213,5 +212,4 @@ void AbstractTabDocument::onSavedExternally(const QString &filePath, bool saved)
     }
 }
 
-} // ns document
-} // ns taste3
+}

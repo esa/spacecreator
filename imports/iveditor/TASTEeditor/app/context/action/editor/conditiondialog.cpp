@@ -21,7 +21,7 @@
 #include "ui_conditiondialog.h"
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 /*!
  * \class taste3::aadl::ConditionDialog
@@ -71,5 +71,5 @@ void ConditionDialog::on_btnRmAttr_clicked()
     m_attrsModel->removeRow(currId.row());
 }
 
-} // ns aadl
-} // ns taste3
+}
+}

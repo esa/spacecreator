@@ -7,8 +7,6 @@ target_sources(${APP_NAME} PRIVATE
     app/commandlineparser.h
     app/commandsstack.cpp
     app/commandsstack.h
-    app/common.cpp
-    app/common.h
     app/context/action/action.cpp
     app/context/action/action.h
     app/context/action/actionsmanager.cpp
@@ -31,10 +29,8 @@ target_sources(${APP_NAME} PRIVATE
     app/context/action/editor/dynactioneditor.ui
     app/context/action/extprocmonitor.cpp
     app/context/action/extprocmonitor.h
-    app/datatypes/basicdatatype.cpp
-    app/datatypes/basicdatatype.h
-    app/datatypes/datatypesstorage.cpp
-    app/datatypes/datatypesstorage.h
+    app/aadltabdocument.cpp
+    app/aadltabdocument.h
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
@@ -81,30 +77,6 @@ target_sources(${APP_NAME} PRIVATE
     settings/appoptions.h
     settings/settingsmanager.cpp
     settings/settingsmanager.h
-    tab_aadl/aadlcommonprops.cpp
-    tab_aadl/aadlcommonprops.h
-    tab_aadl/aadlnamevalidator.cpp
-    tab_aadl/aadlnamevalidator.h
-    tab_aadl/aadlobject.cpp
-    tab_aadl/aadlobject.h
-    tab_aadl/aadlobjectcomment.cpp
-    tab_aadl/aadlobjectcomment.h
-    tab_aadl/aadlobjectconnection.cpp
-    tab_aadl/aadlobjectconnection.h
-    tab_aadl/aadlobjectfunction.cpp
-    tab_aadl/aadlobjectfunction.h
-    tab_aadl/aadlobjectfunctiontype.cpp
-    tab_aadl/aadlobjectfunctiontype.h
-    tab_aadl/aadlobjectiface.cpp
-    tab_aadl/aadlobjectiface.h
-    tab_aadl/aadlobjectsmodel.cpp
-    tab_aadl/aadlobjectsmodel.h
-    tab_aadl/aadlparameter.cpp
-    tab_aadl/aadlparameter.h
-    tab_aadl/aadltabdocument.cpp
-    tab_aadl/aadltabdocument.h
-    tab_aadl/aadlxmlreader.cpp
-    tab_aadl/aadlxmlreader.h
     tab_concurrency/concurrencytabdocument.cpp
     tab_concurrency/concurrencytabdocument.h
     tab_data/datatabdocument.cpp
@@ -189,8 +161,6 @@ target_sources(${APP_NAME} PRIVATE
     tab_interface/commenttextdialog.cpp
     tab_interface/commenttextdialog.h
     tab_interface/commenttextdialog.ui
-    tab_interface/connectioncreationvalidator.cpp
-    tab_interface/connectioncreationvalidator.h
     tab_interface/creatortool.cpp
     tab_interface/creatortool.h
     tab_interface/graphicsitemhelpers.cpp
@@ -253,8 +223,6 @@ target_sources(${APP_NAME} PRIVATE
     templating/templatesyntaxhelpdialog.h
     templating/xmlhighlighter.cpp
     templating/xmlhighlighter.h
-    util/delayedsignal.cpp
-    util/delayedsignal.h
     resources.qrc
     tab_interface/tab_interface_resources.qrc
     templating/template_syntax_help.qrc
@@ -262,6 +230,8 @@ target_sources(${APP_NAME} PRIVATE
 
 
 target_link_libraries(${APP_NAME} PUBLIC
+    aadl
+    utils
     Qt5::Concurrent
     Qt5::Network
     Qt5::Svg

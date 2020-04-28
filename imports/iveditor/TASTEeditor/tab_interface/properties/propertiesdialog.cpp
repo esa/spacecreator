@@ -26,25 +26,24 @@
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
-#include "tab_aadl/aadlnamevalidator.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
+#include "aadlobjectiface.h"
 #include "ui_propertiesdialog.h"
 
 #include <QDebug>
 #include <QHeaderView>
 #include <QTableView>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(AADLObject *obj, QWidget *parent)
+PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
     , m_cmdMacro(new cmd::CommandsStack::Macro(
               tr("Edit %1 - %2")
-                      .arg(AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(), m_dataObject->title())))
+                      .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(), m_dataObject->title())))
 {
     ui->setupUi(this);
 
@@ -66,17 +65,17 @@ QString PropertiesDialog::objectTypeName() const
         return QString();
 
     switch (m_dataObject->aadlType()) {
-    case AADLObject::Type::FunctionType:
+    case aadl::AADLObject::Type::FunctionType:
         return tr("Function Type");
-    case AADLObject::Type::Function:
+    case aadl::AADLObject::Type::Function:
         return tr("Function");
-    case AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::RequiredInterface:
         return tr("RI");
-    case AADLObject::Type::ProvidedInterface:
+    case aadl::AADLObject::Type::ProvidedInterface:
         return tr("PI");
-    case AADLObject::Type::Comment:
+    case aadl::AADLObject::Type::Comment:
         return tr("Comment");
-    case AADLObject::Type::Connection:
+    case aadl::AADLObject::Type::Connection:
         return tr("Connection");
     default:
         return QString();
@@ -100,18 +99,18 @@ void PropertiesDialog::initTabs()
         return;
 
     auto initAttributesView = [this]() {
-        PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        auto viewAttrs = new PropertiesViewBase(this);
         QStyledItemDelegate *modelDelegate { nullptr };
         PropertiesListModel *modelAttrs { nullptr };
 
         switch (m_dataObject->aadlType()) {
-        case AADLObject::Type::Function: {
+        case aadl::AADLObject::Type::Function: {
             modelAttrs = new FunctionPropertiesListModel(this);
             modelDelegate = new FunctionAttrDelegate(viewAttrs->tableView());
             break;
         }
-        case AADLObject::Type::RequiredInterface:
-        case AADLObject::Type::ProvidedInterface: {
+        case aadl::AADLObject::Type::RequiredInterface:
+        case aadl::AADLObject::Type::ProvidedInterface: {
             modelAttrs = new InterfacePropertiesListModel(this);
             modelDelegate = new InterfaceAttrDelegate(viewAttrs->tableView());
             break;
@@ -155,8 +154,8 @@ void PropertiesDialog::initTabs()
                                             viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
                 IfaceParametersModel::ColumnDirection,
-                new StringListComboDelegate({ IfaceParameter::directionName(IfaceParameter::Direction::In),
-                                              IfaceParameter::directionName(IfaceParameter::Direction::Out) },
+                new StringListComboDelegate({ aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
+                                              aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
                                             viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelIfaceParams);
@@ -166,31 +165,31 @@ void PropertiesDialog::initTabs()
     QString objectTypeLabel;
 
     switch (m_dataObject->aadlType()) {
-    case AADLObject::Type::FunctionType: {
+    case aadl::AADLObject::Type::FunctionType: {
         objectTypeLabel = tr("Function Type");
         initContextParams();
         break;
     }
-    case AADLObject::Type::Function: {
+    case aadl::AADLObject::Type::Function: {
         objectTypeLabel = tr("Function");
         initContextParams();
         break;
     }
-    case AADLObject::Type::RequiredInterface: {
+    case aadl::AADLObject::Type::RequiredInterface: {
         objectTypeLabel = tr("RI");
         initIfaceParams();
         break;
     }
-    case AADLObject::Type::ProvidedInterface: {
+    case aadl::AADLObject::Type::ProvidedInterface: {
         objectTypeLabel = tr("PI");
         initIfaceParams();
         break;
     }
-    case AADLObject::Type::Comment: {
+    case aadl::AADLObject::Type::Comment: {
         objectTypeLabel = tr("Comment");
         break;
     }
-    case AADLObject::Type::Connection: {
+    case aadl::AADLObject::Type::Connection: {
         objectTypeLabel = tr("Connection");
         break;
     }
@@ -204,5 +203,4 @@ void PropertiesDialog::initTabs()
     ui->tabWidget->setCurrentIndex(0);
 }
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "attrhandler.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QJsonObject>
 #include <QString>

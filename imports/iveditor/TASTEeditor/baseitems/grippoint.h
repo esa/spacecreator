@@ -25,7 +25,7 @@
 #include <QPainterPath>
 #include <QPointer>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class AbstractInteractiveObject;
 class GripPointsHandler;

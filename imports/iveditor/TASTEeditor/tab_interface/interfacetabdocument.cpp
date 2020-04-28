@@ -25,8 +25,8 @@
 #include "commands/commandsfactory.h"
 #include "creatortool.h"
 #include "interfacetabgraphicsscene.h"
-#include "tab_aadl/aadlobjectsmodel.h"
-#include "tab_aadl/aadlxmlreader.h"
+#include "aadlobjectsmodel.h"
+#include "aadlxmlreader.h"
 #include "tab_interface/aadlcommentgraphicsitem.h"
 #include "tab_interface/aadlconnectiongraphicsitem.h"
 #include "tab_interface/aadlfunctiongraphicsitem.h"
@@ -36,6 +36,7 @@
 #include "tab_interface/commenttextdialog.h"
 #include "tab_interface/properties/dynamicpropertymanager.h"
 #include "tab_interface/properties/propertiesdialog.h"
+#include "app/context/action/actionsmanager.h"
 
 #include <QDebug>
 #include <QFile>
@@ -52,7 +53,6 @@
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
-namespace taste3 {
 namespace document {
 
 static inline void dumpItem(QObject *obj, bool strict = false)
@@ -61,7 +61,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
     return;
 #endif
 
-    auto item = qobject_cast<aadl::InteractiveObject *>(obj);
+    auto item = qobject_cast<aadlinterface::InteractiveObject *>(obj);
     if (!item)
         return;
 
@@ -80,7 +80,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
              << item->aadlObject()->props() << "\n"
              << item->aadlObject()->attrs();
 
-    if (auto iface = qobject_cast<aadl::AADLInterfaceGraphicsItem *>(item)) {
+    if (auto iface = qobject_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Iface geometry:"
                  << "\n"
                  << iface->scenePos() << "\n"
@@ -88,9 +88,9 @@ static inline void dumpItem(QObject *obj, bool strict = false)
         qDebug() << "\nInternal Iface data:"
                  << "\n"
                  << iface->entity()->title() << "\n"
-                 << utils::pos(iface->entity()->coordinates()) << "\n";
-        Q_ASSERT(!strict || iface->scenePos().toPoint() == utils::pos(iface->entity()->coordinates()));
-    } else if (auto connection = qobject_cast<aadl::AADLConnectionGraphicsItem *>(item)) {
+                 << aadlinterface::pos(iface->entity()->coordinates()) << "\n";
+        Q_ASSERT(!strict || iface->scenePos().toPoint() == aadlinterface::pos(iface->entity()->coordinates()));
+    } else if (auto connection = qobject_cast<aadlinterface::AADLConnectionGraphicsItem *>(item)) {
         qDebug() << "\nGraphics Connection geometry:"
                  << "\n"
                  << connection->points() << "\n"
@@ -102,23 +102,23 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                                                                             connection->endItem()->entity()->title())
                                                              : connection->entity()->title())
                  << "\n"
-                 << utils::polygon(connection->entity()->coordinates()) << "\n";
+                 << aadlinterface::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(
                 !strict
-                || comparePolygones(connection->graphicsPoints(), utils::polygon(connection->entity()->coordinates())));
+                || comparePolygones(connection->graphicsPoints(), aadlinterface::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                 || comparePolygones(connection->points(), utils::polygon(connection->entity()->coordinates())));
-    } else if (auto rectItem = qobject_cast<aadl::AADLRectGraphicsItem *>(item)) {
+                 || comparePolygones(connection->points(), aadlinterface::polygon(connection->entity()->coordinates())));
+    } else if (auto rectItem = qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item)) {
         qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:"
                  << "\n"
                  << rectItem->sceneBoundingRect() << "\n";
         qDebug() << "\nInternal Function data:"
                  << "\n"
                  << rectItem->aadlObject()->title() << "\n"
-                 << utils::rect(rectItem->aadlObject()->coordinates()) << "\n";
+                 << aadlinterface::rect(rectItem->aadlObject()->coordinates()) << "\n";
         Q_ASSERT(!strict
                  || rectItem->sceneBoundingRect().toRect()
-                         == utils::rect(rectItem->aadlObject()->coordinates()).toRect());
+                         == aadlinterface::rect(rectItem->aadlObject()->coordinates()).toRect());
     } else {
         qFatal("Not implemented trace");
     }
@@ -155,10 +155,10 @@ InterfaceTabDocument::~InterfaceTabDocument()
 QWidget *InterfaceTabDocument::createView()
 {
     if (!m_graphicsView) {
-        m_graphicsView = new GraphicsView;
-        connect(m_graphicsView, &GraphicsView::zoomChanged, this, [this](qreal percent) {
+        m_graphicsView = new aadlinterface::GraphicsView;
+        connect(m_graphicsView, &aadlinterface::GraphicsView::zoomChanged, this, [this](qreal percent) {
             for (auto item : m_graphicsScene->selectedItems()) {
-                if (auto iObj = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
+                if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
                     iObj->updateGripPoints();
                 }
             }
@@ -182,11 +182,11 @@ QWidget *InterfaceTabDocument::createView()
 QGraphicsScene *InterfaceTabDocument::createScene()
 {
     if (!m_graphicsScene) {
-        m_graphicsScene = new InterfaceTabGraphicsScene(this);
+        m_graphicsScene = new aadlinterface::InterfaceTabGraphicsScene(this);
         connect(m_graphicsScene, &QGraphicsScene::selectionChanged, [this]() {
             const QList<QGraphicsItem *> selectedItems = m_graphicsScene->selectedItems();
             auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(), [](QGraphicsItem *item) {
-                return qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject()) != nullptr;
+                return qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject()) != nullptr;
             });
             m_actRemove->setEnabled(it != selectedItems.cend());
         });
@@ -214,16 +214,16 @@ QMenu *InterfaceTabDocument::customMenu() const
     QAction *actDynContext = root->addAction(tr("Context Actions"));
     connect(actDynContext, &QAction::triggered, this, &InterfaceTabDocument::onDynContextEditorMenuInvoked);
 
-    common::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
-    common::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
-    common::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
-    common::registerAction(Q_FUNC_INFO, actDynContext, "Context actions",
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDynContext, "Context actions",
                            "Show editor for common custom context menu actions");
 
     return root;
 }
 
-const QHash<common::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() const
+const QHash<utils::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() const
 {
     return m_model->objects();
 }
@@ -267,14 +267,14 @@ void InterfaceTabDocument::closeImpl()
 QVector<QAction *> InterfaceTabDocument::initActions()
 {
     if (!m_tool) {
-        m_tool = new aadl::CreatorTool(m_graphicsView, m_model, this);
-        connect(m_tool, &aadl::CreatorTool::created, this, [this]() {
+        m_tool = new aadlinterface::CreatorTool(m_graphicsView, m_model, this);
+        connect(m_tool, &aadlinterface::CreatorTool::created, this, [this]() {
             if (QAction *currentAction = m_actionGroup->checkedAction())
                 currentAction->setChecked(false);
-            m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Pointer);
+            m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Pointer);
         });
-        connect(m_tool, &aadl::CreatorTool::propertyEditorRequest, this, &InterfaceTabDocument::showPropertyEditor);
-        connect(m_tool, &aadl::CreatorTool::informUser, this, &InterfaceTabDocument::showInfoMessage);
+        connect(m_tool, &aadlinterface::CreatorTool::propertyEditorRequest, this, &InterfaceTabDocument::showPropertyEditor);
+        connect(m_tool, &aadlinterface::CreatorTool::informUser, this, &InterfaceTabDocument::showInfoMessage);
     }
 
     if (!m_actionGroup) {
@@ -284,7 +284,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
 
         m_actCreateFunctionType->setCheckable(true);
         m_actCreateFunctionType->setActionGroup(m_actionGroup);
@@ -294,7 +294,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
 
         m_actCreateFunction->setCheckable(true);
         m_actCreateFunction->setActionGroup(m_actionGroup);
@@ -305,7 +305,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface",
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface",
                                "Create Provided Interface object");
 
         m_actCreateProvidedInterface->setCheckable(true);
@@ -317,7 +317,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface",
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface",
                                "Create Required Interface object");
 
         m_actCreateRequiredInterface->setCheckable(true);
@@ -329,7 +329,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
 
         m_actCreateComment->setCheckable(true);
         m_actCreateComment->setActionGroup(m_actionGroup);
@@ -348,7 +348,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
-        common::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
 
         m_actCreateConnection->setCheckable(true);
         m_actCreateConnection->setActionGroup(m_actionGroup);
@@ -358,7 +358,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actRemove) {
         m_actRemove = new QAction(tr("Remove"));
-        common::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
 
         m_actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
         m_actRemove->setEnabled(false);
@@ -368,7 +368,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomIn) {
         m_actZoomIn = new QAction(tr("Zoom In"));
-        common::registerAction(Q_FUNC_INFO, m_actZoomIn, "Zoom In", "Scale up the current scene");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomIn, "Zoom In", "Scale up the current scene");
 
         m_actZoomIn->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_in.svg")));
         m_actZoomIn->setShortcut(QKeySequence::ZoomIn);
@@ -377,7 +377,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomOut) {
         m_actZoomOut = new QAction(tr("Zoom Out"));
-        common::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
 
         m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
         m_actZoomOut->setShortcut(QKeySequence::ZoomOut);
@@ -415,28 +415,28 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
 void InterfaceTabDocument::onActionCreateFunctionType()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::FunctionType);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::FunctionType);
     WARN_NOT_IMPLEMENTED;
 }
 
 void InterfaceTabDocument::onActionCreateFunction()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Function);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Function);
 }
 
 void InterfaceTabDocument::onActionCreateProvidedInterface()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::ProvidedInterface);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::ProvidedInterface);
 }
 
 void InterfaceTabDocument::onActionCreateRequiredInterface()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::RequiredInterface);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::RequiredInterface);
 }
 
 void InterfaceTabDocument::onActionCreateComment()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::Comment);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Comment);
 }
 
 void InterfaceTabDocument::onActionGroupConnections()
@@ -446,7 +446,7 @@ void InterfaceTabDocument::onActionGroupConnections()
 
 void InterfaceTabDocument::onActionCreateConnection()
 {
-    m_tool->setCurrentToolType(aadl::CreatorTool::ToolType::MultiPointConnection);
+    m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::MultiPointConnection);
 }
 
 void InterfaceTabDocument::onActionRemoveItem()
@@ -472,7 +472,7 @@ void InterfaceTabDocument::onActionExitToRootFunction()
 void InterfaceTabDocument::onActionExitToParentFunction()
 {
     aadl::AADLObject *parentObject = m_model->rootObject() ? m_model->rootObject()->parentObject() : nullptr;
-    changeRootItem(parentObject ? parentObject->id() : common::InvalidId);
+    changeRootItem(parentObject ? parentObject->id() : utils::InvalidId);
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)
@@ -482,20 +482,20 @@ void InterfaceTabDocument::updateItem(QGraphicsItem *item)
         return;
 
     switch (item->type()) {
-    case aadl::AADLCommentGraphicsItem::Type:
-        updateComment(qgraphicsitem_cast<aadl::AADLCommentGraphicsItem *>(item));
+    case aadlinterface::AADLCommentGraphicsItem::Type:
+        updateComment(qgraphicsitem_cast<aadlinterface::AADLCommentGraphicsItem *>(item));
         break;
-    case aadl::AADLConnectionGraphicsItem::Type:
-        updateConnection(qgraphicsitem_cast<aadl::AADLConnectionGraphicsItem *>(item));
+    case aadlinterface::AADLConnectionGraphicsItem::Type:
+        updateConnection(qgraphicsitem_cast<aadlinterface::AADLConnectionGraphicsItem *>(item));
         break;
-    case aadl::AADLFunctionGraphicsItem::Type:
-        updateFunction(qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(item));
+    case aadlinterface::AADLFunctionGraphicsItem::Type:
+        updateFunction(qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(item));
         break;
-    case aadl::AADLFunctionTypeGraphicsItem::Type:
-        updateFunctionType(qgraphicsitem_cast<aadl::AADLFunctionTypeGraphicsItem *>(item));
+    case aadlinterface::AADLFunctionTypeGraphicsItem::Type:
+        updateFunctionType(qgraphicsitem_cast<aadlinterface::AADLFunctionTypeGraphicsItem *>(item));
         break;
-    case aadl::AADLInterfaceGraphicsItem::Type:
-        updateInterface(qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(item));
+    case aadlinterface::AADLInterfaceGraphicsItem::Type:
+        updateInterface(qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(item));
         break;
     default:
         break;
@@ -507,27 +507,27 @@ void InterfaceTabDocument::updateItem(QGraphicsItem *item)
     }
 }
 
-void InterfaceTabDocument::updateComment(aadl::AADLCommentGraphicsItem *comment)
+void InterfaceTabDocument::updateComment(aadlinterface::AADLCommentGraphicsItem *comment)
 {
     comment->updateFromEntity();
 }
 
-void InterfaceTabDocument::updateInterface(aadl::AADLInterfaceGraphicsItem *iface)
+void InterfaceTabDocument::updateInterface(aadlinterface::AADLInterfaceGraphicsItem *iface)
 {
     iface->updateFromEntity();
 }
 
-void InterfaceTabDocument::updateFunction(aadl::AADLFunctionGraphicsItem *function)
+void InterfaceTabDocument::updateFunction(aadlinterface::AADLFunctionGraphicsItem *function)
 {
     function->updateFromEntity();
 }
 
-void InterfaceTabDocument::updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType)
+void InterfaceTabDocument::updateFunctionType(aadlinterface::AADLFunctionTypeGraphicsItem *functionType)
 {
     functionType->updateFromEntity();
 }
 
-void InterfaceTabDocument::updateConnection(aadl::AADLConnectionGraphicsItem *connection)
+void InterfaceTabDocument::updateConnection(aadlinterface::AADLConnectionGraphicsItem *connection)
 {
     connection->updateFromEntity();
 }
@@ -539,44 +539,44 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         return nullptr;
 
     QGraphicsItem *parentItem = obj->parentObject() ? m_items.value(obj->parentObject()->id()) : nullptr;
-    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, aadl::InteractiveObject *child) {
+    auto nestedGeomtryConnect = [this](QGraphicsItem *parentItem, aadlinterface::InteractiveObject *child) {
         if (parentItem) {
-            if (auto iObjParent = qobject_cast<aadl::InteractiveObject *>(parentItem->toGraphicsObject()))
-                this->connect(child, &aadl::InteractiveObject::boundingBoxChanged, iObjParent,
-                              &aadl::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+            if (auto iObjParent = qobject_cast<aadlinterface::InteractiveObject *>(parentItem->toGraphicsObject()))
+                this->connect(child, &aadlinterface::InteractiveObject::boundingBoxChanged, iObjParent,
+                              &aadlinterface::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
         }
     };
 
     switch (obj->aadlType()) {
     case aadl::AADLObject::Type::Comment: {
-        auto comment = new aadl::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
+        auto comment = new aadlinterface::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, comment);
         return comment;
     } break;
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
-        return new aadl::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
+        return new aadlinterface::AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
     case aadl::AADLObject::Type::Connection:
         if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
             aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
-            auto startItem = qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(
+            auto startItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
                     ifaceStart ? m_items.value(ifaceStart->id()) : nullptr);
 
             aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
-            auto endItem = qgraphicsitem_cast<aadl::AADLInterfaceGraphicsItem *>(
+            auto endItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(
                     ifaceEnd ? m_items.value(ifaceEnd->id()) : nullptr);
 
-            return new aadl::AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+            return new aadlinterface::AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
         }
         break;
     case aadl::AADLObject::Type::Function: {
-        auto function = new aadl::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+        auto function = new aadlinterface::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, function);
         return function;
     } break;
     case aadl::AADLObject::Type::FunctionType: {
         auto functionType =
-                new aadl::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+                new aadlinterface::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, functionType);
         return functionType;
     } break;
@@ -589,10 +589,10 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
     return nullptr;
 }
 
-aadl::AADLFunctionGraphicsItem *InterfaceTabDocument::rootItem() const
+aadlinterface::AADLFunctionGraphicsItem *InterfaceTabDocument::rootItem() const
 {
     if (auto rootEntity = m_model->rootObject())
-        return qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(m_items.value(rootEntity->id()));
+        return qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(m_items.value(rootEntity->id()));
     return nullptr;
 }
 
@@ -609,9 +609,9 @@ void InterfaceTabDocument::onAADLObjectAdded(aadl::AADLObject *object)
     if (!item) {
         item = createItemForObject(object);
         connect(object, &aadl::AADLObject::coordinatesChanged, this, propertyChanged, Qt::QueuedConnection);
-        if (auto clickable = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
-            connect(clickable, &aadl::InteractiveObject::clicked, this, &InterfaceTabDocument::onItemClicked);
-            connect(clickable, &aadl::InteractiveObject::doubleClicked, this,
+        if (auto clickable = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
+            connect(clickable, &aadlinterface::InteractiveObject::clicked, this, &InterfaceTabDocument::onItemClicked);
+            connect(clickable, &aadlinterface::InteractiveObject::doubleClicked, this,
                     &InterfaceTabDocument::onItemDoubleClicked, Qt::QueuedConnection);
         }
         m_items.insert(object->id(), item);
@@ -645,7 +645,7 @@ void InterfaceTabDocument::onItemClicked()
 
 void InterfaceTabDocument::onItemDoubleClicked()
 {
-    if (auto clickedItem = qobject_cast<aadl::InteractiveObject *>(sender())) {
+    if (auto clickedItem = qobject_cast<aadlinterface::InteractiveObject *>(sender())) {
         if (auto clickedEntity = qobject_cast<aadl::AADLObject *>(clickedItem->aadlObject())) {
             if (clickedEntity->aadlType() == aadl::AADLObject::Type::Function) {
                 if (auto function = qobject_cast<aadl::AADLObjectFunction *>(clickedEntity)) {
@@ -655,8 +655,8 @@ void InterfaceTabDocument::onItemDoubleClicked()
                     }
                 }
             } else if (clickedEntity->aadlType() == aadl::AADLObject::Type::Comment) {
-                if (clickedItem->type() == aadl::AADLCommentGraphicsItem::Type) {
-                    auto dialog = new aadl::CommentTextDialog(qobject_cast<aadl::AADLObjectComment *>(clickedEntity),
+                if (clickedItem->type() == aadlinterface::AADLCommentGraphicsItem::Type) {
+                    auto dialog = new aadlinterface::CommentTextDialog(qobject_cast<aadl::AADLObjectComment *>(clickedEntity),
                                                               qobject_cast<QWidget *>(parent()));
                     dialog->setAttribute(Qt::WA_DeleteOnClose);
                     dialog->open();
@@ -668,7 +668,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
     }
 }
 
-void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
+void InterfaceTabDocument::onRootObjectChanged(utils::Id rootId)
 {
     Q_UNUSED(rootId)
 
@@ -690,7 +690,7 @@ void InterfaceTabDocument::onRootObjectChanged(common::Id rootId)
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadl::PropertiesDialog *dialog = new aadl::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
+    aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -714,20 +714,20 @@ void InterfaceTabDocument::clearScene()
     m_items.clear();
 }
 
-void InterfaceTabDocument::changeRootItem(common::Id id)
+void InterfaceTabDocument::changeRootItem(utils::Id id)
 {
     if (m_model->rootObjectId() == id)
         return;
 
     const QVariantList rootEntityParams { QVariant::fromValue(m_model), QVariant::fromValue(id) };
     const auto geometryCmd =
-            taste3::aadl::cmd::CommandsFactory::create(taste3::aadl::cmd::ChangeRootEntity, rootEntityParams);
-    taste3::cmd::CommandsStack::current()->push(geometryCmd);
+            aadlinterface::cmd::CommandsFactory::create(aadlinterface::cmd::ChangeRootEntity, rootEntityParams);
+    aadlinterface::cmd::CommandsStack::current()->push(geometryCmd);
 }
 
 void InterfaceTabDocument::onAttributesManagerRequested()
 {
-    aadl::DynamicPropertyManager *dialog = new aadl::DynamicPropertyManager(qobject_cast<QWidget *>(parent()));
+    auto dialog = new aadlinterface::DynamicPropertyManager(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -740,14 +740,14 @@ void InterfaceTabDocument::onDataTypesMenuInvoked()
 
 void InterfaceTabDocument::onColorSchemeMenuInvoked()
 {
-    aadl::ColorManagerDialog *dialog = new aadl::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
+    aadlinterface::ColorManagerDialog *dialog = new aadlinterface::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
 
 void InterfaceTabDocument::onDynContextEditorMenuInvoked()
 {
-    aadl::DynActionEditor *dialog = new aadl::DynActionEditor(qobject_cast<QWidget *>(parent()));
+    auto dialog = new taste3::ctx::DynActionEditor(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     dialog->open();
@@ -789,5 +789,4 @@ void InterfaceTabDocument::updateSceneRect()
     }
 }
 
-} // ns document
-} // ns taste3
+}

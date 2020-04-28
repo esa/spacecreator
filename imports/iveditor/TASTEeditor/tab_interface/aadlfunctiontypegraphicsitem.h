@@ -18,25 +18,28 @@
 #pragma once
 
 #include "aadlrectgraphicsitem.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
-namespace taste3 {
 namespace aadl {
-class AADLFunctionNameGraphicsItem;
 class AADLObjectFunctionType;
+}
+
+namespace aadlinterface {
+
+class AADLFunctionNameGraphicsItem;
 
 class AADLFunctionTypeGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionTypeGraphicsItem(AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
+    explicit AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunctionType *entity, QGraphicsItem *parentItem = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::Type::FunctionType)
+        Type = UserType + static_cast<int>(aadl::AADLObject::Type::FunctionType)
     };
     int type() const override { return Type; }
 
-    AADLObjectFunctionType *entity() const;
+    aadl::AADLObjectFunctionType *entity() const;
 
     QSizeF minimalSize() const override;
 
@@ -75,5 +78,4 @@ protected:
     AADLFunctionNameGraphicsItem *m_textItem = nullptr;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -20,8 +20,7 @@
 #include <QComboBox>
 #include <QStringListModel>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 ComboBoxDelegate::ComboBoxDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -67,5 +66,4 @@ QAbstractItemModel *StringListComboDelegate::editorModel(const QModelIndex & /*i
     return m_model;
 }
 
-} // ns aadl
-} // ns taste3
+}

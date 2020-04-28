@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "common.h"
 #include "document/abstracttabdocument.h"
 
 #include <QGraphicsView>
@@ -27,21 +27,20 @@
 
 class QMutex;
 
-namespace taste3 {
-class InterfaceTabGraphicsScene;
-
 namespace aadl {
-class CreatorTool;
 class AADLObject;
 class AADLObjectsModel;
+}
 
+namespace aadlinterface {
+class CreatorTool;
 class AADLCommentGraphicsItem;
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;
 class AADLFunctionTypeGraphicsItem;
 class AADLInterfaceGraphicsItem;
-
-} // namespace aadl
+class InterfaceTabGraphicsScene;
+}
 
 namespace document {
 
@@ -55,7 +54,7 @@ public:
     QString title() const override;
     QMenu *customMenu() const override;
 
-    const QHash<common::Id, aadl::AADLObject *> &objects() const;
+    const QHash<utils::Id, aadl::AADLObject *> &objects() const;
     QString supportedFileExtensions() const override;
 
 protected:
@@ -87,7 +86,7 @@ protected Q_SLOTS:
     void onAADLObjectRemoved(aadl::AADLObject *object);
     void onItemClicked();
     void onItemDoubleClicked();
-    void onRootObjectChanged(common::Id rootId);
+    void onRootObjectChanged(utils::Id rootId);
 
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
@@ -100,21 +99,21 @@ protected Q_SLOTS:
 
 private:
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
-    aadl::AADLFunctionGraphicsItem *rootItem() const;
+    aadlinterface::AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
 
-    void updateComment(aadl::AADLCommentGraphicsItem *comment);
-    void updateInterface(aadl::AADLInterfaceGraphicsItem *iface);
-    void updateFunction(aadl::AADLFunctionGraphicsItem *function);
-    void updateFunctionType(aadl::AADLFunctionTypeGraphicsItem *functionType);
-    void updateConnection(aadl::AADLConnectionGraphicsItem *connection);
+    void updateComment(aadlinterface::AADLCommentGraphicsItem *comment);
+    void updateInterface(aadlinterface::AADLInterfaceGraphicsItem *iface);
+    void updateFunction(aadlinterface::AADLFunctionGraphicsItem *function);
+    void updateFunctionType(aadlinterface::AADLFunctionTypeGraphicsItem *functionType);
+    void updateConnection(aadlinterface::AADLConnectionGraphicsItem *connection);
 
     void clearScene();
-    void changeRootItem(common::Id id);
+    void changeRootItem(utils::Id id);
 
 private:
-    InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
-    QPointer<GraphicsView> m_graphicsView { nullptr };
+    aadlinterface::InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
+    QPointer<aadlinterface::GraphicsView> m_graphicsView { nullptr };
     aadl::AADLObjectsModel *m_model { nullptr };
     QActionGroup *m_actionGroup { nullptr };
     QAction *m_actCreateFunctionType { nullptr };
@@ -130,8 +129,8 @@ private:
     QAction *m_actExitToRoot { nullptr };
     QAction *m_actExitToParent { nullptr };
 
-    aadl::CreatorTool *m_tool { nullptr };
-    QHash<common::Id, QGraphicsItem *> m_items;
+    aadlinterface::CreatorTool *m_tool { nullptr };
+    QHash<utils::Id, QGraphicsItem *> m_items;
 
     QMutex *m_mutex { nullptr };
     QQueue<aadl::AADLObject *> m_rmQueu;
@@ -142,5 +141,4 @@ private:
     void updateSceneRect();
 };
 
-} // ns document
-} // ns taste3
+}

@@ -17,16 +17,15 @@
 
 #include "functionattrdelegate.h"
 
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlcommonprops.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
 #include "tab_interface/properties/propertieslistmodel.h"
 
 #include <QComboBox>
 #include <QDebug>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 FunctionAttrDelegate::FunctionAttrDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -41,13 +40,13 @@ QWidget *FunctionAttrDelegate::createEditor(QWidget *parent, const QStyleOptionV
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const meta::Props::Token t = meta::Props::token(attrName);
+                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
 
-                const AADLObjectFunction *objFn = qobject_cast<const AADLObjectFunction *>(pModel->dataObject());
+                auto objFn = qobject_cast<const aadl::AADLObjectFunction *>(pModel->dataObject());
                 Q_ASSERT(objFn);
 
                 switch (t) {
-                case meta::Props::Token::instance_of: {
+                case aadl::meta::Props::Token::instance_of: {
                     const QStringList &availableFnTypes = (QStringList() << QString())
                             + objFn->objectsModel()->getAvailableFunctionTypes(objFn).keys();
                     QComboBox *cb = new QComboBox(parent);
@@ -62,5 +61,5 @@ QWidget *FunctionAttrDelegate::createEditor(QWidget *parent, const QStyleOptionV
 
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
-} // ns aadl
-} // ns taste3
+
+}

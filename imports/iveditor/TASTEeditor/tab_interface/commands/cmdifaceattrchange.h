@@ -18,22 +18,23 @@
 #pragma once
 
 #include "cmdifacedatachangebase.h"
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlcommonprops.h"
+#include "aadlobjectsmodel.h"
 
 #include <QPointer>
 #include <QVariant>
 
-namespace taste3 {
 namespace aadl {
+class AADLObject;
+}
 
-class AADLObjectConnection;
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceAttrChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdIfaceAttrChange(AADLObjectIface *entity, const QString &attrName, const QVariant &value);
+    explicit CmdIfaceAttrChange(aadl::AADLObjectIface *entity, const QString &attrName, const QVariant &value);
 
     void redo() override;
     void undo() override;
@@ -45,9 +46,8 @@ private:
     void removeConnections();
     void restoreConnections();
 
-    bool connectionMustDie(const AADLObjectConnection *connection) const override;
+    bool connectionMustDie(const aadl::AADLObjectConnection *connection) const override;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

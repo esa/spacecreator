@@ -22,11 +22,9 @@
 
 class QAction;
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
-} // ns aadl
-} // ns taste3
+}
 
 class QMenu;
 namespace taste3 {
@@ -35,7 +33,7 @@ namespace ctx {
 class ActionsManager
 {
 public:
-    static void populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj);
+    static void populateMenu(QMenu *menu, aadl::AADLObject *currObj);
     static bool registerScriptableAction(QAction *action, const QString &key, const QString &description);
     static void listRegisteredActions();
     static ActionsManager *instance();
@@ -45,6 +43,8 @@ public:
     static QStringList scriptableActionNames();
     static void reload();
     static QStringList externalArgsHoldersDescr();
+
+    static void registerAction(const QString &caller, QAction *action, const QString &title = QString(), const QString &description = QString());
 
 private:
     struct ScriptableActionHandler {
@@ -63,11 +63,11 @@ private:
     void loadActions(const QString &fromFile);
 
     static void triggerActionInternal(const Action &act);
-    static void triggerActionExternal(const Action &act, const taste3::aadl::AADLObject *aadlObj);
+    static void triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj);
 
     static QMap<QString, ActionsManager::ScriptableActionHandler> scriptableActions();
 
-    static QString replaceKeyHolder(const QString &text, const taste3::aadl::AADLObject *aadlObj);
+    static QString replaceKeyHolder(const QString &text, const aadl::AADLObject *aadlObj);
 
     QVector<Action> m_actions;
     QMap<QString, ScriptableActionHandler> m_qactions;

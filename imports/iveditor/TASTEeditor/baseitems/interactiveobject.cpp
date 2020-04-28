@@ -22,11 +22,11 @@
 #include "baseitems/common/highlightrectitem.h"
 #include "baseitems/common/utils.h"
 #include "grippointshandler.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 #include "tab_interface/commands/cmdentityautolayout.h"
 #include "tab_interface/commands/commandids.h"
 #include "tab_interface/commands/commandsfactory.h"
-#include "util/delayedsignal.h"
+#include "delayedsignal.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -37,10 +37,9 @@
 #include <app/commandsstack.h>
 #include <functional>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
+InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , m_dataObject(entity)
     , m_selectedPen(Qt::black, 2, Qt::DotLine)
@@ -53,8 +52,8 @@ InteractiveObject::InteractiveObject(AADLObject *entity, QGraphicsItem *parent)
 
     connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::applyColorScheme);
 
-    m_rebuildLayoutSignal = new util::DelayedSignal(this);
-    connect(m_rebuildLayoutSignal, &util::DelayedSignal::triggered, this, &InteractiveObject::doRebuildLayout);
+    m_rebuildLayoutSignal = new utils::DelayedSignal(this);
+    connect(m_rebuildLayoutSignal, &utils::DelayedSignal::triggered, this, &InteractiveObject::doRebuildLayout);
 }
 
 void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -76,7 +75,7 @@ QRectF InteractiveObject::boundingRect() const
     return m_boundingRect;
 }
 
-AADLObject *InteractiveObject::aadlObject() const
+aadl::AADLObject *InteractiveObject::aadlObject() const
 {
     return m_dataObject;
 }
@@ -146,7 +145,7 @@ void InteractiveObject::updateEntity()
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
                    [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
     const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
-    taste3::cmd::CommandsStack::current()->push(changeGeometryCmd);
+    cmd::CommandsStack::current()->push(changeGeometryCmd);
 }
 
 void InteractiveObject::mergeGeometry()
@@ -165,8 +164,8 @@ void InteractiveObject::mergeGeometry()
     QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
     autolayoutCmd->redo();
 
-    const int cmdIdx = taste3::cmd::CommandsStack::current()->index();
-    const QUndoCommand *prevCmd = taste3::cmd::CommandsStack::current()->command(cmdIdx - 1);
+    const int cmdIdx = cmd::CommandsStack::current()->index();
+    const QUndoCommand *prevCmd = cmd::CommandsStack::current()->command(cmdIdx - 1);
     if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(prevCmd))
         const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd)->mergeCommand(autolayoutCmd);
     else
@@ -301,7 +300,7 @@ void InteractiveObject::initGripPoints()
         return;
 
     m_gripPointsHandler = new GripPointsHandler(this);
-    m_gripPointsHandler->setZValue(utils::kGripZLevel);
+    m_gripPointsHandler->setZValue(aadlinterface::kGripZLevel);
 
     connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,
             &InteractiveObject::gripPointPressed);
@@ -441,10 +440,10 @@ void InteractiveObject::instantLayoutUpdate()
     update();
 }
 
-aadl::ColorHandler InteractiveObject::colorHandler() const
+ColorHandler InteractiveObject::colorHandler() const
 {
     ColorHandler h = ColorManager::colorsForItem(handledColorType());
-    if (AADLObject *aadlObj = aadlObject()) {
+    if (auto aadlObj = aadlObject()) {
         if (aadlObj->props().contains("color")) { // keep single custom color
             h.setFillType(ColorHandler::Color);
             h.setBrushColor0(QColor(aadlObj->props().value("color").toString()));
@@ -459,5 +458,4 @@ QString InteractiveObject::prepareTooltip() const
     return aadlObject() ? aadlObject()->title() : QString();
 }
 
-} // namespace aadl
-} // namespace taste3
+}

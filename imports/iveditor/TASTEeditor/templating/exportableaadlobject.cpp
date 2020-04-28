@@ -21,11 +21,10 @@
 #include "exportableaadlfunction.h"
 #include "exportableaadliface.h"
 #include "exportableaadlconnection.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectconnection.h"
+#include "aadlobject.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectconnection.h"
 
-namespace taste3 {
 namespace templating {
 
 ExportableAADLObject::ExportableAADLObject(const aadl::AADLObject *aadlObject)
@@ -124,5 +123,4 @@ QVariantList ExportableAADLObject::generateProperties(const QHash<QString, QVari
     return result;
 }
 
-} // ns templating
-} // ns taste3
+}

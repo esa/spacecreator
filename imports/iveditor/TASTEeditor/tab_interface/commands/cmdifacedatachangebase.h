@@ -18,14 +18,13 @@
 #pragma once
 
 #include "commandids.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlobjectsmodel.h"
 
 #include <QPointer>
 #include <QUndoCommand>
 #include <QVariant>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceDataChangeBase : public QUndoCommand
@@ -36,26 +35,24 @@ public:
 protected:
     CmdIfaceDataChangeBase() = delete;
     CmdIfaceDataChangeBase(const CmdIfaceDataChangeBase &other) = delete;
-    explicit CmdIfaceDataChangeBase(AADLObjectIface *iface, const QString &targetName, const QVariant &targetValue,
+    explicit CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName, const QVariant &targetValue,
                                     const QVariant &prevValue, QUndoCommand *parent = nullptr);
 
-    QPointer<AADLObjectIface> m_iface;
-    QPointer<AADLObjectsModel> m_model;
-    QVector<AADLObjectConnection *> m_relatedConnections;
+    QPointer<aadl::AADLObjectIface> m_iface;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    QVector<aadl::AADLObjectConnection *> m_relatedConnections;
     const QString m_targetName;
-    const meta::Props::Token m_targetToken;
+    const aadl::meta::Props::Token m_targetToken;
     const QVariant m_oldValue, m_newValue;
     QVector<QUndoCommand *> m_cmdRmConnection;
 
-    virtual QVector<QPointer<AADLObjectIface>> getRelatedIfaces();
-    virtual QVector<AADLObjectConnection *> getRelatedConnections();
-    virtual bool connectionMustDie(const AADLObjectConnection *connection) const = 0;
-    static AADLObjectIface *getConnectionOtherSide(const AADLObjectConnection *connection,
-                                                   AADLObjectIface *changedIface);
+    virtual QVector<QPointer<aadl::AADLObjectIface>> getRelatedIfaces();
+    virtual QVector<aadl::AADLObjectConnection *> getRelatedConnections();
+    virtual bool connectionMustDie(const aadl::AADLObjectConnection *connection) const = 0;
+    static aadl::AADLObjectIface *getConnectionOtherSide(const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface);
 
     void prepareRemoveConnectionCommands();
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+}
+}

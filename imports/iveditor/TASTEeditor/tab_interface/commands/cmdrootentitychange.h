@@ -20,28 +20,30 @@
 #include "cmdentitygeometrychange.h"
 
 #include <QPointer>
-#include <app/common.h>
+#include "common.h"
 
-namespace taste3 {
 namespace aadl {
+class AADLObject;
 class AADLObjectsModel;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdRootEntityChange : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdRootEntityChange(AADLObjectsModel *model, const common::Id &id);
+    explicit CmdRootEntityChange(aadl::AADLObjectsModel *model, const utils::Id &id);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
-    common::Id m_newId;
-    common::Id m_prevId;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    utils::Id m_newId;
+    utils::Id m_prevId;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

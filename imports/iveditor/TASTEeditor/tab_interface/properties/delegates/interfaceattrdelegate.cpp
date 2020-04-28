@@ -17,16 +17,15 @@
 
 #include "interfaceattrdelegate.h"
 
-#include "tab_aadl/aadlcommonprops.h"
-#include "tab_aadl/aadlobjectiface.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlcommonprops.h"
+#include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
 #include "tab_interface/properties/propertieslistmodel.h"
 
 #include <QComboBox>
 #include <QDebug>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 InterfaceAttrDelegate::InterfaceAttrDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -41,24 +40,24 @@ QWidget *InterfaceAttrDelegate::createEditor(QWidget *parent, const QStyleOption
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const meta::Props::Token t = meta::Props::token(attrName);
+                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
 
-                const AADLObjectIface *iface = qobject_cast<const AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const aadl::AADLObjectIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {
-                case meta::Props::Token::kind: {
-                    QMap<AADLObjectIface::OperationKind, QString> names = AADLObjectIface::xmlKindNames();
+                case aadl::meta::Props::Token::kind: {
+                    auto names = aadl::AADLObjectIface::xmlKindNames();
                     if (auto model = qobject_cast<const PropertiesListModel *>(index.model()))
-                        if (auto iface = model->dataObject()->as<const AADLObjectIface *>()) {
+                        if (auto iface = model->dataObject()->as<const aadl::AADLObjectIface *>()) {
                             if (iface->isProvided())
-                                names.take(AADLObjectIface::OperationKind::Any);
+                                names.take(aadl::AADLObjectIface::OperationKind::Any);
                             else
-                                names.take(AADLObjectIface::OperationKind::Cyclic);
+                                names.take(aadl::AADLObjectIface::OperationKind::Cyclic);
                         }
 
                     QComboBox *cb = new QComboBox(parent);
-                    QMap<AADLObjectIface::OperationKind, QString>::const_iterator i = names.cbegin();
+                    auto i = names.cbegin();
                     while (i != names.cend()) {
                         cb->addItem(i.value(), QVariant::fromValue(i.key()));
                         ++i;
@@ -81,13 +80,13 @@ void InterfaceAttrDelegate::setEditorData(QWidget *editor, const QModelIndex &in
             if (pModel->isAttr(index)) {
                 const QString &attrName =
                         pModel->data(pModel->index(PropertiesListModel::ColumnTitle, index.row())).toString();
-                const meta::Props::Token t = meta::Props::token(attrName);
+                const aadl::meta::Props::Token t = aadl::meta::Props::token(attrName);
 
-                const AADLObjectIface *iface = qobject_cast<const AADLObjectIface *>(pModel->dataObject());
+                auto iface = qobject_cast<const aadl::AADLObjectIface *>(pModel->dataObject());
                 Q_ASSERT(iface);
 
                 switch (t) {
-                case meta::Props::Token::kind: {
+                case aadl::meta::Props::Token::kind: {
                     if (QComboBox *cb = qobject_cast<QComboBox *>(editor))
                         cb->setCurrentIndex(static_cast<int>(iface->kind()));
                 }
@@ -100,5 +99,4 @@ void InterfaceAttrDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     return QStyledItemDelegate::setEditorData(editor, index);
 }
 
-} // ns aadl
-} // ns taste3
+}

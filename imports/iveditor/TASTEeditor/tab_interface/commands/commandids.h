@@ -17,8 +17,7 @@
 
 #pragma once
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 enum Id
@@ -53,6 +52,5 @@ enum Id
     LastId
 };
 
-} // ns cmd
-} // ns aadl
-} // ns taste3
+}
+}

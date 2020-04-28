@@ -23,7 +23,7 @@
 #include <QPointer>
 
 class QGraphicsView;
-namespace taste3 {
+
 namespace document {
 
 class DummyGraphicsScene;
@@ -54,5 +54,4 @@ private:
     QAction *m_actDummy { nullptr };
 };
 
-} // ns document
-} // ns taste3
+}

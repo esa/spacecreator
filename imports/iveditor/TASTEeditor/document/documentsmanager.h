@@ -25,7 +25,6 @@
 #include <QTabWidget>
 #include <QVector>
 
-namespace taste3 {
 namespace document {
 
 class DocumentsManager : public QObject
@@ -56,5 +55,4 @@ protected:
     QMap<document::AbstractTabDocument *, QWidget *> m_views;
 };
 
-} // ns document
-} // ns taste3
+}

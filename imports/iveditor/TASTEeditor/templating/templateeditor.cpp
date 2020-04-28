@@ -40,7 +40,6 @@
 #include <QTabWidget>
 #include <QTextStream>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -385,5 +384,4 @@ void TemplateEditor::openIncludedTemplates(const QString &templateText)
     }
 }
 
-} // ns templating
-} // ns taste3
+}

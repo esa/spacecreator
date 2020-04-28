@@ -19,16 +19,15 @@
 
 #include "commandids.h"
 #include "commandsfactory.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectsmodel.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-QVector<QPointer<AADLObjectIface>> relatedIfaces(AADLObjectIface *iface)
+QVector<QPointer<aadl::AADLObjectIface>> relatedIfaces(aadl::AADLObjectIface *iface)
 {
-    QVector<QPointer<AADLObjectIface>> ifaces;
+    QVector<QPointer<aadl::AADLObjectIface>> ifaces;
 
     if (iface) {
         ifaces.append(iface);
@@ -40,18 +39,18 @@ QVector<QPointer<AADLObjectIface>> relatedIfaces(AADLObjectIface *iface)
     return ifaces;
 }
 
-QVector<AADLObjectConnection *> relatedConnections(AADLObjectIface *iface)
+QVector<aadl::AADLObjectConnection *> relatedConnections(aadl::AADLObjectIface *iface)
 {
-    QVector<AADLObjectConnection *> connections;
+    QVector<aadl::AADLObjectConnection *> connections;
 
     if (iface && iface->objectsModel())
-        for (AADLObjectIface *i : relatedIfaces(iface))
+        for (aadl::AADLObjectIface *i : relatedIfaces(iface))
             connections += i->objectsModel()->getConnectionsForIface(i->id());
 
     return connections;
 }
 
-CmdIfaceParamBase::CmdIfaceParamBase(AADLObjectIface *iface)
+CmdIfaceParamBase::CmdIfaceParamBase(aadl::AADLObjectIface *iface)
     : QUndoCommand()
     , m_iface(iface)
     , m_connections(relatedConnections(m_iface))
@@ -65,8 +64,8 @@ CmdIfaceParamBase::~CmdIfaceParamBase()
 
 void CmdIfaceParamBase::prepareRmCommands()
 {
-    if (AADLObjectsModel *model = m_iface->objectsModel()) {
-        for (AADLObjectConnection *connection : m_connections) {
+    if (auto model = m_iface->objectsModel()) {
+        for (auto connection : m_connections) {
             if (connection->sourceInterface() && connection->targetInterface()) {
                 if (connection->sourceInterface()->params() != connection->targetInterface()->params()) {
                     const QVariantList params = { QVariant::fromValue(connection), QVariant::fromValue(model) };
@@ -100,6 +99,5 @@ bool CmdIfaceParamBase::mergeWith(const QUndoCommand * /*command*/)
     return false;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

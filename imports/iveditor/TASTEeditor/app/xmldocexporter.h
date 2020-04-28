@@ -21,13 +21,13 @@
 #include <QVariantList>
 
 class QWidget;
-namespace taste3 {
 
 namespace document {
 class AbstractTabDocument;
 class InterfaceTabDocument;
 }
 
+namespace taste3 {
 namespace app {
 
 class XmlDocExporter

@@ -19,24 +19,22 @@
 
 #include "cmdifaceparambase.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceParamCreate : public CmdIfaceParamBase
 {
 public:
-    explicit CmdIfaceParamCreate(AADLObject *entity, const IfaceParameter &param);
+    explicit CmdIfaceParamCreate(aadl::AADLObject *entity, const aadl::IfaceParameter &param);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    QVector<IfaceParameter> m_targetParams;
-    const QVector<IfaceParameter> m_sourceParams;
+    QVector<aadl::IfaceParameter> m_targetParams;
+    const QVector<aadl::IfaceParameter> m_sourceParams;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

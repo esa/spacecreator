@@ -18,7 +18,7 @@
 #include "attributesmodel.h"
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 const int COLUMN_ID_Name = 0;
 const int COLUMN_ID_Value = 1;
@@ -158,5 +158,5 @@ bool AttributesModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-} // ns aadl
-} // ns taste3
+}
+}

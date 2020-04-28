@@ -21,25 +21,26 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QRectF;
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObjectFunction;
 class AADLObjectFunctionType;
 class AADLObjectIface;
 class AADLObjectComment;
 class AADLObjectConnection;
+}
+
+namespace aadlinterface {
 namespace gi {
 
-AADLObjectFunction *functionObject(QGraphicsItem *item);
+aadl::AADLObjectFunction *functionObject(QGraphicsItem *item);
 
-AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item);
+aadl::AADLObjectFunctionType *functionTypeObject(QGraphicsItem *item);
 
-AADLObjectIface *interfaceObject(QGraphicsItem *item);
+aadl::AADLObjectIface *interfaceObject(QGraphicsItem *item);
 
-AADLObjectComment *commentObject(QGraphicsItem *item);
+aadl::AADLObjectComment *commentObject(QGraphicsItem *item);
 
-AADLObjectConnection *connectionObject(QGraphicsItem *item);
+aadl::AADLObjectConnection *connectionObject(QGraphicsItem *item);
 
 enum RectOperation
 {
@@ -49,6 +50,5 @@ enum RectOperation
 bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
                   const RectOperation action);
 
-} // ns gi
-} // ns aadl
-} // ns taste3
+}
+}

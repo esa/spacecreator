@@ -19,8 +19,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class InterfaceAttrDelegate : public QStyledItemDelegate
 {
@@ -31,5 +30,4 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 };
 
-} // ns aadl
-} // ns taste3
+}

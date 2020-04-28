@@ -21,7 +21,7 @@
 #include <QVariant>
 #include <QVector>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class AppOption
 {
@@ -101,4 +101,4 @@ private:
     AppOptions &operator=(const AppOptions &) = delete;
 };
 
-} // namespace taste3
+}

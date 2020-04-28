@@ -26,7 +26,6 @@ class QGraphicsScene;
 class QToolBar;
 class QUndoStack;
 
-namespace taste3 {
 namespace document {
 
 struct AbstractTabDocumentPrivate;
@@ -88,5 +87,4 @@ private:
     std::unique_ptr<AbstractTabDocumentPrivate> const d;
 };
 
-} // ns document
-} // ns taste3
+}

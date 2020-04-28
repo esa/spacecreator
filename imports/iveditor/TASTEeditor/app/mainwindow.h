@@ -33,13 +33,14 @@ namespace Ui {
 class MainWindow;
 }
 
-namespace taste3 {
-
 namespace document {
 class DocumentsManager;
 }
 
+namespace taste3 {
+
 class ZoomController;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
