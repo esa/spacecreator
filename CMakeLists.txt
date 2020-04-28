@@ -43,7 +43,15 @@ find_package(Qt5 COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widg
 # Do not use outdated Qt APIs
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
+# Remove some warnings
+set(CMAKE_OBJECT_PATH_MAX 500)
+
 # Grantlee dependency
+get_target_property(QtCore_location Qt5::Core LOCATION)
+get_filename_component(QT_DIR ${QtCore_location} DIRECTORY)
+get_filename_component(QT_DIR ${QT_DIR} DIRECTORY)
+set(Grantlee5_DIR "${QT_DIR}/lib/cmake/Grantlee5")
+message("Qt dir: ${QtCore_location} ${Grantlee5_DIR}")
 find_package(Grantlee5 REQUIRED)
 
 enable_testing()

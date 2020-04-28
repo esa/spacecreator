@@ -10,13 +10,16 @@ if not exist %ANTLR_JAR% (
 )
 SET CLASSPATH=.;%ANTLR_JAR%;%CLASSPATH%
 
-SET JAVA="C:\Program Files (x86)\Java\jre1.8.0_181\bin\java.exe"
+SET JAVA="java.exe"
 REM Check if Java is found
 if not exist %JAVA% (
-    SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath\java.exe"
+    SET JAVA="C:\Program Files (x86)\Java\jre1.8.0_181\bin\java.exe"
     if not exist %JAVA% (
-        echo Error: Did not find Java - using path
-        SET JAVA=java.exe
+        SET JAVA="C:\Program Files (x86)\Common Files\Oracle\Java\javapath\java.exe"
+        if not exist %JAVA% (
+            echo Error: Did not find Java - using path
+            SET JAVA=java.exe
+        )
     )
 )
 
