@@ -1,47 +1,26 @@
-# Title
-
-## Import of existing editors
-
-### Import of MSC editor:
-
-For the integration the tag 'gollum_integration' is used (hash: 'f34f255f5cf84adb93d1b3a92adb02df936a8835')
-
-'git subtree add -P imports/msceditor ssh://git@git.vikingsoftware.com:2222/esa/msceditor.git gollum_integration'
-
-### Import of Interface View editor:
-
-For the integration the tag 'gollum_integration' is used (hash: '9a6f93b9c6dae7d0d2e5a276b6fb5a6370558cc5')
-
-'git subtree add -P imports/iveditor ssh://git@git.vikingsoftware.com:2222/esa/taste3.git gollum_integration'
-
-### Import of ASN1 editor:
-
-For the integration the hash '752de71b9c9fea971da0cccccfba563325e17b7d' is used
-
-'git subtree add -P imports/asn1scc.IDE https://github.com/n7space/asn1scc.IDE.git master'
-
 # Dependency list
 
 This repository depends on these parts:
 
-* Qt (tested with 5.14.1, works with earlier as well)
-* The Qt SVG module
+* Qt
+* The Qt SVG module if it did not come with Qt (on Debian: sudo apt install libqt5svg5-dev)
 * Grantlee (see below)
-
-
-## Grantlee templating engine
+* Java SE 8
+* On Windows: Visual Studio 2017 or 2019
+* CMake
 
 Grantlee is a Qt implementation of string template engine of Django syntax.
 Sources of Grantlee are avalable from here https://github.com/steveire/grantlee
 
     git clone https://github.com/steveire/grantlee.git
 
+### Tested version combinations
 
-### Template engine documentation
+On Windows, the build is tested with Qt 5.14.1 (binary msvc_2017_64 package), Visual Studio 2019, cmake 3.17.1 and jdk 8.0.211.
 
-The best source of documentation is in the grantlee website http://www.grantlee.org. Examples of use are found here: http://www.grantlee.org/apidox/examples.html.
+On Linux: TODO.
 
-### Linux build
+#### Grantlee Linux build
 
 To build Grantlee, you need at least Qt5.3 (with development packages), CMake 3.1 and
 some additional optional packages:
@@ -71,7 +50,7 @@ The last command can require root permissions. Then use the 'sudo' command as fo
 
     sudo cmake --build . --target install
 
-### Windows build
+#### Grantlee Windows build
 
 Make sure cmake, qmake and Visual Studio are installed and avalable in PATH.
 Following instructions require git bash.
@@ -96,26 +75,18 @@ To build Taste3 correctly Grantlee should be installed into QTDIR directory (if 
 
 # SpaceCreator build
 
-## Install dependendcies
+When working on SpaceCreator, just open the CMakeLists.txt in Qt Creator and run the build.
 
-Nothing to do if pre-built Qt is used.
-Otherwise it is required to install QtSvg module from debian packages.
+On the command line, do this:
 
-    sudo apt install libqt5svg5-dev
-
-## Clone sources
-
-    git clone ssh://git@git.vikingsoftware.com:2222/esa/taste3.git
-
-## Build
-
-    mkdir build
-    cd build
-    qmake ../taste3
+    mkdir build-spacecreator
+    cd build-spacecreator
+    cmake ../SpaceCreator
     make -j<number_of_build_threads>
 
-Grantlee notes
-==============
+# Grantlee notes
+
+The best source of documentation is in the grantlee website http://www.grantlee.org. Examples of use are found here: http://www.grantlee.org/apidox/examples.html.
 
 **Steps to integrate the string template engine**<br>
 The current implementation is based on the [Grantlee string template library](https://github.com/steveire/grantlee).
@@ -146,3 +117,23 @@ The current implementation is based on the [Grantlee string template library](ht
 `        templating/templatesyntaxhelpdialog.cpp`
 *  Write a successor of `AbstractExportableObject` as a lightweight wrapper to export your QObject-derived objects. Use implementation of `ExportableAADLObject` and its successors as a reference.
 *  Create exportable an object, cast it to `QVariant` and append it in `QHash<QString, QVariantList>` by using a `groupName()` as a key. Then invoke `StringTemplate::parseFile()` for parsing a template. Use implementation of `XmlDocExporter` from *taste3/TASTEeditor/app/* as a reference.
+
+# Import of existing editors
+
+## Import of MSC editor:
+
+For the integration the tag 'gollum_integration' is used (hash: 'f34f255f5cf84adb93d1b3a92adb02df936a8835')
+
+'git subtree add -P imports/msceditor ssh://git@git.vikingsoftware.com:2222/esa/msceditor.git gollum_integration'
+
+## Import of Interface View editor:
+
+For the integration the tag 'gollum_integration' is used (hash: '9a6f93b9c6dae7d0d2e5a276b6fb5a6370558cc5')
+
+'git subtree add -P imports/iveditor ssh://git@git.vikingsoftware.com:2222/esa/taste3.git gollum_integration'
+
+## Import of ASN1 editor:
+
+For the integration the hash '752de71b9c9fea971da0cccccfba563325e17b7d' is used
+
+'git subtree add -P imports/asn1scc.IDE https://github.com/n7space/asn1scc.IDE.git master'
