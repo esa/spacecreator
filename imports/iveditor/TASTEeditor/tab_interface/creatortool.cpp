@@ -55,6 +55,134 @@ static const QList<int> kFunctionTypes = { aadlinterface::AADLFunctionGraphicsIt
                                            aadlinterface::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
 
+namespace {
+
+struct ValidationResult {
+    aadl::AADLObjectIface *startIface { nullptr };
+    aadl::AADLObjectIface *endIface { nullptr };
+    utils::Id startIfaceId = {};
+    utils::Id endIfaceId = {};
+    QPointF startPointAdjusted {};
+    QPointF endPointAdjusted {};
+    QLineF connectionLine {};
+    QGraphicsItem *functionAtStartPos { nullptr };
+    aadl::AADLObjectFunction *startObject { nullptr };
+    QGraphicsItem *functionAtEndPos { nullptr };
+    aadl::AADLObjectFunction *endObject { nullptr };
+    bool isToOrFromNested { false };
+
+    aadl::ConnectionCreationValidator::FailReason status { aadl::ConnectionCreationValidator::FailReason::NoScene };
+    inline bool failed() const { return status != aadl::ConnectionCreationValidator::FailReason::NotFail; }
+    inline bool setFailed(aadl::ConnectionCreationValidator::FailReason s)
+    {
+        status = s;
+        return failed();
+    }
+};
+
+}
+
+/*!
+ * \brief The tolerance used to find an AADLInterfaceGraphicsItem on scene (the size of a squre used as a search area)
+ */
+static const qreal kInterfaceTolerance = 20.;
+
+/*!
+ * \brief Performs the validation to detect if it's possible to connect the \a scene's items located in \a startPos and
+ * \a endPos.
+ *
+ * Returns the status of such validation as instance of ConnectionCreationValidator::ValidationResult.
+ * Anything except the FailReason::NotFail in ConnectionCreationValidator::ValidationResult::status
+ * means that the connection creation is prohibited.
+ */
+static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &startPos, const QPointF &endPos)
+{
+    ValidationResult result;
+
+    result.connectionLine = { startPos, endPos };
+    result.functionAtStartPos = aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance), { aadlinterface::AADLFunctionGraphicsItem::Type });
+    result.functionAtEndPos = aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance), { aadlinterface::AADLFunctionGraphicsItem::Type });
+    result.startObject = aadlinterface::gi::functionObject(result.functionAtStartPos);
+    result.endObject = aadlinterface::gi::functionObject(result.functionAtEndPos);
+    result.isToOrFromNested =
+            (result.functionAtStartPos && result.functionAtStartPos->isAncestorOf(result.functionAtEndPos))
+            || (result.functionAtEndPos && result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
+
+    if (!result.startObject) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoStartFunction);
+        return result;
+    }
+
+    if (auto startIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(startPos, kInterfaceTolerance), { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
+        result.startIface = startIfaceItem->entity();
+        result.startPointAdjusted = startIfaceItem->scenePos();
+    } else if (!aadlinterface::intersects(result.functionAtStartPos->sceneBoundingRect(), result.connectionLine, &result.startPointAdjusted)) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
+        return result;
+    }
+
+    if (!result.endObject) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::NoEndFunction);
+        return result;
+    }
+
+    if (auto endIfaceItem = qgraphicsitem_cast<aadlinterface::AADLInterfaceGraphicsItem *>(aadlinterface::nearestItem(scene, aadlinterface::adjustFromPoint(endPos, kInterfaceTolerance), { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
+        result.endIface = endIfaceItem->entity();
+        result.endPointAdjusted = endIfaceItem->scenePos();
+    } else if (!aadlinterface::intersects(result.functionAtEndPos->sceneBoundingRect(), result.connectionLine, &result.endPointAdjusted)) {
+        result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
+        return result;
+    }
+
+    if (result.startIface && result.endIface && result.isToOrFromNested) {
+        if (result.startIface->direction() != result.endIface->direction()) {
+            result.setFailed(aadl::ConnectionCreationValidator::FailReason::ToFromNestedDifferentDirection);
+            return result;
+        }
+    }
+
+    if (result.startIface && result.endIface) {
+        if (result.startIface->direction() == result.endIface->direction() && !result.isToOrFromNested) {
+            result.setFailed(aadl::ConnectionCreationValidator::FailReason::SameDirectionIfaceWrongParents);
+            return result;
+        }
+    }
+
+    if (!result.startIface) {
+        if (auto fn = result.startObject->as<const aadl::AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
+    if (!result.endIface) {
+        if (auto fn = result.endObject->as<const aadl::AADLObjectFunction *>())
+            if (fn->instanceOf()) {
+                result.setFailed(aadl::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
+                return result;
+            }
+    }
+
+    result.startIfaceId = result.startIface ? result.startIface->id() : utils::createId();
+    result.endIfaceId = result.endIface ? result.endIface->id() : utils::createId();
+
+    result.status = aadl::ConnectionCreationValidator::canConnect(result.startObject, result.endObject, result.startIface, result.endIface);
+    return result;
+}
+
+/*!
+ * \brief The helper method that perfoms validation and prints its status.
+ * Used to bypass the \a scene and edge points of \a connectionPoints to
+ * ConnectionCreationValidator::validateCreate() and returns the result of such validation.
+ */
+static ValidationResult validate(QGraphicsScene *scene, const QVector<QPointF> &connectionPoints)
+{
+    const ValidationResult info = validateCreate(scene, connectionPoints.first(), connectionPoints.last());
+    qDebug() << info.status;
+    return info;
+}
+
 namespace aadlinterface {
 
 CreatorTool::CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent)
@@ -158,8 +286,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
 
     if (m_toolType == ToolType::DirectConnection) {
         if (!nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
-            if (!nearestItem(scene, scenePos, aadl::ConnectionCreationValidator::kInterfaceTolerance / 2,
-                                    { AADLFunctionGraphicsItem::Type }))
+            if (!nearestItem(scene, scenePos, ::kInterfaceTolerance / 2, { AADLFunctionGraphicsItem::Type }))
                 return false;
         }
 
@@ -175,8 +302,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection) {
         if (!m_previewConnectionItem) {
-            QGraphicsItem *item = nearestItem(scene, scenePos, aadl::ConnectionCreationValidator::kInterfaceTolerance,
-                                                     { AADLInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
             if (!item)
                 return false;
 
@@ -374,8 +500,7 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 
 static inline bool alignToSidePoint(const QGraphicsScene *scene, const QPointF &point, QPointF &pointToAlign)
 {
-    auto foundItem = nearestItem(scene, point, aadl::ConnectionCreationValidator::kInterfaceTolerance / 2,
-                                        { AADLInterfaceGraphicsItem::Type });
+    auto foundItem = nearestItem(scene, point, kInterfaceTolerance / 2, { AADLInterfaceGraphicsItem::Type });
     if (!foundItem)
         return false;
 
@@ -414,7 +539,7 @@ static inline QRectF adjustToSize(const QRectF &rect, const QSizeF &minSize)
 
 void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) const
 {
-    auto info = aadl::ConnectionCreationValidator::validate(m_view ? m_view->scene() : nullptr, connectionPoints);
+    auto info = ::validate(m_view ? m_view->scene() : nullptr, connectionPoints);
     if (info.failed())
         return;
 
@@ -486,7 +611,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
     } else {
-        auto pi = aadl::AADLObjectConnection::selectIface<aadl::AADLObjectIfaceProvided *>(info.startIface, info.endIface);
+        aadl::AADLObjectIface* pi = aadl::AADLObjectConnection::selectIface<aadl::AADLObjectIfaceProvided *>(info.startIface, info.endIface);
         if (!pi)
             pi = info.startIface;
         ifaceCommons = aadl::AADLObjectIface::CreationInfo::fromIface(pi);
@@ -543,8 +668,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     utils::Id prevEndIfaceId = info.endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
-        const QVector<QPointF> intersectionPoints =
-                intersectionPoints(item->sceneBoundingRect(), connectionPoints);
+        auto intersectionPoints = aadlinterface::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
@@ -653,10 +777,7 @@ bool CreatorTool::handleConnectionCreate(const QPointF &pos)
 
     QPointF alignedPos { pos };
     if (m_connectionPoints.size() > 2) {
-        if (QGraphicsItem *itemUnderCursor =
-                    nearestItem(scene, pos, aadl::ConnectionCreationValidator::kInterfaceTolerance,
-                                       { AADLInterfaceGraphicsItem::Type })) {
-
+        if (auto itemUnderCursor = nearestItem(scene, pos, ::kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type })) {
             const QPointF finishPoint = itemUnderCursor->mapToScene(QPointF(0, 0));
             if (!alignToSidePoint(scene, finishPoint, m_connectionPoints.last()))
                 return false;
@@ -757,8 +878,7 @@ QUndoCommand *CreatorTool::createInterfaceCommand(const aadl::AADLObjectIface::C
 
 void CreatorTool::handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos)
 {
-    if (QGraphicsItem *parentItem = nearestItem(
-                scene, adjustFromPoint(pos, aadl::ConnectionCreationValidator::kInterfaceTolerance), kFunctionTypes)) {
+    if (auto parentItem = nearestItem( scene, adjustFromPoint(pos, ::kInterfaceTolerance), kFunctionTypes)) {
         aadl::AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
         aadl::AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, utils::InvalidId);
         ifaceDescr.resetKind();
@@ -977,7 +1097,7 @@ bool CreatorTool::warnConnectionPreview(const QPointF &pos)
     else
         connectionPoints.append(pos);
 
-    const aadl::ConnectionInfo &info = aadl::ConnectionCreationValidator::validate(m_view ? m_view->scene() : nullptr, connectionPoints);
+    auto info = ::validate(m_view ? m_view->scene() : nullptr, connectionPoints);
     const bool warn = info.failed();
 
     if (m_previewConnectionItem) {
