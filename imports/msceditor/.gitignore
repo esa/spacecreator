@@ -1,36 +1,3 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*libs/*.lai
-*libs/*.la
-*libs/*.a
-*libs/*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
 # IDE files
 .project
 *.pro.user
@@ -40,21 +7,6 @@ license.qtc.txt
 
 # System files
 .directory
-
-# ANTLR generated files
-libs/asn1editor/parser/*.cpp
-libs/asn1editor/parser/*.h
-libs/asn1editor/parser/*.interp
-libs/asn1editor/parser/*.tokens
-libs/msclibrary/parser/*.cpp
-libs/msclibrary/parser/*.h
-libs/msclibrary/parser/*.interp
-libs/msclibrary/parser/*.tokens
-
-# ANTLR internals (win build)
-3rdparty/antlr/cpp_runtime/runtime/.vs/
-3rdparty/antlr/cpp_runtime/runtime/bin/
-3rdparty/antlr/cpp_runtime/runtime/obj/
 
 # QDoc generated files
 doc/html

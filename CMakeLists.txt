@@ -23,6 +23,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Generated files should be in the include path
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Use ccache for faster builds when available
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)

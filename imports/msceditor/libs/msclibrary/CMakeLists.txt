@@ -1,30 +1,33 @@
 set(LIB_NAME msclibrary)
 
-
 # Generate ANTL parser files
-set(ANTLR_RUNTIME_PATH ${CMAKE_SOURCE_DIR}/src/3rdparty/antlr/cpp_runtime/runtime)
-if (WIN32)
-    set(ANTLR_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/create_msc_parser.bat)
-else()
-    set(ANTLR_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/create_msc_parser.sh)
-endif()
-execute_process(COMMAND ${ANTLR_COMMAND}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../..
-)
+set(PARSER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/parser/Msc.g4)
+set(ANTLR_JAR_LOCATION ${CMAKE_SOURCE_DIR}/src/3rdparty/antlr/antlr-4.8-complete.jar)
 
-# cmake caches are problematic, so list the files in a variable
+# ANTLR output files
 set(ANTLR_SRC
-    parser/MscBaseVisitor.h
-    parser/MscLexer.h
-    parser/MscParser.h
-    parser/MscVisitor.h
-    parser/MscBaseVisitor.cpp
-    parser/MscLexer.cpp
-    parser/MscParser.cpp
-    parser/MscVisitor.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/MscBaseVisitor.h
+    ${CMAKE_CURRENT_BINARY_DIR}/MscLexer.h
+    ${CMAKE_CURRENT_BINARY_DIR}/MscParser.h
+    ${CMAKE_CURRENT_BINARY_DIR}/MscVisitor.h
+    ${CMAKE_CURRENT_BINARY_DIR}/MscBaseVisitor.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/MscLexer.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/MscParser.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/MscVisitor.cpp
 )
-# End of generate ANTL parser files
 
+foreach(src_file ${ANTLR_SRC})
+    set_source_files_properties(${src_file} PROPERTIES GENERATED TRUE)
+endforeach()
+
+find_package(Java COMPONENTS Runtime REQUIRED)
+cmake_policy(SET CMP0071 OLD) # This makes AUTO_MOC skip the generated files
+add_custom_command(
+    OUTPUT ${ANTLR_SRC}
+    COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR_JAR_LOCATION}" -Dlanguage=Cpp -no-listener -visitor ${PARSER_FILE}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    DEPENDS ${PARSER_FILE}
+)
 
 add_library(${LIB_NAME} STATIC)
 

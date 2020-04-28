@@ -19,7 +19,7 @@
 
 #include "cif/cifparser.h"
 #include "mscmessage.h"
-#include "parser/MscBaseVisitor.h"
+#include "MscBaseVisitor.h"
 
 #include <QVector>
 
