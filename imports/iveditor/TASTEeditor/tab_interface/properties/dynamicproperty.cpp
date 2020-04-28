@@ -21,10 +21,9 @@
 #include <QJsonArray>
 #include <QMetaEnum>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-struct DynamicPropertyPrivate {
+struct DynamicProperty::DynamicPropertyPrivate {
     QString m_name;
     DynamicProperty::Type m_type;
     DynamicProperty::Scopes m_scope;
@@ -38,7 +37,7 @@ struct DynamicPropertyPrivate {
     } JsonFileds;
 };
 
-const DynamicPropertyPrivate::Consts DynamicPropertyPrivate::JsonFileds = {};
+const DynamicProperty::DynamicPropertyPrivate::Consts DynamicProperty::DynamicPropertyPrivate::JsonFileds = {};
 
 DynamicProperty::DynamicProperty(const QString &name, Type t, const Scopes &s, const QVector<QVariant> &enumVals)
     : d(new DynamicPropertyPrivate({ name, t, s, enumVals }))
@@ -137,5 +136,4 @@ DynamicProperty *DynamicProperty::fromJson(const QJsonObject &json)
                                json[DynamicPropertyPrivate::JsonFileds.Range].toArray().toVariantList().toVector());
 }
 
-} // ns aadl
-} // ns taste3
+}

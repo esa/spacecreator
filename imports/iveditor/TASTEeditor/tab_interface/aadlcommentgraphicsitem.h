@@ -17,29 +17,32 @@
 
 #pragma once
 #include "aadlrectgraphicsitem.h"
-#include "tab_aadl/aadlobjectcomment.h"
+#include "aadlobject.h"
 
 #include <QScopedPointer>
 #include <QTextLayout>
 
-namespace taste3 {
 namespace aadl {
+class AADLObjectComment;
+}
+
+namespace aadlinterface {
 
 class AADLCommentGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
+    explicit AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::Type::Comment)
+        Type = UserType + static_cast<int>(aadl::AADLObject::Type::Comment)
     };
     int type() const override { return Type; }
 
     void setText(const QString &text);
     QString text() const;
 
-    AADLObjectComment *entity() const;
+    aadl::AADLObjectComment *entity() const;
     QSizeF minimalSize() const override;
     void updateFromEntity() override;
 
@@ -59,5 +62,4 @@ private:
     QString m_text;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

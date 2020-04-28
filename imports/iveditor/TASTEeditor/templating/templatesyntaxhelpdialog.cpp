@@ -23,7 +23,6 @@
 #include <QDialogButtonBox>
 #include <QDebug>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -58,5 +57,4 @@ TemplateSyntaxHelpDialog::TemplateSyntaxHelpDialog(QWidget *parent)
     connect(closeButtonBox, &QDialogButtonBox::rejected, this, &TemplateSyntaxHelpDialog::reject);
 }
 
-} // ns templating
-} // ns taste3
+}

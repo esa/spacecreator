@@ -15,13 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef XMLHIGHLIGHTER_H
-#define XMLHIGHLIGHTER_H
+#pragma once
 
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -46,7 +44,4 @@ private:
     QVector<HighlightingRule> m_highlightingRules;
 };
 
-} // ns templating
-} // ns taste3
-
-#endif // XMLHIGHLIGHTER_H
+}

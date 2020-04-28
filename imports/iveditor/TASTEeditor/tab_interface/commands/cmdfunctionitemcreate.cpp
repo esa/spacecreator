@@ -21,18 +21,16 @@
 
 #include <QtDebug>
 #include <baseitems/common/utils.h>
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
-                                             const QRectF &geometry)
+CmdFunctionItemCreate::CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new AADLObjectFunction(QString(),
+    , m_entity(new aadl::AADLObjectFunction(QString(),
                                       m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
@@ -63,6 +61,5 @@ int CmdFunctionItemCreate::id() const
     return CreateFunctionEntity;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

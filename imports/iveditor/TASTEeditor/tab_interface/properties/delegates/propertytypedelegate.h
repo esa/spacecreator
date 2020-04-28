@@ -20,10 +20,13 @@
 #include "comboboxdelegate.h"
 
 class QStringListModel;
-namespace taste3 {
-namespace aadl {
 
+namespace aadl {
 class AADLObject;
+}
+
+namespace aadlinterface {
+
 class PropertyTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
@@ -32,5 +35,4 @@ public:
     ~PropertyTypeDelegate() override;
 };
 
-} // ns aadl
-} // ns taste3
+}

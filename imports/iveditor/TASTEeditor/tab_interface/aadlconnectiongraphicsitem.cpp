@@ -28,9 +28,9 @@
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 
 #include <QGuiApplication>
 #include <QPainter>
@@ -43,8 +43,7 @@ static const qreal kSelectionOffset = 10;
 static const qreal kMinLineLength = 20;
 static const qreal kConnectionMargin = 20;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 static inline QList<QVector<QPointF>> generateConnection(const QPointF &startPoint, const QPointF &endPoint)
 {
@@ -64,7 +63,7 @@ static inline QVector<QPointF> generateConnection(const QLineF &startDirection, 
     const qreal angle = startDirection.angleTo(endDirection);
     static const qreal tolerance = 0.1;
     if (qAbs(qSin(qDegreesToRadians(angle))) <= tolerance) { // ||
-        const QPointF mid = utils::lineCenter(QLineF(connectionPoints.first(), connectionPoints.last()));
+        const QPointF mid = lineCenter(QLineF(connectionPoints.first(), connectionPoints.last()));
         QLineF midLine { mid, QPointF(0, 0) };
         midLine.setAngle(startDirection.angle() - 90);
 
@@ -99,7 +98,7 @@ static inline QVector<QPointF> generateConnection(const QLineF &startDirection, 
 
 static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
 {
-    switch (utils::getNearestSide(sceneRect, point)) {
+    switch (getNearestSide(sceneRect, point)) {
     case Qt::AlignTop:
         return QLineF(sceneRect.topLeft(), sceneRect.topRight()).normalVector();
     case Qt::AlignBottom:
@@ -132,11 +131,11 @@ static inline QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const 
 
     const QRectF itemRectMargins =
             itemRect.adjusted(-kConnectionMargin, -kConnectionMargin, kConnectionMargin, kConnectionMargin);
-    const QList<QPointF> rectCorners = utils::sortedCorners(itemRectMargins, startPoint, endPoint);
+    const QList<QPointF> rectCorners = sortedCorners(itemRectMargins, startPoint, endPoint);
     QList<QVector<QPointF>> allPaths;
     for (const QPointF &p : rectCorners) {
         for (auto polygon : generateConnection(startPoint, p)) {
-            if (!utils::intersects(itemRect, polygon) && !utils::intersects(itemRect, QLineF(p, endPoint))) {
+            if (!intersects(itemRect, polygon) && !intersects(itemRect, QLineF(p, endPoint))) {
                 QVector<QPointF> previousPoints(prevPoints);
                 previousPoints.removeLast();
                 previousPoints << polygon;
@@ -161,7 +160,7 @@ static inline QVector<QPointF> findPath(QGraphicsScene *scene, const QLineF &sta
             continue;
 
         QPointF intersectionPoint;
-        if (utils::intersects((*it)->sceneBoundingRect(), points, &intersectionPoint)
+        if (intersects((*it)->sceneBoundingRect(), points, &intersectionPoint)
             && QLineF(startDirection.p2(), intersectionPoint).length() < distance) {
             intersectionItem = *it;
         }
@@ -207,7 +206,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
                         intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
                             if (!types.contains(item->type()))
                                 return false;
-                            return utils::intersectionPoints(item->sceneBoundingRect(), subPath).size() > 1;
+                            return intersectionPoints(item->sceneBoundingRect(), subPath).size() > 1;
                         });
                 if (it != intersectedItems.constEnd())
                     continue;
@@ -220,7 +219,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
         if (!results.isEmpty()) {
             std::sort(results.begin(), results.end(), [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
                 if (v1.size() == v2.size())
-                    return utils::distancePolygon(v1) < utils::distancePolygon(v2);
+                    return distancePolygon(v1) < distancePolygon(v2);
                 return v1.size() < v2.size();
             });
 
@@ -294,7 +293,7 @@ QPainterPath AADLConnectionGraphicsItem::GraphicsPathItem::shape() const
     return stroker.createStroke(path()).simplified();
 }
 
-AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *connection,
+AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(aadl::AADLObjectConnection *connection,
                                                        AADLInterfaceGraphicsItem *startIface,
                                                        AADLInterfaceGraphicsItem *endIface, QGraphicsItem *parentItem)
     : InteractiveObject(connection, parentItem)
@@ -305,7 +304,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(AADLObjectConnection *con
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
              | QGraphicsItem::ItemContainsChildrenInShape);
-    setZValue(utils::kConnectionZLevel);
+    setZValue(kConnectionZLevel);
 
     applyColorScheme();
 
@@ -338,7 +337,7 @@ void AADLConnectionGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    setPoints(utils::polygon(obj->coordinates()));
+    setPoints(polygon(obj->coordinates()));
 }
 
 void AADLConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
@@ -370,7 +369,7 @@ QVector<QPointF> AADLConnectionGraphicsItem::graphicsPoints() const
     return mapToScene(polygon);
 }
 
-AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
+aadl::AADLObjectConnection *AADLConnectionGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectConnection *>(aadlObject());
 }
@@ -602,11 +601,11 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     QPointF intersectionPoint { releasedAt };
     if (idx > 0 && idx < m_points.size() - 1) {
         QLineF prevLine = { m_points.value(idx - 1), intersectionPoint };
-        if (utils::alignedLine(prevLine))
+        if (alignedLine(prevLine))
             intersectionPoint = prevLine.p2();
 
         QLineF nextLine = { m_points.value(idx + 1), intersectionPoint };
-        if (utils::alignedLine(nextLine))
+        if (alignedLine(nextLine))
             intersectionPoint = nextLine.p2();
     }
     m_points[idx] = intersectionPoint;
@@ -626,8 +625,8 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF
     }
 
     for (auto item : scene()->items(m_points)) {
-        if (qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-            if (utils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
+        if (qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+            if (intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
                 rebuildLayout();
                 updateEntity();
                 return;
@@ -675,7 +674,7 @@ QVector<QPointF> AADLConnectionGraphicsItem::simplify(const QVector<QPointF> &po
         const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
 
         if (qFuzzyCompare(prevLine.angle(), nextLine.angle()) && currentLine.length() < kMinLineLength) {
-            const QPointF midPoint = utils::lineCenter(currentLine);
+            const QPointF midPoint = lineCenter(currentLine);
             const QPointF prevOffset = midPoint - currentLine.p1();
             simplifiedPoints[idx - 1] = prevLine.p1() + prevOffset;
             const QPointF nextOffset = midPoint - currentLine.p2();
@@ -741,5 +740,4 @@ QString AADLConnectionGraphicsItem::prepareTooltip() const
     return tooltip;
 }
 
-} // namespace aadl
-} // namespace taste3
+}

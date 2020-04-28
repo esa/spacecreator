@@ -23,22 +23,23 @@ namespace Ui {
 class CommentTextDialog;
 }
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectComment;
+}
+
+namespace aadlinterface {
 
 class CommentTextDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit CommentTextDialog(AADLObjectComment *comment, QWidget *parent = nullptr);
+    explicit CommentTextDialog(aadl::AADLObjectComment *comment, QWidget *parent = nullptr);
     ~CommentTextDialog() override;
 
 private:
     Ui::CommentTextDialog *ui;
-    AADLObjectComment *m_entity;
+    aadl::AADLObjectComment *m_entity;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

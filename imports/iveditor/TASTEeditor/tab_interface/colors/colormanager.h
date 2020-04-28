@@ -22,8 +22,7 @@
 #include <QObject>
 #include <QPen>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 struct ColorHandlerData;
 
@@ -118,7 +117,6 @@ private:
     QString prepareDefaultSource() const;
 };
 
-} // ns aadl
-} // ns taste3
+}
 
-Q_DECLARE_TYPEINFO(taste3::aadl::ColorHandler, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(aadlinterface::ColorHandler, Q_MOVABLE_TYPE);

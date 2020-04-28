@@ -19,10 +19,12 @@
 
 #include <QStandardItemModel>
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
+}
+
+namespace aadlinterface {
+
 class PropertiesModelBase : public QStandardItemModel
 {
 public:
@@ -35,7 +37,7 @@ public:
     virtual bool isAttr(const QModelIndex &id) const = 0;
     virtual bool isProp(const QModelIndex &id) const = 0;
 
-    virtual const AADLObject *dataObject() const = 0;
+    virtual const aadl::AADLObject *dataObject() const = 0;
 };
-} // ns aadl
-} // ns taste3
+
+}

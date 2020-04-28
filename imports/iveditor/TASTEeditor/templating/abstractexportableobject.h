@@ -20,7 +20,6 @@
 #include <QObject>
 #include <QPointer>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -59,9 +58,4 @@ private:
     QPointer<const QObject> m_exportedObject;
 };
 
-} // ns templating
-} // ns taste3
-
-#define DECLARE_EXPORTABLE_TYPE(TYPE) \
-    Q_DECLARE_METATYPE(taste3::templating::TYPE) \
-    Q_DECLARE_TYPEINFO(taste3::templating::TYPE, Q_MOVABLE_TYPE);
+}

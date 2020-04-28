@@ -29,7 +29,7 @@ class DynActionEditor;
 class QItemSelection;
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 class ActionsModel;
 class ConditionsModel;
@@ -71,5 +71,5 @@ private:
     bool save();
 };
 
-} // ns aadl
-} // ns taste3
+}
+}

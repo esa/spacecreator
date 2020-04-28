@@ -21,13 +21,12 @@
 #include "commandids.h"
 
 #include <QDebug>
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdContextParameterRemove::CmdContextParameterRemove(AADLObjectFunctionType *entity, int at)
+CmdContextParameterRemove::CmdContextParameterRemove(aadl::AADLObjectFunctionType *entity, int at)
     : QUndoCommand()
     , m_entity(entity)
     , m_params()
@@ -44,7 +43,7 @@ void CmdContextParameterRemove::redo()
     if (!m_entity)
         return;
 
-    for (const ContextParameter &param : m_params)
+    for (const aadl::ContextParameter &param : m_params)
         m_entity->removeContextParam(param);
 }
 
@@ -53,12 +52,12 @@ void CmdContextParameterRemove::undo()
     if (!m_entity)
         return;
 
-    QVector<ContextParameter> params = m_entity->contextParams();
+    QVector<aadl::ContextParameter> params = m_entity->contextParams();
 
     QList<int> ids = m_params.keys();
     std::sort(ids.begin(), ids.end());
     for (int i : ids) {
-        const ContextParameter &param = m_params.value(i);
+        const aadl::ContextParameter &param = m_params.value(i);
         params.insert(i, param);
     }
     m_entity->setContextParams(params);
@@ -78,6 +77,5 @@ int CmdContextParameterRemove::id() const
     return RemoveContextParameter;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

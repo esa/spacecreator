@@ -20,16 +20,15 @@
 
 #include "commandids.h"
 
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdIfaceParamCreate::CmdIfaceParamCreate(AADLObject *entity, const IfaceParameter &param)
-    : CmdIfaceParamBase(entity ? entity->as<AADLObjectIface *>() : nullptr)
+CmdIfaceParamCreate::CmdIfaceParamCreate(aadl::AADLObject *entity, const aadl::IfaceParameter &param)
+    : CmdIfaceParamBase(entity ? entity->as<aadl::AADLObjectIface *>() : nullptr)
     , m_targetParams({ param })
-    , m_sourceParams(m_iface ? m_iface->params() : QVector<IfaceParameter>())
+    , m_sourceParams(m_iface ? m_iface->params() : QVector<aadl::IfaceParameter>())
 {
     setText(QObject::tr("Create Iface Parameter"));
 }
@@ -39,7 +38,7 @@ void CmdIfaceParamCreate::redo()
     if (!m_iface)
         return;
 
-    QVector<IfaceParameter> currParams = m_iface->params();
+    QVector<aadl::IfaceParameter> currParams = m_iface->params();
     currParams.append(m_targetParams);
     m_iface->setParams(currParams);
 
@@ -61,6 +60,5 @@ int CmdIfaceParamCreate::id() const
     return CreateIfaceParam;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

@@ -23,7 +23,7 @@
 #include <QVector>
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 class AttributesModel : public QStringListModel
 {
@@ -55,5 +55,5 @@ private:
     QVector<ctx::AttrHandler> *m_attrs { nullptr };
 };
 
-} // ns aadl
-} // ns taste3
+}
+}

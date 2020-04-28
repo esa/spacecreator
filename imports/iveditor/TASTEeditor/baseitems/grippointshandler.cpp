@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 
-namespace taste3 {
+namespace aadlinterface {
 
 GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
     : QGraphicsObject(parent)
@@ -129,7 +129,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     const int duration = m_visible ? 100 : 150;
     setVisible(true);
 
-    if (QPropertyAnimation *anim = utils::createLinearAnimation(this, "opacity", from, to, duration)) {
+    if (QPropertyAnimation *anim = aadlinterface::createLinearAnimation(this, "opacity", from, to, duration)) {
         connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::onOpacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }

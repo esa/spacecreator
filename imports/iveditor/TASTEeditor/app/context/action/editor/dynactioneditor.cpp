@@ -33,7 +33,7 @@
 #include <QStandardPaths>
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 /*!
  * \class taste3::aadl::DynActionEditor
@@ -278,5 +278,5 @@ void DynActionEditor::on_btnCreateFile_clicked()
     }
 }
 
-} // ns taste3
-} // ns aadl
+}
+}

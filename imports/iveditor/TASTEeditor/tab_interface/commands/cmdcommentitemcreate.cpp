@@ -20,19 +20,16 @@
 #include "commandids.h"
 
 #include <baseitems/common/utils.h>
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdCommentItemCreate::CmdCommentItemCreate(AADLObjectsModel *model, AADLObjectFunctionType *parent,
-                                           const QRectF &geometry)
+CmdCommentItemCreate::CmdCommentItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunctionType *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Comment"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new AADLObjectComment(QString(),
-                                     m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
+    , m_entity(new aadl::AADLObjectComment(QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }
@@ -62,6 +59,5 @@ int CmdCommentItemCreate::id() const
     return CreateCommentEntity;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

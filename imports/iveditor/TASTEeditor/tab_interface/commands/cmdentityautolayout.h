@@ -19,18 +19,19 @@
 
 #include "cmdentitygeometrychange.h"
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityAutoLayout : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdEntityAutoLayout(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData);
+    explicit CmdEntityAutoLayout(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData);
     int id() const override;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

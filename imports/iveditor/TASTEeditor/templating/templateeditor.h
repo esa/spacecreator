@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef TEMPLATEEDITOR_H
-#define TEMPLATEEDITOR_H
+#pragma once
 
 #include <QDialog>
 #include <QVariant>
@@ -25,7 +24,6 @@ class QSpinBox;
 class QTabWidget;
 class QPlainTextEdit;
 
-namespace taste3 {
 namespace templating {
 
 class StringTemplate;
@@ -75,7 +73,4 @@ private:
     QString m_outFileName;
 };
 
-} // ns templating
-} // ns taste3
-
-#endif // TEMPLATEEDITOR_H
+}

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectiface.h"
 
 #include <QCursor>
 #include <QObject>
@@ -34,16 +34,19 @@ class QGraphicsScene;
 class QMenu;
 class QUndoCommand;
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectsModel;
 class AADLObject;
+}
+
+namespace aadlinterface {
+
 class InteractiveObject;
 class CreatorTool : public QObject
 {
     Q_OBJECT
 public:
-    explicit CreatorTool(QGraphicsView *view, AADLObjectsModel *model, QObject *parent = nullptr);
+    explicit CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent = nullptr);
     enum class ToolType
     {
         Pointer = 0,
@@ -63,12 +66,12 @@ public:
 
 Q_SIGNALS:
     void created();
-    void propertyEditorRequest(AADLObject *entity) const;
+    void propertyEditorRequest(aadl::AADLObject *entity) const;
     void informUser(const QString &title, const QString &message) const;
 
 protected:
     QPointer<QGraphicsView> m_view;
-    QPointer<AADLObjectsModel> m_model;
+    QPointer<aadl::AADLObjectsModel> m_model;
     QGraphicsRectItem *m_previewItem = nullptr;
     QGraphicsPathItem *m_previewConnectionItem = nullptr;
     QVector<QPointF> m_connectionPoints;
@@ -93,7 +96,7 @@ private:
     void handleComment(QGraphicsScene *scene, const QPointF &pos);
     void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
     void handleFunction(QGraphicsScene *scene, const QPointF &pos);
-    void handleInterface(QGraphicsScene *scene, AADLObjectIface::IfaceType type, const QPointF &pos);
+    void handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos);
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
     void handleConnection(const QVector<QPointF> &connectionPoints) const;
@@ -111,8 +114,7 @@ private:
     CreatorTool::ToolType m_toolType { ToolType::Pointer };
     QSet<InteractiveObject *> m_collidedItems;
 
-    QUndoCommand *createInterfaceCommand(const AADLObjectIface::CreationInfo &info) const;
+    QUndoCommand *createInterfaceCommand(const aadl::AADLObjectIface::CreationInfo &info) const;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

@@ -18,15 +18,14 @@
 #include "propertiesviewbase.h"
 
 #include "propertieslistmodel.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 #include "ui_propertiesviewbase.h"
 
 #include <QDebug>
 #include <QSortFilterProxyModel>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 PropertiesViewBase::PropertiesViewBase(QWidget *parent)
     : QWidget(parent)
@@ -112,19 +111,19 @@ bool PropertiesViewBase::setButtonsDisabled()
 
     bool disabled = false;
 
-    if (const AADLObject *dataObject = m_model->dataObject()) {
+    if (auto dataObject = m_model->dataObject()) {
         switch (dataObject->aadlType()) {
-        case AADLObject::Type::Function: {
-            if (const AADLObjectFunction *fn = dataObject->as<const AADLObjectFunction *>())
+        case aadl::AADLObject::Type::Function: {
+            if (auto fn = dataObject->as<const aadl::AADLObjectFunction *>())
                 disabled = fn->inheritsFunctionType();
             break;
         }
-        case AADLObject::Type::RequiredInterface:
+        case aadl::AADLObject::Type::RequiredInterface:
         case aadl::AADLObject::Type::ProvidedInterface: {
-            if (const AADLObjectIface *iface = dataObject->as<const AADLObjectIface *>()) {
+            if (auto iface = dataObject->as<const aadl::AADLObjectIface *>()) {
                 disabled = iface->isClone();
                 if (!disabled && iface->isRequired()) {
-                    if (const AADLObjectIfaceRequired *ri = iface->as<const AADLObjectIfaceRequired *>())
+                    if (auto ri = iface->as<const aadl::AADLObjectIfaceRequired *>())
                         disabled = ri->hasPrototypePi();
                 }
             }
@@ -144,5 +143,4 @@ bool PropertiesViewBase::setButtonsDisabled()
     return disabled;
 }
 
-} // namespace aadl
-} // namespace taste3
+}

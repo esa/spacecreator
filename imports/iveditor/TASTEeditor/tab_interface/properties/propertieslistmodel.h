@@ -19,10 +19,12 @@
 
 #include "propertiesmodelbase.h"
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
+}
+
+namespace aadlinterface {
+
 class PropertiesListModel : public PropertiesModelBase
 {
     Q_OBJECT
@@ -49,8 +51,8 @@ public:
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(AADLObject *obj);
-    const AADLObject *dataObject() const override;
+    void setDataObject(aadl::AADLObject *obj);
+    const aadl::AADLObject *dataObject() const override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -61,7 +63,7 @@ public:
     bool isProp(const QModelIndex &id) const override;
 
 protected:
-    AADLObject *m_dataObject { nullptr };
+    aadl::AADLObject *m_dataObject { nullptr };
     QVector<QString> m_names;
 
     virtual bool isEditable(const QModelIndex &index) const;
@@ -85,5 +87,5 @@ public:
 protected:
     bool isEditable(const QModelIndex &index) const override;
 };
-} // namespace aadl
-} // namespace taste3
+
+}

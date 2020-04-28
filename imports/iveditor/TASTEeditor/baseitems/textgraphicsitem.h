@@ -23,7 +23,7 @@
 #include <QRegularExpression>
 #include <QTextOption>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class TextGraphicsItem : public QGraphicsTextItem
 {

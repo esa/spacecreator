@@ -30,9 +30,9 @@
 #include <app/commandsstack.h>
 #include <baseitems/common/utils.h>
 #include <baseitems/grippointshandler.h>
-#include <tab_aadl/aadlobjectconnection.h>
-#include <tab_aadl/aadlobjectfunction.h>
-#include <tab_aadl/aadlobjectiface.h>
+#include <aadlobjectconnection.h>
+#include <aadlobjectfunction.h>
+#include <aadlobjectiface.h>
 
 static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;
@@ -41,10 +41,9 @@ static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceTitleMaxLength = 80;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QGraphicsItem *parent)
+AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *entity, QGraphicsItem *parent)
     : InteractiveObject(entity, parent)
     , m_type(new QGraphicsPathItem(this))
     , m_iface(new QGraphicsPathItem(this))
@@ -52,7 +51,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setZValue(utils::kInterfaceZLevel);
+    setZValue(kInterfaceZLevel);
     updateKind();
 
     QPainterPath pp;
@@ -62,15 +61,15 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(AADLObjectIface *entity, QG
     m_iface->setPath(pp);
     //    setInterfaceName(ifaceLabel());
 
-    connect(entity, &AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
-    connect(entity, &AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
-    if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity))
-        connect(ri, &AADLObjectIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    connect(entity, &aadl::AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
+    connect(entity, &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+    if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity))
+        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
 
     applyColorScheme();
 }
 
-AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
+aadl::AADLObjectIface *AADLInterfaceGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectIface *>(aadlObject());
 }
@@ -98,7 +97,7 @@ QList<QPointer<AADLConnectionGraphicsItem>> AADLInterfaceGraphicsItem::connectio
 
 AADLFunctionGraphicsItem *AADLInterfaceGraphicsItem::targetItem() const
 {
-    return qgraphicsitem_cast<aadl::AADLFunctionGraphicsItem *>(parentItem());
+    return qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem());
 }
 
 void AADLInterfaceGraphicsItem::setTargetItem(QGraphicsItem *item, const QPointF &scenePos)
@@ -156,7 +155,7 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     prepareGeometryChange();
 
-    const bool insideOut = entity()->direction() == AADLObjectIface::IfaceType::Required;
+    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
     const qreal offset = kBase + 2;
 
     qreal rotationDegree = 0.;
@@ -195,16 +194,16 @@ void AADLInterfaceGraphicsItem::doRebuildLayout()
     }
 
     const QPointF ifacePos = pos();
-    if (utils::pos(entity()->coordinates()).isNull()) {
+    if (aadlinterface::pos(entity()->coordinates()).isNull()) {
         layout();
         return;
     }
 
     const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = utils::getNearestSide(parentRect, ifacePos);
+    const Qt::Alignment alignment = getNearestSide(parentRect, ifacePos);
 
     updateInternalItems(alignment);
-    const QPointF stickyPos = utils::getSidePosition(parentRect, ifacePos, alignment);
+    const QPointF stickyPos = getSidePosition(parentRect, ifacePos, alignment);
     setPos(stickyPos);
 }
 
@@ -223,7 +222,7 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    const QPointF coordinates = utils::pos(obj->coordinates());
+    const QPointF coordinates = aadlinterface::pos(obj->coordinates());
     if (coordinates.isNull())
         instantLayoutUpdate();
     else
@@ -262,27 +261,27 @@ void AADLInterfaceGraphicsItem::layout()
         if (auto theirItem = theirIface->targetItem()) {
             const QRectF theirRect = theirItem->sceneBoundingRect();
             const QRectF ourRect = targetItem()->sceneBoundingRect();
-            const QPointF theirPos = utils::pos(theirIface->entity()->coordinates());
+            const QPointF theirPos = aadlinterface::pos(theirIface->entity()->coordinates());
             const QPointF ourPos = ourRect.center();
             Qt::Alignment side = Qt::AlignAbsolute;
             QPointF sidePos;
             if (theirItem->isRootItem()) {
                 if (theirPos.isNull()) {
-                    side = utils::getNearestSide(theirRect, ourPos);
-                    sidePos = utils::getSidePosition(theirRect, ourPos, side);
+                    side = getNearestSide(theirRect, ourPos);
+                    sidePos = getSidePosition(theirRect, ourPos, side);
                 } else {
-                    side = utils::getNearestSide(ourRect, theirPos);
-                    sidePos = utils::getSidePosition(ourRect, ourPos, side);
+                    side = getNearestSide(ourRect, theirPos);
+                    sidePos = getSidePosition(ourRect, ourPos, side);
                 }
             } else if (targetItem()->isRootItem()) {
-                side = utils::getNearestSide(ourRect, theirRect.center());
-                sidePos = utils::getSidePosition(ourRect, theirRect.center(), side);
+                side = getNearestSide(ourRect, theirRect.center());
+                sidePos = getSidePosition(ourRect, theirRect.center(), side);
             } else if (theirRect.isValid()) {
                 if (theirPos.isNull())
-                    side = utils::getNearestSide(ourRect, theirRect.center());
+                    side = getNearestSide(ourRect, theirRect.center());
                 else
-                    side = utils::getNearestSide(ourRect, theirPos);
-                sidePos = utils::getSidePosition(ourRect, ourRect.center(), side);
+                    side = getNearestSide(ourRect, theirPos);
+                sidePos = getSidePosition(ourRect, ourRect.center(), side);
             }
             if (side != Qt::AlignAbsolute) {
                 updateInternalItems(side);
@@ -349,7 +348,7 @@ void AADLInterfaceGraphicsItem::adjustItem()
     QList<QRectF> siblingsRects;
     const QList<QGraphicsItem *> siblingItems = parentItem()->childItems();
     std::for_each(siblingItems.cbegin(), siblingItems.cend(), [this, &siblingsRects](const QGraphicsItem *sibling) {
-        if (sibling->type() == aadl::AADLInterfaceGraphicsItem::Type && sibling != this)
+        if (sibling->type() == AADLInterfaceGraphicsItem::Type && sibling != this)
             siblingsRects.append(sibling->mapRectToParent(sibling->boundingRect()));
     });
 
@@ -363,7 +362,7 @@ void AADLInterfaceGraphicsItem::adjustItem()
         return false;
     };
     const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = utils::getNearestSide(parentRect, pos());
+    const Qt::Alignment alignment = getNearestSide(parentRect, pos());
     const int initialAlignment = kRectSides.indexOf(alignment);
     const QPointF offset = m_boundingRect.topLeft();
     const QRectF itemRect = mapRectToParent(m_boundingRect);
@@ -419,13 +418,13 @@ void AADLInterfaceGraphicsItem::updateLabel()
 
 void AADLInterfaceGraphicsItem::updateKind()
 {
-    AADLObjectIface *iface = qobject_cast<AADLObjectIface *>(entity());
+    auto iface = qobject_cast<aadl::AADLObjectIface *>(entity());
     if (!iface)
         return;
 
     QPainterPath kindPath;
     switch (iface->kind()) {
-    case AADLObjectIface::OperationKind::Cyclic: {
+    case aadl::AADLObjectIface::OperationKind::Cyclic: {
         const qreal kindBaseValue = kHeight;
         kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
                          kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
@@ -438,7 +437,7 @@ void AADLInterfaceGraphicsItem::updateKind()
         kindPath.translate(0, kindBaseValue / 2);
         break;
     }
-    case AADLObjectIface::OperationKind::Sporadic: {
+    case aadl::AADLObjectIface::OperationKind::Sporadic: {
         const qreal kindBaseValue = kHeight;
         kindPath.moveTo(-kindBaseValue / 2, 0);
         kindPath.lineTo(0, -kindBaseValue / 4);
@@ -446,7 +445,7 @@ void AADLInterfaceGraphicsItem::updateKind()
         kindPath.lineTo(kindBaseValue / 2, 0);
         break;
     }
-    case AADLObjectIface::OperationKind::Protected: {
+    case aadl::AADLObjectIface::OperationKind::Protected: {
         const qreal kindBaseValue = kHeight;
         const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
         kindPath.addRoundedRect(rect, 2, 2);
@@ -467,7 +466,7 @@ void AADLInterfaceGraphicsItem::updateKind()
 QString AADLInterfaceGraphicsItem::ifaceLabel() const
 {
     if (entity()->isRequired())
-        if (AADLObjectIfaceRequired *ri = qobject_cast<AADLObjectIfaceRequired *>(entity())) {
+        if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity())) {
             if (ri->isInheritPI()) {
                 const QStringList &labels = ri->inheritedLables();
                 if (labels.size())
@@ -483,7 +482,7 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
     if (entity()->isProvided())
         return toolTip;
 
-    const AADLObjectIfaceRequired *ri = entity()->as<const AADLObjectIfaceRequired *>();
+    auto ri = entity()->as<const aadl::AADLObjectIfaceRequired *>();
     if (!ri)
         return toolTip;
 
@@ -494,18 +493,18 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
     return toolTip;
 }
 
-void AADLInterfaceGraphicsItem::onAttrOrPropChanged(taste3::aadl::meta::Props::Token t)
+void AADLInterfaceGraphicsItem::onAttrOrPropChanged(aadl::meta::Props::Token t)
 {
     switch (t) {
         //    case taste3::aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
-    case taste3::aadl::meta::Props::Token::InheritPI: {
+    case aadl::meta::Props::Token::InheritPI: {
 #ifdef QT_DEBUG
         qWarning() << "check for a call duplication" << t;
 #endif
         updateLabel();
         break;
     }
-    case taste3::aadl::meta::Props::Token::kind:
+    case aadl::meta::Props::Token::kind:
         updateKind();
         break;
     default:
@@ -538,5 +537,4 @@ QVariant AADLInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const 
     return InteractiveObject::itemChange(change, value);
 }
 
-} // namespace aadl
-} // namespace taste3
+}

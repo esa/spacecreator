@@ -21,8 +21,6 @@
 
 #include <QVariant>
 
-namespace taste3 {
-
 namespace aadl {
     class AADLObject;
 }
@@ -53,13 +51,13 @@ protected:
     static QVariantList generateProperties(const QHash<QString, QVariant> &props);
 };
 
-} // ns templating
-} // ns taste3
+}
 
-DECLARE_EXPORTABLE_TYPE(ExportableAADLObject)
+Q_DECLARE_METATYPE(templating::ExportableAADLObject)
+Q_DECLARE_TYPEINFO(templating::ExportableAADLObject, Q_MOVABLE_TYPE);
 
-template<> inline taste3::templating::ExportableAADLObject
-qvariant_cast<taste3::templating::ExportableAADLObject>(const QVariant &v)
+template<> inline templating::ExportableAADLObject
+qvariant_cast<templating::ExportableAADLObject>(const QVariant &v)
 {
-    return *static_cast<const taste3::templating::ExportableAADLObject *>(v.constData());
+    return *static_cast<const templating::ExportableAADLObject *>(v.constData());
 }

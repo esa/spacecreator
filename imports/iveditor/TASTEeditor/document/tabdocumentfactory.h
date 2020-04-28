@@ -18,7 +18,7 @@
 #pragma once
 
 class QObject;
-namespace taste3 {
+
 namespace document {
 
 class AbstractTabDocument;
@@ -42,5 +42,4 @@ private:
     static AbstractTabDocument *initDoc(AbstractTabDocument *doc);
 };
 
-} // ns document
-} // ns taste3
+}

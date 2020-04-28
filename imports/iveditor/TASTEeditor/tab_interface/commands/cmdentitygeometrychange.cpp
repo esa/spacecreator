@@ -22,14 +22,12 @@
 
 #include <QtDebug>
 #include <baseitems/common/utils.h>
-#include <tab_aadl/aadlobjectsmodel.h>
+#include <aadlobjectsmodel.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData,
-                                                 const QString &title)
+CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
@@ -80,7 +78,7 @@ void CmdEntityGeometryChange::mergeCommand(QUndoCommand *command)
     m_mergedCmds.append(command);
 }
 
-static inline int parentLevel(AADLObject *object)
+static inline int parentLevel(aadl::AADLObject *object)
 {
     int idx = 0;
     while (auto parentObject = object->parentObject()) {
@@ -91,11 +89,11 @@ static inline int parentLevel(AADLObject *object)
 }
 
 QList<CmdEntityGeometryChange::ObjectData>
-CmdEntityGeometryChange::convertData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
+CmdEntityGeometryChange::convertData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
-        result.append({ objectData.first, objectData.first->coordinates(), utils::coordinates(objectData.second) });
+        result.append({ objectData.first, objectData.first->coordinates(), coordinates(objectData.second) });
 
     std::stable_sort(result.begin(), result.end(), [](const ObjectData &data1, const ObjectData &data2) {
         if (data1.entity->aadlType() == data2.entity->aadlType())
@@ -107,11 +105,10 @@ CmdEntityGeometryChange::convertData(const QList<QPair<AADLObject *, QVector<QPo
     return result;
 }
 
-void CmdEntityGeometryChange::prepareData(const QList<QPair<AADLObject *, QVector<QPointF>>> &objectsData)
+void CmdEntityGeometryChange::prepareData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
 {
     m_data = convertData(objectsData);
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

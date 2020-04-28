@@ -19,18 +19,17 @@
 
 #include "baseitems/common/utils.h"
 #include "commandids.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectiface.h"
-#include "tab_aadl/aadlobjectsmodel.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
 
 #include <QtMath>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLObjectFunction *parent,
-                                                 const common::Id sourceIfaceId, const common::Id &targetIfaceId,
+CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
+                                                 const utils::Id sourceIfaceId, const utils::Id &targetIfaceId,
                                                  const QVector<QPointF> &points)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
@@ -40,10 +39,9 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(AADLObjectsModel *model, AADLOb
     Q_ASSERT(!sourceIfaceId.isNull());
     Q_ASSERT(!targetIfaceId.isNull());
 
-    AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
-    AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
-    m_entity = new AADLObjectConnection(sourceIface->function(), targetIface->function(), sourceIface, targetIface,
-                                        parent);
+    aadl::AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
+    aadl::AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
+    m_entity = new aadl::AADLObjectConnection(sourceIface->function(), targetIface->function(), sourceIface, targetIface, parent);
     prepareData({ qMakePair(m_entity, points) });
 }
 
@@ -72,6 +70,5 @@ int CmdConnectionItemCreate::id() const
     return CreateConnectionEntity;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

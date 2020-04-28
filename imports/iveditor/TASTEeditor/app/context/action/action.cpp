@@ -17,7 +17,7 @@
 
 #include "action.h"
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QJsonArray>
 

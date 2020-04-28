@@ -26,7 +26,7 @@ class ConditionDialog;
 }
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 class AttributesModel;
 class ConditionDialog : public QDialog
@@ -50,5 +50,5 @@ private:
     AttributesModel *m_attrsModel { nullptr };
 };
 
-} // ns aadl
-} // ns taste3
+}
+}

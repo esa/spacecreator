@@ -19,26 +19,24 @@
 
 #include "cmdifaceparambase.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceParamChange : public CmdIfaceParamBase
 {
 public:
-    explicit CmdIfaceParamChange(AADLObject *entity, const IfaceParameter &from, const IfaceParameter &to);
+    explicit CmdIfaceParamChange(aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
 
     void redo() override;
     void undo() override;
     int id() const override;
 
 protected:
-    IfaceParameter m_newParam;
-    IfaceParameter m_oldParam;
+    aadl::IfaceParameter m_newParam;
+    aadl::IfaceParameter m_oldParam;
 
-    void swapParam(const IfaceParameter &from, const IfaceParameter &to);
+    void swapParam(const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

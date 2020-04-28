@@ -26,7 +26,7 @@
 #include <QTextCursor>
 #include <QTextDocument>
 
-namespace taste3 {
+namespace aadlinterface {
 
 TextGraphicsItem::TextGraphicsItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)

@@ -26,8 +26,7 @@
 class QLineF;
 class QPropertyAnimation;
 
-namespace taste3 {
-namespace utils {
+namespace aadlinterface {
 
 static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
@@ -72,29 +71,8 @@ QVector<qint32> coordinates(const QPointF &point);
 QVector<qint32> coordinates(const QRectF &rect);
 QVector<qint32> coordinates(const QVector<QPointF> &points);
 
-template<typename T>
-bool isAncestorOf(const T *const parent, T *object)
-{
-    if (!parent || !object)
-        return false;
-
-    if (parent == object)
-        return true;
-
-    T *obj { object };
-    while (auto objParent = qobject_cast<T *>(obj->parent())) {
-        if (objParent == parent)
-            return true;
-
-        obj = objParent;
-    }
-
-    return false;
-}
-
 QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 
 QList<int> knownGraphicsItemTypes();
 
-} // ns utils
-} // ns taste3
+}

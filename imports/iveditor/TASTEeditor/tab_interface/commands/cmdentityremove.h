@@ -17,25 +17,27 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "common.h"
 
 #include <QPointer>
 #include <QRect>
 #include <QUndoCommand>
 #include <QVector>
 
-namespace taste3 {
 namespace aadl {
 class AADLObject;
 class AADLObjectsModel;
 class AADLObjectFunction;
 class AADLObjectFunctionType;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdEntityRemove : public QUndoCommand
 {
 public:
-    explicit CmdEntityRemove(AADLObject *entity, AADLObjectsModel *model);
+    explicit CmdEntityRemove(aadl::AADLObject *entity, aadl::AADLObjectsModel *model);
     ~CmdEntityRemove() override;
 
     void redo() override;
@@ -43,25 +45,24 @@ public:
     bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
-    AADLObject *entity() const;
+    aadl::AADLObject *entity() const;
 
 private:
-    QPointer<AADLObjectsModel> m_model;
-    QPointer<AADLObject> m_entity;
-    QVector<QPointer<AADLObject>> m_relatedEntities;
-    QVector<QPointer<AADLObject>> m_relatedConnections;
-    QVector<QPointer<AADLObject>> m_relatedIfaces;
-    QHash<common::Id, QPointer<AADLObjectFunctionType>> m_parentFunctions;
+    QPointer<aadl::AADLObjectsModel> m_model;
+    QPointer<aadl::AADLObject> m_entity;
+    QVector<QPointer<aadl::AADLObject>> m_relatedEntities;
+    QVector<QPointer<aadl::AADLObject>> m_relatedConnections;
+    QVector<QPointer<aadl::AADLObject>> m_relatedIfaces;
+    QHash<utils::Id, QPointer<aadl::AADLObjectFunctionType>> m_parentFunctions;
 
-    void collectRelatedItems(AADLObject *toBeRemoved);
-    void storeLinkedEntity(AADLObject *linkedEntity);
+    void collectRelatedItems(aadl::AADLObject *toBeRemoved);
+    void storeLinkedEntity(aadl::AADLObject *linkedEntity);
 
-    AADLObjectFunctionType *putParentFunctionFor(const AADLObject *obj);
-    AADLObjectFunctionType *popParentFunctionFor(const AADLObject *obj);
-    void advancedRemove(AADLObject *obj);
-    void advancedRestore(AADLObject *obj);
+    aadl::AADLObjectFunctionType *putParentFunctionFor(const aadl::AADLObject *obj);
+    aadl::AADLObjectFunctionType *popParentFunctionFor(const aadl::AADLObject *obj);
+    void advancedRemove(aadl::AADLObject *obj);
+    void advancedRestore(aadl::AADLObject *obj);
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

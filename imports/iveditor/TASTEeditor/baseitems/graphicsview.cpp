@@ -19,13 +19,13 @@
 
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 #include "tab_interface/aadlrectgraphicsitem.h"
 
 #include <QGraphicsItem>
 #include <QMouseEvent>
 
-namespace taste3 {
+namespace aadlinterface {
 
 /*!
   \class taste3::GraphicsView
@@ -97,7 +97,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
-        if (auto iObj = qobject_cast<aadl::InteractiveObject *>(item->toGraphicsObject())) {
+        if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
             info.append(coordinatesInfo(item->mapFromScene(scenePos),
                                         iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None")));
         }
@@ -154,10 +154,10 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Down: {
         for (QGraphicsItem *item : scene()->selectedItems()) {
-            if (aadl::AADLRectGraphicsItem *rectItem =
+            if (aadlinterface::AADLRectGraphicsItem *rectItem =
                         // Not the qgraphicsitem_cast due its "successfull" cast of AADLFunctionName/Text Graphics Items
-                qobject_cast<aadl::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-                rectItem->singleStepMove(aadl::AADLRectGraphicsItem::MoveStep(event->key()));
+                qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+                rectItem->singleStepMove(aadlinterface::AADLRectGraphicsItem::MoveStep(event->key()));
                 keyHandled = true;
             }
         }
@@ -215,4 +215,4 @@ void GraphicsView::setZoomStepPercent(qreal percent)
     m_zoomStepPercent = percent;
 }
 
-} // namespace taste3
+}

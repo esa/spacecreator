@@ -25,16 +25,18 @@ namespace Ui {
 class PropertiesDialog;
 }
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
+}
+
+namespace aadlinterface {
+
 class PropertiesDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(AADLObject *obj, QWidget *parent = nullptr);
+    explicit PropertiesDialog(aadl::AADLObject *obj, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
 public Q_SLOTS:
@@ -43,14 +45,13 @@ public Q_SLOTS:
 
 private:
     Ui::PropertiesDialog *ui;
-    AADLObject *m_dataObject { nullptr };
+    aadl::AADLObject *m_dataObject { nullptr };
 
     QString objectTypeName() const;
 
     void initTabs();
 
-    taste3::cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
+    cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
 };
 
-} // namespace aadl
-} // namespace taste3
+}

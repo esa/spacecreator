@@ -23,6 +23,7 @@
 #include "colors/colormanager.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
+#include "aadlobjectcomment.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -36,16 +37,15 @@
 static const qreal kBorderWidth = 2;
 static const qreal kMargins = 14 + kBorderWidth;
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-AADLCommentGraphicsItem::AADLCommentGraphicsItem(AADLObjectComment *comment, QGraphicsItem *parent)
+AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)
     , m_textLayout(new QTextLayout)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFont(QFont(qApp->font()));
-    setZValue(utils::kCommentZLevel);
+    setZValue(kCommentZLevel);
 
     applyColorScheme();
 }
@@ -72,7 +72,7 @@ QString AADLCommentGraphicsItem::text() const
     return m_text;
 }
 
-AADLObjectComment *AADLCommentGraphicsItem::entity() const
+aadl::AADLObjectComment *AADLCommentGraphicsItem::entity() const
 {
     return qobject_cast<aadl::AADLObjectComment *>(aadlObject());
 }
@@ -119,7 +119,7 @@ void AADLCommentGraphicsItem::doRebuildLayout()
 
 QSizeF AADLCommentGraphicsItem::minimalSize() const
 {
-    return utils::DefaultGraphicsItemSize;
+    return DefaultGraphicsItemSize;
 }
 
 ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
@@ -165,5 +165,4 @@ void AADLCommentGraphicsItem::applyColorScheme()
     update();
 }
 
-} // namespace aadl
-} // namespace taste3
+}

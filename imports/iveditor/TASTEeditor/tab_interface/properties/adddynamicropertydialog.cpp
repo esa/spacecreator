@@ -16,7 +16,7 @@
 */
 
 #include "adddynamicpropertydialog.h"
-#include "app/common.h"
+#include "common.h"
 #include "baseitems/common/utils.h"
 #include "dynamicproperty.h"
 #include "ui_adddynamicpropertydialog.h"
@@ -27,8 +27,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 AddDynamicPropertyDialog::AddDynamicPropertyDialog(const QStringList &prohibitedNames, QWidget *parent)
     : QDialog(parent)
@@ -71,7 +70,7 @@ bool AddDynamicPropertyDialog::validateName(const bool showWarn)
         warn = tr("The name of new property must be unique.");
 
     const bool valid = warn.isEmpty();
-    common::setWidgetFontColor(ui->leName, valid ? m_nameColorDefault : Qt::red);
+    utils::setWidgetFontColor(ui->leName, valid ? m_nameColorDefault : Qt::red);
 
     if (!valid && showWarn)
         QMessageBox::warning(this, tr("Property name"), warn);
@@ -163,5 +162,4 @@ DynamicProperty *AddDynamicPropertyDialog::attribute() const
     return m_attr;
 }
 
-} // ns aadl
-} // ns taste3
+}

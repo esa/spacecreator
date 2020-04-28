@@ -6,10 +6,8 @@
 #include <QVector>
 #include <memory>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
-struct DynamicPropertyPrivate;
 class DynamicProperty
 {
     Q_GADGET
@@ -31,9 +29,9 @@ public:
         Function = 0x2,
         Interface = 0x4
     };
-    Q_ENUM(taste3::aadl::DynamicProperty::Scope)
+    Q_ENUM(aadlinterface::DynamicProperty::Scope)
     Q_DECLARE_FLAGS(Scopes, Scope)
-    Q_FLAG(taste3::aadl::DynamicProperty::Scopes)
+    Q_FLAG(aadlinterface::DynamicProperty::Scopes)
 
     DynamicProperty(const QString &name = "unknown", Type t = Type::Integer, const Scopes &s = Scope::None,
                     const QVector<QVariant> &listVals = QVector<QVariant>());
@@ -55,12 +53,12 @@ public:
     static DynamicProperty *fromJson(const QJsonObject &json);
 
 private:
+    struct DynamicPropertyPrivate;
     const std::unique_ptr<DynamicPropertyPrivate> d;
 };
 
-} // ns aadl
-} // ns taste3
+}
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(taste3::aadl::DynamicProperty::Scopes)
-Q_DECLARE_METATYPE(taste3::aadl::DynamicProperty::Type)
-Q_DECLARE_METATYPE(taste3::aadl::DynamicProperty::Scopes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(aadlinterface::DynamicProperty::Scopes)
+Q_DECLARE_METATYPE(aadlinterface::DynamicProperty::Type)
+Q_DECLARE_METATYPE(aadlinterface::DynamicProperty::Scopes)

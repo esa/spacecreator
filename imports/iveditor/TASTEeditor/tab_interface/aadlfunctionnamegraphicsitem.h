@@ -20,8 +20,7 @@
 
 #include <baseitems/textgraphicsitem.h>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class AADLFunctionNameGraphicsItem : public TextGraphicsItem
 {
@@ -34,5 +33,4 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-} // ns aadl
-} // ns taste3
+}

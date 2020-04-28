@@ -23,8 +23,7 @@ namespace Ui {
 class DynamicPropertyManager;
 }
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class DynamicPropertyManager : public QDialog
 {
@@ -48,5 +47,4 @@ private:
     void setTextColor(const QColor &color);
 };
 
-} // ns aadl
-} // ns taste3
+}

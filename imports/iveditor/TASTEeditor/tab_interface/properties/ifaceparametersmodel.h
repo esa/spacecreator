@@ -18,13 +18,15 @@
 #pragma once
 
 #include "propertiesmodelbase.h"
-#include "tab_aadl/aadlparameter.h"
+#include "aadlparameter.h"
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObject;
 class IfaceParameter;
+}
+
+namespace aadlinterface {
+
 class IfaceParametersModel : public PropertiesModelBase
 {
     Q_OBJECT
@@ -45,8 +47,8 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void setDataObject(AADLObject *obj);
-    const AADLObject *dataObject() const override;
+    void setDataObject(aadl::AADLObject *obj);
+    const aadl::AADLObject *dataObject() const override;
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -59,11 +61,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
-    AADLObject *m_dataObject { nullptr };
-    QVector<IfaceParameter> m_params;
+    aadl::AADLObject *m_dataObject { nullptr };
+    QVector<aadl::IfaceParameter> m_params;
 
-    void createNewRow(const IfaceParameter &param, int row);
+    void createNewRow(const aadl::IfaceParameter &param, int row);
 };
 
-} // namespace aadl
-} // namespace taste3
+}

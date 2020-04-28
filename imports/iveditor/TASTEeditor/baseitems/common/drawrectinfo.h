@@ -20,7 +20,7 @@
 #include <QBrush>
 #include <QPen>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class DrawRectInfo
 {

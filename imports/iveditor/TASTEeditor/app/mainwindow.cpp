@@ -18,7 +18,7 @@
 #include "mainwindow.h"
 
 #include "app/commandsstack.h"
-#include "app/common.h"
+#include "common.h"
 #include "app/context/action/actionsmanager.h"
 #include "app/xmldocexporter.h"
 #include "app/zoomcontroller.h"
@@ -29,8 +29,8 @@
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "settings/settingsmanager.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadltabdocument.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
@@ -158,11 +158,11 @@ void MainWindow::initMenuFile()
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
-    common::registerAction(Q_FUNC_INFO, m_actOpenFile, "Open file", "Show Open File dialog");
-    common::registerAction(Q_FUNC_INFO, m_actCreateFile, "Create file", "Create new empty file");
-    common::registerAction(Q_FUNC_INFO, m_actCloseFile, "Close file", "Close current file");
-    common::registerAction(Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
-    common::registerAction(Q_FUNC_INFO, m_actQuit, "Quit", "Quite the application");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actOpenFile, "Open file", "Show Open File dialog");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFile, "Create file", "Create new empty file");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCloseFile, "Close file", "Close current file");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actQuit, "Quit", "Quite the application");
 }
 
 /*!
@@ -185,8 +185,8 @@ void MainWindow::initMenuEdit()
     m_menuEdit->addAction(m_actRedo);
     m_menuEdit->addSeparator();
 
-    common::registerAction(Q_FUNC_INFO, m_actUndo, "Undo", "Undo the last operation");
-    common::registerAction(Q_FUNC_INFO, m_actRedo, "Redo", "Redo the last undone operation");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actUndo, "Undo", "Undo the last operation");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actRedo, "Redo", "Redo the last undone operation");
 }
 
 /*!
@@ -198,8 +198,8 @@ void MainWindow::initMenuHelp()
     m_actReport = m_menuHelp->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
     m_actAbout = m_menuHelp->addAction(tr("About"), this, &MainWindow::onAboutRequested, QKeySequence::HelpContents);
 
-    common::registerAction(Q_FUNC_INFO, m_actReport, "Report", "Send the debug information");
-    common::registerAction(Q_FUNC_INFO, m_actAbout, "About", "Show About dialog");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actReport, "Report", "Send the debug information");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actAbout, "About", "Show About dialog");
 }
 
 /*!
@@ -374,9 +374,9 @@ void MainWindow::onTabSwitched(int tab)
         doc->fillToolBar(m_docToolbar);
         m_docToolbar->show();
         currentStack = doc->commandsStack();
-        if (auto view = qobject_cast<GraphicsView *>(doc->view())) {
+        if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
             m_zoomCtrl->setView(view);
-            connect(view, &GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
+            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
         }
     }
 
@@ -388,7 +388,7 @@ void MainWindow::onTabSwitched(int tab)
         m_undoGroup->removeStack(m_undoGroup->activeStack());
     }
 
-    cmd::CommandsStack::setCurrent(currentStack);
+    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
 
     updateActions();
 }
@@ -446,9 +446,9 @@ void MainWindow::initTabs()
 
 void MainWindow::initSettings()
 {
-    restoreGeometry(AppOptions::MainWindow.Geometry.read().toByteArray());
-    restoreState(AppOptions::MainWindow.State.read().toByteArray());
-    onTabSwitched(AppOptions::MainWindow.LastTab.read().toInt());
+    restoreGeometry(aadlinterface::AppOptions::MainWindow.Geometry.read().toByteArray());
+    restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
+    onTabSwitched(aadlinterface::AppOptions::MainWindow.LastTab.read().toInt());
 }
 
 void MainWindow::updateActions()
@@ -566,9 +566,9 @@ bool MainWindow::prepareQuit()
         if (!closeTab(i))
             return false;
 
-    AppOptions::MainWindow.State.write(saveState());
-    AppOptions::MainWindow.Geometry.write(saveGeometry());
-    AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
+    aadlinterface::AppOptions::MainWindow.State.write(saveState());
+    aadlinterface::AppOptions::MainWindow.Geometry.write(saveGeometry());
+    aadlinterface::AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
 
     return true;
 }

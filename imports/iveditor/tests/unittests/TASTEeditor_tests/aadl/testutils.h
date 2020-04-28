@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectiface.h"
 
 #include <QString>
 

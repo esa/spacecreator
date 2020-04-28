@@ -17,10 +17,11 @@
 
 #include "commandsstack.h"
 
-namespace taste3 {
+namespace aadlinterface {
 namespace cmd {
+
 /*!
- * \class taste3::cmd::CommandsStack
+ * \class CommandsStack
  * \brief A wrapper around the QUndoStack, provides the convenient acces to the current stack.
  * During integration of other types of documents may be replaced by QUndoGroup. Or may not.
  */
@@ -34,7 +35,7 @@ namespace cmd {
  */
 CommandsStack::Macro::Macro(const QString &title)
 {
-    taste3::cmd::CommandsStack::current()->beginMacro(title);
+    CommandsStack::current()->beginMacro(title);
 }
 
 /*!
@@ -57,22 +58,21 @@ CommandsStack::Macro::Macro(const QString &title)
  */
 CommandsStack::Macro::~Macro()
 {
-    taste3::cmd::CommandsStack::current()->endMacro();
+    CommandsStack::current()->endMacro();
 
     int count = 0;
-    if (const auto cmd =
-                taste3::cmd::CommandsStack::current()->command(taste3::cmd::CommandsStack::current()->index() - 1))
+    if (const auto cmd = CommandsStack::current()->command(CommandsStack::current()->index() - 1))
         count = cmd->childCount();
 
     if (!isComplete() || 0 == count) {
 
         // I found no other way to remove a macro from the stack:
-        const int posOfMacro = taste3::cmd::CommandsStack::current()->index() - 1;
-        if (auto macroCmd = const_cast<QUndoCommand *>(taste3::cmd::CommandsStack::current()->command(posOfMacro))) {
+        const int posOfMacro = CommandsStack::current()->index() - 1;
+        if (auto macroCmd = const_cast<QUndoCommand *>(CommandsStack::current()->command(posOfMacro))) {
             macroCmd->undo(); // unperform all the stuff
             macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
         }
-        taste3::cmd::CommandsStack::current()->undo(); // just removes the history record
+        CommandsStack::current()->undo(); // just removes the history record
     }
 }
 
@@ -85,7 +85,7 @@ bool CommandsStack::Macro::push(QUndoCommand *cmd) const
 {
     if (!cmd)
         return false;
-    taste3::cmd::CommandsStack::current()->push(cmd);
+    CommandsStack::current()->push(cmd);
     return true;
 }
 
@@ -187,5 +187,5 @@ QUndoStack *CommandsStack::currentStack() const
     return m_current;
 }
 
-} // namespace cmd
-} // ns taste3
+}
+}

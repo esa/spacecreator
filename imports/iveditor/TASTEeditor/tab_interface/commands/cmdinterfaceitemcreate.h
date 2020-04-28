@@ -18,21 +18,23 @@
 #pragma once
 
 #include "cmdentitygeometrychange.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectiface.h"
 
 #include <QPointer>
 #include <QRect>
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectFunctionType;
 class AADLObjectsModel;
+}
+
+namespace aadlinterface {
 namespace cmd {
 
 class CmdInterfaceItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdInterfaceItemCreate(const AADLObjectIface::CreationInfo &creationInfo);
+    explicit CmdInterfaceItemCreate(const aadl::AADLObjectIface::CreationInfo &creationInfo);
     ~CmdInterfaceItemCreate() override;
 
     void redo() override;
@@ -40,11 +42,10 @@ public:
     int id() const override;
 
 private:
-    const AADLObjectIface::CreationInfo m_ifaceInfo;
-    QPointer<AADLObjectIface> m_entity;
+    const aadl::AADLObjectIface::CreationInfo m_ifaceInfo;
+    QPointer<aadl::AADLObjectIface> m_entity;
     QVector<QUndoCommand *> m_cmdClones;
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

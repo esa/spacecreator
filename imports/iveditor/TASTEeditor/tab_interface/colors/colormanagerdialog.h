@@ -28,8 +28,7 @@ namespace Ui {
 class ColorManagerDialog;
 }
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 class ColorManagerDialog : public QDialog
 {
@@ -60,5 +59,4 @@ private:
     void openFile(const QString &path);
 };
 
-} // ns aadl
-} // ns taste3
+}

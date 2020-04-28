@@ -22,7 +22,7 @@
 #include <QStringListModel>
 
 namespace taste3 {
-namespace aadl {
+namespace ctx {
 
 class ActionsModel : public QStringListModel
 {
@@ -54,5 +54,5 @@ private:
     QVector<ctx::Action> *m_collection { nullptr };
 };
 
-} // namespace aadl
-} // namespace taste3
+}
+}

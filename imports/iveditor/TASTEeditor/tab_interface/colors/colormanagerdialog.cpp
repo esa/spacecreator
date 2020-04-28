@@ -17,7 +17,7 @@
 
 #include "colormanagerdialog.h"
 
-#include "app/common.h"
+#include "common.h"
 #include "ui_colormanagerdialog.h"
 
 #include <QDebug>
@@ -28,8 +28,7 @@
 #include <QJsonObject>
 #include <QPushButton>
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 ColorManagerDialog::ColorManagerDialog(QWidget *parent)
     : QDialog(parent)
@@ -101,7 +100,7 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
 {
     const QString file =
             QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (common::copyResourceFile(ColorManager::defaultColorsResourceFile(), file, common::FileCopyingMode::Overwrite))
+    if (utils::copyResourceFile(ColorManager::defaultColorsResourceFile(), file, utils::FileCopyingMode::Overwrite))
         openFile(file);
 }
 
@@ -145,5 +144,4 @@ void ColorManagerDialog::reject()
     QDialog::reject();
 }
 
-} // ns aadl
-} // ns taste3
+}

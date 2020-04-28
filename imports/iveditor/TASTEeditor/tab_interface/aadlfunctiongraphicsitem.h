@@ -21,21 +21,23 @@
 
 class QSvgRenderer;
 
-namespace taste3 {
 namespace aadl {
 class AADLObjectFunction;
+}
+
+namespace aadlinterface {
 
 class AADLFunctionGraphicsItem : public AADLFunctionTypeGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit AADLFunctionGraphicsItem(AADLObjectFunction *entity, QGraphicsItem *parent = nullptr);
+    explicit AADLFunctionGraphicsItem(aadl::AADLObjectFunction *entity, QGraphicsItem *parent = nullptr);
     enum
     {
-        Type = UserType + static_cast<int>(AADLObject::Type::Function)
+        Type = UserType + static_cast<int>(aadl::AADLObject::Type::Function)
     };
 
-    AADLObjectFunction *entity() const;
+    aadl::AADLObjectFunction *entity() const;
 
     int type() const override { return Type; }
 
@@ -78,5 +80,4 @@ private:
     bool m_hasNestedItems = false;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

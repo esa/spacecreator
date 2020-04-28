@@ -18,14 +18,13 @@
 #include "tabdocumentfactory.h"
 
 #include "abstracttabdocument.h"
-#include "tab_aadl/aadltabdocument.h"
+#include "app/aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
 #include "tab_deployment/deploymenttabdocument.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "tab_msc/msctabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 /*!
@@ -73,5 +72,4 @@ AbstractTabDocument *TabDocumentFactory::createMSCTabDocument(QObject *parent)
     return initDoc(new MSCTabDocument(parent));
 }
 
-} // ns document
-} // ns taste3
+}

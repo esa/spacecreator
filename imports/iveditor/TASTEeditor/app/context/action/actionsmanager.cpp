@@ -17,11 +17,11 @@
 
 #include "actionsmanager.h"
 
-#include "app/common.h"
+#include "common.h"
 #include "extprocmonitor.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobject.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 
 #include <QAction>
 #include <QApplication>
@@ -85,7 +85,7 @@ QString ActionsManager::storagePath()
  * Adds the appropriate actions into \a menu, managing its enablement based on action conditions and the \a currObj.
  * Initiates connection from QAction to the related handler slot.
  */
-void ActionsManager::populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj)
+void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
 {
     if (!menu)
         return;
@@ -102,7 +102,7 @@ void ActionsManager::populateMenu(QMenu *menu, taste3::aadl::AADLObject *currObj
                 if (!actHandler.m_internalActName.isEmpty())
                     triggerActionInternal(actHandler);
                 else if (!actHandler.m_externalApp.isEmpty()) {
-                    triggerActionExternal(actHandler, act ? act->data().value<taste3::aadl::AADLObject *>() : nullptr);
+                    triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr);
                 } else {
                     QMessageBox::warning(
                             nullptr, QObject::tr("Custom action"),
@@ -139,10 +139,10 @@ void ActionsManager::deployDefaults()
     const QString targetFile("contextmenu.json");
     const QString targetFilePath(targetDir + targetFile);
 
-    common::ensureDirExists(targetDir);
+    utils::ensureDirExists(targetDir);
 
     if (!QFileInfo::exists(targetFilePath)) {
-        common::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
+        utils::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
     }
 }
 
@@ -273,7 +273,7 @@ void ActionsManager::triggerActionInternal(const Action &act)
     }
 }
 
-QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl::AADLObject *aadlObj)
+QString ActionsManager::replaceKeyHolder(const QString &text, const aadl::AADLObject *aadlObj)
 {
     if (text.isEmpty() || !aadlObj) {
         return {};
@@ -337,7 +337,7 @@ QString ActionsManager::replaceKeyHolder(const QString &text, const taste3::aadl
  * Replaces the keyholders by actual values of \a aadlObj's attributes or parameters.
  * Creates and shows an instance of ExtProcMonitor.
  */
-void ActionsManager::triggerActionExternal(const Action &act, const taste3::aadl::AADLObject *aadlObj)
+void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLObject *aadlObj)
 {
     if (!act.m_externalApp.isEmpty()) {
         QStringList params = act.m_externalAppParams;
@@ -369,6 +369,33 @@ QStringList ActionsManager::externalArgsHoldersDescr()
         result.append(QString("%1 - %2").arg(t.key, t.description));
     }
     return result;
+}
+
+/*!
+  \brief Helper function for registering the \a action as scriptable, with key \a title and optional \a description.
+ * The \a caller argument is used to provide reasonable debug record.
+ */
+void ActionsManager::registerAction(const QString &caller, QAction *action, const QString &title, const QString &description)
+{
+    if (!action) {
+        qWarning() << "Null action can not be registered" << caller;
+        return;
+    }
+
+    const QString &titleRef = title.isEmpty() ? action->text() : title;
+    if (titleRef.isEmpty()) {
+        qWarning() << "Action with no Title not be registered" << caller;
+        return;
+    }
+
+    if (description.isEmpty()) {
+        qWarning() << "Action with no Description not be registered" << caller;
+        return;
+    }
+
+    if (!taste3::ctx::ActionsManager::registerScriptableAction(action, title, description)) {
+        qWarning() << caller << "The registration of action failed; probably the duplicate key used:\n";
+    }
 }
 
 } // ns ctx

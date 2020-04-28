@@ -15,12 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef TEMPLATESYNTAXHELPDIALOG_H
-#define TEMPLATESYNTAXHELPDIALOG_H
+#pragma once
 
 #include <QDialog>
 
-namespace taste3 {
 namespace templating {
 
 /**
@@ -33,7 +31,4 @@ public:
     explicit TemplateSyntaxHelpDialog(QWidget *parent = nullptr);
 };
 
-} // ns templating
-} // ns taste3
-
-#endif // TEMPLATESYNTAXHELPDIALOG_H
+}

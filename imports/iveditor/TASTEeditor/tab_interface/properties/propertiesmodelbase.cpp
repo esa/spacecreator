@@ -17,8 +17,7 @@
 
 #include "propertiesmodelbase.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 
 PropertiesModelBase::PropertiesModelBase(QObject *parent)
     : QStandardItemModel(parent)
@@ -27,5 +26,4 @@ PropertiesModelBase::PropertiesModelBase(QObject *parent)
 
 PropertiesModelBase::~PropertiesModelBase() {}
 
-} // namespace aadl
-} // namespace taste3
+}

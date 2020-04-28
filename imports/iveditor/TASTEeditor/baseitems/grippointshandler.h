@@ -24,7 +24,7 @@
 #include <QGraphicsObject>
 #include <QSet>
 
-namespace taste3 {
+namespace aadlinterface {
 
 class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObject
 {

@@ -25,24 +25,30 @@
 #include <QGraphicsObject>
 #include <QPointer>
 
-namespace taste3 {
+namespace aadlinterface {
 class HighlightRectItem;
-namespace util { class DelayedSignal; }
+}
+
+namespace utils {
+class DelayedSignal;
+}
 
 namespace aadl {
-
 class AADLObject;
+}
+
+namespace aadlinterface {
 
 class InteractiveObject : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    InteractiveObject(AADLObject *entity, QGraphicsItem *parent = nullptr);
+    InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
 
-    AADLObject *aadlObject() const;
+    aadl::AADLObject *aadlObject() const;
 
     bool isHovered() const;
 
@@ -134,7 +140,7 @@ private Q_SLOTS:
     virtual void gripPointReleased(GripPoint *pos, const QPointF &pressedAt, const QPointF &releasedAt);
 
 protected:
-    const QPointer<AADLObject> m_dataObject;
+    const QPointer<aadl::AADLObject> m_dataObject;
     QPointer<GripPointsHandler> m_gripPointsHandler;
     QRectF m_boundingRect;
     bool m_hovered = false;
@@ -143,15 +149,14 @@ protected:
     bool m_layoutDirty = false;
 
     bool m_highlightable = false;
-    HighlightRectItem *m_highlighter = nullptr;
+    aadlinterface::HighlightRectItem *m_highlighter = nullptr;
     QPen m_selectedPen;
 
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
 
-    util::DelayedSignal* m_rebuildLayoutSignal;
+    utils::DelayedSignal* m_rebuildLayoutSignal;
 };
 
-} // namespace aadl
-} // namespace taste3
+}

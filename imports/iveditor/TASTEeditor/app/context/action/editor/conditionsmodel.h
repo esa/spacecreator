@@ -20,12 +20,9 @@
 #include <QStringListModel>
 
 namespace taste3 {
-
 namespace ctx {
-struct Condition;
-} // ns ctx
 
-namespace aadl {
+struct Condition;
 
 class ConditionsModel : public QStringListModel
 {
@@ -55,5 +52,5 @@ private:
     QVector<ctx::Condition> *m_conditions { nullptr };
 };
 
-} // ns aadl
-} // ns taste3
+}
+}

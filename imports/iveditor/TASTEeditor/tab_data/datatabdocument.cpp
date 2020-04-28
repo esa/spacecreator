@@ -17,7 +17,6 @@
 
 #include "datatabdocument.h"
 
-namespace taste3 {
 namespace document {
 
 DataTabDocument::DataTabDocument(QObject *parent)
@@ -30,5 +29,4 @@ QString DataTabDocument::title() const
     return tr("Data");
 }
 
-} // ns document
-} // ns taste3
+}

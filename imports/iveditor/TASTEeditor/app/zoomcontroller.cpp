@@ -17,6 +17,8 @@
 
 #include "zoomcontroller.h"
 
+#include "baseitems/graphicsview.h"
+
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -111,7 +113,7 @@ void ZoomController::refill()
     }
 }
 
-void ZoomController::setView(GraphicsView *view)
+void ZoomController::setView(aadlinterface::GraphicsView *view)
 {
     if (m_view == view)
         return;
@@ -119,7 +121,7 @@ void ZoomController::setView(GraphicsView *view)
     if (m_view) {
         disconnect(m_combo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
                    &ZoomController::onCurrentIndexChanged);
-        disconnect(m_view, &GraphicsView::zoomChanged, this, &ZoomController::displayZoomLevel);
+        disconnect(m_view, &aadlinterface::GraphicsView::zoomChanged, this, &ZoomController::displayZoomLevel);
     }
 
     m_view = view;
@@ -133,7 +135,7 @@ void ZoomController::setView(GraphicsView *view)
 
     refill();
 
-    connect(m_view, &GraphicsView::zoomChanged, this, &ZoomController::displayZoomLevel);
+    connect(m_view, &aadlinterface::GraphicsView::zoomChanged, this, &ZoomController::displayZoomLevel);
     connect(m_combo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
             &ZoomController::onCurrentIndexChanged);
 

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QMap>
 

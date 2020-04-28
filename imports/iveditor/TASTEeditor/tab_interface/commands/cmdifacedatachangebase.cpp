@@ -19,11 +19,10 @@
 
 #include "commandsfactory.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(AADLObjectIface *iface, const QString &targetName,
+CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
                                                const QVariant &targetValue, const QVariant &prevValue,
                                                QUndoCommand *parent)
     : QUndoCommand(parent)
@@ -31,7 +30,7 @@ CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(AADLObjectIface *iface, const QSt
     , m_model(m_iface ? m_iface->objectsModel() : nullptr)
     , m_relatedConnections()
     , m_targetName(targetName)
-    , m_targetToken(meta::Props::token(m_targetName))
+    , m_targetToken(aadl::meta::Props::token(m_targetName))
     , m_oldValue(prevValue)
     , m_newValue(targetValue)
     , m_cmdRmConnection()
@@ -44,43 +43,43 @@ CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()
     qDeleteAll(m_cmdRmConnection);
 }
 
-QVector<QPointer<AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
+QVector<QPointer<aadl::AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIfaces()
 {
-    QVector<QPointer<AADLObjectIface>> ifaces;
+    QVector<QPointer<aadl::AADLObjectIface>> ifaces;
 
     if (m_iface) {
         ifaces.append(m_iface);
-        for (AADLObjectIface *clone : m_iface->clones())
+        for (auto clone : m_iface->clones())
             ifaces.append(clone);
     }
 
     return ifaces;
 }
 
-QVector<AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
+QVector<aadl::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
 {
-    QVector<AADLObjectConnection *> affected;
+    QVector<aadl::AADLObjectConnection *> affected;
 
     if (m_iface && m_model)
-        for (const AADLObjectIface *i : getRelatedIfaces())
+        for (auto i : getRelatedIfaces())
             affected += m_model->getConnectionsForIface(i->id());
 
     return affected;
 }
 
-AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const AADLObjectConnection *connection,
-                                                                AADLObjectIface *changedIface)
+aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const aadl::AADLObjectConnection *connection,
+                                                                aadl::AADLObjectIface *changedIface)
 {
     if (connection && changedIface) {
         switch (connection->connectionType()) {
-        case AADLObjectConnection::ConnectionType::RI2PI: {
+        case aadl::AADLObjectConnection::ConnectionType::RI2PI: {
             return changedIface->isRequired() ? connection->targetInterface() : changedIface;
         }
-        case AADLObjectConnection::ConnectionType::PI2RI: {
+        case aadl::AADLObjectConnection::ConnectionType::PI2RI: {
             return changedIface->isProvided() ? connection->targetInterface() : changedIface;
         }
-        case AADLObjectConnection::ConnectionType::PI2PI:
-        case AADLObjectConnection::ConnectionType::RI2RI: {
+        case aadl::AADLObjectConnection::ConnectionType::PI2PI:
+        case aadl::AADLObjectConnection::ConnectionType::RI2RI: {
             if (connection->sourceInterface() == changedIface
                 || connection->sourceInterface()->cloneOf() == changedIface) {
                 return connection->targetInterface();
@@ -114,6 +113,5 @@ void CmdIfaceDataChangeBase::prepareRemoveConnectionCommands()
     }
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

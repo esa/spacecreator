@@ -21,20 +21,19 @@
 #include "commandids.h"
 #include "commandsfactory.h"
 
-namespace taste3 {
-namespace aadl {
+namespace aadlinterface {
 namespace cmd {
 
-QVariant getCurrentProperty(const AADLObjectIfaceRequired *entity, const QString &name)
+QVariant getCurrentProperty(const aadl::AADLObjectIfaceRequired *entity, const QString &name)
 {
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
-CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(AADLObjectIfaceRequired *entity, const QString &propName,
+CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(aadl::AADLObjectIfaceRequired *entity, const QString &propName,
                                                                const QVariant &value)
     : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
-    if (m_targetToken == meta::Props::Token::InheritPI) {
+    if (m_targetToken == aadl::meta::Props::Token::InheritPI) {
         const bool lostInheritance = !m_newValue.toBool();
         if (lostInheritance) {
             m_relatedConnections = getRelatedConnections();
@@ -46,7 +45,7 @@ CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(AADLObjectIfaceRe
 void CmdRequiredIfacePropertyChange::redo()
 {
     switch (m_targetToken) {
-    case meta::Props::Token::InheritPI: {
+    case aadl::meta::Props::Token::InheritPI: {
         setInheritPI(m_newValue.toBool());
         break;
     }
@@ -59,7 +58,7 @@ void CmdRequiredIfacePropertyChange::redo()
 void CmdRequiredIfacePropertyChange::undo()
 {
     switch (m_targetToken) {
-    case meta::Props::Token::InheritPI: {
+    case aadl::meta::Props::Token::InheritPI: {
         setInheritPI(m_oldValue.toBool());
         break;
     }
@@ -102,9 +101,9 @@ void CmdRequiredIfacePropertyChange::setInheritPI(bool nowInherited)
     }
 }
 
-bool CmdRequiredIfacePropertyChange::connectionMustDie(const AADLObjectConnection *connection) const
+bool CmdRequiredIfacePropertyChange::connectionMustDie(const aadl::AADLObjectConnection *connection) const
 {
-    const AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
+    const aadl::AADLObjectIface *otherIface = getConnectionOtherSide(connection, m_iface);
     if (!otherIface) {
         Q_UNREACHABLE();
         return true;
@@ -114,20 +113,19 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const AADLObjectConnectio
     if (!sameParams)
         return true;
 
-    const AADLObjectIface::OperationKind newKind =
-            m_iface->kindFromString(m_iface->originalAttr(meta::Props::token(meta::Props::Token::kind)).toString());
-    if (AADLObjectIface::OperationKind::Cyclic == newKind) {
+    const aadl::AADLObjectIface::OperationKind newKind =
+            m_iface->kindFromString(m_iface->originalAttr(aadl::meta::Props::token(aadl::meta::Props::Token::kind)).toString());
+    if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;
     }
 
-    if (AADLObjectIface::OperationKind::Any != newKind && AADLObjectIface::OperationKind::Any != otherIface->kind()) {
+    if (aadl::AADLObjectIface::OperationKind::Any != newKind && aadl::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 
     return false;
 }
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

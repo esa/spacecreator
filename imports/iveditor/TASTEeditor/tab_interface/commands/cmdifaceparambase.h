@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobjectiface.h"
 
 #include <QPointer>
 #include <QUndoCommand>
 
-namespace taste3 {
 namespace aadl {
-
 class AADLObjectIface;
 class AADLObjectConnection;
+}
 
+namespace aadlinterface {
 namespace cmd {
 
 class CmdIfaceParamBase : public QUndoCommand
@@ -41,12 +41,12 @@ public:
 
 protected:
     // NOT to be instantiated directly!
-    explicit CmdIfaceParamBase(AADLObjectIface *iface);
+    explicit CmdIfaceParamBase(aadl::AADLObjectIface *iface);
     int id() const override = 0;
 
 protected:
-    QPointer<AADLObjectIface> m_iface;
-    QVector<AADLObjectConnection *> m_connections;
+    QPointer<aadl::AADLObjectIface> m_iface;
+    QVector<aadl::AADLObjectConnection *> m_connections;
     QVector<QUndoCommand *> m_cmdRmConnections;
 
 private:
@@ -54,6 +54,5 @@ private:
     void prepareRmCommands();
 };
 
-} // namespace cmd
-} // namespace aadl
-} // namespace taste3
+}
+}

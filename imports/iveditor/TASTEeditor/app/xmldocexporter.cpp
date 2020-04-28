@@ -17,14 +17,14 @@
 
 #include "xmldocexporter.h"
 
-#include "app/common.h"
+#include "common.h"
 #include "document/abstracttabdocument.h"
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectcomment.h"
-#include "tab_aadl/aadlobjectconnection.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobject.h"
+#include "aadlobjectcomment.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectiface.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "templating/exportableaadlobject.h"
 #include "templating/stringtemplate.h"
@@ -71,7 +71,7 @@ void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPol
         const QString fileFrom(sourceFile.arg(fileName, TemplateFileExtension));
         const QString fileTo(QString("%1/%2.%3").arg(targetFilePath, fileName, TemplateFileExtension));
         if (forcedOverwrite || !QFileInfo::exists(fileTo))
-            common::copyResourceFile(fileFrom, fileTo);
+            utils::copyResourceFile(fileFrom, fileTo);
     };
 
     for (int i = 0; i < fileNames.size(); ++i) {
