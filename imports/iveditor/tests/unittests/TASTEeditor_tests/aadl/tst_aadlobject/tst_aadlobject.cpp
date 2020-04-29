@@ -15,13 +15,13 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "tab_aadl/aadlobject.h"
+#include "aadlobject.h"
 
 #include <QSignalSpy>
 #include <QTest>
 #include <QVariant>
 
-class AADLObjectImp : public taste3::aadl::AADLObject
+class AADLObjectImp : public aadl::AADLObject
 {
     Q_OBJECT
 public:
@@ -39,13 +39,10 @@ private slots:
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();
-
-private:
-    static const QString TestObjectTitleValid, TestObjectTitleInvalid;
 };
 
-const QString tst_AADLObject::TestObjectTitleValid = { "Test_Object_Title" };
-const QString tst_AADLObject::TestObjectTitleInvalid = { "Test Object Title" };
+static const char* TestObjectTitleValid = "Test_Object_Title";
+static const char* TestObjectTitleInvalid = "Test Object Title";
 
 void tst_AADLObject::test_defaultConstructor()
 {
@@ -76,11 +73,10 @@ void tst_AADLObject::test_paramConstructor()
 void tst_AADLObject::test_setTitle()
 {
     QSKIP("hangs or fails");
-    using namespace taste3::aadl;
 
     auto checkNaming = [](const QString &name) {
         AADLObjectImp obj;
-        QSignalSpy spy(&obj, &AADLObject::titleChanged);
+        QSignalSpy spy(&obj, &aadl::AADLObject::titleChanged);
 
         QVERIFY(obj.title() != name);
         obj.setTitle(name);

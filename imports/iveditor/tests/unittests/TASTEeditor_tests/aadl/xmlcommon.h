@@ -28,11 +28,10 @@ struct XmlFileMock {
     const QString m_xmlContent;
     int m_expectedErrorCount { 0 };
     bool m_canBeParsed { true };
-    QMap<taste3::aadl::AADLObject::Type, int> m_objectCountByType;
+    QMap<aadl::AADLObject::Type, int> m_objectCountByType;
 
-    int expectedObjectCount(
-            taste3::aadl::AADLObject::Type t = taste3::aadl::AADLObject::Type::Unknown) const;
-    void setExpectedObjectCount(taste3::aadl::AADLObject::Type t, int count);
+    int expectedObjectCount(aadl::AADLObject::Type t = aadl::AADLObject::Type::Unknown) const;
+    void setExpectedObjectCount(aadl::AADLObject::Type t, int count);
 
     static XmlFileMock createEmptyFile();
     static XmlFileMock createEmptyDoc();
@@ -56,8 +55,6 @@ private:
 public:
     static XmlHelper *instance();
 
-    // These handlers can not be static because of the
-    // internally used meta::Props::token which is also static
     const XmlFileMock EmptyFile;
     const XmlFileMock EmptyDoc;
     const XmlFileMock SingleFunction;
