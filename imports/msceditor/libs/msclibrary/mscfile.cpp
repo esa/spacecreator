@@ -23,9 +23,9 @@
 #include "mscerrorlistener.h"
 #include "mscmodel.h"
 #include "mscparservisitor.h"
-#include "parser/MscBaseVisitor.h"
-#include "parser/MscLexer.h"
-#include "parser/MscParser.h"
+#include "MscBaseVisitor.h"
+#include "MscLexer.h"
+#include "MscParser.h"
 
 #include <QFileInfo>
 #include <QObject>

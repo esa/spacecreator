@@ -998,7 +998,7 @@ QString MscParserVisitor::dropCommentBraces(const QString &srcLine)
     return line;
 }
 
-QStringList MscParserVisitor::readComments(const QVector<antlr4::Token *> &tokens) const
+QStringList MscParserVisitor::readComments(const std::vector<antlr4::Token *> &tokens) const
 {
     QStringList lines;
     for (const antlr4::Token *const token : tokens)
@@ -1011,8 +1011,7 @@ void MscParserVisitor::storePrecedingCif(antlr4::ParserRuleContext *ctx)
     if (!ctx)
         return;
 
-    const auto &precedingTokens =
-            QVector<antlr4::Token *>::fromStdVector(getHiddenCommentTokensToLeft(ctx->start->getTokenIndex()));
+    const auto &precedingTokens = getHiddenCommentTokensToLeft(static_cast<int>(ctx->start->getTokenIndex()));
     if (precedingTokens.empty())
         return;
 

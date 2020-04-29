@@ -126,12 +126,11 @@ private:
     // EventsDelayMs - In my local environment 20ms is enough, but I'm not sure
     // about CI, so here is some extra time span.
     // The difference in total test duration (20ms per event vs 100ms) is about 3s.
-    static constexpr QPoint MoveDistance = { 10, 10 };
-
-    static constexpr bool IsLocalBuild = false; // show the view and process events after each action to see the result
 };
 
-constexpr QPoint tst_InteractiveObject::MoveDistance;
+static const QPoint MoveDistance = { 10, 10 };
+
+static const bool IsLocalBuild = false; // show the view and process events after each action to see the result
 
 void tst_InteractiveObject::initTestCase()
 {

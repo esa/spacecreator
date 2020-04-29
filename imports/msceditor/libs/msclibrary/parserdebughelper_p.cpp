@@ -17,7 +17,7 @@
 
 #include "parserdebughelper_p.h"
 
-#include "parser/MscParser.h"
+#include "MscParser.h"
 
 #include <QDebug>
 

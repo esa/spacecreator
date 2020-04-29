@@ -136,7 +136,7 @@ void tst_ArrowItem::testBoundingRect()
 
 void tst_ArrowItem::testUpdateStart()
 {
-    static constexpr QPointF shift(10, 10);
+    const QPointF shift(10, 10);
     const QRectF &rect1(instanceRect(m_item1));
     const QRectF &rect2(instanceRect(m_item2));
 
@@ -153,7 +153,7 @@ void tst_ArrowItem::testUpdateStart()
 
 void tst_ArrowItem::testUpdateEnd()
 {
-    static constexpr QPointF shift(10, 10);
+    const QPointF shift(10, 10);
     const QRectF &rect1(instanceRect(m_item1));
     const QRectF &rect2(instanceRect(m_item2));
 

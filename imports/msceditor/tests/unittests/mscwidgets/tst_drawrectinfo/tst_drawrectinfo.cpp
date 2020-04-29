@@ -32,19 +32,12 @@ private Q_SLOTS:
     void testBorderWidth();
     void testBorderColor();
     void testBodyColor();
-
-private:
-    static constexpr qreal w1 = 1.;
-    static constexpr qreal w10 = 10.;
-    static constexpr QSizeF sz100 = { 100., 100. };
-    static constexpr QSizeF sz200 = { 200., 200. };
 };
 
-// make cpp11 happy for ODR-use:
-constexpr qreal tst_DrawRectInfo::w1;
-constexpr qreal tst_DrawRectInfo::w10;
-constexpr QSizeF tst_DrawRectInfo::sz100;
-constexpr QSizeF tst_DrawRectInfo::sz200;
+static const qreal w1 = 1.;
+static const qreal w10 = 10.;
+static const QSizeF sz100 = { 100., 100. };
+static const QSizeF sz200 = { 200., 200. };
 
 void tst_DrawRectInfo::testCtorDefault()
 {
