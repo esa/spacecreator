@@ -24,13 +24,10 @@ find_package(Java COMPONENTS Runtime REQUIRED)
 cmake_policy(SET CMP0071 OLD) # This makes AUTO_MOC skip the generated files
 add_custom_command(
     OUTPUT ${ANTLR_SRC}
-    COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR_JAR_LOCATION}" -Dlanguage=Cpp -no-listener -visitor ${PARSER_FILE}
+    COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR_JAR_LOCATION}" -Dlanguage=Cpp -no-listener -visitor ${PARSER_FILE} -o "${CMAKE_CURRENT_BINARY_DIR}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     DEPENDS ${PARSER_FILE}
 )
-
-# This is necessary to make Qt Creator happy
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${LIB_NAME} STATIC)
 
@@ -99,7 +96,8 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_include_directories(${LIB_NAME}
     PUBLIC .
-    private cif
+    PRIVATE cif
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(${LIB_NAME}
