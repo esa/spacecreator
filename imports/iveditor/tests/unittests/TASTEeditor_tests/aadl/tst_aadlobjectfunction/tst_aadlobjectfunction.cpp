@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectiface.h"
+#include "aadlobject.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 
 #include <QtTest>
 #include <testutils.h>
@@ -36,31 +36,29 @@ private slots:
 void tst_AADLObjectFunction::testAadlType()
 {
     QSKIP("hangs or fails");
-    using namespace taste3::aadl;
-    AADLObjectFunction obj;
+    aadl::AADLObjectFunction obj;
 
-    QCOMPARE(obj.aadlType(), AADLObject::Type::Function);
+    QCOMPARE(obj.aadlType(), aadl::AADLObject::Type::Function);
 }
 
 void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 {
     QSKIP("hangs or fails");
-    using namespace taste3::aadl;
-    AADLObjectFunction obj;
+    aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    static constexpr AADLObjectIface::IfaceType ifaceType = AADLObjectIface::IfaceType::Required;
-    static constexpr int ifacesCount { 10 };
+    auto ifaceType = aadl::AADLObjectIface::IfaceType::Required;
+    const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        AADLObjectIface *ri = TASTEtest::createIface(&obj, ifaceType);
+        auto ri = TASTEtest::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
     }
 
     for (int i = 0; i < ifacesCount; ++i) {
-        AADLObjectIface *ri = obj.ris().first();
+        auto ri = obj.ris().first();
         const bool ok = obj.removeChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), ifacesCount - i - 1);
@@ -71,15 +69,14 @@ void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 {
     QSKIP("hangs or fails");
-    using namespace taste3::aadl;
-    AADLObjectFunction obj;
+    aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    static constexpr AADLObjectIface::IfaceType ifaceType = AADLObjectIface::IfaceType::Provided;
-    static constexpr int ifacesCount { 10 };
+    auto ifaceType = aadl::AADLObjectIface::IfaceType::Provided;
+    const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        AADLObjectIface *pi = TASTEtest::createIface(&obj, ifaceType);
+        auto pi = TASTEtest::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
@@ -88,7 +85,7 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
     QCOMPARE(obj.pis().size(), ifacesCount);
 
     for (int i = 0; i < ifacesCount; ++i) {
-        AADLObjectIface *pi = obj.pis().first();
+        auto pi = obj.pis().first();
         const bool ok = obj.removeChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), ifacesCount - i - 1);
@@ -101,16 +98,15 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 void tst_AADLObjectFunction::testCommonInterfacesManagement() const
 {
     QSKIP("hangs or fails");
-    using namespace taste3::aadl;
-    AADLObjectFunction obj;
+    aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
 
-    static constexpr int ifacesCountHalf { 5 };
-    static constexpr AADLObjectIface::IfaceType itProvided = AADLObjectIface::IfaceType::Provided;
-    static constexpr AADLObjectIface::IfaceType itRequired = AADLObjectIface::IfaceType::Required;
+    const int ifacesCountHalf = 5;
+    auto itProvided = aadl::AADLObjectIface::IfaceType::Provided;
+    auto itRequired = aadl::AADLObjectIface::IfaceType::Required;
 
-    QVector<AADLObjectIface *> ifaces;
+    QVector<aadl::AADLObjectIface *> ifaces;
     for (int i = 0; i < ifacesCountHalf; ++i) {
         ifaces << TASTEtest::createIface(&obj, itProvided) << TASTEtest::createIface(&obj, itRequired);
     }
@@ -126,7 +122,7 @@ void tst_AADLObjectFunction::testCommonInterfacesManagement() const
     QCOMPARE(obj.pis().size(), ifacesCountHalf);
 
     while (ifaces.size()) {
-        if (AADLObjectIface *iface = ifaces.takeLast()) {
+        if (aadl::AADLObjectIface *iface = ifaces.takeLast()) {
             const int prevCount = iface->isProvided() ? obj.pis().size() : obj.ris().size();
             const bool ok = obj.removeChild(iface);
             QVERIFY(ok);

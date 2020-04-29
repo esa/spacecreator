@@ -14,23 +14,20 @@
   You should have received a copy of the GNU Library General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
-#include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlxmlreader.h"
+#include "aadlobject.h"
+#include "aadlxmlreader.h"
 #include "xmlcommon.h"
 
 #include <QBuffer>
 #include <QSignalSpy>
 #include <QtTest>
 
-// add necessary includes here
-
-using namespace taste3::aadl;
-
 class XMLReader : public QObject
 {
     Q_OBJECT
 
     void runReader(const XmlFileMock &xml);
+
 private slots:
     void test_emptyInterfaceViewDoc();
     void test_singleItems();
@@ -44,14 +41,14 @@ void XMLReader::runReader(const XmlFileMock &xml)
     QBuffer buffer(&result);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    AADLXMLReader reader;
-    connect(&reader, &AADLXMLReader::objectsParsed, this, [&xml](const QVector<AADLObject *> &objectsList) {
+    aadl::AADLXMLReader reader;
+    connect(&reader, &aadl::AADLXMLReader::objectsParsed, this, [&xml](const QVector<aadl::AADLObject *> &objectsList) {
         QCOMPARE(objectsList.size(), xml.expectedObjectCount());
     });
-    connect(&reader, &AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
+    connect(&reader, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
-    QSignalSpy spyObjectsParsed(&reader, &AADLXMLReader::objectsParsed);
-    QSignalSpy spyError(&reader, &AADLXMLReader::error);
+    QSignalSpy spyObjectsParsed(&reader, &aadl::AADLXMLReader::objectsParsed);
+    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
 
     const bool ok = reader.read(&buffer);
     QCOMPARE(ok, xml.m_canBeParsed);
@@ -63,7 +60,7 @@ void XMLReader::runReader(const XmlFileMock &xml)
 
     if (spyObjectsParsed.count()) {
         const QList<QVariant> &objectsList = spyObjectsParsed.takeFirst();
-        const QVector<AADLObject *> &aadlObjects = objectsList.first().value<QVector<AADLObject *>>();
+        const QVector<aadl::AADLObject *> &aadlObjects = objectsList.first().value<QVector<aadl::AADLObject *>>();
         QCOMPARE(aadlObjects.size(), xml.expectedObjectCount());
     }
 
