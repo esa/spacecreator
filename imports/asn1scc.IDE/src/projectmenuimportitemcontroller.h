@@ -43,7 +43,7 @@ class ProjectMenuImportItemController : public QObject
 public:
     ProjectMenuImportItemController(QAction *menuItem, QObject *parent = nullptr);
 
-private slots:
+private Q_SLOTS:
     void onAboutToShowContextMenu(ProjectExplorer::Project *project, ProjectExplorer::Node *node);
 
 private:

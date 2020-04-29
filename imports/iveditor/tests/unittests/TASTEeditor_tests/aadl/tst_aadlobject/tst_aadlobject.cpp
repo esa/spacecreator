@@ -35,7 +35,7 @@ class tst_AADLObject : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void test_defaultConstructor();
     void test_paramConstructor();
     void test_setTitle();

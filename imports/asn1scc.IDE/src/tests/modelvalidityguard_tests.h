@@ -40,7 +40,7 @@ public:
     explicit ModelValidityGuardTests(QObject *parent = 0);
     ~ModelValidityGuardTests();
 
-private slots:
+private Q_SLOTS:
     void test_noModifiers();
     void test_singleModifiers();
     void test_multipleModifiers();

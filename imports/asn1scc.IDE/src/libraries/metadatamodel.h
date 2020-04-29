@@ -53,7 +53,7 @@ public:
     const Metadata::LibraryNode *dataNode(const QModelIndex &index) const;
     const QHash<QPersistentModelIndex, Qt::CheckState> &selectedItems() const;
 
-signals:
+Q_SIGNALS:
     void conflictOccurred(const QString &first, const QString &second) const;
 
 private:

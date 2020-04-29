@@ -42,7 +42,7 @@ class ProjectWatcher : public QObject
 public:
     ProjectWatcher();
 
-private slots:
+private Q_SLOTS:
     void onProjectAdded(ProjectExplorer::Project *project);
     void onProjectRemoved(ProjectExplorer::Project *project);
     void onProjectFileListChanged();

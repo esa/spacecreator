@@ -45,7 +45,7 @@ class ToolsMenuImportItemController : public QObject
 public:
     ToolsMenuImportItemController(Utils::ParameterAction *menuItem, QObject *parent = nullptr);
 
-private slots:
+private Q_SLOTS:
     void onActiveProjectChanged(ProjectExplorer::Project *project);
     void onProjectLoadingFinished();
 

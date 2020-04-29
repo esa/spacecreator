@@ -26,7 +26,7 @@ class tst_AADLObjectFunction : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testAadlType();
     void testRequiredInterfacesManagement() const;
     void testProvidedInterfacesManagement() const;

@@ -38,7 +38,7 @@ public:
     explicit ComboModelTests(QObject *parent = 0);
     ~ComboModelTests();
 
-private slots:
+private Q_SLOTS:
     void test_emptyModel();
     void test_modelWithDummyPopulation();
 };

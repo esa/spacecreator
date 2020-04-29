@@ -40,7 +40,7 @@ class GeneralMetadataParserTests : public QObject
 public:
     explicit GeneralMetadataParserTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_empty();
     void test_partiallyFilled();
     void test_complete();

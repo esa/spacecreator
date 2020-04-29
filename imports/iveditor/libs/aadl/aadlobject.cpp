@@ -154,7 +154,7 @@ void AADLObject::setCoordinates(const QVector<qint32> &coordinates)
     }
 
     setProp(meta::Props::token(token), coordinatesToString(coordinates));
-    emit coordinatesChanged(coordinates);
+    Q_EMIT coordinatesChanged(coordinates);
 }
 
 AADLObject *AADLObject::parentObject() const
@@ -259,21 +259,21 @@ void AADLObject::setAttr(const QString &name, const QVariant &val)
                 usedName = AADLNameValidator::encodeName(this->aadlType(), usedName);
 
             d->m_attrs[name] = usedName;
-            emit titleChanged(usedName);
+            Q_EMIT titleChanged(usedName);
             break;
         }
         default:
             d->m_attrs[name] = val;
             break;
         }
-        emit attributeChanged(meta::Props::token(name));
+        Q_EMIT attributeChanged(meta::Props::token(name));
     }
 }
 
 void AADLObject::removeAttr(const QString &name)
 {
     if (!name.isEmpty() && d->m_attrs.remove(name))
-        emit attributeChanged(meta::Props::token(name));
+        Q_EMIT attributeChanged(meta::Props::token(name));
 }
 
 QHash<QString, QVariant> AADLObject::props() const
@@ -300,14 +300,14 @@ void AADLObject::setProp(const QString &name, const QVariant &val)
 {
     if (!name.isEmpty() && val != d->m_props[name]) {
         d->m_props[name] = val;
-        emit propertyChanged(meta::Props::token(name));
+        Q_EMIT propertyChanged(meta::Props::token(name));
     }
 }
 
 void AADLObject::removeProp(const QString &name)
 {
     if (!name.isEmpty() && d->m_props.remove(name))
-        emit propertyChanged(meta::Props::token(name));
+        Q_EMIT propertyChanged(meta::Props::token(name));
 }
 
 void AADLObject::setObjectsModel(AADLObjectsModel *model)

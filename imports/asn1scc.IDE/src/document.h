@@ -42,10 +42,10 @@ class Document : public TextEditor::TextDocument
 public:
     explicit Document();
 
-signals:
+Q_SIGNALS:
     void extraSelectionsUpdated(const QList<QTextEdit::ExtraSelection> &selections) const;
 
-private slots:
+private Q_SLOTS:
     void onModelChanged();
     void onFileContentChanged();
     void onFilePathChanged(const Utils::FileName &oldPath, const Utils::FileName &newPath);

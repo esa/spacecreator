@@ -222,13 +222,13 @@ void InteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void InteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     onManualMoveFinish(nullptr, event->buttonDownScenePos(event->button()), event->scenePos());
-    emit clicked();
+    Q_EMIT clicked();
     QGraphicsObject::mouseReleaseEvent(event);
 }
 
 void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit doubleClicked();
+    Q_EMIT doubleClicked();
     QGraphicsObject::mouseDoubleClickEvent(event);
 }
 

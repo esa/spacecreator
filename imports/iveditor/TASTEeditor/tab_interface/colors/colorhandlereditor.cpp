@@ -63,7 +63,7 @@ void ColorHandlerEditor::on_sbWidth_valueChanged(qreal v)
 {
     if (m_colorHandler) {
         m_colorHandler->setPenWidth(v);
-        emit colorHandlerValueChanged();
+        Q_EMIT colorHandlerValueChanged();
     }
 }
 
@@ -71,7 +71,7 @@ void ColorHandlerEditor::on_btnColorStroke_colorChanged(const QColor &c)
 {
     if (m_colorHandler) {
         m_colorHandler->setPenColor(c);
-        emit colorHandlerValueChanged();
+        Q_EMIT colorHandlerValueChanged();
     }
 }
 
@@ -85,7 +85,7 @@ void ColorHandlerEditor::on_cbFillType_currentIndexChanged(int id)
 
     if (m_colorHandler) {
         m_colorHandler->setFillType(ft);
-        emit colorHandlerValueChanged();
+        Q_EMIT colorHandlerValueChanged();
     }
 }
 
@@ -93,7 +93,7 @@ void ColorHandlerEditor::on_btnColor_colorChanged(const QColor &c)
 {
     if (m_colorHandler) {
         m_colorHandler->setBrushColor0(c);
-        emit colorHandlerValueChanged();
+        Q_EMIT colorHandlerValueChanged();
     }
 }
 
@@ -101,7 +101,7 @@ void ColorHandlerEditor::on_btnColorStop_colorChanged(const QColor &c)
 {
     if (m_colorHandler) {
         m_colorHandler->setBrushColor1(c);
-        emit colorHandlerValueChanged();
+        Q_EMIT colorHandlerValueChanged();
     }
 }
 

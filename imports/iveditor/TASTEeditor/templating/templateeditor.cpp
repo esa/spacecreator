@@ -156,7 +156,7 @@ bool TemplateEditor::saveResultToFile(const QString &fileName)
         qWarning() << "Can't open file for writing:" << fileName << outputFile.errorString();
     }
 
-    emit fileSaved(fileName, saved);
+    Q_EMIT fileSaved(fileName, saved);
     return saved;
 }
 

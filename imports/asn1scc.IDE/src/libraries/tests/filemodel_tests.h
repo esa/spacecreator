@@ -37,7 +37,7 @@ class FileModelTests : public QObject
 public:
     explicit FileModelTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_emptyModel();
     void test_modelWithDummyPopulation();
 };

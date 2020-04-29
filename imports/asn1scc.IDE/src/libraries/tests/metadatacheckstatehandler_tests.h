@@ -37,7 +37,7 @@ class MetadataCheckStateHandlerTests : public QObject
 public:
     explicit MetadataCheckStateHandlerTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_singleElementChecked();
     void test_allParentChildrenChecked();
 

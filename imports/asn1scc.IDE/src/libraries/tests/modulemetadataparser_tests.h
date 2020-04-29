@@ -41,7 +41,7 @@ class ModuleMetadataParserTests : public QObject
 public:
     explicit ModuleMetadataParserTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_emptyFile();
     void test_malformedJson();
     void test_wrongJsonType();

@@ -42,7 +42,7 @@ class LinkCreatorTests : public QObject
 public:
     explicit LinkCreatorTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_createLinksInEmptyDocument();
     void test_createLinksFromEmptyStorage();
 

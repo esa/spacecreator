@@ -40,7 +40,7 @@ class ExpansionStateRestorer : public QObject
 public:
     ExpansionStateRestorer(QTreeView *view, const Model *model, QObject *parent = nullptr);
 
-private slots:
+private Q_SLOTS:
     void onModelAboutToBeReset();
     void onModelResetFinished();
 

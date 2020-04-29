@@ -38,7 +38,7 @@ public:
     explicit OutlineModelTests(QObject *parent = 0);
     ~OutlineModelTests();
 
-private slots:
+private Q_SLOTS:
     void test_emptyModel();
     void test_modelWithDummyPopulation();
 };

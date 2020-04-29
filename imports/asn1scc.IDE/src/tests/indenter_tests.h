@@ -39,7 +39,7 @@ class IndenterTests : public QObject
 public:
     explicit IndenterTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
 

@@ -43,7 +43,7 @@ public:
     explicit SelectionPositionResolverTests(QObject *parent = 0);
     ~SelectionPositionResolverTests() = default;
 
-private slots:
+private Q_SLOTS:
     void test_emptyDocument();
     void test_singleWord();
     void test_singleWordOnlyHyphens();

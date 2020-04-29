@@ -48,7 +48,7 @@ public:
                               QObject *parent = nullptr);
     ~RelationsLabelsController();
 
-public slots:
+public Q_SLOTS:
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:

@@ -46,7 +46,7 @@ public:
 
     void changeCheckState(const QModelIndex &index, const QVariant &value);
 
-private slots:
+private Q_SLOTS:
     void onDirectoryLoaded(const QString &path);
 
 private:

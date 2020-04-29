@@ -63,7 +63,7 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty) const;
 
-public slots:
+public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
 
 protected Q_SLOTS:

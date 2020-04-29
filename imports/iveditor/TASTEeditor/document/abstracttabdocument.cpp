@@ -131,7 +131,7 @@ bool AbstractTabDocument::load(const QString &path)
         d->m_filePath = path;
         d->m_commandsStack->clear();
         resetDirtyness();
-        emit dirtyChanged(false);
+        Q_EMIT dirtyChanged(false);
     }
 
     return loaded;
@@ -154,7 +154,7 @@ void AbstractTabDocument::close()
     closeImpl();
     d->m_filePath.clear();
     resetDirtyness();
-    emit dirtyChanged(false);
+    Q_EMIT dirtyChanged(false);
 }
 
 QString AbstractTabDocument::path() const
@@ -184,7 +184,7 @@ void AbstractTabDocument::updateDirtyness()
     d->m_dirty = d->m_lastSavedIndex != d->m_commandsStack->index();
 
     if (wasDirty != isDirty()) {
-        emit dirtyChanged(isDirty());
+        Q_EMIT dirtyChanged(isDirty());
     }
 }
 
@@ -206,7 +206,7 @@ void AbstractTabDocument::onSavedExternally(const QString &filePath, bool saved)
         d->m_filePath = filePath;
 
         if (forceTitleUpdate)
-            emit dirtyChanged(false);
+            Q_EMIT dirtyChanged(false);
         else
             resetDirtyness();
     }

@@ -42,7 +42,7 @@ class OutlineCombo : public Utils::TreeViewComboBox
 public:
     OutlineCombo(const Utils::FileName &filePath, TextEditor::TextEditorWidget *textEditor);
 
-private slots:
+private Q_SLOTS:
     void modelRootChanged();
     void updateSelection(const QModelIndexList &selected, const QModelIndex &current);
 

@@ -28,7 +28,7 @@ class XMLReader : public QObject
 
     void runReader(const XmlFileMock &xml);
 
-private slots:
+private Q_SLOTS:
     void test_emptyInterfaceViewDoc();
     void test_singleItems();
     void test_allItems();

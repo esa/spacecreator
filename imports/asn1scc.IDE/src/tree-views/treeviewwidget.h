@@ -57,7 +57,7 @@ public:
     QList<QAction *> filterMenuActions() const override;
     void setCursorSynchronization(bool syncWithCursor) override;
 
-public slots:
+public Q_SLOTS:
     void updateSelection(const QModelIndexList &selected, const QModelIndex &current);
 
 protected:

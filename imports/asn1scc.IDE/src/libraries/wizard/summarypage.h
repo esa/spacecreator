@@ -50,7 +50,7 @@ public:
                          QWidget *parent = nullptr);
     void initializePage() override;
 
-private slots:
+private Q_SLOTS:
     void onVcsCheckboxStateChanged(int state);
     void onVcsComboIndexChanged(int index);
     void onVcsListChanged();

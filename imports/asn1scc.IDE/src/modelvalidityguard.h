@@ -46,7 +46,7 @@ public:
 
     bool isValid() const;
 
-signals:
+Q_SIGNALS:
     void modelAboutToChange() const;
     void modelChanged() const;
 

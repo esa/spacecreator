@@ -58,7 +58,7 @@ public:
     void initializePage() override;
     bool validatePage() override;
 
-private slots:
+private Q_SLOTS:
     void onComboTextChanged(const QString &text);
 
     void onLibrariesInvalidated();

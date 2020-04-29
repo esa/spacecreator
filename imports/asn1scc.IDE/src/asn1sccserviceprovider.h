@@ -61,7 +61,7 @@ public:
         start();
     }
 
-private slots:
+private Q_SLOTS:
     void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void stayAliveTimeout();
     void settingsChanged();

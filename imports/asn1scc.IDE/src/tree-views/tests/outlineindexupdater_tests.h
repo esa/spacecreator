@@ -43,7 +43,7 @@ public:
     explicit OutlineIndexUpdaterTests(QObject *parent = 0);
     ~OutlineIndexUpdaterTests();
 
-private slots:
+private Q_SLOTS:
     void test_setEmptyEditor();
     void test_setNonEmpytEditorChangedPosition();
 

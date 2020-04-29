@@ -38,7 +38,7 @@ public:
     explicit TypesTreeModelTests(QObject *parent = 0);
     ~TypesTreeModelTests();
 
-private slots:
+private Q_SLOTS:
     void test_emptyModel();
     void test_modelWithDummyPopulation();
 };

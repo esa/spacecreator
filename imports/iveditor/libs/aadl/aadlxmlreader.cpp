@@ -146,7 +146,7 @@ bool AADLXMLReader::readFile(const QString &file)
 
     const QString &errMsg = QString("Can't open file %1: %2").arg(file, in.errorString());
     qWarning() << errMsg;
-    emit error(errMsg);
+    Q_EMIT error(errMsg);
 
     return false;
 }
@@ -155,7 +155,7 @@ bool AADLXMLReader::read(QIODevice *openForRead)
 {
     if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
         if (readXml(openForRead)) {
-            emit objectsParsed(d->m_allObjects);
+            Q_EMIT objectsParsed(d->m_allObjects);
             return true;
         }
     }
@@ -182,7 +182,7 @@ bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
     while (!xml.atEnd()) {
         if (xml.hasError()) {
             qWarning() << xml.errorString();
-            emit error(xml.errorString());
+            Q_EMIT error(xml.errorString());
             return false;
         }
 
@@ -200,7 +200,7 @@ bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
 
     if (xml.hasError()) {
         qWarning() << xml.errorString();
-        emit error(xml.errorString());
+        Q_EMIT error(xml.errorString());
         return false;
     }
 

@@ -51,7 +51,7 @@ public:
 
     virtual State state() = 0;
 
-signals:
+Q_SIGNALS:
     void processingFinished(const QString &projectName) const;
 };
 

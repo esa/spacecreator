@@ -58,7 +58,7 @@ public:
     void handleFileListChanged(const QString &projectName, const Utils::FileNameList &fileList);
     void handleFileContentChanged(const Utils::FileName &path);
 
-private slots:
+private Q_SLOTS:
     void onFilesProcessingFinished(const QString &projectName);
 
 private:

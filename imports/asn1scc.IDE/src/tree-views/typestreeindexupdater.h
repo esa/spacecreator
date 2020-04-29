@@ -36,7 +36,7 @@ class TypesTreeIndexUpdater : public SynchronizedIndexUpdater
 public:
     explicit TypesTreeIndexUpdater(const Model *model, QObject *parent);
 
-private slots:
+private Q_SLOTS:
     void onEditorChanged(Core::IEditor *editor);
     void onEditorAboutToClose(Core::IEditor *editor);
 

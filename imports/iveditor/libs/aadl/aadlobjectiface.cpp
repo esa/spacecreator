@@ -221,7 +221,7 @@ void AADLObjectIface::setParams(const QVector<IfaceParameter> &params)
 {
     if (d->m_params != params) {
         d->m_params = params;
-        emit paramsChanged();
+        Q_EMIT paramsChanged();
     }
 }
 
@@ -229,7 +229,7 @@ void AADLObjectIface::addParam(const IfaceParameter &param)
 {
     if (!d->m_params.contains(param)) {
         d->m_params.append(param);
-        emit paramsChanged();
+        Q_EMIT paramsChanged();
     }
 }
 
@@ -329,7 +329,7 @@ void AADLObjectIface::cloneInternals(const AADLObjectIface *from)
     }
 
     if (storedKindDiffers())
-        emit attributeChanged(meta::Props::Token::kind);
+        Q_EMIT attributeChanged(meta::Props::Token::kind);
 
     connect(from, &AADLObjectIface::attributeChanged, this, &AADLObjectIface::onReflectedAttrChanged,
             Qt::UniqueConnection);
@@ -367,7 +367,7 @@ void AADLObjectIface::restoreInternals(const AADLObjectIface *disconnectMe)
     }
 
     if (kindChanged)
-        emit attributeChanged(meta::Props::Token::kind);
+        Q_EMIT attributeChanged(meta::Props::Token::kind);
 
     m_originalFields = {};
 }
@@ -507,10 +507,10 @@ void AADLObjectIfaceRequired::setProp(const QString &name, const QVariant &val)
             const bool newVal = val.toBool();
             if (prop(meta::Props::token(meta::Props::Token::InheritPI)) != newVal) {
                 // should be handled in Connection _before_ the actual value change:
-                emit inheritedLabelsChanged(inheritedLables());
+                Q_EMIT inheritedLabelsChanged(inheritedLables());
 
                 AADLObject::setProp(name, val);
-                emit propChanged_InheritPI(newVal);
+                Q_EMIT propChanged_InheritPI(newVal);
             }
             break;
         }
@@ -629,7 +629,7 @@ void AADLObjectIfaceRequired::setPrototype(const AADLObjectIfaceProvided *pi)
     if (!m_prototypes.isEmpty())
         cloneInternals(pi);
 
-    emit inheritedLabelsChanged(inheritedLables());
+    Q_EMIT inheritedLabelsChanged(inheritedLables());
 }
 
 void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
@@ -641,7 +641,7 @@ void AADLObjectIfaceRequired::unsetPrototype(const AADLObjectIfaceProvided *pi)
     if (m_prototypes.isEmpty() || !isInheritPI())
         restoreInternals(pi);
 
-    emit inheritedLabelsChanged(inheritedLables());
+    Q_EMIT inheritedLabelsChanged(inheritedLables());
 }
 
 bool AADLObjectIfaceRequired::isInheritPI() const

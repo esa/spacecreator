@@ -49,7 +49,7 @@ public:
     void saveTo(QSettings *s) const;
     void loadFrom(QSettings *s);
 
-signals:
+Q_SIGNALS:
     void changed();
 
 protected:

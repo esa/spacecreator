@@ -18,13 +18,13 @@ class DelayedSignal : public QObject {
 public:
     explicit DelayedSignal(QObject* parent = nullptr);
 
-signals:
+Q_SIGNALS:
     void triggered(QObject* parent);
 
-public slots:
+public Q_SLOTS:
     void triggerSignal();
 
-private slots:
+private Q_SLOTS:
     void triggerNow();
 
 private:

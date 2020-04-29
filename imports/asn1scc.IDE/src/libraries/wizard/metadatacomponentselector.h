@@ -43,7 +43,7 @@ public:
 
     QStringList pathsToImport() override;
 
-private slots:
+private Q_SLOTS:
     void onConflictOccured(const QString &first, const QString &second) const;
 
 private:

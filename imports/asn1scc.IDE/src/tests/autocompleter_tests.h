@@ -40,7 +40,7 @@ public:
     explicit AutoCompleterTests(QObject *parent = 0);
     ~AutoCompleterTests();
 
-private slots:
+private Q_SLOTS:
     void test_cursorInComment();
     void test_cursorNotInComment();
 

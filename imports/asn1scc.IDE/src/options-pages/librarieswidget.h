@@ -46,7 +46,7 @@ public:
 
     QStringList manualLibPaths() const;
 
-private slots:
+private Q_SLOTS:
     void addExisitingLibraryDir();
 
 private:

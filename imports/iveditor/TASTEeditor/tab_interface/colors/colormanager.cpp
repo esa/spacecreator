@@ -237,7 +237,7 @@ bool ColorManager::setSourceFile(const QString &from)
     if (loaded) {
         m_filePath = from;
         AppOptions::Aadl.ColorSchemeFile.write(m_filePath);
-        emit colorsUpdated();
+        Q_EMIT colorsUpdated();
     }
 
     return loaded;

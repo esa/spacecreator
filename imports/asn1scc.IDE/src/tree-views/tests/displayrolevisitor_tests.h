@@ -39,7 +39,7 @@ class DisplayRoleVisitorTests : public QObject
 public:
     explicit DisplayRoleVisitorTests(QObject *parent = nullptr);
 
-private slots:
+private Q_SLOTS:
     void test_definitions();
     void test_file();
     void test_typeAssignmentBuiltIn();

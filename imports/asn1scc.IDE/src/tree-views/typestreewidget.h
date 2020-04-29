@@ -43,7 +43,7 @@ public:
 
     QToolButton *toggleSyncButton();
 
-private slots:
+private Q_SLOTS:
     void toggleCursorSynchronization();
 
 private:

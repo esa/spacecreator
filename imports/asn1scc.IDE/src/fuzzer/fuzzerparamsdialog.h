@@ -45,7 +45,7 @@ class FuzzerParamsDialog : public QDialog
 public:
     explicit FuzzerParamsDialog(FuzzerParamsProviderPtr provider, QWidget *parent = nullptr);
 
-public slots:
+public Q_SLOTS:
     int exec() override;
     void accept() override;
 

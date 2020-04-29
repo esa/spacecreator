@@ -65,7 +65,7 @@ bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 
     blockSignals(currentState);
 
-    emit rootObjectChanged(d->m_rootObjectId);
+    Q_EMIT rootObjectChanged(d->m_rootObjectId);
 
     return true;
 }
@@ -87,7 +87,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
     d->m_visibleObjects.append(obj);
-    emit aadlObjectAdded(obj);
+    Q_EMIT aadlObjectAdded(obj);
     return true;
 }
 
@@ -104,7 +104,7 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     d->m_objectsOrder.removeAll(id);
     d->m_visibleObjects.removeAll(obj);
 
-    emit aadlObjectRemoved(obj);
+    Q_EMIT aadlObjectRemoved(obj);
     return true;
 }
 
@@ -115,7 +115,7 @@ void AADLObjectsModel::setRootObject(utils::Id rootId)
 
     d->m_rootObjectId = rootId;
     d->m_visibleObjects.clear();
-    emit modelReset();
+    Q_EMIT modelReset();
 
     auto rootObj = d->m_objects.value(rootId);
     for (const auto &id : d->m_objectsOrder) {
@@ -138,7 +138,7 @@ void AADLObjectsModel::setRootObject(utils::Id rootId)
             }
         }
     }
-    emit rootObjectChanged(d->m_rootObjectId);
+    Q_EMIT rootObjectChanged(d->m_rootObjectId);
 }
 
 AADLObject *AADLObjectsModel::rootObject() const
@@ -294,7 +294,7 @@ QList<AADLObject *> AADLObjectsModel::visibleObjects() const
 
 void AADLObjectsModel::clear()
 {
-    emit modelReset();
+    Q_EMIT modelReset();
 
     for (auto object : d->m_objects.values())
         object->deleteLater();

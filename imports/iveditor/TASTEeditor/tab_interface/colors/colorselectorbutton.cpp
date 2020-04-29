@@ -42,7 +42,7 @@ void ColorSelectorButton::setColor(const QColor &color, AcceptPolicy accept)
         px.fill(m_color);
         setIcon(px);
 
-        emit colorChanged(m_color);
+        Q_EMIT colorChanged(m_color);
     }
 }
 

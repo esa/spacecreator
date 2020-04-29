@@ -17,7 +17,7 @@ void DelayedSignal::triggerSignal() {
 }
 
 void DelayedSignal::triggerNow() {
-    emit triggered(parent());
+    Q_EMIT triggered(parent());
 }
 
 }

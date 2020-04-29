@@ -39,7 +39,7 @@ class AstXmlParserTests : public QObject
 public:
     explicit AstXmlParserTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_emptyFile();
     void test_badXmlRoot();
     void test_emptyDefinitions();

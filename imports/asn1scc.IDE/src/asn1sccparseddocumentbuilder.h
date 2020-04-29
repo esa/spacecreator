@@ -56,7 +56,7 @@ public:
         return m_errorMessages;
     }
 
-private slots:
+private Q_SLOTS:
     void requestFinished();
 
 private:

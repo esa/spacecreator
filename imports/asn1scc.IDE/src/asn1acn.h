@@ -56,7 +56,7 @@ public:
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
 
-private slots:
+private Q_SLOTS:
     void raiseImportComponentWindow(ProjectExplorer::Project *project);
     void findUsages();
     void onTaskStarted(Core::Id id);

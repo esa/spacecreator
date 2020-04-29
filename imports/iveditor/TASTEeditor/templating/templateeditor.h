@@ -44,7 +44,7 @@ public:
 
     QString resultText() const;
 
-private slots:
+private Q_SLOTS:
     void onApplyTemplate();
     void onSaveTemplateAs();
     void onOpenTemplate();

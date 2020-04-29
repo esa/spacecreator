@@ -46,7 +46,7 @@ public:
     void add(const QString &id, Asn1AcnBuildStep *step);
     Asn1AcnBuildStep *get(const QString &id) const;
 
-private slots:
+private Q_SLOTS:
     void onAboutToRemoveProject(ProjectExplorer::Project *p);
 
 private:

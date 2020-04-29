@@ -195,7 +195,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
     }
 
     QStandardItemModel::setData(index, value, role);
-    emit dataChanged(index, index, { role, Qt::DisplayRole });
+    Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
     return true;
 }
 

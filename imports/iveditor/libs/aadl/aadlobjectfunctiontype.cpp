@@ -224,7 +224,7 @@ void AADLObjectFunctionType::addContextParam(const ContextParameter &param)
 {
     if (!d->m_contextParams.contains(param)) {
         d->m_contextParams.append(param);
-        emit contextParamsChanged();
+        Q_EMIT contextParamsChanged();
     }
 }
 
@@ -232,7 +232,7 @@ bool AADLObjectFunctionType::removeContextParam(const ContextParameter &param)
 {
     const bool removed = d->m_contextParams.removeOne(param);
     if (removed)
-        emit contextParamsChanged();
+        Q_EMIT contextParamsChanged();
     return removed;
 }
 
@@ -243,14 +243,14 @@ void AADLObjectFunctionType::clearContextParams()
     const int newSize = d->m_contextParams.size();
 
     if (prevSize != newSize)
-        emit contextParamsChanged();
+        Q_EMIT contextParamsChanged();
 }
 
 void AADLObjectFunctionType::setContextParams(const QVector<ContextParameter> &params)
 {
     if (d->m_contextParams != params) {
         d->m_contextParams = params;
-        emit contextParamsChanged();
+        Q_EMIT contextParamsChanged();
     }
 }
 

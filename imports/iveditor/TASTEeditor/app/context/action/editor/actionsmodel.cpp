@@ -81,7 +81,7 @@ bool ActionsModel::setData(const QModelIndex &index, const QVariant &value, int 
             const int row = index.row();
             if (row >= 0 && row < m_collection->size()) {
                 m_collection->operator[](row).m_title = value.toString();
-                emit dataChanged(index, index, QVector<int>() << role);
+                Q_EMIT dataChanged(index, index, QVector<int>() << role);
                 return true;
             }
             break;

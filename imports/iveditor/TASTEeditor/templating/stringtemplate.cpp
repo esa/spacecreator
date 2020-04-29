@@ -92,7 +92,7 @@ bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjec
     if (stringTemplate->error()) {
         // Tokenizing or parsing error, or couldn't find custom tags or filters.
         qWarning() << Q_FUNC_INFO << stringTemplate->errorString();
-        emit errorOccurred(stringTemplate->errorString());
+        Q_EMIT errorOccurred(stringTemplate->errorString());
         return false;
     }
 
@@ -100,7 +100,7 @@ bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjec
     const QString formatted = formatText(result);
     if (!out->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Can't open device for writing:" << out->errorString();
-        emit errorOccurred(out->errorString());
+        Q_EMIT errorOccurred(out->errorString());
         return false;
     }
 
@@ -141,7 +141,7 @@ QString StringTemplate::formatText(const QString &text)
                                              .arg(xmlReader.lineNumber())
                                              .arg(xmlReader.columnNumber());
         qWarning() << Q_FUNC_INFO << errorString;
-        emit errorOccurred(errorString);
+        Q_EMIT errorOccurred(errorString);
         return text;
     }
 

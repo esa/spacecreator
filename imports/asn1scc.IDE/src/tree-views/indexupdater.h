@@ -43,7 +43,7 @@ public:
     virtual ~IndexUpdater() = default;
     virtual void updateCurrentIndex() = 0;
 
-signals:
+Q_SIGNALS:
     void indexSelectionUpdated(const QModelIndexList &selected, const QModelIndex &current);
 
 protected:

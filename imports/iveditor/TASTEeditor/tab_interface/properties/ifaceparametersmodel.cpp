@@ -165,7 +165,7 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
     }
 
     QStandardItemModel::setData(index, value, role);
-    emit dataChanged(index, index, { role, Qt::DisplayRole });
+    Q_EMIT dataChanged(index, index, { role, Qt::DisplayRole });
     return true;
 }
 

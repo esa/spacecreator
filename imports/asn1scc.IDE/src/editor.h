@@ -48,7 +48,7 @@ protected:
 
     Utils::CommentDefinition m_commentDefinition;
 
-private slots:
+private Q_SLOTS:
     void onExtraSelectionsUpdated(const QList<QTextEdit::ExtraSelection> &selections);
 
 private:

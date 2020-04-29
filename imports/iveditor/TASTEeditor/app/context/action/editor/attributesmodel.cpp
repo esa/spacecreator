@@ -123,7 +123,7 @@ bool AttributesModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 
     if (changed) {
-        emit dataChanged(index, index, QVector<int>() << role);
+        Q_EMIT dataChanged(index, index, QVector<int>() << role);
         return true;
     }
 

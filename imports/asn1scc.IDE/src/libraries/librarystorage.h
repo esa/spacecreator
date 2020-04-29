@@ -59,7 +59,7 @@ public:
     Metadata::General generalMetadata(const QString &path);
     const Metadata::Library *library(const QString &path) const;
 
-signals:
+Q_SIGNALS:
     void aboutToChange();
     void changed();
 

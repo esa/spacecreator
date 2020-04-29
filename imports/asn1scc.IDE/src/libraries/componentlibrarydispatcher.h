@@ -36,7 +36,7 @@ class CompontentLibraryDispatcher : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     static void dispatch(const QStringList &directories, const QStringList &files);
 };
 

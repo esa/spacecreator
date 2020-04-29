@@ -61,7 +61,7 @@ public:
 
     State state() override;
 
-private slots:
+private Q_SLOTS:
     void onBuilderFinished();
     void onBuilderFailed();
     void onBuilderErrored();

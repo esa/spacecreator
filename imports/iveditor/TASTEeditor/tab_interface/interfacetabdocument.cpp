@@ -703,7 +703,7 @@ void InterfaceTabDocument::showInfoMessage(const QString &title, const QString &
     // MessageBoxHandler mb(title, message);
     // mb.buttons = QMessageBox::Ok;
     // mb.callback = &someCallbackToHandle(StandardButton);
-    // emit requestMessageBox(mb)
+    // Q_EMIT requestMessageBox(mb)
 
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
 }

@@ -42,7 +42,7 @@ public:
     explicit ParsedDocumentBuilderTests(QObject *parent = nullptr);
     ~ParsedDocumentBuilderTests();
 
-private slots:
+private Q_SLOTS:
     void test_failed();
     void test_error();
     void test_success();

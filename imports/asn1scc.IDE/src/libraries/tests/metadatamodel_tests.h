@@ -37,7 +37,7 @@ class MetadataModelTests : public QObject
 public:
     explicit MetadataModelTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_emptyModel();
     void test_modelWithDummyPopulation();
 };

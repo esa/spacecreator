@@ -43,7 +43,7 @@ public:
     explicit ProjectContentHandlerTests(QObject *parent = 0);
     ~ProjectContentHandlerTests();
 
-private slots:
+private Q_SLOTS:
     void test_singleProjectAddedAndRemoved();
     void test_multipleProjectsAddedAndRemoved();
     void test_projectAddedAndRemovedTwice();

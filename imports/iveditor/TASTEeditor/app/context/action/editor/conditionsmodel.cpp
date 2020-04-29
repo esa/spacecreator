@@ -82,7 +82,7 @@ bool ConditionsModel::setData(const QModelIndex &index, const QVariant &value, i
             const int row = index.row();
             if (row >= 0 && row < m_conditions->size()) {
                 m_conditions->operator[](row).m_itemType = value.toString();
-                emit dataChanged(index, index, QVector<int>() << role);
+                Q_EMIT dataChanged(index, index, QVector<int>() << role);
                 return true;
             }
             break;

@@ -254,7 +254,7 @@ bool CreatorTool::eventFilter(QObject *watched, QEvent *event)
                         scene->clearSelection();
                 } else {
                     clearPreviewItem();
-                    emit created();
+                    Q_EMIT created();
                 }
             } break;
             }
@@ -763,7 +763,7 @@ void CreatorTool::handleToolType(CreatorTool::ToolType type, const QPointF &pos)
         clearPreviewItem();
     }
 
-    emit created();
+    Q_EMIT created();
 }
 
 bool CreatorTool::handleConnectionCreate(const QPointF &pos)
@@ -867,7 +867,7 @@ QUndoCommand *CreatorTool::createInterfaceCommand(const aadl::AADLObjectIface::C
                 const QString message = tr("Can't add interface directly in <b>%1</b>.<br>"
                                            "Please edit the related <b>%2</b> instead.")
                                                 .arg(fn->title(), fnType->title());
-                emit informUser(tr("Interface adding"), message);
+                Q_EMIT informUser(tr("Interface adding"), message);
                 return nullptr;
             }
         }
@@ -938,7 +938,7 @@ void CreatorTool::removeSelectedItems()
                                    "<b>%1</b><br><br>"
                                    "Please edit the related FunctionType.")
                                         .arg(names);
-            emit informUser(tr("Interface removal"), msg);
+            Q_EMIT informUser(tr("Interface removal"), msg);
         }
     }
 }
@@ -1040,7 +1040,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPoint
     action->setEnabled(aadlObj);
 
     if (aadlObj) {
-        connect(action, &QAction::triggered, [this, aadlObj]() { emit propertyEditorRequest(aadlObj); });
+        connect(action, &QAction::triggered, [this, aadlObj]() { Q_EMIT propertyEditorRequest(aadlObj); });
         taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
     }
 }

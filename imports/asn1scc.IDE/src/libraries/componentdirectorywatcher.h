@@ -46,7 +46,7 @@ class ComponentDirectoryWatcher : public QObject
 public:
     ComponentDirectoryWatcher(Settings::LibrariesConstPtr libraries, QObject *parent = nullptr);
 
-private slots:
+private Q_SLOTS:
     void configChanged();
     void filesChanged(const QString &path);
 

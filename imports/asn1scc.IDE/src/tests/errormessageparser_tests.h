@@ -38,7 +38,7 @@ class ErrorMessageParserTests : public QObject
 public:
     explicit ErrorMessageParserTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_emptyMessage();
     void test_wrongFormatMessage();
     void test_messageWithOnlyLineNumber();

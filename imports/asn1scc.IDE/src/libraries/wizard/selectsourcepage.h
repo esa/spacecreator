@@ -51,7 +51,7 @@ public:
     bool validatePage() override;
     bool isComplete() const override;
 
-private slots:
+private Q_SLOTS:
     void refreshPaths();
     void builtInRadioToggled(bool checked);
 

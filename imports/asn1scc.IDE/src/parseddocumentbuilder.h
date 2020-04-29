@@ -49,7 +49,7 @@ public:
     virtual std::vector<std::unique_ptr<Data::File>> takeDocuments() = 0;
     virtual const std::vector<Data::ErrorMessage> &errorMessages() const = 0;
 
-signals:
+Q_SIGNALS:
     void finished();
     void errored();
     void failed();

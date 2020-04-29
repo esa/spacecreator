@@ -44,7 +44,7 @@ class DocumentProcessorTests : public QObject
 public:
     explicit DocumentProcessorTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_unstarted();
     void test_successful();
     void test_error();

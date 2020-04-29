@@ -53,11 +53,11 @@ public:
     bool needValidateXMLDocument() const;
     int autoFormattingIndent() const;
 
-public slots:
+public Q_SLOTS:
     void setNeedValidateXMLDocument(bool validate);
     void setAutoFormattingIndent(int autoFormattingIndent);
 
-signals:
+Q_SIGNALS:
     void errorOccurred(const QString &errorString);
 
 private:

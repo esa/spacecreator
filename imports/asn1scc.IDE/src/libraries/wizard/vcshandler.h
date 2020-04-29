@@ -49,10 +49,10 @@ public:
 
     void addToVcs(const QStringList &files);
 
-private slots:
+private Q_SLOTS:
     void onConfigChanged();
 
-signals:
+Q_SIGNALS:
     void vcsListChanged();
 
 private:

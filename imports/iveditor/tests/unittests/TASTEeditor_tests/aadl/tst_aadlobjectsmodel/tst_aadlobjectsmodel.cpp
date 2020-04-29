@@ -28,7 +28,7 @@ class tst_AADLObjectsModel : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testManageContainers();
     void testManageFunctions();
     void testManageIfaces();

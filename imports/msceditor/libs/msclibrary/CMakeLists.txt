@@ -108,4 +108,4 @@ target_link_libraries(${LIB_NAME}
     antlr4_static
 )
 
-target_compile_definitions(${LIB_NAME} PUBLIC QT_NO_KEYWORDS ANTLR4CPP_STATIC)
+target_compile_definitions(${LIB_NAME} PUBLIC ANTLR4CPP_STATIC)

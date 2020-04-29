@@ -40,7 +40,7 @@ class ParsedDataStorageTests : public QObject
 public:
     explicit ParsedDataStorageTests(QObject *parent = 0);
 
-private slots:
+private Q_SLOTS:
     void test_addAndRemoveProject();
     void test_addAndRemoveMultipleProjects();
 
