@@ -12,4 +12,4 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Qt5::Test
 )
 
-target_compile_definitions(${TEST_NAME} PUBLIC EXAMPLES_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../../../examples/\")
+target_compile_definitions(${TEST_NAME} PUBLIC EXAMPLES_DIR=\"${CMAKE_SOURCE_DIR}/examples/msc/\")
