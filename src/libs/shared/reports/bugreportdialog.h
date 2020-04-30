@@ -29,6 +29,7 @@ class BugreportDialog : public QDialog
 
 public:
     explicit BugreportDialog(const QString &logPath, const QList<QPixmap> &images, QWidget *parent = nullptr);
+    explicit BugreportDialog(const QList<QPixmap> &images, QWidget *parent = nullptr);
     ~BugreportDialog();
 
 private Q_SLOTS:

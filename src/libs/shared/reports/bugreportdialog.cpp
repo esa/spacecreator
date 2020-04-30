@@ -32,13 +32,39 @@ static const QString localName() { return "GroupBugReport"; }
 namespace reports {
 
 struct BugreportDialog::BugreportDialogPrivate {
-    explicit BugreportDialogPrivate(const QList<QPixmap> &images)
+    explicit BugreportDialogPrivate(BugreportDialog* dialog, const QString& logPath, const QList<QPixmap> &images)
         : reportHandler(nullptr)
         , images(images)
         , host("GroupBugReport/Host")
         , projectID("GroupBugReport/ProjectID")
         , accessToken("GroupBugReport/AccessToken")
     {
+        ui.setupUi(dialog);
+        connect(ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, dialog, &BugreportDialog::sendReport);
+        connect(ui.buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, dialog, &QDialog::close);
+        connect(ui.titleLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.hostLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.accessTokenLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+        connect(ui.projectLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
+
+        const QString settingsHost = host.read().toString();
+        ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
+
+        const QString settingsProjectID = projectID.read().toString();
+        ui.projectLineEdit->setText(settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
+
+        ui.accessTokenLineEdit->setText(accessToken.read().toByteArray());
+
+        if (!logPath.isEmpty()) {
+            QFile file(logPath);
+            if (file.open(QIODevice::ReadOnly)) {
+                ui.logTextEdit->setPlainText(file.readAll());
+                file.close();
+            }
+        } else {
+            ui.logTextEdit->hide();
+            ui.logTextEditLabel->hide();
+        }
     }
 
     Ui::BugreportDialog ui;
@@ -52,29 +78,14 @@ struct BugreportDialog::BugreportDialogPrivate {
 
 BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &images, QWidget *parent)
     : QDialog(parent)
-    , d(new BugreportDialogPrivate(images))
+    , d(new BugreportDialogPrivate(this, logPath, images))
 {
-    d->ui.setupUi(this);
-    connect(d->ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &BugreportDialog::sendReport);
-    connect(d->ui.buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &QDialog::close);
-    connect(d->ui.titleLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
-    connect(d->ui.hostLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
-    connect(d->ui.accessTokenLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
-    connect(d->ui.projectLineEdit, &QLineEdit::textChanged, this, &BugreportDialog::updateButtonBox);
+}
 
-    const QString settingsHost = d->host.read().toString();
-    d->ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
-
-    const QString settingsProjectID = d->projectID.read().toString();
-    d->ui.projectLineEdit->setText(settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
-
-    d->ui.accessTokenLineEdit->setText(d->accessToken.read().toByteArray());
-
-    QFile file(logPath);
-    if (file.open(QIODevice::ReadOnly)) {
-        d->ui.logTextEdit->setPlainText(file.readAll());
-        file.close();
-    }
+BugreportDialog::BugreportDialog(const QList<QPixmap> &images, QWidget *parent)
+    : QDialog(parent)
+    , d(new BugreportDialogPrivate(this, QString(), images))
+{
 }
 
 BugreportDialog::~BugreportDialog()

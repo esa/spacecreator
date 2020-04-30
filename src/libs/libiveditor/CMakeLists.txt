@@ -172,10 +172,6 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/propertiesviewbase.cpp
     interface/properties/propertiesviewbase.h
     interface/properties/propertiesviewbase.ui
-    logging/logcategory.cpp
-    logging/logcategory.h
-    logging/loghandler.cpp
-    logging/loghandler.h
     settings/appoptions.cpp
     settings/appoptions.h
     templating/exportableaadlconnection.cpp

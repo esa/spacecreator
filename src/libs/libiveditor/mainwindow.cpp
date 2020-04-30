@@ -25,7 +25,6 @@
 #include "baseitems/common/utils.h"
 #include "document/documentsmanager.h"
 #include "tabdocumentfactory.h"
-#include "logging/loghandler.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "aadlobjectfunctiontype.h"
@@ -415,7 +414,7 @@ void MainWindow::onReportRequested()
             }
         }
     }
-    auto dialog = new reports::BugreportDialog(LogHandler::logPath(), images, this);
+    auto dialog = new reports::BugreportDialog(images, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->exec();
 }

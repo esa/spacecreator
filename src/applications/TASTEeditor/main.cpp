@@ -17,8 +17,6 @@
 
 #include "datatypesstorage.h"
 #include "mainwindow.h"
-#include "logging/loghandler.h"
-#include "reports/bugreporthandler.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -29,7 +27,6 @@
 int main(int argc, char *argv[])
 {
     using namespace taste3;
-    LogHandler logHandler;
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
