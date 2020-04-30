@@ -27,8 +27,8 @@
 #include "aadlobjectiface.h"
 #include "tab_interface/interfacetabdocument.h"
 #include "templating/exportableaadlobject.h"
-#include "templating/stringtemplate.h"
-#include "templating/templateeditor.h"
+#include "stringtemplate.h"
+#include "templateeditor.h"
 
 #include <QDebug>
 #include <QFileDialog>

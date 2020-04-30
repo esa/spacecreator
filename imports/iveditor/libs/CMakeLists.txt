@@ -1,3 +1,4 @@
 add_subdirectory(aadl)
 add_subdirectory(shared)
+add_subdirectory(templating)
 add_subdirectory(utils)

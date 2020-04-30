@@ -192,7 +192,6 @@ target_sources(${APP_NAME} PRIVATE
     tab_interface/properties/propertiesviewbase.ui
     tab_msc/msctabdocument.cpp
     tab_msc/msctabdocument.h
-    templating/abstractexportableobject.h
     templating/exportableaadlconnection.cpp
     templating/exportableaadlconnection.h
     templating/exportableaadlfunction.cpp
@@ -201,32 +200,19 @@ target_sources(${APP_NAME} PRIVATE
     templating/exportableaadliface.h
     templating/exportableaadlobject.cpp
     templating/exportableaadlobject.h
-    templating/exportableproperty.h
-    templating/stringtemplate.cpp
-    templating/stringtemplate.h
-    templating/templateeditor.cpp
-    templating/templateeditor.h
-    templating/templatehighlighter.cpp
-    templating/templatehighlighter.h
-    templating/templatesyntaxhelpdialog.cpp
-    templating/templatesyntaxhelpdialog.h
-    templating/xmlhighlighter.cpp
-    templating/xmlhighlighter.h
     resources.qrc
     tab_interface/tab_interface_resources.qrc
-    templating/template_syntax_help.qrc
 )
-
 
 target_link_libraries(${APP_NAME} PUBLIC
     aadl
     shared
+    templating
     utils
     Qt5::Concurrent
     Qt5::Network
     Qt5::Svg
     Qt5::Widgets
-    Grantlee5::Templates
 )
 
 target_include_directories(${APP_NAME} PRIVATE

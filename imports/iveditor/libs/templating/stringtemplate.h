@@ -27,10 +27,6 @@ class FileSystemTemplateLoader;
 
 class QIODevice;
 
-namespace aadl {
-class AADLObject;
-}
-
 namespace templating {
 
 /**

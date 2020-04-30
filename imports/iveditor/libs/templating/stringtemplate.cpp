@@ -17,8 +17,6 @@
 
 #include "stringtemplate.h"
 
-#include "aadlobject.h"
-
 #include <QApplication>
 #include <QDebug>
 #include <QFileInfo>
