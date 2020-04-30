@@ -71,7 +71,6 @@ private Q_SLOTS:
     void saveAsMsc();
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
-    void showErrorView();
     bool openMscChain(const QString &dirPath);
     void activateDefaultTool();
     void onCreateMessageToolRequested();

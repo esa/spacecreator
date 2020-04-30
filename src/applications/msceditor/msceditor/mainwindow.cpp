@@ -62,6 +62,7 @@
 #include <QIcon>
 #include <QImageWriter>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QKeySequence>
 #include <QMessageBox>
 #include <QMetaEnum>
@@ -225,7 +226,6 @@ void MainWindow::selectAndOpenFile()
 
     const QString filename = QFileDialog::getOpenFileName(this, tr("MSC"), path, suffixes.join(";;"));
     if (!filename.isEmpty()) {
-        d->ui->errorTextEdit->clear();
         openFileMsc(filename);
     }
 }
@@ -237,43 +237,26 @@ void MainWindow::selectAndOpenFile()
  */
 bool MainWindow::openFileMsc(const QString &file)
 {
-    QString logRecord = tr("Opening file: %1").arg(file);
-    d->ui->errorTextEdit->appendPlainText(logRecord);
-    qDebug() << logRecord;
-
     QFileInfo fileInfo(file);
     if (!fileInfo.exists()) {
-        logRecord = tr("File not exists.");
-        d->ui->errorTextEdit->appendPlainText(logRecord);
-        return false;
+        QMessageBox::critical(this, tr("Open file problem"), tr("The file does not exist."));
     }
 
     d->m_model->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
     const bool ok = d->m_model->loadFile(file);
-    if (ok) {
-        d->ui->graphicsView->setZoom(100);
-    }
-
-    if (!d->m_model->mscErrorMessages().isEmpty())
-        showErrorView();
-
-    d->ui->errorTextEdit->appendHtml(d->m_model->mscErrorMessages().join("\n"));
-    QString loadStatus = tr("success");
-    QString statusColor = "black";
-    if (!d->m_model->mscErrorMessages().isEmpty()) {
-        loadStatus = tr("warnings");
-        statusColor = "orange";
-    }
     if (!ok) {
-        loadStatus = tr("failed");
-        statusColor = "red";
+        QMessageBox::critical(this, tr("File Error"), tr("Could not read the file. Errors:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
+        return false;
     }
-    logRecord = tr("Model loading: <b><font color=%2>%1</font></b><br>").arg(loadStatus, statusColor);
-    d->ui->errorTextEdit->appendHtml(logRecord);
-    qDebug() << logRecord;
 
-    return ok;
+    if (!d->m_model->mscErrorMessages().isEmpty()) {
+        QMessageBox::warning(this, tr("Open File Warnings"), tr("Warnings found while opening the file:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
+    }
+
+    d->ui->graphicsView->setZoom(100);
+
+    return true;
 }
 
 /*!
@@ -395,16 +378,6 @@ void MainWindow::showHierarchyView(bool show)
         d->m_deleteTool->setCurrentChart(nullptr);
 
         updateZoomBox(d->ui->hierarchyView->zoom());
-    }
-}
-
-/*!
- * \brief MainWindow::showErrorView Show the error view
- */
-void MainWindow::showErrorView()
-{
-    if (!d->ui->dockWidgetErrors->isVisible()) {
-        d->m_actToggleErrorView->trigger();
     }
 }
 
@@ -681,9 +654,6 @@ void MainWindow::initMenuViewWindows()
     d->m_menuView->addSeparator();
     d->m_menuViewWindows = d->m_menuView->addMenu("Windows");
 
-    d->m_actToggleErrorView = d->ui->dockWidgetErrors->toggleViewAction();
-    d->m_menuViewWindows->addAction(d->m_actToggleErrorView);
-
     d->m_actToggleHierarchyView = d->ui->dockWidgetDocument->toggleViewAction();
     d->m_menuViewWindows->addAction(d->m_actToggleHierarchyView);
 
@@ -888,10 +858,8 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
             d->m_hierarchyToolBar->setVisible(false);
             d->ui->mainToolBar->setVisible(false);
 
-            d->ui->dockWidgetErrors->hide();
             d->ui->dockWidgetMscText->hide();
             d->ui->dockWidgetDocument->hide();
-            d->ui->dockWidgetErrorsContents->hide();
             d->ui->dockWidgetDocumenetContents->hide();
             d->ui->dockWidgetAsn1->hide();
 
@@ -1114,11 +1082,6 @@ void MainWindow::updateModel()
 {
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
     updateMscToolbarActionsEnablement();
-}
-
-QPlainTextEdit *MainWindow::textOutputPane() const
-{
-    return d->ui->errorTextEdit;
 }
 
 #ifdef QT_DEBUG

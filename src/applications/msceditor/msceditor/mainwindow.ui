@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>861</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -83,7 +83,7 @@
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>117</height>
+     <height>123</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -146,57 +146,11 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetErrors">
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="windowTitle">
-    <string>Errors</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetErrorsContents">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-     <property name="spacing">
-      <number>5</number>
-     </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetMinimumSize</enum>
-     </property>
-     <property name="leftMargin">
-      <number>5</number>
-     </property>
-     <property name="topMargin">
-      <number>5</number>
-     </property>
-     <property name="rightMargin">
-      <number>5</number>
-     </property>
-     <property name="bottomMargin">
-      <number>5</number>
-     </property>
-     <item>
-      <widget class="QPlainTextEdit" name="errorTextEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="dockWidgetMscText">
    <property name="minimumSize">
     <size>
-     <width>89</width>
-     <height>111</height>
+     <width>97</width>
+     <height>123</height>
     </size>
    </property>
    <property name="windowTitle">
