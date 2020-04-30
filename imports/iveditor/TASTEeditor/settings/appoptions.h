@@ -28,10 +28,10 @@ class GroupMainWindow
 public:
     GroupMainWindow();
 
-    const shared::SettingsAppOption Geometry;
-    const shared::SettingsAppOption State;
-    const shared::SettingsAppOption LastFilePath;
-    const shared::SettingsAppOption LastTab;
+    shared::SettingsAppOption Geometry;
+    shared::SettingsAppOption State;
+    shared::SettingsAppOption LastFilePath;
+    shared::SettingsAppOption LastTab;
 
 private:
     GroupMainWindow(const GroupMainWindow &) = delete;
@@ -40,34 +40,18 @@ private:
     static const QString localName() { return "MainWindow"; }
 };
 
-class GroupBugReport
-{
-public:
-    GroupBugReport();
-
-    const shared::SettingsAppOption Host;
-    const shared::SettingsAppOption ProjectID;
-    const shared::SettingsAppOption AccessToken;
-
-private:
-    GroupBugReport(const GroupBugReport &) = delete;
-    GroupBugReport &operator=(const GroupBugReport &) = delete;
-
-    static const QString localName() { return "GroupBugReport"; }
-};
-
 class GroupAadl
 {
 public:
     GroupAadl();
 
-    const shared::SettingsAppOption CustomPropertiesConfig;
-    const shared::SettingsAppOption DataTypesConfig;
-    const shared::SettingsAppOption ColorSchemeFile;
+    shared::SettingsAppOption CustomPropertiesConfig;
+    shared::SettingsAppOption DataTypesConfig;
+    shared::SettingsAppOption ColorSchemeFile;
 
 private:
-    GroupAadl(const GroupBugReport &) = delete;
-    GroupAadl &operator=(const GroupBugReport &) = delete;
+    GroupAadl(const GroupAadl&) = delete;
+    GroupAadl &operator=(const GroupAadl&) = delete;
 
     static const QString localName() { return "GroupAadl"; }
 };
@@ -75,9 +59,8 @@ private:
 class AppOptions
 {
 public:
-    static const GroupMainWindow MainWindow;
-    static const GroupBugReport BugReport;
-    static const GroupAadl Aadl;
+    static GroupMainWindow MainWindow;
+    static GroupAadl Aadl;
 
 private:
     AppOptions() = delete;

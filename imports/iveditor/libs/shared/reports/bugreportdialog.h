@@ -17,15 +17,11 @@
 
 #pragma once
 
+#include "settingsappoption.h"
+
 #include <QDialog>
 
-namespace Ui {
-class BugreportDialog;
-}
-
 namespace reports {
-class BugReportHandler;
-} // namespace reports
 
 class BugreportDialog : public QDialog
 {
@@ -42,7 +38,8 @@ private Q_SLOTS:
     void updateButtonBox();
 
 private:
-    Ui::BugreportDialog *m_ui = nullptr;
-    reports::BugReportHandler *m_reportHandler = nullptr;
-    const QList<QPixmap> m_images;
+    struct BugreportDialogPrivate;
+    BugreportDialogPrivate* d;
 };
+
+}

@@ -30,16 +30,7 @@ GroupMainWindow::GroupMainWindow()
 {
 }
 
-const GroupMainWindow AppOptions::MainWindow = {};
-
-GroupBugReport::GroupBugReport()
-    : Host(QString("%1/Host").arg(localName()))
-    , ProjectID(QString("%1/ProjectID").arg(localName()))
-    , AccessToken(QString("%1/AccessToken").arg(localName()))
-{
-}
-
-const GroupBugReport AppOptions::BugReport = {};
+GroupMainWindow AppOptions::MainWindow = {};
 
 GroupAadl::GroupAadl()
     : CustomPropertiesConfig(QString("%1/CustomPropsConf").arg(localName()))
@@ -48,6 +39,6 @@ GroupAadl::GroupAadl()
 {
 }
 
-const GroupAadl AppOptions::Aadl = {};
+GroupAadl AppOptions::Aadl = {};
 
 }

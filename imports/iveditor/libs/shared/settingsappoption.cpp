@@ -14,12 +14,8 @@ QVariant SettingsAppOption::read() const
     return shared::SettingsManager::instance()->storage()->value(Name, DefaultValue);
 }
 
-void SettingsAppOption::write(const QVariant &val) const
+void SettingsAppOption::write(const QVariant &val)
 {
-    if (val == DefaultValue) {
-        return;
-    }
-
     shared::SettingsManager::instance()->storage()->setValue(Name, val);
 }
 

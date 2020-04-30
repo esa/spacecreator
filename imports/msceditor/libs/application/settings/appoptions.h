@@ -41,10 +41,10 @@ class GroupMainWindow : public OptionsGroup
 public:
     GroupMainWindow();
 
-    const shared::SettingsAppOption *Geometry = Options[0];
-    const shared::SettingsAppOption *State = Options[1];
-    const shared::SettingsAppOption *LastFilePath = Options[2];
-    const shared::SettingsAppOption *DocOrHierarchyViewMode = Options[3];
+    shared::SettingsAppOption *Geometry = Options[0];
+    shared::SettingsAppOption *State = Options[1];
+    shared::SettingsAppOption *LastFilePath = Options[2];
+    shared::SettingsAppOption *DocOrHierarchyViewMode = Options[3];
 
 private:
     GroupMainWindow(const GroupMainWindow &) = delete;
@@ -56,7 +56,7 @@ private:
 class AppOptions
 {
 public:
-    static const GroupMainWindow MainWindow;
+    static GroupMainWindow MainWindow;
 
 private:
     AppOptions() = delete;

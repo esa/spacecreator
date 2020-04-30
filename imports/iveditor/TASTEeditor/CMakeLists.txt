@@ -64,11 +64,6 @@ target_sources(${APP_NAME} PRIVATE
     logging/loghandler.cpp
     logging/loghandler.h
     main.cpp
-    reports/bugreportdialog.cpp
-    reports/bugreportdialog.h
-    reports/bugreportdialog.ui
-    reports/bugreporthandler.cpp
-    reports/bugreporthandler.h
     settings/appoptions.cpp
     settings/appoptions.h
     tab_concurrency/concurrencytabdocument.cpp

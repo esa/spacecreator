@@ -38,9 +38,9 @@ class BugReportHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit BugReportHandler(const QString &host, const QString &projectID, const QByteArray &accessToken,
-                              QObject *parent = nullptr);
+    explicit BugReportHandler(const QString &host, const QString &projectID, const QByteArray &accessToken, QObject *parent = nullptr);
     ~BugReportHandler() override;
+
     void sendReport(QSharedPointer<BugReport> report);
 
 Q_SIGNALS:
@@ -57,7 +57,6 @@ private:
 
     void clear();
 
-private:
     QNetworkAccessManager *m_networkManager = nullptr;
     const QString m_host;
     const QString m_project;
@@ -70,4 +69,4 @@ private:
     QQueue<QPair<QByteArray, QMimeType>> m_attachments;
 };
 
-} // namespace reports
+}

@@ -415,7 +415,7 @@ void MainWindow::onReportRequested()
             }
         }
     }
-    BugreportDialog *dialog = new BugreportDialog(LogHandler::logPath(), images, this);
+    auto dialog = new reports::BugreportDialog(LogHandler::logPath(), images, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->exec();
 }

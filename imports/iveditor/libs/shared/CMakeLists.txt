@@ -7,6 +7,11 @@ target_sources(${LIB_NAME} PRIVATE
     document/abstracttabdocument.h
     document/documentsmanager.cpp
     document/documentsmanager.h
+    reports/bugreportdialog.cpp
+    reports/bugreportdialog.h
+    reports/bugreportdialog.ui
+    reports/bugreporthandler.cpp
+    reports/bugreporthandler.h
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp
@@ -19,4 +24,6 @@ target_link_libraries(${LIB_NAME}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
+    Qt5::Network
+    Qt5::Concurrent
 )

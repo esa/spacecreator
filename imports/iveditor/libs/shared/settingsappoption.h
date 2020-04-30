@@ -30,7 +30,7 @@ public:
     const QVariant DefaultValue;
 
     QVariant read() const;
-    void write(const QVariant &val) const;
+    void write(const QVariant &val);
 
 private:
     SettingsAppOption() = delete;

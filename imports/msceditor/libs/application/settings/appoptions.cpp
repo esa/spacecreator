@@ -37,4 +37,4 @@ GroupMainWindow::GroupMainWindow()
 {
 }
 
-const GroupMainWindow AppOptions::MainWindow = {};
+GroupMainWindow AppOptions::MainWindow = {};
