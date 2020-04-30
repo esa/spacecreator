@@ -7,6 +7,10 @@ target_sources(${LIB_NAME} PRIVATE
     document/abstracttabdocument.h
     document/documentsmanager.cpp
     document/documentsmanager.h
+    settingsappoption.cpp
+    settingsappoption.h
+    settingsmanager.cpp
+    settingsmanager.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

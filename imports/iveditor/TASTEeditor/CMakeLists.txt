@@ -71,8 +71,6 @@ target_sources(${APP_NAME} PRIVATE
     reports/bugreporthandler.h
     settings/appoptions.cpp
     settings/appoptions.h
-    settings/settingsmanager.cpp
-    settings/settingsmanager.h
     tab_concurrency/concurrencytabdocument.cpp
     tab_concurrency/concurrencytabdocument.h
     tab_data/datatabdocument.cpp

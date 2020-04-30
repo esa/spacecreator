@@ -20,28 +20,32 @@
 #include <QDebug>
 #include <QStandardPaths>
 
-SettingsManager *SettingsManager::m_instance = nullptr;
+static QString path() {
+    return QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+}
 
-SettingsManager::SettingsManager(QObject *parent)
-    : QObject(parent)
-    , m_settings(new QSettings(
-              QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
-              QSettings::IniFormat, this))
+namespace shared {
+
+SettingsManager::SettingsManager()
+    : m_settings(new QSettings(path(), QSettings::IniFormat, this))
 {
-    Q_ASSERT_X(!m_instance, "SettingsManager", "only one instance of Settings can be created!");
-    SettingsManager::m_instance = this;
-
     qDebug() << "Config:" << m_settings->fileName();
 }
 
 SettingsManager *SettingsManager::instance()
 {
-    if (!m_instance)
-        qFatal("SettingsManager should be explicitly created in the application startup");
-    return m_instance;
+    static shared::SettingsManager* instance = nullptr;
+
+    if (instance == nullptr) {
+        instance = new shared::SettingsManager;
+    }
+
+    return instance;
 }
 
 QSettings *SettingsManager::storage()
 {
     return m_settings;
+}
+
 }

@@ -17,33 +17,17 @@
 
 #pragma once
 
-#include <QString>
-#include <QVariant>
+#include "settingsappoption.h"
+
 #include <QVector>
-
-class AppOption
-{
-public:
-    AppOption(const QString &name, const QVariant &defaultValue = QVariant());
-    const QString Name;
-    const QVariant DefaultValue;
-
-    QVariant read() const;
-    void write(const QVariant &val) const;
-
-private:
-    AppOption() = delete;
-    AppOption(const AppOption &) = delete;
-    AppOption &operator=(const AppOption &) = delete;
-};
 
 class OptionsGroup
 {
 public:
-    OptionsGroup(const QString &name, const QVector<AppOption *> &options, const QVector<OptionsGroup *> &subroups);
+    OptionsGroup(const QString &name, const QVector<shared::SettingsAppOption *> &options, const QVector<OptionsGroup *> &subroups);
 
     const QString Name;
-    const QVector<AppOption *> Options;
+    const QVector<shared::SettingsAppOption *> Options;
     const QVector<OptionsGroup *> Groups;
 
 private:
@@ -57,10 +41,10 @@ class GroupMainWindow : public OptionsGroup
 public:
     GroupMainWindow();
 
-    const AppOption *Geometry = Options[0];
-    const AppOption *State = Options[1];
-    const AppOption *LastFilePath = Options[2];
-    const AppOption *DocOrHierarchyViewMode = Options[3];
+    const shared::SettingsAppOption *Geometry = Options[0];
+    const shared::SettingsAppOption *State = Options[1];
+    const shared::SettingsAppOption *LastFilePath = Options[2];
+    const shared::SettingsAppOption *DocOrHierarchyViewMode = Options[3];
 
 private:
     GroupMainWindow(const GroupMainWindow &) = delete;
@@ -76,6 +60,6 @@ public:
 
 private:
     AppOptions() = delete;
-    AppOptions(const AppOption &) = delete;
+    AppOptions(const AppOptions &) = delete;
     AppOptions &operator=(const AppOptions &) = delete;
 };

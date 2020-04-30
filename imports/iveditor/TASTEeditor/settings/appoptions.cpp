@@ -16,36 +16,11 @@
 */
 
 #include "appoptions.h"
-
-#include "settingsmanager.h"
 #include "tab_interface/properties/dynamicpropertyconfig.h"
 
 #include <QStandardPaths>
 
 namespace aadlinterface {
-
-AppOption::AppOption(const QString &name, const QVariant &defaultValue)
-    : Name(name)
-    , DefaultValue(defaultValue)
-{
-}
-
-QVariant AppOption::read() const
-{
-    if (QSettings *settings = SettingsManager::instance()->storage())
-        return settings->value(Name, DefaultValue);
-
-    return QVariant();
-}
-
-void AppOption::write(const QVariant &val) const
-{
-    if (val == DefaultValue)
-        return;
-
-    if (QSettings *settings = SettingsManager::instance()->storage())
-        settings->setValue(Name, val);
-}
 
 GroupMainWindow::GroupMainWindow()
     : Geometry(QString("%1/Geometry").arg(localName()))

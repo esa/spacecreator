@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2018-2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,21 +17,25 @@
 
 #pragma once
 
-#include <QObject>
-#include <QRect>
-#include <QSettings>
-#include <QVector>
+#include <QString>
+#include <QVariant>
 
-class SettingsManager : public QObject
+namespace shared {
+
+class SettingsAppOption
 {
-    Q_OBJECT
 public:
-    explicit SettingsManager(QObject *parent = nullptr);
+    explicit SettingsAppOption(const QString &name, const QVariant &defaultValue = QVariant());
+    const QString Name;
+    const QVariant DefaultValue;
 
-    QSettings *storage();
-    static SettingsManager *instance();
+    QVariant read() const;
+    void write(const QVariant &val) const;
 
 private:
-    static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    SettingsAppOption() = delete;
+    SettingsAppOption(const SettingsAppOption &) = delete;
+    SettingsAppOption &operator=(const SettingsAppOption &) = delete;
 };
+
+}

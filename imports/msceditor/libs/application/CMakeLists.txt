@@ -18,8 +18,6 @@ target_sources(${LIB_NAME} PRIVATE
     remotecontrolwebserver.h
     settings/appoptions.cpp
     settings/appoptions.h
-    settings/settingsmanager.cpp
-    settings/settingsmanager.h
 )
 
 target_include_directories(${LIB_NAME}
@@ -27,6 +25,7 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
+    shared
     msclibrary
     mscwidgets
     asn1editor

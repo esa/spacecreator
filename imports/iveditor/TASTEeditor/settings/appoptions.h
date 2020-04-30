@@ -17,37 +17,21 @@
 
 #pragma once
 
-#include <QString>
-#include <QVariant>
+#include "settingsappoption.h"
+
 #include <QVector>
 
 namespace aadlinterface {
-
-class AppOption
-{
-public:
-    explicit AppOption(const QString &name, const QVariant &defaultValue = QVariant());
-    const QString Name;
-    const QVariant DefaultValue;
-
-    QVariant read() const;
-    void write(const QVariant &val) const;
-
-private:
-    AppOption() = delete;
-    AppOption(const AppOption &) = delete;
-    AppOption &operator=(const AppOption &) = delete;
-};
 
 class GroupMainWindow
 {
 public:
     GroupMainWindow();
 
-    const AppOption Geometry;
-    const AppOption State;
-    const AppOption LastFilePath;
-    const AppOption LastTab;
+    const shared::SettingsAppOption Geometry;
+    const shared::SettingsAppOption State;
+    const shared::SettingsAppOption LastFilePath;
+    const shared::SettingsAppOption LastTab;
 
 private:
     GroupMainWindow(const GroupMainWindow &) = delete;
@@ -61,9 +45,9 @@ class GroupBugReport
 public:
     GroupBugReport();
 
-    const AppOption Host;
-    const AppOption ProjectID;
-    const AppOption AccessToken;
+    const shared::SettingsAppOption Host;
+    const shared::SettingsAppOption ProjectID;
+    const shared::SettingsAppOption AccessToken;
 
 private:
     GroupBugReport(const GroupBugReport &) = delete;
@@ -77,9 +61,9 @@ class GroupAadl
 public:
     GroupAadl();
 
-    const AppOption CustomPropertiesConfig;
-    const AppOption DataTypesConfig;
-    const AppOption ColorSchemeFile;
+    const shared::SettingsAppOption CustomPropertiesConfig;
+    const shared::SettingsAppOption DataTypesConfig;
+    const shared::SettingsAppOption ColorSchemeFile;
 
 private:
     GroupAadl(const GroupBugReport &) = delete;
@@ -97,7 +81,7 @@ public:
 
 private:
     AppOptions() = delete;
-    AppOptions(const AppOption &) = delete;
+    AppOptions(const AppOptions &) = delete;
     AppOptions &operator=(const AppOptions &) = delete;
 };
 

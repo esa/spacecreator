@@ -19,7 +19,6 @@
 #include "app/mainwindow.h"
 #include "logging/loghandler.h"
 #include "reports/bugreporthandler.h"
-#include "settings/settingsmanager.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -36,8 +35,6 @@ int main(int argc, char *argv[])
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
     aadl::DataTypesStorage::init();
-
-    SettingsManager settings;
 
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())

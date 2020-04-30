@@ -20,7 +20,6 @@
 #include "common.h"
 #include "baseitems/common/utils.h"
 #include "settings/appoptions.h"
-#include "settings/settingsmanager.h"
 
 #include <QDebug>
 #include <QFile>

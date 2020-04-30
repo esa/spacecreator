@@ -15,30 +15,27 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "settingsmanager.h"
+#pragma once
 
-#include <QDebug>
-#include <QStandardPaths>
+#include <QObject>
+#include <QRect>
+#include <QSettings>
+#include <QVector>
 
-SettingsManager *SettingsManager::m_instance = nullptr;
+namespace shared {
 
-SettingsManager::SettingsManager(QObject *parent)
-    : QObject(parent)
-    , m_settings(new QSettings(
-              QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
-              QSettings::IniFormat, this))
+class SettingsManager : public QObject
 {
-    qDebug() << "Config:" << m_settings->fileName();
-}
+    Q_OBJECT
 
-SettingsManager *SettingsManager::instance()
-{
-    if (!m_instance)
-        m_instance = new SettingsManager();
-    return m_instance;
-}
+    SettingsManager();
 
-QSettings *SettingsManager::storage()
-{
-    return m_settings;
+public:
+    QSettings *storage();
+    static SettingsManager *instance();
+
+private:
+    QSettings *m_settings = nullptr;
+};
+
 }

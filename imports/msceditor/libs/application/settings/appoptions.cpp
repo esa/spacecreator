@@ -17,34 +17,7 @@
 
 #include "appoptions.h"
 
-#include "settingsmanager.h"
-
-AppOption::AppOption(const QString &name, const QVariant &defaultValue)
-    : Name(name)
-    , DefaultValue(defaultValue)
-{
-}
-
-QVariant AppOption::read() const
-{
-    if (QSettings *settings = SettingsManager::instance()->storage()) {
-        return settings->value(Name, DefaultValue);
-    }
-
-    return QVariant();
-}
-
-void AppOption::write(const QVariant &val) const
-{
-    if (val == DefaultValue)
-        return;
-
-    if (QSettings *settings = SettingsManager::instance()->storage()) {
-        settings->setValue(Name, val);
-    }
-}
-
-OptionsGroup::OptionsGroup(const QString &name, const QVector<AppOption *> &options,
+OptionsGroup::OptionsGroup(const QString &name, const QVector<shared::SettingsAppOption *> &options,
                            const QVector<OptionsGroup *> &subroups)
     : Name(name)
     , Options(options)
@@ -55,10 +28,10 @@ OptionsGroup::OptionsGroup(const QString &name, const QVector<AppOption *> &opti
 GroupMainWindow::GroupMainWindow()
     : OptionsGroup(localName(),
                    {
-                           new AppOption(QString("%1/Geometry").arg(localName())),
-                           new AppOption(QString("%1/State").arg(localName())),
-                           new AppOption(QString("%1/LastFilePath").arg(localName())),
-                           new AppOption(QString("%1/DocOrHierarchyViewMode").arg(localName())),
+                           new shared::SettingsAppOption(QString("%1/Geometry").arg(localName())),
+                           new shared::SettingsAppOption(QString("%1/State").arg(localName())),
+                           new shared::SettingsAppOption(QString("%1/LastFilePath").arg(localName())),
+                           new shared::SettingsAppOption(QString("%1/DocOrHierarchyViewMode").arg(localName())),
                    },
                    {})
 {

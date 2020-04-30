@@ -28,7 +28,6 @@
 #include "logging/loghandler.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
-#include "settings/settingsmanager.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
