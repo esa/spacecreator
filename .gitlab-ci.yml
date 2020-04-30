@@ -45,4 +45,4 @@ test_docker:
     - build_debian10_gcc
   artifacts:
     reports:
-      junit: build/tst_*_result.xml
+      junit: build/tst_*-result.xml
