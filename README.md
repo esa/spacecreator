@@ -30,9 +30,9 @@ some additional optional packages:
 The current Grantlee release (v.5.2.0) has a problem with escape sequences.
 Therefore you must apply a patch before:
 
-    cp <TASTE3_DIR>/grantlee/fix_escape.diff <GRANTLEE_DIR>
+    cp SpaceCreator/patches/grantlee_fix_escape.diff <GRANTLEE_DIR>
     cd <GRANTLEE_DIR>
-    git apply fix_escape.diff
+    git apply grantlee_fix_escape.diff
 
 To build Taste3 correctly Grantlee should be installed into QTDIR directory:
 
@@ -55,9 +55,9 @@ The last command can require root permissions. Then use the 'sudo' command as fo
 Make sure cmake, qmake and Visual Studio are installed and avalable in PATH.
 Following instructions require git bash.
 
-    cp <TASTE3_DIR>/grantlee/fix_escape.diff <GRANTLEE_DIR>
+    cp SpaceCreator/patches/grantlee_fix_escape.diff <GRANTLEE_DIR>
     cd <GRANTLEE_DIR>
-    git apply --ignore-space-change --ignore-whitespace fix_escape.diff
+    git apply --ignore-space-change --ignore-whitespace grantlee_fix_escape.diff
 
 To build Taste3 correctly Grantlee should be installed into QTDIR directory (if CMAKE_PREFIX_PATH is already set, expand it instead of setting):
 

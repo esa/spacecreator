@@ -18,9 +18,9 @@
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "aadltestutils.h"
 
 #include <QtTest>
-#include <testutils.h>
 
 class tst_AADLObjectFunction : public QObject
 {
@@ -51,7 +51,7 @@ void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
     auto ifaceType = aadl::AADLObjectIface::IfaceType::Required;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        auto ri = TASTEtest::createIface(&obj, ifaceType);
+        auto ri = aadl::testutils::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(ri);
         QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
@@ -76,7 +76,7 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
     auto ifaceType = aadl::AADLObjectIface::IfaceType::Provided;
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
-        auto pi = TASTEtest::createIface(&obj, ifaceType);
+        auto pi = aadl::testutils::createIface(&obj, ifaceType);
         const bool ok = obj.addChild(pi);
         QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
@@ -108,7 +108,7 @@ void tst_AADLObjectFunction::testCommonInterfacesManagement() const
 
     QVector<aadl::AADLObjectIface *> ifaces;
     for (int i = 0; i < ifacesCountHalf; ++i) {
-        ifaces << TASTEtest::createIface(&obj, itProvided) << TASTEtest::createIface(&obj, itRequired);
+        ifaces << aadl::testutils::createIface(&obj, itProvided) << aadl::testutils::createIface(&obj, itRequired);
     }
 
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);

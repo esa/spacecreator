@@ -23,6 +23,8 @@ target_sources(${LIB_NAME} PRIVATE
     aadlobjectsmodel.h
     aadlparameter.cpp
     aadlparameter.h
+    aadltestutils.cpp
+    aadltestutils.h
     aadlxmlreader.cpp
     aadlxmlreader.h
     basicdatatype.cpp

@@ -1,15 +1,2 @@
-# IDE files
-.project
-*.pro.user
-*.h.autosave
-*.cpp.autosave
-license.qtc.txt
-
-# System files
-.directory
-
-# QDoc generated files
-doc/html
-
 # Example files to be used locally
 examples/*.local.msc

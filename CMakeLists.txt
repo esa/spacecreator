@@ -64,6 +64,5 @@ enable_testing()
 # Disable the asn1 plugin for now
 add_subdirectory(src)
 #add_subdirectory(imports/asn1scc.IDE)
-add_subdirectory(imports/iveditor)
 add_subdirectory(imports/msceditor)
 add_subdirectory(tests)

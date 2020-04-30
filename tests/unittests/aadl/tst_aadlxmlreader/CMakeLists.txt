@@ -1,8 +1,10 @@
-set(TEST_NAME tst_aadlobjectsmodel)
+set(TEST_NAME tst_aadlxmlreader)
 
 add_executable(${TEST_NAME}
-    tst_aadlobjectsmodel.cpp
-    ${IV_SOURCES}
+    tst_aadlxmlreader.cpp
+    rsc.qrc
+    xmlcommon.cpp
+    xmlcommon.h
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
@@ -15,9 +17,4 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Qt5::Test
     Qt5::Widgets
     Grantlee5::Templates
-)
-
-target_include_directories(${TEST_NAME} PRIVATE
-    ${IV_DIR}
-    ..
 )

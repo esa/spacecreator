@@ -1,4 +1,3 @@
-add_subdirectory(3rdparty/antlr/cpp_runtime/runtime)
-add_subdirectory(3rdparty/qobjectlistmodel)
-
+add_subdirectory(3rdparty)
 add_subdirectory(libs)
+add_subdirectory(applications)

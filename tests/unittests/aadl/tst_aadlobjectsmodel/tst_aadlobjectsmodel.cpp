@@ -20,9 +20,9 @@
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
+#include "aadltestutils.h"
 
 #include <QtTest>
-#include <testutils.h>
 
 class tst_AADLObjectsModel : public QObject
 {
@@ -184,11 +184,11 @@ void tst_AADLObjectsModel::testManageIfaces()
 
     aadl::AADLObjectFunction fn("fn");
     model.addObject(&fn);
-    aadl::AADLObjectIface::CreationInfo ci1 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
+    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
     ci1.name = "eth0";
-    aadl::AADLObjectIface::CreationInfo ci2 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Required, &fn);
+    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, &fn);
     ci2.name = "wlan0";
-    aadl::AADLObjectIface::CreationInfo ci3 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
+    aadl::AADLObjectIface::CreationInfo ci3 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn);
     ci3.name = "ppp0";
 
     QVector<aadl::AADLObjectIface *> createdIfaces;
@@ -232,7 +232,7 @@ void tst_AADLObjectsModel::testManageIfaces()
         QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
 
         aadl::AADLObjectIface *dummy =
-                aadl::AADLObjectIface::createIface(TASTEtest::init(aadl::AADLObjectIface::IfaceType::Provided, nullptr));
+                aadl::AADLObjectIface::createIface(aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, nullptr));
         const bool dummyRemoved = model.removeObject(dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), ifaces.size() + 1); // +function
@@ -269,13 +269,13 @@ void tst_AADLObjectsModel::testManageMixed()
     aadl::AADLObjectFunction fn3("Fn3", &model);
     const int functionsCount = 6;
 
-    aadl::AADLObjectIface::CreationInfo ci1 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Provided, &fn1);
+    aadl::AADLObjectIface::CreationInfo ci1 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn1);
     ci1.name = "eth0";
     aadl::AADLObjectIface *iface1 = aadl::AADLObjectIface::createIface(ci1);
-    aadl::AADLObjectIface::CreationInfo ci2 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Required, &fn2);
+    aadl::AADLObjectIface::CreationInfo ci2 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Required, &fn2);
     ci2.name = "wlan0";
     aadl::AADLObjectIface *iface2 = aadl::AADLObjectIface::createIface(ci2);
-    aadl::AADLObjectIface::CreationInfo ci3 = TASTEtest::init(aadl::AADLObjectIface::IfaceType::Provided, &fn3);
+    aadl::AADLObjectIface::CreationInfo ci3 = aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, &fn3);
     ci3.name = "ppp0";
     aadl::AADLObjectIface *iface3 = aadl::AADLObjectIface::createIface(ci3);
 
