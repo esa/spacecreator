@@ -16,7 +16,7 @@
 */
 
 #include "datatypesstorage.h"
-#include "app/mainwindow.h"
+#include "mainwindow.h"
 #include "logging/loghandler.h"
 #include "reports/bugreporthandler.h"
 

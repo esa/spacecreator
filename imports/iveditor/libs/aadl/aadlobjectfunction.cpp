@@ -21,7 +21,7 @@
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
-//#include "tab_interface/commands/commandsfactory.h"
+//#include "interface/commands/commandsfactory.h"
 
 #include <QDebug>
 #include <QScopedPointer>

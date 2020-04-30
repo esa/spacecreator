@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="fonts/Ubuntu-B.ttf">resources/ubuntu-font-family-0.83/Ubuntu-B.ttf</file>
+        <file alias="fonts/Ubuntu-BI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-BI.ttf</file>
+        <file alias="fonts/Ubuntu-C.ttf">resources/ubuntu-font-family-0.83/Ubuntu-C.ttf</file>
+        <file alias="fonts/Ubuntu-L.ttf">resources/ubuntu-font-family-0.83/Ubuntu-L.ttf</file>
+        <file alias="fonts/Ubuntu-LI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-LI.ttf</file>
+        <file alias="fonts/Ubuntu-M.ttf">resources/ubuntu-font-family-0.83/Ubuntu-M.ttf</file>
+        <file alias="fonts/Ubuntu-MI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-MI.ttf</file>
+        <file alias="fonts/Ubuntu-R.ttf">resources/ubuntu-font-family-0.83/Ubuntu-R.ttf</file>
+        <file alias="fonts/Ubuntu-RI.ttf">resources/ubuntu-font-family-0.83/Ubuntu-RI.ttf</file>
+        <file alias="fonts/UbuntuMono-B.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-B.ttf</file>
+        <file alias="fonts/UbuntuMono-BI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-BI.ttf</file>
+        <file alias="fonts/UbuntuMono-R.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-R.ttf</file>
+        <file alias="fonts/UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
+        <file alias="backgrounds/texture.png">resources/texture.png</file>
+    </qresource>
+    <qresource prefix="/defaults">
+        <file>resources/taste-types.asn</file>
+        <file>interface/properties/resources/aadl_properties.json</file>
+        <file>resources/contextmenu.json</file>
+        <file>templating/xml_templates/comment.tmplt</file>
+        <file>templating/xml_templates/comments.tmplt</file>
+        <file>templating/xml_templates/connection.tmplt</file>
+        <file>templating/xml_templates/connections.tmplt</file>
+        <file>templating/xml_templates/function.tmplt</file>
+        <file>templating/xml_templates/functions.tmplt</file>
+        <file>templating/xml_templates/interface.tmplt</file>
+        <file>templating/xml_templates/interfaces.tmplt</file>
+        <file>templating/xml_templates/interfaceview.tmplt</file>
+    </qresource>
+</RCC>
