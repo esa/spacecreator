@@ -20,6 +20,16 @@ build_debian10_gcc:
       - build
     expire_in: 1 day
 
+build_windows:
+  stage: build
+  tags:
+    - win10
+    - vs2017
+    - x64
+    - grantlee
+  script:
+    - ./scripts/build_windows.ps1
+
 ##################
 # TEST
 ##################
