@@ -25,31 +25,14 @@ class GraphicsView;
 #include <QIntValidator>
 #include <QPointer>
 
+class ZoomValidator;
+
 namespace taste3 {
-
-class ZoomValidator : public QValidator
-{
-    Q_OBJECT
-public:
-    explicit ZoomValidator(QObject *parent = nullptr);
-
-    virtual State validate(QString &, int &) const override;
-    virtual void fixup(QString &) const override;
-
-    void setBottom(int);
-    void setRange(int bottom, int top);
-    void setTop(int);
-
-    void addSuffix(QString &text) const;
-    QString clearSuffix(QString &value) const;
-
-private:
-    QIntValidator *m_validator { nullptr };
-};
 
 class ZoomController : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit ZoomController(QWidget *parent = nullptr);
 
@@ -60,11 +43,9 @@ protected Q_SLOTS:
     void setZoomLevel(qreal percent);
     void displayZoomLevel(qreal percent);
 
-Q_SIGNALS:
-
 private:
     QComboBox *m_combo { nullptr };
-    ZoomValidator *m_validator { nullptr };
+    ::ZoomValidator *m_validator { nullptr };
     QPointer<aadlinterface::GraphicsView> m_view;
 
     void refill();

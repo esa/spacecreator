@@ -17,6 +17,8 @@
 
 #include "documentsmanager.h"
 
+static const int InvalidDocId = -1;
+
 namespace document {
 
 /*!

@@ -17,7 +17,7 @@
 
 #include "tabdocumentfactory.h"
 
-#include "abstracttabdocument.h"
+#include "document/abstracttabdocument.h"
 #include "app/aadltabdocument.h"
 #include "tab_concurrency/concurrencytabdocument.h"
 #include "tab_data/datatabdocument.h"
@@ -34,7 +34,7 @@ namespace document {
 \sa taste3::document::AbstractTabDocument, taste3::document::DocumentsManager, taste3::document::InterfaceTabDocument
 */
 
-AbstractTabDocument *TabDocumentFactory::initDoc(AbstractTabDocument *doc)
+static AbstractTabDocument* initDoc(AbstractTabDocument *doc)
 {
     if (doc)
         doc->init();

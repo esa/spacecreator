@@ -30,6 +30,7 @@ namespace document {
 class DocumentsManager : public QObject
 {
     Q_OBJECT
+
 public:
     explicit DocumentsManager(QTabWidget *tabWidget, QObject *parent = nullptr);
 
@@ -49,7 +50,6 @@ Q_SIGNALS:
     void currentDocIdChanged(int currentDocId);
 
 protected:
-    static int constexpr InvalidDocId { -1 };
     QPointer<QTabWidget> m_tabs;
     QVector<document::AbstractTabDocument *> m_documents;
     QMap<document::AbstractTabDocument *, QWidget *> m_views;

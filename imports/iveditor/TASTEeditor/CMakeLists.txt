@@ -34,6 +34,8 @@ target_sources(${APP_NAME} PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/tabdocumentfactory.cpp
+    app/tabdocumentfactory.h
     app/xmldocexporter.cpp
     app/xmldocexporter.h
     app/zoomcontroller.cpp
@@ -55,12 +57,6 @@ target_sources(${APP_NAME} PRIVATE
     baseitems/interactiveobject.h
     baseitems/textgraphicsitem.cpp
     baseitems/textgraphicsitem.h
-    document/abstracttabdocument.cpp
-    document/abstracttabdocument.h
-    document/documentsmanager.cpp
-    document/documentsmanager.h
-    document/tabdocumentfactory.cpp
-    document/tabdocumentfactory.h
     dummy/dummytabdocument.cpp
     dummy/dummytabdocument.h
     logging/logcategory.cpp
@@ -231,6 +227,7 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     aadl
+    shared
     utils
     Qt5::Concurrent
     Qt5::Network

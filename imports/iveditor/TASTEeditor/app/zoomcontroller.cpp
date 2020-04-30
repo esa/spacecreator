@@ -23,63 +23,66 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-namespace taste3 {
-
 /*!
  * \class taste3::ZoomValidator
  * \brief validator used in ZoomController's combo box.
  * \sa ZoomController
  */
-ZoomValidator::ZoomValidator(QObject *parent)
-    : QValidator(parent)
-    , m_validator(new QIntValidator(this))
+class ZoomValidator : public QValidator
 {
-}
+public:
+    explicit ZoomValidator(QObject *parent = nullptr) : QValidator(parent), m_validator(new QIntValidator(this))
+    {
+    }
 
-void ZoomValidator::addSuffix(QString &text) const
-{
-    if (!text.endsWith('%'))
-        text.append('%');
-}
+    virtual State validate(QString &s, int &i) const override
+    {
+        clearSuffix(s);
+        QValidator::State validated = m_validator->validate(s, i);
+        addSuffix(s);
 
-QString ZoomValidator::clearSuffix(QString &value) const
-{
-    value.remove('%');
-    return value;
-}
+        return validated;
+    }
 
-QValidator::State ZoomValidator::validate(QString &s, int &i) const
-{
-    clearSuffix(s);
+    virtual void fixup(QString &s) const override
+    {
+        clearSuffix(s);
+        m_validator->fixup(s);
+        addSuffix(s);
+    }
 
-    QValidator::State validated = m_validator->validate(s, i);
+    void setBottom(int min)
+    {
+        m_validator->setBottom(min);
+    }
 
-    addSuffix(s);
+    void setRange(int bottom, int top)
+    {
+        m_validator->setRange(bottom, top);
+    }
 
-    return validated;
-}
+    void setTop(int top)
+    {
+        m_validator->setTop(top);
+    }
 
-void ZoomValidator::fixup(QString &s) const
-{
-    clearSuffix(s);
-    m_validator->fixup(s);
-    addSuffix(s);
-}
+    void addSuffix(QString &text) const
+    {
+        if (!text.endsWith('%'))
+            text.append('%');
+    }
 
-void ZoomValidator::setBottom(int min)
-{
-    m_validator->setBottom(min);
-}
+    QString clearSuffix(QString &value) const
+    {
+        value.remove('%');
+        return value;
+    }
 
-void ZoomValidator::setRange(int bottom, int top)
-{
-    m_validator->setRange(bottom, top);
-}
+private:
+    QIntValidator *m_validator;
+};
 
-void ZoomValidator::setTop(int top)
-{
-    m_validator->setTop(top);
-}
+namespace taste3 {
 
 /*!
  * \class taste3::ZoomController
@@ -89,7 +92,7 @@ void ZoomValidator::setTop(int top)
 ZoomController::ZoomController(QWidget *parent)
     : QWidget(parent)
     , m_combo(new QComboBox(this))
-    , m_validator(new ZoomValidator(this))
+    , m_validator(new ::ZoomValidator(this))
 {
     QHBoxLayout *hBox = new QHBoxLayout(this);
     hBox->addWidget(new QLabel(tr("Zoom:")));

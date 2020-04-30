@@ -38,7 +38,7 @@ may need some API changes/polishing.
 \sa taste3::document::TabDocumentFactory, taste3::document::DocumentsManager, taste3::document::InterfaceTabDocument
 */
 
-struct AbstractTabDocumentPrivate {
+struct AbstractTabDocument::AbstractTabDocumentPrivate {
     explicit AbstractTabDocumentPrivate(QObject *parent)
         : m_commandsStack(new QUndoStack(parent))
     {

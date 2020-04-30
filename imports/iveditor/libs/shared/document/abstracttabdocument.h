@@ -28,7 +28,6 @@ class QUndoStack;
 
 namespace document {
 
-struct AbstractTabDocumentPrivate;
 class AbstractTabDocument : public QObject
 {
     Q_OBJECT
@@ -84,6 +83,7 @@ protected:
     virtual QGraphicsScene *createScene() = 0;
 
 private:
+    struct AbstractTabDocumentPrivate;
     std::unique_ptr<AbstractTabDocumentPrivate> const d;
 };
 

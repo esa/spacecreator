@@ -23,23 +23,14 @@ namespace document {
 
 class AbstractTabDocument;
 
-class TabDocumentFactory
-{
-public:
-    static AbstractTabDocument *createDataTabDocument(QObject *parent);
-    static AbstractTabDocument *createInterfaceTabDocument(QObject *parent);
-    static AbstractTabDocument *createDeploymentTabDocument(QObject *parent);
-    static AbstractTabDocument *createConcurrencyTabDocument(QObject *parent);
-    static AbstractTabDocument *createAADLTabDocument(QObject *parent);
-    static AbstractTabDocument *createMSCTabDocument(QObject *parent);
+namespace TabDocumentFactory {
 
-private:
-    TabDocumentFactory() = delete;
-    ~TabDocumentFactory() = delete;
-    TabDocumentFactory(const TabDocumentFactory &other) = delete;
-    TabDocumentFactory *operator=(const TabDocumentFactory &other) = delete;
+AbstractTabDocument *createDataTabDocument(QObject *parent);
+AbstractTabDocument *createInterfaceTabDocument(QObject *parent);
+AbstractTabDocument *createDeploymentTabDocument(QObject *parent);
+AbstractTabDocument *createConcurrencyTabDocument(QObject *parent);
+AbstractTabDocument *createAADLTabDocument(QObject *parent);
+AbstractTabDocument *createMSCTabDocument(QObject *parent);
 
-    static AbstractTabDocument *initDoc(AbstractTabDocument *doc);
-};
-
+}
 }

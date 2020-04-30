@@ -24,7 +24,7 @@
 #include "app/zoomcontroller.h"
 #include "baseitems/common/utils.h"
 #include "document/documentsmanager.h"
-#include "document/tabdocumentfactory.h"
+#include "tabdocumentfactory.h"
 #include "logging/loghandler.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
