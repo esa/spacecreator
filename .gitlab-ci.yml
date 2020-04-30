@@ -40,17 +40,9 @@ test_docker:
     - docker
   image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
   script:
-    - mkdir -p build; cd build
-    - cmake -GNinja ..
-    - find . | xargs touch # Avoid rebuilding
-    - ninja
-    - export QT_QPA_PLATFORM=offscreen
-    - ctest -j2 --test-timeout 30
+    - ./scripts/run_tests.sh build
   dependencies:
     - build_debian10_gcc
   artifacts:
-    paths:
-      - build/Testing/Temporary # test output is in LastTest.log
-    expire_in: 1 week
     reports:
       junit: build/tst_*_result.xml
