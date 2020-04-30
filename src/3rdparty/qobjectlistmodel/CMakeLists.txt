@@ -8,6 +8,8 @@ target_sources(${LIB_NAME} PRIVATE
     qobjectlistmodel.cpp
 )
 
+set_property(SOURCE qobjectlistmodelt.h PROPERTY SKIP_AUTOMOC ON)
+
 target_include_directories(${LIB_NAME}
     PUBLIC .
 )
