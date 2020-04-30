@@ -8,6 +8,7 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} -xunitxml -o ${CMAKE_BINARY_DIR}
 
 target_link_libraries(${TEST_NAME} PUBLIC
     application
+    shared
     Qt5::Core
     Qt5::Test
 )
