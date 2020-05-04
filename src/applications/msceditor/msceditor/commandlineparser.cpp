@@ -32,53 +32,54 @@ CommandLineParser::CommandLineParser()
 
 bool CommandLineParser::isSet(CommandLineParser::Positional arg) const
 {
-    if (CommandLineParser::Positional::Unknown == arg)
+    if (CommandLineParser::Positional::Unknown == arg) {
         return false;
+    }
 
     return QCommandLineParser::isSet(positionalArg(arg));
 }
 
 QString CommandLineParser::value(CommandLineParser::Positional arg) const
 {
-    if (CommandLineParser::Positional::Unknown == arg)
+    if (CommandLineParser::Positional::Unknown == arg) {
         return QString();
+    }
 
     return QCommandLineParser::value(positionalArg(arg));
 }
 
 QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positional arg)
 {
+    QStringList names;
+    QString description;
+    QString valueName;
+
     switch (arg) {
-    case CommandLineParser::Positional::OpenFileMsc: {
-        return QCommandLineOption({ "m", "open-msc" },
-                                  QCoreApplication::translate("CommandLineParser", "Open the MSC <file> on startup."),
-                                  QCoreApplication::translate("CommandLineParser", "file"));
-    }
-    case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
-        return QCommandLineOption(
-                { "e", "examples-chain" },
-                QCoreApplication::translate("CommandLineParser", "Open all MSC files in the <dir> one-by-one"),
-                QCoreApplication::translate("CommandLineParser", "dir"));
-    }
-    case CommandLineParser::Positional::StartRemoteControl: {
-        return QCommandLineOption({ "p", "remote-control-port" },
-                                  QCoreApplication::translate("CommandLineParser", "Start remote control using <port>"),
-                                  QCoreApplication::translate("CommandLineParser", "port"));
-    }
-    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
-        return QCommandLineOption(
-                { "d", "drop-changes-silently" },
-                QCoreApplication::translate("CommandLineParser",
-                                            "Do not propose to save changes when closing a document"));
-    }
-    default: {
-        Q_UNREACHABLE();
+    case CommandLineParser::Positional::OpenFileMsc:
+        names << "m" << "open-msc";
+        description = QCoreApplication::translate("CommandLineParser", "Open the MSC <file> on startup");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
-    }
+    case CommandLineParser::Positional::DbgOpenMscExamplesChain:
+        names << "e" << "examples-chain";
+        description = QCoreApplication::translate("CommandLineParser", "Open all MSC files in the <dir> one-by-one");
+        valueName = QCoreApplication::translate("CommandLineParser", "dir");
+        break;
+    case CommandLineParser::Positional::StartRemoteControl:
+        names << "p" << "remote-control-port";
+        description = QCoreApplication::translate("CommandLineParser", "Start remote control using <port>");
+        valueName = QCoreApplication::translate("CommandLineParser", "port");
+        break;
+    case CommandLineParser::Positional::DropUnsavedChangesSilently:
+        names << "d" << "drop-changes-silently";
+        description = QCoreApplication::translate("CommandLineParser", "Do not propose to save changes when closing a document");
+        break;
+    default:
+        qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";
+        return QCommandLineOption("Unknown option");
     }
 
-    qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";
-    return QCommandLineOption("Unknown option");
+    return QCommandLineOption(names, description, valueName);
 }
 
 void CommandLineParser::populatePositionalArgs()

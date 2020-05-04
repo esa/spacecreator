@@ -18,17 +18,12 @@
 #include "commandlineparser.h"
 #include "mainwindow.h"
 
-#include <QMessageBox>
-#include <QTimer>
-#include <QWebSocket>
-#include <QWebSocketServer>
 #include <QtTest>
 
 class tst_CommandLineParser : public QObject
 {
     Q_OBJECT
 
-public:
 private Q_SLOTS:
     /*
      * A test slot name for each option must contain "testCmdArgument" -
@@ -47,10 +42,9 @@ private Q_SLOTS:
 
 void tst_CommandLineParser::testCmdArgumentOpenMsc()
 {
-    static const QCommandLineOption cmdOpenMsc =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::OpenFileMsc);
-    static const QString FileName(QString(EXAMPLES_STORAGE_PATH).append("example01.msc"));
-    static const QString NoFileName("./no-such-file.msc");
+    const QCommandLineOption cmdOpenMsc = CommandLineParser::positionalArg(CommandLineParser::Positional::OpenFileMsc);
+    const QString FileName(QString(EXAMPLES_STORAGE_PATH).append("example01.msc"));
+    const QString NoFileName("./no-such-file.msc");
 
     CommandLineParser parser;
     parser.process({ QApplication::instance()->applicationFilePath(),
@@ -62,42 +56,25 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
     const QString argFromParser1(parser.value(CommandLineParser::Positional::OpenFileMsc));
     QCOMPARE(argFromParser1, FileName);
 
-    MainWindow w;
-    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc, argFromParser1);
-    QCOMPARE(processed, true);
-
     parser.process({ QApplication::instance()->applicationFilePath(),
                      QString("-%1=%2").arg(cmdOpenMsc.names().first(), NoFileName) });
     QCOMPARE(parser.isSet(CommandLineParser::Positional::OpenFileMsc), true);
     const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenFileMsc));
     QCOMPARE(argFromParser2, NoFileName);
-
-    const bool notProcessed = w.processCommandLineArg(CommandLineParser::Positional::OpenFileMsc, argFromParser2);
-    QCOMPARE(notProcessed, false);
 }
 
 void tst_CommandLineParser::testCmdArgumentRemoteControl()
 {
-    static const QCommandLineOption cmdRemoteControl =
-            CommandLineParser::positionalArg(CommandLineParser::Positional::StartRemoteControl);
-    static const quint16 inUsePort = 34568;
-    static const quint16 port = 34567;
-    MainWindow w;
+    const QCommandLineOption cmdRemoteControl = CommandLineParser::positionalArg(CommandLineParser::Positional::StartRemoteControl);
+    const quint16 inUsePort = 34568;
+    const quint16 port = 34567;
+
     CommandLineParser parser;
-
-    QWebSocketServer server(QLatin1String("tst_CommandLineParserWebSockerServer"), QWebSocketServer::NonSecureMode);
-    if (server.listen(QHostAddress::Any, inUsePort)) {
-        parser.process({ QApplication::instance()->applicationFilePath(),
-                         QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
-        QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);
-        const QString argFromParser2(parser.value(CommandLineParser::Positional::StartRemoteControl));
-        QCOMPARE(argFromParser2, QString::number(inUsePort));
-
-        const bool notProcessed =
-                w.processCommandLineArg(CommandLineParser::Positional::StartRemoteControl, argFromParser2);
-        QCOMPARE(notProcessed, false);
-        server.close();
-    }
+    parser.process({ QApplication::instance()->applicationFilePath(),
+                     QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
+    QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);
+    const QString argFromParser2(parser.value(CommandLineParser::Positional::StartRemoteControl));
+    QCOMPARE(argFromParser2, QString::number(inUsePort));
 
     parser.process({ QApplication::instance()->applicationFilePath(),
                      QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(port)) });
@@ -107,20 +84,6 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
 
     const QString argFromParser1(parser.value(CommandLineParser::Positional::StartRemoteControl));
     QCOMPARE(argFromParser1.toUShort(), port);
-
-    const bool processed = w.processCommandLineArg(CommandLineParser::Positional::StartRemoteControl, argFromParser1);
-    QCOMPARE(processed, true);
-
-    QWebSocket socket;
-    QSignalSpy socketConnectedSpy(&socket, SIGNAL(connected()));
-    QSignalSpy textMessageReceived(&socket, SIGNAL(textMessageReceived(QString)));
-    QSignalSpy socketError(&socket, SIGNAL(error(QAbstractSocket::SocketError)));
-    socket.open(QUrl(QStringLiteral("ws://localhost:%1").arg(port)));
-
-    QTRY_COMPARE(socketConnectedSpy.count(), 1);
-    QCOMPARE(socketError.count(), 0);
-    QCOMPARE(socket.state(), QAbstractSocket::ConnectedState);
-    socket.close();
 }
 
 void tst_CommandLineParser::testCoverage()

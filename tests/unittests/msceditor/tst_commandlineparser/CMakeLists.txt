@@ -4,9 +4,6 @@ add_executable(${TEST_NAME}
     tst_commandlineparser.cpp
     ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/commandlineparser.cpp
     ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/commandlineparser.h
-    ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/mainwindow.cpp
-    ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/mainwindow.h
-    ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/mainwindow.ui
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
