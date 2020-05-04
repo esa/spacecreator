@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
     Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(mscresources);
     qRegisterMetaType<msc::MscDocument::HierarchyType>("HierarchyType");
 
     QApplication a(argc, argv);

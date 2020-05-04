@@ -30,6 +30,9 @@ class MscMessageDeclarationList;
 class MscDocument : public MscEntity
 {
     Q_OBJECT
+    Q_PROPERTY(msc::MscDocument::HierarchyType hierarchyType READ hierarchyType NOTIFY hierarchyTypeChanged)
+    Q_PROPERTY(QString hierarchyTypeString READ hierarchyTypeString NOTIFY hierarchyTypeChanged)
+
 public:
     enum HierarchyType
     {
@@ -42,6 +45,7 @@ public:
         HierarchyException,
         HierarchyUnkown /// Only used when loaded from a file
     };
+    Q_ENUM(HierarchyType);
 
     explicit MscDocument(QObject *parent = nullptr);
     MscDocument(const QString &name, QObject *parent = nullptr);
@@ -67,6 +71,7 @@ public:
 
     HierarchyType hierarchyType() const;
     void setHierarchyType(HierarchyType type);
+    QString hierarchyTypeString() const;
 
     bool isSingleChildDocument() const;
     bool isAddChildEnable() const;

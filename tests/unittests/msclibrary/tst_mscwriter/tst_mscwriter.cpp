@@ -37,11 +37,15 @@ using namespace msc;
 class tst_MscWriter : public MscWriter
 {
     Q_OBJECT
+public:
+    tst_MscWriter();
 
 private Q_SLOTS:
     void cleanup();
 
     void testSelthTabbing();
+    void testSaveDocumentModel_data();
+    void testSaveDocumentModel();
     void testSerializeMscMessage();
     void testSerializeMscMessageParameters();
     void testSerializeMscMessageMultiParameters();
@@ -73,6 +77,11 @@ private:
 };
 
 const QString tst_MscWriter::TabSpaces = QString("    "); // 4 space chars
+
+tst_MscWriter::tst_MscWriter()
+{
+    Q_INIT_RESOURCE(mscresources);
+}
 
 QString tst_MscWriter::prependTabs(const QString &str, int count)
 {
@@ -108,6 +117,40 @@ void tst_MscWriter::testSelthTabbing()
     QCOMPARE(tab1(tabTest), TabSpaces + tabTest);
     QCOMPARE(tab2(tabTest), TabSpaces + TabSpaces + tabTest);
     QCOMPARE(tab3(tabTest), TabSpaces + TabSpaces + TabSpaces + tabTest);
+}
+
+void tst_MscWriter::testSaveDocumentModel_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+
+    auto model = new MscModel(this);
+    model->addDocument(new MscDocument("EmptyDoc", model));
+    QString result = { "mscdocument EmptyDoc /* MSC AND */;\nendmscdocument;" };
+    QTest::addRow("Simple doc") << model << result;
+
+    model = new MscModel(this);
+    model->addDocument(new MscDocument("Doc1", model));
+    model->addDocument(new MscDocument("Doc2", model));
+    result = QString("mscdocument Doc1 /* MSC AND */;\nendmscdocument;\n\n"
+                     "mscdocument Doc2 /* MSC AND */;\nendmscdocument;");
+    QTest::addRow("Two docs") << model << result;
+}
+
+void tst_MscWriter::testSaveDocumentModel()
+{
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    text = text.trimmed();
+
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, result);
 }
 
 void tst_MscWriter::testSerializeMscMessage()
@@ -590,6 +633,6 @@ void tst_MscWriter::testSerializeMessageDeclarations()
     QCOMPARE(serializeList.at(2), QString("endmscdocument;"));
 }
 
-QTEST_APPLESS_MAIN(tst_MscWriter)
+QTEST_MAIN(tst_MscWriter)
 
 #include "tst_mscwriter.moc"

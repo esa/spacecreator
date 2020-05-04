@@ -85,6 +85,7 @@ target_sources(${LIB_NAME} PRIVATE
     mscparameterlist.h
     mscparservisitor.cpp
     mscparservisitor.h
+    mscresources.qrc
     msctimer.cpp
     msctimer.h
     mscwriter.cpp
@@ -103,6 +104,7 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME}
     asn1editor
     qobjectlistmodel
+    templating
     Qt5::Core
     Qt5::Gui
     antlr4_static

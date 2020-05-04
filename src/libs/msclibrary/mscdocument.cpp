@@ -229,6 +229,32 @@ void MscDocument::setHierarchyType(MscDocument::HierarchyType type)
     }
 }
 
+/**
+   Returns the hierarchy type as short string. As used in MSC
+ */
+QString MscDocument::hierarchyTypeString() const
+{
+    switch (m_hierarchyType) {
+    case HierarchyLeaf:
+        return { "LEAF" };
+    case HierarchyIs:
+        return { "IS" };
+    case HierarchyAnd:
+        return { "AND" };
+    case HierarchyOr:
+        return { "OR" };
+    case HierarchyParallel:
+        return { "PARALLEL" };
+    case HierarchyRepeat:
+        return { "REPEAT" };
+    case HierarchyException:
+        return { "EXCEPTION" };
+    default:
+        Q_ASSERT(true);
+    }
+    return {};
+}
+
 /*!
    \brief MscDocument::isSingleChildDocument
    \return Returns if this document should only have one single child (dependent on the hierarchy type)

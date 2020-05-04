@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "mscdocument.h"
+
 #include <QObject>
 #include <QVector>
 
@@ -24,7 +26,6 @@ class QFileInfo;
 
 namespace msc {
 class MscChart;
-class MscDocument;
 
 class MscModel : public QObject
 {
@@ -32,6 +33,7 @@ class MscModel : public QObject
     Q_PROPERTY(QString dataLanguage READ dataLanguage WRITE setDataLanguage NOTIFY dataLanguageChanged)
     Q_PROPERTY(QString dataDefinitionString READ dataDefinitionString WRITE setDataDefinitionString NOTIFY
                        dataDefinitionStringChanged)
+    Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY dataChanged)
 
 public:
     explicit MscModel(QObject *parent = nullptr);
@@ -74,3 +76,5 @@ private:
 };
 
 } // namespace msc
+
+Q_DECLARE_METATYPE(QVector<msc::MscDocument *>)

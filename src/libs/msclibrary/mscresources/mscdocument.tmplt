@@ -1,0 +1,4 @@
+{% comment %}
+{% endcomment %}
+mscdocument {{ document.name }} /* MSC {{ document.hierarchyTypeString }} */;
+endmscdocument;

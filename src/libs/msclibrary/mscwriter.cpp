@@ -29,10 +29,13 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
+#include "stringtemplate.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QVariant>
 
 namespace msc {
 
@@ -46,6 +49,24 @@ MscWriter::MscWriter(QObject *parent)
 {
 }
 
+/**
+   Defines which engine to use for saving msc data
+ */
+void MscWriter::setSaveMode(MscWriter::SaveMode mode)
+{
+    m_saveMode = mode;
+
+    if (m_saveMode == GRANTLEE && m_template == nullptr) {
+        m_template = templating::StringTemplate::create(this);
+        m_template->setNeedValidateXMLDocument(false);
+    } else {
+        if (m_template != nullptr) {
+            delete m_template;
+            m_template = nullptr;
+        }
+    }
+}
+
 /*!
  * \brief MscWriter::saveModel Save a model text to file.
  * \param model
@@ -54,23 +75,27 @@ MscWriter::MscWriter(QObject *parent)
  */
 bool MscWriter::saveModel(MscModel *model, const QString &fileName)
 {
-    if (model == nullptr || fileName.isEmpty())
+    if (model == nullptr || fileName.isEmpty()) {
         return false;
+    }
 
     QFile mscFile(fileName);
-    if (!mscFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!mscFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         return false;
+    }
 
     QTextStream out(&mscFile);
 
     setModel(model);
 
     int tabCount = 0;
-    for (const auto *doc : model->documents())
+    for (const auto *doc : model->documents()) {
         out << serialize(doc, tabCount++);
+    }
 
-    for (const auto *chart : model->charts())
+    for (const auto *chart : model->charts()) {
         out << serialize(chart);
+    }
 
     mscFile.close();
 
@@ -113,15 +138,25 @@ QString MscWriter::modelText(MscModel *model)
     QString text;
     QTextStream out(&text);
 
-    int tabCount = 0;
-    for (const auto *doc : model->documents())
-        out << serialize(doc, tabCount++);
-
-    for (const auto *chart : model->charts())
-        out << serialize(chart);
+    if (!model->documents().isEmpty()) {
+        if (m_saveMode == CUSTOM) {
+            for (MscDocument *doc : model->documents()) {
+                if (!text.isEmpty()) {
+                    out << "\n";
+                }
+                out << serialize(doc);
+                out.flush();
+            }
+        } else {
+            text = exportGrantlee(model);
+        }
+    } else {
+        for (const auto *chart : model->charts()) {
+            out << serialize(chart);
+        }
+    }
 
     setModel(nullptr);
-
     return text;
 }
 
@@ -620,6 +655,27 @@ QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &ent
     }
 
     return cifTexts.join("\n") + entitySerialized;
+}
+
+QString MscWriter::exportGrantlee(MscModel *model)
+{
+    // @todo make template selectable
+    const QString templateFile = ":/mscresources/mscmodel.tmplt";
+
+    QBuffer buffer;
+    QByteArray bufferArray;
+    buffer.setBuffer(&bufferArray);
+    buffer.open(QIODevice::WriteOnly);
+    QHash<QString, QVariantList> grouppedObjects;
+
+    QVariantList varList;
+    varList.append(QVariant::fromValue(model));
+    grouppedObjects.insert("model", varList);
+    m_template->parseFile(grouppedObjects, templateFile, &buffer);
+
+    buffer.close();
+    buffer.open(QIODevice::ReadOnly);
+    return buffer.readAll();
 }
 
 } // namespace msc

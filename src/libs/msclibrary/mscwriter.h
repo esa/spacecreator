@@ -19,6 +19,10 @@
 
 #include <QObject>
 
+namespace templating {
+class StringTemplate;
+}
+
 namespace msc {
 
 class MscAction;
@@ -41,7 +45,15 @@ class MscWriter : public QObject
     Q_OBJECT
 
 public:
+    enum SaveMode
+    {
+        CUSTOM,
+        GRANTLEE
+    };
+
     MscWriter(QObject *parent = nullptr);
+
+    void setSaveMode(SaveMode mode);
 
     bool saveModel(MscModel *model, const QString &fileName);
     bool saveChart(const MscChart *chart, const QString &fileName);
@@ -71,7 +83,11 @@ private:
 
     QString serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const;
 
+    QString exportGrantlee(MscModel *model);
+
     MscModel *m_model = nullptr;
+    SaveMode m_saveMode = CUSTOM;
+    templating::StringTemplate *m_template = nullptr;
 };
 
 } // namespace msc

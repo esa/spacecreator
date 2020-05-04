@@ -67,8 +67,9 @@ void StringTemplate::init()
 bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName,
                                QIODevice *out)
 {
-    if (!out || templateFileName.isEmpty())
+    if (!out || templateFileName.isEmpty()) {
         return false;
+    }
 
     const QFileInfo fileInfo(templateFileName);
 
@@ -83,8 +84,24 @@ bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjec
     m_engine->addPluginPath(QApplication::applicationDirPath());
 
     Grantlee::Context context;
-    for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it)
-        context.insert(it.key(), it.value());
+    for (auto it = grouppedObjects.cbegin(); it != grouppedObjects.cend(); ++it) {
+        const QString &name = it.key();
+        QVariant v = it.value();
+        bool isObject = false;
+        if (v.canConvert<QVariantList>()) {
+            QVariantList list = v.value<QVariantList>();
+            if (list.size() == 1) {
+                if (list[0].canConvert<QObject *>()) {
+                    QObject *obj = list[0].value<QObject *>();
+                    context.insert(name, obj);
+                    isObject = true;
+                }
+            }
+        }
+        if (!isObject) {
+            context.insert(name, v);
+        }
+    }
 
     const Grantlee::Template stringTemplate = m_engine->loadByName(fileInfo.fileName());
     if (stringTemplate->error()) {

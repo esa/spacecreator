@@ -1,0 +1,5 @@
+{% comment %}
+{% endcomment %}
+{% for document in model.documents %}
+    {% include "mscdocument.tmplt" %}
+{% endfor %}
