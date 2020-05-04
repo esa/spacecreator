@@ -24,7 +24,7 @@ build_windows:
   stage: build
   tags:
     - win10
-    - vs2017
+    - vs2019
     - x64
     - grantlee
   script:
