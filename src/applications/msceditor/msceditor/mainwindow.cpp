@@ -240,6 +240,7 @@ bool MainWindow::openFileMsc(const QString &file)
     QFileInfo fileInfo(file);
     if (!fileInfo.exists()) {
         QMessageBox::critical(this, tr("Open file problem"), tr("The file does not exist."));
+        return false;
     }
 
     d->m_model->chartViewModel().setPreferredChartBoxSize(QSizeF());
