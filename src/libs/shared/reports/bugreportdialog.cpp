@@ -83,8 +83,7 @@ BugreportDialog::BugreportDialog(const QString &logPath, const QList<QPixmap> &i
 }
 
 BugreportDialog::BugreportDialog(const QList<QPixmap> &images, QWidget *parent)
-    : QDialog(parent)
-    , d(new BugreportDialogPrivate(this, QString(), images))
+    : BugreportDialog(QString(), images, parent)
 {
 }
 
