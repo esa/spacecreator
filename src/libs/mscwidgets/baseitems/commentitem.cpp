@@ -124,7 +124,7 @@ void CommentItem::attachTo(InteractiveObject *iObj)
 
     if (auto entity = commentEntity()) {
         connect(entity, &MscComment::dataChanged, this, &CommentItem::needUpdateLayout, Qt::UniqueConnection);
-        setText(entity->comment());
+        setText(entity->text());
     }
 
     rebuildLayout();
@@ -421,7 +421,7 @@ void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QP
 void CommentItem::textEdited(const QString &text)
 {
     const QRect oldRect = commentEntity() ? commentEntity()->rect() : QRect();
-    const QString oldText = commentEntity() ? commentEntity()->comment() : QString();
+    const QString oldText = commentEntity() ? commentEntity()->text() : QString();
     QRect newRect;
     if (utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
         if (oldRect != newRect || oldText != text) {

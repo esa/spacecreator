@@ -143,7 +143,7 @@ QUndoCommand *CommandsFactory::createChangeComment(const QVariantList &params)
         if (!item->comment() && comment.isEmpty())
             return nullptr;
 
-        if (item->comment() && item->comment()->comment() == comment)
+        if (item->comment() && item->comment()->text() == comment)
             return nullptr;
 
         return new CmdEntityCommentChange(chart, item, comment);

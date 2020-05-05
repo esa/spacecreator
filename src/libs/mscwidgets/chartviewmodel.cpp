@@ -1118,7 +1118,7 @@ void ChartViewModel::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInsta
 CommentItem *ChartViewModel::addCommentItem(MscComment *comment)
 {
     CommentItem *item = itemForComment(comment);
-    if (comment->comment().isEmpty()) {
+    if (comment->text().isEmpty()) {
         if (item) {
             item->setVisible(false);
         }
@@ -1138,7 +1138,7 @@ CommentItem *ChartViewModel::addCommentItem(MscComment *comment)
             }
             storeEntityItem(item);
         }
-        item->setText(comment->comment());
+        item->setText(comment->text());
         item->setVisible(true);
         item->instantLayoutUpdate();
     }

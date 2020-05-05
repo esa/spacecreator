@@ -35,3 +35,5 @@ public:
     virtual bool relatesTo(const MscInstance *instance) const = 0;
 };
 }
+
+Q_DECLARE_METATYPE(msc::MscInstanceEvent *)

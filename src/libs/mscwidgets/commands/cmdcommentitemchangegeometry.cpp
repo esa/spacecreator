@@ -42,7 +42,7 @@ void CmdCommentItemChangeGeometry::redo()
 
     auto comment = m_modelItem->comment();
     if (!comment) {
-        comment = m_modelItem->setComment(QString());
+        comment = m_modelItem->setCommentString(QString());
         m_chart->addInstanceEvent(comment);
     }
     comment->setRect(m_newRect);
@@ -55,7 +55,7 @@ void CmdCommentItemChangeGeometry::undo()
 
     auto comment = m_modelItem->comment();
     if (!comment) {
-        comment = m_modelItem->setComment(QString());
+        comment = m_modelItem->setCommentString(QString());
         m_chart->addInstanceEvent(comment);
     }
     comment->setRect(m_oldRect);

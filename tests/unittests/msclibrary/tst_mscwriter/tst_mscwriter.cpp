@@ -159,7 +159,15 @@ void tst_MscWriter::testSaveDocumentModel_data()
                              "mscdocument ChildDoc /* MSC AND */;\n"
                              "endmscdocument;\n"
                              "endmscdocument;";
-    QTest::addRow("DataDef") << model << result << resultGrantLee;
+    QTest::addRow("Nested documents") << model << result << resultGrantLee;
+
+    model = new MscModel(this);
+    auto doc2 = new MscDocument("CommentedDoc", model);
+    doc2->setCommentString("Ignore this");
+    model->addDocument(doc2);
+
+    result = QString("mscdocument CommentedDoc comment 'Ignore this' /* MSC AND */;\nendmscdocument;");
+    QTest::addRow("Commented doc") << model << result << result;
 }
 
 void tst_MscWriter::testSaveDocumentModel()
@@ -611,23 +619,23 @@ void tst_MscWriter::testSerializeChartWithCreate()
 void tst_MscWriter::testSerializeComments()
 {
     MscDocument document("Doc_1");
-    document.setComment("Doc1 comment");
+    document.setCommentString("Doc1 comment");
 
     MscChart *chart = new MscChart("Chart_1");
     document.addChart(chart);
 
     MscInstance *instance1 = new MscInstance("Inst_1");
-    chart->addInstanceEvent(instance1->setComment("Inst1 comment"));
+    chart->addInstanceEvent(instance1->setCommentString("Inst1 comment"));
     chart->addInstance(instance1);
 
     MscMessage *message = new MscMessage("Msg_1");
-    chart->addInstanceEvent(message->setComment("Msg1 comment"));
+    chart->addInstanceEvent(message->setCommentString("Msg1 comment"));
     message->setTargetInstance(instance1);
     chart->addInstanceEvent(message);
 
     MscAction *action = new MscAction();
     action->setInformalAction("Stop");
-    chart->addInstanceEvent(action->setComment("Action1 comment"));
+    chart->addInstanceEvent(action->setCommentString("Action1 comment"));
     action->setInstance(instance1);
     chart->addInstanceEvent(action);
 

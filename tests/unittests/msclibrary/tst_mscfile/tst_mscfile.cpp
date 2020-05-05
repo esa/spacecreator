@@ -168,19 +168,19 @@ void tst_MscFile::testEntityComments()
     "));
     QCOMPARE(model->documents().size(), 1);
     MscDocument *doc = model->documents().at(0);
-    QCOMPARE(doc->comment()->comment(), QString("doc comment"));
+    QCOMPARE(doc->comment()->text(), QString("doc comment"));
 
     QCOMPARE(doc->charts().size(), 1);
     MscChart *chart = model->documents().at(0)->charts().at(0);
-    QCOMPARE(chart->comment()->comment(), QString("chart comment"));
+    QCOMPARE(chart->comment()->text(), QString("chart comment"));
 
     QCOMPARE(chart->instances().size(), 1);
     MscInstance *instance = chart->instances().at(0);
-    QCOMPARE(instance->comment()->comment(), QString("instance comment"));
+    QCOMPARE(instance->comment()->text(), QString("instance comment"));
 
     QCOMPARE(chart->instanceEvents().size(), 5);
     MscInstanceEvent *event = chart->instanceEvents().at(3);
-    QCOMPARE(event->comment()->comment(), QString("msg comment"));
+    QCOMPARE(event->comment()->text(), QString("msg comment"));
 }
 
 void tst_MscFile::testNestedDocuments()

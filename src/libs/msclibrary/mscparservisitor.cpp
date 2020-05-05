@@ -109,7 +109,7 @@ static msc::MscComment *parseComment(msc::MscEntity *entity, MscParser::EndConte
         return nullptr;
 
     if (end->comment())
-        return entity->setComment(charactersToString(end->comment()->CHARACTERSTRING()));
+        return entity->setCommentString(charactersToString(end->comment()->CHARACTERSTRING()));
 
     return nullptr;
 }

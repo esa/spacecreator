@@ -34,8 +34,7 @@ const QRegExp MscEntity::m_nameVerify("([A-Z]|[a-z]|\\d|_|\\.)+");
 const QString MscEntity::DefaultName = QObject::tr("Untitled");
 
 MscEntity::MscEntity(QObject *parent)
-    : QObject(parent)
-    , m_id(QUuid::createUuid())
+    : MscEntity(DefaultName, parent)
 {
 }
 
@@ -44,6 +43,7 @@ MscEntity::MscEntity(const QString &name, QObject *parent)
     , m_name(name)
     , m_id(QUuid::createUuid())
 {
+    qRegisterMetaType<msc::MscEntity *>();
 }
 
 const QString &MscEntity::name() const
@@ -86,17 +86,31 @@ void MscEntity::setComment(MscComment *comment)
         return;
     }
 
+    if (m_comment) {
+        disconnect(m_comment, 0, this, 0);
+    }
+
     m_comment = comment;
+    connect(m_comment, &MscComment::textChanged, this, &MscEntity::commentChanged);
     Q_EMIT commentChanged();
 }
 
-MscComment *MscEntity::setComment(const QString &comment)
+QString MscEntity::commentString() const
 {
     if (!m_comment) {
-        m_comment = new MscComment(this);
+        return {};
+    }
+
+    return m_comment->text();
+}
+
+MscComment *MscEntity::setCommentString(const QString &comment)
+{
+    if (!m_comment) {
+        setComment(new MscComment(this));
         m_comment->attachTo(this);
     }
-    m_comment->setComment(comment);
+    m_comment->setText(comment);
     return m_comment;
 }
 

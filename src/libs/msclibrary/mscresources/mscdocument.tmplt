@@ -1,9 +1,10 @@
 {% comment %}
 {% endcomment %}
-mscdocument {{ document.name }} /* MSC {{ document.hierarchyTypeString }} */;
+mscdocument {{ document.name }}{% if document.commentString and not document.comment.isGlobal %} comment '{{ document.commentString }}'{% endif %} /* MSC {{ document.hierarchyTypeString }} */;
 {% if mscModel.dataLanguage and mscModel.dataLanguage != "" %}    language {{ mscModel.dataLanguage }};{% endif %}
 {% if mscModel.dataDefinitionString and mscModel.dataDefinitionString != "" %}    data {{ mscModel.dataDefinitionString }};{% endif %}
 {% for document in document.documents %}
     {% include "mscdocument.tmplt" %}
 {% endfor %}
+{# MSC document body #}
 endmscdocument;

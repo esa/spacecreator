@@ -26,7 +26,7 @@ namespace cmd {
 CmdEntityCommentChange::CmdEntityCommentChange(MscChart *chart, MscEntity *item, const QString &newComment)
     : BaseCommand(item)
     , m_chart(chart)
-    , m_oldComment(item && item->comment() ? item->comment()->comment() : QString())
+    , m_oldComment(item && item->comment() ? item->comment()->text() : QString())
     , m_newComment(newComment)
 {
 }
@@ -39,7 +39,7 @@ void CmdEntityCommentChange::redo()
     auto comment = m_modelItem->comment();
     if (m_newComment.isEmpty()) {
         if (comment) {
-            comment->setComment(m_newComment);
+            comment->setCommentString(m_newComment);
             m_chart->removeInstanceEvent(comment);
 
             // this command takes over ownership
@@ -47,9 +47,9 @@ void CmdEntityCommentChange::redo()
         }
     } else {
         if (!comment)
-            comment = m_modelItem->setComment(m_newComment);
+            comment = m_modelItem->setCommentString(m_newComment);
         m_chart->addInstanceEvent(comment);
-        comment->setComment(m_newComment);
+        comment->setCommentString(m_newComment);
     }
 }
 
@@ -61,7 +61,7 @@ void CmdEntityCommentChange::undo()
     auto comment = m_modelItem->comment();
     if (m_oldComment.isEmpty()) {
         if (comment) {
-            comment->setComment(m_oldComment);
+            comment->setCommentString(m_oldComment);
             m_chart->removeInstanceEvent(comment);
 
             // this command takes over ownership
@@ -69,9 +69,9 @@ void CmdEntityCommentChange::undo()
         }
     } else {
         if (!comment)
-            comment = m_modelItem->setComment(m_oldComment);
+            comment = m_modelItem->setCommentString(m_oldComment);
         m_chart->addInstanceEvent(comment);
-        comment->setComment(m_oldComment);
+        comment->setCommentString(m_oldComment);
     }
 }
 

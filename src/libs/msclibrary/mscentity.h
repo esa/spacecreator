@@ -32,6 +32,8 @@ class MscEntity : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(msc::MscComment *comment READ comment WRITE setComment NOTIFY commentChanged)
+    Q_PROPERTY(QString commentString READ commentString WRITE setCommentString NOTIFY commentChanged)
 
 public:
     enum class EntityType
@@ -65,7 +67,8 @@ public:
     MscComment *comment() const;
     void setComment(MscComment *comment);
 
-    MscComment *setComment(const QString &comment);
+    QString commentString() const;
+    MscComment *setCommentString(const QString &comment);
 
     virtual MscEntity::EntityType entityType() const = 0;
 
@@ -93,4 +96,6 @@ private:
     static const QRegExp m_nameVerify;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscEntity *)

@@ -28,6 +28,7 @@ namespace msc {
 MscComment::MscComment(QObject *parent)
     : MscInstanceEvent(parent)
 {
+    qRegisterMetaType<msc::MscComment *>();
     connect(this, &MscEntity::dataChanged, this, &MscComment::onDataChanged);
 }
 
@@ -53,25 +54,28 @@ QRect MscComment::rect() const
 
 void MscComment::setRect(const QRect &rect)
 {
-    if (m_rect == rect)
+    if (m_rect == rect) {
         return;
+    }
 
     m_rect = rect;
     updateCifComment();
 }
 
-QString MscComment::comment() const
+QString MscComment::text() const
 {
-    return m_comment;
+    return m_text;
 }
 
-void MscComment::setComment(const QString &comment)
+void MscComment::setText(const QString &comment)
 {
-    if (m_comment == comment)
+    if (m_text == comment) {
         return;
+    }
 
-    m_comment = comment;
+    m_text = comment;
     updateCifComment();
+    Q_EMIT commentChanged();
 }
 
 MscEntity *MscComment::attachedEntity() const
@@ -81,16 +85,21 @@ MscEntity *MscComment::attachedEntity() const
 
 void MscComment::attachTo(MscEntity *entity)
 {
-    if (m_attachedEntity == entity)
+    if (m_attachedEntity == entity) {
         return;
+    }
 
-    if (m_attachedEntity)
+    if (m_attachedEntity) {
         m_attachedEntity->setComment(nullptr);
+    }
 
     m_attachedEntity = entity;
 
-    if (m_attachedEntity)
+    if (m_attachedEntity) {
         m_attachedEntity->setComment(this);
+    }
+
+    Q_EMIT isGlobalChanged();
 }
 
 bool MscComment::relatesTo(const MscInstance *instance) const
@@ -128,7 +137,7 @@ void MscComment::updateCifComment()
     }
 
     /// Comment text update
-    if (isGlobal() && !m_comment.isEmpty() && m_rect.isValid()) {
+    if (isGlobal() && !m_text.isEmpty() && m_rect.isValid()) {
         if (cifBlock.isNull()) {
             cifBlock = cif::CifBlockFactory::createBlockText({ cif::CifLineShared(new cif::CifLineText()) });
             addCif(cifBlock);
@@ -138,7 +147,7 @@ void MscComment::updateCifComment()
 
         if (!cifBlock->hasPayloadFor(cif::CifLine::CifType::GlobalComment))
             cifBlock->addLine(cif::CifLineShared(new cif::CifLineGlobalComment()));
-        cifBlock->setPayload(QVariant::fromValue(m_comment), cif::CifLine::CifType::GlobalComment);
+        cifBlock->setPayload(QVariant::fromValue(m_text), cif::CifLine::CifType::GlobalComment);
 
         if (!cifBlock->hasPayloadFor(cif::CifLine::CifType::End))
             cifBlock->addLine(cif::CifLineShared(new cif::CifLineEnd()));
@@ -159,7 +168,7 @@ void MscComment::onDataChanged()
         return;
 
     if (cifBlock->hasPayloadFor(cif::CifLine::CifType::GlobalComment))
-        m_comment = cifBlock->payload(cif::CifLine::CifType::GlobalComment).toString();
+        m_text = cifBlock->payload(cif::CifLine::CifType::GlobalComment).toString();
 
     if (!cifBlock->hasPayloadFor(mainCifType()))
         return;

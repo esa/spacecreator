@@ -9,13 +9,14 @@ namespace msc {
  */
 
 MscInstanceEvent::MscInstanceEvent(QObject *parent)
-    : MscEntity(parent)
+    : MscInstanceEvent(DefaultName, parent)
 {
 }
 
 MscInstanceEvent::MscInstanceEvent(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
+    qRegisterMetaType<msc::MscInstanceEvent *>();
 }
 
 MscInstanceEvent::~MscInstanceEvent() {}

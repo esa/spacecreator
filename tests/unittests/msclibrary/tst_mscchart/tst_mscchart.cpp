@@ -120,7 +120,7 @@ void tst_MscChart::testDestructor()
             auto comment = new MscComment;
             auto instance = chart->instances().first();
             Q_ASSERT(instance);
-            comment->setComment(QLatin1String("Text Comment for the First Instance"));
+            comment->setCommentString(QLatin1String("Text Comment for the First Instance"));
             comment->attachTo(instance);
             instance->setComment(comment);
             chart->addInstanceEvent(comment);

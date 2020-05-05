@@ -586,11 +586,11 @@ QString MscWriter::serializeComment(const msc::MscEntity *entity, int tabsSize) 
     if (!cifInfo.isEmpty()) {
         cifInfo.prepend(QLatin1Char('\n'));
         cifInfo.append(QLatin1Char('\n'));
-    } else if (commentEntity->comment().isEmpty()) {
+    } else if (commentEntity->text().isEmpty()) {
         return {};
     }
 
-    return QString("%1 comment '%2'").arg(cifInfo, commentEntity->comment());
+    return QString("%1 comment '%2'").arg(cifInfo, commentEntity->text());
 }
 
 /*!
@@ -606,7 +606,7 @@ QString MscWriter::serializeGlobalComments(const MscEntity *entity, int tabsSize
 
     QStringList cifTexts;
     if (MscComment *comment = entity->comment()) {
-        const QString globalText = comment->comment();
+        const QString globalText = comment->text();
         if (comment->isGlobal() && !globalText.isEmpty()) {
             for (const cif::CifBlockShared &cifBlock : comment->cifs()) {
                 if (cifBlock->blockType() == cif::CifLine::CifType::Text)

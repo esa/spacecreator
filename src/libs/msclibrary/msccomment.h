@@ -27,6 +27,10 @@ namespace msc {
 class MscComment : public MscInstanceEvent
 {
     Q_OBJECT
+
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_PROPERTY(bool isGlobal READ isGlobal NOTIFY isGlobalChanged)
+
 public:
     explicit MscComment(QObject *parent = nullptr);
 
@@ -37,13 +41,17 @@ public:
     QRect rect() const;
     void setRect(const QRect &rect);
 
-    QString comment() const;
-    void setComment(const QString &comment);
+    QString text() const;
+    void setText(const QString &comment);
 
     MscEntity *attachedEntity() const;
     void attachTo(MscEntity *entity);
 
     bool relatesTo(const MscInstance *instance) const override;
+
+Q_SIGNALS:
+    void textChanged();
+    void isGlobalChanged();
 
 private:
     void updateCifComment();
@@ -51,8 +59,10 @@ private:
 
 private:
     QPointer<MscEntity> m_attachedEntity;
-    QString m_comment;
+    QString m_text;
     QRect m_rect;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscComment *)
