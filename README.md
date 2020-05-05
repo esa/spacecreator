@@ -87,6 +87,7 @@ On the command line, do this:
 # Grantlee notes
 
 The best source of documentation is in the grantlee website http://www.grantlee.org. Examples of use are found here: http://www.grantlee.org/apidox/examples.html.
+The template language is documented in the Django framework https://docs.djangoproject.com/en/3.0/ref/templates/language.
 
 **Steps to integrate the string template engine**<br>
 The current implementation is based on the [Grantlee string template library](https://github.com/steveire/grantlee).

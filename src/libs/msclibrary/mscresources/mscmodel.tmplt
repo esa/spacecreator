@@ -1,5 +1,11 @@
 {% comment %}
 {% endcomment %}
 {% for document in model.documents %}
-    {% include "mscdocument.tmplt" %}
+    {% if forloop.first %}
+        {% with model as mscModel %}
+            {% include "mscdocument.tmplt" %}
+        {% endwith %}
+    {% else %}
+        {% include "mscdocument.tmplt" %}
+    {% endif %}
 {% endfor %}

@@ -141,11 +141,7 @@ QString MscWriter::modelText(MscModel *model)
     if (!model->documents().isEmpty()) {
         if (m_saveMode == CUSTOM) {
             for (MscDocument *doc : model->documents()) {
-                if (!text.isEmpty()) {
-                    out << "\n";
-                }
                 out << serialize(doc);
-                out.flush();
             }
         } else {
             text = exportGrantlee(model);
@@ -675,7 +671,13 @@ QString MscWriter::exportGrantlee(MscModel *model)
 
     buffer.close();
     buffer.open(QIODevice::ReadOnly);
-    return buffer.readAll();
+    QString result = buffer.readAll();
+
+    // Fix too many empty lines
+    result.replace("\n\n\n", "\n");
+    result.replace("\n\n", "\n");
+
+    return result;
 }
 
 } // namespace msc

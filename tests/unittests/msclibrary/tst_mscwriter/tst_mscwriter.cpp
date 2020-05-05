@@ -132,9 +132,19 @@ void tst_MscWriter::testSaveDocumentModel_data()
     model = new MscModel(this);
     model->addDocument(new MscDocument("Doc1", model));
     model->addDocument(new MscDocument("Doc2", model));
-    result = QString("mscdocument Doc1 /* MSC AND */;\nendmscdocument;\n\n"
+    result = QString("mscdocument Doc1 /* MSC AND */;\nendmscdocument;\n"
                      "mscdocument Doc2 /* MSC AND */;\nendmscdocument;");
     QTest::addRow("Two docs") << model << result;
+
+    model = new MscModel(this);
+    model->addDocument(new MscDocument("DataDoc", model));
+    model->setDataLanguage("ASN.1");
+    model->setDataDefinitionString("RPos.asn");
+    result = "mscdocument DataDoc /* MSC AND */;\n"
+             "    language ASN.1;\n"
+             "    data RPos.asn;\n"
+             "endmscdocument;";
+    QTest::addRow("DataDef") << model << result;
 }
 
 void tst_MscWriter::testSaveDocumentModel()
