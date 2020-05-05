@@ -81,7 +81,7 @@ bool AADLFunctionGraphicsItem::isRootItem() const
     return !parentItem() && entity() && entity()->isRootObject();
 }
 
-void AADLFunctionGraphicsItem::doRebuildLayout()
+void AADLFunctionGraphicsItem::rebuildLayout()
 {
     //    qDebug() << Q_FUNC_INFO << entity()->title();
 

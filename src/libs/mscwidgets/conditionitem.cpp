@@ -235,14 +235,14 @@ void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ConditionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
         moveBy(0., to.y() - from.y());
     }
 }
 
-void ConditionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);

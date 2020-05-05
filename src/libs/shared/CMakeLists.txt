@@ -12,8 +12,18 @@ target_sources(${LIB_NAME} PRIVATE
     reports/bugreportdialog.ui
     reports/bugreporthandler.cpp
     reports/bugreporthandler.h
+    ui/drawrectinfo.cpp
+    ui/drawrectinfo.h
     ui/graphicsviewbase.cpp
     ui/graphicsviewbase.h
+    ui/grippoint.cpp
+    ui/grippoint.h
+    ui/grippointshandler.cpp
+    ui/grippointshandler.h
+    ui/highlightrectitem.cpp
+    ui/highlightrectitem.h
+    ui/interactiveobjectbase.cpp
+    ui/interactiveobjectbase.h
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp
@@ -23,6 +33,7 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
+    utils
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets

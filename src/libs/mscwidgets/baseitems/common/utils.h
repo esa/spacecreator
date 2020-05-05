@@ -101,8 +101,6 @@ QVector<MscEntityType *> getEntityFromSelection(QGraphicsScene *scene)
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPointF lineCenter(const QLineF &line);
 QPointF pointFromPath(const QPainterPath &path, int num);
-QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
-                                          const QVariant &to, const int durationMs);
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool removeSceneItem(QGraphicsItem *item);
 bool intersects(const QRectF &rect, const QLineF &line);

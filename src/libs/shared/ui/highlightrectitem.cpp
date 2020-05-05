@@ -17,17 +17,13 @@
 
 #include "highlightrectitem.h"
 
-#include "utils.h"
+#include "animation.h"
 
 #include <QGraphicsRectItem>
 #include <QPropertyAnimation>
 
-namespace aadlinterface {
-
-/*!
- * \class taste3::HighlightRectItem
- * \brief Helper class for graphics items to support animated color change.
- */
+namespace shared {
+namespace ui {
 
 HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
@@ -35,21 +31,23 @@ HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
 {
 }
 
-HighlightRectItem::~HighlightRectItem()
+void HighlightRectItem::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)
 {
-    clearAnimation();
-}
-
-void HighlightRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter)
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
 }
 
 QRectF HighlightRectItem::boundingRect() const
 {
     return m_pathItem->boundingRect();
+}
+
+QPainterPath HighlightRectItem::shape() const
+{
+    return m_pathItem->shape();
+}
+
+void HighlightRectItem::setPath(const QPainterPath &path)
+{
+    return m_pathItem->setPath(path);
 }
 
 void HighlightRectItem::setRect(const QRectF &rect)
@@ -71,15 +69,15 @@ void HighlightRectItem::setBrush(const QBrush &brush)
 
 void HighlightRectItem::highlight()
 {
-    static constexpr qreal from = 1.;
-    static constexpr qreal to = 0.;
-    static constexpr int duration = 250;
+    const qreal from = 1.;
+    const qreal to = 0.;
+    const int duration = 250;
 
     show();
 
-    clearAnimation();
+    delete m_lastAnimation.data();
 
-    m_lastAnimation = aadlinterface::createLinearAnimation(this, "opacity", from, to, duration);
+    m_lastAnimation = utils::Animation::createLinearAnimation(this, "opacity", from, to, duration);
     connect(m_lastAnimation, &QPropertyAnimation::finished, this, [this]() {
         hide();
         Q_EMIT highlighted();
@@ -87,22 +85,5 @@ void HighlightRectItem::highlight()
     m_lastAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void HighlightRectItem::clearAnimation()
-{
-    if (m_lastAnimation) {
-        m_lastAnimation->stop();
-        delete m_lastAnimation;
-    }
 }
-
-QPainterPath HighlightRectItem::shape() const
-{
-    return m_pathItem->shape();
-}
-
-void HighlightRectItem::setPath(const QPainterPath &path)
-{
-    return m_pathItem->setPath(path);
-}
-
 }

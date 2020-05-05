@@ -185,7 +185,7 @@ void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     m_textItem->enableEditMode();
 }
 
-void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void TimerItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
         const QPointF &newPos = pos() + (to - from);
@@ -193,7 +193,7 @@ void TimerItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoint
     }
 }
 
-void TimerItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void TimerItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);

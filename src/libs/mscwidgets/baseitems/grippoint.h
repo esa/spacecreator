@@ -56,8 +56,7 @@ public:
         Resizer
     };
 
-    GripPoint(Location pos, GripPointsHandler *parent = nullptr,
-              GripPoint::GripType gpType = GripPoint::GripType::Resizer);
+    GripPoint(Location pos, GripPointsHandler *parent = nullptr, GripPoint::GripType gpType = GripPoint::GripType::Resizer);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

@@ -23,7 +23,6 @@
 
 #include <QGraphicsItem>
 #include <QMouseEvent>
-#include <QUndoStack>
 #include <mscentity.h>
 
 namespace msc {

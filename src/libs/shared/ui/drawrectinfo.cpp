@@ -16,21 +16,15 @@
 */
 #include "drawrectinfo.h"
 
-namespace aadlinterface {
-
-/*!
-  \class taste3::DrawRectInfo
-  \brief Internal helper for rect drawing.
-*/
+namespace shared {
+namespace ui {
 
 DrawRectInfo::DrawRectInfo()
     : DrawRectInfo(QSizeF(12., 12.), 0.5, Qt::red, { QColor::fromRgbF(0, 0, 0.5, 0.75) })
 {
-    update();
 }
 
-DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor,
-                           const QColor &bodyColor)
+DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor)
     : m_rectSize(rectSize)
     , m_borderWidth(borderWidth)
     , m_borderColor(borderColor)
@@ -122,4 +116,5 @@ void DrawRectInfo::update()
     m_body = QBrush(m_bodyColor);
 }
 
-} // ns taste3
+}
+}

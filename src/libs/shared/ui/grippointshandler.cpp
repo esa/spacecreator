@@ -18,7 +18,7 @@
 
 #include "grippointshandler.h"
 
-#include "common/utils.h"
+#include "animation.h"
 
 #include <QDebug>
 #include <QGraphicsView>
@@ -26,11 +26,11 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 
-namespace aadlinterface {
+namespace shared {
+namespace ui {
 
 GripPointsHandler::GripPointsHandler(QGraphicsItem *parent)
     : QGraphicsObject(parent)
-    , AbstractInteractiveObject()
 {
     setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemSendsGeometryChanges);
     hide();
@@ -40,7 +40,7 @@ GripPoint *GripPointsHandler::createGripPoint(GripPoint::Location location, int 
 {
     auto grip = new GripPoint(location, this);
     m_usedPoints.insert(grip->location());
-    m_gripPoints.insert(idx == -1 ? m_gripPoints.size() : idx, grip);
+    m_gripPoints.insert(idx < 0 ? m_gripPoints.size() : idx, grip);
     return grip;
 }
 
@@ -50,9 +50,18 @@ void GripPointsHandler::removeGripPoint(GripPoint *handle)
     delete handle;
 }
 
-GripPoint::Locations GripPointsHandler::usedPoints() const
+QRectF GripPointsHandler::boundingRect() const
 {
-    return m_usedPoints;
+    if (QGraphicsItem *parent = parentItem()) {
+        auto bounds = parent->boundingRect();
+        auto scaleFactor = viewScale();
+        return QRectF(bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(), bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y());
+    }
+    return QRectF();
+}
+
+void GripPointsHandler::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)
+{
 }
 
 QList<GripPoint *> GripPointsHandler::gripPoints() const
@@ -70,39 +79,35 @@ void GripPointsHandler::updateLayout()
     }
 }
 
-QRectF GripPointsHandler::boundingRect() const
+QSizeF GripPointsHandler::minSize() const
 {
-    QRectF bounds;
-    if (QGraphicsItem *parent = parentItem()) {
-        bounds = parent->boundingRect();
+    const qreal SpanBetweenTwoGrips = 2;
+    const qreal oneSide = GripPoint::sideSize() * 3 + SpanBetweenTwoGrips * 2;
+    return { oneSide, oneSide };
+}
 
-        const QPointF &scaleFactor(viewScale());
-        bounds = { bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(),
-                   bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y() };
+void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
+{
+    if (m_usedPoints == points)
+        return;
+
+    m_usedPoints = points;
+    updateLayout();
+}
+
+GripPoint::Locations GripPointsHandler::usedPoints() const
+{
+    return m_usedPoints;
+}
+
+void GripPointsHandler::setGripPointPos(GripPoint *grip, const QPointF &pos)
+{
+    if (grip) {
+        const QPointF &currScale(viewScale());
+        const QPointF &destination(mapFromScene(pos));
+        const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
+        grip->setPos(destinationScaled);
     }
-    return bounds;
-}
-
-void GripPointsHandler::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter)
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
-}
-
-void GripPointsHandler::handleGripPointPress(GripPoint *handle, const QPointF &at)
-{
-    Q_EMIT manualGeometryChangeStart(handle, at);
-}
-
-void GripPointsHandler::handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to)
-{
-    Q_EMIT manualGeometryChangeProgress(handle, from, to);
-}
-
-void GripPointsHandler::handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    Q_EMIT manualGeometryChangeFinish(handle, pressedAt, releasedAt);
 }
 
 void GripPointsHandler::showAnimated()
@@ -115,7 +120,7 @@ void GripPointsHandler::hideAnimated()
     changeVisibilityAnimated(false);
 }
 
-void GripPointsHandler::onOpacityAnimationFinished()
+void GripPointsHandler::opacityAnimationFinished()
 {
     if (!m_visible)
         setVisible(false);
@@ -123,23 +128,20 @@ void GripPointsHandler::onOpacityAnimationFinished()
 
 void GripPointsHandler::changeVisibilityAnimated(bool appear)
 {
+    if (appear == m_visible) {
+        return;
+    }
+
     m_visible = appear;
     const qreal from = m_visible ? 0. : 1.;
     const qreal to = m_visible ? 1. : 0.;
     const int duration = m_visible ? 100 : 150;
     setVisible(true);
 
-    if (QPropertyAnimation *anim = aadlinterface::createLinearAnimation(this, "opacity", from, to, duration)) {
-        connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::onOpacityAnimationFinished);
+    if (QPropertyAnimation *anim = utils::Animation::createLinearAnimation(this, "opacity", from, to, duration)) {
+        connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::opacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }
-}
-
-QSizeF GripPointsHandler::minSize() const
-{
-    static const qreal SpanBetweenTwoGrips = 2.;
-    const qreal oneSide = GripPoint::sideSize() * 3. + SpanBetweenTwoGrips * 2.;
-    return { oneSide, oneSide };
 }
 
 QPointF GripPointsHandler::viewScale() const
@@ -161,14 +163,5 @@ QPointF GripPointsHandler::viewScale() const
     return { 1., 1. };
 }
 
-void GripPointsHandler::setGripPointPos(GripPoint *grip, const QPointF &pos)
-{
-    if (grip) {
-        const QPointF &currScale(viewScale());
-        const QPointF &destination(mapFromScene(pos));
-        const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
-        grip->setPos(destinationScaled);
-    }
 }
-
-} // namespace taste3
+}

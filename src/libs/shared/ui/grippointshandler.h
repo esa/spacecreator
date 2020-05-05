@@ -18,15 +18,21 @@
 
 #pragma once
 
-#include "common/abstractinteractiveobject.h"
 #include "grippoint.h"
 
 #include <QGraphicsObject>
 #include <QSet>
 
-namespace aadlinterface {
+namespace shared {
+namespace ui {
 
-class GripPointsHandler : public QGraphicsObject, public AbstractInteractiveObject
+/*!
+  \class shared::ui::GripPointsHandler
+  \brief Set of handlers (up to 9) for resizing/moving item by mouse.
+
+  \inmodule shared
+*/
+class GripPointsHandler : public QGraphicsObject
 {
     Q_OBJECT
 
@@ -36,10 +42,6 @@ public:
     GripPoint *createGripPoint(GripPoint::Location location, int idx = -1);
     void removeGripPoint(GripPoint *handle);
 
-    void handleGripPointPress(GripPoint *handle, const QPointF &at) override;
-    void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) override;
-    void handleGripPointRelease(GripPoint *handle, const QPointF &pressedAt, const QPointF &releasedAt) override;
-
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -48,6 +50,7 @@ public:
 
     QSizeF minSize() const;
 
+    void setUsedPoints(GripPoint::Locations points);
     GripPoint::Locations usedPoints() const;
 
     void setGripPointPos(GripPoint *grip, const QPointF &pos);
@@ -57,15 +60,16 @@ public Q_SLOTS:
     void hideAnimated();
 
 protected Q_SLOTS:
-    void onOpacityAnimationFinished();
+    void opacityAnimationFinished();
 
 Q_SIGNALS:
     void manualGeometryChangeStart(GripPoint *gripPoint, const QPointF &at);
     void manualGeometryChangeProgress(GripPoint *gripPoint, const QPointF &from, const QPointF &to);
     void manualGeometryChangeFinish(GripPoint *gripPoint, const QPointF &startedAt, const QPointF &releasedAt);
 
-protected:
+private:
     void changeVisibilityAnimated(bool appear);
+
     /*
      * To keep the selection frame and its grippoints unscaled,
      * the QGraphicsItem::ItemIgnoresTransformations flag is used.
@@ -79,7 +83,6 @@ protected:
      */
     QPointF viewScale() const;
 
-protected:
     QList<GripPoint *> m_gripPoints;
     DrawRectInfo m_highlighter;
     bool m_visible = false;
@@ -87,4 +90,5 @@ protected:
     GripPoint::Locations m_usedPoints;
 };
 
-} // namespace taste3
+}
+}

@@ -91,7 +91,7 @@ aadl::AADLObjectFunctionType *AADLFunctionTypeGraphicsItem::entity() const
     return qobject_cast<aadl::AADLObjectFunctionType *>(aadlObject());
 }
 
-void AADLFunctionTypeGraphicsItem::doRebuildLayout()
+void AADLFunctionTypeGraphicsItem::rebuildLayout()
 {
     AADLRectGraphicsItem::rebuildLayout();
     updateTextPosition();

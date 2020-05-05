@@ -57,7 +57,7 @@ protected:
         painter->drawRect(boundingRect());
     }
 
-    virtual void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override
+    virtual void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override
     {
         Q_UNUSED(gp);
 
@@ -65,7 +65,7 @@ protected:
         moveBy(offset.x(), offset.y());
     }
 
-    virtual void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override
+    virtual void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override
     {
         // Note: the correctness of resizing itself does not matter now,
         // we are here just to ensure that the handler is called in a propper way.

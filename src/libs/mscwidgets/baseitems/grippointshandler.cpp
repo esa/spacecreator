@@ -28,14 +28,6 @@
 
 namespace msc {
 
-/*!
-  \class msc::GripPointsHandler
-  \brief Set of handlers (up to 9) for resizing/moving item by mouse.
-
-  \inmodule MscWidgets
-
-*/
-
 const QMap<GripPoint::Location, GripPoint *> createGripPoints(GripPointsHandler *parent)
 {
     QMap<GripPoint::Location, GripPoint *> result;

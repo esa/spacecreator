@@ -19,23 +19,29 @@
 
 #include <QGraphicsObject>
 #include <QPointer>
-#include <QPropertyAnimation>
 
-class QGraphicsRectItem;
+class QGraphicsPathItem;
+class QPropertyAnimation;
 
-namespace msc {
+namespace shared {
+namespace ui {
 
+/*!
+ * \class HighlightRectItem
+ * \brief Helper class for graphics items to support animated color change.
+ */
 class HighlightRectItem : public QGraphicsObject
 {
     Q_OBJECT
-public:
-    HighlightRectItem(QGraphicsItem *parent);
-    ~HighlightRectItem();
 
-    // QGraphicsItem interface
+public:
+    explicit HighlightRectItem(QGraphicsItem *parent);
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
+    QPainterPath shape() const override;
 
+    void setPath(const QPainterPath &path);
     void setRect(const QRectF &rect);
     void setPen(const QPen &pen);
     void setBrush(const QBrush &brush);
@@ -46,10 +52,9 @@ Q_SIGNALS:
     void highlighted() const;
 
 private:
-    QGraphicsRectItem *m_rectItem = new QGraphicsRectItem(this);
-    QPointer<QPropertyAnimation> m_lastAnimation = nullptr;
-
-    void clearAnimation();
+    QGraphicsPathItem *m_pathItem = nullptr;
+    QPointer<QPropertyAnimation> m_lastAnimation;
 };
 
-} // ns msc
+}
+}

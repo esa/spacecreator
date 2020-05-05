@@ -315,7 +315,7 @@ void CommentItem::setGlobalPreview(bool isGlobalPreview)
     update();
 }
 
-void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() != GripPoint::Location::Center)
         return;
@@ -357,7 +357,7 @@ void CommentItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
     Q_EMIT needUpdateLayout();
 }
 
-void CommentItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     const QPoint shift = QPointF(to - from).toPoint();
     QRect rect = m_textItem->sceneBoundingRect().toRect();

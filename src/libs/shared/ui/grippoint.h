@@ -18,21 +18,22 @@
 
 #pragma once
 
-#include "common/drawrectinfo.h"
+#include "drawrectinfo.h"
 
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QPainterPath>
 #include <QPointer>
 
-namespace aadlinterface {
+namespace shared {
+namespace ui {
 
-class AbstractInteractiveObject;
 class GripPointsHandler;
 
 class GripPoint : public QGraphicsItem
 {
     Q_GADGET
+
 public:
     enum Location
     {
@@ -61,7 +62,7 @@ public:
         Type = UserType + std::numeric_limits<uchar>::max()
     };
 
-    explicit GripPoint(Location pos, GripPointsHandler *parent = nullptr);
+    explicit GripPoint(Location pos, GripPointsHandler* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -81,7 +82,6 @@ public:
     static QColor bodyColor();
 
     GripPoint::GripType gripType() const;
-    void setGripType(GripPoint::GripType gpType);
     bool isMover() const;
 
     bool isUsed() const;
@@ -91,9 +91,7 @@ public:
     void updateLayout();
 
 protected:
-    static DrawRectInfo m_uiDescr;
-
-    AbstractInteractiveObject *const m_listener;
+    GripPointsHandler *const m_listener;
     Location m_location;
 
     const QRectF m_boundRect;
@@ -107,4 +105,5 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-} // namespace taste3
+}
+}

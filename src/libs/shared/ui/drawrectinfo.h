@@ -20,14 +20,19 @@
 #include <QBrush>
 #include <QPen>
 
-namespace aadlinterface {
+namespace shared {
+namespace ui {
 
+/*!
+  \class shared::ui::DrawRectInfo
+  \brief Internal helper for rect drawing.
+*/
 class DrawRectInfo
 {
 public:
     DrawRectInfo();
-
     DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor);
+
     QSizeF rectSize() const;
     void setRectSize(const QSizeF &sz);
 
@@ -56,4 +61,5 @@ private:
     void update();
 };
 
-} // ns taste3
+}
+}

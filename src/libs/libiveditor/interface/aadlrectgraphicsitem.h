@@ -49,7 +49,7 @@ public:
     void layout();
 
 protected:
-    void doRebuildLayout() override;
+    void rebuildLayout() override;
     void initGripPoints() override;
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;

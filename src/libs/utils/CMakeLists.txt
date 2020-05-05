@@ -3,6 +3,8 @@ set(LIB_NAME utils)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    animation.cpp
+    animation.h
     common.cpp
     common.h
     delayedsignal.cpp

@@ -21,7 +21,6 @@
 
 #include <QDebug>
 #include <QGraphicsView>
-#include <QPropertyAnimation>
 #include <QtGlobal>
 
 namespace msc {
@@ -71,19 +70,6 @@ QPointF pointFromPath(const QPainterPath &path, int num)
         result = path.elementAt(num);
     }
     return result;
-}
-
-QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
-                                          const QVariant &to, const int durationMs)
-{
-    QPropertyAnimation *anim = new QPropertyAnimation(target, propName.toUtf8());
-    anim->setDuration(durationMs);
-    anim->setEasingCurve(QEasingCurve::Linear);
-
-    anim->setStartValue(from);
-    anim->setEndValue(to);
-
-    return anim;
 }
 
 QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance)

@@ -16,8 +16,6 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/common/coordinatesconverter.h
     baseitems/common/drawrectinfo.cpp
     baseitems/common/drawrectinfo.h
-    baseitems/common/highlightrectitem.cpp
-    baseitems/common/highlightrectitem.h
     baseitems/common/objectanchor.cpp
     baseitems/common/objectanchor.h
     baseitems/common/objectslink.cpp

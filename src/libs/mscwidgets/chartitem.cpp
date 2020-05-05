@@ -113,14 +113,14 @@ void ChartItem::setName(const QString &name)
     }
 }
 
-void ChartItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ChartItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);
     Q_UNUSED(to);
 }
 
-void ChartItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ChartItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_prevContentRect.isNull())
         m_prevContentRect = contentRect();

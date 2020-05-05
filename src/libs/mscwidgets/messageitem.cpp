@@ -489,7 +489,7 @@ void MessageItem::setAutoResizable(bool resizable)
     m_autoResize = resizable;
 }
 
-void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() != GripPoint::Location::Center || from == to || isCreator())
         return;
@@ -516,7 +516,7 @@ void MessageItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPoi
     updateSourceAndTarget(QPointF(0, shift));
 }
 
-void MessageItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (from == to)
         return;

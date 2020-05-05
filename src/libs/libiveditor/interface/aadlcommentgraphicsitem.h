@@ -50,7 +50,7 @@ protected Q_SLOTS:
     virtual void applyColorScheme() override;
 
 protected:
-    void doRebuildLayout() override;
+    void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual ColorManager::HandledColors handledColorType() const override;
 

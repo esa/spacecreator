@@ -117,14 +117,14 @@ void CoregionItem::rebuildLayout()
     setPos(rect.topLeft());
 }
 
-void CoregionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CoregionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);
     Q_UNUSED(to);
 }
 
-void CoregionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CoregionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);

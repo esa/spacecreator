@@ -182,7 +182,7 @@ QList<QVariantList> AADLRectGraphicsItem::prepareChangeCoordinatesCommandParams(
     return params;
 }
 
-void AADLRectGraphicsItem::doRebuildLayout()
+void AADLRectGraphicsItem::rebuildLayout()
 {
     const QRectF sceneRect = sceneBoundingRect();
     if (auto graphicsItemParent = parentItem()) {

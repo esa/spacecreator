@@ -3,19 +3,10 @@ set(LIB_NAME libiveditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    baseitems/common/abstractinteractiveobject.h
-    baseitems/common/drawrectinfo.cpp
-    baseitems/common/drawrectinfo.h
-    baseitems/common/highlightrectitem.cpp
-    baseitems/common/highlightrectitem.h
     baseitems/common/utils.cpp
     baseitems/common/utils.h
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
-    baseitems/grippoint.cpp
-    baseitems/grippoint.h
-    baseitems/grippointshandler.cpp
-    baseitems/grippointshandler.h
     baseitems/interactiveobject.cpp
     baseitems/interactiveobject.h
     baseitems/textgraphicsitem.cpp

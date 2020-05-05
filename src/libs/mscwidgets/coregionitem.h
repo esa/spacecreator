@@ -46,8 +46,8 @@ public:
 protected:
     void prepareHoverMark() override;
     void rebuildLayout() override;
-    void onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
     QPointer<ChartViewModel> m_model;

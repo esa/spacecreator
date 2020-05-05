@@ -74,7 +74,7 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView
     connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
     connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this, [this](const QPointF &from, const QPointF &to) {
         if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center)) {
-            onMoveRequested(gp, from, to);
+            onManualMoveProgress(gp, from, to);
         }
     });
 
@@ -217,7 +217,7 @@ void InstanceItem::applyCif()
     }
 }
 
-void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() != GripPoint::Location::Center)
         return;
@@ -238,7 +238,7 @@ void InstanceItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPo
         setPos(pos() + delta);
 }
 
-void InstanceItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);

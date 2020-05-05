@@ -122,14 +122,14 @@ void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ActionItem::onMoveRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ActionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (gp->location() == GripPoint::Location::Center) {
         moveBy(0., to.y() - from.y());
     }
 }
 
-void ActionItem::onResizeRequested(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ActionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);

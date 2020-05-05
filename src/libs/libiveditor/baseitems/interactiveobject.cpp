@@ -19,29 +19,23 @@
 #include "interactiveobject.h"
 
 #include "commandsstack.h"
-#include "baseitems/common/highlightrectitem.h"
 #include "baseitems/common/utils.h"
-#include "grippointshandler.h"
 #include "aadlobject.h"
 #include "interface/commands/cmdentityautolayout.h"
 #include "interface/commands/commandids.h"
 #include "interface/commands/commandsfactory.h"
-#include "delayedsignal.h"
 
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QPen>
 #include <functional>
 
 namespace aadlinterface {
 
 InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *parent)
-    : QGraphicsObject(parent)
+    : shared::ui::InteractiveObjectBase(parent)
     , m_dataObject(entity)
-    , m_selectedPen(Qt::black, 2, Qt::DotLine)
 {
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
@@ -50,66 +44,11 @@ InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *pa
     setCursor(Qt::ArrowCursor);
 
     connect(ColorManager::instance(), &ColorManager::colorsUpdated, this, &InteractiveObject::applyColorScheme);
-
-    m_rebuildLayoutSignal = new utils::DelayedSignal(this);
-    connect(m_rebuildLayoutSignal, &utils::DelayedSignal::triggered, this, &InteractiveObject::doRebuildLayout);
-}
-
-void InteractiveObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option)
-    Q_UNUSED(widget)
-
-    if (isSelected()) {
-        painter->save();
-        painter->setPen(m_selectedPen);
-
-        painter->drawRect(m_boundingRect);
-        painter->restore();
-    }
-}
-
-QRectF InteractiveObject::boundingRect() const
-{
-    return m_boundingRect;
 }
 
 aadl::AADLObject *InteractiveObject::aadlObject() const
 {
     return m_dataObject;
-}
-
-void InteractiveObject::gripPointPressed(GripPoint *gp, const QPointF &at)
-{
-    if (!gp)
-        return;
-
-    if (gp->isMover())
-        onManualMoveStart(gp, at);
-    else
-        onManualResizeStart(gp, at);
-}
-
-void InteractiveObject::gripPointMoved(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    if (!gp)
-        return;
-
-    if (gp->isMover())
-        onManualMoveProgress(gp, from, to);
-    else
-        onManualResizeProgress(gp, from, to);
-}
-
-void InteractiveObject::gripPointReleased(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    if (!gp)
-        return;
-
-    if (gp->isMover())
-        onManualMoveFinish(gp, pressedAt, releasedAt);
-    else
-        onManualResizeFinish(gp, pressedAt, releasedAt);
 }
 
 void InteractiveObject::onSelectionChanged(bool isSelected)
@@ -121,10 +60,6 @@ void InteractiveObject::onSelectionChanged(bool isSelected)
     } else {
         hideGripPoints();
     }
-}
-
-void InteractiveObject::rebuildLayout() {
-    m_rebuildLayoutSignal->triggerSignal();
 }
 
 QFont InteractiveObject::font() const
@@ -231,56 +166,6 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsObject::mouseDoubleClickEvent(event);
 }
 
-void InteractiveObject::onManualMoveStart(GripPoint *gp, const QPointF &at)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(at)
-}
-
-void InteractiveObject::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(from)
-    Q_UNUSED(to)
-}
-
-void InteractiveObject::onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(pressedAt)
-    Q_UNUSED(releasedAt)
-}
-
-void InteractiveObject::onManualGripPointAdd(GripPoint *gp)
-{
-    Q_UNUSED(gp)
-}
-
-void InteractiveObject::onManualGripPointRemove(GripPoint *gp)
-{
-    Q_UNUSED(gp)
-}
-
-void InteractiveObject::onManualResizeStart(GripPoint *gp, const QPointF &at)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(at)
-}
-
-void InteractiveObject::onManualResizeFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(pressedAt)
-    Q_UNUSED(releasedAt)
-}
-
-void InteractiveObject::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp)
-    Q_UNUSED(from)
-    Q_UNUSED(to)
-}
-
 void InteractiveObject::hideGripPoints()
 {
     if (m_gripPointsHandler)
@@ -312,131 +197,6 @@ void InteractiveObject::initGripPoints()
         if (m_gripPointsHandler && !m_gripPointsHandler->isVisible())
             delete m_gripPointsHandler; // it's not a thing directly added to the scene, so just delete is enough
     });
-}
-
-void InteractiveObject::updateGripPoints()
-{
-    if (m_gripPointsHandler)
-        m_gripPointsHandler->updateLayout();
-}
-
-QVariant InteractiveObject::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case QGraphicsItem::ItemSelectedChange:
-        onSelectionChanged(value.toBool());
-        break;
-    case QGraphicsItem::ItemPositionChange:
-        m_prevPos = pos();
-        break;
-    case QGraphicsItem::ItemPositionHasChanged:
-        Q_EMIT relocated(m_prevPos, pos());
-        break;
-    default:
-        break;
-    }
-
-    return QGraphicsObject::itemChange(change, value);
-}
-
-bool InteractiveObject::isHovered() const
-{
-    if (!isUnderMouse())
-        return false;
-
-    return m_gripPointsHandler && m_gripPointsHandler->isVisible();
-}
-
-HighlightRectItem *InteractiveObject::createHighlighter()
-{
-    if (m_highlighter)
-        delete m_highlighter;
-    m_highlighter = new HighlightRectItem(this);
-    connect(m_highlighter, &HighlightRectItem::highlighted, m_highlighter, &QObject::deleteLater);
-    connect(m_highlighter, &QObject::destroyed, this, [this]() { m_highlighter = nullptr; });
-
-    m_highlighter->setPath(shape());
-
-    return m_highlighter;
-}
-
-bool InteractiveObject::isHighlightable() const
-{
-    return m_highlightable;
-}
-
-void InteractiveObject::setHighlightable(bool highlightable)
-{
-    m_highlightable = highlightable;
-    clearHighlight();
-}
-
-void InteractiveObject::highlightConnected()
-{
-    doHighlighting(Qt::green, false);
-}
-
-void InteractiveObject::highlightDisconnected()
-{
-    doHighlighting(Qt::red, false);
-}
-
-void InteractiveObject::doHighlighting(const QColor &color, bool permanent)
-{
-    if (!m_highlightable) {
-        return;
-    }
-
-    if (HighlightRectItem *highlighter = createHighlighter()) {
-        QColor targetColor(color);
-        QPen p(targetColor);
-        p.setWidthF(1.);
-        highlighter->setPen(p);
-        targetColor.setAlphaF(0.25);
-        highlighter->setBrush(targetColor);
-
-        if (!permanent)
-            highlighter->highlight();
-    }
-}
-
-void InteractiveObject::clearHighlight()
-{
-    if (m_highlighter) {
-        delete m_highlighter;
-        m_highlighter = nullptr;
-    }
-}
-
-bool InteractiveObject::isHighlighting() const
-{
-    return m_highlighter != nullptr;
-}
-
-QPointF InteractiveObject::centerInScene() const
-{
-    return sceneBoundingRect().center();
-}
-
-void InteractiveObject::scheduleLayoutUpdate()
-{
-    if (m_layoutDirty)
-        return;
-
-    m_layoutDirty = QMetaObject::invokeMethod(this, "instantLayoutUpdate", Qt::QueuedConnection);
-}
-
-void InteractiveObject::instantLayoutUpdate()
-{
-    const QRectF oldBounds = sceneBoundingRect();
-
-    rebuildLayout();
-    m_layoutDirty = false;
-
-    if (oldBounds != sceneBoundingRect())
-        Q_EMIT boundingBoxChanged();
-
-    update();
 }
 
 ColorHandler InteractiveObject::colorHandler() const
