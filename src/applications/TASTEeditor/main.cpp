@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
     Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(tab_interface_resources);
 
     aadl::DataTypesStorage::init();
 
