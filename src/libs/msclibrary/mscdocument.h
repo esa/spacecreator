@@ -94,4 +94,7 @@ private:
     HierarchyType m_hierarchyType = HierarchyAnd;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscDocument *)
+Q_DECLARE_METATYPE(QVector<msc::MscDocument *>)

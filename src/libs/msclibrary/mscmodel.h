@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "mscdocument.h"
-
 #include <QObject>
 #include <QVector>
 
@@ -26,6 +24,7 @@ class QFileInfo;
 
 namespace msc {
 class MscChart;
+class MscDocument;
 
 class MscModel : public QObject
 {
@@ -75,6 +74,4 @@ private:
     QVariantList m_asn1TypesData;
 };
 
-} // namespace msc
-
-Q_DECLARE_METATYPE(QVector<msc::MscDocument *>)
+}

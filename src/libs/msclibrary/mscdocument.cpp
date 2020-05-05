@@ -29,17 +29,15 @@ namespace msc {
  */
 
 MscDocument::MscDocument(QObject *parent)
-    : MscEntity(parent)
-    , m_messageDeclarations(new MscMessageDeclarationList(this))
+    : MscDocument({}, parent)
 {
-    connect(m_messageDeclarations, &MscMessageDeclarationList::dataChanged, this, &MscDocument::dataChanged);
-    connect(m_messageDeclarations, &MscMessageDeclarationList::countChanged, this, &MscDocument::dataChanged);
 }
 
 MscDocument::MscDocument(const QString &name, QObject *parent)
     : MscEntity(name, parent)
     , m_messageDeclarations(new MscMessageDeclarationList(this))
 {
+    qRegisterMetaType<QVector<msc::MscDocument *>>();
     connect(m_messageDeclarations, &MscMessageDeclarationList::dataChanged, this, &MscDocument::dataChanged);
     connect(m_messageDeclarations, &MscMessageDeclarationList::countChanged, this, &MscDocument::dataChanged);
 }
