@@ -69,14 +69,11 @@ private Q_SLOTS:
     void testSerializeMessageDeclarations();
 
 private:
-    static const QString TabSpaces;
     QString prependTabs(const QString &str, int count) const;
     QString tab1(const QString &str) const;
     QString tab2(const QString &str) const;
     QString tab3(const QString &str) const;
 };
-
-const QString tst_MscWriter::TabSpaces = QString("    "); // 4 space chars
 
 tst_MscWriter::tst_MscWriter()
 {
@@ -85,9 +82,10 @@ tst_MscWriter::tst_MscWriter()
 
 QString tst_MscWriter::prependTabs(const QString &str, int count) const
 {
+    const QString tabSpaces = QString("    "); // 4 space chars
     QString res;
     for (int i = 0; i < count; ++i)
-        res += TabSpaces;
+        res += tabSpaces;
     return res + str;
 }
 
@@ -113,10 +111,11 @@ void tst_MscWriter::cleanup()
 
 void tst_MscWriter::testSelthTabbing()
 {
-    static const QString tabTest("tabTest");
-    QCOMPARE(tab1(tabTest), TabSpaces + tabTest);
-    QCOMPARE(tab2(tabTest), TabSpaces + TabSpaces + tabTest);
-    QCOMPARE(tab3(tabTest), TabSpaces + TabSpaces + TabSpaces + tabTest);
+    const QString tabSpaces = QString("    "); // 4 space chars
+    const QString tabTest("tabTest");
+    QCOMPARE(tab1(tabTest), tabSpaces + tabTest);
+    QCOMPARE(tab2(tabTest), tabSpaces + tabSpaces + tabTest);
+    QCOMPARE(tab3(tabTest), tabSpaces + tabSpaces + tabSpaces + tabTest);
 }
 
 void tst_MscWriter::testSaveDocumentModel_data()
