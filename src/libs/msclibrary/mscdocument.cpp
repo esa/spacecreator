@@ -18,6 +18,7 @@
 #include "mscdocument.h"
 
 #include "mscchart.h"
+#include "mscmessagedeclaration.h"
 #include "mscmessagedeclarationlist.h"
 
 namespace msc {
@@ -163,6 +164,15 @@ MscMessageDeclarationList *MscDocument::messageDeclarations() const
 MscMessageDeclarationList *MscDocument::messageDeclarations()
 {
     return m_messageDeclarations;
+}
+
+/**
+    Return the message declarations in a QList (if QObjectListT can't be handeled)
+    Normally messageDeclarations() is preferred.
+ */
+QList<msc::MscMessageDeclaration *> MscDocument::declarations() const
+{
+    return m_messageDeclarations->objectList();
 }
 
 /*!

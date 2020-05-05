@@ -38,4 +38,4 @@ public:
     void setObjectList(const QList<MscMessageDeclaration *> &objects) override;
 };
 
-} // namespace msc
+}

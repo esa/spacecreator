@@ -1,6 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource prefix="/">
+        <file>mscresources/documentBody.tmplt</file>
         <file>mscresources/mscdocument.tmplt</file>
         <file>mscresources/mscmodel.tmplt</file>
     </qresource>

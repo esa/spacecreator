@@ -27,6 +27,8 @@ namespace msc {
 MscMessageDeclaration::MscMessageDeclaration(QObject *parent)
     : QObject(parent)
 {
+    qRegisterMetaType<msc::MscMessageDeclaration *>();
+    qRegisterMetaType<QList<msc::MscMessageDeclaration *>>();
 }
 
 const QStringList &MscMessageDeclaration::names() const
@@ -34,9 +36,25 @@ const QStringList &MscMessageDeclaration::names() const
     return m_names;
 }
 
+/**
+   Returns all the names as one string, connected by a ", "
+ */
+QString MscMessageDeclaration::joinedNames() const
+{
+    return m_names.join(", ");
+}
+
 const QStringList &MscMessageDeclaration::typeRefList() const
 {
     return m_typeRefList;
+}
+
+/**
+   Returns all the type references as one string, connected by a ", "
+ */
+QString MscMessageDeclaration::joinedTypeRefList() const
+{
+    return m_typeRefList.join(", ");
 }
 
 void MscMessageDeclaration::setNames(const QStringList &names)

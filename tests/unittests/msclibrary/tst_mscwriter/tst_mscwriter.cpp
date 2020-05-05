@@ -165,9 +165,25 @@ void tst_MscWriter::testSaveDocumentModel_data()
     auto doc2 = new MscDocument("CommentedDoc", model);
     doc2->setCommentString("Ignore this");
     model->addDocument(doc2);
-
     result = QString("mscdocument CommentedDoc comment 'Ignore this' /* MSC AND */;\nendmscdocument;");
     QTest::addRow("Commented doc") << model << result << result;
+
+    model = new MscModel(this);
+    auto doc3 = new MscDocument("DeclDoc", model);
+    auto declaration = new msc::MscMessageDeclaration(doc3);
+    declaration->setNames({ "init", "x" });
+    declaration->setTypeRefList({ "int", "width" });
+    doc3->messageDeclarations()->append(declaration);
+    auto declaration1 = new msc::MscMessageDeclaration(doc3);
+    declaration1->setNames({ "gui_send_tm", "pepe" });
+    declaration1->setTypeRefList({ "str", "T-POS" });
+    doc3->messageDeclarations()->append(declaration1);
+    model->addDocument(doc3);
+    result = QString("mscdocument DeclDoc /* MSC AND */;\n"
+                     "    msg init, x : (int, width);\n"
+                     "    msg gui_send_tm, pepe : (str, T-POS);\n"
+                     "endmscdocument;");
+    QTest::addRow("Doc with declaration") << model << result << result;
 }
 
 void tst_MscWriter::testSaveDocumentModel()

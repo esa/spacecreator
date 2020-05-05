@@ -25,6 +25,7 @@
 
 namespace msc {
 class MscChart;
+class MscMessageDeclaration;
 class MscMessageDeclarationList;
 
 class MscDocument : public MscEntity
@@ -33,6 +34,7 @@ class MscDocument : public MscEntity
     Q_PROPERTY(msc::MscDocument::HierarchyType hierarchyType READ hierarchyType NOTIFY hierarchyTypeChanged)
     Q_PROPERTY(QString hierarchyTypeString READ hierarchyTypeString NOTIFY hierarchyTypeChanged)
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY documentsChanged)
+    Q_PROPERTY(QList<msc::MscMessageDeclaration *> declarations READ declarations CONSTANT)
 
 public:
     enum HierarchyType
@@ -62,6 +64,7 @@ public:
 
     MscMessageDeclarationList *messageDeclarations() const;
     MscMessageDeclarationList *messageDeclarations();
+    QList<msc::MscMessageDeclaration *> declarations() const;
 
     void clear();
     void clearCharts();

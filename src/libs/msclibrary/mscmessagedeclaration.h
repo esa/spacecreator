@@ -26,12 +26,18 @@ class MscMessageDeclaration : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QStringList names READ names WRITE setNames NOTIFY namesChanged)
+    Q_PROPERTY(QString joinedNames READ joinedNames NOTIFY namesChanged)
     Q_PROPERTY(QStringList typeRefList READ typeRefList WRITE setTypeRefList NOTIFY typeRefListChanged)
+    Q_PROPERTY(QString joinedTypeRefList READ joinedTypeRefList NOTIFY typeRefListChanged)
+
 public:
     explicit MscMessageDeclaration(QObject *parent = nullptr);
 
     const QStringList &names() const;
+    QString joinedNames() const;
+
     const QStringList &typeRefList() const;
+    QString joinedTypeRefList() const;
 
 public Q_SLOTS:
     void setNames(const QStringList &names);
@@ -47,4 +53,7 @@ private:
     QStringList m_typeRefList;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscMessageDeclaration *)
+Q_DECLARE_METATYPE(QList<msc::MscMessageDeclaration *>)

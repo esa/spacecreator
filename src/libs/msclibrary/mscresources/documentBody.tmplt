@@ -1,0 +1,8 @@
+{% comment %}
+{% endcomment %}
+{% for declaration in document.declarations %}
+    msg {{ declaration.joinedNames }}{% if declaration.joinedTypeRefList != "" %} : ({{ declaration.joinedTypeRefList }}){% endif %};
+{% endfor %}
+{% for document in document.documents %}
+    {% include "mscdocument.tmplt" %}
+{% endfor %}
