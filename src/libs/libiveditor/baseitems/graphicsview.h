@@ -19,8 +19,6 @@
 
 #include "ui/graphicsviewbase.h"
 
-#include <QPointF>
-
 namespace aadlinterface {
 
 /*!

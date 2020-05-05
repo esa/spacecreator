@@ -19,9 +19,6 @@
 
 #include "ui/graphicsviewbase.h"
 
-#include <QPointF>
-
-class QUndoStack;
 namespace msc {
 
 class GraphicsView : public shared::ui::GraphicsViewBase
