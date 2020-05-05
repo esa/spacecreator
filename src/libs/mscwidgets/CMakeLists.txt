@@ -166,4 +166,10 @@ target_include_directories(${LIB_NAME}
     PUBLIC .
 )
 
-target_link_libraries(${LIB_NAME} Qt5::Core Qt5::Gui Qt5::Widgets msclibrary)
+target_link_libraries(${LIB_NAME}
+    msclibrary
+    shared
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+)

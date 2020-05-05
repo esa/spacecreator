@@ -43,38 +43,14 @@ namespace msc {
   Constructs a MSV view object with the parent \a parent.
 */
 GraphicsView::GraphicsView(QWidget *parent)
-    : QGraphicsView(parent)
+    : shared::ui::GraphicsViewBase(parent)
 {
+    setMinZoomPercent(50);
+
     setBackgroundBrush(QImage(":/resources/resources/texture.png"));
 
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
-
-    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-}
-
-/*!
- * \brief GraphicsView::zoom Get the current zoom percentage
- * \return
- */
-double GraphicsView::zoom() const
-{
-    return m_zoomPercent;
-}
-
-/*!
- * \brief GraphicsView::setZoom Set the current zoom percentage and update the view
- * \param percent
- */
-void GraphicsView::setZoom(double percent)
-{
-    if (percent < minZoomPercent() || percent > maxZoomPercent())
-        return;
-
-    m_zoomPercent = percent;
-
-    resetTransform();
-    scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
 }
 
 void GraphicsView::mousePressEvent(QMouseEvent *event)
@@ -84,16 +60,12 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    if (event->buttons() == Qt::MidButton) {
-        m_panning = true;
-        m_lastMousePosition = event->localPos();
-    }
-
-    QGraphicsView::mousePressEvent(event);
+    shared::ui::GraphicsViewBase::mousePressEvent(event);
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    // TODO: Move this after creating a shared InteractiveObject class
     const QPoint &screenPos(event->pos());
     const QPointF &scenePos(mapToScene(screenPos));
 
@@ -113,77 +85,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     Q_EMIT mouseMoved(info);
 
-    if (m_panning) {
-        QPointF translation = event->localPos() - m_lastMousePosition;
-        translate(translation.x(), translation.y());
-        m_lastMousePosition = event->localPos();
-    }
-
-    QGraphicsView::mouseMoveEvent(event);
+    shared::ui::GraphicsViewBase::mouseMoveEvent(event);
 }
 
-void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
-{
-    m_panning = false;
-    QGraphicsView::mouseReleaseEvent(event);
 }
-
-void GraphicsView::wheelEvent(QWheelEvent *event)
-{
-    if (event->modifiers() & Qt::ControlModifier) {
-        QPointF oldPos = mapToScene(event->pos());
-
-        setZoom(m_zoomPercent + (event->delta() > 0 ? zoomStepPercent() : -zoomStepPercent()));
-
-        QPointF newPos = mapToScene(event->pos());
-        QPointF delta = newPos - oldPos;
-
-        translate(delta.x(), delta.y());
-
-        Q_EMIT zoomChanged(m_zoomPercent);
-    } else {
-        QGraphicsView::wheelEvent(event);
-    }
-}
-
-void GraphicsView::keyPressEvent(QKeyEvent *event)
-{
-    if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
-        setZoom(m_zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
-        Q_EMIT zoomChanged(m_zoomPercent);
-    } else {
-        QGraphicsView::keyPressEvent(event);
-    }
-}
-
-qreal GraphicsView::minZoomPercent() const
-{
-    return m_minZoomPercent;
-}
-
-void GraphicsView::setMinZoomPercent(qreal percent)
-{
-    m_minZoomPercent = percent;
-}
-
-qreal GraphicsView::maxZoomPercent() const
-{
-    return m_maxZoomPercent;
-}
-
-void GraphicsView::setMaxZoomPercent(qreal percent)
-{
-    m_maxZoomPercent = percent;
-}
-
-qreal GraphicsView::zoomStepPercent() const
-{
-    return m_zoomStepPercent;
-}
-
-void GraphicsView::setZoomStepPercent(qreal percent)
-{
-    m_zoomStepPercent = percent;
-}
-
-} // namespace msc

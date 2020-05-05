@@ -12,6 +12,8 @@ target_sources(${LIB_NAME} PRIVATE
     reports/bugreportdialog.ui
     reports/bugreporthandler.cpp
     reports/bugreporthandler.h
+    ui/graphicsviewbase.cpp
+    ui/graphicsviewbase.h
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp

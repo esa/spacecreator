@@ -27,63 +27,19 @@
 
 namespace aadlinterface {
 
-/*!
-  \class taste3::GraphicsView
-  \brief The QGraphicsView wrapper for displaying the AADL.
-*/
-
 GraphicsView::GraphicsView(QWidget *parent)
-    : QGraphicsView(parent)
+    : shared::ui::GraphicsViewBase(parent)
 {
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);
 
     setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
-
-    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-}
-
-/*!
-\brief GraphicsView::zoom() Get the current zoom percentage.
-Returns the value of \c m_zoomPercent
-*/
-
-double GraphicsView::zoom() const
-{
-    return m_zoomPercent;
-}
-
-/*!
- * \brief GraphicsView::setZoom Set the current zoom percentage and update the view
- * \a percent
- */
-void GraphicsView::setZoom(double percent)
-{
-    percent = qBound(minZoomPercent(), percent, maxZoomPercent());
-    if (qFuzzyCompare(m_zoomPercent, percent))
-        return;
-
-    m_zoomPercent = percent;
-
-    resetTransform();
-    scale(m_zoomPercent / 100.0, m_zoomPercent / 100.0);
-
-    Q_EMIT zoomChanged(m_zoomPercent);
-}
-
-void GraphicsView::mousePressEvent(QMouseEvent *event)
-{
-    if (event->buttons() == Qt::MidButton) {
-        m_panning = true;
-        m_lastMousePosition = event->localPos();
-    }
-
-    QGraphicsView::mousePressEvent(event);
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    // TODO: Move this after creating a shared InteractiveObject class
     const QPoint &screenPos(event->pos());
     const QPointF &scenePos(mapToScene(screenPos));
 
@@ -105,48 +61,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     Q_EMIT mouseMoved(info);
 
-    if (m_panning) {
-        QPointF translation = event->localPos() - m_lastMousePosition;
-        translate(translation.x(), translation.y());
-        m_lastMousePosition = event->localPos();
-    }
-
-    QGraphicsView::mouseMoveEvent(event);
-}
-
-void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
-{
-    m_panning = false;
-    QGraphicsView::mouseReleaseEvent(event);
-}
-
-void GraphicsView::wheelEvent(QWheelEvent *event)
-{
-    if (event->modifiers() & Qt::ControlModifier) {
-        QPointF oldPos = mapToScene(event->pos());
-
-        setZoom(m_zoomPercent + (event->delta() > 0 ? zoomStepPercent() : -zoomStepPercent()));
-
-        QPointF newPos = mapToScene(event->pos());
-        QPointF delta = newPos - oldPos;
-
-        translate(delta.x(), delta.y());
-
-        Q_EMIT zoomChanged(m_zoomPercent);
-    } else {
-        QGraphicsView::wheelEvent(event);
-    }
+    shared::ui::GraphicsViewBase::mouseMoveEvent(event);
 }
 
 void GraphicsView::keyPressEvent(QKeyEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
-        setZoom(m_zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
-        Q_EMIT zoomChanged(m_zoomPercent);
-        event->accept();
-        return;
-    }
-
     bool keyHandled(false);
     switch (event->key()) {
     case Qt::Key_Left:
@@ -170,49 +89,21 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     if (keyHandled)
         event->accept();
     else
-        QGraphicsView::keyPressEvent(event);
+        GraphicsViewBase::keyPressEvent(event);
 }
 
 void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
 {
+    // TODO: Use this or just setting a background image like in the MSC editor?
     static const QImage brushImage { QLatin1String(":/backgrounds/texture.png") };
-    const QRectF scaleSceneRect { rect.topLeft() * m_zoomPercent / 100, rect.size() * m_zoomPercent / 100 };
+    const int zoomPercent = zoom();
+    const QRectF scaleSceneRect { rect.topLeft() * zoomPercent / 100, rect.size() * zoomPercent / 100 };
     painter->save();
-    painter->scale(100 / m_zoomPercent, 100 / m_zoomPercent);
+    painter->scale(100 / zoomPercent, 100 / zoomPercent);
     painter->setPen(Qt::NoPen);
     painter->setBrush(brushImage);
     painter->drawRect(scaleSceneRect);
     painter->restore();
-}
-
-qreal GraphicsView::minZoomPercent() const
-{
-    return m_minZoomPercent;
-}
-
-void GraphicsView::setMinZoomPercent(qreal percent)
-{
-    m_minZoomPercent = percent;
-}
-
-qreal GraphicsView::maxZoomPercent() const
-{
-    return m_maxZoomPercent;
-}
-
-void GraphicsView::setMaxZoomPercent(qreal percent)
-{
-    m_maxZoomPercent = percent;
-}
-
-qreal GraphicsView::zoomStepPercent() const
-{
-    return m_zoomStepPercent;
-}
-
-void GraphicsView::setZoomStepPercent(qreal percent)
-{
-    m_zoomStepPercent = percent;
 }
 
 }

@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
+    Q_INIT_RESOURCE(resources);
+
     aadl::DataTypesStorage::init();
 
     QDirIterator dirIt(":/fonts");
