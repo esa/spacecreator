@@ -32,6 +32,7 @@ class MscDocument : public MscEntity
     Q_OBJECT
     Q_PROPERTY(msc::MscDocument::HierarchyType hierarchyType READ hierarchyType NOTIFY hierarchyTypeChanged)
     Q_PROPERTY(QString hierarchyTypeString READ hierarchyTypeString NOTIFY hierarchyTypeChanged)
+    Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY documentsChanged)
 
 public:
     enum HierarchyType
@@ -80,6 +81,7 @@ public:
     int setInstanceNameNumbers(int nextNumber);
 
 Q_SIGNALS:
+    void documentsChanged();
     void documentAdded(MscDocument *document);
     void documentRemoved(MscDocument *document);
     void chartAdded(MscChart *chart);

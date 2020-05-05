@@ -95,6 +95,7 @@ bool MscDocument::addDocument(MscDocument *document, bool checkType, int index)
 
     connect(document, &MscDocument::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT documentAdded(document);
+    Q_EMIT documentsChanged();
     Q_EMIT dataChanged();
 
     return true;
@@ -119,6 +120,7 @@ void MscDocument::removeDocument(MscDocument *document, bool clear)
     }
 
     Q_EMIT documentRemoved(document);
+    Q_EMIT documentsChanged();
     Q_EMIT dataChanged();
 }
 

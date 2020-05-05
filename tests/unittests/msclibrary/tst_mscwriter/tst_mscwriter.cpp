@@ -70,10 +70,10 @@ private Q_SLOTS:
 
 private:
     static const QString TabSpaces;
-    static QString prependTabs(const QString &str, int count);
-    static QString tab1(const QString &str);
-    static QString tab2(const QString &str);
-    static QString tab3(const QString &str);
+    QString prependTabs(const QString &str, int count) const;
+    QString tab1(const QString &str) const;
+    QString tab2(const QString &str) const;
+    QString tab3(const QString &str) const;
 };
 
 const QString tst_MscWriter::TabSpaces = QString("    "); // 4 space chars
@@ -83,7 +83,7 @@ tst_MscWriter::tst_MscWriter()
     Q_INIT_RESOURCE(mscresources);
 }
 
-QString tst_MscWriter::prependTabs(const QString &str, int count)
+QString tst_MscWriter::prependTabs(const QString &str, int count) const
 {
     QString res;
     for (int i = 0; i < count; ++i)
@@ -91,17 +91,17 @@ QString tst_MscWriter::prependTabs(const QString &str, int count)
     return res + str;
 }
 
-QString tst_MscWriter::tab1(const QString &str)
+QString tst_MscWriter::tab1(const QString &str) const
 {
     return prependTabs(str, 1);
 }
 
-QString tst_MscWriter::tab2(const QString &str)
+QString tst_MscWriter::tab2(const QString &str) const
 {
     return prependTabs(str, 2);
 }
 
-QString tst_MscWriter::tab3(const QString &str)
+QString tst_MscWriter::tab3(const QString &str) const
 {
     return prependTabs(str, 3);
 }
@@ -123,18 +123,19 @@ void tst_MscWriter::testSaveDocumentModel_data()
 {
     QTest::addColumn<MscModel *>("model");
     QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
 
     auto model = new MscModel(this);
     model->addDocument(new MscDocument("EmptyDoc", model));
     QString result = { "mscdocument EmptyDoc /* MSC AND */;\nendmscdocument;" };
-    QTest::addRow("Simple doc") << model << result;
+    QTest::addRow("Simple doc") << model << result << result;
 
     model = new MscModel(this);
     model->addDocument(new MscDocument("Doc1", model));
     model->addDocument(new MscDocument("Doc2", model));
     result = QString("mscdocument Doc1 /* MSC AND */;\nendmscdocument;\n"
                      "mscdocument Doc2 /* MSC AND */;\nendmscdocument;");
-    QTest::addRow("Two docs") << model << result;
+    QTest::addRow("Two docs") << model << result << result;
 
     model = new MscModel(this);
     model->addDocument(new MscDocument("DataDoc", model));
@@ -144,13 +145,29 @@ void tst_MscWriter::testSaveDocumentModel_data()
              "    language ASN.1;\n"
              "    data RPos.asn;\n"
              "endmscdocument;";
-    QTest::addRow("DataDef") << model << result;
+    QTest::addRow("DataDef") << model << result << result;
+
+    model = new MscModel(this);
+    auto doc1 = new MscDocument("ParentDoc", model);
+    model->addDocument(doc1);
+    doc1->addDocument(new MscDocument("ChildDoc", model));
+
+    result = "mscdocument ParentDoc /* MSC AND */;\n"
+             "    mscdocument ChildDoc /* MSC AND */;\n"
+             "    endmscdocument;\n"
+             "endmscdocument;";
+    QString resultGrantLee = "mscdocument ParentDoc /* MSC AND */;\n"
+                             "mscdocument ChildDoc /* MSC AND */;\n"
+                             "endmscdocument;\n"
+                             "endmscdocument;";
+    QTest::addRow("DataDef") << model << result << resultGrantLee;
 }
 
 void tst_MscWriter::testSaveDocumentModel()
 {
     QFETCH(MscModel *, model);
     QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
     setSaveMode(CUSTOM);
     QString text = modelText(model);
@@ -160,7 +177,7 @@ void tst_MscWriter::testSaveDocumentModel()
 
     setSaveMode(GRANTLEE);
     text = modelText(model);
-    QCOMPARE(text, result);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeMscMessage()
