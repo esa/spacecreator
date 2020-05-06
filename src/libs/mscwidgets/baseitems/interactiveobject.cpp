@@ -47,7 +47,7 @@ void InteractiveObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     m_storedZ = zValue();
     setZValue(m_storedZ + 1.);
 
-    prepareHoverMark();
+    showGripPoints();
     updateGripPoints();
     QGraphicsObject::hoverEnterEvent(event);
 }
@@ -57,8 +57,7 @@ void InteractiveObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     m_hovered = false;
     setZValue(m_storedZ);
 
-    if (m_gripPoints)
-        m_gripPoints->hideAnimated();
+    hideGripPoints();
 
     QGraphicsObject::hoverLeaveEvent(event);
 }
@@ -72,26 +71,6 @@ QPair<QPointF, bool> InteractiveObject::commentPoint() const
 MscEntity *InteractiveObject::modelEntity() const
 {
     return m_entity.data();
-}
-
-void InteractiveObject::prepareHoverMark()
-{
-    if (!m_gripPoints) {
-        m_gripPoints = new GripPointsHandler(this);
-        m_gripPoints->setZValue(0);
-
-        connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeProgress, this,
-                &InteractiveObject::gripPointMoved);
-        connect(m_gripPoints, &GripPointsHandler::visibleChanged, this, [this]() {
-            if (m_gripPoints && !m_gripPoints->isVisible())
-                delete m_gripPoints; // it's not a thing directly added to the scene, so just delete
-                                     // is enough
-        });
-        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center))
-            gp->setGripType(GripPoint::GripType::Mover);
-    }
-
-    m_gripPoints->showAnimated();
 }
 
 void InteractiveObject::postCreatePolishing()

@@ -22,7 +22,7 @@
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
-
+#include "ui/grippoint.h"
 #include <QDebug>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -113,14 +113,14 @@ void ChartItem::setName(const QString &name)
     }
 }
 
-void ChartItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ChartItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(gp);
     Q_UNUSED(from);
     Q_UNUSED(to);
 }
 
-void ChartItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_prevContentRect.isNull())
         m_prevContentRect = contentRect();
@@ -170,7 +170,7 @@ void ChartItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const
     setContentRect(rect, utils::CifUpdatePolicy::DontChange);
 }
 
-void ChartItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &, const QPointF &)
+void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint::Location, const QPointF &, const QPointF &)
 {
     QRect cifRectPrev;
     if (!utils::CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
@@ -186,6 +186,7 @@ void ChartItem::onManualGeometryChangeFinished(GripPoint::Location, const QPoint
     m_prevContentRect = QRectF();
 }
 
+// FIXME_BEFORE_MR: These needs to be recoded
 void ChartItem::prepareHoverMark()
 {
     InteractiveObject::prepareHoverMark();

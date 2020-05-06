@@ -49,7 +49,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void relocated(const QPointF &from, const QPointF &to) const;
-    void moved(InteractiveObject *item);
+    void moved(InteractiveObjectBase *item);
     void boundingBoxChanged();
     void needUpdateLayout() const;
 
@@ -63,6 +63,10 @@ protected:
     virtual void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to);
     virtual void onManualResizeFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt);
     virtual void onSelectionChanged(bool isSelected);
+
+    virtual void initGripPoints();
+    virtual void showGripPoints();
+    virtual void hideGripPoints();
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

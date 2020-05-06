@@ -210,6 +210,39 @@ void InteractiveObjectBase::onSelectionChanged(bool)
 {
 }
 
+void InteractiveObjectBase::initGripPoints()
+{
+    if (d->gripPointsHandler) {
+        return;
+    }
+
+    d->gripPointsHandler = new GripPointsHandler(this);
+    d->gripPointsHandler->setZValue(0);
+
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this, &InteractiveObjectBase::gripPointPressed);
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeProgress, this, &InteractiveObjectBase::gripPointMoved);
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeFinish, this, &InteractiveObjectBase::gripPointReleased);
+
+    connect(d->gripPointsHandler, &GripPointsHandler::visibleChanged, this, [this]() {
+        if (d->gripPointsHandler && !d->gripPointsHandler->isVisible()) {
+            // it's not a thing directly added to the scene, so just delete is enough
+            delete d->gripPointsHandler;
+        }
+    });
+}
+
+void InteractiveObjectBase::showGripPoints()
+{
+    initGripPoints();
+    d->gripPointsHandler->showAnimated();
+}
+
+void InteractiveObjectBase::hideGripPoints()
+{
+    if (d->gripPointsHandler)
+        d->gripPointsHandler->hideAnimated();
+}
+
 QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {

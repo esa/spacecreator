@@ -55,8 +55,6 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-    virtual void prepareHoverMark();
-
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     virtual cif::CifLine::CifType mainCifType() const;
 

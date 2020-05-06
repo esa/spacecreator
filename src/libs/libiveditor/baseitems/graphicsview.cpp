@@ -39,7 +39,7 @@ GraphicsView::GraphicsView(QWidget *parent)
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    // TODO: Move this after creating a shared InteractiveObject class
+    // FIXME_BEFORE_MR: Move this after creating a shared InteractiveObject class
     const QPoint &screenPos(event->pos());
     const QPointF &scenePos(mapToScene(screenPos));
 
@@ -94,7 +94,6 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
 
 void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    // TODO: Use this or just setting a background image like in the MSC editor?
     static const QImage brushImage { QLatin1String(":/backgrounds/texture.png") };
     const int zoomPercent = zoom();
     const QRectF scaleSceneRect { rect.topLeft() * zoomPercent / 100, rect.size() * zoomPercent / 100 };

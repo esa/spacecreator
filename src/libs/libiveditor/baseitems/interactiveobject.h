@@ -19,7 +19,6 @@
 #pragma once
 
 #include "ui/interactiveobjectbase.h"
-#include "grippoint.h"
 #include "interface/colors/colormanager.h"
 
 #include <QFont>
@@ -67,10 +66,6 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
-    virtual void hideGripPoints();
-    virtual void showGripPoints();
-    virtual void initGripPoints();
 
     void onSelectionChanged(bool isSelected) override;
 

@@ -166,39 +166,6 @@ void InteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsObject::mouseDoubleClickEvent(event);
 }
 
-void InteractiveObject::hideGripPoints()
-{
-    if (m_gripPointsHandler)
-        m_gripPointsHandler->hideAnimated();
-}
-
-void InteractiveObject::showGripPoints()
-{
-    initGripPoints();
-    m_gripPointsHandler->showAnimated();
-}
-
-void InteractiveObject::initGripPoints()
-{
-    if (m_gripPointsHandler)
-        return;
-
-    m_gripPointsHandler = new GripPointsHandler(this);
-    m_gripPointsHandler->setZValue(aadlinterface::kGripZLevel);
-
-    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,
-            &InteractiveObject::gripPointPressed);
-    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeProgress, this,
-            &InteractiveObject::gripPointMoved);
-    connect(m_gripPointsHandler, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &InteractiveObject::gripPointReleased);
-
-    connect(m_gripPointsHandler, &GripPointsHandler::visibleChanged, this, [this]() {
-        if (m_gripPointsHandler && !m_gripPointsHandler->isVisible())
-            delete m_gripPointsHandler; // it's not a thing directly added to the scene, so just delete is enough
-    });
-}
-
 ColorHandler InteractiveObject::colorHandler() const
 {
     ColorHandler h = ColorManager::colorsForItem(handledColorType());
