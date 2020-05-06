@@ -109,6 +109,7 @@ void MscChart::addInstance(MscInstance *instance, int index)
     }
     connect(instance, &MscInstance::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT instanceAdded(instance, m_instances.indexOf(instance));
+    Q_EMIT instancesChanged();
     Q_EMIT dataChanged();
 }
 
@@ -130,6 +131,7 @@ void MscChart::removeInstance(MscInstance *instance)
             instance->setParent(nullptr);
         }
         Q_EMIT instanceRemoved(instance);
+        Q_EMIT instancesChanged();
         Q_EMIT dataChanged();
     }
 }
@@ -360,6 +362,7 @@ void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
     m_instances.move(currPos, pos);
 
     Q_EMIT instanceOrderChanged(instance, currPos, pos);
+    Q_EMIT instancesChanged();
     Q_EMIT dataChanged();
 }
 

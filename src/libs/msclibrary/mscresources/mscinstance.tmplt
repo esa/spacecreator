@@ -1,0 +1,5 @@
+{% comment %}
+{% endcomment %}
+instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}{% if instance.commentString %} comment '{{ instance.commentString }}'{% endif %};
+{# instance events #}
+{% if instance.explicitStop %}stop;{% else %}endinstance;{% endif %}

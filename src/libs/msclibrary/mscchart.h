@@ -38,6 +38,8 @@ class MscTimer;
 class MscChart : public MscEntity
 {
     Q_OBJECT
+    Q_PROPERTY(QVector<msc::MscInstance *> instances READ instances NOTIFY instancesChanged)
+
 public:
     explicit MscChart(QObject *parent = nullptr);
     explicit MscChart(const QString &name, QObject *parent = nullptr);
@@ -84,6 +86,7 @@ public Q_SLOTS:
     void updateFollowingTimer(MscTimer *timer, int idx = -1);
 
 Q_SIGNALS:
+    void instancesChanged();
     void instanceAdded(MscInstance *instance, int pos);
     void instanceRemoved(MscInstance *instance);
     void instanceOrderChanged(MscInstance *instance, int from, int to);

@@ -51,6 +51,7 @@ private Q_SLOTS:
     void testSerializeMscMessageMultiParameters();
     void testSerializeMscTimer();
     void testSerializeMscCoregion();
+    void testSerializeMscInstance_data();
     void testSerializeMscInstance();
     void testSerializeMscInstanceStop();
     void testSerializeMscInstanceKind();
@@ -291,11 +292,75 @@ void tst_MscWriter::testSerializeMscCoregion()
     QCOMPARE(this->serialize(&region2, &instance), QString("endconcurrent;\n"));
 }
 
+void tst_MscWriter::testSerializeMscInstance_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart1 = new MscChart("Chart_1");
+    auto instance = new MscInstance("instA");
+    chart1->addInstance(instance);
+    model->addChart(chart1);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance instA;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    auto resultGrantLee = QString("msc Chart_1;\n"
+                                  "instance instA;\n"
+                                  "endinstance;\n"
+                                  "endmsc;");
+    QTest::addRow("Empty instance") << model << result << resultGrantLee;
+
+    model = new MscModel(this);
+    auto chart2 = new MscChart("Chart_2");
+    auto instance2 = new MscInstance("instB");
+    instance2->setCommentString("Do not touch");
+    chart2->addInstance(instance2);
+    model->addChart(chart2);
+    result = QString("msc Chart_2;\n"
+                     "    instance instB comment 'Do not touch';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    resultGrantLee = QString("msc Chart_2;\n"
+                             "instance instB comment 'Do not touch';\n"
+                             "endinstance;\n"
+                             "endmsc;");
+    QTest::addRow("Commented instance") << model << result << resultGrantLee;
+
+    model = new MscModel(this);
+    auto chart3 = new MscChart("Chart_3");
+    auto instance3 = new MscInstance("instC");
+    instance3->setDenominator("foo");
+    instance3->setKind("bar");
+    instance3->setInheritance("master");
+    chart3->addInstance(instance3);
+    model->addChart(chart3);
+    result = QString("msc Chart_3;\n"
+                     "    instance instC: foo bar master;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    resultGrantLee = QString("msc Chart_3;\n"
+                             "instance instC: foo bar master;\n"
+                             "endinstance;\n"
+                             "endmsc;");
+    QTest::addRow("Instance denominator") << model << result << resultGrantLee;
+}
+
 void tst_MscWriter::testSerializeMscInstance()
 {
-    MscInstance instance("Inst_1");
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
-    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1;\nendinstance;\n"));
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeMscInstanceStop()

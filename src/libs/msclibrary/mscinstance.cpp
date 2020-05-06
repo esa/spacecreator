@@ -26,13 +26,14 @@
 namespace msc {
 
 MscInstance::MscInstance(QObject *parent)
-    : MscEntity(parent)
+    : MscInstance({}, parent)
 {
 }
 
 MscInstance::MscInstance(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
+    qRegisterMetaType<QVector<msc::MscInstance *>>();
 }
 
 /*!

@@ -20,6 +20,7 @@
 #include "mscentity.h"
 
 #include <QSize>
+#include <QVector>
 
 namespace msc {
 
@@ -81,4 +82,7 @@ private:
     cif::CifBlockShared cifInstance() const;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscInstance *)
+Q_DECLARE_METATYPE(QVector<msc::MscInstance *>)

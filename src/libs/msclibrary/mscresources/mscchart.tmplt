@@ -1,4 +1,7 @@
 {% comment %}
 {% endcomment %}
 msc {{ chart.name }};
+{% for instance in chart.instances %}
+{% include "mscinstance.tmplt" %}
+{% endfor %}
 endmsc;
