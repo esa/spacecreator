@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
 {
     using namespace taste3;
 
+    Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(tab_interface_resources);
+
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
 
