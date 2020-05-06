@@ -17,6 +17,7 @@
 
 #include "actionitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
@@ -56,7 +57,7 @@ ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     connect(m_textItem, &TextItem::edited, this, &ActionItem::onTextEdited, Qt::QueuedConnection);
     connect(m_textItem, &TextItem::textChanged, this, &ActionItem::scheduleLayoutUpdate);
 
-    m_boundingRect = m_textItem->boundingRect();
+    setBoundingRect(m_textItem->boundingRect());
     scheduleLayoutUpdate();
 }
 
@@ -122,27 +123,20 @@ void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ActionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ActionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() == GripPoint::Location::Center) {
-        moveBy(0., to.y() - from.y());
-    }
+    moveBy(0., to.y() - from.y());
 }
 
-void ActionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ActionItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF&, const QPointF&)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    Q_EMIT moved(this);
 }
 
-void ActionItem::prepareHoverMark()
+void ActionItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
-
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &ActionItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
+    InteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 }
 
 void ActionItem::onTextEdited(const QString &text)
@@ -171,8 +165,8 @@ void ActionItem::rebuildLayout()
         m_textItem->adjustSize();
     }
 
-    m_boundingRect = m_textItem->boundingRect();
-    const double x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
+    setBoundingRect(m_textItem->boundingRect());
+    const double x = m_instance->centerInScene().x() - boundingRect().width() / 2;
     if (std::abs(x - this->x()) > 1e-3) {
         setX(x);
     }
@@ -183,13 +177,6 @@ void ActionItem::onInstanceMoved(const QPointF &from, const QPointF &to)
     Q_UNUSED(from);
     Q_UNUSED(to);
     instantLayoutUpdate();
-}
-
-void ActionItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
-{
-    if (pos == GripPoint::Location::Center) {
-        Q_EMIT moved(this);
-    }
 }
 
 QString ActionItem::actionText() const
@@ -235,7 +222,7 @@ void ActionItem::applyCif()
             const QPointF &textBoxSize = scenePoints.at(1);
 
             QSignalBlocker keepSilent(this);
-            m_boundingRect = m_textItem->boundingRect();
+            setBoundingRect(m_textItem->boundingRect());
 
             m_textItem->setExplicitSize({ textBoxSize.x(), textBoxSize.y() });
             const QPointF shift = textBoxTopLeft - pos();

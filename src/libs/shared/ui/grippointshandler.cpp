@@ -88,10 +88,14 @@ QSizeF GripPointsHandler::minSize() const
 
 void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
 {
+    // FIXME_BEFORE_MR
     if (m_usedPoints == points)
         return;
 
     m_usedPoints = points;
+    for (auto location : points)
+        createGripPoint(location);
+
     updateLayout();
 }
 
@@ -107,6 +111,16 @@ void GripPointsHandler::setGripPointPos(GripPoint *grip, const QPointF &pos)
         const QPointF &destination(mapFromScene(pos));
         const QPointF &destinationScaled = { destination.x() * currScale.x(), destination.y() * currScale.y() };
         grip->setPos(destinationScaled);
+    }
+}
+
+void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPointF &pos)
+{
+    for (auto l : m_gripPoints) {
+        if (l->location() == location) {
+            setGripPointPos(l, pos);
+            return;
+        }
     }
 }
 

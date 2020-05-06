@@ -17,6 +17,7 @@
 
 #include "timeritem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/textitem.h"
 #include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
@@ -66,8 +67,9 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
     m_timerConnector->setVisible(m_timer->precedingTimer() != nullptr);
     m_timerConnector->setPen(QPen(Qt::black, 1));
 
-    m_boundingRect = symbolSize;
-    m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+    QRectF br = symbolSize;
+    br.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+    setBoundingRect(br);
 }
 
 MscTimer *TimerItem::modelItem() const
@@ -110,7 +112,8 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QPen pen(Qt::black, 1);
     painter->setPen(pen);
 
-    QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
+    auto br = boundingRect();
+    QPointF start(br.x(), br.center().y());
     QRectF symboxRect = symbolBox();
 
     if (m_timer->timerType() == MscTimer::TimerType::Start) {
@@ -122,8 +125,8 @@ void TimerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawLine(start, symboxRect.center());
             drawStopSymbol(painter, symboxRect);
         } else {
-            start.setY(m_boundingRect.height() - symboxRect.height() / 2.);
-            symboxRect.moveTop(m_boundingRect.height() - symboxRect.height());
+            start.setY(br.height() - symboxRect.height() / 2.);
+            symboxRect.moveTop(br.height() - symboxRect.height());
             painter->drawLine(start, symboxRect.center());
             drawStopSymbol(painter, symboxRect);
         }
@@ -185,28 +188,21 @@ void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     m_textItem->enableEditMode();
 }
 
-void TimerItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void TimerItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() == GripPoint::Location::Center) {
-        const QPointF &newPos = pos() + (to - from);
-        setPos(newPos);
-    }
+    const QPointF &newPos = pos() + (to - from);
+    setPos(newPos);
 }
 
-void TimerItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void TimerItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF&, const QPointF&)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    Q_EMIT moved(this);
 }
 
-void TimerItem::prepareHoverMark()
+void TimerItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
-
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &TimerItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
+    InteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 }
 
 void TimerItem::onTextEdited(const QString &text)
@@ -231,11 +227,11 @@ void TimerItem::rebuildLayout()
     const qreal textOffset = (symbolSize.height() - m_textItem->boundingRect().height()) / 2.;
     m_textItem->setY(textOffset);
 
-    m_boundingRect = symbolSize;
+    QRectF br = symbolSize;
 
     if (m_timer->precedingTimer() == nullptr) {
         m_textItem->setVisible(true);
-        m_boundingRect.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+        br.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
     } else {
         m_textItem->setVisible(false);
         TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
@@ -250,6 +246,8 @@ void TimerItem::rebuildLayout()
         }
     }
 
+    setBoundingRect(br);
+
     updateConnectorLineVisibility();
 
     const qreal x = m_instance->centerInScene().x();
@@ -261,15 +259,6 @@ void TimerItem::onInstanceMoved(const QPointF &from, const QPointF &to)
     Q_UNUSED(from);
     Q_UNUSED(to);
     scheduleLayoutUpdate();
-}
-
-void TimerItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-    if (pos == GripPoint::Location::Center) {
-        Q_EMIT moved(this);
-    }
 }
 
 void TimerItem::updateConnectorLineVisibility()
@@ -308,7 +297,7 @@ void TimerItem::drawTimeoutArrow(QPainter *painter, const QPointF &pt)
 QRectF TimerItem::symbolBox() const
 {
     const qreal boxSize = symbolSize.height();
-    const QPointF start(m_boundingRect.x(), m_boundingRect.center().y());
+    const QPointF start(boundingRect().x(), boundingRect().center().y());
     const QPointF boxCenter(start.x() + symbolSize.width() - boxSize / 2, start.y());
     return QRectF(boxCenter.x() - boxSize / 2, boxCenter.y() - boxSize / 2, boxSize, boxSize);
 }

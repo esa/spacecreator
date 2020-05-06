@@ -17,6 +17,7 @@
 
 #include "coregionitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/common/utils.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
@@ -60,10 +61,10 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     InteractiveObject::paint(painter, option, widget);
 }
 
-void CoregionItem::prepareHoverMark()
+void CoregionItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(GripPoint::Locations {});
+    InteractiveObjectBase::initGripPoints();
+    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations {});
 }
 
 void CoregionItem::rebuildLayout()
@@ -75,10 +76,9 @@ void CoregionItem::rebuildLayout()
         m_instance->stackBefore(this);
 
     prepareGeometryChange();
-    m_boundingRect = QRectF();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
         || m_end->instance() != m_instance->modelItem()) {
-        m_boundingRect = QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset));
+        setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset)));
         return;
     }
 
@@ -100,7 +100,7 @@ void CoregionItem::rebuildLayout()
     }
     const QRectF instanceRect = m_instance->sceneBoundingRect();
     if (!rect.isValid()) {
-        m_boundingRect = QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset));
+        setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset)));
         setX(instanceRect.x() + (instanceRect.width() - kCoregionWidth) / 2);
         return;
     }
@@ -113,22 +113,8 @@ void CoregionItem::rebuildLayout()
         rect.setTop(axis.y1());
     if (rect.bottom() > axis.y2())
         rect.setBottom(axis.y2());
-    m_boundingRect = { QPointF(0, 0), rect.size() };
+    setBoundingRect({ QPointF(0, 0), rect.size() });
     setPos(rect.topLeft());
-}
-
-void CoregionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-}
-
-void CoregionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
 }
 
 void CoregionItem::connectObjects(InstanceItem *instance, qreal y)

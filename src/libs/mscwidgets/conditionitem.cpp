@@ -17,6 +17,7 @@
 
 #include "conditionitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "msccondition.h"
@@ -75,20 +76,6 @@ QPainterPath ConditionItem::shape() const
     result.addRect(m_polygonItem->boundingRect());
     result.addRect(m_nameItem->boundingRect());
     return result;
-}
-
-void ConditionItem::setBoundingRect(const QRectF &geometry)
-{
-    if (geometry == boundingRect())
-        return;
-
-    prepareGeometryChange();
-    m_boundingRect = geometry;
-
-    if (m_gripPoints)
-        m_gripPoints->updateLayout();
-
-    buildLayout();
 }
 
 void ConditionItem::connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect)
@@ -159,40 +146,40 @@ void ConditionItem::buildLayout()
         nameSize = m_nameItem->boundingRect().size();
     }
 
-    if (m_boundingRect.isEmpty()) {
-        m_boundingRect.setTopLeft({ 0.0, 0.0 });
-        m_boundingRect.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, CONDITION_WIDTH));
-        m_boundingRect.setHeight(qMax(nameSize.height(), CONDITION_HEIGHT));
-
-        updateGripPoints();
+    QRectF br = boundingRect();
+    if (br.isEmpty()) {
+        br.setTopLeft({ 0.0, 0.0 });
+        br.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, CONDITION_WIDTH));
+        br.setHeight(qMax(nameSize.height(), CONDITION_HEIGHT));
+        setBoundingRect(br);
     }
 
     if (modelItem()->shared() && m_InstancesRect.isValid()) {
-        m_boundingRect.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, m_InstancesRect.width()));
-        updateGripPoints();
+        br.setWidth(qMax(nameSize.width() + CONDITION_MARGIN, m_InstancesRect.width()));
+        setBoundingRect(br);
     }
 
     QVector<QPointF> points;
-    points.append(m_boundingRect.topLeft() + QPointF(CONDITION_MARGIN, 0));
-    points.append(m_boundingRect.topRight() - QPointF(CONDITION_MARGIN, 0));
-    points.append(m_boundingRect.topRight() + QPointF(0, (m_boundingRect.bottom() - m_boundingRect.top()) / 2));
-    points.append(m_boundingRect.bottomRight() - QPointF(CONDITION_MARGIN, 0));
-    points.append(m_boundingRect.bottomLeft() + QPointF(CONDITION_MARGIN, 0));
-    points.append(m_boundingRect.topLeft() + QPointF(0, (m_boundingRect.bottom() - m_boundingRect.top()) / 2));
+    points.append(br.topLeft() + QPointF(CONDITION_MARGIN, 0));
+    points.append(br.topRight() - QPointF(CONDITION_MARGIN, 0));
+    points.append(br.topRight() + QPointF(0, (br.bottom() - br.top()) / 2));
+    points.append(br.bottomRight() - QPointF(CONDITION_MARGIN, 0));
+    points.append(br.bottomLeft() + QPointF(CONDITION_MARGIN, 0));
+    points.append(br.topLeft() + QPointF(0, (br.bottom() - br.top()) / 2));
     m_polygonItem->setPolygon(points);
 
     // name in the middle of polygon
-    const QPointF nameDelta = m_boundingRect.center() - m_nameItem->boundingRect().center();
+    const QPointF nameDelta = br.center() - m_nameItem->boundingRect().center();
     m_nameItem->setPos({ 0., 0. });
     m_nameItem->moveBy(nameDelta.x(), nameDelta.y());
 
     double x = 0;
     if (modelItem()->shared()) {
         if (m_InstancesRect.isValid()) {
-            x = m_InstancesRect.x() - qAbs((m_InstancesRect.width() - m_boundingRect.width()) / 2);
+            x = m_InstancesRect.x() - qAbs((m_InstancesRect.width() - br.width()) / 2);
         }
     } else if (m_instance) {
-        x = m_instance->centerInScene().x() - m_boundingRect.width() / 2;
+        x = m_instance->centerInScene().x() - br.width() / 2;
     }
 
     setX(x);
@@ -210,15 +197,8 @@ void ConditionItem::onNameEdited(const QString &name)
 
 void ConditionItem::rebuildLayout()
 {
-    m_boundingRect = QRectF();
+    setBoundingRect(QRectF());
     buildLayout();
-}
-
-void ConditionItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &, const QPointF &)
-{
-    if (pos == GripPoint::Location::Center) {
-        Q_EMIT moved(this);
-    }
 }
 
 void ConditionItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -235,26 +215,20 @@ void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ConditionItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualMoveProgress(shared::ui::GripPoint*, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() == GripPoint::Location::Center) {
-        moveBy(0., to.y() - from.y());
-    }
+    moveBy(0., to.y() - from.y());
 }
 
-void ConditionItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF &, const QPointF &)
 {
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
+    Q_EMIT moved(this);
 }
 
-void ConditionItem::prepareHoverMark()
+void ConditionItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &ConditionItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
+    InteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 }
 
 void ConditionItem::onInstanceMoved(const QPointF &from, const QPointF &to)

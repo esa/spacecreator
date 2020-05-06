@@ -102,11 +102,11 @@ public Q_SLOTS:
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void updateGripPoints() override;
 
-    void prepareHoverMark() override;
+    void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
 
 private Q_SLOTS:
@@ -115,7 +115,7 @@ private Q_SLOTS:
     void rebuildLayout() override;
     void commitGeometryChange();
     void onRenamed(const QString &title);
-    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     void updateDisplayText();
 
 private:
@@ -128,8 +128,6 @@ private:
     bool m_autoResize = true;
     bool m_preventRecursion = false;
     QVector<QPointF> m_originalMessagePoints;
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     QString displayTextFromModel() const;
 

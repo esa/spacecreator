@@ -6,6 +6,7 @@ namespace shared {
 namespace ui {
 
 class GripPoint;
+class GripPointsHandler;
 class HighlightRectItem;
 
 /*!
@@ -25,6 +26,9 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
     QRectF boundingRect() const override;
+    void setBoundingRect(const QRectF newRect);
+
+    GripPointsHandler* gripPointsHandler();
 
     bool isHovered() const;
 
@@ -42,6 +46,8 @@ public:
     virtual void postCreatePolishing();
 
     virtual void updateGripPoints();
+
+    QPen selectedPen() const;
 
 public Q_SLOTS:
     void scheduleLayoutUpdate();

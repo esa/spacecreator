@@ -36,7 +36,6 @@
 #include <QSvgRenderer>
 #include <QTimer>
 #include <QtDebug>
-#include <baseitems/grippointshandler.h>
 
 static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
@@ -122,7 +121,7 @@ void AADLFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphi
 
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter->setPen(isSelected() ? m_selectedPen : m_pen);
+    painter->setPen(isSelected() ? selectedPen() : m_pen);
     painter->setBrush(brush());
 
     const QRectF br = boundingRect().adjusted(kOffset, kOffset, -kOffset, -kOffset);
@@ -171,17 +170,14 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
-void AADLFunctionGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLFunctionGraphicsItem::onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
     layoutConnectionsOnResize();
 }
 
-void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt,
-                                                    const QPointF &releasedAt)
+void AADLFunctionGraphicsItem::onManualResizeFinish(shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_UNUSED(grip)
-
     if (pressedAt == releasedAt)
         return;
 
@@ -194,7 +190,7 @@ void AADLFunctionGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPoin
     }
 }
 
-void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLFunctionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     if (isRootItem())
         return;
@@ -203,10 +199,8 @@ void AADLFunctionGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPoin
     layoutConnectionsOnMove(ConnectionLayoutPolicy::IgnoreCollisions);
 }
 
-void AADLFunctionGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLFunctionGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    Q_UNUSED(grip)
-
     if (isRootItem())
         return;
 

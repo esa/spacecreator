@@ -55,7 +55,7 @@ public:
     QLineF axis() const;
 
     QPainterPath shape() const override;
-    void setBoundingRect(const QRectF &geometry);
+    void setGeometry(const QRectF &geometry);
 
     static InstanceItem *createDefaultItem(ChartViewModel *model, MscInstance *instance, MscChart *chart,
                                            const QPointF &pos);
@@ -84,8 +84,9 @@ public Q_SLOTS:
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
-    void prepareHoverMark() override;
+    void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
 
 #ifdef QT_DEBUG
@@ -110,7 +111,6 @@ private:
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
-    void onManualGeometryChangeFinished(shared::ui::GripPoint::Location pos, const QPointF &from, const QPointF &to);
 };
 
 } // namespace msc

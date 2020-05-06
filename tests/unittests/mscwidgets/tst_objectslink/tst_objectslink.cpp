@@ -59,7 +59,7 @@ void tst_ObjectsLink::init()
 
     for (InstanceItem *item : { m_itemA, m_itemB, m_itemC }) {
         m_scene->addItem(item);
-        item->setBoundingRect(QRectF(0, 0, 50, 50));
+        item->setGeometry(QRectF(0, 0, 50, 50));
     }
 
     m_itemA->setPos(100., 100.);

@@ -29,7 +29,6 @@
 #include <QPainter>
 #include <QtDebug>
 #include <baseitems/common/utils.h>
-#include <baseitems/grippointshandler.h>
 #include <aadlobjectconnection.h>
 #include <aadlobjectfunction.h>
 #include <aadlobjectiface.h>
@@ -182,14 +181,14 @@ void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
     m_iface->setTransform(QTransform().rotate(rotationDegree));
     m_type->setPos(shift);
     m_shape = composeShape();
-    m_boundingRect = childrenBoundingRect();
+    setBoundingRect(childrenBoundingRect());
 }
 
 void AADLInterfaceGraphicsItem::rebuildLayout()
 {
     if (!parentItem()) {
         prepareGeometryChange();
-        m_boundingRect = QRectF();
+        setBoundingRect(QRectF());
         return;
     }
 
@@ -301,10 +300,8 @@ void AADLInterfaceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraph
     Q_UNUSED(widget)
 }
 
-void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLInterfaceGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(grip)
-
     if (!scene() || !m_connections.isEmpty())
         return;
 
@@ -327,10 +324,8 @@ void AADLInterfaceGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPoi
     Q_EMIT needUpdateLayout();
 }
 
-void AADLInterfaceGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLInterfaceGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(grip)
-
     const QPointF shift = { to - from };
     if (shift.isNull())
         return;
@@ -364,8 +359,8 @@ void AADLInterfaceGraphicsItem::adjustItem()
     const QRectF parentRect = parentItem()->boundingRect();
     const Qt::Alignment alignment = getNearestSide(parentRect, pos());
     const int initialAlignment = kRectSides.indexOf(alignment);
-    const QPointF offset = m_boundingRect.topLeft();
-    const QRectF itemRect = mapRectToParent(m_boundingRect);
+    const QPointF offset = boundingRect().topLeft();
+    const QRectF itemRect = mapRectToParent(boundingRect());
 
     QRectF intersectedRect;
     if (checkCollision(siblingsRects, itemRect, intersectedRect) && parentRect.isValid()) {

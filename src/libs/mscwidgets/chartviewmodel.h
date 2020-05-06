@@ -27,6 +27,12 @@
 class QGraphicsScene;
 class QGraphicsObject;
 
+namespace shared {
+namespace ui {
+class InteractiveObjectBase;
+}
+}
+
 namespace msc {
 
 class ActionItem;
@@ -110,7 +116,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();
-    void onInstanceEventItemMoved(InteractiveObject *item);
+    void onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item);
     void onMessageRetargeted(MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
     void onInstanceCreatorChanged(MscInstance *newCreator);
 

@@ -15,11 +15,11 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/drawrectinfo.h"
+#include "ui/drawrectinfo.h"
 
 #include <QtTest>
 
-using namespace msc;
+using namespace shared::ui;
 
 class tst_DrawRectInfo : public QObject
 {

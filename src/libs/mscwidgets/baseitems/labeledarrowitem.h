@@ -18,6 +18,7 @@
 
 #include "baseitems/common/objectanchor.h"
 
+#include <QPen>
 #include <QGraphicsObject>
 
 namespace msc {

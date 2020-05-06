@@ -16,15 +16,12 @@
 */
 
 #include "aadlconnectiongraphicsitem.h"
-
 #include "aadlcommentgraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippoint.h"
-#include "baseitems/grippointshandler.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
@@ -32,6 +29,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "ui/grippointshandler.h"
 
 #include <QGuiApplication>
 #include <QPainter>
@@ -472,7 +470,7 @@ void AADLConnectionGraphicsItem::updateBoundingRect()
     QPainterPath pp;
     pp.addPolygon(mapFromScene(QPolygonF(m_points)));
     m_item->setPath(pp);
-    m_boundingRect = pp.boundingRect();
+    setBoundingRect(pp.boundingRect());
     updateGripPoints();
 }
 
@@ -510,12 +508,9 @@ QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandP
     return params;
 }
 
-void AADLConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF &at)
+void AADLConnectionGraphicsItem::onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at)
 {
-    if (!m_gripPointsHandler || !gp)
-        return;
-
-    auto grips = m_gripPointsHandler->gripPoints();
+    auto grips = gripPointsHandler()->gripPoints();
     qDebug() << grips;
     const int idx = grips.indexOf(gp);
     if (idx == -1)
@@ -523,8 +518,8 @@ void AADLConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF 
 
     if (qApp->keyboardModifiers().testFlag(Qt::ControlModifier)) {
         m_points.insert(idx, at);
-        auto grip = m_gripPointsHandler->createGripPoint(gp->location(), idx);
-        m_gripPointsHandler->setGripPointPos(grip, at);
+        auto grip = gripPointsHandler()->createGripPoint(gp->location(), idx);
+        gripPointsHandler()->setGripPointPos(grip, at);
         grip->stackBefore(gp);
         updateBoundingRect();
     }
@@ -532,34 +527,31 @@ void AADLConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF 
 
 void AADLConnectionGraphicsItem::updateGripPoints()
 {
-    if (!m_gripPointsHandler)
+    if (gripPointsHandler() == nullptr)
         return;
 
     const QVector<QPointF> points = graphicsPoints();
-    if (points.isEmpty())
+    if (points.isEmpty()) {
         return;
+    }
 
-    auto grips = m_gripPointsHandler->gripPoints();
+    auto grips = gripPointsHandler()->gripPoints();
     for (int idx = 0; idx < qMax(points.size(), grips.size()); ++idx) {
         if (idx >= points.size()) {
-            m_gripPointsHandler->removeGripPoint(grips.value(idx));
+            gripPointsHandler()->removeGripPoint(grips.value(idx));
             continue;
         }
-        if (idx >= grips.size())
-            m_gripPointsHandler->createGripPoint(GripPoint::Absolute);
-        m_gripPointsHandler->setGripPointPos(grips.value(idx), points.value(idx));
+        if (idx >= grips.size()) {
+            gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
+        }
+        gripPointsHandler()->setGripPointPos(grips.value(idx), points.value(idx));
     }
     InteractiveObject::updateGripPoints();
 }
 
-void AADLConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &, const QPointF &to)
 {
-    Q_UNUSED(from)
-
-    if (!m_gripPointsHandler || !gp)
-        return;
-
-    auto grips = m_gripPointsHandler->gripPoints();
+    auto grips = gripPointsHandler()->gripPoints();
     int idx = grips.indexOf(gp);
     if (idx == -1)
         return;
@@ -588,12 +580,12 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPoin
     updateBoundingRect();
 }
 
-void AADLConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLConnectionGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt || !gp)
         return;
 
-    auto grips = m_gripPointsHandler->gripPoints();
+    auto grips = gripPointsHandler()->gripPoints();
     int idx = grips.indexOf(gp);
     if (idx == -1)
         return;
@@ -692,7 +684,7 @@ void AADLConnectionGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
     for (int idx = 0; idx < m_points.size(); ++idx)
-        m_gripPointsHandler->createGripPoint(GripPoint::Absolute);
+        gripPointsHandler()->createGripPoint(shared::ui::GripPoint::Absolute);
 }
 
 ColorManager::HandledColors AADLConnectionGraphicsItem::handledColorType() const
@@ -707,14 +699,14 @@ void AADLConnectionGraphicsItem::applyColorScheme()
     update();
 }
 
-bool AADLConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
+bool AADLConnectionGraphicsItem::removeCollidedGrips(shared::ui::GripPoint *gp)
 {
-    auto grips = m_gripPointsHandler->gripPoints();
+    auto grips = gripPointsHandler()->gripPoints();
     const int idx = grips.indexOf(gp);
     if (idx == -1)
         return false;
 
-    auto it = std::find_if(grips.cbegin(), grips.cend(), [gp](const GripPoint *const grip) {
+    auto it = std::find_if(grips.cbegin(), grips.cend(), [gp](const shared::ui::GripPoint *const grip) {
         return grip != gp && grip->sceneBoundingRect().intersects(gp->sceneBoundingRect());
     });
     if (it != grips.cend()) {
@@ -723,7 +715,7 @@ bool AADLConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
         const int endIdx = intersectionIdx < idx ? idx : intersectionIdx + 1;
         for (int i = endIdx - 1; i >= startIdx; --i) {
             auto item = grips.takeAt(i);
-            m_gripPointsHandler->removeGripPoint(item);
+            gripPointsHandler()->removeGripPoint(item);
             m_points.removeAt(i);
         }
         return true;

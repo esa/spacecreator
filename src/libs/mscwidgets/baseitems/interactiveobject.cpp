@@ -20,12 +20,12 @@
 
 #include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
-#include "grippointshandler.h"
 #include "mscentity.h"
 
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsScene>
+#include <QCursor>
 #include <functional>
 
 namespace msc {

@@ -34,6 +34,12 @@ InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem* parent)
     connect(d->rebuildLayoutSignal, &utils::DelayedSignal::triggered, this, &InteractiveObjectBase::instantLayoutUpdate);
 }
 
+InteractiveObjectBase::~InteractiveObjectBase()
+{
+    delete d;
+    d = nullptr;
+}
+
 void InteractiveObjectBase::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     if (isSelected()) {
@@ -46,6 +52,17 @@ void InteractiveObjectBase::paint(QPainter* painter, const QStyleOptionGraphicsI
 QRectF InteractiveObjectBase::boundingRect() const
 {
     return d->boundingRect;
+}
+
+void InteractiveObjectBase::setBoundingRect(const QRectF newRect)
+{
+    d->boundingRect = newRect;
+    updateGripPoints();
+}
+
+GripPointsHandler* InteractiveObjectBase::gripPointsHandler()
+{
+    return d->gripPointsHandler;
 }
 
 bool InteractiveObjectBase::isHovered() const
@@ -137,6 +154,11 @@ void InteractiveObjectBase::updateGripPoints()
 {
     if (d->gripPointsHandler)
         d->gripPointsHandler->updateLayout();
+}
+
+QPen InteractiveObjectBase::selectedPen() const
+{
+    return d->selectedPen;
 }
 
 /*!

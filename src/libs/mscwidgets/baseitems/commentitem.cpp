@@ -18,6 +18,7 @@
 
 #include "commentitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
 #include "cif/cifblockfactory.h"
@@ -63,7 +64,7 @@ CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
     connect(m_textItem, &TextItem::edited, this, &CommentItem::textEdited);
     connect(m_textItem, &TextItem::textChanged, this, [this]() {
         prepareGeometryChange();
-        m_boundingRect = m_textItem->boundingRect();
+        setBoundingRect(m_textItem->boundingRect());
         updateGripPoints();
     });
 
@@ -183,16 +184,16 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     InteractiveObject::paint(painter, option, widget);
 }
 
-void CommentItem::prepareHoverMark()
+void CommentItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(
-            isGlobal() ? GripPoint::Locations { GripPoint::Location::Top, GripPoint::Location::Left,
-                                                GripPoint::Location::Bottom, GripPoint::Location::Right,
-                                                GripPoint::Location::TopLeft, GripPoint::Location::BottomLeft,
-                                                GripPoint::Location::TopRight, GripPoint::Location::BottomRight,
-                                                GripPoint::Location::Center }
-                       : GripPoint::Locations { GripPoint::Location::Center });
+    InteractiveObjectBase::initGripPoints();
+    gripPointsHandler()->setUsedPoints(
+            isGlobal() ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
+                                                shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
+                                                shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
+                                                shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight,
+                                                shared::ui::GripPoint::Location::Center }
+                       : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
 }
 
 cif::CifLine::CifType CommentItem::mainCifType() const
@@ -264,7 +265,7 @@ void CommentItem::rebuildLayout()
     }
 
     prepareGeometryChange();
-    m_boundingRect = m_textItem->boundingRect();
+    setBoundingRect(m_textItem->boundingRect());
 
     m_linkItem->setVisible(isVisible() && !isGlobal());
     QPainterPath pp;
@@ -315,21 +316,21 @@ void CommentItem::setGlobalPreview(bool isGlobalPreview)
     update();
 }
 
-void CommentItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() != GripPoint::Location::Center)
+    if (gp->location() != shared::ui::GripPoint::Location::Center)
         return;
 
     const QRectF contentRect = utils::CoordinatesConverter::currentChartItem()->contentRect();
     QPointF newPos = pos() + (to - from);
     if (newPos.x() < contentRect.left())
         newPos.setX(contentRect.left());
-    else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
-        newPos.setX(contentRect.right() - m_boundingRect.width());
+    else if ((newPos.x() + boundingRect().width()) > contentRect.right())
+        newPos.setX(contentRect.right() - boundingRect().width());
     if (newPos.y() < contentRect.top())
         newPos.setY(contentRect.top());
-    else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
-        newPos.setY(contentRect.bottom() - m_boundingRect.height());
+    else if ((newPos.y() + boundingRect().height()) > contentRect.bottom())
+        newPos.setY(contentRect.bottom() - boundingRect().height());
 
     QRect oldRect;
     if (geometryManagedByCif()) {
@@ -339,7 +340,7 @@ void CommentItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const
         return;
     }
 
-    QRectF rect { newPos, m_boundingRect.size() };
+    QRectF rect { newPos, boundingRect().size() };
     QRect newRect;
     if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
@@ -357,33 +358,33 @@ void CommentItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const
     Q_EMIT needUpdateLayout();
 }
 
-void CommentItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     const QPoint shift = QPointF(to - from).toPoint();
     QRect rect = m_textItem->sceneBoundingRect().toRect();
     switch (gp->location()) {
-    case GripPoint::Left:
+    case shared::ui::GripPoint::Left:
         rect.setLeft(rect.left() + shift.x());
         break;
-    case GripPoint::Top:
+    case shared::ui::GripPoint::Top:
         rect.setTop(rect.top() + shift.y());
         break;
-    case GripPoint::Right:
+    case shared::ui::GripPoint::Right:
         rect.setRight(rect.right() + shift.x());
         break;
-    case GripPoint::Bottom:
+    case shared::ui::GripPoint::Bottom:
         rect.setBottom(rect.bottom() + shift.y());
         break;
-    case GripPoint::TopLeft:
+    case shared::ui::GripPoint::TopLeft:
         rect.setTopLeft(rect.topLeft() + shift);
         break;
-    case GripPoint::TopRight:
+    case shared::ui::GripPoint::TopRight:
         rect.setTopRight(rect.topRight() + shift);
         break;
-    case GripPoint::BottomLeft:
+    case shared::ui::GripPoint::BottomLeft:
         rect.setBottomLeft(rect.bottomLeft() + shift);
         break;
-    case GripPoint::BottomRight:
+    case shared::ui::GripPoint::BottomRight:
         rect.setBottomRight(rect.bottomRight() + shift);
         break;
     default:

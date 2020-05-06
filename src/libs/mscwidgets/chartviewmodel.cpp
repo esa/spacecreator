@@ -1345,7 +1345,7 @@ void ChartViewModel::onInstanceGeometryChanged()
     }
 }
 
-void ChartViewModel::onInstanceEventItemMoved(InteractiveObject *item)
+void ChartViewModel::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item)
 {
     auto actionItem = qobject_cast<ActionItem *>(item);
     if (actionItem) {

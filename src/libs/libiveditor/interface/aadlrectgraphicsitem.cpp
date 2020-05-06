@@ -17,9 +17,9 @@
 
 #include "aadlrectgraphicsitem.h"
 
+#include "ui/grippointshandler.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippointshandler.h"
 #include "aadlobject.h"
 #include "interface/graphicsitemhelpers.h"
 
@@ -70,9 +70,12 @@ bool AADLRectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
         }
     }
 
-    if (m_boundingRect.size() != sceneGeometry.size()) {
+    QRectF br = boundingRect();
+    if (br.size() != sceneGeometry.size()) {
         prepareGeometryChange();
-        m_boundingRect.setSize(sceneGeometry.size());
+        br.setSize(sceneGeometry.size());
+        setBoundingRect(br);
+
         Q_EMIT boundingBoxChanged();
     }
 
@@ -89,16 +92,14 @@ void AADLRectGraphicsItem::setRect(const QRectF &geometry)
 void AADLRectGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    const GripPoint::Locations locations {
-        GripPoint::Location::Top, GripPoint::Location::Left,
-        GripPoint::Location::Bottom, GripPoint::Location::Right,
-        GripPoint::Location::TopLeft, GripPoint::Location::BottomLeft,
-        GripPoint::Location::TopRight, GripPoint::Location::BottomRight };
-    for (auto location : locations)
-        m_gripPointsHandler->createGripPoint(location);
+    gripPointsHandler()->setUsedPoints({
+        shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
+        shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
+        shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
+        shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight });
 }
 
-QRectF AADLRectGraphicsItem::adjustRectToParent(GripPoint *grip, const QPointF &from, const QPointF &to)
+QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QPointF shift = QPointF(to - from);
     QRectF rect = mapRectToParent(boundingRect());
@@ -108,42 +109,42 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(GripPoint *grip, const QPointF &
             ? parentObj->boundingRect().marginsRemoved(parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
             : QRectF();
     switch (grip->location()) {
-    case GripPoint::Left: {
+    case shared::ui::GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
         if (contentRect.isNull() || left >= contentRect.left())
             rect.setLeft(left);
     } break;
-    case GripPoint::Top: {
+    case shared::ui::GripPoint::Top: {
         const qreal top = rect.top() + shift.y();
         if (contentRect.isNull() || top >= contentRect.top())
             rect.setTop(top);
     } break;
-    case GripPoint::Right: {
+    case shared::ui::GripPoint::Right: {
         const qreal right = rect.right() + shift.x();
         if (contentRect.isNull() || right <= contentRect.right())
             rect.setRight(right);
     } break;
-    case GripPoint::Bottom: {
+    case shared::ui::GripPoint::Bottom: {
         const qreal bottom = rect.bottom() + shift.y();
         if (contentRect.isNull() || bottom <= contentRect.bottom())
             rect.setBottom(bottom);
     } break;
-    case GripPoint::TopLeft: {
+    case shared::ui::GripPoint::TopLeft: {
         const QPointF topLeft = rect.topLeft() + shift;
         if (contentRect.isNull() || contentRect.contains(topLeft))
             rect.setTopLeft(topLeft);
     } break;
-    case GripPoint::TopRight: {
+    case shared::ui::GripPoint::TopRight: {
         const QPointF topRight = rect.topRight() + shift;
         if (contentRect.isNull() || contentRect.contains(topRight))
             rect.setTopRight(topRight);
     } break;
-    case GripPoint::BottomLeft: {
+    case shared::ui::GripPoint::BottomLeft: {
         const QPointF bottomLeft = rect.bottomLeft() + shift;
         if (contentRect.isNull() || contentRect.contains(bottomLeft))
             rect.setBottomLeft(bottomLeft);
     } break;
-    case GripPoint::BottomRight: {
+    case shared::ui::GripPoint::BottomRight: {
         const QPointF bottomRight = rect.bottomRight() + shift;
         if (contentRect.isNull() || contentRect.contains(bottomRight))
             rect.setBottomRight(bottomRight);
@@ -207,10 +208,8 @@ bool AADLRectGraphicsItem::allowGeometryChange(const QPointF &from, const QPoint
     return gi::canPlaceRect(scene(), this, currentBounds, gi::RectOperation::Edit);
 }
 
-void AADLRectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLRectGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    Q_UNUSED(grip)
-
     if (!scene())
         return;
 
@@ -222,31 +221,31 @@ void AADLRectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &
 
         if (newPos.x() < contentRect.left())
             newPos.setX(contentRect.left());
-        else if ((newPos.x() + m_boundingRect.width()) > contentRect.right())
-            newPos.setX(contentRect.right() - m_boundingRect.width());
+        else if ((newPos.x() + boundingRect().width()) > contentRect.right())
+            newPos.setX(contentRect.right() - boundingRect().width());
 
         if (newPos.y() < contentRect.top())
             newPos.setY(contentRect.top());
-        else if ((newPos.y() + m_boundingRect.height()) > contentRect.bottom())
-            newPos.setY(contentRect.bottom() - m_boundingRect.height());
+        else if ((newPos.y() + boundingRect().height()) > contentRect.bottom())
+            newPos.setY(contentRect.bottom() - boundingRect().height());
     }
-    setRect(QRectF(newPos, m_boundingRect.size()));
+    setRect(QRectF(newPos, boundingRect().size()));
 }
 
-void AADLRectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLRectGraphicsItem::onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     const QRectF rect = adjustRectToParent(grip, from, to);
     if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height())
         setRect(mapRectToScene(mapRectFromParent(rect)));
 }
 
-void AADLRectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLRectGraphicsItem::onManualResizeFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
     handleGeometryChange(pressedAt, releasedAt);
 }
 
-void AADLRectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLRectGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
     handleGeometryChange(pressedAt, releasedAt);

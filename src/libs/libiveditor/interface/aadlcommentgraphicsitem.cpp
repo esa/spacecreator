@@ -20,7 +20,6 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippointshandler.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/commandids.h"
@@ -141,9 +140,9 @@ void AADLCommentGraphicsItem::updateTextLayout(const QString &text)
     QTextLine line = m_textLayout->createLine();
     while (line.isValid()) {
         line.setPosition(QPointF(kMargins, y));
-        line.setLineWidth(m_boundingRect.width() - 2 * kMargins);
+        line.setLineWidth(boundingRect().width() - 2 * kMargins);
         y += line.height();
-        if (y > (m_boundingRect.height() - 2 * kMargins)) {
+        if (y > (boundingRect().height() - 2 * kMargins)) {
             const QString sf(text.constData(), line.textStart() + line.textLength() - 2 * ellipsis.size());
             m_textLayout->endLayout();
             updateTextLayout(sf + ellipsis);

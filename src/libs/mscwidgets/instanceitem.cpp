@@ -17,10 +17,9 @@
 
 #include "instanceitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippoint.h"
-#include "baseitems/grippointshandler.h"
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
@@ -73,13 +72,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView
     connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
     connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
     connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this, [this](const QPointF &from, const QPointF &to) {
-        if (GripPoint *gp = m_gripPoints->gripPoint(GripPoint::Location::Center)) {
-            onManualMoveProgress(gp, from, to);
-        }
+        onManualMoveProgress(nullptr, from, to);
     });
 
     connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, [this](const QPointF &from, const QPointF &to) {
-        onManualGeometryChangeFinished(GripPoint::Center, from, to);
+        onManualMoveFinish(nullptr, from, to);
     });
 
     connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, [this]() {
@@ -165,12 +162,13 @@ void InstanceItem::rebuildLayout()
     prepareGeometryChange();
 
     QRectF headRect(m_headSymbol->boundingRect());
-    m_boundingRect.setWidth(headRect.width());
-    m_boundingRect.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
-    updateGripPoints();
+    QRectF br = boundingRect();
+    br.setWidth(headRect.width());
+    br.setHeight(headRect.height() + m_axisHeight + endSymbolHeight);
+    setBoundingRect(br);
 
     // move end symb to the bottom:
-    QRectF footerRect(m_boundingRect);
+    QRectF footerRect(boundingRect());
     footerRect.setTop(footerRect.bottom() - endSymbolHeight);
     m_endSymbol->setRect(footerRect);
 
@@ -186,11 +184,6 @@ void InstanceItem::rebuildLayout()
             updateCif();
         Q_EMIT needUpdateLayout();
     }
-}
-
-QRectF InstanceItem::boundingRect() const
-{
-    return m_boundingRect;
 }
 
 void InstanceItem::applyCif()
@@ -217,11 +210,8 @@ void InstanceItem::applyCif()
     }
 }
 
-void InstanceItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() != GripPoint::Location::Center)
-        return;
-
     QPointF delta { (to - from).x(), 0. };
     if (delta.isNull())
         return;
@@ -238,13 +228,6 @@ void InstanceItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, cons
         setPos(pos() + delta);
 }
 
-void InstanceItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-}
-
 QPainterPath InstanceItem::shape() const
 {
     QPainterPath result;
@@ -254,15 +237,13 @@ QPainterPath InstanceItem::shape() const
     return result;
 }
 
-void InstanceItem::setBoundingRect(const QRectF &geometry)
+void InstanceItem::setGeometry(const QRectF &geometry)
 {
     if (geometry == boundingRect())
         return;
 
     prepareGeometryChange();
-    m_boundingRect = geometry;
-    if (m_gripPoints)
-        m_gripPoints->updateLayout();
+    setBoundingRect(geometry);
     scheduleLayoutUpdate();
 }
 
@@ -280,18 +261,15 @@ QPair<QPointF, bool> InstanceItem::commentPoint() const
     return qMakePair(QPointF(m_headSymbol->rectGeometry().right(), m_headSymbol->rectGeometry().center().y()), false);
 }
 
-void InstanceItem::prepareHoverMark()
+void InstanceItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints({ GripPoint::Location::Center });
+    InteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 
-    const qreal zVal(m_gripPoints->zValue() - 1.);
+    const qreal zVal(gripPointsHandler()->zValue() - 1.);
     m_headSymbol->setZValue(zVal);
     m_axisSymbol->setZValue(zVal);
     m_endSymbol->setZValue(zVal);
-
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
-            &InstanceItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
 void InstanceItem::onNameEdited(const QString &newName)
@@ -412,7 +390,7 @@ QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, 
     return QPointF(0., 0.);
 }
 
-void InstanceItem::onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF &from, const QPointF &to)
 {
     const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
     if (!delta.isNull())
@@ -459,7 +437,7 @@ void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
         const QString tt = cifBlock->toString(0) + "\naxis:" + QString::number(m_axisHeight) + " "
                 + QString::number(m_axisSymbol->line().length()) + "\naxisToCif:" + QString::number(axisToCif.x()) + " "
                 + QString::number(axisToCif.y()) + "\naxisFromCif:" + QString::number(axisFromCif.x()) + " "
-                + QString::number(axisFromCif.y()) + "\nme mbr: " + rectToStr(m_boundingRect)
+                + QString::number(axisFromCif.y()) + "\nme mbr: " + rectToStr(boundingRect())
                 + "\nme bb: " + rectToStr(boundingRect()) + "\nme sbr: " + rectToStr(sceneBoundingRect());
         setToolTip(tt);
     }

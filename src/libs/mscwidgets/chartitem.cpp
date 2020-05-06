@@ -22,7 +22,7 @@
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
-#include "ui/grippoint.h"
+#include "ui/grippointshandler.h"
 #include <QDebug>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -113,13 +113,6 @@ void ChartItem::setName(const QString &name)
     }
 }
 
-void ChartItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
-{
-    Q_UNUSED(gp);
-    Q_UNUSED(from);
-    Q_UNUSED(to);
-}
-
 void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_prevContentRect.isNull())
@@ -131,28 +124,28 @@ void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF 
     const QPointF shift = QPointF(to - from);
     QRectF rect = contentRect();
     switch (gp->location()) {
-    case GripPoint::Left:
+    case shared::ui::GripPoint::Left:
         rect.setLeft(rect.left() + shift.x());
         break;
-    case GripPoint::Top:
+    case shared::ui::GripPoint::Top:
         rect.setTop(rect.top() + shift.y());
         break;
-    case GripPoint::Right:
+    case shared::ui::GripPoint::Right:
         rect.setRight(rect.right() + shift.x());
         break;
-    case GripPoint::Bottom:
+    case shared::ui::GripPoint::Bottom:
         rect.setBottom(rect.bottom() + shift.y());
         break;
-    case GripPoint::TopLeft:
+    case shared::ui::GripPoint::TopLeft:
         rect.setTopLeft(rect.topLeft() + shift);
         break;
-    case GripPoint::TopRight:
+    case shared::ui::GripPoint::TopRight:
         rect.setTopRight(rect.topRight() + shift);
         break;
-    case GripPoint::BottomLeft:
+    case shared::ui::GripPoint::BottomLeft:
         rect.setBottomLeft(rect.bottomLeft() + shift);
         break;
-    case GripPoint::BottomRight:
+    case shared::ui::GripPoint::BottomRight:
         rect.setBottomRight(rect.bottomRight() + shift);
         break;
     default:
@@ -170,7 +163,7 @@ void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF 
     setContentRect(rect, utils::CifUpdatePolicy::DontChange);
 }
 
-void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint::Location, const QPointF &, const QPointF &)
+void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint*, const QPointF &, const QPointF &)
 {
     QRect cifRectPrev;
     if (!utils::CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
@@ -186,14 +179,13 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint::Location, 
     m_prevContentRect = QRectF();
 }
 
-// FIXME_BEFORE_MR: These needs to be recoded
-void ChartItem::prepareHoverMark()
+void ChartItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
-    m_gripPoints->setUsedPoints(GripPoint::Locations { GripPoint::Left, GripPoint::Top, GripPoint::Right,
-                                                       GripPoint::Bottom, GripPoint::TopLeft, GripPoint::BottomLeft,
-                                                       GripPoint::TopRight, GripPoint::BottomRight });
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+    InteractiveObject::initGripPoints();
+    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations { shared::ui::GripPoint::Left, shared::ui::GripPoint::Top, shared::ui::GripPoint::Right,
+                                                       shared::ui::GripPoint::Bottom, shared::ui::GripPoint::TopLeft, shared::ui::GripPoint::BottomLeft,
+                                                       shared::ui::GripPoint::TopRight, shared::ui::GripPoint::BottomRight });
+    connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 

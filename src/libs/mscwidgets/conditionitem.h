@@ -42,8 +42,6 @@ public:
 
     QPainterPath shape() const override;
 
-    void setBoundingRect(const QRectF &geometry);
-
     void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
 
     void setInstancesRect(const QRectF &instancesRect);
@@ -57,16 +55,16 @@ public Q_SLOTS:
 private Q_SLOTS:
     void onNameEdited(const QString &name);
     void rebuildLayout() override;
-    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
     void onInstanceMoved(const QPointF &from, const QPointF &to);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void prepareHoverMark() override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint* gp, const QPointF &from, const QPointF &to);
+
+    void initGripPoints() override;
 
 private:
     void setInstance(InstanceItem *instance);

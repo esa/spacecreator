@@ -23,7 +23,7 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippointshandler.h"
+//#include "baseitems/grippointshandler.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -108,7 +108,7 @@ void AADLFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGr
 
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter->setPen(isSelected() ? m_selectedPen : pen());
+    painter->setPen(isSelected() ? selectedPen() : pen());
     painter->setBrush(brush());
     painter->drawRect(
             boundingRect().adjusted(kBorderWidth / 2, kBorderWidth / 2, -kBorderWidth / 2, -kBorderWidth / 2));

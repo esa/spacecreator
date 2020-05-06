@@ -44,10 +44,8 @@ public:
     void setInstance(InstanceItem *instance);
 
 protected:
-    void prepareHoverMark() override;
+    void initGripPoints() override;
     void rebuildLayout() override;
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
     QPointer<ChartViewModel> m_model;

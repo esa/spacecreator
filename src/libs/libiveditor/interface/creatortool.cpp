@@ -24,8 +24,7 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippoint.h"
-#include "baseitems/grippointshandler.h"
+#include "ui/grippointshandler.h"
 #include "context/action/actionsmanager.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -276,7 +275,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
     const QPointF scenePos = cursorInScene(e->globalPos());
     if (e->modifiers() & Qt::ControlModifier) {
         auto itemAtCursor = m_view->itemAt(e->pos());
-        if ((e->button() & Qt::MouseButton::LeftButton) && (!itemAtCursor || itemAtCursor->type() != GripPoint::Type))
+        if ((e->button() & Qt::MouseButton::LeftButton) && (!itemAtCursor || itemAtCursor->type() != shared::ui::GripPoint::Type))
             m_toolType = ToolType::DirectConnection;
         else
             return false;

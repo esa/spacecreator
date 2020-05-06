@@ -17,12 +17,12 @@
 
 #include "messageitem.h"
 
+#include "ui/grippointshandler.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
 #include "baseitems/common/utils.h"
-#include "baseitems/grippointshandler.h"
 #include "baseitems/labeledarrowitem.h"
 #include "baseitems/msgidentificationitem.h"
 #include "chartitem.h"
@@ -102,14 +102,21 @@ MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, Instanc
 
     m_arrowItem->setColor(QColor("#3e47e6"));
     m_arrowItem->setDashed(isCreator());
+
+    connect(this, &InteractiveObjectBase::relocated, [this](const QPointF &from, const QPointF &to) {
+        if (proceedPositionChange()) {
+            updateSourceAndTarget(to - from);
+        }
+    });
 }
 
 void MessageItem::onTextChanged()
 {
     rebuildLayout();
 
-    if (m_gripPoints)
-        m_gripPoints->updateLayout();
+    if (auto gph = gripPointsHandler()) {
+        gph->updateLayout();
+    }
 
     update();
 }
@@ -129,7 +136,6 @@ MscMessage *MessageItem::modelItem() const
 
 void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targetInstance)
 {
-    m_layoutDirty = true;
     const bool sourceChanged = setSourceInstanceItem(sourceInstance);
     const bool targetChanged = setTargetInstanceItem(targetInstance);
 
@@ -137,7 +143,7 @@ void MessageItem::setInstances(InstanceItem *sourceInstance, InstanceItem *targe
         rebuildLayout();
     }
 
-    m_layoutDirty = false;
+    instantLayoutUpdate();
 }
 
 bool MessageItem::setSourceInstanceItem(InstanceItem *sourceInstance)
@@ -285,30 +291,15 @@ QPainterPath MessageItem::shape() const
 
 void MessageItem::updateGripPoints()
 {
-    if (m_gripPoints) {
-        m_gripPoints->updateLayout();
+    InteractiveObjectBase::updateGripPoints();
 
+    if (auto gph = gripPointsHandler()) {
         const QPointF &start(m_arrowItem->arrow()->anchorPointSource());
         const QPointF &end(m_arrowItem->arrow()->anchorPointTarget());
 
-        m_gripPoints->setGripPointPos(GripPoint::Left, start);
-        m_gripPoints->setGripPointPos(GripPoint::Right, end);
+        gph->setGripPointPos(shared::ui::GripPoint::Left, start);
+        gph->setGripPointPos(shared::ui::GripPoint::Right, end);
     }
-}
-
-QVariant MessageItem::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case ItemPositionHasChanged: {
-        if (proceedPositionChange()) {
-            updateSourceAndTarget(value.toPointF() - m_prevPos);
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    return InteractiveObject::itemChange(change, value);
 }
 
 QString MessageItem::displayTextFromModel() const
@@ -410,9 +401,9 @@ InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
 void MessageItem::commitGeometryChange()
 {
     const QRectF &newBounds = mapRectFromItem(m_arrowItem, m_arrowItem->boundingRect());
-    if (m_boundingRect != newBounds) {
+    if (boundingRect() != newBounds) {
         prepareGeometryChange();
-        m_boundingRect = newBounds;
+        setBoundingRect(newBounds);
     }
 }
 
@@ -489,9 +480,9 @@ void MessageItem::setAutoResizable(bool resizable)
     m_autoResize = resizable;
 }
 
-void MessageItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() != GripPoint::Location::Center || from == to || isCreator())
+    if (gp->location() != shared::ui::GripPoint::Location::Center || from == to || isCreator())
         return;
 
     const qreal shift = QPointF(to - from).y();
@@ -516,7 +507,7 @@ void MessageItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const
     updateSourceAndTarget(QPointF(0, shift));
 }
 
-void MessageItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (from == to)
         return;
@@ -529,7 +520,7 @@ void MessageItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, con
     if (m_originalMessagePoints.isEmpty())
         m_originalMessagePoints = currentPoints;
 
-    const bool isSource = gp->location() == GripPoint::Left;
+    const bool isSource = gp->location() == shared::ui::GripPoint::Left;
     auto validatePoint = [&](const QPointF &requestedPoint, int pointId) {
         QPointF point(requestedPoint);
         const QPointF &oppositePoint = currentPoints.at(pointId == 0 ? currentPoints.size() - 1 : 0);
@@ -557,14 +548,14 @@ void MessageItem::onManualResizeProgress(GripPoint *gp, const QPointF &from, con
         updateTarget(validated, ObjectAnchor::Snap::SnapTo);
 }
 
-void MessageItem::onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to)
+void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint* gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(to);
 
     if (m_sourceInstance == m_targetInstance) {
         GeometryNotificationBlocker keepSilent(this);
         m_originalMessagePoints.clear();
-        const bool isSource = pos == GripPoint::Left;
+        const bool isSource = gp->location() == shared::ui::GripPoint::Left;
         if (isSource)
             updateSource(from, ObjectAnchor::Snap::SnapTo);
         else
@@ -686,20 +677,19 @@ bool MessageItem::isCreator() const
     return m_message && m_message->messageType() == MscMessage::MessageType::Create;
 }
 
-void MessageItem::prepareHoverMark()
+void MessageItem::initGripPoints()
 {
-    InteractiveObject::prepareHoverMark();
+    InteractiveObjectBase::initGripPoints();
 
     if (isCreator())
-        m_gripPoints->setUsedPoints(GripPoint::Locations());
+        gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations());
     else
-        m_gripPoints->setUsedPoints(
-                { GripPoint::Location::Left, GripPoint::Location::Right, GripPoint::Location::Center });
+        gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::Center });
 
-    connect(m_gripPoints, &GripPointsHandler::manualGeometryChangeFinish, this,
+    connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &MessageItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 
-    m_arrowItem->setZValue(m_gripPoints->zValue() - 1);
+    m_arrowItem->setZValue(gripPointsHandler()->zValue() - 1);
 }
 
 void MessageItem::onRenamed(const QString &title)
