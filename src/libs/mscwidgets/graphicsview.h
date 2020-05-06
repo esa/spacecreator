@@ -21,6 +21,16 @@
 
 namespace msc {
 
+/*!
+  \class msc::GraphicsView
+  \brief Basic view for an MSC diagram
+
+  \inmodule MscWidgets
+
+  * Handles the middle mouse button to pan the view.
+  * Provides zoom functionality.
+  * Reports the current mouse position as signal
+*/
 class GraphicsView : public shared::ui::GraphicsViewBase
 {
     Q_OBJECT
@@ -33,7 +43,8 @@ Q_SIGNALS:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
+
+    QList<QPair<QPointF, QString>> mouseMoveCoordinates(QGraphicsScene* scene, const QPoint& screenPos, const QPointF& scenePos) const override;
 };
 
 }

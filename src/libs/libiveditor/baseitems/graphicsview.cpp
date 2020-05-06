@@ -37,31 +37,16 @@ GraphicsView::GraphicsView(QWidget *parent)
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 }
 
-void GraphicsView::mouseMoveEvent(QMouseEvent *event)
+QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(QGraphicsScene*, const QPoint& screenPos, const QPointF& scenePos) const
 {
-    // FIXME_BEFORE_MR: Move this after creating a shared InteractiveObject class
-    const QPoint &screenPos(event->pos());
-    const QPointF &scenePos(mapToScene(screenPos));
-
-    const QString infoTemplate("%1: [%2;%3]; ");
-    auto coordinatesInfo = [infoTemplate](const QPointF &point, const QString &name) {
-        return infoTemplate.arg(name, QString::number(point.x()), QString::number(point.y()));
-    };
-
-    QString info = coordinatesInfo(screenPos, "Screen");
-    info.append(coordinatesInfo(scenePos, "Scene"));
-
+    QList<QPair<QPointF, QString>> coords;
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
         if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
-            info.append(coordinatesInfo(item->mapFromScene(scenePos),
-                                        iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None")));
+            coords.push_back({item->mapFromScene(scenePos), iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None")});
         }
     }
-
-    Q_EMIT mouseMoved(info);
-
-    shared::ui::GraphicsViewBase::mouseMoveEvent(event);
+    return coords;
 }
 
 void GraphicsView::keyPressEvent(QKeyEvent *event)

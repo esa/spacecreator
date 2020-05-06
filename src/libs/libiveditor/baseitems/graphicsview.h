@@ -33,7 +33,8 @@ public:
     explicit GraphicsView(QWidget *parent = nullptr);
 
 protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+    QList<QPair<QPointF, QString>> mouseMoveCoordinates(QGraphicsScene* scene, const QPoint& screenPos, const QPointF& scenePos) const override;
+
     void keyPressEvent(QKeyEvent *event) override;
 
     void drawBackground(QPainter *painter, const QRectF &rect) override;

@@ -102,11 +102,32 @@ void GraphicsViewBase::mousePressEvent(QMouseEvent* event)
 
 void GraphicsViewBase::mouseMoveEvent(QMouseEvent *event)
 {
+    // Handle panning
     if (d->panning) {
         QPointF translation = event->localPos() - d->lastMousePosition;
         translate(translation.x(), translation.y());
         d->lastMousePosition = event->localPos();
     }
+
+    // Show the coordinates list in the statusbar
+    const QPoint &screenPos(event->pos());
+    const QPointF &scenePos(mapToScene(screenPos));
+    const QString infoTemplate("%1: [%2;%3]; ");
+
+    auto coordinatesInfo = [infoTemplate](const QPointF &point, const QString &name) {
+        return infoTemplate.arg(name, QString::number(point.x()), QString::number(point.y()));
+    };
+
+    QString info = coordinatesInfo(screenPos, "Screen");
+    info.append(coordinatesInfo(scenePos, "Scene"));
+
+    // Handle the coordinates from the subclass
+    auto coords = mouseMoveCoordinates(scene(), screenPos, scenePos);
+    for (auto item : coords) {
+        info.append(coordinatesInfo(item.first, item.second));
+    }
+
+    Q_EMIT mouseMoved(info);
 
     QGraphicsView::mouseMoveEvent(event);
 }

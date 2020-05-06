@@ -28,17 +28,6 @@
 namespace msc {
 
 /*!
-  \class msc::GraphicsView
-  \brief Basic view for an MSC diagram
-
-  \inmodule MscWidgets
-
-  * Handles the middle mouse button to pan the view.
-  * Provides zoom functionality.
-  * Reports the current mouse position as signal
-*/
-
-/*!
   Constructs a MSV view object with the parent \a parent.
 */
 GraphicsView::GraphicsView(QWidget *parent)
@@ -62,29 +51,14 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     shared::ui::GraphicsViewBase::mousePressEvent(event);
 }
 
-void GraphicsView::mouseMoveEvent(QMouseEvent *event)
+QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(QGraphicsScene* scene, const QPoint&, const QPointF& scenePos) const
 {
-    // TODO: Move this after creating a shared InteractiveObject class
-    const QPoint &screenPos(event->pos());
-    const QPointF &scenePos(mapToScene(screenPos));
-
-    auto coordinatesInfo = [](const QPointF &point, const QString &name) {
-        static const QString infoTemplate("%1: [%2;%3]; ");
-        return infoTemplate.arg(name, QString::number(point.x()), QString::number(point.y()));
-    };
-
-    QString info = coordinatesInfo(screenPos, "Screen");
-    info.append(coordinatesInfo(scenePos, "Scene"));
-    info.append(coordinatesInfo(utils::CoordinatesConverter::sceneToCif(scenePos), "CIF"));
-
-    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene(), scenePos)) {
-        info.append(coordinatesInfo(item->mapFromScene(scenePos),
-                                    item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None")));
+    QList<QPair<QPointF, QString>> coords;
+    coords.push_back({utils::CoordinatesConverter::sceneToCif(scenePos), "CIF"});
+    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene, scenePos)) {
+        coords.push_back({item->mapFromScene(scenePos), item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None")});
     }
-
-    Q_EMIT mouseMoved(info);
-
-    shared::ui::GraphicsViewBase::mouseMoveEvent(event);
+    return coords;
 }
 
 }
