@@ -30,7 +30,7 @@ namespace msc {
  */
 
 MscDocument::MscDocument(QObject *parent)
-    : MscDocument({}, parent)
+    : MscDocument(DefaultName, parent)
 {
 }
 
@@ -150,6 +150,7 @@ void MscDocument::addChart(MscChart *chart)
     m_charts.append(chart);
     connect(chart, &MscChart::dataChanged, this, &MscChart::dataChanged);
     Q_EMIT chartAdded(chart);
+    Q_EMIT chartsChanged();
     Q_EMIT dataChanged();
 }
 
@@ -191,6 +192,7 @@ void MscDocument::clear()
     }
 
     Q_EMIT cleared();
+    Q_EMIT documentsChanged();
     Q_EMIT dataChanged();
 }
 
@@ -201,6 +203,7 @@ void MscDocument::clearCharts()
 {
     qDeleteAll(m_charts);
     m_charts.clear();
+    Q_EMIT chartsChanged();
 }
 
 /*!

@@ -34,6 +34,7 @@ class MscDocument : public MscEntity
     Q_PROPERTY(msc::MscDocument::HierarchyType hierarchyType READ hierarchyType NOTIFY hierarchyTypeChanged)
     Q_PROPERTY(QString hierarchyTypeString READ hierarchyTypeString NOTIFY hierarchyTypeChanged)
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY documentsChanged)
+    Q_PROPERTY(QVector<msc::MscChart *> charts READ charts NOTIFY chartsChanged)
     Q_PROPERTY(QList<msc::MscMessageDeclaration *> declarations READ declarations CONSTANT)
 
 public:
@@ -87,6 +88,7 @@ Q_SIGNALS:
     void documentsChanged();
     void documentAdded(MscDocument *document);
     void documentRemoved(MscDocument *document);
+    void chartsChanged();
     void chartAdded(MscChart *chart);
     void cleared();
     void hierarchyTypeChanged(HierarchyType type);

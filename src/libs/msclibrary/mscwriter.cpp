@@ -59,11 +59,10 @@ void MscWriter::setSaveMode(MscWriter::SaveMode mode)
     if (m_saveMode == GRANTLEE && m_template == nullptr) {
         m_template = templating::StringTemplate::create(this);
         m_template->setNeedValidateXMLDocument(false);
-    } else {
-        if (m_template != nullptr) {
-            delete m_template;
-            m_template = nullptr;
-        }
+    }
+    if (m_saveMode == CUSTOM && m_template != nullptr) {
+        delete m_template;
+        m_template = nullptr;
     }
 }
 
@@ -133,18 +132,18 @@ bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
  */
 QString MscWriter::modelText(MscModel *model)
 {
+    if (m_saveMode == GRANTLEE) {
+        return exportGrantlee(model);
+    }
+
     setModel(model);
 
     QString text;
     QTextStream out(&text);
 
     if (!model->documents().isEmpty()) {
-        if (m_saveMode == CUSTOM) {
-            for (MscDocument *doc : model->documents()) {
-                out << serialize(doc);
-            }
-        } else {
-            text = exportGrantlee(model);
+        for (MscDocument *doc : model->documents()) {
+            out << serialize(doc);
         }
     } else {
         for (const auto *chart : model->charts()) {

@@ -58,6 +58,7 @@ private Q_SLOTS:
     void testSerializeMscConditions();
     void testSerializeMscActionsInformal();
     void testSerializeMscActionsFormal();
+    void testSerializeMscChart_data();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
@@ -184,6 +185,20 @@ void tst_MscWriter::testSaveDocumentModel_data()
                      "    msg gui_send_tm, pepe : (str, T-POS);\n"
                      "endmscdocument;");
     QTest::addRow("Doc with declaration") << model << result << result;
+
+    model = new MscModel(this);
+    auto doc4 = new MscDocument("ChartDoc", model);
+    doc4->addChart(new MscChart("UltimateChart"));
+    model->addDocument(doc4);
+    result = "mscdocument ChartDoc /* MSC AND */;\n"
+             "    msc UltimateChart;\n"
+             "    endmsc;\n"
+             "endmscdocument;";
+    resultGrantLee = "mscdocument ChartDoc /* MSC AND */;\n"
+                     "msc UltimateChart;\n"
+                     "endmsc;\n"
+                     "endmscdocument;";
+    QTest::addRow("ChartIncluded") << model << result << resultGrantLee;
 }
 
 void tst_MscWriter::testSaveDocumentModel()
@@ -425,10 +440,38 @@ void tst_MscWriter::testSerializeMscActionsFormal()
     QCOMPARE(serializeList.at(2), QString("endinstance;"));
 }
 
+void tst_MscWriter::testSerializeMscChart_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    model->addChart(new MscChart("Chart_1"));
+    QString result = "msc Chart_1;\nendmsc;\n";
+    QTest::addRow("Simple chart") << model << result << result.trimmed();
+
+    model = new MscModel(this);
+    auto chart1 = new MscChart("Chart_1");
+    chart1->setCommentString("Importante");
+    model->addChart(chart1);
+    result = "msc Chart_1;\nendmsc;\n";
+    QTest::addRow("Plain chart comments ignored") << model << result << result.trimmed();
+}
+
 void tst_MscWriter::testSerializeMscChart()
 {
-    MscChart chart("Chart_1");
-    QCOMPARE(this->serialize(&chart), QString("msc Chart_1;\nendmsc;\n"));
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
+
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeMscChartInstance()

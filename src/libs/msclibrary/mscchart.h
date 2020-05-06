@@ -119,4 +119,7 @@ private:
     cif::CifBlockShared cifMscDoc() const;
 };
 
-} // namespace msc
+}
+
+Q_DECLARE_METATYPE(msc::MscChart *)
+Q_DECLARE_METATYPE(QVector<msc::MscChart *>)

@@ -33,6 +33,7 @@ class MscModel : public QObject
     Q_PROPERTY(QString dataDefinitionString READ dataDefinitionString WRITE setDataDefinitionString NOTIFY
                        dataDefinitionStringChanged)
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY dataChanged)
+    Q_PROPERTY(QVector<msc::MscChart *> charts READ charts NOTIFY dataChanged)
 
 public:
     explicit MscModel(QObject *parent = nullptr);

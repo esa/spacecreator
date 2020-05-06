@@ -9,3 +9,6 @@
         {% include "mscdocument.tmplt" %}
     {% endif %}
 {% endfor %}
+{% for chart in model.charts %}
+    {% include "mscchart.tmplt" %}
+{% endfor %}

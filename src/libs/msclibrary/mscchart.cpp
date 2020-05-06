@@ -33,13 +33,14 @@
 namespace msc {
 
 MscChart::MscChart(QObject *parent)
-    : MscEntity(parent)
+    : MscChart(DefaultName, parent)
 {
 }
 
 MscChart::MscChart(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
+    qRegisterMetaType<QVector<msc::MscChart *>>();
 }
 
 MscChart::~MscChart()

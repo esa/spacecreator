@@ -1,0 +1,4 @@
+{% comment %}
+{% endcomment %}
+msc {{ chart.name }};
+endmsc;
