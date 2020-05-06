@@ -40,7 +40,6 @@ MscChart::MscChart(QObject *parent)
 MscChart::MscChart(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
-    qRegisterMetaType<QVector<msc::MscChart *>>();
 }
 
 MscChart::~MscChart()

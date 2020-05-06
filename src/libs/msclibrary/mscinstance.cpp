@@ -33,7 +33,6 @@ MscInstance::MscInstance(QObject *parent)
 MscInstance::MscInstance(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
-    qRegisterMetaType<QVector<msc::MscInstance *>>();
 }
 
 /*!

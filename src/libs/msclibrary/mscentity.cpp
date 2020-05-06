@@ -43,7 +43,6 @@ MscEntity::MscEntity(const QString &name, QObject *parent)
     , m_name(name)
     , m_id(QUuid::createUuid())
 {
-    qRegisterMetaType<msc::MscEntity *>();
 }
 
 const QString &MscEntity::name() const

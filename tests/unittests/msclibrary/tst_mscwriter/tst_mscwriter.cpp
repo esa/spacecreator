@@ -23,6 +23,7 @@
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
+#include "msclibrary.h"
 #include "mscmessage.h"
 #include "mscmessagedeclaration.h"
 #include "mscmessagedeclarationlist.h"
@@ -79,7 +80,7 @@ private:
 
 tst_MscWriter::tst_MscWriter()
 {
-    Q_INIT_RESOURCE(mscresources);
+    initMscLibrary();
 }
 
 QString tst_MscWriter::prependTabs(const QString &str, int count) const

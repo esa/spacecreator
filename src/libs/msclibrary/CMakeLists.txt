@@ -73,6 +73,8 @@ target_sources(${LIB_NAME} PRIVATE
     mscinstance.h
     mscinstanceevent.cpp
     mscinstanceevent.h
+    msclibrary.cpp
+    msclibrary.h
     mscmessage.cpp
     mscmessage.h
     mscmessagedeclaration.cpp

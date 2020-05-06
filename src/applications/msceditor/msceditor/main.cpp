@@ -18,6 +18,7 @@
 #include "commandlineparser.h"
 #include "mainwindow.h"
 #include "mscdocument.h"
+#include "msclibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(asn1_resources);
     Q_INIT_RESOURCE(resources);
     Q_INIT_RESOURCE(mscresources);
-    qRegisterMetaType<msc::MscDocument::HierarchyType>("HierarchyType");
+    msc::initMscLibrary();
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));

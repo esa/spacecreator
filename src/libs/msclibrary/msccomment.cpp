@@ -28,7 +28,6 @@ namespace msc {
 MscComment::MscComment(QObject *parent)
     : MscInstanceEvent(parent)
 {
-    qRegisterMetaType<msc::MscComment *>();
     connect(this, &MscEntity::dataChanged, this, &MscComment::onDataChanged);
 }
 

@@ -27,8 +27,6 @@ namespace msc {
 MscMessageDeclaration::MscMessageDeclaration(QObject *parent)
     : QObject(parent)
 {
-    qRegisterMetaType<msc::MscMessageDeclaration *>();
-    qRegisterMetaType<QList<msc::MscMessageDeclaration *>>();
 }
 
 const QStringList &MscMessageDeclaration::names() const

@@ -16,7 +16,6 @@ MscInstanceEvent::MscInstanceEvent(QObject *parent)
 MscInstanceEvent::MscInstanceEvent(const QString &name, QObject *parent)
     : MscEntity(name, parent)
 {
-    qRegisterMetaType<msc::MscInstanceEvent *>();
 }
 
 MscInstanceEvent::~MscInstanceEvent() {}
