@@ -66,8 +66,8 @@ protected:
     void onSelectionChanged(bool isSelected) override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
     void updateInternalItems(Qt::Alignment alignment);
     virtual ColorManager::HandledColors handledColorType() const override;

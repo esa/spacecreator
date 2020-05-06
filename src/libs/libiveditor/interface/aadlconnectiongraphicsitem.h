@@ -20,7 +20,6 @@
 #include "baseitems/interactiveobject.h"
 #include "aadlobject.h"
 
-#include <QGraphicsObject>
 #include <QGraphicsRectItem>
 #include <QPointer>
 
@@ -84,9 +83,9 @@ public:
     void layout();
 
 protected:
-    void onManualMoveStart(GripPoint *gp, const QPointF &at) override;
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     virtual ColorManager::HandledColors handledColorType() const override;
 
@@ -97,7 +96,7 @@ protected Q_SLOTS:
 
 private:
     //    void adjustGripPointCount();
-    bool removeCollidedGrips(GripPoint *gp);
+    bool removeCollidedGrips(shared::ui::GripPoint *gp);
     void simplify();
     void updateBoundingRect();
 

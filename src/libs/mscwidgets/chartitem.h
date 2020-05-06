@@ -19,9 +19,9 @@
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 #include "chartviewmodel.h"
+#include "ui/grippoint.h"
 
-#include <QMargins>
-
+class QMargins;
 class QGraphicsRectItem;
 
 namespace msc {

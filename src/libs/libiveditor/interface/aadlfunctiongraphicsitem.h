@@ -52,10 +52,10 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
-    void onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-    void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
 

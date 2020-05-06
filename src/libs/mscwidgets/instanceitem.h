@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
+#include "ui/grippoint.h"
 
 #include <QPointer>
 
@@ -82,8 +82,8 @@ public Q_SLOTS:
     void rebuildLayout() override;
 
 protected:
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void prepareHoverMark() override;
     cif::CifLine::CifType mainCifType() const override;
@@ -110,7 +110,7 @@ private:
 private Q_SLOTS:
     void onNameEdited(const QString &newName);
     void onKindEdited(const QString &newKind);
-    void onManualGeometryChangeFinished(GripPoint::Location pos, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint::Location pos, const QPointF &from, const QPointF &to);
 };
 
 } // namespace msc
