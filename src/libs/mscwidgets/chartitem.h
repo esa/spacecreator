@@ -66,14 +66,14 @@ public Q_SLOTS:
     void setName(const QString &name);
 
 protected:
-    void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void prepareHoverMark() override;
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
-    void onManualGeometryChangeFinished(GripPoint::Location, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint::Location, const QPointF &from, const QPointF &to);
     void onChartCifRectChanged();
 
 private:
