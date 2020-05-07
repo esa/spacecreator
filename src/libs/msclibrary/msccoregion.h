@@ -24,6 +24,7 @@ namespace msc {
 class MscCoregion : public MscInstanceEvent
 {
     Q_OBJECT
+    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
     Q_PROPERTY(msc::MscCoregion::Type type READ type WRITE setType NOTIFY typeChanged)
 
 public:
@@ -32,6 +33,7 @@ public:
         Begin,
         End
     };
+    Q_ENUM(Type)
 
     explicit MscCoregion(QObject *parent = nullptr);
     explicit MscCoregion(Type type, QObject *parent = nullptr);

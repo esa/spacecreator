@@ -8,5 +8,17 @@ instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.de
 {% if event.entityType == event.Condition %}
 {% include "msccondition.tmplt" %}
 {% endif %}
+{% if event.entityType == event.Coregion %}
+{% include "msccoregion.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Create %}
+{% include "msccreate.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Message %}
+{% include "mscmessage.tmplt" %}
+{% endif %}
+{% if event.entityType == event.Timer %}
+{% include "msctimer.tmplt" %}
+{% endif %}
 {% endfor %}
 {% if instance.explicitStop %}stop;{% else %}endinstance;{% endif %}

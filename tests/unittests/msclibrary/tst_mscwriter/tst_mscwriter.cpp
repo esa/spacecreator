@@ -51,7 +51,6 @@ private Q_SLOTS:
     void testSerializeMscMessageParameters();
     void testSerializeMscMessageMultiParameters();
     void testSerializeMscTimer();
-    void testSerializeMscCoregion();
     void testSerializeMscInstance_data();
     void testSerializeMscInstance();
     void testSerializeMscInstanceStop();
@@ -61,6 +60,7 @@ private Q_SLOTS:
     void testSerializeMscActions();
     void testSerializeMscConditions_data();
     void testSerializeMscConditions();
+    void testSerializeMscCoregion();
     void testSerializeMscChart_data();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
@@ -286,21 +286,6 @@ void tst_MscWriter::testSerializeMscTimer()
 
     MscTimer timer3("T3", MscTimer::TimerType::Timeout);
     QCOMPARE(this->serialize(&timer3, nullptr), QString("timeout T3;\n"));
-}
-
-void tst_MscWriter::testSerializeMscCoregion()
-{
-    MscInstance instance("Inst_1");
-
-    MscCoregion region1(MscCoregion::Type::Begin);
-    region1.setInstance(&instance);
-    QCOMPARE(this->serialize(&region1, &instance), QString("concurrent;\n"));
-    QCOMPARE(this->serialize(&region1, &instance, 1), tab1("concurrent;\n"));
-    QCOMPARE(this->serialize(&region1, &instance, 2), tab2("concurrent;\n"));
-
-    MscCoregion region2(MscCoregion::Type::End);
-    region2.setInstance(&instance);
-    QCOMPARE(this->serialize(&region2, &instance), QString("endconcurrent;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstance_data()
@@ -546,6 +531,38 @@ void tst_MscWriter::testSerializeMscConditions()
     setSaveMode(GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
+}
+
+void tst_MscWriter::testSerializeMscCoregion()
+{
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+
+    auto region1 = new MscCoregion(MscCoregion::Type::Begin);
+    region1->setInstance(instance);
+    chart->addInstanceEvent(region1);
+    auto region2 = new MscCoregion(MscCoregion::Type::End);
+    region2->setInstance(instance);
+    chart->addInstanceEvent(region2);
+
+    chart->addInstance(instance);
+    model->addChart(chart);
+
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        concurrent;\n"
+                          "        endconcurrent;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, removeIndention(result));
 }
 
 void tst_MscWriter::testSerializeMscChart_data()

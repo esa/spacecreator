@@ -1,0 +1,5 @@
+{% comment %}
+{% endcomment %}
+{% if event.instance == instance %}
+{% if event.type == event.Begin %}concurrent{% else %}endconcurrent{% endif %};
+{% endif %}

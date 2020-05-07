@@ -3,6 +3,7 @@
     <qresource prefix="/">
         <file>mscresources/mscaction.tmplt</file>
         <file>mscresources/msccondition.tmplt</file>
+        <file>mscresources/msccoregion.tmplt</file>
         <file>mscresources/mscchart.tmplt</file>
         <file>mscresources/documentBody.tmplt</file>
         <file>mscresources/mscdocument.tmplt</file>
