@@ -32,7 +32,8 @@ class MscInstance : public MscEntity
     Q_PROPERTY(QString denominatorAndKind READ denominatorAndKind WRITE setDenominatorAndKind NOTIFY
                        denominatorOrKindChanged)
     Q_PROPERTY(QString inheritance READ inheritance WRITE setInheritance NOTIFY inheritanceChanged)
-    Q_PROPERTY(MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY explicitCreatorChanged)
+    Q_PROPERTY(msc::MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY
+                       explicitCreatorChanged)
     Q_PROPERTY(bool explicitStop READ explicitStop WRITE setExplicitStop NOTIFY explicitStopChanged)
 
 public:

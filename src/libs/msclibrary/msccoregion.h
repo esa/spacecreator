@@ -24,7 +24,7 @@ namespace msc {
 class MscCoregion : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(MscCoregion::Type type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(msc::MscCoregion::Type type READ type WRITE setType NOTIFY typeChanged)
 
 public:
     enum class Type

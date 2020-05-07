@@ -26,7 +26,7 @@ class MscInstance;
 class MscCondition : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
     Q_PROPERTY(bool shared READ shared WRITE setShared NOTIFY sharedChanged)
 
 public:

@@ -57,9 +57,9 @@ private Q_SLOTS:
     void testSerializeMscInstanceStop();
     void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
+    void testSerializeMscActions_data();
+    void testSerializeMscActions();
     void testSerializeMscConditions();
-    void testSerializeMscActionsInformal();
-    void testSerializeMscActionsFormal();
     void testSerializeMscChart_data();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
@@ -76,6 +76,7 @@ private:
     QString tab1(const QString &str) const;
     QString tab2(const QString &str) const;
     QString tab3(const QString &str) const;
+    QString removeIndention(const QString &text) const;
 };
 
 tst_MscWriter::tst_MscWriter()
@@ -105,6 +106,22 @@ QString tst_MscWriter::tab2(const QString &str) const
 QString tst_MscWriter::tab3(const QString &str) const
 {
     return prependTabs(str, 3);
+}
+
+QString tst_MscWriter::removeIndention(const QString &text) const
+{
+    QStringList lines = text.split("\n");
+    QString result;
+    for (const QString &line : lines) {
+        if (!line.isEmpty()) {
+            if (!result.isEmpty()) {
+                result += "\n";
+            }
+            result += line.trimmed();
+        }
+    }
+
+    return result;
 }
 
 void tst_MscWriter::cleanup()
@@ -158,11 +175,7 @@ void tst_MscWriter::testSaveDocumentModel_data()
              "    mscdocument ChildDoc /* MSC AND */;\n"
              "    endmscdocument;\n"
              "endmscdocument;";
-    QString resultGrantLee = "mscdocument ParentDoc /* MSC AND */;\n"
-                             "mscdocument ChildDoc /* MSC AND */;\n"
-                             "endmscdocument;\n"
-                             "endmscdocument;";
-    QTest::addRow("Nested documents") << model << result << resultGrantLee;
+    QTest::addRow("Nested documents") << model << result << removeIndention(result);
 
     model = new MscModel(this);
     auto doc2 = new MscDocument("CommentedDoc", model);
@@ -196,11 +209,7 @@ void tst_MscWriter::testSaveDocumentModel_data()
              "    msc UltimateChart;\n"
              "    endmsc;\n"
              "endmscdocument;";
-    resultGrantLee = "mscdocument ChartDoc /* MSC AND */;\n"
-                     "msc UltimateChart;\n"
-                     "endmsc;\n"
-                     "endmscdocument;";
-    QTest::addRow("ChartIncluded") << model << result << resultGrantLee;
+    QTest::addRow("ChartIncluded") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSaveDocumentModel()
@@ -308,11 +317,7 @@ void tst_MscWriter::testSerializeMscInstance_data()
                           "    instance instA;\n"
                           "    endinstance;\n"
                           "endmsc;\n");
-    auto resultGrantLee = QString("msc Chart_1;\n"
-                                  "instance instA;\n"
-                                  "endinstance;\n"
-                                  "endmsc;");
-    QTest::addRow("Empty instance") << model << result << resultGrantLee;
+    QTest::addRow("Empty instance") << model << result << removeIndention(result);
 
     model = new MscModel(this);
     auto chart2 = new MscChart("Chart_2");
@@ -324,11 +329,7 @@ void tst_MscWriter::testSerializeMscInstance_data()
                      "    instance instB comment 'Do not touch';\n"
                      "    endinstance;\n"
                      "endmsc;\n");
-    resultGrantLee = QString("msc Chart_2;\n"
-                             "instance instB comment 'Do not touch';\n"
-                             "endinstance;\n"
-                             "endmsc;");
-    QTest::addRow("Commented instance") << model << result << resultGrantLee;
+    QTest::addRow("Commented instance") << model << result << removeIndention(result);
 
     model = new MscModel(this);
     auto chart3 = new MscChart("Chart_3");
@@ -342,11 +343,7 @@ void tst_MscWriter::testSerializeMscInstance_data()
                      "    instance instC: foo bar master;\n"
                      "    endinstance;\n"
                      "endmsc;\n");
-    resultGrantLee = QString("msc Chart_3;\n"
-                             "instance instC: foo bar master;\n"
-                             "endinstance;\n"
-                             "endmsc;");
-    QTest::addRow("Instance denominator") << model << result << resultGrantLee;
+    QTest::addRow("Instance denominator") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscInstance()
@@ -430,6 +427,69 @@ void tst_MscWriter::testSerializeMscInstanceEvents()
     QCOMPARE(serializeList.at(6), QString("endinstance;"));
 }
 
+void tst_MscWriter::testSerializeMscActions_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    auto action = new MscAction();
+    action->setActionType(MscAction::ActionType::Informal);
+    action->setInformalAction("informal_stop");
+    action->setInstance(instance);
+    chart->addInstanceEvent(action);
+    model->addChart(chart);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        action 'informal_stop';\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    QTest::addRow("Informal action") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_2");
+    instance = new MscInstance("Inst_2");
+    chart->addInstance(instance);
+    action = new MscAction();
+    action->setActionType(MscAction::ActionType::Formal);
+    auto statement = new msc::DataStatement(action);
+    statement->setType(msc::DataStatement::StatementType::Define);
+    statement->setVariableString("digit1");
+    action->addDataStatement(statement);
+    auto statement2 = new msc::DataStatement(action);
+    statement2->setType(msc::DataStatement::StatementType::UnDefine);
+    statement2->setVariableString("digit2");
+    action->addDataStatement(statement2);
+    action->setInstance(instance);
+    chart->addInstanceEvent(action);
+    model->addChart(chart);
+    result = QString("msc Chart_2;\n"
+                     "    instance Inst_2;\n"
+                     "        action def digit1, undef digit2;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Formal action") << model << result << removeIndention(result);
+}
+
+void tst_MscWriter::testSerializeMscActions()
+{
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
+
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
+}
+
 void tst_MscWriter::testSerializeMscConditions()
 {
     MscInstance instance("Inst_1");
@@ -454,58 +514,6 @@ void tst_MscWriter::testSerializeMscConditions()
     QCOMPARE(serializeList.at(3), QString("endinstance;"));
 }
 
-void tst_MscWriter::testSerializeMscActionsInformal()
-{
-    MscInstance instance("Inst_1");
-
-    QScopedPointer<MscAction> action(new MscAction());
-    action->setActionType(MscAction::ActionType::Informal);
-    action->setInformalAction("informal_stop");
-    action->setInstance(&instance);
-
-    QVector<MscInstanceEvent *> events;
-    events.append(action.data());
-
-    QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
-    QCOMPARE(serializeList.size(), 3);
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("action 'informal_stop';"));
-    QCOMPARE(serializeList.at(2), QString("endinstance;"));
-
-    MscInstance instance2("Inst_2");
-    serializeList = this->serialize(&instance2, events).split("\n", QString::SkipEmptyParts);
-    QCOMPARE(serializeList.size(), 2);
-    QCOMPARE(serializeList.at(0), QString("instance Inst_2;"));
-    QCOMPARE(serializeList.at(1), QString("endinstance;"));
-}
-
-void tst_MscWriter::testSerializeMscActionsFormal()
-{
-    MscInstance instance("Inst_1");
-
-    QScopedPointer<MscAction> action(new MscAction());
-    action->setActionType(MscAction::ActionType::Formal);
-    MscAction::DataStatement statement;
-    statement.m_type = MscAction::DataStatement::StatementType::Define;
-    statement.m_variableString = "digit1";
-    action->addDataStatement(statement);
-
-    statement.m_type = MscAction::DataStatement::StatementType::UnDefine;
-    statement.m_variableString = "digit2";
-    action->addDataStatement(statement);
-
-    action->setInstance(&instance);
-
-    QVector<MscInstanceEvent *> events;
-    events.append(action.data());
-
-    QStringList serializeList = this->serialize(&instance, events).split("\n", QString::SkipEmptyParts);
-    QCOMPARE(serializeList.size(), 3);
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("action def digit1, undef digit2;"));
-    QCOMPARE(serializeList.at(2), QString("endinstance;"));
-}
-
 void tst_MscWriter::testSerializeMscChart_data()
 {
     QTest::addColumn<MscModel *>("model");
@@ -515,14 +523,14 @@ void tst_MscWriter::testSerializeMscChart_data()
     auto model = new MscModel(this);
     model->addChart(new MscChart("Chart_1"));
     QString result = "msc Chart_1;\nendmsc;\n";
-    QTest::addRow("Simple chart") << model << result << result.trimmed();
+    QTest::addRow("Simple chart") << model << result << removeIndention(result);
 
     model = new MscModel(this);
     auto chart1 = new MscChart("Chart_1");
     chart1->setCommentString("Importante");
     model->addChart(chart1);
     result = "msc Chart_1;\nendmsc;\n";
-    QTest::addRow("Plain chart comments ignored") << model << result << result.trimmed();
+    QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscChart()

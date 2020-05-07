@@ -619,19 +619,20 @@ void appendDataStatement(MscAction *action, MscParser::DataStatementListContext 
         return;
     }
 
-    MscAction::DataStatement statement;
+    auto statement = new msc::DataStatement(action);
     if (statementCtx->defineStatement()) {
-        statement.m_type = MscAction::DataStatement::StatementType::Define;
-        statement.m_variableString = ::treeNodeToString(statementCtx->defineStatement()->variableString()->STRING());
+        statement->setType(msc::DataStatement::StatementType::Define);
+        statement->setVariableString(::treeNodeToString(statementCtx->defineStatement()->variableString()->STRING()));
         action->addDataStatement(statement);
     }
     if (statementCtx->undefineStatement()) {
-        statement.m_type = MscAction::DataStatement::StatementType::UnDefine;
-        statement.m_variableString = ::treeNodeToString(statementCtx->undefineStatement()->variableString()->STRING());
+        statement->setType(msc::DataStatement::StatementType::UnDefine);
+        statement->setVariableString(treeNodeToString(statementCtx->undefineStatement()->variableString()->STRING()));
         action->addDataStatement(statement);
     }
     if (statementCtx->binding()) {
         qWarning() << "Formal binding action types is not suported";
+        delete statement;
     }
 
     appendDataStatement(action, statementList->dataStatementList());

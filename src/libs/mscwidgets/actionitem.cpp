@@ -154,8 +154,6 @@ void ActionItem::rebuildLayout()
     if (!m_instance)
         return;
 
-
-
     m_textItem->setTextWrapMode(QTextOption::ManualWrap);
     const QSizeF nameSize(m_textItem->boundingRect().size());
     prepareGeometryChange();
@@ -185,18 +183,18 @@ QString ActionItem::actionText() const
         return m_action->informalAction();
     } else {
         QString text;
-        for (const MscAction::DataStatement &statement : m_action->dataStatements()) {
+        for (const msc::DataStatement *statement : m_action->dataStatements()) {
             if (!text.isEmpty()) {
                 text += ", ";
             }
-            switch (statement.m_type) {
-            case MscAction::DataStatement::StatementType::Define:
-                text += "<b>define</b> " + statement.m_variableString;
+            switch (statement->type()) {
+            case msc::DataStatement::StatementType::Define:
+                text += "<b>define</b> " + statement->variableString();
                 break;
-            case MscAction::DataStatement::StatementType::UnDefine:
-                text += "<b>undefine</b> " + statement.m_variableString;
+            case msc::DataStatement::StatementType::UnDefine:
+                text += "<b>undefine</b> " + statement->variableString();
                 break;
-            case MscAction::DataStatement::StatementType::Binding:
+            case msc::DataStatement::StatementType::Binding:
                 qWarning() << "Binding actions is not yet supported";
                 continue;
             }

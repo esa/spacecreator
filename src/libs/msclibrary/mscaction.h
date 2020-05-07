@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "datastatement.h"
 #include "mscinstanceevent.h"
 
 #include <QVector>
@@ -25,12 +26,17 @@ namespace msc {
 
 class MscInstance;
 
+/**
+   @brief The MscAction class
+ */
 class MscAction : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(MscAction::ActionType actionType READ actionType WRITE setActionType NOTIFY actionTypeChanged)
+    Q_PROPERTY(msc::MscAction::ActionType actionType READ actionType WRITE setActionType NOTIFY actionTypeChanged)
     Q_PROPERTY(QString informalAction READ informalAction WRITE setInformalAction NOTIFY informalActionChanged)
-    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(bool isAssignAction READ isAssignAction NOTIFY isAssignActionChanged)
+    Q_PROPERTY(QVector<msc::DataStatement *> dataStatements READ dataStatements NOTIFY dataStatementsChanged)
+    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
 
 public:
     enum class ActionType
@@ -38,18 +44,7 @@ public:
         Informal,
         Formal
     };
-
-    struct DataStatement {
-        enum class StatementType
-        {
-            Define,
-            UnDefine,
-            Binding
-        };
-
-        StatementType m_type = StatementType::Define;
-        QString m_variableString;
-    };
+    Q_ENUM(ActionType)
 
     explicit MscAction(QObject *parent = nullptr);
 
@@ -61,8 +56,10 @@ public:
     void setInformalAction(const QString &action);
     QString informalAction() const;
 
-    void addDataStatement(const DataStatement &statement);
-    QVector<DataStatement> dataStatements() const;
+    bool isAssignAction() const;
+
+    void addDataStatement(DataStatement *statement);
+    QVector<DataStatement *> dataStatements() const;
 
     MscInstance *instance() const;
     void setInstance(MscInstance *instance);
@@ -72,13 +69,14 @@ public:
 Q_SIGNALS:
     void actionTypeChanged();
     void informalActionChanged(const QString &text);
+    void isAssignActionChanged();
     void dataStatementsChanged();
     void instanceChanged();
 
 private:
     ActionType m_actionType = ActionType::Informal;
     QString m_informalAction;
-    QVector<DataStatement> m_dataStatementList;
+    QVector<DataStatement *> m_dataStatementList;
     MscInstance *m_instance = nullptr;
 };
 }

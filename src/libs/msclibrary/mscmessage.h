@@ -32,8 +32,8 @@ class MscMessage : public MscInstanceEvent
     Q_OBJECT
     Q_PROPERTY(QString messageInstanceName READ messageInstanceName WRITE setMessageInstanceName NOTIFY
                        messageInstanceNameChanged)
-    Q_PROPERTY(MscInstance *sourceInstance READ sourceInstance WRITE setSourceInstance NOTIFY sourceChanged)
-    Q_PROPERTY(MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
+    Q_PROPERTY(msc::MscInstance *sourceInstance READ sourceInstance WRITE setSourceInstance NOTIFY sourceChanged)
+    Q_PROPERTY(msc::MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
 
 public:
     enum class MessageType

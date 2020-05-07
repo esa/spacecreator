@@ -1,0 +1,14 @@
+{% comment %}
+{% endcomment %}
+{% if event.instance == instance %}
+{% if event.actionType == event.Informal %}
+{% if event.isAssignAction %}
+action {{ event.informalAction}}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% else %}
+action '{{ event.informalAction}}'{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% endif %}
+{% else %}
+{# Formal action #}
+action {% for stmnt in event.dataStatements %}{% if not forloop.first %}, {% endif %}{% if stmnt.type == stmnt.Define %}def{% else %}undef{% endif %} {{ stmnt.variableString }}{% endfor %};
+{% endif %}
+{% endif %}

@@ -39,6 +39,7 @@ class MscChart : public MscEntity
 {
     Q_OBJECT
     Q_PROPERTY(QVector<msc::MscInstance *> instances READ instances NOTIFY instancesChanged)
+    Q_PROPERTY(QVector<msc::MscInstanceEvent *> instanceEvents READ instanceEvents NOTIFY instanceEventsChanged)
 
 public:
     explicit MscChart(QObject *parent = nullptr);
@@ -92,6 +93,7 @@ Q_SIGNALS:
     void instanceOrderChanged(MscInstance *instance, int from, int to);
     void instanceEventAdded(MscInstanceEvent *message);
     void instanceEventRemoved(MscInstanceEvent *message);
+    void instanceEventsChanged();
     void eventMoved();
     void messageRetargeted();
     void gateAdded(MscGate *gate);

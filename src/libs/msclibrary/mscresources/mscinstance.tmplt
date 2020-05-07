@@ -1,5 +1,9 @@
 {% comment %}
 {% endcomment %}
 instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}{% if instance.commentString %} comment '{{ instance.commentString }}'{% endif %};
-{# instance events #}
+{% for event in chart.instanceEvents %}
+{% if event.entityType == event.Action %}
+{% include "mscaction.tmplt" %}
+{% endif %}
+{% endfor %}
 {% if instance.explicitStop %}stop;{% else %}endinstance;{% endif %}

@@ -359,18 +359,18 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
     } else {
         QString actionText = tabString + "action ";
         bool first = true;
-        for (const auto &statement : action->dataStatements()) {
+        for (const auto statement : action->dataStatements()) {
             if (!first) {
                 actionText += ", ";
             }
-            switch (statement.m_type) {
-            case MscAction::DataStatement::StatementType::Define:
-                actionText += "def " + statement.m_variableString;
+            switch (statement->type()) {
+            case msc::DataStatement::StatementType::Define:
+                actionText += "def " + statement->variableString();
                 break;
-            case MscAction::DataStatement::StatementType::UnDefine:
-                actionText += "undef " + statement.m_variableString;
+            case msc::DataStatement::StatementType::UnDefine:
+                actionText += "undef " + statement->variableString();
                 break;
-            case MscAction::DataStatement::StatementType::Binding:
+            case msc::DataStatement::StatementType::Binding:
                 qWarning() << "Writing of formal binding actions is not yet supported";
                 continue;
             }

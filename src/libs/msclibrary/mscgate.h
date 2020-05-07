@@ -28,8 +28,8 @@ namespace msc {
 class MscGate : public MscInstanceEvent
 {
     Q_OBJECT
-    Q_PROPERTY(MscGate::Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
-    Q_PROPERTY(MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(msc::MscGate::Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+    Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
     Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName NOTIFY instanceNameChanged)
     Q_PROPERTY(QString paramName READ paramName WRITE setParamName NOTIFY paramNameChanged)
     Q_PROPERTY(QVariantList params READ params WRITE setParams NOTIFY paramsChanged)

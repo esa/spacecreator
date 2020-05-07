@@ -36,6 +36,7 @@ void MscAction::setActionType(MscAction::ActionType type)
 
     m_actionType = type;
     Q_EMIT actionTypeChanged();
+    Q_EMIT isAssignActionChanged();
     Q_EMIT dataChanged();
 }
 
@@ -52,6 +53,7 @@ void MscAction::setInformalAction(const QString &action)
 
     m_informalAction = action;
     Q_EMIT informalActionChanged(m_informalAction);
+    Q_EMIT isAssignActionChanged();
     Q_EMIT dataChanged();
 }
 
@@ -60,9 +62,14 @@ QString MscAction::informalAction() const
     return m_informalAction;
 }
 
-void MscAction::addDataStatement(const MscAction::DataStatement &statement)
+bool MscAction::isAssignAction() const
 {
-    if (statement.m_type == DataStatement::StatementType::Binding) {
+    return m_actionType == ActionType::Informal && m_informalAction.contains("=");
+}
+
+void MscAction::addDataStatement(DataStatement *statement)
+{
+    if (statement->type() == DataStatement::StatementType::Binding) {
         qWarning() << "Action data statement type 'binding' is not supported";
         return;
     }
@@ -72,7 +79,7 @@ void MscAction::addDataStatement(const MscAction::DataStatement &statement)
     Q_EMIT dataChanged();
 }
 
-QVector<MscAction::DataStatement> MscAction::dataStatements() const
+QVector<DataStatement *> MscAction::dataStatements() const
 {
     return m_dataStatementList;
 }
@@ -97,4 +104,5 @@ bool MscAction::relatesTo(const MscInstance *instance) const
 {
     return m_instance == instance;
 }
+
 }

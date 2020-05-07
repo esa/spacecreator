@@ -246,6 +246,7 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
     }
 
     Q_EMIT instanceEventAdded(instanceEvent);
+    Q_EMIT instanceEventsChanged();
     Q_EMIT dataChanged();
 }
 
@@ -276,6 +277,7 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
         disconnect(instanceEvent, nullptr, this, nullptr);
 
         Q_EMIT instanceEventRemoved(instanceEvent);
+        Q_EMIT instanceEventsChanged();
         Q_EMIT dataChanged();
     }
 }

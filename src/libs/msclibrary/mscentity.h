@@ -34,6 +34,7 @@ class MscEntity : public QObject
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(msc::MscComment *comment READ comment WRITE setComment NOTIFY commentChanged)
     Q_PROPERTY(QString commentString READ commentString WRITE setCommentString NOTIFY commentChanged)
+    Q_PROPERTY(msc::MscEntity::EntityType entityType READ entityType CONSTANT)
 
 public:
     enum class EntityType
