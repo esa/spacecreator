@@ -39,10 +39,15 @@ void tst_GripPoint::testConstructor()
 {
     const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
-        GripPoint gp(GripPoint::Location(e.value(i)));
+        auto location = static_cast<shared::ui::GripPoint::Location>(e.value(i));
+        GripPoint gp(location);
         QCOMPARE(gp.location(), GripPoint::Location(e.value(i)));
         QCOMPARE(gp.parentItem(), static_cast<QGraphicsItem *>(nullptr));
-        QCOMPARE(gp.gripType(), GripPoint::GripType::Resizer);
+        if (location == GripPoint::Center || location == GripPoint::Absolute) {
+            QCOMPARE(gp.gripType(), GripPoint::GripType::Mover);
+        } else {
+            QCOMPARE(gp.gripType(), GripPoint::GripType::Resizer);
+        }
     }
 }
 

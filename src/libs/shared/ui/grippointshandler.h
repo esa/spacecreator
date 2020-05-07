@@ -56,6 +56,8 @@ public:
     void setGripPointPos(GripPoint *grip, const QPointF &pos);
     void setGripPointPos(GripPoint::Location location, const QPointF &pos);
 
+    GripPoint* gripPoint(GripPoint::Location location);
+
 public Q_SLOTS:
     void showAnimated();
     void hideAnimated();

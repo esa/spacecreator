@@ -33,26 +33,27 @@ private Q_SLOTS:
 void tst_GripPointsHandler::testConstructor()
 {
     GripPointsHandler handler;
-    const QMetaEnum &e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
-
-    QCOMPARE(handler.gripPoints().size(), e.keyCount());
-    QCOMPARE(handler.usedPoints().size(), e.keyCount());
+    QCOMPARE(handler.gripPoints().size(), 0);
+    QCOMPARE(handler.usedPoints().size(), 0);
 }
 
 void tst_GripPointsHandler::testUsedPoints()
 {
-    // FIXME_BEFORE_MR
-//    GripPointsHandler handler;
+    GripPointsHandler handler;
 
-//    const QMetaEnum &e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
-//    for (int i = 0; i < e.keyCount(); ++i) {
-//        GripPoint *gp = handler.gripPoint(shared::ui::GripPoint::Location(e.value(i)));
-//        GripPoint::Locations points = handler.usedPoints();
-//        QVERIFY(points.contains(gp->location()));
-//        points.remove(gp->location());
-//        handler.setUsedPoints(points);
-//        QVERIFY(!handler.usedPoints().contains(gp->location()));
-//    }
+    const QMetaEnum &e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
+    GripPoint::Locations locations = { GripPoint::Center, GripPoint::Left };
+    handler.setUsedPoints(locations);
+    QCOMPARE(handler.usedPoints(), locations);
+    for (int i = 0; i < e.keyCount(); ++i) {
+        auto location = static_cast<shared::ui::GripPoint::Location>(e.value(i));
+        GripPoint *gp = handler.gripPoint(location);
+        if (locations.contains(location)) {
+            QVERIFY(gp != nullptr);
+        } else {
+            QVERIFY(gp == nullptr);
+        }
+    }
 }
 
 QTEST_MAIN(tst_GripPointsHandler)

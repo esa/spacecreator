@@ -124,6 +124,16 @@ void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPoi
     }
 }
 
+GripPoint* GripPointsHandler::gripPoint(GripPoint::Location location)
+{
+    for (auto gp : m_gripPoints) {
+        if (gp->location() == location) {
+            return gp;
+        }
+    }
+    return nullptr;
+}
+
 void GripPointsHandler::showAnimated()
 {
     changeVisibilityAnimated(true);

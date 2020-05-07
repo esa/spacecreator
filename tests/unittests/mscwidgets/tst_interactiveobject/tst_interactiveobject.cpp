@@ -37,19 +37,13 @@ public:
     {
         prepareGeometryChange();
         setBoundingRect(QRectF(-50., -50., 100., 100.));
-        updateGripPoints();
+        initGripPoints();
     }
 
     GripPoint *gripPoint(GripPoint::Location location)
     {
-        auto gph = gripPointsHandler();
-        if (gph != nullptr) {
-            return nullptr;
-        }
-        for (auto gp : gph->gripPoints()) {
-            if (gp->location() == location) {
-                return gp;
-            }
+        if (auto gph = gripPointsHandler()) {
+            return gph->gripPoint(location);
         }
         return nullptr;
     }
@@ -61,6 +55,12 @@ protected:
         Q_UNUSED(widget);
 
         painter->drawRect(boundingRect());
+    }
+
+    void initGripPoints() override
+    {
+        InteractiveObject::initGripPoints();
+        gripPointsHandler()->setUsedPoints({ GripPoint::Location::Center });
     }
 
     virtual void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override
