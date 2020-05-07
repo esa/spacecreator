@@ -122,6 +122,7 @@ void MscMessage::setParameters(const MscParameterList &parameters)
 
     m_parameters = parameters;
 
+    Q_EMIT parameterStringChanged();
     Q_EMIT dataChanged();
 }
 

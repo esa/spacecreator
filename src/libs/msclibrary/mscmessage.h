@@ -34,6 +34,7 @@ class MscMessage : public MscInstanceEvent
                        messageInstanceNameChanged)
     Q_PROPERTY(msc::MscInstance *sourceInstance READ sourceInstance WRITE setSourceInstance NOTIFY sourceChanged)
     Q_PROPERTY(msc::MscInstance *targetInstance READ targetInstance WRITE setTargetInstance NOTIFY targetChanged)
+    Q_PROPERTY(QString parameterString READ paramString NOTIFY parameterStringChanged)
 
 public:
     enum class MessageType
@@ -108,6 +109,7 @@ Q_SIGNALS:
     void messageInstanceNameChanged();
     void sourceChanged(MscInstance *source);
     void targetChanged(MscInstance *target);
+    void parameterStringChanged();
     void cifPointsChanged();
 
 protected:

@@ -61,14 +61,14 @@ private Q_SLOTS:
     void testSerializeMscConditions_data();
     void testSerializeMscConditions();
     void testSerializeMscCoregion();
+    void testSerializeCreate_data();
+    void testSerializeCreate();
     void testSerializeMscChart_data();
     void testSerializeMscChart();
     void testSerializeMscChartInstance();
     void testSerializeMscDocument();
     void testSerializeMscDocumentChart();
     void testSerializeDataDefinition();
-    void testSerializeCreate();
-    void testSerializeChartWithCreate();
     void testSerializeComments();
     void testSerializeMessageDeclarations();
 
@@ -565,6 +565,75 @@ void tst_MscWriter::testSerializeMscCoregion()
     QCOMPARE(text, removeIndention(result));
 }
 
+void tst_MscWriter::testSerializeCreate_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    auto create = new MscCreate("");
+    create->setSourceInstance(instance);
+    create->setTargetInstance(instance2);
+    chart->addInstanceEvent(create);
+    model->addChart(chart);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        create Inst_2;\n"
+                          "    endinstance;\n"
+                          "    instance Inst_2;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    QTest::addRow("Simple create") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    create = new MscCreate("");
+    create->setSourceInstance(instance);
+    create->setTargetInstance(instance2);
+    MscParameterList parameters;
+    MscParameter parameter;
+    parameter.setPattern("data1");
+    parameters << parameter;
+    parameter.setPattern("data2");
+    parameters << parameter;
+    create->setParameters(parameters);
+    chart->addInstanceEvent(create);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        create Inst_2(data1, data2);\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Create with parameters") << model << result << removeIndention(result);
+}
+
+void tst_MscWriter::testSerializeCreate()
+{
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
+
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
+}
+
 void tst_MscWriter::testSerializeMscChart_data()
 {
     QTest::addColumn<MscModel *>("model");
@@ -731,73 +800,6 @@ void tst_MscWriter::testSerializeDataDefinition()
     QCOMPARE(serializeList.at(1), tab1("language ASN.1;"));
     QCOMPARE(serializeList.at(2), tab1("data TPos.asn;"));
     QCOMPARE(serializeList.at(3), QString("endmscdocument;"));
-}
-
-void tst_MscWriter::testSerializeCreate()
-{
-    MscInstance instanceSource("Inst_1");
-    MscInstance instanceSubscriber("subscriber");
-    MscInstance instanceSubscriber2("subscriber2");
-    QVector<MscInstanceEvent *> messages;
-
-    QScopedPointer<MscCreate> createSubscriber(new MscCreate());
-    createSubscriber->setSourceInstance(&instanceSource);
-    createSubscriber->setTargetInstance(&instanceSubscriber);
-    MscParameterList parameters;
-    MscParameter parameter;
-    parameter.setPattern("data1");
-    parameters << parameter;
-    parameter.setPattern("data2");
-    parameters << parameter;
-    createSubscriber->setParameters(parameters);
-
-    messages.append(createSubscriber.data());
-
-    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
-    message->setTargetInstance(&instanceSource);
-    messages.append(message.data());
-
-    QScopedPointer<MscCreate> createSubscriber2(new MscCreate());
-    createSubscriber2->setSourceInstance(&instanceSource);
-    createSubscriber2->setTargetInstance(&instanceSubscriber2);
-    messages.append(createSubscriber2.data());
-
-    const QStringList &serializeList = this->serialize(&instanceSource, messages).split("\n", QString::SkipEmptyParts);
-
-    QVERIFY(serializeList.size() >= 5);
-
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("create subscriber(data1, data2);"));
-    QCOMPARE(serializeList.at(2), tab1("in Msg_1 from env;"));
-    QCOMPARE(serializeList.at(3), tab1("create subscriber2;"));
-    QCOMPARE(serializeList.at(4), QString("endinstance;"));
-}
-
-void tst_MscWriter::testSerializeChartWithCreate()
-{
-    MscChart chart("Chart01");
-    auto instance1 = new MscInstance("Instance01");
-    chart.addInstance(instance1);
-    auto instance2 = new MscInstance("Instance02");
-    chart.addInstance(instance2);
-    chart.addInstance(new MscInstance("Instance03"));
-
-    auto create = new MscCreate();
-    create->setSourceInstance(instance1);
-    create->setTargetInstance(instance2);
-    chart.addInstanceEvent(create);
-
-    QStringList serializeList = this->serialize(&chart).split("\n", QString::SkipEmptyParts);
-    QVERIFY(serializeList.size() >= 9);
-    QCOMPARE(serializeList.at(0), QString("msc Chart01;"));
-    QCOMPARE(serializeList.at(1), tab1("instance Instance01;"));
-    QCOMPARE(serializeList.at(2), tab2("create Instance02;"));
-    QCOMPARE(serializeList.at(3), tab1("endinstance;"));
-    QCOMPARE(serializeList.at(4), tab1("instance Instance02;"));
-    QCOMPARE(serializeList.at(5), tab1("endinstance;"));
-    QCOMPARE(serializeList.at(6), tab1("instance Instance03;"));
-    QCOMPARE(serializeList.at(7), tab1("endinstance;"));
-    QCOMPARE(serializeList.at(8), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeComments()

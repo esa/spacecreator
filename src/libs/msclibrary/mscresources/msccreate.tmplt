@@ -1,0 +1,5 @@
+{% comment %}
+{% endcomment %}
+{% if event.sourceInstance == instance %}
+create {{ event.targetInstance.name }}{% if event.parameterString %}({{ event.parameterString }}){% endif %};
+{% endif %}
