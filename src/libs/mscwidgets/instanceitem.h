@@ -64,7 +64,6 @@ public:
 
     void applyCif() override;
 
-    QRectF boundingRect() const override;
     void updateCif() override;
 
     QPointF avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const;
@@ -83,7 +82,6 @@ public Q_SLOTS:
 
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void initGripPoints() override;

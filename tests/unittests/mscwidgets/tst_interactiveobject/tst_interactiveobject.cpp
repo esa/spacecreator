@@ -16,8 +16,7 @@
 */
 
 #include "baseitems/common/utils.h"
-#include "baseitems/grippoint.h"
-#include "baseitems/grippointshandler.h"
+#include "ui/grippointshandler.h"
 #include "baseitems/interactiveobject.h"
 #include "tst_common.h"
 
@@ -27,6 +26,7 @@
 #include <QTest>
 
 using namespace msc;
+using namespace shared::ui;
 
 class InteractiveObjectImpl : public InteractiveObject
 {
@@ -36,16 +36,22 @@ public:
         : InteractiveObject(nullptr, parent)
     {
         prepareGeometryChange();
-        m_boundingRect = QRectF(-50., -50., 100., 100.);
+        setBoundingRect(QRectF(-50., -50., 100., 100.));
         updateGripPoints();
     }
 
     GripPoint *gripPoint(GripPoint::Location location)
     {
-        if (!m_gripPoints)
+        auto gph = gripPointsHandler();
+        if (gph != nullptr) {
             return nullptr;
-
-        return m_gripPoints->usedPoints().contains(location) ? m_gripPoints->gripPoint(location) : nullptr;
+        }
+        for (auto gp : gph->gripPoints()) {
+            if (gp->location() == location) {
+                return gp;
+            }
+        }
+        return nullptr;
     }
 
 protected:
@@ -71,34 +77,36 @@ protected:
         // we are here just to ensure that the handler is called in a propper way.
 
         const QPointF &offset(to - from);
+        auto br = boundingRect();
         switch (gp->location()) {
         case GripPoint::Location::Top:
-            m_boundingRect.setTop(m_boundingRect.top() + offset.y());
+            br.setTop(boundingRect().top() + offset.y());
             break;
         case GripPoint::Location::Bottom:
-            m_boundingRect.setBottom(m_boundingRect.bottom() - offset.y());
+            br.setBottom(boundingRect().bottom() - offset.y());
             break;
         case GripPoint::Location::Left:
-            m_boundingRect.setLeft(m_boundingRect.left() + offset.x());
+            br.setLeft(boundingRect().left() + offset.x());
             break;
         case GripPoint::Location::Right:
-            m_boundingRect.setRight(m_boundingRect.right() - offset.x());
+            br.setRight(boundingRect().right() - offset.x());
             break;
         case GripPoint::Location::TopLeft:
-            m_boundingRect.setTopLeft(m_boundingRect.topLeft() + offset);
+            br.setTopLeft(boundingRect().topLeft() + offset);
             break;
         case GripPoint::Location::BottomLeft:
-            m_boundingRect.setBottomLeft(m_boundingRect.bottomLeft() - offset);
+            br.setBottomLeft(boundingRect().bottomLeft() - offset);
             break;
         case GripPoint::Location::TopRight:
-            m_boundingRect.setTopRight(m_boundingRect.topRight() + offset);
+            br.setTopRight(boundingRect().topRight() + offset);
             break;
         case GripPoint::Location::BottomRight:
-            m_boundingRect.setBottomRight(m_boundingRect.bottomRight() - offset);
+            br.setBottomRight(boundingRect().bottomRight() - offset);
             break;
         default:
             return;
         }
+        setBoundingRect(br);
         prepareGeometryChange();
         updateGripPoints();
     }
@@ -206,7 +214,7 @@ void tst_InteractiveObject::testResize()
     // place mouse pointer over item to activate its grippointshandler:
     msc::test::ui::sendMouseMove(m_view->viewport(), QPoint(), Qt::NoButton, Qt::NoButton);
 
-    const QMetaEnum &e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum &e = QMetaEnum::fromType<GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         const GripPoint::Location loc = static_cast<GripPoint::Location>(e.value(i));
 

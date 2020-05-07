@@ -37,7 +37,7 @@ private Q_SLOTS:
 
 void tst_GripPoint::testConstructor()
 {
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         GripPoint gp(GripPoint::Location(e.value(i)));
         QCOMPARE(gp.location(), GripPoint::Location(e.value(i)));
@@ -49,7 +49,7 @@ void tst_GripPoint::testConstructor()
 void tst_GripPoint::testSideSize()
 {
     static constexpr qreal side = 123.;
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         GripPoint gp(GripPoint::Location(e.value(i)));
         gp.setSideSize(side + i);
@@ -60,7 +60,7 @@ void tst_GripPoint::testSideSize()
 void tst_GripPoint::testBorderWidth()
 {
     static constexpr qreal border = 123.;
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         GripPoint gp(GripPoint::Location(e.value(i)));
         gp.setBorderWidth(border + i);
@@ -71,7 +71,7 @@ void tst_GripPoint::testBorderWidth()
 void tst_GripPoint::testBorderColor()
 {
     static const QColor color(Qt::red);
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         GripPoint gp(GripPoint::Location(e.value(i)));
         gp.setBorderColor(color);
@@ -82,7 +82,7 @@ void tst_GripPoint::testBorderColor()
 void tst_GripPoint::testBodyColor()
 {
     static const QColor color(Qt::red);
-    const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
         GripPoint gp(GripPoint::Location(e.value(i)));
         gp.setBodyColor(color);
@@ -92,11 +92,14 @@ void tst_GripPoint::testBodyColor()
 
 void tst_GripPoint::testGripType()
 {
-    for (const GripPoint::GripType gpType : { GripPoint::GripType::Resizer, GripPoint::GripType::Mover }) {
-        const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
-        for (int i = 0; i < e.keyCount(); ++i) {
-            GripPoint gp(GripPoint::Location(e.value(i)), nullptr, gpType);
-            QCOMPARE(gp.gripType(), gpType);
+    const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
+    for (int i = 0; i < e.keyCount(); ++i) {
+        auto l = static_cast<GripPoint::Location>(e.value(i));
+        const GripPoint gp(l, nullptr);
+        if (l == GripPoint::Location::Center || l == GripPoint::Location::Absolute) {
+            QCOMPARE(gp.gripType(), GripPoint::GripType::Mover);
+        } else {
+            QCOMPARE(gp.gripType(), GripPoint::GripType::Resizer);
         }
     }
 }
@@ -104,7 +107,7 @@ void tst_GripPoint::testGripType()
 void tst_GripPoint::testIsUsed()
 {
     for (const bool used : { true, false }) {
-        const QMetaEnum e = QMetaEnum::fromType<msc::GripPoint::Location>();
+        const QMetaEnum e = QMetaEnum::fromType<shared::ui::GripPoint::Location>();
         for (int i = 0; i < e.keyCount(); ++i) {
             GripPoint gp(GripPoint::Location(e.value(i)));
             gp.setIsUsed(used);
