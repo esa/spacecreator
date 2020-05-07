@@ -59,6 +59,7 @@ private Q_SLOTS:
     void testSerializeMscInstanceEvents();
     void testSerializeMscActions_data();
     void testSerializeMscActions();
+    void testSerializeMscConditions_data();
     void testSerializeMscConditions();
     void testSerializeMscChart_data();
     void testSerializeMscChart();
@@ -490,28 +491,61 @@ void tst_MscWriter::testSerializeMscActions()
     QCOMPARE(text, resultGrantLee);
 }
 
+void tst_MscWriter::testSerializeMscConditions_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    auto condition = new MscCondition("Con_1");
+    condition->setInstance(instance);
+    chart->addInstanceEvent(condition);
+    model->addChart(chart);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        condition Con_1;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    QTest::addRow("Simple condition") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    condition = new MscCondition("Con_1");
+    condition->setShared(true);
+    condition->setInstance(instance);
+    chart->addInstanceEvent(condition);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        condition Con_1 shared all;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Shared condition") << model << result << removeIndention(result);
+}
+
 void tst_MscWriter::testSerializeMscConditions()
 {
-    MscInstance instance("Inst_1");
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
-    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
-    message->setTargetInstance(&instance);
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
 
-    QScopedPointer<MscCondition> condition(new MscCondition("Con_1"));
-    condition->setInstance(&instance);
-
-    QVector<MscInstanceEvent *> messages;
-    messages.append(condition.data());
-    messages.append(message.data());
-
-    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
-
-    QVERIFY(serializeList.size() >= 4);
-
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("condition Con_1;"));
-    QCOMPARE(serializeList.at(2), tab1("in Msg_1 from env;"));
-    QCOMPARE(serializeList.at(3), QString("endinstance;"));
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeMscChart_data()

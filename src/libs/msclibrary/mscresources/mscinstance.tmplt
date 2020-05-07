@@ -5,5 +5,8 @@ instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.de
 {% if event.entityType == event.Action %}
 {% include "mscaction.tmplt" %}
 {% endif %}
+{% if event.entityType == event.Condition %}
+{% include "msccondition.tmplt" %}
+{% endif %}
 {% endfor %}
 {% if instance.explicitStop %}stop;{% else %}endinstance;{% endif %}
