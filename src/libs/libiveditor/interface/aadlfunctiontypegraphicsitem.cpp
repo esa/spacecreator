@@ -23,7 +23,6 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "commandsstack.h"
 #include "baseitems/common/utils.h"
-//#include "baseitems/grippointshandler.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"

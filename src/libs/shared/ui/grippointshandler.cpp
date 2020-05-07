@@ -88,7 +88,6 @@ QSizeF GripPointsHandler::minSize() const
 
 void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
 {
-    // FIXME_BEFORE_MR
     if (m_usedPoints == points)
         return;
 
