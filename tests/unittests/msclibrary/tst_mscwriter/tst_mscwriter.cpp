@@ -61,9 +61,8 @@ private Q_SLOTS:
     void testSerializeMscCoregion();
     void testSerializeCreate_data();
     void testSerializeCreate();
+    void testSerializeMscMessage_data();
     void testSerializeMscMessage();
-    void testSerializeMscMessageParameters();
-    void testSerializeMscMessageMultiParameters();
     void testSerializeMscTimer();
     void testSerializeComments();
     void testSerializeMessageDeclarations();
@@ -697,47 +696,138 @@ void tst_MscWriter::testSerializeCreate()
     QCOMPARE(text, resultGrantLee);
 }
 
+void tst_MscWriter::testSerializeMscMessage_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    auto message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setTargetInstance(instance2);
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        out Msg_1 to Inst_2;\n"
+                          "    endinstance;\n"
+                          "    instance Inst_2;\n"
+                          "        in Msg_1 from Inst_1;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    QTest::addRow("Simple message") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    chart->addInstanceEvent(message);
+    auto message2 = new MscMessage("Msg_2");
+    message2->setTargetInstance(instance2);
+    chart->addInstanceEvent(message2);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        out Msg_1 to env;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "        in Msg_2 from env;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Env.  message") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setTargetInstance(instance2);
+    message->setMessageInstanceName("a");
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        out Msg_1,a to Inst_2;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "        in Msg_1,a from Inst_1;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Instance name") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setTargetInstance(instance2);
+    message->setMessageInstanceName("a");
+    message->setParameters({ { "longitude:-174.0", "" } });
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        out Msg_1,a(longitude:-174.0) to Inst_2;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "        in Msg_1,a(longitude:-174.0) from Inst_1;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Parameter") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setTargetInstance(instance2);
+    message->setMessageInstanceName("a");
+    message->setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        out Msg_1,a(longitude:-174.0, init) to Inst_2;\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "        in Msg_1,a(longitude:-174.0, init) from Inst_1;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Multi-parameter") << model << result << removeIndention(result);
+}
+
 void tst_MscWriter::testSerializeMscMessage()
 {
-    MscMessage message("Msg_1");
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
 
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1 to Inst_2;\n"));
-    QCOMPARE(this->serialize(&message, &target), QString("in Msg_1 from Inst_1;\n"));
-}
-
-void tst_MscWriter::testSerializeMscMessageParameters()
-{
-    MscMessage message("Msg_1");
-    message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" } });
-
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
-
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
-
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
-}
-
-void tst_MscWriter::testSerializeMscMessageMultiParameters()
-{
-    MscMessage message("Msg_1");
-    message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
-
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
-
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
-
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0, init) to Inst_2;\n"));
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeMscTimer()

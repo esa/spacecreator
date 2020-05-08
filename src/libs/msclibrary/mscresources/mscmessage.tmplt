@@ -1,0 +1,6 @@
+{% extends "basemessage.tmplt" %}
+{% block direction1 %}{% if event.sourceInstance == instance %}out{% else %}in{% endif %}{% endblock %}
+{% block messageInstanceName %}{% if event.messageInstanceName %},{{ event.messageInstanceName }}{% endif %}{% endblock %}
+{% block params %}{% if event.parameterString %}({{ event.parameterString }}){% endif %}{% endblock %}
+{% block direction2 %}{% if event.sourceInstance == instance %}to{% else %}from{% endif %}{% endblock %}
+{% block target %}{% if event.sourceInstance == instance %}{% if event.targetInstance.name %}{{ event.targetInstance.name }}{% else %}env{% endif %}{% else %}{% if event.sourceInstance.name %}{{ event.sourceInstance.name }}{% else %}env{% endif %}{% endif %}{% endblock %}
