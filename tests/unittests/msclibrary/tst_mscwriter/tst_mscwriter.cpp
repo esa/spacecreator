@@ -47,14 +47,12 @@ private Q_SLOTS:
     void testSelthTabbing();
     void testSaveDocumentModel_data();
     void testSaveDocumentModel();
-    void testSerializeMscMessage();
-    void testSerializeMscMessageParameters();
-    void testSerializeMscMessageMultiParameters();
-    void testSerializeMscTimer();
+    void testSerializeMscDocumentChart();
+    void testSerializeMscChart_data();
+    void testSerializeMscChart();
+    void testSerializeMscChartInstance();
     void testSerializeMscInstance_data();
     void testSerializeMscInstance();
-    void testSerializeMscInstanceStop();
-    void testSerializeMscInstanceKind();
     void testSerializeMscInstanceEvents();
     void testSerializeMscActions_data();
     void testSerializeMscActions();
@@ -63,12 +61,10 @@ private Q_SLOTS:
     void testSerializeMscCoregion();
     void testSerializeCreate_data();
     void testSerializeCreate();
-    void testSerializeMscChart_data();
-    void testSerializeMscChart();
-    void testSerializeMscChartInstance();
-    void testSerializeMscDocument();
-    void testSerializeMscDocumentChart();
-    void testSerializeDataDefinition();
+    void testSerializeMscMessage();
+    void testSerializeMscMessageParameters();
+    void testSerializeMscMessageMultiParameters();
+    void testSerializeMscTimer();
     void testSerializeComments();
     void testSerializeMessageDeclarations();
 
@@ -171,7 +167,6 @@ void tst_MscWriter::testSaveDocumentModel_data()
     auto doc1 = new MscDocument("ParentDoc", model);
     model->addDocument(doc1);
     doc1->addDocument(new MscDocument("ChildDoc", model));
-
     result = "mscdocument ParentDoc /* MSC AND */;\n"
              "    mscdocument ChildDoc /* MSC AND */;\n"
              "    endmscdocument;\n"
@@ -230,62 +225,137 @@ void tst_MscWriter::testSaveDocumentModel()
     QCOMPARE(text, resultGrantLee);
 }
 
-void tst_MscWriter::testSerializeMscMessage()
+void tst_MscWriter::testSerializeMscDocumentChart()
 {
-    MscMessage message("Msg_1");
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
+    MscDocument document("Doc_1");
 
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
+    MscChart *chart = new MscChart("Chart_1");
+    MscInstance *instance1 = new MscInstance("Inst_1");
+    MscInstance *instance2 = new MscInstance("Inst_2");
+    MscInstance *instance3 = new MscInstance("Inst_3");
 
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1 to Inst_2;\n"));
-    QCOMPARE(this->serialize(&message, &target), QString("in Msg_1 from Inst_1;\n"));
+    chart->addInstance(instance1);
+    chart->addInstance(instance2);
+    chart->addInstance(instance3);
+
+    document.addChart(chart);
+    document.addChart(new MscChart("Chart_2"));
+
+    QStringList serializeList = this->serialize(&document).split("\n");
+
+    QVERIFY(serializeList.size() >= 12);
+
+    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
+
+    QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
+    QCOMPARE(serializeList.at(2), tab2("instance Inst_1;"));
+    QCOMPARE(serializeList.at(3), tab2("endinstance;"));
+    QCOMPARE(serializeList.at(4), tab2("instance Inst_2;"));
+    QCOMPARE(serializeList.at(5), tab2("endinstance;"));
+    QCOMPARE(serializeList.at(6), tab2("instance Inst_3;"));
+    QCOMPARE(serializeList.at(7), tab2("endinstance;"));
+    QCOMPARE(serializeList.at(8), tab1("endmsc;"));
+
+    QCOMPARE(serializeList.at(9), tab1("msc Chart_2;"));
+    QCOMPARE(serializeList.at(10), tab1("endmsc;"));
+
+    QCOMPARE(serializeList.at(11), QString("endmscdocument;"));
 }
 
-void tst_MscWriter::testSerializeMscMessageParameters()
+void tst_MscWriter::testSerializeMscChart_data()
 {
-    MscMessage message("Msg_1");
-    message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" } });
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
 
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
+    auto model = new MscModel(this);
+    model->addChart(new MscChart("Chart_1"));
+    QString result = "msc Chart_1;\nendmsc;\n";
+    QTest::addRow("Simple chart") << model << result << removeIndention(result);
 
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
-
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
+    model = new MscModel(this);
+    auto chart1 = new MscChart("Chart_1");
+    chart1->setCommentString("Importante");
+    model->addChart(chart1);
+    result = "msc Chart_1;\nendmsc;\n";
+    QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
 }
 
-void tst_MscWriter::testSerializeMscMessageMultiParameters()
+void tst_MscWriter::testSerializeMscChart()
 {
-    MscMessage message("Msg_1");
-    message.setMessageInstanceName("a");
-    message.setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
-    MscInstance source("Inst_1");
-    MscInstance target("Inst_2");
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
 
-    message.setSourceInstance(&source);
-    message.setTargetInstance(&target);
-
-    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0, init) to Inst_2;\n"));
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
-void tst_MscWriter::testSerializeMscTimer()
+void tst_MscWriter::testSerializeMscChartInstance()
 {
-    MscTimer timer1("T1", MscTimer::TimerType::Start);
-    timer1.setTimerInstanceName("a");
-    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1,a;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1,a;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1,a;\n"));
+    MscChart chart("Chart_1");
 
-    MscTimer timer2("T2", MscTimer::TimerType::Stop);
-    QCOMPARE(this->serialize(&timer2, nullptr), QString("stoptimer T2;\n"));
+    MscInstance *instance = new MscInstance("Inst_1");
 
-    MscTimer timer3("T3", MscTimer::TimerType::Timeout);
-    QCOMPARE(this->serialize(&timer3, nullptr), QString("timeout T3;\n"));
+    MscMessage *message = new MscMessage("Msg_1");
+    MscInstance *instance2 = new MscInstance("Inst_2");
+
+    message->setSourceInstance(instance2);
+    message->setTargetInstance(instance);
+
+    MscMessage *message2 = new MscMessage("Msg_2");
+    message2->setSourceInstance(instance);
+    message2->setTargetInstance(instance2);
+
+    MscCondition *condition = new MscCondition("Con_1");
+    condition->setShared(true);
+    condition->setInstance(instance);
+
+    MscCondition *condition2 = new MscCondition("Con_2");
+    condition2->setInstance(instance2);
+
+    MscTimer *timer1 = new MscTimer("T_1", MscTimer::TimerType::Start);
+    timer1->setInstance(instance);
+
+    MscTimer *timer2 = new MscTimer("T_2", MscTimer::TimerType::Stop);
+    timer2->setInstance(instance2);
+
+    chart.addInstanceEvent(condition);
+    chart.addInstanceEvent(timer1);
+    chart.addInstanceEvent(message);
+    chart.addInstanceEvent(condition2);
+    chart.addInstanceEvent(message2);
+    chart.addInstanceEvent(timer2);
+
+    chart.addInstance(instance);
+    chart.addInstance(instance2);
+
+    QStringList serializeList = this->serialize(&chart).split("\n");
+
+    QVERIFY(serializeList.size() >= 14);
+
+    QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
+
+    QCOMPARE(serializeList.at(1), tab1("instance Inst_1;"));
+    QCOMPARE(serializeList.at(2), tab2("condition Con_1 shared all;"));
+    QCOMPARE(serializeList.at(3), tab2("starttimer T_1;"));
+    QCOMPARE(serializeList.at(4), tab2("in Msg_1 from Inst_2;"));
+    QCOMPARE(serializeList.at(5), tab2("out Msg_2 to Inst_2;"));
+    QCOMPARE(serializeList.at(6), tab1("endinstance;"));
+
+    QCOMPARE(serializeList.at(7), tab1("instance Inst_2;"));
+    QCOMPARE(serializeList.at(8), tab2("out Msg_1 to Inst_1;"));
+    QCOMPARE(serializeList.at(9), tab2("condition Con_2;"));
+    QCOMPARE(serializeList.at(10), tab2("in Msg_2 from Inst_1;"));
+    QCOMPARE(serializeList.at(11), tab2("stoptimer T_2;"));
+    QCOMPARE(serializeList.at(12), tab1("endinstance;"));
+
+    QCOMPARE(serializeList.at(13), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeMscInstance_data()
@@ -320,16 +390,28 @@ void tst_MscWriter::testSerializeMscInstance_data()
     model = new MscModel(this);
     auto chart3 = new MscChart("Chart_3");
     auto instance3 = new MscInstance("instC");
-    instance3->setDenominator("foo");
-    instance3->setKind("bar");
-    instance3->setInheritance("master");
+    instance3->setDenominator("PROCESS");
+    instance3->setKind("cu_unit");
+    instance3->setInheritance("P1");
     chart3->addInstance(instance3);
     model->addChart(chart3);
     result = QString("msc Chart_3;\n"
-                     "    instance instC: foo bar master;\n"
+                     "    instance instC: PROCESS cu_unit P1;\n"
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Instance denominator") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    auto chart = new MscChart("Chart_4");
+    instance = new MscInstance("instS");
+    instance->setExplicitStop(true);
+    chart->addInstance(instance);
+    model->addChart(chart);
+    result = QString("msc Chart_4;\n"
+                     "    instance instS;\n"
+                     "    stop;\n"
+                     "endmsc;\n");
+    QTest::addRow("Instance stop") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscInstance()
@@ -345,25 +427,6 @@ void tst_MscWriter::testSerializeMscInstance()
     setSaveMode(GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
-}
-
-void tst_MscWriter::testSerializeMscInstanceStop()
-{
-    MscInstance instance("Inst_1");
-    instance.setExplicitStop(true);
-
-    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()), QString("instance Inst_1;\nstop;\n"));
-}
-
-void tst_MscWriter::testSerializeMscInstanceKind()
-{
-    MscInstance instance("Inst_1");
-    instance.setDenominator("PROCESS");
-    instance.setKind("cu_unit");
-    instance.setInheritance("P1");
-
-    QCOMPARE(this->serialize(&instance, QVector<MscInstanceEvent *>()),
-             QString("instance Inst_1: PROCESS cu_unit P1;\nendinstance;\n"));
 }
 
 void tst_MscWriter::testSerializeMscInstanceEvents()
@@ -634,172 +697,62 @@ void tst_MscWriter::testSerializeCreate()
     QCOMPARE(text, resultGrantLee);
 }
 
-void tst_MscWriter::testSerializeMscChart_data()
+void tst_MscWriter::testSerializeMscMessage()
 {
-    QTest::addColumn<MscModel *>("model");
-    QTest::addColumn<QString>("result");
-    QTest::addColumn<QString>("resultGrantLee");
+    MscMessage message("Msg_1");
+    MscInstance source("Inst_1");
+    MscInstance target("Inst_2");
 
-    auto model = new MscModel(this);
-    model->addChart(new MscChart("Chart_1"));
-    QString result = "msc Chart_1;\nendmsc;\n";
-    QTest::addRow("Simple chart") << model << result << removeIndention(result);
+    message.setSourceInstance(&source);
+    message.setTargetInstance(&target);
 
-    model = new MscModel(this);
-    auto chart1 = new MscChart("Chart_1");
-    chart1->setCommentString("Importante");
-    model->addChart(chart1);
-    result = "msc Chart_1;\nendmsc;\n";
-    QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
+    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1 to Inst_2;\n"));
+    QCOMPARE(this->serialize(&message, &target), QString("in Msg_1 from Inst_1;\n"));
 }
 
-void tst_MscWriter::testSerializeMscChart()
+void tst_MscWriter::testSerializeMscMessageParameters()
 {
-    QFETCH(MscModel *, model);
-    QFETCH(QString, result);
-    QFETCH(QString, resultGrantLee);
+    MscMessage message("Msg_1");
+    message.setMessageInstanceName("a");
+    message.setParameters({ { "longitude:-174.0", "" } });
 
-    setSaveMode(CUSTOM);
-    QString text = modelText(model);
-    QCOMPARE(text, result);
+    MscInstance source("Inst_1");
+    MscInstance target("Inst_2");
 
-    setSaveMode(GRANTLEE);
-    text = modelText(model);
-    QCOMPARE(text, resultGrantLee);
+    message.setSourceInstance(&source);
+    message.setTargetInstance(&target);
+
+    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0) to Inst_2;\n"));
 }
 
-void tst_MscWriter::testSerializeMscChartInstance()
+void tst_MscWriter::testSerializeMscMessageMultiParameters()
 {
-    MscChart chart("Chart_1");
+    MscMessage message("Msg_1");
+    message.setMessageInstanceName("a");
+    message.setParameters({ { "longitude:-174.0", "" }, { "", "init" } });
 
-    MscInstance *instance = new MscInstance("Inst_1");
+    MscInstance source("Inst_1");
+    MscInstance target("Inst_2");
 
-    MscMessage *message = new MscMessage("Msg_1");
-    MscInstance *instance2 = new MscInstance("Inst_2");
+    message.setSourceInstance(&source);
+    message.setTargetInstance(&target);
 
-    message->setSourceInstance(instance2);
-    message->setTargetInstance(instance);
-
-    MscMessage *message2 = new MscMessage("Msg_2");
-    message2->setSourceInstance(instance);
-    message2->setTargetInstance(instance2);
-
-    MscCondition *condition = new MscCondition("Con_1");
-    condition->setShared(true);
-    condition->setInstance(instance);
-
-    MscCondition *condition2 = new MscCondition("Con_2");
-    condition2->setInstance(instance2);
-
-    MscTimer *timer1 = new MscTimer("T_1", MscTimer::TimerType::Start);
-    timer1->setInstance(instance);
-
-    MscTimer *timer2 = new MscTimer("T_2", MscTimer::TimerType::Stop);
-    timer2->setInstance(instance2);
-
-    chart.addInstanceEvent(condition);
-    chart.addInstanceEvent(timer1);
-    chart.addInstanceEvent(message);
-    chart.addInstanceEvent(condition2);
-    chart.addInstanceEvent(message2);
-    chart.addInstanceEvent(timer2);
-
-    chart.addInstance(instance);
-    chart.addInstance(instance2);
-
-    QStringList serializeList = this->serialize(&chart).split("\n");
-
-    QVERIFY(serializeList.size() >= 14);
-
-    QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
-
-    QCOMPARE(serializeList.at(1), tab1("instance Inst_1;"));
-    QCOMPARE(serializeList.at(2), tab2("condition Con_1 shared all;"));
-    QCOMPARE(serializeList.at(3), tab2("starttimer T_1;"));
-    QCOMPARE(serializeList.at(4), tab2("in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(5), tab2("out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(6), tab1("endinstance;"));
-
-    QCOMPARE(serializeList.at(7), tab1("instance Inst_2;"));
-    QCOMPARE(serializeList.at(8), tab2("out Msg_1 to Inst_1;"));
-    QCOMPARE(serializeList.at(9), tab2("condition Con_2;"));
-    QCOMPARE(serializeList.at(10), tab2("in Msg_2 from Inst_1;"));
-    QCOMPARE(serializeList.at(11), tab2("stoptimer T_2;"));
-    QCOMPARE(serializeList.at(12), tab1("endinstance;"));
-
-    QCOMPARE(serializeList.at(13), QString("endmsc;"));
+    QCOMPARE(this->serialize(&message, &source), QString("out Msg_1,a(longitude:-174.0, init) to Inst_2;\n"));
 }
 
-void tst_MscWriter::testSerializeMscDocument()
+void tst_MscWriter::testSerializeMscTimer()
 {
-    MscDocument document("Doc_1");
-    QCOMPARE(this->serialize(&document), QString("mscdocument Doc_1 /* MSC AND */;\nendmscdocument;\n"));
+    MscTimer timer1("T1", MscTimer::TimerType::Start);
+    timer1.setTimerInstanceName("a");
+    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1,a;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1,a;\n"));
+    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1,a;\n"));
 
-    // check hierarchy
-    document.addDocument(new MscDocument("Doc_2"));
-    document.addDocument(new MscDocument("Doc_3"));
-    QStringList serializeList = this->serialize(&document).split("\n");
-    QVERIFY(serializeList.size() >= 6);
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
-    QCOMPARE(serializeList.at(1), tab1("mscdocument Doc_2 /* MSC AND */;"));
-    QCOMPARE(serializeList.at(2), tab1("endmscdocument;"));
-    QCOMPARE(serializeList.at(3), tab1("mscdocument Doc_3 /* MSC AND */;"));
-    QCOMPARE(serializeList.at(4), tab1("endmscdocument;"));
-    QCOMPARE(serializeList.at(5), QString("endmscdocument;"));
-}
+    MscTimer timer2("T2", MscTimer::TimerType::Stop);
+    QCOMPARE(this->serialize(&timer2, nullptr), QString("stoptimer T2;\n"));
 
-void tst_MscWriter::testSerializeMscDocumentChart()
-{
-    MscDocument document("Doc_1");
-
-    MscChart *chart = new MscChart("Chart_1");
-    MscInstance *instance1 = new MscInstance("Inst_1");
-    MscInstance *instance2 = new MscInstance("Inst_2");
-    MscInstance *instance3 = new MscInstance("Inst_3");
-
-    chart->addInstance(instance1);
-    chart->addInstance(instance2);
-    chart->addInstance(instance3);
-
-    document.addChart(chart);
-    document.addChart(new MscChart("Chart_2"));
-
-    QStringList serializeList = this->serialize(&document).split("\n");
-
-    QVERIFY(serializeList.size() >= 12);
-
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
-
-    QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
-    QCOMPARE(serializeList.at(2), tab2("instance Inst_1;"));
-    QCOMPARE(serializeList.at(3), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(4), tab2("instance Inst_2;"));
-    QCOMPARE(serializeList.at(5), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(6), tab2("instance Inst_3;"));
-    QCOMPARE(serializeList.at(7), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(8), tab1("endmsc;"));
-
-    QCOMPARE(serializeList.at(9), tab1("msc Chart_2;"));
-    QCOMPARE(serializeList.at(10), tab1("endmsc;"));
-
-    QCOMPARE(serializeList.at(11), QString("endmscdocument;"));
-}
-
-void tst_MscWriter::testSerializeDataDefinition()
-{
-    MscModel model;
-    model.addDocument(new MscDocument("automade", &model));
-    model.setDataLanguage("ASN.1");
-    model.setDataDefinitionString("TPos.asn");
-
-    setModel(&model);
-
-    QStringList serializeList = serialize(model.documents().at(0)).split("\n");
-    QCOMPARE(serializeList.size(), 5);
-    QCOMPARE(serializeList.at(0), QString("mscdocument automade /* MSC AND */;"));
-    QCOMPARE(serializeList.at(1), tab1("language ASN.1;"));
-    QCOMPARE(serializeList.at(2), tab1("data TPos.asn;"));
-    QCOMPARE(serializeList.at(3), QString("endmscdocument;"));
+    MscTimer timer3("T3", MscTimer::TimerType::Timeout);
+    QCOMPARE(this->serialize(&timer3, nullptr), QString("timeout T3;\n"));
 }
 
 void tst_MscWriter::testSerializeComments()
