@@ -63,9 +63,9 @@ private Q_SLOTS:
     void testSerializeCreate();
     void testSerializeMscMessage_data();
     void testSerializeMscMessage();
+    void testSerializeMscTimer_data();
     void testSerializeMscTimer();
     void testSerializeComments();
-    void testSerializeMessageDeclarations();
 
 private:
     QString prependTabs(const QString &str, int count) const;
@@ -830,19 +830,87 @@ void tst_MscWriter::testSerializeMscMessage()
     QCOMPARE(text, resultGrantLee);
 }
 
+void tst_MscWriter::testSerializeMscTimer_data()
+{
+    QTest::addColumn<MscModel *>("model");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<QString>("resultGrantLee");
+
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    auto timer = new MscTimer("T1", MscTimer::TimerType::Start);
+    timer->setInstance(instance);
+    chart->addInstanceEvent(timer);
+    model->addChart(chart);
+    auto result = QString("msc Chart_1;\n"
+                          "    instance Inst_1;\n"
+                          "        starttimer T1;\n"
+                          "    endinstance;\n"
+                          "endmsc;\n");
+    QTest::addRow("Start") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    timer = new MscTimer("T1", MscTimer::TimerType::Stop);
+    timer->setInstance(instance);
+    chart->addInstanceEvent(timer);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        stoptimer T1;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Stop") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    timer = new MscTimer("T1", MscTimer::TimerType::Timeout);
+    timer->setInstance(instance);
+    chart->addInstanceEvent(timer);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        timeout T1;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Timeout") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    timer = new MscTimer("T1", MscTimer::TimerType::Start);
+    timer->setTimerInstanceName("a");
+    timer->setInstance(instance);
+    chart->addInstanceEvent(timer);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        starttimer T1,a;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Instance name") << model << result << removeIndention(result);
+}
+
 void tst_MscWriter::testSerializeMscTimer()
 {
-    MscTimer timer1("T1", MscTimer::TimerType::Start);
-    timer1.setTimerInstanceName("a");
-    QCOMPARE(this->serialize(&timer1, nullptr), QString("starttimer T1,a;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 1), tab1("starttimer T1,a;\n"));
-    QCOMPARE(this->serialize(&timer1, nullptr, 2), tab2("starttimer T1,a;\n"));
+    QFETCH(MscModel *, model);
+    QFETCH(QString, result);
+    QFETCH(QString, resultGrantLee);
 
-    MscTimer timer2("T2", MscTimer::TimerType::Stop);
-    QCOMPARE(this->serialize(&timer2, nullptr), QString("stoptimer T2;\n"));
+    setSaveMode(CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
 
-    MscTimer timer3("T3", MscTimer::TimerType::Timeout);
-    QCOMPARE(this->serialize(&timer3, nullptr), QString("timeout T3;\n"));
+    setSaveMode(GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, resultGrantLee);
 }
 
 void tst_MscWriter::testSerializeComments()
@@ -879,21 +947,6 @@ void tst_MscWriter::testSerializeComments()
     QCOMPARE(serializeList.at(5), tab2("endinstance;"));
     QCOMPARE(serializeList.at(6), tab1("endmsc;"));
     QCOMPARE(serializeList.at(7), QString("endmscdocument;"));
-}
-
-void tst_MscWriter::testSerializeMessageDeclarations()
-{
-    MscDocument document("Doc_1");
-    auto md = new MscMessageDeclaration(&document);
-    md->setNames({ "gui_send_tm", "pepe" });
-    md->setTypeRefList({ { "str" }, { "T-POS" } });
-    document.messageDeclarations()->append(md);
-
-    QStringList serializeList = this->serialize(&document).split("\n");
-    QVERIFY(serializeList.size() >= 3);
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
-    QCOMPARE(serializeList.at(1), tab1("msg gui_send_tm, pepe : (str, T-POS);"));
-    QCOMPARE(serializeList.at(2), QString("endmscdocument;"));
 }
 
 QTEST_MAIN(tst_MscWriter)

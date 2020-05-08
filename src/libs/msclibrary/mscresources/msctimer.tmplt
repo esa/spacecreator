@@ -1,0 +1,3 @@
+{% comment %}
+{% endcomment %}
+{% if event.timerType == event.Start %}starttimer{% else %}{% if event.timerType == event.Stop %}stoptimer{% else %}timeout{% endif %}{% endif %} {{ event.name }}{% if event.timerInstanceName %},{{ event.timerInstanceName }}{% endif %};

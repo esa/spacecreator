@@ -12,5 +12,6 @@
         <file>mscresources/mscinstance.tmplt</file>
         <file>mscresources/mscmessage.tmplt</file>
         <file>mscresources/mscmodel.tmplt</file>
+        <file>mscresources/msctimer.tmplt</file>
     </qresource>
 </RCC>

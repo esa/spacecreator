@@ -30,6 +30,8 @@ class MscTimer : public MscInstanceEvent
     Q_OBJECT
     Q_PROPERTY(msc::MscTimer::TimerType timerType READ timerType WRITE setTimerType NOTIFY timerTypeChanged)
     Q_PROPERTY(msc::MscInstance *instance READ instance WRITE setInstance NOTIFY instanceChanged)
+    Q_PROPERTY(
+            QString timerInstanceName READ timerInstanceName WRITE setTimerInstanceName NOTIFY timerInstanceNameChanged)
 
 public:
     enum class TimerType
