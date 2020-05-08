@@ -44,16 +44,12 @@ public:
 private Q_SLOTS:
     void cleanup();
 
-    void testSelthTabbing();
     void testSaveDocumentModel_data();
     void testSaveDocumentModel();
-    void testSerializeMscDocumentChart();
     void testSerializeMscChart_data();
     void testSerializeMscChart();
-    void testSerializeMscChartInstance();
     void testSerializeMscInstance_data();
     void testSerializeMscInstance();
-    void testSerializeMscInstanceEvents();
     void testSerializeMscActions_data();
     void testSerializeMscActions();
     void testSerializeMscConditions_data();
@@ -65,43 +61,14 @@ private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscTimer_data();
     void testSerializeMscTimer();
-    void testSerializeComments();
 
 private:
-    QString prependTabs(const QString &str, int count) const;
-    QString tab1(const QString &str) const;
-    QString tab2(const QString &str) const;
-    QString tab3(const QString &str) const;
     QString removeIndention(const QString &text) const;
 };
 
 tst_MscWriter::tst_MscWriter()
 {
     initMscLibrary();
-}
-
-QString tst_MscWriter::prependTabs(const QString &str, int count) const
-{
-    const QString tabSpaces = QString("    "); // 4 space chars
-    QString res;
-    for (int i = 0; i < count; ++i)
-        res += tabSpaces;
-    return res + str;
-}
-
-QString tst_MscWriter::tab1(const QString &str) const
-{
-    return prependTabs(str, 1);
-}
-
-QString tst_MscWriter::tab2(const QString &str) const
-{
-    return prependTabs(str, 2);
-}
-
-QString tst_MscWriter::tab3(const QString &str) const
-{
-    return prependTabs(str, 3);
 }
 
 QString tst_MscWriter::removeIndention(const QString &text) const
@@ -123,15 +90,6 @@ QString tst_MscWriter::removeIndention(const QString &text) const
 void tst_MscWriter::cleanup()
 {
     setModel(nullptr);
-}
-
-void tst_MscWriter::testSelthTabbing()
-{
-    const QString tabSpaces = QString("    "); // 4 space chars
-    const QString tabTest("tabTest");
-    QCOMPARE(tab1(tabTest), tabSpaces + tabTest);
-    QCOMPARE(tab2(tabTest), tabSpaces + tabSpaces + tabTest);
-    QCOMPARE(tab3(tabTest), tabSpaces + tabSpaces + tabSpaces + tabTest);
 }
 
 void tst_MscWriter::testSaveDocumentModel_data()
@@ -224,43 +182,6 @@ void tst_MscWriter::testSaveDocumentModel()
     QCOMPARE(text, resultGrantLee);
 }
 
-void tst_MscWriter::testSerializeMscDocumentChart()
-{
-    MscDocument document("Doc_1");
-
-    MscChart *chart = new MscChart("Chart_1");
-    MscInstance *instance1 = new MscInstance("Inst_1");
-    MscInstance *instance2 = new MscInstance("Inst_2");
-    MscInstance *instance3 = new MscInstance("Inst_3");
-
-    chart->addInstance(instance1);
-    chart->addInstance(instance2);
-    chart->addInstance(instance3);
-
-    document.addChart(chart);
-    document.addChart(new MscChart("Chart_2"));
-
-    QStringList serializeList = this->serialize(&document).split("\n");
-
-    QVERIFY(serializeList.size() >= 12);
-
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 /* MSC AND */;"));
-
-    QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
-    QCOMPARE(serializeList.at(2), tab2("instance Inst_1;"));
-    QCOMPARE(serializeList.at(3), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(4), tab2("instance Inst_2;"));
-    QCOMPARE(serializeList.at(5), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(6), tab2("instance Inst_3;"));
-    QCOMPARE(serializeList.at(7), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(8), tab1("endmsc;"));
-
-    QCOMPARE(serializeList.at(9), tab1("msc Chart_2;"));
-    QCOMPARE(serializeList.at(10), tab1("endmsc;"));
-
-    QCOMPARE(serializeList.at(11), QString("endmscdocument;"));
-}
-
 void tst_MscWriter::testSerializeMscChart_data()
 {
     QTest::addColumn<MscModel *>("model");
@@ -293,68 +214,6 @@ void tst_MscWriter::testSerializeMscChart()
     setSaveMode(GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
-}
-
-void tst_MscWriter::testSerializeMscChartInstance()
-{
-    MscChart chart("Chart_1");
-
-    MscInstance *instance = new MscInstance("Inst_1");
-
-    MscMessage *message = new MscMessage("Msg_1");
-    MscInstance *instance2 = new MscInstance("Inst_2");
-
-    message->setSourceInstance(instance2);
-    message->setTargetInstance(instance);
-
-    MscMessage *message2 = new MscMessage("Msg_2");
-    message2->setSourceInstance(instance);
-    message2->setTargetInstance(instance2);
-
-    MscCondition *condition = new MscCondition("Con_1");
-    condition->setShared(true);
-    condition->setInstance(instance);
-
-    MscCondition *condition2 = new MscCondition("Con_2");
-    condition2->setInstance(instance2);
-
-    MscTimer *timer1 = new MscTimer("T_1", MscTimer::TimerType::Start);
-    timer1->setInstance(instance);
-
-    MscTimer *timer2 = new MscTimer("T_2", MscTimer::TimerType::Stop);
-    timer2->setInstance(instance2);
-
-    chart.addInstanceEvent(condition);
-    chart.addInstanceEvent(timer1);
-    chart.addInstanceEvent(message);
-    chart.addInstanceEvent(condition2);
-    chart.addInstanceEvent(message2);
-    chart.addInstanceEvent(timer2);
-
-    chart.addInstance(instance);
-    chart.addInstance(instance2);
-
-    QStringList serializeList = this->serialize(&chart).split("\n");
-
-    QVERIFY(serializeList.size() >= 14);
-
-    QCOMPARE(serializeList.at(0), QString("msc Chart_1;"));
-
-    QCOMPARE(serializeList.at(1), tab1("instance Inst_1;"));
-    QCOMPARE(serializeList.at(2), tab2("condition Con_1 shared all;"));
-    QCOMPARE(serializeList.at(3), tab2("starttimer T_1;"));
-    QCOMPARE(serializeList.at(4), tab2("in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(5), tab2("out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(6), tab1("endinstance;"));
-
-    QCOMPARE(serializeList.at(7), tab1("instance Inst_2;"));
-    QCOMPARE(serializeList.at(8), tab2("out Msg_1 to Inst_1;"));
-    QCOMPARE(serializeList.at(9), tab2("condition Con_2;"));
-    QCOMPARE(serializeList.at(10), tab2("in Msg_2 from Inst_1;"));
-    QCOMPARE(serializeList.at(11), tab2("stoptimer T_2;"));
-    QCOMPARE(serializeList.at(12), tab1("endinstance;"));
-
-    QCOMPARE(serializeList.at(13), QString("endmsc;"));
 }
 
 void tst_MscWriter::testSerializeMscInstance_data()
@@ -426,53 +285,6 @@ void tst_MscWriter::testSerializeMscInstance()
     setSaveMode(GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
-}
-
-void tst_MscWriter::testSerializeMscInstanceEvents()
-{
-    MscInstance instance("Inst_1");
-
-    QScopedPointer<MscMessage> message(new MscMessage("Msg_1"));
-    MscInstance instance2("Inst_2");
-
-    message->setSourceInstance(&instance2);
-    message->setTargetInstance(&instance);
-
-    QScopedPointer<MscMessage> message2(new MscMessage("Msg_2"));
-    message2->setSourceInstance(&instance);
-    message2->setTargetInstance(&instance2);
-
-    QVector<MscInstanceEvent *> messages;
-    messages.append(message.data());
-    messages.append(message2.data());
-
-    QStringList serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
-    QCOMPARE(serializeList.size(), 4);
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(2), tab1("out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(3), QString("endinstance;"));
-
-    // Add some timers and test again
-    QScopedPointer<MscTimer> timer1(new MscTimer("T_start", MscTimer::TimerType::Start));
-    timer1->setInstance(&instance);
-    messages.insert(1, timer1.data());
-    QScopedPointer<MscTimer> timer2(new MscTimer("T_fire", MscTimer::TimerType::Timeout));
-    timer2->setInstance(&instance);
-    messages.append(timer2.data());
-    QScopedPointer<MscTimer> timer3(new MscTimer("T_stop", MscTimer::TimerType::Stop));
-    messages.append(timer3.data());
-    timer3->setInstance(&instance);
-
-    serializeList = this->serialize(&instance, messages).split("\n", QString::SkipEmptyParts);
-    QCOMPARE(serializeList.size(), 7);
-    QCOMPARE(serializeList.at(0), QString("instance Inst_1;"));
-    QCOMPARE(serializeList.at(1), tab1("in Msg_1 from Inst_2;"));
-    QCOMPARE(serializeList.at(2), tab1("starttimer T_start;"));
-    QCOMPARE(serializeList.at(3), tab1("out Msg_2 to Inst_2;"));
-    QCOMPARE(serializeList.at(4), tab1("timeout T_fire;"));
-    QCOMPARE(serializeList.at(5), tab1("stoptimer T_stop;"));
-    QCOMPARE(serializeList.at(6), QString("endinstance;"));
 }
 
 void tst_MscWriter::testSerializeMscActions_data()
@@ -911,42 +723,6 @@ void tst_MscWriter::testSerializeMscTimer()
     setSaveMode(GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
-}
-
-void tst_MscWriter::testSerializeComments()
-{
-    MscDocument document("Doc_1");
-    document.setCommentString("Doc1 comment");
-
-    MscChart *chart = new MscChart("Chart_1");
-    document.addChart(chart);
-
-    MscInstance *instance1 = new MscInstance("Inst_1");
-    chart->addInstanceEvent(instance1->setCommentString("Inst1 comment"));
-    chart->addInstance(instance1);
-
-    MscMessage *message = new MscMessage("Msg_1");
-    chart->addInstanceEvent(message->setCommentString("Msg1 comment"));
-    message->setTargetInstance(instance1);
-    chart->addInstanceEvent(message);
-
-    MscAction *action = new MscAction();
-    action->setInformalAction("Stop");
-    chart->addInstanceEvent(action->setCommentString("Action1 comment"));
-    action->setInstance(instance1);
-    chart->addInstanceEvent(action);
-
-    QStringList serializeList = this->serialize(&document).split("\n");
-
-    QVERIFY(serializeList.size() >= 8);
-    QCOMPARE(serializeList.at(0), QString("mscdocument Doc_1 comment 'Doc1 comment' /* MSC AND */;"));
-    QCOMPARE(serializeList.at(1), tab1("msc Chart_1;"));
-    QCOMPARE(serializeList.at(2), tab2("instance Inst_1 comment 'Inst1 comment';"));
-    QCOMPARE(serializeList.at(3), tab3("in Msg_1 from env comment 'Msg1 comment';"));
-    QCOMPARE(serializeList.at(4), tab3("action 'Stop' comment 'Action1 comment';"));
-    QCOMPARE(serializeList.at(5), tab2("endinstance;"));
-    QCOMPARE(serializeList.at(6), tab1("endmsc;"));
-    QCOMPARE(serializeList.at(7), QString("endmscdocument;"));
 }
 
 QTEST_MAIN(tst_MscWriter)
