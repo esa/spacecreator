@@ -1,5 +1,5 @@
 {% comment %}
 {% endcomment %}
 {% if event.instance == instance %}
-condition {{ event.name }}{% if event.shared %} shared all{% endif %};
+condition {{ event.name }}{% if event.shared %} shared all{% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
 {% endif %}

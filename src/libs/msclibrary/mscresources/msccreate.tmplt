@@ -1,5 +1,5 @@
 {% comment %}
 {% endcomment %}
 {% if event.sourceInstance == instance %}
-create {{ event.targetInstance.name }}{% if event.parameterString %}({{ event.parameterString }}){% endif %};
+create {{ event.targetInstance.name }}{% if event.parameterString %}({{ event.parameterString }}){% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
 {% endif %}

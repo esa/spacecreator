@@ -1,5 +1,5 @@
 {% comment %}
 {% endcomment %}
 {% if event.instance == instance %}
-{% if event.type == event.Begin %}concurrent{% else %}endconcurrent{% endif %};
+{% if event.type == event.Begin %}concurrent{% else %}endconcurrent{% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
 {% endif %}

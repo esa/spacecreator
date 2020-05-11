@@ -265,9 +265,10 @@ QString MscWriter::serialize(const MscCondition *condition, int tabsSize)
     if (condition == nullptr)
         return "";
 
+    const QString comment = serializeComment(condition, tabsSize);
     const QString conditionSerialized(
-            QString("%1condition %2%3;\n")
-                    .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : ""));
+            QString("%1condition %2%3%4;\n")
+                    .arg(tabs(tabsSize), condition->name(), condition->shared() ? " shared all" : "", comment));
     return serializeCif(condition, conditionSerialized, tabsSize);
 }
 
@@ -289,6 +290,8 @@ QString MscWriter::serialize(const MscCreate *create, const MscInstance *instanc
         if (!parameters.isEmpty()) {
             res = res.append("(%1)").arg(parameters);
         }
+        const QString comment = serializeComment(create, tabsSize);
+        res += comment;
 
         const QString createSerialized(res.append(";\n"));
         return serializeCif(create, createSerialized, tabsSize);
@@ -325,7 +328,8 @@ QString MscWriter::serialize(const MscTimer *timer, const MscInstance *instance,
         return QString();
     }
 
-    const QString timerSerialized(QString("%1%2 %3;\n").arg(tabs(tabsSize), timerType, timer->fullName()));
+    const QString comment = serializeComment(timer, tabsSize);
+    const QString timerSerialized(QString("%1%2 %3%4;\n").arg(tabs(tabsSize), timerType, timer->fullName(), comment));
     return serializeCif(timer, timerSerialized, tabsSize);
 }
 
@@ -394,7 +398,8 @@ QString MscWriter::serialize(const MscCoregion *region, const MscInstance *insta
         return {};
 
     const char *type = region->type() == MscCoregion::Type::Begin ? "concurrent" : "endconcurrent";
-    const QString regionSerialized(QString("%1%2;\n").arg(tabs(tabsSize), type));
+    const QString comment = serializeComment(region, tabsSize);
+    const QString regionSerialized(QString("%1%2%4;\n").arg(tabs(tabsSize), type, comment));
     return serializeCif(region, regionSerialized, tabsSize);
 }
 
