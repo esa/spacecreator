@@ -123,6 +123,7 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
     if (m_cifs != cifs) {
         m_cifs = cifs;
         Q_EMIT dataChanged();
+        Q_EMIT cifTextChanged();
     }
 }
 
@@ -131,6 +132,7 @@ void MscEntity::addCif(const cif::CifBlockShared &cif)
     if (!m_cifs.contains(cif)) {
         m_cifs.append(cif);
         Q_EMIT dataChanged();
+        Q_EMIT cifTextChanged();
     }
 }
 
@@ -147,7 +149,21 @@ void MscEntity::clearCifs()
     if (!m_cifs.isEmpty()) {
         m_cifs.clear();
         Q_EMIT dataChanged();
+        Q_EMIT cifTextChanged();
     }
+}
+
+QString MscEntity::cifText(int tabsSize) const
+{
+    QStringList cifTexts;
+    cifTexts.reserve(m_cifs.size());
+    for (const cif::CifBlockShared &cifBlock : m_cifs) {
+        if (cifBlock->blockType() != cif::CifLine::CifType::Comment) {
+            cifTexts << cifBlock->toString(tabsSize);
+        }
+    }
+
+    return cifTexts.join("\n");
 }
 
 #ifdef QT_DEBUG

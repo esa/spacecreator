@@ -643,18 +643,11 @@ QString MscWriter::serializeParameters(const MscMessage *message) const
  */
 QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const
 {
-    if (!entity || entitySerialized.isEmpty() || entity->cifs().isEmpty())
+    if (!entity || entitySerialized.isEmpty() || entity->cifs().isEmpty()) {
         return entitySerialized;
-
-    const QVector<cif::CifBlockShared> &cifs = entity->cifs();
-    QStringList cifTexts;
-    cifTexts.reserve(cifs.size());
-    for (const cif::CifBlockShared &cifBlock : cifs) {
-        if (cifBlock->blockType() != cif::CifLine::CifType::Comment)
-            cifTexts << cifBlock->toString(tabsSize);
     }
 
-    return cifTexts.join("\n") + entitySerialized;
+    return entity->cifText(tabsSize) + entitySerialized;
 }
 
 QString MscWriter::exportGrantlee(MscModel *model)

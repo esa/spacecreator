@@ -1,6 +1,7 @@
 {% comment %}
 {% endcomment %}
-msc {{ chart.name }};
+{% if chart.cifText %}{{ chart.cifText }}
+{% endif %}msc {{ chart.name }};
 {% for instance in chart.instances %}
 {% include "mscinstance.tmplt" %}
 {% endfor %}

@@ -114,7 +114,7 @@ void tst_MscGate::testPropertiesCoverage()
 {
     MscGate gate;
     static const int gateCustomPropsCount(gate.metaObject()->propertyCount()
-                                          - 5); // exclude objectName, MscEntity properties
+                                          - 6); // exclude objectName, MscEntity properties
 
     int testedPropsCount(0);
     const QMetaObject *myMeta(metaObject());

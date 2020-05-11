@@ -1,7 +1,8 @@
 {% comment %}
 {% endcomment %}
 {% if event.instance == instance %}
-{% if event.actionType == event.Informal %}
+{% if event.cifText %}{{ event.cifText }}
+{% endif %}{% if event.actionType == event.Informal %}
 {% if event.isAssignAction %}
 action {{ event.informalAction}}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
 {% else %}

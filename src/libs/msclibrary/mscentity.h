@@ -35,6 +35,7 @@ class MscEntity : public QObject
     Q_PROPERTY(msc::MscComment *comment READ comment WRITE setComment NOTIFY commentChanged)
     Q_PROPERTY(QString commentString READ commentString WRITE setCommentString NOTIFY commentChanged)
     Q_PROPERTY(msc::MscEntity::EntityType entityType READ entityType CONSTANT)
+    Q_PROPERTY(QString cifText READ cifText NOTIFY cifTextChanged)
 
 public:
     enum class EntityType
@@ -78,6 +79,7 @@ public:
     void addCif(const cif::CifBlockShared &cif);
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     void clearCifs();
+    QString cifText(int tabsSize = 0) const;
 
 #ifdef QT_DEBUG
     void dbgShowCifs() const;
@@ -87,6 +89,7 @@ Q_SIGNALS:
     void dataChanged();
     void nameChanged(const QString &name);
     void commentChanged();
+    void cifTextChanged();
 
 private:
     QString m_name = MscEntity::DefaultName;

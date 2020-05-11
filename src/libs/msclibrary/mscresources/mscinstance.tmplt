@@ -1,6 +1,7 @@
 {% comment %}
 {% endcomment %}
-instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}{% if instance.commentString %} comment '{{ instance.commentString }}'{% endif %};
+{% if instance.cifText %}{{ instance.cifText }}
+{% endif %}instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}{% if instance.commentString %} comment '{{ instance.commentString }}'{% endif %};
 {% for event in chart.instanceEvents %}
 {% if event.entityType == event.Action %}
 {% include "mscaction.tmplt" %}

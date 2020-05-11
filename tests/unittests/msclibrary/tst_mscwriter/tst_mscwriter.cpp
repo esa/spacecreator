@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccomment.h"
@@ -164,6 +166,23 @@ void tst_MscWriter::testSaveDocumentModel_data()
              "    endmsc;\n"
              "endmscdocument;";
     QTest::addRow("ChartIncluded") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    auto doc5 = new MscDocument("BaseDoc", model);
+    auto doc6 = new MscDocument("CifDoc", model);
+    doc5->addDocument(doc6);
+    cif::CifBlockShared mscDocCif = cif::CifBlockFactory::createBlockMscDocument();
+    mscDocCif->addLine(cif::CifLineShared(new cif::CifLineMscDocument()));
+    const QVector<QPoint> points { QPoint(20, 30), QPoint(500, 400) };
+    mscDocCif->setPayload(QVariant::fromValue(points), cif::CifLine::CifType::MscDocument);
+    doc6->addCif(mscDocCif);
+    model->addDocument(doc5);
+    result = "mscdocument BaseDoc /* MSC AND */;\n"
+             "/* CIF MSCDOCUMENT (20, 30) (500, 400) */\n"
+             "    mscdocument CifDoc /* MSC AND */;\n"
+             "    endmscdocument;\n"
+             "endmscdocument;";
+    QTest::addRow("ChartIncluded") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSaveDocumentModel()
@@ -271,6 +290,19 @@ void tst_MscWriter::testSerializeMscInstance_data()
                      "    stop;\n"
                      "endmsc;\n");
     QTest::addRow("Instance stop") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_4");
+    instance = new MscInstance("instS");
+    instance->setCifGeometry({ QPoint(50, 10), QPoint(50, 140), QPoint(800, 1000) });
+    chart->addInstance(instance);
+    model->addChart(chart);
+    result = QString("msc Chart_4;\n"
+                     "    /* CIF INSTANCE (50, 10) (50, 140) (800, 1000) */\n"
+                     "    instance instS;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Instance geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscInstance()
@@ -732,7 +764,24 @@ void tst_MscWriter::testSerializeMscMessage_data()
                      "        out Msg_1 to env comment 'Shout out';\n"
                      "    endinstance;\n"
                      "endmsc;\n");
-    QTest::addRow("Commented  message") << model << result << removeIndention(result);
+    QTest::addRow("Commented message") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setCifPoints({ QPoint(125, 50), QPoint(90, 150) });
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "    /* CIF MESSAGE (125, 50) (90, 150) */\n"
+                     "        out Msg_1 to env;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Message geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscMessage()
