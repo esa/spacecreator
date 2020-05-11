@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "common.h"
 #include "aadlcommonprops.h"
+#include "common.h"
 
 #include <QObject>
 #include <QVariant>
@@ -32,7 +32,7 @@ class AADLObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(utils::Id id READ id)
+    Q_PROPERTY(utils::Id id READ id CONSTANT)
 
 public:
     enum class Type
@@ -111,12 +111,12 @@ public:
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);
-    void attributeChanged(aadl::meta::Props::Token attr = aadl::meta::Props::Token::Unknown) const;
-    void propertyChanged(aadl::meta::Props::Token prop = aadl::meta::Props::Token::Unknown) const;
+    void attributeChanged(aadl::meta::Props::Token attr = aadl::meta::Props::Token::Unknown);
+    void propertyChanged(aadl::meta::Props::Token prop = aadl::meta::Props::Token::Unknown);
 
 public Q_SLOTS:
     bool setTitle(const QString &title);
-    bool setParentObject(AADLObject *parentObject);
+    bool setParentObject(aadl::AADLObject *parentObject);
 
 private:
     const std::unique_ptr<AADLObjectPrivate> d;

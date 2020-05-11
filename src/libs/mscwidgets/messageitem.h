@@ -94,7 +94,7 @@ public:
     void onChartBoxChanged();
 
 Q_SIGNALS:
-    void retargeted(MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
+    void retargeted(msc::MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
 public Q_SLOTS:
     void setPositionChangeIgnored(bool ignored);

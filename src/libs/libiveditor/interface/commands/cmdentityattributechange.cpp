@@ -52,12 +52,12 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(aadl::AADLObject *entity, con
 
 CmdEntityAttributeChange::~CmdEntityAttributeChange()
 {
-    for (const utils::Id key : m_cmdSet.keys()) {
+    for (const utils::Id &key : m_cmdSet.keys()) {
         m_cmdUnset.remove(key);
         qDeleteAll(m_cmdSet.take(key));
     }
 
-    for (auto cmds : m_cmdUnset)
+    for (const auto &cmds : m_cmdUnset)
         qDeleteAll(cmds);
 }
 
@@ -187,7 +187,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const aadl::AADL
     const QVector<aadl::AADLObjectIface *> &fnIfaces = m_function->interfaces();
     const QVector<aadl::AADLObjectIface *> &fnTypeIfaces = fnType->interfaces();
     for (auto fnTypeIface : fnTypeIfaces) {
-        for (auto clone : fnTypeIface->clones()) {
+        for (const auto &clone : fnTypeIface->clones()) {
             auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),
                                       [clone](aadl::AADLObjectIface *fnIface) { return clone == fnIface; });
 
@@ -232,7 +232,8 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const aadl::AADLOb
         if (aadl::AADLObjectIface *existingIface = findExistingClone(fnTypeIface)) {
             existingIface->setCloneOrigin(fnTypeIface);
         } else {
-            const aadl::AADLObjectIface::CreationInfo clone = aadl::AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
+            const aadl::AADLObjectIface::CreationInfo clone =
+                    aadl::AADLObjectIface::CreationInfo::cloneIface(fnTypeIface, m_function);
             if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::CreateInterfaceEntity, clone.toVarList()))
                 cmdStorage.append(cmdRm);
         }

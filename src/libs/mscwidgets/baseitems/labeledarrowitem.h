@@ -18,8 +18,8 @@
 
 #include "baseitems/common/objectanchor.h"
 
-#include <QPen>
 #include <QGraphicsObject>
+#include <QPen>
 
 namespace msc {
 
@@ -56,7 +56,7 @@ public:
     void enableEditMode();
 
 Q_SIGNALS:
-    void layoutChanged() const;
+    void layoutChanged();
     void textEdited(const QString &text);
     void textChanged();
 

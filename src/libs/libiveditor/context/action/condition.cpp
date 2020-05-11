@@ -32,14 +32,14 @@ namespace ctx {
  * \class taste3::ctx::Condition
  * \brief The serializable collection of taste3::ctx::AttrHandler.
  */
-static const char* JSON_FIELD_NAME_ItemType = "itemType";
-static const char* JSON_FIELD_NAME_Attributes = "attributes";
+static const char *JSON_FIELD_NAME_ItemType = "itemType";
+static const char *JSON_FIELD_NAME_Attributes = "attributes";
 
 static QVector<AttrHandler> attrsFromJson(const QJsonObject &jasonObject)
 {
     QVector<AttrHandler> res;
     const QJsonArray &arr = jasonObject[JSON_FIELD_NAME_Attributes].toArray();
-    for (auto obj : arr)
+    for (const auto &obj : arr)
         res.append(AttrHandler(obj.toObject()));
     return res;
 }
@@ -61,7 +61,7 @@ Condition Condition::createGlobal()
 QJsonObject Condition::toJson() const
 {
     QJsonArray jAttrs;
-    for (auto attr : m_attrs)
+    for (const auto &attr : m_attrs)
         jAttrs.append(attr.toJson());
 
     return { { JSON_FIELD_NAME_ItemType, m_itemType }, { JSON_FIELD_NAME_Attributes, jAttrs } };

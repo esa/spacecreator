@@ -86,12 +86,12 @@ public:
 
 Q_SIGNALS:
     void documentsChanged();
-    void documentAdded(MscDocument *document);
-    void documentRemoved(MscDocument *document);
+    void documentAdded(msc::MscDocument *document);
+    void documentRemoved(msc::MscDocument *document);
     void chartsChanged();
-    void chartAdded(MscChart *chart);
+    void chartAdded(msc::MscChart *chart);
     void cleared();
-    void hierarchyTypeChanged(HierarchyType type);
+    void hierarchyTypeChanged(msc::MscDocument::HierarchyType type);
 
 private:
     QVector<MscDocument *> m_documents;

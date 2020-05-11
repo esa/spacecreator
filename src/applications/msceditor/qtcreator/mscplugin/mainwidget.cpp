@@ -52,7 +52,7 @@
 
 namespace MscPlugin {
 namespace Common {
-const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
+static const char* HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)

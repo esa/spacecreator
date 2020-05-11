@@ -16,13 +16,14 @@ struct GraphicsViewBase::GraphicsViewBasePrivate {
     QPointF lastMousePosition;
 };
 
-GraphicsViewBase::GraphicsViewBase(QGraphicsScene* scene, QWidget* parent)
-    : QGraphicsView(scene, parent), d(new GraphicsViewBasePrivate)
+GraphicsViewBase::GraphicsViewBase(QGraphicsScene *scene, QWidget *parent)
+    : QGraphicsView(scene, parent)
+    , d(new GraphicsViewBasePrivate)
 {
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
-GraphicsViewBase::GraphicsViewBase(QWidget* parent)
+GraphicsViewBase::GraphicsViewBase(QWidget *parent)
     : GraphicsViewBase(nullptr, parent)
 {
 }
@@ -90,7 +91,7 @@ void GraphicsViewBase::setZoomStepPercent(qreal percent)
     d->zoomStepPercent = percent;
 }
 
-void GraphicsViewBase::mousePressEvent(QMouseEvent* event)
+void GraphicsViewBase::mousePressEvent(QMouseEvent *event)
 {
     if (event->buttons() == Qt::MidButton) {
         d->panning = true;
@@ -123,7 +124,7 @@ void GraphicsViewBase::mouseMoveEvent(QMouseEvent *event)
 
     // Handle the coordinates from the subclass
     auto coords = mouseMoveCoordinates(scene(), screenPos, scenePos);
-    for (auto item : coords) {
+    for (const auto &item : coords) {
         info.append(coordinatesInfo(item.first, item.second));
     }
 
@@ -164,8 +165,6 @@ void GraphicsViewBase::keyPressEvent(QKeyEvent *event)
         QGraphicsView::keyPressEvent(event);
     }
 }
-
-
 
 }
 }

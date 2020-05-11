@@ -51,7 +51,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void modelDeleted();
-    void documentMoved(const DocumentItem *documentItem, const QPointF &point);
+    void documentMoved(const msc::DocumentItem *documentItem, const QPointF &point);
     void documentPositionChanged(const QPointF &position);
 
 private:

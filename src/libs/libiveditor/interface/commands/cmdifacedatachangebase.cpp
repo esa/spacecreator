@@ -49,7 +49,7 @@ QVector<QPointer<aadl::AADLObjectIface>> CmdIfaceDataChangeBase::getRelatedIface
 
     if (m_iface) {
         ifaces.append(m_iface);
-        for (auto clone : m_iface->clones())
+        for (const auto &clone : m_iface->clones())
             ifaces.append(clone);
     }
 
@@ -61,14 +61,14 @@ QVector<aadl::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnecti
     QVector<aadl::AADLObjectConnection *> affected;
 
     if (m_iface && m_model)
-        for (auto i : getRelatedIfaces())
+        for (const auto &i : getRelatedIfaces())
             affected += m_model->getConnectionsForIface(i->id());
 
     return affected;
 }
 
 aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const aadl::AADLObjectConnection *connection,
-                                                                aadl::AADLObjectIface *changedIface)
+                                                                      aadl::AADLObjectIface *changedIface)
 {
     if (connection && changedIface) {
         switch (connection->connectionType()) {

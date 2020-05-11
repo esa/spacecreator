@@ -55,7 +55,7 @@ private Q_SLOTS:
     void onIndentChanged(int value);
 
 Q_SIGNALS:
-    void fileSaved(const QString &filePath, bool ok) const;
+    void fileSaved(const QString &filePath, bool ok);
 
 private:
     QPlainTextEdit *addTemplateEditor(const QString &tabLabel = QString());

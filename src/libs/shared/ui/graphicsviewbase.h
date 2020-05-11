@@ -15,8 +15,8 @@ class GraphicsViewBase : public QGraphicsView
     Q_PROPERTY(qreal zoomStepPercent READ zoomStepPercent WRITE setZoomStepPercent NOTIFY zoomStepPercentChanged)
 
 public:
-    explicit GraphicsViewBase(QGraphicsScene* scene, QWidget* parent = nullptr);
-    explicit GraphicsViewBase(QWidget* parent = nullptr);
+    explicit GraphicsViewBase(QGraphicsScene *scene, QWidget *parent = nullptr);
+    explicit GraphicsViewBase(QWidget *parent = nullptr);
     ~GraphicsViewBase() override;
 
     double zoom() const;
@@ -25,7 +25,7 @@ public:
     qreal zoomStepPercent() const;
 
 Q_SIGNALS:
-    void mouseMoved(const QString &coordsInfo) const;
+    void mouseMoved(const QString &coordsInfo);
     void zoomChanged(qreal percent);
     void minZoomPercentChanged(qreal percent);
     void maxZoomPercentChanged(qreal percent);
@@ -39,7 +39,8 @@ public Q_SLOTS:
 
 protected:
     // Return a list of coordinate+name that should be shown in the statusbar on mouse moves
-    virtual QList<QPair<QPointF, QString>> mouseMoveCoordinates(QGraphicsScene* scene, const QPoint& screenPos, const QPointF& scenePos) const = 0;
+    virtual QList<QPair<QPointF, QString>> mouseMoveCoordinates(QGraphicsScene *scene, const QPoint &screenPos,
+                                                                const QPointF &scenePos) const = 0;
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -49,9 +50,8 @@ protected:
 
 private:
     struct GraphicsViewBasePrivate;
-    GraphicsViewBasePrivate* d;
+    GraphicsViewBasePrivate *d;
 };
 
 }
 }
-

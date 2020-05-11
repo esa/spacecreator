@@ -45,8 +45,8 @@ public:
     bool read(QIODevice *openForRead);
 
 Q_SIGNALS:
-    void objectsParsed(const QVector<AADLObject *> &objects);
-    void error(const QString &msg) const;
+    void objectsParsed(const QVector<aadl::AADLObject *> &objects);
+    void error(const QString &msg);
 
 private:
     const std::unique_ptr<AADLXMLReaderPrivate> d;

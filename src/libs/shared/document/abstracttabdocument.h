@@ -60,7 +60,7 @@ public:
     virtual QMenu *customMenu() const;
 
 Q_SIGNALS:
-    void dirtyChanged(bool dirty) const;
+    void dirtyChanged(bool dirty);
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);

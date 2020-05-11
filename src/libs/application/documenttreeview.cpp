@@ -31,7 +31,7 @@
 #include <functional>
 
 namespace {
-const QByteArray HIERARCHY_TYPE_TAG { "hierarchyTag" };
+static const char *HIERARCHY_TYPE_TAG { "hierarchyTag" };
 
 class DocumentDelegate : public QStyledItemDelegate
 {

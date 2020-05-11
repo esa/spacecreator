@@ -107,7 +107,7 @@ QJsonObject DynamicProperty::toJson() const
     jObj[DynamicPropertyPrivate::JsonFileds.Scope] = scopesToJSON(scope());
 
     QJsonArray jArr;
-    for (auto val : valuesList())
+    for (const auto &val : valuesList())
         jArr.append(QVariant::fromValue(val).toJsonValue());
     if (!jArr.isEmpty())
         jObj[DynamicPropertyPrivate::JsonFileds.Range] = jArr;

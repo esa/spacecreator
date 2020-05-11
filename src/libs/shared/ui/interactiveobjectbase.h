@@ -20,15 +20,15 @@ class InteractiveObjectBase : public QGraphicsObject
     Q_OBJECT
 
 public:
-    explicit InteractiveObjectBase(QGraphicsItem* parent = nullptr);
+    explicit InteractiveObjectBase(QGraphicsItem *parent = nullptr);
     ~InteractiveObjectBase() override;
 
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF boundingRect() const override;
     void setBoundingRect(const QRectF newRect);
 
-    GripPointsHandler* gripPointsHandler();
+    GripPointsHandler *gripPointsHandler();
 
     bool isHovered() const;
 
@@ -54,10 +54,10 @@ public Q_SLOTS:
     void instantLayoutUpdate();
 
 Q_SIGNALS:
-    void relocated(const QPointF &from, const QPointF &to) const;
-    void moved(InteractiveObjectBase *item);
+    void relocated(const QPointF &from, const QPointF &to);
+    void moved(shared::ui::InteractiveObjectBase *item);
     void boundingBoxChanged();
-    void needUpdateLayout() const;
+    void needUpdateLayout();
 
 protected:
     virtual void onManualMoveStart(GripPoint *gp, const QPointF &at);
@@ -80,17 +80,16 @@ protected Q_SLOTS:
     virtual void rebuildLayout();
 
 private Q_SLOTS:
-    virtual void gripPointPressed(GripPoint *pos, const QPointF &at);
-    virtual void gripPointMoved(GripPoint *gp, const QPointF &from, const QPointF &to);
-    virtual void gripPointReleased(GripPoint *pos, const QPointF &pressedAt, const QPointF &releasedAt);
+    virtual void gripPointPressed(shared::ui::GripPoint *pos, const QPointF &at);
+    virtual void gripPointMoved(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
+    virtual void gripPointReleased(shared::ui::GripPoint *pos, const QPointF &pressedAt, const QPointF &releasedAt);
 
 private:
-    HighlightRectItem* createHighlighter();
+    HighlightRectItem *createHighlighter();
 
     struct InteractiveObjectBasePrivate;
-    InteractiveObjectBasePrivate* d;
+    InteractiveObjectBasePrivate *d;
 };
 
 }
 }
-

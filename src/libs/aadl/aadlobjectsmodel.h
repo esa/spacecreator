@@ -45,8 +45,7 @@ public:
     utils::Id rootObjectId() const;
 
     AADLObject *getObject(const utils::Id &id) const;
-    AADLObject *getObjectByName(const QString &name,
-                                AADLObject::Type type = AADLObject::Type::Unknown) const;
+    AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown) const;
     AADLObjectIface *getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
                                     AADLObjectFunctionType *parent = nullptr) const;
     AADLObjectFunction *getFunction(const utils::Id &id) const;
@@ -67,13 +66,13 @@ public:
     void clear();
 
 Q_SIGNALS:
-    void aadlObjectAdded(AADLObject *object);
-    void aadlObjectRemoved(AADLObject *object);
+    void aadlObjectAdded(aadl::AADLObject *object);
+    void aadlObjectRemoved(aadl::AADLObject *object);
     void modelReset();
     void rootObjectChanged(utils::Id rootId);
 
 public Q_SLOTS:
-    bool initFromObjects(const QVector<AADLObject *> &visibleObjects);
+    bool initFromObjects(const QVector<aadl::AADLObject *> &visibleObjects);
 
 private:
     const std::unique_ptr<AADLObjectsModelPrivate> d;

@@ -107,8 +107,8 @@ public:
 
 Q_SIGNALS:
     void messageInstanceNameChanged();
-    void sourceChanged(MscInstance *source);
-    void targetChanged(MscInstance *target);
+    void sourceChanged(msc::MscInstance *source);
+    void targetChanged(msc::MscInstance *target);
     void parameterStringChanged();
     void cifPointsChanged();
 

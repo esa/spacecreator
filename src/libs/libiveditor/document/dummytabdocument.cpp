@@ -56,7 +56,7 @@ QString DummyTabDocument::title() const
 
 bool DummyTabDocument::loadImpl(const QString &path)
 {
-    if (path.isEmpty() || !QFileInfo(path).exists()) {
+    if (path.isEmpty() || !QFileInfo::exists(path)) {
         qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }

@@ -17,11 +17,11 @@
 
 #include "actionsmanager.h"
 
-#include "common.h"
-#include "extprocmonitor.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "common.h"
+#include "extprocmonitor.h"
 
 #include <QAction>
 #include <QApplication>
@@ -42,20 +42,31 @@
 #include <iostream>
 
 struct ExternalArgHolder {
-    enum Type { CWD, Attr, Prop, Param };
+    enum Type
+    {
+        CWD,
+        Attr,
+        Prop,
+        Param
+    };
 
     QString key;
     QString description;
     Type target;
 };
 
-static QVector<ExternalArgHolder> externalArgs(bool namedKey) {
+static QVector<ExternalArgHolder> externalArgs(bool namedKey)
+{
     const QString name = namedKey ? "name" : "";
     QVector<ExternalArgHolder> args;
     args.append({ "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD });
-    args.append({ "$attr_" + name, QObject::tr("Value of the selected object's attribute [name]"), ExternalArgHolder::Type::Attr });
-    args.append({ "$prop_" + name, QObject::tr("Value of the selected object's property [name]"), ExternalArgHolder::Type::Prop });
-    args.append({ "$param_" + name, QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."), ExternalArgHolder::Type::Param });
+    args.append({ "$attr_" + name, QObject::tr("Value of the selected object's attribute [name]"),
+                  ExternalArgHolder::Type::Attr });
+    args.append({ "$prop_" + name, QObject::tr("Value of the selected object's property [name]"),
+                  ExternalArgHolder::Type::Prop });
+    args.append({ "$param_" + name,
+                  QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."),
+                  ExternalArgHolder::Type::Param });
     return args;
 }
 
@@ -69,7 +80,6 @@ namespace ctx {
  *context menu and to actually invoke the internal QAction or external application.
  */
 ActionsManager *ActionsManager::m_instance = nullptr;
-
 
 /*!
  * Returns path to a dir that contains custom actions descriptions.
@@ -207,7 +217,7 @@ QVector<Action> ActionsManager::parseFile(const QString &filePath, QString *erro
     }
 
     const QJsonArray &root = doc.array();
-    for (auto obj : root)
+    for (const auto &obj : root)
         res.append(Action(obj.toObject()));
 
     return res;
@@ -236,9 +246,10 @@ void ActionsManager::listRegisteredActions()
     const QMap<QString, ctx::ActionsManager::ScriptableActionHandler> &actions =
             ctx::ActionsManager::scriptableActions();
     const QStringList &names = actions.keys();
-    const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
-                                return lhs.length() < rhs.length();
-                            })->length();
+    const int titleLength =
+            std::max_element(names.cbegin(), names.cend(),
+                             [](const QString &lhs, const QString &rhs) { return lhs.length() < rhs.length(); })
+                    ->length();
 
     std::cout << qPrintable(QObject::tr("Available actions:")) << std::endl;
     for (const ctx::ActionsManager::ScriptableActionHandler &h : actions)
@@ -365,7 +376,7 @@ void ActionsManager::triggerActionExternal(const Action &act, const aadl::AADLOb
 QStringList ActionsManager::externalArgsHoldersDescr()
 {
     QStringList result;
-    for (auto t : externalArgs(true)) {
+    for (const auto &t : externalArgs(true)) {
         result.append(QString("%1 - %2").arg(t.key, t.description));
     }
     return result;
@@ -375,7 +386,8 @@ QStringList ActionsManager::externalArgsHoldersDescr()
   \brief Helper function for registering the \a action as scriptable, with key \a title and optional \a description.
  * The \a caller argument is used to provide reasonable debug record.
  */
-void ActionsManager::registerAction(const QString &caller, QAction *action, const QString &title, const QString &description)
+void ActionsManager::registerAction(const QString &caller, QAction *action, const QString &title,
+                                    const QString &description)
 {
     if (!action) {
         qWarning() << "Null action can not be registered" << caller;

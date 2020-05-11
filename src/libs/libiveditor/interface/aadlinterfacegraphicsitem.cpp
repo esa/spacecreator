@@ -20,18 +20,18 @@
 
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
-#include "commandsstack.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
+#include "commandsstack.h"
 
 #include <QPainter>
 #include <QtDebug>
-#include <baseitems/common/utils.h>
 #include <aadlobjectconnection.h>
 #include <aadlobjectfunction.h>
 #include <aadlobjectiface.h>
+#include <baseitems/common/utils.h>
 
 static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;
@@ -63,7 +63,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     connect(entity, &aadl::AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
     connect(entity, &aadl::AADLObjectIface::titleChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
     if (auto ri = qobject_cast<aadl::AADLObjectIfaceRequired *>(entity))
-        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this, &AADLInterfaceGraphicsItem::updateLabel);
+        connect(ri, &aadl::AADLObjectIfaceRequired::inheritedLabelsChanged, this,
+                &AADLInterfaceGraphicsItem::updateLabel);
 
     applyColorScheme();
 }
@@ -240,7 +241,7 @@ QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandPa
 {
     QList<QVariantList> params = { { QVariant::fromValue(entity()),
                                      QVariant::fromValue(QVector<QPointF> { scenePos() }) } };
-    for (auto connection : connectionItems()) {
+    for (const auto &connection : connectionItems()) {
         if (connection) {
             params.append(
                     { QVariant::fromValue(connection->entity()),
@@ -522,7 +523,7 @@ QVariant AADLInterfaceGraphicsItem::itemChange(GraphicsItemChange change, const 
 {
     switch (change) {
     case QGraphicsItem::ItemVisibleHasChanged: {
-        for (auto connection : m_connections)
+        for (const auto &connection : m_connections)
             connection->setVisible(connection->startItem()->isVisible() && connection->endItem()->isVisible());
         break;
     }

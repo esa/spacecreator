@@ -66,7 +66,7 @@ public:
 
 Q_SIGNALS:
     void created();
-    void propertyEditorRequest(aadl::AADLObject *entity) const;
+    void propertyEditorRequest(aadl::AADLObject *entity);
     void informUser(const QString &title, const QString &message) const;
 
 protected:

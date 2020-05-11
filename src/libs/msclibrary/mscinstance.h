@@ -69,7 +69,7 @@ Q_SIGNALS:
     void kindChanged(const QString &kind);
     void denominatorOrKindChanged(const QString &value);
     void inheritanceChanged(const QString &inheritance);
-    void explicitCreatorChanged(MscInstance *creator);
+    void explicitCreatorChanged(msc::MscInstance *creator);
     void explicitStopChanged(bool value);
     void cifGeometryChanged();
 

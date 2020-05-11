@@ -153,7 +153,6 @@ void MscEntity::clearCifs()
 #ifdef QT_DEBUG
 void MscEntity::dbgShowCifs() const
 {
-    static const QString info("TODO: %1(%2)->setCif(%3)");
     const QMetaEnum &e = QMetaEnum::fromType<MscEntity::EntityType>();
     const QString currTypeName(e.valueToKey(int(entityType())));
     qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), currTypeName).arg(m_cifs.size());

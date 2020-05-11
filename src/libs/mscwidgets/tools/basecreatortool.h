@@ -35,7 +35,7 @@ public:
     BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
 
 public Q_SLOTS:
-    void setModel(ChartViewModel *model);
+    void setModel(msc::ChartViewModel *model);
 
 Q_SIGNALS:
     void created();

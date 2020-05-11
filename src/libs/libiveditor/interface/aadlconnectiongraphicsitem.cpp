@@ -16,19 +16,20 @@
 */
 
 #include "aadlconnectiongraphicsitem.h"
+
 #include "aadlcommentgraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "commandsstack.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 #include "baseitems/common/utils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
+#include "commandsstack.h"
 #include "ui/grippointshandler.h"
 
 #include <QGuiApplication>
@@ -132,7 +133,7 @@ static inline QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const 
     const QList<QPointF> rectCorners = sortedCorners(itemRectMargins, startPoint, endPoint);
     QList<QVector<QPointF>> allPaths;
     for (const QPointF &p : rectCorners) {
-        for (auto polygon : generateConnection(startPoint, p)) {
+        for (const auto &polygon : generateConnection(startPoint, p)) {
             if (!intersects(itemRect, polygon) && !intersects(itemRect, QLineF(p, endPoint))) {
                 QVector<QPointF> previousPoints(prevPoints);
                 previousPoints.removeLast();
@@ -177,7 +178,7 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
     while (true) {
         QList<QVector<QPointF>> deeper;
         QList<QVector<QPointF>> results;
-        for (auto path : paths) {
+        for (const auto &path : paths) {
             Q_ASSERT(path.size() >= 2);
             if (path.size() < 2)
                 return {};
@@ -200,12 +201,12 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
                     continue;
 
                 const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
-                auto it = std::find_if(
-                        intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
-                            if (!types.contains(item->type()))
-                                return false;
-                            return intersectionPoints(item->sceneBoundingRect(), subPath).size() > 1;
-                        });
+                auto it = std::find_if(intersectedItems.constBegin(), intersectedItems.constEnd(),
+                                       [subPath](QGraphicsItem *item) {
+                                           if (!types.contains(item->type()))
+                                               return false;
+                                           return intersectionPoints(item->sceneBoundingRect(), subPath).size() > 1;
+                                       });
                 if (it != intersectedItems.constEnd())
                     continue;
                 else if (subPath.last() == endDirection.p2())
@@ -580,7 +581,8 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp,
     updateBoundingRect();
 }
 
-void AADLConnectionGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLConnectionGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt,
+                                                    const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt || !gp)
         return;

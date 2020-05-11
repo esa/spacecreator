@@ -160,7 +160,7 @@ void CmdEntityRemove::collectRelatedItems(aadl::AADLObject *toBeRemoved)
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface: {
         if (auto *iface = qobject_cast<aadl::AADLObjectIface *>(toBeRemoved)) {
-            for (auto clone : iface->clones())
+            for (const auto &clone : iface->clones())
                 collectRelatedItems(clone);
             if (auto connection = m_model->getConnectionForIface(iface->id()))
                 storeLinkedEntity(connection);
@@ -173,7 +173,8 @@ void CmdEntityRemove::collectRelatedItems(aadl::AADLObject *toBeRemoved)
             for (auto iface : fnType->interfaces())
                 collectRelatedItems(iface);
 
-            for (auto child : toBeRemoved->findChildren<aadl::AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
+            for (auto child :
+                 toBeRemoved->findChildren<aadl::AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
                 collectRelatedItems(child);
         }
         break;

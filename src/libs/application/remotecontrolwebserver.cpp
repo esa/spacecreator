@@ -215,10 +215,7 @@ void RemoteControlWebServer::error(QAbstractSocket::SocketError error)
 void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType commandType, bool result,
                                          const QString &peerName, const QString &errorString)
 {
-    const QMetaEnum qtEnum = QMetaEnum::fromType<RemoteControlWebServer::CommandType>();
-    const int commandTypeInt = static_cast<int>(commandType);
-    const QString commandTypeStr = QLatin1String(qtEnum.valueToKey(commandTypeInt));
-
+    Q_UNUSED(commandType)
     auto it = std::find_if(m_clients.constBegin(), m_clients.constEnd(),
                            [peerName](const QWebSocket *socket) { return socket->peerName() == peerName; });
     if (it == m_clients.constEnd())

@@ -36,7 +36,7 @@ struct AADLObjectIfacePrivate;
 class AADLObjectIface : public AADLObject
 {
     Q_OBJECT
-    Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction)
+    Q_PROPERTY(AADLObjectIface::IfaceType direction READ direction CONSTANT)
 
 public:
     enum class IfaceType

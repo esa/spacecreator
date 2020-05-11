@@ -565,7 +565,7 @@ QStringList AADLObjectIfaceRequired::collectInheritedLabels() const
 
 void AADLObjectIfaceRequired::namesForRIToPIs(QStringList &result) const
 {
-    for (const QString label : result) {
+    for (const QString &label : result) {
         int count = result.count(label);
         if (count > 1)
             while (count >= 1) {

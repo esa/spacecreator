@@ -72,7 +72,7 @@
 #include <QUndoStack>
 #include <QVector>
 
-const QByteArray HIERARCHY_TYPE_TAG = "hierarchyTag";
+static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
@@ -247,12 +247,16 @@ bool MainWindow::openFileMsc(const QString &file)
 
     const bool ok = d->m_model->loadFile(file);
     if (!ok) {
-        QMessageBox::critical(this, tr("File Error"), tr("Could not read the file. Errors:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
+        QMessageBox::critical(
+                this, tr("File Error"),
+                tr("Could not read the file. Errors:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
         return false;
     }
 
     if (!d->m_model->mscErrorMessages().isEmpty()) {
-        QMessageBox::warning(this, tr("Open File Warnings"), tr("Warnings found while opening the file:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
+        QMessageBox::warning(
+                this, tr("Open File Warnings"),
+                tr("Warnings found while opening the file:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
     }
 
     d->ui->graphicsView->setZoom(100);

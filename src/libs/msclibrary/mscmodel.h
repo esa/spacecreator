@@ -61,8 +61,8 @@ public:
 
 Q_SIGNALS:
     void dataChanged();
-    void documentAdded(MscDocument *document);
-    void chartAdded(MscChart *chart);
+    void documentAdded(msc::MscDocument *document);
+    void chartAdded(msc::MscChart *chart);
     void cleared();
     void dataLanguageChanged(const QString &dataLanguage);
     void dataDefinitionStringChanged(const QString &dataString);

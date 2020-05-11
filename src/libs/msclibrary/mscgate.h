@@ -55,8 +55,8 @@ public:
     bool relatesTo(const MscInstance *instance) const override;
 
 public Q_SLOTS:
-    void setDirection(MscGate::Direction dir);
-    void setInstance(MscInstance *instance);
+    void setDirection(msc::MscGate::Direction dir);
+    void setInstance(msc::MscInstance *instance);
     void setInstanceName(const QString &instanceName);
     void setParamName(const QString &name);
     void setParams(const QVariantList &params);

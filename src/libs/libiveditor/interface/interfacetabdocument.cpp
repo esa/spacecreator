@@ -17,16 +17,16 @@
 
 #include "interfacetabdocument.h"
 
-#include "commandsstack.h"
-#include "context/action/editor/dynactioneditor.h"
+#include "aadlobjectsmodel.h"
+#include "aadlxmlreader.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/graphicsview.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
+#include "commandsstack.h"
+#include "context/action/actionsmanager.h"
+#include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
-#include "interfacetabgraphicsscene.h"
-#include "aadlobjectsmodel.h"
-#include "aadlxmlreader.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -36,7 +36,7 @@
 #include "interface/commenttextdialog.h"
 #include "interface/properties/dynamicpropertymanager.h"
 #include "interface/properties/propertiesdialog.h"
-#include "context/action/actionsmanager.h"
+#include "interfacetabgraphicsscene.h"
 
 #include <QDebug>
 #include <QFile>
@@ -103,11 +103,12 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                                                              : connection->entity()->title())
                  << "\n"
                  << aadlinterface::polygon(connection->entity()->coordinates()) << "\n";
+        Q_ASSERT(!strict
+                 || comparePolygones(connection->graphicsPoints(),
+                                     aadlinterface::polygon(connection->entity()->coordinates())));
         Q_ASSERT(
                 !strict
-                || comparePolygones(connection->graphicsPoints(), aadlinterface::polygon(connection->entity()->coordinates())));
-        Q_ASSERT(!strict
-                 || comparePolygones(connection->points(), aadlinterface::polygon(connection->entity()->coordinates())));
+                || comparePolygones(connection->points(), aadlinterface::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item)) {
         qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:"
                  << "\n"
@@ -214,11 +215,14 @@ QMenu *InterfaceTabDocument::customMenu() const
     QAction *actDynContext = root->addAction(tr("Context Actions"));
     connect(actDynContext, &QAction::triggered, this, &InterfaceTabDocument::onDynContextEditorMenuInvoked);
 
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties",
+                                                "Show editor for common Properties");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes",
+                                                "Show editor for common Datatypes");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme",
+                                                "Show editor for common Color schemes");
     taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDynContext, "Context actions",
-                           "Show editor for common custom context menu actions");
+                                                "Show editor for common custom context menu actions");
 
     return root;
 }
@@ -238,7 +242,7 @@ bool InterfaceTabDocument::createImpl(const QString &path)
 
 bool InterfaceTabDocument::loadImpl(const QString &path)
 {
-    if (path.isEmpty() || !QFileInfo(path).exists()) {
+    if (path.isEmpty() || !QFileInfo::exists(path)) {
         qWarning() << Q_FUNC_INFO << "Invalid path";
         return false;
     }
@@ -273,7 +277,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
                 currentAction->setChecked(false);
             m_tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Pointer);
         });
-        connect(m_tool, &aadlinterface::CreatorTool::propertyEditorRequest, this, &InterfaceTabDocument::showPropertyEditor);
+        connect(m_tool, &aadlinterface::CreatorTool::propertyEditorRequest, this,
+                &InterfaceTabDocument::showPropertyEditor);
         connect(m_tool, &aadlinterface::CreatorTool::informUser, this, &InterfaceTabDocument::showInfoMessage);
     }
 
@@ -284,7 +289,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type",
+                                                    "Create FunctionType object");
 
         m_actCreateFunctionType->setCheckable(true);
         m_actCreateFunctionType->setActionGroup(m_actionGroup);
@@ -294,7 +300,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function",
+                                                    "Create Function object");
 
         m_actCreateFunction->setCheckable(true);
         m_actCreateFunction->setActionGroup(m_actionGroup);
@@ -306,7 +313,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
         taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface",
-                               "Create Provided Interface object");
+                                                    "Create Provided Interface object");
 
         m_actCreateProvidedInterface->setCheckable(true);
         m_actCreateProvidedInterface->setActionGroup(m_actionGroup);
@@ -318,7 +325,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
         taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface",
-                               "Create Required Interface object");
+                                                    "Create Required Interface object");
 
         m_actCreateRequiredInterface->setCheckable(true);
         m_actCreateRequiredInterface->setActionGroup(m_actionGroup);
@@ -329,7 +336,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment",
+                                                    "Create Comment object");
 
         m_actCreateComment->setCheckable(true);
         m_actCreateComment->setActionGroup(m_actionGroup);
@@ -348,7 +356,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection",
+                                                    "Create Connection object");
 
         m_actCreateConnection->setCheckable(true);
         m_actCreateConnection->setActionGroup(m_actionGroup);
@@ -377,7 +386,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomOut) {
         m_actZoomOut = new QAction(tr("Zoom Out"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
+        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out",
+                                                    "Scale down the current scene");
 
         m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
         m_actZoomOut->setShortcut(QKeySequence::ZoomOut);
@@ -549,7 +559,8 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
 
     switch (obj->aadlType()) {
     case aadl::AADLObject::Type::Comment: {
-        auto comment = new aadlinterface::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
+        auto comment =
+                new aadlinterface::AADLCommentGraphicsItem(qobject_cast<aadl::AADLObjectComment *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, comment);
         return comment;
     } break;
@@ -570,13 +581,14 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         }
         break;
     case aadl::AADLObject::Type::Function: {
-        auto function = new aadlinterface::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+        auto function =
+                new aadlinterface::AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, function);
         return function;
     } break;
     case aadl::AADLObject::Type::FunctionType: {
-        auto functionType =
-                new aadlinterface::AADLFunctionTypeGraphicsItem(qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
+        auto functionType = new aadlinterface::AADLFunctionTypeGraphicsItem(
+                qobject_cast<aadl::AADLObjectFunctionType *>(obj), parentItem);
         nestedGeomtryConnect(parentItem, functionType);
         return functionType;
     } break;
@@ -656,8 +668,8 @@ void InterfaceTabDocument::onItemDoubleClicked()
                 }
             } else if (clickedEntity->aadlType() == aadl::AADLObject::Type::Comment) {
                 if (clickedItem->type() == aadlinterface::AADLCommentGraphicsItem::Type) {
-                    auto dialog = new aadlinterface::CommentTextDialog(qobject_cast<aadl::AADLObjectComment *>(clickedEntity),
-                                                              qobject_cast<QWidget *>(parent()));
+                    auto dialog = new aadlinterface::CommentTextDialog(
+                            qobject_cast<aadl::AADLObjectComment *>(clickedEntity), qobject_cast<QWidget *>(parent()));
                     dialog->setAttribute(Qt::WA_DeleteOnClose);
                     dialog->open();
                 }
@@ -690,7 +702,8 @@ void InterfaceTabDocument::onRootObjectChanged(utils::Id rootId)
 
 void InterfaceTabDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
+    aadlinterface::PropertiesDialog *dialog =
+            new aadlinterface::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -740,7 +753,8 @@ void InterfaceTabDocument::onDataTypesMenuInvoked()
 
 void InterfaceTabDocument::onColorSchemeMenuInvoked()
 {
-    aadlinterface::ColorManagerDialog *dialog = new aadlinterface::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
+    aadlinterface::ColorManagerDialog *dialog =
+            new aadlinterface::ColorManagerDialog(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

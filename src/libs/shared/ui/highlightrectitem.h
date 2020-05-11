@@ -49,7 +49,7 @@ public:
     void highlight();
 
 Q_SIGNALS:
-    void highlighted() const;
+    void highlighted();
 
 private:
     QGraphicsPathItem *m_pathItem = nullptr;

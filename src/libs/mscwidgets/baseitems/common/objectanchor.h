@@ -53,7 +53,7 @@ public:
     bool operator==(const ObjectAnchor &other) const;
 
 Q_SIGNALS:
-    void anchorChanged(InteractiveObject *object, const QPointF &scenePoint) const;
+    void anchorChanged(msc::InteractiveObject *object, const QPointF &scenePoint) const;
 
 private:
     ObjectAnchor &operator=(const ObjectAnchor &other) = delete;

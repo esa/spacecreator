@@ -82,22 +82,22 @@ public:
     bool moveEvent(MscInstanceEvent *event, int newIndex);
 
 public Q_SLOTS:
-    void resetTimerRelations(MscTimer *timer);
-    void updatePrecedingTimer(MscTimer *timer, int idx = -1);
-    void updateFollowingTimer(MscTimer *timer, int idx = -1);
+    void resetTimerRelations(msc::MscTimer *timer);
+    void updatePrecedingTimer(msc::MscTimer *timer, int idx = -1);
+    void updateFollowingTimer(msc::MscTimer *timer, int idx = -1);
 
 Q_SIGNALS:
     void instancesChanged();
-    void instanceAdded(MscInstance *instance, int pos);
-    void instanceRemoved(MscInstance *instance);
-    void instanceOrderChanged(MscInstance *instance, int from, int to);
-    void instanceEventAdded(MscInstanceEvent *message);
-    void instanceEventRemoved(MscInstanceEvent *message);
+    void instanceAdded(msc::MscInstance *instance, int pos);
+    void instanceRemoved(msc::MscInstance *instance);
+    void instanceOrderChanged(msc::MscInstance *instance, int from, int to);
+    void instanceEventAdded(msc::MscInstanceEvent *message);
+    void instanceEventRemoved(msc::MscInstanceEvent *message);
     void instanceEventsChanged();
     void eventMoved();
     void messageRetargeted();
-    void gateAdded(MscGate *gate);
-    void gateRemoved(MscGate *gate);
+    void gateAdded(msc::MscGate *gate);
+    void gateRemoved(msc::MscGate *gate);
     void rectChanged();
     void globalCommentTextChanged(const QString &text, const QString &hash);
     void globalCommentRectChanged(const QRect rect, const QString &hash);
