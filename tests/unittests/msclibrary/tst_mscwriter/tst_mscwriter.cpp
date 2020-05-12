@@ -191,13 +191,13 @@ void tst_MscWriter::testSaveDocumentModel()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     text = text.trimmed();
 
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -240,11 +240,11 @@ void tst_MscWriter::testSerializeMscChart()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -339,11 +339,11 @@ void tst_MscWriter::testSerializeMscInstance()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -441,11 +441,11 @@ void tst_MscWriter::testSerializeMscActions()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -533,11 +533,11 @@ void tst_MscWriter::testSerializeMscConditions()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -622,11 +622,11 @@ void tst_MscWriter::testSerializeMscCoregion()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, removeIndention(resultGrantLee));
 }
@@ -736,11 +736,11 @@ void tst_MscWriter::testSerializeCreate()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -924,11 +924,11 @@ void tst_MscWriter::testSerializeMscMessage()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }
@@ -1042,11 +1042,11 @@ void tst_MscWriter::testSerializeMscTimer()
     QFETCH(QString, result);
     QFETCH(QString, resultGrantLee);
 
-    setSaveMode(CUSTOM);
+    setSaveMode(SaveMode::CUSTOM);
     QString text = modelText(model);
     QCOMPARE(text, result);
 
-    setSaveMode(GRANTLEE);
+    setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
 }

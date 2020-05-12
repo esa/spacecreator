@@ -47,6 +47,7 @@ namespace msc {
 MscWriter::MscWriter(QObject *parent)
     : QObject(parent)
 {
+    setSaveMode(m_saveMode);
 }
 
 /**
@@ -56,11 +57,11 @@ void MscWriter::setSaveMode(MscWriter::SaveMode mode)
 {
     m_saveMode = mode;
 
-    if (m_saveMode == GRANTLEE && m_template == nullptr) {
+    if (m_saveMode == SaveMode::GRANTLEE && m_template == nullptr) {
         m_template = templating::StringTemplate::create(this);
         m_template->setNeedValidateXMLDocument(false);
     }
-    if (m_saveMode == CUSTOM && m_template != nullptr) {
+    if (m_saveMode == SaveMode::CUSTOM && m_template != nullptr) {
         delete m_template;
         m_template = nullptr;
     }
@@ -83,18 +84,8 @@ bool MscWriter::saveModel(MscModel *model, const QString &fileName)
         return false;
     }
 
-    QTextStream out(&mscFile);
-
-    setModel(model);
-
-    int tabCount = 0;
-    for (const auto *doc : model->documents()) {
-        out << serialize(doc, tabCount++);
-    }
-
-    for (const auto *chart : model->charts()) {
-        out << serialize(chart);
-    }
+    QString mscText = modelText(model);
+    mscFile.write(mscText.toUtf8());
 
     mscFile.close();
 
@@ -132,7 +123,7 @@ bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
  */
 QString MscWriter::modelText(MscModel *model)
 {
-    if (m_saveMode == GRANTLEE) {
+    if (m_saveMode == SaveMode::GRANTLEE) {
         return exportGrantlee(model);
     }
 

@@ -45,7 +45,7 @@ class MscWriter : public QObject
     Q_OBJECT
 
 public:
-    enum SaveMode
+    enum class SaveMode
     {
         CUSTOM,
         GRANTLEE
@@ -86,7 +86,7 @@ private:
     QString exportGrantlee(MscModel *model);
 
     MscModel *m_model = nullptr;
-    SaveMode m_saveMode = CUSTOM;
+    SaveMode m_saveMode = SaveMode::GRANTLEE;
     templating::StringTemplate *m_template = nullptr;
 };
 
