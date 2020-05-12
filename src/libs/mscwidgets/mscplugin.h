@@ -10,7 +10,7 @@ class MSCPlugin : public shared::Plugin
     Q_OBJECT
 
 public:
-    explicit MSCPlugin(QObject *parent = 0);
+    explicit MSCPlugin(QObject *parent = nullptr);
 
     GraphicsView *graphicsView() override;
     void addToolBars(QMainWindow *window) override;
