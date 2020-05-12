@@ -50,10 +50,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
+    bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
 
 protected:
     void closeEvent(QCloseEvent *e) override;

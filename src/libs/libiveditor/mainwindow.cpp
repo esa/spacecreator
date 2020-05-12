@@ -59,13 +59,13 @@ process command line arguments and user actions.
 \sa taste3::document::AbstractTabDocument, taste3::document::DocumentsManager, taste3::CommandLineParser
 */
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_tabWidget(new QTabWidget(this))
     , m_zoomCtrl(new ZoomController())
     , m_docsManager(new document::DocumentsManager(m_tabWidget, this))
-    , m_plugin(new aadlinterface::IVEditorPlugin(this))
+    , m_plugin(plugin)
 {
     ui->setupUi(this);
     statusBar()->addPermanentWidget(m_zoomCtrl);
@@ -437,14 +437,14 @@ void MainWindow::updateActions()
  * \a value - its value.
  * Returns \c true if the option \a arg \a value is known and handled.
  */
-bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
+bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value)
 {
     switch (arg) {
-    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+    case shared::CommandLineParser::Positional::DropUnsavedChangesSilently: {
         m_dropUnsavedChangesSilently = true;
         return true;
     }
-    case CommandLineParser::Positional::OpenAADLXMLFile: {
+    case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
         if (!value.isEmpty())
             if (document::AbstractTabDocument *doc = m_docsManager->docById(TABDOC_ID_InterfaceView))
                 if (doc->load(value)) {
@@ -454,20 +454,20 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
 
         return false;
     }
-    case CommandLineParser::Positional::OpenStringTemplateFile:
+    case shared::CommandLineParser::Positional::OpenStringTemplateFile:
         if (!value.isEmpty())
             return exportDocsAs(QString(), value);
         return false;
-    case CommandLineParser::Positional::ExportToFile:
+    case shared::CommandLineParser::Positional::ExportToFile:
         if (!value.isEmpty())
             return exportCurrentDocAsXml(value);
         return false;
-    case CommandLineParser::Positional::ListScriptableActions: {
+    case shared::CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return true;
     }
-    case CommandLineParser::Positional::Unknown:
+    default:
         break;
     }
     qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;

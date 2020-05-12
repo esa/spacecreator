@@ -16,6 +16,7 @@
 */
 
 #include "datatypesstorage.h"
+#include "iveditorplugin.h"
 #include "mainwindow.h"
 #include "sharedlibrary.h"
 
@@ -43,27 +44,23 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    MainWindow w;
+    aadlinterface::IVEditorPlugin plugin;
 
-    CommandLineParser cmdParser;
+    MainWindow w(&plugin);
+
+    shared::CommandLineParser cmdParser;
+    cmdParser.setApplicationDescription("TASTE editor");
+    plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
-    QVector<CommandLineParser::Positional> args;
-    const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
-    for (int i = 0; i < e.keyCount(); ++i) {
-        const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
-        if (CommandLineParser::Positional::Unknown != posArgType) {
-            if (cmdParser.isSet(posArgType)) {
-                args.append(posArgType);
-            }
-        }
+    const auto args = cmdParser.positionalsSet();
+    for (auto arg : args) {
+        w.processCommandLineArg(arg, cmdParser.value(arg));
     }
 
-    for (auto arg : args)
-        w.processCommandLineArg(arg, cmdParser.value(arg));
-
-    if (!cmdParser.isSet(CommandLineParser::Positional::ListScriptableActions))
+    if (!cmdParser.isSet(shared::CommandLineParser::Positional::ListScriptableActions)) {
         w.show();
+    }
 
     return a.exec();
 }

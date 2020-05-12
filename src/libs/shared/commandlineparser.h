@@ -22,6 +22,10 @@
 
 namespace shared {
 
+/*!
+\class shared::CommandLineParser
+\brief The processor of options passed as command line arguments.
+*/
 class CommandLineParser : public QCommandLineParser
 {
     Q_GADGET
@@ -30,9 +34,18 @@ public:
 
     enum class Positional
     {
+        // MSC editor
         OpenFileMsc = 0,
         DbgOpenMscExamplesChain,
         StartRemoteControl,
+
+        // AADL editor
+        OpenAADLXMLFile,
+        OpenStringTemplateFile,
+        ExportToFile,
+        ListScriptableActions,
+
+        // Both
         DropUnsavedChangesSilently,
 
         Unknown
@@ -42,9 +55,15 @@ public:
     bool isSet(CommandLineParser::Positional arg) const;
     QString value(CommandLineParser::Positional arg) const;
 
-    void handleOption(Positional arg);
+    void handlePositional(Positional arg);
+    bool isPositionalHandled(Positional arg) const;
+
+    QVector<Positional> positionalsSet() const;
 
     static QCommandLineOption positionalArg(CommandLineParser::Positional arg);
+
+private:
+    QVector<Positional> m_handledPositionals;
 };
 
 }

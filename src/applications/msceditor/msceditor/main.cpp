@@ -54,20 +54,7 @@ int main(int argc, char *argv[])
     plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
-    QVector<shared::CommandLineParser::Positional> args;
-    auto e = QMetaEnum::fromType<shared::CommandLineParser::Positional>();
-    for (int i = 0; i < e.keyCount(); ++i) {
-        auto posArgType = static_cast<shared::CommandLineParser::Positional>(e.value(i));
-        if (shared::CommandLineParser::Positional::Unknown != posArgType) {
-            if (cmdParser.isSet(posArgType)) {
-                if (posArgType == shared::CommandLineParser::Positional::OpenFileMsc) {
-                    args.prepend(posArgType);
-                } else {
-                    args.append(posArgType);
-                }
-            }
-        }
-    }
+    const auto args = cmdParser.positionalsSet();
     for (auto it = args.crbegin(); it != args.crend(); ++it) {
         auto arg = *it;
         w.processCommandLineArg(arg, cmdParser.value(arg));

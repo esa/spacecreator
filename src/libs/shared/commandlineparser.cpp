@@ -29,6 +29,29 @@ CommandLineParser::CommandLineParser()
     addVersionOption();
 }
 
+/*!
+    \enum CommandLineParser::Positional
+
+    This enum type specifies a particular command line option:
+
+    \value DropUnsavedChangesSilently
+           Do not warn about unsaved changes on the document closing.
+    \value OpenAADLXMLFile
+           Automatically load the speceficied file on startup.
+    \value OpenStringTemplateFile
+           Load the specificied template file.
+    \value ExportToFile
+           Save the file opened by OpenAADLXMLFile using the template passed with OpenStringTemplateFile.
+    \value ListScriptableActions
+           List all the actions available for scripting and exit.
+*/
+
+/*!
+  \fn bool CommandLineParser::isSet(Positional arg) const
+ \brief checks the presence of the option \a arg.
+ \a arg - the option to be checked
+ Returns \c true if set.
+*/
 bool CommandLineParser::isSet(CommandLineParser::Positional arg) const
 {
     if (CommandLineParser::Positional::Unknown == arg) {
@@ -47,9 +70,35 @@ QString CommandLineParser::value(CommandLineParser::Positional arg) const
     return QCommandLineParser::value(positionalArg(arg));
 }
 
-void CommandLineParser::handleOption(CommandLineParser::Positional arg)
+void CommandLineParser::handlePositional(Positional arg)
 {
-    addOption(positionalArg(arg));
+    if (!isPositionalHandled(arg)) {
+        addOption(positionalArg(arg));
+        m_handledPositionals << arg;
+    }
+}
+
+bool CommandLineParser::isPositionalHandled(CommandLineParser::Positional arg) const
+{
+    return m_handledPositionals.contains(arg);
+}
+
+/*! Get the list of command line options the user gave */
+QVector<CommandLineParser::Positional> CommandLineParser::positionalsSet() const
+{
+    QVector<Positional> args;
+    auto e = QMetaEnum::fromType<Positional>();
+    for (int i = 0; i < e.keyCount(); ++i) {
+        auto posArgType = static_cast<Positional>(e.value(i));
+        if (isPositionalHandled(posArgType) && isSet(posArgType)) {
+            if (posArgType == Positional::OpenFileMsc) {
+                args.prepend(posArgType);
+            } else {
+                args.append(posArgType);
+            }
+        }
+    }
+    return args;
 }
 
 QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positional arg)
@@ -82,6 +131,32 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
               << "drop-changes-silently";
         description = QCoreApplication::translate(
                 "CommandLineParser", "Do not propose to save changes when closing a document");
+        break;
+    case CommandLineParser::Positional::OpenAADLXMLFile:
+        names << "o"
+              << "open-aadl-xml";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Do not propose to save changes when closing a document");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
+        break;
+    case CommandLineParser::Positional::OpenStringTemplateFile:
+        names << "t"
+              << "open-template";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Open a string template <file> on startup (-o option is required).");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
+        break;
+    case CommandLineParser::Positional::ExportToFile:
+        names << "x"
+              << "export-to-xml";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Export the doc to the <file> using default template (-o option is required).");
+        valueName = QCoreApplication::translate("CommandLineParser", "file");
+        break;
+    case CommandLineParser::Positional::ListScriptableActions:
+        names << "l"
+              << "list-actions";
+        description = QCoreApplication::translate("CommandLineParser", "List scriptable actions and exit.");
         break;
     default:
         qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";

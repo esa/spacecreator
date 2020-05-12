@@ -33,10 +33,10 @@ void MSCPlugin::addToolBars(QMainWindow *window)
 
 void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
-    parser->handleOption(shared::CommandLineParser::Positional::OpenFileMsc);
-    parser->handleOption(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
-    parser->handleOption(shared::CommandLineParser::Positional::StartRemoteControl);
-    parser->handleOption(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
+    parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
+    parser->handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
+    parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 
 }

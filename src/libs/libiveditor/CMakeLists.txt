@@ -173,8 +173,6 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableaadliface.h
     templating/exportableaadlobject.cpp
     templating/exportableaadlobject.h
-    commandlineparser.cpp
-    commandlineparser.h
     commandsstack.cpp
     commandsstack.h
     iveditorplugin.cpp

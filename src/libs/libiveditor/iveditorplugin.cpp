@@ -1,5 +1,7 @@
 #include "iveditorplugin.h"
 
+#include "commandlineparser.h"
+
 #include <QMainWindow>
 #include <QToolBar>
 
@@ -28,8 +30,11 @@ void IVEditorPlugin::addToolBars(QMainWindow *window)
 
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
-    // Do nothing for now
-    Q_UNUSED(parser)
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::ListScriptableActions);
+    parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 
 }
