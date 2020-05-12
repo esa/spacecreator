@@ -24,6 +24,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    commandlineparser.cpp
+    commandlineparser.h
     plugin.cpp
     plugin.h
     settingsappoption.cpp

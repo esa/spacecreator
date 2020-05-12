@@ -2,13 +2,12 @@ set(TEST_NAME tst_commandlineparser)
 
 add_executable(${TEST_NAME}
     tst_commandlineparser.cpp
-    ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/commandlineparser.cpp
-    ${CMAKE_SOURCE_DIR}/src/applications/msceditor/msceditor/commandlineparser.h
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_link_libraries(${TEST_NAME} PUBLIC
+    shared
     application
     Qt5::Core
     Qt5::Test

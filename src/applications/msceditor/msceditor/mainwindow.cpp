@@ -78,9 +78,9 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
 struct MainWindowPrivate {
-    explicit MainWindowPrivate(MainWindow *mainWindow)
+    explicit MainWindowPrivate(msc::MSCPlugin *plugin, MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
-        , m_plugin(new msc::MSCPlugin(mainWindow))
+        , m_plugin(plugin)
         , m_model(new MainModel(mainWindow))
     {
     }
@@ -140,9 +140,9 @@ struct MainWindowPrivate {
  * \brief MainWindow::MainWindow Create an empty view.
  * \param parent
  */
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(msc::MSCPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
-    , d(new MainWindowPrivate(this))
+    , d(new MainWindowPrivate(plugin, this))
 {
     setupUi();
     d->ui->hierarchyView->setRenderHints(
@@ -811,16 +811,14 @@ void MainWindow::initConnections()
  * \param value
  * \return
  */
-bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const QString &value)
+bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value)
 {
     switch (arg) {
-    case CommandLineParser::Positional::OpenFileMsc: {
+    case shared::CommandLineParser::Positional::OpenFileMsc:
         return openFileMsc(value);
-    }
-    case CommandLineParser::Positional::DbgOpenMscExamplesChain: {
+    case shared::CommandLineParser::Positional::DbgOpenMscExamplesChain:
         return openMscChain(value);
-    }
-    case CommandLineParser::Positional::StartRemoteControl: {
+    case shared::CommandLineParser::Positional::StartRemoteControl:
         if (startRemoteControl(value.toUShort())) {
             menuBar()->setVisible(false);
 
@@ -836,11 +834,10 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
             statusBar()->hide();
             return true;
         }
-    } break;
-    case CommandLineParser::Positional::DropUnsavedChangesSilently: {
+        break;
+    case shared::CommandLineParser::Positional::DropUnsavedChangesSilently:
         d->m_dropUnsavedChangesSilently = true;
         break;
-    }
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;

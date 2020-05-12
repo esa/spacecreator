@@ -10,6 +10,8 @@ class QMainWindow;
 
 namespace shared {
 
+class CommandLineParser;
+
 namespace ui {
 class GraphicsViewBase;
 }
@@ -19,7 +21,7 @@ class Plugin : public QObject
     Q_OBJECT
 
 public:
-    explicit Plugin(QObject *parent);
+    explicit Plugin(QObject *parent = 0);
     virtual ~Plugin();
 
     virtual ui::GraphicsViewBase *graphicsView() = 0;
@@ -36,6 +38,9 @@ public:
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
+
+    // Populate a CommandLineParser with the arguments this application can handle
+    virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
 
 private:
     QUndoGroup *m_undoGroup;

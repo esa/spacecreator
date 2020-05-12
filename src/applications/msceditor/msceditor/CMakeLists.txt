@@ -3,8 +3,6 @@ set(APP_NAME msceditor)
 add_executable(${APP_NAME})
 
 target_sources(${APP_NAME} PRIVATE
-    commandlineparser.cpp
-    commandlineparser.h
     main.cpp
     mainwindow.cpp
     mainwindow.h

@@ -33,6 +33,7 @@ class MainWindow;
 namespace msc {
 class MscDocument;
 class BaseTool;
+class MSCPlugin;
 }
 
 class MainModel;
@@ -47,12 +48,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(msc::MSCPlugin *plugin, QWidget *parent = nullptr);
     ~MainWindow();
 
     QGraphicsView *currentView() const;
 
-    bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
+    bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
     QPlainTextEdit *textOutputPane() const;
 
 public Q_SLOTS:

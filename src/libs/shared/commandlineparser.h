@@ -20,6 +20,8 @@
 #include <QCommandLineParser>
 #include <QObject>
 
+namespace shared {
+
 class CommandLineParser : public QCommandLineParser
 {
     Q_GADGET
@@ -40,8 +42,9 @@ public:
     bool isSet(CommandLineParser::Positional arg) const;
     QString value(CommandLineParser::Positional arg) const;
 
-    static QCommandLineOption positionalArg(CommandLineParser::Positional arg);
+    void handleOption(Positional arg);
 
-private:
-    void populatePositionalArgs();
+    static QCommandLineOption positionalArg(CommandLineParser::Positional arg);
 };
+
+}

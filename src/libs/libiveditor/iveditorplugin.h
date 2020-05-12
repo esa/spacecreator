@@ -15,6 +15,8 @@ public:
 
     QToolBar *docToolBar() { return m_docToolBar; }
 
+    void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
+
 private:
     GraphicsView *m_graphicsView;
     QToolBar *m_docToolBar;

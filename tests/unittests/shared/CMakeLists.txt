@@ -1,3 +1,4 @@
+add_subdirectory(tst_commandlineparser)
 add_subdirectory(tst_drawrectinfo)
 add_subdirectory(tst_grippoint)
 add_subdirectory(tst_grippointshandler)

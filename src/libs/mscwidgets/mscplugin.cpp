@@ -1,5 +1,7 @@
 #include "mscplugin.h"
 
+#include "commandlineparser.h"
+
 #include <QMainWindow>
 #include <QToolBar>
 
@@ -27,6 +29,14 @@ void MSCPlugin::addToolBars(QMainWindow *window)
     window->addToolBar(mainToolBar());
     window->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
     window->addToolBar(Qt::LeftToolBarArea, m_hierarchyToolBar);
+}
+
+void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
+{
+    parser->handleOption(shared::CommandLineParser::Positional::OpenFileMsc);
+    parser->handleOption(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
+    parser->handleOption(shared::CommandLineParser::Positional::StartRemoteControl);
+    parser->handleOption(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 
 }

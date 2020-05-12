@@ -20,14 +20,13 @@
 #include <QDebug>
 #include <QMetaEnum>
 
+namespace shared {
+
 CommandLineParser::CommandLineParser()
     : QCommandLineParser()
 {
-    setApplicationDescription("MSC file editor");
     addHelpOption();
     addVersionOption();
-
-    populatePositionalArgs();
 }
 
 bool CommandLineParser::isSet(CommandLineParser::Positional arg) const
@@ -46,6 +45,11 @@ QString CommandLineParser::value(CommandLineParser::Positional arg) const
     }
 
     return QCommandLineParser::value(positionalArg(arg));
+}
+
+void CommandLineParser::handleOption(CommandLineParser::Positional arg)
+{
+    addOption(positionalArg(arg));
 }
 
 QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positional arg)
@@ -87,11 +91,4 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     return QCommandLineOption(names, description, valueName);
 }
 
-void CommandLineParser::populatePositionalArgs()
-{
-    const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
-    for (int i = 0; i < e.keyCount(); ++i) {
-        if (CommandLineParser::Positional::Unknown != static_cast<CommandLineParser::Positional>(e.value(i)))
-            addOption(positionalArg(CommandLineParser::Positional(e.value(i))));
-    }
 }

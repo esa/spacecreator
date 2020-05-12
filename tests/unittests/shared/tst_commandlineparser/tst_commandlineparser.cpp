@@ -17,8 +17,11 @@
 
 #include "commandlineparser.h"
 #include "mainwindow.h"
+#include "mscplugin.h"
 
 #include <QtTest>
+
+using shared::CommandLineParser;
 
 class tst_CommandLineParser : public QObject
 {
@@ -38,6 +41,9 @@ private Q_SLOTS:
     void testCmdArgumentRemoteControl();
 
     void testCoverage();
+
+private:
+    msc::MSCPlugin m_plugin;
 };
 
 void tst_CommandLineParser::testCmdArgumentOpenMsc()
@@ -47,6 +53,7 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
     const QString NoFileName("./no-such-file.msc");
 
     CommandLineParser parser;
+    m_plugin.populateCommandLineArguments(&parser);
     parser.process({ QApplication::instance()->applicationFilePath(),
             QString("-%1=%2").arg(cmdOpenMsc.names().first(), FileName) });
 
@@ -71,6 +78,7 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
     const quint16 port = 34567;
 
     CommandLineParser parser;
+    m_plugin.populateCommandLineArguments(&parser);
     parser.process({ QApplication::instance()->applicationFilePath(),
             QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
     QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);

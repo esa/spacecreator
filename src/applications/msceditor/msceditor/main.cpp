@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 #include "mscdocument.h"
 #include "msclibrary.h"
+#include "mscplugin.h"
 #include "sharedlibrary.h"
 
 #include <QApplication>
@@ -44,28 +45,32 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    MainWindow w;
+    msc::MSCPlugin plugin;
 
-    CommandLineParser cmdParser;
+    MainWindow w(&plugin);
+
+    shared::CommandLineParser cmdParser;
+    cmdParser.setApplicationDescription("MSC file editor");
+    plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
-    QVector<CommandLineParser::Positional> args;
-    const QMetaEnum &e = QMetaEnum::fromType<CommandLineParser::Positional>();
+    QVector<shared::CommandLineParser::Positional> args;
+    auto e = QMetaEnum::fromType<shared::CommandLineParser::Positional>();
     for (int i = 0; i < e.keyCount(); ++i) {
-        const CommandLineParser::Positional posArgType(static_cast<CommandLineParser::Positional>(e.value(i)));
-        if (CommandLineParser::Positional::Unknown != posArgType)
+        auto posArgType = static_cast<shared::CommandLineParser::Positional>(e.value(i));
+        if (shared::CommandLineParser::Positional::Unknown != posArgType) {
             if (cmdParser.isSet(posArgType)) {
-                if (posArgType == CommandLineParser::Positional::OpenFileMsc)
+                if (posArgType == shared::CommandLineParser::Positional::OpenFileMsc) {
                     args.prepend(posArgType);
-                else
+                } else {
                     args.append(posArgType);
+                }
             }
+        }
     }
-    QVector<CommandLineParser::Positional>::const_reverse_iterator it = args.crbegin();
-    while (it != args.crend()) {
-        const CommandLineParser::Positional arg = *it;
+    for (auto it = args.crbegin(); it != args.crend(); ++it) {
+        auto arg = *it;
         w.processCommandLineArg(arg, cmdParser.value(arg));
-        ++it;
     }
 
     w.show();

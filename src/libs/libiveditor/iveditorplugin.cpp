@@ -26,4 +26,10 @@ void IVEditorPlugin::addToolBars(QMainWindow *window)
     window->addToolBar(m_docToolBar);
 }
 
+void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
+{
+    // Do nothing for now
+    Q_UNUSED(parser)
+}
+
 }
