@@ -46,8 +46,9 @@ void CmdEntityCommentChange::redo()
             comment->setParent(this);
         }
     } else {
-        if (!comment)
+        if (!comment) {
             comment = m_modelItem->setCommentString(m_newComment);
+        }
         m_chart->addInstanceEvent(comment);
         comment->setText(m_newComment);
     }
@@ -61,15 +62,17 @@ void CmdEntityCommentChange::undo()
     MscComment *comment = m_modelItem->comment();
     if (m_oldComment.isEmpty()) {
         if (comment) {
-            comment->setCommentString(m_oldComment);
+            comment->setText(m_oldComment);
             m_chart->removeInstanceEvent(comment);
+            comment->attachTo(nullptr);
 
             // this command takes over ownership
             comment->setParent(this);
         }
     } else {
-        if (!comment)
+        if (!comment) {
             comment = m_modelItem->setCommentString(m_oldComment);
+        }
         m_chart->addInstanceEvent(comment);
         comment->setText(m_oldComment);
     }

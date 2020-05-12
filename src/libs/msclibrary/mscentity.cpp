@@ -90,7 +90,9 @@ void MscEntity::setComment(MscComment *comment)
     }
 
     m_comment = comment;
-    connect(m_comment, &MscComment::textChanged, this, &MscEntity::commentChanged);
+    if (m_comment != nullptr) {
+        connect(m_comment, &MscComment::textChanged, this, &MscEntity::commentChanged);
+    }
     Q_EMIT commentChanged();
 }
 
