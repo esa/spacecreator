@@ -21,7 +21,7 @@ class Plugin : public QObject
     Q_OBJECT
 
 public:
-    explicit Plugin(QObject *parent = 0);
+    explicit Plugin(QObject *parent = nullptr);
     virtual ~Plugin();
 
     virtual ui::GraphicsViewBase *graphicsView() = 0;
