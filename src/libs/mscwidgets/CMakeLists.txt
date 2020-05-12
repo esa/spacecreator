@@ -113,6 +113,8 @@ target_sources(${LIB_NAME} PRIVATE
     hierarchyviewmodel.h
     instanceitem.cpp
     instanceitem.h
+    mscplugin.cpp
+    mscplugin.h
     messagedeclarationsdialog.cpp
     messagedeclarationsdialog.h
     messagedeclarationsdialog.ui

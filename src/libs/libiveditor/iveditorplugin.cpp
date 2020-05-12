@@ -1,7 +1,6 @@
 #include "iveditorplugin.h"
 
-#include "baseitems/graphicsview.h"
-
+#include <QMainWindow>
 #include <QToolBar>
 
 namespace aadlinterface {
@@ -9,23 +8,22 @@ namespace aadlinterface {
 IVEditorPlugin::IVEditorPlugin(QObject *parent)
     : shared::Plugin(parent)
     , m_graphicsView(new GraphicsView)
-    , m_docToolbar(new QToolBar)
+    , m_docToolBar(new QToolBar)
 {
-    m_docToolbar->setObjectName("Document ToolBar");
-    m_docToolbar->setAllowedAreas(Qt::AllToolBarAreas);
-    m_docToolbar->setMovable(true);
+    m_docToolBar->setObjectName("Document ToolBar");
+    m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+    m_docToolBar->setMovable(true);
 }
-
-IVEditorPlugin::~IVEditorPlugin() { }
 
 GraphicsView *IVEditorPlugin::graphicsView()
 {
     return m_graphicsView;
 }
 
-QVector<QToolBar *> IVEditorPlugin::additionalToolBars()
+void IVEditorPlugin::addToolBars(QMainWindow *window)
 {
-    return { m_docToolbar };
+    window->addToolBar(mainToolBar());
+    window->addToolBar(m_docToolBar);
 }
 
 }

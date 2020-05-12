@@ -69,12 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     statusBar()->addPermanentWidget(m_zoomCtrl);
-
     setCentralWidget(m_tabWidget);
-    addToolBar(m_plugin->mainToolBar());
-    for (auto toolbar : m_plugin->additionalToolBars()) {
-        addToolBar(toolbar);
-    }
+    m_plugin->addToolBars(this);
 
     // Connect the actions
     connect(m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);

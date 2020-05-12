@@ -6,6 +6,7 @@
 class QToolBar;
 class QAction;
 class QUndoGroup;
+class QMainWindow;
 
 namespace shared {
 
@@ -23,7 +24,7 @@ public:
 
     virtual ui::GraphicsViewBase *graphicsView() = 0;
     virtual QToolBar *mainToolBar();
-    virtual QVector<QToolBar *> additionalToolBars();
+    virtual void addToolBars(QMainWindow *window) = 0;
 
     QUndoGroup *undoGroup() { return m_undoGroup; }
 

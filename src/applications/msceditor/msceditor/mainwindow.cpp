@@ -33,6 +33,7 @@
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "mscplugin.h"
 #include "msctimer.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
@@ -79,41 +80,24 @@ const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 struct MainWindowPrivate {
     explicit MainWindowPrivate(MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
+        , m_plugin(new msc::MSCPlugin(mainWindow))
         , m_model(new MainModel(mainWindow))
-        , m_mscToolBar(new QToolBar(QObject::tr("MSC"), mainWindow))
-        , m_hierarchyToolBar(new QToolBar(QObject::tr("Hierarchy"), mainWindow))
-        , m_undoGroup(new QUndoGroup(mainWindow))
     {
-        m_mscToolBar->setObjectName("mscTools");
-        m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-        mainWindow->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
-
-        m_hierarchyToolBar->setObjectName("hierarchyTools");
-        m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
-        mainWindow->addToolBar(Qt::LeftToolBarArea, m_hierarchyToolBar);
     }
 
     ~MainWindowPrivate() { delete ui; }
 
     Ui::MainWindow *ui = nullptr;
 
+    msc::MSCPlugin *m_plugin;
+
     QComboBox *m_zoomBox = nullptr;
 
     MainModel *m_model = nullptr;
-    QToolBar *m_mscToolBar = nullptr;
-    QToolBar *m_hierarchyToolBar = nullptr;
-    QUndoGroup *m_undoGroup = nullptr;
 
     QMenu *m_menuFile = nullptr;
-    QAction *m_actNewFile = nullptr;
-    QAction *m_actOpenFile = nullptr;
-    QAction *m_actSaveFile = nullptr;
-    QAction *m_actSaveFileAs = nullptr;
-    QAction *m_actQuit = nullptr;
 
     QMenu *m_menuEdit = nullptr;
-    QAction *m_actUndo = nullptr;
-    QAction *m_actRedo = nullptr;
 
     QAction *m_actCopy = nullptr;
     QAction *m_actPaste = nullptr;
@@ -170,8 +154,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadSettings();
 
-    d->m_mscToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
-    d->m_hierarchyToolBar->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
+    d->m_plugin->mscToolBar()->setVisible(d->ui->centerView->currentWidget() == d->ui->graphicsView);
+    d->m_plugin->hierarchyToolBar()->setVisible(d->ui->centerView->currentWidget() == d->ui->hierarchyView);
 }
 
 MainWindow::~MainWindow()
@@ -273,8 +257,6 @@ void MainWindow::updateTitles()
     const QString &filename = d->m_model->currentFilePath();
     const QString mscFileName(filename.isEmpty() ? tr("Untitled") : QFileInfo(filename).fileName());
     setWindowTitle(title.arg(qApp->applicationName(), mscFileName, dirtyMarker));
-
-    d->m_actSaveFile->setText(tr("&Save \"%1\"").arg(mscFileName));
 }
 
 /*!
@@ -345,8 +327,8 @@ void MainWindow::showDocumentView(bool show)
     if (show) {
         d->ui->centerView->setCurrentWidget(d->ui->graphicsView);
 
-        d->m_hierarchyToolBar->hide();
-        d->m_mscToolBar->show();
+        d->m_plugin->hierarchyToolBar()->hide();
+        d->m_plugin->mscToolBar()->show();
 
         d->m_actCopy->setEnabled(true);
         msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
@@ -371,8 +353,8 @@ void MainWindow::showHierarchyView(bool show)
     if (show) {
         d->ui->centerView->setCurrentWidget(d->ui->hierarchyView);
 
-        d->m_hierarchyToolBar->show();
-        d->m_mscToolBar->hide();
+        d->m_plugin->hierarchyToolBar()->show();
+        d->m_plugin->mscToolBar()->hide();
 
         d->m_actCopy->setEnabled(false);
         d->m_actPaste->setEnabled(false);
@@ -393,13 +375,14 @@ void MainWindow::selectCurrentChart()
 
     if (chart != nullptr) {
         if (QUndoStack *currentStack = d->m_model->undoStack()) {
-            if (!d->m_undoGroup->stacks().contains(currentStack))
-                d->m_undoGroup->addStack(currentStack);
-            d->m_undoGroup->setActiveStack(currentStack);
+            if (!d->m_plugin->undoGroup()->stacks().contains(currentStack)) {
+                d->m_plugin->undoGroup()->addStack(currentStack);
+            }
+            d->m_plugin->undoGroup()->setActiveStack(currentStack);
         } else {
-            d->m_undoGroup->removeStack(d->m_undoGroup->activeStack());
+            d->m_plugin->undoGroup()->removeStack(d->m_plugin->undoGroup()->activeStack());
         }
-        msc::cmd::CommandsStack::setCurrent(d->m_undoGroup->activeStack());
+        msc::cmd::CommandsStack::setCurrent(d->m_plugin->undoGroup()->activeStack());
 
         // TODO: add support for dedicated stacks for each tab
     }
@@ -460,7 +443,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
                             || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
                 canNewChild = false;
             }
-            for (auto action : d->m_hierarchyToolBar->actions()) {
+            for (auto action : d->m_plugin->hierarchyToolBar()->actions()) {
                 action->setEnabled(canNewChild);
             }
 
@@ -477,6 +460,8 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 void MainWindow::setupUi()
 {
     d->ui->setupUi(this);
+
+    d->m_plugin->addToolBars(this);
 
     d->ui->graphicsView->setScene(d->m_model->graphicsScene());
     //    d->ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft); // make scene's origin be great^W in topLeft
@@ -521,14 +506,6 @@ void MainWindow::setupUi()
  */
 void MainWindow::initActions()
 {
-    d->m_actUndo = d->m_undoGroup->createUndoAction(this, tr("Undo:"));
-    d->m_actUndo->setShortcut(QKeySequence::Undo);
-    d->m_actUndo->setIcon(QIcon::fromTheme("edit-undo", QIcon(":/icons/toolbar/undo.svg")));
-
-    d->m_actRedo = d->m_undoGroup->createRedoAction(this, tr("Redo:"));
-    d->m_actRedo->setShortcut(QKeySequence::Redo);
-    d->m_actRedo->setIcon(QIcon::fromTheme("edit-redo", QIcon(":/icons/toolbar/redo.svg")));
-
     d->m_actCopy = new QAction(tr("Copy:"), this);
     d->m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
     d->m_actCopy->setMenu(new QMenu(this));
@@ -542,6 +519,18 @@ void MainWindow::initActions()
 
     d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
+
+    // Connect the plugin actions
+    connect(d->m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::createNewDocument);
+    connect(d->m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
+    connect(d->m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
+    connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
+    connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, [&]() {
+        if (this->saveDocument()) {
+            this->saveSettings();
+            QApplication::quit();
+        }
+    });
 }
 
 /*!
@@ -559,38 +548,23 @@ void MainWindow::initMenuFile()
 {
     d->m_menuFile = menuBar()->addMenu(tr("File"));
 
-    d->m_actNewFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_FileIcon), tr("New File"), this,
-            &MainWindow::createNewDocument, QKeySequence::New);
-
-    d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this,
-            &MainWindow::selectAndOpenFile, QKeySequence::Open);
-
-    d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this,
-            &MainWindow::saveMsc, QKeySequence::Save);
-
-    d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
-            this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
+    d->m_menuFile->addAction(d->m_plugin->actionNewFile());
+    d->m_menuFile->addAction(d->m_plugin->actionOpenFile());
+    d->m_menuFile->addAction(d->m_plugin->actionSaveFile());
+    d->m_menuFile->addAction(d->m_plugin->actionSaveFileAs());
 
     d->m_actScreenshot = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton),
             tr("Save Screenshot..."), this, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(
-            tr("&Quit"), this,
-            [&]() {
-                if (this->saveDocument()) {
-                    this->saveSettings();
-                    QApplication::quit();
-                }
-            },
-            QKeySequence::Quit);
+    d->m_menuFile->addAction(d->m_plugin->actionQuit());
 }
 
 void MainWindow::initMenuEdit()
 {
     d->m_menuEdit = menuBar()->addMenu(tr("Edit"));
-    d->m_menuEdit->addAction(d->m_actUndo);
-    d->m_menuEdit->addAction(d->m_actRedo);
+    d->m_menuEdit->addAction(d->m_plugin->actionUndo());
+    d->m_menuEdit->addAction(d->m_plugin->actionRedo());
     d->m_menuEdit->addSeparator();
     d->m_menuEdit->addAction(d->m_deleteTool->action());
     d->m_menuEdit->addSeparator();
@@ -624,7 +598,7 @@ void MainWindow::initDocumentViewActions()
     auto addAction = [&](msc::MscDocument::HierarchyType type) {
         // create tool
         auto tool = new msc::HierarchyCreatorTool(type, &(d->m_model->hierarchyViewModel()), nullptr, this);
-        auto action = d->m_hierarchyToolBar->addAction(tool->title());
+        auto action = d->m_plugin->hierarchyToolBar()->addAction(tool->title());
         action->setProperty(HIERARCHY_TYPE_TAG, type);
         action->setCheckable(true);
         action->setIcon(tool->icon());
@@ -638,7 +612,7 @@ void MainWindow::initDocumentViewActions()
 
         connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
         connect(action, &QAction::toggled, this, [this]() {
-            for (QAction *action : d->m_hierarchyToolBar->actions())
+            for (QAction *action : d->m_plugin->hierarchyToolBar()->actions())
                 action->setChecked(false);
         });
     };
@@ -759,7 +733,7 @@ void MainWindow::initTools()
     QActionGroup *toolsActions = new QActionGroup(this);
     toolsActions->setExclusive(false);
     for (msc::BaseTool *tool : d->m_tools) {
-        QAction *toolAction = d->m_mscToolBar->addAction(tool->title());
+        QAction *toolAction = d->m_plugin->mscToolBar()->addAction(tool->title());
         toolAction->setCheckable(true);
         toolAction->setIcon(tool->icon());
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
@@ -782,20 +756,13 @@ void MainWindow::initTools()
 
 void MainWindow::initMainToolbar()
 {
-    d->ui->mainToolBar->addAction(d->m_actNewFile);
-    d->ui->mainToolBar->addAction(d->m_actOpenFile);
-    d->ui->mainToolBar->addAction(d->m_actSaveFile);
+    auto mainToolBar = d->m_plugin->mainToolBar();
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(d->m_deleteTool->action());
 
-    d->ui->mainToolBar->addSeparator();
-    d->ui->mainToolBar->addAction(d->m_actUndo);
-    d->ui->mainToolBar->addAction(d->m_actRedo);
-
-    d->ui->mainToolBar->addSeparator();
-    d->ui->mainToolBar->addAction(d->m_deleteTool->action());
-
-    d->ui->mainToolBar->addSeparator();
-    d->ui->mainToolBar->addAction(d->m_actCopy);
-    d->ui->mainToolBar->addAction(d->m_actPaste);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(d->m_actCopy);
+    mainToolBar->addAction(d->m_actPaste);
 }
 
 void MainWindow::initConnections()
@@ -857,9 +824,9 @@ bool MainWindow::processCommandLineArg(CommandLineParser::Positional arg, const 
         if (startRemoteControl(value.toUShort())) {
             menuBar()->setVisible(false);
 
-            d->m_mscToolBar->setVisible(false);
-            d->m_hierarchyToolBar->setVisible(false);
-            d->ui->mainToolBar->setVisible(false);
+            d->m_plugin->mscToolBar()->setVisible(false);
+            d->m_plugin->hierarchyToolBar()->setVisible(false);
+            d->m_plugin->mainToolBar()->setVisible(false);
 
             d->ui->dockWidgetMscText->hide();
             d->ui->dockWidgetDocument->hide();
@@ -897,7 +864,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Escape: {
         if (!e->isAutoRepeat()) {
-            if (QAction *pointerToolAction = d->m_mscToolBar->actions().first())
+            if (QAction *pointerToolAction = d->m_plugin->mscToolBar()->actions().first())
                 if (!pointerToolAction->isChecked())
                     pointerToolAction->setChecked(true);
         }
@@ -935,7 +902,7 @@ void MainWindow::loadSettings()
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
 
     // the toolbar might be hidden from a streaming tool session
-    d->ui->mainToolBar->show();
+    d->m_plugin->mainToolBar()->show();
 
     const bool isDocViewMode = 0 == AppOptions::MainWindow.DocOrHierarchyViewMode->read().toInt();
     if (isDocViewMode)
@@ -1015,7 +982,7 @@ void MainWindow::updateMscToolbarActionsEnablement()
     const bool hasInstance = chart && !chart->instances().isEmpty();
 
     bool forceDefault(false);
-    for (QAction *act : d->m_mscToolBar->actions()) {
+    for (QAction *act : d->m_plugin->mscToolBar()->actions()) {
         const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
         switch (toolType) {
         case msc::BaseTool::ToolType::ActionCreator:
@@ -1048,7 +1015,7 @@ void MainWindow::updateMscToolbarActionsChecked()
 {
     if (QAction *senderAction = qobject_cast<QAction *>(sender()))
         if (senderAction->isChecked()) {
-            for (QAction *action : d->m_mscToolBar->actions())
+            for (QAction *action : d->m_plugin->mscToolBar()->actions())
                 if (action != senderAction)
                     action->setChecked(false);
         }

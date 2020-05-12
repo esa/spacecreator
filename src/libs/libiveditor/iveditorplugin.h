@@ -9,16 +9,15 @@ class IVEditorPlugin : public shared::Plugin
 {
 public:
     explicit IVEditorPlugin(QObject *parent = 0);
-    ~IVEditorPlugin() override;
 
     GraphicsView *graphicsView() override;
-    QVector<QToolBar *> additionalToolBars() override;
+    void addToolBars(QMainWindow *window) override;
 
-    QToolBar *docToolBar() { return m_docToolbar; }
+    QToolBar *docToolBar() { return m_docToolBar; }
 
 private:
     GraphicsView *m_graphicsView;
-    QToolBar *m_docToolbar;
+    QToolBar *m_docToolBar;
 };
 
 }

@@ -21,16 +21,12 @@ QToolBar *Plugin::mainToolBar()
         m_mainToolBar->addAction(actionNewFile());
         m_mainToolBar->addAction(actionOpenFile());
         m_mainToolBar->addAction(actionSaveFile());
+        m_mainToolBar->addSeparator();
         m_mainToolBar->addAction(actionUndo());
         m_mainToolBar->addAction(actionRedo());
         m_mainToolBar->setObjectName("mainToolBar");
     }
     return m_mainToolBar;
-}
-
-QVector<QToolBar *> Plugin::additionalToolBars()
-{
-    return QVector<QToolBar *>();
 }
 
 QAction *Plugin::actionNewFile()

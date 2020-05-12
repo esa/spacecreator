@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 #include "mscdocument.h"
 #include "msclibrary.h"
+#include "sharedlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -31,6 +32,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(asn1_resources);
     Q_INIT_RESOURCE(resources);
     Q_INIT_RESOURCE(mscresources);
+    shared::initSharedLibrary();
     msc::initMscLibrary();
 
     QApplication a(argc, argv);
