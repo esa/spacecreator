@@ -36,7 +36,7 @@ void CmdEntityCommentChange::redo()
     if (!m_modelItem)
         return;
 
-    auto comment = m_modelItem->comment();
+    MscComment *comment = m_modelItem->comment();
     if (m_newComment.isEmpty()) {
         if (comment) {
             comment->setCommentString(m_newComment);
@@ -49,7 +49,7 @@ void CmdEntityCommentChange::redo()
         if (!comment)
             comment = m_modelItem->setCommentString(m_newComment);
         m_chart->addInstanceEvent(comment);
-        comment->setCommentString(m_newComment);
+        comment->setText(m_newComment);
     }
 }
 
@@ -58,7 +58,7 @@ void CmdEntityCommentChange::undo()
     if (!m_modelItem)
         return;
 
-    auto comment = m_modelItem->comment();
+    MscComment *comment = m_modelItem->comment();
     if (m_oldComment.isEmpty()) {
         if (comment) {
             comment->setCommentString(m_oldComment);
@@ -71,7 +71,7 @@ void CmdEntityCommentChange::undo()
         if (!comment)
             comment = m_modelItem->setCommentString(m_oldComment);
         m_chart->addInstanceEvent(comment);
-        comment->setCommentString(m_oldComment);
+        comment->setText(m_oldComment);
     }
 }
 
