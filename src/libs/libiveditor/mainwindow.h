@@ -37,6 +37,10 @@ namespace document {
 class DocumentsManager;
 }
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace taste3 {
 
 class ZoomController;
@@ -52,10 +56,8 @@ public:
     bool processCommandLineArg(CommandLineParser::Positional arg, const QString &value);
 
 protected:
-    void changeEvent(QEvent *e) override;
     void closeEvent(QCloseEvent *e) override;
 
-    void init();
     void initMenus();
     void initMenuFile();
     void initMenuEdit();
@@ -86,30 +88,22 @@ private:
 
     Ui::MainWindow *ui { nullptr };
     QTabWidget *m_tabWidget { nullptr };
-    QPointer<QToolBar> m_docToolbar;
     ZoomController *m_zoomCtrl { nullptr };
     document::DocumentsManager *m_docsManager { nullptr };
 
-    QUndoGroup *m_undoGroup { nullptr };
     bool m_dropUnsavedChangesSilently { false };
 
     QMenu *m_menuFile { nullptr };
     QMenu *m_menuEdit { nullptr };
     QMenu *m_menuHelp { nullptr };
 
-    QAction *m_actOpenFile { nullptr };
-    QAction *m_actCreateFile { nullptr };
-    QAction *m_actCloseFile { nullptr };
     QAction *m_actSaveSceneRender { nullptr };
-    QAction *m_actExportXml { nullptr };
     QAction *m_actExportAs { nullptr };
-    QAction *m_actQuit { nullptr };
-
-    QAction *m_actUndo { nullptr };
-    QAction *m_actRedo { nullptr };
 
     QAction *m_actAbout { nullptr };
     QAction *m_actReport { nullptr };
+
+    aadlinterface::IVEditorPlugin *m_plugin;
 
     document::AbstractTabDocument *currentDoc() const;
     bool closeTab(int id);
@@ -124,4 +118,4 @@ private:
             const QString &templateToUse = QString());
 };
 
-} // ns taste3
+}

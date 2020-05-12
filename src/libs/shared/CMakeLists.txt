@@ -24,10 +24,16 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    plugin.cpp
+    plugin.h
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp
     settingsmanager.h
+    sharedlibrary.cpp
+    sharedlibrary.h
+
+    sharedresources/sharedresources.qrc
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

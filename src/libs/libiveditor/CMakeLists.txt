@@ -177,6 +177,8 @@ target_sources(${LIB_NAME} PRIVATE
     commandlineparser.h
     commandsstack.cpp
     commandsstack.h
+    iveditorplugin.cpp
+    iveditorplugin.h
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui

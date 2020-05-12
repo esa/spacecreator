@@ -29,6 +29,7 @@
 #include "document/documentsmanager.h"
 #include "document/msctabdocument.h"
 #include "interface/interfacetabdocument.h"
+#include "iveditorplugin.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "tabdocumentfactory.h"
@@ -62,12 +63,41 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_tabWidget(new QTabWidget(this))
-    , m_docToolbar(new QToolBar(this))
     , m_zoomCtrl(new ZoomController())
     , m_docsManager(new document::DocumentsManager(m_tabWidget, this))
-    , m_undoGroup(new QUndoGroup(this))
+    , m_plugin(new aadlinterface::IVEditorPlugin(this))
 {
-    init();
+    ui->setupUi(this);
+    statusBar()->addPermanentWidget(m_zoomCtrl);
+
+    setCentralWidget(m_tabWidget);
+    addToolBar(m_plugin->mainToolBar());
+    for (auto toolbar : m_plugin->additionalToolBars()) {
+        addToolBar(toolbar);
+    }
+
+    // Connect the actions
+    connect(m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);
+    connect(m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
+    connect(m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::onExportXml);
+    connect(m_plugin->actionCloseFile(), &QAction::triggered, this, &MainWindow::onCloseFileRequested);
+    connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
+
+    // Register the actions to the action manager
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionOpenFile(), "Open file", "Show Open File dialog");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionCloseFile(), "Close file", "Close current file");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionQuit(), "Quit", "Quite the application");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
+    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
+
+    initMenus();
+
+    initTabs();
+
+    initConnections();
+
+    initSettings();
 }
 
 /*!
@@ -76,18 +106,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-/*!
- * \brief handler is used to update UI for language change, etc.
- * \a e
- */
-void MainWindow::changeEvent(QEvent *e)
-{
-    QMainWindow::changeEvent(e);
-    if (e->type() == QEvent::LanguageChange) {
-        ui->retranslateUi(this);
-    }
 }
 
 /*!
@@ -100,31 +118,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
         QMainWindow::closeEvent(e);
     else
         e->ignore();
-}
-
-/*!
- * \brief Initialization of the UI, status bar, custom toolbar, menus, actions and so on.
- */
-void MainWindow::init()
-{
-    ui->setupUi(this);
-
-    statusBar()->addPermanentWidget(m_zoomCtrl);
-
-    setCentralWidget(m_tabWidget);
-    m_docToolbar->setObjectName("Document ToolBar");
-    m_docToolbar->setAllowedAreas(Qt::AllToolBarAreas);
-    m_docToolbar->setMovable(true);
-    addToolBar(m_docToolbar);
-    m_docToolbar->hide();
-
-    initMenus();
-
-    initTabs();
-
-    initConnections();
-
-    initSettings();
 }
 
 /*!
@@ -143,25 +136,16 @@ void MainWindow::initMenus()
 void MainWindow::initMenuFile()
 {
     m_menuFile = menuBar()->addMenu(tr("&File"));
-    m_actOpenFile = m_menuFile->addAction(tr("Open"), this, &MainWindow::onOpenFileRequested, QKeySequence::Open);
-    m_actCreateFile = m_menuFile->addAction(tr("Create"), this, &MainWindow::onCreateFileRequested, QKeySequence::New);
-    m_actCloseFile = m_menuFile->addAction(tr("Close"), this, &MainWindow::onCloseFileRequested, QKeySequence::Close);
+    m_menuFile->addAction(m_plugin->actionNewFile());
+    m_menuFile->addAction(m_plugin->actionOpenFile());
+    m_menuFile->addAction(m_plugin->actionSaveFile());
+    m_menuFile->addAction(m_plugin->actionCloseFile());
     m_menuFile->addSeparator();
     m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
     m_menuFile->addSeparator();
-    m_actExportXml =
-            m_menuFile->addAction(tr("Export XML"), this, &MainWindow::onExportXml, QKeySequence(Qt::CTRL + Qt::Key_E));
-    m_actExportAs = m_menuFile->addAction(
-            tr("Export As..."), this, &MainWindow::onExportAs, QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_E));
-    m_menuFile->addSeparator();
-    m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actOpenFile, "Open file", "Show Open File dialog");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFile, "Create file", "Create new empty file");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCloseFile, "Close file", "Close current file");
     ctx::ActionsManager::registerAction(
             Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actQuit, "Quit", "Quite the application");
 }
 
 /*!
@@ -169,23 +153,9 @@ void MainWindow::initMenuFile()
  */
 void MainWindow::initMenuEdit()
 {
-    m_actUndo = m_undoGroup->createUndoAction(this, tr("Undo:"));
-    m_actUndo->setShortcut(QKeySequence::Undo);
-    m_actUndo->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/undo.svg")));
-    ui->mainToolBar->addAction(m_actUndo);
-
-    m_actRedo = m_undoGroup->createRedoAction(this, tr("Redo:"));
-    m_actRedo->setShortcut(QKeySequence::Redo);
-    m_actRedo->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/redo.svg")));
-    ui->mainToolBar->addAction(m_actRedo);
-
     m_menuEdit = menuBar()->addMenu(tr("&Edit"));
-    m_menuEdit->addAction(m_actUndo);
-    m_menuEdit->addAction(m_actRedo);
-    m_menuEdit->addSeparator();
-
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actUndo, "Undo", "Undo the last operation");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actRedo, "Redo", "Redo the last undone operation");
+    m_menuEdit->addAction(m_plugin->actionUndo());
+    m_menuEdit->addAction(m_plugin->actionRedo());
 }
 
 /*!
@@ -371,8 +341,7 @@ void MainWindow::onTabSwitched(int tab)
 {
     QUndoStack *currentStack { nullptr };
     if (document::AbstractTabDocument *doc = m_docsManager->docById(tab)) {
-        doc->fillToolBar(m_docToolbar);
-        m_docToolbar->show();
+        doc->fillToolBar(m_plugin->docToolBar());
         currentStack = doc->commandsStack();
         if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
             m_zoomCtrl->setView(view);
@@ -382,11 +351,12 @@ void MainWindow::onTabSwitched(int tab)
     }
 
     if (currentStack) {
-        if (m_undoGroup->stacks().contains(currentStack))
-            m_undoGroup->addStack(currentStack);
-        m_undoGroup->setActiveStack(currentStack);
+        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
+            m_plugin->undoGroup()->addStack(currentStack);
+        }
+        m_plugin->undoGroup()->setActiveStack(currentStack);
     } else {
-        m_undoGroup->removeStack(m_undoGroup->activeStack());
+        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
     }
 
     aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
@@ -460,7 +430,7 @@ void MainWindow::updateActions()
             renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
         }
 
-        m_actExportXml->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));
+        m_plugin->actionSaveFile()->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));
     }
     m_actSaveSceneRender->setEnabled(renderAvailable);
 }
@@ -602,4 +572,4 @@ bool MainWindow::exportDocInteractive(
     return app::XmlDocExporter::exportDocInteractive(doc, this, pathToSave, templateToUse);
 }
 
-} // ns taste3
+}

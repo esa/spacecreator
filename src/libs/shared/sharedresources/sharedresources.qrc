@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/sharedresources">
+        <file>icons/newfile.svg</file>
+        <file>icons/open.svg</file>
+        <file>icons/save.svg</file>
+        <file>icons/undo.svg</file>
+        <file>icons/redo.svg</file>
+    </qresource>
+</RCC>

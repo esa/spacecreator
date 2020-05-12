@@ -17,6 +17,7 @@
 
 #include "datatypesstorage.h"
 #include "mainwindow.h"
+#include "sharedlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(resources);
     Q_INIT_RESOURCE(tab_interface_resources);
+    shared::initSharedLibrary();
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
