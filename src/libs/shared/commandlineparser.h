@@ -19,6 +19,7 @@
 
 #include <QCommandLineParser>
 #include <QObject>
+#include <QVector>
 
 namespace shared {
 
