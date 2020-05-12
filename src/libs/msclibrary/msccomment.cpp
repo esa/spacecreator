@@ -107,6 +107,18 @@ bool MscComment::relatesTo(const MscInstance *instance) const
     return false;
 }
 
+QString MscComment::cifText(int tabsSize) const
+{
+    QStringList cifTexts;
+    const QVector<cif::CifBlockShared> cifLines = cifs();
+    cifTexts.reserve(cifLines.size());
+    for (const cif::CifBlockShared &cifBlock : cifLines) {
+        cifTexts << cifBlock->toString(tabsSize);
+    }
+
+    return cifTexts.join("\n");
+}
+
 void MscComment::updateCifComment()
 {
     cif::CifBlockShared cifBlock = cifBlockByType(mainCifType());

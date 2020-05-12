@@ -2,5 +2,6 @@
 {% endcomment %}
 {% if event.sourceInstance == instance %}
 {% if event.cifText %}{{ event.cifText }}
-{% endif %}create {{ event.targetInstance.name }}{% if event.parameterString %}({{ event.parameterString }}){% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% endif %}create {{ event.targetInstance.name }}{% if event.parameterString %}({{ event.parameterString }}){% endif %}{% if event.commentString %}{% if event.comment.cifText %}
+{{ event.comment.cifText }}{% else %} {% endif %}comment '{{ event.commentString }}'{% endif %};
 {% endif %}

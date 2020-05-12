@@ -1,4 +1,5 @@
 {% comment %}
 {% endcomment %}
 {% if event.cifText %}{{ event.cifText }}
-{% endif %}{% if event.timerType == event.Start %}starttimer{% else %}{% if event.timerType == event.Stop %}stoptimer{% else %}timeout{% endif %}{% endif %} {{ event.name }}{% if event.timerInstanceName %},{{ event.timerInstanceName }}{% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% endif %}{% if event.timerType == event.Start %}starttimer{% else %}{% if event.timerType == event.Stop %}stoptimer{% else %}timeout{% endif %}{% endif %} {{ event.name }}{% if event.timerInstanceName %},{{ event.timerInstanceName }}{% endif %}{% if event.commentString %}{% if event.comment.cifText %}
+{{ event.comment.cifText }}{% else %} {% endif %}comment '{{ event.commentString }}'{% endif %};

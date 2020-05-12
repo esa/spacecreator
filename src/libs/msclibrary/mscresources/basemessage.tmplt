@@ -1,4 +1,5 @@
 {% if event.sourceInstance == instance or event.targetInstance == instance %}
 {% if event.cifText %}{{ event.cifText }}
-{% endif %}{% block direction1 %}{% endblock %} {{ event.name }}{% block messageInstanceName %}{% endblock %}{% block params %}{% endblock %} {% block direction2 %}{% endblock %} {% block target %}{% endblock %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% endif %}{% block direction1 %}{% endblock %} {{ event.name }}{% block messageInstanceName %}{% endblock %}{% block params %}{% endblock %} {% block direction2 %}{% endblock %} {% block target %}{% endblock %}{% if event.commentString %}{% if event.comment.cifText %}
+{{ event.comment.cifText }}{% else %} {% endif %}comment '{{ event.commentString }}'{% endif %};
 {% endif %}

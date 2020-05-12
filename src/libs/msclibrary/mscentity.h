@@ -79,7 +79,7 @@ public:
     void addCif(const cif::CifBlockShared &cif);
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     void clearCifs();
-    QString cifText(int tabsSize = 0) const;
+    virtual QString cifText(int tabsSize = 0) const;
 
 #ifdef QT_DEBUG
     void dbgShowCifs() const;

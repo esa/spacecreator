@@ -2,5 +2,6 @@
 {% endcomment %}
 {% if event.instance == instance %}
 {% if event.cifText %}{{ event.cifText }}
-{% endif %}{% if event.type == event.Begin %}concurrent{% else %}endconcurrent{% endif %}{% if event.commentString %} comment '{{ event.commentString }}'{% endif %};
+{% endif %}{% if event.type == event.Begin %}concurrent{% else %}endconcurrent{% endif %}{% if event.commentString %}{% if event.comment.cifText %}
+{{ event.comment.cifText }}{% else %} {% endif %}comment '{{ event.commentString }}'{% endif %};
 {% endif %}

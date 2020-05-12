@@ -231,7 +231,7 @@ void tst_MscWriter::testSerializeMscChart_data()
              "/* Global information */\n"
              "/* CIF END TEXT */\n\n\n"
              "endmsc;\n";
-    QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
+    QTest::addRow("Global comment") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscChart()
@@ -279,6 +279,21 @@ void tst_MscWriter::testSerializeMscInstance_data()
     QTest::addRow("Commented instance") << model << result << removeIndention(result);
 
     model = new MscModel(this);
+    auto chart = new MscChart("Chart");
+    instance = new MscInstance("instB");
+    instance->setCommentString("Do not touch");
+    instance->comment()->setRect(QRect(10, 20, 30, 40));
+    chart->addInstance(instance);
+    model->addChart(chart);
+    result = QString("msc Chart;\n"
+                     "    instance instB\n"
+                     "    /* CIF COMMENT (10, 20) (30, 40) */\n\n"
+                     " comment 'Do not touch';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented instance geometry") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
     auto chart3 = new MscChart("Chart_3");
     auto instance3 = new MscInstance("instC");
     instance3->setDenominator("PROCESS");
@@ -293,7 +308,7 @@ void tst_MscWriter::testSerializeMscInstance_data()
     QTest::addRow("Instance denominator") << model << result << removeIndention(result);
 
     model = new MscModel(this);
-    auto chart = new MscChart("Chart_4");
+    chart = new MscChart("Chart_4");
     instance = new MscInstance("instS");
     instance->setExplicitStop(true);
     chart->addInstance(instance);
@@ -397,6 +412,27 @@ void tst_MscWriter::testSerializeMscActions_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Commented action") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_3");
+    instance = new MscInstance("Inst_3");
+    chart->addInstance(instance);
+    action = new MscAction();
+    action->setActionType(MscAction::ActionType::Informal);
+    action->setInformalAction("doX");
+    action->setCommentString("Very important");
+    action->comment()->setRect(QRect(50, 30, 20, 15));
+    action->setInstance(instance);
+    chart->addInstanceEvent(action);
+    model->addChart(chart);
+    result = QString("msc Chart_3;\n"
+                     "    instance Inst_3;\n"
+                     "        action 'doX'\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'Very important';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented action geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscActions()
@@ -470,6 +506,25 @@ void tst_MscWriter::testSerializeMscConditions_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Commented condition") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    condition = new MscCondition("Con_1");
+    condition->setInstance(instance);
+    condition->setCommentString("Hey ho");
+    condition->comment()->setRect(QRect(50, 30, 20, 15));
+    chart->addInstanceEvent(condition);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        condition Con_1\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'Hey ho';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented condition geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscConditions()
@@ -496,17 +551,14 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     auto model = new MscModel(this);
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
-
     auto region1 = new MscCoregion(MscCoregion::Type::Begin);
     region1->setInstance(instance);
     chart->addInstanceEvent(region1);
     auto region2 = new MscCoregion(MscCoregion::Type::End);
     region2->setInstance(instance);
     chart->addInstanceEvent(region2);
-
     chart->addInstance(instance);
     model->addChart(chart);
-
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
                           "        concurrent;\n"
@@ -518,7 +570,6 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     model = new MscModel(this);
     chart = new MscChart("Chart_1");
     instance = new MscInstance("Inst_1");
-
     region1 = new MscCoregion(MscCoregion::Type::Begin);
     region1->setCommentString("parallel begin");
     region1->setInstance(instance);
@@ -527,10 +578,8 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     region2->setCommentString("parallel end");
     region2->setInstance(instance);
     chart->addInstanceEvent(region2);
-
     chart->addInstance(instance);
     model->addChart(chart);
-
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
                      "        concurrent comment 'parallel begin';\n"
@@ -538,6 +587,33 @@ void tst_MscWriter::testSerializeMscCoregion_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Commented coregion") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    region1 = new MscCoregion(MscCoregion::Type::Begin);
+    region1->setCommentString("parallel begin");
+    region1->comment()->setRect(QRect(50, 30, 20, 15));
+    region1->setInstance(instance);
+    chart->addInstanceEvent(region1);
+    region2 = new MscCoregion(MscCoregion::Type::End);
+    region2->setCommentString("parallel end");
+    region2->comment()->setRect(QRect(60, 90, 30, 15));
+    region2->setInstance(instance);
+    chart->addInstanceEvent(region2);
+    chart->addInstance(instance);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        concurrent\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'parallel begin';\n"
+                     "        endconcurrent\n"
+                     "    /* CIF COMMENT (60, 90) (30, 15) */\n\n"
+                     " comment 'parallel end';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented coregion geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscCoregion()
@@ -628,6 +704,30 @@ void tst_MscWriter::testSerializeCreate_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Commented create") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
+    create = new MscCreate("");
+    create->setSourceInstance(instance);
+    create->setTargetInstance(instance2);
+    create->setCommentString("Let there be an instance");
+    create->comment()->setRect(QRect(50, 30, 20, 15));
+    chart->addInstanceEvent(create);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        create Inst_2\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'Let there be an instance';\n"
+                     "    endinstance;\n"
+                     "    instance Inst_2;\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented create geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeCreate()
@@ -795,6 +895,27 @@ void tst_MscWriter::testSerializeMscMessage_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Message geometry") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance1 = new MscInstance("Inst_1");
+    chart->addInstance(instance1);
+    message = new MscMessage("Msg_1");
+    message->setSourceInstance(instance1);
+    message->setCommentString("Shout out");
+    message->setCifPoints({ QPoint(125, 50), QPoint(90, 150) });
+    message->comment()->setRect(QRect(50, 30, 20, 15));
+    chart->addInstanceEvent(message);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "    /* CIF MESSAGE (125, 50) (90, 150) */\n"
+                     "        out Msg_1 to env\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'Shout out';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented message geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscMessage()
@@ -894,6 +1015,25 @@ void tst_MscWriter::testSerializeMscTimer_data()
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Commented timer") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart = new MscChart("Chart_1");
+    instance = new MscInstance("Inst_1");
+    chart->addInstance(instance);
+    timer = new MscTimer("T1", MscTimer::TimerType::Start);
+    timer->setCommentString("Go go go");
+    timer->comment()->setRect(QRect(50, 30, 20, 15));
+    timer->setInstance(instance);
+    chart->addInstanceEvent(timer);
+    model->addChart(chart);
+    result = QString("msc Chart_1;\n"
+                     "    instance Inst_1;\n"
+                     "        starttimer T1\n"
+                     "    /* CIF COMMENT (50, 30) (20, 15) */\n\n"
+                     " comment 'Go go go';\n"
+                     "    endinstance;\n"
+                     "endmsc;\n");
+    QTest::addRow("Commented timer geometry") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscTimer()
