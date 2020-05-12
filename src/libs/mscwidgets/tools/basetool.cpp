@@ -170,7 +170,7 @@ void BaseTool::movePreviewItem(const QPointF &scenePos)
     m_previewItem->setPos(scenePos - m_previewItem->boundingRect().center());
 }
 
-void BaseTool::removePreviewItem() {}
+void BaseTool::removePreviewItem() { }
 
 QPointF BaseTool::cursorInScene() const
 {

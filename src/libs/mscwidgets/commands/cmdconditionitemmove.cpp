@@ -26,8 +26,8 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(MscCondition *condition, int newPos, MscInstance *newInsance,
-                                           MscChart *chart)
+CmdConditionItemMove::CmdConditionItemMove(
+        MscCondition *condition, int newPos, MscInstance *newInsance, MscChart *chart)
     : BaseCommand(condition)
     , m_condition(condition)
     , m_oldIndex(chart->instanceEvents().indexOf(condition))

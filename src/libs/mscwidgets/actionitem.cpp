@@ -17,12 +17,12 @@
 
 #include "actionitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "mscaction.h"
+#include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -128,7 +128,7 @@ void ActionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &fr
     moveBy(0., to.y() - from.y());
 }
 
-void ActionItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF&, const QPointF&)
+void ActionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }

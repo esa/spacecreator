@@ -119,9 +119,9 @@ private:
     bool exportDocsAs(const QString &savePath = QString(), const QString &templatePath = QString());
 
     bool exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
-                        const QString &templateToUse = QString());
+            const QString &templateToUse = QString());
     bool exportDocInteractive(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
-                              const QString &templateToUse = QString());
+            const QString &templateToUse = QString());
 };
 
 } // ns taste3

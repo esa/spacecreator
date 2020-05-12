@@ -27,8 +27,8 @@
 namespace aadlinterface {
 namespace cmd {
 
-QVector<QUndoCommand *> fillCloneCommands(aadl::AADLObjectIface *iface,
-                                          const aadl::AADLObjectIface::CreationInfo &creationInfo)
+QVector<QUndoCommand *> fillCloneCommands(
+        aadl::AADLObjectIface *iface, const aadl::AADLObjectIface::CreationInfo &creationInfo)
 {
     QVector<QUndoCommand *> clones;
 
@@ -50,9 +50,8 @@ QVector<QUndoCommand *> fillCloneCommands(aadl::AADLObjectIface *iface,
 
 CmdInterfaceItemCreate::CmdInterfaceItemCreate(const aadl::AADLObjectIface::CreationInfo &creationInfo)
     : CmdEntityGeometryChange({},
-                              creationInfo.type == aadl::AADLObjectIface::IfaceType::Provided
-                                      ? QObject::tr("Create PI")
-                                      : QObject::tr("Create RI"))
+            creationInfo.type == aadl::AADLObjectIface::IfaceType::Provided ? QObject::tr("Create PI")
+                                                                            : QObject::tr("Create RI"))
     , m_ifaceInfo(creationInfo)
     , m_entity(aadl::AADLObjectIface::createIface(m_ifaceInfo))
     , m_cmdClones(fillCloneCommands(m_entity, m_ifaceInfo))

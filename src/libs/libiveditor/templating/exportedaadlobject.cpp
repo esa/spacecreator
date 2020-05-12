@@ -17,19 +17,21 @@
 
 #include "exportedaadlobject.h"
 
-#include "exportedaadlproperty.h"
+#include "exportedaadlconnection.h"
 #include "exportedaadlfunction.h"
 #include "exportedaadliface.h"
-#include "exportedaadlconnection.h"
+#include "exportedaadlproperty.h"
 #include "tab_aadl/aadlobject.h"
-#include "tab_aadl/aadlobjectfunctiontype.h"
 #include "tab_aadl/aadlobjectconnection.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
 
 namespace taste3 {
 namespace templating {
 
 ExportedAADLObject::ExportedAADLObject(const aadl::AADLObject *aadlObject)
-    : GenericExportedObject(aadlObject) {}
+    : GenericExportedObject(aadlObject)
+{
+}
 
 /**
  * @brief ExportedAADLObject::createFrom creates appropriate exported class and casts to QVariant
@@ -41,17 +43,14 @@ QVariant ExportedAADLObject::createFrom(const aadl::AADLObject *aadlObject)
     switch (aadlObject->aadlType()) {
     case aadl::AADLObject::Type::Function:
     case aadl::AADLObject::Type::FunctionType:
-        return QVariant::fromValue(ExportedAADLFunction(
-               static_cast<const aadl::AADLObjectFunctionType *>(aadlObject)));
+        return QVariant::fromValue(ExportedAADLFunction(static_cast<const aadl::AADLObjectFunctionType *>(aadlObject)));
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
-        return QVariant::fromValue(TemplatedAADLIface(
-               static_cast<const aadl::AADLObjectIface *>(aadlObject)));
+        return QVariant::fromValue(TemplatedAADLIface(static_cast<const aadl::AADLObjectIface *>(aadlObject)));
     case aadl::AADLObject::Type::Comment:
         return QVariant::fromValue(ExportedAADLObject(aadlObject));
     case aadl::AADLObject::Type::Connection:
-        return QVariant::fromValue(ExportedAADLConnection(
-               static_cast<const aadl::AADLObjectConnection *>(aadlObject)));
+        return QVariant::fromValue(ExportedAADLConnection(static_cast<const aadl::AADLObjectConnection *>(aadlObject)));
     default:
         Q_UNREACHABLE();
     }
@@ -87,7 +86,7 @@ QVariantList ExportedAADLObject::generateProperties(const QHash<QString, QVarian
     for (auto it = props.cbegin(); it != props.cend(); ++it)
         result << QVariant::fromValue(ExportedAADLProperty(it.key(), it.value()));
 
-    std::sort(result.begin(), result.end(), [] (const QVariant &left_val, const QVariant &right_val) {
+    std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
         const ExportedAADLProperty &r = right_val.value<ExportedAADLProperty>();
         const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
         if (right_token == aadl::meta::Props::Token::Unknown)

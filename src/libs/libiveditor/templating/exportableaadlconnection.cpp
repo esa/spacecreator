@@ -22,7 +22,9 @@
 namespace templating {
 
 ExportableAADLConnection::ExportableAADLConnection(const aadl::AADLObjectConnection *connection)
-    : ExportableAADLObject(connection) {}
+    : ExportableAADLObject(connection)
+{
+}
 
 QString ExportableAADLConnection::sourceName() const
 {

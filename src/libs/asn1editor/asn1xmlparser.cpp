@@ -225,8 +225,8 @@ QVariantList Asn1XMLParser::parseXml(const QString &content)
     return asn1TypesData;
 }
 
-QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
-                                     const QString &name)
+QVariantMap Asn1XMLParser::parseType(
+        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, const QString &name)
 {
     QVariantMap typeData;
 
@@ -237,12 +237,10 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     QString typeName = typeElem.tagName();
 
     auto typeByTypeName = [](const QString &typeName) {
-        static QMap<QString, ASN1Type> asn1TypeStringMap {
-            { "IntegerType", ASN1Type::INTEGER },       { "RealType", ASN1Type::DOUBLE },
-            { "BooleanType", ASN1Type::BOOL },          { "SequenceType", ASN1Type::SEQUENCE },
+        static QMap<QString, ASN1Type> asn1TypeStringMap { { "IntegerType", ASN1Type::INTEGER },
+            { "RealType", ASN1Type::DOUBLE }, { "BooleanType", ASN1Type::BOOL }, { "SequenceType", ASN1Type::SEQUENCE },
             { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },
-            { "ChoiceType", ASN1Type::CHOICE }
-        };
+            { "ChoiceType", ASN1Type::CHOICE } };
 
         return asn1TypeStringMap.contains(typeName) ? asn1TypeStringMap[typeName] : ASN1Type::STRING;
     };
@@ -298,8 +296,8 @@ QVariantMap Asn1XMLParser::parseType(const QList<QDomNodeList> &typeAssignments,
     return typeData;
 }
 
-void Asn1XMLParser::parseSequenceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
-                                      QVariantMap &result)
+void Asn1XMLParser::parseSequenceType(
+        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result)
 {
     /*
 <SequenceType>
@@ -353,8 +351,8 @@ void Asn1XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &re
     result[ASN1_VALUES] = values;
 }
 
-void Asn1XMLParser::parseChoiceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
-                                    QVariantMap &result)
+void Asn1XMLParser::parseChoiceType(
+        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result)
 {
     /*
 <ChoiceType>

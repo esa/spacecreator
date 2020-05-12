@@ -18,8 +18,8 @@
 #pragma once
 
 #include <QMetaType>
-#include <QUuid>
 #include <QObject>
+#include <QUuid>
 
 namespace utils {
 
@@ -35,8 +35,8 @@ enum FileCopyingMode
     Overwrite
 };
 
-bool copyResourceFile(const QString &source, const QString &target,
-                      FileCopyingMode replaceMode = FileCopyingMode::Keep);
+bool copyResourceFile(
+        const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
 void setWidgetFontColor(QWidget *widget, const QColor &color);
 

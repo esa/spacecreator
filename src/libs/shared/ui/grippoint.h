@@ -62,7 +62,7 @@ public:
         Type = UserType + std::numeric_limits<uchar>::max()
     };
 
-    explicit GripPoint(Location pos, GripPointsHandler* parent = nullptr);
+    explicit GripPoint(Location pos, GripPointsHandler *parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

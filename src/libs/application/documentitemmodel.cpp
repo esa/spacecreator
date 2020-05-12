@@ -37,7 +37,8 @@ namespace msc {
 DocumentItemModel::DocumentItemModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    connect(this, &QAbstractItemModel::modelReset, this,
+    connect(
+            this, &QAbstractItemModel::modelReset, this,
             [&]() {
                 for (auto doc : m_mscModel->documents()) {
                     connectDocument(doc);

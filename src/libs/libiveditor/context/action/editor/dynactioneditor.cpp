@@ -18,9 +18,9 @@
 #include "dynactioneditor.h"
 
 #include "actionsmodel.h"
-#include "context/action/actionsmanager.h"
 #include "conditiondialog.h"
 #include "conditionsmodel.h"
+#include "context/action/actionsmanager.h"
 #include "ui_dynactioneditor.h"
 
 #include <QDebug>
@@ -83,8 +83,8 @@ bool DynActionEditor::init()
     if (files.size() == 1)
         file = files.first();
     else {
-        file = QFileDialog::getOpenFileName(this, tr("Select actions file"), ctx::ActionsManager::storagePath(),
-                                            "*.json");
+        file = QFileDialog::getOpenFileName(
+                this, tr("Select actions file"), ctx::ActionsManager::storagePath(), "*.json");
     }
 
     return loadFile(file);

@@ -44,7 +44,8 @@ Q_SIGNALS:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
 
-    QList<QPair<QPointF, QString>> mouseMoveCoordinates(QGraphicsScene* scene, const QPoint& screenPos, const QPointF& scenePos) const override;
+    QList<QPair<QPointF, QString>> mouseMoveCoordinates(
+            QGraphicsScene *scene, const QPoint &screenPos, const QPointF &scenePos) const override;
 };
 
 }

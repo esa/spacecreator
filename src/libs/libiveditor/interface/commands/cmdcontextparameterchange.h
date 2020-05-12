@@ -34,7 +34,7 @@ class CmdContextParameterChange : public QUndoCommand
 {
 public:
     explicit CmdContextParameterChange(aadl::AADLObjectFunctionType *entity, const aadl::ContextParameter &oldParam,
-                                       const aadl::ContextParameter &newParam);
+            const aadl::ContextParameter &newParam);
 
     void redo() override;
     void undo() override;

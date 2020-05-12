@@ -73,8 +73,8 @@ void ConditionCreatorTool::commitPreviewItem()
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(condition),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart),
-                                      QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
+        QVariant::fromValue<msc::MscChart *>(m_activeChart), QVariant::fromValue<msc::MscInstance *>(instance),
+        eventIndex };
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
 
     startWaitForModelLayoutComplete(condition);

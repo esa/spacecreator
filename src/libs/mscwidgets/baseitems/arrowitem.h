@@ -38,7 +38,7 @@ public:
     QPointF endSignLocal() const;
 
     QPointF makeArrow(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
-                      const QPointF &targetAnchorPoint);
+            const QPointF &targetAnchorPoint);
 
     bool updateStart(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool updateEnd(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
@@ -64,8 +64,8 @@ private:
     QVector<QPointF> m_polyLine;
     QRectF m_bounds;
     QPointF pathPoint(int num) const;
-    bool updateAnchor(ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint,
-                      ObjectAnchor::Snap snap);
+    bool updateAnchor(
+            ObjectAnchor *anchor, InteractiveObject *anchorObject, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 
     void updatePath();
 

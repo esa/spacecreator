@@ -37,7 +37,7 @@ AADLObjectsModel::AADLObjectsModel(QObject *parent)
 {
 }
 
-AADLObjectsModel::~AADLObjectsModel() {}
+AADLObjectsModel::~AADLObjectsModel() { }
 
 bool AADLObjectsModel::initFromObjects(const QVector<AADLObject *> &objects)
 {
@@ -170,8 +170,8 @@ AADLObject *AADLObjectsModel::getObjectByName(const QString &name, AADLObject::T
     return nullptr;
 }
 
-AADLObjectIface *AADLObjectsModel::getIfaceByName(const QString &name, AADLObjectIface::IfaceType dir,
-                                                  AADLObjectFunctionType *parent) const
+AADLObjectIface *AADLObjectsModel::getIfaceByName(
+        const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent) const
 {
     if (name.isEmpty())
         return nullptr;
@@ -196,8 +196,8 @@ AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const utils::Id &id) c
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }
 
-QHash<QString, AADLObjectFunctionType *>
-AADLObjectsModel::getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const
+QHash<QString, AADLObjectFunctionType *> AADLObjectsModel::getAvailableFunctionTypes(
+        const AADLObjectFunction *fnObj) const
 {
     QHash<QString, AADLObjectFunctionType *> result;
     if (!fnObj)
@@ -281,7 +281,7 @@ QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const u
         if (it.value()->aadlType() == AADLObject::Type::Connection)
             if (auto connection = qobject_cast<AADLObjectConnection *>(it.value()))
                 if ((connection->sourceInterface() && connection->sourceInterface()->id() == id)
-                    || (connection->targetInterface() && connection->targetInterface()->id() == id))
+                        || (connection->targetInterface() && connection->targetInterface()->id() == id))
                     result.append(connection);
 
     return result;

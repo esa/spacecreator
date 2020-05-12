@@ -34,7 +34,7 @@ public:
     Q_FLAG(aadlinterface::DynamicProperty::Scopes)
 
     DynamicProperty(const QString &name = "unknown", Type t = Type::Integer, const Scopes &s = Scope::None,
-                    const QVector<QVariant> &listVals = QVector<QVariant>());
+            const QVector<QVariant> &listVals = QVector<QVariant>());
     ~DynamicProperty();
 
     QString name() const;

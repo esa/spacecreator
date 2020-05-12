@@ -20,7 +20,8 @@
 #include <QDebug>
 #include <QStandardPaths>
 
-static QString path() {
+static QString path()
+{
     return QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
 }
 
@@ -34,7 +35,7 @@ SettingsManager::SettingsManager()
 
 SettingsManager *SettingsManager::instance()
 {
-    static shared::SettingsManager* instance = nullptr;
+    static shared::SettingsManager *instance = nullptr;
 
     if (instance == nullptr) {
         instance = new shared::SettingsManager;

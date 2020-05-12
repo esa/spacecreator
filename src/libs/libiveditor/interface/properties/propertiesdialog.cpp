@@ -17,6 +17,9 @@
 
 #include "propertiesdialog.h"
 
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
+#include "aadlobjectiface.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/comboboxdelegate.h"
@@ -26,9 +29,6 @@
 #include "ifaceparametersmodel.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
-#include "aadlobjectiface.h"
 #include "ui_propertiesdialog.h"
 
 #include <QDebug>
@@ -43,7 +43,8 @@ PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, QWidget *parent)
     , m_dataObject(obj)
     , m_cmdMacro(new cmd::CommandsStack::Macro(
               tr("Edit %1 - %2")
-                      .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(), m_dataObject->title())))
+                      .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
+                              m_dataObject->title())))
 {
     ui->setupUi(this);
 
@@ -134,8 +135,8 @@ void PropertiesDialog::initTabs()
         modelCtxParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::ColumnType,
-                                                         new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                ContextParametersModel::ColumnType, new PropertyTypeDelegate(viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
@@ -146,17 +147,16 @@ void PropertiesDialog::initTabs()
         modelIfaceParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnType,
-                                                         new PropertyTypeDelegate(viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
-                IfaceParametersModel::ColumnEncoding,
+                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
                 new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
-                                            viewAttrs->tableView()));
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                IfaceParametersModel::ColumnDirection,
-                new StringListComboDelegate({ aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
-                                              aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
-                                            viewAttrs->tableView()));
+                        viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnDirection,
+                new StringListComboDelegate(
+                        { aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::In),
+                                aadl::IfaceParameter::directionName(aadl::IfaceParameter::Direction::Out) },
+                        viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelIfaceParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Parameters"));

@@ -25,7 +25,7 @@ class GripPoint;
 class AbstractInteractiveObject
 {
 public:
-    virtual ~AbstractInteractiveObject() {}
+    virtual ~AbstractInteractiveObject() { }
     virtual void handleGripPointPress(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
     virtual void handleGripPointMove(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
     virtual void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;

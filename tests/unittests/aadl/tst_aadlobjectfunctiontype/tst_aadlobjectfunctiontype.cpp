@@ -39,8 +39,8 @@ private Q_SLOTS:
     void testChildrenManagementMixed();
 
 private:
-    void testChildrenManagement(aadl::AADLObjectFunctionType *obj,
-                                const QVector<aadl::AADLObject *> &children, bool addedOnCreation = false);
+    void testChildrenManagement(aadl::AADLObjectFunctionType *obj, const QVector<aadl::AADLObject *> &children,
+            bool addedOnCreation = false);
 };
 
 void tst_AADLObjectFunctionType::testAadlType()
@@ -170,9 +170,8 @@ void tst_AADLObjectFunctionType::testChildrenManagementFunction()
     testChildrenManagement(&obj, functions);
 }
 
-void tst_AADLObjectFunctionType::testChildrenManagement(aadl::AADLObjectFunctionType *obj,
-                                                        const QVector<aadl::AADLObject *> &children,
-                                                        bool addedOnCreation)
+void tst_AADLObjectFunctionType::testChildrenManagement(
+        aadl::AADLObjectFunctionType *obj, const QVector<aadl::AADLObject *> &children, bool addedOnCreation)
 {
     QCOMPARE(obj->children().size(), addedOnCreation ? children.size() : 0);
 

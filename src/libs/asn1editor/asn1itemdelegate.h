@@ -37,8 +37,8 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                              const QModelIndex &index) const override;
+    void updateEditorGeometry(
+            QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 Q_SIGNALS:
     void sequenceOfSizeChanged(const QModelIndex &index, QVariant value, QVariant maxRange) const;
     void choiceFieldChanged(const QModelIndex &index, QVariant lenght, QVariant currentIndex) const;

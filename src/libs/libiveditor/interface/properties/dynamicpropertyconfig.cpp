@@ -17,11 +17,11 @@
 
 #include "dynamicpropertyconfig.h"
 
-#include "common.h"
+#include "aadlobject.h"
 #include "baseitems/common/utils.h"
+#include "common.h"
 #include "dynamicproperty.h"
 #include "settings/appoptions.h"
-#include "aadlobject.h"
 
 #include <QDebug>
 #include <QDir>
@@ -36,13 +36,13 @@
 namespace aadlinterface {
 
 struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
-    DynamicPropertyConfigPrivate() {}
-    ~DynamicPropertyConfigPrivate() {}
+    DynamicPropertyConfigPrivate() { }
+    ~DynamicPropertyConfigPrivate() { }
     void init(const QVector<DynamicProperty *> &attrs)
     {
         QHash<DynamicProperty *, DynamicProperty *> uniqeAttrs;
         auto collectUniqeAttributes = [](const QHash<QString, DynamicProperty *> &attrs,
-                                         QHash<DynamicProperty *, DynamicProperty *> &storage) {
+                                              QHash<DynamicProperty *, DynamicProperty *> &storage) {
             for (auto attr : attrs)
                 if (!storage.contains(attr))
                     storage.insert(attr, attr);
@@ -150,20 +150,20 @@ void DynamicPropertyConfig::generateSampleFile()
 {
     QVector<DynamicProperty *> attrs;
     attrs << new DynamicProperty("CustomIntForAll", DynamicProperty::Type::Integer,
-                                 DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function
-                                         | DynamicProperty::Scope::Interface);
+            DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function
+                    | DynamicProperty::Scope::Interface);
     attrs << new DynamicProperty("CustomRealForTwo", DynamicProperty::Type::Real,
-                                 DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function);
+            DynamicProperty::Scope::FunctionType | DynamicProperty::Scope::Function);
     attrs << new DynamicProperty("CustomBoolForOne", DynamicProperty::Type::Boolean, DynamicProperty::Scope::Interface);
     attrs << new DynamicProperty("CustomString", DynamicProperty::Type::String, DynamicProperty::Scope::Interface);
     attrs << new DynamicProperty("CustomStringList", DynamicProperty::Type::String, DynamicProperty::Scope::Interface,
-                                 { "./file.a", "../file.b", "/file.c" });
-    attrs << new DynamicProperty("CustomIntList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface,
-                                 { -1, 0, 1 });
-    attrs << new DynamicProperty("CustomRealList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface,
-                                 { -1.5, 0., 1.5 });
+            { "./file.a", "../file.b", "/file.c" });
+    attrs << new DynamicProperty(
+            "CustomIntList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface, { -1, 0, 1 });
+    attrs << new DynamicProperty(
+            "CustomRealList", DynamicProperty::Type::Integer, DynamicProperty::Scope::Interface, { -1.5, 0., 1.5 });
     attrs << new DynamicProperty("CustomEnum", DynamicProperty::Type::Enumeration, DynamicProperty::Scope::Interface,
-                                 { "First", "Next", "Last" });
+            { "First", "Next", "Last" });
 
     QJsonArray attrsHolder;
     for (auto attr : attrs)

@@ -88,19 +88,17 @@ void CommentCreatorTool::commitPreviewItem()
         if (utils::CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
-                                          { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
-                                            m_model->currentChart()->cifRect(), newRect,
-                                            QVariant::fromValue<MscEntity *>(m_model->currentChart()) });
+                    { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()), m_model->currentChart()->cifRect(),
+                            newRect, QVariant::fromValue<MscEntity *>(m_model->currentChart()) });
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                                          { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
-                                            QVariant::fromValue<msc::MscEntity *>(m_model->currentChart()),
-                                            itemComment });
+                    { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
+                            QVariant::fromValue<msc::MscEntity *>(m_model->currentChart()), itemComment });
             msc::cmd::CommandsStack::current()->endMacro();
         }
     } else {
         auto previewEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()),
-                                         QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
+            QVariant::fromValue<msc::MscEntity *>(previewEntity), itemComment };
         msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, cmdParams);
     }
 

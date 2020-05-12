@@ -99,15 +99,14 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                  << "\n"
                  << (connection->entity()->title().isEmpty() ? QStringLiteral("Connection %1<>%2")
                                                                        .arg(connection->startItem()->entity()->title(),
-                                                                            connection->endItem()->entity()->title())
+                                                                               connection->endItem()->entity()->title())
                                                              : connection->entity()->title())
                  << "\n"
                  << aadlinterface::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                 || comparePolygones(connection->graphicsPoints(),
-                                     aadlinterface::polygon(connection->entity()->coordinates())));
-        Q_ASSERT(
-                !strict
+                || comparePolygones(
+                        connection->graphicsPoints(), aadlinterface::polygon(connection->entity()->coordinates())));
+        Q_ASSERT(!strict
                 || comparePolygones(connection->points(), aadlinterface::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item)) {
         qDebug() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:"
@@ -118,8 +117,8 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                  << rectItem->aadlObject()->title() << "\n"
                  << aadlinterface::rect(rectItem->aadlObject()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                 || rectItem->sceneBoundingRect().toRect()
-                         == aadlinterface::rect(rectItem->aadlObject()->coordinates()).toRect());
+                || rectItem->sceneBoundingRect().toRect()
+                        == aadlinterface::rect(rectItem->aadlObject()->coordinates()).toRect());
     } else {
         qFatal("Not implemented trace");
     }
@@ -200,7 +199,7 @@ QString InterfaceTabDocument::title() const
     const QString fileName = QFileInfo(path()).fileName();
     return tr("Interface [%1%2]")
             .arg(fileName.isEmpty() ? AbstractTabDocument::title() : fileName,
-                 isDirty() ? QLatin1String("*") : QLatin1String(""));
+                    isDirty() ? QLatin1String("*") : QLatin1String(""));
 }
 
 QMenu *InterfaceTabDocument::customMenu() const
@@ -215,14 +214,14 @@ QMenu *InterfaceTabDocument::customMenu() const
     QAction *actDynContext = root->addAction(tr("Context Actions"));
     connect(actDynContext, &QAction::triggered, this, &InterfaceTabDocument::onDynContextEditorMenuInvoked);
 
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties",
-                                                "Show editor for common Properties");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes",
-                                                "Show editor for common Datatypes");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actColorScheme, "Edit Color scheme",
-                                                "Show editor for common Color schemes");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, actDynContext, "Context actions",
-                                                "Show editor for common custom context menu actions");
+    taste3::ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
+    taste3::ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
+    taste3::ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
+    taste3::ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, actDynContext, "Context actions", "Show editor for common custom context menu actions");
 
     return root;
 }
@@ -289,8 +288,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunctionType, "Function Type",
-                                                    "Create FunctionType object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
 
         m_actCreateFunctionType->setCheckable(true);
         m_actCreateFunctionType->setActionGroup(m_actionGroup);
@@ -300,8 +299,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFunction, "Function",
-                                                    "Create Function object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
 
         m_actCreateFunction->setCheckable(true);
         m_actCreateFunction->setActionGroup(m_actionGroup);
@@ -312,8 +311,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface",
-                                                    "Create Provided Interface object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface", "Create Provided Interface object");
 
         m_actCreateProvidedInterface->setCheckable(true);
         m_actCreateProvidedInterface->setActionGroup(m_actionGroup);
@@ -324,8 +323,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface",
-                                                    "Create Required Interface object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface", "Create Required Interface object");
 
         m_actCreateRequiredInterface->setCheckable(true);
         m_actCreateRequiredInterface->setActionGroup(m_actionGroup);
@@ -336,8 +335,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateComment, "Comment",
-                                                    "Create Comment object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
 
         m_actCreateComment->setCheckable(true);
         m_actCreateComment->setActionGroup(m_actionGroup);
@@ -356,8 +355,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateConnection, "Connection",
-                                                    "Create Connection object");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
 
         m_actCreateConnection->setCheckable(true);
         m_actCreateConnection->setActionGroup(m_actionGroup);
@@ -386,8 +385,8 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomOut) {
         m_actZoomOut = new QAction(tr("Zoom Out"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomOut, "Zoom Out",
-                                                    "Scale down the current scene");
+        taste3::ctx::ActionsManager::registerAction(
+                Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
 
         m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
         m_actZoomOut->setShortcut(QKeySequence::ZoomOut);
@@ -410,17 +409,9 @@ QVector<QAction *> InterfaceTabDocument::initActions()
         m_actExitToParent->setIcon(QIcon(":/tab_interface/toolbar/icns/exit_parent.svg"));
     }
 
-    return { m_actCreateFunctionType,
-             m_actCreateFunction,
-             m_actCreateProvidedInterface,
-             m_actCreateRequiredInterface,
-             m_actCreateComment,
-             m_actCreateConnection,
-             m_actRemove,
-             m_actZoomIn,
-             m_actZoomOut,
-             m_actExitToRoot,
-             m_actExitToParent };
+    return { m_actCreateFunctionType, m_actCreateFunction, m_actCreateProvidedInterface, m_actCreateRequiredInterface,
+        m_actCreateComment, m_actCreateConnection, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot,
+        m_actExitToParent };
 }
 
 void InterfaceTabDocument::onActionCreateFunctionType()
@@ -553,7 +544,7 @@ QGraphicsItem *InterfaceTabDocument::createItemForObject(aadl::AADLObject *obj)
         if (parentItem) {
             if (auto iObjParent = qobject_cast<aadlinterface::InteractiveObject *>(parentItem->toGraphicsObject()))
                 this->connect(child, &aadlinterface::InteractiveObject::boundingBoxChanged, iObjParent,
-                              &aadlinterface::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
+                        &aadlinterface::InteractiveObject::scheduleLayoutUpdate, Qt::QueuedConnection);
         }
     };
 
@@ -690,9 +681,8 @@ void InterfaceTabDocument::onRootObjectChanged(utils::Id rootId)
     m_actExitToParent->setEnabled(nullptr != m_model->rootObject());
 
     QList<aadl::AADLObject *> objects = m_model->visibleObjects();
-    std::stable_sort(objects.begin(), objects.end(), [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) {
-        return obj1->aadlType() < obj2->aadlType();
-    });
+    std::stable_sort(objects.begin(), objects.end(),
+            [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
 
     for (auto it = objects.cbegin(); it != objects.cend(); ++it)
         onAADLObjectAdded(*it);

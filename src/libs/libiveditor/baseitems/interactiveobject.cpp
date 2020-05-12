@@ -18,9 +18,9 @@
 
 #include "interactiveobject.h"
 
-#include "commandsstack.h"
-#include "baseitems/common/utils.h"
 #include "aadlobject.h"
+#include "baseitems/common/utils.h"
+#include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
 #include "interface/commands/commandids.h"
 #include "interface/commands/commandsfactory.h"
@@ -39,7 +39,7 @@ InteractiveObject::InteractiveObject(aadl::AADLObject *entity, QGraphicsItem *pa
 {
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
-             | QGraphicsItem::ItemIsSelectable);
+            | QGraphicsItem::ItemIsSelectable);
 
     setCursor(Qt::ArrowCursor);
 
@@ -77,7 +77,7 @@ void InteractiveObject::updateEntity()
     QList<QVariant> params;
     const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+            [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
     const auto changeGeometryCmd = cmd::CommandsFactory::create(cmd::ChangeEntityGeometry, params);
     cmd::CommandsStack::current()->push(changeGeometryCmd);
 }
@@ -93,7 +93,7 @@ void InteractiveObject::mergeGeometry()
     QList<QVariant> params;
     const QList<QVariantList> preparedParams { prepareChangeCoordinatesCommandParams() };
     std::transform(preparedParams.cbegin(), preparedParams.cend(), std::back_inserter(params),
-                   [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
+            [](const QVariantList entryParams) { return QVariant::fromValue(entryParams); });
 
     QUndoCommand *autolayoutCmd = cmd::CommandsFactory::create(cmd::AutoLayoutEntity, params);
     autolayoutCmd->redo();
@@ -111,7 +111,7 @@ QList<QVariantList> InteractiveObject::prepareChangeCoordinatesCommandParams() c
     QList<QVariantList> params;
     auto children = childItems();
     std::stable_sort(children.begin(), children.end(),
-                     [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
+            [](QGraphicsItem *item1, QGraphicsItem *item2) { return item1->type() < item2->type(); });
 
     for (auto item : children) {
         if (auto iObj = qobject_cast<InteractiveObject *>(item->toGraphicsObject()))

@@ -26,8 +26,8 @@
 namespace msc {
 namespace cmd {
 
-CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(MscChart *chart, const QRect &oldRect, const QRect &newRect,
-                                                           MscEntity *entity)
+CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(
+        MscChart *chart, const QRect &oldRect, const QRect &newRect, MscEntity *entity)
     : BaseCommand(entity)
     , m_chart(chart)
     , m_oldRect(oldRect)

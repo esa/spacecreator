@@ -25,7 +25,7 @@ namespace msc {
 namespace cmd {
 
 CmdCoregionItemCreate::CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscChart *chart,
-                                             msc::MscInstance *instance, int eventIndex)
+        msc::MscInstance *instance, int eventIndex)
     : BaseCommand(nullptr)
     , m_begin(begin)
     , m_end(end)

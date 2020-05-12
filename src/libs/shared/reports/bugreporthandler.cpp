@@ -31,8 +31,8 @@
 
 namespace reports {
 
-BugReportHandler::BugReportHandler(const QString &host, const QString &projectID, const QByteArray &accessToken,
-                                   QObject *parent)
+BugReportHandler::BugReportHandler(
+        const QString &host, const QString &projectID, const QByteArray &accessToken, QObject *parent)
     : QObject(parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_host(host)
@@ -56,8 +56,8 @@ void BugReportHandler::uploadAttachment(const QByteArray &content, const QMimeTy
     QHttpPart httpPart;
     httpPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(mimeType.name()));
     httpPart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                       QVariant(QStringLiteral("form-data; name=\"file\"; filename=\"attachment.%1\"")
-                                        .arg(mimeType.preferredSuffix())));
+            QVariant(QStringLiteral("form-data; name=\"file\"; filename=\"attachment.%1\"")
+                             .arg(mimeType.preferredSuffix())));
     httpPart.setBody(content);
     multiPart->append(httpPart);
 
@@ -77,7 +77,7 @@ void BugReportHandler::createIssue()
     issueObj.insert(QLatin1String("id"), m_project);
     issueObj.insert(QLatin1String("title"), m_report->title);
     issueObj.insert(QLatin1String("description"),
-                    m_report->description + QLatin1String("\n\n") + m_attachmentsLinks.join(QLatin1String("\n\n")));
+            m_report->description + QLatin1String("\n\n") + m_attachmentsLinks.join(QLatin1String("\n\n")));
     issueObj.insert(QLatin1String("labels"), QLatin1String("BugReport"));
     const QByteArray issueData = QJsonDocument(issueObj).toJson();
 

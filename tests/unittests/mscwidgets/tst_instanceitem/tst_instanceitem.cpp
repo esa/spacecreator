@@ -36,7 +36,7 @@ namespace mouse {
 void syntheticPress(QWidget *widget, const QPoint &point)
 {
     QMouseEvent event(QEvent::MouseButtonPress, point, widget->mapToGlobal(point), Qt::LeftButton, Qt::LeftButton,
-                      Qt::NoModifier);
+            Qt::NoModifier);
     QApplication::sendEvent(widget, &event);
     QApplication::processEvents();
 }
@@ -51,7 +51,7 @@ void syntheticMove(QWidget *widget, const QPoint &point, Qt::MouseButton button)
 void syntheticRelease(QWidget *widget, const QPoint &point)
 {
     QMouseEvent event(QEvent::MouseButtonRelease, point, widget->mapToGlobal(point), Qt::LeftButton, Qt::NoButton,
-                      Qt::NoModifier);
+            Qt::NoModifier);
     QApplication::sendEvent(widget, &event);
     QApplication::processEvents();
 }

@@ -161,8 +161,8 @@ MainWindow::MainWindow(QWidget *parent)
     , d(new MainWindowPrivate(this))
 {
     setupUi();
-    d->ui->hierarchyView->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
-                                         | QPainter::SmoothPixmapTransform);
+    d->ui->hierarchyView->setRenderHints(
+            QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
     initConnections();
 
@@ -220,7 +220,7 @@ void MainWindow::selectAndOpenFile()
     }
 
     static const QStringList suffixes = { QString("MSC files (%1)").arg(mscFileFilters().join(" ")),
-                                          QString("All files (*.*)") };
+        QString("All files (*.*)") };
 
     const QString path = QFileInfo(d->m_model->currentFilePath()).absoluteFilePath();
 
@@ -247,15 +247,13 @@ bool MainWindow::openFileMsc(const QString &file)
 
     const bool ok = d->m_model->loadFile(file);
     if (!ok) {
-        QMessageBox::critical(
-                this, tr("File Error"),
+        QMessageBox::critical(this, tr("File Error"),
                 tr("Could not read the file. Errors:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
         return false;
     }
 
     if (!d->m_model->mscErrorMessages().isEmpty()) {
-        QMessageBox::warning(
-                this, tr("Open File Warnings"),
+        QMessageBox::warning(this, tr("Open File Warnings"),
                 tr("Warnings found while opening the file:\n%1").arg(d->m_model->mscErrorMessages().join("\n")));
     }
 
@@ -328,7 +326,7 @@ void MainWindow::saveAsMsc()
 {
     QString fileName =
             QFileDialog::getSaveFileName(this, tr("Save as..."), QFileInfo(d->m_model->currentFilePath()).path(),
-                                         tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
+                    tr("MSC files (%1);;All files (*.*)").arg(mscFileFilters().join(" ")));
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(DotMscFileExtensionLow))
             fileName.append(DotMscFileExtensionLow);
@@ -457,9 +455,9 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
             if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf)
                 canNewChild = false;
             if (document->documents().size() > 0
-                && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
-                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
-                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
+                    && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
+                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
+                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
                 canNewChild = false;
             }
             for (auto action : d->m_hierarchyToolBar->actions()) {
@@ -468,7 +466,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
 
             d->m_model->setSelectedDocument(document);
             d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
-                                      && d->m_model->selectedDocument()->isAddChildEnable());
+                    && d->m_model->selectedDocument()->isAddChildEnable());
         }
     }
 }
@@ -499,7 +497,7 @@ void MainWindow::setupUi()
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
     for (auto x = d->ui->graphicsView->minZoomPercent(); x <= d->ui->graphicsView->maxZoomPercent();
-         x += d->ui->graphicsView->zoomStepPercent())
+            x += d->ui->graphicsView->zoomStepPercent())
         d->m_zoomBox->addItem(QString("%1 %").arg(x), x);
 
     d->m_zoomBox->setCurrentIndex(d->m_zoomBox->findData(100));
@@ -562,30 +560,30 @@ void MainWindow::initMenuFile()
     d->m_menuFile = menuBar()->addMenu(tr("File"));
 
     d->m_actNewFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_FileIcon), tr("New File"), this,
-                                               &MainWindow::createNewDocument, QKeySequence::New);
+            &MainWindow::createNewDocument, QKeySequence::New);
 
     d->m_actOpenFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DirOpenIcon), tr("&Open File"), this,
-                                                &MainWindow::selectAndOpenFile, QKeySequence::Open);
+            &MainWindow::selectAndOpenFile, QKeySequence::Open);
 
     d->m_actSaveFile = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this,
-                                                &MainWindow::saveMsc, QKeySequence::Save);
+            &MainWindow::saveMsc, QKeySequence::Save);
 
     d->m_actSaveFileAs = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save As..."),
-                                                  this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
+            this, &MainWindow::saveAsMsc, QKeySequence::SaveAs);
 
-    d->m_actScreenshot =
-            d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save Screenshot..."), this,
-                                     &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
+    d->m_actScreenshot = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton),
+            tr("Save Screenshot..."), this, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
     d->m_menuFile->addSeparator();
 
-    d->m_actQuit = d->m_menuFile->addAction(tr("&Quit"), this,
-                                            [&]() {
-                                                if (this->saveDocument()) {
-                                                    this->saveSettings();
-                                                    QApplication::quit();
-                                                }
-                                            },
-                                            QKeySequence::Quit);
+    d->m_actQuit = d->m_menuFile->addAction(
+            tr("&Quit"), this,
+            [&]() {
+                if (this->saveDocument()) {
+                    this->saveSettings();
+                    QApplication::quit();
+                }
+            },
+            QKeySequence::Quit);
 }
 
 void MainWindow::initMenuEdit()
@@ -719,12 +717,12 @@ void MainWindow::initTools()
     d->m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
     d->m_tools.append(d->m_instanceStopTool);
 
-    d->m_messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Message,
-                                                         &(d->m_model->chartViewModel()), nullptr, this);
+    d->m_messageCreateTool = new msc::MessageCreatorTool(
+            msc::MscMessage::MessageType::Message, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(d->m_messageCreateTool);
 
-    auto messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Create,
-                                                         &(d->m_model->chartViewModel()), nullptr, this);
+    auto messageCreateTool = new msc::MessageCreatorTool(
+            msc::MscMessage::MessageType::Create, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(messageCreateTool);
 
     auto commentCreateTool = new msc::CommentCreatorTool(false, &(d->m_model->chartViewModel()), nullptr, this);
@@ -754,8 +752,8 @@ void MainWindow::initTools()
             new msc::TimerCreatorTool(msc::MscTimer::TimerType::Stop, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(stopTimerCreateTool);
 
-    auto timeoutCreateTool = new msc::TimerCreatorTool(msc::MscTimer::TimerType::Timeout,
-                                                       &(d->m_model->chartViewModel()), nullptr, this);
+    auto timeoutCreateTool = new msc::TimerCreatorTool(
+            msc::MscTimer::TimerType::Timeout, &(d->m_model->chartViewModel()), nullptr, this);
     d->m_tools.append(timeoutCreateTool);
 
     QActionGroup *toolsActions = new QActionGroup(this);
@@ -914,7 +912,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     }
     case Qt::Key_M: {
         if (!e->isAutoRepeat() && e->modifiers().testFlag(Qt::AltModifier)
-            && e->modifiers().testFlag(Qt::ControlModifier) && e->modifiers().testFlag(Qt::ShiftModifier)) {
+                && e->modifiers().testFlag(Qt::ControlModifier) && e->modifiers().testFlag(Qt::ShiftModifier)) {
             showMousePositioner();
         }
         break;
@@ -1069,8 +1067,8 @@ QStringList MainWindow::mscFileFilters()
 bool MainWindow::saveDocument()
 {
     if (!d->m_dropUnsavedChangesSilently && d->m_model->needSave()) {
-        auto result = QMessageBox::warning(
-                this, windowTitle(), tr("You have unsaved data. Do you want to save the MSC document?"),
+        auto result = QMessageBox::warning(this, windowTitle(),
+                tr("You have unsaved data. Do you want to save the MSC document?"),
                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 
         if (result == QMessageBox::Cancel) {
@@ -1098,8 +1096,8 @@ void MainWindow::showMousePositioner()
 {
     const bool isItemMove = currentView()->scene()->selectedItems().size() == 1;
     bool gotText(false);
-    QString input = QInputDialog::getText(this, isItemMove ? "Move selected item to" : "Move mouse to",
-                                          "x y:", QLineEdit::Normal, "0 0", &gotText)
+    QString input = QInputDialog::getText(
+            this, isItemMove ? "Move selected item to" : "Move mouse to", "x y:", QLineEdit::Normal, "0 0", &gotText)
                             .trimmed();
     if (!gotText || input.size() < 3) // minimal valid input is "0 0"
         return;
@@ -1158,7 +1156,7 @@ void MainWindow::openMessageDeclarationEditor()
     if (result == QDialog::Accepted) {
         msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
-                                         QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
+            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
         const QVariantList params { QVariant::fromValue(d->m_model->mscModel()), dialog.fileName(), "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);

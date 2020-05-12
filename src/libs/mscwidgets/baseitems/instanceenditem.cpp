@@ -66,7 +66,7 @@ void InstanceEndItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     if (isStop()) {
         const QRectF &bounds = rect();
         const QVector<QPointF> linesHeads = { bounds.topLeft(), bounds.bottomRight(), bounds.bottomLeft(),
-                                              bounds.topRight() };
+            bounds.topRight() };
 
         QPen pen(this->pen());
         pen.setWidthF(1.);

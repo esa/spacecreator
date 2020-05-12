@@ -27,10 +27,10 @@ ComboBoxDelegate::ComboBoxDelegate(QObject *parent)
 {
 }
 
-ComboBoxDelegate::~ComboBoxDelegate() {}
+ComboBoxDelegate::~ComboBoxDelegate() { }
 
-QWidget *ComboBoxDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & /*option*/,
-                                        const QModelIndex &index) const
+QWidget *ComboBoxDelegate::createEditor(
+        QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
     QComboBox *cb = new QComboBox(parent);
     cb->setModel(editorModel(index));
@@ -59,7 +59,7 @@ StringListComboDelegate::StringListComboDelegate(const QStringList &data, QObjec
 {
     m_model->setStringList(data);
 }
-StringListComboDelegate::~StringListComboDelegate() {}
+StringListComboDelegate::~StringListComboDelegate() { }
 
 QAbstractItemModel *StringListComboDelegate::editorModel(const QModelIndex & /*id*/) const
 {

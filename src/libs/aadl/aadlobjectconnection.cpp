@@ -32,9 +32,9 @@ struct ConnectionHolder {
 };
 
 struct AADLObjectConnectionPrivate {
-    AADLObjectConnectionPrivate() {}
-    AADLObjectConnectionPrivate(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
-                                AADLObjectIface *ifaceTarget)
+    AADLObjectConnectionPrivate() { }
+    AADLObjectConnectionPrivate(
+            AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
         : m_source(source)
         , m_target(target)
         , m_ifaceSource(ifaceSource)
@@ -50,7 +50,7 @@ struct AADLObjectConnectionPrivate {
 };
 
 AADLObjectConnection::AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
-                                           AADLObjectIface *ifaceTarget, QObject *parent)
+        AADLObjectIface *ifaceTarget, QObject *parent)
     : AADLObject(AADLObject::Type::Connection, QString(), parent)
     , d(new AADLObjectConnectionPrivate { source, target, ifaceSource, ifaceTarget })
 {
@@ -189,14 +189,12 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         return true;
 
     AADLObject *objFrom = objectsModel()->getObjectByName(d->m_delayedInit.m_from->m_functionName);
-    AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(
-            d->m_delayedInit.m_from->m_interfaceName, d->m_delayedInit.m_from->m_ifaceDirection,
-            objFrom ? objFrom->as<AADLObjectFunctionType *>() : nullptr);
+    AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(d->m_delayedInit.m_from->m_interfaceName,
+            d->m_delayedInit.m_from->m_ifaceDirection, objFrom ? objFrom->as<AADLObjectFunctionType *>() : nullptr);
 
     AADLObject *objTo = objectsModel()->getObjectByName(d->m_delayedInit.m_to->m_functionName);
     AADLObjectIface *ifaceTo = objectsModel()->getIfaceByName(d->m_delayedInit.m_to->m_interfaceName,
-                                                              d->m_delayedInit.m_to->m_ifaceDirection,
-                                                              objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
+            d->m_delayedInit.m_to->m_ifaceDirection, objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
 
     if (!objFrom || !ifaceFrom || !objTo || !ifaceTo)
         return false;

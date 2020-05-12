@@ -47,7 +47,7 @@ public:
     };
 
     explicit MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source = nullptr,
-                         InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
+            InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
 

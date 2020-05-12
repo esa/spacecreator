@@ -35,7 +35,8 @@ GripPoint::GripPoint(Location pos, GripPointsHandler *parent)
     : QGraphicsItem(parent)
     , m_listener(parent)
     , m_location(pos)
-    , m_boundRect(QPointF(-::uiDescr.rectSize().width() / 2., -::uiDescr.rectSize().height() / 2.), ::uiDescr.rectSize())
+    , m_boundRect(
+              QPointF(-::uiDescr.rectSize().width() / 2., -::uiDescr.rectSize().height() / 2.), ::uiDescr.rectSize())
 {
     setFlags(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
@@ -47,7 +48,7 @@ QRectF GripPoint::boundingRect() const
     return m_boundRect;
 }
 
-void GripPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void GripPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->fillPath(m_path, ::uiDescr.body());
     painter->strokePath(m_path, ::uiDescr.border());
@@ -200,7 +201,8 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (m_listener) {
-        Q_EMIT m_listener->manualGeometryChangeFinish(this, event->buttonDownScenePos(event->button()), event->scenePos());
+        Q_EMIT m_listener->manualGeometryChangeFinish(
+                this, event->buttonDownScenePos(event->button()), event->scenePos());
     }
 }
 

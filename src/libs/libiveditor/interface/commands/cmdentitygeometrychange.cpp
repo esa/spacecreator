@@ -17,17 +17,18 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include "commandsstack.h"
 #include "commandids.h"
+#include "commandsstack.h"
 
 #include <QtDebug>
-#include <baseitems/common/utils.h>
 #include <aadlobjectsmodel.h>
+#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {
 
-CmdEntityGeometryChange::CmdEntityGeometryChange(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
+CmdEntityGeometryChange::CmdEntityGeometryChange(
+        const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title)
     : QUndoCommand(title.isEmpty() ? QObject::tr("Change item(s) geometry/position") : title)
     , m_internalData(objectsData)
     , m_data(convertData(m_internalData))
@@ -88,8 +89,8 @@ static inline int parentLevel(aadl::AADLObject *object)
     return idx;
 }
 
-QList<CmdEntityGeometryChange::ObjectData>
-CmdEntityGeometryChange::convertData(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
+QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
+        const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData)
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)

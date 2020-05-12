@@ -59,7 +59,7 @@ AbstractTabDocument::AbstractTabDocument(QObject *parent)
     connect(commandsStack(), &QUndoStack::indexChanged, this, &AbstractTabDocument::updateDirtyness);
 }
 
-AbstractTabDocument::~AbstractTabDocument() {}
+AbstractTabDocument::~AbstractTabDocument() { }
 
 void AbstractTabDocument::init()
 {

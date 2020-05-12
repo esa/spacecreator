@@ -112,7 +112,7 @@ void Asn1Editor::setValue(const QString &value)
     connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
 
     auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(),
-                             [&](const QVariant &value) { return value.toMap()["name"] == currentType; });
+            [&](const QVariant &value) { return value.toMap()["name"] == currentType; });
 
     if (find != m_asn1Types.end())
         m_asn1TreeView->setAsn1Value(valueParser.parseAsn1Value((*find).toMap(), value));
@@ -163,7 +163,7 @@ void Asn1Editor::showParseError(const QString &error)
 void Asn1Editor::showAsn1Type(const QString &text)
 {
     auto find = std::find_if(m_asn1Types.begin(), m_asn1Types.end(),
-                             [&](const QVariant &value) { return value.toMap()["name"] == text; });
+            [&](const QVariant &value) { return value.toMap()["name"] == text; });
 
     if (find != m_asn1Types.end())
         m_asn1TreeView->setAsn1Model((*find).toMap());

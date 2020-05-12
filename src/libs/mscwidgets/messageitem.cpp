@@ -17,7 +17,6 @@
 
 #include "messageitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/arrowitem.h"
 #include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
@@ -33,6 +32,7 @@
 #include "messagedialog.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "ui/grippointshandler.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -60,7 +60,7 @@ MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
 }
 
 MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source, InstanceItem *target,
-                         QGraphicsItem *parent)
+        QGraphicsItem *parent)
     : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
@@ -223,7 +223,7 @@ void MessageItem::updateTooltip()
     const QString env(tr("Env"));
     setToolTip(tr("%1: %2→%3")
                        .arg(name(), m_sourceInstance ? m_sourceInstance->name() : env,
-                            m_targetInstance ? m_targetInstance->name() : env));
+                               m_targetInstance ? m_targetInstance->name() : env));
 }
 
 QString MessageItem::name() const
@@ -497,9 +497,9 @@ void MessageItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
 
     const QRectF actualContentRect = m_chartViewModel ? m_chartViewModel->actualContentRect() : QRectF();
     const qreal upperBound = qMax(m_sourceInstance ? m_sourceInstance->axis().y1() : actualContentRect.top(),
-                                  m_targetInstance ? m_targetInstance->axis().y1() : actualContentRect.top());
+            m_targetInstance ? m_targetInstance->axis().y1() : actualContentRect.top());
     const qreal lowerBound = qMin(m_sourceInstance ? m_sourceInstance->axis().y2() : actualContentRect.bottom(),
-                                  m_targetInstance ? m_targetInstance->axis().y2() : actualContentRect.bottom());
+            m_targetInstance ? m_targetInstance->axis().y2() : actualContentRect.bottom());
 
     if (newHead < upperBound || newHead > lowerBound || newTail < upperBound || newTail > lowerBound)
         return;
@@ -548,7 +548,7 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
         updateTarget(validated, ObjectAnchor::Snap::SnapTo);
 }
 
-void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint* gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(to);
 
@@ -605,27 +605,27 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint* gp, cons
     if (sourceChanged) {
         const int newIdx = m_chartViewModel->eventIndex(tail().y());
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                                        QVariant::fromValue<MscInstance *>(
-                                                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
-                                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
-                                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+                { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                        QVariant::fromValue<MscInstance *>(
+                                sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
+                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
+                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     }
     if (targetChanged) {
         const int newIdx = m_chartViewModel->eventIndex(head().y());
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MscMessage *>(m_message), newIdx,
-                                        QVariant::fromValue<MscInstance *>(
-                                                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
-                                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
-                                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+                { QVariant::fromValue<MscMessage *>(m_message), newIdx,
+                        QVariant::fromValue<MscInstance *>(
+                                targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
+                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
+                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     }
 
     const int newIdx = m_chartViewModel->eventIndex(sceneBoundingRect().y());
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
-                                  { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                                    QVariant::fromValue(newPointsCif), newIdx,
-                                    QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+            { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
+                    QVariant::fromValue(newPointsCif), newIdx,
+                    QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
     cmd::CommandsStack::current()->endMacro();
 
     if (auto item = m_chartViewModel->itemForComment(m_message->comment()))
@@ -684,7 +684,8 @@ void MessageItem::initGripPoints()
     if (isCreator())
         gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations());
     else
-        gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::Center });
+        gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Left,
+                shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::Center });
 
     connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &MessageItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
@@ -713,8 +714,7 @@ void MessageItem::onRenamed(const QString &title)
     // prevent recursion, as parametes ans name are not set as one unit
     disconnect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
     CommandsStack::current()->beginMacro(tr("Set message identification"));
-    CommandsStack::push(
-            SetParameterList,
+    CommandsStack::push(SetParameterList,
             { QVariant::fromValue<MscEntity *>(m_message), QVariant::fromValue<MscParameterList>(parameters) });
     CommandsStack::push(RenameEntity, { QVariant::fromValue<MscEntity *>(m_message), name });
     CommandsStack::current()->endMacro();
@@ -744,7 +744,7 @@ QVector<QPointF> MessageItem::messagePoints() const
     QVector<QPointF> scenePoints(localPoints.size());
     ArrowItem *pArrow = m_arrowItem->arrow();
     std::transform(localPoints.cbegin(), localPoints.cend(), scenePoints.begin(),
-                   [&pArrow](const QPointF &point) { return pArrow->mapToScene(point); });
+            [&pArrow](const QPointF &point) { return pArrow->mapToScene(point); });
 
     return scenePoints;
 }

@@ -20,7 +20,7 @@
 #include "exportableaadlobject.h"
 
 namespace aadl {
-    class AADLObjectIface;
+class AADLObjectIface;
 }
 
 namespace templating {

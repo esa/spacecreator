@@ -50,8 +50,8 @@ public:
     shared::SettingsAppOption ColorSchemeFile;
 
 private:
-    GroupAadl(const GroupAadl&) = delete;
-    GroupAadl &operator=(const GroupAadl&) = delete;
+    GroupAadl(const GroupAadl &) = delete;
+    GroupAadl &operator=(const GroupAadl &) = delete;
 
     static const QString localName() { return "GroupAadl"; }
 };

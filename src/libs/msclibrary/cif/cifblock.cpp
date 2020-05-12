@@ -23,7 +23,7 @@
 namespace msc {
 namespace cif {
 
-CifBlock::~CifBlock() {}
+CifBlock::~CifBlock() { }
 
 QVector<CifLineShared> CifBlock::lines() const
 {

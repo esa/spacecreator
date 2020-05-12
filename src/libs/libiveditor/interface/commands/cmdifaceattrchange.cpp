@@ -107,7 +107,8 @@ bool CmdIfaceAttrChange::connectionMustDie(const aadl::AADLObjectConnection *con
     const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(m_newValue.toString());
     if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind)
         return true;
-    if (aadl::AADLObjectIface::OperationKind::Any == newKind || aadl::AADLObjectIface::OperationKind::Any == otherIface->kind())
+    if (aadl::AADLObjectIface::OperationKind::Any == newKind
+            || aadl::AADLObjectIface::OperationKind::Any == otherIface->kind())
         return false;
 
     if (!connection->isOneDirection()) {

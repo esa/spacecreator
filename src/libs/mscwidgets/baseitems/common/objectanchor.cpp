@@ -137,8 +137,8 @@ void ObjectAnchor::connectObject()
 {
     if (m_anchorObject) {
         m_storedFlags = m_anchorObject->flags();
-        m_anchorObject->setFlags(m_storedFlags | QGraphicsItem::ItemSendsGeometryChanges
-                                 | QGraphicsItem::ItemSendsScenePositionChanges);
+        m_anchorObject->setFlags(
+                m_storedFlags | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges);
         m_anchorObject->highlightConnected();
     }
 }

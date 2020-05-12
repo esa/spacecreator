@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "commandids.h"
 #include "aadlobjectsmodel.h"
+#include "commandids.h"
 
 #include <QPointer>
 #include <QUndoCommand>
@@ -35,8 +35,8 @@ public:
 protected:
     CmdIfaceDataChangeBase() = delete;
     CmdIfaceDataChangeBase(const CmdIfaceDataChangeBase &other) = delete;
-    explicit CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName, const QVariant &targetValue,
-                                    const QVariant &prevValue, QUndoCommand *parent = nullptr);
+    explicit CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
+            const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent = nullptr);
 
     QPointer<aadl::AADLObjectIface> m_iface;
     QPointer<aadl::AADLObjectsModel> m_model;
@@ -49,7 +49,8 @@ protected:
     virtual QVector<QPointer<aadl::AADLObjectIface>> getRelatedIfaces();
     virtual QVector<aadl::AADLObjectConnection *> getRelatedConnections();
     virtual bool connectionMustDie(const aadl::AADLObjectConnection *connection) const = 0;
-    static aadl::AADLObjectIface *getConnectionOtherSide(const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface);
+    static aadl::AADLObjectIface *getConnectionOtherSide(
+            const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface);
 
     void prepareRemoveConnectionCommands();
 };

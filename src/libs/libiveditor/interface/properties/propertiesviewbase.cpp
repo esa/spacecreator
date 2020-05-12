@@ -17,9 +17,9 @@
 
 #include "propertiesviewbase.h"
 
-#include "propertieslistmodel.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
+#include "propertieslistmodel.h"
 #include "ui_propertiesviewbase.h"
 
 #include <QDebug>
@@ -47,7 +47,7 @@ void PropertiesViewBase::setModel(PropertiesModelBase *model)
 
     if (tableView()->selectionModel())
         disconnect(tableView()->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                   &PropertiesViewBase::onCurrentRowChanged);
+                &PropertiesViewBase::onCurrentRowChanged);
 
     m_model = model;
     tableView()->setModel(m_model);

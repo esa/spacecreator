@@ -98,8 +98,8 @@ void InstanceStopTool::setExplicitStop()
     const bool newValue = !instance->explicitStop();
     instance->setExplicitStop(newValue);
 
-    msc::cmd::CommandsStack::push(msc::cmd::StopInstance,
-                                  { QVariant::fromValue<msc::MscInstance *>(instance), newValue });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::StopInstance, { QVariant::fromValue<msc::MscInstance *>(instance), newValue });
 }
 
 void InstanceStopTool::updateEnabledState()

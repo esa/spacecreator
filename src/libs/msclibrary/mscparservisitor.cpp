@@ -861,7 +861,7 @@ void MscParserVisitor::orderInstanceEvents()
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
                 InstanceEvents &events = m_instanceEventsList[j];
                 while (!events.isEmpty() && events.first()->entityType() != MscEntity::EntityType::Message
-                       && events.first()->entityType() != MscEntity::EntityType::Condition) {
+                        && events.first()->entityType() != MscEntity::EntityType::Condition) {
                     // This is not a message, condition and timer move it to the chart
                     m_currentChart->addInstanceEvent(events.takeFirst());
                 }
@@ -879,8 +879,9 @@ void MscParserVisitor::orderInstanceEvents()
             auto checkEvent = [&](MscInstanceEvent *event) {
                 return (event->entityType() == MscEntity::EntityType::Message && event->name() == firstEvent->name())
                         || (event->entityType() == MscEntity::EntityType::Condition
-                            && event->name() == firstEvent->name() && static_cast<MscCondition *>(firstEvent)->shared()
-                            && static_cast<MscCondition *>(event)->shared());
+                                && event->name() == firstEvent->name()
+                                && static_cast<MscCondition *>(firstEvent)->shared()
+                                && static_cast<MscCondition *>(event)->shared());
             };
 
             // look first elements of others list
@@ -935,13 +936,13 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
         const QString missedLine =
                 QString("%1 %2 %3 %4;")
                         .arg(QLatin1String(missedIn ? "in" : "out"), message->fullName(),
-                             QLatin1String(missedIn ? "from" : "to"),
-                             instanceName(missedIn ? message->sourceInstance() : message->targetInstance()));
+                                QLatin1String(missedIn ? "from" : "to"),
+                                instanceName(missedIn ? message->sourceInstance() : message->targetInstance()));
 
         return QObject::tr("@%1:%2 A missed reference to this message is required ('%3' in %4).")
                 .arg(QString::number(foundFlow.m_sourceLineInfo.m_line),
-                     QString::number(foundFlow.m_sourceLineInfo.m_pos), missedLine,
-                     instanceName(missedIn ? message->targetInstance() : message->sourceInstance()));
+                        QString::number(foundFlow.m_sourceLineInfo.m_pos), missedLine,
+                        instanceName(missedIn ? message->targetInstance() : message->sourceInstance()));
     };
 
     for (const MscInstanceEvent *event : m_currentChart->instanceEvents()) {
@@ -969,7 +970,7 @@ void MscParserVisitor::checkMessagesDoubleNotation() const
 QString MscParserVisitor::denominatorString(const QString &name) const
 {
     if (name.compare("system", Qt::CaseInsensitive) == 0 || name.compare("block", Qt::CaseInsensitive) == 0
-        || name.compare("process", Qt::CaseInsensitive) == 0 || name.compare("service", Qt::CaseInsensitive) == 0) {
+            || name.compare("process", Qt::CaseInsensitive) == 0 || name.compare("service", Qt::CaseInsensitive) == 0) {
         return name;
     }
 
@@ -1099,7 +1100,7 @@ antlrcpp::Any MscParserVisitor::visitChildren(antlr4::tree::ParseTree *node)
 msc::MscEntity *MscParserVisitor::cifTarget() const
 {
     const QVector<MscEntity *> possibleTargets = { m_currentMessage, m_currentEvent, m_currentInstance, m_currentChart,
-                                                   m_currentDocument };
+        m_currentDocument };
     for (MscEntity *target : possibleTargets)
         if (target)
             return target;

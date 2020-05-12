@@ -87,7 +87,7 @@ void Asn1TreeView::setAsn1Value(const QVariantMap &asn1Value)
 
         setChildValue(nameItem, asn1Value["choice"], -1, itemChoiceIndex(nameItem, choiceValue));
     } else if (asnType.startsWith("integer") || asnType.startsWith("double") || asnType.startsWith("string")
-               || asnType.startsWith("enumerated"))
+            || asnType.startsWith("enumerated"))
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString());
     else if (asnType.startsWith("bool"))
         m_ItemModel->item(row, MODEL_VALUE_INDEX)->setText(asn1Value["value"].toString().toLower());
@@ -133,10 +133,10 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
     if (asnType == CHOICE && hide) {
         const QVariantList &choices = model->item(row, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
         onChoiceFieldChanged(model->item(row)->index(), choices.size(),
-                             choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
+                choices.indexOf(model->item(row, MODEL_VALUE_INDEX)->text()));
     } else if (asnType == SEQUENCEOF && hide) {
         onSequenceOfSizeChanged(model->item(row)->index(), model->item(row, MODEL_VALUE_INDEX)->text(),
-                                model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
+                model->item(row, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
     }
 
     for (int x = 0; x < item->rowCount(); ++x) {
@@ -145,11 +145,11 @@ void Asn1TreeView::hideExtraFields(const QStandardItem *item, bool hide, int row
         asnType = static_cast<ASN1Type>(item->child(x, MODEL_VALUE_INDEX)->data(ASN1TYPE_ROLE).toInt());
         if (asnType == SEQUENCEOF)
             onSequenceOfSizeChanged(item->child(x)->index(), item->child(x, MODEL_VALUE_INDEX)->text(),
-                                    item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
+                    item->child(x, MODEL_VALUE_INDEX)->data(MAX_RANGE_ROLE));
         else if (asnType == CHOICE) {
             const QVariantList &choices = item->child(x, MODEL_VALUE_INDEX)->data(CHOICE_LIST_ROLE).toList();
             onChoiceFieldChanged(item->child(x)->index(), choices.size(),
-                                 choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));
+                    choices.indexOf(item->child(x, MODEL_VALUE_INDEX)->text()));
         }
     }
 }
@@ -171,7 +171,7 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     QVariant value = (asn1Value.type()) ? asn1Value.toList()[childIndex] : asn1Value;
 
     if (asnType.startsWith("integer") || asnType.startsWith("double") || asnType.startsWith("string")
-        || asnType.startsWith("enumerated"))
+            || asnType.startsWith("enumerated"))
         child->setText(value.toMap()["value"].toString());
     else if (asnType.startsWith("bool"))
         child->setText(value.toMap()["value"].toString().toLower());

@@ -23,12 +23,12 @@
 class QWebSocketServer;
 class QWebSocket;
 
-
 class RemoteControlWebServer : public QObject
 {
     Q_OBJECT
 public:
-    enum class CommandType {
+    enum class CommandType
+    {
         Instance,
         StopInstance,
         Message,
@@ -53,13 +53,12 @@ public:
     void error(QAbstractSocket::SocketError error);
 
 public Q_SLOTS:
-    void commandDone(RemoteControlWebServer::CommandType commandType, bool result,
-                     const QString &peerName, const QString &errorString);
+    void commandDone(RemoteControlWebServer::CommandType commandType, bool result, const QString &peerName,
+            const QString &errorString);
 
 Q_SIGNALS:
-    void executeCommand(RemoteControlWebServer::CommandType commandType,
-                        const QVariantMap &params,
-                        const QString &peerName);
+    void executeCommand(
+            RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName);
 
 private:
     QWebSocketServer *m_webSocketServer = nullptr;

@@ -196,9 +196,9 @@ QMenu *DocumentTreeView::contextMenu(msc::MscDocument *document)
                 else
                     // constraint for "repeat", "is", "leaf" and "exception" - possible if only one child
                     action->setDisabled(document->documents().size() > 1
-                                        && (type == msc::MscDocument::HierarchyType::HierarchyRepeat
-                                            || type == msc::MscDocument::HierarchyType::HierarchyIs
-                                            || type == msc::MscDocument::HierarchyType::HierarchyException));
+                            && (type == msc::MscDocument::HierarchyType::HierarchyRepeat
+                                    || type == msc::MscDocument::HierarchyType::HierarchyIs
+                                    || type == msc::MscDocument::HierarchyType::HierarchyException));
             }
         }
 

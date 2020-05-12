@@ -44,8 +44,8 @@ Q_SIGNALS:
 private:
     QVariantList parseXml(const QString &content);
 
-    QVariantMap parseType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type,
-                          const QString &name = QString());
+    QVariantMap parseType(
+            const QList<QDomNodeList> &typeAssignments, const QDomElement &type, const QString &name = QString());
     template<typename T>
     void parseRange(const QDomElement &type, QVariantMap &result);
     void parseSequenceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);

@@ -18,13 +18,13 @@
 #include "aadlcommentgraphicsitem.h"
 
 #include "aadlfunctiongraphicsitem.h"
-#include "commandsstack.h"
+#include "aadlobjectcomment.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
-#include "aadlobjectcomment.h"
+#include "commandsstack.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -88,19 +88,14 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 
     const QRectF br = boundingRect();
     auto preparePolygon = [](const QRectF &rect) {
-        return QVector<QPointF> { rect.topRight() - QPointF(kMargins, 0),
-                                  rect.topLeft(),
-                                  rect.bottomLeft(),
-                                  rect.bottomRight(),
-                                  rect.topRight() + QPointF(0, kMargins),
-                                  rect.topRight() - QPointF(kMargins, 0) };
+        return QVector<QPointF> { rect.topRight() - QPointF(kMargins, 0), rect.topLeft(), rect.bottomLeft(),
+            rect.bottomRight(), rect.topRight() + QPointF(0, kMargins), rect.topRight() - QPointF(kMargins, 0) };
     };
     painter->drawPolygon(preparePolygon(br));
 
     auto preparePolyline = [](const QRectF &rect) {
         return QVector<QPointF> { rect.topRight() + QPointF(0, kMargins),
-                                  rect.topRight() - QPointF(kMargins, -kMargins),
-                                  rect.topRight() - QPointF(kMargins, 0) };
+            rect.topRight() - QPointF(kMargins, -kMargins), rect.topRight() - QPointF(kMargins, 0) };
     };
     painter->drawPolyline(preparePolyline(br));
 

@@ -27,7 +27,7 @@ const QString CifLinePointsTestBase::m_separatorComma = QString(',');
 const QString CifLinePointsTestBase::m_separatorSpace = QString(' ');
 const QString CifLinePointsTestBase::m_separatorNone = QString();
 
-CifLinePointsTestBase::CifLinePointsTestBase() {}
+CifLinePointsTestBase::CifLinePointsTestBase() { }
 
 QString CifLinePointsTestBase::lineTag() const
 {

@@ -17,18 +17,18 @@
 
 #include "xmldocexporter.h"
 
-#include "common.h"
-#include "document/abstracttabdocument.h"
 #include "aadlobject.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "common.h"
+#include "document/abstracttabdocument.h"
 #include "interface/interfacetabdocument.h"
-#include "templating/exportableaadlobject.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
+#include "templating/exportableaadlobject.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -45,7 +45,7 @@ namespace app {
  * \brief The helper that incorporates templating::StringTemplate-related stuff.
  */
 
-const char* TemplateFileExtension = "tmplt";
+const char *TemplateFileExtension = "tmplt";
 
 QString XmlDocExporter::templatesPath()
 {
@@ -60,7 +60,7 @@ QString XmlDocExporter::interfaceDefaultTemplate()
 void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy)
 {
     const QStringList fileNames { QStringLiteral("interfaceview"), QStringLiteral("interface"),
-                QStringLiteral("function"), QStringLiteral("connection"), QStringLiteral("comment") };
+        QStringLiteral("function"), QStringLiteral("connection"), QStringLiteral("comment") };
 
     const QString sourceFile(":/defaults/templating/xml_templates/%1.%2");
     const QString targetFilePath = QFileInfo(interfaceDefaultTemplate()).path();
@@ -82,7 +82,7 @@ void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPol
     }
 }
 
-XmlDocExporter::XmlDocExporter() {}
+XmlDocExporter::XmlDocExporter() { }
 
 bool XmlDocExporter::canExportXml(document::AbstractTabDocument *doc)
 {
@@ -98,20 +98,20 @@ bool XmlDocExporter::canExportXml(document::AbstractTabDocument *doc)
     return false;
 }
 
-bool XmlDocExporter::exportDocSilently(document::AbstractTabDocument *doc, const QString &outPath,
-                                       const QString &templatePath)
+bool XmlDocExporter::exportDocSilently(
+        document::AbstractTabDocument *doc, const QString &outPath, const QString &templatePath)
 {
     return exportDoc(doc, nullptr, outPath, templatePath, InteractionPolicy::Silently);
 }
 
-bool XmlDocExporter::exportDocInteractive(document::AbstractTabDocument *doc, QWidget *root, const QString &outPath,
-                                          const QString &templatePath)
+bool XmlDocExporter::exportDocInteractive(
+        document::AbstractTabDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath)
 {
     return exportDoc(doc, root, outPath, templatePath, InteractionPolicy::Interactive);
 }
 
 bool XmlDocExporter::exportDoc(document::AbstractTabDocument *doc, QWidget *root, const QString &outPath,
-                               const QString &templatePath, InteractionPolicy interaction)
+        const QString &templatePath, InteractionPolicy interaction)
 {
     if (!doc)
         return false;
@@ -123,8 +123,7 @@ bool XmlDocExporter::exportDoc(document::AbstractTabDocument *doc, QWidget *root
         if (interaction == InteractionPolicy::Interactive) {
             if (usedTemplate.isEmpty())
                 usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template for Interface doc"),
-                                                            QFileInfo(interfaceDefaultTemplate()).path(),
-                                                            QString("*.%1").arg(TemplateFileExtension));
+                        QFileInfo(interfaceDefaultTemplate()).path(), QString("*.%1").arg(TemplateFileExtension));
             if (usedTemplate.isEmpty())
                 return false;
         }
@@ -137,8 +136,7 @@ bool XmlDocExporter::exportDoc(document::AbstractTabDocument *doc, QWidget *root
 }
 
 bool XmlDocExporter::exportDocInterface(document::InterfaceTabDocument *doc, QWidget *parentWindow,
-                                        const QString &outPath, const QString &templatePath,
-                                        InteractionPolicy interaction)
+        const QString &outPath, const QString &templatePath, InteractionPolicy interaction)
 {
     if (!doc)
         return false;
@@ -149,7 +147,7 @@ bool XmlDocExporter::exportDocInterface(document::InterfaceTabDocument *doc, QWi
 
     if (savePath.isEmpty())
         savePath = QFileDialog::getSaveFileName(parentWindow, QObject::tr("Export Interface to an XML file"),
-                                                doc->path(), doc->supportedFileExtensions());
+                doc->path(), doc->supportedFileExtensions());
 
     if (savePath.isEmpty())
         return false;
@@ -167,7 +165,7 @@ bool XmlDocExporter::exportDocInterface(document::InterfaceTabDocument *doc, QWi
 }
 
 bool XmlDocExporter::runExportSilently(document::InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
-                                       const QString &templateFileName, const QString &outFileName)
+        const QString &templateFileName, const QString &outFileName)
 {
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
     QFile out(outFileName);
@@ -178,8 +176,7 @@ bool XmlDocExporter::runExportSilently(document::InterfaceTabDocument *doc, cons
 }
 
 bool XmlDocExporter::showExportDialog(document::InterfaceTabDocument *doc, QWidget *parentWindow,
-                                      const QHash<QString, QVariantList> &content, const QString &templateFileName,
-                                      const QString &outFileName)
+        const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName)
 {
     templating::TemplateEditor *previewDialog = new templating::TemplateEditor(outFileName, parentWindow);
     previewDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -187,7 +184,7 @@ bool XmlDocExporter::showExportDialog(document::InterfaceTabDocument *doc, QWidg
     const bool templateParsed = previewDialog->parseTemplate(content, templateFileName);
     if (doc && templateParsed) {
         QObject::connect(previewDialog, &templating::TemplateEditor::fileSaved, doc,
-                         &document::AbstractTabDocument::onSavedExternally);
+                &document::AbstractTabDocument::onSavedExternally);
     }
     return templateParsed;
 }

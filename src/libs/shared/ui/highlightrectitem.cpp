@@ -31,9 +31,7 @@ HighlightRectItem::HighlightRectItem(QGraphicsItem *parent)
 {
 }
 
-void HighlightRectItem::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)
-{
-}
+void HighlightRectItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) { }
 
 QRectF HighlightRectItem::boundingRect() const
 {

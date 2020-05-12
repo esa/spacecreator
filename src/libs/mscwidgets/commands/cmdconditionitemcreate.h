@@ -32,8 +32,8 @@ namespace cmd {
 class CmdConditionItemCreate : public BaseCommand
 {
 public:
-    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscChart *chart, msc::MscInstance *instance,
-                           int eventIndex);
+    CmdConditionItemCreate(
+            msc::MscCondition *condition, msc::MscChart *chart, msc::MscInstance *instance, int eventIndex);
 
     void redo() override;
     void undo() override;

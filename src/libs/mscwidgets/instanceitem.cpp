@@ -17,7 +17,6 @@
 
 #include "instanceitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/instanceenditem.h"
@@ -32,6 +31,7 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "ui/grippointshandler.h"
 
 #include <QApplication>
 #include <QBrush>
@@ -46,8 +46,8 @@
 
 namespace msc {
 
-InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView, MscChart *chart,
-                           QGraphicsItem *parent)
+InstanceItem::InstanceItem(
+        msc::MscInstance *instance, ChartViewModel *chartView, MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(instance, parent)
     , m_model(chartView)
     , m_instance(instance)
@@ -71,13 +71,11 @@ InstanceItem::InstanceItem(msc::MscInstance *instance, ChartViewModel *chartView
 
     connect(m_headSymbol, &InstanceHeadItem::nameEdited, this, &InstanceItem::onNameEdited);
     connect(m_headSymbol, &InstanceHeadItem::kindEdited, this, &InstanceItem::onKindEdited);
-    connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this, [this](const QPointF &from, const QPointF &to) {
-        onManualMoveProgress(nullptr, from, to);
-    });
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveRequested, this,
+            [this](const QPointF &from, const QPointF &to) { onManualMoveProgress(nullptr, from, to); });
 
-    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this, [this](const QPointF &from, const QPointF &to) {
-        onManualMoveFinish(nullptr, from, to);
-    });
+    connect(m_headSymbol, &InstanceHeadItem::manualMoveFinished, this,
+            [this](const QPointF &from, const QPointF &to) { onManualMoveFinish(nullptr, from, to); });
 
     connect(m_headSymbol, &InstanceHeadItem::layoutUpdated, this, [this]() {
         instantLayoutUpdate();
@@ -247,8 +245,8 @@ void InstanceItem::setGeometry(const QRectF &geometry)
     scheduleLayoutUpdate();
 }
 
-InstanceItem *InstanceItem::createDefaultItem(ChartViewModel *model, MscInstance *instance, MscChart *chart,
-                                              const QPointF &pos)
+InstanceItem *InstanceItem::createDefaultItem(
+        ChartViewModel *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
 {
     InstanceItem *messageItem = new InstanceItem(instance, model, chart);
     messageItem->setPos(pos);
@@ -390,7 +388,7 @@ QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, 
     return QPointF(0., 0.);
 }
 
-void InstanceItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
     if (!delta.isNull())
@@ -414,8 +412,8 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF &fro
 
             if (oldIdx != newIdx) {
                 cmd::CommandsStack::push(cmd::Id::ReorderInstance,
-                                         { QVariant::fromValue<MscInstance *>(m_instance), newIdx,
-                                           QVariant::fromValue<MscChart *>(m_chart) });
+                        { QVariant::fromValue<MscInstance *>(m_instance), newIdx,
+                                QVariant::fromValue<MscChart *>(m_chart) });
             }
         }
         cmd::CommandsStack::push(cmd::Id::ChangeInstancePosition, paramsPosition);

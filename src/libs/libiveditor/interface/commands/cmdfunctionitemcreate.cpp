@@ -20,18 +20,19 @@
 #include "commandids.h"
 
 #include <QtDebug>
-#include <baseitems/common/utils.h>
 #include <aadlobjectsmodel.h>
+#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {
 
-CmdFunctionItemCreate::CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry)
+CmdFunctionItemCreate::CmdFunctionItemCreate(
+        aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function"))
     , m_model(model)
     , m_parent(parent)
-    , m_entity(new aadl::AADLObjectFunction(QString(),
-                                      m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
+    , m_entity(new aadl::AADLObjectFunction(
+              QString(), m_parent ? qobject_cast<QObject *>(m_parent) : qobject_cast<QObject *>(m_model)))
 {
     prepareData({ qMakePair(m_entity, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 }

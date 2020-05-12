@@ -123,7 +123,8 @@ void tst_ObjectAnchor::testReplaceNoSnap()
 
     const QPointF pnt10(10., 10.);
     bool notificationCatched(false);
-    connect(&anchor, &ObjectAnchor::anchorChanged, this,
+    connect(
+            &anchor, &ObjectAnchor::anchorChanged, this,
             [&notificationCatched](InteractiveObject *, const QPointF &) { notificationCatched = true; },
             Qt::DirectConnection);
 
@@ -149,7 +150,8 @@ void tst_ObjectAnchor::testReplaceSnap()
     QCOMPARE(anchor.point(), anchorPointB);
 
     bool notificationCatched(false);
-    connect(&anchor, &ObjectAnchor::anchorChanged, this,
+    connect(
+            &anchor, &ObjectAnchor::anchorChanged, this,
             [&notificationCatched](InteractiveObject *, const QPointF &) { notificationCatched = true; },
             Qt::DirectConnection);
 

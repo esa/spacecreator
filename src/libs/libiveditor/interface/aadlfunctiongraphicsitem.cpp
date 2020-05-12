@@ -21,10 +21,10 @@
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "baseitems/common/utils.h"
-#include "colors/colormanager.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
+#include "baseitems/common/utils.h"
+#include "colors/colormanager.h"
 #include "interface/commands/commandids.h"
 #include "interface/commands/commandsfactory.h"
 
@@ -41,8 +41,7 @@ static const qreal kBorderWidth = 2.0;
 static const qreal kRadius = 10.0;
 static const qreal kOffset = kBorderWidth / 2.0;
 static const QList<int> kNestedTypes { aadlinterface::AADLFunctionGraphicsItem::Type,
-                                       aadlinterface::AADLFunctionTypeGraphicsItem::Type,
-                                       aadlinterface::AADLCommentGraphicsItem::Type };
+    aadlinterface::AADLFunctionTypeGraphicsItem::Type, aadlinterface::AADLCommentGraphicsItem::Type };
 
 namespace aadlinterface {
 
@@ -170,13 +169,15 @@ QVariant AADLFunctionGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange 
     return AADLFunctionTypeGraphicsItem::itemChange(change, value);
 }
 
-void AADLFunctionGraphicsItem::onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+void AADLFunctionGraphicsItem::onManualResizeProgress(
+        shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     AADLFunctionTypeGraphicsItem::onManualResizeProgress(grip, from, to);
     layoutConnectionsOnResize();
 }
 
-void AADLFunctionGraphicsItem::onManualResizeFinish(shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLFunctionGraphicsItem::onManualResizeFinish(
+        shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
         return;
@@ -199,7 +200,8 @@ void AADLFunctionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *grip,
     layoutConnectionsOnMove(ConnectionLayoutPolicy::IgnoreCollisions);
 }
 
-void AADLFunctionGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLFunctionGraphicsItem::onManualMoveFinish(
+        shared::ui::GripPoint *, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (isRootItem())
         return;
@@ -281,7 +283,7 @@ void AADLFunctionGraphicsItem::applyColorScheme()
 
     if (auto parentFunction = qgraphicsitem_cast<AADLFunctionGraphicsItem *>(parentItem())) {
         if (!parentFunction->entity()->props().contains("color") && !entity()->props().contains("color")
-            && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
+                && parentFunction->handledColorType() == ColorManager::HandledColors::FunctionRegular) { // [Hm...]
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }

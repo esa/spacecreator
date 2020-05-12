@@ -22,7 +22,9 @@
 namespace templating {
 
 ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
-    : ExportableAADLObject(iface) {}
+    : ExportableAADLObject(iface)
+{
+}
 
 bool ExportableAADLIface::isProvided() const
 {

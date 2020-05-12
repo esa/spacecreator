@@ -59,8 +59,8 @@ public:
     bool saveChart(const MscChart *chart, const QString &fileName);
     QString modelText(MscModel *model);
 
-    QString serialize(const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents,
-                      int tabsSize = 0);
+    QString serialize(
+            const MscInstance *instance, const QVector<msc::MscInstanceEvent *> &instanceEvents, int tabsSize = 0);
     QString serialize(const MscMessage *message, const MscInstance *instance, int tabsSize = 0);
     QString serialize(const MscCondition *condition, int tabsSize = 0);
     QString serialize(const MscCreate *create, const MscInstance *instance, int tabsSize = 0);

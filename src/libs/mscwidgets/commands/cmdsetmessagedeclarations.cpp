@@ -23,8 +23,8 @@
 namespace msc {
 namespace cmd {
 
-CmdSetMessageDeclarations::CmdSetMessageDeclarations(msc::MscDocument *document,
-                                                     msc::MscMessageDeclarationList *declarations)
+CmdSetMessageDeclarations::CmdSetMessageDeclarations(
+        msc::MscDocument *document, msc::MscMessageDeclarationList *declarations)
     : BaseCommand(document)
     , m_document(document)
     , m_newDeclarations(declarations->clone())

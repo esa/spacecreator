@@ -56,23 +56,28 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
 
     switch (arg) {
     case CommandLineParser::Positional::OpenFileMsc:
-        names << "m" << "open-msc";
+        names << "m"
+              << "open-msc";
         description = QCoreApplication::translate("CommandLineParser", "Open the MSC <file> on startup");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     case CommandLineParser::Positional::DbgOpenMscExamplesChain:
-        names << "e" << "examples-chain";
+        names << "e"
+              << "examples-chain";
         description = QCoreApplication::translate("CommandLineParser", "Open all MSC files in the <dir> one-by-one");
         valueName = QCoreApplication::translate("CommandLineParser", "dir");
         break;
     case CommandLineParser::Positional::StartRemoteControl:
-        names << "p" << "remote-control-port";
+        names << "p"
+              << "remote-control-port";
         description = QCoreApplication::translate("CommandLineParser", "Start remote control using <port>");
         valueName = QCoreApplication::translate("CommandLineParser", "port");
         break;
     case CommandLineParser::Positional::DropUnsavedChangesSilently:
-        names << "d" << "drop-changes-silently";
-        description = QCoreApplication::translate("CommandLineParser", "Do not propose to save changes when closing a document");
+        names << "d"
+              << "drop-changes-silently";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Do not propose to save changes when closing a document");
         break;
     default:
         qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";

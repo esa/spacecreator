@@ -30,8 +30,8 @@
 #include <QKeyEvent>
 #include <QRegExpValidator>
 
-MessageDeclarationsDialog::MessageDeclarationsDialog(msc::MscMessageDeclarationList *model,
-                                                     const QVariantList &asn1Types, QWidget *parent)
+MessageDeclarationsDialog::MessageDeclarationsDialog(
+        msc::MscMessageDeclarationList *model, const QVariantList &asn1Types, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())
@@ -110,7 +110,7 @@ void MessageDeclarationsDialog::showSelectedMessage()
 {
     if (m_selectedDeclaration)
         disconnect(m_selectedDeclaration, &msc::MscMessageDeclaration::dataChanged, this,
-                   &MessageDeclarationsDialog::updateDeclarationDetails);
+                &MessageDeclarationsDialog::updateDeclarationDetails);
 
     QItemSelectionModel *selectionModel = ui->messagesView->selectionModel();
     if (!selectionModel->hasSelection()) {

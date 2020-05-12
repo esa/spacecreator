@@ -33,7 +33,7 @@ class CmdMessageItemResize : public BaseCommand
 {
 public:
     CmdMessageItemResize(MscMessage *message, int newPos, msc::MscInstance *newInsance,
-                         msc::MscMessage::EndType endType, MscChart *chart);
+            msc::MscMessage::EndType endType, MscChart *chart);
 
     void redo() override;
     void undo() override;

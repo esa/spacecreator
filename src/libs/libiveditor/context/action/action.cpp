@@ -32,13 +32,13 @@ namespace ctx {
  * Stored in JSON.
  */
 
-static const char* JSON_FIELD_NAME_Title = "title";
+static const char *JSON_FIELD_NAME_Title = "title";
 // static const char* JSON_FIELD_NAME_Tabs = "tabs";
-static const char* JSON_FIELD_NAME_Conditions = "conditions";
-static const char* JSON_FIELD_NAME_Action = "action";
-static const char* JSON_FIELD_NAME_App = "app";
-static const char* JSON_FIELD_NAME_AppArgs = "appArgs";
-static const char* JSON_FIELD_NAME_AppCwd = "appCwd";
+static const char *JSON_FIELD_NAME_Conditions = "conditions";
+static const char *JSON_FIELD_NAME_Action = "action";
+static const char *JSON_FIELD_NAME_App = "app";
+static const char *JSON_FIELD_NAME_AppArgs = "appArgs";
+static const char *JSON_FIELD_NAME_AppCwd = "appCwd";
 
 static QStringList stringListFromJArray(const QJsonArray &jArr)
 {

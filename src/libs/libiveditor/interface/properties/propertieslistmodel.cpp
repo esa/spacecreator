@@ -17,11 +17,11 @@
 
 #include "propertieslistmodel.h"
 
-#include "commandsstack.h"
 #include "aadlcommonprops.h"
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
+#include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
@@ -48,7 +48,7 @@ PropertiesListModel::PropertiesListModel(QObject *parent)
 {
 }
 
-PropertiesListModel::~PropertiesListModel() {}
+PropertiesListModel::~PropertiesListModel() { }
 
 void PropertiesListModel::createNewRow(const QString &title, const QVariant &value, ItemType type, int row)
 {
@@ -161,8 +161,7 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
             }
 
             const QVariantMap attributes = { { name, value } };
-            const auto attributesCmd = cmd::CommandsFactory::create(
-                    cmd::ChangeEntityAttributes,
+            const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeEntityAttributes,
                     { QVariant::fromValue(m_dataObject), QVariant::fromValue(attributes) });
             cmd::CommandsStack::current()->push(attributesCmd);
         } else if (isProp(index)) {

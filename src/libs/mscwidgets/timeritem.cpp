@@ -17,12 +17,12 @@
 
 #include "timeritem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/textitem.h"
 #include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "msctimer.h"
+#include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -194,7 +194,7 @@ void TimerItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &fro
     setPos(newPos);
 }
 
-void TimerItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF&, const QPointF&)
+void TimerItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }
@@ -308,7 +308,7 @@ bool TimerItem::canConnectTimers(MscTimer *targetTimer, const QPointF &targetPos
         return false;
 
     if (m_timer->instance() != targetTimer->instance() || targetTimer->instance() == nullptr
-        || m_timer->instance() == nullptr)
+            || m_timer->instance() == nullptr)
         return false;
 
     const bool upperItem = scenePos().y() < targetPos.y();

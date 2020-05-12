@@ -95,7 +95,7 @@ void tst100messages::testPerformance()
         const QPointF &messagePos = { instacneCenter.x() - ArrowItem::defaultWidth() / 2, instacneCenter.y() };
 
         QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()),
-                                QVariant::fromValue<ChartViewModel *>(&m_model), QPointF() };
+            QVariant::fromValue<ChartViewModel *>(&m_model), QPointF() };
 
         for (int j = 0; j < CommandsCount / 2; ++j) {
 

@@ -31,7 +31,9 @@ class GenericExportedObject
 {
 public:
     GenericExportedObject(const QObject *object)
-        : m_exportedObject(object) {}
+        : m_exportedObject(object)
+    {
+    }
 
 protected:
     /**
@@ -44,6 +46,7 @@ protected:
         Q_ASSERT(o);
         return o;
     }
+
 private:
     QPointer<const QObject> m_exportedObject;
 };
@@ -51,6 +54,6 @@ private:
 } // ns templating
 } // ns taste3
 
-#define DECLARE_EXPORTED_TYPE(TYPE) \
-    Q_DECLARE_METATYPE(taste3::templating::TYPE) \
+#define DECLARE_EXPORTED_TYPE(TYPE)                                                                                    \
+    Q_DECLARE_METATYPE(taste3::templating::TYPE)                                                                       \
     Q_DECLARE_TYPEINFO(taste3::templating::TYPE, Q_MOVABLE_TYPE);

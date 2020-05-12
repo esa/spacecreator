@@ -58,15 +58,13 @@ public:
     Q_ENUM(FailReason)
 
     static ConnectionCreationValidator::FailReason canConnect(AADLObjectFunction *sourceFunction,
-                                                              AADLObjectFunction *targetFunction,
-                                                              AADLObjectIface *sourceIource,
-                                                              AADLObjectIface *targetIface);
+            AADLObjectFunction *targetFunction, AADLObjectIface *sourceIource, AADLObjectIface *targetIface);
 
 private:
     ConnectionCreationValidator();
 
-    static ConnectionCreationValidator::FailReason checkKindAndParams(AADLObjectIface *sourceIface,
-                                                                      AADLObjectIface *targetIface);
+    static ConnectionCreationValidator::FailReason checkKindAndParams(
+            AADLObjectIface *sourceIface, AADLObjectIface *targetIface);
 };
 
 }

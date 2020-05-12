@@ -17,16 +17,18 @@
 
 #include "exportableaadlfunction.h"
 
-#include "aadlobjectfunctiontype.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectiface.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectiface.h"
 
 namespace templating {
 
 ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionType *function)
-    : ExportableAADLObject(function) {}
+    : ExportableAADLObject(function)
+{
+}
 
 QVariantList ExportableAADLFunction::interfaces() const
 {

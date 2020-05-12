@@ -17,15 +17,15 @@
 
 #include "mscfile.h"
 
+#include "MscBaseVisitor.h"
+#include "MscLexer.h"
+#include "MscParser.h"
 #include "asn1xmlparser.h"
 #include "exceptions.h"
 #include "mscdocument.h"
 #include "mscerrorlistener.h"
 #include "mscmodel.h"
 #include "mscparservisitor.h"
-#include "MscBaseVisitor.h"
-#include "MscLexer.h"
-#include "MscParser.h"
 
 #include <QFileInfo>
 #include <QObject>
@@ -45,7 +45,7 @@ namespace msc {
 /*!
   \brief MscFile::MscFile
 */
-MscFile::MscFile() {}
+MscFile::MscFile() { }
 
 /*!
   \fn MscFile::parseFile(const QString &filename)
@@ -70,8 +70,8 @@ MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages
     if (!mscModel->dataDefinitionString().isEmpty()) {
         // parse ASN.1
         asn1::Asn1XMLParser xmlParser;
-        mscModel->setAsn1TypesData(xmlParser.parseAsn1File(QFileInfo(filename).absolutePath(),
-                                                           mscModel->dataDefinitionString(), errorMessages));
+        mscModel->setAsn1TypesData(xmlParser.parseAsn1File(
+                QFileInfo(filename).absolutePath(), mscModel->dataDefinitionString(), errorMessages));
     }
 
     return mscModel;

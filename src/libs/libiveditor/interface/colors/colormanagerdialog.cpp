@@ -83,8 +83,7 @@ void ColorManagerDialog::onColorHandlerSelected(const QModelIndex &id)
         const QString &name = id.data().toString();
         m_color = ColorManager::instance()->colorsForItem(m_colorNames.value(name));
         ui->colorHandlerEditor->setColorHandler(&m_color);
-    }
-    else {
+    } else {
         ui->colorHandlerEditor->setColorHandler(nullptr);
     }
 }

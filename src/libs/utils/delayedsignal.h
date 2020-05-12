@@ -12,14 +12,15 @@ namespace utils {
  *
  * The actual signal will be fired at the next event loop.
  */
-class DelayedSignal : public QObject {
+class DelayedSignal : public QObject
+{
     Q_OBJECT
 
 public:
-    explicit DelayedSignal(QObject* parent = nullptr);
+    explicit DelayedSignal(QObject *parent = nullptr);
 
 Q_SIGNALS:
-    void triggered(QObject* parent);
+    void triggered(QObject *parent);
 
 public Q_SLOTS:
     void triggerSignal();
@@ -28,7 +29,7 @@ private Q_SLOTS:
     void triggerNow();
 
 private:
-    QTimer* mTimer;
+    QTimer *mTimer;
 };
 
 }

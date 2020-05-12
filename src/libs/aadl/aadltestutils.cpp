@@ -3,7 +3,7 @@
 namespace aadl {
 namespace testutils {
 
-AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunctionType* fn, const QString& name)
+AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunctionType *fn, const QString &name)
 {
     AADLObjectIface::CreationInfo ci;
     ci.kind = AADLObjectIface::OperationKind::Protected;
@@ -20,11 +20,10 @@ AADLObjectIface::CreationInfo init(AADLObjectIface::IfaceType t, AADLObjectFunct
     return ci;
 }
 
-AADLObjectIface* createIface(AADLObjectFunctionType* fn, AADLObjectIface::IfaceType t, const QString& name)
+AADLObjectIface *createIface(AADLObjectFunctionType *fn, AADLObjectIface::IfaceType t, const QString &name)
 {
     return AADLObjectIface::createIface(init(t, fn, name));
 }
-
 
 }
 }

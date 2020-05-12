@@ -51,12 +51,14 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     shared::ui::GraphicsViewBase::mousePressEvent(event);
 }
 
-QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(QGraphicsScene* scene, const QPoint&, const QPointF& scenePos) const
+QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
+        QGraphicsScene *scene, const QPoint &, const QPointF &scenePos) const
 {
     QList<QPair<QPointF, QString>> coords;
-    coords.push_back({utils::CoordinatesConverter::sceneToCif(scenePos), "CIF"});
+    coords.push_back({ utils::CoordinatesConverter::sceneToCif(scenePos), "CIF" });
     for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene, scenePos)) {
-        coords.push_back({item->mapFromScene(scenePos), item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None")});
+        coords.push_back({ item->mapFromScene(scenePos),
+                item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None") });
     }
     return coords;
 }

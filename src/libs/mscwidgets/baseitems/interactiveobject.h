@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "ui/interactiveobjectbase.h"
 #include "cif/cifblock.h"
 #include "cif/cifline.h"
+#include "ui/interactiveobjectbase.h"
 
 #include <QPointer>
 

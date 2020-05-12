@@ -86,7 +86,7 @@ void CmdDocumentMove::clearDocumentCharts(MscDocument *document)
 void CmdDocumentMove::addDocumentChart(MscDocument *document)
 {
     if (document->documents().empty() && document->charts().empty()
-        && document->hierarchyType() == MscDocument::HierarchyLeaf) {
+            && document->hierarchyType() == MscDocument::HierarchyLeaf) {
         document->addChart(new MscChart(tr("msc")));
     }
 }

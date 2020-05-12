@@ -17,10 +17,10 @@
 
 #include "cmdifaceparambase.h"
 
-#include "commandids.h"
-#include "commandsfactory.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectsmodel.h"
+#include "commandids.h"
+#include "commandsfactory.h"
 
 namespace aadlinterface {
 namespace cmd {

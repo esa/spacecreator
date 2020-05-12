@@ -532,7 +532,7 @@ void tst_MscFile::testAction()
     QVERIFY(action != nullptr);
     QCOMPARE(action->actionType(), MscAction::ActionType::Informal);
     QCOMPARE(action->informalAction(),
-             QString("filter(mkpixrow_t((. 0,0,0 .), (. 128,128,128 .)))=mkpixrow_t((. 4,0,0 .),(. 132,128,128 .))"));
+            QString("filter(mkpixrow_t((. 0,0,0 .), (. 128,128,128 .)))=mkpixrow_t((. 4,0,0 .),(. 132,128,128 .))"));
     QCOMPARE(action->instance(), chart->instances().at(0));
 }
 

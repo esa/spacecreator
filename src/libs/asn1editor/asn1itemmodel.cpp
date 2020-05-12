@@ -68,10 +68,9 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const QVariantMap &asn1It
     ItemMap itemMap;
     QString typeLimit;
     QStandardItem *valueItem;
-    static QMap<ASN1Type, QString> asn1TypeStringMap {
-        { INTEGER, "integer" },       { DOUBLE, "double" },         { BOOL, "bool" },     { SEQUENCE, "sequence" },
-        { SEQUENCEOF, "sequenceOf" }, { ENUMERATED, "enumerated" }, { CHOICE, "choice" }, { STRING, "string" }
-    };
+    static QMap<ASN1Type, QString> asn1TypeStringMap { { INTEGER, "integer" }, { DOUBLE, "double" }, { BOOL, "bool" },
+        { SEQUENCE, "sequence" }, { SEQUENCEOF, "sequenceOf" }, { ENUMERATED, "enumerated" }, { CHOICE, "choice" },
+        { STRING, "string" } };
 
     QStandardItem *nameItem = new QStandardItem(asn1Item[ASN1_NAME].toString());
     nameItem->setEditable(false);

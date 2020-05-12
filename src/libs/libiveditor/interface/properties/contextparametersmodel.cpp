@@ -17,10 +17,10 @@
 
 #include "contextparametersmodel.h"
 
-#include "commandsstack.h"
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
+#include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
@@ -38,7 +38,7 @@ ContextParametersModel::ContextParametersModel(QObject *parent)
 {
 }
 
-ContextParametersModel::~ContextParametersModel() {}
+ContextParametersModel::~ContextParametersModel() { }
 
 void ContextParametersModel::createNewRow(const aadl::ContextParameter &param, int row)
 {
@@ -148,10 +148,9 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             return false;
         }
 
-        if (const auto attributesCmd =
-                    cmd::CommandsFactory::create(cmd::ChangeContextParameter,
-                                                 { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
-                                                   QVariant::fromValue(paramNew) })) {
+        if (const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeContextParameter,
+                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
+                            QVariant::fromValue(paramNew) })) {
 
             cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);
@@ -193,8 +192,8 @@ bool ContextParametersModel::removeProperty(const QModelIndex &index)
         return res;
 
     const int row(index.row());
-    const auto propsCmd = cmd::CommandsFactory::create(cmd::RemoveContextParameter,
-                                                       { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
+    const auto propsCmd = cmd::CommandsFactory::create(
+            cmd::RemoveContextParameter, { QVariant::fromValue(m_dataObject), QVariant::fromValue(row) });
     if (propsCmd) {
         cmd::CommandsStack::current()->push(propsCmd);
         removeRow(row);

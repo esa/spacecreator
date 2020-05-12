@@ -34,8 +34,8 @@ class ChartItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit ChartItem(MscChart *chartEntity, ChartViewModel *chartViewModel = nullptr,
-                       QGraphicsItem *parent = nullptr);
+    explicit ChartItem(
+            MscChart *chartEntity, ChartViewModel *chartViewModel = nullptr, QGraphicsItem *parent = nullptr);
     ~ChartItem() override = default;
 
     QRectF boundingRect() const override;
@@ -72,7 +72,7 @@ protected:
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
-    void onManualGeometryChangeFinished(shared::ui::GripPoint*, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint *, const QPointF &from, const QPointF &to);
     void onChartCifRectChanged();
 
 private:

@@ -208,8 +208,8 @@ void tst_Asn1ValueParser::testChoiceValue()
     choice = { { "name", "choiceReal" }, { "type", DOUBLE } };
     choices.append(choice);
 
-    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyChoice" }, { "type", CHOICE }, { "choices", choices } },
-                                                "choiceReal : 31.07");
+    auto valueMap = valueParser->parseAsn1Value(
+            { { "name", "MyChoice" }, { "type", CHOICE }, { "choices", choices } }, "choiceReal : 31.07");
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MyChoice"));
 
@@ -231,8 +231,8 @@ void tst_Asn1ValueParser::testChoiceValueError()
     choice = { { "name", "choiceReal" }, { "type", DOUBLE } };
     choices.append(choice);
 
-    auto valueMap = valueParser->parseAsn1Value({ { "name", "MyChoice" }, { "type", CHOICE }, { "choices", choices } },
-                                                "choice : TRUE");
+    auto valueMap = valueParser->parseAsn1Value(
+            { { "name", "MyChoice" }, { "type", CHOICE }, { "choices", choices } }, "choice : TRUE");
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 1);
 
@@ -251,7 +251,7 @@ void tst_Asn1ValueParser::testSequenceValue()
 
     auto valueMap =
             valueParser->parseAsn1Value({ { "name", "MySequence" }, { "type", SEQUENCE }, { "children", children } },
-                                        "{ intVal 3107, realVal 31.07 }");
+                    "{ intVal 3107, realVal 31.07 }");
 
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MySequence"));
@@ -283,7 +283,7 @@ void tst_Asn1ValueParser::testSequenceValueError()
 
     auto valueMap =
             valueParser->parseAsn1Value({ { "name", "MySequence" }, { "type", SEQUENCE }, { "children", children } },
-                                        "{ intVal 31o7, realVal 31.07 }");
+                    "{ intVal 31o7, realVal 31.07 }");
 
     QCOMPARE(valueMap.size(), 0);
     QCOMPARE(spy.count(), 2);

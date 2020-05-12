@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "settingsappoption.h"
 #include "settings/appoptions.h"
+#include "settingsappoption.h"
 
 #include <QAction>
 #include <QCoreApplication>
@@ -36,7 +36,7 @@ private:
     static const QByteArray TestData1;
     static const QByteArray TestData2;
 
-    void checkOption(shared::SettingsAppOption* option, const QVariant &data) const;
+    void checkOption(shared::SettingsAppOption *option, const QVariant &data) const;
     void checkOptionByteArray(shared::SettingsAppOption *option) const;
 };
 
@@ -44,13 +44,13 @@ const QByteArray tst_Settings::TestDataEmpty = { "" };
 const QByteArray tst_Settings::TestData1 = { "data1" };
 const QByteArray tst_Settings::TestData2 = { "data2" };
 
-void tst_Settings::checkOption(shared::SettingsAppOption* option, const QVariant &data) const
+void tst_Settings::checkOption(shared::SettingsAppOption *option, const QVariant &data) const
 {
     option->write(data);
     QCOMPARE(option->read(), data);
 }
 
-void tst_Settings::checkOptionByteArray(shared::SettingsAppOption* option) const
+void tst_Settings::checkOptionByteArray(shared::SettingsAppOption *option) const
 {
     checkOption(option, TestData1);
     checkOption(option, TestData2);

@@ -17,24 +17,24 @@
 
 #include "mainwindow.h"
 
+#include "aadlobjectfunctiontype.h"
+#include "baseitems/common/utils.h"
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
-#include "xmldocexporter.h"
-#include "zoomcontroller.h"
-#include "baseitems/common/utils.h"
-#include "document/documentsmanager.h"
-#include "tabdocumentfactory.h"
-#include "reports/bugreportdialog.h"
-#include "settings/appoptions.h"
-#include "aadlobjectfunctiontype.h"
 #include "document/aadltabdocument.h"
 #include "document/concurrencytabdocument.h"
 #include "document/datatabdocument.h"
 #include "document/deploymenttabdocument.h"
+#include "document/documentsmanager.h"
 #include "document/msctabdocument.h"
 #include "interface/interfacetabdocument.h"
+#include "reports/bugreportdialog.h"
+#include "settings/appoptions.h"
+#include "tabdocumentfactory.h"
 #include "ui_mainwindow.h"
+#include "xmldocexporter.h"
+#include "zoomcontroller.h"
 
 #include <QCloseEvent>
 #include <QDateTime>
@@ -151,15 +151,16 @@ void MainWindow::initMenuFile()
     m_menuFile->addSeparator();
     m_actExportXml =
             m_menuFile->addAction(tr("Export XML"), this, &MainWindow::onExportXml, QKeySequence(Qt::CTRL + Qt::Key_E));
-    m_actExportAs = m_menuFile->addAction(tr("Export As..."), this, &MainWindow::onExportAs,
-                                          QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_E));
+    m_actExportAs = m_menuFile->addAction(
+            tr("Export As..."), this, &MainWindow::onExportAs, QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_E));
     m_menuFile->addSeparator();
     m_actQuit = m_menuFile->addAction(tr("Quit"), this, &MainWindow::onQuitRequested, QKeySequence::Quit);
 
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actOpenFile, "Open file", "Show Open File dialog");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCreateFile, "Create file", "Create new empty file");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actCloseFile, "Close file", "Close current file");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
+    ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actQuit, "Quit", "Quite the application");
 }
 
@@ -257,7 +258,8 @@ bool MainWindow::closeTab(int id)
     if (document::AbstractTabDocument *doc = m_docsManager->docById(id)) {
         if (doc->isDirty() && !m_dropUnsavedChangesSilently) {
             const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
-            auto btn = QMessageBox::question(this, tr("Document closing"), tr("There are unsaved changes.\nWould you like to save the document?"), btns);
+            auto btn = QMessageBox::question(this, tr("Document closing"),
+                    tr("There are unsaved changes.\nWould you like to save the document?"), btns);
             if (btn == QMessageBox::Save) {
                 if (app::XmlDocExporter::canExportXml(doc)) {
                     if (!exportDocAsXml(doc))
@@ -374,7 +376,8 @@ void MainWindow::onTabSwitched(int tab)
         currentStack = doc->commandsStack();
         if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
             m_zoomCtrl->setView(view);
-            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo, Qt::UniqueConnection);
+            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
+                    Qt::UniqueConnection);
         }
     }
 
@@ -575,8 +578,8 @@ bool MainWindow::prepareQuit()
  * \brief Exports the document \a doc to the output file \a pathToSave using the template file \a templateToUse.
  * Returns \c true on succes.
  */
-bool MainWindow::exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave,
-                                const QString &templateToUse)
+bool MainWindow::exportDocAsXml(
+        document::AbstractTabDocument *doc, const QString &pathToSave, const QString &templateToUse)
 {
     if (!doc)
         return false;
@@ -590,8 +593,8 @@ bool MainWindow::exportDocAsXml(document::AbstractTabDocument *doc, const QStrin
  * If a \a pathToSave or \a templateToUse is empty, user will be asked to select the file via QFileDialog.
  * Returns true if the preview dialog can not be shown.
  */
-bool MainWindow::exportDocInteractive(document::AbstractTabDocument *doc, const QString &pathToSave,
-                                      const QString &templateToUse)
+bool MainWindow::exportDocInteractive(
+        document::AbstractTabDocument *doc, const QString &pathToSave, const QString &templateToUse)
 {
     if (!doc)
         return false;

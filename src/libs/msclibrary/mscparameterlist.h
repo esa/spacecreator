@@ -33,7 +33,7 @@ public:
         Unknown // error state
     };
 
-    MscParameter() {}
+    MscParameter() { }
     explicit MscParameter(const QString &parameter);
     MscParameter(const QString &expression, const QString &pattern);
 

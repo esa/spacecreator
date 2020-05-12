@@ -55,14 +55,13 @@ QRectF GripPointsHandler::boundingRect() const
     if (QGraphicsItem *parent = parentItem()) {
         auto bounds = parent->boundingRect();
         auto scaleFactor = viewScale();
-        return QRectF(bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(), bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y());
+        return QRectF(bounds.topLeft().x() * scaleFactor.x(), bounds.topLeft().y() * scaleFactor.y(),
+                bounds.width() * scaleFactor.x(), bounds.height() * scaleFactor.y());
     }
     return QRectF();
 }
 
-void GripPointsHandler::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)
-{
-}
+void GripPointsHandler::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) { }
 
 QList<GripPoint *> GripPointsHandler::gripPoints() const
 {
@@ -123,7 +122,7 @@ void GripPointsHandler::setGripPointPos(GripPoint::Location location, const QPoi
     }
 }
 
-GripPoint* GripPointsHandler::gripPoint(GripPoint::Location location)
+GripPoint *GripPointsHandler::gripPoint(GripPoint::Location location)
 {
     for (auto gp : m_gripPoints) {
         if (gp->location() == location) {

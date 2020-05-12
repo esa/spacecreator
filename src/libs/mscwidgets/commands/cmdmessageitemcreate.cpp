@@ -40,8 +40,8 @@ CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(
     return geometry;
 }
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, msc::ChartViewModel *model, int eventIndex,
-                                           const QVector<QPoint> &points)
+CmdMessageItemCreate::CmdMessageItemCreate(
+        msc::MscMessage *message, msc::ChartViewModel *model, int eventIndex, const QVector<QPoint> &points)
     : BaseCommand(message)
     , m_message(message)
     , m_viewModel(model)

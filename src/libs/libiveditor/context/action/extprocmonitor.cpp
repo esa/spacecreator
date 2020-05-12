@@ -97,7 +97,8 @@ void ExtProcMonitor::closeEvent(QCloseEvent *event)
     if (m_process->state() == QProcess::Running) {
         const QString msg = tr("The process %1 [%2] is still running.");
         const qint64 pid = m_process->processId();
-        switch (QMessageBox::question(this, tr("Closing"), msg.arg(m_process->program(), QString::number(pid)), tr("Kill"), tr("Cancel closing"))) {
+        switch (QMessageBox::question(this, tr("Closing"), msg.arg(m_process->program(), QString::number(pid)),
+                tr("Kill"), tr("Cancel closing"))) {
         case 0:
             syncStop();
             break;

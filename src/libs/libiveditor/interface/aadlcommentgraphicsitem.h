@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "aadlrectgraphicsitem.h"
 #include "aadlobject.h"
+#include "aadlrectgraphicsitem.h"
 
 #include <QScopedPointer>
 #include <QTextLayout>

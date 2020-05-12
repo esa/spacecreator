@@ -28,6 +28,6 @@ AADLObjectComment::AADLObjectComment(const QString &title, QObject *parent)
         root->addChild(this);
 }
 
-AADLObjectComment::~AADLObjectComment() {}
+AADLObjectComment::~AADLObjectComment() { }
 
 }

@@ -138,7 +138,7 @@ void MscChart::removeInstance(MscInstance *instance)
 MscInstance *MscChart::instanceByName(const QString &name) const
 {
     auto it = std::find_if(m_instances.constBegin(), m_instances.constEnd(),
-                           [name](MscInstance *instance) { return name == instance->name(); });
+            [name](MscInstance *instance) { return name == instance->name(); });
 
     if (it != m_instances.constEnd())
         return *it;
@@ -428,8 +428,8 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
     return false;
 }
 
-void MscChart::updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos,
-                                   msc::MscMessage::EndType endType)
+void MscChart::updateMessageTarget(
+        MscMessage *message, MscInstance *newInstance, int eventPos, msc::MscMessage::EndType endType)
 {
     Q_ASSERT(message);
 
@@ -487,7 +487,7 @@ int MscChart::setInstanceNameNumbers(int nextNumber)
         for (auto msg2 = msg + 1; msg2 != messages.end(); ++msg2) {
             // now check if they are not unique
             if ((*msg)->name() == (*msg2)->name() && (*msg)->sourceInstance() == (*msg2)->sourceInstance()
-                && (*msg)->targetInstance() == (*msg2)->targetInstance()) {
+                    && (*msg)->targetInstance() == (*msg2)->targetInstance()) {
                 if ((*msg)->messageInstanceName().isEmpty())
                     (*msg)->setMessageInstanceName(QString::number(nextNumber++));
                 if ((*msg2)->messageInstanceName().isEmpty())

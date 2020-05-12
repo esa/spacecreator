@@ -16,6 +16,7 @@
 */
 
 #include "cmdinstancestopchange.h"
+
 #include "mscinstance.h"
 
 namespace msc {
@@ -26,7 +27,6 @@ CmdInstanceStopChange::CmdInstanceStopChange(msc::MscInstance *item, bool newVal
     , m_instance(item)
     , m_newExStop(newValue)
 {
-
 }
 
 void CmdInstanceStopChange::redo()
@@ -54,4 +54,3 @@ int CmdInstanceStopChange::id() const
 
 } // ns cmd
 } // ns msc
-

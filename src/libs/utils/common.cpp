@@ -17,11 +17,11 @@
 
 #include "common.h"
 
-#include <QWidget>
-#include <QPalette>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QPalette>
+#include <QWidget>
 
 #ifdef Q_OS_WIN
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;

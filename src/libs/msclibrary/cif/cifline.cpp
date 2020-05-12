@@ -29,7 +29,7 @@ CifLine::CifLine(QObject *parent)
 {
 }
 
-CifLine::~CifLine() {}
+CifLine::~CifLine() { }
 
 QString CifLine::nameForType(CifLine::CifType t)
 {

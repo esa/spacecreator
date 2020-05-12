@@ -48,7 +48,7 @@ void Asn1ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         rc.setLeft(0);
 
     painter->drawLines({ QLineF(rc.left(), rc.bottom(), rc.right(), rc.bottom()),
-                         QLineF(rc.right(), rc.top(), rc.right(), rc.bottom()) });
+            QLineF(rc.right(), rc.top(), rc.right(), rc.bottom()) });
 
     painter->restore();
 }
@@ -157,11 +157,11 @@ void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 
     if (asnType == CHOICE)
         Q_EMIT choiceFieldChanged(index.sibling(index.row(), 0), index.data(CHOICE_LIST_ROLE).toList().size(),
-                                  qobject_cast<QComboBox *>(editor)->currentIndex());
+                qobject_cast<QComboBox *>(editor)->currentIndex());
 }
 
-void Asn1ItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                                            const QModelIndex &index) const
+void Asn1ItemDelegate::updateEditorGeometry(
+        QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QRect editorRect;
 

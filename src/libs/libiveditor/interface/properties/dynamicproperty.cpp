@@ -44,7 +44,7 @@ DynamicProperty::DynamicProperty(const QString &name, Type t, const Scopes &s, c
 {
 }
 
-DynamicProperty::~DynamicProperty() {}
+DynamicProperty::~DynamicProperty() { }
 
 QString DynamicProperty::name() const
 {
@@ -132,8 +132,8 @@ DynamicProperty *DynamicProperty::fromJson(const QJsonObject &json)
     static const QMetaEnum &scopesMeta = QMetaEnum::fromType<DynamicProperty::Scopes>();
     const DynamicProperty::Scopes s(scopesMeta.keysToValue(scopeStr.toUtf8()));
 
-    return new DynamicProperty(name, t, s,
-                               json[DynamicPropertyPrivate::JsonFileds.Range].toArray().toVariantList().toVector());
+    return new DynamicProperty(
+            name, t, s, json[DynamicPropertyPrivate::JsonFileds.Range].toArray().toVariantList().toVector());
 }
 
 }

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
 #include "aadlobject.h"
+#include "baseitems/interactiveobject.h"
 
 #include <QPointer>
 

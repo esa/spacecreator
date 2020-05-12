@@ -25,7 +25,8 @@ namespace cmd {
 class CmdIfaceParamChange : public CmdIfaceParamBase
 {
 public:
-    explicit CmdIfaceParamChange(aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
+    explicit CmdIfaceParamChange(
+            aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to);
 
     void redo() override;
     void undo() override;

@@ -31,7 +31,7 @@ class MscModel : public QObject
     Q_OBJECT
     Q_PROPERTY(QString dataLanguage READ dataLanguage WRITE setDataLanguage NOTIFY dataLanguageChanged)
     Q_PROPERTY(QString dataDefinitionString READ dataDefinitionString WRITE setDataDefinitionString NOTIFY
-                       dataDefinitionStringChanged)
+                    dataDefinitionStringChanged)
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY dataChanged)
     Q_PROPERTY(QVector<msc::MscChart *> charts READ charts NOTIFY dataChanged)
 

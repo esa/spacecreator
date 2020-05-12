@@ -22,7 +22,7 @@
 namespace taste3 {
 
 namespace aadl {
-    class AADLObjectFunctionType;
+class AADLObjectFunctionType;
 }
 
 namespace templating {

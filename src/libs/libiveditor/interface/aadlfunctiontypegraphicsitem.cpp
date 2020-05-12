@@ -17,22 +17,22 @@
 
 #include "aadlfunctiontypegraphicsitem.h"
 
+#include "aadlcommonprops.h"
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctionnamegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
-#include "commandsstack.h"
+#include "aadlnamevalidator.h"
+#include "aadlobject.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
-#include "aadlcommonprops.h"
-#include "aadlnamevalidator.h"
-#include "aadlobject.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
+#include "commandsstack.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -118,7 +118,7 @@ QSizeF AADLFunctionTypeGraphicsItem::minimalSize() const
 {
     const QSizeF textSize = m_textItem->boundingRect().size();
     return { qMax(textSize.width(), DefaultGraphicsItemSize.width()),
-             qMax(textSize.height(), DefaultGraphicsItemSize.height()) };
+        qMax(textSize.height(), DefaultGraphicsItemSize.height()) };
 }
 
 void AADLFunctionTypeGraphicsItem::updateTextPosition()

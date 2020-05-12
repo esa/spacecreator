@@ -394,7 +394,7 @@ void MainModel::pasteChart()
 
     if (mideData->hasFormat(MscChartMimeType)) {
         const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-                                          mideData->data(MscChartMimeType) };
+            mideData->data(MscChartMimeType) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::PasteChart, cmdParams);
         setSelectedDocument(document);
     }

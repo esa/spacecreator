@@ -17,9 +17,9 @@
 
 #include "ifaceparametersmodel.h"
 
-#include "commandsstack.h"
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
+#include "commandsstack.h"
 #include "interface/commands/cmdentitypropertycreate.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/properties/dynamicproperty.h"
@@ -35,7 +35,7 @@ IfaceParametersModel::IfaceParametersModel(QObject *parent)
 {
 }
 
-IfaceParametersModel::~IfaceParametersModel() {}
+IfaceParametersModel::~IfaceParametersModel() { }
 
 void IfaceParametersModel::createNewRow(const aadl::IfaceParameter &param, int row)
 {
@@ -154,10 +154,9 @@ bool IfaceParametersModel::setData(const QModelIndex &index, const QVariant &val
             return false;
         }
 
-        if (const auto attributesCmd =
-                    cmd::CommandsFactory::create(cmd::ChangeIfaceParam,
-                                                 { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
-                                                   QVariant::fromValue(paramNew) })) {
+        if (const auto attributesCmd = cmd::CommandsFactory::create(cmd::ChangeIfaceParam,
+                    { QVariant::fromValue(m_dataObject), QVariant::fromValue(paramOld),
+                            QVariant::fromValue(paramNew) })) {
 
             cmd::CommandsStack::current()->push(attributesCmd);
             m_params.replace(index.row(), paramNew);

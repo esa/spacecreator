@@ -89,8 +89,7 @@ MessageDialog::~MessageDialog()
 void MessageDialog::accept()
 {
     msc::cmd::CommandsStack::current()->beginMacro("Edit message");
-    msc::cmd::CommandsStack::push(
-            msc::cmd::RenameEntity,
+    msc::cmd::CommandsStack::push(msc::cmd::RenameEntity,
             { QVariant::fromValue(m_message.data()), QVariant::fromValue(ui->nameLineEdit->text()) });
 
     msc::MscParameterList parameters;
@@ -102,8 +101,8 @@ void MessageDialog::accept()
             qWarning() << "An empty parameter is not allowed";
         }
     }
-    msc::cmd::CommandsStack::push(msc::cmd::SetParameterList,
-                                  { QVariant::fromValue(m_message.data()), QVariant::fromValue(parameters) });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::SetParameterList, { QVariant::fromValue(m_message.data()), QVariant::fromValue(parameters) });
     msc::cmd::CommandsStack::current()->endMacro();
 
     QDialog::accept();
@@ -183,7 +182,7 @@ void MessageDialog::editDeclarations()
 
     if (result == QDialog::Accepted) {
         const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
-                                         QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
+            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
         const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
@@ -317,7 +316,7 @@ void MessageDialog::checkTextValidity()
                 const QString &value = ui->parameterTable->item(i, 0)->text();
                 const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
                 auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
-                                         [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
+                        [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
                 if (find != asn1Types.end()) {
                     bool ok;
                     parser.parseAsn1Value((*find).toMap(), value, &ok);

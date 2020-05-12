@@ -31,7 +31,9 @@
 class ZoomValidator : public QValidator
 {
 public:
-    explicit ZoomValidator(QObject *parent = nullptr) : QValidator(parent), m_validator(new QIntValidator(this))
+    explicit ZoomValidator(QObject *parent = nullptr)
+        : QValidator(parent)
+        , m_validator(new QIntValidator(this))
     {
     }
 
@@ -51,20 +53,11 @@ public:
         addSuffix(s);
     }
 
-    void setBottom(int min)
-    {
-        m_validator->setBottom(min);
-    }
+    void setBottom(int min) { m_validator->setBottom(min); }
 
-    void setRange(int bottom, int top)
-    {
-        m_validator->setRange(bottom, top);
-    }
+    void setRange(int bottom, int top) { m_validator->setRange(bottom, top); }
 
-    void setTop(int top)
-    {
-        m_validator->setTop(top);
-    }
+    void setTop(int top) { m_validator->setTop(top); }
 
     void addSuffix(QString &text) const
     {
@@ -123,7 +116,7 @@ void ZoomController::setView(aadlinterface::GraphicsView *view)
 
     if (m_view) {
         disconnect(m_combo, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
-                   &ZoomController::onCurrentIndexChanged);
+                &ZoomController::onCurrentIndexChanged);
         disconnect(m_view, &aadlinterface::GraphicsView::zoomChanged, this, &ZoomController::displayZoomLevel);
     }
 

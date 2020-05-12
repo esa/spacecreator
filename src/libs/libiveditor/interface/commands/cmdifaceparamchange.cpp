@@ -25,7 +25,8 @@
 namespace aadlinterface {
 namespace cmd {
 
-CmdIfaceParamChange::CmdIfaceParamChange(aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to)
+CmdIfaceParamChange::CmdIfaceParamChange(
+        aadl::AADLObject *entity, const aadl::IfaceParameter &from, const aadl::IfaceParameter &to)
     : CmdIfaceParamBase(entity ? entity->as<aadl::AADLObjectIface *>() : nullptr)
     , m_newParam(to)
     , m_oldParam(from)

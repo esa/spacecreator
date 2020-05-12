@@ -228,8 +228,8 @@ void tst_AADLObjectsModel::testManageIfaces()
     {
         QSignalSpy spyCommon(&model, &aadl::AADLObjectsModel::aadlObjectRemoved);
 
-        aadl::AADLObjectIface *dummy =
-                aadl::AADLObjectIface::createIface(aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, nullptr));
+        aadl::AADLObjectIface *dummy = aadl::AADLObjectIface::createIface(
+                aadl::testutils::init(aadl::AADLObjectIface::IfaceType::Provided, nullptr));
         const bool dummyRemoved = model.removeObject(dummy);
         QVERIFY(!dummyRemoved);
         QCOMPARE(model.objects().size(), ifaces.size() + 1); // +function
@@ -275,8 +275,8 @@ void tst_AADLObjectsModel::testManageMixed()
     ci3.name = "ppp0";
     aadl::AADLObjectIface *iface3 = aadl::AADLObjectIface::createIface(ci3);
 
-    const QVector<aadl::AADLObject *> objects { &container1, &fn1,        iface1, &container2, &fn2,
-                                          iface2,      &container3, &fn3,   iface3 };
+    const QVector<aadl::AADLObject *> objects { &container1, &fn1, iface1, &container2, &fn2, iface2, &container3, &fn3,
+        iface3 };
 
     for (auto object : objects)
         QVERIFY(model.addObject(object));

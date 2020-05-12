@@ -24,7 +24,8 @@ DrawRectInfo::DrawRectInfo()
 {
 }
 
-DrawRectInfo::DrawRectInfo(const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor)
+DrawRectInfo::DrawRectInfo(
+        const QSizeF &rectSize, qreal borderWidth, const QColor &borderColor, const QColor &bodyColor)
     : m_rectSize(rectSize)
     , m_borderWidth(borderWidth)
     , m_borderColor(borderColor)

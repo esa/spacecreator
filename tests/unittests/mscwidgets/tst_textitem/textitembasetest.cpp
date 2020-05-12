@@ -237,7 +237,7 @@ void TextItemBaseTest::testPasteInMiddleImpl()
     QTest::keySequence(m_view, QKeySequence::Paste);
 
     QCOMPARE(m_item->toPlainText(),
-             allowed.left(allowedMiddle) + allowed + allowed.right(allowed.length() - allowedMiddle));
+            allowed.left(allowedMiddle) + allowed + allowed.right(allowed.length() - allowedMiddle));
 
 #else
     QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));

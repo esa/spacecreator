@@ -17,17 +17,19 @@
 
 #include "exportedaadlfunction.h"
 
-#include "tab_aadl/aadlobjectfunctiontype.h"
-#include "tab_aadl/aadlobjectfunction.h"
-#include "tab_aadl/aadlobjectiface.h"
 #include "tab_aadl/aadlobjectcomment.h"
 #include "tab_aadl/aadlobjectconnection.h"
+#include "tab_aadl/aadlobjectfunction.h"
+#include "tab_aadl/aadlobjectfunctiontype.h"
+#include "tab_aadl/aadlobjectiface.h"
 
 namespace taste3 {
 namespace templating {
 
 ExportedAADLFunction::ExportedAADLFunction(const aadl::AADLObjectFunctionType *function)
-    : ExportedAADLObject(function) {}
+    : ExportedAADLObject(function)
+{
+}
 
 QVariantList ExportedAADLFunction::interfaces() const
 {
@@ -66,4 +68,3 @@ QVariantList ExportedAADLFunction::connections() const
 
 } // ns templating
 } // ns taste3
-

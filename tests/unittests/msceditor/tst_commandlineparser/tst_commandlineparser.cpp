@@ -48,7 +48,7 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
 
     CommandLineParser parser;
     parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdOpenMsc.names().first(), FileName) });
+            QString("-%1=%2").arg(cmdOpenMsc.names().first(), FileName) });
 
     QCOMPARE(parser.isSet(CommandLineParser::Positional::Unknown), false);
     QCOMPARE(parser.isSet(CommandLineParser::Positional::OpenFileMsc), true);
@@ -57,7 +57,7 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
     QCOMPARE(argFromParser1, FileName);
 
     parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdOpenMsc.names().first(), NoFileName) });
+            QString("-%1=%2").arg(cmdOpenMsc.names().first(), NoFileName) });
     QCOMPARE(parser.isSet(CommandLineParser::Positional::OpenFileMsc), true);
     const QString argFromParser2(parser.value(CommandLineParser::Positional::OpenFileMsc));
     QCOMPARE(argFromParser2, NoFileName);
@@ -65,19 +65,20 @@ void tst_CommandLineParser::testCmdArgumentOpenMsc()
 
 void tst_CommandLineParser::testCmdArgumentRemoteControl()
 {
-    const QCommandLineOption cmdRemoteControl = CommandLineParser::positionalArg(CommandLineParser::Positional::StartRemoteControl);
+    const QCommandLineOption cmdRemoteControl =
+            CommandLineParser::positionalArg(CommandLineParser::Positional::StartRemoteControl);
     const quint16 inUsePort = 34568;
     const quint16 port = 34567;
 
     CommandLineParser parser;
     parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
+            QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
     QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);
     const QString argFromParser2(parser.value(CommandLineParser::Positional::StartRemoteControl));
     QCOMPARE(argFromParser2, QString::number(inUsePort));
 
     parser.process({ QApplication::instance()->applicationFilePath(),
-                     QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(port)) });
+            QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(port)) });
 
     QCOMPARE(parser.isSet(CommandLineParser::Positional::Unknown), false);
     QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);

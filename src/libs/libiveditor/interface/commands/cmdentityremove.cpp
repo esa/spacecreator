@@ -174,7 +174,7 @@ void CmdEntityRemove::collectRelatedItems(aadl::AADLObject *toBeRemoved)
                 collectRelatedItems(iface);
 
             for (auto child :
-                 toBeRemoved->findChildren<aadl::AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
+                    toBeRemoved->findChildren<aadl::AADLObjectFunction *>(QString(), Qt::FindDirectChildrenOnly))
                 collectRelatedItems(child);
         }
         break;

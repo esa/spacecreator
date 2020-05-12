@@ -33,7 +33,7 @@ class CmdMessagePointsEdit : public BaseCommand
 {
 public:
     CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
-                         int newIdx, MscChart *chart);
+            int newIdx, MscChart *chart);
 
     void redo() override;
     void undo() override;

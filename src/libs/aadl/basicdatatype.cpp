@@ -27,7 +27,7 @@ BasicDataType::BasicDataType(const QString &name, DataTypeName type)
 {
 }
 
-BasicDataType::~BasicDataType() {}
+BasicDataType::~BasicDataType() { }
 
 QString BasicDataType::name() const
 {

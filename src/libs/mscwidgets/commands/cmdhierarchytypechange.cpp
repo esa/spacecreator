@@ -36,7 +36,7 @@ void CmdHierarchyTypeChange::redo()
         m_document->setHierarchyType(m_newType);
 
         if (m_newType == MscDocument::HierarchyLeaf && m_document->documents().empty()
-            && m_document->charts().empty()) {
+                && m_document->charts().empty()) {
             m_document->addChart(new MscChart(m_document->name() + QObject::tr("_msc")));
             m_newChart = true;
         }

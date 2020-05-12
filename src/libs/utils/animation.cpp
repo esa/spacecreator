@@ -5,7 +5,8 @@
 namespace utils {
 namespace Animation {
 
-QPropertyAnimation* createLinearAnimation(QObject* target, const QString& propName, const QVariant& from, const QVariant& to, const int durationMs)
+QPropertyAnimation *createLinearAnimation(
+        QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs)
 {
     QPropertyAnimation *anim = new QPropertyAnimation(target, propName.toUtf8());
     anim->setDuration(durationMs);

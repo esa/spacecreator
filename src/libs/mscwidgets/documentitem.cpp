@@ -50,7 +50,7 @@ DocumentItem::DocumentItem(MscDocument *document, QGraphicsItem *parent)
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
-DocumentItem::~DocumentItem() {}
+DocumentItem::~DocumentItem() { }
 
 QRectF DocumentItem::boundingRect() const
 {
@@ -197,7 +197,7 @@ void DocumentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     } else {
         // Paint the leaf diagonal line
         painter->drawLine(QPointF(boxRect.x() + 1, boxRect.center().y()),
-                          QPointF(boxRect.x() + (boxRect.center().y() - boxRect.y()) + 1, boxRect.bottom()));
+                QPointF(boxRect.x() + (boxRect.center().y() - boxRect.y()) + 1, boxRect.bottom()));
     }
 
     if (d->disablePaint) {

@@ -75,8 +75,8 @@ TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
     splitter->addWidget(m_resultTextEdit);
 
     QDialogButtonBox *templateButtonBox = new QDialogButtonBox(this);
-    templateButtonBox->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Open | QDialogButtonBox::Apply
-                                          | QDialogButtonBox::Help);
+    templateButtonBox->setStandardButtons(
+            QDialogButtonBox::Save | QDialogButtonBox::Open | QDialogButtonBox::Apply | QDialogButtonBox::Help);
     templateButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save &Template As.."));
     templateButtonBox->button(QDialogButtonBox::Open)->setText(tr("&Open Template"));
     templateButtonBox->button(QDialogButtonBox::Apply)->setText(tr("&Apply and Save"));

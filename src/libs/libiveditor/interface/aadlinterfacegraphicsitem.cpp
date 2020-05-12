@@ -54,8 +54,8 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     updateKind();
 
     QPainterPath pp;
-    pp.addPolygon(QVector<QPointF> { QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2),
-                                     QPointF(2 * kHeight / 3, 0) });
+    pp.addPolygon(QVector<QPointF> {
+            QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2), QPointF(2 * kHeight / 3, 0) });
     pp.closeSubpath();
     m_iface->setPath(pp);
     //    setInterfaceName(ifaceLabel());
@@ -120,7 +120,7 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
 }
 
 static inline void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
-                             const QRectF &parentBoundingRect, const QPointF &offset, bool invert)
+        const QRectF &parentBoundingRect, const QPointF &offset, bool invert)
 {
     if (!intersectedItemRect.isValid())
         return;
@@ -240,14 +240,13 @@ void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 QList<QVariantList> AADLInterfaceGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
     QList<QVariantList> params = { { QVariant::fromValue(entity()),
-                                     QVariant::fromValue(QVector<QPointF> { scenePos() }) } };
+            QVariant::fromValue(QVector<QPointF> { scenePos() }) } };
     for (const auto &connection : connectionItems()) {
         if (connection) {
-            params.append(
-                    { QVariant::fromValue(connection->entity()),
-                      QVariant::fromValue(
-                              connection->graphicsPoints()) }); // connection->prepareChangeCoordinatesCommandParams()
-                                                                // - will be fixed during work on Undo/Redo issues
+            params.append({ QVariant::fromValue(connection->entity()),
+                    QVariant::fromValue(
+                            connection->graphicsPoints()) }); // connection->prepareChangeCoordinatesCommandParams()
+                                                              // - will be fixed during work on Undo/Redo issues
         }
     }
 
@@ -350,7 +349,7 @@ void AADLInterfaceGraphicsItem::adjustItem()
 
     auto checkCollision = [](const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF &collidingRect) {
         auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
-                               [itemRect](const QRectF &siblibgRect) { return siblibgRect.intersects(itemRect); });
+                [itemRect](const QRectF &siblibgRect) { return siblibgRect.intersects(itemRect); });
         if (it != itemRects.cend()) {
             collidingRect = *it;
             return true;
@@ -375,7 +374,7 @@ void AADLInterfaceGraphicsItem::adjustItem()
         int ccAlignmentIdx { initialAlignment };
 
         while (qAbs(cAlignmentIdx - initialAlignment) < kRectSides.size()
-               && qAbs(ccAlignmentIdx - initialAlignment) < kRectSides.size()) {
+                && qAbs(ccAlignmentIdx - initialAlignment) < kRectSides.size()) {
             moveIface(cIntersectedRect, cbr, cAlignmentIdx, parentRect, offset, false);
             if (!checkCollision(siblingsRects, cbr, cIntersectedRect)) {
                 alignmentIdx = cAlignmentIdx;
@@ -423,13 +422,13 @@ void AADLInterfaceGraphicsItem::updateKind()
     case aadl::AADLObjectIface::OperationKind::Cyclic: {
         const qreal kindBaseValue = kHeight;
         kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
-                         kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
-                       -90, -270);
+                               kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
+                -90, -270);
         kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
         kindPath.addPolygon(
                 QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
-                                   kindPath.currentPosition(),
-                                   kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
+                        kindPath.currentPosition(),
+                        kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
         kindPath.translate(0, kindBaseValue / 2);
         break;
     }

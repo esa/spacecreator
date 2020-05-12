@@ -33,7 +33,7 @@ public:
     virtual ~ObjectsLink();
 
     QPointF makeLink(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
-                     const QPointF &targetAnchorPoint);
+            const QPointF &targetAnchorPoint);
     bool replaceSource(InteractiveObject *source, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
     bool replaceTarget(InteractiveObject *target, const QPointF &anchorPoint, ObjectAnchor::Snap snap);
 

@@ -251,8 +251,8 @@ void TextGraphicsItem::keyPressEvent(QKeyEvent *event)
     QGraphicsTextItem::keyPressEvent(event);
 
     if (m_explicitSize.isValid()
-        && (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
-            || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
+            && (QGraphicsTextItem::boundingRect().width() > m_explicitSize.width()
+                    || QGraphicsTextItem::boundingRect().height() > m_explicitSize.height())) {
         prepareGeometryChange();
         m_explicitSize = QGraphicsTextItem::boundingRect().size();
     }

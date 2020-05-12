@@ -41,8 +41,8 @@ static const int kCommentZLevel = 3;
 static const int kGripZLevel = 4;
 
 QPointF lineCenter(const QLineF &line);
-QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
-                                          const QVariant &to, const int durationMs);
+QPropertyAnimation *createLinearAnimation(
+        QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs);
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
 QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
@@ -54,12 +54,12 @@ QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QP
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
 
-QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos,
-                           const QList<int> &acceptableTypes = QList<int>());
-QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area,
-                           const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(
+        const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(
+        const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes = QList<int>());
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
-                           const QList<int> &acceptableTypes = QList<int>());
+        const QList<int> &acceptableTypes = QList<int>());
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
 

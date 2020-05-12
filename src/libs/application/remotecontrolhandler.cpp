@@ -53,8 +53,8 @@ void RemoteControlHandler::setModel(MainModel *model)
  *
  * This is the main function. Call this to perform a command.
  */
-void RemoteControlHandler::handleRemoteCommand(RemoteControlWebServer::CommandType commandType,
-                                               const QVariantMap &params, const QString &peerName)
+void RemoteControlHandler::handleRemoteCommand(
+        RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName)
 {
     if (!m_model) {
         Q_EMIT commandDone(commandType, false, peerName, QLatin1String("Empty model"));
@@ -149,7 +149,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     m_model->chartViewModel().currentChart()->addInstance(mscInstance);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
-                                     QVariant::fromValue<msc::MscChart *>(mscChart), pos };
+        QVariant::fromValue<msc::MscChart *>(mscChart), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
     if (!result)
         *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
@@ -175,7 +175,7 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
     mscInstance->setExplicitStop(true);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
-                                     mscInstance->explicitStop() };
+        mscInstance->explicitStop() };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::StopInstance, cmdParams);
     if (!result)
         *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
@@ -219,9 +219,9 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
     const int messageIdx = mscChart->instanceEvents().size();
     const QString name = params.value(QLatin1String("name"),
-                                      messageType == msc::MscMessage::MessageType::Message
-                                              ? QStringLiteral("Message_%1").arg(messageIdx)
-                                              : QStringLiteral("Create_%1").arg(messageIdx))
+                                       messageType == msc::MscMessage::MessageType::Message
+                                               ? QStringLiteral("Message_%1").arg(messageIdx)
+                                               : QStringLiteral("Create_%1").arg(messageIdx))
                                  .toString();
     if (messageType == msc::MscMessage::MessageType::Create && !mscTargetInstance) {
         *errorString = tr("Can't create Message with type Create without target Instance");
@@ -237,7 +237,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     mscChart->addInstanceEvent(message, pos);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
-                                     QVariant::fromValue<msc::ChartViewModel *>(&m_model->chartViewModel()), pos };
+        QVariant::fromValue<msc::ChartViewModel *>(&m_model->chartViewModel()), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
     if (!result)
         *errorString = tr("Message is added but unavailable for Undo/Redo actions");
@@ -280,9 +280,8 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     mscChart->addInstanceEvent(mscTimer, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(mscTimer),
-                                      QVariant::fromValue<msc::MscTimer::TimerType>(timerType),
-                                      QVariant::fromValue<msc::MscChart *>(mscChart),
-                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscTimer::TimerType>(timerType), QVariant::fromValue<msc::MscChart *>(mscChart),
+        QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
     if (!result)
         *errorString = tr("Timer is added but unavailable for Undo/Redo actions");
@@ -316,8 +315,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     mscChart->addInstanceEvent(mscAction, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(mscAction),
-                                      QVariant::fromValue<msc::MscChart *>(mscChart),
-                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscChart *>(mscChart), QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
     if (!result)
         *errorString = tr("Action is added but unavailable for Undo/Redo actions");
@@ -351,8 +349,7 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     mscChart->addInstanceEvent(mscCondition, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(mscCondition),
-                                      QVariant::fromValue<msc::MscChart *>(mscChart),
-                                      QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscChart *>(mscChart), QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
     if (!result)
         *errorString = tr("Condition is added but unavailable for Undo/Redo actions");

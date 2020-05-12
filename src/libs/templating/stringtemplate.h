@@ -41,8 +41,8 @@ class StringTemplate : public QObject
 public:
     static StringTemplate *create(QObject *parent = nullptr);
 
-    bool parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName,
-                   QIODevice *out);
+    bool parseFile(
+            const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName, QIODevice *out);
 
     QString formatText(const QString &text);
 

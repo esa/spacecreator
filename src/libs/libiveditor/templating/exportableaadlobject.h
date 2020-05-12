@@ -22,7 +22,7 @@
 #include <QVariant>
 
 namespace aadl {
-    class AADLObject;
+class AADLObject;
 }
 
 namespace templating {
@@ -56,8 +56,8 @@ protected:
 Q_DECLARE_METATYPE(templating::ExportableAADLObject)
 Q_DECLARE_TYPEINFO(templating::ExportableAADLObject, Q_MOVABLE_TYPE);
 
-template<> inline templating::ExportableAADLObject
-qvariant_cast<templating::ExportableAADLObject>(const QVariant &v)
+template<>
+inline templating::ExportableAADLObject qvariant_cast<templating::ExportableAADLObject>(const QVariant &v)
 {
     return *static_cast<const templating::ExportableAADLObject *>(v.constData());
 }

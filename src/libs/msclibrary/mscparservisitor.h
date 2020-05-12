@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include "MscBaseVisitor.h"
 #include "cif/cifparser.h"
 #include "mscmessage.h"
-#include "MscBaseVisitor.h"
 
 #include <QVector>
 

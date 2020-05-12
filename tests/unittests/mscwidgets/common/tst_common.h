@@ -30,12 +30,12 @@ constexpr int EventsDelayMs = 100;
 
 // QGraphicsScene does not accept QTest's mouse press event,
 // so we have to synthesize them:
-void sendMousePress(QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton,
-                    int delay = EventsDelayMs);
+void sendMousePress(
+        QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton, int delay = EventsDelayMs);
 void sendMouseMove(QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::NoButton,
-                   Qt::MouseButtons buttons = Qt::NoButton, int delay = EventsDelayMs);
-void sendMouseRelease(QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton,
-                      int delay = EventsDelayMs);
+        Qt::MouseButtons buttons = Qt::NoButton, int delay = EventsDelayMs);
+void sendMouseRelease(
+        QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton, int delay = EventsDelayMs);
 
 } // ns ui
 } // ns test

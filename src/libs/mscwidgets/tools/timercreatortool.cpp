@@ -26,8 +26,8 @@
 
 namespace msc {
 
-TimerCreatorTool::TimerCreatorTool(MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view,
-                                   QObject *parent)
+TimerCreatorTool::TimerCreatorTool(
+        MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_timerType(type)
 {
@@ -86,9 +86,8 @@ void TimerCreatorTool::commitPreviewItem()
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(timer),
-                                      QVariant::fromValue<msc::MscTimer::TimerType>(m_timerType),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart),
-                                      QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
+        QVariant::fromValue<msc::MscTimer::TimerType>(m_timerType), QVariant::fromValue<msc::MscChart *>(m_activeChart),
+        QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
 
     startWaitForModelLayoutComplete(timer);

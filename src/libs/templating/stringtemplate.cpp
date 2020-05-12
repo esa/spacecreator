@@ -64,8 +64,8 @@ void StringTemplate::init()
  * @param openedOutFile a pointer to the buffer to store result
  * @return false if data has not been written
  */
-bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName,
-                               QIODevice *out)
+bool StringTemplate::parseFile(
+        const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName, QIODevice *out)
 {
     if (!out || templateFileName.isEmpty()) {
         return false;
@@ -74,8 +74,8 @@ bool StringTemplate::parseFile(const QHash<QString, QVariantList> &grouppedObjec
     const QFileInfo fileInfo(templateFileName);
 
     if (auto cache = m_engine->templateLoaders().size()
-                ? m_engine->templateLoaders().first().staticCast<Grantlee::CachingLoaderDecorator>()
-                : nullptr)
+                    ? m_engine->templateLoaders().first().staticCast<Grantlee::CachingLoaderDecorator>()
+                    : nullptr)
         cache->clear();
 
     m_fileLoader->setTemplateDirs({ fileInfo.absolutePath() });

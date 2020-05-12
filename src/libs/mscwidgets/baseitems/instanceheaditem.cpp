@@ -164,11 +164,11 @@ void InstanceHeadItem::updateLayout()
             qMax(defaultSizeScene.width(), qMax(m_textItemName->idealWidth(), m_textItemKind->idealWidth()));
 
     if (!qFuzzyIsNull(m_textItemKind->textWidth())
-        && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
+            && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
         m_textItemName->setTextWidth(width);
     }
     if (!qFuzzyIsNull(m_textItemKind->textWidth())
-        && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
+            && (m_textItemKind->textWidth() - width) / m_textItemKind->textWidth() > 0.1) {
         m_textItemKind->setTextWidth(width);
     }
     QRectF nameRect = m_textItemName->boundingRect();

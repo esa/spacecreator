@@ -48,7 +48,7 @@ enum RectOperation
     Edit
 };
 bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
-                  const RectOperation action);
+        const RectOperation action);
 
 }
 }

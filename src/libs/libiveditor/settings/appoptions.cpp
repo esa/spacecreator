@@ -16,6 +16,7 @@
 */
 
 #include "appoptions.h"
+
 #include "interface/properties/dynamicpropertyconfig.h"
 
 #include <QStandardPaths>

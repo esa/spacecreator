@@ -27,7 +27,7 @@ namespace utils {
 
 CoordinatesConverter *CoordinatesConverter::m_instance = nullptr;
 
-CoordinatesConverter::CoordinatesConverter() {}
+CoordinatesConverter::CoordinatesConverter() { }
 
 CoordinatesConverter *CoordinatesConverter::instance()
 {
@@ -59,7 +59,7 @@ void CoordinatesConverter::setScene(QGraphicsScene *scene)
 
     if (viewChanged && m_view) {
         setDPI(QPointF(m_view->physicalDpiX(), m_view->physicalDpiY()),
-               QPointF(m_view->logicalDpiX(), m_view->logicalDpiY()));
+                QPointF(m_view->logicalDpiX(), m_view->logicalDpiY()));
     }
 
     if (!m_view)

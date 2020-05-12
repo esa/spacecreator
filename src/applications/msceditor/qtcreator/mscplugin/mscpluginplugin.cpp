@@ -101,8 +101,8 @@ ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
 
 void MscPluginPlugin::triggerAction()
 {
-    QMessageBox::information(Core::ICore::mainWindow(), tr("Action Triggered"),
-                             tr("This is an action from MscPlugin."));
+    QMessageBox::information(
+            Core::ICore::mainWindow(), tr("Action Triggered"), tr("This is an action from MscPlugin."));
 }
 
 } // namespace Internal

@@ -16,6 +16,7 @@
 */
 
 #include "connectioncreationvalidator.h"
+
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
@@ -95,9 +96,7 @@ namespace aadl {
  * Anything except the FailReason::NotFail means that the connection creation is prohibited.
  */
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(AADLObjectFunction *sourceFunction,
-                                                                                AADLObjectFunction *targetFunction,
-                                                                                AADLObjectIface *sourceIface,
-                                                                                AADLObjectIface *targetIface)
+        AADLObjectFunction *targetFunction, AADLObjectIface *sourceIface, AADLObjectIface *targetIface)
 {
     // [1] - the edge functions are not FunctionType
     for (const AADLObjectFunction *function : { sourceFunction, targetFunction })
@@ -131,7 +130,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
                 if (auto model = iface->objectsModel()) {
                     for (auto connection : model->getConnectionsForIface(iface->id())) {
                         if (connection->sourceInterface()->isRequired()
-                            && connection->targetInterface()->isRequired()) {
+                                && connection->targetInterface()->isRequired()) {
                             return FailReason::MulticastDisabled;
                         }
                     }
@@ -156,8 +155,8 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
  * Returns ConnectionCreationValidator::FailReason, anything except the FailReason::NotFail
  * means that the connection creation is prohibited.
  */
-ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(AADLObjectIface *sourceIface,
-                                                                                        AADLObjectIface *targetIface)
+ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAndParams(
+        AADLObjectIface *sourceIface, AADLObjectIface *targetIface)
 {
     if (auto ri = AADLObjectConnection::selectIface<const AADLObjectIfaceRequired *>(sourceIface, targetIface))
         if (AADLObjectConnection::selectIface<const AADLObjectIfaceProvided *>(sourceIface, targetIface)) {
@@ -166,7 +165,7 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::checkKindAn
                 const QVector<AADLObjectConnection *> riConnections = model->getConnectionsForIface(ri->id());
                 for (const AADLObjectConnection *riConnection : riConnections)
                     if ((riConnection->sourceInterface() && riConnection->sourceInterface()->isProvided())
-                        || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
+                            || (riConnection->targetInterface() && riConnection->targetInterface()->isProvided()))
                         return FailReason::MulticastDisabled;
             }
 #endif // AADL_MULTICAST_CONNECTION

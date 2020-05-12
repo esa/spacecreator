@@ -36,13 +36,11 @@ protected:
     void highlightBlock(const QString &text) override;
 
 private:
-    struct HighlightingRule
-    {
+    struct HighlightingRule {
         QRegularExpression pattern;
         QTextCharFormat format;
     };
-    struct Highlighting
-    {
+    struct Highlighting {
         QRegularExpression basePattern;
         QTextCharFormat baseFormat;
         QVector<HighlightingRule> highlightingRules;

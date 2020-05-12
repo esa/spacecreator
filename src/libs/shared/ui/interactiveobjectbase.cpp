@@ -1,6 +1,7 @@
 #include "interactiveobjectbase.h"
-#include "grippointshandler.h"
+
 #include "delayedsignal.h"
+#include "grippointshandler.h"
 #include "highlightrectitem.h"
 
 #include <QPainter>
@@ -9,11 +10,11 @@
 namespace shared {
 namespace ui {
 
-struct InteractiveObjectBase::InteractiveObjectBasePrivate
-{
+struct InteractiveObjectBase::InteractiveObjectBasePrivate {
     InteractiveObjectBasePrivate()
         : selectedPen(Qt::black, 2)
-    {}
+    {
+    }
 
     QPointer<shared::ui::GripPointsHandler> gripPointsHandler;
     QRectF boundingRect;
@@ -24,14 +25,16 @@ struct InteractiveObjectBase::InteractiveObjectBasePrivate
     QPointer<HighlightRectItem> highlighter;
     QPen selectedPen;
 
-    utils::DelayedSignal* rebuildLayoutSignal;
+    utils::DelayedSignal *rebuildLayoutSignal;
 };
 
-InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem* parent)
-    : QGraphicsObject(parent), d(new InteractiveObjectBasePrivate)
+InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem *parent)
+    : QGraphicsObject(parent)
+    , d(new InteractiveObjectBasePrivate)
 {
     d->rebuildLayoutSignal = new utils::DelayedSignal(this);
-    connect(d->rebuildLayoutSignal, &utils::DelayedSignal::triggered, this, &InteractiveObjectBase::instantLayoutUpdate);
+    connect(d->rebuildLayoutSignal, &utils::DelayedSignal::triggered, this,
+            &InteractiveObjectBase::instantLayoutUpdate);
 }
 
 InteractiveObjectBase::~InteractiveObjectBase()
@@ -40,7 +43,7 @@ InteractiveObjectBase::~InteractiveObjectBase()
     d = nullptr;
 }
 
-void InteractiveObjectBase::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void InteractiveObjectBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     if (isSelected()) {
         auto pen = painter->pen();
@@ -60,7 +63,7 @@ void InteractiveObjectBase::setBoundingRect(const QRectF newRect)
     updateGripPoints();
 }
 
-GripPointsHandler* InteractiveObjectBase::gripPointsHandler()
+GripPointsHandler *InteractiveObjectBase::gripPointsHandler()
 {
     return d->gripPointsHandler;
 }
@@ -147,8 +150,7 @@ void InteractiveObjectBase::setHighlightable(bool highlightable)
   set to be the only selected item, input focus forced to its first text field
   (to edit default name, etc).
 */
-void InteractiveObjectBase::postCreatePolishing() {
-}
+void InteractiveObjectBase::postCreatePolishing() { }
 
 void InteractiveObjectBase::updateGripPoints()
 {
@@ -196,41 +198,23 @@ void InteractiveObjectBase::instantLayoutUpdate()
     update();
 }
 
-void InteractiveObjectBase::onManualMoveStart(GripPoint*, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualMoveStart(GripPoint *, const QPointF &) { }
 
-void InteractiveObjectBase::onManualMoveProgress(GripPoint*, const QPointF&, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualMoveProgress(GripPoint *, const QPointF &, const QPointF &) { }
 
-void InteractiveObjectBase::onManualMoveFinish(GripPoint*, const QPointF&, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualMoveFinish(GripPoint *, const QPointF &, const QPointF &) { }
 
-void InteractiveObjectBase::onManualGripPointAdd(GripPoint*)
-{
-}
+void InteractiveObjectBase::onManualGripPointAdd(GripPoint *) { }
 
-void InteractiveObjectBase::onManualGripPointRemove(GripPoint*)
-{
-}
+void InteractiveObjectBase::onManualGripPointRemove(GripPoint *) { }
 
-void InteractiveObjectBase::onManualResizeStart(GripPoint*, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualResizeStart(GripPoint *, const QPointF &) { }
 
-void InteractiveObjectBase::onManualResizeProgress(GripPoint*, const QPointF&, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualResizeProgress(GripPoint *, const QPointF &, const QPointF &) { }
 
-void InteractiveObjectBase::onManualResizeFinish(GripPoint*, const QPointF&, const QPointF&)
-{
-}
+void InteractiveObjectBase::onManualResizeFinish(GripPoint *, const QPointF &, const QPointF &) { }
 
-void InteractiveObjectBase::onSelectionChanged(bool)
-{
-}
+void InteractiveObjectBase::onSelectionChanged(bool) { }
 
 void InteractiveObjectBase::initGripPoints()
 {
@@ -241,9 +225,12 @@ void InteractiveObjectBase::initGripPoints()
     d->gripPointsHandler = new GripPointsHandler(this);
     d->gripPointsHandler->setZValue(0);
 
-    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this, &InteractiveObjectBase::gripPointPressed);
-    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeProgress, this, &InteractiveObjectBase::gripPointMoved);
-    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeFinish, this, &InteractiveObjectBase::gripPointReleased);
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,
+            &InteractiveObjectBase::gripPointPressed);
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeProgress, this,
+            &InteractiveObjectBase::gripPointMoved);
+    connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeFinish, this,
+            &InteractiveObjectBase::gripPointReleased);
 
     connect(d->gripPointsHandler, &GripPointsHandler::visibleChanged, this, [this]() {
         if (d->gripPointsHandler && !d->gripPointsHandler->isVisible()) {
@@ -289,8 +276,7 @@ QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVar
    In this function updates to the geometry, content etc. is done
    This is usually triggered by the funtion \see InteractiveObject::updateLayout
  */
-void InteractiveObjectBase::rebuildLayout() {
-}
+void InteractiveObjectBase::rebuildLayout() { }
 
 void InteractiveObjectBase::gripPointPressed(GripPoint *gp, const QPointF &at)
 {
@@ -319,7 +305,7 @@ void InteractiveObjectBase::gripPointReleased(GripPoint *gp, const QPointF &pres
     }
 }
 
-HighlightRectItem* InteractiveObjectBase::createHighlighter()
+HighlightRectItem *InteractiveObjectBase::createHighlighter()
 {
     auto highlighter = new HighlightRectItem(this);
     highlighter->setPath(shape());

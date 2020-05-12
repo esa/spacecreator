@@ -130,8 +130,8 @@ bool Asn1ValueParser::checkFormat(const QString &asn1Value) const
  * \param valueMap
  * \return
  */
-bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type, const QString &asn1Value,
-                                         QVariantMap &valueMap) const
+bool Asn1ValueParser::parseSequenceValue(
+        const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const
 {
     /*
 { intVal 5,
@@ -197,8 +197,8 @@ bool Asn1ValueParser::parseSequenceValue(const QVariantMap &asn1Type, const QStr
     return true;
 }
 
-bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type, const QString &asn1Value,
-                                           QVariantMap &valueMap) const
+bool Asn1ValueParser::parseSequenceOfValue(
+        const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const
 {
     /*
 {enum1, enum3}
@@ -239,8 +239,8 @@ bool Asn1ValueParser::parseSequenceOfValue(const QVariantMap &asn1Type, const QS
     return true;
 }
 
-bool Asn1ValueParser::parseChoiceValue(const QVariantMap &asn1Type, const QString &asn1Value,
-                                       QVariantMap &valueMap) const
+bool Asn1ValueParser::parseChoiceValue(
+        const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const
 {
     /*
  choiceReal : 10.5

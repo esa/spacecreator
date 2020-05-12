@@ -4,7 +4,7 @@
 
 namespace utils {
 
-DelayedSignal::DelayedSignal(QObject* parent)
+DelayedSignal::DelayedSignal(QObject *parent)
     : QObject(parent)
 {
     mTimer = new QTimer(this);
@@ -12,11 +12,13 @@ DelayedSignal::DelayedSignal(QObject* parent)
     connect(mTimer, SIGNAL(timeout()), SLOT(triggerNow()));
 }
 
-void DelayedSignal::triggerSignal() {
+void DelayedSignal::triggerSignal()
+{
     mTimer->start();
 }
 
-void DelayedSignal::triggerNow() {
+void DelayedSignal::triggerNow()
+{
     Q_EMIT triggered(parent());
 }
 

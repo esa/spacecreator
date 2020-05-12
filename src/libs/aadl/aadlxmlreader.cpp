@@ -135,7 +135,7 @@ AADLXMLReader::AADLXMLReader(QObject *parent)
 {
 }
 
-AADLXMLReader::~AADLXMLReader() {}
+AADLXMLReader::~AADLXMLReader() { }
 
 bool AADLXMLReader::readFile(const QString &file)
 {
@@ -207,8 +207,8 @@ bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
     return true;
 }
 
-IfaceParameter addIfaceParameter(const QString &name, const XmlAttributes &otherAttrs,
-                                 IfaceParameter::Direction direction)
+IfaceParameter addIfaceParameter(
+        const QString &name, const XmlAttributes &otherAttrs, IfaceParameter::Direction direction)
 {
     IfaceParameter param;
 
@@ -264,8 +264,8 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
                 attrs.value(Props::token(Props::Token::is_type), QStringLiteral("no")).m_value.toLower()
                 == QStringLiteral("yes");
 
-        obj = addFunction(nameAttr.m_value,
-                          isFunctionType ? AADLObject::Type::FunctionType : AADLObject::Type::Function);
+        obj = addFunction(
+                nameAttr.m_value, isFunctionType ? AADLObject::Type::FunctionType : AADLObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
@@ -279,8 +279,7 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::Input_Parameter: {
         Q_ASSERT(d->m_currentObject.iface() != nullptr);
 
-        const IfaceParameter param = addIfaceParameter(
-                nameAttr.m_value, attrs,
+        const IfaceParameter param = addIfaceParameter(nameAttr.m_value, attrs,
                 t == Props::Token::Input_Parameter ? IfaceParameter::Direction::In : IfaceParameter::Direction::Out);
         d->m_currentObject.iface()->addParam(param);
         break;
@@ -314,8 +313,8 @@ void AADLXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
     default:
         static const QString msg("The '%1' is unknown/unexpedted here: %2@%3 %4");
-        qWarning() << msg.arg(tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()),
-                              xml.tokenString());
+        qWarning() << msg.arg(
+                tagName, QString::number(xml.lineNumber()), QString::number(xml.columnNumber()), xml.tokenString());
         break;
     }
 

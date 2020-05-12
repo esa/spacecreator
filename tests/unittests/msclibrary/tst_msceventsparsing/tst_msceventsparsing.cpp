@@ -246,8 +246,7 @@ void tst_MscEventsParsing::testMultiParameters()
 void tst_MscEventsParsing::testMessageParametersCurlyBraces()
 {
     static const QStringList params { "{}", "{dpu_undervoltage:TRUE}",
-                                      "heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}",
-                                      "{VBS_Valid: FALSE, CHU_Valid: FALSE}" };
+        "heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}", "{VBS_Valid: FALSE, CHU_Valid: FALSE}" };
     static const QString mscTemplate = "MSC msc1;"
                                        "INSTANCE A;"
                                        "%1"

@@ -18,7 +18,6 @@
 
 #include "commentitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
 #include "cif/cifblockfactory.h"
@@ -31,6 +30,7 @@
 #include "mscentity.h"
 #include "objectslinkitem.h"
 #include "textitem.h"
+#include "ui/grippointshandler.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -167,11 +167,9 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     if ((m_iObj && isGlobal()) || (!m_iObj && m_isGlobalPreview)) {
         painter->setBrush(QColor(0xf9e29c));
         painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(),
-                                                br.bottomRight(), br.topRight() + QPointF(0, kMargins),
-                                                br.topRight() - QPointF(kMargins, 0) });
+                br.bottomRight(), br.topRight() + QPointF(0, kMargins), br.topRight() - QPointF(kMargins, 0) });
         painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, kMargins),
-                                                 br.topRight() - QPointF(kMargins, -kMargins),
-                                                 br.topRight() - QPointF(kMargins, 0) });
+                br.topRight() - QPointF(kMargins, -kMargins), br.topRight() - QPointF(kMargins, 0) });
     } else {
         painter->fillRect(br, QColor(0xf9e29c));
         if (m_inverseLayout)
@@ -187,13 +185,13 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 void CommentItem::initGripPoints()
 {
     InteractiveObjectBase::initGripPoints();
-    gripPointsHandler()->setUsedPoints(
-            isGlobal() ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
-                                                shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
-                                                shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
-                                                shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight,
-                                                shared::ui::GripPoint::Location::Center }
-                       : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
+    gripPointsHandler()->setUsedPoints(isGlobal()
+                    ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top,
+                            shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
+                            shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
+                            shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
+                            shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
+                    : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
 }
 
 cif::CifLine::CifType CommentItem::mainCifType() const
@@ -239,25 +237,23 @@ void CommentItem::rebuildLayout()
     } else if (!isGlobal()) {
         if (m_inverseLayout) {
             if (br.left() - commentPosition.x() > kLineLength) {
-                link = QPolygonF(QVector<QPointF> {
-                        QPointF(br.left(), br.center().y()), QPointF(br.left() - kLineLength / 2, br.center().y()),
+                link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()),
+                        QPointF(br.left() - kLineLength / 2, br.center().y()),
                         QPointF(br.left() - kLineLength / 2, commentPosition.y()), commentPosition });
                 m_inverseLayout = false;
             } else {
-                link = QPolygonF(QVector<QPointF> {
-                        QPointF(br.right(), br.center().y()),
+                link = QPolygonF(QVector<QPointF> { QPointF(br.right(), br.center().y()),
                         QPointF((br.right() + commentPosition.x()) / 2, br.center().y()),
                         QPointF((br.right() + commentPosition.x()) / 2, commentPosition.y()), commentPosition });
             }
         } else {
             if (br.left() - commentPosition.x() > kLineLength) {
                 link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()),
-                                                    QPointF((br.left() + commentPosition.x()) / 2, br.center().y()),
-                                                    QPointF((br.left() + commentPosition.x()) / 2, commentPosition.y()),
-                                                    commentPosition });
+                        QPointF((br.left() + commentPosition.x()) / 2, br.center().y()),
+                        QPointF((br.left() + commentPosition.x()) / 2, commentPosition.y()), commentPosition });
             } else {
-                link = QPolygonF(QVector<QPointF> {
-                        QPointF(br.right(), br.center().y()), QPointF(br.right() + kLineLength / 2, br.center().y()),
+                link = QPolygonF(QVector<QPointF> { QPointF(br.right(), br.center().y()),
+                        QPointF(br.right() + kLineLength / 2, br.center().y()),
                         QPointF(br.right() + kLineLength / 2, commentPosition.y()), commentPosition });
                 m_inverseLayout = true;
             }
@@ -344,8 +340,8 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRect newRect;
     if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                                      { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
 
         rebuildLayout();
         updateGripPoints();
@@ -403,8 +399,8 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     QRect newRect;
     if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                                      { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
 
         rebuildLayout();
         updateGripPoints();
@@ -428,11 +424,11 @@ void CommentItem::textEdited(const QString &text)
         if (oldRect != newRect || oldText != text) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
             msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                                          { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                                            QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                    { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
+                            QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                                          { QVariant::fromValue<MscChart *>(m_chart),
-                                            QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
+                    { QVariant::fromValue<MscChart *>(m_chart),
+                            QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
             msc::cmd::CommandsStack::current()->endMacro();
         }
     }

@@ -23,8 +23,7 @@ namespace aadlinterface {
 namespace cmd {
 
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(aadl::AADLObjectIface *iface, const QString &targetName,
-                                               const QVariant &targetValue, const QVariant &prevValue,
-                                               QUndoCommand *parent)
+        const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
     : QUndoCommand(parent)
     , m_iface(iface)
     , m_model(m_iface ? m_iface->objectsModel() : nullptr)
@@ -67,8 +66,8 @@ QVector<aadl::AADLObjectConnection *> CmdIfaceDataChangeBase::getRelatedConnecti
     return affected;
 }
 
-aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const aadl::AADLObjectConnection *connection,
-                                                                      aadl::AADLObjectIface *changedIface)
+aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(
+        const aadl::AADLObjectConnection *connection, aadl::AADLObjectIface *changedIface)
 {
     if (connection && changedIface) {
         switch (connection->connectionType()) {
@@ -81,12 +80,12 @@ aadl::AADLObjectIface *CmdIfaceDataChangeBase::getConnectionOtherSide(const aadl
         case aadl::AADLObjectConnection::ConnectionType::PI2PI:
         case aadl::AADLObjectConnection::ConnectionType::RI2RI: {
             if (connection->sourceInterface() == changedIface
-                || connection->sourceInterface()->cloneOf() == changedIface) {
+                    || connection->sourceInterface()->cloneOf() == changedIface) {
                 return connection->targetInterface();
             }
 
             if (connection->targetInterface() == changedIface
-                || connection->targetInterface()->cloneOf() == changedIface) {
+                    || connection->targetInterface()->cloneOf() == changedIface) {
                 return connection->sourceInterface();
             }
 

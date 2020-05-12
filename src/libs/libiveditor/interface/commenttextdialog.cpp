@@ -19,9 +19,9 @@
 
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
+#include "commandsstack.h"
 #include "ui_commenttextdialog.h"
 
-#include "commandsstack.h"
 #include <aadlobjectcomment.h>
 
 namespace aadlinterface {

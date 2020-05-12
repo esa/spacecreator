@@ -24,7 +24,6 @@ namespace msc {
 MscCreate::MscCreate(QObject *parent)
     : MscCreate(QString(), parent) // rename from default one (which is MscEntity::DefaultName - "Untitled")
 {
-
 }
 
 MscCreate::MscCreate(const QString &name, QObject *parent)

@@ -42,7 +42,7 @@ class MainModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(msc::MscDocument *selectedDocument READ selectedDocument WRITE setSelectedDocument NOTIFY
-                       selectedDocumentChanged)
+                    selectedDocumentChanged)
     Q_PROPERTY(QString currentFilePath READ currentFilePath WRITE setCurrentFilePath NOTIFY currentFilePathChanged)
 
 public:

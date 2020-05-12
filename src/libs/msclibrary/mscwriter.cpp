@@ -162,8 +162,8 @@ QString MscWriter::modelText(MscModel *model)
  * \param tabsSize
  * \return
  */
-QString MscWriter::serialize(const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents,
-                             int tabsSize)
+QString MscWriter::serialize(
+        const MscInstance *instance, const QVector<MscInstanceEvent *> &instanceEvents, int tabsSize)
 {
     if (instance == nullptr)
         return "";
@@ -355,11 +355,11 @@ QString MscWriter::serialize(const MscAction *action, const MscInstance *instanc
 
     if (action->actionType() == MscAction::ActionType::Informal) {
         if (action->informalAction().contains('='))
-            return serializeCif(action, QString("%1action %2%3;\n").arg(tabString, action->informalAction(), comment),
-                                tabsSize);
+            return serializeCif(
+                    action, QString("%1action %2%3;\n").arg(tabString, action->informalAction(), comment), tabsSize);
         else
-            return serializeCif(action, QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment),
-                                tabsSize);
+            return serializeCif(
+                    action, QString("%1action '%2'%3;\n").arg(tabString, action->informalAction(), comment), tabsSize);
     } else {
         QString actionText = tabString + "action ";
         bool first = true;
@@ -456,7 +456,7 @@ QString MscWriter::serialize(const MscChart *chart, int tabsSize)
     const QString &tabString = tabs(tabsSize);
     const QString chartSerialized(QString("%1msc %2%4;%5\n%3%1endmsc;\n")
                                           .arg(tabString, chart->name(), instances, serializeComment(chart, tabsSize),
-                                               serializeGlobalComments(chart, tabsSize)));
+                                                  serializeGlobalComments(chart, tabsSize)));
     return serializeCif(chart, chartSerialized, tabsSize);
 }
 
@@ -518,7 +518,7 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
     const QString &tabString = tabs(tabsSize);
     const QString documentSerialized(QString("%1mscdocument %2%6%4;%5\n%3%1endmscdocument;\n")
                                              .arg(tabString, document->name(), documentBody, relation, dataDef,
-                                                  serializeComment(document, tabsSize)));
+                                                     serializeComment(document, tabsSize)));
     return serializeCif(document, documentSerialized, tabsSize);
 }
 

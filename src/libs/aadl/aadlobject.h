@@ -49,7 +49,7 @@ public:
     Q_ENUM(Type)
 
     explicit AADLObject(const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
-                        const utils::Id &id = utils::InvalidId);
+            const utils::Id &id = utils::InvalidId);
     virtual ~AADLObject();
 
     QString title() const;

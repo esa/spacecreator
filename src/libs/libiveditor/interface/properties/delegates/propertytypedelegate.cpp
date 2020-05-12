@@ -17,8 +17,8 @@
 
 #include "propertytypedelegate.h"
 
-#include "datatypesstorage.h"
 #include "aadlparameter.h"
+#include "datatypesstorage.h"
 
 #include <QComboBox>
 #include <QStringListModel>
@@ -43,6 +43,6 @@ PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
 {
 }
 
-PropertyTypeDelegate::~PropertyTypeDelegate() {}
+PropertyTypeDelegate::~PropertyTypeDelegate() { }
 
 }

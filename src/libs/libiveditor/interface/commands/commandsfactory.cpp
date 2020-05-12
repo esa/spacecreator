@@ -114,10 +114,10 @@ QUndoCommand *CommandsFactory::createFunctionCommand(const QVariantList &params)
     const QVariant model = params.value(0);
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
-    if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid() && model.canConvert<aadl::AADLObjectsModel *>()
-        && parent.canConvert<aadl::AADLObjectFunction *>())
-        return new CmdFunctionItemCreate(model.value<aadl::AADLObjectsModel *>(), parent.value<aadl::AADLObjectFunction *>(),
-                                         geometry.value<QRectF>());
+    if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
+            && model.canConvert<aadl::AADLObjectsModel *>() && parent.canConvert<aadl::AADLObjectFunction *>())
+        return new CmdFunctionItemCreate(model.value<aadl::AADLObjectsModel *>(),
+                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>());
 
     return nullptr;
 }
@@ -128,10 +128,10 @@ QUndoCommand *CommandsFactory::createFunctionTypeCommand(const QVariantList &par
     const QVariant model = params.value(0);
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
-    if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid() && model.canConvert<aadl::AADLObjectsModel *>()
-        && parent.canConvert<aadl::AADLObjectFunction *>())
-        return new CmdFunctionTypeItemCreate(model.value<aadl::AADLObjectsModel *>(), parent.value<aadl::AADLObjectFunction *>(),
-                                             geometry.value<QRectF>());
+    if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
+            && model.canConvert<aadl::AADLObjectsModel *>() && parent.canConvert<aadl::AADLObjectFunction *>())
+        return new CmdFunctionTypeItemCreate(model.value<aadl::AADLObjectsModel *>(),
+                parent.value<aadl::AADLObjectFunction *>(), geometry.value<QRectF>());
 
     return nullptr;
 }
@@ -143,9 +143,9 @@ QUndoCommand *CommandsFactory::createCommentCommand(const QVariantList &params)
     const QVariant parent = params.value(1);
     const QVariant geometry = params.value(2);
     if (geometry.isValid() && geometry.canConvert<QRectF>() && model.isValid()
-        && model.canConvert<aadl::AADLObjectsModel *>())
-        return new CmdCommentItemCreate(model.value<aadl::AADLObjectsModel *>(), parent.value<aadl::AADLObjectFunctionType *>(),
-                                        geometry.value<QRectF>());
+            && model.canConvert<aadl::AADLObjectsModel *>())
+        return new CmdCommentItemCreate(model.value<aadl::AADLObjectsModel *>(),
+                parent.value<aadl::AADLObjectFunctionType *>(), geometry.value<QRectF>());
 
     return nullptr;
 }
@@ -169,12 +169,12 @@ QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &param
     const QVariant endIfaceId = params.value(3);
     const QVariant points = params.value(4);
     if (points.isValid() && points.canConvert<QVector<QPointF>>() && model.isValid()
-        && model.canConvert<aadl::AADLObjectsModel *>() && parentFunction.isValid()
-        && parentFunction.canConvert<aadl::AADLObjectFunction *>() && startIfaceId.isValid()
-        && startIfaceId.canConvert<utils::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<utils::Id>()) {
-        return new CmdConnectionItemCreate(
-                model.value<aadl::AADLObjectsModel *>(), parentFunction.value<aadl::AADLObjectFunction *>(),
-                startIfaceId.value<utils::Id>(), endIfaceId.value<utils::Id>(), points.value<QVector<QPointF>>());
+            && model.canConvert<aadl::AADLObjectsModel *>() && parentFunction.isValid()
+            && parentFunction.canConvert<aadl::AADLObjectFunction *>() && startIfaceId.isValid()
+            && startIfaceId.canConvert<utils::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<utils::Id>()) {
+        return new CmdConnectionItemCreate(model.value<aadl::AADLObjectsModel *>(),
+                parentFunction.value<aadl::AADLObjectFunction *>(), startIfaceId.value<utils::Id>(),
+                endIfaceId.value<utils::Id>(), points.value<QVector<QPointF>>());
     }
 
     return nullptr;
@@ -195,7 +195,7 @@ QUndoCommand *CommandsFactory::changeGeometryCommand(const QVariantList &params)
         const QVariant entity = objectDataList.value(0);
         const QVariant points = objectDataList.value(1);
         if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && points.isValid()
-            && points.canConvert<QVector<QPointF>>()) {
+                && points.canConvert<QVector<QPointF>>()) {
             objectsData.append(qMakePair(entity.value<aadl::AADLObject *>(), points.value<QVector<QPointF>>()));
         } else {
             return nullptr;
@@ -210,7 +210,7 @@ QUndoCommand *CommandsFactory::removeEntityCommand(const QVariantList &params)
     const QVariant entity = params.value(0);
     const QVariant model = params.value(1);
     if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && model.isValid()
-        && model.canConvert<aadl::AADLObjectsModel *>()) {
+            && model.canConvert<aadl::AADLObjectsModel *>()) {
         return new CmdEntityRemove(entity.value<aadl::AADLObject *>(), model.value<aadl::AADLObjectsModel *>());
     }
 
@@ -404,7 +404,7 @@ QUndoCommand *CommandsFactory::autoLayoutEntityCommand(const QVariantList &param
         const QVariant entity = objectDataList.value(0);
         const QVariant points = objectDataList.value(1);
         if (entity.isValid() && entity.canConvert<aadl::AADLObject *>() && points.isValid()
-            && points.canConvert<QVector<QPointF>>()) {
+                && points.canConvert<QVector<QPointF>>()) {
             objectsData.append(qMakePair(entity.value<aadl::AADLObject *>(), points.value<QVector<QPointF>>()));
         } else {
             return nullptr;

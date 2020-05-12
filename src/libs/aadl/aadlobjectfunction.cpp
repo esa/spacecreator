@@ -41,7 +41,7 @@ AADLObjectFunction::AADLObjectFunction(const QString &title, QObject *parent)
     setAttr(meta::Props::token(meta::Props::Token::instance_of), QVariant());
 }
 
-AADLObjectFunction::~AADLObjectFunction() {}
+AADLObjectFunction::~AADLObjectFunction() { }
 
 bool AADLObjectFunction::postInit()
 {
@@ -65,7 +65,7 @@ void AADLObjectFunction::setInstanceOf(AADLObjectFunctionType *fnType)
         if (d->m_fnType) {
 
             disconnect(d->m_fnType, &AADLObjectFunction::contextParamsChanged, this,
-                       &AADLObjectFunction::reflectContextParam);
+                    &AADLObjectFunction::reflectContextParam);
             disconnect(d->m_fnType, &AADLObjectFunction::propertyChanged, this, &AADLObjectFunction::reflectProp);
             disconnect(d->m_fnType, &AADLObjectFunction::attributeChanged, this, &AADLObjectFunction::reflectAttr);
 
@@ -150,7 +150,7 @@ void AADLObjectFunction::reflectAttrs(const QHash<QString, QVariant> &attrs)
 {
     QHash<QString, QVariant> prepared(attrs);
     for (meta::Props::Token t :
-         { meta::Props::Token::is_type, meta::Props::Token::instance_of, meta::Props::Token::name }) {
+            { meta::Props::Token::is_type, meta::Props::Token::instance_of, meta::Props::Token::name }) {
         const QString name = meta::Props::token(t);
         if (prepared.contains(name))
             prepared.insert(name, attr(name));

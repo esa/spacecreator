@@ -91,8 +91,8 @@ protected:
     virtual bool onMouseRelease(QMouseEvent *e);
     virtual bool onMouseMove(QMouseEvent *e);
 
-    virtual void createPreviewItem() {}
-    virtual void commitPreviewItem() {}
+    virtual void createPreviewItem() { }
+    virtual void commitPreviewItem() { }
 
     virtual void movePreviewItem(const QPointF &cursorInScene);
     virtual void removePreviewItem();

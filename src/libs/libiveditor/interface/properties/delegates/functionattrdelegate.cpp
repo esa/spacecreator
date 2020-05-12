@@ -32,8 +32,8 @@ FunctionAttrDelegate::FunctionAttrDelegate(QObject *parent)
 {
 }
 
-QWidget *FunctionAttrDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                                            const QModelIndex &index) const
+QWidget *FunctionAttrDelegate::createEditor(
+        QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (index.column() == PropertiesListModel::ColumnValue)
         if (const PropertiesListModel *pModel = qobject_cast<const PropertiesListModel *>(index.model())) {

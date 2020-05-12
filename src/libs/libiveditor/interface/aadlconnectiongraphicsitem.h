@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "baseitems/interactiveobject.h"
 #include "aadlobject.h"
+#include "baseitems/interactiveobject.h"
 
 #include <QGraphicsRectItem>
 #include <QPointer>
@@ -43,13 +43,12 @@ public:
     int type() const override { return Type; }
 
     explicit AADLConnectionGraphicsItem(aadl::AADLObjectConnection *connection, AADLInterfaceGraphicsItem *ifaceStart,
-                                        AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
+            AADLInterfaceGraphicsItem *ifaceEnd, QGraphicsItem *parent = nullptr);
     ~AADLConnectionGraphicsItem() override;
 
     static QVector<QPointF> connectionPath(AADLInterfaceGraphicsItem *ifaceStart, AADLInterfaceGraphicsItem *ifaceEnd);
     static QVector<QPointF> connectionPath(QGraphicsScene *scene, const QPointF &startIfacePos,
-                                           const QRectF &sourceRect, const QPointF &endIfacePos,
-                                           const QRectF &targetRect);
+            const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect);
 
     void setPoints(const QVector<QPointF> &points);
     QVector<QPointF> points() const;

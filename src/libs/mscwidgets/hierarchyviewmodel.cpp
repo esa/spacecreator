@@ -91,8 +91,8 @@ public:
     }
 
     // The posY is 0 for the toplevel items and boxSize height + spaceY for all others
-    QSizeF layoutItemsHelper(const QVector<DocumentItem *> &items, qreal spaceX, qreal spaceY, qreal posY,
-                             const QSizeF &boxSize) const
+    QSizeF layoutItemsHelper(
+            const QVector<DocumentItem *> &items, qreal spaceX, qreal spaceY, qreal posY, const QSizeF &boxSize) const
     {
         qreal x = 0;
         qreal height = 0;
@@ -107,7 +107,7 @@ public:
             item->setBoxSize(boxSize);
 
             QRectF boundingRect(0, 0, qMax(boxSize.width(), childrensRect.width()),
-                                qMax(posY + boxSize.height(), childrensRect.height()));
+                    qMax(posY + boxSize.height(), childrensRect.height()));
 
             qreal pathHeight = boxSize.height() + (childrensRect.height() > 0 ? childrensRect.height() + spaceY : 0.);
             height = std::max(height, pathHeight);
@@ -156,7 +156,7 @@ HierarchyViewModel::HierarchyViewModel(QObject *parent)
 {
 }
 
-HierarchyViewModel::~HierarchyViewModel() {}
+HierarchyViewModel::~HierarchyViewModel() { }
 
 /*!
  * \brief HierarchyViewModel::graphicsScene Get the graphics scene for this view
@@ -227,23 +227,23 @@ void HierarchyViewModel::updateModel()
 
         for (msc::DocumentItem *item : d->documentItems) {
             QObject::connect(item, &msc::DocumentItem::doubleClicked, this,
-                             &msc::HierarchyViewModel::documentDoubleClicked, Qt::UniqueConnection);
+                    &msc::HierarchyViewModel::documentDoubleClicked, Qt::UniqueConnection);
             QObject::connect(item, &msc::DocumentItem::clicked, this, &msc::HierarchyViewModel::setSelectedDocument,
-                             Qt::UniqueConnection);
+                    Qt::UniqueConnection);
 
             QObject::connect(item->document(), &MscDocument::documentAdded, this, &HierarchyViewModel::updateModel,
-                             Qt::UniqueConnection);
+                    Qt::UniqueConnection);
             QObject::connect(item->document(), &MscDocument::documentRemoved, this, &HierarchyViewModel::updateModel,
-                             Qt::UniqueConnection);
+                    Qt::UniqueConnection);
             QObject::connect(item->document(), &MscDocument::nameChanged, this, &HierarchyViewModel::updateModel,
-                             Qt::UniqueConnection);
+                    Qt::UniqueConnection);
             QObject::connect(item->document(), &MscDocument::hierarchyTypeChanged, this,
-                             &HierarchyViewModel::updateModel, Qt::UniqueConnection);
+                    &HierarchyViewModel::updateModel, Qt::UniqueConnection);
 
-            QObject::connect(item, &DocumentItem::moved, this, &HierarchyViewModel::documentMoved,
-                             Qt::UniqueConnection);
+            QObject::connect(
+                    item, &DocumentItem::moved, this, &HierarchyViewModel::documentMoved, Qt::UniqueConnection);
             QObject::connect(item, &DocumentItem::positionChanged, this, &HierarchyViewModel::documentPositionChanged,
-                             Qt::UniqueConnection);
+                    Qt::UniqueConnection);
         }
     }
 }
@@ -268,8 +268,8 @@ void HierarchyViewModel::documentMoved(const DocumentItem *documentItem, const Q
 
     if (parentItem && parentItem != documentItem->parentItem() && parentItem->document()->isAddChildEnable()) {
         msc::cmd::CommandsStack::push(msc::cmd::MoveDocument,
-                                      { QVariant::fromValue<MscDocument *>(documentItem->document()),
-                                        QVariant::fromValue<MscDocument *>(parentItem->document()) });
+                { QVariant::fromValue<MscDocument *>(documentItem->document()),
+                        QVariant::fromValue<MscDocument *>(parentItem->document()) });
     } else {
         updateModel();
     }

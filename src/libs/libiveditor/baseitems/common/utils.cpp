@@ -17,8 +17,8 @@
 
 #include "utils.h"
 
-#include "baseitems/interactiveobject.h"
 #include "aadlobject.h"
+#include "baseitems/interactiveobject.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -56,8 +56,8 @@ QPointF lineCenter(const QLineF &line)
  * \brief The animation creation helper.
  * \sa HighlightRectItem
  */
-QPropertyAnimation *createLinearAnimation(QObject *target, const QString &propName, const QVariant &from,
-                                          const QVariant &to, const int durationMs)
+QPropertyAnimation *createLinearAnimation(
+        QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs)
 {
     QPropertyAnimation *anim = new QPropertyAnimation(target, propName.toUtf8());
     anim->setDuration(durationMs);
@@ -183,15 +183,15 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
             { QLineF(boundingArea.bottomRight(), boundingArea.bottomLeft()), Qt::AlignBottom },
         };
         const QLineF line { boundingArea.center(), pos };
-        auto it = std::find_if(rectLines.constBegin(), rectLines.constEnd(),
-                               [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
-                                   QPointF dummyPoint;
+        auto it = std::find_if(
+                rectLines.constBegin(), rectLines.constEnd(), [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
+                    QPointF dummyPoint;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-                                   return line.intersects(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
+                    return line.intersects(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
 #else
                                    return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
 #endif
-                               });
+                });
         if (it != rectLines.constEnd())
             side = it->second;
     }
@@ -272,8 +272,8 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, cons
  * \brief Iterates over all \a scene items in the square with center in \a center and the size of \a offset and returns
  * the first one which QGraphicsItem::type found in \a acceptableTypes list.
  */
-QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
-                           const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(
+        const QGraphicsScene *scene, const QPointF &center, qreal offset, const QList<int> &acceptableTypes)
 {
     const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
     return nearestItem(scene, area, acceptableTypes);

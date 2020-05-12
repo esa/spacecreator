@@ -45,8 +45,8 @@ private Q_SLOTS:
 private:
     void hideExtraFields(const QStandardItem *item, bool hide = false, int row = 0);
 
-    void setChildValue(const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize = -1,
-                       int choiceRow = -1);
+    void setChildValue(
+            const QStandardItem *rootItem, const QVariant &asn1Value, int seqOfSize = -1, int choiceRow = -1);
     void setChildRowValue(const QStandardItem *rootItem, int childIndex, const QVariant &asn1Value);
 
     QVariantMap findValue(const QString &name, const QVariantMap &asn1Value) const;

@@ -15,8 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlobject.h"
 #include "aadlcommonprops.h"
+#include "aadlobject.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -42,8 +42,8 @@ private Q_SLOTS:
     void test_setTitle();
 };
 
-static const char* TestObjectTitleValid = "Test_Object_Title";
-static const char* TestObjectTitleInvalid = "Test Object Title";
+static const char *TestObjectTitleValid = "Test_Object_Title";
+static const char *TestObjectTitleInvalid = "Test Object Title";
 
 void tst_AADLObject::test_defaultConstructor()
 {

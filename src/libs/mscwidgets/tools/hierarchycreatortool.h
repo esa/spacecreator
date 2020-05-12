@@ -31,7 +31,7 @@ class HierarchyCreatorTool : public BaseCreatorTool
 
 public:
     HierarchyCreatorTool(MscDocument::HierarchyType hierarchyType, HierarchyViewModel *model, QGraphicsView *view,
-                         QObject *parent = nullptr);
+            QObject *parent = nullptr);
 
     virtual BaseTool::ToolType toolType() const override;
 

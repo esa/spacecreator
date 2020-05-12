@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "propertiesmodelbase.h"
 #include "aadlparameter.h"
+#include "propertiesmodelbase.h"
 
 namespace aadl {
 class AADLObject;

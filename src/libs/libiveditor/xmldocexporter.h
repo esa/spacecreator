@@ -38,10 +38,10 @@ public:
 
     static bool canExportXml(document::AbstractTabDocument *doc);
     static bool exportDocSilently(document::AbstractTabDocument *doc, const QString &outPath = QString(),
-                                  const QString &templatePath = QString());
+            const QString &templatePath = QString());
 
     static bool exportDocInteractive(document::AbstractTabDocument *doc, QWidget *root,
-                                     const QString &outPath = QString(), const QString &templatePath = QString());
+            const QString &outPath = QString(), const QString &templatePath = QString());
 
     static QHash<QString, QVariantList> collectInterfaceObjects(document::InterfaceTabDocument *doc);
 
@@ -61,17 +61,16 @@ private:
     };
 
     static bool exportDoc(document::AbstractTabDocument *doc, QWidget *root, const QString &outPath,
-                          const QString &templatePath, InteractionPolicy interaction);
+            const QString &templatePath, InteractionPolicy interaction);
 
     static void ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy = RolloutDefaultsPolicy::Keep);
     static bool exportDocInterface(document::InterfaceTabDocument *doc, QWidget *root, const QString &outPath,
-                                   const QString &templatePath, InteractionPolicy interaction);
+            const QString &templatePath, InteractionPolicy interaction);
 
     static bool runExportSilently(document::InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
-                                  const QString &templateFileName, const QString &outFileName);
+            const QString &templateFileName, const QString &outFileName);
     static bool showExportDialog(document::InterfaceTabDocument *doc, QWidget *parentWindow,
-                                 const QHash<QString, QVariantList> &content, const QString &templateFileName,
-                                 const QString &outFileName);
+            const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName);
 };
 
 } // ns app

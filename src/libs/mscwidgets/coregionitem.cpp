@@ -17,12 +17,12 @@
 
 #include "coregionitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/common/utils.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "msccoregion.h"
+#include "ui/grippointshandler.h"
 
 #include <QPainter>
 
@@ -77,7 +77,7 @@ void CoregionItem::rebuildLayout()
 
     prepareGeometryChange();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
-        || m_end->instance() != m_instance->modelItem()) {
+            || m_end->instance() != m_instance->modelItem()) {
         setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset)));
         return;
     }

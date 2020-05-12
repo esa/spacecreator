@@ -17,10 +17,10 @@
 
 #include "conditionitem.h"
 
-#include "ui/grippointshandler.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
 #include "msccondition.h"
+#include "ui/grippointshandler.h"
 
 #include <QDebug>
 #include <QGraphicsPolygonItem>
@@ -139,7 +139,7 @@ void ConditionItem::buildLayout()
     prepareGeometryChange();
 
     if (nameSize.width()
-        > (modelItem()->shared() && m_InstancesRect.isValid() ? m_InstancesRect.width() : MAX_TEXT_WIDTH)) {
+            > (modelItem()->shared() && m_InstancesRect.isValid() ? m_InstancesRect.width() : MAX_TEXT_WIDTH)) {
         m_nameItem->setTextWrapMode(QTextOption::WrapAnywhere);
         m_nameItem->setTextWidth(m_InstancesRect.width() - 2 * CONDITION_MARGIN);
 
@@ -215,12 +215,12 @@ void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ConditionItem::onManualMoveProgress(shared::ui::GripPoint*, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     moveBy(0., to.y() - from.y());
 }
 
-void ConditionItem::onManualMoveFinish(shared::ui::GripPoint*, const QPointF &, const QPointF &)
+void ConditionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }

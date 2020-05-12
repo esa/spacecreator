@@ -33,8 +33,8 @@ class CmdEntityGeometryChange : public QUndoCommand
 {
 
 public:
-    explicit CmdEntityGeometryChange(const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData,
-                                     const QString &title = {});
+    explicit CmdEntityGeometryChange(
+            const QList<QPair<aadl::AADLObject *, QVector<QPointF>>> &objectsData, const QString &title = {});
     ~CmdEntityGeometryChange() override;
 
     void redo() override;

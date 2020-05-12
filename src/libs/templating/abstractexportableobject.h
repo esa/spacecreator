@@ -30,7 +30,9 @@ class AbstractExportableObject
 {
 public:
     AbstractExportableObject(const QObject *exportedObject)
-        : m_exportedObject(exportedObject) {}
+        : m_exportedObject(exportedObject)
+    {
+    }
 
     virtual ~AbstractExportableObject() = default;
 

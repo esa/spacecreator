@@ -168,8 +168,8 @@ void RemoteControlWebServer::processTextMessage(const QString &message)
     const QString commandTypeStr = obj.value(qtEnum.name()).toString();
     const int commandTypeInt = qtEnum.keyToValue(commandTypeStr.toLocal8Bit().constData());
     Q_EMIT executeCommand(static_cast<RemoteControlWebServer::CommandType>(commandTypeInt),
-                          obj.value(QLatin1String("Parameters")).toObject().toVariantMap(),
-                          pClient ? pClient->peerName() : QString());
+            obj.value(QLatin1String("Parameters")).toObject().toVariantMap(),
+            pClient ? pClient->peerName() : QString());
 }
 
 /*!
@@ -213,11 +213,11 @@ void RemoteControlWebServer::error(QAbstractSocket::SocketError error)
  * \param errorString
  */
 void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType commandType, bool result,
-                                         const QString &peerName, const QString &errorString)
+        const QString &peerName, const QString &errorString)
 {
     Q_UNUSED(commandType)
     auto it = std::find_if(m_clients.constBegin(), m_clients.constEnd(),
-                           [peerName](const QWebSocket *socket) { return socket->peerName() == peerName; });
+            [peerName](const QWebSocket *socket) { return socket->peerName() == peerName; });
     if (it == m_clients.constEnd())
         return;
 

@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "cmdifacedatachangebase.h"
 #include "aadlcommonprops.h"
 #include "aadlobjectsmodel.h"
+#include "cmdifacedatachangebase.h"
 
 #include <QPointer>
 #include <QVariant>
@@ -35,8 +35,8 @@ namespace cmd {
 class CmdRequiredIfacePropertyChange : public CmdIfaceDataChangeBase
 {
 public:
-    explicit CmdRequiredIfacePropertyChange(aadl::AADLObjectIfaceRequired *entity, const QString &propName,
-                                            const QVariant &value);
+    explicit CmdRequiredIfacePropertyChange(
+            aadl::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value);
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;

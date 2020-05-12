@@ -48,7 +48,10 @@ class ExportableProperty
     Q_PROPERTY(QVariant value READ value)
 public:
     ExportableProperty(const QString &name = QString(), const QVariant &value = QVariant())
-        : m_name(name), m_value(value) {}
+        : m_name(name)
+        , m_value(value)
+    {
+    }
 
     inline QString name() const { return m_name; }
     inline QVariant value() const { return m_value; }

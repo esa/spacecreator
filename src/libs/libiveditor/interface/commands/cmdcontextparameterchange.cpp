@@ -26,8 +26,8 @@
 namespace aadlinterface {
 namespace cmd {
 
-CmdContextParameterChange::CmdContextParameterChange(aadl::AADLObjectFunctionType *entity, const aadl::ContextParameter &oldParam,
-                                                     const aadl::ContextParameter &newParam)
+CmdContextParameterChange::CmdContextParameterChange(aadl::AADLObjectFunctionType *entity,
+        const aadl::ContextParameter &oldParam, const aadl::ContextParameter &newParam)
     : QUndoCommand()
     , m_entity(entity)
     , m_newParam(newParam)

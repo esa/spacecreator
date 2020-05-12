@@ -80,8 +80,8 @@ void tst_CmdInstanceItemCreate::testCreate()
     QMetaObject::invokeMethod(&m_chartModel, "doLayout", Qt::DirectConnection);
     for (int i = 0; i < CommandsCount; ++i) {
         cmd::CommandsStack::push(cmd::Id::CreateInstance,
-                                 { QVariant::fromValue<msc::MscInstance *>(nullptr),
-                                   QVariant::fromValue<msc::MscChart *>(m_chart), -1 });
+                { QVariant::fromValue<msc::MscInstance *>(nullptr), QVariant::fromValue<msc::MscChart *>(m_chart),
+                        -1 });
     }
 
     QCOMPARE(itemsCount(), CommandsCount);
@@ -133,8 +133,8 @@ void tst_CmdInstanceItemCreate::testInsertingOrder()
 
     for (const QString &name : names) {
         cmd::CommandsStack::push(cmd::Id::CreateInstance,
-                                 { QVariant::fromValue<msc::MscInstance *>(new msc::MscInstance(name)),
-                                   QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends instance
+                { QVariant::fromValue<msc::MscInstance *>(new msc::MscInstance(name)),
+                        QVariant::fromValue<msc::MscChart *>(m_chart), 0 }); // prepends instance
     }
 
     QCOMPARE(m_chart->instances().size(), names.size());

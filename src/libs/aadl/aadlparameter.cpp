@@ -16,6 +16,7 @@
 */
 
 #include "aadlparameter.h"
+
 #include "basicdatatype.h"
 #include "datatypesstorage.h"
 
@@ -30,7 +31,7 @@ BasicParameter::BasicParameter(const QString &name, Type t, const QString &param
 {
 }
 
-BasicParameter::~BasicParameter() {}
+BasicParameter::~BasicParameter() { }
 
 QString BasicParameter::name() const
 {
@@ -118,14 +119,12 @@ bool BasicParameter::isValidValue(const QVariant &value) const
 
     switch (m_basicDataType->dataType()) {
     case DataTypeName::Integer: {
-        if (SignedIntegerDataType *signedData =
-                    dynamic_cast<SignedIntegerDataType *>(m_basicDataType)) {
+        if (SignedIntegerDataType *signedData = dynamic_cast<SignedIntegerDataType *>(m_basicDataType)) {
             const qint64 v = value.toLongLong();
             return v >= signedData->min() && v <= signedData->max();
         }
 
-        if (UnsignedIntegerDataType *unsignedData =
-                    dynamic_cast<UnsignedIntegerDataType *>(m_basicDataType)) {
+        if (UnsignedIntegerDataType *unsignedData = dynamic_cast<UnsignedIntegerDataType *>(m_basicDataType)) {
             const quint64 v = value.toUInt();
             return v >= unsignedData->min() && v <= unsignedData->max();
         }
@@ -171,7 +170,7 @@ ContextParameter::ContextParameter(const QString &name, Type t, const QString &p
 {
 }
 
-ContextParameter::~ContextParameter() {}
+ContextParameter::~ContextParameter() { }
 
 QVariant ContextParameter::defaultValue() const
 {
@@ -233,15 +232,15 @@ bool ContextParameter::isNull() const
     return BasicParameter::isNull() || this->operator==({});
 }
 
-IfaceParameter::IfaceParameter(const QString &name, Type t, const QString &paramTypeName, const QString &encoding,
-                               Direction dir)
+IfaceParameter::IfaceParameter(
+        const QString &name, Type t, const QString &paramTypeName, const QString &encoding, Direction dir)
     : BasicParameter(name, t, paramTypeName)
     , m_encoding(encoding)
     , m_direction(dir)
 {
 }
 
-IfaceParameter::~IfaceParameter() {}
+IfaceParameter::~IfaceParameter() { }
 
 QString IfaceParameter::encoding() const
 {
@@ -284,9 +283,8 @@ QString IfaceParameter::directionName(IfaceParameter::Direction dir)
 
 IfaceParameter::Direction IfaceParameter::directionFromName(const QString &dir)
 {
-    static const QMap<QString, IfaceParameter::Direction> names {
-        { QObject::tr("IN"), IfaceParameter::Direction::In }, { QObject::tr("OUT"), IfaceParameter::Direction::Out }
-    };
+    static const QMap<QString, IfaceParameter::Direction> names { { QObject::tr("IN"), IfaceParameter::Direction::In },
+        { QObject::tr("OUT"), IfaceParameter::Direction::Out } };
     const QString &name = dir.toUpper();
     return names.contains(name) ? names.value(name) : names.first();
 }

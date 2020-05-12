@@ -36,7 +36,7 @@ class CmdMessageItemCreate : public BaseCommand
 {
 public:
     CmdMessageItemCreate(msc::MscMessage *message, msc::ChartViewModel *chart, int eventIndex,
-                         const QVector<QPoint> &points = QVector<QPoint>());
+            const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
     void undo() override;

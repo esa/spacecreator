@@ -69,7 +69,7 @@ bool DummyTabDocument::saveImpl(const QString & /*path*/)
     return false;
 }
 
-void DummyTabDocument::closeImpl() {}
+void DummyTabDocument::closeImpl() { }
 
 QVector<QAction *> DummyTabDocument::initActions()
 {
@@ -81,6 +81,6 @@ QVector<QAction *> DummyTabDocument::initActions()
     return { m_actDummy };
 }
 
-void DummyTabDocument::onActionDummy() {}
+void DummyTabDocument::onActionDummy() { }
 
 }

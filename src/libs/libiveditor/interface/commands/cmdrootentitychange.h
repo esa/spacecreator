@@ -18,9 +18,9 @@
 #pragma once
 
 #include "cmdentitygeometrychange.h"
+#include "common.h"
 
 #include <QPointer>
-#include "common.h"
 
 namespace aadl {
 class AADLObject;

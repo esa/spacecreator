@@ -24,7 +24,7 @@
 namespace taste3 {
 
 namespace aadl {
-    class AADLObject;
+class AADLObject;
 }
 
 namespace templating {

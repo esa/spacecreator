@@ -141,8 +141,8 @@ void CmdEntityAttributeChange::handleFunctionInstanceOf(const QVariant &attr, bo
 }
 
 Commands getCommands(const aadl::AADLObjectFunctionType *fnType, const CommandsStorage &cmdStorage,
-                     CmdEntityAttributeChange *caller,
-                     void (CmdEntityAttributeChange::*prepareMethod)(const aadl::AADLObjectFunctionType *fn))
+        CmdEntityAttributeChange *caller,
+        void (CmdEntityAttributeChange::*prepareMethod)(const aadl::AADLObjectFunctionType *fn))
 {
     if (!fnType || !caller || !prepareMethod)
         return {};
@@ -189,11 +189,11 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const aadl::AADL
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
             auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),
-                                      [clone](aadl::AADLObjectIface *fnIface) { return clone == fnIface; });
+                    [clone](aadl::AADLObjectIface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
                 const QVariantList params = { QVariant::fromValue(clone.data()),
-                                              QVariant::fromValue(clone->objectsModel()) };
+                    QVariant::fromValue(clone->objectsModel()) };
                 if (QUndoCommand *cmdRm = cmd::CommandsFactory::create(cmd::RemoveEntity, params))
                     cmdStorage.append(cmdRm);
             }

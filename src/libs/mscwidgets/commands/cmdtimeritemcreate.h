@@ -33,7 +33,7 @@ class CmdTimerItemCreate : public BaseCommand
 {
 public:
     CmdTimerItemCreate(msc::MscTimer *timer, MscTimer::TimerType timerType, msc::MscChart *chart,
-                       msc::MscInstance *instance, int eventIndex);
+            msc::MscInstance *instance, int eventIndex);
 
     void redo() override;
     void undo() override;

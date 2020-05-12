@@ -79,31 +79,25 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
 {
     switch (arg) {
     case CommandLineParser::Positional::DropUnsavedChangesSilently:
-        return QCommandLineOption(
-                { "d", "drop-changes-silently" },
-                QCoreApplication::translate("CommandLineParser",
-                                            "Do not propose to save changes when closing a document."));
+        return QCommandLineOption({ "d", "drop-changes-silently" },
+                QCoreApplication::translate(
+                        "CommandLineParser", "Do not propose to save changes when closing a document."));
     case CommandLineParser::Positional::OpenAADLXMLFile:
-        return QCommandLineOption(
-                { "o", "open-aadl-xml" },
+        return QCommandLineOption({ "o", "open-aadl-xml" },
                 QCoreApplication::translate("CommandLineParser", "Open an AADL XML <file> on startup."),
                 QCoreApplication::translate("CommandLineParser", "file"));
     case CommandLineParser::Positional::OpenStringTemplateFile:
-        return QCommandLineOption(
-                { "t", "open-template" },
-                QCoreApplication::translate("CommandLineParser",
-                                            "Open a string template <file> on startup (-o option is required)."),
+        return QCommandLineOption({ "t", "open-template" },
+                QCoreApplication::translate(
+                        "CommandLineParser", "Open a string template <file> on startup (-o option is required)."),
                 QCoreApplication::translate("CommandLineParser", "file"));
     case CommandLineParser::Positional::ExportToFile:
-        return QCommandLineOption(
-                { "e", "export-to-xml" },
-                QCoreApplication::translate(
-                        "CommandLineParser",
+        return QCommandLineOption({ "e", "export-to-xml" },
+                QCoreApplication::translate("CommandLineParser",
                         "Export the doc to the <file> using default template (-o option is required)."),
                 QCoreApplication::translate("CommandLineParser", "file"));
     case CommandLineParser::Positional::ListScriptableActions:
-        return QCommandLineOption(
-                { "l", "list-actions" },
+        return QCommandLineOption({ "l", "list-actions" },
                 QCoreApplication::translate("CommandLineParser", "List scriptable actions and exit."));
 
     case CommandLineParser::Positional::Unknown:

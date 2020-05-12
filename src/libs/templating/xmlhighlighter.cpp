@@ -34,8 +34,7 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat xmlValueElementFormat;
     xmlValueElementFormat.setForeground(Qt::black);
     xmlValueElementFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral(">[^\n]*</"),
-                                      QRegularExpression::InvertedGreedinessOption);
+    rule.pattern = QRegularExpression(QStringLiteral(">[^\n]*</"), QRegularExpression::InvertedGreedinessOption);
     rule.format = xmlValueElementFormat;
     m_highlightingRules.append(rule);
 
@@ -73,8 +72,7 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
     QTextCharFormat valueFormat;
     valueFormat.setForeground(Qt::magenta);
     valueFormat.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<=[=>])\".*\""),
-                                      QRegularExpression::InvertedGreedinessOption);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<=[=>])\".*\""), QRegularExpression::InvertedGreedinessOption);
     rule.format = valueFormat;
     m_highlightingRules.append(rule);
 }
@@ -85,11 +83,12 @@ XMLHighlighter::XMLHighlighter(QTextDocument *parent)
  */
 void XMLHighlighter::highlightBlock(const QString &text)
 {
-    //for every pattern
+    // for every pattern
     for (const HighlightingRule &rule : m_highlightingRules) {
         QRegularExpression expression(rule.pattern);
         if (!expression.isValid()) {
-            qWarning() << Q_FUNC_INFO << expression.errorString() << expression.pattern();;
+            qWarning() << Q_FUNC_INFO << expression.errorString() << expression.pattern();
+            ;
             continue;
         }
         QRegularExpressionMatchIterator it = expression.globalMatch(text);

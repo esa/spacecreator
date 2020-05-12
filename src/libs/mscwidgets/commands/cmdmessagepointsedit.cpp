@@ -26,7 +26,7 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-                                           const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart)
+        const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart)
     : BaseCommand(message)
     , m_message(message)
     , m_chart(chart)

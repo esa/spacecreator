@@ -61,12 +61,12 @@ static QVector<ExternalArgHolder> externalArgs(bool namedKey)
     QVector<ExternalArgHolder> args;
     args.append({ "$TASTE3", QObject::tr("Path to the Taste binary"), ExternalArgHolder::Type::CWD });
     args.append({ "$attr_" + name, QObject::tr("Value of the selected object's attribute [name]"),
-                  ExternalArgHolder::Type::Attr });
+            ExternalArgHolder::Type::Attr });
     args.append({ "$prop_" + name, QObject::tr("Value of the selected object's property [name]"),
-                  ExternalArgHolder::Type::Prop });
+            ExternalArgHolder::Type::Prop });
     args.append({ "$param_" + name,
-                  QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."),
-                  ExternalArgHolder::Type::Param });
+            QObject::tr("Value of the selected Interface's parameter (or Function's context parameter) [name]."),
+            ExternalArgHolder::Type::Param });
     return args;
 }
 
@@ -114,8 +114,7 @@ void ActionsManager::populateMenu(QMenu *menu, aadl::AADLObject *currObj)
                 else if (!actHandler.m_externalApp.isEmpty()) {
                     triggerActionExternal(actHandler, act ? act->data().value<aadl::AADLObject *>() : nullptr);
                 } else {
-                    QMessageBox::warning(
-                            nullptr, QObject::tr("Custom action"),
+                    QMessageBox::warning(nullptr, QObject::tr("Custom action"),
                             QObject::tr("No internal or extrernal action provided by %1").arg(actHandler.m_title));
                 }
             });
@@ -246,10 +245,9 @@ void ActionsManager::listRegisteredActions()
     const QMap<QString, ctx::ActionsManager::ScriptableActionHandler> &actions =
             ctx::ActionsManager::scriptableActions();
     const QStringList &names = actions.keys();
-    const int titleLength =
-            std::max_element(names.cbegin(), names.cend(),
-                             [](const QString &lhs, const QString &rhs) { return lhs.length() < rhs.length(); })
-                    ->length();
+    const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
+        return lhs.length() < rhs.length();
+    })->length();
 
     std::cout << qPrintable(QObject::tr("Available actions:")) << std::endl;
     for (const ctx::ActionsManager::ScriptableActionHandler &h : actions)
@@ -386,8 +384,8 @@ QStringList ActionsManager::externalArgsHoldersDescr()
   \brief Helper function for registering the \a action as scriptable, with key \a title and optional \a description.
  * The \a caller argument is used to provide reasonable debug record.
  */
-void ActionsManager::registerAction(const QString &caller, QAction *action, const QString &title,
-                                    const QString &description)
+void ActionsManager::registerAction(
+        const QString &caller, QAction *action, const QString &title, const QString &description)
 {
     if (!action) {
         qWarning() << "Null action can not be registered" << caller;

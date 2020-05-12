@@ -25,8 +25,8 @@
 
 namespace msc {
 
-HierarchyCreatorTool::HierarchyCreatorTool(MscDocument::HierarchyType hierarchyType, HierarchyViewModel *model,
-                                           QGraphicsView *view, QObject *parent)
+HierarchyCreatorTool::HierarchyCreatorTool(
+        MscDocument::HierarchyType hierarchyType, HierarchyViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(nullptr, view, parent)
     , m_hierarchyType(hierarchyType)
     , m_hierarchyViewModel(model)
@@ -49,8 +49,7 @@ void HierarchyCreatorTool::createPreviewItem()
     document->setHierarchyType(m_hierarchyType);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
-                                      QVariant::fromValue<msc::MscDocument *>(
-                                              m_hierarchyViewModel->selectedDocument()) };
+        QVariant::fromValue<msc::MscDocument *>(m_hierarchyViewModel->selectedDocument()) };
 
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateDocument, cmdParams);
 

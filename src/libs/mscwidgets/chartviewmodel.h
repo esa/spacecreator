@@ -68,11 +68,11 @@ public:
 
     void clearScene();
 
-    msc::InstanceItem *createDefaultInstanceItem(msc::MscInstance *orphanInstance = nullptr,
-                                                 const QPointF &pos = QPointF());
+    msc::InstanceItem *createDefaultInstanceItem(
+            msc::MscInstance *orphanInstance = nullptr, const QPointF &pos = QPointF());
     bool removeInstanceItem(msc::InstanceItem *item);
-    msc::MessageItem *createDefaultMessageItem(msc::MscMessage *orphanMessage = nullptr,
-                                               const QPointF &pos = QPointF());
+    msc::MessageItem *createDefaultMessageItem(
+            msc::MscMessage *orphanMessage = nullptr, const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
     ChartItem *itemForChart() const;

@@ -17,11 +17,11 @@
 
 #include "aadlrectgraphicsitem.h"
 
-#include "ui/grippointshandler.h"
-#include "commandsstack.h"
-#include "baseitems/common/utils.h"
 #include "aadlobject.h"
+#include "baseitems/common/utils.h"
+#include "commandsstack.h"
 #include "interface/graphicsitemhelpers.h"
+#include "ui/grippointshandler.h"
 
 #include <QKeyEvent>
 #include <QtDebug>
@@ -92,11 +92,10 @@ void AADLRectGraphicsItem::setRect(const QRectF &geometry)
 void AADLRectGraphicsItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({
-        shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
-        shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
-        shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
-        shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight });
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Top, shared::ui::GripPoint::Location::Left,
+            shared::ui::GripPoint::Location::Bottom, shared::ui::GripPoint::Location::Right,
+            shared::ui::GripPoint::Location::TopLeft, shared::ui::GripPoint::Location::BottomLeft,
+            shared::ui::GripPoint::Location::TopRight, shared::ui::GripPoint::Location::BottomRight });
 }
 
 QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
@@ -105,9 +104,9 @@ QRectF AADLRectGraphicsItem::adjustRectToParent(shared::ui::GripPoint *grip, con
     QRectF rect = mapRectToParent(boundingRect());
 
     auto parentObj = qobject_cast<InteractiveObject *>(parentObject());
-    const QRectF contentRect = parentObj
-            ? parentObj->boundingRect().marginsRemoved(parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
-            : QRectF();
+    const QRectF contentRect = parentObj ? parentObj->boundingRect().marginsRemoved(
+                                       parentObj->aadlObject()->isRootObject() ? kRootMargins : kContentMargins)
+                                         : QRectF();
     switch (grip->location()) {
     case shared::ui::GripPoint::Left: {
         const qreal left = rect.left() + shift.x();
@@ -239,13 +238,15 @@ void AADLRectGraphicsItem::onManualResizeProgress(shared::ui::GripPoint *grip, c
         setRect(mapRectToScene(mapRectFromParent(rect)));
 }
 
-void AADLRectGraphicsItem::onManualResizeFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLRectGraphicsItem::onManualResizeFinish(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
     handleGeometryChange(pressedAt, releasedAt);
 }
 
-void AADLRectGraphicsItem::onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void AADLRectGraphicsItem::onManualMoveFinish(
+        shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     Q_UNUSED(grip)
     handleGeometryChange(pressedAt, releasedAt);
@@ -389,7 +390,8 @@ void AADLRectGraphicsItem::layout()
     }
 
     auto parentFunction = qobject_cast<AADLRectGraphicsItem *>(parentObject());
-    const QMarginsF kCurrentMargins = parentFunction && parentFunction->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
+    const QMarginsF kCurrentMargins =
+            parentFunction && parentFunction->aadlObject()->isRootObject() ? kRootMargins : kContentMargins;
 
     QRectF boundedRect = QRectF(parentFunction ? parentFunction->sceneBoundingRect().marginsRemoved(kCurrentMargins)
                                                : scene()->itemsBoundingRect());

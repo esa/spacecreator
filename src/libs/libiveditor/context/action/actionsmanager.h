@@ -44,7 +44,8 @@ public:
     static void reload();
     static QStringList externalArgsHoldersDescr();
 
-    static void registerAction(const QString &caller, QAction *action, const QString &title = QString(), const QString &description = QString());
+    static void registerAction(const QString &caller, QAction *action, const QString &title = QString(),
+            const QString &description = QString());
 
 private:
     struct ScriptableActionHandler {

@@ -23,9 +23,9 @@
 #include "mscentity.h"
 
 #include <QBrush>
+#include <QCursor>
 #include <QDebug>
 #include <QGraphicsScene>
-#include <QCursor>
 #include <functional>
 
 namespace msc {
@@ -129,7 +129,7 @@ bool InteractiveObject::geometryManagedByCif() const
     return targetType == cif::CifLine::CifType::Unknown ? false : nullptr != cifBlockByType(targetType);
 }
 
-void InteractiveObject::updateCif() {}
+void InteractiveObject::updateCif() { }
 
 void InteractiveObject::moveSilentlyBy(const QPointF &shift)
 {

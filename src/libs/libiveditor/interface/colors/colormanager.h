@@ -63,8 +63,7 @@ private:
     QExplicitlySharedDataPointer<ColorHandlerData> d;
 };
 
-struct ColorHandlerData : public QSharedData
-{
+struct ColorHandlerData : public QSharedData {
     ColorHandler::FillType fillType { ColorHandler::FillType::Color };
     qreal penWidth { 1.0 };
     QColor penColor { Qt::black };

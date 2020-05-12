@@ -497,7 +497,7 @@ void tst_CifParser::testParsingCifBlockCollapsed()
     scenario associated with a transaction*/
     /* CIF End Text */
     testParsingCifBlock({ { CifLine::CifType::TextMode, CifLine::CifType::Text, CifLine::CifType::Collapsed,
-                            CifLine::CifType::TextName, CifLine::CifType::End } });
+            CifLine::CifType::TextName, CifLine::CifType::End } });
 }
 
 void tst_CifParser::testParsingCifBlockEnd()
@@ -550,7 +550,7 @@ void tst_CifParser::testParsingCifBlockMessage()
     /* CIF MESSAGE (20, 239) (758, 239) */
     /* CIF POSITION (209, 193) */
     testParsingCifBlock({ { CifLine::CifType::TextMode, CifLine::CifType::Modified, CifLine::CifType::Message,
-                            CifLine::CifType::Position } });
+            CifLine::CifType::Position } });
 }
 
 void tst_CifParser::testParsingCifBlockMscDocument()

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "ui/interactiveobjectbase.h"
 #include "interface/colors/colormanager.h"
+#include "ui/interactiveobjectbase.h"
 
 #include <QFont>
 #include <QPointer>

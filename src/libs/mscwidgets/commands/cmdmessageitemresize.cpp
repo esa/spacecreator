@@ -23,14 +23,14 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscInstance *newInsance,
-                                           MscMessage::EndType endType, MscChart *chart)
+CmdMessageItemResize::CmdMessageItemResize(
+        MscMessage *message, int newPos, MscInstance *newInsance, MscMessage::EndType endType, MscChart *chart)
     : BaseCommand(message)
     , m_message(message)
     , m_oldIndex(chart->instanceEvents().indexOf(message))
     , m_newIndex(newPos)
-    , m_oldInstance(endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance()
-                                                                     : message->targetInstance())
+    , m_oldInstance(
+              endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance())
     , m_newInstance(newInsance)
     , m_endType(endType)
     , m_chart(chart)

@@ -30,10 +30,10 @@ class MscInstance : public MscEntity
     Q_PROPERTY(QString denominator READ denominator WRITE setDenominator NOTIFY denominatorChanged)
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindChanged)
     Q_PROPERTY(QString denominatorAndKind READ denominatorAndKind WRITE setDenominatorAndKind NOTIFY
-                       denominatorOrKindChanged)
+                    denominatorOrKindChanged)
     Q_PROPERTY(QString inheritance READ inheritance WRITE setInheritance NOTIFY inheritanceChanged)
     Q_PROPERTY(msc::MscInstance *explicitCreator READ explicitCreator WRITE setExplicitCreator NOTIFY
-                       explicitCreatorChanged)
+                    explicitCreatorChanged)
     Q_PROPERTY(bool explicitStop READ explicitStop WRITE setExplicitStop NOTIFY explicitStopChanged)
 
 public:

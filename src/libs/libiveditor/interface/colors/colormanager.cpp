@@ -17,8 +17,8 @@
 
 #include "colormanager.h"
 
-#include "common.h"
 #include "baseitems/common/utils.h"
+#include "common.h"
 #include "settings/appoptions.h"
 
 #include <QDebug>
@@ -31,10 +31,14 @@
 namespace aadlinterface {
 
 ColorHandler::ColorHandler()
-    : d(new ColorHandlerData()) {}
+    : d(new ColorHandlerData())
+{
+}
 
 ColorHandler::ColorHandler(const ColorHandler &other)
-    : d(other.d) {}
+    : d(other.d)
+{
+}
 
 QPen ColorHandler::pen() const
 {

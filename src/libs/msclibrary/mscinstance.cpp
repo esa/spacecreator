@@ -112,8 +112,8 @@ void MscInstance::splitDenominatorKind(const QString &text, QString &denominator
     if (tokens.size() > 1) {
         const QString denom = tokens.at(0);
         if (denom.compare("system", Qt::CaseInsensitive) == 0 || denom.compare("block", Qt::CaseInsensitive) == 0
-            || denom.compare("process", Qt::CaseInsensitive) == 0
-            || denom.compare("service", Qt::CaseInsensitive) == 0) {
+                || denom.compare("process", Qt::CaseInsensitive) == 0
+                || denom.compare("service", Qt::CaseInsensitive) == 0) {
             tokens.removeAt(0);
             kind = tokens.join(" ");
             denominator = denom;

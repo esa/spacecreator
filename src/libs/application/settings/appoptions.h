@@ -24,7 +24,8 @@
 class OptionsGroup
 {
 public:
-    OptionsGroup(const QString &name, const QVector<shared::SettingsAppOption *> &options, const QVector<OptionsGroup *> &subroups);
+    OptionsGroup(const QString &name, const QVector<shared::SettingsAppOption *> &options,
+            const QVector<OptionsGroup *> &subroups);
 
     const QString Name;
     const QVector<shared::SettingsAppOption *> Options;

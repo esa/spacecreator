@@ -27,12 +27,15 @@
 static const char *defaultHost = "https://git.vikingsoftware.com";
 static const int defaultProjectID = 60;
 
-static const QString localName() { return "GroupBugReport"; }
+static const QString localName()
+{
+    return "GroupBugReport";
+}
 
 namespace reports {
 
 struct BugreportDialog::BugreportDialogPrivate {
-    explicit BugreportDialogPrivate(BugreportDialog* dialog, const QString& logPath, const QList<QPixmap> &images)
+    explicit BugreportDialogPrivate(BugreportDialog *dialog, const QString &logPath, const QList<QPixmap> &images)
         : reportHandler(nullptr)
         , images(images)
         , host("GroupBugReport/Host")
@@ -40,7 +43,8 @@ struct BugreportDialog::BugreportDialogPrivate {
         , accessToken("GroupBugReport/AccessToken")
     {
         ui.setupUi(dialog);
-        connect(ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, dialog, &BugreportDialog::sendReport);
+        connect(ui.buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, dialog,
+                &BugreportDialog::sendReport);
         connect(ui.buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, dialog, &QDialog::close);
         connect(ui.titleLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
         connect(ui.hostLineEdit, &QLineEdit::textChanged, dialog, &BugreportDialog::updateButtonBox);
@@ -51,7 +55,8 @@ struct BugreportDialog::BugreportDialogPrivate {
         ui.hostLineEdit->setText(settingsHost.isEmpty() ? QString(::defaultHost) : settingsHost);
 
         const QString settingsProjectID = projectID.read().toString();
-        ui.projectLineEdit->setText(settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
+        ui.projectLineEdit->setText(
+                settingsProjectID.isEmpty() ? QString::number(::defaultProjectID) : settingsProjectID);
 
         ui.accessTokenLineEdit->setText(accessToken.read().toByteArray());
 
@@ -68,7 +73,7 @@ struct BugreportDialog::BugreportDialogPrivate {
     }
 
     Ui::BugreportDialog ui;
-    reports::BugReportHandler* reportHandler;
+    reports::BugReportHandler *reportHandler;
     const QList<QPixmap> images;
 
     shared::SettingsAppOption host;
@@ -100,7 +105,8 @@ void BugreportDialog::sendReport()
 
     delete d->reportHandler;
 
-    d->reportHandler = new reports::BugReportHandler(d->ui.hostLineEdit->text(), d->ui.projectLineEdit->text(), d->ui.accessTokenLineEdit->text().toUtf8(), this);
+    d->reportHandler = new reports::BugReportHandler(d->ui.hostLineEdit->text(), d->ui.projectLineEdit->text(),
+            d->ui.accessTokenLineEdit->text().toUtf8(), this);
     connect(d->reportHandler, &reports::BugReportHandler::error, this, &BugreportDialog::error);
     connect(d->reportHandler, &reports::BugReportHandler::reportSent, this, &BugreportDialog::reportSent);
 
@@ -136,7 +142,8 @@ void BugreportDialog::reportSent(const QString &msg)
 void BugreportDialog::updateButtonBox()
 {
     auto applyButton = d->ui.buttonBox->button(QDialogButtonBox::Apply);
-    applyButton->setDisabled(d->ui.hostLineEdit->text().isEmpty() || d->ui.projectLineEdit->text().isEmpty() || d->ui.accessTokenLineEdit->text().isEmpty() || d->ui.titleLineEdit->text().isEmpty());
+    applyButton->setDisabled(d->ui.hostLineEdit->text().isEmpty() || d->ui.projectLineEdit->text().isEmpty()
+            || d->ui.accessTokenLineEdit->text().isEmpty() || d->ui.titleLineEdit->text().isEmpty());
 }
 
 }

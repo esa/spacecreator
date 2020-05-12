@@ -17,8 +17,8 @@
 
 #include "cmdentityautolayout.h"
 
-#include "commandsstack.h"
 #include "commandids.h"
+#include "commandsstack.h"
 
 #include <QtDebug>
 

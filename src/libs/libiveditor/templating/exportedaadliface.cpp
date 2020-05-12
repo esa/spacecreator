@@ -23,7 +23,9 @@ namespace taste3 {
 namespace templating {
 
 TemplatedAADLIface::TemplatedAADLIface(const aadl::AADLObjectIface *iface)
-    : ExportedAADLObject(iface) {}
+    : ExportedAADLObject(iface)
+{
+}
 
 bool TemplatedAADLIface::isProvided() const
 {

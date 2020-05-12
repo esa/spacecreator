@@ -16,8 +16,8 @@
 */
 
 #include "adddynamicpropertydialog.h"
-#include "common.h"
 #include "baseitems/common/utils.h"
+#include "common.h"
 #include "dynamicproperty.h"
 #include "ui_adddynamicpropertydialog.h"
 

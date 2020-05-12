@@ -23,8 +23,8 @@
 namespace msc {
 namespace cmd {
 
-CmdTimerItemCreate::CmdTimerItemCreate(MscTimer *timer, MscTimer::TimerType timerType, MscChart *chart,
-                                       msc::MscInstance *instance, int eventIndex)
+CmdTimerItemCreate::CmdTimerItemCreate(
+        MscTimer *timer, MscTimer::TimerType timerType, MscChart *chart, msc::MscInstance *instance, int eventIndex)
     : BaseCommand(timer)
     , m_timer(timer)
     , m_chart(chart)

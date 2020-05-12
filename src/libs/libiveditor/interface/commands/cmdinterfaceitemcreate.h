@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "cmdentitygeometrychange.h"
 #include "aadlobjectiface.h"
+#include "cmdentitygeometrychange.h"
 
 #include <QPointer>
 #include <QRect>

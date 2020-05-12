@@ -67,8 +67,8 @@ Q_SIGNALS:
     void contextParamsChanged();
 
 protected:
-    explicit AADLObjectFunctionType(const AADLObject::Type t, const QString &title = QString(),
-                                    QObject *parent = nullptr);
+    explicit AADLObjectFunctionType(
+            const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr);
 
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;

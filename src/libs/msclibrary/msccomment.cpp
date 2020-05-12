@@ -151,7 +151,7 @@ void MscComment::updateCifComment()
         if (!cifBlock->hasPayloadFor(cif::CifLine::CifType::End))
             cifBlock->addLine(cif::CifLineShared(new cif::CifLineEnd()));
         cifBlock->setPayload(QVariant::fromValue(cif::CifLine::nameForType(cif::CifLine::CifType::Text)),
-                             cif::CifLine::CifType::End);
+                cif::CifLine::CifType::End);
     } else if (cifBlock) {
         cifBlock->clearPayload(cif::CifLine::CifType::GlobalComment);
         cifBlock->clearPayload(cif::CifLine::CifType::End);

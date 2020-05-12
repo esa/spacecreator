@@ -17,13 +17,13 @@
 
 #include "graphicsitemhelpers.h"
 
-#include "baseitems/common/utils.h"
 #include "aadlobject.h"
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
+#include "baseitems/common/utils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -105,7 +105,7 @@ bool isOwnConnection(const QGraphicsItem *owner, const QGraphicsItem *connection
 }
 
 bool canPlaceRect(QGraphicsScene *scene, const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect,
-                  const RectOperation action)
+        const RectOperation action)
 {
     if (!scene || upcomingItemRect.isEmpty() || !upcomingItem)
         return false;

@@ -63,7 +63,7 @@ XmlFileMock XmlFileMock::createEmptyDoc()
 {
     XmlFileMock file(QStringLiteral("<InterfaceView>\n"
                                     "</InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -82,7 +82,7 @@ XmlFileMock XmlFileMock::createSingleFunction()
                                     <Property name=\"Taste::SomeOtherProp\" value =\"Some value\" />\n \
                                     </Function>\n \
                                     </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -109,7 +109,7 @@ XmlFileMock XmlFileMock::createSingleFunctionType()
                                     <Property name=\"Taste::SomeOtherProp\" value =\"Some value\" />\n \
                                     </Function>\n \
                                     </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -136,7 +136,7 @@ XmlFileMock XmlFileMock::createSingleComment()
                                         <Property name=\"Taste::unknownProperty\" value=\"foo\"/> \
                                     </Comment> \n \
                                     </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -163,7 +163,7 @@ XmlFileMock XmlFileMock::createSingleIfaceInvalid()
                                         <Property name=\"Taste::InheritPI\" value=\"true\"/>\n \
                                     </Required_Interface>\n \
                                     </InterfaceView>"),
-                     1, false);
+            1, false);
 
     return file;
 }
@@ -179,7 +179,7 @@ XmlFileMock XmlFileMock::createSingleIfaceValid()
                                         </Required_Interface>\n \
                                     </Function>\n \
                                     </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -247,7 +247,7 @@ XmlFileMock XmlFileMock::createSingleConnectionOrphan()
                                             <Target func_name=\"NestedFn1\" pi_name=\"PI_8\"/>\n \
                                         </Connection>\n \
                                     </InterfaceView>"),
-                     0, true);
+            0, true);
 
     file.setExpectedObjectCount(aadl::AADLObject::Type::Connection, 1);
 
@@ -275,7 +275,7 @@ XmlFileMock XmlFileMock::createSingleConnectionValid()
                                         <Target func_name=\"Function_2\" pi_name=\"PI_2\"/>\n \
                                     </Connection>\n \
                                 </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {
@@ -321,7 +321,7 @@ XmlFileMock XmlFileMock::createSingleConnectionValidMultipoint()
                                         <Property name=\"Taste::coordinates\" value=\"-30600 -33000 -30800 -33000 -32900 -37000 -32600 -44100 -24400 -43000 -16300 -42300 -8100 -46800 -1200 -41900 2700 -37300 4300 -29500 4200 -25300 3800 -23100 300 -19600 -1400 -18000 -7200 -15300 -13900 -13700 -22300 -12200 -34100 -11500 -47400 -12200 -58300 -14000 -64500 -15500 -80100 -18600 -85200 -21600 -86800 -28900 -85200 -35600 -81600 -41400 -79200 -44300 -76000 -47300 -72800 -49000 -66800 -48900 -62600 -48700 -56100 -47900 -51300 -47800 -44000 -47200 -43100 -46400 -41300 -44400 -39900 -42800 -38800 -40700 -38100 -33000 -42300 -33000\"/>\n \
                                     </Connection>\n \
                                 </InterfaceView>"),
-                     0, true);
+            0, true);
 
     const QMetaEnum &me = QMetaEnum::fromType<aadl::AADLObject::Type>();
     for (int i = 0; i < me.keyCount(); ++i) {

@@ -35,7 +35,8 @@ namespace cmd {
 class CmdFunctionItemCreate : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdFunctionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry);
+    explicit CmdFunctionItemCreate(
+            aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry);
 
     void redo() override;
     void undo() override;

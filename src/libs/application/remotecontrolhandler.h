@@ -33,12 +33,12 @@ public:
     void setModel(MainModel *model);
 
 public Q_SLOTS:
-    void handleRemoteCommand(RemoteControlWebServer::CommandType commandType, const QVariantMap &params,
-                             const QString &peerName);
+    void handleRemoteCommand(
+            RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName);
 
 Q_SIGNALS:
     void commandDone(RemoteControlWebServer::CommandType commandType, bool result, const QString &peerName,
-                     const QString &errorString);
+            const QString &errorString);
 
 private:
     bool handleInstanceCommand(const QVariantMap &params, QString *errorString);

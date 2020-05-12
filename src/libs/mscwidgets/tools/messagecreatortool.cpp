@@ -35,8 +35,8 @@
 
 namespace msc {
 
-MessageCreatorTool::MessageCreatorTool(MscMessage::MessageType msgType, ChartViewModel *model, QGraphicsView *view,
-                                       QObject *parent)
+MessageCreatorTool::MessageCreatorTool(
+        MscMessage::MessageType msgType, ChartViewModel *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_messageType(msgType)
 {
@@ -442,8 +442,8 @@ QVariantList MessageCreatorTool::prepareMessage()
             const int eventIndex = m_model->eventIndex(m_previewItem->y());
             const QVector<QPoint> &arrowPoints = getCif(m_messageItem->messagePoints());
             args = { QVariant::fromValue<msc::MscMessage *>(message),
-                     QVariant::fromValue<msc::ChartViewModel *>(m_model), eventIndex,
-                     QVariant::fromValue<QVector<QPoint>>(arrowPoints) };
+                QVariant::fromValue<msc::ChartViewModel *>(m_model), eventIndex,
+                QVariant::fromValue<QVector<QPoint>>(arrowPoints) };
         }
     } else {
         m_previewEntity.reset(message); // make it be clearable within removePreviewItem

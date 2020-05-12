@@ -32,7 +32,7 @@ class AADLObjectConnection : public AADLObject
 
 public:
     explicit AADLObjectConnection(AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource,
-                                  AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
+            AADLObjectIface *ifaceTarget, QObject *parent = nullptr);
     ~AADLObjectConnection() override;
 
     QString sourceName() const;

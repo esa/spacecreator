@@ -28,10 +28,9 @@
 namespace aadl {
 
 AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
-                                            const QPointF &position, AADLObjectIface::IfaceType type,
-                                            const utils::Id &id, const QVector<IfaceParameter> parameters,
-                                            OperationKind kind, const QString &name, const CreationInfo::Policy policy,
-                                            AADLObjectIface *source)
+        const QPointF &position, AADLObjectIface::IfaceType type, const utils::Id &id,
+        const QVector<IfaceParameter> parameters, OperationKind kind, const QString &name,
+        const CreationInfo::Policy policy, AADLObjectIface *source)
     : model(model)
     , function(function)
     , position(position)
@@ -50,22 +49,15 @@ QVariantList AADLObjectIface::CreationInfo::toVarList() const
     return { QVariant::fromValue(*this) };
 }
 
-AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::initFromIface(AADLObjectIface *iface,
-                                                                           const CreationInfo::Policy policy)
+AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::initFromIface(
+        AADLObjectIface *iface, const CreationInfo::Policy policy)
 {
     if (!iface)
         return {};
 
     return { iface->objectsModel(),
-             (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr),
-             QPointF(),
-             iface->direction(),
-             iface->id(),
-             iface->params(),
-             iface->kind(),
-             iface->title(),
-             policy,
-             iface };
+        (iface->parentObject() ? iface->parentObject()->as<AADLObjectFunctionType *>() : nullptr), QPointF(),
+        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->title(), policy, iface };
 }
 
 AADLObjectIface::CreationInfo AADLObjectIface::CreationInfo::fromIface(AADLObjectIface *iface)
@@ -169,8 +161,8 @@ QString AADLObjectIface::kindToString(AADLObjectIface::OperationKind k)
     return kindNamesXml.contains(k) ? kindNamesXml.value(k) : QString();
 }
 
-AADLObjectIface::OperationKind AADLObjectIface::kindFromString(const QString &k,
-                                                               AADLObjectIface::OperationKind defaultKind)
+AADLObjectIface::OperationKind AADLObjectIface::kindFromString(
+        const QString &k, AADLObjectIface::OperationKind defaultKind)
 {
     static const QMap<AADLObjectIface::OperationKind, QString> &kindNamesXml = AADLObjectIface::xmlKindNames();
     static const QStringList &names = kindNamesXml.values();
@@ -411,7 +403,7 @@ void AADLObjectIface::reflectAttrs(const AADLObjectIface *from)
         return;
 
     auto revertAttribute = [](const QString &name, QHash<QString, QVariant> &attrs,
-                              const QHash<QString, QVariant> &attrsOriginal) {
+                                   const QHash<QString, QVariant> &attrsOriginal) {
         const QVariant &value = attrsOriginal.value(name);
         if (value.isValid())
             attrs[name] = value;
@@ -436,7 +428,7 @@ void AADLObjectIface::reflectProps(const AADLObjectIface *from)
         return;
 
     auto revertProperty = [](meta::Props::Token t, QHash<QString, QVariant> &props,
-                             const QHash<QString, QVariant> &propsOriginal) {
+                                  const QHash<QString, QVariant> &propsOriginal) {
         const QString &name = meta::Props::token(t);
         const QVariant &value = propsOriginal.value(name);
         if (value.isValid())
@@ -448,7 +440,7 @@ void AADLObjectIface::reflectProps(const AADLObjectIface *from)
     const bool isFunctionTypeInherited = from->isNestedInFunctionType();
 
     for (auto t :
-         { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::InnerCoordinates }) {
+            { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::InnerCoordinates }) {
         const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
         const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
         if (!isInheritPIFlag || isInheritedPI)
@@ -549,7 +541,7 @@ QStringList AADLObjectIfaceRequired::collectInheritedLabels() const
 {
     QStringList result, titles;
     std::transform(m_prototypes.cbegin(), m_prototypes.cend(), std::back_inserter(titles),
-                   [](const AADLObjectIfaceProvided *pi) { return pi->title(); });
+            [](const AADLObjectIfaceProvided *pi) { return pi->title(); });
 
     for (const AADLObjectIfaceProvided *pi : m_prototypes) {
         QString label = pi->title();
@@ -668,7 +660,7 @@ void AADLObjectIfaceRequired::restoreInternals(const AADLObjectIface *disconnect
     AADLObjectIface::restoreInternals(disconnectMe);
     if (const AADLObjectIfaceRequired *ri = disconnectMe->as<const AADLObjectIfaceRequired *>())
         disconnect(ri, &AADLObjectIfaceRequired::propChanged_InheritPI, this,
-                   &AADLObjectIfaceRequired::propChanged_InheritPI);
+                &AADLObjectIfaceRequired::propChanged_InheritPI);
 }
 
 }

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "aadlrectgraphicsitem.h"
 #include "aadlobject.h"
+#include "aadlrectgraphicsitem.h"
 
 namespace aadl {
 class AADLObjectFunctionType;
@@ -60,7 +60,7 @@ protected:
     {
         QStringList result;
         std::transform(collection.cbegin(), collection.cend(), std::back_inserter(result),
-                       [](AADLType obj) { return obj ? obj->title() : QString(); });
+                [](AADLType obj) { return obj ? obj->title() : QString(); });
         const QString line = joinNonEmpty(result, QStringLiteral(", "));
         return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
     }

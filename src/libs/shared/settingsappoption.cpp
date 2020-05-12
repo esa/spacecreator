@@ -1,4 +1,5 @@
 #include "settingsappoption.h"
+
 #include "settingsmanager.h"
 
 namespace shared {

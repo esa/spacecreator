@@ -42,7 +42,7 @@ class InstanceItem : public InteractiveObject
 
 public:
     explicit InstanceItem(MscInstance *instance, ChartViewModel *chartView = nullptr, MscChart *chart = nullptr,
-                          QGraphicsItem *parent = nullptr);
+            QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
 
@@ -57,8 +57,8 @@ public:
     QPainterPath shape() const override;
     void setGeometry(const QRectF &geometry);
 
-    static InstanceItem *createDefaultItem(ChartViewModel *model, MscInstance *instance, MscChart *chart,
-                                           const QPointF &pos);
+    static InstanceItem *createDefaultItem(
+            ChartViewModel *model, MscInstance *instance, MscChart *chart, const QPointF &pos);
 
     QPair<QPointF, bool> commentPoint() const override;
 

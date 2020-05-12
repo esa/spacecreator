@@ -20,7 +20,7 @@
 #include "exportableaadlobject.h"
 
 namespace aadl {
-    class AADLObjectFunctionType;
+class AADLObjectFunctionType;
 }
 
 namespace templating {

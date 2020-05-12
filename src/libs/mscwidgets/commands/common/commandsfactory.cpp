@@ -171,8 +171,8 @@ QUndoCommand *CommandsFactory::createDeleteEntity(const QVariantList &params)
 
     QVector<MscEntity *> items = params.at(0).value<QVector<MscEntity *>>();
     if (!items.isEmpty()) {
-        return new CmdDeleteEntity(items, params.at(1).value<msc::MscChart *>(),
-                                   params.at(2).value<msc::MscDocument *>());
+        return new CmdDeleteEntity(
+                items, params.at(1).value<msc::MscChart *>(), params.at(2).value<msc::MscDocument *>());
     }
 
     return nullptr;
@@ -512,7 +512,7 @@ QUndoCommand *CommandsFactory::createEditMessagePoints(const QVariantList &param
     if (auto chart = params.last().value<MscChart *>()) {
         if (auto message = params.at(0).value<MscMessage *>())
             return new CmdMessagePointsEdit(message, params.at(1).value<QVector<QPoint>>(),
-                                            params.at(2).value<QVector<QPoint>>(), params.at(3).toInt(), chart);
+                    params.at(2).value<QVector<QPoint>>(), params.at(3).toInt(), chart);
     }
 
     return nullptr;

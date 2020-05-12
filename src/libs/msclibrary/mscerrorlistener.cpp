@@ -24,7 +24,7 @@
 namespace msc {
 
 void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token *offendingSymbol, size_t line,
-                                   size_t charPositionInLine, const std::string &msg, std::exception_ptr /*e*/)
+        size_t charPositionInLine, const std::string &msg, std::exception_ptr /*e*/)
 {
     const QString lineOfError = QString::number(line);
     const QString positionInLine = QString::number(charPositionInLine);
@@ -46,9 +46,10 @@ void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token
     }
 
     if (offendingSymbol) {
-        m_errorMessages.append(QString("@%1:%2: <b>'%3' - %4</b>; Rules stack:<br>[%5]<br>")
-                                       .arg(lineOfError, positionInLine,
-                                            QString::fromStdString(offendingSymbol->getText()), errorMessage, stack));
+        m_errorMessages.append(
+                QString("@%1:%2: <b>'%3' - %4</b>; Rules stack:<br>[%5]<br>")
+                        .arg(lineOfError, positionInLine, QString::fromStdString(offendingSymbol->getText()),
+                                errorMessage, stack));
     } else {
         m_errorMessages.append(QString("@%1:%2: <b>%3</b>; Rules stack:<br>[%4]<br>")
                                        .arg(lineOfError, positionInLine, errorMessage, stack));

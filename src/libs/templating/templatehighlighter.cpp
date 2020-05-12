@@ -32,16 +32,18 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule tagRule;
     tagRule.format.setForeground(Qt::blue);
     tagRule.format.setFontWeight(QFont::Bold);
-    const QString tags = QStringLiteral("\\b(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block|endblock|"
-                                            "autoescape\\s+(on|off)|endautoescape|cycle|as|silent|filter|endfilter|debug|ifchanged|endifchanged|"
-                                            "ifequal|endifequal|ifnotequal|endifnotequal|load|from|media_finder|now|range|endrange|by|regroup|"
-                                            "spaceless|endspaceless|templatetag|widthratio|with|endwith)\\b");
+    const QString tags = QStringLiteral(
+            "\\b(include|extends|for|in|endfor|comment|endcomment|if|elif|else|endif|firstof|block|endblock|"
+            "autoescape\\s+(on|off)|endautoescape|cycle|as|silent|filter|endfilter|debug|ifchanged|endifchanged|"
+            "ifequal|endifequal|ifnotequal|endifnotequal|load|from|media_finder|now|range|endrange|by|regroup|"
+            "spaceless|endspaceless|templatetag|widthratio|with|endwith)\\b");
     tagRule.pattern = QRegularExpression(tags, QRegularExpression::InvertedGreedinessOption);
 
     // block.super tag rule
     HighlightingRule blockSuperTagRule;
     blockSuperTagRule.format = tagRule.format;
-    blockSuperTagRule.pattern = QRegularExpression(QStringLiteral("\\bblock.super\\b"), QRegularExpression::InvertedGreedinessOption);
+    blockSuperTagRule.pattern =
+            QRegularExpression(QStringLiteral("\\bblock.super\\b"), QRegularExpression::InvertedGreedinessOption);
 
     // variable rule
     HighlightingRule variableRule;
@@ -53,11 +55,12 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule filterRule;
     filterRule.format.setForeground(Qt::darkRed);
     filterRule.format.setFontWeight(QFont::Bold);
-    const QString filters = QStringLiteral("(?<=\\||filter\\s)\\s*\\b(add|addslashes|capfirst|center|cut|date|default|"
-                                           "default_if_none|dictsort|divisibleby|escape|escapejs|first|floatformat|force_escape|"
-                                           "get_digit|join|last|length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|"
-                                           "lower|make_list|random|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|"
-                                           "timesince|timeuntil|title|truncatewords|unordered_list|upper|wordcount|wordwrap|yesno)\\b");
+    const QString filters =
+            QStringLiteral("(?<=\\||filter\\s)\\s*\\b(add|addslashes|capfirst|center|cut|date|default|"
+                           "default_if_none|dictsort|divisibleby|escape|escapejs|first|floatformat|force_escape|"
+                           "get_digit|join|last|length|length_is|linebreaks|linebreaksbr|linenumbers|ljust|"
+                           "lower|make_list|random|rjust|safe|safeseq|slice|slugify|stringformat|striptags|time|"
+                           "timesince|timeuntil|title|truncatewords|unordered_list|upper|wordcount|wordwrap|yesno)\\b");
     filterRule.pattern = QRegularExpression(filters, QRegularExpression::InvertedGreedinessOption);
 
     // filter delimiter rule
@@ -70,7 +73,8 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     HighlightingRule stringRule;
     stringRule.format.setForeground(Qt::magenta);
     stringRule.format.setFontWeight(QFont::Bold);
-    stringRule.pattern = QRegularExpression(QStringLiteral("(\".*\")|(\'.*\')"), QRegularExpression::InvertedGreedinessOption);
+    stringRule.pattern =
+            QRegularExpression(QStringLiteral("(\".*\")|(\'.*\')"), QRegularExpression::InvertedGreedinessOption);
 
     // brackets highlighting
     Highlighting bracketHighlighting;
@@ -80,7 +84,8 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
 
     // tags highlighting
     Highlighting tagHighlighting;
-    tagHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={%).*(?=%})"), QRegularExpression::InvertedGreedinessOption);
+    tagHighlighting.basePattern =
+            QRegularExpression(QStringLiteral("(?<={%).*(?=%})"), QRegularExpression::InvertedGreedinessOption);
     tagHighlighting.highlightingRules.append(variableRule);
     tagHighlighting.highlightingRules.append(filterRule);
     tagHighlighting.highlightingRules.append(filterDelimiterRule);
@@ -90,7 +95,8 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
 
     // variables highlighting
     Highlighting variableHighlighting;
-    variableHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={{).*(?=}})"), QRegularExpression::InvertedGreedinessOption);
+    variableHighlighting.basePattern =
+            QRegularExpression(QStringLiteral("(?<={{).*(?=}})"), QRegularExpression::InvertedGreedinessOption);
     variableHighlighting.highlightingRules.append(variableRule);
     variableHighlighting.highlightingRules.append(blockSuperTagRule);
     variableHighlighting.highlightingRules.append(filterRule);
@@ -104,7 +110,8 @@ TemplateHighlighter::TemplateHighlighter(QTextDocument *parent)
     m_commentEndExpression.setPattern(QStringLiteral("{%\\s*endcomment\\s*%}"));
 
     Highlighting commentHighlighting;
-    commentHighlighting.basePattern = QRegularExpression(QStringLiteral("(?<={#).+(?=#})"), QRegularExpression::InvertedGreedinessOption);
+    commentHighlighting.basePattern =
+            QRegularExpression(QStringLiteral("(?<={#).+(?=#})"), QRegularExpression::InvertedGreedinessOption);
     commentHighlighting.baseFormat = m_commentFormat;
     m_highlightings.append(commentHighlighting);
 }
@@ -158,8 +165,7 @@ void TemplateHighlighter::highlightBlock(const QString &text)
         startIndex = startMatch.hasMatch() ? startMatch.capturedEnd() : -1;
     }
 
-    while (startIndex >= 0)
-    {
+    while (startIndex >= 0) {
         QRegularExpressionMatch endMatch;
         int endIndex = text.indexOf(m_commentEndExpression, startIndex, &endMatch);
         int commentLength;
@@ -173,7 +179,8 @@ void TemplateHighlighter::highlightBlock(const QString &text)
 
         setFormat(startIndex, commentLength, m_commentFormat);
         QRegularExpressionMatch startMatch = m_commentStartExpression.match(text, startIndex + commentLength);
-        startIndex = startMatch.hasMatch() ? startMatch.capturedEnd() : -1;;
+        startIndex = startMatch.hasMatch() ? startMatch.capturedEnd() : -1;
+        ;
     }
 }
 

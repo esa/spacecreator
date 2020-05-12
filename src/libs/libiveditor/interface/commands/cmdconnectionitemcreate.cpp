@@ -17,11 +17,11 @@
 
 #include "cmdconnectionitemcreate.h"
 
-#include "baseitems/common/utils.h"
-#include "commandids.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
+#include "baseitems/common/utils.h"
+#include "commandids.h"
 
 #include <QtMath>
 
@@ -29,8 +29,7 @@ namespace aadlinterface {
 namespace cmd {
 
 CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
-                                                 const utils::Id sourceIfaceId, const utils::Id &targetIfaceId,
-                                                 const QVector<QPointF> &points)
+        const utils::Id sourceIfaceId, const utils::Id &targetIfaceId, const QVector<QPointF> &points)
     : CmdEntityGeometryChange({}, QObject::tr("Create Connection"))
     , m_model(model)
     , m_parent(parent)
@@ -41,7 +40,8 @@ CmdConnectionItemCreate::CmdConnectionItemCreate(aadl::AADLObjectsModel *model, 
 
     aadl::AADLObjectIface *sourceIface = m_model->getInterface(sourceIfaceId);
     aadl::AADLObjectIface *targetIface = m_model->getInterface(targetIfaceId);
-    m_entity = new aadl::AADLObjectConnection(sourceIface->function(), targetIface->function(), sourceIface, targetIface, parent);
+    m_entity = new aadl::AADLObjectConnection(
+            sourceIface->function(), targetIface->function(), sourceIface, targetIface, parent);
     prepareData({ qMakePair(m_entity, points) });
 }
 

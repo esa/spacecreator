@@ -55,7 +55,7 @@ AADLObjectFunctionType::AADLObjectFunctionType(const AADLObject::Type t, const Q
     //        root->addChild(this);
 }
 
-AADLObjectFunctionType::~AADLObjectFunctionType() {}
+AADLObjectFunctionType::~AADLObjectFunctionType() { }
 
 QVector<AADLObject *> AADLObjectFunctionType::children() const
 {

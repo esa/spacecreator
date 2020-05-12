@@ -17,9 +17,9 @@
 
 #include "graphicsview.h"
 
+#include "aadlobject.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
-#include "aadlobject.h"
 #include "interface/aadlrectgraphicsitem.h"
 
 #include <QGraphicsItem>
@@ -37,13 +37,15 @@ GraphicsView::GraphicsView(QWidget *parent)
     setRubberBandSelectionMode(Qt::IntersectsItemShape);
 }
 
-QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(QGraphicsScene*, const QPoint& screenPos, const QPointF& scenePos) const
+QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
+        QGraphicsScene *, const QPoint &screenPos, const QPointF &scenePos) const
 {
     QList<QPair<QPointF, QString>> coords;
     QList<QGraphicsItem *> itemsUnderCursor = items(screenPos);
     for (QGraphicsItem *item : itemsUnderCursor) {
         if (auto iObj = qobject_cast<aadlinterface::InteractiveObject *>(item->toGraphicsObject())) {
-            coords.push_back({item->mapFromScene(scenePos), iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None")});
+            coords.push_back({ item->mapFromScene(scenePos),
+                    iObj->aadlObject() ? iObj->aadlObject()->objectName() : QLatin1String("None") });
         }
     }
     return coords;
@@ -59,8 +61,9 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down: {
         for (QGraphicsItem *item : scene()->selectedItems()) {
             if (aadlinterface::AADLRectGraphicsItem *rectItem =
-                        // Not the qgraphicsitem_cast due its "successfull" cast of AADLFunctionName/Text Graphics Items
-                qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
+                            // Not the qgraphicsitem_cast due its "successfull" cast of AADLFunctionName/Text Graphics
+                            // Items
+                    qobject_cast<aadlinterface::AADLRectGraphicsItem *>(item->toGraphicsObject())) {
                 rectItem->singleStepMove(aadlinterface::AADLRectGraphicsItem::MoveStep(event->key()));
                 keyHandled = true;
             }

@@ -23,6 +23,7 @@
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
 #include "ui/grippointshandler.h"
+
 #include <QDebug>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -163,7 +164,7 @@ void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF 
     setContentRect(rect, utils::CifUpdatePolicy::DontChange);
 }
 
-void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint*, const QPointF &, const QPointF &)
+void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     QRect cifRectPrev;
     if (!utils::CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
@@ -182,9 +183,10 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint*, const QPo
 void ChartItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations { shared::ui::GripPoint::Left, shared::ui::GripPoint::Top, shared::ui::GripPoint::Right,
-                                                       shared::ui::GripPoint::Bottom, shared::ui::GripPoint::TopLeft, shared::ui::GripPoint::BottomLeft,
-                                                       shared::ui::GripPoint::TopRight, shared::ui::GripPoint::BottomRight });
+    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations { shared::ui::GripPoint::Left,
+            shared::ui::GripPoint::Top, shared::ui::GripPoint::Right, shared::ui::GripPoint::Bottom,
+            shared::ui::GripPoint::TopLeft, shared::ui::GripPoint::BottomLeft, shared::ui::GripPoint::TopRight,
+            shared::ui::GripPoint::BottomRight });
     connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
@@ -308,10 +310,8 @@ QRectF ChartItem::storedCustomRect() const
 QPainterPath ChartItem::shape() const
 {
     const QRectF &rect = boundingRect();
-    const QVector<QLineF> lines { { rect.topLeft(), rect.topRight() },
-                                  { rect.topRight(), rect.bottomRight() },
-                                  { rect.bottomRight(), rect.bottomLeft() },
-                                  { rect.bottomLeft(), rect.topLeft() } };
+    const QVector<QLineF> lines { { rect.topLeft(), rect.topRight() }, { rect.topRight(), rect.bottomRight() },
+        { rect.bottomRight(), rect.bottomLeft() }, { rect.bottomLeft(), rect.topLeft() } };
     QPainterPath result;
     for (const QLineF &line : lines)
         result.addPath(utils::lineShape(line, utils::LineHoverTolerance));

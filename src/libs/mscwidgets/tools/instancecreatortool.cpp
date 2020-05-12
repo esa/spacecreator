@@ -76,7 +76,7 @@ void InstanceCreatorTool::onActionTriggered(bool activated)
 
     static constexpr int pos { -1 };
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscInstance *>(instance),
-                                      QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
+        QVariant::fromValue<msc::MscChart *>(m_activeChart), pos };
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
     Q_EMIT created();
 }

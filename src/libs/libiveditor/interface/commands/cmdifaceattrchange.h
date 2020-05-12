@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "cmdifacedatachangebase.h"
 #include "aadlcommonprops.h"
 #include "aadlobjectsmodel.h"
+#include "cmdifacedatachangebase.h"
 
 #include <QPointer>
 #include <QVariant>

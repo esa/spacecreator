@@ -52,7 +52,7 @@
 
 namespace MscPlugin {
 namespace Common {
-static const char* HIERARCHY_TYPE_TAG = "hierarchyTag";
+static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
@@ -211,9 +211,9 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
             if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf)
                 canNewChild = false;
             if (document->documents().size() > 0
-                && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
-                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
-                    || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
+                    && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
+                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
+                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
                 canNewChild = false;
             }
             for (QAction *action : hierarchyActions()) {
@@ -322,12 +322,12 @@ void MainWidget::initTools()
     m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
     m_tools.append(m_instanceStopTool);
 
-    m_messageCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Message,
-                                                      &(m_model->chartViewModel()), nullptr, this);
+    m_messageCreateTool = new msc::MessageCreatorTool(
+            msc::MscMessage::MessageType::Message, &(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_messageCreateTool);
 
-    m_createCreateTool = new msc::MessageCreatorTool(msc::MscMessage::MessageType::Create, &(m_model->chartViewModel()),
-                                                     nullptr, this);
+    m_createCreateTool = new msc::MessageCreatorTool(
+            msc::MscMessage::MessageType::Create, &(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_createCreateTool);
 
     m_commentCreateTool = new msc::CommentCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);

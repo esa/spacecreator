@@ -18,7 +18,7 @@
 #include "appoptions.h"
 
 OptionsGroup::OptionsGroup(const QString &name, const QVector<shared::SettingsAppOption *> &options,
-                           const QVector<OptionsGroup *> &subroups)
+        const QVector<OptionsGroup *> &subroups)
     : Name(name)
     , Options(options)
     , Groups(subroups)
@@ -27,13 +27,13 @@ OptionsGroup::OptionsGroup(const QString &name, const QVector<shared::SettingsAp
 
 GroupMainWindow::GroupMainWindow()
     : OptionsGroup(localName(),
-                   {
-                           new shared::SettingsAppOption(QString("%1/Geometry").arg(localName())),
-                           new shared::SettingsAppOption(QString("%1/State").arg(localName())),
-                           new shared::SettingsAppOption(QString("%1/LastFilePath").arg(localName())),
-                           new shared::SettingsAppOption(QString("%1/DocOrHierarchyViewMode").arg(localName())),
-                   },
-                   {})
+            {
+                    new shared::SettingsAppOption(QString("%1/Geometry").arg(localName())),
+                    new shared::SettingsAppOption(QString("%1/State").arg(localName())),
+                    new shared::SettingsAppOption(QString("%1/LastFilePath").arg(localName())),
+                    new shared::SettingsAppOption(QString("%1/DocOrHierarchyViewMode").arg(localName())),
+            },
+            {})
 {
 }
 

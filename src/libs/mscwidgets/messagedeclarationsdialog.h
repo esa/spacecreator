@@ -35,8 +35,8 @@ class MessageDeclarationsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit MessageDeclarationsDialog(msc::MscMessageDeclarationList *model, const QVariantList &asn1Types,
-                                       QWidget *parent = nullptr);
+    explicit MessageDeclarationsDialog(
+            msc::MscMessageDeclarationList *model, const QVariantList &asn1Types, QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;

@@ -29,11 +29,11 @@ AADLNameValidator *AADLNameValidator::m_instance = nullptr;
 
 AADLNameValidator::AADLNameValidator()
     : m_typePrefixes { { AADLObject::Type::FunctionType, QObject::tr("Function Type ") },
-                       { AADLObject::Type::Function, QObject::tr("Function ") },
-                       { AADLObject::Type::RequiredInterface, QObject::tr("RI ") },
-                       { AADLObject::Type::ProvidedInterface, QObject::tr("PI ") },
-                       { AADLObject::Type::Comment, QObject::tr("Comment ") },
-                       { AADLObject::Type::Connection, QObject::tr("Comment ") } }
+        { AADLObject::Type::Function, QObject::tr("Function ") },
+        { AADLObject::Type::RequiredInterface, QObject::tr("RI ") },
+        { AADLObject::Type::ProvidedInterface, QObject::tr("PI ") },
+        { AADLObject::Type::Comment, QObject::tr("Comment ") },
+        { AADLObject::Type::Connection, QObject::tr("Comment ") } }
 {
 }
 
@@ -56,7 +56,7 @@ QString AADLNameValidator::encodeName(const AADLObject::Type t, const QString &n
     case aadl::AADLObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
-                       [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
+                [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char('_'); });
         return result;
     }
     case AADLObject::Type::Comment: {
@@ -93,7 +93,7 @@ QString AADLNameValidator::decodeName(const AADLObject::Type t, const QString &n
     case aadl::AADLObject::Type::RequiredInterface: {
         QString result;
         std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
-                       [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
+                [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
         return result;
     }
     case AADLObject::Type::Comment: {
@@ -437,7 +437,7 @@ bool AADLNameValidator::isValidProvidedInterfaceName(const QString &name, const 
         return false;
     }
 
-    for (const auto pi : parent->pis())  {
+    for (const auto pi : parent->pis()) {
         if (pi->title() == name) {
             return false;
         }

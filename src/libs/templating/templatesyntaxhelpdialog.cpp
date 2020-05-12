@@ -18,10 +18,10 @@
 #include "templatesyntaxhelpdialog.h"
 
 #include <QBoxLayout>
+#include <QDebug>
+#include <QDialogButtonBox>
 #include <QFile>
 #include <QTextBrowser>
-#include <QDialogButtonBox>
-#include <QDebug>
 
 namespace templating {
 
@@ -41,8 +41,7 @@ TemplateSyntaxHelpDialog::TemplateSyntaxHelpDialog(QWidget *parent)
     if (helpFile.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&helpFile);
         browser->setText(stream.readAll());
-    }
-    else {
+    } else {
         qWarning() << "Unable to open" << helpFile.fileName();
     }
 

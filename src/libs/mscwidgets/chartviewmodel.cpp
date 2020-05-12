@@ -54,7 +54,7 @@ namespace msc {
  */
 
 struct ChartViewLayoutInfo {
-    ChartViewLayoutInfo() {}
+    ChartViewLayoutInfo() { }
 
     ~ChartViewLayoutInfo() { clear(); }
 
@@ -86,7 +86,7 @@ private:
 };
 
 struct ChartViewModelPrivate {
-    ChartViewModelPrivate() {}
+    ChartViewModelPrivate() { }
 
     QGraphicsScene m_scene;
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
@@ -124,10 +124,9 @@ struct ChartViewModelPrivate {
     {
         if (m_instanceItems.isEmpty()) {
             static const qreal oneMessageHeight = utils::CoordinatesConverter::heightInScene(100);
-            const int eventsCount =
-                    qMax(1,
-                         m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
-                                                  : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
+            const int eventsCount = qMax(1,
+                    m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
+                                             : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
             return eventsCount * (oneMessageHeight + interMessageSpan());
         }
 
@@ -236,8 +235,8 @@ void ChartViewModel::fillView(MscChart *chart)
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
 
-MessageItem *ChartViewModel::fillMessageItem(MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem,
-                                             qreal verticalOffset)
+MessageItem *ChartViewModel::fillMessageItem(
+        MscMessage *message, InstanceItem *sourceItem, InstanceItem *targetItem, qreal verticalOffset)
 {
     MessageItem *item = itemForMessage(message);
     if (!item) {
@@ -449,8 +448,8 @@ void ChartViewModel::addInstanceEventItems()
         }
         case MscEntity::EntityType::Condition: {
             ConditionItem *prevItem = qobject_cast<ConditionItem *>(instanceEventItem);
-            instanceEventItem = addConditionItem(static_cast<MscCondition *>(instanceEvent), prevItem,
-                                                 d->m_layoutInfo.m_instancesRect);
+            instanceEventItem = addConditionItem(
+                    static_cast<MscCondition *>(instanceEvent), prevItem, d->m_layoutInfo.m_instancesRect);
             break;
         }
         case MscEntity::EntityType::Timer: {
@@ -1101,14 +1100,14 @@ void ChartViewModel::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInsta
 {
     if (!d->m_layoutInfo.m_dynamicInstances.contains(dynamicInstance)) {
         MscInstance *creatorInstance = dynamicInstance->explicitCreator();
-        if (MessageItem *item = fillMessageItem(msgCreate, itemForInstance(creatorInstance),
-                                                itemForInstance(dynamicInstance), 0.)) {
+        if (MessageItem *item = fillMessageItem(
+                    msgCreate, itemForInstance(creatorInstance), itemForInstance(dynamicInstance), 0.)) {
             d->m_layoutInfo.m_dynamicInstances.insert(dynamicInstance, item);
         }
     }
 
     if (d->m_layoutInfo.m_dynamicInstances.contains(dynamicInstance)
-        && !d->m_layoutInfo.m_dynamicInstanceMarkers.contains(dynamicInstance)) {
+            && !d->m_layoutInfo.m_dynamicInstanceMarkers.contains(dynamicInstance)) {
         if (MessageItem *item = d->m_layoutInfo.m_dynamicInstances.value(dynamicInstance)) {
             d->m_layoutInfo.m_dynamicInstanceMarkers.insert(dynamicInstance, item);
         }
@@ -1202,7 +1201,7 @@ ConditionItem *ChartViewModel::addConditionItem(MscCondition *condition, Conditi
     if (instance) {
         qreal verticalOffset = instance->axis().p1().y();
         if (prevItem
-            && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
+                && (prevItem->modelItem()->instance() == condition->instance() || prevItem->modelItem()->shared())) {
             verticalOffset += prevItem->boundingRect().height() + d->interMessageSpan();
         }
         item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + verticalOffset, instancesRect);
@@ -1303,7 +1302,7 @@ QVariantList ChartViewModel::prepareChangeOrderCommand(MscInstance *instance) co
 
     if (currentIdx != nextIdx)
         return { QVariant::fromValue<MscInstance *>(instance), nextIdx,
-                 QVariant::fromValue<MscChart *>(d->m_currentChart.data()) };
+            QVariant::fromValue<MscChart *>(d->m_currentChart.data()) };
 
     return {};
 }
@@ -1354,9 +1353,9 @@ void ChartViewModel::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase 
         const int newIdx = eventIndex(item->y());
         if (newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
-                                          { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
-                                            QVariant::fromValue<MscInstance *>(newInstance),
-                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                    { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
+                            QVariant::fromValue<MscInstance *>(newInstance),
+                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
         } else {
             updateLayout();
         }
@@ -1369,9 +1368,9 @@ void ChartViewModel::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase 
         const int newIdx = eventIndex(item->y());
         if (newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveCondition,
-                                          { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
-                                            QVariant::fromValue<MscInstance *>(newInstance),
-                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                    { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
+                            QVariant::fromValue<MscInstance *>(newInstance),
+                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
         } else {
             updateLayout();
         }
@@ -1384,9 +1383,9 @@ void ChartViewModel::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase 
         const int newIdx = eventIndex(item->y());
         if (newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
-                                          { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
-                                            QVariant::fromValue<MscInstance *>(newInstance),
-                                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                    { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
+                            QVariant::fromValue<MscInstance *>(newInstance),
+                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
         } else {
             updateLayout();
         }
@@ -1412,7 +1411,7 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
     const int currentIdx = d->m_currentChart->instanceEvents().indexOf(message);
     const int newIdx = eventIndex(pos.y());
     if (((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx)
-        && (newInstance || otherInstance)) {
+            && (newInstance || otherInstance)) {
 
         if (utils::isHorizontal(item->messagePoints())) {
             if (item->geometryManagedByCif())
@@ -1421,10 +1420,9 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
             item->updateCif();
         }
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
-                                      { QVariant::fromValue<MscMessage *>(message), newIdx,
-                                        QVariant::fromValue<MscInstance *>(newInstance),
-                                        QVariant::fromValue<MscMessage::EndType>(endType),
-                                        QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                { QVariant::fromValue<MscMessage *>(message), newIdx, QVariant::fromValue<MscInstance *>(newInstance),
+                        QVariant::fromValue<MscMessage::EndType>(endType),
+                        QVariant::fromValue<MscChart *>(d->m_currentChart) });
     } else {
         if (item->geometryManagedByCif())
             item->applyCif();

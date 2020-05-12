@@ -47,8 +47,8 @@ MscEditorDocument::MscEditorDocument(MainWidget *designWidget, QObject *parent)
     connect(m_designWidget.data(), &Common::MainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
-Core::IDocument::OpenResult MscEditorDocument::open(QString *errorString, const QString &fileName,
-                                                    const QString &realFileName)
+Core::IDocument::OpenResult MscEditorDocument::open(
+        QString *errorString, const QString &fileName, const QString &realFileName)
 {
     Q_UNUSED(realFileName)
 

@@ -24,6 +24,6 @@ PropertiesModelBase::PropertiesModelBase(QObject *parent)
 {
 }
 
-PropertiesModelBase::~PropertiesModelBase() {}
+PropertiesModelBase::~PropertiesModelBase() { }
 
 }

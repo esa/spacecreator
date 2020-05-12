@@ -81,7 +81,7 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
 QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int insertId)
 {
     return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::ChartViewModel *>(&m_chartModel),
-             insertId, m_dummyCif };
+        insertId, m_dummyCif };
 }
 
 void tst_CmdMessageItemCreate::testCreate()
@@ -138,8 +138,8 @@ void tst_CmdMessageItemCreate::testPerformance()
     QCOMPARE(itemsCount(), 0);
 
     QBENCHMARK {
-        m_chartModel.graphicsScene()->setSceneRect(-CommandsCount, -CommandsCount, 2. * CommandsCount,
-                                                   2. * CommandsCount);
+        m_chartModel.graphicsScene()->setSceneRect(
+                -CommandsCount, -CommandsCount, 2. * CommandsCount, 2. * CommandsCount);
 
         // create:
         for (int i = 0; i < CommandsCount; ++i) {
@@ -179,8 +179,8 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
     QCOMPARE(itemsCount(), 0);
 
     for (const QString &name : names) {
-        cmd::CommandsStack::push(cmd::Id::CreateMessage,
-                                 createParams(new msc::MscMessage(name), 0)); // prepends message
+        cmd::CommandsStack::push(
+                cmd::Id::CreateMessage, createParams(new msc::MscMessage(name), 0)); // prepends message
     }
 
     QCOMPARE(m_chart->instanceEvents().size(), names.size());

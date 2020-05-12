@@ -53,7 +53,8 @@ protected:
     void initGripPoints() override;
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
-    void onManualResizeFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
+    void onManualResizeFinish(
+            shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     QRectF adjustRectToParent(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to);

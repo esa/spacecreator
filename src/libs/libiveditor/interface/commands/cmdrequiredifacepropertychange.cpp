@@ -29,8 +29,8 @@ QVariant getCurrentProperty(const aadl::AADLObjectIfaceRequired *entity, const Q
     return (entity && !name.isEmpty()) ? entity->prop(name) : QVariant();
 }
 
-CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(aadl::AADLObjectIfaceRequired *entity, const QString &propName,
-                                                               const QVariant &value)
+CmdRequiredIfacePropertyChange::CmdRequiredIfacePropertyChange(
+        aadl::AADLObjectIfaceRequired *entity, const QString &propName, const QVariant &value)
     : CmdIfaceDataChangeBase(entity, propName, value, getCurrentProperty(entity, propName))
 {
     if (m_targetToken == aadl::meta::Props::Token::InheritPI) {
@@ -113,14 +113,15 @@ bool CmdRequiredIfacePropertyChange::connectionMustDie(const aadl::AADLObjectCon
     if (!sameParams)
         return true;
 
-    const aadl::AADLObjectIface::OperationKind newKind =
-            m_iface->kindFromString(m_iface->originalAttr(aadl::meta::Props::token(aadl::meta::Props::Token::kind)).toString());
+    const aadl::AADLObjectIface::OperationKind newKind = m_iface->kindFromString(
+            m_iface->originalAttr(aadl::meta::Props::token(aadl::meta::Props::Token::kind)).toString());
     if (aadl::AADLObjectIface::OperationKind::Cyclic == newKind) {
         Q_UNREACHABLE(); // m_iface is a RI
         return true;
     }
 
-    if (aadl::AADLObjectIface::OperationKind::Any != newKind && aadl::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
+    if (aadl::AADLObjectIface::OperationKind::Any != newKind
+            && aadl::AADLObjectIface::OperationKind::Any != otherIface->kind()) {
         return otherIface->kind() == newKind;
     }
 

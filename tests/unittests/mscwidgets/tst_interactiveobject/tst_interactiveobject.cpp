@@ -16,9 +16,9 @@
 */
 
 #include "baseitems/common/utils.h"
-#include "ui/grippointshandler.h"
 #include "baseitems/interactiveobject.h"
 #include "tst_common.h"
+#include "ui/grippointshandler.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -187,8 +187,8 @@ void tst_InteractiveObject::testMove()
     const QPointF &prevPos(m_item->pos());
     QVERIFY(prevPos.isNull());
 
-    msc::test::ui::sendMouseMove(m_view->viewport(),
-                                 m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
+    msc::test::ui::sendMouseMove(
+            m_view->viewport(), m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
 
     if (GripPoint *gp = m_item->gripPoint(GripPoint::Center)) {
         const QPointF &gpScene = gp->mapToScene(gp->boundingRect().center());

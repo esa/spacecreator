@@ -19,14 +19,14 @@
 
 #include "commandids.h"
 
-#include <baseitems/common/utils.h>
 #include <aadlobjectsmodel.h>
+#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {
 
-CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
-                                                     const QRectF &geometry)
+CmdFunctionTypeItemCreate::CmdFunctionTypeItemCreate(
+        aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent, const QRectF &geometry)
     : CmdEntityGeometryChange({}, QObject::tr("Create Function Type"))
     , m_model(model)
     , m_parent(parent)

@@ -42,7 +42,6 @@
 
 using namespace MscPlugin::Common;
 
-
 namespace MscPlugin {
 
 namespace Internal {
@@ -88,7 +87,6 @@ MscEditorData::MscEditorData(QObject *parent)
             m_widgetStack->setVisibleEditor(mscEditor);
             m_mainToolBar->setCurrentEditor(mscEditor);
             updateToolBar();
-
         }
     });
 
@@ -135,8 +133,8 @@ void MscEditorData::fullInit()
     m_context = new MscContext(mscContexts, m_modeWidget, this);
     ICore::addContextObject(m_context);
 
-    DesignMode::registerDesignWidget(m_modeWidget, QStringList(QLatin1String(MscPlugin::Constants::MSC_MIMETYPE)),
-                                     m_contexts);
+    DesignMode::registerDesignWidget(
+            m_modeWidget, QStringList(QLatin1String(MscPlugin::Constants::MSC_MIMETYPE)), m_contexts);
 }
 
 IEditor *MscEditorData::createEditor()
