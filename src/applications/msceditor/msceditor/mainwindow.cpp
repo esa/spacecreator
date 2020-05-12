@@ -525,7 +525,7 @@ void MainWindow::initActions()
     connect(d->m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::selectAndOpenFile);
     connect(d->m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::saveMsc);
     connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, &MainWindow::saveAsMsc);
-    connect(d->m_plugin->actionSaveFileAs(), &QAction::triggered, this, [&]() {
+    connect(d->m_plugin->actionQuit(), &QAction::triggered, this, [&]() {
         if (this->saveDocument()) {
             this->saveSettings();
             QApplication::quit();
