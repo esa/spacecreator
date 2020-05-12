@@ -37,7 +37,6 @@ private Q_SLOTS:
 
 void tst_AADLObjectsModel::testManageContainers()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectsModel model;
 
     QCOMPARE(model.objects().size(), 0);
@@ -109,7 +108,6 @@ void tst_AADLObjectsModel::testManageContainers()
 
 void tst_AADLObjectsModel::testManageFunctions()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectsModel model;
 
     QCOMPARE(model.objects().size(), 0);
@@ -177,7 +175,6 @@ void tst_AADLObjectsModel::testManageFunctions()
 
 void tst_AADLObjectsModel::testManageIfaces()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectsModel model;
 
     QCOMPARE(model.objects().size(), 0);
@@ -256,7 +253,6 @@ void tst_AADLObjectsModel::testManageIfaces()
 
 void tst_AADLObjectsModel::testManageMixed()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectsModel model;
 
     QCOMPARE(model.objects().size(), 0);

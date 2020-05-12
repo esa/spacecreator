@@ -35,7 +35,6 @@ private Q_SLOTS:
 
 void tst_AADLObjectFunction::testAadlType()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.aadlType(), aadl::AADLObject::Type::Function);
@@ -43,7 +42,6 @@ void tst_AADLObjectFunction::testAadlType()
 
 void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
@@ -68,7 +66,6 @@ void tst_AADLObjectFunction::testRequiredInterfacesManagement() const
 
 void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
@@ -97,7 +94,6 @@ void tst_AADLObjectFunction::testProvidedInterfacesManagement() const
 
 void tst_AADLObjectFunction::testCommonInterfacesManagement() const
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);

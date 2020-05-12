@@ -72,7 +72,6 @@ protected:
 
 private:
     const std::unique_ptr<AADLObjectFunctionTypePrivate> d;
-    void init();
 };
 
 typedef QVector<AADLObjectFunctionType *> AADLFunctionTypeVector;

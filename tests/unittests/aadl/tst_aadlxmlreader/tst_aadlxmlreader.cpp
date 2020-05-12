@@ -36,7 +36,6 @@ private Q_SLOTS:
 
 void XMLReader::runReader(const XmlFileMock &xml)
 {
-    QSKIP("hangs or fails");
     QByteArray result = xml.m_xmlContent.toUtf8();
     QBuffer buffer(&result);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -71,27 +70,25 @@ void XMLReader::runReader(const XmlFileMock &xml)
 
 void XMLReader::test_emptyInterfaceViewDoc()
 {
-    QSKIP("hangs or fails");
     for (auto xml : { XmlHelper::instance()->EmptyFile, XmlHelper::instance()->EmptyDoc })
         runReader(xml);
 }
 
 void XMLReader::test_singleItems()
 {
-    QSKIP("hangs or fails");
-    for (auto xml :
-         { XmlHelper::instance()->SingleFunction, XmlHelper::instance()->SingleFunctionType,
-           XmlHelper::instance()->SingleComment,
-           /*XmlHelper::instance()->SingleIfaceInvalid, */ // for now there is an Q_ASSERT (crash)
-           XmlHelper::instance()->SingleIfaceValid,
-           XmlHelper::instance()->ParametrizedIfaces, XmlHelper::instance()->SingleConnectionOrphan,
-           XmlHelper::instance()->SingleConnectionValid, XmlHelper::instance()->SingleConnectionValidMultipoint })
-        runReader(xml);
+    runReader(XmlHelper::instance()->SingleFunction);
+    runReader(XmlHelper::instance()->SingleFunctionType);
+    runReader(XmlHelper::instance()->SingleComment);
+    /*runReader(XmlHelper::instance()->SingleIfaceInvalid, */ // for now there is an Q_ASSERT (crash)
+    runReader(XmlHelper::instance()->SingleIfaceValid);
+    runReader(XmlHelper::instance()->ParametrizedIfaces);
+    runReader(XmlHelper::instance()->SingleConnectionOrphan);
+    runReader(XmlHelper::instance()->SingleConnectionValid);
+    runReader(XmlHelper::instance()->SingleConnectionValidMultipoint);
 }
 
 void XMLReader::test_allItems()
 {
-    QSKIP("hangs or fails");
     for (auto xml : { XmlHelper::instance()->AllItems })
         runReader(xml);
 }

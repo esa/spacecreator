@@ -45,7 +45,6 @@ private:
 
 void tst_AADLObjectFunctionType::testAadlType()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunctionType obj;
 
     QCOMPARE(obj.aadlType(), aadl::AADLObject::Type::FunctionType);
@@ -53,7 +52,6 @@ void tst_AADLObjectFunctionType::testAadlType()
 
 void tst_AADLObjectFunctionType::testRequiredInterfacesManagement()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunctionType obj;
 
     QCOMPARE(obj.ris().size(), 0);
@@ -80,7 +78,6 @@ void tst_AADLObjectFunctionType::testRequiredInterfacesManagement()
 
 void tst_AADLObjectFunctionType::testProvidedInterfacesManagement()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunctionType obj;
 
     QCOMPARE(obj.ris().size(), 0);
@@ -111,7 +108,6 @@ void tst_AADLObjectFunctionType::testProvidedInterfacesManagement()
 
 void tst_AADLObjectFunctionType::testCommonInterfacesManagement()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunction obj;
 
     QCOMPARE(obj.ris().size(), 0);
@@ -156,7 +152,6 @@ void tst_AADLObjectFunctionType::testCommonInterfacesManagement()
 
 void tst_AADLObjectFunctionType::testChildrenManagementFunction()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunctionType obj;
 
     auto itProvided = aadl::AADLObjectIface::IfaceType::Provided;
@@ -172,14 +167,13 @@ void tst_AADLObjectFunctionType::testChildrenManagementFunction()
     fn3.addChild(aadl::testutils::createIface(&fn3, itProvided));
 
     const QVector<aadl::AADLObject *> functions { &fn0, &fn1, &fn2, &fn3 };
-    testChildrenManagement(&obj, functions, functions.size());
+    testChildrenManagement(&obj, functions);
 }
 
 void tst_AADLObjectFunctionType::testChildrenManagement(aadl::AADLObjectFunctionType *obj,
                                                         const QVector<aadl::AADLObject *> &children,
                                                         bool addedOnCreation)
 {
-    QSKIP("hangs or fails");
     QCOMPARE(obj->children().size(), addedOnCreation ? children.size() : 0);
 
     for (auto fn : children) {
@@ -227,7 +221,6 @@ void tst_AADLObjectFunctionType::testChildrenManagement(aadl::AADLObjectFunction
 
 void tst_AADLObjectFunctionType::testChildrenManagementContainer()
 {
-    QSKIP("hangs or fails");
     aadl::AADLObjectFunctionType obj;
 
     auto itProvided = aadl::AADLObjectIface::IfaceType::Provided;
@@ -250,13 +243,11 @@ void tst_AADLObjectFunctionType::testChildrenManagementContainer()
     fnType3.addChild(aadl::testutils::createIface(&fnType3, itProvided));
 
     const QVector<aadl::AADLObject *> functionTypes { &fnType0, &fnType1, &fnType2, &fnType3 };
-    testChildrenManagement(&obj, functionTypes, functionTypes.size());
+    testChildrenManagement(&obj, functionTypes, true);
 }
 
 void tst_AADLObjectFunctionType::testChildrenManagementMixed()
 {
-    QSKIP("hangs or fails");
-
     auto itProvided = aadl::AADLObjectIface::IfaceType::Provided;
     auto itRequired = aadl::AADLObjectIface::IfaceType::Required;
 
@@ -285,7 +276,7 @@ void tst_AADLObjectFunctionType::testChildrenManagementMixed()
     fnType3.addChild(aadl::testutils::createIface(&fnType3, itProvided));
 
     const QVector<aadl::AADLObject *> children { &fnType0, &fn0, &fnType1, &fn1, &fnType2, &fn3, &fnType3, &fn2 };
-    testChildrenManagement(&obj, children, true);
+    testChildrenManagement(&obj, children);
 }
 
 QTEST_APPLESS_MAIN(tst_AADLObjectFunctionType)

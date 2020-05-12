@@ -40,20 +40,13 @@ struct AADLObjectFunctionTypePrivate {
 };
 
 AADLObjectFunctionType::AADLObjectFunctionType(const QString &title, QObject *parent)
-    : AADLObject(AADLObject::Type::FunctionType, title, parent)
-    , d(new AADLObjectFunctionTypePrivate)
+    : AADLObjectFunctionType(AADLObject::Type::FunctionType, title, parent)
 {
-    init();
 }
 
 AADLObjectFunctionType::AADLObjectFunctionType(const AADLObject::Type t, const QString &title, QObject *parent)
     : AADLObject(t, title, parent)
     , d(new AADLObjectFunctionTypePrivate)
-{
-    init();
-}
-
-void AADLObjectFunctionType::init()
 {
     setAttr(meta::Props::token(meta::Props::Token::language), QVariant());
     setAttr(meta::Props::token(meta::Props::Token::is_type), QStringLiteral("YES"));

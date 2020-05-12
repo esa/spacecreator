@@ -189,7 +189,6 @@ XmlFileMock XmlFileMock::createSingleIfaceValid()
             file.setExpectedObjectCount(t, 1);
             break;
         case aadl::AADLObject::Type::RequiredInterface:
-        case aadl::AADLObject::Type::ProvidedInterface:
             file.setExpectedObjectCount(t, 1);
             break;
 
@@ -225,7 +224,7 @@ XmlFileMock XmlFileMock::createParametrizedIfaces()
             break;
         case aadl::AADLObject::Type::RequiredInterface:
         case aadl::AADLObject::Type::ProvidedInterface:
-            file.setExpectedObjectCount(t, 2);
+            file.setExpectedObjectCount(t, 1);
             break;
         case aadl::AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
@@ -287,8 +286,6 @@ XmlFileMock XmlFileMock::createSingleConnectionValid()
             break;
         case aadl::AADLObject::Type::RequiredInterface:
         case aadl::AADLObject::Type::ProvidedInterface:
-            file.setExpectedObjectCount(t, 2);
-            break;
         case aadl::AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
             break;
@@ -335,8 +332,6 @@ XmlFileMock XmlFileMock::createSingleConnectionValidMultipoint()
             break;
         case aadl::AADLObject::Type::RequiredInterface:
         case aadl::AADLObject::Type::ProvidedInterface:
-            file.setExpectedObjectCount(t, 2);
-            break;
         case aadl::AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 1);
             break;
@@ -381,8 +376,10 @@ XmlFileMock XmlFileMock::createAllItems()
             file.setExpectedObjectCount(t, 9);
             break;
         case aadl::AADLObject::Type::RequiredInterface:
+            file.setExpectedObjectCount(t, 13);
+            break;
         case aadl::AADLObject::Type::ProvidedInterface:
-            file.setExpectedObjectCount(t, 27);
+            file.setExpectedObjectCount(t, 14);
             break;
         case aadl::AADLObject::Type::Connection:
             file.setExpectedObjectCount(t, 13);
