@@ -2,7 +2,10 @@
 {% endcomment %}
 {% if chart.cifText %}{{ chart.cifText }}
 {% endif %}msc {{ chart.name }};
-{% for instance in chart.instances %}
+{% if chart.comment.cifText %}
+
+{{ chart.comment.cifText }}
+{% endif %}{% for instance in chart.instances %}
 {% include "mscinstance.tmplt" %}
 {% endfor %}
 endmsc;

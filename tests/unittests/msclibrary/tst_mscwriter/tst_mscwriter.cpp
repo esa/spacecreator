@@ -219,6 +219,19 @@ void tst_MscWriter::testSerializeMscChart_data()
     model->addChart(chart1);
     result = "msc Chart_1;\nendmsc;\n";
     QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
+
+    model = new MscModel(this);
+    chart1 = new MscChart("Chart_1");
+    chart1->setCommentString("Global information");
+    chart1->comment()->setRect(QRect(140, 55, 40, 30));
+    // add global comment
+    model->addChart(chart1);
+    result = "msc Chart_1;\n"
+             "/* CIF TEXT (140, 55) (40, 30) */\n"
+             "/* Global information */\n"
+             "/* CIF END TEXT */\n\n\n"
+             "endmsc;\n";
+    QTest::addRow("Plain chart comments ignored") << model << result << removeIndention(result);
 }
 
 void tst_MscWriter::testSerializeMscChart()
