@@ -23,6 +23,11 @@ target_include_directories(${APP_NAME} PRIVATE
     .
 )
 
+set_target_properties(${APP_NAME}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
 if (WIN32)
   if(CMAKE_BUILD_TYPE STREQUAL "Release")
     # hide the console window for release builds
