@@ -13,3 +13,6 @@ CMakeLists.txt.user
 
 # Example files to be used locally
 examples/*.local.msc
+
+# Generated API documentation
+doc/doxygen

@@ -1,11 +1,11 @@
 stages:
   - build
   - test
+  - deploy
 
 ##################
 # Build
 ##################
-
 build_debian10_gcc:
   stage: build
   tags:
@@ -33,7 +33,6 @@ build_windows:
 ##################
 # TEST
 ##################
-
 test_docker:
   stage: test
   tags:
@@ -46,3 +45,23 @@ test_docker:
   artifacts:
     reports:
       junit: build/tst_*-result.xml
+
+##################
+# Documentation
+##################
+documentation:
+  stage: deploy
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  script:
+    - mkdir -p public
+    - ./scripts/generate_documentation.sh
+    - cd doc/doxygen
+    - zip -r ../../public/space_creater_api_documentation.zip html
+  artifacts:
+    paths:
+      - public
+    expire_in: 4 weeks
+  only:
+    - master
