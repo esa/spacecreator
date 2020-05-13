@@ -837,7 +837,7 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         break;
     case shared::CommandLineParser::Positional::DropUnsavedChangesSilently:
         d->m_dropUnsavedChangesSilently = true;
-        break;
+        return true;
     default:
         qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
         break;
