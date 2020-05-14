@@ -102,9 +102,7 @@ private:
 
     void setupUi();
     void initActions();
-    void initMenus();
     void initDocumentViewActions();
-    void initMenuHelp();
     void initTools();
     void initMainToolbar();
     void initConnections();

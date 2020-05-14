@@ -21,6 +21,7 @@ public:
     void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
     void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
     void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
+    void addMenuHelpActions(QMenu *menu, QMainWindow *window) override;
 
     QToolBar *mscToolBar() { return m_mscToolBar; }
     QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }

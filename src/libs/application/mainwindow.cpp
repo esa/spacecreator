@@ -469,7 +469,6 @@ void MainWindow::setupUi()
 
     d->m_plugin->initMenus(this);
 
-    initMenus();
     initTools();
     initMainToolbar();
     initDocumentViewActions();
@@ -517,11 +516,6 @@ void MainWindow::initActions()
     });
 }
 
-void MainWindow::initMenus()
-{
-    initMenuHelp();
-}
-
 void MainWindow::initDocumentViewActions()
 {
     auto addAction = [&](msc::MscDocument::HierarchyType type) {
@@ -553,12 +547,6 @@ void MainWindow::initDocumentViewActions()
     addAction(msc::MscDocument::HierarchyRepeat);
     addAction(msc::MscDocument::HierarchyException);
     addAction(msc::MscDocument::HierarchyLeaf);
-}
-
-void MainWindow::initMenuHelp()
-{
-    d->m_menuHelp = menuBar()->addMenu(tr("Help"));
-    d->m_actAboutQt = d->m_menuHelp->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
 void MainWindow::onCreateMessageToolRequested()

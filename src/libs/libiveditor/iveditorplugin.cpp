@@ -62,6 +62,19 @@ void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
     }
 }
 
+/*!
+ * \brief Fills the Help menu with actions.
+ */
+void IVEditorPlugin::addMenuHelpActions(QMenu *menu, QMainWindow *window)
+{
+    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
+    auto report = menu->addAction(tr("Send report..."), mainWindow, &taste3::MainWindow::onReportRequested);
+    auto about = menu->addAction(tr("About"), mainWindow, &taste3::MainWindow::onAboutRequested);
+
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
+    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, about, "About", "Show About dialog");
+}
+
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);

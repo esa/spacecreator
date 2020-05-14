@@ -89,6 +89,11 @@ void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
     menuWindows->addAction(mainWindow->dockWidgetAsn1ToggleAction());
 }
 
+void MSCPlugin::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
+{
+    // Do nothing
+}
+
 void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);

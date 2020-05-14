@@ -90,7 +90,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     initTabs();
 
     m_plugin->initMenus(this);
-    initMenus();
 
     initConnections();
 
@@ -115,27 +114,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
         QMainWindow::closeEvent(e);
     else
         e->ignore();
-}
-
-/*!
- * \brief Fills the menu bar.
- */
-void MainWindow::initMenus()
-{
-    initMenuHelp();
-}
-
-/*!
- * \brief Fills the Help menu with actions.
- */
-void MainWindow::initMenuHelp()
-{
-    m_menuHelp = menuBar()->addMenu(tr("&Help"));
-    m_actReport = m_menuHelp->addAction(tr("Send report..."), this, &MainWindow::onReportRequested);
-    m_actAbout = m_menuHelp->addAction(tr("About"), this, &MainWindow::onAboutRequested, QKeySequence::HelpContents);
-
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actReport, "Report", "Send the debug information");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actAbout, "About", "Show About dialog");
 }
 
 /*!

@@ -60,8 +60,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *e) override;
 
-    void initMenus();
-    void initMenuHelp();
     void initConnections();
     void initTabs();
     void initSettings();
@@ -92,13 +90,6 @@ private:
     document::DocumentsManager *m_docsManager { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
-
-    QMenu *m_menuHelp { nullptr };
-
-    QAction *m_actExportAs { nullptr };
-
-    QAction *m_actAbout { nullptr };
-    QAction *m_actReport { nullptr };
 
     aadlinterface::IVEditorPlugin *m_plugin;
 

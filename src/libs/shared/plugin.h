@@ -37,6 +37,7 @@ public:
     virtual void addMenuFileActions(QMenu *menu, QMainWindow *window) = 0;
     virtual void addMenuEditActions(QMenu *menu, QMainWindow *window) = 0;
     virtual void addMenuViewActions(QMenu *menu, QMainWindow *window) = 0;
+    virtual void addMenuHelpActions(QMenu *menu, QMainWindow *window) = 0;
 
     QUndoGroup *undoGroup() { return m_undoGroup; }
 

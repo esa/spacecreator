@@ -1,6 +1,7 @@
 #include "plugin.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QToolBar>
@@ -58,6 +59,11 @@ void Plugin::initMenus(QMainWindow *window)
     // Initialize the view menu
     menu = window->menuBar()->addMenu(tr("&View"));
     addMenuViewActions(menu, window);
+
+    // Initialize the help menu
+    menu = window->menuBar()->addMenu(tr("&Help"));
+    addMenuHelpActions(menu, window);
+    menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
 QAction *Plugin::actionNewFile()
