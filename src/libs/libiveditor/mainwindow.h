@@ -55,6 +55,8 @@ public:
 
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
 
+    QList<QMenu *> tabViewMenus();
+
 protected:
     void closeEvent(QCloseEvent *e) override;
 
@@ -91,7 +93,6 @@ private:
 
     bool m_dropUnsavedChangesSilently { false };
 
-    QMenu *m_menuEdit { nullptr };
     QMenu *m_menuHelp { nullptr };
 
     QAction *m_actExportAs { nullptr };

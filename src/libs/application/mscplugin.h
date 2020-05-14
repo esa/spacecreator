@@ -20,6 +20,7 @@ public:
     void addToolBars(QMainWindow *window) override;
     void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
     void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
+    void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
 
     QToolBar *mscToolBar() { return m_mscToolBar; }
     QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }
@@ -28,6 +29,8 @@ public:
 
     QAction *actionCopy() { return m_actionCopy; }
     QAction *actionPaste() { return m_actionPaste; }
+    QAction *actionShowDocument() { return m_actionShowDocument; }
+    QAction *actionShowHierarchy() { return m_actionShowHierarchy; }
 
 private:
     QAction *createActionCopy(MainWindow *window);
@@ -41,6 +44,8 @@ private:
     QAction *m_editSeparator = nullptr;
     QAction *m_actionCopy = nullptr;
     QAction *m_actionPaste = nullptr;
+    QAction *m_actionShowDocument = nullptr;
+    QAction *m_actionShowHierarchy = nullptr;
 };
 
 }

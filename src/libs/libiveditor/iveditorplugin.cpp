@@ -49,7 +49,18 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
 }
 
-void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window) { }
+void IVEditorPlugin::addMenuEditActions(QMenu * /*menu*/, QMainWindow * /*window*/)
+{
+    // Nothing to add
+}
+
+void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
+{
+    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
+    for (auto documentMenu : mainWindow->tabViewMenus()) {
+        menu->addMenu(documentMenu);
+    }
+}
 
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {

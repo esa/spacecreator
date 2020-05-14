@@ -87,10 +87,10 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
+    initTabs();
+
     m_plugin->initMenus(this);
     initMenus();
-
-    initTabs();
 
     initConnections();
 
@@ -370,16 +370,9 @@ void MainWindow::initTabs()
     //    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
     //    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
 
-    QMenu *tabsCustom = new QMenu(tr("&Tabs"), this);
     for (auto doc : m_docsManager->documents()) {
-        if (QMenu *menu = doc->customMenu())
-            tabsCustom->addMenu(menu);
         connect(doc, &AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
     }
-    if (tabsCustom->children().size())
-        menuBar()->addMenu(tabsCustom);
-    else
-        delete tabsCustom;
 }
 
 void MainWindow::initSettings()
@@ -443,6 +436,17 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     }
     qWarning() << Q_FUNC_INFO << "Unhandled option:" << arg << value;
     return false;
+}
+
+QList<QMenu *> MainWindow::tabViewMenus()
+{
+    QList<QMenu *> menus;
+    for (auto doc : m_docsManager->documents()) {
+        if (QMenu *menu = doc->customMenu()) {
+            menus << menu;
+        }
+    }
+    return menus;
 }
 
 /*!

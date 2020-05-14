@@ -16,6 +16,7 @@ public:
     void addToolBars(QMainWindow *window) override;
     void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
     void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
+    void addMenuViewActions(QMenu *menu, QMainWindow *window) override;
 
     QToolBar *docToolBar() { return m_docToolBar; }
 

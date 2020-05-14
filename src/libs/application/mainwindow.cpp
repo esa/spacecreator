@@ -100,11 +100,6 @@ struct MainWindow::MainWindowPrivate {
 
     QAction *m_actScreenshot = nullptr;
 
-    QMenu *m_menuView = nullptr;
-    QAction *m_actShowDocument = nullptr;
-    QAction *m_actShowHierarchy = nullptr;
-
-    QMenu *m_menuViewWindows = nullptr;
     QAction *m_actToggleErrorView = nullptr;
     QAction *m_actToggleHierarchyView = nullptr;
     QAction *m_actToggleMscTextView = nullptr;
@@ -524,29 +519,7 @@ void MainWindow::initActions()
 
 void MainWindow::initMenus()
 {
-    initMenuView();
     initMenuHelp();
-}
-
-void MainWindow::initMenuView()
-{
-    d->m_menuView = menuBar()->addMenu(tr("&View"));
-    d->m_actShowDocument =
-            d->m_menuView->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
-    d->m_actShowHierarchy =
-            d->m_menuView->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
-
-    d->m_actShowDocument->setCheckable(true);
-    d->m_actShowHierarchy->setCheckable(true);
-    auto group = new QActionGroup(d->m_menuView);
-    group->addAction(d->m_actShowDocument);
-    group->addAction(d->m_actShowHierarchy);
-    d->m_actShowDocument->setChecked(true);
-
-    d->m_menuView->addSeparator();
-    d->m_menuView->addAction(tr("Show messages ..."), this, &MainWindow::openMessageDeclarationEditor);
-
-    initMenuViewWindows();
 }
 
 void MainWindow::initDocumentViewActions()
@@ -580,21 +553,6 @@ void MainWindow::initDocumentViewActions()
     addAction(msc::MscDocument::HierarchyRepeat);
     addAction(msc::MscDocument::HierarchyException);
     addAction(msc::MscDocument::HierarchyLeaf);
-}
-
-void MainWindow::initMenuViewWindows()
-{
-    d->m_menuView->addSeparator();
-    d->m_menuViewWindows = d->m_menuView->addMenu("Windows");
-
-    d->m_actToggleHierarchyView = d->ui->dockWidgetDocument->toggleViewAction();
-    d->m_menuViewWindows->addAction(d->m_actToggleHierarchyView);
-
-    d->m_actToggleMscTextView = d->ui->dockWidgetMscText->toggleViewAction();
-    d->m_menuViewWindows->addAction(d->m_actToggleMscTextView);
-
-    d->m_actToggleAsn1View = d->ui->dockWidgetAsn1->toggleViewAction();
-    d->m_menuViewWindows->addAction(d->m_actToggleAsn1View);
 }
 
 void MainWindow::initMenuHelp()
@@ -806,6 +764,21 @@ BaseTool *MainWindow::deleteTool()
     return d->m_deleteTool;
 }
 
+QAction *MainWindow::dockWidgetDocumentToggleAction()
+{
+    return d->ui->dockWidgetDocument->toggleViewAction();
+}
+
+QAction *MainWindow::dockWidgetMscTextToggleAction()
+{
+    return d->ui->dockWidgetMscText->toggleViewAction();
+}
+
+QAction *MainWindow::dockWidgetAsn1ToggleAction()
+{
+    return d->ui->dockWidgetAsn1->toggleViewAction();
+}
+
 void MainWindow::copyCurrentChart()
 {
     d->m_model->copyCurrentChart();
@@ -882,7 +855,8 @@ void MainWindow::loadSettings()
         showDocumentView(true);
     else
         showHierarchyView(true);
-    QAction *changeViewModeAction = isDocViewMode ? d->m_actShowDocument : d->m_actShowHierarchy;
+    QAction *changeViewModeAction =
+            isDocViewMode ? d->m_plugin->actionShowDocument() : d->m_plugin->actionShowHierarchy();
     changeViewModeAction->setChecked(true);
 }
 

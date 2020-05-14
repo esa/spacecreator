@@ -54,6 +54,10 @@ void Plugin::initMenus(QMainWindow *window)
     menu->addAction(actionUndo());
     menu->addAction(actionRedo());
     addMenuEditActions(menu, window);
+
+    // Initialize the view menu
+    menu = window->menuBar()->addMenu(tr("&View"));
+    addMenuViewActions(menu, window);
 }
 
 QAction *Plugin::actionNewFile()

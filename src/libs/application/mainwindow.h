@@ -56,6 +56,10 @@ public:
 
     BaseTool *deleteTool();
 
+    QAction *dockWidgetDocumentToggleAction();
+    QAction *dockWidgetMscTextToggleAction();
+    QAction *dockWidgetAsn1ToggleAction();
+
 public Q_SLOTS:
     void copyCurrentChart();
     void copyCurrentChartAsPicture();
@@ -99,9 +103,7 @@ private:
     void setupUi();
     void initActions();
     void initMenus();
-    void initMenuView();
     void initDocumentViewActions();
-    void initMenuViewWindows();
     void initMenuHelp();
     void initTools();
     void initMainToolbar();

@@ -64,6 +64,31 @@ void MSCPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window)
     menu->addAction(createActionPaste(mainWindow));
 }
 
+void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
+{
+    auto mainWindow = dynamic_cast<MainWindow *>(window);
+
+    m_actionShowDocument = menu->addAction(tr("Show &Document"), mainWindow, &MainWindow::showDocumentView, tr("F8"));
+    m_actionShowHierarchy =
+            menu->addAction(tr("Show &Hierarchy"), mainWindow, &MainWindow::showHierarchyView, tr("F9"));
+
+    m_actionShowDocument->setCheckable(true);
+    m_actionShowHierarchy->setCheckable(true);
+    auto group = new QActionGroup(menu);
+    group->addAction(m_actionShowDocument);
+    group->addAction(m_actionShowHierarchy);
+    m_actionShowDocument->setChecked(true);
+
+    menu->addSeparator();
+    menu->addAction(tr("Show messages ..."), mainWindow, &MainWindow::openMessageDeclarationEditor);
+
+    menu->addSeparator();
+    auto menuWindows = menu->addMenu("Windows");
+    menuWindows->addAction(mainWindow->dockWidgetDocumentToggleAction());
+    menuWindows->addAction(mainWindow->dockWidgetMscTextToggleAction());
+    menuWindows->addAction(mainWindow->dockWidgetAsn1ToggleAction());
+}
+
 void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
