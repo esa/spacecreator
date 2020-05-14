@@ -93,6 +93,9 @@ public:
 
     void onChartBoxChanged();
 
+    QRectF getChartBox() const;
+    QPointF extendToNearestEdge(const QPointF &shiftMe) const;
+
 Q_SIGNALS:
     void retargeted(msc::MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 

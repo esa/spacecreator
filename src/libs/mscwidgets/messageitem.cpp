@@ -846,25 +846,6 @@ void MessageItem::extendGlobalMessage()
     if (!m_targetInstance && !m_sourceInstance)
         return;
 
-    auto getChartBox = [this]() {
-        if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
-            return chartItem->sceneBoundingRect(); // NOTE: not a contentRect!
-        if (QGraphicsScene *scene = this->scene())
-            return scene->sceneRect();
-        return QRectF();
-    };
-
-    const QRectF boxRect = getChartBox();
-    auto extendToNearestEdge = [&](const QPointF &shiftMe) {
-        const QLineF left({ boxRect.left(), shiftMe.y() }, shiftMe);
-        const QLineF right({ boxRect.right(), shiftMe.y() }, shiftMe);
-
-        if (left.length() <= right.length())
-            return QPointF(boxRect.left(), shiftMe.y());
-        else
-            return QPointF(boxRect.right(), shiftMe.y());
-    };
-
     QVector<QPointF> points(messagePoints());
     const bool isFromEnv = !m_sourceInstance;
     const int shiftPointId = isFromEnv ? 0 : points.size() - 1;
@@ -887,6 +868,28 @@ void MessageItem::onChartBoxChanged()
         return;
 
     extendGlobalMessage();
+}
+
+QRectF MessageItem::getChartBox() const
+{
+    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+        return chartItem->contentRect();
+    if (QGraphicsScene *scene = this->scene())
+        return scene->sceneRect();
+    return QRectF();
+}
+
+QPointF MessageItem::extendToNearestEdge(const QPointF &shiftMe) const
+{
+    const QRectF boxRect = getChartBox();
+    const QLineF left({ boxRect.left(), shiftMe.y() }, shiftMe);
+    const QLineF right({ boxRect.right(), shiftMe.y() }, shiftMe);
+
+    if (left.length() <= right.length()) {
+        return QPointF(boxRect.left(), shiftMe.y());
+    } else {
+        return QPointF(boxRect.right(), shiftMe.y());
+    }
 }
 
 /*
