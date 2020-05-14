@@ -1,4 +1,4 @@
-set(LIB_NAME application)
+set(LIB_NAME libmsceditor)
 
 add_library(${LIB_NAME} STATIC)
 
