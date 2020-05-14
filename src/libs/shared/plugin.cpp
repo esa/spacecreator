@@ -1,6 +1,8 @@
 #include "plugin.h"
 
 #include <QAction>
+#include <QMainWindow>
+#include <QMenuBar>
 #include <QToolBar>
 #include <QUndoGroup>
 
@@ -27,6 +29,22 @@ QToolBar *Plugin::mainToolBar()
         m_mainToolBar->setObjectName("mainToolBar");
     }
     return m_mainToolBar;
+}
+
+void Plugin::initMenus(QMainWindow *window)
+{
+    // Initialize the file menu
+    auto menu = window->menuBar()->addMenu(tr("File"));
+
+    menu->addAction(actionNewFile());
+    menu->addAction(actionOpenFile());
+    menu->addAction(actionSaveFile());
+    menu->addAction(actionSaveFileAs());
+    menu->addAction(actionCloseFile());
+    menu->addSeparator();
+    addMenuFileActions(menu, window);
+    menu->addSeparator();
+    menu->addAction(actionQuit());
 }
 
 QAction *Plugin::actionNewFile()

@@ -87,6 +87,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
+    m_plugin->initMenus(this);
     initMenus();
 
     initTabs();
@@ -121,27 +122,8 @@ void MainWindow::closeEvent(QCloseEvent *e)
  */
 void MainWindow::initMenus()
 {
-    initMenuFile();
     initMenuEdit();
     initMenuHelp();
-}
-
-/*!
- * \brief Fills the File menu with actions.
- */
-void MainWindow::initMenuFile()
-{
-    m_menuFile = menuBar()->addMenu(tr("&File"));
-    m_menuFile->addAction(m_plugin->actionNewFile());
-    m_menuFile->addAction(m_plugin->actionOpenFile());
-    m_menuFile->addAction(m_plugin->actionSaveFile());
-    m_menuFile->addAction(m_plugin->actionCloseFile());
-    m_menuFile->addSeparator();
-    m_actSaveSceneRender = m_menuFile->addAction(tr("Render Scene..."), this, &MainWindow::onSaveRenderRequested);
-    m_menuFile->addSeparator();
-
-    ctx::ActionsManager::registerAction(
-            Q_FUNC_INFO, m_actSaveSceneRender, "Render", "Save current scene complete render.");
 }
 
 /*!
@@ -428,7 +410,7 @@ void MainWindow::updateActions()
 
         m_plugin->actionSaveFile()->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));
     }
-    m_actSaveSceneRender->setEnabled(renderAvailable);
+    m_plugin->actionSaveSceneRender()->setEnabled(renderAvailable);
 }
 
 /*!

@@ -30,18 +30,16 @@ namespace Ui {
 class MainWindow;
 }
 
-namespace msc {
-class MscDocument;
-class BaseTool;
-class MSCPlugin;
-}
-
 class MainModel;
 class QUndoGroup;
 class QGraphicsView;
 class QPlainTextEdit;
 
-struct MainWindowPrivate;
+namespace msc {
+
+class MscDocument;
+class BaseTool;
+class MSCPlugin;
 
 class MainWindow : public QMainWindow
 {
@@ -64,7 +62,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
 
-private Q_SLOTS:
+public Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
     bool openFileMsc(const QString &file);
@@ -85,6 +83,8 @@ private Q_SLOTS:
 
 private:
     static const QLatin1String DotMscFileExtensionLow;
+
+    struct MainWindowPrivate;
     std::unique_ptr<MainWindowPrivate> const d;
 
     void loadSettings();
@@ -128,3 +128,5 @@ private:
 
     void saveSceneRender(const QString &filePath) const;
 };
+
+}

@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     msc::MSCPlugin plugin;
 
-    MainWindow w(&plugin);
+    msc::MainWindow w(&plugin);
 
     shared::CommandLineParser cmdParser;
     cmdParser.setApplicationDescription("MSC file editor");

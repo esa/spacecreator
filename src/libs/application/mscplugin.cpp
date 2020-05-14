@@ -1,8 +1,10 @@
 #include "mscplugin.h"
 
 #include "commandlineparser.h"
+#include "mainwindow.h"
 
 #include <QMainWindow>
+#include <QMenu>
 #include <QToolBar>
 
 namespace msc {
@@ -19,6 +21,11 @@ MSCPlugin::MSCPlugin(QObject *parent)
     m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
 }
 
+void MSCPlugin::setPluginActive(bool active)
+{
+    m_actionScreenshot->setVisible(active);
+}
+
 GraphicsView *MSCPlugin::graphicsView()
 {
     return m_graphicsView;
@@ -29,6 +36,17 @@ void MSCPlugin::addToolBars(QMainWindow *window)
     window->addToolBar(mainToolBar());
     window->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
     window->addToolBar(Qt::LeftToolBarArea, m_hierarchyToolBar);
+}
+
+/*!
+ * \brief Fills the File menu with actions.
+ */
+void MSCPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
+{
+    auto mainWindow = dynamic_cast<MainWindow *>(window);
+    m_actionScreenshot = menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")),
+            tr("Save Screenshot..."), mainWindow, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
+    menu->addSeparator();
 }
 
 void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const

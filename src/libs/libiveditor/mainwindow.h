@@ -69,7 +69,7 @@ protected:
     void updateActions();
     void saveSceneRender(const QString &filePath) const;
 
-protected Q_SLOTS:
+public Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
     bool onCloseFileRequested();
@@ -93,11 +93,9 @@ private:
 
     bool m_dropUnsavedChangesSilently { false };
 
-    QMenu *m_menuFile { nullptr };
     QMenu *m_menuEdit { nullptr };
     QMenu *m_menuHelp { nullptr };
 
-    QAction *m_actSaveSceneRender { nullptr };
     QAction *m_actExportAs { nullptr };
 
     QAction *m_actAbout { nullptr };

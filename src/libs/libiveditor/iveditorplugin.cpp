@@ -1,8 +1,11 @@
 #include "iveditorplugin.h"
 
 #include "commandlineparser.h"
+#include "context/action/actionsmanager.h"
+#include "mainwindow.h"
 
 #include <QMainWindow>
+#include <QMenu>
 #include <QToolBar>
 
 namespace aadlinterface {
@@ -17,6 +20,11 @@ IVEditorPlugin::IVEditorPlugin(QObject *parent)
     m_docToolBar->setMovable(true);
 }
 
+void IVEditorPlugin::setPluginActive(bool active)
+{
+    m_actionSaveSceneRender->setVisible(active);
+}
+
 GraphicsView *IVEditorPlugin::graphicsView()
 {
     return m_graphicsView;
@@ -26,6 +34,19 @@ void IVEditorPlugin::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
     window->addToolBar(m_docToolBar);
+}
+
+/*!
+ * \brief Fills the File menu with actions.
+ */
+void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
+{
+    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
+    m_actionSaveSceneRender =
+            menu->addAction(tr("Render Scene..."), mainWindow, &taste3::MainWindow::onSaveRenderRequested);
+
+    taste3::ctx::ActionsManager::registerAction(
+            Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
 }
 
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const

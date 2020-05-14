@@ -12,8 +12,11 @@ class MSCPlugin : public shared::Plugin
 public:
     explicit MSCPlugin(QObject *parent = nullptr);
 
+    void setPluginActive(bool active) override;
+
     GraphicsView *graphicsView() override;
     void addToolBars(QMainWindow *window) override;
+    void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
 
     QToolBar *mscToolBar() { return m_mscToolBar; }
     QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }
@@ -24,6 +27,8 @@ private:
     GraphicsView *m_graphicsView;
     QToolBar *m_mscToolBar;
     QToolBar *m_hierarchyToolBar;
+
+    QAction *m_actionScreenshot = nullptr;
 };
 
 }

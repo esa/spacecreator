@@ -7,6 +7,7 @@ class QToolBar;
 class QAction;
 class QUndoGroup;
 class QMainWindow;
+class QMenu;
 
 namespace shared {
 
@@ -24,9 +25,16 @@ public:
     explicit Plugin(QObject *parent = nullptr);
     virtual ~Plugin();
 
+    // Override this to show or hide actions
+    virtual void setPluginActive(bool active) = 0;
+
     virtual ui::GraphicsViewBase *graphicsView() = 0;
     virtual QToolBar *mainToolBar();
     virtual void addToolBars(QMainWindow *window) = 0;
+
+    // Set up all the menus
+    void initMenus(QMainWindow *window);
+    virtual void addMenuFileActions(QMenu *menu, QMainWindow *window) = 0;
 
     QUndoGroup *undoGroup() { return m_undoGroup; }
 

@@ -62,6 +62,7 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QImageWriter>
+#include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QKeySequence>
@@ -75,9 +76,11 @@
 
 static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
+namespace msc {
+
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
-struct MainWindowPrivate {
+struct MainWindow::MainWindowPrivate {
     explicit MainWindowPrivate(msc::MSCPlugin *plugin, MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
         , m_plugin(plugin)
@@ -94,8 +97,6 @@ struct MainWindowPrivate {
     QComboBox *m_zoomBox = nullptr;
 
     MainModel *m_model = nullptr;
-
-    QMenu *m_menuFile = nullptr;
 
     QMenu *m_menuEdit = nullptr;
 
@@ -473,6 +474,8 @@ void MainWindow::setupUi()
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
     d->ui->asn1Widget->setModel(d->m_model->mscModel());
 
+    d->m_plugin->initMenus(this);
+
     initActions();
     initMenus();
     initTools();
@@ -544,21 +547,7 @@ void MainWindow::initMenus()
     initMenuHelp();
 }
 
-void MainWindow::initMenuFile()
-{
-    d->m_menuFile = menuBar()->addMenu(tr("File"));
-
-    d->m_menuFile->addAction(d->m_plugin->actionNewFile());
-    d->m_menuFile->addAction(d->m_plugin->actionOpenFile());
-    d->m_menuFile->addAction(d->m_plugin->actionSaveFile());
-    d->m_menuFile->addAction(d->m_plugin->actionSaveFileAs());
-
-    d->m_actScreenshot = d->m_menuFile->addAction(style()->standardIcon(QStyle::SP_DialogSaveButton),
-            tr("Save Screenshot..."), this, &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
-    d->m_menuFile->addSeparator();
-
-    d->m_menuFile->addAction(d->m_plugin->actionQuit());
-}
+void MainWindow::initMenuFile() { }
 
 void MainWindow::initMenuEdit()
 {
@@ -1052,7 +1041,6 @@ void MainWindow::updateModel()
 }
 
 #ifdef QT_DEBUG
-#include <QInputDialog>
 
 // A way to precisiousely move mouse pointer to scene coordinates without pixel hunting.
 // Invoked by CTRL+ALT+SHIFT+M
@@ -1176,4 +1164,6 @@ void MainWindow::saveSceneRender(const QString &filePath) const
         scene->render(&p);
         img.save(filePath);
     }
+}
+
 }

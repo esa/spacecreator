@@ -12,6 +12,11 @@ target_sources(${LIB_NAME} PRIVATE
     documenttreeview.h
     mainmodel.cpp
     mainmodel.h
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    mscplugin.cpp
+    mscplugin.h
     remotecontrolhandler.cpp
     remotecontrolhandler.h
     remotecontrolwebserver.cpp
