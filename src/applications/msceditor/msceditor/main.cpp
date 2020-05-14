@@ -17,16 +17,14 @@
 
 #include "commandlineparser.h"
 #include "mainwindow.h"
-#include "mscdocument.h"
 #include "msclibrary.h"
 #include "mscplugin.h"
+#include "mscwriter.h"
 #include "sharedlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
-#include <QMetaEnum>
-#include <QPlainTextEdit>
-#include <QPointer>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -47,20 +45,34 @@ int main(int argc, char *argv[])
 
     msc::MSCPlugin plugin;
 
-    msc::MainWindow w(&plugin);
-
     shared::CommandLineParser cmdParser;
     cmdParser.setApplicationDescription("MSC file editor");
     plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
-    const auto args = cmdParser.positionalsSet();
-    for (auto it = args.crbegin(); it != args.crend(); ++it) {
-        auto arg = *it;
-        w.processCommandLineArg(arg, cmdParser.value(arg));
+    const QVector<shared::CommandLineParser::Positional> args = cmdParser.positionalsSet();
+    if (args.contains(shared::CommandLineParser::Positional::OpenFileMsc)
+            && args.contains(shared::CommandLineParser::Positional::OpenStringTemplateFile)
+            && args.contains(shared::CommandLineParser::Positional::ExportToFile)) {
+        // Convert the .msc file
+        const QString inputFile = cmdParser.value(shared::CommandLineParser::Positional::OpenFileMsc);
+        const QString templateFile = cmdParser.value(shared::CommandLineParser::Positional::OpenStringTemplateFile);
+        const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
+
+        msc::MscWriter writer;
+        const bool ok = writer.convertMscFile(inputFile, templateFile, outputFile);
+        return ok ? 0 : 1;
+    } else {
+        // Show the MSC editor
+        msc::MainWindow w(&plugin);
+
+        for (auto it = args.crbegin(); it != args.crend(); ++it) {
+            auto arg = *it;
+            w.processCommandLineArg(arg, cmdParser.value(arg));
+        }
+
+        w.show();
+
+        return a.exec();
     }
-
-    w.show();
-
-    return a.exec();
 }

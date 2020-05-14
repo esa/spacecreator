@@ -141,16 +141,17 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         break;
     case CommandLineParser::Positional::OpenStringTemplateFile:
         names << "t"
-              << "open-template";
+              << "template";
         description = QCoreApplication::translate(
                 "CommandLineParser", "Open a string template <file> on startup (-o option is required).");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     case CommandLineParser::Positional::ExportToFile:
         names << "x"
-              << "export-to-xml";
-        description = QCoreApplication::translate(
-                "CommandLineParser", "Export the doc to the <file> using default template (-o option is required).");
+              << "export";
+        description = QCoreApplication::translate("CommandLineParser",
+                "Export the doc to the <file> using the template set by -t or the default template (-o or -m option is "
+                "required).");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
         break;
     case CommandLineParser::Positional::ListScriptableActions:

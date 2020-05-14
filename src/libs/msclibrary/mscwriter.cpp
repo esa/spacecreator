@@ -24,6 +24,7 @@
 #include "msccoregion.h"
 #include "msccreate.h"
 #include "mscdocument.h"
+#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
@@ -34,6 +35,8 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
+#include <QScopedPointer>
 #include <QTextStream>
 #include <QVariant>
 
@@ -124,7 +127,7 @@ bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
 QString MscWriter::modelText(MscModel *model)
 {
     if (m_saveMode == SaveMode::GRANTLEE) {
-        return exportGrantlee(model);
+        return exportGrantlee(model, QString());
     }
 
     setModel(model);
@@ -514,6 +517,85 @@ QString MscWriter::serialize(const MscDocument *document, int tabsSize)
 }
 
 /*!
+   \brief MscWriter::exportGrantlee exports the given msc model using the given template file. If the template file
+   can't be loaded, the default template in the resource is used.
+   \param model The model to be exported
+   \param templateFile the grantlee template file to use
+   \return the string representation.
+ */
+QString MscWriter::exportGrantlee(MscModel *model, QString templateFile)
+{
+    QFileInfo fi(templateFile);
+    if (!fi.exists() || !fi.isReadable()) {
+        templateFile = ":/mscresources/mscmodel.tmplt";
+    }
+
+    QBuffer buffer;
+    QByteArray bufferArray;
+    buffer.setBuffer(&bufferArray);
+    buffer.open(QIODevice::WriteOnly);
+    QHash<QString, QVariantList> grouppedObjects;
+
+    QVariantList varList;
+    varList.append(QVariant::fromValue(model));
+    grouppedObjects.insert("model", varList);
+    m_template->parseFile(grouppedObjects, templateFile, &buffer);
+
+    buffer.close();
+    buffer.open(QIODevice::ReadOnly);
+    QString result = buffer.readAll();
+
+    // Fix too many empty lines
+    result.replace("\n\n\n", "\n");
+    result.replace("\n\n", "\n");
+
+    return result;
+}
+
+/*!
+   \brief MscWriter::convertMscFile convert the msc file, based on the given grantlee template
+   \param inputFile the .msc file to read
+   \param templateFile the grantlee template file to be used
+   \param outputFile the file to store the result to
+   \return
+ */
+bool MscWriter::convertMscFile(const QString &inputFile, const QString &templateFile, const QString &outputFile) const
+{
+    QFileInfo fi(templateFile);
+    if (!fi.exists() || !fi.isReadable()) {
+        qWarning() << tr("Unable to use template file '%1'").arg(templateFile);
+        return false;
+    }
+
+    fi.setFile(inputFile);
+    if (!fi.exists() || !fi.isReadable()) {
+        qWarning() << tr("Unable to use input file file '%1'").arg(inputFile);
+        return false;
+    }
+
+    msc::MscFile reader;
+    QStringList errors;
+    QScopedPointer<msc::MscModel> mscModel(reader.parseFile(inputFile, &errors));
+    if (!errors.isEmpty() || mscModel.isNull()) {
+        qWarning() << errors.join('\n');
+        return false;
+    }
+
+    msc::MscWriter writer;
+    writer.setSaveMode(msc::MscWriter::SaveMode::GRANTLEE);
+    const QString fileContent = writer.exportGrantlee(mscModel.data(), templateFile);
+    QFile out(outputFile);
+    if (!out.open(QIODevice::WriteOnly)) {
+        qWarning() << tr("Can't write file '%1'").arg(outputFile);
+        return false;
+    }
+    out.write(fileContent.toUtf8());
+    out.close();
+
+    return true;
+}
+
+/*!
  * \brief MscWriter::setModel Set the model to write
  * \param model
  */
@@ -639,33 +721,6 @@ QString MscWriter::serializeCif(const msc::MscEntity *entity, const QString &ent
     }
 
     return entity->cifText(tabsSize) + entitySerialized;
-}
-
-QString MscWriter::exportGrantlee(MscModel *model)
-{
-    // @todo make template selectable
-    const QString templateFile = ":/mscresources/mscmodel.tmplt";
-
-    QBuffer buffer;
-    QByteArray bufferArray;
-    buffer.setBuffer(&bufferArray);
-    buffer.open(QIODevice::WriteOnly);
-    QHash<QString, QVariantList> grouppedObjects;
-
-    QVariantList varList;
-    varList.append(QVariant::fromValue(model));
-    grouppedObjects.insert("model", varList);
-    m_template->parseFile(grouppedObjects, templateFile, &buffer);
-
-    buffer.close();
-    buffer.open(QIODevice::ReadOnly);
-    QString result = buffer.readAll();
-
-    // Fix too many empty lines
-    result.replace("\n\n\n", "\n");
-    result.replace("\n\n", "\n");
-
-    return result;
 }
 
 } // namespace msc

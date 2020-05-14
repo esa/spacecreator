@@ -99,6 +99,8 @@ void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) 
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
     parser->handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
+    parser->handlePositional(shared::CommandLineParser::Positional::ExportToFile);
+    parser->handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 

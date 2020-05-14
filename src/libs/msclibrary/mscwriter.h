@@ -72,6 +72,10 @@ public:
     QString serialize(const MscChart *chart, int tabsSize = 0);
     QString serialize(const MscDocument *document, int tabsSize = 0);
 
+    QString exportGrantlee(MscModel *model, QString templateFile);
+
+    bool convertMscFile(const QString &inputFile, const QString &templateFile, const QString &outputFile) const;
+
     void setModel(MscModel *model);
 
 private:
@@ -82,8 +86,6 @@ private:
     QString serializeParameters(const MscMessage *message) const;
 
     QString serializeCif(const msc::MscEntity *entity, const QString &entitySerialized, int tabsSize) const;
-
-    QString exportGrantlee(MscModel *model);
 
     MscModel *m_model = nullptr;
     SaveMode m_saveMode = SaveMode::GRANTLEE;

@@ -42,11 +42,11 @@ public:
 
         // AADL editor
         OpenAADLXMLFile,
-        OpenStringTemplateFile,
-        ExportToFile,
         ListScriptableActions,
 
         // Both
+        OpenStringTemplateFile,
+        ExportToFile,
         DropUnsavedChangesSilently,
 
         Unknown
