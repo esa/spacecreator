@@ -79,6 +79,8 @@ MessageDialog::MessageDialog(msc::MscMessage *message, QWidget *parent)
     setParameterEditState();
 
     checkTextValidity();
+
+    ui->nameLineEdit->setFocus();
 }
 
 MessageDialog::~MessageDialog()
