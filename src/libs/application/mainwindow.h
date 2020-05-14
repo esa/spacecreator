@@ -54,7 +54,13 @@ public:
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
     QPlainTextEdit *textOutputPane() const;
 
+    BaseTool *deleteTool();
+
 public Q_SLOTS:
+    void copyCurrentChart();
+    void copyCurrentChartAsPicture();
+    void pasteChart();
+
     void createNewDocument();
     void selectAndOpenFile();
     void selectCurrentChart();
@@ -93,8 +99,6 @@ private:
     void setupUi();
     void initActions();
     void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
     void initMenuView();
     void initDocumentViewActions();
     void initMenuViewWindows();

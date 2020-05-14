@@ -98,11 +98,6 @@ struct MainWindow::MainWindowPrivate {
 
     MainModel *m_model = nullptr;
 
-    QMenu *m_menuEdit = nullptr;
-
-    QAction *m_actCopy = nullptr;
-    QAction *m_actPaste = nullptr;
-
     QAction *m_actScreenshot = nullptr;
 
     QMenu *m_menuView = nullptr;
@@ -331,12 +326,12 @@ void MainWindow::showDocumentView(bool show)
         d->m_plugin->hierarchyToolBar()->hide();
         d->m_plugin->mscToolBar()->show();
 
-        d->m_actCopy->setEnabled(true);
+        d->m_plugin->actionCopy()->setEnabled(true);
         msc::MscChart *chart = d->m_model->chartViewModel().currentChart();
         QClipboard *clipboard = QApplication::clipboard();
         const QMimeData *mimeData = clipboard->mimeData();
         const bool clipBoardHasMscChart = mimeData ? mimeData->hasFormat(MainModel::MscChartMimeType) : false;
-        d->m_actPaste->setEnabled(clipBoardHasMscChart && chart && chart->instances().isEmpty());
+        d->m_plugin->actionPaste()->setEnabled(clipBoardHasMscChart && chart && chart->instances().isEmpty());
 
         d->m_deleteTool->setView(d->ui->graphicsView);
         d->m_deleteTool->setCurrentChart(chart);
@@ -357,8 +352,8 @@ void MainWindow::showHierarchyView(bool show)
         d->m_plugin->hierarchyToolBar()->show();
         d->m_plugin->mscToolBar()->hide();
 
-        d->m_actCopy->setEnabled(false);
-        d->m_actPaste->setEnabled(false);
+        d->m_plugin->actionCopy()->setEnabled(false);
+        d->m_plugin->actionPaste()->setEnabled(false);
 
         d->m_deleteTool->setView(d->ui->hierarchyView);
         d->m_deleteTool->setCurrentChart(nullptr);
@@ -449,7 +444,8 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
             }
 
             d->m_model->setSelectedDocument(document);
-            d->m_actPaste->setEnabled(QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
+            d->m_plugin->actionPaste()->setEnabled(
+                    QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)
                     && d->m_model->selectedDocument()->isAddChildEnable());
         }
     }
@@ -474,9 +470,10 @@ void MainWindow::setupUi()
     d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
     d->ui->asn1Widget->setModel(d->m_model->mscModel());
 
+    initActions();
+
     d->m_plugin->initMenus(this);
 
-    initActions();
     initMenus();
     initTools();
     initMainToolbar();
@@ -509,17 +506,6 @@ void MainWindow::setupUi()
  */
 void MainWindow::initActions()
 {
-    d->m_actCopy = new QAction(tr("Copy:"), this);
-    d->m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
-    d->m_actCopy->setMenu(new QMenu(this));
-    d->m_actCopy->menu()->addAction(tr("Copy Diagram"), d->m_model, &MainModel::copyCurrentChart, QKeySequence::Copy);
-    d->m_actCopy->menu()->addAction(tr("Copy as Picture"), d->m_model, &MainModel::copyCurrentChartAsPicture);
-
-    d->m_actPaste = new QAction(tr("Paste:"), this);
-    d->m_actPaste->setShortcut(QKeySequence::Paste);
-    d->m_actPaste->setIcon(QIcon::fromTheme("edit-paste"));
-    connect(d->m_actPaste, &QAction::triggered, d->m_model, &MainModel::pasteChart);
-
     d->m_deleteTool = new msc::EntityDeleteTool(&(d->m_model->chartViewModel()), d->ui->graphicsView, this);
     d->m_deleteTool->setCurrentChart(d->m_model->chartViewModel().currentChart());
 
@@ -536,29 +522,10 @@ void MainWindow::initActions()
     });
 }
 
-/*!
- * \brief MainWindow::initMenus Initialize the menus. Calls each menu initialization
- */
 void MainWindow::initMenus()
 {
-    initMenuFile();
-    initMenuEdit();
     initMenuView();
     initMenuHelp();
-}
-
-void MainWindow::initMenuFile() { }
-
-void MainWindow::initMenuEdit()
-{
-    d->m_menuEdit = menuBar()->addMenu(tr("Edit"));
-    d->m_menuEdit->addAction(d->m_plugin->actionUndo());
-    d->m_menuEdit->addAction(d->m_plugin->actionRedo());
-    d->m_menuEdit->addSeparator();
-    d->m_menuEdit->addAction(d->m_deleteTool->action());
-    d->m_menuEdit->addSeparator();
-    d->m_menuEdit->addAction(d->m_actCopy);
-    d->m_menuEdit->addAction(d->m_actPaste);
 }
 
 void MainWindow::initMenuView()
@@ -750,8 +717,8 @@ void MainWindow::initMainToolbar()
     mainToolBar->addAction(d->m_deleteTool->action());
 
     mainToolBar->addSeparator();
-    mainToolBar->addAction(d->m_actCopy);
-    mainToolBar->addAction(d->m_actPaste);
+    mainToolBar->addAction(d->m_plugin->actionCopy());
+    mainToolBar->addAction(d->m_plugin->actionPaste());
 }
 
 void MainWindow::initConnections()
@@ -832,6 +799,26 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         break;
     }
     return false;
+}
+
+BaseTool *MainWindow::deleteTool()
+{
+    return d->m_deleteTool;
+}
+
+void MainWindow::copyCurrentChart()
+{
+    d->m_model->copyCurrentChart();
+}
+
+void MainWindow::copyCurrentChartAsPicture()
+{
+    d->m_model->copyCurrentChartAsPicture();
+}
+
+void MainWindow::pasteChart()
+{
+    d->m_model->pasteChart();
 }
 
 msc::BaseTool *MainWindow::activeTool() const

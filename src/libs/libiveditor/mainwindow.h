@@ -59,8 +59,6 @@ protected:
     void closeEvent(QCloseEvent *e) override;
 
     void initMenus();
-    void initMenuFile();
-    void initMenuEdit();
     void initMenuHelp();
     void initConnections();
     void initTabs();

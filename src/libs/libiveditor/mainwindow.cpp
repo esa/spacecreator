@@ -122,18 +122,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
  */
 void MainWindow::initMenus()
 {
-    initMenuEdit();
     initMenuHelp();
-}
-
-/*!
- * \brief Fills the Edit menu with actions.
- */
-void MainWindow::initMenuEdit()
-{
-    m_menuEdit = menuBar()->addMenu(tr("&Edit"));
-    m_menuEdit->addAction(m_plugin->actionUndo());
-    m_menuEdit->addAction(m_plugin->actionRedo());
 }
 
 /*!

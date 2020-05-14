@@ -31,6 +31,9 @@ QToolBar *Plugin::mainToolBar()
     return m_mainToolBar;
 }
 
+/*!
+ * \brief initMenus Initialize the menus. Calls each menu initialization
+ */
 void Plugin::initMenus(QMainWindow *window)
 {
     // Initialize the file menu
@@ -45,6 +48,12 @@ void Plugin::initMenus(QMainWindow *window)
     addMenuFileActions(menu, window);
     menu->addSeparator();
     menu->addAction(actionQuit());
+
+    // Initialize the edit menu
+    menu = window->menuBar()->addMenu(tr("Edit"));
+    menu->addAction(actionUndo());
+    menu->addAction(actionRedo());
+    addMenuEditActions(menu, window);
 }
 
 QAction *Plugin::actionNewFile()

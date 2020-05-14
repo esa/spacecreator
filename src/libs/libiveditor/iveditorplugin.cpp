@@ -49,6 +49,8 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
 }
 
+void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window) { }
+
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);

@@ -35,6 +35,7 @@ public:
     // Set up all the menus
     void initMenus(QMainWindow *window);
     virtual void addMenuFileActions(QMenu *menu, QMainWindow *window) = 0;
+    virtual void addMenuEditActions(QMenu *menu, QMainWindow *window) = 0;
 
     QUndoGroup *undoGroup() { return m_undoGroup; }
 
