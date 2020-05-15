@@ -34,6 +34,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QDir>
 #include <QGraphicsScene>
 #include <QImage>
@@ -313,6 +314,9 @@ bool MainModel::loadFile(const QString &filename)
         model = file.parseFile(filename, &d->m_mscErrorMessages);
     } catch (const msc::ParserException &e) {
         d->m_mscErrorMessages.append(e.errorMessage());
+        for (const QString &error : d->m_mscErrorMessages) {
+            qWarning() << error;
+        }
         return false;
     } catch (...) {
         // print error message

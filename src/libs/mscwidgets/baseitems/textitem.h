@@ -28,6 +28,8 @@ namespace msc {
 class TextItem : public QGraphicsTextItem
 {
     Q_OBJECT
+    Q_PROPERTY(bool textIsValid READ textIsValid NOTIFY textIsValidChanged)
+
 public:
     TextItem(QGraphicsItem *parent = nullptr);
 
@@ -74,6 +76,8 @@ public:
 
     void setSendClickEvent(bool send);
 
+    bool textIsValid() const;
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
@@ -82,6 +86,7 @@ Q_SIGNALS:
        Send when setSendClickEvent() is set true, and the item was clicked.
      */
     void clicked();
+    void textIsValidChanged();
 
 protected Q_SLOTS:
     virtual void onContentsChange(int position, int charsRemoved, int charsAdded);
@@ -94,8 +99,11 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual bool validateInput(const QString &text) const;
+    virtual bool validateText(const QString &text) const;
 
     QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
+
+    void checkTextValidity();
 
 protected:
     QColor m_bgrColor = Qt::white;
@@ -110,6 +118,8 @@ protected:
     QSizeF m_explicitSize;
     bool m_sendClickEvent = false;
     bool m_disableEditingGuard = false;
+    bool m_textIsValid = true;
+    bool m_filterInvalidText = true;
 };
 
 class NameItem : public TextItem

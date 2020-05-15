@@ -88,12 +88,14 @@ MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
     MscErrorListener errorListener;
 
     MscLexer lexer(&input);
+    lexer.removeErrorListeners();
     lexer.addErrorListener(&errorListener);
 
     CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     MscParser parser(&tokens);
+    parser.removeErrorListeners();
     parser.addErrorListener(&errorListener);
 
     MscParserVisitor visitor(&tokens);

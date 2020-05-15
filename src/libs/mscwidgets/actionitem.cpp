@@ -22,6 +22,7 @@
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "mscaction.h"
+#include "mscfile.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
@@ -33,6 +34,36 @@ static const qreal kMaxTextWidth = 250.0;
 
 namespace msc {
 
+class ActionTextItem : public TextItem
+{
+public:
+    ActionTextItem(QGraphicsItem *parent = nullptr)
+        : TextItem(parent)
+    {
+    }
+
+protected:
+    bool validateText(const QString &text) const
+    {
+        MscFile file;
+        QStringList errors;
+        // test plain informal action, or data statements
+        QString testDoc = QString("msc c1;instance i1;action %1;endinstance;endmsc;").arg(text);
+        try {
+            file.parseText(testDoc, &errors);
+        } catch (...) {
+            // test quoted informal action
+            testDoc = QString("msc c1;instance i1;action '%1';endinstance;endmsc;").arg(text);
+            try {
+                file.parseText(testDoc, &errors);
+            } catch (...) {
+                return false;
+            }
+        }
+        return errors.isEmpty();
+    }
+};
+
 /*!
  * \class msc::ActionItem
  *
@@ -41,7 +72,7 @@ namespace msc {
 ActionItem::ActionItem(msc::MscAction *action, QGraphicsItem *parent)
     : InteractiveObject(action, parent)
     , m_action(action)
-    , m_textItem(new TextItem(this))
+    , m_textItem(new ActionTextItem(this))
 {
     Q_ASSERT(m_action != nullptr);
 

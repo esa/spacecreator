@@ -28,6 +28,8 @@
 
 namespace msc {
 
+static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
+
 /*!
   \class msc::TextItem
   \brief Text holder with customizable alignment, background and frame.
@@ -145,7 +147,11 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->save();
 
     const QRectF body = boundingRect();
-    painter->fillRect(body, background());
+    QBrush backColor = background();
+    if (!m_textIsValid) {
+        backColor = QBrush(ERROR_BACKGROUND_COLOR);
+    }
+    painter->fillRect(body, backColor);
 
     if (framed()) {
         QPen pen(painter->pen());
@@ -198,8 +204,8 @@ void TextItem::disableEditMode()
 
     m_disableEditingGuard = true;
 
-    if (m_prevText != toPlainText()) {
-        if (toPlainText().isEmpty()) {
+    if (m_prevText != toPlainText() || !m_textIsValid) {
+        if (toPlainText().isEmpty() || !m_textIsValid) {
             setPlainText(m_prevText);
             setTextWidth(idealWidth());
             adjustSize();
@@ -349,6 +355,11 @@ bool TextItem::validateInput(const QString &text) const
     return matched.hasMatch() && matched.captured() == text;
 }
 
+bool TextItem::validateText(const QString &text) const
+{
+    return true;
+}
+
 QPair<int, int> TextItem::prepareSelectionRange(int desiredFrom, int desiredTo) const
 {
     QPair<int, int> res(0, 0);
@@ -378,8 +389,10 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved);
 
-    if (0 == charsAdded)
+    if (0 == charsAdded) {
+        checkTextValidity();
         return;
+    }
 
     // QTextDocument automatically appends the 'PARAGRAPH SEPARATOR' (U+2029) char
     // which is not actually an input (and does not affect the view)
@@ -393,20 +406,23 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
     const int inputLength = position + charsAdded;
     for (int i = position; i < inputLength; ++i) {
         const QChar &newChar = document()->characterAt(i);
-        if (isAutoParagraphSeparator(newChar, i, inputLength))
+        if (isAutoParagraphSeparator(newChar, i, inputLength)) {
             break;
+        }
 
         inputString.append(newChar);
-        if (validateInput(newChar))
-            inputStringValid.append(newChar);
-        else {
+        if (!validateInput(newChar) && m_filterInvalidText) {
             const QString wrnMsg("Invalid characted '%1' [%2] at #%3 filtered out in '%4'");
             qWarning() << wrnMsg.arg(newChar).arg(newChar.unicode()).arg(i + 1).arg(inputString);
+        } else {
+            inputStringValid.append(newChar);
         }
     }
 
-    if (inputStringValid == inputString)
+    if (inputStringValid == inputString) {
+        checkTextValidity();
         return;
+    }
 
     QTextCursor currCursor = textCursor();
     if (currCursor.isNull()) {
@@ -424,6 +440,7 @@ void TextItem::onContentsChange(int position, int charsRemoved, int charsAdded)
 
     QSignalBlocker suppressContentsChange(document());
     setTextCursor(currCursor);
+    checkTextValidity();
 }
 
 void TextItem::setExplicitSize(const QSizeF &size)
@@ -450,6 +467,22 @@ QRectF TextItem::boundingRect() const
 void TextItem::setSendClickEvent(bool send)
 {
     m_sendClickEvent = send;
+}
+
+bool TextItem::textIsValid() const
+{
+    return m_textIsValid;
+}
+
+void TextItem::checkTextValidity()
+{
+    bool valid = validateText(toPlainText());
+    if (valid == m_textIsValid) {
+        return;
+    }
+
+    m_textIsValid = valid;
+    Q_EMIT textIsValidChanged();
 }
 
 } // namespace msc
