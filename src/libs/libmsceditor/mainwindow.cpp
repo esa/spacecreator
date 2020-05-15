@@ -680,6 +680,12 @@ void MainWindow::initConnections()
     connect(d->m_model, &MainModel::modelUpdated, this, &MainWindow::updateModel);
     connect(d->m_model, &MainModel::modelUpdated, d->ui->asn1Widget, &ASN1FileView::setModel);
 
+    connect(d->ui->dockWidgetMscText->toggleViewAction(), &QAction::toggled, this, [this](bool on) {
+        if (on) {
+            QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
+        }
+    });
+
     connect(d->m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWindow::showSelection);
 
     connect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
