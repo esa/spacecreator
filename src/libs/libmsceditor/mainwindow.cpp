@@ -98,16 +98,6 @@ struct MainWindow::MainWindowPrivate {
 
     MainModel *m_model = nullptr;
 
-    QAction *m_actScreenshot = nullptr;
-
-    QAction *m_actToggleErrorView = nullptr;
-    QAction *m_actToggleHierarchyView = nullptr;
-    QAction *m_actToggleMscTextView = nullptr;
-    QAction *m_actToggleAsn1View = nullptr;
-
-    QMenu *m_menuHelp = nullptr;
-    QAction *m_actAboutQt = nullptr;
-
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
     msc::InstanceStopTool *m_instanceStopTool = nullptr;
@@ -689,12 +679,6 @@ void MainWindow::initConnections()
     connect(d->m_model, &MainModel::modelDataChanged, this, &MainWindow::updateModel);
     connect(d->m_model, &MainModel::modelUpdated, this, &MainWindow::updateModel);
     connect(d->m_model, &MainModel::modelUpdated, d->ui->asn1Widget, &ASN1FileView::setModel);
-
-    connect(d->m_actToggleMscTextView, &QAction::toggled, this, [this](bool on) {
-        if (on) {
-            QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
-        }
-    });
 
     connect(d->m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWindow::showSelection);
 
