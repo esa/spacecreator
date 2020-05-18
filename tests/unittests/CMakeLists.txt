@@ -1,6 +1,7 @@
 add_subdirectory(aadl)
-add_subdirectory(libmsceditor)
 add_subdirectory(asn1editor)
+add_subdirectory(libiveditor)
+add_subdirectory(libmsceditor)
 add_subdirectory(msclibrary)
 add_subdirectory(mscwidgets)
 add_subdirectory(shared)

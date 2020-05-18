@@ -58,6 +58,9 @@ public:
     const QHash<utils::Id, aadl::AADLObject *> &objects() const;
     QString supportedFileExtensions() const override;
 
+public Q_SLOTS:
+    void setObjects(const QVector<aadl::AADLObject *> &objects);
+
 protected:
     bool createImpl(const QString &path = QString()) override;
     bool loadImpl(const QString &path) override;

@@ -236,6 +236,16 @@ const QHash<utils::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() cons
     return m_model->objects();
 }
 
+/*!
+   \brief InterfaceTabDocument::setObjects
+ */
+void InterfaceTabDocument::setObjects(const QVector<aadl::AADLObject *> &objects)
+{
+    if (m_model->initFromObjects(objects)) {
+        m_model->setRootObject({});
+    }
+}
+
 bool InterfaceTabDocument::createImpl(const QString &path)
 {
     if (!path.isEmpty())
@@ -252,10 +262,7 @@ bool InterfaceTabDocument::loadImpl(const QString &path)
     }
 
     aadl::AADLXMLReader parser;
-    connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, [this](const QVector<aadl::AADLObject *> &objects) {
-        if (m_model->initFromObjects(objects))
-            m_model->setRootObject({});
-    });
+    connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceTabDocument::setObjects);
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);
@@ -718,7 +725,9 @@ void InterfaceTabDocument::showInfoMessage(const QString &title, const QString &
 
 void InterfaceTabDocument::clearScene()
 {
-    m_graphicsScene->clear();
+    if (m_graphicsScene) {
+        m_graphicsScene->clear();
+    }
     m_items.clear();
 }
 
