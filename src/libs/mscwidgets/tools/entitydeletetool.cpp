@@ -29,6 +29,9 @@
 #include "mscentity.h"
 
 #include <QAction>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QUndoStack>
 #include <QVariant>
 #include <QVector>
 

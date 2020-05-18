@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <QMimeType>
 #include <QObject>
 #include <QPointer>
 #include <QQueue>
 #include <QSharedPointer>
 
+class QMimeType;
 class QNetworkAccessManager;
 class QNetworkReply;
 

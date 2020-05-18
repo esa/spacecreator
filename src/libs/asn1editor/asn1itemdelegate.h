@@ -19,6 +19,9 @@
 
 #include <QStyledItemDelegate>
 
+class QSize;
+class QWidgest;
+
 namespace asn1 {
 
 class Asn1ItemDelegate : public QStyledItemDelegate

@@ -17,12 +17,18 @@
 
 #pragma once
 
-#include "aadlobjectsmodel.h"
-#include "commandids.h"
+#include "aadlcommonprops.h" // for Props, Props::Token
 
 #include <QPointer>
 #include <QUndoCommand>
 #include <QVariant>
+#include <QVector>
+
+namespace aadl {
+class AADLObjectConnection;
+class AADLObjectIface;
+class AADLObjectsModel;
+}
 
 namespace aadlinterface {
 namespace cmd {

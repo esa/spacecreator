@@ -22,6 +22,7 @@
 #include "aadlfunctiongraphicsitem.h"
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
+#include "aadlobjectconnection.h"
 #include "baseitems/common/utils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdfunctionitemcreate.h"

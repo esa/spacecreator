@@ -22,7 +22,6 @@
 
 namespace msc {
 
-class MscDocument;
 class HierarchyViewModel;
 
 class HierarchyCreatorTool : public BaseCreatorTool

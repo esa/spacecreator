@@ -19,14 +19,13 @@
 
 #include "aadlobject.h"
 
+#include <QHash>
+#include <QString>
+
 namespace aadl {
 
-class AADLObject;
-class AADLObjectsModel;
-class AADLObjectFunction;
 class AADLObjectFunctionType;
-class AADLObjectIfaceRequired;
-class AADLObjectIfaceProvided;
+
 class AADLNameValidator
 {
 public:

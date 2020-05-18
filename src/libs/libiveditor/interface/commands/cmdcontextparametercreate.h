@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "aadlobject.h"
-#include "aadlobjectfunctiontype.h"
+#include "aadlparameter.h"
 
 #include <QPointer>
 #include <QUndoCommand>
+#include <QVector>
 
 namespace aadl {
-class AADLObject;
+class AADLObjectFunctionType;
 }
 
 namespace aadlinterface {

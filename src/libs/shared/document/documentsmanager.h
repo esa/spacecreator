@@ -17,15 +17,16 @@
 
 #pragma once
 
-#include "abstracttabdocument.h"
-
 #include <QMap>
 #include <QObject>
 #include <QPointer>
-#include <QTabWidget>
 #include <QVector>
 
+class QTabWidget;
+
 namespace document {
+
+class AbstractTabDocument;
 
 class DocumentsManager : public QObject
 {

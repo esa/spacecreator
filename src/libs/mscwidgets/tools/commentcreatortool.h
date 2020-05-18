@@ -18,7 +18,6 @@
 #pragma once
 
 #include "basecreatortool.h"
-#include "messageitem.h"
 
 namespace msc {
 

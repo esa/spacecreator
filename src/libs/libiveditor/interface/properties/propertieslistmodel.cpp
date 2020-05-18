@@ -21,6 +21,7 @@
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"

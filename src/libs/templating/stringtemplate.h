@@ -20,12 +20,12 @@
 #include <QObject>
 #include <QSharedPointer>
 
+class QIODevice;
+
 namespace Grantlee {
 class Engine;
 class FileSystemTemplateLoader;
 }
-
-class QIODevice;
 
 namespace templating {
 

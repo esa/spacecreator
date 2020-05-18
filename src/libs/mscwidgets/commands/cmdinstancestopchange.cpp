@@ -17,6 +17,7 @@
 
 #include "cmdinstancestopchange.h"
 
+#include "common/commandids.h"
 #include "mscinstance.h"
 
 namespace msc {

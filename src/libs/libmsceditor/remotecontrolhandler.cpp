@@ -29,6 +29,7 @@
 #include "msctimer.h"
 
 #include <QMetaEnum>
+#include <QUndoStack>
 
 /*!
  * \class RemoteControlHandler

@@ -17,6 +17,7 @@
 
 #include "cmdsetparameterlist.h"
 
+#include "common/commandids.h"
 #include "mscmessage.h"
 
 namespace msc {

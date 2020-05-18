@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "basicdatatype.h"
+#include <QMap>
+#include <QString>
 
 namespace aadl {
+class BasicDataType;
 
 class DataTypesStorage
 {

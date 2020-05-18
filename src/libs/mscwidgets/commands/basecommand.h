@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "common/commandids.h"
-
 #include <QPointer>
 #include <QUndoCommand>
 

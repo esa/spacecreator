@@ -19,12 +19,6 @@
 
 #include "comboboxdelegate.h"
 
-class QStringListModel;
-
-namespace aadl {
-class AADLObject;
-}
-
 namespace aadlinterface {
 
 class PropertyTypeDelegate : public StringListComboDelegate

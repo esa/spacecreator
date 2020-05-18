@@ -17,8 +17,10 @@
 
 #include "cmdmessagepointsedit.h"
 
+#include "common/commandids.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 
 #include <QDebug>
 

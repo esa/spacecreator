@@ -21,8 +21,6 @@
 
 namespace msc {
 
-class MscInstance;
-
 class MscCreate : public MscMessage
 {
     Q_OBJECT

@@ -31,6 +31,7 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
+#include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
 #include <QApplication>
@@ -41,6 +42,8 @@
 #include <QGraphicsTextItem>
 #include <QLinearGradient>
 #include <QPainter>
+#include <QPainterPath>
+#include <QUndoStack>
 #include <QtDebug>
 #include <functional>
 

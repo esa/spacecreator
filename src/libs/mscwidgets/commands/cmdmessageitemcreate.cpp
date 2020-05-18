@@ -20,6 +20,7 @@
 #include "chartviewmodel.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
+#include "common/commandids.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"

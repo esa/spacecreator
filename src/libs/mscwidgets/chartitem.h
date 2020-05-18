@@ -18,14 +18,20 @@
 #pragma once
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
-#include "chartviewmodel.h"
 #include "ui/grippoint.h"
 
 class QMargins;
 class QGraphicsRectItem;
 
+namespace shared {
+namespace ui {
+class GripPoint;
+}
+}
+
 namespace msc {
 
+class ChartViewModel;
 class MscChart;
 class TextItem;
 

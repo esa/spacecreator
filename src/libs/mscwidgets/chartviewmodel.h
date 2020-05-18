@@ -54,7 +54,7 @@ class MscInstanceEvent;
 class MscTimer;
 
 struct ChartViewModelPrivate;
-struct ChartViewLayoutInfo;
+
 class ChartViewModel : public QObject
 {
     Q_OBJECT

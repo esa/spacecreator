@@ -17,6 +17,8 @@
 
 #include "commandsstack.h"
 
+#include <QUndoStack>
+
 namespace aadlinterface {
 namespace cmd {
 

@@ -19,12 +19,12 @@
 
 #include "aadlobject.h"
 
-#include <QHash>
 #include <QObject>
-#include <QXmlStreamReader>
+#include <QVector>
 #include <memory>
 
 class QIODevice;
+class QXmlStreamReader;
 
 namespace aadl {
 

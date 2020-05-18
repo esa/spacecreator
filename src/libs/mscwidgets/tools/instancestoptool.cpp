@@ -23,6 +23,9 @@
 #include "instanceitem.h"
 #include "mscinstance.h"
 
+#include <QGraphicsScene>
+#include <QGraphicsView>
+
 namespace msc {
 
 InstanceStopTool::InstanceStopTool(QGraphicsView *view, QObject *parent)

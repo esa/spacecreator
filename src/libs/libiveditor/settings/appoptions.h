@@ -19,8 +19,6 @@
 
 #include "settingsappoption.h"
 
-#include <QVector>
-
 namespace aadlinterface {
 
 class GroupMainWindow

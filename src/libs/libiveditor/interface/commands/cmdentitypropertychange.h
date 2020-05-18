@@ -19,7 +19,6 @@
 #pragma once
 
 #include <QPointer>
-#include <QRect>
 #include <QUndoCommand>
 
 namespace aadl {

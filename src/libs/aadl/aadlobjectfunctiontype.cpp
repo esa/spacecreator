@@ -21,6 +21,7 @@
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
 
 #include <QDebug>
 

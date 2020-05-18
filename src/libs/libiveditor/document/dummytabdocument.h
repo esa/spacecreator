@@ -21,12 +21,10 @@
 
 #include <QGraphicsView>
 #include <QPointer>
-
-class QGraphicsView;
+#include <QVector>
 
 namespace document {
 
-class DummyGraphicsScene;
 class DummyTabDocument : public AbstractTabDocument
 {
     Q_OBJECT

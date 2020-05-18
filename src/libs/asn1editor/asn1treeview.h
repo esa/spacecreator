@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <QMap>
+#include <QSharedPointer>
 #include <QTreeView>
+#include <QVariantMap>
 
 class QStandardItem;
 

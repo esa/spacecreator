@@ -18,7 +18,8 @@
 #pragma once
 
 #include <QDialog>
-#include <QVariant>
+#include <QHash>
+#include <QVariantList>
 
 class QSpinBox;
 class QTabWidget;

@@ -22,8 +22,6 @@
 #include <QTextBrowser>
 #include <QTimer>
 
-class MainModel;
-
 namespace msc {
 class MscModel;
 }

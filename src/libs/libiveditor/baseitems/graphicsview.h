@@ -19,6 +19,9 @@
 
 #include "ui/graphicsviewbase.h"
 
+#include <QList>
+#include <QPair>
+
 namespace aadlinterface {
 
 /*!

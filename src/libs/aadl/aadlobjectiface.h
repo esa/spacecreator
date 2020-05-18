@@ -20,6 +20,8 @@
 #include "aadlobject.h"
 #include "aadlparameter.h"
 
+#include <QHash>
+#include <QMap>
 #include <QMetaType>
 #include <QObject>
 #include <QPointF>

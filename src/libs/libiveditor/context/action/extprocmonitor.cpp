@@ -24,6 +24,7 @@
 #include <QFileInfo>
 #include <QLayout>
 #include <QMessageBox>
+#include <QTextBrowser>
 
 namespace taste3 {
 namespace ctx {

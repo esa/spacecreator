@@ -17,6 +17,7 @@
 
 #include "cmdsetmessagedeclarations.h"
 
+#include "common/commandids.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
 

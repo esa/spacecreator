@@ -22,6 +22,7 @@
 class QDomElement;
 class QDomNodeList;
 class QFileInfo;
+class QStringList;
 
 namespace asn1 {
 

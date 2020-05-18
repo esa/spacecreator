@@ -18,6 +18,8 @@
 
 #include "commandsfactory.h"
 
+#include <QUndoStack>
+
 namespace msc {
 namespace cmd {
 

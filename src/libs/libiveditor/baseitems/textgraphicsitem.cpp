@@ -18,7 +18,6 @@
 
 #include "textgraphicsitem.h"
 
-#include <QApplication>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QKeyEvent>

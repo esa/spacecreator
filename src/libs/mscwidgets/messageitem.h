@@ -18,7 +18,6 @@
 #pragma once
 
 #include "baseitems/common/objectanchor.h"
-#include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"

@@ -23,8 +23,6 @@
 #include <QApplication>
 #include <QDirIterator>
 #include <QFontDatabase>
-#include <QMetaEnum>
-#include <QSslSocket>
 
 int main(int argc, char *argv[])
 {

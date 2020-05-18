@@ -19,7 +19,6 @@
 #include "condition.h"
 
 #include <QJsonObject>
-#include <QVariant>
 
 namespace aadl {
 class AADLObject;

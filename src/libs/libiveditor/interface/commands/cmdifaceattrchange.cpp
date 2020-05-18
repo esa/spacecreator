@@ -17,6 +17,9 @@
 
 #include "cmdifaceattrchange.h"
 
+#include "aadlobjectconnection.h"
+#include "commandids.h"
+
 namespace aadlinterface {
 namespace cmd {
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QObject>
-#include <QVector>
 
 class QToolBar;
 class QAction;

@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QVariantMap>
 
 class MainModel;
 

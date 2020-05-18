@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <QBrush>
 #include <QMap>
 #include <QObject>
 #include <QPen>

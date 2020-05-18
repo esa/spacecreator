@@ -17,6 +17,8 @@
 
 #include "commandsfactory.h"
 
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
 #include "cmdcommentitemcreate.h"
 #include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"

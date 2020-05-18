@@ -19,6 +19,8 @@
 
 #include "commandids.h"
 
+#include <aadlobjectfunction.h>
+#include <aadlobjectfunctiontype.h>
 #include <aadlobjectsmodel.h>
 #include <baseitems/common/utils.h>
 

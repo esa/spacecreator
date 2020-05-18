@@ -25,6 +25,7 @@
 #include "msccomment.h"
 
 #include <QMouseEvent>
+#include <QUndoStack>
 
 namespace msc {
 

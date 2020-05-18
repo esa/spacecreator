@@ -20,8 +20,8 @@
 #include "cmdentitygeometrychange.h"
 #include "common.h"
 
+#include <QPointF>
 #include <QPointer>
-#include <QRect>
 #include <QVector>
 
 namespace aadl {

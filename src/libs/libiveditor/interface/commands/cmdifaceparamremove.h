@@ -19,6 +19,11 @@
 
 #include "cmdifaceparamcreate.h"
 
+namespace aadl {
+class AADLObject;
+class IfaceParameter;
+}
+
 namespace aadlinterface {
 namespace cmd {
 

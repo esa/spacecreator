@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "tools/basetool.h"
 
+#include <QActionGroup>
 #include <QMainWindow>
 #include <QMenu>
 #include <QToolBar>

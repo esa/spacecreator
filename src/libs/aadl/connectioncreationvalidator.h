@@ -19,10 +19,7 @@
 
 #include "common.h"
 
-#include <QLineF>
 #include <QObject>
-#include <QPointF>
-#include <QVector>
 
 class QGraphicsScene;
 class QGraphicsItem;

@@ -17,6 +17,7 @@
 
 #include "cmdconditionitemcreate.h"
 
+#include "common/commandids.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscinstance.h"

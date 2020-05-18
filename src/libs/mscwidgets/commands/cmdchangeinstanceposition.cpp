@@ -19,6 +19,8 @@
 
 #include "cif/cifblockfactory.h"
 #include "cif/cifparser.h"
+#include "common/commandids.h"
+#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {

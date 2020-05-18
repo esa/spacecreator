@@ -16,7 +16,6 @@
 */
 
 #pragma once
-#include <QMap>
 #include <QStringListModel>
 
 namespace taste3 {

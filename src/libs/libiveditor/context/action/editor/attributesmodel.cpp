@@ -17,6 +17,8 @@
 
 #include "attributesmodel.h"
 
+#include "context/action/attrhandler.h"
+
 namespace taste3 {
 namespace ctx {
 

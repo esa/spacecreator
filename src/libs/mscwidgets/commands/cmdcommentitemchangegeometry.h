@@ -20,7 +20,7 @@
 #include "basecommand.h"
 
 #include <QPointer>
-#include <QRectF>
+#include <QRect>
 
 namespace msc {
 

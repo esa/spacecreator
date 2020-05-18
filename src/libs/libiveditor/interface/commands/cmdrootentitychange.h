@@ -23,7 +23,6 @@
 #include <QPointer>
 
 namespace aadl {
-class AADLObject;
 class AADLObjectsModel;
 }
 

@@ -17,6 +17,7 @@
 
 #include "mscparservisitor.h"
 
+#include "datastatement.h"
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"

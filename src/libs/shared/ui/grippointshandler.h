@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include "drawrectinfo.h"
 #include "grippoint.h"
 
 #include <QGraphicsObject>
-#include <QSet>
 
 namespace shared {
 namespace ui {

@@ -18,6 +18,7 @@
 #include "aadlnamevalidator.h"
 
 #include "aadlobject.h"
+#include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectsmodel.h"
 

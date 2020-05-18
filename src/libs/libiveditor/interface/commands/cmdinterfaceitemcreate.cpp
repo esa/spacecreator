@@ -21,6 +21,7 @@
 #include "commandsfactory.h"
 
 #include <QDebug>
+#include <aadlobjectfunction.h>
 #include <aadlobjectsmodel.h>
 #include <baseitems/common/utils.h>
 

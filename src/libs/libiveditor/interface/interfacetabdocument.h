@@ -20,11 +20,12 @@
 #include "common.h"
 #include "document/abstracttabdocument.h"
 
-#include <QGraphicsView>
 #include <QPointer>
 #include <QQueue>
 #include <baseitems/graphicsview.h>
 
+class QAction;
+class QActionGroup;
 class QMutex;
 
 namespace aadl {

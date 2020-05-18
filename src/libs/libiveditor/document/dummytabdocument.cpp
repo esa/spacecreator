@@ -17,6 +17,7 @@
 
 #include "dummytabdocument.h"
 
+#include <QAction>
 #include <QDebug>
 #include <QFileInfo>
 #include <QGraphicsScene>

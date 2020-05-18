@@ -17,6 +17,7 @@
 
 #include "cmdcoregionitemcreate.h"
 
+#include "common/commandids.h"
 #include "mscchart.h"
 #include "msccoregion.h"
 #include "mscinstance.h"

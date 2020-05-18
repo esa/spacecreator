@@ -17,6 +17,7 @@
 
 #include "cmdmessageitemresize.h"
 
+#include "common/commandids.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 

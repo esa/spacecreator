@@ -17,6 +17,7 @@
 
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
+#include "datastatement.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccomment.h"

@@ -19,7 +19,7 @@
 
 #include "mscentity.h"
 
-#include <QSize>
+#include <QPoint>
 #include <QVector>
 
 namespace msc {

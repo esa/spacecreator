@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include <QAction>
 #include <QObject>
 #include <QVector>
 #include <memory>
 
+class QAction;
 class QGraphicsScene;
+class QMenu;
 class QToolBar;
 class QUndoStack;
 

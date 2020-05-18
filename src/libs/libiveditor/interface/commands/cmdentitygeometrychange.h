@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <QPointF>
 #include <QPointer>
-#include <QRect>
 #include <QUndoCommand>
 #include <QVector>
 

@@ -19,6 +19,7 @@
 
 #include "aadlcommonprops.h"
 #include "aadlnamevalidator.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 

@@ -21,6 +21,7 @@
 
 #include <QComboBox>
 #include <QPainter>
+#include <QSize>
 #include <QSpinBox>
 #include <QTextEdit>
 #include <limits>

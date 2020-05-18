@@ -20,8 +20,6 @@
 #include <QObject>
 #include <QVector>
 
-class QFileInfo;
-
 namespace msc {
 class MscChart;
 class MscDocument;

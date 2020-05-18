@@ -17,6 +17,10 @@
 
 #include "documentsmanager.h"
 
+#include "abstracttabdocument.h"
+
+#include <QTabWidget>
+
 static const int InvalidDocId = -1;
 
 namespace document {

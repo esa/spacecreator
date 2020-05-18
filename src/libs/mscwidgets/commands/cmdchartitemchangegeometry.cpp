@@ -19,6 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
+#include "common/commandids.h"
 #include "mscchart.h"
 
 namespace msc {

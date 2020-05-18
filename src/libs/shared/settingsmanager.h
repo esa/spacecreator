@@ -18,9 +18,7 @@
 #pragma once
 
 #include <QObject>
-#include <QRect>
 #include <QSettings>
-#include <QVector>
 
 namespace shared {
 

@@ -16,14 +16,10 @@
 */
 #pragma once
 
-#include <QAction>
-#include <QGraphicsObject>
 #include <QGraphicsScene>
-#include <QPainterPath>
-#include <QPointF>
-#include <QPointer>
 
 class QLineF;
+class QPointF;
 class QPropertyAnimation;
 
 namespace aadlinterface {

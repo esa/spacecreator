@@ -1,5 +1,7 @@
 #include "aadltestutils.h"
 
+#include "aadlobjectfunctiontype.h"
+
 namespace aadl {
 namespace testutils {
 

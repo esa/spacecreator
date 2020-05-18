@@ -19,8 +19,10 @@
 
 #include "baseitems/graphicsview.h"
 
+#include <QComboBox>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
 
 /*!

@@ -26,6 +26,7 @@
 #include "interface/commands/commandsfactory.h"
 
 #include <QBrush>
+#include <QCursor>
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>

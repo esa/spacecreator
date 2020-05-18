@@ -17,12 +17,16 @@
 
 #pragma once
 
-#include "aadlobject.h"
 #include "attrhandler.h"
 
 #include <QJsonObject>
 #include <QString>
+#include <QStringList>
 #include <QVector>
+
+namespace aadl {
+class AADLObject;
+}
 
 namespace taste3 {
 namespace ctx {

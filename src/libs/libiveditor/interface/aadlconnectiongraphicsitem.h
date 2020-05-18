@@ -20,7 +20,6 @@
 #include "aadlobject.h"
 #include "baseitems/interactiveobject.h"
 
-#include <QGraphicsRectItem>
 #include <QPointer>
 
 namespace aadl {

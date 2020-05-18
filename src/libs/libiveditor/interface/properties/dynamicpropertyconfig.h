@@ -17,15 +17,11 @@
 
 #pragma once
 
-#include <QStringList>
 #include <QVector>
 #include <memory>
 
 namespace aadl {
 class AADLObject;
-class AADLObjectTemplate;
-class AADLObjectFunction;
-class AADLObjectInterface;
 }
 
 namespace aadlinterface {

@@ -20,8 +20,9 @@
 #include "commands/common/commandids.h"
 
 #include <QObject>
-#include <QUndoStack>
-#include <QVariant>
+#include <QVariantList>
+
+class QUndoStack;
 
 namespace msc {
 namespace cmd {

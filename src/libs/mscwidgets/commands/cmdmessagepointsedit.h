@@ -18,14 +18,16 @@
 #pragma once
 
 #include "basecommand.h"
-#include "mscmessage.h"
 
+#include <QPoint>
 #include <QPointer>
+#include <QVector>
 
 namespace msc {
 
 class MscChart;
 class MscInstance;
+class MscMessage;
 
 namespace cmd {
 

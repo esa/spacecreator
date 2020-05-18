@@ -17,6 +17,7 @@
 
 #include "mscwriter.h"
 
+#include "datastatement.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccomment.h"

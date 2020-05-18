@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "aadlobject.h"
-
+#include <QHash>
 #include <QPointer>
 #include <QUndoCommand>
 

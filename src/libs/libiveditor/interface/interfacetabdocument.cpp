@@ -17,6 +17,9 @@
 
 #include "interfacetabdocument.h"
 
+#include "aadlobjectcomment.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
 #include "baseitems/common/utils.h"
@@ -38,6 +41,7 @@
 #include "interface/properties/propertiesdialog.h"
 #include "interfacetabgraphicsscene.h"
 
+#include <QAction>
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
@@ -50,6 +54,7 @@
 #include <QMutexLocker>
 #include <QScreen>
 #include <QShortcut>
+#include <QUndoStack>
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 

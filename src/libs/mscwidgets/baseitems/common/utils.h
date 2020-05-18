@@ -16,11 +16,10 @@
 */
 #pragma once
 
-#include <QGraphicsObject>
+#include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QPainterPath>
 #include <QPointF>
-#include <QPointer>
 
 class QLineF;
 class QPropertyAnimation;

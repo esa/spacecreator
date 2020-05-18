@@ -18,8 +18,9 @@
 #pragma once
 
 #include <QObject>
-#include <QUndoStack>
-#include <QVariant>
+
+class QUndoCommand;
+class QUndoStack;
 
 namespace aadlinterface {
 namespace cmd {

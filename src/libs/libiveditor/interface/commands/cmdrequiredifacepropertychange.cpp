@@ -17,6 +17,7 @@
 
 #include "cmdrequiredifacepropertychange.h"
 
+#include "aadlobjectconnection.h"
 #include "cmdentityremove.h"
 #include "commandids.h"
 #include "commandsfactory.h"

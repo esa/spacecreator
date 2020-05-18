@@ -17,7 +17,10 @@
 
 #include "aadlobjectsmodel.h"
 
+#include "aadlobjectcomment.h"
+#include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
 #include "common.h"
 
 #include <QtDebug>

@@ -19,10 +19,9 @@
 
 #include "cif/cifblock.h"
 
-#include <QMap>
 #include <QObject>
 #include <QRegularExpression>
-#include <QSharedPointer>
+#include <QVector>
 
 namespace msc {
 namespace cif {

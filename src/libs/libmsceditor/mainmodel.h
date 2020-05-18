@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 #include <memory>
 
@@ -29,8 +30,6 @@ class HierarchyViewModel;
 class MscChart;
 class MscDocument;
 class MscModel;
-
-class InstanceItem;
 }
 
 class QGraphicsScene;

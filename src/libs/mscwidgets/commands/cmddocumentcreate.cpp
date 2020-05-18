@@ -17,6 +17,7 @@
 
 #include "cmddocumentcreate.h"
 
+#include "common/commandids.h"
 #include "hierarchyviewmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"

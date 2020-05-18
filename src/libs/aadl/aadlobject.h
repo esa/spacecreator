@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QVector>
 #include <memory>
 
 namespace aadl {

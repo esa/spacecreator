@@ -21,12 +21,7 @@
 #include "cmdentitygeometrychange.h"
 
 #include <QPointer>
-#include <QRect>
-
-namespace aadl {
-class AADLObjectFunctionType;
-class AADLObjectsModel;
-}
+#include <QVector>
 
 namespace aadlinterface {
 namespace cmd {

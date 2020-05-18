@@ -22,6 +22,7 @@
 #include "commandsstack.h"
 #include "ui_commenttextdialog.h"
 
+#include <QUndoCommand>
 #include <aadlobjectcomment.h>
 
 namespace aadlinterface {

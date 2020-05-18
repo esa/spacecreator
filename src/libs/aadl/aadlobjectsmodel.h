@@ -17,10 +17,7 @@
 
 #pragma once
 
-#include "aadlobjectcomment.h"
-#include "aadlobjectconnection.h"
-#include "aadlobjectfunction.h"
-#include "aadlobjectfunctiontype.h"
+#include "aadlobject.h"
 #include "aadlobjectiface.h"
 
 #include <QObject>
@@ -28,6 +25,11 @@
 #include <memory>
 
 namespace aadl {
+
+class AADLObjectComment;
+class AADLObjectConnection;
+class AADLObjectFunction;
+class AADLObjectFunctionType;
 
 struct AADLObjectsModelPrivate;
 class AADLObjectsModel : public QObject

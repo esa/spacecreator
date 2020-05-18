@@ -19,17 +19,14 @@
 
 #include <QAction>
 #include <QGraphicsObject>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QObject>
 #include <QPixmap>
 #include <QPointer>
 
+class QGraphicsView;
 class QMouseEvent;
 
 namespace msc {
-
-class ChartViewModel;
 
 class BaseTool : public QObject
 {

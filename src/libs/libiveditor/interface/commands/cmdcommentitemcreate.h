@@ -20,7 +20,6 @@
 #include "cmdentitygeometrychange.h"
 
 #include <QPointer>
-#include <QRect>
 
 namespace aadl {
 class AADLObjectFunctionType;

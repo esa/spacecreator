@@ -21,7 +21,7 @@
 #include "mscmessage.h"
 
 #include <QObject>
-#include <QRectF>
+#include <QRect>
 #include <QString>
 #include <QVector>
 

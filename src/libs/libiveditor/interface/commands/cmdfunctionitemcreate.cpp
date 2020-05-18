@@ -20,6 +20,8 @@
 #include "commandids.h"
 
 #include <QtDebug>
+#include <aadlobjectfunction.h>
+#include <aadlobjectfunctiontype.h>
 #include <aadlobjectsmodel.h>
 #include <baseitems/common/utils.h>
 

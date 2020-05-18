@@ -17,6 +17,8 @@
 
 #include "aadlobjectconnection.h"
 
+#include "aadlobjectfunction.h"
+#include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 #include "connectioncreationvalidator.h"

@@ -21,7 +21,6 @@
 #include "common.h"
 
 #include <QPointer>
-#include <QRect>
 #include <QUndoCommand>
 
 namespace aadl {

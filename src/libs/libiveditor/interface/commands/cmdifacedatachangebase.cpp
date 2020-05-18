@@ -17,6 +17,9 @@
 
 #include "cmdifacedatachangebase.h"
 
+#include "aadlobjectconnection.h"
+#include "aadlobjectiface.h"
+#include "aadlobjectsmodel.h"
 #include "commandsfactory.h"
 
 namespace aadlinterface {

@@ -23,7 +23,6 @@
 
 namespace msc {
 
-class ConditionItem;
 class MscChart;
 class MscCondition;
 class MscInstance;

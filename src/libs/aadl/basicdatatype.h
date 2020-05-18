@@ -20,6 +20,7 @@
 #include <QString>
 #include <QVariant>
 #include <QVector>
+#include <limits>
 
 namespace aadl {
 

@@ -32,6 +32,7 @@
 #include <QVariant>
 #include <QVector>
 #include <QXmlStreamAttribute>
+#include <QXmlStreamReader>
 
 namespace aadl {
 

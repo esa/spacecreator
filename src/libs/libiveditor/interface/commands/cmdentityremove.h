@@ -20,14 +20,12 @@
 #include "common.h"
 
 #include <QPointer>
-#include <QRect>
 #include <QUndoCommand>
 #include <QVector>
 
 namespace aadl {
 class AADLObject;
 class AADLObjectsModel;
-class AADLObjectFunction;
 class AADLObjectFunctionType;
 }
 

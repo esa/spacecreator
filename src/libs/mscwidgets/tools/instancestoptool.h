@@ -20,8 +20,6 @@
 #include "basetool.h"
 
 namespace msc {
-class MscChart;
-class MscInstance;
 
 class InstanceStopTool : public BaseTool
 {

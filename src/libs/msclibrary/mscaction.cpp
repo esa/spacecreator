@@ -17,6 +17,7 @@
 
 #include "mscaction.h"
 
+#include "datastatement.h"
 #include "mscinstance.h"
 
 #include <QDebug>

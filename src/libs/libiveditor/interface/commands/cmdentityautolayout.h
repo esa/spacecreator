@@ -19,6 +19,8 @@
 
 #include "cmdentitygeometrychange.h"
 
+#include <QPointF>
+
 namespace aadl {
 class AADLObject;
 }

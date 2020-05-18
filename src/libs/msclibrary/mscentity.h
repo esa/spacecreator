@@ -20,9 +20,9 @@
 #include "cif/cifblock.h"
 
 #include <QPointer>
-#include <QRegExp>
 #include <QString>
 #include <QUuid>
+#include <QVector>
 
 namespace msc {
 

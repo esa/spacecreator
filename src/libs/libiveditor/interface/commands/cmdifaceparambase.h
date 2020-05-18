@@ -17,10 +17,9 @@
 
 #pragma once
 
-#include "aadlobjectiface.h"
-
 #include <QPointer>
 #include <QUndoCommand>
+#include <QVector>
 
 namespace aadl {
 class AADLObjectIface;

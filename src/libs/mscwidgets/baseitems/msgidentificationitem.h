@@ -20,8 +20,6 @@
 #include "mscparameterlist.h"
 #include "textitem.h"
 
-#include <QStringList>
-
 namespace msc {
 
 class MsgIdentificationItem : public NameItem

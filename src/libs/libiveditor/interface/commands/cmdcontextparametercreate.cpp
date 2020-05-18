@@ -21,6 +21,7 @@
 #include "commandids.h"
 
 #include <QDebug>
+#include <aadlobjectfunctiontype.h>
 #include <aadlobjectsmodel.h>
 
 namespace aadlinterface {

@@ -20,6 +20,7 @@
 #include "context/action/action.h"
 
 #include <QStringListModel>
+#include <QVector>
 
 namespace taste3 {
 namespace ctx {

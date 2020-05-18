@@ -18,8 +18,9 @@
 #pragma once
 
 #include <QProcess>
-#include <QTextBrowser>
 #include <QWidget>
+
+class QTextBrowser;
 
 namespace taste3 {
 namespace ctx {

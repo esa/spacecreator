@@ -20,8 +20,10 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/textitem.h"
+#include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
+#include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>

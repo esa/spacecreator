@@ -26,8 +26,6 @@
 
 namespace msc {
 
-class MscChart;
-
 class BaseCreatorTool : public BaseTool
 {
     Q_OBJECT

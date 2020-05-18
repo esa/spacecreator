@@ -20,6 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
+#include "datastatement.h"
 #include "instanceitem.h"
 #include "mscaction.h"
 #include "mscfile.h"

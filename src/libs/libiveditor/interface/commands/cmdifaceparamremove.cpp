@@ -21,6 +21,7 @@
 #include "commandids.h"
 
 #include <aadlobjectsmodel.h>
+#include <aadlparameter.h>
 
 namespace aadlinterface {
 namespace cmd {

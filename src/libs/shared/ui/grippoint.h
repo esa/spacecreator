@@ -18,12 +18,10 @@
 
 #pragma once
 
-#include "drawrectinfo.h"
-
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QPainterPath>
-#include <QPointer>
+#include <QSet>
 
 namespace shared {
 namespace ui {

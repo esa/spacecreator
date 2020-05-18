@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "context/action/condition.h"
-
 #include <QStringListModel>
 #include <QVector>
 
 namespace taste3 {
 namespace ctx {
+
+struct AttrHandler;
 
 class AttributesModel : public QStringListModel
 {

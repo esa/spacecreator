@@ -18,14 +18,18 @@
 #pragma once
 
 #include "baseitems/interactiveobject.h"
-#include "ui/grippoint.h"
 
+#include <QLineF>
 #include <QPointer>
+#include <QRectF>
 
-class QGraphicsRectItem;
-class QGraphicsTextItem;
+class QPainterPath;
 
 namespace msc {
+
+namespace ui {
+class GripPoint;
+}
 
 class MscInstance;
 class MscChart;

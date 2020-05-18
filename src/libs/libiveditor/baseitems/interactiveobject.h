@@ -22,6 +22,7 @@
 #include "ui/interactiveobjectbase.h"
 
 #include <QFont>
+#include <QPen>
 #include <QPointer>
 
 namespace aadl {

@@ -18,6 +18,7 @@
 #pragma once
 #include "action.h"
 
+#include <QMap>
 #include <QVector>
 
 class QAction;

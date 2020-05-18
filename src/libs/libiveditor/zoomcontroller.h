@@ -21,11 +21,12 @@ namespace aadlinterface {
 class GraphicsView;
 }
 
-#include <QComboBox>
-#include <QIntValidator>
 #include <QPointer>
+#include <QWidget>
 
 class ZoomValidator;
+
+class QComboBox;
 
 namespace taste3 {
 

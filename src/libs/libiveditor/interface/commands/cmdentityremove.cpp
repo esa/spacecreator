@@ -21,9 +21,10 @@
 
 #include <aadlobject.h>
 #include <aadlobjectconnection.h>
+#include <aadlobjectfunction.h>
+#include <aadlobjectfunctiontype.h>
 #include <aadlobjectiface.h>
 #include <aadlobjectsmodel.h>
-
 namespace aadlinterface {
 namespace cmd {
 

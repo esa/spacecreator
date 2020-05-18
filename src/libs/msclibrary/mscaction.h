@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include "datastatement.h"
 #include "mscinstanceevent.h"
 
 #include <QVector>
 
 namespace msc {
-
+class DataStatement;
 class MscInstance;
 
 /**

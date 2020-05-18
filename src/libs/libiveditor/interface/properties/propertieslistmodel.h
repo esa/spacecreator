@@ -19,6 +19,8 @@
 
 #include "propertiesmodelbase.h"
 
+#include <QVector>
+
 namespace aadl {
 class AADLObject;
 }

@@ -21,13 +21,7 @@
 #include "aadlobjectsmodel.h"
 #include "cmdifacedatachangebase.h"
 
-#include <QPointer>
 #include <QVariant>
-
-namespace aadl {
-class AADLObjectIfaceRequired;
-class AADLObjectConnection;
-}
 
 namespace aadlinterface {
 namespace cmd {

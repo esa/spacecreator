@@ -21,7 +21,6 @@
 #include "commands/basecommand.h"
 
 #include <QPointer>
-#include <QVector>
 
 namespace msc {
 

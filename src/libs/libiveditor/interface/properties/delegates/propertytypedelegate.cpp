@@ -18,10 +18,8 @@
 #include "propertytypedelegate.h"
 
 #include "aadlparameter.h"
+#include "basicdatatype.h"
 #include "datatypesstorage.h"
-
-#include <QComboBox>
-#include <QStringListModel>
 
 namespace aadlinterface {
 

@@ -17,11 +17,8 @@
 
 #pragma once
 
-#include "aadlobject.h"
-
 #include <QPointer>
 #include <QUndoCommand>
-#include <QVector>
 
 namespace aadl {
 class AADLObject;

@@ -24,8 +24,6 @@
 #include <QPointF>
 #include <QPointer>
 
-class QGraphicsView;
-
 namespace msc {
 namespace utils {
 

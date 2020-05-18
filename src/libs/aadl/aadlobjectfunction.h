@@ -19,7 +19,9 @@
 
 #include "aadlobjectfunctiontype.h"
 
+#include <QHash>
 #include <QObject>
+#include <QVector>
 
 namespace aadl {
 

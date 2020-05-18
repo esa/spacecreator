@@ -17,8 +17,9 @@
 
 #pragma once
 
+#include <QAbstractSocket>
 #include <QObject>
-#include <QtNetwork/QAbstractSocket>
+#include <QVariantMap>
 
 class QWebSocketServer;
 class QWebSocket;

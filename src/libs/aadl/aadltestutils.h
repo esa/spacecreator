@@ -1,11 +1,12 @@
 #pragma once
 
-#include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 
 #include <QString>
 
 namespace aadl {
+class AADLObjectFunctionType;
+
 namespace testutils {
 
 AADLObjectIface::CreationInfo init(

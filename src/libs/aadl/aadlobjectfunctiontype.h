@@ -18,7 +18,6 @@
 #pragma once
 
 #include "aadlobject.h"
-#include "aadlobjectiface.h"
 #include "aadlparameter.h"
 
 #include <QObject>
@@ -30,7 +29,10 @@ namespace aadl {
 class AADLObjectFunction;
 class AADLObjectConnection;
 class AADLObjectComment;
+class AADLObjectIface;
+
 struct AADLObjectFunctionTypePrivate;
+
 class AADLObjectFunctionType : public AADLObject
 {
     Q_OBJECT
