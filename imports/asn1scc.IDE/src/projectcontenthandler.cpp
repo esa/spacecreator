@@ -26,6 +26,7 @@
 #include "projectcontenthandler.h"
 
 #include <QList>
+#include <QSet>
 
 #include <utils/qtcassert.h>
 

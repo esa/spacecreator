@@ -29,6 +29,7 @@
 #include <memory>
 
 #include <QMutex>
+#include <QObject>
 #include <QString>
 
 #include "metadata/general.h"

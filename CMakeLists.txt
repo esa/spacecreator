@@ -42,7 +42,7 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
 
 # Do not use potentially conflicting Qt keywords
-add_definitions(-DQT_NO_KEYWORDS)
+#add_definitions(-DQT_NO_KEYWORDS)
 # Do not use outdated Qt APIs
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
@@ -62,6 +62,7 @@ find_package(Grantlee5 REQUIRED)
 enable_testing()
 
 # Disable the asn1 plugin for now
-#add_subdirectory(imports/asn1scc.IDE)
+add_subdirectory(imports/asn1scc.IDE)
+add_definitions(-DQT_NO_KEYWORDS)
 add_subdirectory(src)
 add_subdirectory(tests)
