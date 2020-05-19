@@ -25,7 +25,7 @@
 #include <QPointer>
 
 namespace msc {
-namespace utils {
+namespace shared {
 
 class CoordinatesConverter
 {

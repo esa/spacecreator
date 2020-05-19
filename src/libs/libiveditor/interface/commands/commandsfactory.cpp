@@ -173,10 +173,10 @@ QUndoCommand *CommandsFactory::createConnectionCommand(const QVariantList &param
     if (points.isValid() && points.canConvert<QVector<QPointF>>() && model.isValid()
             && model.canConvert<aadl::AADLObjectsModel *>() && parentFunction.isValid()
             && parentFunction.canConvert<aadl::AADLObjectFunction *>() && startIfaceId.isValid()
-            && startIfaceId.canConvert<utils::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<utils::Id>()) {
+            && startIfaceId.canConvert<shared::Id>() && endIfaceId.isValid() && endIfaceId.canConvert<shared::Id>()) {
         return new CmdConnectionItemCreate(model.value<aadl::AADLObjectsModel *>(),
-                parentFunction.value<aadl::AADLObjectFunction *>(), startIfaceId.value<utils::Id>(),
-                endIfaceId.value<utils::Id>(), points.value<QVector<QPointF>>());
+                parentFunction.value<aadl::AADLObjectFunction *>(), startIfaceId.value<shared::Id>(),
+                endIfaceId.value<shared::Id>(), points.value<QVector<QPointF>>());
     }
 
     return nullptr;
@@ -387,8 +387,9 @@ QUndoCommand *CommandsFactory::changeRootEntityCommand(const QVariantList &param
     Q_ASSERT(params.size() == 2);
     const QVariant model = params.value(0);
     const QVariant id = params.value(1);
-    if (id.isValid() && id.canConvert<utils::Id>() && model.isValid() && model.canConvert<aadl::AADLObjectsModel *>()) {
-        return new CmdRootEntityChange(model.value<aadl::AADLObjectsModel *>(), id.value<utils::Id>());
+    if (id.isValid() && id.canConvert<shared::Id>() && model.isValid()
+            && model.canConvert<aadl::AADLObjectsModel *>()) {
+        return new CmdRootEntityChange(model.value<aadl::AADLObjectsModel *>(), id.value<shared::Id>());
     }
 
     return nullptr;

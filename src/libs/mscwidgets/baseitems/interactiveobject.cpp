@@ -31,7 +31,7 @@
 namespace msc {
 
 InteractiveObject::InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent)
-    : shared::ui::InteractiveObjectBase(parent)
+    : ::shared::ui::InteractiveObjectBase(parent)
     , m_entity(entity)
 {
     setAcceptHoverEvents(true);

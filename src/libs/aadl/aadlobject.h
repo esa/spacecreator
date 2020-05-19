@@ -33,7 +33,7 @@ class AADLObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(utils::Id id READ id CONSTANT)
+    Q_PROPERTY(shared::Id id READ id CONSTANT)
 
 public:
     enum class Type
@@ -50,11 +50,11 @@ public:
     Q_ENUM(Type)
 
     explicit AADLObject(const AADLObject::Type t, const QString &title = QString(), QObject *parent = nullptr,
-            const utils::Id &id = utils::InvalidId);
+            const shared::Id &id = shared::InvalidId);
     virtual ~AADLObject();
 
     QString title() const;
-    utils::Id id() const;
+    shared::Id id() const;
 
     AADLObject::Type aadlType() const;
 

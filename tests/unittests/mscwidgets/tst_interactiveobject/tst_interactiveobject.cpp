@@ -26,7 +26,7 @@
 #include <QTest>
 
 using namespace msc;
-using namespace shared::ui;
+using namespace ::shared::ui;
 
 class InteractiveObjectImpl : public InteractiveObject
 {

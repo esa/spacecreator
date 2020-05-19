@@ -188,13 +188,13 @@ void TimerItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     m_textItem->enableEditMode();
 }
 
-void TimerItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
+void TimerItem::onManualMoveProgress(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     const QPointF &newPos = pos() + (to - from);
     setPos(newPos);
 }
 
-void TimerItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
+void TimerItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }
@@ -202,7 +202,7 @@ void TimerItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, con
 void TimerItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
+    gripPointsHandler()->setUsedPoints({ ::shared::ui::GripPoint::Location::Center });
 }
 
 void TimerItem::onTextEdited(const QString &text)

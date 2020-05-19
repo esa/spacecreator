@@ -75,7 +75,7 @@ void HighlightRectItem::highlight()
 
     delete m_lastAnimation.data();
 
-    m_lastAnimation = utils::Animation::createLinearAnimation(this, "opacity", from, to, duration);
+    m_lastAnimation = shared::Animation::createLinearAnimation(this, "opacity", from, to, duration);
     connect(m_lastAnimation, &QPropertyAnimation::finished, this, [this]() {
         hide();
         Q_EMIT highlighted();

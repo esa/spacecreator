@@ -29,7 +29,7 @@
 namespace aadl {
 
 AADLObjectIface::CreationInfo::CreationInfo(AADLObjectsModel *model, AADLObjectFunctionType *function,
-        const QPointF &position, AADLObjectIface::IfaceType type, const utils::Id &id,
+        const QPointF &position, AADLObjectIface::IfaceType type, const shared::Id &id,
         const QVector<IfaceParameter> parameters, OperationKind kind, const QString &name,
         const CreationInfo::Policy policy, AADLObjectIface *source)
     : model(model)
@@ -98,7 +98,7 @@ struct AADLObjectIfacePrivate {
 };
 
 AADLObjectIface::AADLObjectIface(AADLObject::Type ifaceType, const CreationInfo &ci)
-    : AADLObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? utils::createId() : ci.id)
+    : AADLObject(ifaceType, ci.name, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
     , d(new AADLObjectIfacePrivate(Type::RequiredInterface == ifaceType ? AADLObjectIface::IfaceType::Required
                                                                         : AADLObjectIface::IfaceType::Provided))
 {
@@ -584,7 +584,7 @@ void AADLObjectIfaceRequired::namesForRIsToPI(QStringList &result) const
         return nullptr;
     };
 
-    const utils::Id &parentId = parentFn->id();
+    const shared::Id &parentId = parentFn->id();
     for (const AADLObjectIfaceProvided *pi : m_prototypes) {
         const QVector<AADLObjectConnection *> &relatedConnecions = objectsModel()->getConnectionsForIface(pi->id());
         for (auto i = relatedConnecions.crbegin(); i != relatedConnecions.crend(); ++i) {

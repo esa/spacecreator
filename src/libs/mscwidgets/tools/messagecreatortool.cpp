@@ -350,7 +350,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
 
     auto ensureIntersected = [&](const QLineF &arrow, MscInstance *instance) {
         const QRectF r = instanceItemRect(instance);
-        if (!r.isNull() && !utils::intersects(r, arrow))
+        if (!r.isNull() && !shared::intersects(r, arrow))
             return false;
         return true;
     };
@@ -424,10 +424,10 @@ QVariantList MessageCreatorTool::prepareMessage()
             return retPoints;
 
         if (sceneCoords.size() > 2) {
-            retPoints = utils::CoordinatesConverter::sceneToCif(sceneCoords);
+            retPoints = shared::CoordinatesConverter::sceneToCif(sceneCoords);
         } else {
-            retPoints = utils::isHorizontal(sceneCoords) ? QVector<QPoint>()
-                                                         : utils::CoordinatesConverter::sceneToCif(sceneCoords);
+            retPoints = shared::isHorizontal(sceneCoords) ? QVector<QPoint>()
+                                                         : shared::CoordinatesConverter::sceneToCif(sceneCoords);
         }
         return retPoints;
     };

@@ -31,7 +31,7 @@ namespace msc {
   Constructs a MSV view object with the parent \a parent.
 */
 GraphicsView::GraphicsView(QWidget *parent)
-    : shared::ui::GraphicsViewBase(parent)
+    : ::shared::ui::GraphicsViewBase(parent)
 {
     setMinZoomPercent(50);
 
@@ -48,15 +48,15 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    shared::ui::GraphicsViewBase::mousePressEvent(event);
+    ::shared::ui::GraphicsViewBase::mousePressEvent(event);
 }
 
 QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
         QGraphicsScene *scene, const QPoint &, const QPointF &scenePos) const
 {
     QList<QPair<QPointF, QString>> coords;
-    coords.push_back({ utils::CoordinatesConverter::sceneToCif(scenePos), "CIF" });
-    for (InteractiveObject *item : utils::itemByPos<InteractiveObject>(scene, scenePos)) {
+    coords.push_back({ shared::CoordinatesConverter::sceneToCif(scenePos), "CIF" });
+    for (InteractiveObject *item : shared::itemByPos<InteractiveObject>(scene, scenePos)) {
         coords.push_back({ item->mapFromScene(scenePos),
                 item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None") });
     }

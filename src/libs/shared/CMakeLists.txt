@@ -24,8 +24,14 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    animation.cpp
+    animation.h
     commandlineparser.cpp
     commandlineparser.h
+    common.cpp
+    common.h
+    delayedsignal.cpp
+    delayedsignal.h
     plugin.cpp
     plugin.h
     settingsappoption.cpp
@@ -41,7 +47,6 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
-    utils
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets

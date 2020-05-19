@@ -27,10 +27,10 @@
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
-namespace utils {
+namespace shared {
 
 /*!
-  \namespace utils
+  \namespace shared
 
   \brief The collection of utilites shared among all submodules.
 */
@@ -51,7 +51,7 @@ Id createId()
 }
 
 /*!
-  \enum utils::FileCopyingMode
+  \enum shared::FileCopyingMode
 
   This enum specifies a file overwriting policy:
     \value Keep

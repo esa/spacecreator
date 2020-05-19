@@ -50,10 +50,10 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->drawLine(topLine);
     painter->drawLine(bottomLine);
     painter->setPen(QPen(Qt::white, 3., Qt::SolidLine));
-    painter->drawLine(utils::lineCenter(topLine), utils::lineCenter(bottomLine));
+    painter->drawLine(shared::lineCenter(topLine), shared::lineCenter(bottomLine));
     painter->setPen(QPen(Qt::darkGray, 3., Qt::DashLine));
     if (m_unorderedEntities) {
-        painter->drawLine(utils::lineCenter(topLine), utils::lineCenter(bottomLine));
+        painter->drawLine(shared::lineCenter(topLine), shared::lineCenter(bottomLine));
     } else {
         painter->drawLine(rect.topLeft(), rect.bottomLeft());
         painter->drawLine(rect.topRight(), rect.bottomRight());
@@ -64,7 +64,7 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 void CoregionItem::initGripPoints()
 {
     InteractiveObjectBase::initGripPoints();
-    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations {});
+    gripPointsHandler()->setUsedPoints(::shared::ui::GripPoint::Locations {});
 }
 
 void CoregionItem::rebuildLayout()

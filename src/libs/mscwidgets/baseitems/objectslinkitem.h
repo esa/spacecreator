@@ -32,7 +32,7 @@ class ObjectsLinkItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    static QPainterPath hoverableLine(const QLineF &line, const qreal lineWidth = utils::LineHoverTolerance);
+    static QPainterPath hoverableLine(const QLineF &line, const qreal lineWidth = shared::LineHoverTolerance);
 
     ObjectsLinkItem(QGraphicsItem *parent = nullptr);
 

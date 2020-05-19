@@ -231,7 +231,7 @@ QMenu *InterfaceTabDocument::customMenu() const
     return root;
 }
 
-const QHash<utils::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() const
+const QHash<shared::Id, aadl::AADLObject *> &InterfaceTabDocument::objects() const
 {
     return m_model->objects();
 }
@@ -485,7 +485,7 @@ void InterfaceTabDocument::onActionExitToRootFunction()
 void InterfaceTabDocument::onActionExitToParentFunction()
 {
     aadl::AADLObject *parentObject = m_model->rootObject() ? m_model->rootObject()->parentObject() : nullptr;
-    changeRootItem(parentObject ? parentObject->id() : utils::InvalidId);
+    changeRootItem(parentObject ? parentObject->id() : shared::InvalidId);
 }
 
 void InterfaceTabDocument::updateItem(QGraphicsItem *item)
@@ -683,7 +683,7 @@ void InterfaceTabDocument::onItemDoubleClicked()
     }
 }
 
-void InterfaceTabDocument::onRootObjectChanged(utils::Id rootId)
+void InterfaceTabDocument::onRootObjectChanged(shared::Id rootId)
 {
     Q_UNUSED(rootId)
 
@@ -731,7 +731,7 @@ void InterfaceTabDocument::clearScene()
     m_items.clear();
 }
 
-void InterfaceTabDocument::changeRootItem(utils::Id id)
+void InterfaceTabDocument::changeRootItem(shared::Id id)
 {
     if (m_model->rootObjectId() == id)
         return;

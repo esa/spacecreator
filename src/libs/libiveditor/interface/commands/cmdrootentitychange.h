@@ -32,7 +32,7 @@ namespace cmd {
 class CmdRootEntityChange : public CmdEntityGeometryChange
 {
 public:
-    explicit CmdRootEntityChange(aadl::AADLObjectsModel *model, const utils::Id &id);
+    explicit CmdRootEntityChange(aadl::AADLObjectsModel *model, const shared::Id &id);
 
     void redo() override;
     void undo() override;
@@ -40,8 +40,8 @@ public:
 
 private:
     QPointer<aadl::AADLObjectsModel> m_model;
-    utils::Id m_newId;
-    utils::Id m_prevId;
+    shared::Id m_newId;
+    shared::Id m_prevId;
 };
 
 }

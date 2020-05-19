@@ -5,7 +5,7 @@ class QString;
 class QVariant;
 class QPropertyAnimation;
 
-namespace utils {
+namespace shared {
 namespace Animation {
 
 QPropertyAnimation *createLinearAnimation(

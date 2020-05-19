@@ -51,7 +51,7 @@ private:
     QVector<QPointer<aadl::AADLObject>> m_relatedEntities;
     QVector<QPointer<aadl::AADLObject>> m_relatedConnections;
     QVector<QPointer<aadl::AADLObject>> m_relatedIfaces;
-    QHash<utils::Id, QPointer<aadl::AADLObjectFunctionType>> m_parentFunctions;
+    QHash<shared::Id, QPointer<aadl::AADLObjectFunctionType>> m_parentFunctions;
 
     void collectRelatedItems(aadl::AADLObject *toBeRemoved);
     void storeLinkedEntity(aadl::AADLObject *linkedEntity);

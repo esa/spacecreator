@@ -99,7 +99,7 @@ void ColorManagerDialog::on_btnCreateNew_clicked()
 {
     const QString file =
             QFileDialog::getSaveFileName(this, tr("Choose color scheme file"), ui->lePath->text(), "*.json");
-    if (utils::copyResourceFile(ColorManager::defaultColorsResourceFile(), file, utils::FileCopyingMode::Overwrite))
+    if (shared::copyResourceFile(ColorManager::defaultColorsResourceFile(), file, shared::FileCopyingMode::Overwrite))
         openFile(file);
 }
 

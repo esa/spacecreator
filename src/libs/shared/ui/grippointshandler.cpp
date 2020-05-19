@@ -160,7 +160,7 @@ void GripPointsHandler::changeVisibilityAnimated(bool appear)
     const int duration = m_visible ? 100 : 150;
     setVisible(true);
 
-    if (QPropertyAnimation *anim = utils::Animation::createLinearAnimation(this, "opacity", from, to, duration)) {
+    if (QPropertyAnimation *anim = shared::Animation::createLinearAnimation(this, "opacity", from, to, duration)) {
         connect(anim, &QPropertyAnimation::finished, this, &GripPointsHandler::opacityAnimationFinished);
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     }

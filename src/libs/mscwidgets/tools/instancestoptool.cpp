@@ -90,7 +90,7 @@ void InstanceStopTool::setExplicitStop()
     if (!m_view || !m_view->scene())
         return;
 
-    const auto instances = utils::getEntityFromSelection<msc::InstanceItem, msc::MscInstance>(m_view->scene());
+    const auto instances = shared::getEntityFromSelection<msc::InstanceItem, msc::MscInstance>(m_view->scene());
     if (instances.size() != 1)
         return;
 
@@ -111,7 +111,7 @@ void InstanceStopTool::updateEnabledState()
         return;
 
     if (m_view && m_view->scene()) {
-        const auto instances = utils::getEntityFromSelection<msc::InstanceItem, msc::MscInstance>(m_view->scene());
+        const auto instances = shared::getEntityFromSelection<msc::InstanceItem, msc::MscInstance>(m_view->scene());
         if (instances.size() == 1) {
             m_action->setEnabled(true);
             m_action->setChecked(instances.front()->explicitStop());

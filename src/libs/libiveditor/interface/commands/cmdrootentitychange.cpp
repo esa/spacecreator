@@ -24,7 +24,7 @@
 namespace aadlinterface {
 namespace cmd {
 
-CmdRootEntityChange::CmdRootEntityChange(aadl::AADLObjectsModel *model, const utils::Id &id)
+CmdRootEntityChange::CmdRootEntityChange(aadl::AADLObjectsModel *model, const shared::Id &id)
     : CmdEntityGeometryChange({}, QObject::tr("Change root item"))
     , m_model(model)
     , m_newId(id)

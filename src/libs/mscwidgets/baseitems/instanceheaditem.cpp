@@ -307,7 +307,7 @@ QSizeF InstanceHeadItem::defaultSize()
     static QSizeF sizeScene { 0., 0. };
     if (sizeScene.isEmpty()) {
         const QSize sizeCIF { 100, 50 };
-        const QPointF sz = utils::CoordinatesConverter::vector2DInScene(sizeCIF.width(), sizeCIF.height());
+        const QPointF sz = shared::CoordinatesConverter::vector2DInScene(sizeCIF.width(), sizeCIF.height());
         sizeScene = { sz.x(), sz.y() };
     }
 

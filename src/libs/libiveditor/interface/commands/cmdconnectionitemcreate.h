@@ -37,7 +37,7 @@ class CmdConnectionItemCreate : public CmdEntityGeometryChange
 {
 public:
     explicit CmdConnectionItemCreate(aadl::AADLObjectsModel *model, aadl::AADLObjectFunction *parent,
-            const utils::Id sourceIfaceId, const utils::Id &targetIfaceId, const QVector<QPointF> &points);
+            const shared::Id sourceIfaceId, const shared::Id &targetIfaceId, const QVector<QPointF> &points);
 
     void redo() override;
     void undo() override;

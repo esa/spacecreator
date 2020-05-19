@@ -60,8 +60,8 @@ namespace {
 struct ValidationResult {
     aadl::AADLObjectIface *startIface { nullptr };
     aadl::AADLObjectIface *endIface { nullptr };
-    utils::Id startIfaceId = {};
-    utils::Id endIfaceId = {};
+    shared::Id startIfaceId = {};
+    shared::Id endIfaceId = {};
     QPointF startPointAdjusted {};
     QPointF endPointAdjusted {};
     QLineF connectionLine {};
@@ -176,8 +176,8 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
             }
     }
 
-    result.startIfaceId = result.startIface ? result.startIface->id() : utils::createId();
-    result.endIfaceId = result.endIface ? result.endIface->id() : utils::createId();
+    result.startIfaceId = result.startIface ? result.startIface->id() : shared::createId();
+    result.endIfaceId = result.endIface ? result.endIface->id() : shared::createId();
 
     result.status = aadl::ConnectionCreationValidator::canConnect(
             result.startObject, result.endObject, result.startIface, result.endIface);
@@ -639,7 +639,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     AADLFunctionGraphicsItem *prevStartItem =
             qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtStartPos);
     QPointF firstExcludedPoint = *std::next(connectionPoints.constBegin());
-    utils::Id prevStartIfaceId = info.startIfaceId;
+    shared::Id prevStartIfaceId = info.startIfaceId;
     /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
@@ -665,7 +665,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         } else {
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.last();
-            ifaceCommons.id = utils::createId();
+            ifaceCommons.id = shared::createId();
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -684,7 +684,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
 
     QPointF lastExcludedPoint = *std::next(connectionPoints.crbegin());
     auto prevEndItem = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(info.functionAtEndPos);
-    utils::Id prevEndIfaceId = info.endIfaceId;
+    shared::Id prevEndIfaceId = info.endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
         auto intersectionPoints = aadlinterface::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
@@ -704,7 +704,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
         if (item == info.functionAtStartPos) {
             ifaceCommons.id = info.startIfaceId;
         } else {
-            ifaceCommons.id = utils::createId();
+            ifaceCommons.id = shared::createId();
 
             ifaceCommons.function = item->entity();
             ifaceCommons.position = intersectionPoints.last();
@@ -899,7 +899,7 @@ void CreatorTool::handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::
 {
     if (auto parentItem = nearestItem(scene, adjustFromPoint(pos, ::kInterfaceTolerance), kFunctionTypes)) {
         aadl::AADLObjectFunctionType *parentObject = gi::functionTypeObject(parentItem);
-        aadl::AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, utils::InvalidId);
+        aadl::AADLObjectIface::CreationInfo ifaceDescr(m_model.data(), parentObject, pos, type, shared::InvalidId);
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))

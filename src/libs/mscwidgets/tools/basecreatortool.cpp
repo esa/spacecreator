@@ -66,7 +66,7 @@ void BaseCreatorTool::removePreviewItem()
         return;
     }
 
-    utils::removeSceneItem(m_previewItem);
+    shared::removeSceneItem(m_previewItem);
     delete m_previewItem.data();
     m_previewEntity.reset();
 }

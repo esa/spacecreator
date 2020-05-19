@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QUuid>
 
-namespace utils {
+namespace shared {
 
 typedef QUuid Id;
 
@@ -64,4 +64,4 @@ bool isAncestorOf(const T *const parent, T *object)
 
 }
 
-Q_DECLARE_METATYPE(utils::Id)
+Q_DECLARE_METATYPE(shared::Id)

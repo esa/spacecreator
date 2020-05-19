@@ -51,7 +51,7 @@ aadl::AADLObjectFunctionType *CmdEntityRemove::putParentFunctionFor(const aadl::
     if (!obj || !obj->parentObject())
         return nullptr;
 
-    const utils::Id &objId = obj->id();
+    const shared::Id &objId = obj->id();
     if (auto *fn = obj->parentObject()->as<aadl::AADLObjectFunctionType *>())
         m_parentFunctions[objId] = fn;
 

@@ -2,7 +2,7 @@
 
 #include <QPropertyAnimation>
 
-namespace utils {
+namespace shared {
 namespace Animation {
 
 QPropertyAnimation *createLinearAnimation(

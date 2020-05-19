@@ -26,8 +26,8 @@
 namespace aadl {
 
 struct AADLObjectPrivate {
-    AADLObjectPrivate(const utils::Id &id, const AADLObject::Type t)
-        : m_id(id == utils::InvalidId ? utils::createId() : id)
+    AADLObjectPrivate(const shared::Id &id, const AADLObject::Type t)
+        : m_id(id == shared::InvalidId ? shared::createId() : id)
         , m_attrs()
         , m_props()
         , m_model(nullptr)
@@ -35,14 +35,14 @@ struct AADLObjectPrivate {
     {
     }
 
-    const utils::Id m_id;
+    const shared::Id m_id;
     QHash<QString, QVariant> m_attrs;
     QHash<QString, QVariant> m_props;
     AADLObjectsModel *m_model;
     const AADLObject::Type m_type;
 };
 
-AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *parent, const utils::Id &id)
+AADLObject::AADLObject(const AADLObject::Type t, const QString &title, QObject *parent, const shared::Id &id)
     : QObject(parent)
     , d(new AADLObjectPrivate(id, t))
 {
@@ -66,7 +66,7 @@ bool AADLObject::postInit()
     return true;
 }
 
-utils::Id AADLObject::id() const
+shared::Id AADLObject::id() const
 {
     return d->m_id;
 }

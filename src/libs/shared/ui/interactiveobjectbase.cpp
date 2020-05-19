@@ -25,15 +25,15 @@ struct InteractiveObjectBase::InteractiveObjectBasePrivate {
     QPointer<HighlightRectItem> highlighter;
     QPen selectedPen;
 
-    utils::DelayedSignal *rebuildLayoutSignal;
+    shared::DelayedSignal *rebuildLayoutSignal;
 };
 
 InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem *parent)
     : QGraphicsObject(parent)
     , d(new InteractiveObjectBasePrivate)
 {
-    d->rebuildLayoutSignal = new utils::DelayedSignal(this);
-    connect(d->rebuildLayoutSignal, &utils::DelayedSignal::triggered, this,
+    d->rebuildLayoutSignal = new shared::DelayedSignal(this);
+    connect(d->rebuildLayoutSignal, &shared::DelayedSignal::triggered, this,
             &InteractiveObjectBase::instantLayoutUpdate);
 }
 

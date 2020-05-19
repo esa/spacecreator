@@ -8,10 +8,9 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     aadl
-    shared
     libiveditor
+    shared
     templating
-    utils
     Qt5::Concurrent
     Qt5::Network
     Qt5::Svg

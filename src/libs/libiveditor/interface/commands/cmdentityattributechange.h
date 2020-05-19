@@ -50,8 +50,8 @@ private:
     const QVariantHash m_newAttrs;
     const QVariantHash m_oldAttrs;
 
-    QHash<utils::Id, QVector<QUndoCommand *>> m_cmdSet;
-    QHash<utils::Id, QVector<QUndoCommand *>> m_cmdUnset;
+    QHash<shared::Id, QVector<QUndoCommand *>> m_cmdSet;
+    QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
     void setAttrs(const QVariantHash &attrs, bool isRedo);
     aadl::AADLObjectFunctionType *functionTypeByName(const QString &name) const;

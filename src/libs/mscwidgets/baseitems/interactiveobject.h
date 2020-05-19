@@ -28,7 +28,7 @@ namespace msc {
 
 class MscEntity;
 
-class InteractiveObject : public shared::ui::InteractiveObjectBase
+class InteractiveObject : public ::shared::ui::InteractiveObjectBase
 {
     Q_OBJECT
 

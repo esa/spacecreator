@@ -71,7 +71,7 @@ void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPol
         const QString fileFrom(sourceFile.arg(fileName, TemplateFileExtension));
         const QString fileTo(QString("%1/%2.%3").arg(targetFilePath, fileName, TemplateFileExtension));
         if (forcedOverwrite || !QFileInfo::exists(fileTo))
-            utils::copyResourceFile(fileFrom, fileTo);
+            shared::copyResourceFile(fileFrom, fileTo);
     };
 
     for (int i = 0; i < fileNames.size(); ++i) {

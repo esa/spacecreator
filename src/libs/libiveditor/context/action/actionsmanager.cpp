@@ -148,10 +148,10 @@ void ActionsManager::deployDefaults()
     const QString targetFile("contextmenu.json");
     const QString targetFilePath(targetDir + targetFile);
 
-    utils::ensureDirExists(targetDir);
+    shared::ensureDirExists(targetDir);
 
     if (!QFileInfo::exists(targetFilePath)) {
-        utils::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
+        shared::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
     }
 }
 

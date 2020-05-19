@@ -39,7 +39,7 @@ qreal ArrowItem::defaultWidth()
     static constexpr int defaultWidthCif { 200 };
     static qreal defaultWidthScene { 0. };
     if (qFuzzyIsNull(defaultWidthScene)) {
-        defaultWidthScene = utils::CoordinatesConverter::widthInScene(defaultWidthCif);
+        defaultWidthScene = shared::CoordinatesConverter::widthInScene(defaultWidthCif);
     }
     return defaultWidthScene;
 }
@@ -110,7 +110,7 @@ void ArrowItem::buildLayout()
     const QPointF currEndLolcal(mapFromScene(currEnd));
 
     QLineF line(currStartLocal, currEndLolcal);
-    line.translate(-utils::lineCenter(line));
+    line.translate(-shared::lineCenter(line));
 
     updateLine(line);
 }
@@ -227,7 +227,7 @@ QPointF ArrowItem::pathPoint(int num) const
 
 QPainterPath ArrowItem::shape() const
 {
-    QPainterPath result = createShape(utils::LineHoverTolerance);
+    QPainterPath result = createShape(shared::LineHoverTolerance);
     if (result.isEmpty())
         result = m_bodyPath;
 

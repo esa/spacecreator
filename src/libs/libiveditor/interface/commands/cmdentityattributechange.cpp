@@ -30,7 +30,7 @@ namespace aadlinterface {
 namespace cmd {
 
 typedef QVector<QUndoCommand *> Commands;
-typedef QHash<utils::Id, Commands> CommandsStorage;
+typedef QHash<shared::Id, Commands> CommandsStorage;
 
 static inline QVariantHash getCurrentAttributes(aadl::AADLObject *entity, const QVariantHash &attrs)
 {
@@ -52,7 +52,7 @@ CmdEntityAttributeChange::CmdEntityAttributeChange(aadl::AADLObject *entity, con
 
 CmdEntityAttributeChange::~CmdEntityAttributeChange()
 {
-    for (const utils::Id &key : m_cmdSet.keys()) {
+    for (const shared::Id &key : m_cmdSet.keys()) {
         m_cmdUnset.remove(key);
         qDeleteAll(m_cmdSet.take(key));
     }
@@ -147,7 +147,7 @@ Commands getCommands(const aadl::AADLObjectFunctionType *fnType, const CommandsS
     if (!fnType || !caller || !prepareMethod)
         return {};
 
-    const utils::Id &fnTypeId = fnType->id();
+    const shared::Id &fnTypeId = fnType->id();
     if (!cmdStorage.contains(fnTypeId))
         (caller->*prepareMethod)(fnType);
 
@@ -164,7 +164,7 @@ Commands CmdEntityAttributeChange::commandsSetNewFunctionType(const aadl::AADLOb
     return getCommands(fnType, m_cmdSet, this, &CmdEntityAttributeChange::prepareSetFunctionTypeCommands);
 }
 
-bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppositeCommands, const utils::Id &fnTypeId)
+bool useOppositeCommands(CommandsStorage &commands, const CommandsStorage &oppositeCommands, const shared::Id &fnTypeId)
 {
     if (oppositeCommands.contains(fnTypeId)) {
         commands[fnTypeId] = oppositeCommands.value(fnTypeId, {});
@@ -179,7 +179,7 @@ void CmdEntityAttributeChange::prepareUnsetFunctionTypeCommands(const aadl::AADL
     if (!fnType)
         return;
 
-    const utils::Id fnTypeId = fnType->id();
+    const shared::Id fnTypeId = fnType->id();
     if (useOppositeCommands(m_cmdUnset, m_cmdSet, fnTypeId))
         return;
 
@@ -206,7 +206,7 @@ void CmdEntityAttributeChange::prepareSetFunctionTypeCommands(const aadl::AADLOb
     if (!fnType)
         return;
 
-    const utils::Id fnTypeId = fnType->id();
+    const shared::Id fnTypeId = fnType->id();
     if (useOppositeCommands(m_cmdSet, m_cmdUnset, fnTypeId))
         return;
 

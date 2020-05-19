@@ -4,7 +4,7 @@
 
 class QTimer;
 
-namespace utils {
+namespace shared {
 
 /*!
  * This class is used to have a bunch of methods emit the same signal,

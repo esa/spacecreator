@@ -66,7 +66,7 @@ struct ChartViewLayoutInfo {
         m_instancesRect = QRectF();
 
         if (m_chartItem) {
-            utils::removeSceneItem(m_chartItem);
+            shared::removeSceneItem(m_chartItem);
             delete m_chartItem;
         }
 
@@ -100,7 +100,7 @@ struct ChartViewModelPrivate {
         static constexpr int interMessageSpanCIF { 40 };
         static qreal interMessageSpanScene { 0. };
         if (qFuzzyIsNull(interMessageSpanScene)) {
-            interMessageSpanScene = utils::CoordinatesConverter::heightInScene(interMessageSpanCIF);
+            interMessageSpanScene = shared::CoordinatesConverter::heightInScene(interMessageSpanCIF);
         }
         return interMessageSpanScene;
     }
@@ -110,7 +110,7 @@ struct ChartViewModelPrivate {
         static constexpr int interInstanceSpanCIF { 200 };
         static qreal interInstanceSpanScene { 0. };
         if (qFuzzyIsNull(interInstanceSpanScene)) {
-            interInstanceSpanScene = utils::CoordinatesConverter::heightInScene(interInstanceSpanCIF);
+            interInstanceSpanScene = shared::CoordinatesConverter::heightInScene(interInstanceSpanCIF);
         }
         return interInstanceSpanScene;
     }
@@ -123,7 +123,7 @@ struct ChartViewModelPrivate {
     qreal calcInstanceAxisHeight() const
     {
         if (m_instanceItems.isEmpty()) {
-            static const qreal oneMessageHeight = utils::CoordinatesConverter::heightInScene(100);
+            static const qreal oneMessageHeight = shared::CoordinatesConverter::heightInScene(100);
             const int eventsCount = qMax(1,
                     m_visibleItemLimit == -1 ? m_currentChart->instanceEvents().size()
                                              : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
@@ -276,7 +276,7 @@ MessageItem *ChartViewModel::fillMessageItem(
         if (item->geometryManagedByCif()) {
             bool converted = false;
             const QVector<QPointF> pointsScene =
-                    utils::CoordinatesConverter::cifToScene(item->modelItem()->cifPoints(), &converted);
+                    shared::CoordinatesConverter::cifToScene(item->modelItem()->cifPoints(), &converted);
             if (converted && points.size() == pointsScene.size())
                 points = pointsScene;
         }
@@ -587,7 +587,7 @@ QRectF ChartViewModel::minimalContentRect() const
         return totalRect;
     };
 
-    const QRectF &currChartBox = utils::CoordinatesConverter::currentChartItem()->contentRect();
+    const QRectF &currChartBox = shared::CoordinatesConverter::currentChartItem()->contentRect();
     auto eventEffectiveRect = [&currChartBox](InteractiveObject *item) {
         if (!item)
             return QRectF();
@@ -1027,7 +1027,7 @@ InstanceItem *ChartViewModel::createDefaultInstanceItem(MscInstance *orphanInsta
 
 bool ChartViewModel::removeInstanceItem(msc::InstanceItem *item)
 {
-    if (item && utils::removeSceneItem(item)) {
+    if (item && shared::removeSceneItem(item)) {
         delete item;
         return true;
     }
@@ -1050,7 +1050,7 @@ msc::MessageItem *ChartViewModel::createDefaultMessageItem(msc::MscMessage *orph
 
 bool ChartViewModel::removeMessageItem(msc::MessageItem *item)
 {
-    if (item && utils::removeSceneItem(item)) {
+    if (item && shared::removeSceneItem(item)) {
         delete item;
         return true;
     }
@@ -1075,7 +1075,7 @@ void ChartViewModel::removeInstanceItem(MscInstance *instance)
 
     if (msc::InstanceItem *item = d->m_instanceItems.take(instance->internalId())) {
         d->m_instanceItemsSorted.removeOne(item);
-        utils::removeSceneItem(item);
+        shared::removeSceneItem(item);
         delete item;
 
         clearScene();
@@ -1090,7 +1090,7 @@ void ChartViewModel::removeEventItem(MscInstanceEvent *event)
 
     if (msc::InteractiveObject *item = d->m_instanceEventItems.take(event->internalId())) {
         d->m_instanceEventItemsSorted.removeOne(item);
-        utils::removeSceneItem(item);
+        shared::removeSceneItem(item);
         delete item;
         updateLayout();
     }
@@ -1344,7 +1344,7 @@ void ChartViewModel::onInstanceGeometryChanged()
     }
 }
 
-void ChartViewModel::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item)
+void ChartViewModel::onInstanceEventItemMoved(::shared::ui::InteractiveObjectBase *item)
 {
     auto actionItem = qobject_cast<ActionItem *>(item);
     if (actionItem) {
@@ -1413,7 +1413,7 @@ void ChartViewModel::onMessageRetargeted(MessageItem *item, const QPointF &pos, 
     if (((newInstance != currentInstance && newInstance != otherInstance) || newIdx != currentIdx)
             && (newInstance || otherInstance)) {
 
-        if (utils::isHorizontal(item->messagePoints())) {
+        if (shared::isHorizontal(item->messagePoints())) {
             if (item->geometryManagedByCif())
                 item->modelItem()->clearCifs();
         } else {
@@ -1562,7 +1562,7 @@ void ChartViewModel::prepareChartBoxItem()
         d->m_scene.addItem(d->m_layoutInfo.m_chartItem);
     }
 
-    utils::CoordinatesConverter::init(&d->m_scene, d->m_layoutInfo.m_chartItem);
+    shared::CoordinatesConverter::init(&d->m_scene, d->m_layoutInfo.m_chartItem);
 }
 
 void ChartViewModel::applyContentRect(const QRectF &newRect)

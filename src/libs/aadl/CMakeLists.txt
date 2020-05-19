@@ -38,7 +38,7 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
-    utils
+    shared
     Qt5::Core
     Qt5::Gui
 )

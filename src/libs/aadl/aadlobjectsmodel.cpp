@@ -28,9 +28,9 @@
 namespace aadl {
 
 struct AADLObjectsModelPrivate {
-    utils::Id m_rootObjectId;
-    QList<utils::Id> m_objectsOrder;
-    QHash<utils::Id, AADLObject *> m_objects;
+    shared::Id m_rootObjectId;
+    QList<shared::Id> m_objectsOrder;
+    QHash<shared::Id, AADLObject *> m_objects;
     QList<AADLObject *> m_visibleObjects;
 };
 
@@ -78,7 +78,7 @@ bool AADLObjectsModel::addObject(AADLObject *obj)
     if (!obj)
         return false;
 
-    const utils::Id &id = obj->id();
+    const shared::Id &id = obj->id();
     if (getObject(id))
         return false;
 
@@ -99,7 +99,7 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     if (!obj)
         return false;
 
-    const utils::Id &id = obj->id();
+    const shared::Id &id = obj->id();
     if (!getObject(id))
         return false;
 
@@ -111,7 +111,7 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
     return true;
 }
 
-void AADLObjectsModel::setRootObject(utils::Id rootId)
+void AADLObjectsModel::setRootObject(shared::Id rootId)
 {
     if (d->m_rootObjectId == rootId)
         return;
@@ -128,13 +128,13 @@ void AADLObjectsModel::setRootObject(utils::Id rootId)
                 continue;
             }
 
-            if (!obj->isConnection() && (utils::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
+            if (!obj->isConnection() && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
                 d->m_visibleObjects.append(obj);
             } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
                 const bool sourceIfaceAncestor =
-                        utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
+                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
                 const bool targetIfaceAncestor =
-                        utils::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
+                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
                 if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
                     d->m_visibleObjects.append(obj);
                 }
@@ -149,12 +149,12 @@ AADLObject *AADLObjectsModel::rootObject() const
     return getObject(d->m_rootObjectId);
 }
 
-utils::Id AADLObjectsModel::rootObjectId() const
+shared::Id AADLObjectsModel::rootObjectId() const
 {
     return d->m_rootObjectId;
 }
 
-AADLObject *AADLObjectsModel::getObject(const utils::Id &id) const
+AADLObject *AADLObjectsModel::getObject(const shared::Id &id) const
 {
     if (id.isNull())
         return nullptr;
@@ -189,12 +189,12 @@ AADLObjectIface *AADLObjectsModel::getIfaceByName(
     return nullptr;
 }
 
-AADLObjectFunction *AADLObjectsModel::getFunction(const utils::Id &id) const
+AADLObjectFunction *AADLObjectsModel::getFunction(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }
 
-AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const utils::Id &id) const
+AADLObjectFunctionType *AADLObjectsModel::getFunctionType(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectFunction *>(getObject(id));
 }
@@ -230,32 +230,32 @@ QHash<QString, AADLObjectFunctionType *> AADLObjectsModel::getAvailableFunctionT
     return result;
 }
 
-AADLObjectIface *AADLObjectsModel::getInterface(const utils::Id &id) const
+AADLObjectIface *AADLObjectsModel::getInterface(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectIface *>(getObject(id));
 }
 
-AADLObjectIfaceRequired *AADLObjectsModel::getRequiredInterface(const utils::Id &id) const
+AADLObjectIfaceRequired *AADLObjectsModel::getRequiredInterface(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectIfaceRequired *>(getObject(id));
 }
 
-AADLObjectIfaceProvided *AADLObjectsModel::getProvidedInterface(const utils::Id &id) const
+AADLObjectIfaceProvided *AADLObjectsModel::getProvidedInterface(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectIfaceProvided *>(getObject(id));
 }
 
-AADLObjectConnection *AADLObjectsModel::getConnection(const utils::Id &id) const
+AADLObjectConnection *AADLObjectsModel::getConnection(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectConnection *>(getObject(id));
 }
 
-AADLObjectComment *AADLObjectsModel::getCommentById(const utils::Id &id) const
+AADLObjectComment *AADLObjectsModel::getCommentById(const shared::Id &id) const
 {
     return qobject_cast<AADLObjectComment *>(getObject(id));
 }
 
-AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const utils::Id &id) const
+AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const shared::Id &id) const
 {
     for (auto it = d->m_objects.constBegin(); it != d->m_objects.constEnd(); ++it) {
         if (it.value()->aadlType() != AADLObject::Type::Connection)
@@ -271,12 +271,12 @@ AADLObjectConnection *AADLObjectsModel::getConnectionForIface(const utils::Id &i
     return nullptr;
 }
 
-const QHash<utils::Id, AADLObject *> &AADLObjectsModel::objects() const
+const QHash<shared::Id, AADLObject *> &AADLObjectsModel::objects() const
 {
     return d->m_objects;
 }
 
-QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const utils::Id &id) const
+QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const shared::Id &id) const
 {
     QVector<AADLObjectConnection *> result;
 
@@ -306,7 +306,7 @@ void AADLObjectsModel::clear()
     d->m_objectsOrder.clear();
     d->m_visibleObjects.clear();
 
-    d->m_rootObjectId = utils::InvalidId;
+    d->m_rootObjectId = shared::InvalidId;
 }
 
 }

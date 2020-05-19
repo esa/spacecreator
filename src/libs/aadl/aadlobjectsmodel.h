@@ -42,27 +42,27 @@ public:
     bool addObject(AADLObject *obj);
     bool removeObject(AADLObject *obj);
 
-    void setRootObject(utils::Id id);
+    void setRootObject(shared::Id id);
     AADLObject *rootObject() const;
-    utils::Id rootObjectId() const;
+    shared::Id rootObjectId() const;
 
-    AADLObject *getObject(const utils::Id &id) const;
+    AADLObject *getObject(const shared::Id &id) const;
     AADLObject *getObjectByName(const QString &name, AADLObject::Type type = AADLObject::Type::Unknown) const;
     AADLObjectIface *getIfaceByName(
             const QString &name, AADLObjectIface::IfaceType dir, AADLObjectFunctionType *parent = nullptr) const;
-    AADLObjectFunction *getFunction(const utils::Id &id) const;
-    AADLObjectFunctionType *getFunctionType(const utils::Id &id) const;
+    AADLObjectFunction *getFunction(const shared::Id &id) const;
+    AADLObjectFunctionType *getFunctionType(const shared::Id &id) const;
     QHash<QString, AADLObjectFunctionType *> getAvailableFunctionTypes(const AADLObjectFunction *fnObj) const;
-    AADLObjectIface *getInterface(const utils::Id &id) const;
-    AADLObjectIfaceRequired *getRequiredInterface(const utils::Id &id) const;
-    AADLObjectIfaceProvided *getProvidedInterface(const utils::Id &id) const;
-    AADLObjectConnection *getConnection(const utils::Id &id) const;
-    AADLObjectComment *getCommentById(const utils::Id &id) const;
+    AADLObjectIface *getInterface(const shared::Id &id) const;
+    AADLObjectIfaceRequired *getRequiredInterface(const shared::Id &id) const;
+    AADLObjectIfaceProvided *getProvidedInterface(const shared::Id &id) const;
+    AADLObjectConnection *getConnection(const shared::Id &id) const;
+    AADLObjectComment *getCommentById(const shared::Id &id) const;
 
-    AADLObjectConnection *getConnectionForIface(const utils::Id &id) const;
-    QVector<AADLObjectConnection *> getConnectionsForIface(const utils::Id &id) const;
+    AADLObjectConnection *getConnectionForIface(const shared::Id &id) const;
+    QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;
 
-    const QHash<utils::Id, AADLObject *> &objects() const;
+    const QHash<shared::Id, AADLObject *> &objects() const;
     QList<AADLObject *> visibleObjects() const;
 
     void clear();
@@ -71,7 +71,7 @@ Q_SIGNALS:
     void aadlObjectAdded(aadl::AADLObject *object);
     void aadlObjectRemoved(aadl::AADLObject *object);
     void modelReset();
-    void rootObjectChanged(utils::Id rootId);
+    void rootObjectChanged(shared::Id rootId);
 
 public Q_SLOTS:
     bool initFromObjects(const QVector<aadl::AADLObject *> &visibleObjects);

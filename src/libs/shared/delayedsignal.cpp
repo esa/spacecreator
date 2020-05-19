@@ -2,7 +2,7 @@
 
 #include <QTimer>
 
-namespace utils {
+namespace shared {
 
 DelayedSignal::DelayedSignal(QObject *parent)
     : QObject(parent)

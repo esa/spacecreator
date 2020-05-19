@@ -55,7 +55,7 @@ public:
     QString title() const override;
     QMenu *customMenu() const override;
 
-    const QHash<utils::Id, aadl::AADLObject *> &objects() const;
+    const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     QString supportedFileExtensions() const override;
 
 public Q_SLOTS:
@@ -90,7 +90,7 @@ protected Q_SLOTS:
     void onAADLObjectRemoved(aadl::AADLObject *object);
     void onItemClicked();
     void onItemDoubleClicked();
-    void onRootObjectChanged(utils::Id rootId);
+    void onRootObjectChanged(shared::Id rootId);
 
     void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
@@ -113,7 +113,7 @@ private:
     void updateConnection(aadlinterface::AADLConnectionGraphicsItem *connection);
 
     void clearScene();
-    void changeRootItem(utils::Id id);
+    void changeRootItem(shared::Id id);
 
 private:
     aadlinterface::InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
@@ -134,7 +134,7 @@ private:
     QAction *m_actExitToParent { nullptr };
 
     aadlinterface::CreatorTool *m_tool { nullptr };
-    QHash<utils::Id, QGraphicsItem *> m_items;
+    QHash<shared::Id, QGraphicsItem *> m_items;
 
     QMutex *m_mutex { nullptr };
     QQueue<aadl::AADLObject *> m_rmQueu;

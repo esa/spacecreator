@@ -67,7 +67,7 @@ public:
         };
         CreationInfo(AADLObjectsModel *model = nullptr, AADLObjectFunctionType *function = nullptr,
                 const QPointF &position = QPointF(), AADLObjectIface::IfaceType type = DefaultDirection,
-                const utils::Id &id = utils::createId(),
+                const shared::Id &id = shared::createId(),
                 const QVector<IfaceParameter> parameters = QVector<IfaceParameter>(),
                 OperationKind kind = OperationKind::Sporadic, const QString &name = QString(),
                 const CreationInfo::Policy policy = CreationInfo::Policy::Init, AADLObjectIface *toBeCloned = nullptr);
@@ -75,7 +75,7 @@ public:
         AADLObjectFunctionType *function { nullptr };
         QPointF position = {};
         AADLObjectIface::IfaceType type { DefaultDirection };
-        utils::Id id = {};
+        shared::Id id = {};
         QVector<IfaceParameter> parameters = {};
         OperationKind kind = { OperationKind::Sporadic };
         QString name {};

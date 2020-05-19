@@ -143,7 +143,7 @@ QRectF LabeledArrowItem::boundingRect() const
 {
     const QRectF &arrowBounds = m_itemArrow->boundingRect();
     const QVector<QPointF> &currPoints = m_itemArrow->turnPoints();
-    if (currPoints.size() == 2 && utils::isHorizontal(currPoints)) {
+    if (currPoints.size() == 2 && shared::isHorizontal(currPoints)) {
         const QRectF &titleBounds = m_itemText->boundingRect().translated(m_itemText->pos());
         const QRectF &titledArrowBounds = arrowBounds | titleBounds;
         return titledArrowBounds.adjusted(0., 0., 0., ArrowSign::ARROW_HEIGHT);

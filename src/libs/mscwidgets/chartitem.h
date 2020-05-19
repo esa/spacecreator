@@ -52,7 +52,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF contentRect() const;
-    QPointF setContentRect(const QRectF &r, utils::CifUpdatePolicy cifUpdate = utils::CifUpdatePolicy::UpdateIfExists);
+    QPointF setContentRect(
+            const QRectF &r, shared::CifUpdatePolicy cifUpdate = shared::CifUpdatePolicy::UpdateIfExists);
 
     static QPointF chartMargin();
     static QMarginsF chartMargins();
@@ -72,13 +73,13 @@ public Q_SLOTS:
     void setName(const QString &name);
 
 protected:
-    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void initGripPoints() override;
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
-    void onManualGeometryChangeFinished(shared::ui::GripPoint *, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to);
     void onChartCifRectChanged();
 
 private:
@@ -93,7 +94,7 @@ private:
     bool m_guard = false;
 
     static QPointF m_margin;
-    void updateCifIfNecessary(utils::CifUpdatePolicy cause);
+    void updateCifIfNecessary(shared::CifUpdatePolicy cause);
 };
 
 } // ns msc

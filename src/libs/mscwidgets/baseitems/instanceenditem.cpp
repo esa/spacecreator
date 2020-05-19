@@ -114,7 +114,7 @@ qreal InstanceEndItem::stopSymbolHeight()
     static constexpr int stopSymbolHeightCIF { 50 };
     static qreal stopSymbolHeightScene { 0. };
     if (qFuzzyIsNull(stopSymbolHeightScene)) {
-        stopSymbolHeightScene = utils::CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
+        stopSymbolHeightScene = shared::CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
     }
 
     return stopSymbolHeightScene;
@@ -125,7 +125,7 @@ qreal InstanceEndItem::endSymbolHeight()
     static constexpr int endSymbolHeightCIF { 25 };
     static qreal endSymbolHeightScene { 0. };
     if (qFuzzyIsNull(endSymbolHeightScene)) {
-        endSymbolHeightScene = utils::CoordinatesConverter::heightInScene(endSymbolHeightCIF);
+        endSymbolHeightScene = shared::CoordinatesConverter::heightInScene(endSymbolHeightCIF);
     }
 
     return endSymbolHeightScene;

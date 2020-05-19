@@ -24,7 +24,7 @@
 #include <QtGlobal>
 
 namespace msc {
-namespace utils {
+namespace shared {
 
 /*!
   \namespace msc::utils

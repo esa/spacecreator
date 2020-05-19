@@ -74,9 +74,9 @@ void tst_ArrowItem::initTestCase()
 
 void tst_ArrowItem::cleanupTestCase()
 {
-    if (utils::removeSceneItem(m_item2))
+    if (msc::shared::removeSceneItem(m_item2))
         delete m_item2;
-    if (utils::removeSceneItem(m_item1))
+    if (msc::shared::removeSceneItem(m_item1))
         delete m_item1;
 }
 
@@ -125,13 +125,13 @@ void tst_ArrowItem::testBoundingRect()
     const QLineF itemCenters(rect1.center(), rect2.center());
 
     ai.makeArrow(m_item1, rect1.center(), m_item2, rect2.center());
-    ai.setPos(utils::lineCenter(itemCenters));
+    ai.setPos(msc::shared::lineCenter(itemCenters));
 
     const QRectF &aiBounds(ai.sceneBoundingRect());
     QCOMPARE(aiBounds.width(), itemCenters.length());
     QVERIFY(!qFuzzyIsNull(aiBounds.height()));
-    QCOMPARE(utils::lineCenter(QLineF(aiBounds.topLeft(), aiBounds.bottomLeft())), itemCenters.p1());
-    QCOMPARE(utils::lineCenter(QLineF(aiBounds.topRight(), aiBounds.bottomRight())), itemCenters.p2());
+    QCOMPARE(msc::shared::lineCenter(QLineF(aiBounds.topLeft(), aiBounds.bottomLeft())), itemCenters.p1());
+    QCOMPARE(msc::shared::lineCenter(QLineF(aiBounds.topRight(), aiBounds.bottomRight())), itemCenters.p2());
 }
 
 void tst_ArrowItem::testUpdateStart()

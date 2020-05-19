@@ -116,7 +116,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();
-    void onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item);
+    void onInstanceEventItemMoved(::shared::ui::InteractiveObjectBase *item);
     void onMessageRetargeted(msc::MessageItem *item, const QPointF &pos, msc::MscMessage::EndType endType);
     void onInstanceCreatorChanged(msc::MscInstance *newCreator);
 

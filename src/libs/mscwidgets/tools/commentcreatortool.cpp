@@ -86,7 +86,7 @@ void CommentCreatorTool::commitPreviewItem()
             itemSceneRect.setBottom(contentRect.bottom());
 
         QRect newRect;
-        if (utils::CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
+        if (shared::CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
                     { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()), m_model->currentChart()->cifRect(),

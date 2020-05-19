@@ -12,7 +12,7 @@
 namespace msc {
 
 MSCPlugin::MSCPlugin(QObject *parent)
-    : shared::Plugin(parent)
+    : ::shared::Plugin(parent)
     , m_graphicsView(new GraphicsView)
     , m_mscToolBar(new QToolBar(tr("MSC")))
     , m_hierarchyToolBar(new QToolBar(tr("Hierarchy")))
@@ -95,7 +95,7 @@ void MSCPlugin::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
     // Do nothing
 }
 
-void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
+void MSCPlugin::populateCommandLineArguments(::shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);

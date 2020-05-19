@@ -297,8 +297,8 @@ void MessageItem::updateGripPoints()
         const QPointF &start(m_arrowItem->arrow()->anchorPointSource());
         const QPointF &end(m_arrowItem->arrow()->anchorPointTarget());
 
-        gph->setGripPointPos(shared::ui::GripPoint::Left, start);
-        gph->setGripPointPos(shared::ui::GripPoint::Right, end);
+        gph->setGripPointPos(::shared::ui::GripPoint::Left, start);
+        gph->setGripPointPos(::shared::ui::GripPoint::Right, end);
     }
 }
 
@@ -394,7 +394,7 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, Insta
 
 InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
 {
-    const QVector<InstanceItem *> &others = utils::instanceItemsByPos(scene(), hoverPoint);
+    const QVector<InstanceItem *> &others = shared::instanceItemsByPos(scene(), hoverPoint);
     return others.isEmpty() ? nullptr : others.first();
 }
 
@@ -480,9 +480,9 @@ void MessageItem::setAutoResizable(bool resizable)
     m_autoResize = resizable;
 }
 
-void MessageItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() != shared::ui::GripPoint::Location::Center || from == to || isCreator())
+    if (gp->location() != ::shared::ui::GripPoint::Location::Center || from == to || isCreator())
         return;
 
     const qreal shift = QPointF(to - from).y();
@@ -507,7 +507,7 @@ void MessageItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     updateSourceAndTarget(QPointF(0, shift));
 }
 
-void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (from == to)
         return;
@@ -520,7 +520,7 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     if (m_originalMessagePoints.isEmpty())
         m_originalMessagePoints = currentPoints;
 
-    const bool isSource = gp->location() == shared::ui::GripPoint::Left;
+    const bool isSource = gp->location() == ::shared::ui::GripPoint::Left;
     auto validatePoint = [&](const QPointF &requestedPoint, int pointId) {
         QPointF point(requestedPoint);
         const QPointF &oppositePoint = currentPoints.at(pointId == 0 ? currentPoints.size() - 1 : 0);
@@ -548,14 +548,14 @@ void MessageItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
         updateTarget(validated, ObjectAnchor::Snap::SnapTo);
 }
 
-void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void MessageItem::onManualGeometryChangeFinished(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     Q_UNUSED(to);
 
     if (m_sourceInstance == m_targetInstance) {
         GeometryNotificationBlocker keepSilent(this);
         m_originalMessagePoints.clear();
-        const bool isSource = gp->location() == shared::ui::GripPoint::Left;
+        const bool isSource = gp->location() == ::shared::ui::GripPoint::Left;
         if (isSource)
             updateSource(from, ObjectAnchor::Snap::SnapTo);
         else
@@ -568,7 +568,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     onChartBoxChanged();
 
     bool converted(false);
-    const QVector<QPoint> &oldPointsCif = utils::CoordinatesConverter::sceneToCif(m_originalMessagePoints, &converted);
+    const QVector<QPoint> &oldPointsCif = shared::CoordinatesConverter::sceneToCif(m_originalMessagePoints, &converted);
     if (m_originalMessagePoints.size() && !converted) {
         m_originalMessagePoints.clear();
         qWarning() << "MessageItem move: scene->mm original coordinates conversion failed";
@@ -576,7 +576,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     }
 
     const QVector<QPointF> &currPoints = messagePoints();
-    const QVector<QPoint> &newPointsCif = utils::CoordinatesConverter::sceneToCif(currPoints, &converted);
+    const QVector<QPoint> &newPointsCif = shared::CoordinatesConverter::sceneToCif(currPoints, &converted);
     if (!converted) {
         qWarning() << "MessageItem move: scene->mm target coordinates conversion failed";
         return;
@@ -682,12 +682,12 @@ void MessageItem::initGripPoints()
     InteractiveObjectBase::initGripPoints();
 
     if (isCreator())
-        gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations());
+        gripPointsHandler()->setUsedPoints(::shared::ui::GripPoint::Locations());
     else
-        gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Left,
-                shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::Center });
+        gripPointsHandler()->setUsedPoints({ ::shared::ui::GripPoint::Location::Left,
+                ::shared::ui::GripPoint::Location::Right, ::shared::ui::GripPoint::Location::Center });
 
-    connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
+    connect(gripPointsHandler(), &::shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &MessageItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 
     m_arrowItem->setZValue(gripPointsHandler()->zValue() - 1);
@@ -768,7 +768,7 @@ void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
     Q_ASSERT(!scenePoints.isEmpty());
 
     GeometryNotificationBlocker keepSilent(this);
-    setPos(utils::lineCenter({ scenePoints.first(), scenePoints.last() }));
+    setPos(shared::lineCenter({ scenePoints.first(), scenePoints.last() }));
     m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
     updateGripPoints();
@@ -781,7 +781,7 @@ void MessageItem::applyCif()
     if (const cif::CifBlockShared &cifBlock = mainCifBlock()) {
         const QVector<QPoint> &pointsCif = cifBlock->payload(mainCifType()).value<QVector<QPoint>>();
         bool converted(false);
-        const QVector<QPointF> &pointsScene = utils::CoordinatesConverter::cifToScene(pointsCif, &converted);
+        const QVector<QPointF> &pointsScene = shared::CoordinatesConverter::cifToScene(pointsCif, &converted);
         setMessagePoints(pointsScene);
     }
 }
@@ -825,7 +825,7 @@ void MessageItem::updateCif()
     using namespace cif;
 
     const cif::CifLine::CifType usedCifType = mainCifType();
-    const QVector<QPoint> &pointsCif = utils::CoordinatesConverter::sceneToCif(messagePoints());
+    const QVector<QPoint> &pointsCif = shared::CoordinatesConverter::sceneToCif(messagePoints());
     if (!geometryManagedByCif()) {
         const CifBlockShared &emptyCif =
                 isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
@@ -872,7 +872,7 @@ void MessageItem::onChartBoxChanged()
 
 QRectF MessageItem::getChartBox() const
 {
-    if (ChartItem *chartItem = utils::CoordinatesConverter::currentChartItem())
+    if (ChartItem *chartItem = shared::CoordinatesConverter::currentChartItem())
         return chartItem->contentRect();
     if (QGraphicsScene *scene = this->scene())
         return scene->sceneRect();

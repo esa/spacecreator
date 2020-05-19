@@ -186,12 +186,12 @@ void CommentItem::initGripPoints()
 {
     InteractiveObjectBase::initGripPoints();
     gripPointsHandler()->setUsedPoints(isGlobal()
-                    ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top,
-                            shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
-                            shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
-                            shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
-                            shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
-                    : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
+                    ? ::shared::ui::GripPoint::Locations { ::shared::ui::GripPoint::Location::Top,
+                            ::shared::ui::GripPoint::Location::Left, ::shared::ui::GripPoint::Location::Bottom,
+                            ::shared::ui::GripPoint::Location::Right, ::shared::ui::GripPoint::Location::TopLeft,
+                            ::shared::ui::GripPoint::Location::BottomLeft, ::shared::ui::GripPoint::Location::TopRight,
+                            ::shared::ui::GripPoint::Location::BottomRight, ::shared::ui::GripPoint::Location::Center }
+                    : ::shared::ui::GripPoint::Locations { ::shared::ui::GripPoint::Location::Center });
 }
 
 cif::CifLine::CifType CommentItem::mainCifType() const
@@ -279,7 +279,7 @@ void CommentItem::applyCif()
         return;
 
     QRectF rect;
-    if (!utils::CoordinatesConverter::cifToScene(storedCifRect, rect))
+    if (!shared::CoordinatesConverter::cifToScene(storedCifRect, rect))
         qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << storedCifRect;
 
     if (!rect.isNull() && rect != m_textItem->sceneBoundingRect()) {
@@ -298,7 +298,7 @@ void CommentItem::updateCif()
     const QRectF textItemRect = m_textItem->sceneBoundingRect();
 
     QRect cifRect;
-    if (!utils::CoordinatesConverter::sceneToCif(textItemRect, cifRect))
+    if (!shared::CoordinatesConverter::sceneToCif(textItemRect, cifRect))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << cifRect;
     else if (storedCifRect == textItemRect)
         return;
@@ -312,12 +312,12 @@ void CommentItem::setGlobalPreview(bool isGlobalPreview)
     update();
 }
 
-void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    if (gp->location() != shared::ui::GripPoint::Location::Center)
+    if (gp->location() != ::shared::ui::GripPoint::Location::Center)
         return;
 
-    const QRectF contentRect = utils::CoordinatesConverter::currentChartItem()->contentRect();
+    const QRectF contentRect = shared::CoordinatesConverter::currentChartItem()->contentRect();
     QPointF newPos = pos() + (to - from);
     if (newPos.x() < contentRect.left())
         newPos.setX(contentRect.left());
@@ -331,14 +331,14 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRect oldRect;
     if (geometryManagedByCif()) {
         oldRect = commentEntity()->rect();
-    } else if (!utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
+    } else if (!shared::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << oldRect;
         return;
     }
 
     QRectF rect { newPos, boundingRect().size() };
     QRect newRect;
-    if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
+    if (shared::CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
                 { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
                         QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
@@ -354,33 +354,33 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     Q_EMIT needUpdateLayout();
 }
 
-void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void CommentItem::onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     const QPoint shift = QPointF(to - from).toPoint();
     QRect rect = m_textItem->sceneBoundingRect().toRect();
     switch (gp->location()) {
-    case shared::ui::GripPoint::Left:
+    case ::shared::ui::GripPoint::Left:
         rect.setLeft(rect.left() + shift.x());
         break;
-    case shared::ui::GripPoint::Top:
+    case ::shared::ui::GripPoint::Top:
         rect.setTop(rect.top() + shift.y());
         break;
-    case shared::ui::GripPoint::Right:
+    case ::shared::ui::GripPoint::Right:
         rect.setRight(rect.right() + shift.x());
         break;
-    case shared::ui::GripPoint::Bottom:
+    case ::shared::ui::GripPoint::Bottom:
         rect.setBottom(rect.bottom() + shift.y());
         break;
-    case shared::ui::GripPoint::TopLeft:
+    case ::shared::ui::GripPoint::TopLeft:
         rect.setTopLeft(rect.topLeft() + shift);
         break;
-    case shared::ui::GripPoint::TopRight:
+    case ::shared::ui::GripPoint::TopRight:
         rect.setTopRight(rect.topRight() + shift);
         break;
-    case shared::ui::GripPoint::BottomLeft:
+    case ::shared::ui::GripPoint::BottomLeft:
         rect.setBottomLeft(rect.bottomLeft() + shift);
         break;
-    case shared::ui::GripPoint::BottomRight:
+    case ::shared::ui::GripPoint::BottomRight:
         rect.setBottomRight(rect.bottomRight() + shift);
         break;
     default:
@@ -391,13 +391,13 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     QRect oldRect;
     if (geometryManagedByCif()) {
         oldRect = commentEntity()->rect();
-    } else if (!utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
+    } else if (!shared::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), oldRect)) {
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << oldRect;
         return;
     }
 
     QRect newRect;
-    if (utils::CoordinatesConverter::sceneToCif(rect, newRect)) {
+    if (shared::CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
                 { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
                         QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
@@ -420,7 +420,7 @@ void CommentItem::textEdited(const QString &text)
     const QRect oldRect = commentEntity() ? commentEntity()->rect() : QRect();
     const QString oldText = commentEntity() ? commentEntity()->text() : QString();
     QRect newRect;
-    if (utils::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
+    if (shared::CoordinatesConverter::sceneToCif(m_textItem->sceneBoundingRect(), newRect)) {
         if (oldRect != newRect || oldText != text) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
             msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,

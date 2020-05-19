@@ -38,7 +38,7 @@ namespace msc {
 
 QPainterPath ObjectsLinkItem::hoverableLine(const QLineF &line, const qreal lineWidth)
 {
-    return utils::lineShape(line, lineWidth);
+    return shared::lineShape(line, lineWidth);
 }
 
 ObjectsLinkItem::ObjectsLinkItem(QGraphicsItem *parent)

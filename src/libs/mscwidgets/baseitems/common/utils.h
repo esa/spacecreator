@@ -28,7 +28,7 @@ namespace msc {
 
 class InstanceItem;
 
-namespace utils {
+namespace shared {
 
 static constexpr qreal LineHoverTolerance = 10.;
 static constexpr qreal LineHorizontalityTolerance = 15.;
@@ -74,7 +74,7 @@ template<typename ItemType, typename MscEntityType>
 ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
 {
     if (event)
-        for (ItemType *item : utils::toplevelItems<ItemType>(scene))
+        for (ItemType *item : shared::toplevelItems<ItemType>(scene))
             if (item && item->modelEntity() && item->modelEntity()->internalId() == event->internalId())
                 return item;
 

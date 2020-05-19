@@ -87,7 +87,7 @@ DynamicPropertyConfig::DynamicPropertyConfig()
 QString DynamicPropertyConfig::defaultConfigPath()
 {
     const QString &path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    utils::ensureDirExists(path);
+    shared::ensureDirExists(path);
     return path + "/aadl_properties.json";
 }
 
@@ -124,7 +124,7 @@ QString ensureFileExists()
             storedFilePath = DynamicPropertyConfig::defaultConfigPath();
 
         const QString rscFilePath(":/defaults/tab_interface/properties/resources/aadl_properties.json");
-        if (!utils::copyResourceFile(rscFilePath, storedFilePath)) {
+        if (!shared::copyResourceFile(rscFilePath, storedFilePath)) {
             qWarning() << "Can't create default ASN datatypes file" << storedFilePath;
             return QString();
         }

@@ -194,7 +194,6 @@ target_link_libraries(${LIB_NAME}
     aadl
     shared
     templating
-    utils
     Qt5::Concurrent
     Qt5::Network
     Qt5::Svg

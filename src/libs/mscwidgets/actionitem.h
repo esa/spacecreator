@@ -47,8 +47,8 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
+    void onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
 
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;

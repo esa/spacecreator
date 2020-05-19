@@ -703,14 +703,14 @@ void MainWindow::initConnections()
  * \param value
  * \return
  */
-bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value)
+bool MainWindow::processCommandLineArg(::shared::CommandLineParser::Positional arg, const QString &value)
 {
     switch (arg) {
-    case shared::CommandLineParser::Positional::OpenFileMsc:
+    case ::shared::CommandLineParser::Positional::OpenFileMsc:
         return openFileMsc(value);
-    case shared::CommandLineParser::Positional::DbgOpenMscExamplesChain:
+    case ::shared::CommandLineParser::Positional::DbgOpenMscExamplesChain:
         return openMscChain(value);
-    case shared::CommandLineParser::Positional::StartRemoteControl:
+    case ::shared::CommandLineParser::Positional::StartRemoteControl:
         if (startRemoteControl(value.toUShort())) {
             menuBar()->setVisible(false);
 
@@ -727,7 +727,7 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
             return true;
         }
         break;
-    case shared::CommandLineParser::Positional::DropUnsavedChangesSilently:
+    case ::shared::CommandLineParser::Positional::DropUnsavedChangesSilently:
         d->m_dropUnsavedChangesSilently = true;
         return true;
     default:
@@ -1006,7 +1006,7 @@ void MainWindow::showMousePositioner()
         if (xOk && yOk) {
             QPointF scenePos(inputPos);
             if (isCif)
-                scenePos = msc::utils::CoordinatesConverter::cifToScene(scenePos.toPoint());
+                scenePos = msc::shared::CoordinatesConverter::cifToScene(scenePos.toPoint());
 
             const QPoint &localPos = currentView()->mapFromScene(scenePos);
             const QPoint &globalPos = currentView()->mapToGlobal(localPos);

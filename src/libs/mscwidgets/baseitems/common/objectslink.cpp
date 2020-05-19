@@ -51,7 +51,7 @@ ObjectAnchor *ObjectsLink::target() const
 
 QPointF ObjectsLink::linkCenter() const
 {
-    return utils::lineCenter({ m_anchorStart->point(), m_anchorEnd->point() });
+    return shared::lineCenter({ m_anchorStart->point(), m_anchorEnd->point() });
 }
 
 QPointF ObjectsLink::makeLink(InteractiveObject *source, const QPointF &sourceAnchorPoint, InteractiveObject *target,
