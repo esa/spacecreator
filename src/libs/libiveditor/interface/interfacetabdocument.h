@@ -52,7 +52,6 @@ public:
     explicit InterfaceTabDocument(QObject *parent = nullptr);
     ~InterfaceTabDocument() override;
 
-    QString title() const override;
     QMenu *customMenu() const override;
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;

@@ -17,6 +17,7 @@
 
 #include "abstracttabdocument.h"
 
+#include <QFileInfo>
 #include <QGraphicsScene>
 #include <QPointer>
 #include <QToolBar>
@@ -31,11 +32,10 @@ editing and displaying (AADL-graphics, AADL-text, same for the MSC, etc).
 It designed to be used in the multi-document editor, providing methods to handle
 data loading, saving and closing, document's dirtyness and operations stack management.
 It's the place to create and store related instances of QGraphicsScene and QGraphicasView.
-An descendant instances should be created via TabDocumentFactory.
 Currently it's used only to work with AADL (graphical) data, the other formats integration
 may need some API changes/polishing.
 
-\sa taste3::document::TabDocumentFactory, taste3::document::DocumentsManager, taste3::document::InterfaceTabDocument
+\sa taste3::document::InterfaceTabDocument
 */
 
 struct AbstractTabDocument::AbstractTabDocumentPrivate {
@@ -128,7 +128,7 @@ bool AbstractTabDocument::load(const QString &path)
     const bool loaded = loadImpl(path);
 
     if (loaded) {
-        d->m_filePath = path;
+        setPath(path);
         d->m_commandsStack->clear();
         resetDirtyness();
         Q_EMIT dirtyChanged(false);
@@ -142,7 +142,7 @@ bool AbstractTabDocument::save(const QString &path)
     const bool saved = saveImpl(path);
 
     if (saved) {
-        d->m_filePath = path;
+        setPath(path);
         resetDirtyness();
     }
 
@@ -152,7 +152,7 @@ bool AbstractTabDocument::save(const QString &path)
 void AbstractTabDocument::close()
 {
     closeImpl();
-    d->m_filePath.clear();
+    setPath(QString());
     resetDirtyness();
     Q_EMIT dirtyChanged(false);
 }
@@ -190,7 +190,11 @@ void AbstractTabDocument::updateDirtyness()
 
 QString AbstractTabDocument::title() const
 {
-    return tr("Untitled");
+    const QString fileName = QFileInfo(path()).fileName();
+    if (fileName.isEmpty()) {
+        return tr("Untitled");
+    }
+    return fileName;
 }
 
 QMenu *AbstractTabDocument::customMenu() const
@@ -203,12 +207,20 @@ void AbstractTabDocument::onSavedExternally(const QString &filePath, bool saved)
     if (saved) {
         const bool forceTitleUpdate = d->m_filePath != filePath && !isDirty();
 
-        d->m_filePath = filePath;
+        setPath(filePath);
 
         if (forceTitleUpdate)
             Q_EMIT dirtyChanged(false);
         else
             resetDirtyness();
+    }
+}
+
+void AbstractTabDocument::setPath(const QString &path)
+{
+    if (path != d->m_filePath) {
+        d->m_filePath = path;
+        Q_EMIT titleChanged();
     }
 }
 

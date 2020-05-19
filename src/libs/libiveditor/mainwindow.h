@@ -18,23 +18,15 @@
 #pragma once
 
 #include "commandlineparser.h"
-#include "document/abstracttabdocument.h"
 
 #include <QMainWindow>
-#include <QPointer>
-#include <QToolBar>
-
-class QMenu;
-class QAction;
-class QTabWidget;
-class QUndoGroup;
 
 namespace Ui {
 class MainWindow;
 }
 
 namespace document {
-class DocumentsManager;
+class InterfaceTabDocument;
 }
 
 namespace aadlinterface {
@@ -55,13 +47,9 @@ public:
 
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
 
-    QList<QMenu *> tabViewMenus();
-
 protected:
     void closeEvent(QCloseEvent *e) override;
 
-    void initConnections();
-    void initTabs();
     void initSettings();
 
     void updateActions();
@@ -70,40 +58,27 @@ protected:
 public Q_SLOTS:
     void onOpenFileRequested();
     void onCreateFileRequested();
-    bool onCloseFileRequested();
     void onSaveRenderRequested();
-    bool onExportXml();
-    bool onExportAs();
+    bool exportXml(const QString &savePath = QString(), const QString &templatePath = QString());
+    bool exportXmlAs(const QString &savePath = QString(), const QString &templatePath = QString());
     void onQuitRequested();
     void onAboutRequested();
-    void onTabSwitched(int);
     void onReportRequested();
     void onDocDirtyChanged(bool dirty);
     void onGraphicsViewInfo(const QString &info);
+    void updateWindowTitle();
 
 private:
-    static constexpr int TABDOC_ID_InterfaceView { 0 };
+    bool closeFile();
+    bool prepareQuit();
 
     Ui::MainWindow *ui { nullptr };
-    QTabWidget *m_tabWidget { nullptr };
     ZoomController *m_zoomCtrl { nullptr };
-    document::DocumentsManager *m_docsManager { nullptr };
+    document::InterfaceTabDocument *m_document { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
 
     aadlinterface::IVEditorPlugin *m_plugin;
-
-    document::AbstractTabDocument *currentDoc() const;
-    bool closeTab(int id);
-    bool prepareQuit();
-
-    bool exportCurrentDocAsXml(const QString &savePath = QString(), const QString &templatePath = QString());
-    bool exportDocsAs(const QString &savePath = QString(), const QString &templatePath = QString());
-
-    bool exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
-            const QString &templateToUse = QString());
-    bool exportDocInteractive(document::AbstractTabDocument *doc, const QString &pathToSave = QString(),
-            const QString &templateToUse = QString());
 };
 
 }

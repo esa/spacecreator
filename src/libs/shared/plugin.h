@@ -44,7 +44,6 @@ public:
     QAction *actionOpenFile();
     QAction *actionSaveFile();
     QAction *actionSaveFileAs();
-    QAction *actionCloseFile();
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();

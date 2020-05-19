@@ -62,6 +62,7 @@ public:
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
+    void titleChanged();
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
@@ -84,6 +85,8 @@ protected:
     virtual QGraphicsScene *createScene() = 0;
 
 private:
+    void setPath(const QString &path);
+
     struct AbstractTabDocumentPrivate;
     std::unique_ptr<AbstractTabDocumentPrivate> const d;
 };

@@ -133,7 +133,7 @@ static inline void dumpItem(QObject *obj, bool strict = false)
 \class taste3::document::InterfaceTabDocument
 \brief taste3::document::InterfaceTabDocument is the document for graphical AADL data (loaded from the XML).
 
-\sa taste3::document::AbstractTabDocument, taste3::document::TabDocumentFactory, taste3::document::DocumentsManager
+\sa taste3::document::AbstractTabDocument
 */
 
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
@@ -197,14 +197,6 @@ QGraphicsScene *InterfaceTabDocument::createScene()
         });
     }
     return m_graphicsScene;
-}
-
-QString InterfaceTabDocument::title() const
-{
-    const QString fileName = QFileInfo(path()).fileName();
-    return tr("Interface [%1%2]")
-            .arg(fileName.isEmpty() ? AbstractTabDocument::title() : fileName,
-                    isDirty() ? QLatin1String("*") : QLatin1String(""));
 }
 
 QMenu *InterfaceTabDocument::customMenu() const

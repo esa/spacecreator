@@ -22,17 +22,10 @@
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
-#include "document/aadltabdocument.h"
-#include "document/concurrencytabdocument.h"
-#include "document/datatabdocument.h"
-#include "document/deploymenttabdocument.h"
-#include "document/documentsmanager.h"
-#include "document/msctabdocument.h"
 #include "interface/interfacetabdocument.h"
 #include "iveditorplugin.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
-#include "tabdocumentfactory.h"
 #include "ui_mainwindow.h"
 #include "xmldocexporter.h"
 #include "zoomcontroller.h"
@@ -56,44 +49,70 @@ namespace taste3 {
 \brief Main appllication window - the place to store and manage supported document types, import/export data,
 process command line arguments and user actions.
 
-\sa taste3::document::AbstractTabDocument, taste3::document::DocumentsManager, taste3::CommandLineParser
+\sa taste3::document::AbstractTabDocument, taste3::CommandLineParser
 */
 
 MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , m_tabWidget(new QTabWidget(this))
     , m_zoomCtrl(new ZoomController())
-    , m_docsManager(new document::DocumentsManager(m_tabWidget, this))
+    , m_document(new document::InterfaceTabDocument(this))
     , m_plugin(plugin)
 {
     ui->setupUi(this);
+
+    m_document->init();
+    setCentralWidget(m_document->view());
+
     statusBar()->addPermanentWidget(m_zoomCtrl);
-    setCentralWidget(m_tabWidget);
     m_plugin->addToolBars(this);
 
     // Connect the actions
     connect(m_plugin->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);
     connect(m_plugin->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
-    connect(m_plugin->actionSaveFile(), &QAction::triggered, this, &MainWindow::onExportXml);
-    connect(m_plugin->actionCloseFile(), &QAction::triggered, this, &MainWindow::onCloseFileRequested);
+    connect(m_plugin->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
+    connect(m_plugin->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 
     // Register the actions to the action manager
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionOpenFile(), "Open file", "Show Open File dialog");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionCloseFile(), "Close file", "Close current file");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionQuit(), "Quit", "Quite the application");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
     ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
-    initTabs();
+    connect(m_document, &document::AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
     m_plugin->initMenus(this);
 
-    initConnections();
+    QUndoStack *currentStack { nullptr };
+    if (document::AbstractTabDocument *doc = m_document) {
+        doc->fillToolBar(m_plugin->docToolBar());
+        currentStack = doc->commandsStack();
+        if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
+            m_zoomCtrl->setView(view);
+            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
+                    Qt::UniqueConnection);
+        }
+    }
+
+    if (currentStack) {
+        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
+            m_plugin->undoGroup()->addStack(currentStack);
+        }
+        m_plugin->undoGroup()->setActiveStack(currentStack);
+    } else {
+        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
+    }
+
+    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
+
+    updateActions();
 
     initSettings();
+
+    updateWindowTitle();
+    connect(m_document, &document::InterfaceTabDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 }
 
 /*!
@@ -117,24 +136,15 @@ void MainWindow::closeEvent(QCloseEvent *e)
 }
 
 /*!
- * \brief  The entry point to setup common connections.
- */
-void MainWindow::initConnections()
-{
-    connect(m_docsManager, &document::DocumentsManager::currentDocIdChanged, this, &MainWindow::onTabSwitched);
-}
-
-/*!
  * \brief Handler for File->open action.
  */
 void MainWindow::onOpenFileRequested()
 {
-    if (document::AbstractTabDocument *doc = currentDoc()) {
-        const QString prevPath(doc->path());
-        const QString &fileName =
-                QFileDialog::getOpenFileName(this, tr("Open file"), prevPath, doc->supportedFileExtensions());
-        if (!fileName.isEmpty() && onCloseFileRequested())
-            doc->load(fileName);
+    const QString prevPath(m_document->path());
+    const QString &fileName =
+            QFileDialog::getOpenFileName(this, tr("Open file"), prevPath, m_document->supportedFileExtensions());
+    if (!fileName.isEmpty() && closeFile()) {
+        m_document->load(fileName);
     }
 }
 
@@ -143,54 +153,9 @@ void MainWindow::onOpenFileRequested()
  */
 void MainWindow::onCreateFileRequested()
 {
-    onCloseFileRequested();
-    if (document::AbstractTabDocument *doc = currentDoc())
-        doc->create();
-}
-
-/*!
- * \brief Helper function to handle requests for closing current file.
- * Calls the bool MainWindow::closeTab(int id) with current doc id.
- * \sa bool MainWindow::closeTab(int id)
- * Returns \c true if document is closed.
- */
-bool MainWindow::onCloseFileRequested()
-{
-    if (document::AbstractTabDocument *doc = currentDoc())
-        return closeTab(m_docsManager->docId(doc));
-
-    return true;
-}
-
-/*!
- * \brief \a id - the id of the to be closed doc.
- *
- * Performs check for unsaved changes, asking the user to save, if necessary.
- * Returns true if the file is closed.
- */
-bool MainWindow::closeTab(int id)
-{
-    if (document::AbstractTabDocument *doc = m_docsManager->docById(id)) {
-        if (doc->isDirty() && !m_dropUnsavedChangesSilently) {
-            const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
-            auto btn = QMessageBox::question(this, tr("Document closing"),
-                    tr("There are unsaved changes.\nWould you like to save the document?"), btns);
-            if (btn == QMessageBox::Save) {
-                if (app::XmlDocExporter::canExportXml(doc)) {
-                    if (!exportDocAsXml(doc))
-                        return false;
-                } else {
-                    qWarning() << "Not implemented yet";
-                }
-            } else if (btn == QMessageBox::Cancel) {
-                return false;
-            }
-        }
-
-        doc->close();
+    if (closeFile()) {
+        m_document->create();
     }
-
-    return true;
 }
 
 /*!
@@ -225,44 +190,24 @@ void MainWindow::onSaveRenderRequested()
     }
 }
 
-/**
- * \brief Slot to open Template Editor dialog
+/*!
+ * \brief Exports the document document to the output file \a savePath using the template file \a templatePath.
+ * Returns \c true on succes.
  */
-bool MainWindow::onExportAs()
+bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return exportDocsAs();
-}
-
-/**
- * \brief slot to export the current document to XML
- * with current/default values (the template and result file names)
- */
-bool MainWindow::onExportXml()
-{
-    return exportCurrentDocAsXml();
+    return app::XmlDocExporter::exportDocSilently(m_document, savePath, templatePath);
 }
 
 /*!
- * \brief Helper function to save the carrent doc.
- * Passes parameters to
- * \sa bool MainWindow::exportDocAsXml(document::AbstractTabDocument *doc, const QString &pathToSave, const QString
- * &templateToUse) and returns its result.
+ * \brief Shows the preview dialog for exportin the document to the output file \a savePath
+ * using the template file \a templatePath.
+ * If a \a savePath or \a templatePath is empty, user will be asked to select the file via QFileDialog.
+ * Returns true if the preview dialog can not be shown.
  */
-bool MainWindow::exportCurrentDocAsXml(const QString &savePath, const QString &templatePath)
+bool MainWindow::exportXmlAs(const QString &savePath, const QString &templatePath)
 {
-    return exportDocAsXml(currentDoc(), savePath, templatePath);
-}
-
-/*!
- * \brief Helper function to save all the documents to the \a savePath using the same template file \a templatePath
- * The first failed export breaks the exporting loop and returns \c false
- */
-bool MainWindow::exportDocsAs(const QString &savePath, const QString &templatePath)
-{
-    for (int i = 0; i < m_tabWidget->count(); ++i)
-        if (!exportDocInteractive(m_docsManager->docById(i), savePath, templatePath))
-            return false;
-    return true;
+    return app::XmlDocExporter::exportDocInteractive(m_document, this, savePath, templatePath);
 }
 
 void MainWindow::onQuitRequested()
@@ -282,43 +227,13 @@ void MainWindow::onAboutRequested()
     QMessageBox::information(this, tr("About"), info);
 }
 
-void MainWindow::onTabSwitched(int tab)
-{
-    QUndoStack *currentStack { nullptr };
-    if (document::AbstractTabDocument *doc = m_docsManager->docById(tab)) {
-        doc->fillToolBar(m_plugin->docToolBar());
-        currentStack = doc->commandsStack();
-        if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
-            m_zoomCtrl->setView(view);
-            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
-                    Qt::UniqueConnection);
-        }
-    }
-
-    if (currentStack) {
-        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
-            m_plugin->undoGroup()->addStack(currentStack);
-        }
-        m_plugin->undoGroup()->setActiveStack(currentStack);
-    } else {
-        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
-    }
-
-    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
-
-    updateActions();
-}
-
 void MainWindow::onReportRequested()
 {
     QList<QPixmap> images;
-    for (int idx = 0; idx < m_docsManager->docCount(); ++idx) {
-        if (document::AbstractTabDocument *doc = m_docsManager->docById(idx)) {
-            if (QGraphicsScene *scene = doc->scene()) {
-                const QSize sceneSize = scene->sceneRect().size().toSize();
-                if (sceneSize.isNull())
-                    continue;
-
+    if (document::AbstractTabDocument *doc = m_document) {
+        if (QGraphicsScene *scene = doc->scene()) {
+            const QSize sceneSize = scene->sceneRect().size().toSize();
+            if (!sceneSize.isNull()) {
                 QPixmap pix(sceneSize);
                 pix.fill(Qt::transparent);
 
@@ -337,39 +252,20 @@ void MainWindow::onReportRequested()
     dialog->exec();
 }
 
-void MainWindow::initTabs()
-{
-    using namespace document;
-
-    //    m_docsManager->addDocument(TabDocumentFactory::createDataTabDocument(this));
-    m_docsManager->addDocument(TabDocumentFactory::createInterfaceTabDocument(this));
-    //    m_docsManager->addDocument(TabDocumentFactory::createDeploymentTabDocument(this));
-    //    m_docsManager->addDocument(TabDocumentFactory::createConcurrencyTabDocument(this));
-    //    m_docsManager->addDocument(TabDocumentFactory::createAADLTabDocument(this));
-    //    m_docsManager->addDocument(TabDocumentFactory::createMSCTabDocument(this));
-
-    for (auto doc : m_docsManager->documents()) {
-        connect(doc, &AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
-    }
-}
-
 void MainWindow::initSettings()
 {
     restoreGeometry(aadlinterface::AppOptions::MainWindow.Geometry.read().toByteArray());
     restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
-    onTabSwitched(aadlinterface::AppOptions::MainWindow.LastTab.read().toInt());
 }
 
 void MainWindow::updateActions()
 {
     bool renderAvailable(false);
-    if (document::AbstractTabDocument *doc = currentDoc()) {
-        if (QGraphicsScene *scene = doc->scene()) {
-            renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
-        }
-
-        m_plugin->actionSaveFile()->setEnabled(doc->isDirty() && app::XmlDocExporter::canExportXml(doc));
+    if (QGraphicsScene *scene = m_document->scene()) {
+        renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
     }
+
+    m_plugin->actionSaveFile()->setEnabled(m_document->isDirty());
     m_plugin->actionSaveSceneRender()->setEnabled(renderAvailable);
 }
 
@@ -387,22 +283,21 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return true;
     }
     case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
-        if (!value.isEmpty())
-            if (document::AbstractTabDocument *doc = m_docsManager->docById(TABDOC_ID_InterfaceView))
-                if (doc->load(value)) {
-                    m_tabWidget->setCurrentIndex(TABDOC_ID_InterfaceView);
-                    return true;
-                }
+        if (!value.isEmpty()) {
+            if (document::AbstractTabDocument *doc = m_document) {
+                return doc->load(value);
+            }
+        };
 
         return false;
     }
     case shared::CommandLineParser::Positional::OpenStringTemplateFile:
         if (!value.isEmpty())
-            return exportDocsAs(QString(), value);
+            return exportXmlAs(QString(), value);
         return false;
     case shared::CommandLineParser::Positional::ExportToFile:
         if (!value.isEmpty())
-            return exportCurrentDocAsXml(value);
+            return exportXml(value);
         return false;
     case shared::CommandLineParser::Positional::ListScriptableActions: {
         ctx::ActionsManager::listRegisteredActions();
@@ -416,17 +311,6 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
     return false;
 }
 
-QList<QMenu *> MainWindow::tabViewMenus()
-{
-    QList<QMenu *> menus;
-    for (auto doc : m_docsManager->documents()) {
-        if (QMenu *menu = doc->customMenu()) {
-            menus << menu;
-        }
-    }
-    return menus;
-}
-
 /*!
  * \brief Renders the whole scene and saves it to the \a filePath
  */
@@ -435,36 +319,22 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (document::AbstractTabDocument *doc = currentDoc()) {
-        if (QGraphicsScene *scene = doc->scene()) {
-            QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
-            img.fill(Qt::transparent);
-            QPainter p(&img);
-            scene->render(&p);
-            img.save(filePath);
-        }
+    if (QGraphicsScene *scene = m_document->scene()) {
+        QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+        img.fill(Qt::transparent);
+        QPainter p(&img);
+        scene->render(&p);
+        img.save(filePath);
     }
-}
-
-/*!
- * \brief Helper method, returns pointer to the current document (the doc for currently active tab).
- */
-document::AbstractTabDocument *MainWindow::currentDoc() const
-{
-    return m_docsManager->currentDoc();
 }
 
 /*!
  * \brief Updates the title of a tab related to the updated doc.
  * (Adds or removes the "*" sign when doc is changed/saved).
  */
-void MainWindow::onDocDirtyChanged(bool /*dirty*/)
+void MainWindow::onDocDirtyChanged(bool dirty)
 {
-    if (document::AbstractTabDocument *caller = qobject_cast<document::AbstractTabDocument *>(sender())) {
-        int docId = m_docsManager->docId(caller);
-        if (m_docsManager->isValidDocId(docId))
-            m_tabWidget->setTabText(docId, caller->title());
-    }
+    setWindowModified(dirty);
     updateActions();
 }
 
@@ -476,49 +346,49 @@ void MainWindow::onGraphicsViewInfo(const QString &info)
     statusBar()->showMessage(info);
 }
 
+void MainWindow::updateWindowTitle()
+{
+    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_document->title()));
+}
+
+/*!
+ * Performs check for unsaved changes, asking the user to save, if necessary.
+ * Returns true if the file is closed.
+ */
+bool MainWindow::closeFile()
+{
+    if (m_document->isDirty() && !m_dropUnsavedChangesSilently) {
+        const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
+        auto btn = QMessageBox::question(this, tr("Document closing"),
+                tr("There are unsaved changes.\nWould you like to save the document?"), btns);
+        if (btn == QMessageBox::Save) {
+            if (!exportXml()) {
+                return false;
+            }
+        } else if (btn == QMessageBox::Cancel) {
+            return false;
+        }
+    }
+
+    m_document->close();
+
+    return true;
+}
+
 /*!
  * \brief Closes documents, attempting to save changes, if any.
  * If user declyne request to save cahnges, returns \c false.
  */
 bool MainWindow::prepareQuit()
 {
-    for (int i = 0; i < m_tabWidget->count(); ++i)
-        if (!closeTab(i))
-            return false;
+    if (!closeFile()) {
+        return false;
+    }
 
     aadlinterface::AppOptions::MainWindow.State.write(saveState());
     aadlinterface::AppOptions::MainWindow.Geometry.write(saveGeometry());
-    aadlinterface::AppOptions::MainWindow.LastTab.write(m_tabWidget->currentIndex());
 
     return true;
-}
-
-/*!
- * \brief Exports the document \a doc to the output file \a pathToSave using the template file \a templateToUse.
- * Returns \c true on succes.
- */
-bool MainWindow::exportDocAsXml(
-        document::AbstractTabDocument *doc, const QString &pathToSave, const QString &templateToUse)
-{
-    if (!doc)
-        return false;
-
-    return app::XmlDocExporter::exportDocSilently(doc, pathToSave, templateToUse);
-}
-
-/*!
- * \brief Shows the preview dialog for exportin the \a doc to the output file \a pathToSave
- * using the template file \a templateToUse.
- * If a \a pathToSave or \a templateToUse is empty, user will be asked to select the file via QFileDialog.
- * Returns true if the preview dialog can not be shown.
- */
-bool MainWindow::exportDocInteractive(
-        document::AbstractTabDocument *doc, const QString &pathToSave, const QString &templateToUse)
-{
-    if (!doc)
-        return false;
-
-    return app::XmlDocExporter::exportDocInteractive(doc, this, pathToSave, templateToUse);
 }
 
 }

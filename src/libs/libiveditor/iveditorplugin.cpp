@@ -54,12 +54,9 @@ void IVEditorPlugin::addMenuEditActions(QMenu * /*menu*/, QMainWindow * /*window
     // Nothing to add
 }
 
-void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
+void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
 {
-    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
-    for (auto documentMenu : mainWindow->tabViewMenus()) {
-        menu->addMenu(documentMenu);
-    }
+    menu->hide();
 }
 
 /*!

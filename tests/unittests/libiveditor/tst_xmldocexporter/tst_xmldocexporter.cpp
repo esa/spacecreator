@@ -17,7 +17,6 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
-#include "document/msctabdocument.h"
 #include "interface/interfacetabdocument.h"
 #include "xmldocexporter.h"
 
@@ -82,12 +81,8 @@ void tst_XmlDocExporter::cleanup()
 
 void tst_XmlDocExporter::testCanExportXml()
 {
-    auto doc1 = std::make_unique<document::MSCTabDocument>(this);
-    bool canExport = app::XmlDocExporter::canExportXml(doc1.get());
-    QCOMPARE(canExport, false);
-
-    auto doc2 = std::make_unique<document::InterfaceTabDocument>(this);
-    canExport = app::XmlDocExporter::canExportXml(doc2.get());
+    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
+    bool canExport = app::XmlDocExporter::canExportXml(doc.get());
     QCOMPARE(canExport, true);
 }
 

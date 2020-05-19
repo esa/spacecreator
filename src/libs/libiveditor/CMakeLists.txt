@@ -33,18 +33,6 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/condition.h
     context/action/extprocmonitor.cpp
     context/action/extprocmonitor.h
-    document/aadltabdocument.cpp
-    document/aadltabdocument.h
-    document/concurrencytabdocument.cpp
-    document/concurrencytabdocument.h
-    document/datatabdocument.cpp
-    document/datatabdocument.h
-    document/deploymenttabdocument.cpp
-    document/deploymenttabdocument.h
-    document/dummytabdocument.cpp
-    document/dummytabdocument.h
-    document/msctabdocument.cpp
-    document/msctabdocument.h
     interface/aadlcommentgraphicsitem.cpp
     interface/aadlcommentgraphicsitem.h
     interface/aadlconnectiongraphicsitem.cpp
@@ -180,8 +168,6 @@ target_sources(${LIB_NAME} PRIVATE
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    tabdocumentfactory.cpp
-    tabdocumentfactory.h
     xmldocexporter.cpp
     xmldocexporter.h
     zoomcontroller.cpp

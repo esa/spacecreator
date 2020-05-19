@@ -5,8 +5,6 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     document/abstracttabdocument.cpp
     document/abstracttabdocument.h
-    document/documentsmanager.cpp
-    document/documentsmanager.h
     reports/bugreportdialog.cpp
     reports/bugreportdialog.h
     reports/bugreportdialog.ui

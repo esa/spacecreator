@@ -44,7 +44,6 @@ void Plugin::initMenus(QMainWindow *window)
     menu->addAction(actionOpenFile());
     menu->addAction(actionSaveFile());
     menu->addAction(actionSaveFileAs());
-    menu->addAction(actionCloseFile());
     menu->addSeparator();
     addMenuFileActions(menu, window);
     menu->addSeparator();
@@ -103,15 +102,6 @@ QAction *Plugin::actionSaveFileAs()
         m_actionSaveFileAs->setShortcut(QKeySequence::SaveAs);
     }
     return m_actionSaveFileAs;
-}
-
-QAction *Plugin::actionCloseFile()
-{
-    if (m_actionCloseFile == nullptr) {
-        m_actionCloseFile = new QAction(tr("&Close file"), this);
-        m_actionCloseFile->setShortcut(QKeySequence::Close);
-    }
-    return m_actionCloseFile;
 }
 
 QAction *Plugin::actionQuit()
