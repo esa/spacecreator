@@ -84,7 +84,7 @@ void TextViewDialog::setModel(msc::MscModel *model)
 QAction *TextViewDialog::toggleViewAction()
 {
     if (d->toggleViewAction == nullptr) {
-        d->toggleViewAction = new QAction(tr("Show MSC text dialog"));
+        d->toggleViewAction = new QAction(tr("Show MSC text dialog"), this);
         d->toggleViewAction->setCheckable(true);
         d->toggleViewAction->setChecked(isVisible());
         connect(d->toggleViewAction, &QAction::triggered, this, &TextViewDialog::setVisible);
