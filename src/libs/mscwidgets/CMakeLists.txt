@@ -122,8 +122,8 @@ target_sources(${LIB_NAME} PRIVATE
     messageitem.cpp
     messageitem.h
     resources.qrc
-    textview.cpp
-    textview.h
+    textviewdialog.cpp
+    textviewdialog.h
     timeritem.cpp
     timeritem.h
     tools/actioncreatortool.cpp

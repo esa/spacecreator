@@ -86,7 +86,7 @@ void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
     menu->addSeparator();
     auto menuWindows = menu->addMenu("Windows");
     menuWindows->addAction(mainWindow->dockWidgetDocumentToggleAction());
-    menuWindows->addAction(mainWindow->dockWidgetMscTextToggleAction());
+    menuWindows->addAction(mainWindow->mscTextViewToggleAction());
     menuWindows->addAction(mainWindow->dockWidgetAsn1ToggleAction());
 }
 

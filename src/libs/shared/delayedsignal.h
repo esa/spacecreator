@@ -25,11 +25,14 @@ Q_SIGNALS:
 public Q_SLOTS:
     void triggerSignal();
 
+    //! Update the delay to /a msec. Default is 0.
+    void setInterval(int msec);
+
 private Q_SLOTS:
     void triggerNow();
 
 private:
-    QTimer *mTimer;
+    QTimer *m_timer;
 };
 
 }

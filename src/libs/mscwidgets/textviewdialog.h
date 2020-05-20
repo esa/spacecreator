@@ -18,29 +18,43 @@
 
 #pragma once
 
-#include <QPointer>
-#include <QTextBrowser>
-#include <QTimer>
+#include <QDialog>
+
+class QAction;
 
 namespace msc {
-class MscModel;
-}
 
-class TextView : public QTextBrowser
+class MscModel;
+
+/*!
+  \class msc::TextView
+  \inmodule MscWidgets
+
+  A text view of the current model. The text is the same as if it would be saved to a file.
+*/
+class TextViewDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    explicit TextView(QWidget *parent = nullptr);
+    explicit TextViewDialog(QWidget *parent = nullptr);
+    ~TextViewDialog() override;
+
     void setModel(msc::MscModel *model);
 
-public Q_SLOTS:
-    void updateView();
+    //! Get an action to show or hide this dialog
+    QAction *toggleViewAction();
+
+protected:
+    void closeEvent(QCloseEvent *) override;
+    void showEvent(QShowEvent *) override;
 
 private Q_SLOTS:
-    void refillView();
+    void updateText();
 
 private:
-    bool m_dirty = false;
-    QPointer<msc::MscModel> m_model;
-    QTimer m_updateTimer;
+    struct TextViewDialogPrivate;
+    TextViewDialogPrivate *d;
 };
+
+}

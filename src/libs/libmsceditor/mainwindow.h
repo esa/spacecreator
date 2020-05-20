@@ -57,7 +57,7 @@ public:
     BaseTool *deleteTool();
 
     QAction *dockWidgetDocumentToggleAction();
-    QAction *dockWidgetMscTextToggleAction();
+    QAction *mscTextViewToggleAction();
     QAction *dockWidgetAsn1ToggleAction();
 
 public Q_SLOTS:

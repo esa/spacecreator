@@ -38,7 +38,7 @@
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 #include "settings/appoptions.h"
-#include "textview.h"
+#include "textviewdialog.h"
 #include "tools/actioncreatortool.h"
 #include "tools/commentcreatortool.h"
 #include "tools/conditioncreatortool.h"
@@ -85,6 +85,7 @@ struct MainWindow::MainWindowPrivate {
         : ui(new Ui::MainWindow)
         , m_plugin(plugin)
         , m_model(new MainModel(mainWindow))
+        , mscTextBrowser(new TextViewDialog(mainWindow))
     {
     }
 
@@ -97,6 +98,8 @@ struct MainWindow::MainWindowPrivate {
     QComboBox *m_zoomBox = nullptr;
 
     MainModel *m_model = nullptr;
+
+    msc::TextViewDialog *mscTextBrowser = nullptr;
 
     QVector<msc::BaseTool *> m_tools;
     QAction *m_defaultToolAction = nullptr;
@@ -452,7 +455,7 @@ void MainWindow::setupUi()
     d->ui->hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
     d->ui->hierarchyView->setScene(d->m_model->hierarchyScene());
 
-    d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
+    d->mscTextBrowser->setModel(d->m_model->mscModel());
     d->ui->asn1Widget->setModel(d->m_model->mscModel());
 
     initActions();
@@ -680,12 +683,6 @@ void MainWindow::initConnections()
     connect(d->m_model, &MainModel::modelUpdated, this, &MainWindow::updateModel);
     connect(d->m_model, &MainModel::modelUpdated, d->ui->asn1Widget, &ASN1FileView::setModel);
 
-    connect(d->ui->dockWidgetMscText->toggleViewAction(), &QAction::toggled, this, [this](bool on) {
-        if (on) {
-            QMetaObject::invokeMethod(d->ui->mscTextBrowser, "updateView", Qt::QueuedConnection);
-        }
-    });
-
     connect(d->m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWindow::showSelection);
 
     connect(d->m_model->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
@@ -718,7 +715,6 @@ bool MainWindow::processCommandLineArg(::shared::CommandLineParser::Positional a
             d->m_plugin->hierarchyToolBar()->setVisible(false);
             d->m_plugin->mainToolBar()->setVisible(false);
 
-            d->ui->dockWidgetMscText->hide();
             d->ui->dockWidgetDocument->hide();
             d->ui->dockWidgetDocumenetContents->hide();
             d->ui->dockWidgetAsn1->hide();
@@ -747,9 +743,9 @@ QAction *MainWindow::dockWidgetDocumentToggleAction()
     return d->ui->dockWidgetDocument->toggleViewAction();
 }
 
-QAction *MainWindow::dockWidgetMscTextToggleAction()
+QAction *MainWindow::mscTextViewToggleAction()
 {
-    return d->ui->dockWidgetMscText->toggleViewAction();
+    return d->mscTextBrowser->toggleViewAction();
 }
 
 QAction *MainWindow::dockWidgetAsn1ToggleAction()
@@ -819,9 +815,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::loadSettings()
 {
-    // as default hide the msc text view
-    d->ui->dockWidgetMscText->setVisible(false);
-
     restoreGeometry(AppOptions::MainWindow.Geometry->read().toByteArray());
     restoreState(AppOptions::MainWindow.State->read().toByteArray());
 
@@ -975,7 +968,7 @@ bool MainWindow::saveDocument()
 
 void MainWindow::updateModel()
 {
-    d->ui->mscTextBrowser->setModel(d->m_model->mscModel());
+    d->mscTextBrowser->setModel(d->m_model->mscModel());
     updateMscToolbarActionsEnablement();
 }
 
