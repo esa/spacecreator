@@ -27,6 +27,7 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "msctimer.h"
+#include "mscmodel.h"
 
 #include <QMetaEnum>
 #include <QUndoStack>
@@ -104,6 +105,9 @@ void RemoteControlHandler::handleRemoteCommand(
         break;
     case RemoteControlWebServer::CommandType::Save: {
         m_model->setCurrentFilePath(params.value(QLatin1String("fileName"), m_model->currentFilePath()).toString());
+        msc::MscModel *mscModel = m_model->mscModel();
+        mscModel->setDataLanguage(tr("ASN.1"));
+        mscModel->setDataDefinitionString(params.value(QLatin1String("asn1File"), mscModel->dataDefinitionString()).toString());
         result = !m_model->currentFilePath().isEmpty();
         if (result)
             m_model->saveMsc(m_model->currentFilePath());
