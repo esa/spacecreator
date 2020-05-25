@@ -1,4 +1,5 @@
 set(TEST_NAME tst_msceventsparsing)
+project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
     tst_msceventsparsing.cpp

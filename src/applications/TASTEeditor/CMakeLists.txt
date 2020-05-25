@@ -1,4 +1,5 @@
 set(APP_NAME IVeditor)
+project(${APP_NAME})
 
 add_executable(${APP_NAME})
 

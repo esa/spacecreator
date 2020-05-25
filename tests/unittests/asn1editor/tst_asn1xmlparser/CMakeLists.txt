@@ -1,4 +1,5 @@
 set(TEST_NAME tst_asn1xmlparser)
+project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
     tst_asn1xmlparser.cpp
