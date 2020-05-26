@@ -165,10 +165,11 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     const QString &asnType = rootItem->child(childIndex, MODEL_TYPE_INDEX)->text();
     auto *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
 
-    if (asn1Value.type() == QVariant::List && asn1Value.toList().count() < childIndex)
+    if (asn1Value.type() == QVariant::List && asn1Value.toList().count() <= childIndex) {
         return;
+    }
 
-    QVariant value = (asn1Value.type()) ? asn1Value.toList()[childIndex] : asn1Value;
+    QVariant value = (asn1Value.type() == QVariant::List) ? asn1Value.toList()[childIndex] : asn1Value;
 
     if (asnType.startsWith("integer") || asnType.startsWith("double") || asnType.startsWith("string")
             || asnType.startsWith("enumerated"))

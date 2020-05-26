@@ -1,6 +1,6 @@
 # Variables for the build system
 $VC_PATH = "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC"
-$VC_BIN_PATH = "$VC_PATH/Tools/MSVC/14.25.28610/bin/Hostx64/x64"
+$VC_BIN_PATH = "$VC_PATH/Tools/MSVC/14.26.28801/bin/Hostx64/x64"
 $QT_DIR = "C:/Qt/5.14.2/msvc2017_64"
 
 # Set the variables for visual studio builds

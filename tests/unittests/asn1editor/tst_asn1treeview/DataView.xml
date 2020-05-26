@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ASN1AST>
+    <Asn1File FileName="/tmp/DataView.asn">
+        <Asn1Module ID="DataView">
+        <ExportedTypes>
+            <ExportedType Name="My-Int" />
+            <ExportedType Name="My-Seq" /> 
+        </ExportedTypes>
+        <ExportedVariables>
+         
+        </ExportedVariables>
+        <ImportedModules>
+        </ImportedModules>
+        <TypeAssignments>
+            <TypeAssignment Name="My-Int" Line="3" CharPositionInLine="13">
+                <Type Line="3" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                    <IntegerType Min="0" Max="255"/>
+                </Type>
+            </TypeAssignment>
+            <TypeAssignment Name="My-Seq" Line="5" CharPositionInLine="13">
+                <Type Line="5" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                    <SequenceType>
+                        <SequenceOrSetChild VarName="field-a" CName="field_a" AdaName="field_a" Optional="False" Line="6" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="6" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                                <BooleanType />
+                            </Type>
+                        </SequenceOrSetChild>
+                        <SequenceOrSetChild VarName="field-b" CName="field_b" AdaName="field_b" Optional="False" Line="7" CharPositionInLine="5" bAlwaysPresent = "True" bAlwaysAbsent="False">
+                            <Type Line="7" CharPositionInLine="13" Asn1File="/tmp/DataView.asn">
+                                <ChoiceType>
+                                    <ChoiceChild VarName="choice1" Line="8" CharPositionInLine="7" EnumID ="choice1_PRESENT">
+                                        <Type Line="8" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
+                                            <BooleanType />
+                                        </Type>
+                                    </ChoiceChild>
+                                    <ChoiceChild VarName="choice2" Line="9" CharPositionInLine="7" EnumID ="choice2_PRESENT">
+                                        <Type Line="9" CharPositionInLine="15" Asn1File="/tmp/DataView.asn">
+                                            <SequenceOfType Min="1" Max="10">
+                                                <Type Line="9" CharPositionInLine="42" Asn1File="/tmp/DataView.asn">
+                                                    <ReferenceType ReferencedTypeName="My-Int" Min="0" Max="255"/>
+                                                </Type>
+                                            </SequenceOfType>
+                                        </Type>
+                                    </ChoiceChild>
+                                </ChoiceType>
+                            </Type>
+                        </SequenceOrSetChild>
+                    </SequenceType>
+                </Type>
+            </TypeAssignment>
+        </TypeAssignments>
+        <VariablesAssignments>
+        </VariablesAssignments>
+        </Asn1Module>
+    </Asn1File>
+</ASN1AST>
