@@ -48,7 +48,6 @@ class Boolean : public BuiltinType
 public:
     QString name() const override { return QLatin1String("BOOLEAN"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/boolean.png");
@@ -60,7 +59,6 @@ class Null : public BuiltinType
 public:
     QString name() const override { return QLatin1String("NULL"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/null.png");
@@ -72,7 +70,6 @@ class Integer : public BuiltinType
 public:
     QString name() const override { return QLatin1String("INTEGER"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/integer.png");
@@ -84,7 +81,6 @@ class Real : public BuiltinType
 public:
     QString name() const override { return QLatin1String("REAL"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/real.png");
@@ -96,7 +92,6 @@ class BitString : public BuiltinType
 public:
     QString name() const override { return QLatin1String("BIT STRING"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/bitstring.png");
@@ -108,7 +103,6 @@ class OctetString : public BuiltinType
 public:
     QString name() const override { return QLatin1String("OCTET STRING"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/octetstring.png");
@@ -120,7 +114,6 @@ class IA5String : public BuiltinType
 public:
     QString name() const override { return QLatin1String("IA5String"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/ia5string.png");
@@ -132,7 +125,6 @@ class NumericString : public BuiltinType
 public:
     QString name() const override { return QLatin1String("NumericString"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/numericstring.png");
@@ -144,7 +136,6 @@ class Enumerated : public BuiltinType
 public:
     QString name() const override { return QLatin1String("ENUMERATED"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/enumerated.png");
@@ -156,7 +147,6 @@ class Choice : public BuiltinType
 public:
     QString name() const override { return QLatin1String("CHOICE"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/choice.png");
@@ -168,7 +158,6 @@ class Sequence : public BuiltinType
 public:
     QString name() const override { return QLatin1String("SEQUENCE"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/sequence.png");
@@ -180,7 +169,6 @@ class SequenceOf : public BuiltinType
 public:
     QString name() const override { return QLatin1String("SEQUENCE OF"); }
 
-private:
     QString baseIconFile() const override
     {
         return QStringLiteral(":/asn1acn/images/outline/sequenceof.png");

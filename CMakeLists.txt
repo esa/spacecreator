@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.8)
 
 project(SpaceCreator VERSION 0.1 LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 # Set the SC_GIT_HASH variable
 find_package(Git)
 if(GIT_FOUND)
@@ -61,8 +63,18 @@ find_package(Grantlee5 REQUIRED)
 
 enable_testing()
 
+include(QtCreatorCheck)
+if (${QTC_FOUND})
+    message(STATUS "ASN.1 plugin is build")
+    message(STATUS "- QTC_SOURCE_DIR ${QTC_SOURCE_DIR}")
+    message(STATUS "- QTC_BUILD_DIR ${QTC_BUILD_DIR}")
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+    include(QtCreatorIDEBranding)
+    include(QtCreatorAPI)
+    add_subdirectory(imports/asn1scc.IDE)
+endif()
+
 # Disable the asn1 plugin for now
-add_subdirectory(imports/asn1scc.IDE)
 add_definitions(-DQT_NO_KEYWORDS)
 add_subdirectory(src)
 add_subdirectory(tests)

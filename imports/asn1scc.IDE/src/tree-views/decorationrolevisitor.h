@@ -28,6 +28,8 @@
 
 #include <data/visitorwithvalue.h>
 
+#include <utils/theme/theme.h>
+
 namespace Asn1Acn {
 namespace Internal {
 namespace TreeViews {
@@ -45,6 +47,10 @@ private:
     QIcon valueFor(const Data::ValueAssignment &value) const override;
     QIcon valueFor(const Data::Project &project) const override;
 };
+
+QIcon createIcon(const QString &iconFile, Utils::Theme::Color color);
+QIcon typeIcon(const QString &iconFile);
+QIcon valueIcon(const QString &iconFile);
 
 } // namespace TreeViews
 } // namespace Internal

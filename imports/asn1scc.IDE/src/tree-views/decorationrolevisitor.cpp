@@ -34,10 +34,30 @@
 #include <data/valueassignment.h>
 
 #include <utils/icon.h>
+#include <utils/stylehelper.h>
 
 using namespace Asn1Acn::Internal::TreeViews;
 using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal;
+
+QIcon Asn1Acn::Internal::TreeViews::createIcon(const QString &iconFile, Utils::Theme::Color color)
+{
+    if (iconFile.isEmpty()) {
+        return QIcon();
+    }
+
+    return QIcon(Utils::Icon({{iconFile, color}}, Utils::Icon::Tint).icon());
+}
+
+QIcon Asn1Acn::Internal::TreeViews::typeIcon(const QString &iconFile)
+{
+    return createIcon(iconFile, Utils::Theme::IconsCodeModelStructColor);
+}
+
+QIcon Asn1Acn::Internal::TreeViews::valueIcon(const QString &iconFile)
+{
+    return createIcon(iconFile, Utils::Theme::IconsCodeModelVariableColor);
+}
 
 DecorationRoleVisitor::~DecorationRoleVisitor() {}
 
@@ -59,12 +79,12 @@ QIcon DecorationRoleVisitor::valueFor(const File &file) const
 
 QIcon DecorationRoleVisitor::valueFor(const TypeAssignment &type) const
 {
-    return type.type()->typeIcon();
+    return typeIcon(type.type()->baseIconFile());
 }
 
 QIcon DecorationRoleVisitor::valueFor(const ValueAssignment &value) const
 {
-    return value.type()->valueIcon();
+    return valueIcon(value.type()->baseIconFile());
 }
 
 QIcon DecorationRoleVisitor::valueFor(const Project &project) const

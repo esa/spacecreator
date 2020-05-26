@@ -42,10 +42,9 @@ public:
     QString name() const override;
     QString label() const override;
 
-private:
     QString baseIconFile() const override;
-    QIcon createIcon(Utils::Theme::Color color) const override;
 
+private:
     QString m_name;
 };
 
