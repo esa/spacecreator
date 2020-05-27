@@ -71,7 +71,7 @@ private:
 
     QPainterPath createShape(qreal lineWidth) const;
 
-    bool consistentcyCheck() const;
+    bool consistencyCheck() const;
 };
 
 } // ns msc

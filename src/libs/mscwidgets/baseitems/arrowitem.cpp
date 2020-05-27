@@ -100,7 +100,7 @@ bool ArrowItem::updateAnchor(
         const QLineF line(currStartLocal, currEndLolcal);
         updateLine(line);
     }
-    consistentcyCheck();
+    consistencyCheck();
     return updated;
 }
 
@@ -115,14 +115,14 @@ void ArrowItem::buildLayout()
     line.translate(-line.center());
 
     updateLine(line);
-    consistentcyCheck();
+    consistencyCheck();
 }
 
 void ArrowItem::addTurnPoint(const QPointF &scenePoint)
 {
     m_polyLine.append(mapFromScene(scenePoint));
     updatePath();
-    consistentcyCheck();
+    consistencyCheck();
 }
 
 void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
@@ -137,7 +137,7 @@ void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
         QSignalBlocker silently(this);
         updatePath();
     }
-    consistentcyCheck();
+    consistencyCheck();
 }
 
 /*!
@@ -162,7 +162,7 @@ void ArrowItem::updateLine(const QLineF &newLine)
     }
 
     updatePath();
-    consistentcyCheck();
+    consistencyCheck();
 }
 
 void ArrowItem::updatePath()
@@ -190,7 +190,7 @@ void ArrowItem::updatePath()
     if (m_symbolShown.Target)
         m_bounds |= m_symbols.Target.boundingRect();
 
-    consistentcyCheck();
+    consistencyCheck();
     Q_EMIT geometryChanged(boundingRect());
 }
 
@@ -219,7 +219,7 @@ QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnc
 {
     const QPointF result(link()->makeLink(source, sourceAnchorPoint, target, targetAnchorPoint));
     rebuildLayout();
-    consistentcyCheck();
+    consistencyCheck();
     return result;
 }
 
@@ -262,7 +262,7 @@ QPainterPath ArrowItem::createShape(qreal lineWidth) const
     return result;
 }
 
-bool ArrowItem::consistentcyCheck() const
+bool ArrowItem::consistencyCheck() const
 {
 #ifdef QT_DEBUG
     if (m_polyLine.size() < 2) {
