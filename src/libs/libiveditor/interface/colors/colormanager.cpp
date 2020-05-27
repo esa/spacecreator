@@ -17,7 +17,7 @@
 
 #include "colormanager.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "common.h"
 #include "settings/appoptions.h"
 

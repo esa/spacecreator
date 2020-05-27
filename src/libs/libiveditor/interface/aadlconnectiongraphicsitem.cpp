@@ -24,7 +24,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"

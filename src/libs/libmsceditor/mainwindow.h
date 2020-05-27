@@ -51,7 +51,7 @@ public:
 
     QGraphicsView *currentView() const;
 
-    bool processCommandLineArg(::shared::CommandLineParser::Positional arg, const QString &value);
+    bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
     QPlainTextEdit *textOutputPane() const;
 
     BaseTool *deleteTool();

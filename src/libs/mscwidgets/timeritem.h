@@ -55,8 +55,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void initGripPoints() override;
 
 private Q_SLOTS:

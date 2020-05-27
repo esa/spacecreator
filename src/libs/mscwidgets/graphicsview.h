@@ -31,7 +31,7 @@ namespace msc {
   * Provides zoom functionality.
   * Reports the current mouse position as signal
 */
-class GraphicsView : public ::shared::ui::GraphicsViewBase
+class GraphicsView : public shared::ui::GraphicsViewBase
 {
     Q_OBJECT
 

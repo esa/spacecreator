@@ -17,7 +17,7 @@
 
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/common/objectslink.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
 

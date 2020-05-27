@@ -18,7 +18,7 @@
 #include "mainwindow.h"
 
 #include "aadlobjectfunctiontype.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"

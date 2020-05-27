@@ -17,7 +17,7 @@
 
 #include "basecreatortool.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 #include "mscchart.h"
 
@@ -66,7 +66,7 @@ void BaseCreatorTool::removePreviewItem()
         return;
     }
 
-    shared::removeSceneItem(m_previewItem);
+    removeSceneItem(m_previewItem);
     delete m_previewItem.data();
     m_previewEntity.reset();
 }

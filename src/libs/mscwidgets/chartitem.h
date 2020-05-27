@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 #include "ui/grippoint.h"
 
@@ -52,8 +52,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF contentRect() const;
-    QPointF setContentRect(
-            const QRectF &r, shared::CifUpdatePolicy cifUpdate = shared::CifUpdatePolicy::UpdateIfExists);
+    QPointF setContentRect(const QRectF &r, CifUpdatePolicy cifUpdate = CifUpdatePolicy::UpdateIfExists);
 
     static QPointF chartMargin();
     static QMarginsF chartMargins();
@@ -73,13 +72,13 @@ public Q_SLOTS:
     void setName(const QString &name);
 
 protected:
-    void onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void initGripPoints() override;
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);
     void updateTitlePos();
-    void onManualGeometryChangeFinished(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint *, const QPointF &from, const QPointF &to);
     void onChartCifRectChanged();
 
 private:
@@ -94,7 +93,7 @@ private:
     bool m_guard = false;
 
     static QPointF m_margin;
-    void updateCifIfNecessary(shared::CifUpdatePolicy cause);
+    void updateCifIfNecessary(CifUpdatePolicy cause);
 };
 
 } // ns msc

@@ -16,7 +16,7 @@
 */
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "chartviewmodel.h"
@@ -107,10 +107,9 @@ void tst_ChartViewModel::init()
 {
     m_chartModel.reset(new ChartViewModel);
     m_view.setScene(m_chartModel->graphicsScene());
-    msc::shared::CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
-    static const QPointF dpi1to1(
-            msc::shared::CoordinatesConverter::Dpi1To1, msc::shared::CoordinatesConverter::Dpi1To1);
-    msc::shared::CoordinatesConverter::setDPI(dpi1to1, dpi1to1); // results in cif <-> pixel as 1:1
+    CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
+    static const QPointF dpi1to1(CoordinatesConverter::Dpi1To1, CoordinatesConverter::Dpi1To1);
+    CoordinatesConverter::setDPI(dpi1to1, dpi1to1); // results in cif <-> pixel as 1:1
 }
 
 void tst_ChartViewModel::cleanup()
@@ -195,7 +194,7 @@ void tst_ChartViewModel::testTimerPositionWithCifInstance()
             endmscdocument;\
         endmscdocument;";
 
-    msc::shared::CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
+    CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
 
     parseMsc(mscText);
     QCOMPARE(m_instanceItems.size(), 1);
@@ -312,7 +311,7 @@ void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
                       endmscdocument;\
                   endmscdocument;";
 
-    msc::shared::CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
+    CoordinatesConverter::setDPI(QPointF(128., 128.), QPointF(96., 96.));
 
     parseMsc(mscText);
 

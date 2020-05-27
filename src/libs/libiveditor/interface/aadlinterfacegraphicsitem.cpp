@@ -20,6 +20,10 @@
 
 #include "aadlconnectiongraphicsitem.h"
 #include "aadlfunctiongraphicsitem.h"
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectiface.h"
+#include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
@@ -28,10 +32,6 @@
 
 #include <QPainter>
 #include <QtDebug>
-#include <aadlobjectconnection.h>
-#include <aadlobjectfunction.h>
-#include <aadlobjectiface.h>
-#include <baseitems/common/utils.h>
 
 static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;

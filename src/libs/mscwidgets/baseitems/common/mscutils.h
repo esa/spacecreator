@@ -29,8 +29,6 @@ namespace msc {
 
 class InstanceItem;
 
-namespace shared {
-
 constexpr qreal LineHoverTolerance = 10.;
 constexpr qreal LineHorizontalityTolerance = 15.;
 
@@ -48,7 +46,7 @@ template<typename ItemType, typename MscEntityType>
 ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
 {
     if (event)
-        for (ItemType *item : ::shared::graphicsviewutils::toplevelItems<ItemType>(scene))
+        for (ItemType *item : shared::graphicsviewutils::toplevelItems<ItemType>(scene))
             if (item && item->modelEntity() && item->modelEntity()->internalId() == event->internalId())
                 return item;
 
@@ -80,5 +78,4 @@ bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalToleran
 
 QRectF framedRect(const QRectF &rect, qreal frameWidth);
 
-}
 }

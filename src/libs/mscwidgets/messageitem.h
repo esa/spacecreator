@@ -104,8 +104,8 @@ public Q_SLOTS:
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void updateGripPoints() override;
 
     void initGripPoints() override;
@@ -119,7 +119,7 @@ private Q_SLOTS:
     void rebuildLayout() override;
     void commitGeometryChange();
     void onRenamed(const QString &title);
-    void onManualGeometryChangeFinished(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
+    void onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     void updateDisplayText();
 
 private:

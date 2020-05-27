@@ -18,7 +18,7 @@
 #include "objectslink.h"
 
 #include "baseitems/interactiveobject.h"
-#include "utils.h"
+#include "mscutils.h"
 
 namespace msc {
 

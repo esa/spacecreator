@@ -18,7 +18,7 @@
 #include "dynamicpropertyconfig.h"
 
 #include "aadlobject.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "common.h"
 #include "dynamicproperty.h"
 #include "settings/appoptions.h"

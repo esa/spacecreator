@@ -18,7 +18,7 @@
 #include "graphicsview.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 #include "graphicsviewutils.h"
 
@@ -32,7 +32,7 @@ namespace msc {
   Constructs a MSV view object with the parent \a parent.
 */
 GraphicsView::GraphicsView(QWidget *parent)
-    : ::shared::ui::GraphicsViewBase(parent)
+    : shared::ui::GraphicsViewBase(parent)
 {
     setMinZoomPercent(50);
 
@@ -47,15 +47,15 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    ::shared::ui::GraphicsViewBase::mousePressEvent(event);
+    shared::ui::GraphicsViewBase::mousePressEvent(event);
 }
 
 QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
         QGraphicsScene *scene, const QPoint &, const QPointF &scenePos) const
 {
     QList<QPair<QPointF, QString>> coords;
-    coords.push_back({ shared::CoordinatesConverter::sceneToCif(scenePos), "CIF" });
-    for (InteractiveObject *item : ::shared::graphicsviewutils::itemByPos<InteractiveObject>(scene, scenePos)) {
+    coords.push_back({ CoordinatesConverter::sceneToCif(scenePos), "CIF" });
+    for (InteractiveObject *item : shared::graphicsviewutils::itemByPos<InteractiveObject>(scene, scenePos)) {
         coords.push_back({ item->mapFromScene(scenePos),
                 item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None") });
     }

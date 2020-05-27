@@ -18,7 +18,7 @@
 #include "actioncreatortool.h"
 
 #include "actionitem.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "commands/common/commandsstack.h"
 #include "mscaction.h"
 #include "mscchart.h"

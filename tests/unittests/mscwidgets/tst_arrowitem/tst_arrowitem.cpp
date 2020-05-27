@@ -16,8 +16,8 @@
 */
 
 #include "baseitems/arrowitem.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/common/objectslink.h"
-#include "baseitems/common/utils.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "mscchart.h"
@@ -74,9 +74,9 @@ void tst_ArrowItem::initTestCase()
 
 void tst_ArrowItem::cleanupTestCase()
 {
-    if (msc::shared::removeSceneItem(m_item2))
+    if (removeSceneItem(m_item2))
         delete m_item2;
-    if (msc::shared::removeSceneItem(m_item1))
+    if (removeSceneItem(m_item1))
         delete m_item1;
 }
 

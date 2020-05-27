@@ -17,12 +17,12 @@
 
 #include "cmdentitygeometrychange.h"
 
+#include "aadlobjectsmodel.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 #include "commandsstack.h"
 
 #include <QtDebug>
-#include <aadlobjectsmodel.h>
-#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {

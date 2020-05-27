@@ -18,7 +18,7 @@
 
 #include "interactiveobject.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "mscentity.h"
 
@@ -31,7 +31,7 @@
 namespace msc {
 
 InteractiveObject::InteractiveObject(msc::MscEntity *entity, QGraphicsItem *parent)
-    : ::shared::ui::InteractiveObjectBase(parent)
+    : shared::ui::InteractiveObjectBase(parent)
     , m_entity(entity)
 {
     setAcceptHoverEvents(true);

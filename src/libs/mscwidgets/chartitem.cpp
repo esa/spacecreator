@@ -18,7 +18,7 @@
 #include "chartitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
@@ -88,7 +88,7 @@ void ChartItem::onNameEdited(const QString &text)
 
 QRectF ChartItem::boundingRect() const
 {
-    return shared::framedRect(m_rectItem->boundingRect(), m_rectItem->pen().widthF());
+    return framedRect(m_rectItem->boundingRect(), m_rectItem->pen().widthF());
 }
 
 QString ChartItem::chartName() const
@@ -117,7 +117,7 @@ void ChartItem::setName(const QString &name)
     }
 }
 
-void ChartItem::onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
     if (m_prevContentRect.isNull())
         m_prevContentRect = contentRect();
@@ -128,28 +128,28 @@ void ChartItem::onManualResizeProgress(::shared::ui::GripPoint *gp, const QPoint
     const QPointF shift = QPointF(to - from);
     QRectF rect = contentRect();
     switch (gp->location()) {
-    case ::shared::ui::GripPoint::Left:
+    case shared::ui::GripPoint::Left:
         rect.setLeft(rect.left() + shift.x());
         break;
-    case ::shared::ui::GripPoint::Top:
+    case shared::ui::GripPoint::Top:
         rect.setTop(rect.top() + shift.y());
         break;
-    case ::shared::ui::GripPoint::Right:
+    case shared::ui::GripPoint::Right:
         rect.setRight(rect.right() + shift.x());
         break;
-    case ::shared::ui::GripPoint::Bottom:
+    case shared::ui::GripPoint::Bottom:
         rect.setBottom(rect.bottom() + shift.y());
         break;
-    case ::shared::ui::GripPoint::TopLeft:
+    case shared::ui::GripPoint::TopLeft:
         rect.setTopLeft(rect.topLeft() + shift);
         break;
-    case ::shared::ui::GripPoint::TopRight:
+    case shared::ui::GripPoint::TopRight:
         rect.setTopRight(rect.topRight() + shift);
         break;
-    case ::shared::ui::GripPoint::BottomLeft:
+    case shared::ui::GripPoint::BottomLeft:
         rect.setBottomLeft(rect.bottomLeft() + shift);
         break;
-    case ::shared::ui::GripPoint::BottomRight:
+    case shared::ui::GripPoint::BottomRight:
         rect.setBottomRight(rect.bottomRight() + shift);
         break;
     default:
@@ -164,18 +164,18 @@ void ChartItem::onManualResizeProgress(::shared::ui::GripPoint *gp, const QPoint
     }
 
     QSignalBlocker suppressChartBoxChanged(this);
-    setContentRect(rect, shared::CifUpdatePolicy::DontChange);
+    setContentRect(rect, CifUpdatePolicy::DontChange);
 }
 
-void ChartItem::onManualGeometryChangeFinished(::shared::ui::GripPoint *, const QPointF &, const QPointF &)
+void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     QRect cifRectPrev;
-    if (!shared::CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
+    if (!CoordinatesConverter::sceneToCif(m_prevContentRect, cifRectPrev))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << m_prevContentRect;
 
     const QRectF &chartBox = contentRect();
     QRect cifRectCurr;
-    if (!shared::CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
+    if (!CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
 
     const QVariantList params { cifRectPrev, cifRectCurr, QVariant::fromValue<MscChart *>(chart()) };
@@ -186,11 +186,11 @@ void ChartItem::onManualGeometryChangeFinished(::shared::ui::GripPoint *, const 
 void ChartItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints(::shared::ui::GripPoint::Locations { ::shared::ui::GripPoint::Left,
-            ::shared::ui::GripPoint::Top, ::shared::ui::GripPoint::Right, ::shared::ui::GripPoint::Bottom,
-            ::shared::ui::GripPoint::TopLeft, ::shared::ui::GripPoint::BottomLeft, ::shared::ui::GripPoint::TopRight,
-            ::shared::ui::GripPoint::BottomRight });
-    connect(gripPointsHandler(), &::shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
+    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations { shared::ui::GripPoint::Left,
+            shared::ui::GripPoint::Top, shared::ui::GripPoint::Right, shared::ui::GripPoint::Bottom,
+            shared::ui::GripPoint::TopLeft, shared::ui::GripPoint::BottomLeft, shared::ui::GripPoint::TopRight,
+            shared::ui::GripPoint::BottomRight });
+    connect(gripPointsHandler(), &shared::ui::GripPointsHandler::manualGeometryChangeFinish, this,
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
@@ -206,7 +206,7 @@ QRectF ChartItem::contentRect() const
     return m_contentArea->sceneBoundingRect();
 }
 
-QPointF ChartItem::setContentRect(const QRectF &r, shared::CifUpdatePolicy cifUpdate)
+QPointF ChartItem::setContentRect(const QRectF &r, CifUpdatePolicy cifUpdate)
 {
     const QRectF &currContentRect = contentRect();
     const QPointF &shift = -r.topLeft();
@@ -221,7 +221,7 @@ QPointF ChartItem::setContentRect(const QRectF &r, shared::CifUpdatePolicy cifUp
 
     prepareGeometryChange();
 
-    m_contentArea->setRect(shared::framedRect(newContentRect, m_contentArea->pen().widthF()));
+    m_contentArea->setRect(framedRect(newContentRect, m_contentArea->pen().widthF()));
     m_rectItem->setRect(newContentRect.marginsAdded(chartMargins()));
 
     if (QGraphicsScene *pScene = scene())
@@ -278,7 +278,7 @@ void ChartItem::updateCif()
         return;
 
     QRect cifRect;
-    if (!shared::CoordinatesConverter::sceneToCif(currentContentRect, cifRect))
+    if (!CoordinatesConverter::sceneToCif(currentContentRect, cifRect))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << cifRect;
 
     chart()->setCifRect(cifRect);
@@ -304,7 +304,7 @@ QRectF ChartItem::storedCustomRect() const
         return {};
 
     QRectF rect;
-    if (!shared::CoordinatesConverter::cifToScene(cifRect, rect))
+    if (!CoordinatesConverter::cifToScene(cifRect, rect))
         qWarning() << "ChartItem: Coordinates conversion (mm->scene) failed" << cifRect;
 
     return rect;
@@ -317,22 +317,22 @@ QPainterPath ChartItem::shape() const
         { rect.bottomRight(), rect.bottomLeft() }, { rect.bottomLeft(), rect.topLeft() } };
     QPainterPath result;
     for (const QLineF &line : lines)
-        result.addPath(::shared::graphicsviewutils::lineShape(line, shared::LineHoverTolerance));
+        result.addPath(shared::graphicsviewutils::lineShape(line, LineHoverTolerance));
     return result;
 }
 
-void ChartItem::updateCifIfNecessary(shared::CifUpdatePolicy cause)
+void ChartItem::updateCifIfNecessary(CifUpdatePolicy cause)
 {
     bool writeCif(false);
     switch (cause) {
-    case shared::CifUpdatePolicy::DontChange: {
+    case CifUpdatePolicy::DontChange: {
         break;
     }
-    case shared::CifUpdatePolicy::UpdateIfExists: {
+    case CifUpdatePolicy::UpdateIfExists: {
         writeCif = geometryManagedByCif();
         break;
     }
-    case shared::CifUpdatePolicy::ForceCreate: {
+    case CifUpdatePolicy::ForceCreate: {
         writeCif = true;
         break;
     }

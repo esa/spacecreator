@@ -17,7 +17,7 @@
 
 #include "interfacetabgraphicsscene.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 
 #include <QGraphicsSceneHelpEvent>

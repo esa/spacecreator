@@ -17,7 +17,7 @@
 
 #include "hierarchycreatortool.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "commands/cmddocumentcreate.h"
 #include "commands/common/commandsstack.h"
 #include "documentitem.h"

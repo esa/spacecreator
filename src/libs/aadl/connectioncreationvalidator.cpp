@@ -23,17 +23,10 @@
 #include "aadlobjectiface.h"
 #include "aadlobjectsmodel.h"
 
-//#include "aadlconnectiongraphicsitem.h"
-//#include "aadlfunctiongraphicsitem.h"
-//#include "aadlfunctiontypegraphicsitem.h"
-//#include "aadlinterfacegraphicsitem.h"
-//#include "graphicsitemhelpers.h"
-
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QtMath>
-//#include <baseitems/common/utils.h>
 
 namespace aadl {
 

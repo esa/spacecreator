@@ -18,7 +18,7 @@
 #include "instanceitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
@@ -193,7 +193,7 @@ void InstanceItem::applyCif()
         const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
         if (cifPoints.size() == 3) {
             bool converted(false);
-            const QVector<QPointF> &scenePoints = shared::CoordinatesConverter::cifToScene(cifPoints, &converted);
+            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
 
             const QPointF &textBoxTopLeft = scenePoints.at(0);
             const QPointF &textBoxSize = scenePoints.at(1);
@@ -211,7 +211,7 @@ void InstanceItem::applyCif()
     }
 }
 
-void InstanceItem::onManualMoveProgress(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     QPointF delta { (to - from).x(), 0. };
     if (delta.isNull())
@@ -265,7 +265,7 @@ QPair<QPointF, bool> InstanceItem::commentPoint() const
 void InstanceItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ ::shared::ui::GripPoint::Location::Center });
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 
     const qreal zVal(gripPointsHandler()->zValue() - 1.);
     m_headSymbol->setZValue(zVal);
@@ -341,13 +341,13 @@ void InstanceItem::updateCif()
 
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
     QRect textBoxRectCif;
-    if (!shared::CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
+    if (!CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
         return;
     }
 
     QPoint axisPointCif;
-    if (!shared::CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
+    if (!CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
         return;
     }
@@ -373,7 +373,7 @@ QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, 
 
     const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
     for (InstanceItem *otherItem :
-            ::shared::graphicsviewutils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
+            shared::graphicsviewutils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
         if (otherItem != caller) {
             const QRectF &otherRect = otherItem->sceneBoundingRect();
             if (callerRect.intersects(otherRect)) {
@@ -392,7 +392,7 @@ QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, 
     return QPointF(0., 0.);
 }
 
-void InstanceItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
+void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     const QPointF &delta = avoidOverlaps(this, { (to - from).x(), 0. }, QRectF());
     if (!delta.isNull())
@@ -434,8 +434,8 @@ void InstanceItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     };
 
     if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
-        const QPoint axisToCif = shared::CoordinatesConverter::sceneToCif({ 0, m_axisHeight });
-        const QPointF axisFromCif = shared::CoordinatesConverter::cifToScene(axisToCif);
+        const QPoint axisToCif = CoordinatesConverter::sceneToCif({ 0, m_axisHeight });
+        const QPointF axisFromCif = CoordinatesConverter::cifToScene(axisToCif);
         const QString tt = cifBlock->toString(0) + "\naxis:" + QString::number(m_axisHeight) + " "
                 + QString::number(m_axisSymbol->line().length()) + "\naxisToCif:" + QString::number(axisToCif.x()) + " "
                 + QString::number(axisToCif.y()) + "\naxisFromCif:" + QString::number(axisFromCif.x()) + " "
@@ -452,13 +452,13 @@ QVariantList InstanceItem::prepareChangePositionCommand() const
 {
     const QRectF &textBoxRect = m_headSymbol->textBoxSceneRect();
     QRect textBoxRectCif;
-    if (!shared::CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
+    if (!CoordinatesConverter::sceneToCif(textBoxRect, textBoxRectCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert text box coordinates to CIF";
         return QVariantList();
     }
 
     QPoint axisPointCif;
-    if (!shared::CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
+    if (!CoordinatesConverter::sceneToCif({ 0., m_axisHeight }, axisPointCif)) {
         qWarning() << Q_FUNC_INFO << "Can't convert axis coordinates to CIF";
         return QVariantList();
     }
@@ -501,7 +501,7 @@ qreal InstanceItem::defaultAxisHeight()
     static qreal defaultAxisHeightScene { 0. };
 
     if (qFuzzyIsNull(defaultAxisHeightScene)) {
-        defaultAxisHeightScene = shared::CoordinatesConverter::heightInScene(defaultAxisHeightCIF);
+        defaultAxisHeightScene = CoordinatesConverter::heightInScene(defaultAxisHeightCIF);
     }
 
     return defaultAxisHeightScene;

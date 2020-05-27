@@ -18,7 +18,7 @@
 #include "instanceheaditem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "mscinstance.h"
 
@@ -307,7 +307,7 @@ QSizeF InstanceHeadItem::defaultSize()
     static QSizeF sizeScene { 0., 0. };
     if (sizeScene.isEmpty()) {
         const QSize sizeCIF { 100, 50 };
-        const QPointF sz = shared::CoordinatesConverter::vector2DInScene(sizeCIF.width(), sizeCIF.height());
+        const QPointF sz = CoordinatesConverter::vector2DInScene(sizeCIF.width(), sizeCIF.height());
         sizeScene = { sz.x(), sz.y() };
     }
 

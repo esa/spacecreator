@@ -26,7 +26,7 @@
 #include "aadlobject.h"
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "baseitems/textgraphicsitem.h"
 #include "colors/colormanager.h"
 #include "commands/cmdfunctionitemcreate.h"

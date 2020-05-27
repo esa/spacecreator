@@ -7,7 +7,7 @@ namespace msc {
 
 class MainWindow;
 
-class MSCPlugin : public ::shared::Plugin
+class MSCPlugin : public shared::Plugin
 {
     Q_OBJECT
 
@@ -26,7 +26,7 @@ public:
     QToolBar *mscToolBar() { return m_mscToolBar; }
     QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }
 
-    void populateCommandLineArguments(::shared::CommandLineParser *parser) const override;
+    void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
     QAction *actionCopy() { return m_actionCopy; }
     QAction *actionPaste() { return m_actionPaste; }

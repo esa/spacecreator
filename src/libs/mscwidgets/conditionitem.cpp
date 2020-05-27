@@ -215,12 +215,12 @@ void ConditionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ConditionItem::onManualMoveProgress(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
+void ConditionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     moveBy(0., to.y() - from.y());
 }
 
-void ConditionItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF &, const QPointF &)
+void ConditionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }
@@ -228,7 +228,7 @@ void ConditionItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF 
 void ConditionItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ ::shared::ui::GripPoint::Location::Center });
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 }
 
 void ConditionItem::onInstanceMoved(const QPointF &from, const QPointF &to)

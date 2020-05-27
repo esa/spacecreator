@@ -17,12 +17,11 @@
 
 #include "cmdcommentitemcreate.h"
 
+#include "aadlobjectcomment.h"
+#include "aadlobjectfunctiontype.h"
+#include "aadlobjectsmodel.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandids.h"
-
-#include <aadlobjectcomment.h>
-#include <aadlobjectfunctiontype.h>
-#include <aadlobjectsmodel.h>
-#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {

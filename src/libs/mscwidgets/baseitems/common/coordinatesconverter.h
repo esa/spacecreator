@@ -25,7 +25,6 @@
 #include <QPointer>
 
 namespace msc {
-namespace shared {
 
 class CoordinatesConverter
 {
@@ -70,5 +69,4 @@ private:
     CoordinatesConverter &operator=(const CoordinatesConverter &other) = delete;
 };
 
-} // ns utils
-} // ns msc
+}

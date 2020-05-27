@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 #include "tst_common.h"
 #include "ui/grippointshandler.h"
@@ -26,7 +26,7 @@
 #include <QTest>
 
 using namespace msc;
-using namespace ::shared::ui;
+using namespace shared::ui;
 
 class InteractiveObjectImpl : public InteractiveObject
 {

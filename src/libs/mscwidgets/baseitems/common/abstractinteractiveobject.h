@@ -31,4 +31,4 @@ public:
     virtual void handleGripPointRelease(GripPoint *handle, const QPointF &from, const QPointF &to) = 0;
 };
 
-} // ns msc
+}

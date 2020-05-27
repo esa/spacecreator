@@ -87,8 +87,8 @@ public Q_SLOTS:
     void rebuildLayout() override;
 
 protected:
-    void onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualMoveFinish(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveFinish(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;

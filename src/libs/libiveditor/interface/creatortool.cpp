@@ -23,7 +23,7 @@
 #include "aadlfunctiontypegraphicsitem.h"
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlobjectconnection.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdfunctiontypeitemcreate.h"
@@ -123,7 +123,7 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
                         { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted = startIfaceItem->scenePos();
-    } else if (!::shared::graphicsviewutils::intersects(result.functionAtStartPos->sceneBoundingRect(),
+    } else if (!shared::graphicsviewutils::intersects(result.functionAtStartPos->sceneBoundingRect(),
                        result.connectionLine, &result.startPointAdjusted)) {
         result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;

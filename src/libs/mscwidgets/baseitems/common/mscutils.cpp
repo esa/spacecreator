@@ -14,7 +14,7 @@
    You should have received a copy of the GNU Library General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
-#include "utils.h"
+#include "mscutils.h"
 
 #include "baseitems/interactiveobject.h"
 #include "instanceitem.h"
@@ -24,7 +24,6 @@
 #include <QtGlobal>
 
 namespace msc {
-namespace shared {
 
 /*!
   \namespace msc::utils
@@ -70,7 +69,7 @@ QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF 
 {
     QVector<InstanceItem *> items;
     if (scene)
-        for (InstanceItem *item : ::shared::graphicsviewutils::toplevelItems<InstanceItem>(scene))
+        for (InstanceItem *item : shared::graphicsviewutils::toplevelItems<InstanceItem>(scene))
             if (item->sceneBoundingRect().contains(scenePos))
                 items << item;
 
@@ -99,5 +98,4 @@ QRectF framedRect(const QRectF &rect, qreal frameWidth)
     return rect.adjusted(halfWidth, halfWidth, -halfWidth, -halfWidth);
 }
 
-} // ns utils
-} // ns msc
+}

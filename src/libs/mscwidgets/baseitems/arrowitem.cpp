@@ -18,8 +18,8 @@
 #include "arrowitem.h"
 
 #include "common/coordinatesconverter.h"
+#include "common/mscutils.h"
 #include "common/objectslink.h"
-#include "common/utils.h"
 
 #include <QDebug>
 #include <QGraphicsView>
@@ -40,7 +40,7 @@ qreal ArrowItem::defaultWidth()
     static constexpr int defaultWidthCif { 200 };
     static qreal defaultWidthScene { 0. };
     if (qFuzzyIsNull(defaultWidthScene)) {
-        defaultWidthScene = shared::CoordinatesConverter::widthInScene(defaultWidthCif);
+        defaultWidthScene = CoordinatesConverter::widthInScene(defaultWidthCif);
     }
     return defaultWidthScene;
 }
@@ -235,7 +235,7 @@ QPointF ArrowItem::pathPoint(int num) const
 
 QPainterPath ArrowItem::shape() const
 {
-    QPainterPath result = createShape(shared::LineHoverTolerance);
+    QPainterPath result = createShape(LineHoverTolerance);
     if (result.isEmpty())
         result = m_bodyPath;
 

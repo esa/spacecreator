@@ -17,7 +17,7 @@
 
 #include "coregioncreatortool.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "commands/common/commandids.h"
 #include "commands/common/commandsstack.h"
 #include "coregionitem.h"

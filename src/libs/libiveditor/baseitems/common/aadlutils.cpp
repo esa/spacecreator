@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "utils.h"
+#include "aadlutils.h"
 
 #include "aadlobject.h"
 #include "baseitems/interactiveobject.h"

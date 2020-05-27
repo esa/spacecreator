@@ -19,7 +19,7 @@
 
 #include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
 #include "msccomment.h"
@@ -86,7 +86,7 @@ void CommentCreatorTool::commitPreviewItem()
             itemSceneRect.setBottom(contentRect.bottom());
 
         QRect newRect;
-        if (shared::CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
+        if (CoordinatesConverter::sceneToCif(itemSceneRect, newRect)) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Create comment"));
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeCommentGeometry,
                     { QVariant::fromValue<msc::MscChart *>(m_model->currentChart()), m_model->currentChart()->cifRect(),

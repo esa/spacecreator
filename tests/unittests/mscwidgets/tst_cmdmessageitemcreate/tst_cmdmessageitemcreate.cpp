@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "chartviewmodel.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/common/commandsfactory.h"

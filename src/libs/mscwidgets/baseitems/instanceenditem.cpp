@@ -18,7 +18,7 @@
 #include "instanceenditem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -114,7 +114,7 @@ qreal InstanceEndItem::stopSymbolHeight()
     static constexpr int stopSymbolHeightCIF { 50 };
     static qreal stopSymbolHeightScene { 0. };
     if (qFuzzyIsNull(stopSymbolHeightScene)) {
-        stopSymbolHeightScene = shared::CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
+        stopSymbolHeightScene = CoordinatesConverter::heightInScene(stopSymbolHeightCIF);
     }
 
     return stopSymbolHeightScene;
@@ -125,7 +125,7 @@ qreal InstanceEndItem::endSymbolHeight()
     static constexpr int endSymbolHeightCIF { 25 };
     static qreal endSymbolHeightScene { 0. };
     if (qFuzzyIsNull(endSymbolHeightScene)) {
-        endSymbolHeightScene = shared::CoordinatesConverter::heightInScene(endSymbolHeightCIF);
+        endSymbolHeightScene = CoordinatesConverter::heightInScene(endSymbolHeightCIF);
     }
 
     return endSymbolHeightScene;

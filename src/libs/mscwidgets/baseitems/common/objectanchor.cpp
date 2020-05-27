@@ -16,7 +16,7 @@
 */
 #include "objectanchor.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 
 namespace msc {

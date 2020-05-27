@@ -22,7 +22,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "baseitems/graphicsview.h"
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"

@@ -17,7 +17,7 @@
 
 #include "coregionitem.h"
 
-#include "baseitems/common/utils.h"
+#include "baseitems/common/mscutils.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "mscchart.h"
@@ -64,7 +64,7 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 void CoregionItem::initGripPoints()
 {
     InteractiveObjectBase::initGripPoints();
-    gripPointsHandler()->setUsedPoints(::shared::ui::GripPoint::Locations {});
+    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations {});
 }
 
 void CoregionItem::rebuildLayout()

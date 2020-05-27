@@ -18,7 +18,7 @@
 #include "graphicsview.h"
 
 #include "aadlobject.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "baseitems/interactiveobject.h"
 #include "interface/aadlrectgraphicsitem.h"
 

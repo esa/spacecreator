@@ -17,13 +17,13 @@
 
 #include "cmdinterfaceitemcreate.h"
 
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandids.h"
 #include "commandsfactory.h"
 
 #include <QDebug>
-#include <aadlobjectfunction.h>
-#include <aadlobjectsmodel.h>
-#include <baseitems/common/utils.h>
 
 namespace aadlinterface {
 namespace cmd {

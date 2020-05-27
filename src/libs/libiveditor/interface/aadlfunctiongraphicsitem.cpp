@@ -23,7 +23,7 @@
 #include "aadlinterfacegraphicsitem.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "colors/colormanager.h"
 #include "interface/commands/commandids.h"
 #include "interface/commands/commandsfactory.h"

@@ -14,12 +14,12 @@ target_sources(${LIB_NAME} PRIVATE
     baseitems/common/arrowsign.h
     baseitems/common/coordinatesconverter.cpp
     baseitems/common/coordinatesconverter.h
+    baseitems/common/mscutils.cpp
+    baseitems/common/mscutils.h
     baseitems/common/objectanchor.cpp
     baseitems/common/objectanchor.h
     baseitems/common/objectslink.cpp
     baseitems/common/objectslink.h
-    baseitems/common/utils.cpp
-    baseitems/common/utils.h
     baseitems/instanceenditem.cpp
     baseitems/instanceenditem.h
     baseitems/instanceheaditem.cpp

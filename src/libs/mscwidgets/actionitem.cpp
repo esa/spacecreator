@@ -155,12 +155,12 @@ void ActionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-void ActionItem::onManualMoveProgress(::shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
+void ActionItem::onManualMoveProgress(shared::ui::GripPoint *, const QPointF &from, const QPointF &to)
 {
     moveBy(0., to.y() - from.y());
 }
 
-void ActionItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF &, const QPointF &)
+void ActionItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &, const QPointF &)
 {
     Q_EMIT moved(this);
 }
@@ -168,7 +168,7 @@ void ActionItem::onManualMoveFinish(::shared::ui::GripPoint *, const QPointF &, 
 void ActionItem::initGripPoints()
 {
     InteractiveObject::initGripPoints();
-    gripPointsHandler()->setUsedPoints({ ::shared::ui::GripPoint::Location::Center });
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Location::Center });
 }
 
 void ActionItem::onTextEdited(const QString &text)
@@ -246,7 +246,7 @@ void ActionItem::applyCif()
         const QVector<QPoint> &cifPoints = cifBlock->payload().value<QVector<QPoint>>();
         if (cifPoints.size() == 2) {
             bool converted(false);
-            const QVector<QPointF> &scenePoints = shared::CoordinatesConverter::cifToScene(cifPoints, &converted);
+            const QVector<QPointF> &scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
 
             const QPointF &textBoxTopLeft = scenePoints.at(0);
             const QPointF &textBoxSize = scenePoints.at(1);

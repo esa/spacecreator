@@ -19,7 +19,7 @@
 #include "interactiveobject.h"
 
 #include "aadlobject.h"
-#include "baseitems/common/utils.h"
+#include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityautolayout.h"
 #include "interface/commands/commandids.h"

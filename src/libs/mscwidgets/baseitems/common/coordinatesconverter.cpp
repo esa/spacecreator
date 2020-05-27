@@ -23,7 +23,6 @@
 #include <QtMath>
 
 namespace msc {
-namespace shared {
 
 CoordinatesConverter *CoordinatesConverter::m_instance = nullptr;
 
@@ -212,7 +211,7 @@ bool CoordinatesConverter::sceneToCif(const QRectF sceneRect, QRect &cifRect)
 {
     const QVector<QPointF> scenePoints { sceneRect.topLeft(), { sceneRect.width(), sceneRect.height() } };
     bool converted(false);
-    const QVector<QPoint> &cifPoints = shared::CoordinatesConverter::sceneToCif(scenePoints, &converted);
+    const QVector<QPoint> &cifPoints = CoordinatesConverter::sceneToCif(scenePoints, &converted);
     if (converted)
         cifRect = QRect(cifPoints.first(), QSize(cifPoints.last().x(), cifPoints.last().y()));
 
@@ -223,7 +222,7 @@ bool CoordinatesConverter::cifToScene(const QRect &cifRect, QRectF &sceneRect)
 {
     const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
     bool converted(false);
-    const QVector<QPointF> scenePoints = shared::CoordinatesConverter::cifToScene(cifPoints, &converted);
+    const QVector<QPointF> scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
     sceneRect = { scenePoints.first(), scenePoints.last() };
     return converted;
 }
@@ -262,5 +261,4 @@ qreal CoordinatesConverter::heightInScene(const int mmY)
     return CoordinatesConverter::vector2DInScene(0, mmY).y();
 }
 
-} // ns utils
-} // ns msc
+}

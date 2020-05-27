@@ -57,8 +57,8 @@ protected:
     void initGripPoints() override;
     void rebuildLayout() override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-    void onManualMoveProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
-    void onManualResizeProgress(::shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
 
 private:
     void textEdited(const QString &text);

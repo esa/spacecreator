@@ -3,8 +3,8 @@ set(LIB_NAME libiveditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    baseitems/common/utils.cpp
-    baseitems/common/utils.h
+    baseitems/common/aadlutils.cpp
+    baseitems/common/aadlutils.h
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
     baseitems/interactiveobject.cpp
