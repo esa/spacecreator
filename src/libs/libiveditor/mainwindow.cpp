@@ -49,14 +49,14 @@ namespace aadlinterface {
 \brief Main appllication window - the place to store and manage supported document types, import/export data,
 process command line arguments and user actions.
 
-\sa aadlinterface::AbstractTabDocument, shared::CommandLineParser
+\sa aadlinterface::InterfaceDocument, shared::CommandLineParser
 */
 
 MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())
-    , m_document(new InterfaceTabDocument(this))
+    , m_document(new InterfaceDocument(this))
     , m_plugin(plugin)
 {
     ui->setupUi(this);
@@ -81,19 +81,17 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
-    connect(m_document, &document::AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
+    connect(m_document, &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
     m_plugin->initMenus(this);
 
     QUndoStack *currentStack { nullptr };
-    if (document::AbstractTabDocument *doc = m_document) {
-        doc->fillToolBar(m_plugin->docToolBar());
-        currentStack = doc->commandsStack();
-        if (auto view = qobject_cast<aadlinterface::GraphicsView *>(doc->view())) {
-            m_zoomCtrl->setView(view);
-            connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
-                    Qt::UniqueConnection);
-        }
+    m_document->fillToolBar(m_plugin->docToolBar());
+    currentStack = m_document->commandsStack();
+    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_document->view())) {
+        m_zoomCtrl->setView(view);
+        connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
+                Qt::UniqueConnection);
     }
 
     if (currentStack) {
@@ -112,7 +110,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     initSettings();
 
     updateWindowTitle();
-    connect(m_document, &InterfaceTabDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+    connect(m_document, &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 }
 
 /*!
@@ -230,8 +228,8 @@ void MainWindow::onAboutRequested()
 void MainWindow::onReportRequested()
 {
     QList<QPixmap> images;
-    if (document::AbstractTabDocument *doc = m_document) {
-        if (QGraphicsScene *scene = doc->scene()) {
+    if (m_document != nullptr) {
+        if (QGraphicsScene *scene = m_document->scene()) {
             const QSize sceneSize = scene->sceneRect().size().toSize();
             if (!sceneSize.isNull()) {
                 QPixmap pix(sceneSize);
@@ -283,10 +281,8 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return true;
     }
     case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
-        if (!value.isEmpty()) {
-            if (document::AbstractTabDocument *doc = m_document) {
-                return doc->load(value);
-            }
+        if (!value.isEmpty() && m_document != nullptr) {
+            return m_document->load(value);
         };
 
         return false;

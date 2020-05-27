@@ -24,7 +24,6 @@
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "common.h"
-#include "document/abstracttabdocument.h"
 #include "interface/interfacetabdocument.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
@@ -83,58 +82,38 @@ void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPol
 
 XmlDocExporter::XmlDocExporter() { }
 
-bool XmlDocExporter::canExportXml(document::AbstractTabDocument *doc)
-{
-    if (!doc)
-        return false;
-
-    if (qobject_cast<const InterfaceTabDocument *>(doc))
-        return true;
-
-    //    if (qobject_cast<const document::OtherSupportedDocumentType *>(doc))
-    //        return true;
-
-    return false;
-}
-
-bool XmlDocExporter::exportDocSilently(
-        document::AbstractTabDocument *doc, const QString &outPath, const QString &templatePath)
+bool XmlDocExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath)
 {
     return exportDoc(doc, nullptr, outPath, templatePath, InteractionPolicy::Silently);
 }
 
 bool XmlDocExporter::exportDocInteractive(
-        document::AbstractTabDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath)
+        InterfaceDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath)
 {
     return exportDoc(doc, root, outPath, templatePath, InteractionPolicy::Interactive);
 }
 
-bool XmlDocExporter::exportDoc(document::AbstractTabDocument *doc, QWidget *root, const QString &outPath,
+bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath,
         const QString &templatePath, InteractionPolicy interaction)
 {
     if (!doc)
         return false;
 
-    if (auto *ifaceDoc = qobject_cast<InterfaceTabDocument *>(doc)) {
-        ensureDefaultTemplatesDeployed_interface();
+    ensureDefaultTemplatesDeployed_interface();
 
-        QString usedTemplate(templatePath);
-        if (interaction == InteractionPolicy::Interactive) {
-            if (usedTemplate.isEmpty())
-                usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template for Interface doc"),
-                        QFileInfo(interfaceDefaultTemplate()).path(), QString("*.%1").arg(TemplateFileExtension));
-            if (usedTemplate.isEmpty())
-                return false;
-        }
-
-        return exportDocInterface(ifaceDoc, root, outPath, usedTemplate, interaction);
+    QString usedTemplate(templatePath);
+    if (interaction == InteractionPolicy::Interactive) {
+        if (usedTemplate.isEmpty())
+            usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template for Interface doc"),
+                    QFileInfo(interfaceDefaultTemplate()).path(), QString("*.%1").arg(TemplateFileExtension));
+        if (usedTemplate.isEmpty())
+            return false;
     }
 
-    qWarning() << "Unsupported document skipped";
-    return true; // Do not break MainWindow's loop through all docs if this one is not supported
+    return exportDocInterface(doc, root, outPath, usedTemplate, interaction);
 }
 
-bool XmlDocExporter::exportDocInterface(InterfaceTabDocument *doc, QWidget *parentWindow, const QString &outPath,
+bool XmlDocExporter::exportDocInterface(InterfaceDocument *doc, QWidget *parentWindow, const QString &outPath,
         const QString &templatePath, InteractionPolicy interaction)
 {
     if (!doc)
@@ -163,7 +142,7 @@ bool XmlDocExporter::exportDocInterface(InterfaceTabDocument *doc, QWidget *pare
         return showExportDialog(doc, parentWindow, aadlObjects, usedTemplatePath, savePath);
 }
 
-bool XmlDocExporter::runExportSilently(InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
+bool XmlDocExporter::runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariantList> &content,
         const QString &templateFileName, const QString &outFileName)
 {
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
@@ -174,7 +153,7 @@ bool XmlDocExporter::runExportSilently(InterfaceTabDocument *doc, const QHash<QS
     return saved;
 }
 
-bool XmlDocExporter::showExportDialog(InterfaceTabDocument *doc, QWidget *parentWindow,
+bool XmlDocExporter::showExportDialog(InterfaceDocument *doc, QWidget *parentWindow,
         const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName)
 {
     templating::TemplateEditor *previewDialog = new templating::TemplateEditor(outFileName, parentWindow);
@@ -182,13 +161,13 @@ bool XmlDocExporter::showExportDialog(InterfaceTabDocument *doc, QWidget *parent
 
     const bool templateParsed = previewDialog->parseTemplate(content, templateFileName);
     if (doc && templateParsed) {
-        QObject::connect(previewDialog, &templating::TemplateEditor::fileSaved, doc,
-                &document::AbstractTabDocument::onSavedExternally);
+        QObject::connect(
+                previewDialog, &templating::TemplateEditor::fileSaved, doc, &InterfaceDocument::onSavedExternally);
     }
     return templateParsed;
 }
 
-QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(InterfaceTabDocument *doc)
+QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(InterfaceDocument *doc)
 {
     QHash<QString, QVariantList> grouppedObjects;
     for (const auto aadlObject : doc->objects()) {

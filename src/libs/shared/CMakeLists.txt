@@ -3,8 +3,6 @@ set(LIB_NAME shared)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    document/abstracttabdocument.cpp
-    document/abstracttabdocument.h
     reports/bugreportdialog.cpp
     reports/bugreportdialog.h
     reports/bugreportdialog.ui

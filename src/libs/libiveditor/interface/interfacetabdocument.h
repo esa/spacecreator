@@ -19,14 +19,13 @@
 
 #include "baseitems/graphicsview.h"
 #include "common.h"
-#include "document/abstracttabdocument.h"
 
 #include <QPointer>
 #include <QQueue>
 
-class QAction;
-class QActionGroup;
-class QMutex;
+class QMenu;
+class QToolBar;
+class QUndoStack;
 
 namespace aadl {
 class AADLObject;
@@ -42,46 +41,47 @@ class AADLFunctionTypeGraphicsItem;
 class AADLInterfaceGraphicsItem;
 class InterfaceTabGraphicsScene;
 
-class InterfaceTabDocument : public document::AbstractTabDocument
+class InterfaceDocument : public QObject
 {
     Q_OBJECT
 public:
-    explicit InterfaceTabDocument(QObject *parent = nullptr);
-    ~InterfaceTabDocument() override;
+    explicit InterfaceDocument(QObject *parent = nullptr);
+    ~InterfaceDocument() override;
 
-    QMenu *customMenu() const override;
+    void init();
+
+    void fillToolBar(QToolBar *toolBar);
+
+    QGraphicsScene *scene() const;
+    QWidget *view() const;
+    QUndoStack *commandsStack() const;
+
+    bool create(const QString &path = QString());
+    bool load(const QString &path);
+    bool save(const QString &path);
+    void close();
+
+    QString path() const;
+
+    bool isDirty() const;
+
+    QString title() const;
+
+    QMenu *customMenu() const;
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
-    QString supportedFileExtensions() const override;
+    QString supportedFileExtensions() const;
+
+Q_SIGNALS:
+    void dirtyChanged(bool dirty);
+    void titleChanged();
 
 public Q_SLOTS:
+    void onSavedExternally(const QString &filePath, bool saved);
     void setObjects(const QVector<aadl::AADLObject *> &objects);
 
-protected:
-    bool createImpl(const QString &path = QString()) override;
-    bool loadImpl(const QString &path) override;
-    bool saveImpl(const QString &path) override;
-    void closeImpl() override;
-
-    QVector<QAction *> initActions() override;
-
-    QWidget *createView() override;
-    QGraphicsScene *createScene() override;
-
-protected Q_SLOTS:
-    void onActionCreateFunctionType();
-    void onActionCreateFunction();
-    void onActionCreateProvidedInterface();
-    void onActionCreateRequiredInterface();
-    void onActionCreateComment();
-    void onActionGroupConnections();
-    void onActionCreateConnection();
-    void onActionRemoveItem();
-    void onActionZoomIn();
-    void onActionZoomOut();
-    void onActionExitToRootFunction();
-    void onActionExitToParentFunction();
-
+private Q_SLOTS:
+    void updateDirtyness();
     void onAADLObjectAdded(aadl::AADLObject *object);
     void onAADLObjectRemoved(aadl::AADLObject *object);
     void onItemClicked();
@@ -98,6 +98,17 @@ protected Q_SLOTS:
     void showInfoMessage(const QString &title, const QString &message);
 
 private:
+    void setPath(const QString &path);
+
+    void resetDirtyness();
+
+    bool loadImpl(const QString &path);
+
+    QVector<QAction *> initActions();
+
+    QWidget *createView();
+    QGraphicsScene *createScene();
+
     QGraphicsItem *createItemForObject(aadl::AADLObject *obj);
     aadlinterface::AADLFunctionGraphicsItem *rootItem() const;
     void updateItem(QGraphicsItem *item);
@@ -111,34 +122,11 @@ private:
     void clearScene();
     void changeRootItem(shared::Id id);
 
-private:
-    aadlinterface::InterfaceTabGraphicsScene *m_graphicsScene { nullptr };
-    QPointer<aadlinterface::GraphicsView> m_graphicsView { nullptr };
-    aadl::AADLObjectsModel *m_model { nullptr };
-    QActionGroup *m_actionGroup { nullptr };
-    QAction *m_actCreateFunctionType { nullptr };
-    QAction *m_actCreateFunction { nullptr };
-    QAction *m_actCreateProvidedInterface { nullptr };
-    QAction *m_actCreateRequiredInterface { nullptr };
-    QAction *m_actCreateComment { nullptr };
-    QAction *m_actGroupConnections { nullptr };
-    QAction *m_actCreateConnection { nullptr };
-    QAction *m_actRemove { nullptr };
-    QAction *m_actZoomIn { nullptr };
-    QAction *m_actZoomOut { nullptr };
-    QAction *m_actExitToRoot { nullptr };
-    QAction *m_actExitToParent { nullptr };
-
-    aadlinterface::CreatorTool *m_tool { nullptr };
-    QHash<shared::Id, QGraphicsItem *> m_items;
-
-    QMutex *m_mutex { nullptr };
-    QQueue<aadl::AADLObject *> m_rmQueu;
-    const QRectF m_desktopGeometry;
-    QRectF m_prevItemsRect;
-
     void showNIYGUI(const QString &title = QString());
     void updateSceneRect();
+
+    struct InterfaceDocumentPrivate;
+    InterfaceDocumentPrivate *d;
 };
 
 }

@@ -22,13 +22,9 @@
 
 class QWidget;
 
-namespace document {
-class AbstractTabDocument;
-}
-
 namespace aadlinterface {
 
-class InterfaceTabDocument;
+class InterfaceDocument;
 
 class XmlDocExporter
 {
@@ -36,14 +32,13 @@ public:
     static QString templatesPath();
     static QString interfaceDefaultTemplate();
 
-    static bool canExportXml(document::AbstractTabDocument *doc);
-    static bool exportDocSilently(document::AbstractTabDocument *doc, const QString &outPath = QString(),
+    static bool exportDocSilently(
+            InterfaceDocument *doc, const QString &outPath = QString(), const QString &templatePath = QString());
+
+    static bool exportDocInteractive(InterfaceDocument *doc, QWidget *root, const QString &outPath = QString(),
             const QString &templatePath = QString());
 
-    static bool exportDocInteractive(document::AbstractTabDocument *doc, QWidget *root,
-            const QString &outPath = QString(), const QString &templatePath = QString());
-
-    static QHash<QString, QVariantList> collectInterfaceObjects(InterfaceTabDocument *doc);
+    static QHash<QString, QVariantList> collectInterfaceObjects(InterfaceDocument *doc);
 
 private:
     XmlDocExporter();
@@ -60,16 +55,16 @@ private:
         Overwrite
     };
 
-    static bool exportDoc(document::AbstractTabDocument *doc, QWidget *root, const QString &outPath,
-            const QString &templatePath, InteractionPolicy interaction);
+    static bool exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath,
+            InteractionPolicy interaction);
 
     static void ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy = RolloutDefaultsPolicy::Keep);
-    static bool exportDocInterface(InterfaceTabDocument *doc, QWidget *root, const QString &outPath,
+    static bool exportDocInterface(InterfaceDocument *doc, QWidget *root, const QString &outPath,
             const QString &templatePath, InteractionPolicy interaction);
 
-    static bool runExportSilently(InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
+    static bool runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariantList> &content,
             const QString &templateFileName, const QString &outFileName);
-    static bool showExportDialog(InterfaceTabDocument *doc, QWidget *parentWindow,
+    static bool showExportDialog(InterfaceDocument *doc, QWidget *parentWindow,
             const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName);
 };
 

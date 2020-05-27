@@ -27,7 +27,7 @@ class MainWindow;
 
 namespace aadlinterface {
 
-class InterfaceTabDocument;
+class InterfaceDocument;
 class IVEditorPlugin;
 class ZoomController;
 
@@ -68,7 +68,7 @@ private:
 
     Ui::MainWindow *ui { nullptr };
     ZoomController *m_zoomCtrl { nullptr };
-    InterfaceTabDocument *m_document { nullptr };
+    InterfaceDocument *m_document { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
 

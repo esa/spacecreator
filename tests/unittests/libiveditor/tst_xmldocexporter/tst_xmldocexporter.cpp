@@ -39,7 +39,6 @@ private Q_SLOTS:
     void init();
     void cleanup();
 
-    void testCanExportXml();
     void testExportEmptyDoc();
     void testExportFunctions();
     void testExportComment();
@@ -75,16 +74,9 @@ void tst_XmlDocExporter::cleanup()
     }
 }
 
-void tst_XmlDocExporter::testCanExportXml()
-{
-    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
-    bool canExport = aadlinterface::XmlDocExporter::canExportXml(doc.get());
-    QCOMPARE(canExport, true);
-}
-
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
     aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
     QByteArray text = testFileContent();
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
@@ -93,7 +85,7 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
     auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
@@ -115,7 +107,7 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
     auto testcomment1 = new aadl::AADLObjectComment("TestComment1", doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
@@ -135,7 +127,7 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
     auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
     auto testcomment1 = new aadl::AADLObjectComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
