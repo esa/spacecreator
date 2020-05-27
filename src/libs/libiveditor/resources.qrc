@@ -13,7 +13,6 @@
         <file alias="fonts/UbuntuMono-BI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-BI.ttf</file>
         <file alias="fonts/UbuntuMono-R.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-R.ttf</file>
         <file alias="fonts/UbuntuMono-RI.ttf">resources/ubuntu-font-family-0.83/UbuntuMono-RI.ttf</file>
-        <file alias="backgrounds/texture.png">resources/texture.png</file>
     </qresource>
     <qresource prefix="/defaults">
         <file>resources/taste-types.asn</file>

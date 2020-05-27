@@ -80,17 +80,4 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
         GraphicsViewBase::keyPressEvent(event);
 }
 
-void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
-{
-    static const QImage brushImage { QLatin1String(":/backgrounds/texture.png") };
-    auto zoomPercent = zoom();
-    const QRectF scaleSceneRect { rect.topLeft() * zoomPercent / 100, rect.size() * zoomPercent / 100 };
-    painter->save();
-    painter->scale(100 / zoomPercent, 100 / zoomPercent);
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(brushImage);
-    painter->drawRect(scaleSceneRect);
-    painter->restore();
-}
-
 }

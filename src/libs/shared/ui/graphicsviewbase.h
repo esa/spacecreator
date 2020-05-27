@@ -47,6 +47,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void drawBackground(QPainter *painter, const QRectF &rect) override;
 
 private:
     struct GraphicsViewBasePrivate;

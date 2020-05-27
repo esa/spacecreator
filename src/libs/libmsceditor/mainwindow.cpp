@@ -452,7 +452,6 @@ void MainWindow::setupUi()
     //    d->ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft); // make scene's origin be great^W in topLeft
     d->ui->documentTreeView->setModel(d->m_model->documentItemModel());
 
-    d->ui->hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
     d->ui->hierarchyView->setScene(d->m_model->hierarchyScene());
 
     d->mscTextBrowser->setModel(d->m_model->mscModel());

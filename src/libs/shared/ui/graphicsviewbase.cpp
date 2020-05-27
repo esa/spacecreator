@@ -1,6 +1,8 @@
 #include "graphicsviewbase.h"
 
+#include <QDebug>
 #include <QMouseEvent>
+#include <QPainter>
 
 namespace shared {
 namespace ui {
@@ -164,6 +166,35 @@ void GraphicsViewBase::keyPressEvent(QKeyEvent *event)
     } else {
         QGraphicsView::keyPressEvent(event);
     }
+}
+
+void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    // Light grey background
+    painter->fillRect(rect, QColor(231, 234, 237));
+
+    // Draw the vertical lines
+    painter->save();
+    painter->setPen(QColor(238, 241, 241));
+
+    // By doing this we counter the zooming
+    auto zoomPercent = zoom();
+    const QRectF scaleSceneRect { rect.topLeft() * zoomPercent / 100, rect.size() * zoomPercent / 100 };
+    painter->scale(100 / zoomPercent, 100 / zoomPercent);
+
+    // Now do the drawing
+    const int y1 = static_cast<int>(scaleSceneRect.top());
+    const int y2 = static_cast<int>((scaleSceneRect.bottom() + 1));
+    const int x1 = static_cast<int>((scaleSceneRect.left()));
+    const int x2 = static_cast<int>((scaleSceneRect.right() + 1));
+    for (int x = x1 & ~15; x <= x2; x += 16) {
+        painter->drawLine(x, y1, x, y2);
+    }
+    for (int y = y1 & ~15; y < y2; y += 16) {
+        painter->drawLine(x1, y, x2, y);
+    }
+
+    painter->restore();
 }
 
 }

@@ -36,8 +36,6 @@ GraphicsView::GraphicsView(QWidget *parent)
 {
     setMinZoomPercent(50);
 
-    setBackgroundBrush(QImage(":/resources/resources/texture.png"));
-
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
 }
