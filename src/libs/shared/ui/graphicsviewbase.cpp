@@ -178,7 +178,7 @@ void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)
     painter->setPen(QColor(238, 241, 241));
 
     // By doing this we counter the zooming
-    auto zoomPercent = zoom();
+    const double zoomPercent = zoom();
     const QRectF scaleSceneRect { rect.topLeft() * zoomPercent / 100, rect.size() * zoomPercent / 100 };
     painter->scale(100 / zoomPercent, 100 / zoomPercent);
 
