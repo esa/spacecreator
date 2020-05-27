@@ -42,9 +42,9 @@ public:
     QString name() const override;
     QString label() const override;
 
-private:
     QString baseIconFile() const override;
 
+private:
     QString m_name;
     QString m_module;
 };

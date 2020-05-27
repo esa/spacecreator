@@ -45,9 +45,3 @@ QString LabelType::baseIconFile() const
 {
     return QString();
 }
-
-QIcon LabelType::createIcon(Utils::Theme::Color color) const
-{
-    Q_UNUSED(color);
-    return QIcon();
-}

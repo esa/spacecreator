@@ -107,7 +107,7 @@ struct ChartViewModelPrivate {
 
     static qreal interInstanceSpan()
     {
-        static constexpr int interInstanceSpanCIF { 200 };
+        static constexpr int interInstanceSpanCIF { 300 };
         static qreal interInstanceSpanScene { 0. };
         if (qFuzzyIsNull(interInstanceSpanScene)) {
             interInstanceSpanScene = shared::CoordinatesConverter::heightInScene(interInstanceSpanCIF);

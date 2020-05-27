@@ -1,37 +1,4 @@
-set(PLUGIN_NAME asn1scc.IDE)
-
-# Check is the qtcreator source/build exists
-if($ENV{QTC_SOURCE})
-    set(QTC_SOURCE_DIR $ENV{QTC_SOURCE})
-else()
-    # fallback
-    set(QTC_SOURCE_DIR /opt/qt-creator-dev/qt-creator)
-endif()
-if($ENV{QTC_BUILD})
-    set(QTC_BUILD_DIR $ENV{QTC_BUILD})
-else()
-    # fallback
-    set(QTC_BUILD_DIR /opt/qt-creator-dev/build-debug)
-endif()
-
-if (NOT EXISTS "${QTC_SOURCE_DIR}/src/app/qtcreator.rc")
-    message("Skipping ${PLUGIN_NAME} - could not find QtCreator sources in ${QTC_SOURCE_DIR}")
-    return()
-endif()
-if (NOT EXISTS "${QTC_BUILD_DIR}/lib/qtcreator/plugins/libTextEditor.so")
-    message("Skipping ${PLUGIN_NAME} - could not find QtCreator build in ${QTC_BUILD_DIR}")
-    return()
-endif()
-
-message("${PLUGIN_NAME} is build")
-message(" - QTC_SOURCE_DIR ${QTC_SOURCE_DIR}")
-message(" - QTC_BUILD_DIR ${QTC_BUILD_DIR}")
-
-# Now start the real file
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
-include(QtCreatorIDEBranding)
-include(QtCreatorAPI)
+set(PLUGIN_NAME Asn1Acn)
 
 set(ASN1_SOURCES
     src/completion/autocompleter.cpp
