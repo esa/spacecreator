@@ -1,4 +1,5 @@
-option(ENABLE_LD_GOLD "Use GNU gold linker" ON)
+include(CMakeDependentOption)
+cmake_dependent_option(ENABLE_LD_GOLD "Use GNU gold linker" ON "UNIX" OFF)
 
 set(LD_GOLD_FOUND FALSE)
 if(ENABLE_LD_GOLD)
@@ -13,5 +14,4 @@ if(ENABLE_LD_GOLD)
     message(WARNING "GNU gold linker is not available, falling back to default system linker")
   endif()
 else()
-  message(STATUS "Linker: Default system linker")
 endif()
