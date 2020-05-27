@@ -34,54 +34,6 @@ namespace shared {
 
 */
 
-QPainterPath lineShape(const QLineF &line, qreal span)
-{
-    QPainterPath result;
-
-    QLineF normalSpan(line.normalVector());
-    normalSpan.setLength(span);
-
-    const QPointF delta = line.p1() - normalSpan.p2();
-    const QLineF dec(line.translated(delta));
-    const QLineF inc(line.translated(-delta));
-
-    result.moveTo(dec.p1());
-    result.lineTo(dec.p2());
-    result.lineTo(inc.p2());
-    result.lineTo(inc.p1());
-
-    return result;
-}
-
-QPointF lineCenter(const QLineF &line)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-    return line.center();
-#else
-    return 0.5 * line.p1() + 0.5 * line.p2();
-#endif
-}
-
-QPointF pointFromPath(const QPainterPath &path, int num)
-{
-    QPointF result;
-    if (!path.isEmpty()) {
-        num = qBound(0, num, path.elementCount() - 1);
-        result = path.elementAt(num);
-    }
-    return result;
-}
-
-QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance)
-{
-    QPointF result(source);
-    const QLineF delta(source, target);
-    if (qAbs(delta.dx()) <= tolerance) {
-        result.rx() += delta.dx();
-    }
-    return result;
-}
-
 bool removeSceneItem(QGraphicsItem *item)
 {
     // Removing an item by QGraphicsScene::removeItem + delete
@@ -114,31 +66,11 @@ bool removeSceneItem(QGraphicsItem *item)
     return true;
 }
 
-bool intersects(const QRectF &rect, const QLineF &line)
-{
-    if (rect.isNull() || line.isNull())
-        return false;
-
-    const QVector<QLineF> rectLines = {
-        { rect.topLeft(), rect.topRight() },
-        { rect.topRight(), rect.bottomRight() },
-        { rect.bottomRight(), rect.bottomLeft() },
-        { rect.bottomLeft(), rect.topLeft() },
-    };
-
-    QPointF intersectionPoint;
-    for (const QLineF &rectLine : rectLines)
-        if (rectLine.intersect(line, &intersectionPoint) == QLineF::BoundedIntersection)
-            return true;
-
-    return false;
-}
-
 QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos)
 {
     QVector<InstanceItem *> items;
     if (scene)
-        for (InstanceItem *item : toplevelItems<InstanceItem>(scene))
+        for (InstanceItem *item : ::shared::graphicsviewutils::toplevelItems<InstanceItem>(scene))
             if (item->sceneBoundingRect().contains(scenePos))
                 items << item;
 

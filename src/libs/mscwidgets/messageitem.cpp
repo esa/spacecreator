@@ -768,7 +768,7 @@ void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
     Q_ASSERT(!scenePoints.isEmpty());
 
     GeometryNotificationBlocker keepSilent(this);
-    setPos(shared::lineCenter({ scenePoints.first(), scenePoints.last() }));
+    setPos(QLineF(scenePoints.first(), scenePoints.last()).center());
     m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
     updateGripPoints();

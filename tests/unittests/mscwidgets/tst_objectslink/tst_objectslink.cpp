@@ -89,7 +89,7 @@ void tst_ObjectsLink::testMakeLink()
     ObjectsLink link;
     const QPointF linkCenter = link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
-    QCOMPARE(linkCenter, msc::shared::lineCenter(ab));
+    QCOMPARE(linkCenter, ab.center());
 
     QCOMPARE(link.source()->object(), m_itemA);
     QCOMPARE(link.source()->point(), centerA);
@@ -107,7 +107,7 @@ void tst_ObjectsLink::testLinkCenter()
     ObjectsLink link;
     link.makeLink(m_itemA, centerA, m_itemB, centerB);
 
-    QCOMPARE(link.linkCenter(), msc::shared::lineCenter(ab));
+    QCOMPARE(link.linkCenter(), ab.center());
 }
 
 void tst_ObjectsLink::testReplaceSourceNoSnap()

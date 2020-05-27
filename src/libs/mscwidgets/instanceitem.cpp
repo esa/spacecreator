@@ -372,7 +372,8 @@ QPointF InstanceItem::avoidOverlaps(InstanceItem *caller, const QPointF &delta, 
         return delta;
 
     const QRectF &callerRect = shiftedRect.isNull() ? caller->sceneBoundingRect() : shiftedRect.translated(delta);
-    for (InstanceItem *otherItem : shared::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
+    for (InstanceItem *otherItem :
+            ::shared::graphicsviewutils::itemByPos<InstanceItem, QRectF>(caller->scene(), callerRect)) {
         if (otherItem != caller) {
             const QRectF &otherRect = otherItem->sceneBoundingRect();
             if (callerRect.intersects(otherRect)) {

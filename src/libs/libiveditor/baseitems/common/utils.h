@@ -20,7 +20,6 @@
 
 class QLineF;
 class QPointF;
-class QPropertyAnimation;
 
 namespace aadlinterface {
 
@@ -35,13 +34,6 @@ static const int kConnectionZLevel = 1;
 static const int kInterfaceZLevel = 2;
 static const int kCommentZLevel = 3;
 static const int kGripZLevel = 4;
-
-QPointF lineCenter(const QLineF &line);
-QPropertyAnimation *createLinearAnimation(
-        QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs);
-bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
-bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
-QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
 
 qreal distanceLine(const QPointF &p1, const QPointF &p2);
 qreal distancePolygon(const QVector<QPointF> &polygon);

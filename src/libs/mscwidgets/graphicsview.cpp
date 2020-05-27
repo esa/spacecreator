@@ -20,6 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
 #include "baseitems/interactiveobject.h"
+#include "graphicsviewutils.h"
 
 #include <QGraphicsItem>
 #include <QMouseEvent>
@@ -56,7 +57,7 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
 {
     QList<QPair<QPointF, QString>> coords;
     coords.push_back({ shared::CoordinatesConverter::sceneToCif(scenePos), "CIF" });
-    for (InteractiveObject *item : shared::itemByPos<InteractiveObject>(scene, scenePos)) {
+    for (InteractiveObject *item : ::shared::graphicsviewutils::itemByPos<InteractiveObject>(scene, scenePos)) {
         coords.push_back({ item->mapFromScene(scenePos),
                 item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None") });
     }

@@ -125,13 +125,13 @@ void tst_ArrowItem::testBoundingRect()
     const QLineF itemCenters(rect1.center(), rect2.center());
 
     ai.makeArrow(m_item1, rect1.center(), m_item2, rect2.center());
-    ai.setPos(msc::shared::lineCenter(itemCenters));
+    ai.setPos(itemCenters.center());
 
     const QRectF &aiBounds(ai.sceneBoundingRect());
     QCOMPARE(aiBounds.width(), itemCenters.length());
     QVERIFY(!qFuzzyIsNull(aiBounds.height()));
-    QCOMPARE(msc::shared::lineCenter(QLineF(aiBounds.topLeft(), aiBounds.bottomLeft())), itemCenters.p1());
-    QCOMPARE(msc::shared::lineCenter(QLineF(aiBounds.topRight(), aiBounds.bottomRight())), itemCenters.p2());
+    QCOMPARE(QLineF(aiBounds.topLeft(), aiBounds.bottomLeft()).center(), itemCenters.p1());
+    QCOMPARE(QLineF(aiBounds.topRight(), aiBounds.bottomRight()).center(), itemCenters.p2());
 }
 
 void tst_ArrowItem::testUpdateStart()

@@ -28,7 +28,6 @@
 #include <QDebug>
 #include <QGraphicsView>
 #include <QMetaEnum>
-#include <QPropertyAnimation>
 #include <QtGlobal>
 #include <QtMath>
 
@@ -38,114 +37,6 @@ namespace aadlinterface {
  * \namespace taste3::utils
  * \brief   Graphical, math and other utils, shared among all submodules.
  */
-
-/*!
- * \brief Helper to calc the center of the \a line to be used with Qt < 5.8
- * Returns coordinates in the QPointF.
- */
-QPointF lineCenter(const QLineF &line)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-    return line.center();
-#else
-    return 0.5 * line.p1() + 0.5 * line.p2();
-#endif
-}
-
-/*!
- * \brief The animation creation helper.
- * \sa HighlightRectItem
- */
-QPropertyAnimation *createLinearAnimation(
-        QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs)
-{
-    QPropertyAnimation *anim = new QPropertyAnimation(target, propName.toUtf8());
-    anim->setDuration(durationMs);
-    anim->setEasingCurve(QEasingCurve::Linear);
-
-    anim->setStartValue(from);
-    anim->setEndValue(to);
-
-    return anim;
-}
-
-/*!
- * \brief Helper to detect if the \a line intersects the \a rect.
- * Coordinates of the intersection point stored in \a intersctPos.
- * Returns \c true if \a rect and \a line are not null and intersected.
- */
-bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
-{
-    if (rect.isNull() || line.isNull())
-        return false;
-
-    const QVector<QLineF> rectLines = {
-        { rect.topLeft(), rect.topRight() },
-        { rect.topRight(), rect.bottomRight() },
-        { rect.bottomRight(), rect.bottomLeft() },
-        { rect.bottomLeft(), rect.topLeft() },
-    };
-
-    for (const QLineF &rectLine : rectLines) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        if (rectLine.intersects(line, intersectPos) == QLineF::BoundedIntersection)
-#else
-        if (rectLine.intersect(line, intersectPos) == QLineF::BoundedIntersection)
-#endif
-            return true;
-    }
-
-    return false;
-}
-
-/*!
- * \brief Helper to detect if each sub segment of the \a polygon intersects the \a rect.
- * Returns coordinates of intersection points.
- */
-QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
-{
-    if (rect.isNull() || polygon.isEmpty())
-        return {};
-
-    const QVector<QLineF> rectLines = {
-        { rect.topLeft(), rect.topRight() },
-        { rect.topRight(), rect.bottomRight() },
-        { rect.bottomRight(), rect.bottomLeft() },
-        { rect.bottomLeft(), rect.topLeft() },
-    };
-
-    QPointF intersectPos;
-    QVector<QPointF> points;
-    for (int idx = 1; idx < polygon.size(); ++idx) {
-        const QLineF line = { polygon.value(idx - 1), polygon.value(idx) };
-        for (const QLineF &rectLine : rectLines) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-            if (rectLine.intersects(line, &intersectPos) == QLineF::BoundedIntersection)
-#else
-            if (rectLine.intersect(line, &intersectPos) == QLineF::BoundedIntersection)
-#endif
-                points.append(intersectPos);
-        }
-    }
-    return points;
-}
-
-/*!
- * \brief Helper to detect if at least one sub segment of the \a polygon intersects the \a rect.
- * Coordinates of the intersection point stored in \a intersctPos.
- * Returns \c true if a sub segment of the \a polygon intersects the \a rect.
- */
-/*!
- * Returns coordinates of intersection points.
- */
-bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
-{
-    for (int idx = 1; idx < polygon.size(); ++idx) {
-        if (intersects(rect, QLineF(polygon.value(idx - 1), polygon.value(idx)), intersectPos))
-            return true;
-    }
-    return false;
-}
 
 /*!
  * Returns the side type of \a boundingArea's which is most close to the \a pos.

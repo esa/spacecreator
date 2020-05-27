@@ -30,6 +30,7 @@
 #include "commands/commandids.h"
 #include "commands/commandsfactory.h"
 #include "commandsstack.h"
+#include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
 
 #include <QGuiApplication>
@@ -62,7 +63,7 @@ static inline QVector<QPointF> generateConnection(const QLineF &startDirection, 
     const qreal angle = startDirection.angleTo(endDirection);
     static const qreal tolerance = 0.1;
     if (qAbs(qSin(qDegreesToRadians(angle))) <= tolerance) { // ||
-        const QPointF mid = lineCenter(QLineF(connectionPoints.first(), connectionPoints.last()));
+        const QPointF mid = QLineF(connectionPoints.first(), connectionPoints.last()).center();
         QLineF midLine { mid, QPointF(0, 0) };
         midLine.setAngle(startDirection.angle() - 90);
 
@@ -134,7 +135,8 @@ static inline QList<QVector<QPointF>> findSubPath(
     QList<QVector<QPointF>> allPaths;
     for (const QPointF &p : rectCorners) {
         for (const auto &polygon : generateConnection(startPoint, p)) {
-            if (!intersects(itemRect, polygon) && !intersects(itemRect, QLineF(p, endPoint))) {
+            if (!shared::graphicsviewutils::intersects(itemRect, polygon)
+                    && !shared::graphicsviewutils::intersects(itemRect, QLineF(p, endPoint))) {
                 QVector<QPointF> previousPoints(prevPoints);
                 previousPoints.removeLast();
                 previousPoints << polygon;
@@ -159,7 +161,7 @@ static inline QVector<QPointF> findPath(
             continue;
 
         QPointF intersectionPoint;
-        if (intersects((*it)->sceneBoundingRect(), points, &intersectionPoint)
+        if (shared::graphicsviewutils::intersects((*it)->sceneBoundingRect(), points, &intersectionPoint)
                 && QLineF(startDirection.p2(), intersectionPoint).length() < distance) {
             intersectionItem = *it;
         }
@@ -197,15 +199,19 @@ static inline QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDi
             const auto subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
             static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
             for (auto subPath : subPaths) {
-                if (subPath.isEmpty())
+                if (subPath.isEmpty()) {
                     continue;
+                }
 
                 const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
                 auto it = std::find_if(
                         intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
-                            if (!types.contains(item->type()))
+                            if (!types.contains(item->type())) {
                                 return false;
-                            return intersectionPoints(item->sceneBoundingRect(), subPath).size() > 1;
+                            }
+                            auto points =
+                                    shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), subPath);
+                            return points.size() > 1;
                         });
                 if (it != intersectedItems.constEnd())
                     continue;
@@ -618,7 +624,8 @@ void AADLConnectionGraphicsItem::onManualMoveFinish(
 
     for (auto item : scene()->items(m_points)) {
         if (qobject_cast<AADLRectGraphicsItem *>(item->toGraphicsObject())) {
-            if (intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size() > 1) {
+            if (shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), QPolygonF(m_points)).size()
+                    > 1) {
                 rebuildLayout();
                 updateEntity();
                 return;
@@ -666,7 +673,7 @@ QVector<QPointF> AADLConnectionGraphicsItem::simplify(const QVector<QPointF> &po
         const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
 
         if (qFuzzyCompare(prevLine.angle(), nextLine.angle()) && currentLine.length() < kMinLineLength) {
-            const QPointF midPoint = lineCenter(currentLine);
+            const QPointF midPoint = currentLine.center();
             const QPointF prevOffset = midPoint - currentLine.p1();
             simplifiedPoints[idx - 1] = prevLine.p1() + prevOffset;
             const QPointF nextOffset = midPoint - currentLine.p2();

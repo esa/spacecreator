@@ -50,10 +50,10 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->drawLine(topLine);
     painter->drawLine(bottomLine);
     painter->setPen(QPen(Qt::white, 3., Qt::SolidLine));
-    painter->drawLine(shared::lineCenter(topLine), shared::lineCenter(bottomLine));
+    painter->drawLine(topLine.center(), bottomLine.center());
     painter->setPen(QPen(Qt::darkGray, 3., Qt::DashLine));
     if (m_unorderedEntities) {
-        painter->drawLine(shared::lineCenter(topLine), shared::lineCenter(bottomLine));
+        painter->drawLine(topLine.center(), bottomLine.center());
     } else {
         painter->drawLine(rect.topLeft(), rect.bottomLeft());
         painter->drawLine(rect.topRight(), rect.bottomRight());

@@ -33,6 +33,7 @@
 #include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
 #include "graphicsitemhelpers.h"
+#include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
 
 #include <QAction>
@@ -122,8 +123,8 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
                         { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted = startIfaceItem->scenePos();
-    } else if (!aadlinterface::intersects(result.functionAtStartPos->sceneBoundingRect(), result.connectionLine,
-                       &result.startPointAdjusted)) {
+    } else if (!::shared::graphicsviewutils::intersects(result.functionAtStartPos->sceneBoundingRect(),
+                       result.connectionLine, &result.startPointAdjusted)) {
         result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;
     }
@@ -138,7 +139,7 @@ static ValidationResult validateCreate(QGraphicsScene *scene, const QPointF &sta
                         { aadlinterface::AADLInterfaceGraphicsItem::Type }))) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted = endIfaceItem->scenePos();
-    } else if (!aadlinterface::intersects(
+    } else if (!shared::graphicsviewutils::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), result.connectionLine, &result.endPointAdjusted)) {
         result.setFailed(aadl::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
         return result;
@@ -643,7 +644,7 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     /// TODO: check creating connection from nested function as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevStartItem->parentItem())) {
         const QVector<QPointF> intersectionPoints =
-                aadlinterface::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
+                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             parentForConnection = item;
             break;
@@ -687,7 +688,8 @@ void CreatorTool::handleConnection(const QVector<QPointF> &connectionPoints) con
     shared::Id prevEndIfaceId = info.endIfaceId;
     /// TODO: check creating connection from parent item as a start function
     while (auto item = qgraphicsitem_cast<aadlinterface::AADLFunctionGraphicsItem *>(prevEndItem->parentItem())) {
-        auto intersectionPoints = aadlinterface::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
+        auto intersectionPoints =
+                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;

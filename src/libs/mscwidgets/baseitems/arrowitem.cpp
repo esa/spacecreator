@@ -110,7 +110,7 @@ void ArrowItem::buildLayout()
     const QPointF currEndLolcal(mapFromScene(currEnd));
 
     QLineF line(currStartLocal, currEndLolcal);
-    line.translate(-shared::lineCenter(line));
+    line.translate(-line.center());
 
     updateLine(line);
 }

@@ -22,6 +22,7 @@
 #include "baseitems/textitem.h"
 #include "chartviewmodel.h"
 #include "commands/common/commandsstack.h"
+#include "graphicsviewutils.h"
 #include "mscchart.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
@@ -316,7 +317,7 @@ QPainterPath ChartItem::shape() const
         { rect.bottomRight(), rect.bottomLeft() }, { rect.bottomLeft(), rect.topLeft() } };
     QPainterPath result;
     for (const QLineF &line : lines)
-        result.addPath(shared::lineShape(line, shared::LineHoverTolerance));
+        result.addPath(::shared::graphicsviewutils::lineShape(line, shared::LineHoverTolerance));
     return result;
 }
 

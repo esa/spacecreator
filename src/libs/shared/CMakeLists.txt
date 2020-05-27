@@ -30,6 +30,8 @@ target_sources(${LIB_NAME} PRIVATE
     common.h
     delayedsignal.cpp
     delayedsignal.h
+    graphicsviewutils.cpp
+    graphicsviewutils.h
     plugin.cpp
     plugin.h
     settingsappoption.cpp

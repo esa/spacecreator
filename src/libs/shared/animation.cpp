@@ -5,6 +5,10 @@
 namespace shared {
 namespace Animation {
 
+/*!
+ * \brief The animation creation helper.
+ * \sa HighlightRectItem
+ */
 QPropertyAnimation *createLinearAnimation(
         QObject *target, const QString &propName, const QVariant &from, const QVariant &to, const int durationMs)
 {

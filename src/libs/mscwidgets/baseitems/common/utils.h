@@ -16,13 +16,14 @@
 */
 #pragma once
 
+#include "graphicsviewutils.h"
+
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QPainterPath>
 #include <QPointF>
 
 class QLineF;
-class QPropertyAnimation;
 
 namespace msc {
 
@@ -30,42 +31,15 @@ class InstanceItem;
 
 namespace shared {
 
-static constexpr qreal LineHoverTolerance = 10.;
-static constexpr qreal LineHorizontalityTolerance = 15.;
+constexpr qreal LineHoverTolerance = 10.;
+constexpr qreal LineHorizontalityTolerance = 15.;
+
 enum class CifUpdatePolicy
 {
     DontChange,
     ForceCreate,
     UpdateIfExists
 };
-
-template<class ItemType, class TargetPositioning>
-QVector<ItemType *> itemByPos(QGraphicsScene *scene, const TargetPositioning &scenePos)
-{
-    QVector<ItemType *> items;
-    if (scene)
-        for (QGraphicsItem *item : scene->items(scenePos, Qt::IntersectsItemBoundingRect)) {
-            if (item->parentItem())
-                continue;
-
-            if (ItemType *instance = dynamic_cast<ItemType *>(item))
-                items << instance;
-        }
-    return items;
-}
-
-template<class ItemType>
-QList<ItemType *> toplevelItems(QGraphicsScene *scene)
-{
-    QList<ItemType *> items;
-    if (scene) {
-        for (QGraphicsItem *item : scene->items())
-            if (!item->parentItem())
-                if (ItemType *casted = dynamic_cast<ItemType *>(item))
-                    items.append(casted);
-    }
-    return items;
-}
 
 /*!
   Returns the item of a specific entity in the given scene;
@@ -74,7 +48,7 @@ template<typename ItemType, typename MscEntityType>
 ItemType *itemForEntity(MscEntityType *event, QGraphicsScene *scene)
 {
     if (event)
-        for (ItemType *item : shared::toplevelItems<ItemType>(scene))
+        for (ItemType *item : ::shared::graphicsviewutils::toplevelItems<ItemType>(scene))
             if (item && item->modelEntity() && item->modelEntity()->internalId() == event->internalId())
                 return item;
 
@@ -97,12 +71,7 @@ QVector<MscEntityType *> getEntityFromSelection(QGraphicsScene *scene)
     return items;
 }
 
-QPainterPath lineShape(const QLineF &line, qreal span);
-QPointF lineCenter(const QLineF &line);
-QPointF pointFromPath(const QPainterPath &path, int num);
-QPointF snapToPointByX(const QPointF &target, const QPointF &source, qreal tolerance);
 bool removeSceneItem(QGraphicsItem *item);
-bool intersects(const QRectF &rect, const QLineF &line);
 QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos);
 
 bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
@@ -110,5 +79,6 @@ bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTole
 bool isHorizontal(const QVector<QPointF> &twoPoints, const qreal verticalTolerance = LineHorizontalityTolerance);
 
 QRectF framedRect(const QRectF &rect, qreal frameWidth);
-} // ns utils
-} // ns msc
+
+}
+}
