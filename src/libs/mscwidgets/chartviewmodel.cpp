@@ -366,7 +366,7 @@ void ChartViewModel::addInstanceItems()
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
         d->m_layoutInfo.m_instancesRect |= item->sceneBoundingRect();
 
-        if (d->m_visibleItemLimit != -1 && instance->explicitStop()) {
+        if (isStreamingModeEnabled() && instance->explicitStop()) {
             const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
             const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
             auto chartEvItEnd = chartEvents.crbegin();
@@ -413,7 +413,7 @@ void ChartViewModel::addInstanceEventItems()
     InteractiveObject *instanceEventItem(nullptr);
     const QVector<MscInstanceEvent *> &chartEvents = d->m_currentChart->instanceEvents();
     auto it = chartEvents.begin();
-    if (d->m_visibleItemLimit != -1) {
+    if (isStreamingModeEnabled()) {
         for (; it != chartEvents.end(); ++it) {
             if (std::distance(it, chartEvents.end()) <= d->m_visibleItemLimit)
                 break;
@@ -1478,6 +1478,14 @@ void ChartViewModel::setVisibleItemLimit(int number)
     updateLayout();
 }
 
+/**
+   Returns true if the number of visible items is restricted. That's used for the "streaming mode".
+ */
+bool ChartViewModel::isStreamingModeEnabled() const
+{
+    return d->m_visibleItemLimit > 0;
+}
+
 const QPointer<ChartItem> ChartViewModel::chartItem() const
 {
     return d->m_layoutInfo.m_chartItem;
@@ -1592,6 +1600,10 @@ void ChartViewModel::onInstanceCreatorChanged(MscInstance *newCreator)
 
 void ChartViewModel::forceCifForAll()
 {
+    if (isStreamingModeEnabled()) {
+        return;
+    }
+
     for (InteractiveObject *item : d->allItems()) {
         if (!item->geometryManagedByCif()) {
             QSignalBlocker suppressItemCifAdded(item->modelEntity());

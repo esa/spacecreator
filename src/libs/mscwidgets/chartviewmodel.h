@@ -96,6 +96,7 @@ public:
     int instanceOrderFromPos(const QPointF &scenePos);
 
     void setVisibleItemLimit(int number);
+    bool isStreamingModeEnabled() const;
 
     const QPointer<ChartItem> chartItem() const;
     QRectF minimalContentRect() const;
