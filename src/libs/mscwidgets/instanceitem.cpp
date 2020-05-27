@@ -490,6 +490,11 @@ QRectF InstanceItem::kindBox() const
     return m_headSymbol->rectGeometry();
 }
 
+InstanceHeadItem *InstanceItem::headerItem() const
+{
+    return m_headSymbol;
+}
+
 qreal InstanceItem::defaultAxisHeight()
 {
     static constexpr int defaultAxisHeightCIF { 300 };

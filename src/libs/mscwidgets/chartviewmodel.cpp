@@ -673,6 +673,14 @@ QRectF ChartViewModel::actualContentRect() const
     return r;
 }
 
+/**
+   Returns all the instance items
+ */
+const QVector<InstanceItem *> &ChartViewModel::instanceItems() const
+{
+    return d->m_instanceItemsSorted;
+}
+
 QLineF ChartViewModel::commonAxis() const
 {
     qreal commonAxisStart { 0 }, commonAxisStop { 0 };

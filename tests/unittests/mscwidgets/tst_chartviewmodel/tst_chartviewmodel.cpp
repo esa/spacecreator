@@ -17,11 +17,13 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/utils.h"
+#include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "chartviewmodel.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
+#include "mscdocument.h"
 #include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -36,7 +38,7 @@
 #include <QScopedPointer>
 #include <QVector>
 #include <QtTest>
-#include <mscdocument.h>
+#include <cmath>
 
 using namespace msc;
 
@@ -58,6 +60,7 @@ private Q_SLOTS:
     void testLoadedCifMessagePosition();
     void testDefaultChartSize();
     void testInstanceCifExtendedChartWidth();
+    void testAddTwoMessages();
 
 private:
     QGraphicsView m_view;
@@ -319,6 +322,53 @@ void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
 
     QVERIFY(std::abs(chartItem->contentRect().width() - inst2Rect.right()) <= m_maxOffset);
     QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), inst2Rect.bottom()));
+}
+
+void tst_ChartViewModel::testAddTwoMessages()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_A;\
+                              endinstance;\
+                              instance Instance_B;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    const QVector<MscInstance *> &instances = m_chart->instances();
+    MscInstance *instanceA = instances.at(0);
+    MscInstance *instanceB = instances.at(1);
+
+    auto message1 = new MscMessage("Msg1");
+    message1->setSourceInstance(instanceA);
+    message1->setTargetInstance(instanceB);
+    m_chart->addInstanceEvent(message1);
+    QApplication::processEvents(); // Perform layout update
+
+    InstanceItem *instanceItemA = m_chartModel->instanceItems().at(0);
+    MessageItem *msgItem1 = m_chartModel->itemForMessage(message1);
+    InstanceHeadItem *headItem = instanceItemA->headerItem();
+    const QRectF headRect = headItem->sceneBoundingRect();
+    const QRectF message1Rect = msgItem1->sceneBoundingRect();
+    QVERIFY2(headRect.bottom() <= message1Rect.top(), "The message top is not below the instance head");
+
+    auto message2 = new msc::MscMessage("Msg2");
+    message2->setSourceInstance(instanceA);
+    message2->setTargetInstance(instanceB);
+    m_chart->addInstanceEvent(message2);
+    QApplication::processEvents(); // Perform layout update
+
+    // Message 1 still at same y position? - check from issue #65
+    msgItem1 = m_chartModel->itemForMessage(message1);
+    const QRectF headRect2 = headItem->sceneBoundingRect();
+    const QRectF message1Rect2 = msgItem1->sceneBoundingRect();
+    QVERIFY2(headRect2.bottom() <= message1Rect2.top(), "The message top is not below the instance head");
+
+    const qreal delta = 1.;
+    QVERIFY2(std::abs(message1Rect2.top() - message1Rect2.top()) < delta, "The message Y moved");
 }
 
 QTEST_MAIN(tst_ChartViewModel)

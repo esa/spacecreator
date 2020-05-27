@@ -70,6 +70,8 @@ private:
     void updatePath();
 
     QPainterPath createShape(qreal lineWidth) const;
+
+    bool consistentcyCheck() const;
 };
 
 } // ns msc

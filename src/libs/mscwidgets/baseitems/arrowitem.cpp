@@ -21,6 +21,7 @@
 #include "common/objectslink.h"
 #include "common/utils.h"
 
+#include <QDebug>
 #include <QGraphicsView>
 #include <QPainter>
 
@@ -99,6 +100,7 @@ bool ArrowItem::updateAnchor(
         const QLineF line(currStartLocal, currEndLolcal);
         updateLine(line);
     }
+    consistentcyCheck();
     return updated;
 }
 
@@ -113,12 +115,14 @@ void ArrowItem::buildLayout()
     line.translate(-line.center());
 
     updateLine(line);
+    consistentcyCheck();
 }
 
 void ArrowItem::addTurnPoint(const QPointF &scenePoint)
 {
     m_polyLine.append(mapFromScene(scenePoint));
     updatePath();
+    consistentcyCheck();
 }
 
 void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
@@ -133,6 +137,7 @@ void ArrowItem::setTurnPoints(const QVector<QPointF> &scenePoints)
         QSignalBlocker silently(this);
         updatePath();
     }
+    consistentcyCheck();
 }
 
 /*!
@@ -157,6 +162,7 @@ void ArrowItem::updateLine(const QLineF &newLine)
     }
 
     updatePath();
+    consistentcyCheck();
 }
 
 void ArrowItem::updatePath()
@@ -184,6 +190,7 @@ void ArrowItem::updatePath()
     if (m_symbolShown.Target)
         m_bounds |= m_symbols.Target.boundingRect();
 
+    consistentcyCheck();
     Q_EMIT geometryChanged(boundingRect());
 }
 
@@ -212,6 +219,7 @@ QPointF ArrowItem::makeArrow(InteractiveObject *source, const QPointF &sourceAnc
 {
     const QPointF result(link()->makeLink(source, sourceAnchorPoint, target, targetAnchorPoint));
     rebuildLayout();
+    consistentcyCheck();
     return result;
 }
 
@@ -252,6 +260,36 @@ QPainterPath ArrowItem::createShape(qreal lineWidth) const
     }
 
     return result;
+}
+
+bool ArrowItem::consistentcyCheck() const
+{
+#ifdef QT_DEBUG
+    if (m_polyLine.size() < 2) {
+        return true;
+    }
+    if (!m_link || !m_link->source() || !m_link->target()) {
+        return true;
+    }
+
+    QPointF start = mapToScene(m_polyLine.first());
+    if ((start.toPoint() != m_link->source()->point().toPoint())
+            && (start.toPoint() != m_link->target()->point().toPoint())) {
+        qCritical() << Q_FUNC_INFO << "polyline start is neither arrow start/end." << m_polyLine.first() << start
+                    << m_link->source()->point().toPoint() << m_link->target()->point().toPoint();
+        return false;
+    }
+
+    QPointF end = mapToScene(m_polyLine.last());
+    if ((end.toPoint() != m_link->source()->point().toPoint())
+            && (end.toPoint() != m_link->target()->point().toPoint())) {
+        qCritical() << Q_FUNC_INFO << "polyline end is neither arrow start/end." << m_polyLine.last() << start
+                    << m_link->source()->point().toPoint() << m_link->target()->point().toPoint();
+        return false;
+    }
+#endif
+
+    return true;
 }
 
 } // ns msc

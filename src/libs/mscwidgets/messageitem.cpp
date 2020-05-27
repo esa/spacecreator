@@ -820,6 +820,21 @@ cif::CifLine::CifType MessageItem::mainCifType() const
     return isCreator() ? cif::CifLine::CifType::Create : cif::CifLine::CifType::Message;
 }
 
+QVariant MessageItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemScenePositionHasChanged) {
+        // When the message was moved, make sure the arrow start/end are moved as well
+        const QVector<QPointF> &arrowPoints = messagePoints();
+        if (arrowPoints.size() >= 2) {
+            ObjectsLink *link = m_arrowItem->arrow()->link();
+            link->source()->setPoint(arrowPoints.first(), ObjectAnchor::Snap::NoSnap);
+            link->target()->setPoint(arrowPoints.last(), ObjectAnchor::Snap::NoSnap);
+        }
+    }
+
+    return InteractiveObject::itemChange(change, value);
+}
+
 void MessageItem::updateCif()
 {
     using namespace cif;

@@ -111,6 +111,8 @@ protected:
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
 
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
+
 private Q_SLOTS:
     void onTextChanged();
     void showMessageDialog();

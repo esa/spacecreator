@@ -76,6 +76,8 @@ public:
 
     QRectF kindBox() const;
 
+    InstanceHeadItem *headerItem() const;
+
     static qreal defaultAxisHeight();
 
 public Q_SLOTS:

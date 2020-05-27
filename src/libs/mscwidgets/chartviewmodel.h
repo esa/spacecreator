@@ -101,6 +101,8 @@ public:
     QRectF minimalContentRect() const;
     QRectF actualContentRect() const;
 
+    const QVector<msc::InstanceItem *> &instanceItems() const;
+
 public Q_SLOTS:
     void updateLayout();
     void fillView(msc::MscChart *chart);
