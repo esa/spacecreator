@@ -25,7 +25,7 @@
 #include "exportableaadliface.h"
 #include "exportableproperty.h"
 
-namespace templating {
+namespace aadlinterface {
 
 ExportableAADLObject::ExportableAADLObject(const aadl::AADLObject *aadlObject)
     : AbstractExportableObject(aadlObject)
@@ -105,15 +105,15 @@ QVariantList ExportableAADLObject::generateProperties(const QHash<QString, QVari
 {
     QVariantList result;
     for (auto it = props.cbegin(); it != props.cend(); ++it)
-        result << QVariant::fromValue(ExportableProperty(it.key(), it.value()));
+        result << QVariant::fromValue(templating::ExportableProperty(it.key(), it.value()));
 
     std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const ExportableProperty &r = right_val.value<ExportableProperty>();
+        const auto &r = right_val.value<templating::ExportableProperty>();
         const aadl::meta::Props::Token right_token = aadl::meta::Props::token(r.name());
         if (right_token == aadl::meta::Props::Token::Unknown)
             return true;
 
-        const ExportableProperty &l = left_val.value<ExportableProperty>();
+        const auto &l = left_val.value<templating::ExportableProperty>();
         const aadl::meta::Props::Token left_token = aadl::meta::Props::token(l.name());
         if (left_token == aadl::meta::Props::Token::Unknown)
             return false;

@@ -23,7 +23,7 @@ namespace aadl {
 class AADLObjectIface;
 }
 
-namespace templating {
+namespace aadlinterface {
 
 /**
  * @brief The ExportableAADLIface is a class to export AADLObjectIface
@@ -45,5 +45,5 @@ public:
 
 }
 
-Q_DECLARE_METATYPE(templating::ExportableAADLIface)
-Q_DECLARE_TYPEINFO(templating::ExportableAADLIface, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(aadlinterface::ExportableAADLIface)
+Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLIface, Q_MOVABLE_TYPE);

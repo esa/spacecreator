@@ -31,12 +31,12 @@
 namespace aadl {
 
 /*!
- * \class taste3::aadl::ConnectionCreationValidator
+ * \class aadl::ConnectionCreationValidator
  * The collection of static funcitons to detect if it's possible to connect two interfaces/scene points.
  */
 
 /*!
-    \enum class taste3::aadl::ConnectionCreationValidator::FailReason
+    \enum class aadl::ConnectionCreationValidator::FailReason
     This enum type specifies a reason of why the connection creation is prohibited:
 
         \value NotFail

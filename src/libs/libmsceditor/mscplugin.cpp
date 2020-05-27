@@ -11,6 +11,11 @@
 
 namespace msc {
 
+/*!
+ * \namespace msc
+ * \brief Has most of the code for the MSC Editor UI and the underlying library
+ */
+
 MSCPlugin::MSCPlugin(QObject *parent)
     : shared::Plugin(parent)
     , m_graphicsView(new GraphicsView)

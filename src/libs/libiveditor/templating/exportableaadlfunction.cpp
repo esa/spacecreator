@@ -23,7 +23,7 @@
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 
-namespace templating {
+namespace aadlinterface {
 
 ExportableAADLFunction::ExportableAADLFunction(const aadl::AADLObjectFunctionType *function)
     : ExportableAADLObject(function)

@@ -141,4 +141,4 @@ public:
     }
 };
 
-} // ns taste3
+}

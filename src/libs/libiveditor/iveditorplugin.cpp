@@ -10,6 +10,11 @@
 
 namespace aadlinterface {
 
+/*!
+ * \namespace aadlinterface
+ * \brief Has most of the code for the Interface View Editor UI
+ */
+
 IVEditorPlugin::IVEditorPlugin(QObject *parent)
     : shared::Plugin(parent)
     , m_graphicsView(new GraphicsView)
@@ -41,11 +46,10 @@ void IVEditorPlugin::addToolBars(QMainWindow *window)
  */
 void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
-    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
-    m_actionSaveSceneRender =
-            menu->addAction(tr("Render Scene..."), mainWindow, &taste3::MainWindow::onSaveRenderRequested);
+    auto mainWindow = dynamic_cast<MainWindow *>(window);
+    m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), mainWindow, &MainWindow::onSaveRenderRequested);
 
-    taste3::ctx::ActionsManager::registerAction(
+    ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
 }
 
@@ -64,12 +68,12 @@ void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
  */
 void IVEditorPlugin::addMenuHelpActions(QMenu *menu, QMainWindow *window)
 {
-    auto mainWindow = dynamic_cast<taste3::MainWindow *>(window);
-    auto report = menu->addAction(tr("Send report..."), mainWindow, &taste3::MainWindow::onReportRequested);
-    auto about = menu->addAction(tr("About"), mainWindow, &taste3::MainWindow::onAboutRequested);
+    auto mainWindow = dynamic_cast<MainWindow *>(window);
+    auto report = menu->addAction(tr("Send report..."), mainWindow, &MainWindow::onReportRequested);
+    auto about = menu->addAction(tr("About"), mainWindow, &MainWindow::onAboutRequested);
 
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
-    taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, about, "About", "Show About dialog");
+    ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
+    ActionsManager::registerAction(Q_FUNC_INFO, about, "About", "Show About dialog");
 }
 
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const

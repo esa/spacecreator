@@ -25,12 +25,12 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace templating {
+namespace aadlinterface {
 
 /**
  * @brief The ExportableAADLObject is a common class to export AADLObject and its successors
  */
-class ExportableAADLObject : public AbstractExportableObject
+class ExportableAADLObject : public templating::AbstractExportableObject
 {
     Q_GADGET
     Q_PROPERTY(QString groupName READ groupName)
@@ -53,11 +53,11 @@ protected:
 
 }
 
-Q_DECLARE_METATYPE(templating::ExportableAADLObject)
-Q_DECLARE_TYPEINFO(templating::ExportableAADLObject, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(aadlinterface::ExportableAADLObject)
+Q_DECLARE_TYPEINFO(aadlinterface::ExportableAADLObject, Q_MOVABLE_TYPE);
 
 template<>
-inline templating::ExportableAADLObject qvariant_cast<templating::ExportableAADLObject>(const QVariant &v)
+inline aadlinterface::ExportableAADLObject qvariant_cast<aadlinterface::ExportableAADLObject>(const QVariant &v)
 {
-    return *static_cast<const templating::ExportableAADLObject *>(v.constData());
+    return *static_cast<const aadlinterface::ExportableAADLObject *>(v.constData());
 }

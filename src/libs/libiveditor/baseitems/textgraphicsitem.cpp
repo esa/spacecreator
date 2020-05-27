@@ -444,4 +444,4 @@ void TextGraphicsItem::setSendClickEvent(bool send)
     m_sendClickEvent = send;
 }
 
-} // namespace taste3
+}

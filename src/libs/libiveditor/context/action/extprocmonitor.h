@@ -22,8 +22,7 @@
 
 class QTextBrowser;
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 class ExtProcMonitor : public QWidget
 {
@@ -49,5 +48,4 @@ private:
     QProcess *m_process;
 };
 
-} // ns ctx
-} // ns taste3
+}

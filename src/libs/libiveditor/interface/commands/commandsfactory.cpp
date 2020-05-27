@@ -51,6 +51,11 @@
 namespace aadlinterface {
 namespace cmd {
 
+/*!
+ * \namespace aadlinterface::cmd
+ * \brief Undo and redo commands code for the Interface View Editor
+ */
+
 QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
 {
     switch (id) {

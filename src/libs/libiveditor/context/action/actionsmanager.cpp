@@ -70,11 +70,10 @@ static QVector<ExternalArgHolder> externalArgs(bool namedKey)
     return args;
 }
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- *\class taste3::ctx::ActionsManager
+ *\class aadlinterface::ActionsManager
  * \brief The application wide manager for sriptable actions.
  * Used to: store action instances in runtime, deploy the default file from resources (if necessary), populate the
  *context menu and to actually invoke the internal QAction or external application.
@@ -242,15 +241,15 @@ bool ActionsManager::registerScriptableAction(QAction *action, const QString &ke
 
 void ActionsManager::listRegisteredActions()
 {
-    const QMap<QString, ctx::ActionsManager::ScriptableActionHandler> &actions =
-            ctx::ActionsManager::scriptableActions();
+    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions =
+            ActionsManager::scriptableActions();
     const QStringList &names = actions.keys();
     const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
         return lhs.length() < rhs.length();
     })->length();
 
     std::cout << qPrintable(QObject::tr("Available actions:")) << std::endl;
-    for (const ctx::ActionsManager::ScriptableActionHandler &h : actions)
+    for (const ActionsManager::ScriptableActionHandler &h : actions)
         std::cout << std::left << std::setw(titleLength) << qPrintable(h.m_title) << "\t- "
                   << qPrintable(h.m_description) << std::endl;
 }
@@ -272,8 +271,8 @@ QStringList ActionsManager::scriptableActionNames()
  */
 void ActionsManager::triggerActionInternal(const Action &act)
 {
-    const QMap<QString, ctx::ActionsManager::ScriptableActionHandler> &actions =
-            ctx::ActionsManager::scriptableActions();
+    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions =
+            ActionsManager::scriptableActions();
     if (actions.contains(act.m_internalActName)) {
         qDebug() << "Triggering action:" << act.m_internalActName;
         actions.value(act.m_internalActName).m_action->trigger();
@@ -403,10 +402,9 @@ void ActionsManager::registerAction(
         return;
     }
 
-    if (!taste3::ctx::ActionsManager::registerScriptableAction(action, title, description)) {
+    if (!ActionsManager::registerScriptableAction(action, title, description)) {
         qWarning() << caller << "The registration of action failed; probably the duplicate key used:\n";
     }
 }
 
-} // ns ctx
-} // ns taste3
+}

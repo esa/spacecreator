@@ -26,8 +26,6 @@
 
 int main(int argc, char *argv[])
 {
-    using namespace taste3;
-
     Q_INIT_RESOURCE(resources);
     Q_INIT_RESOURCE(tab_interface_resources);
     shared::initSharedLibrary();
@@ -44,7 +42,7 @@ int main(int argc, char *argv[])
 
     aadlinterface::IVEditorPlugin plugin;
 
-    MainWindow w(&plugin);
+    aadlinterface::MainWindow w(&plugin);
 
     shared::CommandLineParser cmdParser;
     cmdParser.setApplicationDescription("TASTE editor");

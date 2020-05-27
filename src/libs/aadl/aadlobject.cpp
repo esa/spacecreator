@@ -25,6 +25,11 @@
 
 namespace aadl {
 
+/*!
+ * \namespace aadl
+ * \brief The AADL model code
+ */
+
 struct AADLObjectPrivate {
     AADLObjectPrivate(const shared::Id &id, const AADLObject::Type t)
         : m_id(id == shared::InvalidId ? shared::createId() : id)

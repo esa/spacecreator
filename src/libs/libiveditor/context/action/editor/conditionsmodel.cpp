@@ -19,11 +19,10 @@
 
 #include "context/action/condition.h"
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::aadl::ConditionsModel
+ * \class aadlinterface::ConditionsModel
  * \brief The model to store scriptable actions conditions in editor dialog.
  */
 ConditionsModel::ConditionsModel(QObject *parent)
@@ -32,7 +31,7 @@ ConditionsModel::ConditionsModel(QObject *parent)
 {
 }
 
-void ConditionsModel::setupData(QVector<ctx::Condition> *conditions)
+void ConditionsModel::setupData(QVector<Condition> *conditions)
 {
     beginResetModel();
 
@@ -106,7 +105,7 @@ bool ConditionsModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     beginInsertRows(parent, row, row + count - 1);
     for (int i = 0; i < count; ++i) {
-        ctx::Condition c;
+        Condition c;
         c.m_itemType = tr("*");
         m_conditions->insert(row + i, c);
     }
@@ -123,5 +122,4 @@ bool ConditionsModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-}
 }

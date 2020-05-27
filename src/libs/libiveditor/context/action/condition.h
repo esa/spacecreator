@@ -28,8 +28,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 struct Condition {
     explicit Condition(const QJsonObject &jObj = QJsonObject());
@@ -46,5 +45,4 @@ struct Condition {
     bool isAcceptable(aadl::AADLObject *obj) const;
 };
 
-} // ns ctx
-} // ns taste3
+}

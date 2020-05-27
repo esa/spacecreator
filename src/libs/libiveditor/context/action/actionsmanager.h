@@ -28,8 +28,8 @@ class AADLObject;
 }
 
 class QMenu;
-namespace taste3 {
-namespace ctx {
+
+namespace aadlinterface {
 
 class ActionsManager
 {
@@ -75,5 +75,4 @@ private:
     QMap<QString, ScriptableActionHandler> m_qactions;
 };
 
-} // ns ctx
-} // ns taste3
+}

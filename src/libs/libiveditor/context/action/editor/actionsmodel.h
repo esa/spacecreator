@@ -22,8 +22,7 @@
 #include <QStringListModel>
 #include <QVector>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 class ActionsModel : public QStringListModel
 {
@@ -31,7 +30,7 @@ class ActionsModel : public QStringListModel
 
 public:
     explicit ActionsModel(QObject *parent = nullptr);
-    void setupData(QVector<ctx::Action> *collection);
+    void setupData(QVector<Action> *collection);
 
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -52,8 +51,7 @@ public:
     QModelIndex createAction(const QString &title, const QString &target);
 
 private:
-    QVector<ctx::Action> *m_collection { nullptr };
+    QVector<Action> *m_collection { nullptr };
 };
 
-}
 }

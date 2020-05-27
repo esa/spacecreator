@@ -25,8 +25,10 @@
 #include <QIntValidator>
 #include <QLabel>
 
+namespace aadlinterface {
+
 /*!
- * \class taste3::ZoomValidator
+ * \class aadlinterface::ZoomValidator
  * \brief validator used in ZoomController's combo box.
  * \sa ZoomController
  */
@@ -77,17 +79,15 @@ private:
     QIntValidator *m_validator;
 };
 
-namespace taste3 {
-
 /*!
- * \class taste3::ZoomController
+ * \class aadlinterface::ZoomController
  * \brief Control to change, reset and display the zoom level of the graphics scene. Uses editable combo box.
  * \sa ZoomValidator
  */
 ZoomController::ZoomController(QWidget *parent)
     : QWidget(parent)
     , m_combo(new QComboBox(this))
-    , m_validator(new ::ZoomValidator(this))
+    , m_validator(new ZoomValidator(this))
 {
     QHBoxLayout *hBox = new QHBoxLayout(this);
     hBox->addWidget(new QLabel(tr("Zoom:")));
@@ -160,4 +160,4 @@ void ZoomController::displayZoomLevel(qreal percent)
     m_combo->setCurrentText(QString::number(percent));
 }
 
-} // ns taste3
+}

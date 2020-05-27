@@ -21,11 +21,10 @@
 
 #include <QJsonArray>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::ctx::Action
+ * \class aadlinterface::Action
  * \brief Scriptable acction used to customize the context menu.
  * Contains its UI title, the title of target applicaiton action or external application and its arguments,
  * the list of conditions to detect if this action can be invoked or not.
@@ -105,5 +104,4 @@ bool Action::isAcceptable(aadl::AADLObject *obj) const
     return true;
 }
 
-} // ctx
-} // ns taste3
+}

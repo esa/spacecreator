@@ -28,8 +28,7 @@ class DynActionEditor;
 
 class QItemSelection;
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 class ActionsModel;
 class ConditionsModel;
@@ -59,17 +58,16 @@ private Q_SLOTS:
 
 private:
     Ui::DynActionEditor *ui;
-    QVector<ctx::Action> m_actions;
-    ctx::Action *m_action { nullptr };
+    QVector<Action> m_actions;
+    Action *m_action { nullptr };
     ActionsModel *m_actionsModel { nullptr };
     ConditionsModel *m_conditionsModel { nullptr };
 
     bool loadFile(const QString &filePath);
-    void displayAction(ctx::Action *action);
+    void displayAction(Action *action);
     void commitCurrentAction();
 
     bool save();
 };
 
-}
 }

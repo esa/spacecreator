@@ -26,6 +26,11 @@
 
 namespace templating {
 
+/*!
+ * \namespace templating
+ * \brief Shared code for the template based saving
+ */
+
 StringTemplate *StringTemplate::create(QObject *parent)
 {
     StringTemplate *instance = new StringTemplate(parent);

@@ -25,12 +25,11 @@
 #include <QJsonObject>
 #include <QMetaEnum>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::ctx::Condition
- * \brief The serializable collection of taste3::ctx::AttrHandler.
+ * \class aadlinterface::Condition
+ * \brief The serializable collection of AttrHandler.
  */
 static const char *JSON_FIELD_NAME_ItemType = "itemType";
 static const char *JSON_FIELD_NAME_Attributes = "attributes";
@@ -95,5 +94,4 @@ bool Condition::isAcceptable(aadl::AADLObject *obj) const
     return true;
 }
 
-} // ns ctx
-} // ns taste3
+}

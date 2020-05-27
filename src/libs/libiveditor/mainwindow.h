@@ -25,16 +25,10 @@ namespace Ui {
 class MainWindow;
 }
 
-namespace document {
-class InterfaceTabDocument;
-}
-
 namespace aadlinterface {
+
+class InterfaceTabDocument;
 class IVEditorPlugin;
-}
-
-namespace taste3 {
-
 class ZoomController;
 
 class MainWindow : public QMainWindow
@@ -74,7 +68,7 @@ private:
 
     Ui::MainWindow *ui { nullptr };
     ZoomController *m_zoomCtrl { nullptr };
-    document::InterfaceTabDocument *m_document { nullptr };
+    InterfaceTabDocument *m_document { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
 

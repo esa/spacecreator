@@ -19,6 +19,8 @@
 
 #include <QColorDialog>
 
+namespace aadlinterface {
+
 ColorSelectorButton::ColorSelectorButton(QWidget *parent)
     : QToolButton(parent)
 {
@@ -51,4 +53,6 @@ void ColorSelectorButton::onClicked()
     const QColor c = QColorDialog::getColor(m_color, this, tr("Select the color"), QColorDialog::ShowAlphaChannel);
     if (c.isValid())
         setColor(c);
+}
+
 }

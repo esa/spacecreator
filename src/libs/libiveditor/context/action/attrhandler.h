@@ -19,8 +19,7 @@
 #include <QJsonObject>
 #include <QVariant>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 struct AttrHandler {
     explicit AttrHandler(const QJsonObject &jObj = QJsonObject());
@@ -32,5 +31,4 @@ struct AttrHandler {
     bool operator==(const AttrHandler &other) const;
 };
 
-} // ns ctx
-} // ns taste3
+}

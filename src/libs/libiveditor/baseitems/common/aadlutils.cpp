@@ -34,11 +34,6 @@
 namespace aadlinterface {
 
 /*!
- * \namespace taste3::utils
- * \brief   Graphical, math and other utils, shared among all submodules.
- */
-
-/*!
  * Returns the side type of \a boundingArea's which is most close to the \a pos.
  */
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)

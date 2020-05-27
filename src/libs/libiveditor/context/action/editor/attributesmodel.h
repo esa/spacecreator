@@ -20,8 +20,7 @@
 #include <QStringListModel>
 #include <QVector>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 struct AttrHandler;
 
@@ -31,7 +30,7 @@ class AttributesModel : public QStringListModel
 
 public:
     explicit AttributesModel(QObject *parent = nullptr);
-    void setAttributesList(QVector<ctx::AttrHandler> *condition);
+    void setAttributesList(QVector<AttrHandler> *condition);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -52,8 +51,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-    QVector<ctx::AttrHandler> *m_attrs { nullptr };
+    QVector<AttrHandler> *m_attrs { nullptr };
 };
 
-}
 }

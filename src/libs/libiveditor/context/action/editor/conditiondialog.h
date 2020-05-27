@@ -25,8 +25,7 @@ namespace Ui {
 class ConditionDialog;
 }
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 class AttributesModel;
 class ConditionDialog : public QDialog
@@ -34,10 +33,10 @@ class ConditionDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ConditionDialog(const ctx::Condition &cond, const QStringList &itemTypes, QWidget *parent = nullptr);
+    explicit ConditionDialog(const Condition &cond, const QStringList &itemTypes, QWidget *parent = nullptr);
     ~ConditionDialog();
 
-    ctx::Condition condition() const;
+    Condition condition() const;
 
 private Q_SLOTS:
     void on_cbItemType_currentIndexChanged(const QString &text);
@@ -46,9 +45,8 @@ private Q_SLOTS:
 
 private:
     Ui::ConditionDialog *ui;
-    ctx::Condition m_condition;
+    Condition m_condition;
     AttributesModel *m_attrsModel { nullptr };
 };
 
-}
 }

@@ -19,7 +19,7 @@
 
 #include "aadlobjectiface.h"
 
-namespace templating {
+namespace aadlinterface {
 
 ExportableAADLIface::ExportableAADLIface(const aadl::AADLObjectIface *iface)
     : ExportableAADLObject(iface)

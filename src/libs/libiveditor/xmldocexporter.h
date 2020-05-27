@@ -24,11 +24,11 @@ class QWidget;
 
 namespace document {
 class AbstractTabDocument;
-class InterfaceTabDocument;
 }
 
-namespace taste3 {
-namespace app {
+namespace aadlinterface {
+
+class InterfaceTabDocument;
 
 class XmlDocExporter
 {
@@ -43,7 +43,7 @@ public:
     static bool exportDocInteractive(document::AbstractTabDocument *doc, QWidget *root,
             const QString &outPath = QString(), const QString &templatePath = QString());
 
-    static QHash<QString, QVariantList> collectInterfaceObjects(document::InterfaceTabDocument *doc);
+    static QHash<QString, QVariantList> collectInterfaceObjects(InterfaceTabDocument *doc);
 
 private:
     XmlDocExporter();
@@ -64,14 +64,13 @@ private:
             const QString &templatePath, InteractionPolicy interaction);
 
     static void ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy = RolloutDefaultsPolicy::Keep);
-    static bool exportDocInterface(document::InterfaceTabDocument *doc, QWidget *root, const QString &outPath,
+    static bool exportDocInterface(InterfaceTabDocument *doc, QWidget *root, const QString &outPath,
             const QString &templatePath, InteractionPolicy interaction);
 
-    static bool runExportSilently(document::InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
+    static bool runExportSilently(InterfaceTabDocument *doc, const QHash<QString, QVariantList> &content,
             const QString &templateFileName, const QString &outFileName);
-    static bool showExportDialog(document::InterfaceTabDocument *doc, QWidget *parentWindow,
+    static bool showExportDialog(InterfaceTabDocument *doc, QWidget *parentWindow,
             const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName);
 };
 
-} // ns app
-} // ns taste3
+}

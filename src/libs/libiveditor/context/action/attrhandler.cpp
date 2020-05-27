@@ -21,12 +21,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::ctx::AttrHandler
- * \brief The serializable wrapper for AADLObject's attribute to be used with taste3::ctx::Action
+ * \class aadlinterface::AttrHandler
+ * \brief The serializable wrapper for AADLObject's attribute to be used with Action
  */
 static const char *JSON_FIELD_NAME_Title = "title";
 static const char *JSON_FIELD_NAME_Value = "value";
@@ -47,5 +46,4 @@ bool AttrHandler::operator==(const AttrHandler &other) const
     return m_title == other.m_title && m_value == other.m_value;
 }
 
-} // ns ctx
-} // ns taste3
+}

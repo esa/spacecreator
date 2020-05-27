@@ -491,7 +491,7 @@ QString AADLInterfaceGraphicsItem::prepareTooltip() const
 void AADLInterfaceGraphicsItem::onAttrOrPropChanged(aadl::meta::Props::Token t)
 {
     switch (t) {
-        //    case taste3::aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
+        //    aadl::meta::Props::Token::name: // handled in AADLInterfaceGraphicsItem::updateLabel
     case aadl::meta::Props::Token::InheritPI: {
 #ifdef QT_DEBUG
         qWarning() << "check for a call duplication" << t;

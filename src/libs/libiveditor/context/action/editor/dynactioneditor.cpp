@@ -32,11 +32,10 @@
 #include <QJsonDocument>
 #include <QStandardPaths>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::aadl::DynActionEditor
+ * \class aadlinterface::DynActionEditor
  * The UI for editing available scriptable actions.
  */
 
@@ -51,7 +50,7 @@ DynActionEditor::DynActionEditor(QWidget *parent)
     ui->lvActions->setModel(m_actionsModel);
     ui->lvConditions->setModel(m_conditionsModel);
 
-    QStringList keyHolderes = ctx::ActionsManager::externalArgsHoldersDescr();
+    QStringList keyHolderes = ActionsManager::externalArgsHoldersDescr();
     ui->leAppCwd->setToolTip(keyHolderes.takeFirst());
     ui->leAppArgs->setToolTip(keyHolderes.join('\n'));
 
@@ -63,7 +62,7 @@ DynActionEditor::DynActionEditor(QWidget *parent)
     const QStringList actionTypes { tr("TASTE Action"), tr("External app") };
     ui->cbActType->addItems(actionTypes);
 
-    ui->cbAction->addItems(ctx::ActionsManager::scriptableActionNames());
+    ui->cbAction->addItems(ActionsManager::scriptableActionNames());
 
     on_cbActType_currentIndexChanged(0);
     displayAction(nullptr);
@@ -78,13 +77,13 @@ DynActionEditor::~DynActionEditor()
 
 bool DynActionEditor::init()
 {
-    const QStringList &files = ctx::ActionsManager::listUserFiles();
+    const QStringList &files = ActionsManager::listUserFiles();
     QString file;
     if (files.size() == 1)
         file = files.first();
     else {
         file = QFileDialog::getOpenFileName(
-                this, tr("Select actions file"), ctx::ActionsManager::storagePath(), "*.json");
+                this, tr("Select actions file"), ActionsManager::storagePath(), "*.json");
     }
 
     return loadFile(file);
@@ -99,7 +98,7 @@ bool DynActionEditor::loadFile(const QString &filePath)
     m_action = nullptr;
 
     QString errMsg;
-    m_actions = ctx::ActionsManager::parseFile(filePath, &errMsg);
+    m_actions = ActionsManager::parseFile(filePath, &errMsg);
     m_actionsModel->setupData(&m_actions);
 
     if (errMsg.isEmpty()) {
@@ -123,7 +122,7 @@ void DynActionEditor::onActionActivated(const QModelIndex &current, const QModel
     displayAction(m_action);
 }
 
-void DynActionEditor::displayAction(ctx::Action *action)
+void DynActionEditor::displayAction(Action *action)
 {
     ui->gbActionDetails->setEnabled(action);
     m_conditionsModel->setupData(action ? &action->m_conditions : nullptr);
@@ -172,9 +171,9 @@ void DynActionEditor::on_btnCreateAction_clicked()
 {
     QString newName = QInputDialog::getText(nullptr, tr("New action"), tr("Title:"));
     if (!newName.isEmpty()) {
-        auto readNames = [](const QVector<ctx::Action> &actions) {
+        auto readNames = [](const QVector<Action> &actions) {
             QStringList res;
-            for (const ctx::Action &action : actions)
+            for (const Action &action : actions)
                 res.append(action.m_title);
             return res;
         };
@@ -220,8 +219,8 @@ void DynActionEditor::onConditionActivated(const QModelIndex &index)
     if (!index.isValid() || !m_action)
         return;
 
-    const ctx::Condition cond = m_action->m_conditions.at(index.row());
-    const QStringList knowItems = QStringList({ "*" }) + ctx::Condition::knownTypes();
+    const Condition cond = m_action->m_conditions.at(index.row());
+    const QStringList knowItems = QStringList({ "*" }) + Condition::knownTypes();
     ConditionDialog *dlg = new ConditionDialog(cond, knowItems, this);
     if (dlg->exec() == QDialog::Accepted) {
         m_action->m_conditions.replace(index.row(), dlg->condition());
@@ -233,7 +232,7 @@ void DynActionEditor::accept()
 {
     if (save()) {
         QDialog::accept();
-        ctx::ActionsManager::reload();
+        ActionsManager::reload();
     }
 }
 
@@ -242,7 +241,7 @@ bool DynActionEditor::save()
     commitCurrentAction();
 
     QJsonArray jArr;
-    for (const ctx::Action &act : m_actions)
+    for (const Action &act : m_actions)
         jArr.append(act.toJson());
 
     const QString &filePath = ui->leFilePath->text();
@@ -259,7 +258,7 @@ bool DynActionEditor::save()
 void DynActionEditor::on_btnSelectFile_clicked()
 {
     const QString filePath =
-            QFileDialog::getOpenFileName(this, tr("Select file"), ctx::ActionsManager::storagePath(), "*.json");
+            QFileDialog::getOpenFileName(this, tr("Select file"), ActionsManager::storagePath(), "*.json");
     if (!filePath.isEmpty())
         loadFile(filePath);
 }
@@ -267,7 +266,7 @@ void DynActionEditor::on_btnSelectFile_clicked()
 void DynActionEditor::on_btnCreateFile_clicked()
 {
     const QString &filePath =
-            QFileDialog::getSaveFileName(this, tr("Save new file"), ctx::ActionsManager::storagePath(), "*.json");
+            QFileDialog::getSaveFileName(this, tr("Save new file"), ActionsManager::storagePath(), "*.json");
     if (!filePath.isEmpty()) {
         m_actions.clear();
         m_action = nullptr;
@@ -278,5 +277,4 @@ void DynActionEditor::on_btnCreateFile_clicked()
     }
 }
 
-}
 }

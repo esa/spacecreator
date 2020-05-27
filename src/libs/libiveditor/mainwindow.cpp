@@ -42,21 +42,21 @@
 #include <QTabWidget>
 #include <QUndoGroup>
 
-namespace taste3 {
+namespace aadlinterface {
 
 /*!
-\class taste3::MainWindow
+\class aadlinterface::MainWindow
 \brief Main appllication window - the place to store and manage supported document types, import/export data,
 process command line arguments and user actions.
 
-\sa taste3::document::AbstractTabDocument, taste3::CommandLineParser
+\sa aadlinterface::AbstractTabDocument, shared::CommandLineParser
 */
 
 MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())
-    , m_document(new document::InterfaceTabDocument(this))
+    , m_document(new InterfaceTabDocument(this))
     , m_plugin(plugin)
 {
     ui->setupUi(this);
@@ -75,11 +75,11 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 
     // Register the actions to the action manager
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionOpenFile(), "Open file", "Show Open File dialog");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionQuit(), "Quit", "Quite the application");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
-    ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionOpenFile(), "Open file", "Show Open File dialog");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionQuit(), "Quit", "Quite the application");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
     connect(m_document, &document::AbstractTabDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
@@ -112,7 +112,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     initSettings();
 
     updateWindowTitle();
-    connect(m_document, &document::InterfaceTabDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+    connect(m_document, &InterfaceTabDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 }
 
 /*!
@@ -196,7 +196,7 @@ void MainWindow::onSaveRenderRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return app::XmlDocExporter::exportDocSilently(m_document, savePath, templatePath);
+    return XmlDocExporter::exportDocSilently(m_document, savePath, templatePath);
 }
 
 /*!
@@ -207,7 +207,7 @@ bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
  */
 bool MainWindow::exportXmlAs(const QString &savePath, const QString &templatePath)
 {
-    return app::XmlDocExporter::exportDocInteractive(m_document, this, savePath, templatePath);
+    return XmlDocExporter::exportDocInteractive(m_document, this, savePath, templatePath);
 }
 
 void MainWindow::onQuitRequested()
@@ -300,7 +300,7 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
             return exportXml(value);
         return false;
     case shared::CommandLineParser::Positional::ListScriptableActions: {
-        ctx::ActionsManager::listRegisteredActions();
+        ActionsManager::listRegisteredActions();
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return true;
     }

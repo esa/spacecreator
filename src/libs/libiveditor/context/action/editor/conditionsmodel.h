@@ -18,8 +18,7 @@
 #pragma once
 #include <QStringListModel>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 struct Condition;
 
@@ -29,7 +28,7 @@ class ConditionsModel : public QStringListModel
 
 public:
     explicit ConditionsModel(QObject *parent = nullptr);
-    void setupData(QVector<ctx::Condition> *conditions);
+    void setupData(QVector<Condition> *conditions);
 
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -48,8 +47,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-    QVector<ctx::Condition> *m_conditions { nullptr };
+    QVector<Condition> *m_conditions { nullptr };
 };
 
-}
 }

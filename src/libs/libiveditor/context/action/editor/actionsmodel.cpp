@@ -19,11 +19,10 @@
 
 #include <QDebug>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::aadl::ActionsModel
+ * \class aadlinterface::ActionsModel
  * \brief The model to store instances of scriptable actions in editor dialog.
  */
 ActionsModel::ActionsModel(QObject *parent)
@@ -31,7 +30,7 @@ ActionsModel::ActionsModel(QObject *parent)
 {
 }
 
-void ActionsModel::setupData(QVector<ctx::Action> *collection)
+void ActionsModel::setupData(QVector<Action> *collection)
 {
     beginResetModel();
 
@@ -106,8 +105,8 @@ bool ActionsModel::insertRows(int row, int count, const QModelIndex &parent)
     beginInsertRows(parent, row, row + count - 1);
 
     for (int i = 0; i < count; ++i) {
-        ctx::Action action;
-        action.m_conditions.append(ctx::Condition::createGlobal());
+        Action action;
+        action.m_conditions.append(Condition::createGlobal());
         m_collection->insert(row + i, action);
     }
     endInsertRows();
@@ -133,5 +132,4 @@ QModelIndex ActionsModel::createAction(const QString &name, const QString &targe
     return id;
 }
 
-}
 }

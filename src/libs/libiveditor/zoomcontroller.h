@@ -17,18 +17,15 @@
 
 #pragma once
 
-namespace aadlinterface {
-class GraphicsView;
-}
-
 #include <QPointer>
 #include <QWidget>
 
-class ZoomValidator;
-
 class QComboBox;
 
-namespace taste3 {
+namespace aadlinterface {
+
+class GraphicsView;
+class ZoomValidator;
 
 class ZoomController : public QWidget
 {
@@ -46,10 +43,10 @@ protected Q_SLOTS:
 
 private:
     QComboBox *m_combo { nullptr };
-    ::ZoomValidator *m_validator { nullptr };
+    ZoomValidator *m_validator { nullptr };
     QPointer<aadlinterface::GraphicsView> m_view;
 
     void refill();
 };
 
-} // ns taste3
+}

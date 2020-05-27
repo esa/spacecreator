@@ -24,8 +24,7 @@ namespace aadl {
 class AADLObject;
 }
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 struct Action {
     explicit Action(const QJsonObject &jObj = QJsonObject());
@@ -46,5 +45,4 @@ struct Action {
     bool isAcceptable(aadl::AADLObject *obj) const;
 };
 
-} // ctx
-} // ns taste3
+}

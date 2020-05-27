@@ -26,13 +26,12 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
  * \class ExtProcMonitor
  *
- * \brief The GUI for external application, launched by scriptable taste3::ctx::Action.
+ * \brief The GUI for external application, launched by scriptable aadlinterface::Action.
  */
 
 ExtProcMonitor::ExtProcMonitor(QWidget *parent)
@@ -120,5 +119,4 @@ void ExtProcMonitor::syncStop()
     }
 }
 
-} // ns ctx
-} // ns taste3
+}

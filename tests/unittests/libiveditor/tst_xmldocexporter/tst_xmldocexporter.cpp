@@ -24,11 +24,7 @@
 #include <QObject>
 #include <QtTest>
 
-using namespace taste3;
-
-namespace {
 static QString testFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_xmldocex.xml";
-}
 
 class tst_XmlDocExporter : public QObject
 {
@@ -81,15 +77,15 @@ void tst_XmlDocExporter::cleanup()
 
 void tst_XmlDocExporter::testCanExportXml()
 {
-    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
-    bool canExport = app::XmlDocExporter::canExportXml(doc.get());
+    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    bool canExport = aadlinterface::XmlDocExporter::canExportXml(doc.get());
     QCOMPARE(canExport, true);
 }
 
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
-    app::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
+    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
     QByteArray text = testFileContent();
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QCOMPARE(text, expected);
@@ -97,7 +93,7 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
     auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
@@ -106,7 +102,7 @@ void tst_XmlDocExporter::testExportFunctions()
     objects.append(testfunc1);
     doc->setObjects(objects);
 
-    app::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -119,7 +115,7 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
     auto testcomment1 = new aadl::AADLObjectComment("TestComment1", doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
@@ -128,7 +124,7 @@ void tst_XmlDocExporter::testExportComment()
     objects.append(testcomment1);
     doc->setObjects(objects);
 
-    app::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -139,7 +135,7 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto doc = std::make_unique<document::InterfaceTabDocument>(this);
+    auto doc = std::make_unique<aadlinterface::InterfaceTabDocument>(this);
     auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
     auto testcomment1 = new aadl::AADLObjectComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
@@ -148,7 +144,7 @@ void tst_XmlDocExporter::testExportNestedComment()
     objects.append(testfunc1);
     doc->setObjects(objects);
 
-    app::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"

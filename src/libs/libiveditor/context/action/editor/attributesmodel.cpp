@@ -19,14 +19,13 @@
 
 #include "context/action/attrhandler.h"
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 const int COLUMN_ID_Name = 0;
 const int COLUMN_ID_Value = 1;
 
 /*!
- * \class taste3::aadl::AttributesModel
+ * \class aadlinterface::AttributesModel
  * \brief The model to store scriptable actions attributes in editor dialog.
  */
 AttributesModel::AttributesModel(QObject *parent)
@@ -34,7 +33,7 @@ AttributesModel::AttributesModel(QObject *parent)
 {
 }
 
-void AttributesModel::setAttributesList(QVector<ctx::AttrHandler> *attrs)
+void AttributesModel::setAttributesList(QVector<AttrHandler> *attrs)
 {
     if (attrs != m_attrs) {
         beginResetModel();
@@ -106,7 +105,7 @@ bool AttributesModel::setData(const QModelIndex &index, const QVariant &value, i
 
     if (data(index, role) != value && m_attrs) {
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
-            ctx::AttrHandler &attr = m_attrs->operator[](index.row());
+            AttrHandler &attr = m_attrs->operator[](index.row());
             switch (index.column()) {
             case COLUMN_ID_Name: {
                 attr.m_title = value.toString();
@@ -139,7 +138,7 @@ bool AttributesModel::insertRows(int row, int count, const QModelIndex &parent)
 
     beginInsertRows(parent, row, row + count - 1);
     for (int i = 0; i < count; ++i) {
-        ctx::AttrHandler attr;
+        AttrHandler attr;
         attr.m_title = tr("Attribute");
         attr.m_value = tr("*");
         m_attrs->insert(row + i, attr);
@@ -160,5 +159,4 @@ bool AttributesModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-}
 }

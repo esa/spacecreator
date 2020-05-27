@@ -20,15 +20,14 @@
 #include "attributesmodel.h"
 #include "ui_conditiondialog.h"
 
-namespace taste3 {
-namespace ctx {
+namespace aadlinterface {
 
 /*!
- * \class taste3::aadl::ConditionDialog
+ * \class aadlinterface::ConditionDialog
  * The UI for editing conditions of scriptable actions.
  */
 
-ConditionDialog::ConditionDialog(const ctx::Condition &cond, const QStringList &itemTypes, QWidget *parent)
+ConditionDialog::ConditionDialog(const Condition &cond, const QStringList &itemTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ConditionDialog)
     , m_condition(cond)
@@ -48,7 +47,7 @@ ConditionDialog::~ConditionDialog()
     delete ui;
 }
 
-ctx::Condition ConditionDialog::condition() const
+Condition ConditionDialog::condition() const
 {
     return m_condition;
 }
@@ -71,5 +70,4 @@ void ConditionDialog::on_btnRmAttr_clicked()
     m_attrsModel->removeRow(currId.row());
 }
 
-}
 }

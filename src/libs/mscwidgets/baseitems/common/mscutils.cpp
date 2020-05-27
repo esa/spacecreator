@@ -25,14 +25,6 @@
 
 namespace msc {
 
-/*!
-  \namespace msc::utils
-  \brief Collection of utils for internal use.
-
-  \inmodule MscWidgets
-
-*/
-
 bool removeSceneItem(QGraphicsItem *item)
 {
     // Removing an item by QGraphicsScene::removeItem + delete

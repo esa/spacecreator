@@ -58,8 +58,6 @@
 
 #define WARN_NOT_IMPLEMENTED qWarning() << Q_FUNC_INFO << "Not implemented yet."
 
-namespace document {
-
 static inline void dumpItem(QObject *obj, bool strict = false)
 {
 #ifdef NO_AADL_ITEM_DUMP
@@ -129,11 +127,13 @@ static inline void dumpItem(QObject *obj, bool strict = false)
     }
 }
 
-/*!
-\class taste3::document::InterfaceTabDocument
-\brief taste3::document::InterfaceTabDocument is the document for graphical AADL data (loaded from the XML).
+namespace aadlinterface {
 
-\sa taste3::document::AbstractTabDocument
+/*!
+\class aadlinterface::InterfaceTabDocument
+\brief aadlinterface::InterfaceTabDocument is the document for graphical AADL data (loaded from the XML).
+
+\sa aadlinterface::AbstractTabDocument
 */
 
 InterfaceTabDocument::InterfaceTabDocument(QObject *parent)
@@ -211,13 +211,13 @@ QMenu *InterfaceTabDocument::customMenu() const
     QAction *actDynContext = root->addAction(tr("Context Actions"));
     connect(actDynContext, &QAction::triggered, this, &InterfaceTabDocument::onDynContextEditorMenuInvoked);
 
-    taste3::ctx::ActionsManager::registerAction(
+    ActionsManager::registerAction(
             Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
-    taste3::ctx::ActionsManager::registerAction(
+    ActionsManager::registerAction(
             Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
-    taste3::ctx::ActionsManager::registerAction(
+    ActionsManager::registerAction(
             Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
-    taste3::ctx::ActionsManager::registerAction(
+    ActionsManager::registerAction(
             Q_FUNC_INFO, actDynContext, "Context actions", "Show editor for common custom context menu actions");
 
     return root;
@@ -292,7 +292,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunctionType) {
         m_actCreateFunctionType = new QAction(tr("Function Type"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateFunctionType, "Function Type", "Create FunctionType object");
 
         m_actCreateFunctionType->setCheckable(true);
@@ -303,7 +303,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateFunction) {
         m_actCreateFunction = new QAction(tr("Function"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateFunction, "Function", "Create Function object");
 
         m_actCreateFunction->setCheckable(true);
@@ -315,7 +315,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateProvidedInterface) {
         m_actCreateProvidedInterface = new QAction(tr("Provided Interface"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateProvidedInterface, "Provided Interface", "Create Provided Interface object");
 
         m_actCreateProvidedInterface->setCheckable(true);
@@ -327,7 +327,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateRequiredInterface) {
         m_actCreateRequiredInterface = new QAction(tr("Required Interface"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateRequiredInterface, "Required Interface", "Create Required Interface object");
 
         m_actCreateRequiredInterface->setCheckable(true);
@@ -339,7 +339,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateComment) {
         m_actCreateComment = new QAction(tr("Comment"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateComment, "Comment", "Create Comment object");
 
         m_actCreateComment->setCheckable(true);
@@ -359,7 +359,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actCreateConnection) {
         m_actCreateConnection = new QAction(tr("Connection"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actCreateConnection, "Connection", "Create Connection object");
 
         m_actCreateConnection->setCheckable(true);
@@ -370,7 +370,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actRemove) {
         m_actRemove = new QAction(tr("Remove"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
+        ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
 
         m_actRemove->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/remove.svg")));
         m_actRemove->setEnabled(false);
@@ -380,7 +380,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomIn) {
         m_actZoomIn = new QAction(tr("Zoom In"));
-        taste3::ctx::ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomIn, "Zoom In", "Scale up the current scene");
+        ActionsManager::registerAction(Q_FUNC_INFO, m_actZoomIn, "Zoom In", "Scale up the current scene");
 
         m_actZoomIn->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_in.svg")));
         m_actZoomIn->setShortcut(QKeySequence::ZoomIn);
@@ -389,7 +389,7 @@ QVector<QAction *> InterfaceTabDocument::initActions()
 
     if (!m_actZoomOut) {
         m_actZoomOut = new QAction(tr("Zoom Out"));
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, m_actZoomOut, "Zoom Out", "Scale down the current scene");
 
         m_actZoomOut->setIcon(QIcon(QLatin1String(":/tab_interface/toolbar/icns/zoom_out.svg")));
@@ -757,7 +757,7 @@ void InterfaceTabDocument::onColorSchemeMenuInvoked()
 
 void InterfaceTabDocument::onDynContextEditorMenuInvoked()
 {
-    auto dialog = new taste3::ctx::DynActionEditor(qobject_cast<QWidget *>(parent()));
+    auto dialog = new DynActionEditor(qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     dialog->open();

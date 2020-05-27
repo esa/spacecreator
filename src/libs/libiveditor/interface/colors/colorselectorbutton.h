@@ -19,6 +19,8 @@
 
 #include <QToolButton>
 
+namespace aadlinterface {
+
 class ColorSelectorButton : public QToolButton
 {
     Q_OBJECT
@@ -41,3 +43,5 @@ protected Q_SLOTS:
 private:
     QColor m_color { Qt::transparent };
 };
+
+}

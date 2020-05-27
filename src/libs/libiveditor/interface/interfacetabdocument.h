@@ -17,12 +17,12 @@
 
 #pragma once
 
+#include "baseitems/graphicsview.h"
 #include "common.h"
 #include "document/abstracttabdocument.h"
 
 #include <QPointer>
 #include <QQueue>
-#include <baseitems/graphicsview.h>
 
 class QAction;
 class QActionGroup;
@@ -41,11 +41,8 @@ class AADLFunctionGraphicsItem;
 class AADLFunctionTypeGraphicsItem;
 class AADLInterfaceGraphicsItem;
 class InterfaceTabGraphicsScene;
-}
 
-namespace document {
-
-class InterfaceTabDocument : public AbstractTabDocument
+class InterfaceTabDocument : public document::AbstractTabDocument
 {
     Q_OBJECT
 public:

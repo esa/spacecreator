@@ -1061,7 +1061,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu, const QPoint
 
     if (aadlObj) {
         connect(action, &QAction::triggered, [this, aadlObj]() { Q_EMIT propertyEditorRequest(aadlObj); });
-        taste3::ctx::ActionsManager::registerAction(
+        ActionsManager::registerAction(
                 Q_FUNC_INFO, menu->actions().last(), "Properties", "Show AADL object properties editor");
     }
 }
@@ -1106,7 +1106,7 @@ void CreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
         }
     }
 
-    taste3::ctx::ActionsManager::populateMenu(menu, aadlObj);
+    ActionsManager::populateMenu(menu, aadlObj);
 }
 
 bool CreatorTool::warnConnectionPreview(const QPointF &pos)
