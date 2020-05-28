@@ -6,6 +6,69 @@ target_sources(${LIB_NAME} PRIVATE
     asn1fileview.cpp
     asn1fileview.h
     asn1fileview.ui
+    commands/basecommand.cpp
+    commands/basecommand.h
+    commands/cmdactioninformaltext.cpp
+    commands/cmdactioninformaltext.h
+    commands/cmdactionitemcreate.cpp
+    commands/cmdactionitemcreate.h
+    commands/cmdactionitemmove.cpp
+    commands/cmdactionitemmove.h
+    commands/cmdchangeinstanceorder.cpp
+    commands/cmdchangeinstanceorder.h
+    commands/cmdchangeinstanceposition.cpp
+    commands/cmdchangeinstanceposition.h
+    commands/cmdchartitemchangegeometry.cpp
+    commands/cmdchartitemchangegeometry.h
+    commands/cmdcommentitemchangegeometry.cpp
+    commands/cmdcommentitemchangegeometry.h
+    commands/cmdconditionitemcreate.cpp
+    commands/cmdconditionitemcreate.h
+    commands/cmdconditionitemmove.cpp
+    commands/cmdconditionitemmove.h
+    commands/cmdcoregionitemcreate.cpp
+    commands/cmdcoregionitemcreate.h
+    commands/cmddeleteentity.cpp
+    commands/cmddeleteentity.h
+    commands/cmddocumentcreate.cpp
+    commands/cmddocumentcreate.h
+    commands/cmddocumentmove.cpp
+    commands/cmddocumentmove.h
+    commands/cmdentitycommentchange.cpp
+    commands/cmdentitycommentchange.h
+    commands/cmdentitynamechange.cpp
+    commands/cmdentitynamechange.h
+    commands/cmdhierarchytypechange.cpp
+    commands/cmdhierarchytypechange.h
+    commands/cmdinstanceitemcreate.cpp
+    commands/cmdinstanceitemcreate.h
+    commands/cmdinstancekindchange.cpp
+    commands/cmdinstancekindchange.h
+    commands/cmdinstancestopchange.cpp
+    commands/cmdinstancestopchange.h
+    commands/cmdmessageitemcreate.cpp
+    commands/cmdmessageitemcreate.h
+    commands/cmdmessageitemresize.cpp
+    commands/cmdmessageitemresize.h
+    commands/cmdmessagepointsedit.cpp
+    commands/cmdmessagepointsedit.h
+    commands/cmdpastechart.cpp
+    commands/cmdpastechart.h
+    commands/cmdsetasn1file.cpp
+    commands/cmdsetasn1file.h
+    commands/cmdsetmessagedeclarations.cpp
+    commands/cmdsetmessagedeclarations.h
+    commands/cmdsetparameterlist.cpp
+    commands/cmdsetparameterlist.h
+    commands/cmdtimeritemcreate.cpp
+    commands/cmdtimeritemcreate.h
+    commands/cmdtimeritemmove.cpp
+    commands/cmdtimeritemmove.h
+    commands/common/commandids.h
+    commands/common/commandsfactory.cpp
+    commands/common/commandsfactory.h
+    commands/common/commandsstack.cpp
+    commands/common/commandsstack.h
     documentitemmodel.cpp
     documentitemmodel.h
     documenttreeview.cpp
@@ -17,6 +80,92 @@ target_sources(${LIB_NAME} PRIVATE
     mainwindow.ui
     mscplugin.cpp
     mscplugin.h
+    mscwidgets/actionitem.cpp
+    mscwidgets/actionitem.h
+    mscwidgets/baseitems/arrowitem.cpp
+    mscwidgets/baseitems/arrowitem.h
+    mscwidgets/baseitems/commentitem.cpp
+    mscwidgets/baseitems/commentitem.h
+    mscwidgets/baseitems/common/abstractinteractiveobject.h
+    mscwidgets/baseitems/common/arrowsign.cpp
+    mscwidgets/baseitems/common/arrowsign.h
+    mscwidgets/baseitems/common/coordinatesconverter.cpp
+    mscwidgets/baseitems/common/coordinatesconverter.h
+    mscwidgets/baseitems/common/mscutils.cpp
+    mscwidgets/baseitems/common/mscutils.h
+    mscwidgets/baseitems/common/objectanchor.cpp
+    mscwidgets/baseitems/common/objectanchor.h
+    mscwidgets/baseitems/common/objectslink.cpp
+    mscwidgets/baseitems/common/objectslink.h
+    mscwidgets/baseitems/instanceenditem.cpp
+    mscwidgets/baseitems/instanceenditem.h
+    mscwidgets/baseitems/instanceheaditem.cpp
+    mscwidgets/baseitems/instanceheaditem.h
+    mscwidgets/baseitems/interactiveobject.cpp
+    mscwidgets/baseitems/interactiveobject.h
+    mscwidgets/baseitems/labeledarrowitem.cpp
+    mscwidgets/baseitems/labeledarrowitem.h
+    mscwidgets/baseitems/msgidentificationitem.cpp
+    mscwidgets/baseitems/msgidentificationitem.h
+    mscwidgets/baseitems/objectslinkitem.cpp
+    mscwidgets/baseitems/objectslinkitem.h
+    mscwidgets/baseitems/textitem.cpp
+    mscwidgets/baseitems/textitem.h
+    mscwidgets/chartitem.cpp
+    mscwidgets/chartitem.h
+    mscwidgets/chartviewmodel.cpp
+    mscwidgets/chartviewmodel.h
+    mscwidgets/conditionitem.cpp
+    mscwidgets/conditionitem.h
+    mscwidgets/coregionitem.cpp
+    mscwidgets/coregionitem.h
+    mscwidgets/documentitem.cpp
+    mscwidgets/documentitem.h
+    mscwidgets/graphicsview.cpp
+    mscwidgets/graphicsview.h
+    mscwidgets/hierarchyviewmodel.cpp
+    mscwidgets/hierarchyviewmodel.h
+    mscwidgets/instanceitem.cpp
+    mscwidgets/instanceitem.h
+    mscwidgets/messagedeclarationsdialog.cpp
+    mscwidgets/messagedeclarationsdialog.h
+    mscwidgets/messagedeclarationsdialog.ui
+    mscwidgets/messagedialog.cpp
+    mscwidgets/messagedialog.h
+    mscwidgets/messagedialog.ui
+    mscwidgets/messageitem.cpp
+    mscwidgets/messageitem.h
+    mscwidgets/resources.qrc
+    mscwidgets/textviewdialog.cpp
+    mscwidgets/textviewdialog.h
+    mscwidgets/timeritem.cpp
+    mscwidgets/timeritem.h
+    mscwidgets/tools/actioncreatortool.cpp
+    mscwidgets/tools/actioncreatortool.h
+    mscwidgets/tools/basecreatortool.cpp
+    mscwidgets/tools/basecreatortool.h
+    mscwidgets/tools/basetool.cpp
+    mscwidgets/tools/basetool.h
+    mscwidgets/tools/commentcreatortool.cpp
+    mscwidgets/tools/commentcreatortool.h
+    mscwidgets/tools/conditioncreatortool.cpp
+    mscwidgets/tools/conditioncreatortool.h
+    mscwidgets/tools/coregioncreatortool.cpp
+    mscwidgets/tools/coregioncreatortool.h
+    mscwidgets/tools/entitydeletetool.cpp
+    mscwidgets/tools/entitydeletetool.h
+    mscwidgets/tools/hierarchycreatortool.cpp
+    mscwidgets/tools/hierarchycreatortool.h
+    mscwidgets/tools/instancecreatortool.cpp
+    mscwidgets/tools/instancecreatortool.h
+    mscwidgets/tools/instancestoptool.cpp
+    mscwidgets/tools/instancestoptool.h
+    mscwidgets/tools/messagecreatortool.cpp
+    mscwidgets/tools/messagecreatortool.h
+    mscwidgets/tools/pointertool.cpp
+    mscwidgets/tools/pointertool.h
+    mscwidgets/tools/timercreatortool.cpp
+    mscwidgets/tools/timercreatortool.h
     remotecontrolhandler.cpp
     remotecontrolhandler.h
     remotecontrolwebserver.cpp
@@ -27,12 +176,12 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_include_directories(${LIB_NAME}
     PUBLIC .
+    PUBLIC mscwidgets
 )
 
 target_link_libraries(${LIB_NAME}
     shared
     msclibrary
-    mscwidgets
     asn1editor
     Qt5::Core
     Qt5::Gui

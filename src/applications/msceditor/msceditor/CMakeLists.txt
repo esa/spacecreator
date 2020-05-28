@@ -11,7 +11,6 @@ target_link_libraries(${APP_NAME} PUBLIC
     libmsceditor
     asn1editor
     msclibrary
-    mscwidgets
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
