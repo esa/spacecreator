@@ -14,30 +14,29 @@ more than one editor is in the libraries:
 
 * **shared** Generally useful code for all or at lesat 2 editor
 
-* **templates** Code to save data via grantlee.
+* **templates** Common code to save data via grantlee.
 
 
 ## AADL/IV editor
 
-* **aadl** contains the data strucures for aadl
+* **aadl** Contains the data strucures for aadl.
 
-* **libivedtor** contains the application, including: UI, graphics elments, file handling
+* **libivedtor** Contains the application, including: UI, graphics elments, file handling
 
 
 ## ASN.1 editor
 
-TBD
+* **asn1library** Contains the data and parsing for ASN1 files.
 
 
 ## MSC editor
 
-The msc editor is separated in 3 different libraries:
+The MSC editor code is separated in 3 different libraries:
 
-* **msclibrary** handling the .msc file and data structure
+* **msclibrary** Handling the .msc file and data structure. For parsing .msc files [ANTLR4](https://www.antlr.org) is used. For writing .msc files, [Grantlee](https://github.com/steveire/grantlee) is used.
+This includes handling of CIF information for types and geometry, which is stored as comments of the msc elements.
 
-* **mscwidgets** containing all graphical items
+* **libmsceditor** Has the Ui elements an the application itself. With the class [MainModel](@ref MainModel) as the
+central hub of the MSC editor.
 
-* **libmsceditor** has the application itself. With the class [MainModel](@ref MainModel) as the
-central hub of the msc editor.
-
-The library **asn1editor** will be replaces by the ASN.1 editor.
+The library **asn1editor** will probably be replaced by the ASN.1 editor (asn1library).

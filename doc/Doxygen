@@ -833,6 +833,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ../src/applications \
                          ../src/libs \
+                         ../imports \
                          ../doc
 
 # This tag can be used to specify the character encoding of the source files
