@@ -19,8 +19,8 @@
 #include "textviewdialog.h"
 
 #include "delayedsignal.h"
-#include "mscfile.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "mscwriter.h"
 
 #include <QAction>
@@ -116,8 +116,8 @@ void TextViewDialog::updateText()
     d->textView->setTextColor(Qt::black);
     try {
         // Test if we can parse the file
-        msc::MscFile file;
-        QScopedPointer<msc::MscModel> model(file.parseText(mscText));
+        msc::MscReader reader;
+        QScopedPointer<msc::MscModel> model(reader.parseText(mscText));
     } catch (...) {
         // our own msc file is corrupt - write output in red
         d->textView->setTextColor(Qt::red);

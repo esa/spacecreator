@@ -20,10 +20,10 @@
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "msctimer.h"
 
 #include <QCoreApplication>
@@ -41,7 +41,7 @@ private Q_SLOTS:
     void cleanup();
 
     // Currently here is only the message-related stuff,
-    // see the tst_MscFile for other
+    // see the tst_MscReader for other
 
     void testMessage();
     void testSameMessageInTwoInstances();
@@ -75,18 +75,18 @@ private Q_SLOTS:
     void testMultiMessageOccurrence();
 
 private:
-    MscFile *file = nullptr;
+    MscReader *m_reader = nullptr;
 };
 
 void tst_MscEventsParsing::init()
 {
-    file = new MscFile;
+    m_reader = new MscReader;
 }
 
 void tst_MscEventsParsing::cleanup()
 {
-    delete file;
-    file = nullptr;
+    delete m_reader;
+    m_reader = nullptr;
 }
 
 void tst_MscEventsParsing::testMessage()
@@ -98,7 +98,7 @@ void tst_MscEventsParsing::testMessage()
             out ICON to Responder; \
         ENDINSTANCE; \
     ENDMSC;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
@@ -124,7 +124,7 @@ void tst_MscEventsParsing::testSameMessageInTwoInstances()
                   INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
                   INSTANCE Responder;out ICON to Initiator;ENDINSTANCE; \
                   ENDMSC;";
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
@@ -146,7 +146,7 @@ void tst_MscEventsParsing::testMessageWithParameters()
                       OUT q_accept( { cardData (. 1002,9999,'1701' .),amount '400' } ) TO ENV VIA co_tr; \
                    ENDINSTANCE; \
                    ENDMSC;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QVERIFY(model->charts().size() == 1);
     MscChart *chart = model->charts().at(0);
@@ -189,7 +189,7 @@ void tst_MscEventsParsing::testMessageParameterWildcard()
                      ENDINSTANCE; \
                   ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -209,7 +209,7 @@ void tst_MscEventsParsing::testMessageParameterExpression()
                      ENDINSTANCE; \
                   ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -229,7 +229,7 @@ void tst_MscEventsParsing::testMultiParameters()
        endinstance; \
     endmsc;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -268,7 +268,7 @@ void tst_MscEventsParsing::testMessageParametersCurlyBraces()
         return mscTemplate.arg(msgA, msgB);
     };
 
-    QScopedPointer<MscModel> model(file->parseText(prepareMsc()));
+    QScopedPointer<MscModel> model(m_reader->parseText(prepareMsc()));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -292,7 +292,7 @@ void tst_MscEventsParsing::testInstanceCreate()
                       ENDINSTANCE; \
                    ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -321,7 +321,7 @@ void tst_MscEventsParsing::testInstanceCreateNoParameter()
                       ENDINSTANCE; \
                    ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -348,7 +348,7 @@ void tst_MscEventsParsing::testInstanceCreateMultiParameter()
                    ENDMSC;")
                                        .arg(paramsIn.join(", "));
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -384,7 +384,7 @@ void tst_MscEventsParsing::testInstanceCreateEmptyParameter()
                       ENDINSTANCE; \
                    ENDMSC;");
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -407,7 +407,7 @@ void tst_MscEventsParsing::testInstanceCreateNoInstance()
                       ENDINSTANCE; \
                    ENDMSC;");
 
-    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testInstanceCreateDublicate()
@@ -420,7 +420,7 @@ void tst_MscEventsParsing::testInstanceCreateDublicate()
                       INSTANCE subscriber; \
                       ENDINSTANCE; \
                    ENDMSC;");
-    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testSortedMessage()
@@ -440,7 +440,7 @@ void tst_MscEventsParsing::testSortedMessage()
                       endinstance; \
                   endmsc;");
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
 
     MscChart *chart = model->charts().at(0);
@@ -522,7 +522,7 @@ void tst_MscEventsParsing::testSortedMessageTwoCharts()
                       endmsc; \
                   endmscdocument;");
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->documents().size(), 1);
 
     MscDocument *document = model->documents().at(0);
@@ -598,7 +598,7 @@ void tst_MscEventsParsing::testSortedInstanceEvents()
                       endinstance; \
                   endmsc;");
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
 
     MscChart *chart = model->charts().at(0);
@@ -703,7 +703,7 @@ void tst_MscEventsParsing::testMessageCreateInstance()
     // 4 / 6 "Msg04"
     // 5 / 6 "Msg05"
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().first()->charts().size(), 1);
 
@@ -739,7 +739,7 @@ void tst_MscEventsParsing::testIncompleteMessageIn()
                                      endmsc; \
                                  endmscdocument;");
 
-    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testIncompleteMessageOut()
@@ -758,7 +758,7 @@ void tst_MscEventsParsing::testIncompleteMessageOut()
                                      endmsc; \
                                  endmscdocument;");
 
-    QVERIFY_EXCEPTION_THROWN(file->parseText(msc), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testConditionDublicate()
@@ -775,7 +775,7 @@ void tst_MscEventsParsing::testConditionDublicate()
                     endinstance;\
                 endmsc;");
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
 
     MscChart *chart = model->charts().at(0);
@@ -828,7 +828,7 @@ void tst_MscEventsParsing::testTestMessageInstanceName()
                         endinstance; \
                 endmsc; endmscdocument;");
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->documents().size(), 1);
 
     QCOMPARE(model->documents().at(0)->charts().size(), 1);
@@ -852,7 +852,7 @@ void tst_MscEventsParsing::testSameNameDifferentInstances()
         IN getbts ( ann ) FROM instB;\
       ENDINSTANCE;\
       ENDMSC;");
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 3);
@@ -872,7 +872,7 @@ void tst_MscEventsParsing::testDifferentParameter()
                         endinstance; \
                 endmsc; ");
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -895,7 +895,7 @@ void tst_MscEventsParsing::testMultiMessageOccurrence()
                         endinstance; \
                 endmsc; ");
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 

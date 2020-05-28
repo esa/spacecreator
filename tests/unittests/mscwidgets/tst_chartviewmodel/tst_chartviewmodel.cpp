@@ -24,10 +24,10 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "msctimer.h"
 #include "timeritem.h"
 
@@ -79,8 +79,8 @@ private:
 
 void tst_ChartViewModel::parseMsc(const QString &mscText)
 {
-    MscFile mscFile;
-    m_mscModel.reset(mscFile.parseText(mscText));
+    MscReader mscReader;
+    m_mscModel.reset(mscReader.parseText(mscText));
 
     if (m_mscModel->charts().isEmpty()) {
         MscDocument *doc = m_mscModel->documents().at(0);

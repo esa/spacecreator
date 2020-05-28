@@ -25,11 +25,11 @@
 #include "msccoregion.h"
 #include "msccreate.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "msctimer.h"
 #include "stringtemplate.h"
 
@@ -574,7 +574,7 @@ bool MscWriter::convertMscFile(const QString &inputFile, const QString &template
         return false;
     }
 
-    msc::MscFile reader;
+    msc::MscReader reader;
     QStringList errors;
     QScopedPointer<msc::MscModel> mscModel(reader.parseFile(inputFile, &errors));
     if (!errors.isEmpty() || mscModel.isNull()) {

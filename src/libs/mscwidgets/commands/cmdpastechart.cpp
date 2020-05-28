@@ -20,8 +20,8 @@
 #include "common/commandids.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 
 namespace msc {
 namespace cmd {
@@ -34,7 +34,7 @@ CmdPasteChart::CmdPasteChart(msc::MscDocument *document, const QString &copyChar
 
     setText(QObject::tr("Paste chart"));
 
-    m_copyModel = MscFile().parseText(copyChartText);
+    m_copyModel = MscReader().parseText(copyChartText);
 
     if (m_document && m_document->charts().size() == 1) {
         m_chart = m_document->charts()[0];

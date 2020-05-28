@@ -23,11 +23,11 @@
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "mscwriter.h"
 #include "ui_messagedialog.h"
 
@@ -301,9 +301,9 @@ void MessageDialog::checkTextValidity()
     text.remove("\n");
 
     try {
-        msc::MscFile file;
+        msc::MscReader reader;
         const QString mscText = QString("msc chart; instance %1; %2 endinstance; endmsc;").arg(instance->name(), text);
-        QScopedPointer<msc::MscModel> model(file.parseText(mscText));
+        QScopedPointer<msc::MscModel> model(reader.parseText(mscText));
         m_isValid = true;
     } catch (...) {
         m_isValid = false;

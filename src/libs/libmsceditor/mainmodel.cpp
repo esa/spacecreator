@@ -26,10 +26,10 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "mscwriter.h"
 
 #include <QApplication>
@@ -306,12 +306,12 @@ void MainModel::showFirstChart()
  */
 bool MainModel::loadFile(const QString &filename)
 {
-    msc::MscFile file;
+    msc::MscReader reader;
     msc::MscModel *model = nullptr;
 
     try {
         d->m_mscErrorMessages.clear();
-        model = file.parseFile(filename, &d->m_mscErrorMessages);
+        model = reader.parseFile(filename, &d->m_mscErrorMessages);
     } catch (const msc::ParserException &e) {
         d->m_mscErrorMessages.append(e.errorMessage());
         for (const QString &error : d->m_mscErrorMessages) {

@@ -27,10 +27,10 @@ namespace msc {
 class MscModel;
 class MscDocument;
 
-class MscFile
+class MscReader
 {
 public:
-    MscFile();
+    MscReader();
 
     MscModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
     MscModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
@@ -43,4 +43,4 @@ private:
     void checkDocumentHierarchy(MscDocument *doc);
 };
 
-} // namespace msc
+}

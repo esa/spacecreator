@@ -22,18 +22,18 @@
 #include "msccondition.h"
 #include "msccoregion.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 #include "msctimer.h"
 
 #include <QtTest>
 
 using namespace msc;
 
-class tst_MscFile : public QObject
+class tst_MscReader : public QObject
 {
     Q_OBJECT
 
@@ -74,32 +74,32 @@ private Q_SLOTS:
     // for message-related tests see the tst_MscEventsParsing
 
 private:
-    MscFile *file = nullptr;
+    MscReader *m_reader = nullptr;
 };
 
-void tst_MscFile::init()
+void tst_MscReader::init()
 {
-    file = new MscFile;
+    m_reader = new MscReader;
 }
 
-void tst_MscFile::cleanup()
+void tst_MscReader::cleanup()
 {
-    delete file;
-    file = nullptr;
+    delete m_reader;
+    m_reader = nullptr;
 }
 
-void tst_MscFile::testFileOpenError()
+void tst_MscReader::testFileOpenError()
 {
-    QVERIFY_EXCEPTION_THROWN(file->parseFile("some_dummy_file_name"), FileNotFoundException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseFile("some_dummy_file_name"), FileNotFoundException);
 }
 
-void tst_MscFile::testSyntaxError()
+void tst_MscReader::testSyntaxError()
 {
     QString fileName = QFINDTESTDATA("syntax_error.msc");
-    QVERIFY_EXCEPTION_THROWN(file->parseFile(fileName), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseFile(fileName), ParserException);
 }
 
-void tst_MscFile::testExampleFilesParsing_data()
+void tst_MscReader::testExampleFilesParsing_data()
 {
     QTest::addColumn<QString>("filename");
 
@@ -115,48 +115,48 @@ void tst_MscFile::testExampleFilesParsing_data()
 }
 
 // test if the files from the example dir can be opened without an exception
-void tst_MscFile::testExampleFilesParsing()
+void tst_MscReader::testExampleFilesParsing()
 {
     QFETCH(QString, filename);
     try {
-        QScopedPointer<MscModel> model(file->parseFile(filename));
+        QScopedPointer<MscModel> model(m_reader->parseFile(filename));
     } catch (...) {
         filename = "Failed to open file " + filename;
         QFAIL(filename.toStdString().c_str());
     }
 }
 
-void tst_MscFile::testEmptyDocument()
+void tst_MscReader::testEmptyDocument()
 {
-    QScopedPointer<MscModel> model(file->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
+    QScopedPointer<MscModel> model(m_reader->parseText("MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("CU_level"));
 
-    model.reset(file->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;"));
+    model.reset(m_reader->parseText("mscdocument inst_1_cu_nominal.cu_controller;\nendmscdocument;"));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("inst_1_cu_nominal.cu_controller"));
 
-    model.reset(file->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  "));
+    model.reset(m_reader->parseText("  \n mscdocument \n  ABC  ; \n  \n  endmscdocument  ;\n  "));
     QCOMPARE(model->documents().size(), 1);
     QCOMPARE(model->documents().at(0)->name(), QString("ABC"));
 
-    model.reset(file->parseText("MSCDOCUMENT error1; MSCDOCUMENT seq; ENDMSCDOCUMENT; ENDMSCDOCUMENT;"));
+    model.reset(m_reader->parseText("MSCDOCUMENT error1; MSCDOCUMENT seq; ENDMSCDOCUMENT; ENDMSCDOCUMENT;"));
     QCOMPARE(model->documents().size(), 1);
     //    QCOMPARE(model->documents().at(0)->documents().size(), 1);
     // no exception thrown
 }
 
-void tst_MscFile::testComments()
+void tst_MscReader::testComments()
 {
-    QScopedPointer<MscModel> model(file->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
-    model.reset(file->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;"));
-    model.reset(file->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;"));
+    QScopedPointer<MscModel> model(m_reader->parseText("/* This is a comment*/MSCDOCUMENT CU_level;\nENDMSCDOCUMENT;"));
+    model.reset(m_reader->parseText("MSCDOCUMENT CU_level /*This is a comment */ ;\nENDMSCDOCUMENT;"));
+    model.reset(m_reader->parseText("MSCDOCUMENT CU_level;\n/* This is a comment*/\nENDMSCDOCUMENT;"));
     // no exception thrown
 }
 
-void tst_MscFile::testEntityComments()
+void tst_MscReader::testEntityComments()
 {
-    QScopedPointer<MscModel> model(file->parseText(" \
+    QScopedPointer<MscModel> model(m_reader->parseText(" \
         mscdocument automade COMMENT 'doc comment'; \
             inst mygui_GUI : process; \
             msc recorded comment 'chart comment'; \
@@ -183,31 +183,31 @@ void tst_MscFile::testEntityComments()
     QCOMPARE(event->comment()->text(), QString("msg comment"));
 }
 
-void tst_MscFile::testNestedDocuments()
+void tst_MscReader::testNestedDocuments()
 {
-    MscModel *model = file->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
+    MscModel *model = m_reader->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
     auto mainDocuments = model->documents();
     QCOMPARE(mainDocuments.size(), 1);
     QCOMPARE(mainDocuments.at(0)->documents().size(), 1);
     delete model;
 
     // documents in parallel
-    model = file->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT "
-                            "l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
+    model = m_reader->parseText("MSCDOCUMENT l1; MSCDOCUMENT l2;ENDMSCDOCUMENT; MSCDOCUMENT "
+                                "l3;ENDMSCDOCUMENT; \nENDMSCDOCUMENT;");
     mainDocuments = model->documents();
     QCOMPARE(mainDocuments.size(), 1);
     QCOMPARE(mainDocuments.at(0)->documents().size(), 2);
     delete model;
 }
 
-void tst_MscFile::testMscInDocument()
+void tst_MscReader::testMscInDocument()
 {
-    MscModel *model = file->parseText("MSC msc1;ENDMSC;");
+    MscModel *model = m_reader->parseText("MSC msc1;ENDMSC;");
     QCOMPARE(model->charts().size(), 1);
     QCOMPARE(model->charts().at(0)->name(), QString("msc1"));
     delete model;
 
-    model = file->parseText("MSCDOCUMENT doc1; MSC msc1;ENDMSC; ENDMSCDOCUMENT;");
+    model = m_reader->parseText("MSCDOCUMENT doc1; MSC msc1;ENDMSC; ENDMSCDOCUMENT;");
     QCOMPARE(model->documents().size(), 1);
     auto mainDocument = model->documents().at(0);
     QCOMPARE(mainDocument->charts().size(), 1);
@@ -215,9 +215,9 @@ void tst_MscFile::testMscInDocument()
     delete model;
 }
 
-void tst_MscFile::testInstance()
+void tst_MscReader::testInstance()
 {
-    QScopedPointer<MscModel> model(file->parseText("MSC msc1; INSTANCE inst1; ENDINSTANCE; ENDMSC;"));
+    QScopedPointer<MscModel> model(m_reader->parseText("MSC msc1; INSTANCE inst1; ENDINSTANCE; ENDMSC;"));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
@@ -228,13 +228,13 @@ void tst_MscFile::testInstance()
             instance : bla;\
                 IN status FROM  /* MSC AT [104] */ ;\
         endinstance; endmsc;";
-    model.reset(file->parseText(msc));
+    model.reset(m_reader->parseText(msc));
     // no exception
 }
 
-void tst_MscFile::testInstanceWithKind()
+void tst_MscReader::testInstanceWithKind()
 {
-    QScopedPointer<MscModel> model(file->parseText(" \
+    QScopedPointer<MscModel> model(m_reader->parseText(" \
         mscdocument automade; \
             inst mygui_GUI : process; \
             msc recorded; \
@@ -253,7 +253,7 @@ void tst_MscFile::testInstanceWithKind()
     QCOMPARE(instance->denominator(), QString("process"));
 
     // out of spec instance kind
-    model.reset(file->parseText(" \
+    model.reset(m_reader->parseText(" \
         mscdocument automade; \
             msc recorded; \
                 instance mygui_GUI : process foo control unit; \
@@ -271,14 +271,14 @@ void tst_MscFile::testInstanceWithKind()
     QCOMPARE(instance->denominator(), QString("process"));
 }
 
-void tst_MscFile::testGateMessage()
+void tst_MscReader::testGateMessage()
 {
     QString msc = "MSC msc1; \
                    gate out Msg_4 to Inst_1; \
                    INSTANCE Inst_1;in Msg_4 from env;out Msg_3 to Inst_2;ENDINSTANCE; \
                    INSTANCE Inst_2;in Msg_3 from Inst_1;ENDINSTANCE; \
                    ENDMSC;";
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
@@ -286,7 +286,7 @@ void tst_MscFile::testGateMessage()
     delete model;
 }
 
-void tst_MscFile::testCondition()
+void tst_MscReader::testCondition()
 {
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
@@ -295,7 +295,7 @@ void tst_MscFile::testCondition()
                        ENDINSTANCE; \
                    ENDMSC;";
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -313,7 +313,7 @@ void tst_MscFile::testCondition()
     delete model;
 }
 
-void tst_MscFile::testCoregion()
+void tst_MscReader::testCoregion()
 {
     QString msc = "msc connection; \
                       instance Initiator; \
@@ -324,7 +324,7 @@ void tst_MscFile::testCoregion()
                       endinstance; \
                   endmsc;";
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -349,7 +349,7 @@ void tst_MscFile::testCoregion()
     delete model;
 }
 
-void tst_MscFile::testTimer()
+void tst_MscReader::testTimer()
 {
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
@@ -361,7 +361,7 @@ void tst_MscFile::testTimer()
                        ENDINSTANCE; \
                    ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -402,7 +402,7 @@ void tst_MscFile::testTimer()
     QCOMPARE(timer->name(), QString("timer"));
 }
 
-void tst_MscFile::testTimerRelation()
+void tst_MscReader::testTimerRelation()
 {
     QString msc = "MSC msc1; \
                       INSTANCE Inst_1; \
@@ -415,7 +415,7 @@ void tst_MscFile::testTimerRelation()
                       ENDINSTANCE; \
                    ENDMSC;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -469,7 +469,7 @@ void tst_MscFile::testTimerRelation()
             ENDINSTANCE; \
            ENDMSC;";
 
-    model.reset(file->parseText(msc));
+    model.reset(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     chart = model->charts().at(0);
     QCOMPARE(chart->instanceEvents().size(), 18);
@@ -497,7 +497,7 @@ void tst_MscFile::testTimerRelation()
     QVERIFY(timers[5]->followingTimer() == nullptr);
 }
 
-void tst_MscFile::testAction()
+void tst_MscReader::testAction()
 {
     QString msc = { "MSC msc1; \
             INSTANCE Inst_1; \
@@ -509,7 +509,7 @@ void tst_MscFile::testAction()
             ENDINSTANCE; \
          ENDMSC;" };
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -536,7 +536,7 @@ void tst_MscFile::testAction()
     QCOMPARE(action->instance(), chart->instances().at(0));
 }
 
-void tst_MscFile::testInstanceStop_data()
+void tst_MscReader::testInstanceStop_data()
 {
     QTest::addColumn<QString>("mscContent");
 
@@ -556,11 +556,11 @@ void tst_MscFile::testInstanceStop_data()
     QTest::newRow("Example conform (with endinstance;)") << msc;
 }
 
-void tst_MscFile::testInstanceStop()
+void tst_MscReader::testInstanceStop()
 {
     QFETCH(QString, mscContent);
 
-    QScopedPointer<MscModel> model(file->parseText(mscContent));
+    QScopedPointer<MscModel> model(m_reader->parseText(mscContent));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 1);
@@ -569,7 +569,7 @@ void tst_MscFile::testInstanceStop()
     QCOMPARE(instance->explicitStop(), true);
 }
 
-void tst_MscFile::testHierarchy()
+void tst_MscReader::testHierarchy()
 {
     QString msc = "\
         mscdocument test_is /* MSC IS */; \
@@ -599,7 +599,7 @@ void tst_MscFile::testHierarchy()
             endmscdocument; \
         endmscdocument;";
 
-    auto model = file->parseText(msc);
+    auto model = m_reader->parseText(msc);
     QCOMPARE(model->documents().size(), 1);
 
     auto documentIs = model->documents().at(0);
@@ -632,27 +632,27 @@ void tst_MscFile::testHierarchy()
     delete model;
 }
 
-void tst_MscFile::testDataDefinitionLanguage()
+void tst_MscReader::testDataDefinitionLanguage()
 {
     QString msc = "mscdocument automade; language ASN.1; endmscdocument;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->dataLanguage(), QString("ASN.1"));
 }
 
-void tst_MscFile::testDataDefinitionData()
+void tst_MscReader::testDataDefinitionData()
 {
     QString msc = "mscdocument automade; data TPos.asn; endmscdocument;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->dataDefinitionString(), QString("TPos.asn"));
 }
 
-void tst_MscFile::testKeywordAsName()
+void tst_MscReader::testKeywordAsName()
 {
     QString msc = "MSCDOCUMENT timer;\
                 MSC action;\
                 ENDMSC; \
             ENDMSCDOCUMENT;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->documents().size(), 1);
     MscDocument *doc = model->documents().at(0);
@@ -663,7 +663,7 @@ void tst_MscFile::testKeywordAsName()
     QCOMPARE(chart->name(), QString("action"));
 }
 
-void tst_MscFile::testNonStandardVia()
+void tst_MscReader::testNonStandardVia()
 {
     // Using via that way is not really in line with the standard
     QString msc = "MSC msc1; \
@@ -672,7 +672,7 @@ void tst_MscFile::testNonStandardVia()
                          OUT check2(1) TO  VIA gtY; \
                       ENDINSTANCE; \
                    ENDMSC;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -681,14 +681,14 @@ void tst_MscFile::testNonStandardVia()
     QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
-void tst_MscFile::testNonStandardInstance()
+void tst_MscReader::testNonStandardInstance()
 {
     // Using INSTANCE that way is not really in line with the standard
     QString msc = "MSC msc1; \
                       INSTANCE : FAB 1; \
                       ENDINSTANCE; \
                    ENDMSC;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
@@ -698,7 +698,7 @@ void tst_MscFile::testNonStandardInstance()
     QCOMPARE(instance->name(), QString("FAB 1"));
 }
 
-void tst_MscFile::testDocumentsType_data()
+void tst_MscReader::testDocumentsType_data()
 {
     QSKIP("Types are not checked at startup - so old files can be loaded");
     QTest::addColumn<QString>("mscContent");
@@ -731,13 +731,13 @@ void tst_MscFile::testDocumentsType_data()
     QTest::newRow("Is type docs have only one child doc") << msc;
 }
 
-void tst_MscFile::testDocumentsType()
+void tst_MscReader::testDocumentsType()
 {
     QFETCH(QString, mscContent);
-    QVERIFY_EXCEPTION_THROWN(file->parseText(mscContent), ParserException);
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(mscContent), ParserException);
 }
 
-void tst_MscFile::testDefaultDocumentTypeFromLoad()
+void tst_MscReader::testDefaultDocumentTypeFromLoad()
 {
     QString msc = "MSCDOCUMENT root_doc /* MSC OR */; \
                         MSCDOCUMENT doc1; \
@@ -750,7 +750,7 @@ void tst_MscFile::testDefaultDocumentTypeFromLoad()
                         ENDMSCDOCUMENT; \
                   ENDMSCDOCUMENT;";
 
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     MscDocument *doc = model->documents().at(0);
     QCOMPARE(doc->hierarchyType(), MscDocument::HierarchyOr);
 
@@ -765,7 +765,7 @@ void tst_MscFile::testDefaultDocumentTypeFromLoad()
     QCOMPARE(childDoc->hierarchyType(), MscDocument::HierarchyException);
 }
 
-void tst_MscFile::testMessageDeclaration()
+void tst_MscReader::testMessageDeclaration()
 {
     QString msc = "mscdocument automade; \
                 inst mygui_GUI : process; \
@@ -777,7 +777,7 @@ void tst_MscFile::testMessageDeclaration()
                     endinstance; \
                 endmsc; \
             endmscdocument;";
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
     QCOMPARE(model->documents().size(), 1);
     MscDocument *doc = model->documents().at(0);
@@ -795,7 +795,7 @@ void tst_MscFile::testMessageDeclaration()
     QCOMPARE(typeRefs.at(1), QString("T-POS"));
 }
 
-void tst_MscFile::testNameFiltering()
+void tst_MscReader::testNameFiltering()
 {
     QString msc = "MSC msc1; \
                         INSTANCE `oid`1`351`Inst_1`; \
@@ -805,7 +805,7 @@ void tst_MscFile::testNameFiltering()
                         ENDINSTANCE; \
                    ENDMSC;";
 
-    MscModel *model = file->parseText(msc);
+    MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
 
@@ -822,6 +822,6 @@ void tst_MscFile::testNameFiltering()
     QCOMPARE(condition->name(), QString("Con_2"));
 }
 
-QTEST_APPLESS_MAIN(tst_MscFile)
+QTEST_APPLESS_MAIN(tst_MscReader)
 
-#include "tst_mscfile.moc"
+#include "tst_mscreader.moc"

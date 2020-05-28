@@ -67,8 +67,6 @@ target_sources(${LIB_NAME} PRIVATE
     mscentity.h
     mscerrorlistener.cpp
     mscerrorlistener.h
-    mscfile.cpp
-    mscfile.h
     mscgate.cpp
     mscgate.h
     mscinstance.cpp
@@ -89,6 +87,8 @@ target_sources(${LIB_NAME} PRIVATE
     mscparameterlist.h
     mscparservisitor.cpp
     mscparservisitor.h
+    mscreader.cpp
+    mscreader.h
     mscresources.qrc
     msctimer.cpp
     msctimer.h

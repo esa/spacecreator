@@ -21,9 +21,9 @@
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscinstance.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 
 #include <QGraphicsView>
 #include <QUndoStack>
@@ -125,8 +125,8 @@ void tst_InstanceItem::testMoveByHead()
                          ENDMSCDOCUMENT;");
 
     QScopedPointer<ChartViewModel> chartModel(new ChartViewModel());
-    QScopedPointer<MscFile> file(new MscFile);
-    QScopedPointer<MscModel> model(file->parseText(msc));
+    QScopedPointer<MscReader> reader(new MscReader);
+    QScopedPointer<MscModel> model(reader->parseText(msc));
     QScopedPointer<QGraphicsView> view(new QGraphicsView());
     view->setScene(chartModel->graphicsScene());
 

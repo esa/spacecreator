@@ -23,9 +23,9 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscfile.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscreader.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -85,8 +85,8 @@ void tst_MessageItem::enterText(const QString &text)
 
 void tst_MessageItem::parseMsc(const QString &mscText)
 {
-    MscFile mscFile;
-    m_mscModel = mscFile.parseText(mscText);
+    MscReader mscReader;
+    m_mscModel = mscReader.parseText(mscText);
 
     QVERIFY(!m_mscModel->documents().isEmpty());
     QVERIFY(m_mscModel->documents().first());

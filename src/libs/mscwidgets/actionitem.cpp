@@ -23,7 +23,7 @@
 #include "datastatement.h"
 #include "instanceitem.h"
 #include "mscaction.h"
-#include "mscfile.h"
+#include "mscreader.h"
 #include "ui/grippointshandler.h"
 
 #include <QDebug>
@@ -46,17 +46,17 @@ public:
 protected:
     bool validateText(const QString &text) const
     {
-        MscFile file;
+        MscReader reader;
         QStringList errors;
         // test plain informal action, or data statements
         QString testDoc = QString("msc c1;instance i1;action %1;endinstance;endmsc;").arg(text);
         try {
-            file.parseText(testDoc, &errors);
+            reader.parseText(testDoc, &errors);
         } catch (...) {
             // test quoted informal action
             testDoc = QString("msc c1;instance i1;action '%1';endinstance;endmsc;").arg(text);
             try {
-                file.parseText(testDoc, &errors);
+                reader.parseText(testDoc, &errors);
             } catch (...) {
                 return false;
             }

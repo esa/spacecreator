@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscfile.h"
+#include "mscreader.h"
 
 #include "MscBaseVisitor.h"
 #include "MscLexer.h"
@@ -33,7 +33,7 @@
 #include <fstream>
 
 /*!
-  \class MscFile
+  \class MscReader
   \inmodule MscLibrary
 
   The class to load MSC files
@@ -43,16 +43,16 @@ using namespace antlr4;
 
 namespace msc {
 /*!
-  \brief MscFile::MscFile
+  \brief MscReader::MscReader
 */
-MscFile::MscFile() { }
+MscReader::MscReader() { }
 
 /*!
-  \fn MscFile::parseFile(const QString &filename)
+  \fn MscReader::parseFile(const QString &filename)
 
   Loads the file \a filename
 */
-MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages)
+MscModel *MscReader::parseFile(const QString &filename, QStringList *errorMessages)
 {
     if (!QFileInfo::exists(filename)) {
         throw FileNotFoundException();
@@ -77,13 +77,13 @@ MscModel *MscFile::parseFile(const QString &filename, QStringList *errorMessages
     return mscModel;
 }
 
-MscModel *MscFile::parseText(const QString &text, QStringList *errorMessages)
+MscModel *MscReader::parseText(const QString &text, QStringList *errorMessages)
 {
     ANTLRInputStream input(text.toStdString());
     return parse(input, errorMessages);
 }
 
-MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
+MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
     MscErrorListener errorListener;
 
@@ -122,7 +122,7 @@ MscModel *MscFile::parse(ANTLRInputStream &input, QStringList *errorMessages)
     return model;
 }
 
-void MscFile::checkDocumentHierarchy(MscDocument *doc)
+void MscReader::checkDocumentHierarchy(MscDocument *doc)
 {
     Q_ASSERT(doc);
     if (doc->hierarchyType() == MscDocument::HierarchyUnkown) {

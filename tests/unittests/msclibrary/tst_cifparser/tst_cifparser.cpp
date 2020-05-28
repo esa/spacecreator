@@ -17,7 +17,7 @@
 
 #include "cif/cifparser.h"
 #include "exceptions.h"
-#include "mscfile.h"
+#include "mscreader.h"
 
 #include <QMetaEnum>
 #include <QMetaObject>
@@ -36,7 +36,7 @@ class tst_CifParser : public QObject
     Q_OBJECT
 
 private:
-    MscFile *m_mscFile = nullptr;
+    MscReader *m_mscReader = nullptr;
     CifParser *m_cifParser = nullptr;
 private Q_SLOTS:
 
@@ -239,14 +239,14 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
 
 void tst_CifParser::initTestCase()
 {
-    m_mscFile = new MscFile;
+    m_mscReader = new MscReader;
     m_cifParser = new CifParser;
 }
 
 void tst_CifParser::cleanupTestCase()
 {
     delete m_cifParser;
-    delete m_mscFile;
+    delete m_mscReader;
 }
 
 void tst_CifParser::testCoverage()
@@ -280,7 +280,7 @@ void tst_CifParser::testParsingCifLine(CifLine::CifType entityType)
     QString source = createMscSource(cifLine);
 
     try {
-        m_mscFile->parseText(source);
+        m_mscReader->parseText(source);
     } catch (...) {
         QFAIL("Unexpected exception!");
     }
@@ -426,7 +426,7 @@ void tst_CifParser::testParsingCifBlock(const QVector<QVector<CifLine::CifType>>
 
     const QString &source = createMscSource(cifLines.join("\n"));
     try {
-        m_mscFile->parseText(source);
+        m_mscReader->parseText(source);
     } catch (...) {
         QFAIL("Unexpected exception!");
     }
@@ -675,7 +675,7 @@ void tst_CifParser::testParsingCifAtDocumentFront()
             ENDMSCDOCUMENT;";
     QScopedPointer<msc::MscModel> model;
     try {
-        model.reset(m_mscFile->parseText(source));
+        model.reset(m_mscReader->parseText(source));
     } catch (...) {
         QFAIL("Unexpected exception!");
     }
@@ -695,7 +695,7 @@ void tst_CifParser::testIgnoreUnknownCif()
             ENDMSCDOCUMENT;";
     QScopedPointer<msc::MscModel> model;
     try {
-        model.reset(m_mscFile->parseText(source));
+        model.reset(m_mscReader->parseText(source));
     } catch (...) {
         QFAIL("Unexpected exception!");
     }
