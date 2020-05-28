@@ -28,7 +28,7 @@
 #include <projectexplorer/projectexplorerconstants.h>
 #include <projectexplorer/task.h>
 
-#include <data/errormessage.h>
+#include <asn1/errormessage.h>
 
 using namespace Asn1Acn::Internal;
 

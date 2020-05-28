@@ -33,10 +33,10 @@
 #include <coreplugin/progressmanager/progressmanager.h>
 #include <utils/runextensions.h>
 
-#include <data/file.h>
-#include <data/project.h>
-#include <data/root.h>
-#include <data/typereference.h>
+#include <asn1/file.h>
+#include <asn1/project.h>
+#include <asn1/root.h>
+#include <asn1/typereference.h>
 
 #include "asn1acnconstants.h"
 #include "parseddatastorage.h"

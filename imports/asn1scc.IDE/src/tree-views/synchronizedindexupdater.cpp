@@ -30,7 +30,7 @@
 #include <projectexplorer/project.h>
 #include <projectexplorer/session.h>
 
-#include <data/project.h>
+#include <asn1/project.h>
 #include <parseddatastorage.h>
 #include <tree-views/model.h>
 

@@ -26,12 +26,12 @@
 
 #include <coreplugin/fileiconprovider.h>
 
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/project.h>
-#include <data/typeassignment.h>
-#include <data/typereference.h>
-#include <data/valueassignment.h>
+#include <asn1/definitions.h>
+#include <asn1/file.h>
+#include <asn1/project.h>
+#include <asn1/typeassignment.h>
+#include <asn1/typereference.h>
+#include <asn1/valueassignment.h>
 
 #include <utils/icon.h>
 #include <utils/stylehelper.h>

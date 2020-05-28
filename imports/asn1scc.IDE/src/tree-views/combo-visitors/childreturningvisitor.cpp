@@ -26,8 +26,8 @@
 
 #include <tree-views/combo-visitors/childrencountingvisitor.h>
 
-#include <data/types/labeltype.h>
-#include <data/types/type.h>
+#include <asn1/types/labeltype.h>
+#include <asn1/types/type.h>
 
 using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::ComboVisitors;

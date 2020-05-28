@@ -24,7 +24,7 @@
 ****************************************************************************/
 #pragma once
 
-#include <data/visitorwithvalue.h>
+#include <asn1/visitorwithvalue.h>
 
 #include <tree-views/outline-visitors/childrencountingvisitor.h>
 

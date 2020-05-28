@@ -26,7 +26,7 @@
 
 #include <QIcon>
 
-#include <data/visitorwithvalue.h>
+#include <asn1/visitorwithvalue.h>
 
 #include <utils/theme/theme.h>
 

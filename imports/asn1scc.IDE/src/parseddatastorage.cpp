@@ -27,8 +27,8 @@
 
 #include "utils/qtcassert.h"
 
-#include "data/file.h"
-#include "data/project.h"
+#include "asn1/file.h"
+#include "asn1/project.h"
 
 using namespace Asn1Acn::Internal;
 

@@ -33,8 +33,8 @@
 
 #include <utils/fileutils.h>
 
-#include "data/file.h"
-#include "data/root.h"
+#include "asn1/file.h"
+#include "asn1/root.h"
 
 namespace Asn1Acn {
 namespace Internal {

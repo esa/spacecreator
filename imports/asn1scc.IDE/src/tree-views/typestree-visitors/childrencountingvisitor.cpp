@@ -28,7 +28,7 @@
 
 #include <utils/qtcassert.h>
 
-#include <data/project.h>
+#include <asn1/project.h>
 
 using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews;

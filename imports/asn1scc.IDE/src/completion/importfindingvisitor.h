@@ -26,7 +26,7 @@
 
 #include <QString>
 
-#include <data/visitorwithvalue.h>
+#include <asn1/visitorwithvalue.h>
 
 namespace Asn1Acn {
 namespace Internal {

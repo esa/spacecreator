@@ -31,8 +31,8 @@
 #include <QObject>
 #include <QString>
 
-#include <data/errormessage.h>
-#include <data/file.h>
+#include <asn1/errormessage.h>
+#include <asn1/file.h>
 
 namespace Asn1Acn {
 namespace Internal {

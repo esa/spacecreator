@@ -29,8 +29,8 @@
 
 #include <coreplugin/editormanager/editormanager.h>
 
-#include <data/project.h>
-#include <data/root.h>
+#include <asn1/project.h>
+#include <asn1/root.h>
 #include <parseddatastorage.h>
 
 #include "typestree-visitors/indexfindingvisitor.h"

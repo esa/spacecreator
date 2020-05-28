@@ -13,20 +13,6 @@ set(ASN1_SOURCES
     src/completion/acncompletionassist.cpp
     src/completion/keywordproposalsbuilder.cpp
     src/completion/importfindingvisitor.cpp
-    src/data/sourcelocation.cpp
-    src/data/node.cpp
-    src/data/root.cpp
-    src/data/file.cpp
-    src/data/project.cpp
-    src/data/typeassignment.cpp
-    src/data/valueassignment.cpp
-    src/data/typereference.cpp
-    src/data/definitions.cpp
-    src/data/visitor.cpp
-    src/data/types/type.cpp
-    src/data/types/userdefinedtype.cpp
-    src/data/types/labeltype.cpp
-    src/data/types/builtintypes.cpp
     src/tree-views/outline-visitors/childrencountingvisitor.cpp
     src/tree-views/outline-visitors/childreturningvisitor.cpp
     src/tree-views/outline-visitors/indexfindingvisitor.cpp
@@ -100,7 +86,6 @@ set(ASN1_SOURCES
     src/editor.cpp
     src/asn1sccdocumentprocessor.cpp
     src/parseddatastorage.cpp
-    src/astxmlparser.cpp
     src/projectwatcher.cpp
     src/document.cpp
     src/asn1acnjsextension.cpp
@@ -138,24 +123,6 @@ set(ASN1_SOURCES
     src/completion/keywordproposalsbuilder.h
     src/completion/completiontypedefs.h
     src/completion/importfindingvisitor.h
-    src/data/sourcelocation.h
-    src/data/typeassignment.h
-    src/data/valueassignment.h
-    src/data/definitions.h
-    src/data/typereference.h
-    src/data/errormessage.h
-    src/data/node.h
-    src/data/root.h
-    src/data/file.h
-    src/data/project.h
-    src/data/visitor.h
-    src/data/visitorwithvalue.h
-    src/data/importedtype.h
-    src/data/importedvalue.h
-    src/data/types/type.h
-    src/data/types/userdefinedtype.h
-    src/data/types/labeltype.h
-    src/data/types/builtintypes.h
     src/tree-views/outline-visitors/childrencountingvisitor.h
     src/tree-views/outline-visitors/childreturningvisitor.h
     src/tree-views/outline-visitors/indexfindingvisitor.h
@@ -242,7 +209,6 @@ set(ASN1_SOURCES
     src/editor.h
     src/asn1sccdocumentprocessor.h
     src/parseddatastorage.h
-    src/astxmlparser.h
     src/projectwatcher.h
     src/document.h
     src/asn1acnjsextension.h
@@ -284,7 +250,7 @@ set(ASN1_SOURCES
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES ASN1SCC_LIBRARY
-    DEPENDS Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets
+    DEPENDS asn1library Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets
     PLUGIN_DEPENDS
     SOURCES ${ASN1_SOURCES}
 )

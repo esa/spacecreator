@@ -29,10 +29,10 @@
 
 #include <coreplugin/editormanager/editormanager.h>
 
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/project.h>
-#include <data/root.h>
+#include <asn1/definitions.h>
+#include <asn1/file.h>
+#include <asn1/project.h>
+#include <asn1/root.h>
 
 #include <tree-views/decorationrolevisitor.h>
 

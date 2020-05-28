@@ -27,7 +27,7 @@
 #include <QMap>
 #include <QString>
 
-#include "data/errormessage.h"
+#include "asn1/errormessage.h"
 
 namespace Asn1Acn {
 namespace Internal {

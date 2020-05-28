@@ -24,13 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
-#include <QXmlStreamReader>
+#include "file.h"
 
 #include <QString>
-
-#include "data/file.h"
+#include <QXmlStreamReader>
+#include <memory>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -77,8 +75,7 @@ private:
     std::unique_ptr<Data::Types::Type> readType();
     std::unique_ptr<Data::Types::Type> readTypeDetails(const Data::SourceLocation &location);
     std::unique_ptr<Data::Types::Type> readReferenceType(const Data::SourceLocation &location);
-    std::unique_ptr<Data::Types::Type> buildTypeFromName(const Data::SourceLocation &location,
-                                                         const QStringRef &name);
+    std::unique_ptr<Data::Types::Type> buildTypeFromName(const Data::SourceLocation &location, const QStringRef &name);
 
     void readTypeContents(const QStringRef &name);
     void readSequence();

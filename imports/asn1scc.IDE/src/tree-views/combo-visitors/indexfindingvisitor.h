@@ -26,8 +26,8 @@
 
 #include <tree-views/outline-visitors/indexfindingvisitor.h>
 
-#include <data/file.h>
-#include <data/node.h>
+#include <asn1/file.h>
+#include <asn1/node.h>
 
 namespace Asn1Acn {
 namespace Internal {

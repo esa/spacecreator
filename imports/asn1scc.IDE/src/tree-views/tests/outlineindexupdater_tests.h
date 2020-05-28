@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QSignalSpy>
 
-#include <data/node.h>
+#include <asn1/node.h>
 
 #include "../outlineindexupdater.h"
 

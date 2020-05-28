@@ -26,8 +26,8 @@
 
 #include <tree-views/outline-visitors/childreturningvisitor.h>
 
-#include <data/file.h>
-#include <data/typeassignment.h>
+#include <asn1/file.h>
+#include <asn1/typeassignment.h>
 
 namespace Asn1Acn {
 namespace Internal {

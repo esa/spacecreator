@@ -31,7 +31,7 @@
 #include <texteditor/texteditor.h>
 #include <utils/fileutils.h>
 
-#include <data/sourcelocation.h>
+#include <asn1/sourcelocation.h>
 
 #include "indexupdater.h"
 

@@ -30,7 +30,7 @@
 #include <QHash>
 #include <QString>
 
-#include "data/file.h"
+#include "asn1/file.h"
 
 #include "parseddocumentbuilder.h"
 

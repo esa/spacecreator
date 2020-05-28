@@ -33,7 +33,7 @@
 #include <texteditor/codeassist/genericproposal.h>
 #include <texteditor/codeassist/genericproposalmodel.h>
 
-#include "data/file.h"
+#include "asn1/file.h"
 
 #include "acneditor.h"
 #include "asn1acnconstants.h"

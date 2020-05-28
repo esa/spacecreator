@@ -26,10 +26,10 @@
 
 #include <utils/qtcassert.h>
 
-#include <data/definitions.h>
-#include <data/project.h>
-#include <data/root.h>
-#include <data/valueassignment.h>
+#include <asn1/definitions.h>
+#include <asn1/project.h>
+#include <asn1/root.h>
+#include <asn1/valueassignment.h>
 
 using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::TypesTreeVisitors;

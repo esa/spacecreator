@@ -26,7 +26,7 @@
 
 #include <QAbstractItemModel>
 
-#include <data/node.h>
+#include <asn1/node.h>
 
 namespace Asn1Acn {
 namespace Internal {

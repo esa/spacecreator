@@ -29,8 +29,8 @@
 
 #include <texteditor/texteditor.h>
 
-#include "data/file.h"
-#include "data/typereference.h"
+#include "asn1/file.h"
+#include "asn1/typereference.h"
 
 namespace Asn1Acn {
 namespace Internal {

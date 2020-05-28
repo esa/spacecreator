@@ -35,8 +35,8 @@
 
 #include <messages/messageutils.h>
 
-#include "data/definitions.h"
-#include "data/file.h"
+#include "asn1/definitions.h"
+#include "asn1/file.h"
 
 #include "astxmlparser.h"
 #include "errormessageparser.h"

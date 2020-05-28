@@ -26,7 +26,7 @@
 
 #include <QDialog>
 
-#include "data/file.h"
+#include "asn1/file.h"
 
 #include "asn1acnbuildsteprunner.h"
 

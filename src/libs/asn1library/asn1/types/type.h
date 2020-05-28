@@ -24,7 +24,6 @@
 ****************************************************************************/
 #pragma once
 
-#include <QIcon>
 #include <QString>
 
 namespace Asn1Acn {
