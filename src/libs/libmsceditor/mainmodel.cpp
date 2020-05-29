@@ -42,7 +42,7 @@
 #include <QPainter>
 #include <QUndoStack>
 
-using namespace msc;
+namespace msc {
 
 const QLatin1String MainModel::MscChartMimeType("application/mscchart");
 
@@ -78,9 +78,9 @@ struct MainModelPrivate {
 };
 
 /*!
-  \class MainModel
+  \class msc::MainModel
 
-  This is the main model for the document view.
+  This is the main model for the msc chart view.
 */
 
 /*!
@@ -493,4 +493,6 @@ void MainModel::setNewModel(MscModel *model)
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
     Q_EMIT modelUpdated(d->m_mscModel);
+}
+
 }

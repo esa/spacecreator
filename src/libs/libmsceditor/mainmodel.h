@@ -23,6 +23,9 @@
 #include <QVector>
 #include <memory>
 
+class QGraphicsScene;
+class QUndoStack;
+
 namespace msc {
 class ChartViewModel;
 class DocumentItemModel;
@@ -30,10 +33,6 @@ class HierarchyViewModel;
 class MscChart;
 class MscDocument;
 class MscModel;
-}
-
-class QGraphicsScene;
-class QUndoStack;
 
 struct MainModelPrivate;
 
@@ -105,3 +104,5 @@ private:
 
     std::unique_ptr<MainModelPrivate> const d;
 };
+
+}

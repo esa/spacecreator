@@ -24,6 +24,8 @@
 class QWebSocketServer;
 class QWebSocket;
 
+namespace msc {
+
 class RemoteControlWebServer : public QObject
 {
     Q_OBJECT
@@ -65,3 +67,5 @@ private:
     QWebSocketServer *m_webSocketServer = nullptr;
     QList<QWebSocket *> m_clients;
 };
+
+}

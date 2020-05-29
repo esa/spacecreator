@@ -30,7 +30,7 @@
 #include <QStyledItemDelegate>
 #include <functional>
 
-namespace {
+namespace msc {
 static const char *HIERARCHY_TYPE_TAG { "hierarchyTag" };
 
 class DocumentDelegate : public QStyledItemDelegate
@@ -52,10 +52,9 @@ public:
         return editor;
     }
 };
-}
 
 /*!
- * \class DocumentTreeView The class for showing the document tree in the main window
+ * \class msc::DocumentTreeView The class for showing the document tree in the main window
  */
 
 /*!
@@ -219,4 +218,6 @@ QMenu *DocumentTreeView::contextMenu(msc::MscDocument *document)
     menu->addAction(tr("Rename"), this, [&]() { edit(currentIndex()); });
 
     return menu;
+}
+
 }

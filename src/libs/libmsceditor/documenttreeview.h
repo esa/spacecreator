@@ -20,11 +20,10 @@
 
 #include <QTreeView>
 
+class QMenu;
+
 namespace msc {
 class MscDocument;
-}
-
-class QMenu;
 
 class DocumentTreeView : public QTreeView
 {
@@ -49,3 +48,5 @@ private:
     void showDocumentViewMenu(const QPoint &point);
     QMenu *contextMenu(msc::MscDocument *document);
 };
+
+}

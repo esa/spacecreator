@@ -28,8 +28,10 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 
+namespace msc {
+
 /*!
-  \class ASN1FileView
+  \class msc::ASN1FileView
   \brief Show the contents of ASN.1 files.
 
   This is the widget that is used in the main window to show the contents of ASN.1 files.
@@ -156,4 +158,6 @@ void ASN1FileView::fillPreview(const QString &filename)
     } else {
         ui->textEdit->setHtml(html);
     }
+}
+
 }

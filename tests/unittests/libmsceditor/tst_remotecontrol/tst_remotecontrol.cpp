@@ -34,13 +34,14 @@ private Q_SLOTS:
 
     void initTestCase()
     {
-        server = new RemoteControlWebServer(this);
-        handler = new RemoteControlHandler(this);
-        model = new MainModel(this);
+        server = new msc::RemoteControlWebServer(this);
+        handler = new msc::RemoteControlHandler(this);
+        model = new msc::MainModel(this);
         model->initialModel();
         handler->setModel(model);
-        connect(server, &RemoteControlWebServer::executeCommand, handler, &RemoteControlHandler::handleRemoteCommand);
-        connect(handler, &RemoteControlHandler::commandDone, server, &RemoteControlWebServer::commandDone);
+        connect(server, &msc::RemoteControlWebServer::executeCommand, handler,
+                &msc::RemoteControlHandler::handleRemoteCommand);
+        connect(handler, &msc::RemoteControlHandler::commandDone, server, &msc::RemoteControlWebServer::commandDone);
 
         server->start(kPort);
 
@@ -519,9 +520,9 @@ private Q_SLOTS:
     }
 
 private:
-    RemoteControlWebServer *server = nullptr;
-    RemoteControlHandler *handler = nullptr;
-    MainModel *model = nullptr;
+    msc::RemoteControlWebServer *server = nullptr;
+    msc::RemoteControlHandler *handler = nullptr;
+    msc::MainModel *model = nullptr;
     QWebSocket *socket = nullptr;
 };
 

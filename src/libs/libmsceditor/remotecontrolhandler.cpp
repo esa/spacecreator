@@ -26,14 +26,16 @@
 #include "msccreate.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
-#include "msctimer.h"
 #include "mscmodel.h"
+#include "msctimer.h"
 
 #include <QMetaEnum>
 #include <QUndoStack>
 
+namespace msc {
+
 /*!
- * \class RemoteControlHandler
+ * \class msc::RemoteControlHandler
  *
  * Handles the remote control of the view.
  */
@@ -42,7 +44,7 @@ RemoteControlHandler::RemoteControlHandler(QObject *parent)
 {
 }
 
-void RemoteControlHandler::setModel(MainModel *model)
+void RemoteControlHandler::setModel(msc::MainModel *model)
 {
     m_model = model;
 }
@@ -107,7 +109,8 @@ void RemoteControlHandler::handleRemoteCommand(
         m_model->setCurrentFilePath(params.value(QLatin1String("fileName"), m_model->currentFilePath()).toString());
         msc::MscModel *mscModel = m_model->mscModel();
         mscModel->setDataLanguage(tr("ASN.1"));
-        mscModel->setDataDefinitionString(params.value(QLatin1String("asn1File"), mscModel->dataDefinitionString()).toString());
+        mscModel->setDataDefinitionString(
+                params.value(QLatin1String("asn1File"), mscModel->dataDefinitionString()).toString());
         result = !m_model->currentFilePath().isEmpty();
         if (result)
             m_model->saveMsc(m_model->currentFilePath());
@@ -360,4 +363,6 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
         *errorString = tr("Condition is added but unavailable for Undo/Redo actions");
 
     return result;
+}
+
 }

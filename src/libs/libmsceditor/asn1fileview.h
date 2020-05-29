@@ -15,8 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef ASN1FILEVIEW_H
-#define ASN1FILEVIEW_H
+#pragma once
 
 #include <QPointer>
 #include <QWidget>
@@ -27,7 +26,6 @@ class ASN1FileView;
 
 namespace msc {
 class MscModel;
-}
 
 class ASN1FileView : public QWidget
 {
@@ -53,4 +51,4 @@ private:
     QString m_currentDirectory; // directory of the current MSC file
 };
 
-#endif // ASN1FILEVIEW_H
+}

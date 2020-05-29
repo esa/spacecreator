@@ -105,7 +105,7 @@
       <number>5</number>
      </property>
      <item row="0" column="0">
-      <widget class="DocumentTreeView" name="documentTreeView">
+      <widget class="msc::DocumentTreeView" name="documentTreeView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -157,7 +157,7 @@
       <number>5</number>
      </property>
      <item row="0" column="0">
-      <widget class="ASN1FileView" name="asn1Widget" native="true"/>
+      <widget class="msc::ASN1FileView" name="asn1Widget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -171,13 +171,13 @@
    <header>graphicsview.h</header>
   </customwidget>
   <customwidget>
-   <class>ASN1FileView</class>
+   <class>msc::ASN1FileView</class>
    <extends>QWidget</extends>
    <header>asn1fileview.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DocumentTreeView</class>
+   <class>msc::DocumentTreeView</class>
    <extends>QTreeView</extends>
    <header>documenttreeview.h</header>
   </customwidget>

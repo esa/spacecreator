@@ -25,6 +25,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtWebSockets/QWebSocketServer>
 
+namespace msc {
+
 static inline QByteArray generateResponse(bool result, const QString &errorString = QString())
 {
     QJsonObject obj;
@@ -35,7 +37,7 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
 }
 
 /*!
-   \class RemoteControlWebServer
+   \class msc::RemoteControlWebServer
    \brief Handles remote control commands and arguments compounded in json packet using websocket. JSON structure:
     \quotation
         {
@@ -222,4 +224,5 @@ void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType com
         return;
 
     (*it)->sendTextMessage(generateResponse(result, errorString));
+}
 }

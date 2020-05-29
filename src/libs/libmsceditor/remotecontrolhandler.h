@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QVariantMap>
 
+namespace msc {
 class MainModel;
 
 class RemoteControlHandler : public QObject
@@ -31,7 +32,7 @@ class RemoteControlHandler : public QObject
 public:
     explicit RemoteControlHandler(QObject *parent = nullptr);
 
-    void setModel(MainModel *model);
+    void setModel(msc::MainModel *model);
 
 public Q_SLOTS:
     void handleRemoteCommand(
@@ -49,5 +50,7 @@ private:
     bool handleActionCommand(const QVariantMap &params, QString *errorString);
     bool handleConditionCommand(const QVariantMap &params, QString *errorString);
 
-    QPointer<MainModel> m_model;
+    QPointer<msc::MainModel> m_model;
 };
+
+}

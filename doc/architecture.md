@@ -36,7 +36,8 @@ The MSC editor code is separated in 3 different libraries:
 * **msclibrary** Handling the .msc file and data structure. For parsing .msc files [ANTLR4](https://www.antlr.org) is used. For writing .msc files, [Grantlee](https://github.com/steveire/grantlee) is used.
 This includes handling of CIF information for types and geometry, which is stored as comments of the msc elements.
 
-* **libmsceditor** Has the Ui elements an the application itself. With the class [MainModel](@ref MainModel) as the
+* **libmsceditor** Has the Ui elements an the application itself. With the class [msc::MainModel](@ref msc::MainModel) as the
 central hub of the MSC editor.
+The charts are drawn using the QGraphicsScene framework. The leyout of the more complex chart view is controlled by [msc::ChartViewModel](@ref msc::ChartViewModel).
 
 The library **asn1editor** will probably be replaced by the ASN.1 editor (asn1library).
