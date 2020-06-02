@@ -957,7 +957,7 @@ bool MainWindow::saveDocument()
 
         if (result == QMessageBox::Cancel) {
             return false;
-        } else if (result == QMessageBox::Yes) {
+        } else if (result == QMessageBox::Save) {
             saveMsc();
         }
     }
