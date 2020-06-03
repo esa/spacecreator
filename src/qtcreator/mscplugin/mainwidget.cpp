@@ -56,7 +56,7 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_model(new MainModel(this))
+    , m_model(new msc::MainModel(this))
 {
     initUi();
 
@@ -273,10 +273,10 @@ void MainWidget::initUi()
     m_hierarchyView = new msc::GraphicsView();
     m_centerView->addWidget(m_hierarchyView);
 
-    m_documentTree = new DocumentTreeView(this);
+    m_documentTree = new msc::DocumentTreeView(this);
     m_documentTree->header()->setVisible(true);
 
-    m_asn1Widget = new ASN1FileView(this);
+    m_asn1Widget = new msc::ASN1FileView(this);
 
     m_leftVerticalSplitter = new Core::MiniSplitter(Qt::Vertical);
     m_leftVerticalSplitter->addWidget(m_documentTree);
@@ -300,12 +300,12 @@ void MainWidget::initActions()
     m_actCopy = new QAction(tr("Copy Diagram"), this);
     m_actCopy->setShortcut(QKeySequence::Copy);
     m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
-    connect(m_actCopy, &QAction::triggered, m_model, &MainModel::copyCurrentChart);
+    connect(m_actCopy, &QAction::triggered, m_model, &msc::MainModel::copyCurrentChart);
 
     m_actPaste = new QAction(tr("Paste:"), this);
     m_actPaste->setShortcut(QKeySequence::Paste);
     m_actPaste->setIcon(QIcon::fromTheme("edit-paste"));
-    connect(m_actPaste, &QAction::triggered, m_model, &MainModel::pasteChart);
+    connect(m_actPaste, &QAction::triggered, m_model, &msc::MainModel::pasteChart);
 }
 
 void MainWidget::initTools()
@@ -424,18 +424,19 @@ void MainWidget::initConnections()
     connect(&(m_model->chartViewModel()), &msc::ChartViewModel::currentChartChanged, this,
             &MainWidget::selectCurrentChart);
 
-    connect(m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });
+    connect(m_model, &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 
-    connect(m_model, &MainModel::selectedDocumentChanged, m_documentTree, &DocumentTreeView::setSelectedDocument);
+    connect(m_model, &msc::MainModel::selectedDocumentChanged, m_documentTree,
+            &msc::DocumentTreeView::setSelectedDocument);
 
-    connect(m_model, &MainModel::modelUpdated, m_asn1Widget, &ASN1FileView::setModel);
+    connect(m_model, &msc::MainModel::modelUpdated, m_asn1Widget, &msc::ASN1FileView::setModel);
 
     connect(m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWidget::showSelection);
 
     connect(m_model->undoStack(), &QUndoStack::indexChanged, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
-    connect(m_model, &MainModel::lasteSaveUndoChange, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
+    connect(m_model, &msc::MainModel::lasteSaveUndoChange, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
 
-    connect(m_model, &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
+    connect(m_model, &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
         m_asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     });

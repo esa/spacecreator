@@ -20,25 +20,24 @@
 #include <QStackedWidget>
 #include <QWidget>
 
-class ASN1FileView;
-class DocumentTreeView;
-class MainModel;
-
 class QAction;
 class QGraphicsView;
 class QSplitter;
 class QUndoStack;
 
 namespace msc {
+class ASN1FileView;
 class ActionCreatorTool;
 class BaseTool;
 class CommentCreatorTool;
 class ConditionCreatorTool;
 class CoregionCreatorTool;
+class DocumentTreeView;
 class EntityDeleteTool;
 class GraphicsView;
 class InstanceCreatorTool;
 class InstanceStopTool;
+class MainModel;
 class MessageCreatorTool;
 class PointerTool;
 class TimerCreatorTool;
@@ -98,10 +97,10 @@ private:
     msc::GraphicsView *m_graphicsView;
     msc::GraphicsView *m_hierarchyView;
 
-    DocumentTreeView *m_documentTree = nullptr;
-    ASN1FileView *m_asn1Widget = nullptr;
+    msc::DocumentTreeView *m_documentTree = nullptr;
+    msc::ASN1FileView *m_asn1Widget = nullptr;
 
-    MainModel *m_model = nullptr;
+    msc::MainModel *m_model = nullptr;
 
     QAction *m_actCopy = nullptr;
     QAction *m_actPaste = nullptr;

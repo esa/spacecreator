@@ -78,7 +78,7 @@ set(ASN1_SOURCES
     src/messages/messageutils.cpp
     src/messages/messagemanager.cpp
     src/icd/icdbuilder.cpp
-#    src/asn1acn.cpp
+    src/asn1acn.cpp
     src/asneditor.cpp
     src/asndocument.cpp
     src/acneditor.cpp
@@ -201,7 +201,7 @@ set(ASN1_SOURCES
     src/icd/icdbuilder.h
     src/asn1acn_global.h
     src/asn1acnconstants.h
-#    src/asn1acn.h
+    src/asn1acn.h
     src/asneditor.h
     src/asndocument.h
     src/acneditor.h
@@ -246,12 +246,27 @@ set(ASN1_SOURCES
     src/libraries/wizard/select_component.ui
     src/libraries/wizard/summary.ui
     asn1acn.qrc
+    Asn1Acn.json.in
+)
+
+set(ASN_QTC_LIBRARIES
+    -L${QTC_BUILD_DIR}/lib/qtcreator
+    -L${QTC_BUILD_DIR}/lib/qtcreator/plugins
+    Aggregation
+    ExtensionSystem
+    QtcSsh
+    Utils
+)
+set(ASN_QTC_PLUGINS
+    Core
+    ProjectExplorer
+    TextEditor
 )
 
 add_qtc_plugin(${PLUGIN_NAME}
-    DEFINES ASN1SCC_LIBRARY
-    DEPENDS asn1library Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets
-    PLUGIN_DEPENDS
+    DEFINES ASN1ACN_LIBRARY
+    DEPENDS asn1library Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets ${ASN_QTC_LIBRARIES} ${ASN_QTC_PLUGINS}
+    PLUGIN_DEPENDS ${ASN_QTC_PLUGINS}
     SOURCES ${ASN1_SOURCES}
 )
 
@@ -262,9 +277,10 @@ target_include_directories(${PLUGIN_NAME}
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/3rdparty/syntax-highlighting/src/lib
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins
-    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/extensionsystem
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/ssh
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor

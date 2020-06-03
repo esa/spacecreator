@@ -13,6 +13,8 @@ include(GitHash)
 include(CCache)
 include(GoldLinker)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Generated files should be in the include path
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -23,8 +25,6 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
 
-# Do not use potentially conflicting Qt keywords
-#add_definitions(-DQT_NO_KEYWORDS)
 # Do not use outdated Qt APIs
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
@@ -55,6 +55,5 @@ if (${QTC_FOUND})
 endif()
 
 # Disable the asn1 plugin for now
-add_definitions(-DQT_NO_KEYWORDS)
 add_subdirectory(src)
 add_subdirectory(tests)

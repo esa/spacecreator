@@ -463,17 +463,24 @@ function(add_qtc_plugin target_name)
     compare_sources_with_existing_disk_files(${target_name} "${_arg_SOURCES}")
   endif()
 
+  # Disable, as it depends to be in the QtCreator project
   # Generate dependency list:
-  find_dependent_plugins(_DEP_PLUGINS ${_arg_PLUGIN_DEPENDS})
+  #find_dependent_plugins(_DEP_PLUGINS ${_arg_PLUGIN_DEPENDS})
+  set(_DEP_PLUGINS ${_arg_PLUGIN_DEPENDS})
 
   set(_arg_DEPENDENCY_STRING "\"Dependencies\" : [\n")
   foreach(i IN LISTS _DEP_PLUGINS)
-    if (i MATCHES "^${IDE_CASED_ID}::")
-      set(_v ${IDE_VERSION})
-      string(REPLACE "${IDE_CASED_ID}::" "" i ${i})
-    else()
-      get_property(_v TARGET "${i}" PROPERTY _arg_VERSION)
-    endif()
+#    if (i MATCHES "^${IDE_CASED_ID}::")
+#      set(_v ${IDE_VERSION})
+#      string(REPLACE "${IDE_CASED_ID}::" "" i ${i})
+#    else()
+#      get_property(_v TARGET "${i}" PROPERTY _arg_VERSION)
+#    endif()
+
+    # Set the plugin version fixed to the QtCreator version
+    set(_v ${IDE_VERSION})
+    string(REPLACE "${IDE_CASED_ID}::" "" i ${i})
+
     string(APPEND _arg_DEPENDENCY_STRING
       "        { \"Name\" : \"${i}\", \"Version\" : \"${_v}\" }"
     )
