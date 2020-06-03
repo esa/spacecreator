@@ -61,6 +61,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     virtual void applyColorScheme() = 0;
+    virtual void updateGraphicsItem();
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

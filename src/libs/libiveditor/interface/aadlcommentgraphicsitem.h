@@ -16,11 +16,11 @@
 */
 
 #pragma once
+
 #include "aadlobject.h"
 #include "aadlrectgraphicsitem.h"
 
 #include <QScopedPointer>
-#include <QTextLayout>
 
 namespace aadl {
 class AADLObjectComment;
@@ -31,6 +31,7 @@ namespace aadlinterface {
 class AADLCommentGraphicsItem : public AADLRectGraphicsItem
 {
     Q_OBJECT
+
 public:
     explicit AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent = nullptr);
     enum
@@ -55,10 +56,6 @@ protected:
     virtual ColorManager::HandledColors handledColorType() const override;
 
 private:
-    void updateTextLayout(const QString &text);
-
-private:
-    QScopedPointer<QTextLayout> m_textLayout;
     QString m_text;
 };
 

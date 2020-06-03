@@ -142,6 +142,12 @@ void InteractiveObject::setPen(const QPen &pen)
     m_pen = pen;
 }
 
+void InteractiveObject::updateGraphicsItem()
+{
+    updateFromEntity();
+    update();
+}
+
 void InteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);

@@ -40,13 +40,14 @@ namespace aadlinterface {
 
 AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *comment, QGraphicsItem *parent)
     : AADLRectGraphicsItem(comment, parent)
-    , m_textLayout(new QTextLayout)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setFont(QFont(qApp->font()));
+    setFont(qApp->font());
     setZValue(kCommentZLevel);
 
     applyColorScheme();
+
+    connect(comment, &aadl::AADLObject::titleChanged, this, &InteractiveObject::updateGraphicsItem);
 }
 
 void AADLCommentGraphicsItem::updateFromEntity()
@@ -61,7 +62,6 @@ void AADLCommentGraphicsItem::setText(const QString &text)
         return;
 
     m_text = text;
-    updateTextLayout(text);
 
     instantLayoutUpdate();
 }
@@ -99,7 +99,25 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     };
     painter->drawPolyline(preparePolyline(br));
 
-    m_textLayout->draw(painter, QPointF(0, 0));
+    qreal y = kMargins;
+    const qreal lineWidth = boundingRect().width() - 2 * kMargins;
+    for (auto line : m_text.split("\n")) {
+        QTextLayout textLayout(line);
+        textLayout.setFont(font());
+        textLayout.beginLayout();
+        while (true) {
+            QTextLine textLine = textLayout.createLine();
+            if (!textLine.isValid()) {
+                break;
+            }
+
+            textLine.setPosition(QPointF(kMargins, y));
+            textLine.setLineWidth(lineWidth);
+            y += textLine.height();
+        }
+        textLayout.endLayout();
+        textLayout.draw(painter, QPointF(0, 0));
+    }
 
     painter->restore();
     AADLRectGraphicsItem::paint(painter, option, widget);
@@ -108,7 +126,7 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 void AADLCommentGraphicsItem::rebuildLayout()
 {
     AADLRectGraphicsItem::rebuildLayout();
-    updateTextLayout(m_text);
+    update();
 }
 
 QSizeF AADLCommentGraphicsItem::minimalSize() const
@@ -119,33 +137,6 @@ QSizeF AADLCommentGraphicsItem::minimalSize() const
 ColorManager::HandledColors AADLCommentGraphicsItem::handledColorType() const
 {
     return ColorManager::HandledColors::Comment;
-}
-
-void AADLCommentGraphicsItem::updateTextLayout(const QString &text)
-{
-    static const QString ellipsis { QLatin1String("...") };
-    if (text.size() < ellipsis.size())
-        return;
-
-    m_textLayout->setText(text);
-    m_textLayout->setFont(font());
-    m_textLayout->beginLayout();
-    qreal y = kMargins;
-
-    QTextLine line = m_textLayout->createLine();
-    while (line.isValid()) {
-        line.setPosition(QPointF(kMargins, y));
-        line.setLineWidth(boundingRect().width() - 2 * kMargins);
-        y += line.height();
-        if (y > (boundingRect().height() - 2 * kMargins)) {
-            const QString sf(text.constData(), line.textStart() + line.textLength() - 2 * ellipsis.size());
-            m_textLayout->endLayout();
-            updateTextLayout(sf + ellipsis);
-            return;
-        }
-        line = m_textLayout->createLine();
-    }
-    m_textLayout->endLayout();
 }
 
 void AADLCommentGraphicsItem::applyColorScheme()
