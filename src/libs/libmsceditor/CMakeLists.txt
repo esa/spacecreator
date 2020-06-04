@@ -78,6 +78,8 @@ target_sources(${LIB_NAME} PRIVATE
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    msceditor.cpp
+    msceditor.h
     mscplugin.cpp
     mscplugin.h
     mscwidgets/actionitem.cpp
@@ -135,7 +137,7 @@ target_sources(${LIB_NAME} PRIVATE
     mscwidgets/messagedialog.ui
     mscwidgets/messageitem.cpp
     mscwidgets/messageitem.h
-    mscwidgets/resources.qrc
+    mscwidgets/msceditorresources.qrc
     mscwidgets/textviewdialog.cpp
     mscwidgets/textviewdialog.h
     mscwidgets/timeritem.cpp

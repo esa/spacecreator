@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,20 +17,23 @@
 
 #pragma once
 
-#include <QtGlobal>
+#include <texteditor/texteditor.h>
 
-namespace MscPlugin {
-namespace Constants {
+namespace AadlPlugin {
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
+class AadlTextEditor : public TextEditor::BaseTextEditor
+{
+    Q_OBJECT
 
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
+public:
+    AadlTextEditor();
 
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
+    void finalizeInitialization() override;
+    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
 
-const char C_MSCEDITOR[] = "Qt5.MscEditor";
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+    QWidget *toolBar() override { return nullptr; }
+
+    bool isDesignModePreferred() const override { return true; }
+};
 
 } // namespace MscPlugin
-} // namespace Constants

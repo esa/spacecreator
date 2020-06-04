@@ -163,6 +163,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableaadlobject.h
     commandsstack.cpp
     commandsstack.h
+    iveditor.cpp
+    iveditor.h
     iveditorplugin.cpp
     iveditorplugin.h
     mainwindow.cpp
@@ -172,7 +174,7 @@ target_sources(${LIB_NAME} PRIVATE
     xmldocexporter.h
     zoomcontroller.cpp
     zoomcontroller.h
-    resources.qrc
+    iveditorresources.qrc
     interface/tab_interface_resources.qrc
 )
 

@@ -71,16 +71,18 @@ Id createId()
  */
 bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
 {
-
-    if (source.isEmpty() || target.isEmpty() || !QFile::exists(source))
+    if (source.isEmpty() || target.isEmpty() || !QFile::exists(source)) {
         return false;
+    }
 
     if (QFile::exists(target)) {
         if (FileCopyingMode::Overwrite == replaceMode) {
-            if (!QFile::remove(target))
+            if (!QFile::remove(target)) {
                 return false;
-        } else
+            }
+        } else {
             return false;
+        }
     }
 
     bool result(false);
@@ -97,6 +99,7 @@ bool copyResourceFile(const QString &source, const QString &target, FileCopyingM
             qWarning() << "Can't copy resource file " << source << "-->" << target;
         }
     } catch (...) {
+        qWarning() << "Failed to copy resource file " << source << "-->" << target;
     }
 #ifdef Q_OS_WIN
     qt_ntfs_permission_lookup--;
@@ -117,11 +120,12 @@ void setWidgetFontColor(QWidget *widget, const QColor &color)
 bool ensureDirExists(const QString &path)
 {
     QDir dir(path);
-    if (!dir.exists(path))
+    if (!dir.exists(path)) {
         if (!dir.mkpath(path)) {
             qWarning() << "Failed to create path:" << path;
             return false;
         }
+    }
 
     return true;
 }

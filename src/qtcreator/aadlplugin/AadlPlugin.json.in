@@ -1,22 +1,22 @@
 {
-    \"Name\" : \"MscPlugin\",
+    \"Name\" : \"AadlPlugin\",
     \"Version\" : \"0.0.1\",
     \"CompatVersion\" : \"0.0.1\",
     \"Vendor\" : \"ESA\",
     \"Copyright\" : \"(C) 2019 European Space Agency\",
     \"License\" : \"LGPL 2.1\",
     \"Category\" : \"Modeling\",
-    \"Description\" : \"Visual Editor for MSC (message sequence diagram) files\",
-    \"Url\" : \"https://gitrepos.estec.esa.int/taste/MSC-NG\",
+    \"Description\" : \"Visual Editor for AADL files\",
+    \"Url\" : \"https://gitrepos.estec.esa.int/taste/SpaceCreator",
     $$dependencyList,
 
     \"Mimetypes\" : [
         \"<?xml version=\'1.0\' encoding=\'UTF-8\'?>\",
         \"<mime-info xmlns=\'http://www.freedesktop.org/standards/shared-mime-info\'>\",
-        \"    <mime-type type=\'text/vnd.msc\'>\",
-        \"        <sub-class-of type=\'text/msc\'/>\",
-        \"        <comment>MSC Model File</comment>\",
-        \"        <glob pattern=\'*.msc\'/>\",
+        \"    <mime-type type=\'application/xml\'>\",
+        \"        <sub-class-of type=\'text/plain\'/>\",
+        \"        <comment>AADL Model File</comment>\",
+        \"        <glob pattern=\'*.xml\'/>\",
         \"    </mime-type>\",
         \"</mime-info>\"
     ]

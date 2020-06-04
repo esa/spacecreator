@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,13 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscpluginplugin.h"
+#include "aadlplugin.h"
 
-#include "mscdocument.h"
-#include "msceditor.h"
-#include "msceditorfactory.h"
-#include "msclibrary.h"
-#include "mscpluginconstants.h"
+#include "aadleditorfactory.h"
+#include "iveditor.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
@@ -36,31 +33,21 @@
 #include <coreplugin/icontext.h>
 #include <coreplugin/icore.h>
 
-void initMscResources()
+namespace AadlPlugin {
+
+AadlPlugin::AadlPlugin()
 {
-    Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
-    msc::initMscLibrary();
-    msc::initMscEditor();
+    aadlinterface::initIvEditor();
 }
 
-using namespace Core;
-
-namespace MscPlugin {
-namespace Internal {
-
-MscPluginPlugin::MscPluginPlugin()
-{
-    initMscResources();
-}
-
-MscPluginPlugin::~MscPluginPlugin()
+AadlPlugin::~AadlPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
 }
 
-bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool AadlPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -72,19 +59,20 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    (void)new MscEditorFactory(this);
+    (void)new AadlEditorFactory(this);
 
     return true;
 }
-void MscPluginPlugin::extensionsInitialized()
+
+void AadlPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
     // plugins that depend on it are completely initialized.
-    DesignMode::setDesignModeIsRequired();
+    Core::DesignMode::setDesignModeIsRequired();
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag AadlPlugin::aboutToShutdown()
 {
     // Save settings
     // Disconnect from signals that are not needed during shutdown
@@ -92,5 +80,4 @@ ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-} // namespace Internal
-} // namespace MscPlugin
+}

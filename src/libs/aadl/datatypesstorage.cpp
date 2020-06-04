@@ -45,12 +45,14 @@ static QString ensureAsnFileExists()
 
     QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
 
-    if (QFileInfo::exists(asnFilePath))
+    if (QFileInfo::exists(asnFilePath)) {
         return asnFilePath;
+    }
 
-    const QString &rscFilePath = QString(":/defaults/app/resources/%1").arg(asnFileName);
-    if (shared::copyResourceFile(rscFilePath, asnFilePath))
+    const QString &rscFilePath = QString(":/defaults/resources/%1").arg(asnFileName);
+    if (shared::copyResourceFile(rscFilePath, asnFilePath)) {
         return asnFilePath;
+    }
 
     qWarning() << "Can't create default ASN datatypes file" << asnFilePath;
     return QString();
@@ -58,20 +60,23 @@ static QString ensureAsnFileExists()
 
 static QStringList dataRangeFromString(const QString &data)
 {
-    if (data.isEmpty())
+    if (data.isEmpty()) {
         return {};
+    }
 
     QString line = data.mid(1, data.length() - 2);
-    if (line.contains(".."))
+    if (line.contains("..")) {
         return line.split("..", QString::SkipEmptyParts);
+    }
 
     return line.split(",", QString::SkipEmptyParts);
 }
 
 static BasicDataType *datatypeFromString(const QString &line)
 {
-    if (line.isEmpty())
+    if (line.isEmpty()) {
         return nullptr;
+    }
 
     const QRegularExpression rx("(.*\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
     const QStringList &matched = rx.match(line).capturedTexts();
@@ -112,11 +117,13 @@ static BasicDataType *datatypeFromString(const QString &line)
             }
         }
 
-        if (dataType == "BOOLEAN")
+        if (dataType == "BOOLEAN") {
             return new BoolDataType(dataName);
+        }
 
-        if (dataType == "STRING")
+        if (dataType == "STRING") {
             return new StringDataType(dataName);
+        }
     }
     return nullptr;
 }
@@ -125,10 +132,11 @@ DataTypesStorage *DataTypesStorage::init()
 {
     const QString &asnFilePath = ensureAsnFileExists();
     QFile asnFile(asnFilePath);
-    if (asnFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (asnFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return init(asnFile.readAll());
-    else
+    } else {
         qWarning() << "Can't open file:" << asnFilePath << asnFile.errorString();
+    }
 
     return nullptr;
 }
@@ -138,22 +146,25 @@ DataTypesStorage *DataTypesStorage::init(const QString &from)
     QString in(from);
     QTextStream ts(&in);
     QMap<QString, BasicDataType *> datatypes;
-    while (!ts.atEnd())
-        if (BasicDataType *wrapper = datatypeFromString(ts.readLine().trimmed()))
+    while (!ts.atEnd()) {
+        if (BasicDataType *wrapper = datatypeFromString(ts.readLine().trimmed())) {
             datatypes[wrapper->name()] = wrapper;
+        }
+    }
 
     return new DataTypesStorage(datatypes);
 }
 
 DataTypesStorage *DataTypesStorage::instance()
 {
-    if (!m_instance)
+    if (!m_instance) {
         m_instance = init();
+    }
 
     return m_instance;
 }
 
-QMap<QString, BasicDataType *> DataTypesStorage::dataTypes()
+const QMap<QString, BasicDataType *> &DataTypesStorage::dataTypes()
 {
     return instance()->m_dataTypes;
 }

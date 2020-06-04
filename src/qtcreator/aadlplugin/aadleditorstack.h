@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,20 +17,34 @@
 
 #pragma once
 
-#include <QtGlobal>
+#include <QStackedWidget>
+#include <coreplugin/id.h>
 
-namespace MscPlugin {
-namespace Constants {
+namespace Core {
+class IEditor;
+class IMode;
+}
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
+namespace AadlPlugin {
 
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
+class AadlTextEditor;
 
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
+class AadlEditorStack : public QStackedWidget
+{
+    Q_OBJECT
 
-const char C_MSCEDITOR[] = "Qt5.MscEditor";
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+public:
+    AadlEditorStack(QWidget *parent = nullptr);
 
-} // namespace MscPlugin
-} // namespace Constants
+    void add(AadlTextEditor *editor, QWidget *widget);
+    QWidget *widgetForEditor(AadlTextEditor *editor);
+    void removeAadlTextEditor(QObject *);
+    bool setVisibleEditor(Core::IEditor *xmlEditor);
+
+private:
+    void modeAboutToChange(Core::Id m);
+
+    QVector<AadlTextEditor *> m_editors;
+};
+
+}

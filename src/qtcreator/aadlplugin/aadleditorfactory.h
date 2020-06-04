@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,20 +17,23 @@
 
 #pragma once
 
-#include <QtGlobal>
+#include <coreplugin/editormanager/ieditorfactory.h>
 
-namespace MscPlugin {
-namespace Constants {
+namespace AadlPlugin {
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
+class AadlEditorData;
 
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
+class AadlEditorFactory : public Core::IEditorFactory
+{
+    Q_OBJECT
 
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
+public:
+    explicit AadlEditorFactory(QObject *parent);
 
-const char C_MSCEDITOR[] = "Qt5.MscEditor";
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+    Core::IEditor *createEditor() override;
 
-} // namespace MscPlugin
-} // namespace Constants
+private:
+    AadlEditorData *m_editorData = nullptr;
+};
+
+}

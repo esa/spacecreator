@@ -29,7 +29,7 @@ public:
     static DataTypesStorage *init();
     static DataTypesStorage *init(const QString &from);
     static DataTypesStorage *instance();
-    static QMap<QString, BasicDataType *> dataTypes();
+    static const QMap<QString, BasicDataType *> &dataTypes();
 
 private:
     static DataTypesStorage *m_instance;

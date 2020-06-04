@@ -18,6 +18,7 @@
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
 #include "interface/interfacetabdocument.h"
+#include "iveditor.h"
 #include "xmldocexporter.h"
 
 #include <QFile>
@@ -47,7 +48,7 @@ private Q_SLOTS:
 
 tst_XmlDocExporter::tst_XmlDocExporter()
 {
-    Q_INIT_RESOURCE(resources);
+    aadlinterface::initIvEditor();
 }
 
 QByteArray tst_XmlDocExporter::testFileContent() const

@@ -140,16 +140,12 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     aadlinterface::InterfaceTabGraphicsScene *graphicsScene { nullptr };
     QPointer<aadlinterface::GraphicsView> graphicsView { nullptr };
     aadl::AADLObjectsModel *model { nullptr };
-    //    QAction *actCreateProvidedInterface { nullptr };
-    //    QAction *actCreateRequiredInterface { nullptr };
-    //    QAction *actCreateComment { nullptr };
-    //    QAction *actGroupConnections { nullptr };
-    //    QAction *actCreateConnection { nullptr };
     QAction *actRemove { nullptr };
     QAction *actZoomIn { nullptr };
     QAction *actZoomOut { nullptr };
     QAction *actExitToRoot { nullptr };
     QAction *actExitToParent { nullptr };
+    QVector<QAction *> m_toolbarActions;
 
     aadlinterface::CreatorTool *tool { nullptr };
     QHash<shared::Id, QGraphicsItem *> items;
@@ -203,6 +199,7 @@ void InterfaceDocument::init()
 void InterfaceDocument::fillToolBar(QToolBar *toolBar)
 {
     if (toolBar == nullptr) {
+        initActions();
         return;
     }
 
@@ -633,9 +630,10 @@ QVector<QAction *> InterfaceDocument::initActions()
     });
     d->actExitToParent->setIcon(QIcon(":/tab_interface/toolbar/icns/exit_parent.svg"));
 
-    return { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface, actCreateRequiredInterface,
-        actCreateComment, actCreateConnection, d->actRemove, d->actZoomIn, d->actZoomOut, d->actExitToRoot,
-        d->actExitToParent };
+    d->m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
+        actCreateRequiredInterface, actCreateComment, actCreateConnection, d->actRemove, d->actZoomIn, d->actZoomOut,
+        d->actExitToRoot, d->actExitToParent };
+    return d->m_toolbarActions;
 }
 
 QWidget *InterfaceDocument::createView()

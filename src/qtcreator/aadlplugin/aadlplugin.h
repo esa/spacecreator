@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,20 +17,27 @@
 
 #pragma once
 
-#include <QtGlobal>
+#include "aadlplugin_global.h"
 
-namespace MscPlugin {
-namespace Constants {
+#include <extensionsystem/iplugin.h>
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
+namespace AadlPlugin {
 
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
+class AadlPlugin : public ExtensionSystem::IPlugin
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "AadlPlugin.json")
 
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
+public:
+    AadlPlugin();
+    ~AadlPlugin();
 
-const char C_MSCEDITOR[] = "Qt5.MscEditor";
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+    bool initialize(const QStringList &arguments, QString *errorString);
+    void extensionsInitialized();
+    ShutdownFlag aboutToShutdown();
 
-} // namespace MscPlugin
-} // namespace Constants
+private:
+    void triggerAction();
+};
+
+}

@@ -17,6 +17,7 @@
 
 #include "commandlineparser.h"
 #include "mainwindow.h"
+#include "msceditor.h"
 #include "msclibrary.h"
 #include "mscplugin.h"
 #include "mscwriter.h"
@@ -29,10 +30,9 @@
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
-    Q_INIT_RESOURCE(resources);
-    Q_INIT_RESOURCE(mscresources);
     shared::initSharedLibrary();
     msc::initMscLibrary();
+    msc::initMscEditor();
 
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("MSC Editor"));

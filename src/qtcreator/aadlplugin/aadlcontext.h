@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,20 +17,14 @@
 
 #pragma once
 
-#include <QtGlobal>
+#include <coreplugin/icontext.h>
 
-namespace MscPlugin {
-namespace Constants {
+namespace AadlPlugin {
 
-const char MSC_MIMETYPE[] = "text/vnd.msc";
-
-const char K_MSC_EDITOR_ID[] = "MscEditor.Editor";
-const char C_MSC_EDITOR[] = "Msc Editor";
-
-const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
-
-const char C_MSCEDITOR[] = "Qt5.MscEditor";
-const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+class AadlContext : public Core::IContext
+{
+public:
+    explicit AadlContext(const Core::Context &contexts, QWidget *widget, QObject *parent = nullptr);
+};
 
 } // namespace MscPlugin
-} // namespace Constants
