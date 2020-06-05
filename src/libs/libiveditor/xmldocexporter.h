@@ -20,6 +20,7 @@
 #include <QString>
 #include <QVariantList>
 
+class QBuffer;
 class QWidget;
 
 namespace aadlinterface {
@@ -37,6 +38,8 @@ public:
 
     static bool exportDocInteractive(InterfaceDocument *doc, QWidget *root, const QString &outPath = QString(),
             const QString &templatePath = QString());
+
+    static bool exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const QString &templatePath = QString());
 
     static QHash<QString, QVariantList> collectInterfaceObjects(InterfaceDocument *doc);
 

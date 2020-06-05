@@ -44,6 +44,7 @@ private Q_SLOTS:
     void testExportFunctions();
     void testExportComment();
     void testExportNestedComment();
+    void testExportToBuffer();
 };
 
 tst_XmlDocExporter::tst_XmlDocExporter()
@@ -146,6 +147,17 @@ void tst_XmlDocExporter::testExportNestedComment()
                           "    </Function>\n"
                           "</InterfaceView>";
     QCOMPARE(text, expected);
+}
+
+void tst_XmlDocExporter::testExportToBuffer()
+{
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    bool ok = aadlinterface::XmlDocExporter::exportDoc(doc.get(), &buffer);
+    QCOMPARE(ok, true);
+    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
+    QCOMPARE(buffer.data(), expected);
 }
 
 QTEST_MAIN(tst_XmlDocExporter)

@@ -23,6 +23,7 @@
 #include "xmldocexporter.h"
 
 #include <QAction>
+#include <QBuffer>
 #include <QDebug>
 #include <QFileInfo>
 #include <QGraphicsScene>
@@ -79,8 +80,7 @@ void AadlMainWidget::setFileName(const QString &filename)
 
 bool AadlMainWidget::isDirty() const
 {
-    // @todo return if the user edited the model
-    return false;
+    return m_document->isDirty();
 }
 
 QUndoStack *AadlMainWidget::undoStack()
@@ -90,8 +90,14 @@ QUndoStack *AadlMainWidget::undoStack()
 
 QString AadlMainWidget::textContents() const
 {
-    // @todo return the model as xml
-    return "";
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    bool ok = aadlinterface::XmlDocExporter::exportDoc(m_document, &buffer);
+    if (ok) {
+        return buffer.data();
+    } else {
+        return QString();
+    }
 }
 
 QVector<QAction *> AadlMainWidget::toolActions() const

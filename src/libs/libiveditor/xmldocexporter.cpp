@@ -29,6 +29,7 @@
 #include "templateeditor.h"
 #include "templating/exportableaadlobject.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QFileDialog>
 #include <QMetaEnum>
@@ -91,6 +92,30 @@ bool XmlDocExporter::exportDocInteractive(
         InterfaceDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath)
 {
     return exportDoc(doc, root, outPath, templatePath, InteractionPolicy::Interactive);
+}
+
+/**
+   @brief XmlDocExporter::exportDoc writes the document as xml to the given buffer
+   @param doc the AADL document
+   @param outBuffer the buffer that is open and ready to be written to
+   @param templatePath the grantlee template to use for the export. If empty, the default one is used
+   @return true when the export was successful.
+ */
+bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const QString &templatePath)
+{
+    if (!doc || !outBuffer || !outBuffer->isWritable()) {
+        return false;
+    }
+
+    ensureDefaultTemplatesDeployed_interface();
+    QString usedTemplatePath(templatePath);
+    if (templatePath.isEmpty()) {
+        usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
+    }
+
+    const QHash<QString, QVariantList> aadlObjects = collectInterfaceObjects(doc);
+    QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
+    return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
 }
 
 bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath,
