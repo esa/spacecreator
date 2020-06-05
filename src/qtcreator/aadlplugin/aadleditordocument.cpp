@@ -21,14 +21,8 @@
 #include "aadlpluginconstants.h"
 
 #include <QFileInfo>
-#include <QGuiApplication>
 #include <QTextCodec>
 #include <QTextDocument>
-#include <projectexplorer/projectexplorerconstants.h>
-#include <projectexplorer/session.h>
-#include <qtsupport/qtkitinformation.h>
-#include <utils/fileutils.h>
-#include <utils/qtcassert.h>
 
 using namespace Utils;
 

@@ -20,11 +20,8 @@
 #include "aadleditordata.h"
 #include "aadlpluginconstants.h"
 
-#include <QFileInfo>
 #include <QGuiApplication>
-#include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/fileiconprovider.h>
-#include <projectexplorer/projectexplorerconstants.h>
 
 namespace AadlPlugin {
 

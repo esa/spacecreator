@@ -20,20 +20,16 @@
 #include "msceditordata.h"
 #include "mscpluginconstants.h"
 
-#include <QFileInfo>
 #include <QGuiApplication>
-#include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/fileiconprovider.h>
-#include <projectexplorer/projectexplorerconstants.h>
 
-using namespace MscPlugin::Constants;
-using namespace MscPlugin::Internal;
+namespace MscPlugin {
 
 MscEditorFactory::MscEditorFactory(QObject *parent)
     : IEditorFactory(parent)
 {
-    setId(K_MSC_EDITOR_ID);
-    setDisplayName(QCoreApplication::translate("MscEditor", C_MSCEDITOR_DISPLAY_NAME));
+    setId(Constants::K_MSC_EDITOR_ID);
+    setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
     addMimeType(MscPlugin::Constants::MSC_MIMETYPE);
 
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
@@ -48,4 +44,6 @@ Core::IEditor *MscEditorFactory::createEditor()
         QGuiApplication::restoreOverrideCursor();
     }
     return m_editorData->createEditor();
+}
+
 }

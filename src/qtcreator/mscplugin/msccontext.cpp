@@ -17,11 +17,13 @@
 
 #include "msccontext.h"
 
-using namespace MscPlugin::Internal;
+namespace MscPlugin {
 
 MscContext::MscContext(const Core::Context &context, QWidget *widget, QObject *parent)
     : Core::IContext(parent)
 {
     setContext(context);
     setWidget(widget);
+}
+
 }

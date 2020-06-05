@@ -20,7 +20,6 @@
 #include <coreplugin/editormanager/ieditorfactory.h>
 
 namespace MscPlugin {
-namespace Internal {
 
 class MscEditorData;
 
@@ -37,5 +36,4 @@ private:
     MscEditorData *m_editorData = nullptr;
 };
 
-} // namespace Internal
-} // namespace MscPlugin
+}

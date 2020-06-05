@@ -18,8 +18,6 @@
 #pragma once
 
 #include <QPointer>
-#include <projectexplorer/project.h>
-#include <projectexplorer/target.h>
 #include <texteditor/textdocument.h>
 
 QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)

@@ -44,7 +44,6 @@ class TimerCreatorTool;
 }
 
 namespace MscPlugin {
-namespace Common {
 
 class MainWidget : public QWidget
 {
@@ -125,5 +124,4 @@ private:
     QVector<msc::BaseTool *> m_hierarchyTools;
 };
 
-} // namespace Common
-} // namespace MscPlugin
+}

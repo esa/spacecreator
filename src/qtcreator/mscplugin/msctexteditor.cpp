@@ -21,15 +21,10 @@
 #include "msceditordocument.h"
 #include "mscpluginconstants.h"
 
-#include <QBuffer>
 #include <QFileInfo>
-#include <coreplugin/coreconstants.h>
-#include <texteditor/textdocument.h>
-#include <utils/fileutils.h>
 #include <utils/qtcassert.h>
 
-using namespace MscPlugin;
-using namespace MscPlugin::Internal;
+namespace MscPlugin {
 
 MscTextEditor::MscTextEditor()
 {
@@ -48,7 +43,7 @@ void MscTextEditor::finalizeInitialization()
 bool MscTextEditor::open(QString *errorString, const QString &fileName, const QString & /*realFileName*/)
 {
     auto document = qobject_cast<MscEditorDocument *>(textDocument());
-    Common::MainWidget *designWidget = document->designWidget();
+    MainWidget *designWidget = document->designWidget();
     QTC_ASSERT(designWidget, return false);
 
     if (fileName.isEmpty())
@@ -66,4 +61,6 @@ bool MscTextEditor::open(QString *errorString, const QString &fileName, const QS
     document->setFilePath(Utils::FileName::fromString(absfileName));
 
     return true;
+}
+
 }

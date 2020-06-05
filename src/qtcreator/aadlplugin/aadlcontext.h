@@ -27,4 +27,4 @@ public:
     explicit AadlContext(const Core::Context &contexts, QWidget *widget, QObject *parent = nullptr);
 };
 
-} // namespace MscPlugin
+}

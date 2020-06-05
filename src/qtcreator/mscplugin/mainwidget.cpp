@@ -51,7 +51,7 @@
 #include <coreplugin/minisplitter.h>
 
 namespace MscPlugin {
-namespace Common {
+
 static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 MainWidget::MainWidget(QWidget *parent)
@@ -451,5 +451,4 @@ void MainWidget::activateDefaultTool()
     m_pointerTool->action()->setChecked(true);
 }
 
-} // namespace Common
-} // namespace MscPlugin
+}

@@ -21,12 +21,10 @@
 #include "msctexteditor.h"
 
 #include <coreplugin/coreconstants.h>
-#include <coreplugin/imode.h>
 #include <coreplugin/modemanager.h>
 #include <utils/qtcassert.h>
 
-using namespace MscPlugin;
-using namespace MscPlugin::Internal;
+namespace MscPlugin {
 
 MscEditorStack::MscEditorStack(QWidget *parent)
     : QStackedWidget(parent)
@@ -84,4 +82,6 @@ void MscEditorStack::modeAboutToChange(Core::Id m)
             if (auto document = qobject_cast<MscEditorDocument *>(editor->textDocument()))
                 document->syncXmlFromDesignWidget();
     }
+}
+
 }

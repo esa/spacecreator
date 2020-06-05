@@ -32,12 +32,9 @@ public:
     AadlPlugin();
     ~AadlPlugin();
 
-    bool initialize(const QStringList &arguments, QString *errorString);
-    void extensionsInitialized();
-    ShutdownFlag aboutToShutdown();
-
-private:
-    void triggerAction();
+    bool initialize(const QStringList &arguments, QString *errorString) override;
+    void extensionsInitialized() override;
+    ShutdownFlag aboutToShutdown() override;
 };
 
 }

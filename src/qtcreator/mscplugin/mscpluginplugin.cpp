@@ -17,24 +17,12 @@
 
 #include "mscpluginplugin.h"
 
-#include "mscdocument.h"
 #include "msceditor.h"
 #include "msceditorfactory.h"
 #include "msclibrary.h"
-#include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
-#include <QAction>
-#include <QMainWindow>
-#include <QMenu>
-#include <QMessageBox>
-#include <coreplugin/actionmanager/actioncontainer.h>
-#include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/actionmanager/command.h>
-#include <coreplugin/coreconstants.h>
 #include <coreplugin/designmode.h>
-#include <coreplugin/icontext.h>
-#include <coreplugin/icore.h>
 
 void initMscResources()
 {
@@ -47,7 +35,6 @@ void initMscResources()
 using namespace Core;
 
 namespace MscPlugin {
-namespace Internal {
 
 MscPluginPlugin::MscPluginPlugin()
 {
@@ -76,6 +63,7 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
 
     return true;
 }
+
 void MscPluginPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
@@ -92,5 +80,4 @@ ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-} // namespace Internal
-} // namespace MscPlugin
+}

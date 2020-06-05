@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include <QCoreApplication>
-#include <QToolBar>
-#include <QUndoGroup>
-#include <coreplugin/editortoolbar.h>
 #include <coreplugin/icontext.h>
 
-using namespace Core;
+class QUndoGroup;
+class QToolBar;
+
+namespace Core {
+class EditorToolBar;
+class IEditor;
+}
 
 namespace AadlPlugin {
 
@@ -39,19 +41,19 @@ public:
     ~AadlEditorData() override;
 
     void fullInit();
-    IEditor *createEditor();
+    Core::IEditor *createEditor();
 
 private:
     void updateToolBar();
     QWidget *createModeWidget();
-    EditorToolBar *createMainToolBar();
+    Core::EditorToolBar *createMainToolBar();
 
     AadlContext *m_context = nullptr;
-    Context m_contexts;
+    Core::Context m_contexts;
     QWidget *m_modeWidget = nullptr;
     AadlEditorStack *m_widgetStack = nullptr;
     QToolBar *m_widgetToolBar = nullptr;
-    EditorToolBar *m_mainToolBar = nullptr;
+    Core::EditorToolBar *m_mainToolBar = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
     QAction *m_undoAction = nullptr;
     QAction *m_redoAction = nullptr;

@@ -21,17 +21,7 @@
 #include "iveditor.h"
 #include "sharedlibrary.h"
 
-#include <QAction>
-#include <QMainWindow>
-#include <QMenu>
-#include <QMessageBox>
-#include <coreplugin/actionmanager/actioncontainer.h>
-#include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/actionmanager/command.h>
-#include <coreplugin/coreconstants.h>
 #include <coreplugin/designmode.h>
-#include <coreplugin/icontext.h>
-#include <coreplugin/icore.h>
 
 namespace AadlPlugin {
 

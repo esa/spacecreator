@@ -21,7 +21,6 @@
 #include "aadltexteditor.h"
 
 #include <coreplugin/coreconstants.h>
-#include <coreplugin/imode.h>
 #include <coreplugin/modemanager.h>
 #include <utils/qtcassert.h>
 

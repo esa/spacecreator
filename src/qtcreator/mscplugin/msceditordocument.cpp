@@ -21,19 +21,12 @@
 #include "mscpluginconstants.h"
 
 #include <QFileInfo>
-#include <QGuiApplication>
 #include <QTextCodec>
 #include <QTextDocument>
-#include <projectexplorer/projectexplorerconstants.h>
-#include <projectexplorer/session.h>
-#include <qtsupport/qtkitinformation.h>
-#include <utils/fileutils.h>
-#include <utils/qtcassert.h>
 
 using namespace Utils;
 
-using namespace MscPlugin::Common;
-using namespace MscPlugin::Internal;
+namespace MscPlugin {
 
 MscEditorDocument::MscEditorDocument(MainWidget *designWidget, QObject *parent)
     : m_designWidget(designWidget)
@@ -44,7 +37,7 @@ MscEditorDocument::MscEditorDocument(MainWidget *designWidget, QObject *parent)
 
     // Designer needs UTF-8 regardless of settings.
     setCodec(QTextCodec::codecForName("UTF-8"));
-    connect(m_designWidget.data(), &Common::MainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
+    connect(m_designWidget.data(), &MainWidget::dirtyChanged, this, [this] { Q_EMIT changed(); });
 }
 
 Core::IDocument::OpenResult MscEditorDocument::open(
@@ -155,4 +148,5 @@ QString MscEditorDocument::designWidgetContents() const
 void MscEditorDocument::syncXmlFromDesignWidget()
 {
     document()->setPlainText(designWidgetContents());
+}
 }

@@ -38,4 +38,4 @@ public:
     bool isDesignModePreferred() const override { return true; }
 };
 
-} // namespace MscPlugin
+}

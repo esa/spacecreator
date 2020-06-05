@@ -21,11 +21,7 @@
 #include "aadlmainwidget.h"
 #include "aadlpluginconstants.h"
 
-#include <QBuffer>
 #include <QFileInfo>
-#include <coreplugin/coreconstants.h>
-#include <texteditor/textdocument.h>
-#include <utils/fileutils.h>
 #include <utils/qtcassert.h>
 
 namespace AadlPlugin {

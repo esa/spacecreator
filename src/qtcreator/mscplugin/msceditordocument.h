@@ -18,26 +18,20 @@
 #pragma once
 
 #include <QPointer>
-#include <projectexplorer/project.h>
-#include <projectexplorer/target.h>
 #include <texteditor/textdocument.h>
 
 QT_FORWARD_DECLARE_CLASS(QDesignerFormWindowInterface)
 
 namespace MscPlugin {
 
-namespace Common {
 class MainWidget;
-} // namespace Common
-
-namespace Internal {
 
 class MscEditorDocument : public TextEditor::TextDocument
 {
     Q_OBJECT
 
 public:
-    explicit MscEditorDocument(Common::MainWidget *designWidget, QObject *parent = nullptr);
+    explicit MscEditorDocument(MainWidget *designWidget, QObject *parent = nullptr);
 
     // IDocument
     OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
@@ -48,7 +42,7 @@ public:
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) override;
 
     // Internal
-    Common::MainWidget *designWidget() const;
+    MainWidget *designWidget() const;
     void syncXmlFromDesignWidget();
     QString designWidgetContents() const;
     void setFilePath(const Utils::FileName &) override;
@@ -57,8 +51,7 @@ Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
 
 private:
-    QPointer<Common::MainWidget> m_designWidget;
+    QPointer<MainWidget> m_designWidget;
 };
 
-} // namespace Internal
-} // namespace MscPlugin
+}

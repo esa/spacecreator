@@ -29,8 +29,6 @@ namespace MscPlugin {
 
 class MscTextEditor;
 
-namespace Internal {
-
 class MscEditorStack : public QStackedWidget
 {
     Q_OBJECT
@@ -49,5 +47,4 @@ private:
     QVector<MscTextEditor *> m_editors;
 };
 
-} // namespace Internal
-} // namespace MscPlugin
+}

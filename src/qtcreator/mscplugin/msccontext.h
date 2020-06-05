@@ -20,7 +20,6 @@
 #include <coreplugin/icontext.h>
 
 namespace MscPlugin {
-namespace Internal {
 
 class MscContext : public Core::IContext
 {
@@ -28,5 +27,4 @@ public:
     explicit MscContext(const Core::Context &contexts, QWidget *widget, QObject *parent = nullptr);
 };
 
-} // namespace Internal
-} // namespace MscPlugin
+}
