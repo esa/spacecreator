@@ -16,6 +16,7 @@
 */
 #include "aadlobject.h"
 #include "aadlxmlreader.h"
+#include "iveditor.h"
 #include "xmlcommon.h"
 
 #include <QBuffer>
@@ -25,7 +26,10 @@
 class XMLReader : public QObject
 {
     Q_OBJECT
+public:
+    XMLReader();
 
+private:
     void runReader(const XmlFileMock &xml);
 
 private Q_SLOTS:
@@ -33,6 +37,11 @@ private Q_SLOTS:
     void test_singleItems();
     void test_allItems();
 };
+
+XMLReader::XMLReader()
+{
+    aadlinterface::initIvEditor();
+}
 
 void XMLReader::runReader(const XmlFileMock &xml)
 {
