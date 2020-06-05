@@ -7,6 +7,7 @@
 
 # IDE files
 CMakeLists.txt.user
+*.pro.user
 
 # System files
 .directory
