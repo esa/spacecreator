@@ -17,6 +17,7 @@
 
 #include "aadlmainwidget.h"
 
+#include "commandsstack.h"
 #include "interface/interfacetabdocument.h"
 #include "iveditorplugin.h"
 #include "xmldocexporter.h"
@@ -29,6 +30,7 @@
 #include <QImage>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QUndoGroup>
 #include <QUndoStack>
 #include <QtWidgets/QHeaderView>
 #include <coreplugin/minisplitter.h>
@@ -42,6 +44,19 @@ AadlMainWidget::AadlMainWidget(QWidget *parent)
 {
     m_document->init();
     initUi();
+
+    QUndoStack *currentStack { nullptr };
+    currentStack = m_document->commandsStack();
+    if (currentStack) {
+        if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
+            m_plugin->undoGroup()->addStack(currentStack);
+        }
+        m_plugin->undoGroup()->setActiveStack(currentStack);
+    } else {
+        m_plugin->undoGroup()->removeStack(m_plugin->undoGroup()->activeStack());
+    }
+
+    aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
 }
 
 AadlMainWidget::~AadlMainWidget() { }
