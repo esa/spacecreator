@@ -138,3 +138,11 @@ For the integration the tag 'gollum_integration' is used (hash: '9a6f93b9c6dae7d
 For the integration the hash '752de71b9c9fea971da0cccccfba563325e17b7d' is used
 
 'git subtree add -P imports/asn1scc.IDE https://github.com/n7space/asn1scc.IDE.git master'
+
+# Development workflow
+
+For easier work on the QtCreator plugins, add a custom deploy step and a custom target for execution like this:
+
+![QtCreator_project_setup.png](doc/images/QtCreator_project_setup.png)
+
+That way the target QtCreator is started and can be debugged directly.
