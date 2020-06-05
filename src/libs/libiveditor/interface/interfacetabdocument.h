@@ -49,6 +49,7 @@ public:
     ~InterfaceDocument() override;
 
     void init();
+    QVector<QAction *> initActions();
 
     void fillToolBar(QToolBar *toolBar);
 
@@ -103,8 +104,6 @@ private:
     void resetDirtyness();
 
     bool loadImpl(const QString &path);
-
-    QVector<QAction *> initActions();
 
     QWidget *createView();
     QGraphicsScene *createScene();

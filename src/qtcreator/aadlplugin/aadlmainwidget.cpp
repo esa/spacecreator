@@ -96,8 +96,7 @@ QString AadlMainWidget::textContents() const
 
 QVector<QAction *> AadlMainWidget::toolActions() const
 {
-    QVector<QAction *> actions;
-    return actions;
+    return m_actions;
 }
 
 void AadlMainWidget::initUi()
@@ -106,7 +105,7 @@ void AadlMainWidget::initUi()
     layout()->addWidget(m_document->view());
     layout()->setMargin(0);
 
-    m_document->fillToolBar(nullptr);
+    m_actions = m_document->initActions();
 }
 
 }

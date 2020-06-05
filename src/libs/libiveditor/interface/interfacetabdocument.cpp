@@ -199,7 +199,6 @@ void InterfaceDocument::init()
 void InterfaceDocument::fillToolBar(QToolBar *toolBar)
 {
     if (toolBar == nullptr) {
-        initActions();
         return;
     }
 

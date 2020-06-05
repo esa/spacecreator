@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QStackedWidget>
+#include <QVector>
 #include <QWidget>
 
 class QAction;
@@ -64,6 +65,7 @@ private:
 
     aadlinterface::IVEditorPlugin *m_plugin = nullptr;
     aadlinterface::InterfaceDocument *m_document = nullptr;
+    QVector<QAction *> m_actions;
 };
 
 }
