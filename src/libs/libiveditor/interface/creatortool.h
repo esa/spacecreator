@@ -17,22 +17,11 @@
 
 #pragma once
 
-#include "aadlobjectiface.h"
-
-#include <QCursor>
 #include <QObject>
-#include <QPointer>
-#include <QSet>
-#include <QVector>
 
+class QGraphicsView;
 class QMouseEvent;
 class QContextMenuEvent;
-class QGraphicsView;
-class QGraphicsRectItem;
-class QGraphicsPathItem;
-class QGraphicsScene;
-class QMenu;
-class QUndoCommand;
 
 namespace aadl {
 class AADLObjectsModel;
@@ -42,11 +31,15 @@ class AADLObject;
 namespace aadlinterface {
 
 class InteractiveObject;
+
 class CreatorTool : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent = nullptr);
+    CreatorTool(QGraphicsView *view, aadl::AADLObjectsModel *model, QObject *parent = nullptr);
+    ~CreatorTool() override;
+
     enum class ToolType
     {
         Pointer = 0,
@@ -58,7 +51,6 @@ public:
         MultiPointConnection,
         DirectConnection
     };
-    Q_ENUM(ToolType)
 
     CreatorTool::ToolType toolType() const;
     void setCurrentToolType(CreatorTool::ToolType type);
@@ -70,51 +62,16 @@ Q_SIGNALS:
     void informUser(const QString &title, const QString &message) const;
 
 protected:
-    QPointer<QGraphicsView> m_view;
-    QPointer<aadl::AADLObjectsModel> m_model;
-    QGraphicsRectItem *m_previewItem = nullptr;
-    QGraphicsPathItem *m_previewConnectionItem = nullptr;
-    QVector<QPointF> m_connectionPoints;
-    QPointF m_clickScenePos;
-    QCursor m_cursor;
-
     bool eventFilter(QObject *watched, QEvent *event) override;
 
-    virtual bool onMousePress(QMouseEvent *e);
-    virtual bool onMouseRelease(QMouseEvent *e);
-    virtual bool onMouseMove(QMouseEvent *e);
-    virtual bool onContextMenu(QContextMenuEvent *e);
-
-    QPointF cursorInScene() const;
-    QPointF cursorInScene(const QPoint &screenPos) const;
+    bool onMousePress(QMouseEvent *e);
+    bool onMouseRelease(QMouseEvent *e);
+    bool onMouseMove(QMouseEvent *e);
+    bool onContextMenu(QContextMenuEvent *e);
 
 private:
-    void clearPreviewItem();
-
-    void handleToolType(CreatorTool::ToolType type, const QPointF &pos);
-
-    void handleComment(QGraphicsScene *scene, const QPointF &pos);
-    void handleFunctionType(QGraphicsScene *scene, const QPointF &pos);
-    void handleFunction(QGraphicsScene *scene, const QPointF &pos);
-    void handleInterface(QGraphicsScene *scene, aadl::AADLObjectIface::IfaceType type, const QPointF &pos);
-    bool handleConnectionCreate(const QPointF &pos);
-    void handleDirectConnection(const QPointF &pos);
-    void handleConnection(const QVector<QPointF> &connectionPoints) const;
-
-    QMenu *populateContextMenu(const QPointF &scenePos);
-    void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos);
-    void populateContextMenu_propertiesDialog(QMenu *menu, const QPointF &scenePos);
-    void populateContextMenu_user(QMenu *menu, const QPointF &scenePos);
-
-    bool warnConnectionPreview(const QPointF &pos);
-
-    bool showContextMenu(const QPoint &globalPos);
-
-private:
-    CreatorTool::ToolType m_toolType { ToolType::Pointer };
-    QSet<InteractiveObject *> m_collidedItems;
-
-    QUndoCommand *createInterfaceCommand(const aadl::AADLObjectIface::CreationInfo &info) const;
+    struct CreatorToolPrivate;
+    CreatorToolPrivate *d;
 };
 
 }
