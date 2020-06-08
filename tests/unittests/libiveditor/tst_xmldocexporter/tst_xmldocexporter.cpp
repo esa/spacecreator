@@ -17,7 +17,7 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
-#include "interface/interfacetabdocument.h"
+#include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "xmldocexporter.h"
 

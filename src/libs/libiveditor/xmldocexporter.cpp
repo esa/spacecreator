@@ -24,7 +24,7 @@
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
 #include "common.h"
-#include "interface/interfacetabdocument.h"
+#include "interface/interfacedocument.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
 #include "templating/exportableaadlobject.h"

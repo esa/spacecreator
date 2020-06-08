@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "interfacetabdocument.h"
+#include "interfacedocument.h"
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectconnection.h"
@@ -147,7 +147,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QAction *actExitToParent { nullptr };
     QVector<QAction *> m_toolbarActions;
 
-    aadlinterface::CreatorTool *tool { nullptr };
+    CreatorTool *tool { nullptr };
     QHash<shared::Id, QGraphicsItem *> items;
 
     QMutex *mutex { nullptr };
@@ -523,15 +523,14 @@ QVector<QAction *> InterfaceDocument::initActions()
     actionGroup->setExclusive(true);
 
     if (!d->tool) {
-        d->tool = new aadlinterface::CreatorTool(d->graphicsView, d->model, this);
-        connect(d->tool, &aadlinterface::CreatorTool::created, this, [this, actionGroup]() {
+        d->tool = new CreatorTool(d->graphicsView, d->model, this);
+        connect(d->tool, &CreatorTool::created, this, [this, actionGroup]() {
             if (QAction *currentAction = actionGroup->checkedAction())
                 currentAction->setChecked(false);
-            d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Pointer);
+            d->tool->setCurrentToolType(CreatorTool::ToolType::Pointer);
         });
-        connect(d->tool, &aadlinterface::CreatorTool::propertyEditorRequest, this,
-                &InterfaceDocument::showPropertyEditor);
-        connect(d->tool, &aadlinterface::CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
+        connect(d->tool, &CreatorTool::propertyEditorRequest, this, &InterfaceDocument::showPropertyEditor);
+        connect(d->tool, &CreatorTool::informUser, this, &InterfaceDocument::showInfoMessage);
     }
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));
@@ -539,7 +538,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateFunctionType->setCheckable(true);
     actCreateFunctionType->setActionGroup(actionGroup);
     connect(actCreateFunctionType, &QAction::triggered, this, [this]() {
-        d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::FunctionType);
+        d->tool->setCurrentToolType(CreatorTool::ToolType::FunctionType);
         qWarning() << Q_FUNC_INFO << "Not implemented yet.";
     });
     actCreateFunctionType->setIcon(QIcon(":/tab_interface/toolbar/icns/function_type.svg"));
@@ -549,7 +548,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateFunction->setCheckable(true);
     actCreateFunction->setActionGroup(actionGroup);
     connect(actCreateFunction, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Function); });
+            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::Function); });
     actCreateFunction->setIcon(QIcon(":/tab_interface/toolbar/icns/function.svg"));
 
     auto actCreateProvidedInterface = new QAction(tr("Provided Interface"));
@@ -558,7 +557,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateProvidedInterface->setCheckable(true);
     actCreateProvidedInterface->setActionGroup(actionGroup);
     connect(actCreateProvidedInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::ProvidedInterface); });
+            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::ProvidedInterface); });
     actCreateProvidedInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/pi.svg"));
 
     auto actCreateRequiredInterface = new QAction(tr("Required Interface"));
@@ -567,7 +566,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateRequiredInterface->setCheckable(true);
     actCreateRequiredInterface->setActionGroup(actionGroup);
     connect(actCreateRequiredInterface, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::RequiredInterface); });
+            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::RequiredInterface); });
     actCreateRequiredInterface->setIcon(QIcon(":/tab_interface/toolbar/icns/ri.svg"));
 
     auto actCreateComment = new QAction(tr("Comment"));
@@ -575,7 +574,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateComment->setCheckable(true);
     actCreateComment->setActionGroup(actionGroup);
     connect(actCreateComment, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::Comment); });
+            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::Comment); });
     actCreateComment->setIcon(QIcon(":/tab_interface/toolbar/icns/comment.svg"));
 
     //    auto actGroupConnections = new QAction(tr("Group"));
@@ -590,7 +589,7 @@ QVector<QAction *> InterfaceDocument::initActions()
     actCreateConnection->setCheckable(true);
     actCreateConnection->setActionGroup(actionGroup);
     connect(actCreateConnection, &QAction::triggered, this,
-            [this]() { d->tool->setCurrentToolType(aadlinterface::CreatorTool::ToolType::MultiPointConnection); });
+            [this]() { d->tool->setCurrentToolType(CreatorTool::ToolType::MultiPointConnection); });
     actCreateConnection->setIcon(QIcon(":/tab_interface/toolbar/icns/connection.svg"));
 
     d->actRemove = new QAction(tr("Remove"));

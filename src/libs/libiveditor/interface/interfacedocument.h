@@ -33,7 +33,7 @@ class AADLObjectsModel;
 }
 
 namespace aadlinterface {
-class CreatorTool;
+
 class AADLCommentGraphicsItem;
 class AADLConnectionGraphicsItem;
 class AADLFunctionGraphicsItem;

@@ -115,8 +115,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/creatortool.h
     interface/graphicsitemhelpers.cpp
     interface/graphicsitemhelpers.h
-    interface/interfacetabdocument.cpp
-    interface/interfacetabdocument.h
+    interface/interfacedocument.cpp
+    interface/interfacedocument.h
     interface/interfacetabgraphicsscene.cpp
     interface/interfacetabgraphicsscene.h
     interface/properties/adddynamicpropertydialog.h

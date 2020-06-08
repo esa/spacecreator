@@ -22,7 +22,7 @@
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
-#include "interface/interfacetabdocument.h"
+#include "interface/interfacedocument.h"
 #include "iveditorplugin.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
