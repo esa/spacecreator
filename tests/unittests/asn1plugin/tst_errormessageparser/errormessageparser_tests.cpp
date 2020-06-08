@@ -25,7 +25,6 @@
 #include "errormessageparser_tests.h"
 
 #include <QtTest>
-
 #include <errormessageparser.h>
 
 using namespace Asn1Acn::Internal::Tests;
@@ -33,7 +32,8 @@ using namespace Asn1Acn::Internal;
 
 ErrorMessageParserTests::ErrorMessageParserTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 void ErrorMessageParserTests::test_emptyMessage()
 {
@@ -72,3 +72,5 @@ void ErrorMessageParserTests::test_messageWithColumnAndLineNumber()
     QCOMPARE(msg.location().line(), 123);
     QCOMPARE(msg.location().column(), 987);
 }
+
+QTEST_MAIN(ErrorMessageParserTests)

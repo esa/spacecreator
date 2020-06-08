@@ -25,19 +25,15 @@
 
 #include "linkcreator_tests.h"
 
-#include <QtTest>
-
 #include <QTextCursor>
-
-#include <texteditor/textdocument.h>
-#include <utils/fileutils.h>
-
-#include <data/file.h>
-#include <data/typereference.h>
-#include <data/types/builtintypes.h>
-
+#include <QtTest>
+#include <file.h>
 #include <linkcreator.h>
 #include <parseddatastorage.h>
+#include <texteditor/textdocument.h>
+#include <typereference.h>
+#include <types/builtintypes.h>
+#include <utils/fileutils.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
@@ -52,8 +48,7 @@ LinkCreatorTests::LinkCreatorTests(QObject *parent)
 }
 
 namespace {
-std::unique_ptr<TextEditor::TextDocument> createDocument(const QString &path,
-                                                         const QByteArray &content)
+std::unique_ptr<TextEditor::TextDocument> createDocument(const QString &path, const QByteArray &content)
 {
     auto doc = std::make_unique<TextEditor::TextDocument>();
     doc->setFilePath(Utils::FileName::fromString(path));
@@ -106,9 +101,7 @@ void LinkCreatorTests::test_createLinksFromEmptyStorage()
 void LinkCreatorTests::test_createHighlight()
 {
     auto file = std::make_unique<Data::File>(m_path);
-    auto ref = std::make_unique<Data::TypeReference>("TypeName",
-                                                     "ModuleName",
-                                                     Data::SourceLocation(m_path, 1, 5));
+    auto ref = std::make_unique<Data::TypeReference>("TypeName", "ModuleName", Data::SourceLocation(m_path, 1, 5));
 
     file->addTypeReference(std::move(ref));
 
@@ -132,18 +125,13 @@ void LinkCreatorTests::test_createHighlight()
 void LinkCreatorTests::test_createTarget()
 {
     auto file = std::make_unique<Data::File>(m_path);
-    auto ref = std::make_unique<Data::TypeReference>("TypeName",
-                                                     "ModuleName",
-                                                     Data::SourceLocation(m_path, 1, 5));
+    auto ref = std::make_unique<Data::TypeReference>("TypeName", "ModuleName", Data::SourceLocation(m_path, 1, 5));
 
     file->addTypeReference(std::move(ref));
 
-    auto typeAssignment
-        = std::make_unique<Data::TypeAssignment>("TypeName",
-                                                 Data::SourceLocation(m_path, 1, 15),
-                                                 std::make_unique<Data::Types::Integer>());
-    auto defs = std::make_unique<Data::Definitions>("ModuleName",
-                                                    Data::SourceLocation(m_path, 0, 0));
+    auto typeAssignment = std::make_unique<Data::TypeAssignment>(
+            "TypeName", Data::SourceLocation(m_path, 1, 15), std::make_unique<Data::Types::Integer>());
+    auto defs = std::make_unique<Data::Definitions>("ModuleName", Data::SourceLocation(m_path, 0, 0));
 
     defs->addType(std::move(typeAssignment));
     file->add(std::move(defs));
@@ -163,3 +151,5 @@ void LinkCreatorTests::test_createTarget()
 
     m_storage->removeFileFromProject(m_project, Utils::FileName::fromString(m_path));
 }
+
+QTEST_MAIN(LinkCreatorTests)

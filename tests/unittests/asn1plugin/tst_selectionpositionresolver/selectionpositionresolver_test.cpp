@@ -26,11 +26,9 @@
 #include "selectionpositionresolver_test.h"
 
 #include <QTextCursor>
-
+#include <QtTest>
 #include <texteditor/textdocument.h>
 #include <utils/fileutils.h>
-
-#include <QtTest>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
@@ -38,10 +36,10 @@ using namespace Asn1Acn::Internal::Tests;
 SelectionPositionResolverTests::SelectionPositionResolverTests(QObject *parent)
     : QObject(parent)
     , m_doc(std::make_unique<TextEditor::TextDocument>())
-{}
+{
+}
 
-QTextCursor SelectionPositionResolverTests::getInitializedCursor(const QByteArray &content,
-                                                                 const int position)
+QTextCursor SelectionPositionResolverTests::getInitializedCursor(const QByteArray &content, const int position)
 {
     m_doc->setContents(content);
     m_doc->setFilePath(Utils::FileName::fromString("myPath"));
@@ -159,3 +157,5 @@ void SelectionPositionResolverTests::test_wordFollowedByHyphensOnlyWord()
     QCOMPARE(m_resolver.startPosition(), 0);
     QCOMPARE(m_resolver.endPosition(), 4);
 }
+
+QTEST_MAIN(SelectionPositionResolverTests)

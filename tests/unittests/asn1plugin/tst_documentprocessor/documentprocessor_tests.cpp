@@ -25,12 +25,11 @@
 
 #include "documentprocessor_tests.h"
 
-#include <QtTest>
-
-#include <data/project.h>
-#include <parseddatastorage.h>
-
 #include "parseddocumentbuilderstub.h"
+
+#include <QtTest>
+#include <parseddatastorage.h>
+#include <project.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
@@ -42,13 +41,12 @@ DocumentProcessorTests::DocumentProcessorTests(QObject *parent)
         return new ParsedDocumentBuilderStub(documents);
     })
     , m_storage(std::make_unique<ParsedDataStorage>())
-{}
+{
+}
 
 void DocumentProcessorTests::test_unstarted()
 {
-    DocumentProcessor *dp = new Asn1SccDocumentProcessor("ProjectName",
-                                                         m_docBuilderCreator,
-                                                         m_storage.get());
+    DocumentProcessor *dp = new Asn1SccDocumentProcessor("ProjectName", m_docBuilderCreator, m_storage.get());
 
     QCOMPARE(dp->state(), DocumentProcessor::State::Unfinished);
 
@@ -64,9 +62,7 @@ void DocumentProcessorTests::test_successful()
     const QString content("SUCCESS");
     const QString filePath = m_fileDir + fileName;
 
-    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName,
-                                                         m_docBuilderCreator,
-                                                         m_storage.get());
+    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName, m_docBuilderCreator, m_storage.get());
     QSignalSpy spy(dp, &DocumentProcessor::processingFinished);
 
     dp->addToRun(filePath, content);
@@ -83,9 +79,7 @@ void DocumentProcessorTests::test_error()
     const QString content("ERROR");
     const QString filePath = m_fileDir + fileName;
 
-    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName,
-                                                         m_docBuilderCreator,
-                                                         m_storage.get());
+    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName, m_docBuilderCreator, m_storage.get());
     QSignalSpy spy(dp, &DocumentProcessor::processingFinished);
 
     dp->addToRun(filePath, content);
@@ -102,9 +96,7 @@ void DocumentProcessorTests::test_failed()
     const QString content("FAILED");
     const QString filePath = m_fileDir + fileName;
 
-    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName,
-                                                         m_docBuilderCreator,
-                                                         m_storage.get());
+    DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName, m_docBuilderCreator, m_storage.get());
     QSignalSpy spy(dp, &DocumentProcessor::processingFinished);
 
     dp->addToRun(filePath, content);
@@ -128,9 +120,7 @@ void DocumentProcessorTests::test_multipleProcessors()
     std::vector<QSignalSpy *> spies;
 
     for (int i = 0; i < processorsCnt; i++) {
-        DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName,
-                                                             m_docBuilderCreator,
-                                                             m_storage.get());
+        DocumentProcessor *dp = new Asn1SccDocumentProcessor(m_projectName, m_docBuilderCreator, m_storage.get());
         dp->addToRun(filePath, content);
         spies.push_back(new QSignalSpy(dp, &DocumentProcessor::processingFinished));
 
@@ -143,10 +133,7 @@ void DocumentProcessorTests::test_multipleProcessors()
     for (int i = 0; i < processorsCnt - 1; i++)
         examine(processors[i], *spies[i], DocumentProcessor::State::Outdated, fileName, filePath);
 
-    examine(processors[processorsCnt - 1],
-            *spies[processorsCnt - 1],
-            DocumentProcessor::State::Successful,
-            fileName,
+    examine(processors[processorsCnt - 1], *spies[processorsCnt - 1], DocumentProcessor::State::Successful, fileName,
             filePath);
 
     for (int i = 0; i < processorsCnt; i++) {
@@ -155,11 +142,8 @@ void DocumentProcessorTests::test_multipleProcessors()
     }
 }
 
-void DocumentProcessorTests::examine(DocumentProcessor *dp,
-                                     const QSignalSpy &spy,
-                                     const DocumentProcessor::State state,
-                                     const QString &fileName,
-                                     const QString &filePath) const
+void DocumentProcessorTests::examine(DocumentProcessor *dp, const QSignalSpy &spy, const DocumentProcessor::State state,
+        const QString &fileName, const QString &filePath) const
 {
     QCOMPARE(dp->state(), state);
     QCOMPARE(spy.count(), 1);
@@ -174,3 +158,5 @@ void DocumentProcessorTests::examine(DocumentProcessor *dp,
     QCOMPARE(fileName, results.at(0)->location().fileName());
     QCOMPARE(filePath, results.at(0)->location().path());
 }
+
+QTEST_MAIN(DocumentProcessorTests)

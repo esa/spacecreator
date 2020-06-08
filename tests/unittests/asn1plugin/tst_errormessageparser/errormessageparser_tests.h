@@ -24,9 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <QObject>
+#include "errormessageparser.h"
 
-#include "../errormessageparser.h"
+#include <QObject>
 
 namespace Asn1Acn {
 namespace Internal {

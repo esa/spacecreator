@@ -25,13 +25,12 @@
 
 #include "projectcontenthandler_tests.h"
 
-#include <QSignalSpy>
-#include <QtTest>
-
-#include <projectcontenthandler.h>
-
 #include "documentprocessorstub.h"
 #include "sourcereadermock.h"
+
+#include <QSignalSpy>
+#include <QtTest>
+#include <projectcontenthandler.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
@@ -40,8 +39,7 @@ ProjectContentHandlerTests::ProjectContentHandlerTests(QObject *parent)
     : QObject(parent)
     , m_storage(new ParsedDataStorage)
     , m_guard(new ModelValidityGuard)
-    , m_createProcessor(
-          [](const QString &) -> DocumentProcessor * { return new DocumentProcessorStub(); })
+    , m_createProcessor([](const QString &) -> DocumentProcessor * { return new DocumentProcessorStub(); })
 {
     m_fileTypes << "_ERROR_"
                 << "_FAILED_"
@@ -206,10 +204,7 @@ void ProjectContentHandlerTests::addProject(const QString &projectName)
     QSignalSpy spyAboutToUpdate(m_guard, &ModelValidityGuard::modelAboutToChange);
     QSignalSpy spyUpdated(m_guard, &ModelValidityGuard::modelChanged);
 
-    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor,
-                                                           new SourceReaderMock,
-                                                           m_storage,
-                                                           m_guard);
+    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor, new SourceReaderMock, m_storage, m_guard);
     QCOMPARE(spyAboutToUpdate.count(), 1);
     QCOMPARE(m_guard->isValid(), false);
 
@@ -224,10 +219,7 @@ void ProjectContentHandlerTests::removeProject(const QString &projectName)
     QSignalSpy spyAboutToUpdate(m_guard, &ModelValidityGuard::modelAboutToChange);
     QSignalSpy spyUpdated(m_guard, &ModelValidityGuard::modelChanged);
 
-    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor,
-                                                           new SourceReaderMock,
-                                                           m_storage,
-                                                           m_guard);
+    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor, new SourceReaderMock, m_storage, m_guard);
     QCOMPARE(spyAboutToUpdate.count(), 1);
     QCOMPARE(m_guard->isValid(), false);
 
@@ -237,16 +229,12 @@ void ProjectContentHandlerTests::removeProject(const QString &projectName)
     QCOMPARE(m_guard->isValid(), true);
 }
 
-void ProjectContentHandlerTests::fileListChanged(const QString &projectName,
-                                                 const QStringList &files)
+void ProjectContentHandlerTests::fileListChanged(const QString &projectName, const QStringList &files)
 {
     QSignalSpy spyAboutToUpdate(m_guard, &ModelValidityGuard::modelAboutToChange);
     QSignalSpy spyUpdated(m_guard, &ModelValidityGuard::modelChanged);
 
-    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor,
-                                                           new SourceReaderMock,
-                                                           m_storage,
-                                                           m_guard);
+    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor, new SourceReaderMock, m_storage, m_guard);
 
     QCOMPARE(spyAboutToUpdate.count(), 1);
     QCOMPARE(m_guard->isValid(), false);
@@ -265,10 +253,7 @@ void ProjectContentHandlerTests::fileContentChanged(const QString &path)
     QSignalSpy spyAboutToUpdate(m_guard, &ModelValidityGuard::modelAboutToChange);
     QSignalSpy spyUpdated(m_guard, &ModelValidityGuard::modelChanged);
 
-    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor,
-                                                           new SourceReaderMock,
-                                                           m_storage,
-                                                           m_guard);
+    ProjectContentHandler *pch = new ProjectContentHandler(m_createProcessor, new SourceReaderMock, m_storage, m_guard);
 
     QCOMPARE(spyAboutToUpdate.count(), 1);
     QCOMPARE(m_guard->isValid(), false);
@@ -278,3 +263,5 @@ void ProjectContentHandlerTests::fileContentChanged(const QString &path)
     QCOMPARE(spyUpdated.count(), 1);
     QCOMPARE(m_guard->isValid(), true);
 }
+
+QTEST_MAIN(ProjectContentHandlerTests)

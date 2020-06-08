@@ -24,14 +24,12 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
+#include "documentprocessor.h"
 
 #include <QObject>
 #include <QSignalSpy>
-
 #include <asn1sccdocumentprocessor.h>
-
-#include "../documentprocessor.h"
+#include <memory>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -52,11 +50,8 @@ private Q_SLOTS:
     void test_multipleProcessors();
 
 private:
-    void examine(DocumentProcessor *dp,
-                 const QSignalSpy &spy,
-                 const DocumentProcessor::State state,
-                 const QString &fileName,
-                 const QString &filePath) const;
+    void examine(DocumentProcessor *dp, const QSignalSpy &spy, const DocumentProcessor::State state,
+            const QString &fileName, const QString &filePath) const;
 
     const QString m_projectName;
     const QString m_fileDir;

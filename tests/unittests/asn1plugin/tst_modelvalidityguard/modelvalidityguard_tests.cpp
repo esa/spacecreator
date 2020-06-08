@@ -33,7 +33,8 @@ using namespace Asn1Acn::Internal;
 ModelValidityGuardTests::ModelValidityGuardTests(QObject *parent)
     : QObject(parent)
     , m_guard(new ModelValidityGuard)
-{}
+{
+}
 
 ModelValidityGuardTests::~ModelValidityGuardTests()
 {
@@ -80,3 +81,5 @@ void ModelValidityGuardTests::test_multipleModifiers()
     QCOMPARE(spyUpdated.count(), 1);
     QCOMPARE(m_guard->isValid(), true);
 }
+
+QTEST_MAIN(ModelValidityGuardTests)

@@ -25,16 +25,16 @@
 
 #include "parseddatastorage_tests.h"
 
-#include <memory>
-
 #include <QtTest>
+#include <memory>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
 
 ParsedDataStorageTests::ParsedDataStorageTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 void ParsedDataStorageTests::test_addAndRemoveProject()
 {
@@ -231,9 +231,8 @@ void ParsedDataStorageTests::test_getFilesFromNonExistingProject()
     delete storage;
 }
 
-void ParsedDataStorageTests::addFileToProject(ParsedDataStorage *storage,
-                                              const QString &project,
-                                              const Utils::FileName &filePath)
+void ParsedDataStorageTests::addFileToProject(
+        ParsedDataStorage *storage, const QString &project, const Utils::FileName &filePath)
 {
     auto document = std::make_unique<Data::File>(filePath.toString());
     storage->addFileToProject(project, std::move(document));
@@ -243,3 +242,5 @@ Utils::FileName ParsedDataStorageTests::pathFromName(const QString &name)
 {
     return Utils::FileName::fromString("/test/file/path/" + name);
 }
+
+QTEST_MAIN(ParsedDataStorageTests)

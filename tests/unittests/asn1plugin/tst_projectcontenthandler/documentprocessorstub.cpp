@@ -28,7 +28,7 @@
 #include <QFileInfo>
 #include <QList>
 
-#include <data/file.h>
+#include <file.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
