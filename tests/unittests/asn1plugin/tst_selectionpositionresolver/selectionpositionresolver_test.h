@@ -24,10 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
 #include <QObject>
-
+#include <memory>
+#include <pluginmanager.h>
 #include <selectionpositionresolver.h>
 #include <texteditor/textdocument.h>
 
@@ -64,6 +63,7 @@ private Q_SLOTS:
 private:
     QTextCursor getInitializedCursor(const QByteArray &content, const int position);
 
+    std::unique_ptr<ExtensionSystem::PluginManager> m_pluginManager;
     std::unique_ptr<TextEditor::TextDocument> m_doc;
     SelectionPositionResolver m_resolver;
 };

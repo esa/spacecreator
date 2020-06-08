@@ -19,6 +19,7 @@ set(QTC_LIBRARIES
 )
 set(QTC_PLUGINS
     Core
+    ProjectExplorer
     TextEditor
 )
 

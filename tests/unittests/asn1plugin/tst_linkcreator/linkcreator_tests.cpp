@@ -25,11 +25,13 @@
 
 #include "linkcreator_tests.h"
 
+#include <QSettings>
 #include <QTextCursor>
 #include <QtTest>
 #include <file.h>
 #include <linkcreator.h>
 #include <parseddatastorage.h>
+#include <pluginmanager.h>
 #include <texteditor/textdocument.h>
 #include <typereference.h>
 #include <types/builtintypes.h>
@@ -45,6 +47,9 @@ LinkCreatorTests::LinkCreatorTests(QObject *parent)
     , m_project("project_name")
 {
     m_storage->addProject(m_project);
+
+    auto pluginManager = new ExtensionSystem::PluginManager();
+    pluginManager->setSettings(new QSettings());
 }
 
 namespace {

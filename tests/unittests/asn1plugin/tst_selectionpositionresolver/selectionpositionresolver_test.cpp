@@ -25,6 +25,7 @@
 
 #include "selectionpositionresolver_test.h"
 
+#include <QSettings>
 #include <QTextCursor>
 #include <QtTest>
 #include <texteditor/textdocument.h>
@@ -35,8 +36,10 @@ using namespace Asn1Acn::Internal::Tests;
 
 SelectionPositionResolverTests::SelectionPositionResolverTests(QObject *parent)
     : QObject(parent)
-    , m_doc(std::make_unique<TextEditor::TextDocument>())
 {
+    m_pluginManager = std::make_unique<ExtensionSystem::PluginManager>();
+    m_pluginManager->setSettings(new QSettings());
+    m_doc = std::make_unique<TextEditor::TextDocument>();
 }
 
 QTextCursor SelectionPositionResolverTests::getInitializedCursor(const QByteArray &content, const int position)
