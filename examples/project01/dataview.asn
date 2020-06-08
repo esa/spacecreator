@@ -1,0 +1,6 @@
+DV DEFINITIONS ::=
+BEGIN
+MyInt ::= INTEGER (0..255)
+
+MyChoice ::= CHOICE { a MyInt, b BOOLEAN }
+END

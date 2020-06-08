@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<InterfaceView>
+    <Function name="HiddenChildren" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="-14900 42400 27300 64500"/>
+        <Property name="Taste::RootCoordinates" value="3100 3100 186500 85300"/>
+        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="27300 44800"/>
+            <Property name="Taste::InnerCoordinates" value="90300 86600"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Function name="FnTyped_Nested" language="" is_type="NO" instance_of="Nested FnType">
+            <Property name="Taste::coordinates" value="-15800 53300 4200 61300"/>
+            <Property name="Taste::InnerCoordinates" value="37900 57300 80700 80300"/>
+            <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="4200 57300"/>
+                <Property name="Taste::InnerCoordinates" value="80700 63900"/>
+                <Property name="Taste::InheritPI" value="true"/>
+            </Required_Interface>
+        </Function>
+        <Function name="Function 6" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="16300 53100 36300 61100"/>
+            <Property name="Taste::InnerCoordinates" value="132000 60100 173400 80300"/>
+            <Provided_Interface name="PI 1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="16300 53100"/>
+                <Property name="Taste::InnerCoordinates" value="132000 66200"/>
+            </Provided_Interface>
+        </Function>
+        <Function name="Nested_FnType" language="" is_type="YES">
+            <Property name="Taste::coordinates" value="-13400 64500 6600 72500"/>
+            <Property name="Taste::InnerCoordinates" value="8100 64800 28100 72800"/>
+            <Required_Interface name="RI 1" kind="ANY_OPERATION">
+                <Property name="Taste::coordinates" value="-13400 64500"/>
+                <Property name="Taste::InnerCoordinates" value="16300 64800"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="true"/>
+            </Required_Interface>
+        </Function>
+        <Connection>
+            <Source func_name="FnTyped Nested" ri_name="RI 1"/>
+            <Target func_name="Function 6" pi_name="PI 1"/>
+            <Property name="Taste::InnerCoordinates" value="80700 63900 106400 63900 106400 66200 132000 66200"/>
+        </Connection>
+    </Function>
+    <Function name="Function 2" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="87300 10000 181900 91200"/>
+        <Property name="Taste::RootCoordinates" value="-12700 4400 185100 92000"/>
+        <Provided_Interface name="PI 1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="147200 10000"/>
+            <Property name="Taste::InnerCoordinates" value="150200 4400"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI 2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="87300 63300"/>
+            <Property name="Taste::InnerCoordinates" value="90300 92000"/>
+        </Provided_Interface>
+        <Required_Interface name="RI 1" kind="ANY_OPERATION">
+            <Property name="Taste::coordinates" value="159500 10000"/>
+            <Property name="Taste::InnerCoordinates" value="162500 4400"/>
+            <Property name="Taste::InheritPI" value="true"/>
+            <Property name="Taste::Autonamed" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="PI_param_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="87300 42800"/>
+            <Property name="Taste::InnerCoordinates" value="90300 4400"/>
+            <Property name="Taste::InheritPI" value="true"/>
+        </Required_Interface>
+        <Function name="Function 3" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="94700 15100 114700 23100"/>
+            <Provided_Interface name="PI 1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="114200 23100"/>
+            </Provided_Interface>
+            <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="114700 18000"/>
+                <Property name="Taste::InheritPI" value="true"/>
+            </Required_Interface>
+        </Function>
+        <Function name="Function 7" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="140900 32500 177100 76700"/>
+            <Provided_Interface name="PI 1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="148500 32500"/>
+            </Provided_Interface>
+            <Provided_Interface name="PI 2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="140900 33200"/>
+            </Provided_Interface>
+            <Provided_Interface name="PI 3" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="140900 72100"/>
+            </Provided_Interface>
+            <Required_Interface name="RI 1" kind="ANY_OPERATION">
+                <Property name="Taste::coordinates" value="161500 32500"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="true"/>
+            </Required_Interface>
+            <Required_Interface name="RI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="140900 41000"/>
+                <Property name="Taste::InheritPI" value="true"/>
+            </Required_Interface>
+            <Required_Interface name="PI_param_FnTyped" kind="ANY_OPERATION">
+                <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+                <Property name="Taste::coordinates" value="140900 46500"/>
+                <Property name="Taste::InheritPI" value="true"/>
+                <Property name="Taste::Autonamed" value="false"/>
+            </Required_Interface>
+        </Function>
+        <Function name="Function 8" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="101300 49200 121300 57200"/>
+        </Function>
+        <Comment name="Nested Comment">
+            <Property name="Taste::coordinates" value="98500 79100 118500 87100"/>
+        </Comment>
+        <Connection>
+            <Source func_name="Function 7" pi_name="PI 1"/>
+            <Target func_name="Function 2" pi_name="PI 1"/>
+            <Property name="Taste::coordinates" value="148500 32500 147200 10000"/>
+            <Property name="Taste::InnerCoordinates" value="151500 32600 150200 4400"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Function 7" ri_name="RI 1"/>
+            <Target func_name="Function 2" ri_name="RI 1"/>
+            <Property name="Taste::coordinates" value="161500 32500 159500 10000 159500 10000"/>
+            <Property name="Taste::InnerCoordinates" value="164500 32600 164500 18500 162500 18500 162500 4400"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Function 3" ri_name="RI 1"/>
+            <Target func_name="Function 7" pi_name="PI 2"/>
+            <Property name="Taste::coordinates" value="114700 18000 127800 18000 127800 33200 140900 33200"/>
+            <Property name="Taste::InnerCoordinates" value=""/>
+        </Connection>
+        <Connection>
+            <Source func_name="Function 7" ri_name="RI 2"/>
+            <Target func_name="Function 3" pi_name="PI 1"/>
+            <Property name="Taste::coordinates" value="140900 41000 114200 41000 114200 23100"/>
+            <Property name="Taste::InnerCoordinates" value=""/>
+        </Connection>
+        <Connection>
+            <Source func_name="Function 7" ri_name="PI param FnTyped"/>
+            <Target func_name="Function 2" ri_name="PI param FnTyped"/>
+            <Property name="Taste::coordinates" value="140900 46500 114100 46500 114100 42800 87300 42800"/>
+            <Property name="Taste::InnerCoordinates" value="143900 46600 90300 46600 90300 4400"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Function 7" pi_name="PI 3"/>
+            <Target func_name="Function 2" pi_name="PI 2"/>
+            <Property name="Taste::coordinates" value="140900 72100 114100 72100 114100 63300 87300 63300"/>
+            <Property name="Taste::InnerCoordinates" value="143900 72200 90300 72200 90300 92000"/>
+        </Connection>
+    </Function>
+    <Function name="Function_1" language="" is_type="NO" instance_of="Function Type 1">
+        <Property name="Taste::coordinates" value="36000 43900 70300 57100"/>
+        <Provided_Interface name="PI_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="36000 53400"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_param_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="70300 51100"/>
+        </Provided_Interface>
+        <Required_Interface name="RI_FnTyped" kind="ANY_OPERATION">
+            <Property name="Taste::coordinates" value="52400 43900"/>
+            <Property name="Taste::InheritPI" value="true"/>
+            <Property name="Taste::Autonamed" value="false"/>
+        </Required_Interface>
+        <Required_Interface name="RI_param_FnTyped" kind="ANY_OPERATION">
+            <Input_Parameter name="b" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="36000 48700"/>
+            <Property name="Taste::InheritPI" value="true"/>
+            <Property name="Taste::Autonamed" value="false"/>
+        </Required_Interface>
+    </Function>
+    <Function name="Function Type 1" language="" is_type="YES">
+        <Property name="Taste::coordinates" value="37200 9800 66000 25300"/>
+        <Provided_Interface name="PI_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="40700 9800"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_param_FnTyped" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="41600 25300"/>
+        </Provided_Interface>
+        <Required_Interface name="RI_FnTyped" kind="ANY_OPERATION">
+            <Property name="Taste::coordinates" value="50200 9800"/>
+            <Property name="Taste::InheritPI" value="true"/>
+            <Property name="Taste::Autonamed" value="false"/>
+        </Required_Interface>
+        <Required_Interface name="RI_param_FnTyped" kind="ANY_OPERATION">
+            <Input_Parameter name="b" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="51100 25300"/>
+            <Property name="Taste::InheritPI" value="true"/>
+            <Property name="Taste::Autonamed" value="false"/>
+        </Required_Interface>
+    </Function>
+    <Connection>
+        <Source func_name="Function 1" pi_name="PI param FnTyped"/>
+        <Target func_name="Function 2" ri_name="PI param FnTyped"/>
+        <Property name="Taste::coordinates" value="70300 51100 87300 42800"/>
+    </Connection>
+    <Connection>
+        <Source func_name="HiddenChildren" ri_name="RI 1"/>
+        <Target func_name="Function 2" pi_name="PI 2"/>
+        <Property name="Taste::coordinates" value="27300 44800 34000 44800 34000 63400 87300 63300"/>
+    </Connection>
+    <Comment name="Global comment\n\nThis is a sample of all available items/objects">
+        <Property name="Taste::coordinates" value="6600 9700 26600 24700"/>
+    </Comment>
+</InterfaceView>
