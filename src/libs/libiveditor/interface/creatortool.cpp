@@ -402,7 +402,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    if (d->toolType == ToolType::DirectConnection) {
+    if (d->toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
         if (!nearestItem(scene, scenePos, { AADLFunctionGraphicsItem::Type })) {
             if (!nearestItem(scene, scenePos, ::kInterfaceTolerance / 2, { AADLFunctionGraphicsItem::Type }))
                 return false;
@@ -418,7 +418,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         }
         d->connectionPoints.append(scenePos);
         return true;
-    } else if (d->toolType == ToolType::MultiPointConnection) {
+    } else if (d->toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         if (!d->previewConnectionItem) {
             QGraphicsItem *item =
                     nearestItem(scene, scenePos, kInterfaceTolerance, { AADLInterfaceGraphicsItem::Type });
@@ -434,23 +434,13 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             return true;
         }
         return !d->connectionPoints.contains(scenePos);
-    } else if (d->toolType != ToolType::RequiredInterface && d->toolType != ToolType::ProvidedInterface) {
+    } else if (e->button() == Qt::RightButton
+            || (d->toolType != ToolType::RequiredInterface && d->toolType != ToolType::ProvidedInterface)) {
         if (!d->previewItem) {
-            auto findParent = [](QGraphicsItem *baseItem) -> QGraphicsItem * {
-                const QList<int> types = { AADLFunctionGraphicsItem::Type };
-                if (!baseItem || types.contains(baseItem->type()))
-                    return baseItem;
-
-                while (auto parentItem = baseItem->parentItem()) {
-                    if (types.contains(parentItem->type()))
-                        return parentItem;
-
-                    baseItem = parentItem;
-                }
-                return nullptr;
-            };
-
-            QGraphicsItem *parentItem = findParent(d->view->itemAt(e->pos()));
+            QGraphicsItem *parentItem = d->view->itemAt(e->pos());
+            while (parentItem != nullptr && parentItem->type() != AADLFunctionGraphicsItem::Type) {
+                parentItem = parentItem->parentItem();
+            }
             d->previewItem = new QGraphicsRectItem(parentItem);
             d->previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
             d->previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
@@ -486,10 +476,9 @@ bool CreatorTool::onMouseRelease(QMouseEvent *e)
     if (!d->view)
         return false;
 
-    if (d->toolType == ToolType::Pointer) {
-        if ((e->button() & Qt::RightButton) && d->previewItem)
-            return d->showContextMenu(e->globalPos());
-    } else {
+    if ((e->button() & Qt::RightButton) && d->previewItem) {
+        return d->showContextMenu(e->globalPos());
+    } else if (d->toolType != ToolType::Pointer) {
         const bool hasPreview = d->previewItem || d->previewConnectionItem;
         const bool isIface = d->toolType == ToolType::ProvidedInterface || d->toolType == ToolType::RequiredInterface;
         if (hasPreview || isIface) {
