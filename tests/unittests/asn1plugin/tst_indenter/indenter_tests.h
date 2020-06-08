@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include <QObject>
+#include "indenter.h"
 
-#include "../indenter.h"
+#include <QObject>
 
 namespace Asn1Acn {
 namespace Internal {

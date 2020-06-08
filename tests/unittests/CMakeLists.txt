@@ -4,3 +4,7 @@ add_subdirectory(libiveditor)
 add_subdirectory(libmsceditor)
 add_subdirectory(msclibrary)
 add_subdirectory(shared)
+
+if (${QTC_FOUND})
+    add_subdirectory(asn1plugin)
+endif()

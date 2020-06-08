@@ -570,8 +570,8 @@ function(add_qtc_plugin target_name)
   qtc_output_binary_dir(_output_binary_dir)
   set_target_properties(${target_name} PROPERTIES
     SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN ON
+#    CXX_VISIBILITY_PRESET hidden
+#    VISIBILITY_INLINES_HIDDEN ON
     _arg_DEPENDS "${_arg_PLUGIN_DEPENDS}"
     _arg_VERSION "${_arg_VERSION}"
     BUILD_RPATH "${_PLUGIN_RPATH}"

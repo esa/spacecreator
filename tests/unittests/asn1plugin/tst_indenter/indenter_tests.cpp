@@ -24,11 +24,9 @@
 ****************************************************************************/
 #include "indenter_tests.h"
 
-#include <QtTest>
-
 #include <QTextBlock>
 #include <QTextDocument>
-
+#include <QtTest>
 #include <texteditor/tabsettings.h>
 
 using namespace Asn1Acn::Internal::Tests;
@@ -37,7 +35,8 @@ static const int INDENT_SIZE = 4;
 
 IndenterTests::IndenterTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 void IndenterTests::initTestCase()
 {
@@ -45,32 +44,28 @@ void IndenterTests::initTestCase()
     m_indenter = new Indenter(m_document);
 
     m_document->setPlainText(
-                /*  0 */  "    TestingAutocompletion DEFINITIONS ::= BEGIN\n"
-                /*  1 */  "    EXPORTS ALL;\n"
-                /*  2 */  "    IMPORTS\n"
-                /*  3 */  "        MyInt FROM MyModelName;\n"
-                /*  4 */  "        \n"
-                /*  5 */  "    MySequence ::= SEQUENCE {\n"
-                /*  6 */  "        a INTEGER\n"
-                /*  7 */  "    }\n"
-                /*  8 */  "    \n"
-                /*  9 */  "        OtherSequence ::= SEQUENCE\n"
-                /* 10 */  "        {\n"
-                /* 11 */  "            \n"
-                /* 12 */  "            \n"
-                /* 13 */  "            b INTEGER\n"
-                /* 14 */  "            \n"
-                /* 15 */  "            \n"
-                /* 16 */  "        }\n"
-                /* 17 */  "    \n"
-                /* 18 */  "    END\n"
-                );
+            /*  0 */ "    TestingAutocompletion DEFINITIONS ::= BEGIN\n"
+                     /*  1 */ "    EXPORTS ALL;\n"
+                     /*  2 */ "    IMPORTS\n"
+                     /*  3 */ "        MyInt FROM MyModelName;\n"
+                     /*  4 */ "        \n"
+                     /*  5 */ "    MySequence ::= SEQUENCE {\n"
+                     /*  6 */ "        a INTEGER\n"
+                     /*  7 */ "    }\n"
+                     /*  8 */ "    \n"
+                     /*  9 */ "        OtherSequence ::= SEQUENCE\n"
+                     /* 10 */ "        {\n"
+                     /* 11 */ "            \n"
+                     /* 12 */ "            \n"
+                     /* 13 */ "            b INTEGER\n"
+                     /* 14 */ "            \n"
+                     /* 15 */ "            \n"
+                     /* 16 */ "        }\n"
+                     /* 17 */ "    \n"
+                     /* 18 */ "    END\n");
 
-
-    m_tabSettings = new TextEditor::TabSettings(TextEditor::TabSettings::SpacesOnlyTabPolicy,
-                                                4,
-                                                4,
-                                                TextEditor::TabSettings::NoContinuationAlign);
+    m_tabSettings = new TextEditor::TabSettings(
+            TextEditor::TabSettings::SpacesOnlyTabPolicy, 4, 4, TextEditor::TabSettings::NoContinuationAlign);
 }
 
 void IndenterTests::cleanupTestCase()
@@ -159,3 +154,5 @@ void IndenterTests::test_afterBracketOpenAndNewLinesLine()
 
     QCOMPARE(indent, 3 * INDENT_SIZE);
 }
+
+QTEST_MAIN(IndenterTests)
