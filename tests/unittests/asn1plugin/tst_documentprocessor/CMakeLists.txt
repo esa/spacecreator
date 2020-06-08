@@ -15,6 +15,7 @@ set(QTC_LIBRARIES
     -L${QTC_BUILD_DIR}/lib/qtcreator/plugins
     Aggregation
     ExtensionSystem
+    QtcSsh
     Utils
 )
 set(QTC_PLUGINS
