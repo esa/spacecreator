@@ -24,15 +24,16 @@
 ****************************************************************************/
 #include "astxmlparser_tests.h"
 
-#include <QtTest>
+#include "types/builtintypes.h"
 
-#include <data/types/builtintypes.h>
+#include <QtTest>
 
 using namespace Asn1Acn::Internal::Tests;
 
 AstXmlParserTests::AstXmlParserTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 void AstXmlParserTests::setXmlData(const QString &str)
 {
@@ -64,7 +65,7 @@ void AstXmlParserTests::test_emptyDefinitions()
           R"(  <AcnDependencies/>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["TestFile.asn"]->definitionsList().size(), std::size_t{1});
+    QCOMPARE(m_parsedData["TestFile.asn"]->definitionsList().size(), std::size_t { 1 });
     const auto defs = m_parsedData["TestFile.asn"]->definitions("TestDefinitions");
     QCOMPARE(defs->name(), QStringLiteral("TestDefinitions"));
     QCOMPARE(defs->location().path(), QStringLiteral("TestFile.asn"));
@@ -93,8 +94,7 @@ void AstXmlParserTests::test_singleTypeAssignment()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->types().size(),
-             std::size_t{1});
+    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->types().size(), std::size_t { 1 });
     const auto type = m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->type("MyInt");
     QCOMPARE(type->name(), QStringLiteral("MyInt"));
     QCOMPARE(type->location().path(), QStringLiteral("Test2File.asn"));
@@ -118,15 +118,15 @@ void AstXmlParserTests::test_builtinTypeReference()
           R"(          <TypeAssignment Name="MyInt" Line="4" CharPositionInLine="10">)"
           R"(            <Asn1Type>)"
           R"(              <)"
-          + xmlTypeName
-          + "/>"
-            R"(            </Asn1Type>)"
-            R"(          </TypeAssignment>)"
-            R"(        </TypeAssignments>)"
-            R"(      </Module>)"
-            R"(    </Modules>)"
-            R"(  </Asn1File>)"
-            R"(</AstRoot>)");
+            + xmlTypeName
+            + "/>"
+              R"(            </Asn1Type>)"
+              R"(          </TypeAssignment>)"
+              R"(        </TypeAssignments>)"
+              R"(      </Module>)"
+              R"(    </Modules>)"
+              R"(  </Asn1File>)"
+              R"(</AstRoot>)");
 
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), typeName);
 }
@@ -171,8 +171,7 @@ void AstXmlParserTests::test_userDefinedTypeReference()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(),
-             QStringLiteral("OrgInt"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), QStringLiteral("OrgInt"));
 
     const auto ref = m_parsedData["X.asn"]->referencesMap().find(3);
     QVERIFY(ref->second != nullptr);
@@ -213,12 +212,9 @@ void AstXmlParserTests::test_multipleTypeAssignments()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(),
-             QStringLiteral("INTEGER"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyBool")->type()->name(),
-             QStringLiteral("BOOLEAN"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyNull")->type()->name(),
-             QStringLiteral("NULL"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), QStringLiteral("INTEGER"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyBool")->type()->name(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyNull")->type()->name(), QStringLiteral("NULL"));
 }
 
 void AstXmlParserTests::test_importedType()
@@ -243,9 +239,8 @@ void AstXmlParserTests::test_importedType()
 
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().size(), std::size_t(1));
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).module(),
-             QStringLiteral("OtherDefinitions"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(),
-             QStringLiteral("Imported"));
+            QStringLiteral("OtherDefinitions"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(), QStringLiteral("Imported"));
 }
 
 void AstXmlParserTests::test_multipleImportedType()
@@ -270,12 +265,10 @@ void AstXmlParserTests::test_multipleImportedType()
           R"(</AstRoot>)");
 
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().size(), std::size_t(2));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(),
-             QStringLiteral("Imported1"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(1).name(),
-             QStringLiteral("Imported2"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(0).name(), QStringLiteral("Imported1"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(1).name(), QStringLiteral("Imported2"));
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->importedTypes().at(1).module(),
-             QStringLiteral("OtherDefinitions"));
+            QStringLiteral("OtherDefinitions"));
 }
 
 void AstXmlParserTests::test_assignmentsAreTypeReferences()
@@ -297,7 +290,7 @@ void AstXmlParserTests::test_assignmentsAreTypeReferences()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["Test2.asn"]->referencesMap().size(), std::size_t{1});
+    QCOMPARE(m_parsedData["Test2.asn"]->referencesMap().size(), std::size_t { 1 });
 
     const auto ref = m_parsedData["Test2.asn"]->referencesMap().find(19);
     QVERIFY(ref->second != nullptr);
@@ -348,7 +341,7 @@ void AstXmlParserTests::test_sequenceTypeAssingment()
     QCOMPARE(seq->location().column(), 9);
     QCOMPARE(seq->location().path(), QLatin1String("Test2File.asn"));
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t{2});
+    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t { 2 });
 
     const auto ref = m_parsedData["Test2File.asn"]->referencesMap().find(14);
     QVERIFY(ref->second != nullptr);
@@ -399,7 +392,7 @@ void AstXmlParserTests::test_choiceTypeAssignment()
     QCOMPARE(choice->location().column(), 9);
     QCOMPARE(choice->location().path(), QLatin1String("Test2File.asn"));
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t{2});
+    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t { 2 });
 
     const auto ref = m_parsedData["Test2File.asn"]->referencesMap().find(14);
     QVERIFY(ref->second != nullptr);
@@ -443,7 +436,7 @@ void AstXmlParserTests::test_sequenceOfTypeAssingment()
     QCOMPARE(seq->location().column(), 9);
     QCOMPARE(seq->location().path(), QLatin1String("Test2File.asn"));
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t{2});
+    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t { 2 });
 
     const auto ref = m_parsedData["Test2File.asn"]->referencesMap().find(13);
     QVERIFY(ref->second != nullptr);
@@ -474,7 +467,7 @@ void AstXmlParserTests::test_valueAssignment()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->values().size(), std::size_t{1});
+    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->values().size(), std::size_t { 1 });
     const auto var = m_parsedData["Test2File.asn"]->definitions("Defs")->value("asnConstant");
     QCOMPARE(var->name(), QStringLiteral("asnConstant"));
     QCOMPARE(var->location().line(), 2);
@@ -500,12 +493,11 @@ void AstXmlParserTests::test_importedValues()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().size(),
-             std::size_t(1));
+    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().size(), std::size_t(1));
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().at(0).module(),
-             QStringLiteral("OtherDefinitions"));
+            QStringLiteral("OtherDefinitions"));
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().at(0).name(),
-             QStringLiteral("Imported"));
+            QStringLiteral("Imported"));
 }
 
 void AstXmlParserTests::test_multipleImportedValues()
@@ -528,14 +520,13 @@ void AstXmlParserTests::test_multipleImportedValues()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().size(),
-             std::size_t(2));
+    QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().size(), std::size_t(2));
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().at(0).module(),
-             QStringLiteral("OtherDefinitions"));
+            QStringLiteral("OtherDefinitions"));
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().at(0).name(),
-             QStringLiteral("Imported"));
+            QStringLiteral("Imported"));
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("Defs")->importedValues().at(1).name(),
-             QStringLiteral("SecondImported"));
+            QStringLiteral("SecondImported"));
 }
 
 void AstXmlParserTests::test_multipleModules()
@@ -608,31 +599,30 @@ void AstXmlParserTests::test_multipleFiles()
 
 void AstXmlParserTests::test_parametrizedInstancesContentsAreIgnored()
 {
-    parse(
-        R"(<?xml version="1.0" encoding="utf-8"?>)"
-        R"(<AstRoot>)"
-        R"(  <Asn1File FileName="Test2File.asn">)"
-        R"(    <Modules>)"
-        R"(      <Module Name="Defs" Line="13" CharPositionInLine="42">)"
-        R"(        <TypeAssignments>)"
-        R"(          <TypeAssignment Name="MySeq" Line="11" CharPositionInLine="9">)"
-        R"(            <Asn1Type Line="12" CharPositionInLine="19" ParameterizedTypeInstance="true">)"
-        R"(              <SEQUENCE>)"
-        R"(                <Constraints/>)"
-        R"(                <WithComponentConstraints/>)"
-        R"(                <SEQUENCE_COMPONENT Name="b" Line="14" CharPositionInLine="2">)"
-        R"(                  <Asn1Type Line="14" CharPositionInLine="4">)"
-        R"(                    <REFERENCE_TYPE Module="Other" TypeAssignment="MyInt"/>")
+    parse(R"(<?xml version="1.0" encoding="utf-8"?>)"
+          R"(<AstRoot>)"
+          R"(  <Asn1File FileName="Test2File.asn">)"
+          R"(    <Modules>)"
+          R"(      <Module Name="Defs" Line="13" CharPositionInLine="42">)"
+          R"(        <TypeAssignments>)"
+          R"(          <TypeAssignment Name="MySeq" Line="11" CharPositionInLine="9">)"
+          R"(            <Asn1Type Line="12" CharPositionInLine="19" ParameterizedTypeInstance="true">)"
+          R"(              <SEQUENCE>)"
+          R"(                <Constraints/>)"
+          R"(                <WithComponentConstraints/>)"
+          R"(                <SEQUENCE_COMPONENT Name="b" Line="14" CharPositionInLine="2">)"
+          R"(                  <Asn1Type Line="14" CharPositionInLine="4">)"
+          R"(                    <REFERENCE_TYPE Module="Other" TypeAssignment="MyInt"/>")
         R"(                  </Asn1Type>)"
-        R"(                </SEQUENCE_COMPONENT>)"
-        R"(              </SEQUENCE>)"
-        R"(            </Asn1Type>)"
-        R"(          </TypeAssignment>)"
-        R"(        </TypeAssignments>)"
-        R"(      </Module>)"
-        R"(    </Modules>)"
-        R"(  </Asn1File>)"
-        R"(</AstRoot>)");
+          R"(                </SEQUENCE_COMPONENT>)"
+          R"(              </SEQUENCE>)"
+          R"(            </Asn1Type>)"
+          R"(          </TypeAssignment>)"
+          R"(        </TypeAssignments>)"
+          R"(      </Module>)"
+          R"(    </Modules>)"
+          R"(  </Asn1File>)"
+          R"(</AstRoot>)");
 
     const auto seq = m_parsedData["Test2File.asn"]->definitions("Defs")->type("MySeq");
     QCOMPARE(seq->type()->name(), QStringLiteral("SEQUENCE"));
@@ -641,7 +631,7 @@ void AstXmlParserTests::test_parametrizedInstancesContentsAreIgnored()
     QCOMPARE(seq->location().column(), 9);
     QCOMPARE(seq->location().path(), QLatin1String("Test2File.asn"));
 
-    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t{1});
+    QCOMPARE(m_parsedData["Test2File.asn"]->referencesMap().size(), std::size_t { 1 });
 
     const auto ref = m_parsedData["Test2File.asn"]->referencesMap().find(14);
     QVERIFY(ref == m_parsedData["Test2File.asn"]->referencesMap().end());
@@ -661,3 +651,5 @@ void AstXmlParserTests::parse(const QString &xmlData)
     QVERIFY(parser.parse());
     m_parsedData = parser.takeData();
 }
+
+QTEST_MAIN(AstXmlParserTests)

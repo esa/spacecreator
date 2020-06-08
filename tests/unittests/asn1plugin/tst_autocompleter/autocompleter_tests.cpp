@@ -25,11 +25,9 @@
 
 #include "autocompleter_tests.h"
 
-#include <QtTest>
-
 #include <QTextCursor>
 #include <QTextDocument>
-
+#include <QtTest>
 #include <texteditor/tabsettings.h>
 #include <texteditor/textdocumentlayout.h>
 
@@ -129,11 +127,7 @@ void AutoCompleterTests::test_cursorNotInComment()
 void AutoCompleterTests::test_insertMatchingBraceEmptyString()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingBrace(QTextCursor(),
-                                                   QString(),
-                                                   QChar(),
-                                                   true,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingBrace(QTextCursor(), QString(), QChar(), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 5);
@@ -142,11 +136,7 @@ void AutoCompleterTests::test_insertMatchingBraceEmptyString()
 void AutoCompleterTests::test_insertMatchingBraceForLeftBrace()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingBrace(QTextCursor(),
-                                                   QString("("),
-                                                   QChar(),
-                                                   true,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingBrace(QTextCursor(), QString("("), QChar(), true, &skippedChars);
 
     QCOMPARE(ret, QStringLiteral(")"));
     QCOMPARE(skippedChars, 5);
@@ -155,11 +145,7 @@ void AutoCompleterTests::test_insertMatchingBraceForLeftBrace()
 void AutoCompleterTests::test_insertMatchingBraceForRigthBrace()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingBrace(QTextCursor(),
-                                                   QString(")"),
-                                                   QChar(')'),
-                                                   true,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingBrace(QTextCursor(), QString(")"), QChar(')'), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 6);
@@ -168,11 +154,8 @@ void AutoCompleterTests::test_insertMatchingBraceForRigthBrace()
 void AutoCompleterTests::test_insertMatchingBraceForText()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingBrace(QTextCursor(),
-                                                   QString("Test string"),
-                                                   QChar(')'),
-                                                   true,
-                                                   &skippedChars);
+    QString ret =
+            m_completer->insertMatchingBrace(QTextCursor(), QString("Test string"), QChar(')'), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 5);
@@ -181,11 +164,7 @@ void AutoCompleterTests::test_insertMatchingBraceForText()
 void AutoCompleterTests::test_insertMatchingQuoteEmptyString()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingQuote(QTextCursor(),
-                                                   QString(),
-                                                   QChar(),
-                                                   true,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingQuote(QTextCursor(), QString(), QChar(), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 5);
@@ -194,11 +173,8 @@ void AutoCompleterTests::test_insertMatchingQuoteEmptyString()
 void AutoCompleterTests::test_insertMatchingQuoteForText()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingQuote(QTextCursor(),
-                                                   QString("Test string"),
-                                                   QChar('"'),
-                                                   true,
-                                                   &skippedChars);
+    QString ret =
+            m_completer->insertMatchingQuote(QTextCursor(), QString("Test string"), QChar('"'), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 5);
@@ -207,11 +183,7 @@ void AutoCompleterTests::test_insertMatchingQuoteForText()
 void AutoCompleterTests::test_insertMatchingQuoteForSkippedQuote()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingQuote(QTextCursor(),
-                                                   QString("\""),
-                                                   QChar('"'),
-                                                   true,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingQuote(QTextCursor(), QString("\""), QChar('"'), true, &skippedChars);
 
     QCOMPARE(ret, QString());
     QCOMPARE(skippedChars, 6);
@@ -220,11 +192,7 @@ void AutoCompleterTests::test_insertMatchingQuoteForSkippedQuote()
 void AutoCompleterTests::test_insertMatchingQuoteForQuote()
 {
     int skippedChars = 5;
-    QString ret = m_completer->insertMatchingQuote(QTextCursor(),
-                                                   QString("\""),
-                                                   QChar(),
-                                                   false,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingQuote(QTextCursor(), QString("\""), QChar(), false, &skippedChars);
 
     QCOMPARE(ret, QString("\""));
     QCOMPARE(skippedChars, 5);
@@ -237,11 +205,7 @@ void AutoCompleterTests::test_insertQuoteInsideMatchedQuotes()
     QTextCursor cursor(document);
     cursor.setPosition(1);
 
-    QString ret = m_completer->insertMatchingQuote(cursor,
-                                                   QString("\""),
-                                                   QChar(),
-                                                   false,
-                                                   &skippedChars);
+    QString ret = m_completer->insertMatchingQuote(cursor, QString("\""), QChar(), false, &skippedChars);
 
     QCOMPARE(ret, QString());
 
@@ -378,11 +342,9 @@ void AutoCompleterTests::test_insertCurlyBraceMatch()
     QTextCursor cursor(document);
     cursor.movePosition(QTextCursor::EndOfLine);
 
-    TextEditor::TextDocumentLayout::setParentheses(
-        document->firstBlock(),
-        TextEditor::Parentheses() << TextEditor::Parenthesis(TextEditor::Parenthesis::Type::Opened,
-                                                             QLatin1Char('{'),
-                                                             0));
+    TextEditor::TextDocumentLayout::setParentheses(document->firstBlock(),
+            TextEditor::Parentheses() << TextEditor::Parenthesis(
+                    TextEditor::Parenthesis::Type::Opened, QLatin1Char('{'), 0));
 
     int ret = m_completer->paragraphSeparatorAboutToBeInserted(cursor);
 
@@ -406,16 +368,12 @@ void AutoCompleterTests::test_insertCurlyBraceMismatch()
     QTextCursor cursor(document);
     cursor.movePosition(QTextCursor::EndOfLine);
 
-    TextEditor::TextDocumentLayout::setParentheses(
-        document->firstBlock(),
-        TextEditor::Parentheses() << TextEditor::Parenthesis(TextEditor::Parenthesis::Type::Opened,
-                                                             QLatin1Char('{'),
-                                                             0));
-    TextEditor::TextDocumentLayout::setParentheses(
-        document->firstBlock().next(),
-        TextEditor::Parentheses() << TextEditor::Parenthesis(TextEditor::Parenthesis::Type::Closed,
-                                                             QLatin1Char('}'),
-                                                             0));
+    TextEditor::TextDocumentLayout::setParentheses(document->firstBlock(),
+            TextEditor::Parentheses() << TextEditor::Parenthesis(
+                    TextEditor::Parenthesis::Type::Opened, QLatin1Char('{'), 0));
+    TextEditor::TextDocumentLayout::setParentheses(document->firstBlock().next(),
+            TextEditor::Parentheses() << TextEditor::Parenthesis(
+                    TextEditor::Parenthesis::Type::Closed, QLatin1Char('}'), 0));
 
     int ret = m_completer->paragraphSeparatorAboutToBeInserted(cursor);
 
@@ -435,16 +393,12 @@ void AutoCompleterTests::test_insertCurlyBraceMatchInComment()
     QTextCursor cursor(document);
     cursor.movePosition(QTextCursor::EndOfLine);
 
-    TextEditor::TextDocumentLayout::setParentheses(
-        document->firstBlock(),
-        TextEditor::Parentheses() << TextEditor::Parenthesis(TextEditor::Parenthesis::Type::Opened,
-                                                             QLatin1Char('{'),
-                                                             0));
-    TextEditor::TextDocumentLayout::setParentheses(
-        document->firstBlock().next(),
-        TextEditor::Parentheses() << TextEditor::Parenthesis(TextEditor::Parenthesis::Type::Closed,
-                                                             QLatin1Char('}'),
-                                                             4));
+    TextEditor::TextDocumentLayout::setParentheses(document->firstBlock(),
+            TextEditor::Parentheses() << TextEditor::Parenthesis(
+                    TextEditor::Parenthesis::Type::Opened, QLatin1Char('{'), 0));
+    TextEditor::TextDocumentLayout::setParentheses(document->firstBlock().next(),
+            TextEditor::Parentheses() << TextEditor::Parenthesis(
+                    TextEditor::Parenthesis::Type::Closed, QLatin1Char('}'), 4));
 
     QString expected("{\n"
                      "}\n"
@@ -456,3 +410,5 @@ void AutoCompleterTests::test_insertCurlyBraceMatchInComment()
     QCOMPARE(ret, 1);
     QCOMPARE(document->toPlainText(), expected);
 }
+
+QTEST_MAIN(AutoCompleterTests)

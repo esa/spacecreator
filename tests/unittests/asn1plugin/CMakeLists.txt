@@ -1,1 +1,2 @@
+add_subdirectory(tst_autocompleter)
 add_subdirectory(tst_indenter)

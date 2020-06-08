@@ -25,9 +25,10 @@
 
 #pragma once
 
-#include <QObject>
+#include "astxmlparser.h"
 
-#include "../astxmlparser.h"
+#include <QObject>
+#include <QXmlStreamReader>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -67,7 +68,7 @@ private:
     void parse(const QString &xmlData);
 
     QXmlStreamReader m_xmlReader;
-    std::map<QString, std::unique_ptr<Data::File>> m_parsedData;
+    std::map<QString, std::unique_ptr<Asn1Acn::Internal::Data::File>> m_parsedData;
 };
 
 } // namespace Tests
