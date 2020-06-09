@@ -115,3 +115,6 @@ target_link_libraries(${LIB_NAME}
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC ANTLR4CPP_STATIC)
+
+source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
+source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

@@ -51,6 +51,9 @@ if (${QTC_FOUND})
     add_subdirectory(imports/asn1scc.IDE)
 endif()
 
+add_custom_target(DocuFiles SOURCES README.md doc/mainpage.md doc/architecture.md doc/msc_remote_handler.md)
+add_custom_target(BuildFiles SOURCES .gitlab-ci.yml _clang-format _clang-tidy lgpl.lic.qtc .gitattributes .gitignore)
+
 # Disable the asn1 plugin for now
 add_subdirectory(src)
 add_subdirectory(tests)

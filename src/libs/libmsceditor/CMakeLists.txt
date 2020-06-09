@@ -191,3 +191,6 @@ target_link_libraries(${LIB_NAME}
     Qt5::Widgets
     Qt5::WebSockets
 )
+
+source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
+source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")
