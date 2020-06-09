@@ -3,7 +3,7 @@
 # Variables:
 #
 # Input from the environment:
-# QTC_BUILD (root directory of the QtCreator binary installation)
+# QTC_INSTALL  (root directory of the QtCreator binary installation)
 # QTC_SOURCE (root directory of the QtCreator sources)
 #
 # Output:
@@ -14,7 +14,7 @@
 set(QTC_FOUND FALSE)
 
 find_path(QTC_LIB_DIR plugins/libTextEditor.so
-    "$ENV{QTC_BUILD}/lib/qtcreator"
+    "$ENV{QTC_INSTALL}/lib/qtcreator"
     /opt/qt-creator-dev/build-debug/lib/qtcreator
     /usr/lib/x86_64-linux-gnu/qtcreator
     C:/Qt/qtcreator-4.9.2
@@ -37,5 +37,5 @@ if (NOT EXISTS ${QTC_SOURCE_DIR})
     message("No QtCreator sources found - set the environemnt variable QTC_SOURCE to point to the sources directory")
 endif()
 if (NOT EXISTS ${QTC_LIB_DIR})
-    message("No QtCreator binaries found - set the environemnt variable QTC_BUILD to point to the binary directory")
+    message("No QtCreator binaries found - set the environemnt variable QTC_INSTALL  to point to the binary directory")
 endif()
