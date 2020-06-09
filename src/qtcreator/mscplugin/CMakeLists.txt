@@ -23,8 +23,8 @@ set(MSC_PLUGIN_SOURCES
 )
 
 set(MSC_QTC_LIBRARIES
-    -L${QTC_BUILD_DIR}/lib/qtcreator
-    -L${QTC_BUILD_DIR}/lib/qtcreator/plugins
+    -L${QTC_LIB_DIR}
+    -L${QTC_LIB_DIR}/plugins
     Aggregation
     ExtensionSystem
     Utils
