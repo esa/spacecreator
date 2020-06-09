@@ -11,8 +11,8 @@ add_executable(${TEST_NAME}
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 set(QTC_LIBRARIES
-    -L${QTC_BUILD_DIR}/lib/qtcreator
-    -L${QTC_BUILD_DIR}/lib/qtcreator/plugins
+    -L${QTC_LIB_DIR}
+    -L${QTC_LIB_DIR}/plugins
     Aggregation
     ExtensionSystem
     QtcSsh
@@ -40,5 +40,5 @@ target_include_directories(${TEST_NAME}
 )
 
 set_tests_properties(${TEST_NAME} PROPERTIES
-    ENVIRONMENT "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${QTC_BUILD_DIR}/lib/qtcreator:${QTC_BUILD_DIR}/lib/qtcreator/plugins"
+    ENVIRONMENT "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${QTC_LIB_DIR}:${QTC_LIB_DIR}/plugins"
 )
