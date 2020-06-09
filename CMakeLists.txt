@@ -46,13 +46,13 @@ enable_testing()
 include(QtCreatorCheck)
 if (${QTC_FOUND})
     message(STATUS "ASN.1 plugin is build")
-    message(STATUS "- QTC_SOURCE_DIR ${QTC_SOURCE_DIR}")
-    message(STATUS "- QTC_BUILD_DIR ${QTC_BUILD_DIR}")
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
     include(QtCreatorIDEBranding)
     include(QtCreatorAPI)
     add_subdirectory(imports/asn1scc.IDE)
 endif()
+
+add_custom_target(DocuFiles SOURCES README.md doc/mainpage.md doc/architecture.md doc/msc_remote_handler.md)
+add_custom_target(BuildFiles SOURCES .gitlab-ci.yml _clang-format _clang-tidy lgpl.lic.qtc .gitattributes .gitignore)
 
 # Disable the asn1 plugin for now
 add_subdirectory(src)

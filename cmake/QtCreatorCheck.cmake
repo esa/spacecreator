@@ -1,30 +1,41 @@
 # Check is the qtcreator source/build exists
 #
 # Variables:
+#
+# Input from the environment:
+# QTC_INSTALL  (root directory of the QtCreator binary installation)
+# QTC_SOURCE (root directory of the QtCreator sources)
+#
+# Output:
 # QTC_FOUND (true/false)
-# QTC_SOURCE_DIR (root directory of the QtCreator sourcees)
-# QTC_BUILD_DIR (root directory of the QtCreator binary installation)
+# QTC_SOURCE_DIR (root directory of the QtCreator sources)
+# QTC_LIB_DIR (Path to the directory of the qt libraries - plugins are in the "/plugins" directory)
 
-if($ENV{QTC_SOURCE})
-    set(QTC_SOURCE_DIR $ENV{QTC_SOURCE})
-else()
-    # fallback
-    set(QTC_SOURCE_DIR /opt/qt-creator-dev/qt-creator)
-endif()
-if($ENV{QTC_BUILD})
-    set(QTC_BUILD_DIR $ENV{QTC_BUILD})
-else()
-    # fallback
-    set(QTC_BUILD_DIR /opt/qt-creator-dev/build-debug)
+set(QTC_FOUND FALSE)
+
+find_path(QTC_LIB_DIR plugins/libTextEditor.so
+    "$ENV{QTC_INSTALL}/lib/qtcreator"
+    /opt/qt-creator-dev/build-debug/lib/qtcreator
+    /usr/lib/x86_64-linux-gnu/qtcreator
+    C:/Qt/qtcreator-4.9.2
+)
+
+find_path(QTC_SOURCE_DIR src/libs/extensionsystem/iplugin.h
+    "$ENV{QTC_SOURCE}"
+    "${QTC_SOURCE_DIR}/dev"
+    /opt/qt-creator-dev/qt-creator
+    "$ENV{HOME}/Qt/qt-creator"
+)
+
+if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
+    set(QTC_FOUND TRUE)
+    message(STATUS "QtCreator sources in ${QTC_SOURCE_DIR}")
+    message(STATUS "QtCreator libraries in ${QTC_LIB_DIR}")
 endif()
 
-set(QTC_FOUND TRUE)
-
-if (NOT EXISTS "${QTC_SOURCE_DIR}/src/app/qtcreator.rc")
-    message("Skipping ASN.1 plugin - could not find QtCreator sources in ${QTC_SOURCE_DIR}")
-    set(QTC_FOUND FALSE)
+if (NOT EXISTS ${QTC_SOURCE_DIR})
+    message("No QtCreator sources found - set the environemnt variable QTC_SOURCE to point to the sources directory")
 endif()
-if (NOT EXISTS "${QTC_BUILD_DIR}/lib/qtcreator/plugins/libTextEditor.so")
-    message("Skipping ASN.1 plugin - could not find QtCreator build in ${QTC_BUILD_DIR}")
-    set(QTC_FOUND FALSE)
+if (NOT EXISTS ${QTC_LIB_DIR})
+    message("No QtCreator binaries found - set the environemnt variable QTC_INSTALL  to point to the binary directory")
 endif()

@@ -25,3 +25,6 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Xml)
+
+source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
+source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")

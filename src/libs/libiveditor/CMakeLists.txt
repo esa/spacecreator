@@ -189,3 +189,6 @@ target_link_libraries(${LIB_NAME}
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
+
+source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
+source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")
