@@ -31,7 +31,8 @@ using namespace Asn1Acn::Internal::Libraries::Tests;
 ModuleMetadataParserTests::ModuleMetadataParserTests(QObject *parent)
     : QObject(parent)
     , m_parsedData(std::make_unique<Metadata::Module>("BadName", "BadDesc"))
-{}
+{
+}
 
 void ModuleMetadataParserTests::test_emptyFile()
 {
@@ -135,8 +136,8 @@ void ModuleMetadataParserTests::test_completeElement()
     QCOMPARE(static_cast<int>(submodule->elements().size()), 1);
     const auto element = submodule->elements().at(0).get();
 
-    QCOMPARE(element->asn1Files(), (QStringList{"f1", "f2", "f3"}));
-    QCOMPARE(element->additionalFiles(), (QStringList{"a1", "a2", "a3"}));
+    QCOMPARE(element->asn1Files(), (QStringList { "f1", "f2", "f3" }));
+    QCOMPARE(element->additionalFiles(), (QStringList { "a1", "a2", "a3" }));
 
     QCOMPARE(element->conflicts().size(), 2);
     QCOMPARE(element->conflicts().at(0).element(), QStringLiteral("c1"));
@@ -208,3 +209,5 @@ void ModuleMetadataParserTests::parse(const QString &jsonData)
     ModuleMetadataParser parser(jsonData.toUtf8());
     m_parsedData = parser.parse();
 }
+
+QTEST_MAIN(ModuleMetadataParserTests)

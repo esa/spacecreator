@@ -22,44 +22,38 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 ****************************************************************************/
-#pragma once
 
-#include <QObject>
+#include "filemodel_tests.h"
 
-#include "../modulemetadataparser.h"
+#include "modeltest.h"
 
-#include <libraries/metadata/module.h>
+#include <QDir>
+#include <QFileSystemModel>
+#include <QTest>
+#include <libraries/filemodel.h>
+#include <memory>
 
-namespace Asn1Acn {
-namespace Internal {
-namespace Libraries {
-namespace Tests {
+using namespace Asn1Acn::Internal;
+using namespace Asn1Acn::Internal::Libraries;
+using namespace Asn1Acn::Internal::Libraries::Tests;
 
-class ModuleMetadataParserTests : public QObject
+FileModelTests::FileModelTests(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit ModuleMetadataParserTests(QObject *parent = 0);
+}
 
-private Q_SLOTS:
-    void test_emptyFile();
-    void test_malformedJson();
-    void test_wrongJsonType();
-    void test_emptyObject();
-    void test_emptyModule();
-    void test_emptySubmodule();
-    void test_emptyElement();
-    void test_completeElement();
-    void test_complexReferences();
+void FileModelTests::test_emptyModel()
+{
+    const auto model = std::make_unique<FileModel>(this);
+    ModelTest testEmptyModel(model.get(), this);
+}
 
-private:
-    void parsingFails(const QString &jsonData);
-    void parse(const QString &jsonData);
+void FileModelTests::test_modelWithDummyPopulation()
+{
+    const auto model = std::make_unique<FileModel>(this);
+    model->setRootPath(QDir::currentPath());
 
-    std::unique_ptr<Metadata::Module> m_parsedData;
-};
+    ModelTest testNonEmptyModel(model.get(), this);
+}
 
-} // namespace Tests
-} // namespace Libraries
-} // namespace Internal
-} // namespace Asn1Acn
+QTEST_MAIN(FileModelTests)

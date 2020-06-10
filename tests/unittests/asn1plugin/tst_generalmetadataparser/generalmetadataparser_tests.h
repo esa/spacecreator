@@ -23,35 +23,35 @@
 **
 ****************************************************************************/
 
-#include "filemodel_tests.h"
+#pragma once
 
-#include <memory>
+#include "libraries/generalmetadataparser.h"
 
-#include <QDir>
-#include <QFileSystemModel>
+#include <QObject>
 
-#include <libraries/filemodel.h>
+namespace Asn1Acn {
+namespace Internal {
+namespace Libraries {
+namespace Tests {
 
-#include <3rdparty/tests/modeltest.h>
-
-using namespace Asn1Acn::Internal;
-using namespace Asn1Acn::Internal::Libraries;
-using namespace Asn1Acn::Internal::Libraries::Tests;
-
-FileModelTests::FileModelTests(QObject *parent)
-    : QObject(parent)
-{}
-
-void FileModelTests::test_emptyModel()
+class GeneralMetadataParserTests : public QObject
 {
-    const auto model = std::make_unique<FileModel>(this);
-    ModelTest testEmptyModel(model.get(), this);
-}
+    Q_OBJECT
+public:
+    explicit GeneralMetadataParserTests(QObject *parent = 0);
 
-void FileModelTests::test_modelWithDummyPopulation()
-{
-    const auto model = std::make_unique<FileModel>(this);
-    model->setRootPath(QDir::currentPath());
+private Q_SLOTS:
+    void test_empty();
+    void test_partiallyFilled();
+    void test_complete();
 
-    ModelTest testNonEmptyModel(model.get(), this);
-}
+private:
+    void parse(const QString &jsonData, const QString &path);
+
+    Metadata::General m_parsedData;
+};
+
+} // namespace Tests
+} // namespace Libraries
+} // namespace Internal
+} // namespace Asn1Acn

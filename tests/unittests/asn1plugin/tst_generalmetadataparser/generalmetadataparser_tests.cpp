@@ -31,7 +31,8 @@ using namespace Asn1Acn::Internal::Libraries::Tests;
 GeneralMetadataParserTests::GeneralMetadataParserTests(QObject *parent)
     : QObject(parent)
     , m_parsedData("BadName", "BadPath")
-{}
+{
+}
 
 void GeneralMetadataParserTests::test_empty()
 {
@@ -63,7 +64,7 @@ void GeneralMetadataParserTests::test_complete()
           R"("vendor": "MyVendor",)"
           R"("description": "SomeDescription",)"
           R"("license": "GPL"})",
-          "/some/path/with/LibName");
+            "/some/path/with/LibName");
 
     QCOMPARE(m_parsedData.name(), QLatin1Literal("InnerName"));
     QCOMPARE(m_parsedData.path(), QLatin1Literal("/some/path/with/LibName"));
@@ -78,3 +79,5 @@ void GeneralMetadataParserTests::parse(const QString &jsonData, const QString &p
     GeneralMetadataParser parser(jsonData.toUtf8(), path);
     m_parsedData = parser.parse();
 }
+
+QTEST_MAIN(GeneralMetadataParserTests)
