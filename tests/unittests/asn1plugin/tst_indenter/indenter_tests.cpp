@@ -41,7 +41,11 @@ IndenterTests::IndenterTests(QObject *parent)
 void IndenterTests::initTestCase()
 {
     m_document = new QTextDocument;
+#if QTC_VERSION == 480
+    m_indenter = new Indenter();
+#else
     m_indenter = new Indenter(m_document);
+#endif
 
     m_document->setPlainText(
             /*  0 */ "    TestingAutocompletion DEFINITIONS ::= BEGIN\n"

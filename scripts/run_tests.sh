@@ -5,7 +5,7 @@ if [ ! $1 ] ; then
     exit 1
 fi
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/qt-creator-dev/build-debug/lib/qtcreator:/opt/qt-creator-dev/build-debug/lib/qtcreator/plugins
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
 
 BUILD_DIR=$1
 
