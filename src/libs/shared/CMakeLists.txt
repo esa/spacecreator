@@ -28,6 +28,8 @@ target_sources(${LIB_NAME} PRIVATE
     common.h
     delayedsignal.cpp
     delayedsignal.h
+    geometry.cpp
+    geometry.h
     graphicsviewutils.cpp
     graphicsviewutils.h
     plugin.cpp

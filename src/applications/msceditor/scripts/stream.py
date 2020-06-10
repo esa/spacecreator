@@ -20,7 +20,7 @@ with open('astream.json') as json_file:
 def run(*args):
     global idx
     print(idx, len(actions))
-    # time.sleep(0)
+    time.sleep(1)
 
     msg = actions[idx]
     idx += 1

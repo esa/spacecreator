@@ -18,10 +18,12 @@
 #include "mainwindow.h"
 
 #include "baseitems/common/coordinatesconverter.h"
+#include "chartitem.h"
 #include "chartviewmodel.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
+#include "geometry.h"
 #include "graphicsview.h"
 #include "mainmodel.h"
 #include "messagedeclarationsdialog.h"
@@ -69,6 +71,7 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 #include <QMimeData>
+#include <QScreen>
 #include <QToolBar>
 #include <QUndoGroup>
 #include <QUndoStack>
@@ -112,6 +115,8 @@ struct MainWindow::MainWindowPrivate {
     RemoteControlHandler *m_remoteControlHandler = nullptr;
 
     bool m_dropUnsavedChangesSilently = false;
+
+    bool m_streamingMode = false;
 };
 
 /*!
@@ -692,6 +697,8 @@ void MainWindow::initConnections()
         QFileInfo fileInfo(filename);
         d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     });
+
+    connect(d->m_model->graphicsScene(), &QGraphicsScene::sceneRectChanged, this, &MainWindow::adaptWindowSizeToChart);
 }
 
 /*!
@@ -709,6 +716,8 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return openMscChain(value);
     case shared::CommandLineParser::Positional::StartRemoteControl:
         if (startRemoteControl(value.toUShort())) {
+            d->m_streamingMode = true;
+            showDocumentView(true);
             menuBar()->setVisible(false);
 
             d->m_plugin->mscToolBar()->setVisible(false);
@@ -1084,6 +1093,24 @@ void MainWindow::saveScreenshot()
     }
 }
 
+void MainWindow::adaptWindowSizeToChart(const QRectF &rect)
+{
+    if (!d->m_streamingMode) {
+        return;
+    }
+
+    QRect windowRect = geometry();
+    QRect widgetRect = d->ui->graphicsView->geometry();
+    const QSize offsets(windowRect.width() - widgetRect.width(), windowRect.height() - widgetRect.height());
+    widgetRect = rect.marginsAdded(ChartItem::chartMargins()).toRect();
+    windowRect.setSize(rect.size().toSize() + offsets);
+
+    const QRect availableRect = screen()->availableGeometry();
+    windowRect = shared::rectInRect(windowRect, availableRect);
+
+    setGeometry(windowRect);
+}
+
 void MainWindow::saveSceneRender(const QString &filePath) const
 {
     if (filePath.isEmpty())
@@ -1096,6 +1123,18 @@ void MainWindow::saveSceneRender(const QString &filePath) const
         scene->render(&p);
         img.save(filePath);
     }
+}
+
+/**
+   @todo With Qt >= 5.14 use QWidget::screen()
+ */
+QScreen *MainWindow::screen() const
+{
+    if (auto screenByPos = QGuiApplication::screenAt(geometry().center())) {
+        return screenByPos;
+    }
+
+    return QGuiApplication::primaryScreen();
 }
 
 }

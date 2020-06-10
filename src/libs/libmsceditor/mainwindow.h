@@ -24,6 +24,7 @@
 #include <QModelIndex>
 #include <memory>
 
+class QScreen;
 class QUndoStack;
 
 namespace Ui {
@@ -91,6 +92,9 @@ public Q_SLOTS:
     void updateZoomBox(double percent);
     void saveScreenshot();
 
+private Q_SLOTS:
+    void adaptWindowSizeToChart(const QRectF &rect);
+
 private:
     static const QLatin1String DotMscFileExtensionLow;
 
@@ -131,6 +135,8 @@ private:
     msc::BaseTool *activeTool() const;
 
     void saveSceneRender(const QString &filePath) const;
+
+    QScreen *screen() const;
 };
 
 }
