@@ -25,6 +25,134 @@
 
 #include "icdbuilder.h"
 
+#if QTC_VERSION == 480
+
+#include <QStringList>
+
+#include <projectexplorer/buildconfiguration.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projectnodes.h>
+#include <projectexplorer/target.h>
+
+#include <kitinformation.h>
+
+#include <utils/mimetypes/mimedatabase.h>
+
+#include "asn1acnconstants.h"
+
+using namespace Asn1Acn::Internal;
+using namespace Asn1Acn::Internal::Icnd;
+
+static const char ICD_BS_ID[] = "ASN1ACN.ICDBuildStep";
+static QString OUTPUT_PATH(QDir::toNativeSeparators("asn1sccGenerated/icd/"));
+
+Asn1AcnBuildStep *ICDBuilder::createStep(ProjectExplorer::BuildStepList *stepList) const
+{
+    return new ICDBuildStep(stepList);
+}
+
+QString ICDBuilder::progressLabelText() const
+{
+    return QStringLiteral("icd");
+}
+
+ICDBuildStep::ICDBuildStep(ProjectExplorer::BuildStepList *parent)
+    : Asn1AcnBuildStep(parent, ICD_BS_ID, QStringLiteral("icd"))
+    , m_outputFilename("icd.html")
+{}
+
+bool ICDBuildStep::init(QList<const BuildStep *> &earlierSteps)
+{
+    if (!updateRunParams()) {
+        addOutput(tr("Could not initialize build params"), BuildStep::OutputFormat::ErrorMessage);
+        return false;
+    }
+
+    return Asn1AcnBuildStep::init(earlierSteps);
+}
+
+bool ICDBuildStep::updateRunParams()
+{
+    return updateOutputDirectory(buildConfiguration()) && updateAsn1SccCommand()
+           && updateSourcesList();
+}
+
+bool ICDBuildStep::updateOutputDirectory(const ProjectExplorer::BuildConfiguration *bc)
+{
+    m_outputPath = bc->buildDirectory().appendPath(OUTPUT_PATH).toString();
+
+    if (!QDir::root().mkpath(m_outputPath)) {
+        addOutput(tr("Could not create ICD output directory ") + m_outputPath,
+                  BuildStep::OutputFormat::ErrorMessage);
+        return false;
+    }
+
+    return true;
+}
+
+bool ICDBuildStep::updateAsn1SccCommand()
+{
+    m_asn1sccCommand = KitInformation::hasAsn1Exe(target()->kit())
+                           ? KitInformation::asn1Exe(target()->kit()).toString()
+                           : QString();
+
+    if (m_asn1sccCommand.isEmpty()) {
+        addOutput(tr("Asn1scc compiler is not defined"), BuildStep::OutputFormat::ErrorMessage);
+        return false;
+    }
+
+    return true;
+}
+
+bool ICDBuildStep::updateSourcesList()
+{
+    const auto project = target()->project();
+
+    m_sources = project->files([](const ProjectExplorer::Node *n) {
+        if (const auto fn = n->asFileNode())
+            return Utils::mimeTypeForFile(fn->filePath().toString()).name()
+                   == Constants::ASN1_MIMETYPE;
+        return false;
+    });
+
+    if (m_sources.isEmpty()) {
+        addOutput(tr("No ASN.1 present in project"), BuildStep::OutputFormat::ErrorMessage);
+        return false;
+    }
+
+    return true;
+}
+
+namespace {
+QString quoteOne(const QString &file)
+{
+    return QLatin1Char('"') + file + QLatin1Char('"');
+}
+
+QStringList quoteList(const Utils::FileNameList &files)
+{
+    QStringList res;
+    for (const auto &file : files)
+        res << quoteOne(file.toString());
+    return res;
+}
+} // namespace
+
+QString ICDBuildStep::arguments() const
+{
+    const auto in = quoteList(m_sources).join(QLatin1Char(' '));
+    const auto out = quoteOne(m_outputPath + m_outputFilename);
+
+    return QString(" -icdAcn ") + out + QString(" ") + in;
+}
+
+QString ICDBuildStep::executablePath() const
+{
+    return m_asn1sccCommand;
+}
+
+#else
+
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QObject>
@@ -168,3 +296,5 @@ void IcdBuilder::run(ProjectExplorer::Project *project)
 
     BuildManager::buildList(steps);
 }
+
+#endif

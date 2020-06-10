@@ -13,7 +13,7 @@ build_debian10_gcc:
   image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
   script:
     - mkdir -p build; cd build
-    - cmake -GNinja ..
+    - cmake -GNinja -DQTC_VERSION=409 -DQTC_VERSION_STR="4.9.0" ..
     - ninja
   artifacts:
     paths:

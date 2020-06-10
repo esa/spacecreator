@@ -1,9 +1,9 @@
 #BINARY_ARTIFACTS_BRANCH = master
 #PROJECT_USER_FILE_EXTENSION = .user
 
-set(IDE_VERSION "4.9.0")               # The IDE version.
-set(IDE_VERSION_COMPAT "4.9.0")        # The IDE Compatibility version.
-set(IDE_VERSION_DISPLAY "4.9.0")       # The IDE display version.
+set(IDE_VERSION ${QTC_VERSION_STR})               # The IDE version.
+set(IDE_VERSION_COMPAT ${QTC_VERSION_STR})        # The IDE Compatibility version.
+set(IDE_VERSION_DISPLAY ${QTC_VERSION_STR})       # The IDE display version.
 set(IDE_COPYRIGHT_YEAR "2018")          # The IDE copyright year.
 
 set(IDE_SETTINGSVARIANT "QtProject")                  # The IDE settings variation.

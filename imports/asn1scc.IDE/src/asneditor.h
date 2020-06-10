@@ -57,7 +57,8 @@ class AsnEditorWidget : public EditorWidget
 public:
     explicit AsnEditorWidget();
 
-    void findUsages() override;
+    //    void findUsages() override;
+    void findUsages();
 
 protected:
     void findLinkAt(const QTextCursor &,

@@ -215,6 +215,8 @@ void Asn1AcnPlugin::initializeFindUsagesAction(ActionContainer *toolsMenu,
     m_findUsagesAction = action;
 }
 
+#if QTC_VERSION == 480
+#else
 void Asn1AcnPlugin::addBuildICDToToolsMenu(ActionContainer *toolsMenu)
 {
     auto action = new Utils::ParameterAction(tr("Build ICD..."),
@@ -259,6 +261,7 @@ void Asn1AcnPlugin::addBuildICDToProjectMenu()
                                                        projectTreeContext);
     menu->addAction(command, ProjectExplorer::Constants::G_PROJECT_FILES);
 }
+#endif
 
 void Asn1AcnPlugin::initializeGenerateTestsAction(ActionContainer *toolsMenu,
                                                   Settings::FuzzerConstPtr settings)
@@ -291,8 +294,11 @@ void Asn1AcnPlugin::initializeGenerateTestsAction(ActionContainer *toolsMenu,
 
 void Asn1AcnPlugin::initializeBuildICDAction(ActionContainer *toolsMenu)
 {
+#if QTC_VERSION == 480
+#else
     addBuildICDToProjectMenu();
     addBuildICDToToolsMenu(toolsMenu);
+#endif
 }
 
 static EditorWidget *currentEditorWidget()
@@ -304,8 +310,11 @@ static EditorWidget *currentEditorWidget()
 
 void Asn1AcnPlugin::findUsages()
 {
+#if QTC_VERSION == 480
+#else
     if (auto editorWidget = currentEditorWidget())
         editorWidget->findUsages();
+#endif
 }
 
 void Asn1AcnPlugin::initializeSwitchAction(ActionContainer *toolsMenu,

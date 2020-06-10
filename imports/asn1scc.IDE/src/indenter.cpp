@@ -31,6 +31,56 @@
 
 using namespace Asn1Acn::Internal;
 
+#if QTC_VERSION == 480
+Indenter::Indenter() {}
+
+Indenter::~Indenter() {}
+
+bool Indenter::isElectricCharacter(const QChar &ch) const
+{
+    return ch == QLatin1Char('{') || ch == QLatin1Char('}');
+}
+
+static int adjustForClosingBracket(const QTextBlock &block)
+{
+    QString currentText = block.text();
+    const auto closingCount = currentText.count(QLatin1Char('}'));
+    if (closingCount <= 0)
+        return 0;
+    const auto openingCount = currentText.count(QLatin1Char('{'));
+    if (closingCount > openingCount)
+        return closingCount - openingCount;
+    return 0;
+}
+
+int Indenter::indentFor(const QTextBlock &block, const TextEditor::TabSettings &tabSettings)
+{
+    QTextBlock previous = block.previous();
+    if (!previous.isValid())
+        return 0;
+
+    QString currentText = block.text();
+    if (!currentText.remove(QRegularExpression("[{}]")).trimmed().isEmpty())
+        return tabSettings.indentationColumn(block.text());
+
+    QString previousText = previous.text();
+    while (previousText.trimmed().isEmpty()) {
+        previous = previous.previous();
+        if (!previous.isValid())
+            return 0;
+        previousText = previous.text();
+    }
+
+    int indent = tabSettings.indentationColumn(previousText);
+
+    int adjust = previousText.count(QLatin1Char('{')) - previousText.count(QLatin1Char('}'));
+    adjust -= adjustForClosingBracket(block);
+    adjust *= tabSettings.m_indentSize;
+
+    return qMax(0, indent + adjust);
+}
+
+#else
 Indenter::Indenter(QTextDocument *doc)
     : TextEditor::TextIndenter(doc)
 {}
@@ -82,3 +132,4 @@ int Indenter::indentFor(const QTextBlock &block,
 
     return qMax(0, indent + adjust);
 }
+#endif
