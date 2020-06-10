@@ -1,7 +1,7 @@
 {
     \"Name\" : \"MscPlugin\",
     \"Version\" : \"0.0.1\",
-    \"CompatVersion\" : \"0.0.1\",
+    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"ESA\",
     \"Copyright\" : \"(C) 2019 European Space Agency\",
     \"License\" : \"LGPL 2.1\",

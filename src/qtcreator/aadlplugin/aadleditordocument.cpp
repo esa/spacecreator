@@ -23,6 +23,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextDocument>
+#include <fileutils.h>
 
 using namespace Utils;
 

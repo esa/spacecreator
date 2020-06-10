@@ -24,6 +24,52 @@
 ****************************************************************************/
 #pragma once
 
+#if QTC_VERSION == 480
+#include <projectexplorer/abstractprocessstep.h>
+
+#include "asn1acnbuildstep.h"
+#include "asn1acnbuildsteprunner.h"
+
+namespace Asn1Acn {
+namespace Internal {
+namespace Icnd {
+
+class ICDBuilder : public Asn1AcnBuildStepRunner
+{
+private:
+    Asn1AcnBuildStep *createStep(ProjectExplorer::BuildStepList *stepList) const override;
+    QString progressLabelText() const override;
+};
+
+class ICDBuildStep : public Asn1AcnBuildStep
+{
+    Q_OBJECT
+
+public:
+    explicit ICDBuildStep(ProjectExplorer::BuildStepList *parent);
+
+    bool init(QList<const BuildStep *> &earlierSteps) override;
+
+private:
+    bool updateRunParams();
+    bool updateOutputDirectory(const ProjectExplorer::BuildConfiguration *bc);
+    bool updateAsn1SccCommand();
+    bool updateSourcesList();
+
+    QString arguments() const override;
+    QString executablePath() const override;
+
+    QString m_asn1sccCommand;
+    QString m_outputPath;
+    const QString m_outputFilename;
+    Utils::FileNameList m_sources;
+};
+
+} // namespace Icnd
+} // namespace Internal
+} // namespace Asn1Acn
+
+#else
 #include <projectexplorer/project.h>
 #include <projectexplorer/session.h>
 
@@ -43,3 +89,4 @@ public:
 } // namespace Icd
 } // namespace Internal
 } // namespace Asn1Acn
+#endif

@@ -45,6 +45,7 @@ enable_testing()
 
 include(QtCreatorCheck)
 if (${QTC_FOUND})
+    add_definitions(-DQTC_VERSION=${QTC_VERSION})
     message(STATUS "ASN.1 plugin is build")
     include(QtCreatorIDEBranding)
     include(QtCreatorAPI)

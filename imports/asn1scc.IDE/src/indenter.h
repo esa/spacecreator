@@ -25,6 +25,28 @@
 
 #pragma once
 
+#if QTC_VERSION == 480
+
+#include <texteditor/indenter.h>
+
+namespace Asn1Acn {
+namespace Internal {
+
+class Indenter : public TextEditor::Indenter
+{
+public:
+    Indenter();
+    ~Indenter();
+
+    bool isElectricCharacter(const QChar &ch) const override;
+
+    int indentFor(const QTextBlock &block, const TextEditor::TabSettings &tabSettings) override;
+};
+
+} // namespace Internal
+} // namespace Asn1Acn
+
+#else
 #include <texteditor/textindenter.h>
 
 namespace Asn1Acn {
@@ -45,3 +67,4 @@ public:
 
 } // namespace Internal
 } // namespace Asn1Acn
+#endif

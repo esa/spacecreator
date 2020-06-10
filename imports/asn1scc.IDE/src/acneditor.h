@@ -55,7 +55,11 @@ class AcnEditorWidget : public EditorWidget
 public:
     explicit AcnEditorWidget() = default;
 
+#if QTC_VERSION == 480
+    void findUsages();
+#else
     void findUsages() override;
+#endif
 };
 
 } // namespace Internal

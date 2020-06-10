@@ -65,7 +65,11 @@ AsnEditorFactory::AsnEditorFactory()
 
     setCompletionAssistProvider(new Completion::AsnCompletionAssistProvider);
     setAutoCompleterCreator([]() { return new Completion::AutoCompleter; });
-    setIndenterCreator([](QTextDocument *doc) { return new Indenter{doc}; });
+#if QTC_VERSION == 480
+    setIndenterCreator([]() { return new Indenter(); });
+#else
+    setIndenterCreator([](QTextDocument *doc) { return new Indenter(doc); });
+#endif
 
     addHoverHandler(new TextEditor::BaseHoverHandler);
 
@@ -81,9 +85,8 @@ AsnEditorFactory::AsnEditorFactory()
 }
 
 AsnEditorWidget::AsnEditorWidget()
-    : m_usagesFinder(new UsagesFinder(ParsedDataStorage::instance(),
-                                      std::make_unique<FileSourceReader>(),
-                                      this))
+    : m_usagesFinder(
+        new UsagesFinder(ParsedDataStorage::instance(), std::make_unique<FileSourceReader>(), this))
 {}
 
 void AsnEditorWidget::findLinkAt(const QTextCursor &cursor,
