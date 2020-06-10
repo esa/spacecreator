@@ -24,9 +24,9 @@
 ****************************************************************************/
 #pragma once
 
-#include <QObject>
+#include "tree-views/displayrolevisitor.h"
 
-#include "../displayrolevisitor.h"
+#include <QObject>
 
 namespace Asn1Acn {
 namespace Internal {

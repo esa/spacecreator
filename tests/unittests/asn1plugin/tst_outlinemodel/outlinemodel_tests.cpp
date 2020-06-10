@@ -24,14 +24,14 @@
 ****************************************************************************/
 #include "outlinemodel_tests.h"
 
-#include "../outlinemodel.h"
+#include "modeltest.h"
+#include "tree-views/outlinemodel.h"
 
-#include <data/definitions.h>
-#include <data/file.h>
-#include <data/typeassignment.h>
-#include <data/types/builtintypes.h>
-
-#include <3rdparty/tests/modeltest.h>
+#include <QTest>
+#include <definitions.h>
+#include <file.h>
+#include <typeassignment.h>
+#include <types/builtintypes.h>
 
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::TreeViews;
@@ -39,9 +39,10 @@ using namespace Asn1Acn::Internal::TreeViews::Tests;
 
 OutlineModelTests::OutlineModelTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
-OutlineModelTests::~OutlineModelTests() {}
+OutlineModelTests::~OutlineModelTests() { }
 
 void OutlineModelTests::test_emptyModel()
 {
@@ -53,28 +54,18 @@ void OutlineModelTests::test_modelWithDummyPopulation()
     const QString filePath("file.asn1");
     const auto root = std::make_unique<Data::File>(filePath);
 
-    auto definitions1
-        = std::make_unique<Data::Definitions>("Module1", Data::SourceLocation{"file1.asn1", 0, 0});
-    definitions1->addType(
-        std::make_unique<Data::TypeAssignment>("Num1",
-                                               Data::SourceLocation{"file1.asn1", 2, 3},
-                                               std::make_unique<Data::Types::Integer>()));
-    definitions1->addType(
-        std::make_unique<Data::TypeAssignment>("Num2",
-                                               Data::SourceLocation{"file1.asn1", 3, 3},
-                                               std::make_unique<Data::Types::Integer>()));
+    auto definitions1 = std::make_unique<Data::Definitions>("Module1", Data::SourceLocation { "file1.asn1", 0, 0 });
+    definitions1->addType(std::make_unique<Data::TypeAssignment>(
+            "Num1", Data::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Data::Types::Integer>()));
+    definitions1->addType(std::make_unique<Data::TypeAssignment>(
+            "Num2", Data::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Data::Types::Integer>()));
     root->add(std::move(definitions1));
 
-    auto definitions2
-        = std::make_unique<Data::Definitions>("Module2", Data::SourceLocation{"file1.asn1", 5, 0});
-    definitions2->addType(
-        std::make_unique<Data::TypeAssignment>("Num3",
-                                               Data::SourceLocation{"file1.asn1", 6, 3},
-                                               std::make_unique<Data::Types::Integer>()));
-    definitions2->addType(
-        std::make_unique<Data::TypeAssignment>("Num4",
-                                               Data::SourceLocation{"file1.asn1", 7, 3},
-                                               std::make_unique<Data::Types::Integer>()));
+    auto definitions2 = std::make_unique<Data::Definitions>("Module2", Data::SourceLocation { "file1.asn1", 5, 0 });
+    definitions2->addType(std::make_unique<Data::TypeAssignment>(
+            "Num3", Data::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Data::Types::Integer>()));
+    definitions2->addType(std::make_unique<Data::TypeAssignment>(
+            "Num4", Data::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Data::Types::Integer>()));
     root->add(std::move(definitions2));
 
     auto model = new OutlineModel(Utils::FileName::fromString(filePath), this);
@@ -82,3 +73,5 @@ void OutlineModelTests::test_modelWithDummyPopulation()
 
     ModelTest testNonEmptyModel(model, this);
 }
+
+QTEST_MAIN(OutlineModelTests)

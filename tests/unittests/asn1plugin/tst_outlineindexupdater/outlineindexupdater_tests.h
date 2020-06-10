@@ -24,12 +24,11 @@
 ****************************************************************************/
 #pragma once
 
+#include "tree-views/outlineindexupdater.h"
+
 #include <QObject>
 #include <QSignalSpy>
-
 #include <asn1/node.h>
-
-#include "../outlineindexupdater.h"
 
 namespace Asn1Acn {
 namespace Internal {
