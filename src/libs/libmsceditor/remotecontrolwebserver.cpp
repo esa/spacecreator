@@ -37,61 +37,61 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
 }
 
 /*!
-   \class msc::RemoteControlWebServer
-   \brief Handles remote control commands and arguments compounded in json packet using websocket. JSON structure:
-    \quotation
-        {
-            "CommandType": "command",
-            "Parameters": {
-                             "parameter1": "parameter1Value",
-                             "parameter2": "parameter2Value",
-                             "parameter3": "parameter3Value",
-                             ...
-                          }
+\class msc::RemoteControlWebServer
+\brief Handles remote control commands and arguments compounded in json packet using websocket. JSON structure:
+
+    {
+        "CommandType": "command",
+        "Parameters": {
+            "parameter1": "parameter1Value",
+            "parameter2": "parameter2Value",
+            "parameter3": "parameter3Value",
+            ...
         }
-    \endquotation
-    Implemented commands and parameters list:
-    \list
-    \li \c Instance - creating new Instance
-        \list
-        \li \c name - Instance's Name, command fails if CHart already has Instance with this name, optional
-        \li \c exStop - Explicit stop {True, False=default}, optional
-        \endlist
-    \li \c Message - creating new Message, command fails if neither \c srcName nor \c dstName parameter set.
-        \list
-        \li \c name - Message's Name, optional
-        \li \c srcName - source Instance's Name, command fails if Chart doesn't have Instance with this name
-        \li \c dstName - target Instance's Name, command fails if Chart doesn't have Instance with this name
-        \li \c MessageType - type of \c Message, optional
-            \list
-            \li \c Message - default
-            \li \c Create
-            \endlist
-        \endlist
-    \li \c Timer - creating new Timer
-        \list
-        \li \c name - Timer's Name, optional
-        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name,
-   mandatory \li \c TimerType - type of \c Timer, optional \list \li \c Start \li \c Stop \li \c Timeout \li \c Unknown
-   - default \endlist \endlist \li \c Action - creating new Action \list \li \c name - Action's Name, optional \li \c
-   instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
-        \endlist
-    \li \c Condition - creating new Condition
-        \list
-        \li \c name - Condition's Name, optional
-        \li \c instanceName - linked Instance's Name, command fails if Chart doesn't have Instance with this name,
-   mandatory \li \c shared - is it shared Condition, optional, default No \endlist \endlist \li \c VisibleItemLimit -
-   limit visible events in the scene \list \li \c number - count of visible items, -1 if all of them should be visible
-        \endlist
-    \endlist
-    After command processing returns JSON packet:
-    \quotation
-        {
-            "result": True,
-            "errorString": "Short error description"
-        }
-    \endquotation
-   \inmodule MscEditor
+    }
+
+Implemented commands and parameters list:
+
+- **Instance** - creating new Instance
+    + **name** - Instance's Name, command fails if CHart already has Instance with this name, optional
+    + **exStop** - Explicit stop {True, False=default}, optional
+- **Message** - creating new Message, command fails if neither **srcName** nor **dstName** parameter set.
+    + **name** - Message's Name, optional
+    + **srcName** - source Instance's Name, command fails if Chart doesn't have Instance with this name
+    + **dstName** - target Instance's Name, command fails if Chart doesn't have Instance with this name
+    + **MessageType** - type of **Message**, optional
+        + **Message** - default
+        + **Create**
+- **Timer** - creating new Timer
+    + **name** - Timer's Name, optional
+    + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+    + **TimerType** - type of **Timer**, optional
+        + **Start**
+        + **Stop**
+        + **Timeout**
+        + **Unknown**
+- **Action** - creating new Action
+   + **name** - Action's Name, optional
+   + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+- **Condition** - creating new Condition
+    + **name** - Condition's Name, optional
+    + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name,mandatory
+    + **shared** - is it shared Condition, optional, default No
+- **Undo** - revert the last command
+- **Redo** - Redo the last reverted comand
+- **Save** - save the current chart to a file
+    + **fileName** - name of the file to save to
+- **VisibleItemLimit** - limit visible events in the scene
+   + **number** - count of visible items, -1 if all of them should be visible
+
+After command processing returns JSON packet:
+
+    {
+        "result": True,
+        "errorString": "Short error description"
+    }
+
+\ingroup MscEditor
  */
 
 RemoteControlWebServer::RemoteControlWebServer(QObject *parent)

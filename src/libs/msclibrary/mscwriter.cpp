@@ -44,7 +44,7 @@
 namespace msc {
 
 /*!
- * \clas MscWriter
+ * \class MscWriter
  *
  * This class writes an MSC model to a file.
  */

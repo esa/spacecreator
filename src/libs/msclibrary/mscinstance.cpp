@@ -37,8 +37,8 @@ MscInstance::MscInstance(const QString &name, QObject *parent)
 
 /*!
    In an older standrad it says:
-   <kind denominator> ::= system | block | process | service
-   But in newest ones it's just a <name>
+   \<kind denominator\> ::= system | block | process | service
+   But in newest ones it's just a \<name\>
  */
 const QString &MscInstance::denominator() const
 {

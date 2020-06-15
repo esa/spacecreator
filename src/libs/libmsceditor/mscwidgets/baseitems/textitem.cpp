@@ -34,7 +34,7 @@ static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
   \class msc::TextItem
   \brief Text holder with customizable alignment, background and frame.
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

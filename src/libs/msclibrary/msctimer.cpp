@@ -148,7 +148,7 @@ bool MscTimer::allowFollowingTimer(MscTimer *timer)
 
 /*!
    \fn MscTimer::timerInstanceName
-   Where the <timer name> is not sufficient for a unique mapping the <timer instance name> must be
+   Where the \<timer name\> is not sufficient for a unique mapping the \<timer instance name\> must be
    employed.
  */
 const QString &MscTimer::timerInstanceName() const

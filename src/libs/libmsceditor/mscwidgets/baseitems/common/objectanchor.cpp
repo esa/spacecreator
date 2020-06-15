@@ -25,7 +25,7 @@ namespace msc {
   \class msc::ObjectAnchor
   \brief Handler for an object and its point (scene coordinates).
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

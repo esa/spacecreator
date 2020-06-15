@@ -47,7 +47,7 @@ The type of the document is stored as comment of that document.
 The second part is for editing a MSC chart. One important aspect of the editing are the message parameters. There ASN.1 is used for the parameters.
 Another aspect is, that the layout is not purely automatic. When moving entities (instances, messages, ...) the geometry information is stored as comment in CIF format. Where the geometry unit is mm (dpi of the monitor is used).
 
-One special mode exists for the editor. The "MSC Remote Handler" or "Streaming" mode. There a Websocket interface is used to edit a MSC chart. Information about the msc remote handling can be found in [MSC Remote Handler](msc_remote_handler.md).
+One special mode exists for the editor. The "MSC Remote Handler" or "Streaming" mode. There a Websocket interface is used to edit a MSC chart. Information about the msc remote handling can be found in [MSC Remote Handler](@ref RemotehandlerPage).
 
 To learn more about MSC, see [MSC Wiki Page](https://en.wikipedia.org/wiki/Message_sequence_chart) and the official specification http://www.itu.int/rec/T-REC-Z.120.
 
@@ -56,4 +56,4 @@ Note: the MSC parser is not 100% able to parse all specified documents. On the o
 
 # Internal Architecture
 
-Details on the architecture of is described in [Architecture documentation](architecture.md)
+Details on the architecture of is described in [Architecture documentation](@ref ArchitecturePage)

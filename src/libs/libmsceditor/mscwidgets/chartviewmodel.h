@@ -64,6 +64,7 @@ public:
 
     QGraphicsScene *graphicsScene() const;
 
+    void setCurrentChart(msc::MscChart *chart);
     msc::MscChart *currentChart() const;
 
     void clearScene();
@@ -106,7 +107,6 @@ public:
 
 public Q_SLOTS:
     void updateLayout();
-    void fillView(msc::MscChart *chart);
     void updateChartboxToContent();
     void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);

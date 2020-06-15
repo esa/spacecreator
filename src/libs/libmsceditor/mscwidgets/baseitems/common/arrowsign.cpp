@@ -24,7 +24,7 @@ namespace msc {
   \class msc::ArrowSign
   \brief An arrow head/tail triangle holder
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

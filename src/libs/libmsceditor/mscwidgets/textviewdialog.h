@@ -28,7 +28,7 @@ class MscModel;
 
 /*!
   \class msc::TextViewDialog
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
   A text view of the current model. The text is the same as if it would be saved to a file.
 */

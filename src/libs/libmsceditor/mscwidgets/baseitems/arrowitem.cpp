@@ -31,7 +31,7 @@ namespace msc {
   \class msc::ArrowItem
   \brief Arrow pointing to the "end" ObjectAnchor instance.
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

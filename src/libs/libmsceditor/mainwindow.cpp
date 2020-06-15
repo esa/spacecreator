@@ -122,6 +122,7 @@ struct MainWindow::MainWindowPrivate {
 
 /*!
  * \brief MainWindow::MainWindow Create an empty view.
+ * \param plugin hosts most code of the code for the MSC Editor UI of type \ref msc::MSCPlugin
  * \param parent
  */
 MainWindow::MainWindow(msc::MSCPlugin *plugin, QWidget *parent)
@@ -392,7 +393,7 @@ void MainWindow::showChart(const QModelIndex &index)
 
     if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
         if (!document->charts().empty()) {
-            d->m_model->chartViewModel().fillView(document->charts()[0]);
+            d->m_model->chartViewModel().setCurrentChart(document->charts()[0]);
             showDocumentView(true);
         }
     }
@@ -412,7 +413,7 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 
     if (auto chart = dynamic_cast<msc::MscChart *>(obj)) {
-        d->m_model->chartViewModel().fillView(chart);
+        d->m_model->chartViewModel().setCurrentChart(chart);
         showDocumentView(true);
     } else {
         showHierarchyView(true);

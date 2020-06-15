@@ -91,7 +91,7 @@ void tst_ChartViewModel::parseMsc(const QString &mscText)
     } else {
         m_chart = m_mscModel->charts().at(0);
     }
-    m_chartModel->fillView(m_chart);
+    m_chartModel->setCurrentChart(m_chart);
     QApplication::processEvents();
 
     for (MscInstance *instance : m_chart->instances()) {

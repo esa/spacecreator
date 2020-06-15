@@ -60,7 +60,7 @@ void tst_ArrowItem::initTestCase()
 {
     m_model.reset(new ChartViewModel);
     m_chart.reset(new msc::MscChart);
-    m_model->fillView(m_chart.data());
+    m_model->setCurrentChart(m_chart.data());
     m_scene.reset(new QGraphicsScene);
     m_item1 = m_model->createDefaultInstanceItem();
     m_item2 = m_model->createDefaultInstanceItem();

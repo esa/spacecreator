@@ -30,7 +30,7 @@ namespace ui {
   \class shared::ui::GripPointsHandler
   \brief Set of handlers (up to 9) for resizing/moving item by mouse.
 
-  \inmodule shared
+  \ingroup shared
 */
 class GripPointsHandler : public QGraphicsObject
 {

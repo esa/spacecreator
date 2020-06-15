@@ -12,7 +12,7 @@
 namespace msc {
 
 /*!
- * \namespace msc
+ * \class MSCPlugin
  * \brief Has most of the code for the MSC Editor UI and the underlying library
  */
 
@@ -49,7 +49,7 @@ void MSCPlugin::addToolBars(QMainWindow *window)
 }
 
 /*!
- * \brief Fills the File menu with actions.
+ * Fills the File menu with actions.
  */
 void MSCPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {

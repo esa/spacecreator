@@ -34,7 +34,7 @@
 
 /*!
   \class MscReader
-  \inmodule MscLibrary
+  \ingroup MscLibrary
 
   The class to load MSC files
 */

@@ -1,4 +1,4 @@
-# Architecture
+# Architecture {#ArchitecturePage}
 
 [TOC]
 
@@ -38,6 +38,17 @@ This includes handling of CIF information for types and geometry, which is store
 
 * **libmsceditor** Has the Ui elements an the application itself. With the class [msc::MainModel](@ref msc::MainModel) as the
 central hub of the MSC editor.
-The charts are drawn using the QGraphicsScene framework. The leyout of the more complex chart view is controlled by [msc::ChartViewModel](@ref msc::ChartViewModel).
+The charts are drawn using the QGraphicsScene framework. The layout of the more complex chart view is controlled by [msc::ChartViewModel](@ref msc::ChartViewModel).
 
 The library **asn1editor** will probably be replaced by the ASN.1 editor (asn1library).
+
+
+### Main building blocks {#MSCMainBuildingBlocks}
+
+[msc::MscModel](@ref msc::MscModel) holds the data of one .msc file. Whenever the data changes, a signal is emitted and the UI updates accordingly.
+Where the UI can be either the tre view showing the hierarchy of documents. The hierarchy showing the documents graphically.
+The textual representaion of the whole data (like in a .msc file). Or one single chart.
+
+The most complex view is the one for the chart. It's main class is [msc::ChartViewModel](@ref msc::ChartViewModel).
+
+For laoding and saving .msc files the classes [msc::MscReader](@ref msc::MscReader) and [msc::MscWriter](@ref msc::MscWriter) are used.

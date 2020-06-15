@@ -172,7 +172,7 @@ void MainWidget::showChart(const QModelIndex &index)
 
     if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
         if (!document->charts().empty()) {
-            m_model->chartViewModel().fillView(document->charts()[0]);
+            m_model->chartViewModel().setCurrentChart(document->charts()[0]);
             showDocumentView(true);
         }
     }
@@ -201,7 +201,7 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
         }
     }
     if (chart) {
-        m_model->chartViewModel().fillView(chart);
+        m_model->chartViewModel().setCurrentChart(chart);
         showDocumentView(true);
     } else {
         showHierarchyView(true);

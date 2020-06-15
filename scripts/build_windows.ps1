@@ -21,7 +21,7 @@ mkdir build_win
 cd build_win
 
 # Run CMake
-cmake -GNinja -DCMAKE_CXX_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_C_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_PREFIX_PATH="$QT_DIR" -DQT_QMAKE_EXECUTABLE="$QT_DIR/bin/qmake.exe" -DQTC_VERSION=409 -DQTC_VERSION_STR="4.9.0" ..
+cmake -GNinja -DCMAKE_CXX_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_C_COMPILER="$VC_BIN_PATH/cl.exe" -DCMAKE_PREFIX_PATH="$QT_DIR" -DQT_QMAKE_EXECUTABLE="$QT_DIR/bin/qmake.exe" ..
 # Build it
 if( $LASTEXITCODE -eq 0 ) {
     ninja

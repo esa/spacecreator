@@ -61,7 +61,7 @@ constexpr int tst_CmdInstanceItemCreate::CommandsCount;
 void tst_CmdInstanceItemCreate::initTestCase()
 {
     m_chart = new msc::MscChart();
-    m_chartModel.fillView(m_chart);
+    m_chartModel.setCurrentChart(m_chart);
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
 }

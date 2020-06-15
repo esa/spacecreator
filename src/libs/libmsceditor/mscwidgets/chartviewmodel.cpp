@@ -50,7 +50,8 @@ namespace msc {
 
 /*!
    \class  ChartViewModel is the model containing the scene graph of the currently selected/visible
-   MSC chart (showing instances, messages, ...)
+   MSC chart (showing instances, messages, ...). It is doing all the layout and reacts on changes in the chart to
+   trigger a new layout.
  */
 
 struct ChartViewLayoutInfo {
@@ -173,27 +174,10 @@ QGraphicsScene *ChartViewModel::graphicsScene() const
     return &(d->m_scene);
 }
 
-MscChart *ChartViewModel::currentChart() const
-{
-    return d->m_currentChart;
-}
-
-void ChartViewModel::clearScene()
-{
-    qDeleteAll(d->m_instanceEventItems);
-    d->m_instanceEventItems.clear();
-    d->m_instanceEventItemsSorted.clear();
-
-    qDeleteAll(d->m_instanceItems);
-    d->m_instanceItems.clear();
-    d->m_instanceItemsSorted.clear();
-
-    d->m_layoutInfo.clear();
-
-    d->m_scene.clear();
-}
-
-void ChartViewModel::fillView(MscChart *chart)
+/*!
+   Sets the chart to show.
+ */
+void ChartViewModel::setCurrentChart(MscChart *chart)
 {
     if (chart == d->m_currentChart) {
         return;
@@ -233,6 +217,29 @@ void ChartViewModel::fillView(MscChart *chart)
     connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartViewModel::updateLayout);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
+}
+
+/*!
+   \brief ChartViewModel::currentChart returns the currently shown chart
+ */
+MscChart *ChartViewModel::currentChart() const
+{
+    return d->m_currentChart;
+}
+
+void ChartViewModel::clearScene()
+{
+    qDeleteAll(d->m_instanceEventItems);
+    d->m_instanceEventItems.clear();
+    d->m_instanceEventItemsSorted.clear();
+
+    qDeleteAll(d->m_instanceItems);
+    d->m_instanceItems.clear();
+    d->m_instanceItemsSorted.clear();
+
+    d->m_layoutInfo.clear();
+
+    d->m_scene.clear();
 }
 
 MessageItem *ChartViewModel::fillMessageItem(

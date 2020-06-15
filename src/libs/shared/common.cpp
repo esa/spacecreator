@@ -54,9 +54,9 @@ Id createId()
   \enum shared::FileCopyingMode
 
   This enum specifies a file overwriting policy:
-    \value Keep
+    \var Keep
         Do not overwrite existing file.
-    \value Overwrite
+    \var Overwrite
         Do overwrite existing file.
  */
 
@@ -66,7 +66,7 @@ Id createId()
  * Returns \c true if the \a source file copied succesfully and
  * the QFile::WriteUser permission explicitly set for the \a target
  * (otherwise it would be read-only as any file in qrc).
- * If the \target file already exists, this function will not owervirite
+ * If the \a target file already exists, this function will not owervirite
  * and return \c false;
  */
 bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)

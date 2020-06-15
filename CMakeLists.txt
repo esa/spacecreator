@@ -52,7 +52,15 @@ if (${QTC_FOUND})
     add_subdirectory(imports/asn1scc.IDE)
 endif()
 
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    add_custom_target(documentation ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/doc/Doxygen
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
+        COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+endif()
 add_custom_target(DocuFiles SOURCES README.md doc/mainpage.md doc/architecture.md doc/msc_remote_handler.md)
+
 add_custom_target(BuildFiles SOURCES .gitlab-ci.yml _clang-format _clang-tidy lgpl.lic.qtc .gitattributes .gitignore)
 
 # Disable the asn1 plugin for now

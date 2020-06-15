@@ -296,7 +296,7 @@ bool MainModel::needSave() const
  */
 void MainModel::showFirstChart()
 {
-    d->m_chartModel.fillView(firstChart());
+    d->m_chartModel.setCurrentChart(firstChart());
 }
 
 /*!
@@ -414,7 +414,7 @@ void MainModel::showChartFromDocument(MscDocument *document)
         return;
     }
 
-    d->m_chartModel.fillView(document->charts().at(0));
+    d->m_chartModel.setCurrentChart(document->charts().at(0));
     Q_EMIT showChartVew();
 }
 

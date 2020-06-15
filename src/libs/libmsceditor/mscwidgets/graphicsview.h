@@ -25,7 +25,7 @@ namespace msc {
   \class msc::GraphicsView
   \brief Basic view for an MSC diagram
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
   * Handles the middle mouse button to pan the view.
   * Provides zoom functionality.

@@ -33,7 +33,7 @@ namespace msc {
   \class msc::ObjectsLinkItem
   \brief Base class for visual representation of items connections.
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

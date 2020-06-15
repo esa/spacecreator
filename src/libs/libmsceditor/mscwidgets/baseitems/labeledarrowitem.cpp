@@ -30,7 +30,7 @@ namespace msc {
   \class msc::LabeledArrowItem
   \brief Source-to-end arrow with a text holder.
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

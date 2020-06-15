@@ -62,7 +62,7 @@ constexpr bool tst100messages::SkipBenchmark;
 void tst100messages::initTestCase()
 {
     QScopedPointer<msc::MscChart> chart(new msc::MscChart());
-    m_model.fillView(chart.data());
+    m_model.setCurrentChart(chart.data());
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
 

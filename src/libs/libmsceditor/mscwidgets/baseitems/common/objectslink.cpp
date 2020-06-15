@@ -26,7 +26,7 @@ namespace msc {
   \class msc::ObjectsLink
   \brief Handler for two ObjectAnchor instances ("start" and "end").
 
-  \inmodule MscWidgets
+  \ingroup MscWidgets
 
 */
 

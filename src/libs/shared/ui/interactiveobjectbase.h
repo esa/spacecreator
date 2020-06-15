@@ -13,7 +13,7 @@ class HighlightRectItem;
   \class shared::ui::InteractiveObject
   \brief Movable/resizable QGraphicsObject with geometry change notifications.
 
-  \inmodule shared::ui
+  \ingroup shared::ui
 */
 class InteractiveObjectBase : public QGraphicsObject
 {

@@ -66,7 +66,7 @@ void StringTemplate::init()
  * @param grouppedObjects objects which are groupped by type name.
  * Type names can be Functions, Connections, Comments and etc.
  * @param templateFileName name of template file
- * @param openedOutFile a pointer to the buffer to store result
+ * @param out a pointer to the QIODevice to store result
  * @return false if data has not been written
  */
 bool StringTemplate::parseFile(

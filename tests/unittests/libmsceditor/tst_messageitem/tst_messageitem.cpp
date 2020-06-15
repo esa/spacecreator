@@ -94,7 +94,7 @@ void tst_MessageItem::parseMsc(const QString &mscText)
     m_chart = m_mscModel->documents().first()->charts().first();
     QVERIFY(m_chart);
 
-    m_chartModel->fillView(m_chart);
+    m_chartModel->setCurrentChart(m_chart);
     QApplication::processEvents();
 
     for (MscInstance *instance : m_chart->instances()) {

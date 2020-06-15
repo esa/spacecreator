@@ -130,7 +130,7 @@ void tst_InstanceItem::testMoveByHead()
     QScopedPointer<QGraphicsView> view(new QGraphicsView());
     view->setScene(chartModel->graphicsScene());
 
-    chartModel->fillView(model->documents().first()->charts().first());
+    chartModel->setCurrentChart(model->documents().first()->charts().first());
 
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
 

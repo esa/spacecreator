@@ -212,7 +212,8 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
 
 /*!
    Adds an instance event, and takes over parentship.
-   @param eventIdex is the vertical position of the new event. If it tis < 0, then the new event is appended.
+   @param instanceEvent The event (message/action/...) to add.
+   @param eventIndex is the vertical position of the new event. If it tis < 0, then the new event is appended.
  */
 void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 {

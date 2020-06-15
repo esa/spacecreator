@@ -22,29 +22,38 @@
 
 namespace shared {
 
+/*!
+   \class CommandLineParser parses the command line
+ */
+
+/*!
+    \enum shared::CommandLineParser::Positional
+
+    This enum type specifies a particular command line option:
+    \var shared::CommandLineParser::OpenFileMsc
+           Msc file to open directly
+    \var shared::CommandLineParser::DbgOpenMscExamplesChain
+           Used for debug/test purpose only
+    \var shared::CommandLineParser::StartRemoteControl
+           Run the MSC editor instreaming mode
+    \var shared::CommandLineParser::OpenAADLXMLFile
+           Automatically load the speceficied file on startup.
+    \var shared::CommandLineParser::ListScriptableActions
+           List all the actions available for scripting and exit.
+    \var shared::CommandLineParser::OpenStringTemplateFile
+           Load the specificied template file.
+    \var shared::CommandLineParser::ExportToFile
+           Save the file opened by OpenAADLXMLFile using the template passed with OpenStringTemplateFile.
+    \var shared::CommandLineParser::DropUnsavedChangesSilently
+           Do not warn about unsaved changes on the document closing.
+*/
+
 CommandLineParser::CommandLineParser()
     : QCommandLineParser()
 {
     addHelpOption();
     addVersionOption();
 }
-
-/*!
-    \enum CommandLineParser::Positional
-
-    This enum type specifies a particular command line option:
-
-    \value DropUnsavedChangesSilently
-           Do not warn about unsaved changes on the document closing.
-    \value OpenAADLXMLFile
-           Automatically load the speceficied file on startup.
-    \value OpenStringTemplateFile
-           Load the specificied template file.
-    \value ExportToFile
-           Save the file opened by OpenAADLXMLFile using the template passed with OpenStringTemplateFile.
-    \value ListScriptableActions
-           List all the actions available for scripting and exit.
-*/
 
 /*!
   \fn bool CommandLineParser::isSet(Positional arg) const

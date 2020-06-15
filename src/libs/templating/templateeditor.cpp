@@ -44,6 +44,7 @@ namespace templating {
 
 /**
  * @brief PreviewDialog::PreviewDialog ctor
+ * @param saveHere the filename to save the document to.
  * @param parent
  */
 TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
