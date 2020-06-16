@@ -49,7 +49,6 @@ if (${QTC_FOUND})
     message(STATUS "ASN.1 plugin is build")
     include(QtCreatorIDEBranding)
     include(QtCreatorAPI)
-    add_subdirectory(imports/asn1scc.IDE)
 endif()
 
 find_package(Doxygen)
