@@ -22,7 +22,7 @@
 
 namespace msc {
 
-class MsgIdentificationItem : public NameItem
+class MsgIdentificationItem : public TextItem
 {
 public:
     explicit MsgIdentificationItem(QGraphicsItem *parent = nullptr);
@@ -32,9 +32,6 @@ public:
 
     static QString nameFromText(const QString &text);
     static MscParameterList parametersFromText(const QString &text);
-
-protected:
-    bool validateInput(const QString &text) const override;
 };
 
 } // ns msc

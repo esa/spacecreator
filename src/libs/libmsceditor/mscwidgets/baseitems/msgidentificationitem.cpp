@@ -20,8 +20,9 @@
 namespace msc {
 
 MsgIdentificationItem::MsgIdentificationItem(QGraphicsItem *parent)
-    : NameItem(parent)
+    : TextItem(parent)
 {
+    setMscValidationTest(QString("msc c1;instance i1;in %1 from env;endinstance;endmsc;"));
 }
 
 QString MsgIdentificationItem::name() const
@@ -64,12 +65,6 @@ MscParameterList MsgIdentificationItem::parametersFromText(const QString &text)
     }
 
     return parameters;
-}
-
-bool MsgIdentificationItem::validateInput(const QString &text) const
-{
-    Q_UNUSED(text);
-    return true;
 }
 
 } // ns msc

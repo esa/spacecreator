@@ -42,7 +42,7 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
     : InteractiveObject(timer, parent)
     , m_timer(timer)
     , m_model(model)
-    , m_textItem(new NameItem(this))
+    , m_textItem(new TextItem(this))
     , m_timerConnector(new QGraphicsLineItem(this))
 {
     Q_ASSERT(m_timer != nullptr);
@@ -50,6 +50,7 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem 
 
     setFlags(ItemSendsGeometryChanges | ItemSendsScenePositionChanges | ItemIsSelectable);
 
+    m_textItem->setMscValidationTest(QString("msc c1;instance i1;starttimer %1;endinstance;endmsc;"));
     m_textItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     m_textItem->setEditable(true);
     m_textItem->setPlainText(m_timer->name());

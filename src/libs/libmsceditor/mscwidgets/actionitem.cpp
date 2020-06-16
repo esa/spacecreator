@@ -44,7 +44,7 @@ public:
     }
 
 protected:
-    bool validateText(const QString &text) const
+    bool validateText(const QString &text) const override
     {
         MscReader reader;
         QStringList errors;

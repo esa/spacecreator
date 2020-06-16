@@ -77,6 +77,7 @@ public:
     void setSendClickEvent(bool send);
 
     bool textIsValid() const;
+    void setMscValidationTest(const QString &text);
 
 Q_SIGNALS:
     void edited(const QString &newText);
@@ -120,6 +121,7 @@ protected:
     bool m_disableEditingGuard = false;
     bool m_textIsValid = true;
     bool m_filterInvalidText = true;
+    QString m_mscValidationTest;
 };
 
 class NameItem : public TextItem

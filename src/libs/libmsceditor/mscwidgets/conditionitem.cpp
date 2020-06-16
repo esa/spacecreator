@@ -37,7 +37,7 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(condition, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
-    , m_nameItem(new NameItem(this))
+    , m_nameItem(new TextItem(this))
 {
     Q_ASSERT(m_condition != nullptr);
 
@@ -46,6 +46,7 @@ ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     m_polygonItem->setBrush(Qt::white);
     m_polygonItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
+    m_nameItem->setMscValidationTest(QString("msc c1;instance i1;condition %1;endinstance;endmsc;"));
     m_nameItem->setEditable(true);
     setName(m_condition->name());
     m_nameItem->setBackgroundColor(Qt::transparent);

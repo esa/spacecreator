@@ -18,6 +18,8 @@
 
 #include "textitem.h"
 
+#include "mscreader.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -357,7 +359,19 @@ bool TextItem::validateInput(const QString &text) const
 
 bool TextItem::validateText(const QString &text) const
 {
-    return true;
+    if (m_mscValidationTest.isEmpty()) {
+        return true;
+    }
+
+    MscReader reader;
+    QStringList errors;
+    QString testDoc = m_mscValidationTest.arg(text);
+    try {
+        reader.parseText(testDoc, &errors);
+    } catch (...) {
+        return false;
+    }
+    return errors.isEmpty();
 }
 
 QPair<int, int> TextItem::prepareSelectionRange(int desiredFrom, int desiredTo) const
@@ -472,6 +486,19 @@ void TextItem::setSendClickEvent(bool send)
 bool TextItem::textIsValid() const
 {
     return m_textIsValid;
+}
+
+/*!
+   Sets the text to check if the user input is valid. The text is a MSC text with \em %1 as a placeholder for the text.
+   For the validation the MSC parser is used.
+   Exmaple:
+   \code
+    QString("msc c1;instance i1 comment '%1';endinstance;endmsc;")
+   \endcode
+ */
+void TextItem::setMscValidationTest(const QString &text)
+{
+    m_mscValidationTest = text;
 }
 
 void TextItem::checkTextValidity()

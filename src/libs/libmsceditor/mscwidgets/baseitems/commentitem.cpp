@@ -56,6 +56,7 @@ CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
+    m_textItem->setMscValidationTest(QString("msc c1;instance i1 comment '%1';endinstance;endmsc;"));
     m_textItem->setFramed(false);
     m_textItem->setEditable(true);
     m_textItem->setBackgroundColor(Qt::transparent);
