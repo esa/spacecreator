@@ -32,6 +32,11 @@ else ()
   set(_IDE_DATA_PATH "share/${IDE_ID}")
   set(_IDE_DOC_PATH "share/doc/${IDE_ID}")
   set(_IDE_BIN_PATH "bin")
+  if (${QTC_LIB_DIR} STREQUAL "/usr/lib/x86_64-linux-gnu/qtcreator") # QTC_LIB_DIR is set in QtCreatorCheck.cmake
+      set(_IDE_LIBRARY_BASE_PATH "lib/x86_64-linux-gnu")
+      set(_IDE_LIBRARY_PATH "lib/x86_64-linux-gnu/${IDE_ID}")
+      set(_IDE_PLUGIN_PATH "lib/x86_64-linux-gnu/qtcreator/plugins")
+  endif()
 endif ()
 
 set(IDE_APP_PATH "${_IDE_APP_PATH}")                    # The target path of the IDE application (relative to CMAKE_INSTALL_PREFIX).

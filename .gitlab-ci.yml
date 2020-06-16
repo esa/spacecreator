@@ -47,7 +47,7 @@ test_docker:
       junit: build/tst_*-result.xml
 
 ##################
-# Documentation
+# Deployment
 ##################
 documentation:
   stage: deploy
@@ -59,6 +59,24 @@ documentation:
   artifacts:
     paths:
       - doc/doxygen/html
+    expire_in: 4 weeks
+  only:
+    - master
+
+debian_package:
+  stage: deploy
+  tags:
+    - docker
+  image: registry.git.vikingsoftware.com/esa/taste3-ci-image:latest
+  script:
+  - mkdir -p build; cd build
+  - cmake -GNinja .. -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DENABLE_TESTS=OFF
+  - cmake --build . --target all
+  - cpack
+  - cd ..; mkdir -p package; cp build/*.deb package
+  artifacts:
+    paths:
+      - package
     expire_in: 4 weeks
   only:
     - master

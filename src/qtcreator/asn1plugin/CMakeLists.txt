@@ -285,3 +285,7 @@ target_include_directories(${PLUGIN_NAME}
     PUBLIC ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
     PUBLIC ${QTC_SOURCE_DIR}/src/plugins/texteditor
 )
+
+install(FILES generic-highlighter/syntax/acn.xml generic-highlighter/syntax/asn1.xml DESTINATION ${IDE_DATA_PATH}/generic-highlighter)
+install(DIRECTORY snippets DESTINATION ${IDE_DATA_PATH})
+install(DIRECTORY templates DESTINATION ${IDE_DATA_PATH})

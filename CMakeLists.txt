@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(SpaceCreator VERSION 0.1 LANGUAGES CXX)
+set(SC_NAME SpaceCreator)
+set(SC_VERSION_MAJOR "0")
+set(SC_VERSION_MINOR "1")
+
+project(${SC_NAME} VERSION "${SC_VERSION_MAJOR}.${SC_VERSION_MINOR}" LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -41,8 +45,6 @@ if (WIN32)
 endif()
 find_package(Grantlee5 REQUIRED)
 
-enable_testing()
-
 include(QtCreatorCheck)
 if (${QTC_FOUND})
     add_definitions(-DQTC_VERSION=${QTC_VERSION})
@@ -62,6 +64,33 @@ add_custom_target(DocuFiles SOURCES README.md doc/mainpage.md doc/architecture.m
 
 add_custom_target(BuildFiles SOURCES .gitlab-ci.yml _clang-format _clang-tidy lgpl.lic.qtc .gitattributes .gitignore)
 
-# Disable the asn1 plugin for now
+# The actual code
 add_subdirectory(src)
-add_subdirectory(tests)
+
+# Testing
+option(ENABLE_TESTS "Build the tests" ON)
+if(ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
+# Installer data
+if(UNIX)
+set (CPACK_PACKAGE_NAME "${SC_NAME}")
+set (CPACK_PACKAGE_VENDOR "European Space Agency")
+set (CPACK_PACKAGE_HOMEPAGE_URL "https://taste.tools/")
+set(CPACK_PACKAGE_CONTACT "Maxime Perrotin")
+set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "QtCrator plugins for the TASTE project.")
+set (CPACK_PACKAGE_VERSION_MAJOR "${SC_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${SC_VERSION_MINOR}")
+if(DEFINED BUILD_PATCH_NUMBER)
+    set (CPACK_PACKAGE_VERSION_PATCH "${BUILD_PATCH_NUMBER}")
+else()
+    set (CPACK_PACKAGE_VERSION_PATCH "${SC_GIT_HASH}")
+endif()
+set (CPACK_PACKAGING_INSTALL_PREFIX /usr)
+set (CPACK_GENERATOR "DEB")
+set (CPACK_DEBIAN_PACKAGE_SECTION "Development")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5gui5, libqt5svg5, libqt5widgets5, qtcreator")
+include(CPack)
+endif()
