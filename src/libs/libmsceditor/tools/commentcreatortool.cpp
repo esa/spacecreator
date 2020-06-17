@@ -17,11 +17,11 @@
 
 #include "commentcreatortool.h"
 
-#include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "chartitem.h"
 #include "commands/common/commandsstack.h"
+#include "commentitem.h"
 #include "msccomment.h"
 
 #include <QMouseEvent>

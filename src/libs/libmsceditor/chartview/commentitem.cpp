@@ -20,6 +20,8 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/objectslink.h"
+#include "baseitems/objectslinkitem.h"
+#include "baseitems/textitem.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifline.h"
 #include "cif/ciflines.h"
@@ -28,8 +30,6 @@
 #include "mscchart.h"
 #include "msccomment.h"
 #include "mscentity.h"
-#include "objectslinkitem.h"
-#include "textitem.h"
 #include "ui/grippointshandler.h"
 
 #include <QGraphicsScene>

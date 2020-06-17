@@ -18,7 +18,6 @@
 #include "messageitem.h"
 
 #include "baseitems/arrowitem.h"
-#include "baseitems/commentitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/common/objectslink.h"
@@ -29,6 +28,7 @@
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
 #include "commands/common/commandsstack.h"
+#include "commentitem.h"
 #include "messagedialog.h"
 #include "mscchart.h"
 #include "mscinstance.h"

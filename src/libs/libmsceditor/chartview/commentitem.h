@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "interactiveobject.h"
+#include "baseitems/interactiveobject.h"
 
 class QGraphicsPathItem;
 

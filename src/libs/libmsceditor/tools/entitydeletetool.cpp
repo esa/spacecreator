@@ -17,9 +17,9 @@
 
 #include "entitydeletetool.h"
 
-#include "baseitems/commentitem.h"
 #include "baseitems/interactiveobject.h"
 #include "commands/common/commandsstack.h"
+#include "commentitem.h"
 #include "coregionitem.h"
 #include "documentitem.h"
 #include "mscchart.h"

@@ -6,6 +6,51 @@ target_sources(${LIB_NAME} PRIVATE
     asn1fileview.cpp
     asn1fileview.h
     asn1fileview.ui
+    baseitems/arrowitem.cpp
+    baseitems/arrowitem.h
+    baseitems/common/abstractinteractiveobject.h
+    baseitems/common/arrowsign.cpp
+    baseitems/common/arrowsign.h
+    baseitems/common/coordinatesconverter.cpp
+    baseitems/common/coordinatesconverter.h
+    baseitems/common/mscutils.cpp
+    baseitems/common/mscutils.h
+    baseitems/common/objectanchor.cpp
+    baseitems/common/objectanchor.h
+    baseitems/common/objectslink.cpp
+    baseitems/common/objectslink.h
+    baseitems/instanceenditem.cpp
+    baseitems/instanceenditem.h
+    baseitems/instanceheaditem.cpp
+    baseitems/instanceheaditem.h
+    baseitems/interactiveobject.cpp
+    baseitems/interactiveobject.h
+    baseitems/labeledarrowitem.cpp
+    baseitems/labeledarrowitem.h
+    baseitems/msgidentificationitem.cpp
+    baseitems/msgidentificationitem.h
+    baseitems/objectslinkitem.cpp
+    baseitems/objectslinkitem.h
+    baseitems/textitem.cpp
+    baseitems/textitem.h
+    chartview/actionitem.cpp
+    chartview/actionitem.h
+    chartview/chartitem.cpp
+    chartview/chartitem.h
+    chartview/chartlayoutmanager.cpp
+    chartview/chartlayoutmanager.h
+    chartview/commentitem.cpp
+    chartview/commentitem.h
+    chartview/conditionitem.cpp
+    chartview/conditionitem.h
+    chartview/coregionitem.cpp
+    chartview/coregionitem.h
+    chartview/instanceitem.cpp
+    chartview/instanceitem.h
+    chartview/messageitem.cpp
+    chartview/messageitem.h
+    chartview/timeritem.cpp
+    chartview/timeritem.h
     commands/basecommand.cpp
     commands/basecommand.h
     commands/cmdactioninformaltext.cpp
@@ -69,116 +114,74 @@ target_sources(${LIB_NAME} PRIVATE
     commands/common/commandsfactory.h
     commands/common/commandsstack.cpp
     commands/common/commandsstack.h
-    documentitemmodel.cpp
-    documentitemmodel.h
-    documenttreeview.cpp
-    documenttreeview.h
+    documenttree/documentitemmodel.cpp
+    documenttree/documentitemmodel.h
+    documenttree/documenttreeview.cpp
+    documenttree/documenttreeview.h
+    graphicsview.cpp
+    graphicsview.h
+    hierarchyview/documentitem.cpp
+    hierarchyview/documentitem.h
+    hierarchyview/hierarchyviewmodel.cpp
+    hierarchyview/hierarchyviewmodel.h
     mainmodel.cpp
     mainmodel.h
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    messagedeclarationsdialog.cpp
+    messagedeclarationsdialog.h
+    messagedeclarationsdialog.ui
+    messagedialog.cpp
+    messagedialog.h
+    messagedialog.ui
     msceditor.cpp
     msceditor.h
+    msceditorresources.qrc
     mscplugin.cpp
     mscplugin.h
-    mscwidgets/actionitem.cpp
-    mscwidgets/actionitem.h
-    mscwidgets/baseitems/arrowitem.cpp
-    mscwidgets/baseitems/arrowitem.h
-    mscwidgets/baseitems/commentitem.cpp
-    mscwidgets/baseitems/commentitem.h
-    mscwidgets/baseitems/common/abstractinteractiveobject.h
-    mscwidgets/baseitems/common/arrowsign.cpp
-    mscwidgets/baseitems/common/arrowsign.h
-    mscwidgets/baseitems/common/coordinatesconverter.cpp
-    mscwidgets/baseitems/common/coordinatesconverter.h
-    mscwidgets/baseitems/common/mscutils.cpp
-    mscwidgets/baseitems/common/mscutils.h
-    mscwidgets/baseitems/common/objectanchor.cpp
-    mscwidgets/baseitems/common/objectanchor.h
-    mscwidgets/baseitems/common/objectslink.cpp
-    mscwidgets/baseitems/common/objectslink.h
-    mscwidgets/baseitems/instanceenditem.cpp
-    mscwidgets/baseitems/instanceenditem.h
-    mscwidgets/baseitems/instanceheaditem.cpp
-    mscwidgets/baseitems/instanceheaditem.h
-    mscwidgets/baseitems/interactiveobject.cpp
-    mscwidgets/baseitems/interactiveobject.h
-    mscwidgets/baseitems/labeledarrowitem.cpp
-    mscwidgets/baseitems/labeledarrowitem.h
-    mscwidgets/baseitems/msgidentificationitem.cpp
-    mscwidgets/baseitems/msgidentificationitem.h
-    mscwidgets/baseitems/objectslinkitem.cpp
-    mscwidgets/baseitems/objectslinkitem.h
-    mscwidgets/baseitems/textitem.cpp
-    mscwidgets/baseitems/textitem.h
-    mscwidgets/chartitem.cpp
-    mscwidgets/chartitem.h
-    mscwidgets/chartlayoutmanager.cpp
-    mscwidgets/chartlayoutmanager.h
-    mscwidgets/conditionitem.cpp
-    mscwidgets/conditionitem.h
-    mscwidgets/coregionitem.cpp
-    mscwidgets/coregionitem.h
-    mscwidgets/documentitem.cpp
-    mscwidgets/documentitem.h
-    mscwidgets/graphicsview.cpp
-    mscwidgets/graphicsview.h
-    mscwidgets/hierarchyviewmodel.cpp
-    mscwidgets/hierarchyviewmodel.h
-    mscwidgets/instanceitem.cpp
-    mscwidgets/instanceitem.h
-    mscwidgets/messagedeclarationsdialog.cpp
-    mscwidgets/messagedeclarationsdialog.h
-    mscwidgets/messagedeclarationsdialog.ui
-    mscwidgets/messagedialog.cpp
-    mscwidgets/messagedialog.h
-    mscwidgets/messagedialog.ui
-    mscwidgets/messageitem.cpp
-    mscwidgets/messageitem.h
-    mscwidgets/msceditorresources.qrc
-    mscwidgets/textviewdialog.cpp
-    mscwidgets/textviewdialog.h
-    mscwidgets/timeritem.cpp
-    mscwidgets/timeritem.h
-    mscwidgets/tools/actioncreatortool.cpp
-    mscwidgets/tools/actioncreatortool.h
-    mscwidgets/tools/basecreatortool.cpp
-    mscwidgets/tools/basecreatortool.h
-    mscwidgets/tools/basetool.cpp
-    mscwidgets/tools/basetool.h
-    mscwidgets/tools/commentcreatortool.cpp
-    mscwidgets/tools/commentcreatortool.h
-    mscwidgets/tools/conditioncreatortool.cpp
-    mscwidgets/tools/conditioncreatortool.h
-    mscwidgets/tools/coregioncreatortool.cpp
-    mscwidgets/tools/coregioncreatortool.h
-    mscwidgets/tools/entitydeletetool.cpp
-    mscwidgets/tools/entitydeletetool.h
-    mscwidgets/tools/hierarchycreatortool.cpp
-    mscwidgets/tools/hierarchycreatortool.h
-    mscwidgets/tools/instancecreatortool.cpp
-    mscwidgets/tools/instancecreatortool.h
-    mscwidgets/tools/instancestoptool.cpp
-    mscwidgets/tools/instancestoptool.h
-    mscwidgets/tools/messagecreatortool.cpp
-    mscwidgets/tools/messagecreatortool.h
-    mscwidgets/tools/pointertool.cpp
-    mscwidgets/tools/pointertool.h
-    mscwidgets/tools/timercreatortool.cpp
-    mscwidgets/tools/timercreatortool.h
-    remotecontrolhandler.cpp
-    remotecontrolhandler.h
-    remotecontrolwebserver.cpp
-    remotecontrolwebserver.h
+    remotecontrol/remotecontrolhandler.cpp
+    remotecontrol/remotecontrolhandler.h
+    remotecontrol/remotecontrolwebserver.cpp
+    remotecontrol/remotecontrolwebserver.h
     settings/appoptions.cpp
     settings/appoptions.h
+    textviewdialog.cpp
+    textviewdialog.h
+    tools/actioncreatortool.cpp
+    tools/actioncreatortool.h
+    tools/basecreatortool.cpp
+    tools/basecreatortool.h
+    tools/basetool.cpp
+    tools/basetool.h
+    tools/commentcreatortool.cpp
+    tools/commentcreatortool.h
+    tools/conditioncreatortool.cpp
+    tools/conditioncreatortool.h
+    tools/coregioncreatortool.cpp
+    tools/coregioncreatortool.h
+    tools/entitydeletetool.cpp
+    tools/entitydeletetool.h
+    tools/hierarchycreatortool.cpp
+    tools/hierarchycreatortool.h
+    tools/instancecreatortool.cpp
+    tools/instancecreatortool.h
+    tools/instancestoptool.cpp
+    tools/instancestoptool.h
+    tools/messagecreatortool.cpp
+    tools/messagecreatortool.h
+    tools/pointertool.cpp
+    tools/pointertool.h
+    tools/timercreatortool.cpp
+    tools/timercreatortool.h
 )
 
 target_include_directories(${LIB_NAME}
     PUBLIC .
-    PUBLIC mscwidgets
+    PUBLIC chartview
+    PUBLIC documenttree
+    PUBLIC hierarchyview
+    PUBLIC remotecontrol
 )
 
 target_link_libraries(${LIB_NAME}
