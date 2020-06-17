@@ -60,9 +60,22 @@ if(DOXYGEN_FOUND)
         COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif()
-add_custom_target(DocuFiles SOURCES README.md doc/mainpage.md doc/architecture.md doc/msc_remote_handler.md)
+add_custom_target(DocuFiles SOURCES
+    README.md
+    doc/architecture.md
+    doc/mainpage.md
+    doc/msc_conversion_template.md
+    doc/msc_remote_handler.md
+)
 
-add_custom_target(BuildFiles SOURCES .gitlab-ci.yml _clang-format _clang-tidy lgpl.lic.qtc .gitattributes .gitignore)
+add_custom_target(BuildFiles SOURCES
+    .gitattributes
+    .gitignore
+    .gitlab-ci.yml
+    _clang-format
+    _clang-tidy
+    lgpl.lic.qtc
+)
 
 # The actual code
 add_subdirectory(src)

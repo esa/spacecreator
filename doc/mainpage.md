@@ -54,6 +54,10 @@ To learn more about MSC, see [MSC Wiki Page](https://en.wikipedia.org/wiki/Messa
 Note: the MSC parser is not 100% able to parse all specified documents. On the other hand is able to load older spec versions and some additions (for example message parameters). Those changes are documented in the Msc.g4 file.
 
 
+### MSC Conversion Template
+
+MSC editor can be used to convert msc files. Fro more information see [MSC Conversion Template](@ref MSCConversion).
+
 # Internal Architecture
 
 Details on the architecture of is described in [Architecture documentation](@ref ArchitecturePage)
