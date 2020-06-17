@@ -80,6 +80,8 @@ MainWidget::~MainWidget()
         disconnect(m_documentTree->model(), nullptr, this, nullptr);
     }
     disconnect(&(m_model->chartViewModel()), nullptr, this, nullptr);
+    disconnect(m_model, nullptr, this, nullptr);
+    disconnect(m_model->undoStack(), nullptr, this, nullptr);
 }
 
 bool MainWidget::load(const QString &filename)
