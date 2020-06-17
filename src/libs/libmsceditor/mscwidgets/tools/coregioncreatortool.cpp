@@ -26,7 +26,7 @@
 
 namespace msc {
 
-CoregionCreatorTool::CoregionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+CoregionCreatorTool::CoregionCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Coregion");

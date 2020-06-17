@@ -27,7 +27,7 @@
 namespace msc {
 
 TimerCreatorTool::TimerCreatorTool(
-        MscTimer::TimerType type, ChartViewModel *model, QGraphicsView *view, QObject *parent)
+        MscTimer::TimerType type, ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_timerType(type)
 {

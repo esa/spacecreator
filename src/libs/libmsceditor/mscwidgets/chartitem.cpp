@@ -20,7 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "graphicsviewutils.h"
 #include "mscchart.h"
@@ -42,9 +42,9 @@ QPointF ChartItem::m_margin = { 20., 20. };
  *
  * This class represents an entire chart. The contents with be children of this item
  */
-ChartItem::ChartItem(MscChart *chart, ChartViewModel *chartViewModel, QGraphicsItem *parent)
+ChartItem::ChartItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
     : InteractiveObject(chart, parent)
-    , m_chartViewModel(chartViewModel)
+    , m_chartLayoutManager(chartLayoutManager)
     , m_rectItem(new QGraphicsRectItem(this))
     , m_contentArea(new QGraphicsRectItem(this))
     , m_textItemName(new NameItem(this))
@@ -157,8 +157,8 @@ void ChartItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF 
         break;
     }
 
-    if (m_chartViewModel) {
-        const QRectF &minContentRect = m_chartViewModel->minimalContentRect();
+    if (m_chartLayoutManager) {
+        const QRectF &minContentRect = m_chartLayoutManager->minimalContentRect();
         rect.setWidth(qMax(minContentRect.width(), rect.width()));
         rect.setHeight(qMax(minContentRect.height(), rect.height()));
     }

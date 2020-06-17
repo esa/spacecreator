@@ -26,7 +26,7 @@
 
 namespace msc {
 
-ActionCreatorTool::ActionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+ActionCreatorTool::ActionCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Action");

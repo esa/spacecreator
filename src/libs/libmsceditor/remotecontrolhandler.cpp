@@ -17,7 +17,7 @@
 
 #include "remotecontrolhandler.h"
 
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "mainmodel.h"
 #include "mscaction.h"
@@ -245,7 +245,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     mscChart->addInstanceEvent(message, pos);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscMessage *>(message),
-        QVariant::fromValue<msc::ChartViewModel *>(&m_model->chartViewModel()), pos };
+        QVariant::fromValue<msc::ChartLayoutManager *>(&m_model->chartViewModel()), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateMessage, cmdParams);
     if (!result)
         *errorString = tr("Message is added but unavailable for Undo/Redo actions");

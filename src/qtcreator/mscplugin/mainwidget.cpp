@@ -18,7 +18,7 @@
 #include "mainwidget.h"
 
 #include "asn1fileview.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "documentitemmodel.h"
 #include "documenttreeview.h"
 #include "graphicsview.h"
@@ -423,7 +423,7 @@ void MainWidget::initConnections()
     connect(m_documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &MainWidget::showSelection);
     connect(m_documentTree, &QTreeView::doubleClicked, this, &MainWidget::showChart);
 
-    connect(&(m_model->chartViewModel()), &msc::ChartViewModel::currentChartChanged, this,
+    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
             &MainWidget::selectCurrentChart);
 
     connect(m_model, &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });

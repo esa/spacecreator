@@ -19,7 +19,7 @@
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscchart.h"
@@ -42,7 +42,7 @@
 
 using namespace msc;
 
-class tst_ChartViewModel : public QObject
+class tst_ChartLayoutManager : public QObject
 {
     Q_OBJECT
 
@@ -66,7 +66,7 @@ private Q_SLOTS:
 private:
     QGraphicsView m_view;
 
-    QScopedPointer<ChartViewModel> m_chartModel;
+    QScopedPointer<ChartLayoutManager> m_chartModel;
     QScopedPointer<MscModel> m_mscModel;
     QPointer<MscChart> m_chart;
     QVector<MscInstance *> m_instances;
@@ -77,7 +77,7 @@ private:
     const qreal m_maxOffset = 1.5; // used for size comparisons
 };
 
-void tst_ChartViewModel::parseMsc(const QString &mscText)
+void tst_ChartLayoutManager::parseMsc(const QString &mscText)
 {
     MscReader mscReader;
     m_mscModel.reset(mscReader.parseText(mscText));
@@ -104,23 +104,23 @@ void tst_ChartViewModel::parseMsc(const QString &mscText)
     }
 }
 
-void tst_ChartViewModel::init()
+void tst_ChartLayoutManager::init()
 {
-    m_chartModel.reset(new ChartViewModel);
+    m_chartModel.reset(new ChartLayoutManager);
     m_view.setScene(m_chartModel->graphicsScene());
     CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
     static const QPointF dpi1to1(CoordinatesConverter::Dpi1To1, CoordinatesConverter::Dpi1To1);
     CoordinatesConverter::setDPI(dpi1to1, dpi1to1); // results in cif <-> pixel as 1:1
 }
 
-void tst_ChartViewModel::cleanup()
+void tst_ChartLayoutManager::cleanup()
 {
     m_instances.clear();
     m_instanceItems.clear();
     m_instanceRects.clear();
 }
 
-void tst_ChartViewModel::testNearestInstanceSimple()
+void tst_ChartLayoutManager::testNearestInstanceSimple()
 {
     QString mscText = "MSC msc1; \
                           INSTANCE inst1; \
@@ -151,7 +151,7 @@ void tst_ChartViewModel::testNearestInstanceSimple()
     QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
 }
 
-void tst_ChartViewModel::testNearestInstanceCreate()
+void tst_ChartLayoutManager::testNearestInstanceCreate()
 {
     QString mscText = "MSCDOCUMENT mscdoc;\
                         MSC msc1; \
@@ -177,7 +177,7 @@ void tst_ChartViewModel::testNearestInstanceCreate()
     QCOMPARE(inst, static_cast<MscInstance *>(nullptr));
 }
 
-void tst_ChartViewModel::testTimerPositionWithCifInstance()
+void tst_ChartLayoutManager::testTimerPositionWithCifInstance()
 {
     QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
@@ -210,7 +210,7 @@ void tst_ChartViewModel::testTimerPositionWithCifInstance()
     QVERIFY(watchdogItem->scenePos().y() > instanceHeadBottom.y());
 }
 
-void tst_ChartViewModel::testLoadedMessagePosition()
+void tst_ChartLayoutManager::testLoadedMessagePosition()
 {
     QSKIP("Disabled dew some problems in GUI-less environment (CI)");
 
@@ -248,7 +248,7 @@ void tst_ChartViewModel::testLoadedMessagePosition()
     QVERIFY(qFuzzyCompare(points.at(1).x(), chartItem->sceneBoundingRect().left()));
 }
 
-void tst_ChartViewModel::testLoadedCifMessagePosition()
+void tst_ChartLayoutManager::testLoadedCifMessagePosition()
 {
     QSKIP("Force to 200x200 does not work");
 
@@ -280,7 +280,7 @@ void tst_ChartViewModel::testLoadedCifMessagePosition()
     QVERIFY(qFuzzyCompare(points.at(1).x(), chartItem->sceneBoundingRect().right()));
 }
 
-void tst_ChartViewModel::testDefaultChartSize()
+void tst_ChartLayoutManager::testDefaultChartSize()
 {
     QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
@@ -298,7 +298,7 @@ void tst_ChartViewModel::testDefaultChartSize()
     QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), defaultSize.height()));
 }
 
-void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
+void tst_ChartLayoutManager::testInstanceCifExtendedChartWidth()
 {
     QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
@@ -324,7 +324,7 @@ void tst_ChartViewModel::testInstanceCifExtendedChartWidth()
     QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), inst2Rect.bottom()));
 }
 
-void tst_ChartViewModel::testAddTwoMessages()
+void tst_ChartLayoutManager::testAddTwoMessages()
 {
     QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
@@ -371,7 +371,7 @@ void tst_ChartViewModel::testAddTwoMessages()
     QVERIFY2(std::abs(message1Rect2.top() - message1Rect2.top()) < delta, "The message Y moved");
 }
 
-void tst_ChartViewModel::testMaxVisibleItems()
+void tst_ChartLayoutManager::testMaxVisibleItems()
 {
     m_chartModel->setVisibleItemLimit(2);
 
@@ -426,6 +426,6 @@ void tst_ChartViewModel::testMaxVisibleItems()
     QCOMPARE(msg3YScrolled, msg2Y); // Message 3 is now at position of message 2
 }
 
-QTEST_MAIN(tst_ChartViewModel)
+QTEST_MAIN(tst_ChartLayoutManager)
 
-#include "tst_chartviewmodel.moc"
+#include "tst_chartlayoutmanager.moc"

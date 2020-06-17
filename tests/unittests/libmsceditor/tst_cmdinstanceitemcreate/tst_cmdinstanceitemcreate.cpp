@@ -16,7 +16,7 @@
 */
 
 #include "baseitems/common/mscutils.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
@@ -48,7 +48,7 @@ private Q_SLOTS:
     void testInsertingOrder();
 
 private:
-    ChartViewModel m_chartModel;
+    ChartLayoutManager m_chartModel;
     static constexpr int CommandsCount = 10;
     msc::MscChart *m_chart = nullptr;
 

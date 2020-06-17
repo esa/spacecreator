@@ -23,7 +23,7 @@
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
@@ -50,9 +50,9 @@
 namespace msc {
 
 InstanceItem::InstanceItem(
-        msc::MscInstance *instance, ChartViewModel *chartView, MscChart *chart, QGraphicsItem *parent)
+        msc::MscInstance *instance, ChartLayoutManager *chartLayoutManager, MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(instance, parent)
-    , m_model(chartView)
+    , m_model(chartLayoutManager)
     , m_instance(instance)
     , m_chart(chart)
     , m_axisSymbol(new QGraphicsLineItem(this))
@@ -249,7 +249,7 @@ void InstanceItem::setGeometry(const QRectF &geometry)
 }
 
 InstanceItem *InstanceItem::createDefaultItem(
-        ChartViewModel *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
+        ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
 {
     InstanceItem *messageItem = new InstanceItem(instance, model, chart);
     messageItem->setPos(pos);

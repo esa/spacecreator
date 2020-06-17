@@ -17,7 +17,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "messageitem.h"
@@ -63,7 +63,7 @@ private:
     QGraphicsView *m_view = nullptr;
     QUndoStack *m_undoStack = nullptr;
 
-    ChartViewModel *m_chartModel = nullptr;
+    ChartLayoutManager *m_chartModel = nullptr;
     MscModel *m_mscModel = nullptr;
     QPointer<MscChart> m_chart;
     QVector<MscInstance *> m_instances;
@@ -108,7 +108,7 @@ void tst_MessageItem::parseMsc(const QString &mscText)
 
 void tst_MessageItem::init()
 {
-    m_chartModel = new ChartViewModel;
+    m_chartModel = new ChartLayoutManager;
     m_undoStack = new QUndoStack();
     cmd::CommandsStack::setCurrent(m_undoStack);
 

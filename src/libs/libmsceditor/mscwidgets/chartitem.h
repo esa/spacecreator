@@ -31,7 +31,7 @@ class GripPoint;
 
 namespace msc {
 
-class ChartViewModel;
+class ChartLayoutManager;
 class MscChart;
 class TextItem;
 
@@ -40,8 +40,7 @@ class ChartItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit ChartItem(
-            MscChart *chartEntity, ChartViewModel *chartViewModel = nullptr, QGraphicsItem *parent = nullptr);
+    explicit ChartItem(MscChart *chartEntity, ChartLayoutManager *chartLayoutManager = nullptr, QGraphicsItem *parent = nullptr);
     ~ChartItem() override = default;
 
     QRectF boundingRect() const override;
@@ -85,7 +84,7 @@ private:
     MscChart *chart() const;
 
 private:
-    QPointer<ChartViewModel> m_chartViewModel;
+    QPointer<ChartLayoutManager> m_chartLayoutManager;
     QGraphicsRectItem *m_rectItem = nullptr;
     QGraphicsRectItem *m_contentArea = nullptr;
     TextItem *m_textItemName = nullptr;

@@ -1,8 +1,8 @@
-set(TEST_NAME tst_chartviewmodel)
+set(TEST_NAME tst_chartlayoutmanager)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-    tst_chartviewmodel.cpp
+    tst_chartlayoutmanager.cpp
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

@@ -16,7 +16,7 @@
 */
 
 #include "baseitems/common/mscutils.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
@@ -49,7 +49,7 @@ private Q_SLOTS:
     void testInsertingOrder();
 
 private:
-    ChartViewModel m_chartModel;
+    ChartLayoutManager m_chartModel;
     static constexpr int CommandsCount = 10;
     static constexpr bool SkipBenchmark = true; // not a really usefull thing to be run on the CI server
     msc::MscChart *m_chart = nullptr;
@@ -80,7 +80,7 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
 
 QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int insertId)
 {
-    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::ChartViewModel *>(&m_chartModel),
+    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::ChartLayoutManager *>(&m_chartModel),
         insertId, m_dummyCif };
 }
 

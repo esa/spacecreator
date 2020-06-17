@@ -199,7 +199,7 @@ QUndoCommand *CommandsFactory::createMessageItemCreate(const QVariantList &param
     Q_ASSERT(params.size() >= 3);
 
     msc::MscMessage *message = params.at(0).value<msc::MscMessage *>();
-    if (msc::ChartViewModel *model = params.at(1).value<msc::ChartViewModel *>()) {
+    if (msc::ChartLayoutManager *model = params.at(1).value<msc::ChartLayoutManager *>()) {
         const QVector<QPoint> &points = params.size() == 4 ? params.at(3).value<QVector<QPoint>>() : QVector<QPoint>();
         return new CmdMessageItemCreate(message, model, params.at(2).toInt(), points);
     }

@@ -59,12 +59,12 @@ MessageItem::GeometryNotificationBlocker ::~GeometryNotificationBlocker()
     }
 }
 
-MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source, InstanceItem *target,
-        QGraphicsItem *parent)
+MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutManager, InstanceItem *source,
+        InstanceItem *target, QGraphicsItem *parent)
     : InteractiveObject(message, parent)
     , m_message(message)
     , m_arrowItem(new LabeledArrowItem(this))
-    , m_chartViewModel(chartView)
+    , m_chartLayoutManager(chartLayoutManager)
 {
     Q_ASSERT(m_message != nullptr);
 
@@ -77,18 +77,18 @@ MessageItem::MessageItem(MscMessage *message, ChartViewModel *chartView, Instanc
     connect(m_arrowItem, &LabeledArrowItem::textChanged, this, &MessageItem::onTextChanged);
 
     connect(m_message, &msc::MscMessage::sourceChanged, this, [&](msc::MscInstance *mscInstance) {
-        if (!m_chartViewModel)
+        if (!m_chartLayoutManager)
             return;
-        msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
+        msc::InstanceItem *instance = m_chartLayoutManager->itemForInstance(mscInstance);
         this->setSourceInstanceItem(instance);
 
         if (geometryManagedByCif())
             updateCif();
     });
     connect(m_message, &msc::MscMessage::targetChanged, this, [&](msc::MscInstance *mscInstance) {
-        if (!m_chartViewModel)
+        if (!m_chartLayoutManager)
             return;
-        msc::InstanceItem *instance = m_chartViewModel->itemForInstance(mscInstance);
+        msc::InstanceItem *instance = m_chartLayoutManager->itemForInstance(mscInstance);
         this->setTargetInstanceItem(instance);
 
         if (geometryManagedByCif())
@@ -495,7 +495,7 @@ void MessageItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     const qreal newHead = head().y() + shift;
     const qreal newTail = tail().y() + shift;
 
-    const QRectF actualContentRect = m_chartViewModel ? m_chartViewModel->actualContentRect() : QRectF();
+    const QRectF actualContentRect = m_chartLayoutManager ? m_chartLayoutManager->actualContentRect() : QRectF();
     const qreal upperBound = qMax(m_sourceInstance ? m_sourceInstance->axis().y1() : actualContentRect.top(),
             m_targetInstance ? m_targetInstance->axis().y1() : actualContentRect.top());
     const qreal lowerBound = qMin(m_sourceInstance ? m_sourceInstance->axis().y2() : actualContentRect.bottom(),
@@ -603,38 +603,39 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
     }
 
     if (sourceChanged) {
-        const int newIdx = m_chartViewModel->eventIndex(tail().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                 { QVariant::fromValue<MscMessage *>(m_message), newIdx,
                         QVariant::fromValue<MscInstance *>(
                                 sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
                         QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
-                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+                        QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
     }
     if (targetChanged) {
-        const int newIdx = m_chartViewModel->eventIndex(head().y());
+        const int newIdx = m_chartLayoutManager->eventIndex(head().y());
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                 { QVariant::fromValue<MscMessage *>(m_message), newIdx,
                         QVariant::fromValue<MscInstance *>(
                                 targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
                         QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
-                        QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+                        QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
     }
 
-    const int newIdx = m_chartViewModel->eventIndex(sceneBoundingRect().y());
+    const int newIdx = m_chartLayoutManager->eventIndex(sceneBoundingRect().y());
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
             { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
                     QVariant::fromValue(newPointsCif), newIdx,
-                    QVariant::fromValue<MscChart *>(m_chartViewModel->currentChart()) });
+                    QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
     cmd::CommandsStack::current()->endMacro();
 
-    if (auto item = m_chartViewModel->itemForComment(m_message->comment()))
+    if (auto item = m_chartLayoutManager->itemForComment(m_message->comment()))
         item->instantLayoutUpdate();
 }
 
-MessageItem *MessageItem::createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos)
+MessageItem *MessageItem::createDefaultItem(
+        MscMessage *message, ChartLayoutManager *chartLayoutManager, const QPointF &pos)
 {
-    MessageItem *messageItem = new MessageItem(message, chartView);
+    MessageItem *messageItem = new MessageItem(message, chartLayoutManager);
     static const qreal halfLength(ArrowItem::defaultWidth() / 2.);
     const QPointF head(halfLength, pos.y());
     const QPointF tail(-halfLength, pos.y());

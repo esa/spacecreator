@@ -18,7 +18,7 @@
 #pragma once
 
 #include "basetool.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "mscchart.h"
 #include "mscentity.h"
 
@@ -30,10 +30,10 @@ class BaseCreatorTool : public BaseTool
 {
     Q_OBJECT
 public:
-    BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    BaseCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
 
 public Q_SLOTS:
-    void setModel(msc::ChartViewModel *model);
+    void setModel(msc::ChartLayoutManager *model);
 
 Q_SIGNALS:
     void created();
@@ -43,7 +43,7 @@ protected Q_SLOTS:
     virtual void onModelLayoutComplete();
 
 protected:
-    QPointer<ChartViewModel> m_model = nullptr;
+    QPointer<ChartLayoutManager> m_model = nullptr;
     QScopedPointer<MscEntity> m_previewEntity;
     QPointer<MscChart> m_activeChart = nullptr;
     QPointer<MscEntity> m_addedEntity = nullptr;

@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "exceptions.h"
 #include "mscinstance.h"
 #include "msctimer.h"
@@ -44,12 +44,12 @@ private:
     MscTimer *m_timer = nullptr;
     TimerItem *m_timerItem = nullptr;
     MscInstance *m_instance = nullptr;
-    ChartViewModel *m_model = nullptr;
+    ChartLayoutManager *m_model = nullptr;
 };
 
 void tst_TimerItem::init()
 {
-    m_model = new ChartViewModel;
+    m_model = new ChartLayoutManager;
     m_instance = new MscInstance;
 
     m_timer = new MscTimer();

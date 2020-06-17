@@ -26,7 +26,7 @@
 
 namespace msc {
 
-ConditionCreatorTool::ConditionCreatorTool(bool shared, ChartViewModel *model, QGraphicsView *view, QObject *parent)
+ConditionCreatorTool::ConditionCreatorTool(bool shared, ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_shared(shared)
 {

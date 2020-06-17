@@ -27,7 +27,7 @@ class EntityDeleteTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    explicit EntityDeleteTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    explicit EntityDeleteTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
 
     BaseTool::ToolType toolType() const override;
     void setView(QGraphicsView *view) override;

@@ -29,7 +29,7 @@
 
 namespace msc {
 
-CommentCreatorTool::CommentCreatorTool(bool isGlobal, ChartViewModel *model, QGraphicsView *view, QObject *parent)
+CommentCreatorTool::CommentCreatorTool(bool isGlobal, ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
     , m_isGlobalComment(isGlobal)
 {

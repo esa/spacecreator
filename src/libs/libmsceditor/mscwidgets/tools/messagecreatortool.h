@@ -27,7 +27,7 @@ class MessageCreatorTool : public BaseCreatorTool
     Q_OBJECT
 public:
     MessageCreatorTool(
-            MscMessage::MessageType msgType, ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+            MscMessage::MessageType msgType, ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
     virtual BaseTool::ToolType toolType() const override;
 
     void activate();

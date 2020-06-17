@@ -25,7 +25,7 @@ class InstanceCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    InstanceCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent);
     virtual BaseTool::ToolType toolType() const override;
     void setAction(QAction *action) override;
 

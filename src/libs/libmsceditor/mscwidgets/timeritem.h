@@ -29,7 +29,7 @@ class tst_TimerItem;
 
 namespace msc {
 
-class ChartViewModel;
+class ChartLayoutManager;
 class InstanceItem;
 class MscTimer;
 class TextItem;
@@ -38,7 +38,7 @@ class TimerItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem *parent = nullptr);
+    explicit TimerItem(msc::MscTimer *timer, ChartLayoutManager *model, QGraphicsItem *parent = nullptr);
 
     MscTimer *modelItem() const;
 
@@ -74,7 +74,7 @@ private:
 
     QPointer<msc::MscTimer> m_timer;
     QPointer<InstanceItem> m_instance;
-    QPointer<ChartViewModel> m_model;
+    QPointer<ChartLayoutManager> m_model;
     TextItem *m_textItem = nullptr;
     QGraphicsLineItem *m_timerConnector = nullptr;
     msc::TimerItem *m_connectingItem = nullptr;

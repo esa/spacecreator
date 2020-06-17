@@ -25,7 +25,7 @@ class CoregionCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    explicit CoregionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    explicit CoregionCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
     BaseTool::ToolType toolType() const override;
 
 private:

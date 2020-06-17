@@ -115,8 +115,8 @@ target_sources(${LIB_NAME} PRIVATE
     mscwidgets/baseitems/textitem.h
     mscwidgets/chartitem.cpp
     mscwidgets/chartitem.h
-    mscwidgets/chartviewmodel.cpp
-    mscwidgets/chartviewmodel.h
+    mscwidgets/chartlayoutmanager.cpp
+    mscwidgets/chartlayoutmanager.h
     mscwidgets/conditionitem.cpp
     mscwidgets/conditionitem.h
     mscwidgets/coregionitem.cpp

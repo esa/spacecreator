@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "instanceitem.h"
@@ -124,7 +124,7 @@ void tst_InstanceItem::testMoveByHead()
                              ENDMSC; \
                          ENDMSCDOCUMENT;");
 
-    QScopedPointer<ChartViewModel> chartModel(new ChartViewModel());
+    QScopedPointer<ChartLayoutManager> chartModel(new ChartLayoutManager());
     QScopedPointer<MscReader> reader(new MscReader);
     QScopedPointer<MscModel> model(reader->parseText(msc));
     QScopedPointer<QGraphicsView> view(new QGraphicsView());

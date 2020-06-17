@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
@@ -671,7 +671,7 @@ void MainWindow::initConnections()
             &MainWindow::showSelection);
     connect(d->ui->documentTreeView, &QTreeView::doubleClicked, this, &MainWindow::showChart);
 
-    connect(&(d->m_model->chartViewModel()), &msc::ChartViewModel::currentChartChanged, this,
+    connect(&(d->m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
             &MainWindow::selectCurrentChart);
 
     connect(d->m_model, &MainModel::showChartVew, this, [this]() { showDocumentView(true); });

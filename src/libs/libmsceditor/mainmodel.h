@@ -27,7 +27,7 @@ class QGraphicsScene;
 class QUndoStack;
 
 namespace msc {
-class ChartViewModel;
+class ChartLayoutManager;
 class DocumentItemModel;
 class HierarchyViewModel;
 class MscChart;
@@ -58,7 +58,7 @@ public:
 
     QStringList mscErrorMessages() const;
 
-    msc::ChartViewModel &chartViewModel() const;
+    msc::ChartLayoutManager &chartViewModel() const;
     msc::HierarchyViewModel &hierarchyViewModel() const;
 
     QString modelText() const;

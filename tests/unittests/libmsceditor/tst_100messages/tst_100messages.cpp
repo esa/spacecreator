@@ -16,7 +16,7 @@
 */
 
 #include "baseitems/arrowitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
@@ -45,7 +45,7 @@ private Q_SLOTS:
     void testPerformance();
 
 private:
-    ChartViewModel m_model;
+    ChartLayoutManager m_model;
     QPointer<QGraphicsView> m_view;
     QPointer<InstanceItem> m_instanceItem;
     static constexpr int CommandsCount = 100;
@@ -95,7 +95,7 @@ void tst100messages::testPerformance()
         const QPointF &messagePos = { instacneCenter.x() - ArrowItem::defaultWidth() / 2, instacneCenter.y() };
 
         QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()),
-            QVariant::fromValue<ChartViewModel *>(&m_model), QPointF() };
+            QVariant::fromValue<ChartLayoutManager *>(&m_model), QPointF() };
 
         for (int j = 0; j < CommandsCount / 2; ++j) {
 

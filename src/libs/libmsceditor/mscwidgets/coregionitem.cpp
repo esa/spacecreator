@@ -18,7 +18,7 @@
 #include "coregionitem.h"
 
 #include "baseitems/common/mscutils.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "msccoregion.h"
@@ -28,7 +28,7 @@
 
 namespace msc {
 
-CoregionItem::CoregionItem(ChartViewModel *model, QGraphicsItem *parent)
+CoregionItem::CoregionItem(ChartLayoutManager *model, QGraphicsItem *parent)
     : InteractiveObject(nullptr, parent)
     , m_model(model)
 {

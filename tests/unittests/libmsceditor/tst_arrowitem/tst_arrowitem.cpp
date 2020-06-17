@@ -18,7 +18,7 @@
 #include "baseitems/arrowitem.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/common/objectslink.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
@@ -46,7 +46,7 @@ private Q_SLOTS:
     void testObjectsLinkItem();
 
 private:
-    QScopedPointer<ChartViewModel> m_model;
+    QScopedPointer<ChartLayoutManager> m_model;
     QScopedPointer<QGraphicsScene> m_scene;
     QScopedPointer<msc::MscChart> m_chart;
     QPointer<InstanceItem> m_item1;
@@ -58,7 +58,7 @@ private:
 
 void tst_ArrowItem::initTestCase()
 {
-    m_model.reset(new ChartViewModel);
+    m_model.reset(new ChartLayoutManager);
     m_chart.reset(new msc::MscChart);
     m_model->setCurrentChart(m_chart.data());
     m_scene.reset(new QGraphicsScene);

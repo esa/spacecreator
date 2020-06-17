@@ -24,7 +24,7 @@
 
 namespace msc {
 
-InstanceCreatorTool::InstanceCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+InstanceCreatorTool::InstanceCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseCreatorTool(model, view, parent)
 {
     m_title = tr("Instance");

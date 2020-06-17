@@ -26,7 +26,7 @@ class ConditionCreatorTool : public BaseCreatorTool
     Q_OBJECT
 
 public:
-    ConditionCreatorTool(bool shared, ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ConditionCreatorTool(bool shared, ChartLayoutManager *model, QGraphicsView *view, QObject *parent);
     BaseTool::ToolType toolType() const override;
 
 protected:

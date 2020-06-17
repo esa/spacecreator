@@ -25,7 +25,7 @@ class ActionCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    ActionCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent);
+    ActionCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent);
     BaseTool::ToolType toolType() const override;
 
 protected:

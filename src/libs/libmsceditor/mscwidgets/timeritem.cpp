@@ -18,7 +18,7 @@
 #include "timeritem.h"
 
 #include "baseitems/textitem.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "msctimer.h"
@@ -38,7 +38,7 @@ namespace msc {
 
 static const QRectF symbolSize(0, 0, 50, 25);
 
-TimerItem::TimerItem(msc::MscTimer *timer, ChartViewModel *model, QGraphicsItem *parent)
+TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *model, QGraphicsItem *parent)
     : InteractiveObject(timer, parent)
     , m_timer(timer)
     , m_model(model)

@@ -17,7 +17,7 @@
 
 #include "mainmodel.h"
 
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "exceptions.h"
@@ -67,7 +67,7 @@ struct MainModelPrivate {
 
     MscModel *m_mscModel = nullptr; /// model of the msc data
     QStringList m_mscErrorMessages;
-    ChartViewModel m_chartModel; /// model for the chart UI
+    ChartLayoutManager m_chartLayoutManager; /// model for the chart UI
     HierarchyViewModel m_hierarchyModel; /// model of the graphical document UI
     DocumentItemModel *m_documentItemModel = nullptr; /// model of the document tree
     QPointer<msc::MscDocument> m_selectedDocument;
@@ -95,7 +95,7 @@ MainModel::MainModel(QObject *parent)
     connect(&d->m_hierarchyModel, &HierarchyViewModel::selectedDocumentChanged, this, &MainModel::setSelectedDocument);
 
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
-    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
+    connect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     initialModel();
     showFirstChart();
@@ -136,7 +136,7 @@ void MainModel::initialModel()
  */
 QGraphicsScene *MainModel::graphicsScene() const
 {
-    return d->m_chartModel.graphicsScene();
+    return d->m_chartLayoutManager.graphicsScene();
 }
 
 /*!
@@ -170,9 +170,9 @@ QStringList MainModel::mscErrorMessages() const
  * \brief MainModel::chartViewModel Get the chart model
  * \return The chart model
  */
-ChartViewModel &MainModel::chartViewModel() const
+ChartLayoutManager &MainModel::chartViewModel() const
 {
-    return d->m_chartModel;
+    return d->m_chartLayoutManager;
 }
 
 /*!
@@ -296,7 +296,7 @@ bool MainModel::needSave() const
  */
 void MainModel::showFirstChart()
 {
-    d->m_chartModel.setCurrentChart(firstChart());
+    d->m_chartLayoutManager.setCurrentChart(firstChart());
 }
 
 /*!
@@ -343,7 +343,7 @@ bool MainModel::saveMsc(const QString &filename)
     if (d->m_mscModel && (d->m_mscModel->documents().size() || d->m_mscModel->charts().size()))
         ok = mscWriter.saveModel(d->m_mscModel, filename);
     else
-        ok = mscWriter.saveChart(d->m_chartModel.currentChart(), filename);
+        ok = mscWriter.saveChart(d->m_chartLayoutManager.currentChart(), filename);
 
     setCurrentFilePath(filename);
     storeCurrentUndoCommandId();
@@ -356,7 +356,7 @@ bool MainModel::saveMsc(const QString &filename)
  */
 void MainModel::copyCurrentChart()
 {
-    const QString charText = chartText(d->m_chartModel.currentChart());
+    const QString charText = chartText(d->m_chartLayoutManager.currentChart());
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(MscChartMimeType, charText.toLatin1());
@@ -371,7 +371,7 @@ void MainModel::copyCurrentChart()
  */
 void MainModel::copyCurrentChartAsPicture()
 {
-    QGraphicsScene *scene = d->m_chartModel.graphicsScene();
+    QGraphicsScene *scene = d->m_chartLayoutManager.graphicsScene();
 
     QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32);
     image.fill(Qt::transparent);
@@ -414,7 +414,7 @@ void MainModel::showChartFromDocument(MscDocument *document)
         return;
     }
 
-    d->m_chartModel.setCurrentChart(document->charts().at(0));
+    d->m_chartLayoutManager.setCurrentChart(document->charts().at(0));
     Q_EMIT showChartVew();
 }
 
@@ -459,10 +459,11 @@ MscChart *MainModel::firstChart(const QVector<MscDocument *> &docs) const
 void MainModel::clearMscModel()
 {
     d->m_documentItemModel->setMscModel(nullptr);
-    d->m_chartModel.clearScene();
+    d->m_chartLayoutManager.clearScene();
     d->m_hierarchyModel.setModel(nullptr);
     if (d->m_mscModel) {
-        disconnect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
+        disconnect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel,
+                &msc::MscModel::dataChanged);
         disconnect(d->m_mscModel, nullptr, this, nullptr);
 
         delete d->m_mscModel;
@@ -487,7 +488,7 @@ void MainModel::setNewModel(MscModel *model)
     connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
-    connect(&d->m_chartModel, &ChartViewModel::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
+    connect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);

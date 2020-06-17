@@ -53,14 +53,14 @@ class MscInstance;
 class MscInstanceEvent;
 class MscTimer;
 
-struct ChartViewModelPrivate;
+struct ChartLayoutManagerPrivate;
 
-class ChartViewModel : public QObject
+class ChartLayoutManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ChartViewModel(QObject *parent = nullptr);
-    ~ChartViewModel();
+    explicit ChartLayoutManager(QObject *parent = nullptr);
+    ~ChartLayoutManager();
 
     QGraphicsScene *graphicsScene() const;
 
@@ -124,7 +124,7 @@ private Q_SLOTS:
     void onInstanceCreatorChanged(msc::MscInstance *newCreator);
 
 private:
-    std::unique_ptr<ChartViewModelPrivate> const d;
+    std::unique_ptr<ChartLayoutManagerPrivate> const d;
 
     Q_INVOKABLE void doLayout();
 

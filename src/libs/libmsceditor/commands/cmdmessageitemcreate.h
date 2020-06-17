@@ -25,7 +25,7 @@
 
 namespace msc {
 
-class ChartViewModel;
+class ChartLayoutManager;
 class MscChart;
 class MscMessage;
 class InstanceItem;
@@ -35,7 +35,7 @@ namespace cmd {
 class CmdMessageItemCreate : public BaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, msc::ChartViewModel *chart, int eventIndex,
+    CmdMessageItemCreate(msc::MscMessage *message, msc::ChartLayoutManager *chart, int eventIndex,
             const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
@@ -45,7 +45,7 @@ public:
 
 private:
     MscMessage *m_message = nullptr;
-    QPointer<ChartViewModel> m_viewModel;
+    QPointer<ChartLayoutManager> m_viewModel;
     QPointer<MscChart> m_chart;
     int m_eventIndex;
     QVector<QPoint> m_msgPoints;

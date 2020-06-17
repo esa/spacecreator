@@ -25,7 +25,7 @@ class CommentCreatorTool : public BaseCreatorTool
 {
     Q_OBJECT
 public:
-    explicit CommentCreatorTool(bool isGlobal, ChartViewModel *model, QGraphicsView *view, QObject *parent = nullptr);
+    explicit CommentCreatorTool(bool isGlobal, ChartLayoutManager *model, QGraphicsView *view, QObject *parent = nullptr);
 
     BaseTool::ToolType toolType() const override;
 

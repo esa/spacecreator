@@ -23,14 +23,14 @@
 
 namespace msc {
 class MscCoregion;
-class ChartViewModel;
+class ChartLayoutManager;
 class InstanceItem;
 
 class CoregionItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    explicit CoregionItem(ChartViewModel *model, QGraphicsItem *parent = nullptr);
+    explicit CoregionItem(ChartLayoutManager *model, QGraphicsItem *parent = nullptr);
 
     void setBegin(MscCoregion *begin);
     MscCoregion *begin() const { return m_begin; }
@@ -48,7 +48,7 @@ protected:
     void rebuildLayout() override;
 
 private:
-    QPointer<ChartViewModel> m_model;
+    QPointer<ChartLayoutManager> m_model;
     QPointer<InstanceItem> m_instance;
 
     MscCoregion *m_begin = nullptr;

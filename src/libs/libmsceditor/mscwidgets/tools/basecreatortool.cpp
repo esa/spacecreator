@@ -23,18 +23,18 @@
 
 namespace msc {
 
-BaseCreatorTool::BaseCreatorTool(ChartViewModel *model, QGraphicsView *view, QObject *parent)
+BaseCreatorTool::BaseCreatorTool(ChartLayoutManager *model, QGraphicsView *view, QObject *parent)
     : BaseTool(view, parent)
     , m_model(model)
     , m_activeChart(m_model ? m_model->currentChart() : nullptr)
 
 {
     if (model) {
-        connect(model, &ChartViewModel::currentChartChanged, this, &BaseCreatorTool::onCurrentChartChagend);
+        connect(model, &ChartLayoutManager::currentChartChanged, this, &BaseCreatorTool::onCurrentChartChagend);
     }
 }
 
-void BaseCreatorTool::setModel(ChartViewModel *model)
+void BaseCreatorTool::setModel(ChartLayoutManager *model)
 {
     m_model = model;
 }
@@ -57,7 +57,7 @@ void BaseCreatorTool::startWaitForModelLayoutComplete(MscEntity *addedEntity)
     m_addedEntity = addedEntity;
     dropModelLayoutUpdateConnection();
     m_modelUpdateFinishedListener =
-            connect(m_model, &ChartViewModel::layoutComplete, this, &BaseCreatorTool::onModelLayoutComplete);
+            connect(m_model, &ChartLayoutManager::layoutComplete, this, &BaseCreatorTool::onModelLayoutComplete);
 }
 
 void BaseCreatorTool::removePreviewItem()

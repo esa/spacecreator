@@ -19,7 +19,7 @@
 
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/interactiveobject.h"
-#include "chartviewmodel.h"
+#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 
 #include <QPointer>
@@ -45,7 +45,7 @@ public:
         GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
     };
 
-    explicit MessageItem(MscMessage *message, ChartViewModel *chartView, InstanceItem *source = nullptr,
+    explicit MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutManager, InstanceItem *source = nullptr,
             InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
@@ -73,7 +73,8 @@ public:
     bool isAutoResizable() const;
     void setAutoResizable(bool resizable);
 
-    static MessageItem *createDefaultItem(MscMessage *message, ChartViewModel *chartView, const QPointF &pos);
+    static MessageItem *createDefaultItem(
+            MscMessage *message, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
 
     void performSnap();
 
@@ -125,7 +126,7 @@ private Q_SLOTS:
 private:
     QPointer<msc::MscMessage> m_message = nullptr;
     LabeledArrowItem *m_arrowItem = nullptr;
-    QPointer<msc::ChartViewModel> m_chartViewModel = nullptr;
+    QPointer<msc::ChartLayoutManager> m_chartLayoutManager = nullptr;
     QPointer<InstanceItem> m_sourceInstance = nullptr;
     QPointer<InstanceItem> m_targetInstance = nullptr;
     bool m_posChangeIgnored = false;
