@@ -39,6 +39,8 @@ private Q_SLOTS:
     void testRedo();
     void testUndo();
 
+    void testSettingEmptyString();
+
 private:
     msc::MscChart *m_chart = nullptr;
 };
@@ -106,6 +108,21 @@ void tst_CmdEntityCommentChange::testUndo()
     msc::cmd::CommandsStack::current()->undo();
     QVERIFY(m_chart->comment() != nullptr);
     QCOMPARE(m_chart->commentString(), QString("TestXY"));
+}
+
+void tst_CmdEntityCommentChange::testSettingEmptyString()
+{
+    m_chart->setCommentString("Comment A");
+
+    // Applying an empty string is the same as deleting the comment
+    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
+            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
+                    QString("") });
+
+    QCOMPARE(m_chart->commentString(), QString(""));
+
+    msc::cmd::CommandsStack::current()->undo();
+    QCOMPARE(m_chart->commentString(), QString("Comment A"));
 }
 
 QTEST_MAIN(tst_CmdEntityCommentChange)

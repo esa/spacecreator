@@ -40,7 +40,7 @@ void CmdEntityCommentChange::redo()
     MscComment *comment = m_modelItem->comment();
     if (m_newComment.isEmpty()) {
         if (comment) {
-            comment->setCommentString(m_newComment);
+            comment->setText(m_newComment);
             m_chart->removeInstanceEvent(comment);
 
             // this command takes over ownership
