@@ -223,8 +223,7 @@ void MSCPlugin::initConnections()
 {
     Q_ASSERT(m_chartView != nullptr);
 
-    auto chartview = qobject_cast<GraphicsView *>(m_chartView);
-    if (chartview) {
+    if (auto chartview = qobject_cast<GraphicsView *>(m_chartView)) {
         connect(chartview, &msc::GraphicsView::createMessageToolRequested, this, [&]() {
             if (m_messageCreateTool) {
                 m_messageCreateTool->activate();
