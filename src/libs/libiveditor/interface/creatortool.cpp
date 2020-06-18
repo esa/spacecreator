@@ -55,7 +55,6 @@
 #include <limits>
 
 static const qreal kContextMenuItemTolerance = 10.;
-static const qreal kGripPointTolerance = 4;
 static const QList<int> kFunctionTypes = { aadlinterface::AADLFunctionGraphicsItem::Type,
     aadlinterface::AADLFunctionTypeGraphicsItem::Type };
 static const qreal kPreviewItemPenWidth = 2.;
