@@ -203,8 +203,8 @@ void MSCPlugin::initHierarchyViewActions()
             m_model->setSelectedDocument(document);
         });
 
-        connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
         connect(action, &QAction::toggled, this, [&]() {
+            tool->setActive(!tool->isActive());
             for (QAction *action : hierarchyActions())
                 action->setChecked(false);
         });
