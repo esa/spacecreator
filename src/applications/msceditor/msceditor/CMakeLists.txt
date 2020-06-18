@@ -31,3 +31,5 @@ if (WIN32)
     set_property(TARGET ${APP_NAME} PROPERTY WIN32_EXECUTABLE true)
   endif()
 endif()
+
+install(TARGETS ${APP_NAME} DESTINATION bin)
