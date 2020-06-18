@@ -21,6 +21,7 @@
 #include "msccontext.h"
 #include "msceditordocument.h"
 #include "msceditorstack.h"
+#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "msctexteditor.h"
 
@@ -176,7 +177,7 @@ void MscEditorData::updateToolBar()
         for (QAction *action : designWidget->toolActions())
             m_widgetToolBar->addAction(action);
         m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->hierarchyActions())
+        for (QAction *action : designWidget->mscPlugin()->hierarchyActions())
             m_widgetToolBar->addAction(action);
     }
 }

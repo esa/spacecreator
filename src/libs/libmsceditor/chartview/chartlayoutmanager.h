@@ -58,6 +58,8 @@ struct ChartLayoutManagerPrivate;
 class ChartLayoutManager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(msc::MscChart *currentChart READ currentChart WRITE setCurrentChart NOTIFY currentChartChanged)
+
 public:
     explicit ChartLayoutManager(QObject *parent = nullptr);
     ~ChartLayoutManager();

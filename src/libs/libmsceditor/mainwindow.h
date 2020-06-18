@@ -31,7 +31,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainModel;
 class QUndoGroup;
 class QGraphicsView;
 class QPlainTextEdit;
@@ -55,8 +54,6 @@ public:
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
     QPlainTextEdit *textOutputPane() const;
 
-    BaseTool *deleteTool();
-
     QAction *dockWidgetDocumentToggleAction();
     QAction *mscTextViewToggleAction();
     QAction *dockWidgetAsn1ToggleAction();
@@ -68,7 +65,6 @@ public Q_SLOTS:
 
     void createNewDocument();
     void selectAndOpenFile();
-    void selectCurrentChart();
 
 Q_SIGNALS:
     void currentGraphicsViewChanged(QGraphicsView *view);
@@ -82,8 +78,6 @@ public Q_SLOTS:
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     bool openMscChain(const QString &dirPath);
-    void activateDefaultTool();
-    void onCreateMessageToolRequested();
     bool startRemoteControl(quint16 port);
     void updateTitles();
     void updateModel();
@@ -106,8 +100,6 @@ private:
 
     void setupUi();
     void initActions();
-    void initDocumentViewActions();
-    void initTools();
     void initMainToolbar();
     void initConnections();
 
@@ -122,7 +114,6 @@ private:
     QSizeF prepareChartBoxSize() const;
 
     void updateMscToolbarActionsEnablement();
-    void updateMscToolbarActionsChecked();
 
     static QStringList mscFileFilters();
 
@@ -131,8 +122,6 @@ private:
 #ifdef QT_DEBUG
     void showMousePositioner();
 #endif
-
-    msc::BaseTool *activeTool() const;
 
     void saveSceneRender(const QString &filePath) const;
 

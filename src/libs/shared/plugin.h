@@ -27,7 +27,7 @@ public:
     // Override this to show or hide actions
     virtual void setPluginActive(bool active) = 0;
 
-    virtual ui::GraphicsViewBase *graphicsView() = 0;
+    virtual ui::GraphicsViewBase *chartView() = 0;
     virtual QToolBar *mainToolBar();
     virtual void addToolBars(QMainWindow *window) = 0;
 

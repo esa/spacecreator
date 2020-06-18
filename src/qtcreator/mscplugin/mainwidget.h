@@ -19,6 +19,7 @@
 
 #include <QStackedWidget>
 #include <QWidget>
+#include <memory>
 
 class QAction;
 class QGraphicsView;
@@ -27,20 +28,9 @@ class QUndoStack;
 
 namespace msc {
 class ASN1FileView;
-class ActionCreatorTool;
-class BaseTool;
-class CommentCreatorTool;
-class ConditionCreatorTool;
-class CoregionCreatorTool;
 class DocumentTreeView;
-class EntityDeleteTool;
 class GraphicsView;
-class InstanceCreatorTool;
-class InstanceStopTool;
-class MainModel;
-class MessageCreatorTool;
-class PointerTool;
-class TimerCreatorTool;
+class MSCPlugin;
 }
 
 namespace MscPlugin {
@@ -63,14 +53,12 @@ public:
 
     QString textContents() const;
 
-    QAction *actionCopy() const { return m_actCopy; }
-    QAction *actionPaste() const { return m_actPaste; }
+    QAction *actionCopy() const;
+    QAction *actionPaste() const;
     QAction *actionToolDelete() const;
     QVector<QAction *> toolActions() const;
-    QVector<QAction *> hierarchyActions() const;
 
-public Q_SLOTS:
-    void selectCurrentChart();
+    msc::MSCPlugin *mscPlugin() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -78,50 +66,19 @@ Q_SIGNALS:
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
-    void showDocumentView(bool show);
-    void showHierarchyView(bool show);
 
 private:
     void initUi();
     void initActions();
-    void initTools();
-    void initDocumentViewActions();
     void initConnections();
-    void activateDefaultTool();
 
     QSplitter *m_horizontalSplitter = nullptr;
     QSplitter *m_leftVerticalSplitter = nullptr;
 
-    QStackedWidget *m_centerView = nullptr;
-    msc::GraphicsView *m_graphicsView;
-    msc::GraphicsView *m_hierarchyView;
-
     msc::DocumentTreeView *m_documentTree = nullptr;
     msc::ASN1FileView *m_asn1Widget = nullptr;
 
-    msc::MainModel *m_model = nullptr;
-
-    QAction *m_actCopy = nullptr;
-    QAction *m_actPaste = nullptr;
-
-    QVector<msc::BaseTool *> m_tools;
-    msc::EntityDeleteTool *m_deleteTool = nullptr;
-    msc::PointerTool *m_pointerTool = nullptr;
-    msc::InstanceCreatorTool *m_instanceCreatorTool = nullptr;
-    msc::InstanceStopTool *m_instanceStopTool = nullptr;
-    msc::MessageCreatorTool *m_messageCreateTool = nullptr;
-    msc::MessageCreatorTool *m_createCreateTool = nullptr;
-    msc::CommentCreatorTool *m_commentCreateTool = nullptr;
-    msc::CommentCreatorTool *m_globalCommentCreateTool = nullptr;
-    msc::CoregionCreatorTool *m_coregionCreateTool = nullptr;
-    msc::ActionCreatorTool *m_actionCreateTool = nullptr;
-    msc::ConditionCreatorTool *m_conditionCreateTool = nullptr;
-    msc::ConditionCreatorTool *m_sharedConditionTool = nullptr;
-    msc::TimerCreatorTool *m_startTimerCreateTool = nullptr;
-    msc::TimerCreatorTool *m_stopTimerCreateTool = nullptr;
-    msc::TimerCreatorTool *m_timeoutTimerCreateTool = nullptr;
-
-    QVector<msc::BaseTool *> m_hierarchyTools;
+    std::unique_ptr<msc::MSCPlugin> m_plugin;
 };
 
 }

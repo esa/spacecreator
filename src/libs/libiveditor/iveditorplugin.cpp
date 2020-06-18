@@ -30,7 +30,7 @@ void IVEditorPlugin::setPluginActive(bool active)
     m_actionSaveSceneRender->setVisible(active);
 }
 
-GraphicsView *IVEditorPlugin::graphicsView()
+GraphicsView *IVEditorPlugin::chartView()
 {
     return m_graphicsView;
 }

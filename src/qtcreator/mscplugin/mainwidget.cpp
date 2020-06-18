@@ -26,17 +26,8 @@
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
-#include "tools/actioncreatortool.h"
-#include "tools/commentcreatortool.h"
-#include "tools/conditioncreatortool.h"
-#include "tools/coregioncreatortool.h"
+#include "mscplugin.h"
 #include "tools/entitydeletetool.h"
-#include "tools/hierarchycreatortool.h"
-#include "tools/instancecreatortool.h"
-#include "tools/instancestoptool.h"
-#include "tools/messagecreatortool.h"
-#include "tools/pointertool.h"
-#include "tools/timercreatortool.h"
 
 #include <QAction>
 #include <QDebug>
@@ -52,26 +43,24 @@
 
 namespace MscPlugin {
 
-static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
+/*!
+   \brief MscPlugin::MainWidget::MainWidget Is the main widget for the whole MSC plugin in QtCreator
+ */
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_model(new msc::MainModel(this))
+    , m_plugin(new msc::MSCPlugin(this))
 {
     initUi();
 
-    m_documentTree->setModel(m_model->documentItemModel());
-    m_asn1Widget->setModel(m_model->mscModel());
-    m_graphicsView->setScene(m_model->graphicsScene());
-    m_hierarchyView->setBackgroundBrush(QImage(":/resources/resources/texture.png"));
-    m_hierarchyView->setScene(m_model->hierarchyScene());
-
     initActions();
-    initTools();
-    initDocumentViewActions();
+    m_plugin->createActionCopy(nullptr);
+    m_plugin->createActionPaste(nullptr);
+    m_plugin->initChartTools();
+    m_plugin->initHierarchyViewActions();
     initConnections();
 
-    showDocumentView(true);
+    m_plugin->showDocumentView(true);
 }
 
 MainWidget::~MainWidget()
@@ -79,19 +68,18 @@ MainWidget::~MainWidget()
     if (m_documentTree->model()) {
         disconnect(m_documentTree->model(), nullptr, this, nullptr);
     }
-    disconnect(&(m_model->chartViewModel()), nullptr, this, nullptr);
-    disconnect(m_model, nullptr, this, nullptr);
-    disconnect(m_model->undoStack(), nullptr, this, nullptr);
+    disconnect(&(m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
+    disconnect(m_plugin->mainModel(), nullptr, this, nullptr);
+    disconnect(m_plugin->mainModel()->undoStack(), nullptr, this, nullptr);
 }
 
 bool MainWidget::load(const QString &filename)
 {
-    m_model->chartViewModel().setPreferredChartBoxSize(QSizeF());
+    m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(QSizeF());
 
-    const bool ok = m_model->loadFile(filename);
+    const bool ok = m_plugin->mainModel()->loadFile(filename);
     if (ok) {
-        selectCurrentChart();
-        m_graphicsView->setZoom(100);
+        m_plugin->chartView()->setZoom(100);
     }
 
     return ok;
@@ -99,66 +87,57 @@ bool MainWidget::load(const QString &filename)
 
 bool MainWidget::save()
 {
-    return m_model->saveMsc(m_model->currentFilePath());
+    return m_plugin->mainModel()->saveMsc(m_plugin->mainModel()->currentFilePath());
 }
 
 QString MainWidget::errorMessage() const
 {
-    return m_model->mscErrorMessages().join("\n");
+    return m_plugin->mainModel()->mscErrorMessages().join("\n");
 }
 
 void MainWidget::setFileName(const QString &filename)
 {
-    m_model->setCurrentFilePath(filename);
+    m_plugin->mainModel()->setCurrentFilePath(filename);
 }
 
 bool MainWidget::isDirty() const
 {
-    return m_model->needSave();
+    return m_plugin->mainModel()->needSave();
 }
 
 QUndoStack *MainWidget::undoStack()
 {
-    return m_model->undoStack();
+    return m_plugin->mainModel()->undoStack();
 }
 
 QString MainWidget::textContents() const
 {
-    return m_model->modelText();
+    return m_plugin->mainModel()->modelText();
+}
+
+QAction *MainWidget::actionCopy() const
+{
+    return m_plugin->actionCopy();
+}
+
+QAction *MainWidget::actionPaste() const
+{
+    return m_plugin->actionPaste();
 }
 
 QAction *MainWidget::actionToolDelete() const
 {
-    return m_deleteTool->action();
+    return m_plugin->deleteTool()->action();
 }
 
 QVector<QAction *> MainWidget::toolActions() const
 {
-    QVector<QAction *> actions;
-    actions.reserve(m_tools.size());
-    for (msc::BaseTool *tool : m_tools) {
-        if (tool != m_deleteTool)
-            actions.append(tool->action());
-    }
-    return actions;
+    return m_plugin->chartActions();
 }
 
-QVector<QAction *> MainWidget::hierarchyActions() const
+msc::MSCPlugin *MainWidget::mscPlugin() const
 {
-    QVector<QAction *> actions;
-    actions.reserve(m_tools.size());
-    for (msc::BaseTool *tool : m_hierarchyTools) {
-        actions.append(tool->action());
-    }
-    return actions;
-}
-
-void MainWidget::selectCurrentChart()
-{
-    msc::MscChart *chart = m_model->chartViewModel().currentChart();
-    if (m_deleteTool) {
-        m_deleteTool->setCurrentChart(chart);
-    }
+    return m_plugin.get();
 }
 
 void MainWidget::showChart(const QModelIndex &index)
@@ -174,8 +153,8 @@ void MainWidget::showChart(const QModelIndex &index)
 
     if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
         if (!document->charts().empty()) {
-            m_model->chartViewModel().setCurrentChart(document->charts()[0]);
-            showDocumentView(true);
+            m_plugin->mainModel()->chartViewModel().setCurrentChart(document->charts()[0]);
+            m_plugin->showDocumentView(true);
         }
     }
 }
@@ -189,7 +168,7 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
 
     auto *obj = static_cast<QObject *>(current.internalPointer());
     if (obj == nullptr) {
-        m_model->setSelectedDocument(nullptr);
+        m_plugin->mainModel()->setSelectedDocument(nullptr);
         return;
     }
 
@@ -203,10 +182,10 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
         }
     }
     if (chart) {
-        m_model->chartViewModel().setCurrentChart(chart);
-        showDocumentView(true);
+        m_plugin->mainModel()->chartViewModel().setCurrentChart(chart);
+        m_plugin->showDocumentView(true);
     } else {
-        showHierarchyView(true);
+        m_plugin->showHierarchyView(true);
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
             bool canNewChild = true;
@@ -218,62 +197,24 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
                             || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
                 canNewChild = false;
             }
-            for (QAction *action : hierarchyActions()) {
+            for (QAction *action : m_plugin->hierarchyActions()) {
                 action->setEnabled(canNewChild);
             }
 
-            m_model->setSelectedDocument(document);
-        }
-    }
-}
-
-void MainWidget::showDocumentView(bool show)
-{
-    if (show) {
-        m_centerView->setCurrentWidget(m_graphicsView);
-
-        m_actCopy->setEnabled(true);
-
-        msc::MscChart *chart = m_model->chartViewModel().currentChart();
-        m_deleteTool->setView(m_graphicsView);
-        m_deleteTool->setCurrentChart(chart);
-
-        for (QAction *action : toolActions()) {
-            action->setEnabled(true);
-        }
-        for (QAction *action : hierarchyActions()) {
-            action->setEnabled(false);
-        }
-    }
-}
-
-void MainWidget::showHierarchyView(bool show)
-{
-    if (show) {
-        m_centerView->setCurrentWidget(m_hierarchyView);
-
-        m_actCopy->setEnabled(false);
-        m_actPaste->setEnabled(false);
-
-        m_deleteTool->setView(m_hierarchyView);
-        m_deleteTool->setCurrentChart(nullptr);
-
-        for (QAction *action : toolActions()) {
-            action->setEnabled(false);
-        }
-        for (QAction *action : hierarchyActions()) {
-            action->setEnabled(true);
+            m_plugin->mainModel()->setSelectedDocument(document);
         }
     }
 }
 
 void MainWidget::initUi()
 {
-    m_centerView = new QStackedWidget(this);
-    m_graphicsView = new msc::GraphicsView();
-    m_centerView->addWidget(m_graphicsView);
-    m_hierarchyView = new msc::GraphicsView();
-    m_centerView->addWidget(m_hierarchyView);
+    auto centerView = new QStackedWidget(this);
+    auto graphicsView = new msc::GraphicsView(this);
+    centerView->addWidget(graphicsView);
+    auto hierarchyView = new msc::GraphicsView(this);
+    centerView->addWidget(hierarchyView);
+
+    m_plugin->setViews(centerView, graphicsView, hierarchyView);
 
     m_documentTree = new msc::DocumentTreeView(this);
     m_documentTree->header()->setVisible(true);
@@ -288,134 +229,16 @@ void MainWidget::initUi()
 
     m_horizontalSplitter = new Core::MiniSplitter(Qt::Horizontal);
     m_horizontalSplitter->addWidget(m_leftVerticalSplitter);
-    m_horizontalSplitter->addWidget(m_centerView);
+    m_horizontalSplitter->addWidget(centerView);
     m_horizontalSplitter->setStretchFactor(0, 0);
     m_horizontalSplitter->setStretchFactor(1, 1);
 
     setLayout(new QVBoxLayout);
     layout()->addWidget(m_horizontalSplitter);
     layout()->setMargin(0);
-}
 
-void MainWidget::initActions()
-{
-    m_actCopy = new QAction(tr("Copy Diagram"), this);
-    m_actCopy->setShortcut(QKeySequence::Copy);
-    m_actCopy->setIcon(QIcon::fromTheme("edit-copy"));
-    connect(m_actCopy, &QAction::triggered, m_model, &msc::MainModel::copyCurrentChart);
-
-    m_actPaste = new QAction(tr("Paste:"), this);
-    m_actPaste->setShortcut(QKeySequence::Paste);
-    m_actPaste->setIcon(QIcon::fromTheme("edit-paste"));
-    connect(m_actPaste, &QAction::triggered, m_model, &msc::MainModel::pasteChart);
-}
-
-void MainWidget::initTools()
-{
-    m_deleteTool = new msc::EntityDeleteTool(&(m_model->chartViewModel()), m_graphicsView, this);
-    m_deleteTool->setCurrentChart(m_model->chartViewModel().currentChart());
-
-    m_pointerTool = new msc::PointerTool(nullptr, this);
-    m_tools.append(m_pointerTool);
-
-    m_instanceCreatorTool = new msc::InstanceCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_instanceCreatorTool);
-
-    m_instanceStopTool = new msc::InstanceStopTool(nullptr, this);
-    m_tools.append(m_instanceStopTool);
-
-    m_messageCreateTool = new msc::MessageCreatorTool(
-            msc::MscMessage::MessageType::Message, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_messageCreateTool);
-
-    m_createCreateTool = new msc::MessageCreatorTool(
-            msc::MscMessage::MessageType::Create, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_createCreateTool);
-
-    m_commentCreateTool = new msc::CommentCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_commentCreateTool);
-
-    m_globalCommentCreateTool = new msc::CommentCreatorTool(true, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_globalCommentCreateTool);
-
-    m_coregionCreateTool = new msc::CoregionCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_coregionCreateTool);
-
-    m_actionCreateTool = new msc::ActionCreatorTool(&(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_actionCreateTool);
-
-    m_conditionCreateTool = new msc::ConditionCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_conditionCreateTool);
-
-    m_sharedConditionTool = new msc::ConditionCreatorTool(true, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_sharedConditionTool);
-
-    m_startTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Start, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_startTimerCreateTool);
-
-    m_stopTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Stop, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_stopTimerCreateTool);
-
-    m_timeoutTimerCreateTool =
-            new msc::TimerCreatorTool(msc::MscTimer::TimerType::Timeout, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_timeoutTimerCreateTool);
-
-    QActionGroup *toolsActions = new QActionGroup(this);
-    toolsActions->setExclusive(false);
-
-    for (msc::BaseTool *tool : m_tools) {
-        QAction *toolAction = new QAction(tool->title(), this);
-        toolAction->setCheckable(true);
-        toolAction->setIcon(tool->icon());
-        toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
-        toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
-        tool->setView(m_graphicsView);
-        tool->setAction(toolAction);
-
-        if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool))
-            connect(creatorTool, &msc::BaseCreatorTool::created, this, &MainWidget::activateDefaultTool);
-
-        toolsActions->addAction(toolAction);
-    }
-    activateDefaultTool();
-}
-
-void MainWidget::initDocumentViewActions()
-{
-    auto addAction = [&](msc::MscDocument::HierarchyType type) {
-        // create tool
-        auto tool = new msc::HierarchyCreatorTool(type, &(m_model->hierarchyViewModel()), nullptr, this);
-        QAction *action = new QAction(tool->title(), tool);
-        action->setProperty(HIERARCHY_TYPE_TAG, type);
-        action->setCheckable(true);
-        action->setIcon(tool->icon());
-        action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
-        tool->setAction(action);
-        tool->setView(m_hierarchyView);
-
-        m_hierarchyTools.append(tool);
-
-        connect(tool, &msc::HierarchyCreatorTool::documentCreated, this, [&](msc::MscDocument *document) {
-            activateDefaultTool();
-            m_model->setSelectedDocument(document);
-        });
-
-        connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
-        connect(action, &QAction::toggled, this, [&]() {
-            for (QAction *action : hierarchyActions())
-                action->setChecked(false);
-        });
-    };
-
-    addAction(msc::MscDocument::HierarchyAnd);
-    addAction(msc::MscDocument::HierarchyOr);
-    addAction(msc::MscDocument::HierarchyParallel);
-    addAction(msc::MscDocument::HierarchyIs);
-    addAction(msc::MscDocument::HierarchyRepeat);
-    addAction(msc::MscDocument::HierarchyException);
-    addAction(msc::MscDocument::HierarchyLeaf);
+    m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
+    m_asn1Widget->setModel(m_plugin->mainModel()->mscModel());
 }
 
 void MainWidget::initConnections()
@@ -423,34 +246,23 @@ void MainWidget::initConnections()
     connect(m_documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &MainWidget::showSelection);
     connect(m_documentTree, &QTreeView::doubleClicked, this, &MainWidget::showChart);
 
-    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
-            &MainWidget::selectCurrentChart);
-
-    connect(m_model, &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
-
-    connect(m_model, &msc::MainModel::selectedDocumentChanged, m_documentTree,
+    connect(m_plugin->mainModel(), &msc::MainModel::selectedDocumentChanged, m_documentTree,
             &msc::DocumentTreeView::setSelectedDocument);
 
-    connect(m_model, &msc::MainModel::modelUpdated, m_asn1Widget, &msc::ASN1FileView::setModel);
+    connect(m_plugin->mainModel(), &msc::MainModel::modelUpdated, m_asn1Widget, &msc::ASN1FileView::setModel);
 
-    connect(m_model->documentItemModel(), &msc::DocumentItemModel::dataChanged, this, &MainWidget::showSelection);
+    connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
+            &MainWidget::showSelection);
 
-    connect(m_model->undoStack(), &QUndoStack::indexChanged, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
-    connect(m_model, &msc::MainModel::lasteSaveUndoChange, this, [&]() { Q_EMIT dirtyChanged(isDirty()); });
+    connect(m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this,
+            [&]() { Q_EMIT dirtyChanged(isDirty()); });
+    connect(m_plugin->mainModel(), &msc::MainModel::lasteSaveUndoChange, this,
+            [&]() { Q_EMIT dirtyChanged(isDirty()); });
 
-    connect(m_model, &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
+    connect(m_plugin->mainModel(), &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
         m_asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     });
-}
-
-void MainWidget::activateDefaultTool()
-{
-    for (msc::BaseTool *tool : m_tools) {
-        if (tool != m_pointerTool)
-            tool->action()->setChecked(false);
-    }
-    m_pointerTool->action()->setChecked(true);
 }
 
 }
