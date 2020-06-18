@@ -159,7 +159,6 @@ void MSCPlugin::initChartTools()
         tool->setView(m_chartView);
         tool->setAction(toolAction);
 
-        //        connect(this, &MainWindow::currentGraphicsViewChanged, tool, &msc::BaseTool::setView);
         if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool)) {
             connect(creatorTool, &msc::BaseCreatorTool::created, this, &MSCPlugin::activateDefaultTool);
         }
@@ -177,6 +176,66 @@ void MSCPlugin::initChartTools()
             &msc::EntityDeleteTool::setCurrentChart);
 
     activateDefaultTool();
+}
+
+void MSCPlugin::initHierarchyViewActions()
+{
+    Q_ASSERT(m_hierarchyView != nullptr);
+
+    auto addAction = [&](msc::MscDocument::HierarchyType type) {
+        // create tool
+        auto tool = new msc::HierarchyCreatorTool(type, &(m_model->hierarchyViewModel()), nullptr, this);
+        QAction *action = new QAction(tool->title(), tool);
+        action->setProperty(HIERARCHY_TYPE_TAG, type);
+        action->setCheckable(true);
+        action->setIcon(tool->icon());
+        action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        tool->setAction(action);
+        tool->setView(m_hierarchyView);
+        if (m_hierarchyToolBar) {
+            m_hierarchyToolBar->addAction(action);
+        }
+
+        m_hierarchyTools.append(tool);
+
+        connect(tool, &msc::HierarchyCreatorTool::documentCreated, this, [&](msc::MscDocument *document) {
+            activateDefaultTool();
+            m_model->setSelectedDocument(document);
+        });
+
+        connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
+        connect(action, &QAction::toggled, this, [&]() {
+            for (QAction *action : hierarchyActions())
+                action->setChecked(false);
+        });
+    };
+
+    addAction(msc::MscDocument::HierarchyAnd);
+    addAction(msc::MscDocument::HierarchyOr);
+    addAction(msc::MscDocument::HierarchyParallel);
+    addAction(msc::MscDocument::HierarchyIs);
+    addAction(msc::MscDocument::HierarchyRepeat);
+    addAction(msc::MscDocument::HierarchyException);
+    addAction(msc::MscDocument::HierarchyLeaf);
+}
+
+void MSCPlugin::initConnections()
+{
+    Q_ASSERT(m_chartView != nullptr);
+
+    auto chartview = qobject_cast<GraphicsView *>(m_chartView);
+    if (chartview) {
+        connect(chartview, &msc::GraphicsView::createMessageToolRequested, this, [&]() {
+            if (m_messageCreateTool) {
+                m_messageCreateTool->activate();
+            }
+        });
+    }
+
+    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
+            &MSCPlugin::selectCurrentChart);
+
+    connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 }
 
 void MSCPlugin::addToolBars(QMainWindow *window)
@@ -280,6 +339,44 @@ QVector<QAction *> MSCPlugin::hierarchyActions() const
     return actions;
 }
 
+QAction *MSCPlugin::createActionCopy(MainWindow *window)
+{
+    if (m_actionCopy == nullptr) {
+        if (window != nullptr) {
+            m_actionCopy = new QAction(tr("Copy:"), this);
+            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
+            m_actionCopy->setMenu(new QMenu(window));
+            m_actionCopy->menu()->addAction(
+                    tr("Copy Diagram"), window, &MainWindow::copyCurrentChart, QKeySequence::Copy);
+            m_actionCopy->menu()->addAction(tr("Copy as Picture"), window, &MainWindow::copyCurrentChartAsPicture);
+        } else {
+            m_actionCopy = new QAction(tr("Copy Diagram"), this);
+            m_actionCopy->setShortcut(QKeySequence::Copy);
+            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
+            connect(m_actionCopy, &QAction::triggered, m_model.get(), &msc::MainModel::copyCurrentChart);
+        }
+    }
+    return m_actionCopy;
+}
+
+QAction *MSCPlugin::createActionPaste(MainWindow *window)
+{
+    if (m_actionPaste == nullptr) {
+        if (window) {
+            m_actionPaste = new QAction(tr("Paste:"), window);
+            m_actionPaste->setShortcut(QKeySequence::Paste);
+            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
+            connect(m_actionPaste, &QAction::triggered, window, &MainWindow::pasteChart);
+        } else {
+            m_actionPaste = new QAction(tr("Paste:"), this);
+            m_actionPaste->setShortcut(QKeySequence::Paste);
+            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
+            connect(m_actionPaste, &QAction::triggered, m_model.get(), &msc::MainModel::pasteChart);
+        }
+    }
+    return m_actionPaste;
+}
+
 void MSCPlugin::showDocumentView(bool show)
 {
     if (show) {
@@ -293,6 +390,7 @@ void MSCPlugin::showDocumentView(bool show)
         }
         for (QAction *action : chartActions()) {
             action->setEnabled(true);
+            checkGlobalComment();
         }
         for (QAction *action : hierarchyActions()) {
             action->setEnabled(false);
@@ -372,8 +470,24 @@ void MSCPlugin::selectCurrentChart()
         }
         msc::cmd::CommandsStack::setCurrent(undoGroup()->activeStack());
 
-        // TODO: add support for dedicated stacks for each tab
+        connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCPlugin::checkGlobalComment,
+                Qt::UniqueConnection);
     }
+
+    checkGlobalComment();
+}
+
+void MSCPlugin::checkGlobalComment()
+{
+    msc::MscChart *currentChart = m_model->chartViewModel().currentChart();
+    if (!currentChart) {
+        m_globalCommentCreateTool->action()->setEnabled(false);
+        return;
+    }
+
+    const bool hasInstance = currentChart && !currentChart->instances().isEmpty();
+    const bool hasGlobalComment = !currentChart->commentString().isEmpty();
+    m_globalCommentCreateTool->action()->setEnabled(hasInstance && !hasGlobalComment);
 }
 
 void MSCPlugin::updateMscToolbarActionsChecked()
@@ -389,104 +503,6 @@ void MSCPlugin::updateMscToolbarActionsChecked()
                     action->setChecked(false);
                 }
         }
-}
-
-QAction *MSCPlugin::createActionCopy(MainWindow *window)
-{
-    if (m_actionCopy == nullptr) {
-        if (window != nullptr) {
-            m_actionCopy = new QAction(tr("Copy:"), this);
-            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
-            m_actionCopy->setMenu(new QMenu(window));
-            m_actionCopy->menu()->addAction(
-                    tr("Copy Diagram"), window, &MainWindow::copyCurrentChart, QKeySequence::Copy);
-            m_actionCopy->menu()->addAction(tr("Copy as Picture"), window, &MainWindow::copyCurrentChartAsPicture);
-        } else {
-            m_actionCopy = new QAction(tr("Copy Diagram"), this);
-            m_actionCopy->setShortcut(QKeySequence::Copy);
-            m_actionCopy->setIcon(QIcon::fromTheme("edit-copy"));
-            connect(m_actionCopy, &QAction::triggered, m_model.get(), &msc::MainModel::copyCurrentChart);
-        }
-    }
-    return m_actionCopy;
-}
-
-QAction *MSCPlugin::createActionPaste(MainWindow *window)
-{
-    if (m_actionPaste == nullptr) {
-        if (window) {
-            m_actionPaste = new QAction(tr("Paste:"), window);
-            m_actionPaste->setShortcut(QKeySequence::Paste);
-            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
-            connect(m_actionPaste, &QAction::triggered, window, &MainWindow::pasteChart);
-        } else {
-            m_actionPaste = new QAction(tr("Paste:"), this);
-            m_actionPaste->setShortcut(QKeySequence::Paste);
-            m_actionPaste->setIcon(QIcon::fromTheme("edit-paste"));
-            connect(m_actionPaste, &QAction::triggered, m_model.get(), &msc::MainModel::pasteChart);
-        }
-    }
-    return m_actionPaste;
-}
-
-void MSCPlugin::initHierarchyViewActions()
-{
-    Q_ASSERT(m_hierarchyView != nullptr);
-
-    auto addAction = [&](msc::MscDocument::HierarchyType type) {
-        // create tool
-        auto tool = new msc::HierarchyCreatorTool(type, &(m_model->hierarchyViewModel()), nullptr, this);
-        QAction *action = new QAction(tool->title(), tool);
-        action->setProperty(HIERARCHY_TYPE_TAG, type);
-        action->setCheckable(true);
-        action->setIcon(tool->icon());
-        action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
-        tool->setAction(action);
-        tool->setView(m_hierarchyView);
-        if (m_hierarchyToolBar) {
-            m_hierarchyToolBar->addAction(action);
-        }
-
-        m_hierarchyTools.append(tool);
-
-        connect(tool, &msc::HierarchyCreatorTool::documentCreated, this, [&](msc::MscDocument *document) {
-            activateDefaultTool();
-            m_model->setSelectedDocument(document);
-        });
-
-        connect(action, &QAction::toggled, tool, &msc::BaseTool::setActive);
-        connect(action, &QAction::toggled, this, [&]() {
-            for (QAction *action : hierarchyActions())
-                action->setChecked(false);
-        });
-    };
-
-    addAction(msc::MscDocument::HierarchyAnd);
-    addAction(msc::MscDocument::HierarchyOr);
-    addAction(msc::MscDocument::HierarchyParallel);
-    addAction(msc::MscDocument::HierarchyIs);
-    addAction(msc::MscDocument::HierarchyRepeat);
-    addAction(msc::MscDocument::HierarchyException);
-    addAction(msc::MscDocument::HierarchyLeaf);
-}
-
-void MSCPlugin::initConnections()
-{
-    Q_ASSERT(m_chartView != nullptr);
-
-    auto chartview = qobject_cast<GraphicsView *>(m_chartView);
-    if (chartview) {
-        connect(chartview, &msc::GraphicsView::createMessageToolRequested, this, [&]() {
-            if (m_messageCreateTool) {
-                m_messageCreateTool->activate();
-            }
-        });
-    }
-
-    connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
-            &MSCPlugin::selectCurrentChart);
-
-    connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 }
 
 }

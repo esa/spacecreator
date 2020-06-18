@@ -17,8 +17,9 @@ class EntityDeleteTool;
 class GraphicsView;
 class InstanceCreatorTool;
 class InstanceStopTool;
-class MessageCreatorTool;
 class MainModel;
+class MessageCreatorTool;
+class MscChart;
 class PointerTool;
 class TimerCreatorTool;
 
@@ -76,6 +77,7 @@ public Q_SLOTS:
     void showHierarchyView(bool show);
     void activateDefaultTool();
     void selectCurrentChart();
+    void checkGlobalComment();
 
 private Q_SLOTS:
     void updateMscToolbarActionsChecked();

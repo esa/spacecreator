@@ -721,6 +721,8 @@ void MainWindow::updateMscToolbarActionsEnablement()
         }
     }
 
+    d->m_plugin->checkGlobalComment();
+
     if (forceDefault) {
         d->m_plugin->activateDefaultTool();
     }
