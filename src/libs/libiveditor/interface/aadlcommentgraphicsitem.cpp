@@ -150,4 +150,9 @@ void AADLCommentGraphicsItem::applyColorScheme()
     update();
 }
 
+bool AADLCommentGraphicsItem::allowGeometryChange(const QPointF & /*from*/, const QPointF & /*to*/)
+{
+    return true;
+}
+
 }

@@ -338,4 +338,28 @@ QList<int> knownGraphicsItemTypes()
     return result;
 }
 
+qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected)
+{
+    static constexpr qreal zLevelDefault = kGripZLevel - 1.;
+
+    if (!object || itemSelected) {
+        return zLevelDefault;
+    }
+
+    switch (object->aadlType()) {
+    case aadl::AADLObject::Type::Function:
+    case aadl::AADLObject::Type::FunctionType:
+        return kFunctionZLevel;
+    case aadl::AADLObject::Type::RequiredInterface:
+    case aadl::AADLObject::Type::ProvidedInterface:
+        return kInterfaceZLevel;
+    case aadl::AADLObject::Type::Comment:
+        return kCommentZLevel;
+    case aadl::AADLObject::Type::Connection:
+        return kConnectionZLevel;
+    default:
+        return zLevelDefault;
+    }
+}
+
 }

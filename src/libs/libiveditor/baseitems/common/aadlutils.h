@@ -21,6 +21,10 @@
 class QLineF;
 class QPointF;
 
+namespace aadl {
+class AADLObject;
+}
+
 namespace aadlinterface {
 
 static constexpr qreal LineHoverTolerance = 10.;
@@ -33,7 +37,7 @@ static const int kFunctionZLevel = 0;
 static const int kConnectionZLevel = 1;
 static const int kInterfaceZLevel = 2;
 static const int kCommentZLevel = 3;
-static const int kGripZLevel = 4;
+static const int kGripZLevel = 10;
 
 qreal distanceLine(const QPointF &p1, const QPointF &p2);
 qreal distancePolygon(const QVector<QPointF> &polygon);
@@ -62,5 +66,7 @@ QVector<qint32> coordinates(const QVector<QPointF> &points);
 QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 
 QList<int> knownGraphicsItemTypes();
+
+qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected);
 
 }

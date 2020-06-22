@@ -54,7 +54,7 @@ aadl::AADLObject *InteractiveObject::aadlObject() const
 
 void InteractiveObject::onSelectionChanged(bool isSelected)
 {
-    setZValue(isSelected ? 1 : 0);
+    setZValue(itemLevel(aadlObject(), isSelected));
     if (isSelected) {
         showGripPoints();
         updateGripPoints();
