@@ -31,7 +31,7 @@ void tst_AADLObjectConnection::testPostInitEmptyConnection()
 {
     aadl::AADLObjectConnection connection(nullptr, nullptr, nullptr, nullptr);
     const bool result = connection.postInit();
-    // posinit() for connections without source/target fails
+    // postInit() for connections without source/target fails
     QCOMPARE(result, false);
 }
 
