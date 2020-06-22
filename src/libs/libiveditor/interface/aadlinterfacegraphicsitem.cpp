@@ -127,7 +127,7 @@ static void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
         return;
     }
     if (loopCount >= maxMoveIterations) {
-        qDebug() << Q_FUNC_INFO << "All fours sides have been tested. Aborting the loop";
+        qDebug() << Q_FUNC_INFO << "All four sides have been tested. Aborting the loop";
         return;
     }
 
