@@ -191,30 +191,35 @@ void ChartLayoutManager::setCurrentChart(MscChart *chart)
 
     clearScene();
 
-    if (!d->m_scene.views().isEmpty()) {
-        prepareChartBoxItem();
+    if (!d->m_currentChart.isNull()) {
+        if (!d->m_scene.views().isEmpty()) {
+            prepareChartBoxItem();
 
-        const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
-        const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
-        const bool emptyDoc = d->m_currentChart->instances().isEmpty() && d->m_currentChart->instanceEvents().isEmpty();
-        applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
-        if (preferredRectCif.isNull() && emptyDoc) {
-            QSignalBlocker supprecCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
-            d->m_layoutInfo.m_chartItem->updateCif();
+            const QRectF &preferredRectCif = d->m_layoutInfo.m_chartItem->storedCustomRect();
+            const QRectF &preferredRectDefault = QRectF({ 0., 0. }, preferredChartBoxSize());
+            const bool emptyDoc =
+                    d->m_currentChart->instances().isEmpty() && d->m_currentChart->instanceEvents().isEmpty();
+            applyContentRect(preferredRectCif.isNull() ? preferredRectDefault : preferredRectCif);
+            if (preferredRectCif.isNull() && emptyDoc) {
+                QSignalBlocker suppressCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
+                d->m_layoutInfo.m_chartItem->updateCif();
+            }
+
+            doLayout();
         }
 
-        doLayout();
+        connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartLayoutManager::updateLayout);
+        connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
+                QOverload<msc::MscInstance *>::of(&ChartLayoutManager::removeInstanceItem));
+        connect(d->m_currentChart, &msc::MscChart::instanceOrderChanged, this, &ChartLayoutManager::updateLayout);
+
+        connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartLayoutManager::updateLayout);
+        connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartLayoutManager::removeEventItem);
+        connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartLayoutManager::updateLayout);
+        connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartLayoutManager::updateLayout);
+
+        connect(d->m_currentChart, &msc::MscChart::dataChanged, this, &ChartLayoutManager::updateLayout);
     }
-
-    connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartLayoutManager::updateLayout);
-    connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
-            QOverload<msc::MscInstance *>::of(&ChartLayoutManager::removeInstanceItem));
-    connect(d->m_currentChart, &msc::MscChart::instanceOrderChanged, this, &ChartLayoutManager::updateLayout);
-
-    connect(d->m_currentChart, &msc::MscChart::instanceEventAdded, this, &ChartLayoutManager::updateLayout);
-    connect(d->m_currentChart, &msc::MscChart::instanceEventRemoved, this, &ChartLayoutManager::removeEventItem);
-    connect(d->m_currentChart, &msc::MscChart::eventMoved, this, &ChartLayoutManager::updateLayout);
-    connect(d->m_currentChart, &msc::MscChart::messageRetargeted, this, &ChartLayoutManager::updateLayout);
 
     Q_EMIT currentChartChanged(d->m_currentChart);
 }
@@ -331,6 +336,7 @@ void ChartLayoutManager::doLayout()
     addInstanceItems(); // which are not highlightable now to avoid flickering
     addInstanceEventItems();
     disconnectItems();
+    checkVerticalConstraints();
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->interMessageSpan());
     updateChartboxToContent();
     connectItems();
@@ -688,6 +694,55 @@ const QVector<InstanceItem *> &ChartLayoutManager::instanceItems() const
     return d->m_instanceItemsSorted;
 }
 
+/*!
+   Returns all action items belonging to the given instance
+ */
+const QVector<ActionItem *> ChartLayoutManager::actionsOfInstance(const msc::MscInstance *instance) const
+{
+    QVector<ActionItem *> actions;
+    for (msc::InteractiveObject *event : d->m_instanceEventItems) {
+        if (auto actionItem = qobject_cast<msc::ActionItem *>(event)) {
+            if (actionItem->modelItem()->instance() == instance) {
+                actions.append(actionItem);
+            }
+        }
+    }
+    return actions;
+}
+
+/*!
+   Returns all condition items belonging to the given instance.
+   \note This includes shared conditions
+ */
+const QVector<ConditionItem *> ChartLayoutManager::conditionsOfInstance(const MscInstance *instance) const
+{
+    QVector<ConditionItem *> conditions;
+    for (msc::InteractiveObject *event : d->m_instanceEventItems) {
+        if (auto conditionItem = qobject_cast<msc::ConditionItem *>(event)) {
+            if (conditionItem->modelItem()->instance() == instance || conditionItem->modelItem()->shared()) {
+                conditions.append(conditionItem);
+            }
+        }
+    }
+    return conditions;
+}
+
+/*!
+   Returns all timer items belonging to the given instance
+ */
+const QVector<TimerItem *> ChartLayoutManager::timersOfInstance(const MscInstance *instance) const
+{
+    QVector<TimerItem *> timers;
+    for (msc::InteractiveObject *event : d->m_instanceEventItems) {
+        if (auto timerItem = qobject_cast<msc::TimerItem *>(event)) {
+            if (timerItem->modelItem()->instance() == instance) {
+                timers.append(timerItem);
+            }
+        }
+    }
+    return timers;
+}
+
 QLineF ChartLayoutManager::commonAxis() const
 {
     qreal commonAxisStart { 0 }, commonAxisStop { 0 };
@@ -807,6 +862,41 @@ void ChartLayoutManager::updateContentToChartbox(const QRectF &chartBoxRect)
         if (!qFuzzyIsNull(deltaH)) {
             instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH);
         }
+    }
+}
+
+/*!
+   Checks that no item is left of the chart box. And no items overlap horizontally.
+ */
+void ChartLayoutManager::checkVerticalConstraints()
+{
+    qreal leftXLimit = 0.0;
+    for (MscInstance *instance : d->m_currentChart->instances()) {
+        InstanceItem *instanceItem = itemForInstance(instance);
+        Q_ASSERT(instanceItem != nullptr);
+        QRectF rect = instanceItem->sceneBoundingRect();
+        // get width of instance + relevant events
+        for (msc::ActionItem *actionItem : actionsOfInstance(instanceItem->modelItem())) {
+            rect = rect.united(actionItem->sceneBoundingRect());
+        }
+        for (msc::ConditionItem *conditionItem : conditionsOfInstance(instanceItem->modelItem())) {
+            if (!conditionItem->modelItem()->shared()) {
+                rect = rect.united(conditionItem->sceneBoundingRect());
+            }
+        }
+        for (msc::TimerItem *timerItem : timersOfInstance(instanceItem->modelItem())) {
+            rect = rect.united(timerItem->sceneBoundingRect());
+        }
+
+        // check if left overlaps with last right limit
+        const qreal offset = leftXLimit - rect.x();
+        if (offset > 0.0) {
+            // Move the instance (events "follow" the instance)
+            instanceItem->moveBy(offset, 0.0);
+            rect.translate(offset, 0.0);
+        }
+
+        leftXLimit = rect.right() + 1.0;
     }
 }
 

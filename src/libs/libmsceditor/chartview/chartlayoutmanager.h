@@ -107,6 +107,10 @@ public:
 
     const QVector<msc::InstanceItem *> &instanceItems() const;
 
+    const QVector<msc::ActionItem *> actionsOfInstance(const MscInstance *instance) const;
+    const QVector<msc::ConditionItem *> conditionsOfInstance(const MscInstance *instance) const;
+    const QVector<msc::TimerItem *> timersOfInstance(const MscInstance *instance) const;
+
 public Q_SLOTS:
     void updateLayout();
     void updateChartboxToContent();
@@ -132,6 +136,7 @@ private:
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
+    void checkVerticalConstraints();
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;
     void updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;

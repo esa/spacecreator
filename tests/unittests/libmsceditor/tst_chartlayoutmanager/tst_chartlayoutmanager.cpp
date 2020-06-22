@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/instanceheaditem.h"
@@ -22,6 +23,7 @@
 #include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "messageitem.h"
+#include "mscaction.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -62,6 +64,8 @@ private Q_SLOTS:
     void testInstanceCifExtendedChartWidth();
     void testAddTwoMessages();
     void testMaxVisibleItems();
+
+    void testShiftVertialIfNeeded();
 
 private:
     QGraphicsView m_view;
@@ -424,6 +428,45 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     const int msg3YScrolled = msgItem3->sceneBoundingRect().top();
     QCOMPARE(msg2YScrolled, msg1Y); // Now message 2 is at the former position of message 1
     QCOMPARE(msg3YScrolled, msg2Y); // Message 3 is now at position of message 2
+}
+
+void tst_ChartLayoutManager::testShiftVertialIfNeeded()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+
+    parseMsc(mscText);
+
+    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    msc::InstanceItem *instanceItem = m_chartModel->instanceItems().at(0);
+
+    // Blank instance item is at the total left
+    QCOMPARE(instanceItem->scenePos().x(), 0.0);
+
+    auto action = new msc::MscAction();
+    action->setInstance(instanceItem->modelItem());
+    action->setName("A");
+    m_chart->addInstanceEvent(action);
+
+    QApplication::processEvents(); // Perform layout update
+
+    // event is narrow
+    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
+    QVERIFY2(std::abs(instanceItem->scenePos().x()) < 1.0, "Instance is still 'close' to the chart box");
+    QVERIFY2(std::abs(instanceItem->scenePos().x()) > -0.5, "Instance is still not negative");
+    QVERIFY2(actionItem->scenePos().x() >= 0.0, "Event is not negative");
+
+    // event is wide
+    actionItem->setActionText("Action that is a lot wider than before is named here.");
+    QApplication::processEvents(); // Perform layout update
+    QVERIFY2(std::abs(instanceItem->scenePos().x()) > 5, "event is wide - instance got moved");
+    QVERIFY2(actionItem->scenePos().x() >= 0.0, "event is wide - but still not negative");
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

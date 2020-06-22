@@ -103,6 +103,9 @@ void TimerItem::setInstance(InstanceItem *instance)
         m_timer->setInstance(nullptr);
     }
 
+    const qreal x = m_instance->centerInScene().x();
+    setX(x);
+
     scheduleLayoutUpdate();
 }
 
