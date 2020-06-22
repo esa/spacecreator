@@ -1,1 +1,2 @@
 add_subdirectory(tst_xmldocexporter)
+add_subdirectory(tst_itemzorder)
