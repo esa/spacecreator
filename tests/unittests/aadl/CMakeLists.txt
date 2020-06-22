@@ -1,4 +1,5 @@
 add_subdirectory(tst_aadlobject)
+add_subdirectory(tst_aadlobjectconnection)
 add_subdirectory(tst_aadlobjectfunction)
 add_subdirectory(tst_aadlobjectfunctiontype)
 add_subdirectory(tst_aadlobjectsmodel)

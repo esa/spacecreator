@@ -39,6 +39,7 @@ static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceTitleMaxLength = 80;
+static const int maxMoveIterations = 4;
 
 namespace aadlinterface {
 
@@ -119,11 +120,16 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
     }
 }
 
-static inline void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx,
-        const QRectF &parentBoundingRect, const QPointF &offset, bool invert)
+static void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx, const QRectF &parentBoundingRect,
+        const QPointF &offset, bool invert, int loopCount = 0)
 {
-    if (!intersectedItemRect.isValid())
+    if (!intersectedItemRect.isValid()) {
         return;
+    }
+    if (loopCount >= maxMoveIterations) {
+        qDebug() << Q_FUNC_INFO << "All fours sides have been tested. Aborting the loop";
+        return;
+    }
 
     QRectF itemRect { rect };
     const int currentIdx = invert ? idx + 2 : idx;
@@ -145,10 +151,11 @@ static inline void moveIface(const QRectF &intersectedItemRect, QRectF &rect, in
     default:
         return;
     }
-    if (!parentBoundingRect.contains(itemRect.topLeft() - offset))
-        moveIface(intersectedItemRect, rect, invert ? ++idx : --idx, parentBoundingRect, offset, invert);
-    else
+    if (!parentBoundingRect.contains(itemRect.topLeft() - offset)) {
+        moveIface(intersectedItemRect, rect, invert ? ++idx : --idx, parentBoundingRect, offset, invert, ++loopCount);
+    } else {
         rect = itemRect;
+    }
 }
 
 void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)

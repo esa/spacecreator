@@ -187,8 +187,14 @@ void AADLObjectConnection::setDelayedEnd(AADLObjectConnection::EndPointInfo *end
 
 bool AADLObjectConnection::lookupEndpointsPostponed()
 {
-    if (!d->m_delayedInit.m_from || !d->m_delayedInit.m_to)
-        return true;
+    if (!d->m_delayedInit.m_from) {
+        qWarning() << "Can't connect, as the source is missing";
+        return false;
+    }
+    if (!d->m_delayedInit.m_to) {
+        qWarning() << "Can't connect, as the target is missing";
+        return false;
+    }
 
     AADLObject *objFrom = objectsModel()->getObjectByName(d->m_delayedInit.m_from->m_functionName);
     AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(d->m_delayedInit.m_from->m_interfaceName,
@@ -198,8 +204,9 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     AADLObjectIface *ifaceTo = objectsModel()->getIfaceByName(d->m_delayedInit.m_to->m_interfaceName,
             d->m_delayedInit.m_to->m_ifaceDirection, objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
 
-    if (!objFrom || !ifaceFrom || !objTo || !ifaceTo)
+    if (!objFrom || !ifaceFrom || !objTo || !ifaceTo) {
         return false;
+    }
 
     const ConnectionCreationValidator::FailReason status = ConnectionCreationValidator::canConnect(
             objFrom->as<AADLObjectFunction *>(), objTo->as<AADLObjectFunction *>(), ifaceFrom, ifaceTo);
