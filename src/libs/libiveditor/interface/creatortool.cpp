@@ -413,7 +413,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         } else {
             d->previewConnectionItem = new QGraphicsPathItem;
             d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(1);
+            d->previewConnectionItem->setZValue(kConnectionZLevel);
             scene->addItem(d->previewConnectionItem);
         }
         d->connectionPoints.append(scenePos);
@@ -428,7 +428,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             const QPointF startPoint = item->mapToScene(QPointF(0, 0));
             d->previewConnectionItem = new QGraphicsPathItem;
             d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(1);
+            d->previewConnectionItem->setZValue(kConnectionZLevel);
             scene->addItem(d->previewConnectionItem);
             d->connectionPoints.append(startPoint);
             return true;
