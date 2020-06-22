@@ -16,6 +16,10 @@
 */
 
 #include "mainmodel.h"
+#include "mscchart.h"
+#include "mscdocument.h"
+#include "mscinstance.h"
+#include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 
@@ -99,6 +103,27 @@ private Q_SLOTS:
 
         resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+
+        /// Testing creating third instance at pos 1
+        params[QLatin1String("name")] = QLatin1String("C");
+        params[QLatin1String("kind")] = QLatin1String("instaaa");
+        params[QLatin1String("pos")] = 1;
+        obj[QLatin1String("Parameters")] = params;
+        json = QJsonDocument(obj).toJson();
+        socket->sendTextMessage(json);
+
+        QVERIFY(textMessageReceived.wait(1000));
+        QCOMPARE(textMessageReceived.count(), 1);
+        arguments = textMessageReceived.takeFirst();
+        messageReceived = arguments.at(0).toString();
+
+        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+
+        msc::MscChart *chart = model->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+        msc::MscInstance *instanceC = chart->instances().at(1);
+        QCOMPARE(instanceC->name(), QString("C"));
+        QCOMPARE(instanceC->kind(), QString("instaaa"));
     }
 
     void testMessageCommand()
@@ -142,7 +167,7 @@ private Q_SLOTS:
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
-        params.insert(QLatin1String("dstName"), QLatin1String("C"));
+        params.insert(QLatin1String("dstName"), QLatin1String("XY"));
         obj[QLatin1String("Parameters")] = params;
 
         json = QJsonDocument(obj).toJson();
@@ -331,7 +356,7 @@ private Q_SLOTS:
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
-        params.insert(QLatin1String("instanceName"), QLatin1String("C"));
+        params.insert(QLatin1String("instanceName"), QLatin1String("XY"));
         obj[QLatin1String("Parameters")] = params;
 
         json = QJsonDocument(obj).toJson();
@@ -387,7 +412,7 @@ private Q_SLOTS:
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
-        params.insert(QLatin1String("instanceName"), QLatin1String("C"));
+        params.insert(QLatin1String("instanceName"), QLatin1String("XY"));
         obj[QLatin1String("Parameters")] = params;
 
         json = QJsonDocument(obj).toJson();

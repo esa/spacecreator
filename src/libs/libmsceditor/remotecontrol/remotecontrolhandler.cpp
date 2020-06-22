@@ -154,7 +154,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
 
     msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
-    m_model->chartViewModel().currentChart()->addInstance(mscInstance);
+    m_model->chartViewModel().currentChart()->addInstance(mscInstance, pos);
 
     const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
         QVariant::fromValue<msc::MscChart *>(mscChart), pos };

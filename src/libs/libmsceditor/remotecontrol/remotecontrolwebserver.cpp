@@ -53,7 +53,10 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
 Implemented commands and parameters list:
 
 - **Instance** - creating new Instance
-    + **name** - Instance's Name, command fails if CHart already has Instance with this name, optional
+    + **name** - Instance's Name, command fails if Chart already has Instance with this name, optional
+    + **kind** - Instance's Kind, optional - MSC uses the name if no kind is set.
+    + **pos** - Instance's position. The position is the index of the instance from left to right. 0 inserts at the
+total left. Default is '-1' which means append at the right. Optional parameter.
     + **exStop** - Explicit stop {True, False=default}, optional
 - **Message** - creating new Message, command fails if neither **srcName** nor **dstName** parameter set.
     + **name** - Message's Name, optional
