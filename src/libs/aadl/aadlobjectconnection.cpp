@@ -197,12 +197,24 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
     }
 
     AADLObject *objFrom = objectsModel()->getObjectByName(d->m_delayedInit.m_from->m_functionName);
+    if (!objFrom) {
+        qWarning() << "Unable to find object" << d->m_delayedInit.m_from->m_functionName;
+    }
     AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(d->m_delayedInit.m_from->m_interfaceName,
             d->m_delayedInit.m_from->m_ifaceDirection, objFrom ? objFrom->as<AADLObjectFunctionType *>() : nullptr);
+    if (!ifaceFrom) {
+        qWarning() << "Unable to find interface" << d->m_delayedInit.m_from->m_interfaceName;
+    }
 
     AADLObject *objTo = objectsModel()->getObjectByName(d->m_delayedInit.m_to->m_functionName);
+    if (!objTo) {
+        qWarning() << "Unable to find object" << d->m_delayedInit.m_to->m_functionName;
+    }
     AADLObjectIface *ifaceTo = objectsModel()->getIfaceByName(d->m_delayedInit.m_to->m_interfaceName,
             d->m_delayedInit.m_to->m_ifaceDirection, objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
+    if (!ifaceTo) {
+        qWarning() << "Unable to find interface" << d->m_delayedInit.m_to->m_interfaceName;
+    }
 
     if (!objFrom || !ifaceFrom || !objTo || !ifaceTo) {
         return false;
