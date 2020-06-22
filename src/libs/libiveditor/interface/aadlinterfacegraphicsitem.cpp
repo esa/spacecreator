@@ -51,7 +51,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
 {
     setFlag(QGraphicsItem::ItemHasNoContents);
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setZValue(kInterfaceZLevel);
+    setZValue(ZOrder.Interface);
     updateKind();
 
     QPainterPath pp;

@@ -307,7 +307,7 @@ AADLConnectionGraphicsItem::AADLConnectionGraphicsItem(aadl::AADLObjectConnectio
 {
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemHasNoContents | QGraphicsItem::ItemClipsToShape
             | QGraphicsItem::ItemContainsChildrenInShape);
-    setZValue(kConnectionZLevel);
+    setZValue(ZOrder.Connection);
 
     applyColorScheme();
 

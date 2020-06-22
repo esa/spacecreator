@@ -33,11 +33,16 @@ static const QSizeF DefaultGraphicsItemSize = { 200, 80 };
 static const QMarginsF kContentMargins = { 30, 30, 30, 30 };
 static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
-static const int kFunctionZLevel = 0;
-static const int kConnectionZLevel = 1;
-static const int kInterfaceZLevel = 2;
-static const int kCommentZLevel = 3;
-static const int kGripZLevel = 10;
+
+static const struct {
+    const qreal Function = 0.;
+    const qreal Connection = 1.;
+    const qreal Interface = 2.;
+    const qreal Comment = 3.;
+    const qreal GripPoint = 10.;
+
+    const qreal Selected = GripPoint - 1.;
+} ZOrder {};
 
 qreal distanceLine(const QPointF &p1, const QPointF &p2);
 qreal distancePolygon(const QVector<QPointF> &polygon);

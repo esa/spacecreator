@@ -340,25 +340,23 @@ QList<int> knownGraphicsItemTypes()
 
 qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected)
 {
-    static constexpr qreal zLevelDefault = kGripZLevel - 1.;
-
     if (!object || itemSelected) {
-        return zLevelDefault;
+        return ZOrder.Selected;
     }
 
     switch (object->aadlType()) {
     case aadl::AADLObject::Type::Function:
     case aadl::AADLObject::Type::FunctionType:
-        return kFunctionZLevel;
+        return ZOrder.Function;
     case aadl::AADLObject::Type::RequiredInterface:
     case aadl::AADLObject::Type::ProvidedInterface:
-        return kInterfaceZLevel;
+        return ZOrder.Interface;
     case aadl::AADLObject::Type::Comment:
-        return kCommentZLevel;
+        return ZOrder.Comment;
     case aadl::AADLObject::Type::Connection:
-        return kConnectionZLevel;
+        return ZOrder.Connection;
     default:
-        return zLevelDefault;
+        return ZOrder.Selected;
     }
 }
 

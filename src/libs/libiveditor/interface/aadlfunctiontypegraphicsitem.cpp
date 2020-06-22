@@ -49,7 +49,7 @@ AADLFunctionTypeGraphicsItem::AADLFunctionTypeGraphicsItem(aadl::AADLObjectFunct
     , m_textItem(new AADLFunctionNameGraphicsItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setZValue(kFunctionZLevel);
+    setZValue(ZOrder.Function);
 
     if (entity) {
         m_textItem->setPlainText(entity->title());

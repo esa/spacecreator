@@ -43,7 +43,7 @@ AADLCommentGraphicsItem::AADLCommentGraphicsItem(aadl::AADLObjectComment *commen
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFont(qApp->font());
-    setZValue(kCommentZLevel);
+    setZValue(ZOrder.Comment);
 
     applyColorScheme();
 
