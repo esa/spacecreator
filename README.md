@@ -8,6 +8,11 @@ This repository depends on these parts:
 * Java SE 8
 * On Windows: Visual Studio 2017 or 2019
 * CMake
+ 
+Custom Qt Creator build (for plugins) also needs:
+
+* The QtScrip module (marked as deprecated now)
+* clang-dev
 
 Grantlee is a Qt implementation of string template engine of Django syntax.
 Sources of Grantlee are avalable from here https://github.com/steveire/grantlee
@@ -75,6 +80,8 @@ To build Taste3 correctly Grantlee should be installed into QTDIR directory (if 
 
 # SpaceCreator build
 
+## Standalone applications
+
 When working on SpaceCreator, just open the CMakeLists.txt in Qt Creator and run the build.
 
 On the command line, do this:
@@ -82,7 +89,30 @@ On the command line, do this:
     mkdir build-spacecreator
     cd build-spacecreator
     cmake ../SpaceCreator
-    make -j<number_of_build_threads>
+    make -j`nproc` #<number_of_build_threads>
+
+## Qt Creator plugins
+
+### Using prebuilt binaries of QtC
+
+TBD
+
+### Using own build of QtC
+
+```
+git clone http://code.qt.io/qt-creator/qt-creator.git && \
+cd qt-creator && \
+git checkout 4.8 && \
+git submodule init && \
+git submodule update --recursive
+```
+
+1. Get the source code as shown above. Remember the `qt-creator' directory path, we'll need it at step 5; 
+1. Use the same Qt version for all projects (*SpaceCreator*, *QtC*, *Grantlee*). Ensure its **QtScript** module (deprecated now) is installed;
+1. Install **clang** development files (`sudo apt install libclang-dev`);
+1. build the QtC;
+1. Setup build environment variables for the *SpaceCreator*: `QTC_SOURCE=/path/to/qt-creator/from/step/#1` and `QTC_INSTALL=/path/to/the/build/dir/from/step/#4`;
+1. If CMake fails with "Could not detect project version number from..." error, clear CMake configuration and restart the QtC instance to fix it.
 
 # Grantlee notes
 
