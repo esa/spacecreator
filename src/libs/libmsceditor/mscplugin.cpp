@@ -114,9 +114,9 @@ void MSCPlugin::initChartTools()
             msc::MscMessage::MessageType::Message, &(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_messageCreateTool);
 
-    m_messageCreateTool = new msc::MessageCreatorTool(
+    m_createCreateTool = new msc::MessageCreatorTool(
             msc::MscMessage::MessageType::Create, &(m_model->chartViewModel()), nullptr, this);
-    m_tools.append(m_messageCreateTool);
+    m_tools.append(m_createCreateTool);
 
     m_commentCreateTool = new msc::CommentCreatorTool(false, &(m_model->chartViewModel()), nullptr, this);
     m_tools.append(m_commentCreateTool);
