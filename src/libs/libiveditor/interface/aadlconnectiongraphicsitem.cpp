@@ -513,11 +513,28 @@ QList<QVariantList> AADLConnectionGraphicsItem::prepareChangeCoordinatesCommandP
     return params;
 }
 
+shared::ui::GripPoint *AADLConnectionGraphicsItem::gripPointByPos(
+        const QList<shared::ui::GripPoint *> &grips, const QPointF &pos) const
+{
+    if (grips.isEmpty()) {
+        return nullptr;
+    }
+
+    const auto found = std::find_if(grips.cbegin(), grips.cend(), [&pos](const shared::ui::GripPoint *const grip) {
+        return grip && grip->sceneBoundingRect().contains(pos);
+    });
+
+    if (found != grips.end()) {
+        return *found;
+    }
+
+    return nullptr;
+}
+
 void AADLConnectionGraphicsItem::onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at)
 {
-    auto grips = gripPointsHandler()->gripPoints();
-    qDebug() << grips;
-    const int idx = grips.indexOf(gp);
+    const auto &grips = gripPointsHandler()->gripPoints();
+    const int idx = grips.indexOf(gp ? gp : gripPointByPos(grips, at));
     if (idx == -1)
         return;
 
@@ -554,10 +571,10 @@ void AADLConnectionGraphicsItem::updateGripPoints()
     InteractiveObject::updateGripPoints();
 }
 
-void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &, const QPointF &to)
+void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
 {
-    auto grips = gripPointsHandler()->gripPoints();
-    int idx = grips.indexOf(gp);
+    const auto &grips = gripPointsHandler()->gripPoints();
+    int idx = grips.indexOf(gp ? gp : gripPointByPos(grips, from));
     if (idx == -1)
         return;
 
@@ -588,11 +605,12 @@ void AADLConnectionGraphicsItem::onManualMoveProgress(shared::ui::GripPoint *gp,
 void AADLConnectionGraphicsItem::onManualMoveFinish(
         shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (pressedAt == releasedAt || !gp)
+    const auto &grips = gripPointsHandler()->gripPoints();
+    const auto grip = gp ? gp : gripPointByPos(grips, releasedAt);
+    if (pressedAt == releasedAt || !grip)
         return;
 
-    auto grips = gripPointsHandler()->gripPoints();
-    int idx = grips.indexOf(gp);
+    const int idx = grips.indexOf(grip);
     if (idx == -1)
         return;
 

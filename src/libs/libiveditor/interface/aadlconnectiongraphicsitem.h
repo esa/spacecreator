@@ -105,6 +105,8 @@ private:
     };
     void updateInterfaceConnectionsReference(IfaceConnectionReference action);
 
+    shared::ui::GripPoint *gripPointByPos(const QList<shared::ui::GripPoint *> &grips, const QPointF &pos) const;
+
 private:
     class GraphicsPathItem : public QGraphicsPathItem
     {
