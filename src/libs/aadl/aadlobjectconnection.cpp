@@ -201,7 +201,7 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         if (!info || info->m_functionName.isEmpty())
             return nullptr;
 
-        const QString &decodedName = AADLNameValidator::decodeName(AADLObject::Type::Function, info->m_functionName);
+        const QString decodedName = AADLNameValidator::decodeName(AADLObject::Type::Function, info->m_functionName);
         AADLObject *aadlFunction = objectsModel()->getObjectByName(decodedName);
         if (!aadlFunction) {
             QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
@@ -221,9 +221,16 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         const AADLObject::Type ifaceType = info->m_ifaceDirection == AADLObjectIface::IfaceType::Provided
                 ? AADLObject::Type::ProvidedInterface
                 : AADLObject::Type::RequiredInterface;
-        const QString &ifaceName = AADLNameValidator::decodeName(ifaceType, info->m_interfaceName);
-        return objectsModel()->getIfaceByName(ifaceName, info->m_ifaceDirection,
+        const QString decodedName = AADLNameValidator::decodeName(ifaceType, info->m_interfaceName);
+        AADLObjectIface *aadlIface = objectsModel()->getIfaceByName(decodedName, info->m_ifaceDirection,
                 parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr);
+        if (!aadlIface) {
+            QString warningMessage = QStringLiteral("Unable to find Interface %1").arg(info->m_interfaceName);
+            if (info->m_functionName != decodedName)
+                warningMessage += QStringLiteral(" (decoded name: %1)").arg(decodedName);
+            qWarning() << qPrintable(warningMessage);
+        }
+        return aadlIface;
     };
 
     AADLObject *objFrom = findFunction(d->m_delayedInit.m_from);
