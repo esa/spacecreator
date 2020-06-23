@@ -17,6 +17,7 @@
 
 #include "aadlobjectconnection.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectfunctiontype.h"
 #include "aadlobjectiface.h"
@@ -34,7 +35,7 @@ struct ConnectionHolder {
 };
 
 struct AADLObjectConnectionPrivate {
-    AADLObjectConnectionPrivate() { }
+    AADLObjectConnectionPrivate() {}
     AADLObjectConnectionPrivate(
             AADLObject *source, AADLObject *target, AADLObjectIface *ifaceSource, AADLObjectIface *ifaceTarget)
         : m_source(source)
@@ -196,25 +197,40 @@ bool AADLObjectConnection::lookupEndpointsPostponed()
         return false;
     }
 
-    AADLObject *objFrom = objectsModel()->getObjectByName(d->m_delayedInit.m_from->m_functionName);
-    if (!objFrom) {
-        qWarning() << "Unable to find object" << d->m_delayedInit.m_from->m_functionName;
-    }
-    AADLObjectIface *ifaceFrom = objectsModel()->getIfaceByName(d->m_delayedInit.m_from->m_interfaceName,
-            d->m_delayedInit.m_from->m_ifaceDirection, objFrom ? objFrom->as<AADLObjectFunctionType *>() : nullptr);
-    if (!ifaceFrom) {
-        qWarning() << "Unable to find interface" << d->m_delayedInit.m_from->m_interfaceName;
-    }
+    auto findFunction = [&](const AADLObjectConnection::EndPointInfo *const info) -> AADLObject * {
+        if (!info || info->m_functionName.isEmpty())
+            return nullptr;
 
-    AADLObject *objTo = objectsModel()->getObjectByName(d->m_delayedInit.m_to->m_functionName);
-    if (!objTo) {
-        qWarning() << "Unable to find object" << d->m_delayedInit.m_to->m_functionName;
-    }
-    AADLObjectIface *ifaceTo = objectsModel()->getIfaceByName(d->m_delayedInit.m_to->m_interfaceName,
-            d->m_delayedInit.m_to->m_ifaceDirection, objTo ? objTo->as<AADLObjectFunctionType *>() : nullptr);
-    if (!ifaceTo) {
-        qWarning() << "Unable to find interface" << d->m_delayedInit.m_to->m_interfaceName;
-    }
+        const QString &decodedName = AADLNameValidator::decodeName(AADLObject::Type::Function, info->m_functionName);
+        AADLObject *aadlFunction = objectsModel()->getObjectByName(decodedName);
+        if (!aadlFunction) {
+            QString warningMessage = QStringLiteral("Unable to find Fn/FnType %1").arg(info->m_functionName);
+            if (info->m_functionName != decodedName)
+                warningMessage += QStringLiteral(" (decoded name: %1)").arg(decodedName);
+            qWarning() << qPrintable(warningMessage);
+        }
+        return aadlFunction;
+    };
+
+    auto findIface = [&](const AADLObjectConnection::EndPointInfo *const info,
+                             AADLObject *parentObject) -> AADLObjectIface * {
+        if (!info || info->m_interfaceName.isEmpty()) {
+            return nullptr;
+        }
+
+        const AADLObject::Type ifaceType = info->m_ifaceDirection == AADLObjectIface::IfaceType::Provided
+                ? AADLObject::Type::ProvidedInterface
+                : AADLObject::Type::RequiredInterface;
+        const QString &ifaceName = AADLNameValidator::decodeName(ifaceType, info->m_interfaceName);
+        return objectsModel()->getIfaceByName(ifaceName, info->m_ifaceDirection,
+                parentObject ? parentObject->as<AADLObjectFunctionType *>() : nullptr);
+    };
+
+    AADLObject *objFrom = findFunction(d->m_delayedInit.m_from);
+    AADLObjectIface *ifaceFrom = findIface(d->m_delayedInit.m_from, objFrom);
+
+    AADLObject *objTo = findFunction(d->m_delayedInit.m_to);
+    AADLObjectIface *ifaceTo = findIface(d->m_delayedInit.m_to, objTo);
 
     if (!objFrom || !ifaceFrom || !objTo || !ifaceTo) {
         return false;
