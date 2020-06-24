@@ -739,6 +739,9 @@ void MessageItem::addMessagePoint(const QPointF &scenePoint)
     m_arrowItem->arrow()->addTurnPoint(scenePoint);
 }
 
+/*!
+   Returns the message points (from source to target) in scene coordinates
+ */
 QVector<QPointF> MessageItem::messagePoints() const
 {
     const QVector<QPointF> &localPoints = m_arrowItem->arrow()->turnPoints();

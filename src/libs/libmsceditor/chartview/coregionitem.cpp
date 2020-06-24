@@ -20,6 +20,7 @@
 #include "baseitems/common/mscutils.h"
 #include "chartlayoutmanager.h"
 #include "instanceitem.h"
+#include "messageitem.h"
 #include "mscchart.h"
 #include "msccoregion.h"
 #include "ui/grippointshandler.h"
@@ -85,16 +86,27 @@ void CoregionItem::rebuildLayout()
     QRectF rect;
     const QVector<MscInstanceEvent *> &events = m_model->currentChart()->eventsForInstance(m_instance->modelItem());
     auto it = std::next(std::find(events.constBegin(), events.constEnd(), m_begin));
-    while (it != events.end()) {
+    auto itEnd = std::find(events.constBegin(), events.constEnd(), m_end);
+    while (it != events.end() && it != itEnd) {
         Q_ASSERT(*it);
 
         if (InteractiveObject *iObj = m_model->itemForEntity(*it)) {
-            rect |= iObj->sceneBoundingRect();
+            auto messageItem = qobject_cast<MessageItem *>(iObj);
+            if (messageItem != nullptr) {
+                // insert the messages source or target - depending which is in the co-region
+                QPointF pos;
+                if (m_instance->modelItem() == messageItem->sourceInstanceItem()->modelItem()) {
+                    pos = messageItem->messagePoints().first();
+                }
+                if (m_instance.data()->modelItem() == messageItem->targetInstanceItem()->modelItem()) {
+                    pos = messageItem->messagePoints().last();
+                }
+                rect |= QRectF(pos.x() - 1, pos.y() - 1, 2, 2);
+            } else {
+                rect |= iObj->sceneBoundingRect();
+            }
             stackBefore(iObj);
         }
-
-        if (*it == m_end)
-            break;
 
         ++it;
     }
