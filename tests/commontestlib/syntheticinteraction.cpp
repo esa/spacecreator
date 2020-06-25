@@ -86,7 +86,7 @@ void restoreMousePosition()
         return;
     }
 
-    QPoint pos = savedMousePositions.takeLast();
+    const QPoint &pos = savedMousePositions.takeLast();
     QCursor::setPos(pos);
 }
 
