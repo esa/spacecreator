@@ -1,4 +1,3 @@
-add_subdirectory(tst_100messages)
 add_subdirectory(tst_arrowitem)
 add_subdirectory(tst_arrowsign)
 add_subdirectory(tst_chartitem)

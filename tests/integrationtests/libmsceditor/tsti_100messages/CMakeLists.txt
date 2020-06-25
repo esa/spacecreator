@@ -1,10 +1,8 @@
-set(TEST_NAME tst_textitem)
+set(TEST_NAME tsti_100messages)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-    tst_textitem.cpp
-    textitembasetest.cpp
-    textitembasetest.h
+    tsti_100messages.cpp
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

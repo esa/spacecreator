@@ -25,7 +25,7 @@
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
-#include "tst_common.h"
+#include "syntheticinteraction.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -35,12 +35,14 @@
 
 using namespace msc;
 
-class tst100messages : public QObject
+class tsti100messages : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
     void initTestCase();
+    void init();
+    void cleanup();
 
     void testPerformance();
 
@@ -56,11 +58,13 @@ private:
 };
 
 // make cpp11 happy for ODR-use:
-constexpr int tst100messages::CommandsCount;
-constexpr bool tst100messages::SkipBenchmark;
+constexpr int tsti100messages::CommandsCount;
+constexpr bool tsti100messages::SkipBenchmark;
 
-void tst100messages::initTestCase()
+void tsti100messages::initTestCase()
 {
+    test::ui::saveMousePosition();
+
     QScopedPointer<msc::MscChart> chart(new msc::MscChart());
     m_model.setCurrentChart(chart.data());
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
@@ -79,7 +83,17 @@ void tst100messages::initTestCase()
         m_view->show();
 }
 
-void tst100messages::testPerformance()
+void tsti100messages::init()
+{
+    test::ui::saveMousePosition();
+}
+
+void tsti100messages::cleanup()
+{
+    test::ui::restoreMousePosition();
+}
+
+void tsti100messages::testPerformance()
 {
     if (SkipBenchmark)
         QSKIP(qPrintable(QString("This benchmark detects the time spent on:\n\t"
@@ -117,7 +131,7 @@ void tst100messages::testPerformance()
     }
 }
 
-void tst100messages::moveInstance(const QPoint &pntMove)
+void tsti100messages::moveInstance(const QPoint &pntMove)
 {
     const QVector<QPoint> path = {
         pntMove, pntMove + QPoint(CommandsCount, 0), // move right
@@ -135,6 +149,6 @@ void tst100messages::moveInstance(const QPoint &pntMove)
         test::ui::sendMouseMove(m_view->viewport(), pnt, Qt::LeftButton, Qt::LeftButton);
 }
 
-QTEST_MAIN(tst100messages)
+QTEST_MAIN(tsti100messages)
 
-#include "tst_100messages.moc"
+#include "tsti_100messages.moc"

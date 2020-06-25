@@ -22,21 +22,29 @@
 class QWidget;
 class QPoint;
 
-namespace msc {
 namespace test {
 namespace ui {
 
-constexpr int EventsDelayMs = 100;
+// EventsDelayMs - In my local environment 20ms is enough, but I'm not sure
+// about CI, so here is some extra time span.
+// The difference in total test duration (20ms per event vs 100ms) is about 3s.
+static int EventsDelayMs = 50;
 
 // QGraphicsScene does not accept QTest's mouse press event,
 // so we have to synthesize them:
 void sendMousePress(
         QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton, int delay = EventsDelayMs);
+
 void sendMouseMove(QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::NoButton,
         Qt::MouseButtons buttons = Qt::NoButton, int delay = EventsDelayMs);
+
 void sendMouseRelease(
         QWidget *widget, const QPoint &point, Qt::MouseButton button = Qt::LeftButton, int delay = EventsDelayMs);
 
+void sendMouseDrag(QWidget *widget, const QPoint &from, const QPoint &to, int delay = EventsDelayMs);
+
+void saveMousePosition();
+void restoreMousePosition();
+
 } // ns ui
 } // ns test
-} // ns msc

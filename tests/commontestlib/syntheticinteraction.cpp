@@ -15,20 +15,30 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "tst_common.h"
+#include "syntheticinteraction.h"
 
 #include <QApplication>
+#include <QCursor>
 #include <QMouseEvent>
+#include <QPoint>
 #include <QTest>
+#include <QVector>
 
-namespace msc {
+namespace QTest {
+extern Q_TESTLIB_EXPORT int lastMouseTimestamp;
+}
+
 namespace test {
 namespace ui {
+
+static QVector<QPoint> savedMousePositions = {};
 
 void sendMousePress(QWidget *widget, const QPoint &point, Qt::MouseButton button, int delay)
 {
     QMouseEvent event(QEvent::MouseButtonPress, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
+    event.setTimestamp(++(QTest::lastMouseTimestamp));
     QApplication::sendEvent(widget, &event);
+    QApplication::processEvents();
     if (delay > 0)
         QTest::qWait(delay);
 }
@@ -46,11 +56,39 @@ void sendMouseMove(QWidget *widget, const QPoint &point, Qt::MouseButton button,
 void sendMouseRelease(QWidget *widget, const QPoint &point, Qt::MouseButton button, int delay)
 {
     QMouseEvent event(QEvent::MouseButtonRelease, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
+    event.setTimestamp(++(QTest::lastMouseTimestamp));
+    QTest::lastMouseTimestamp += QTest::mouseDoubleClickInterval; // avoid double clicks being generated
     QApplication::sendEvent(widget, &event);
+    QApplication::processEvents();
     if (delay > 0)
         QTest::qWait(delay);
 }
 
-} // ns ui
-} // ns test
-} // ns msc
+/*!
+Convenient function to call all mouse actions for a mouse drag action
+ */
+void sendMouseDrag(QWidget *widget, const QPoint &from, const QPoint &to, int delay)
+{
+    sendMouseMove(widget, from, Qt::NoButton, Qt::NoButton, delay);
+    sendMousePress(widget, from, Qt::LeftButton, delay);
+    sendMouseMove(widget, to, Qt::LeftButton, Qt::LeftButton, delay);
+    sendMouseRelease(widget, to, Qt::LeftButton, delay);
+}
+
+void saveMousePosition()
+{
+    savedMousePositions.append(QCursor::pos());
+}
+
+void restoreMousePosition()
+{
+    if (savedMousePositions.isEmpty()) {
+        return;
+    }
+
+    QPoint pos = savedMousePositions.takeLast();
+    QCursor::setPos(pos);
+}
+
+}
+}

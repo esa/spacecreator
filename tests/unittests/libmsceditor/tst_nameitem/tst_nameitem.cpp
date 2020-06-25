@@ -16,6 +16,7 @@
 */
 
 #include "../tst_textitem/textitembasetest.h"
+#include "syntheticinteraction.h"
 
 #include <QtTest>
 
@@ -67,12 +68,14 @@ QString tst_NameItem::disallowedText() const
 
 void tst_NameItem::init()
 {
+    test::ui::saveMousePosition();
     TextItemBaseTest::initImpl();
 }
 
 void tst_NameItem::cleanup()
 {
     TextItemBaseTest::cleanupImpl();
+    test::ui::restoreMousePosition();
 }
 
 void tst_NameItem::testAllowedInput()

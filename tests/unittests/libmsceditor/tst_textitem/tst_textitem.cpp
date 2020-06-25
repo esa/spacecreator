@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "syntheticinteraction.h"
 #include "textitembasetest.h"
 
 #include <QtTest>
@@ -66,12 +67,14 @@ QString tst_TextItem::disallowedText() const
 
 void tst_TextItem::init()
 {
+    test::ui::saveMousePosition();
     TextItemBaseTest::initImpl();
 }
 
 void tst_TextItem::cleanup()
 {
     TextItemBaseTest::cleanupImpl();
+    test::ui::restoreMousePosition();
 }
 
 void tst_TextItem::testAllowedInput()

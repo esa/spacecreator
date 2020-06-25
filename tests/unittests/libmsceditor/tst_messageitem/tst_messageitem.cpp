@@ -26,6 +26,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscreader.h"
+#include "syntheticinteraction.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -108,6 +109,8 @@ void tst_MessageItem::parseMsc(const QString &mscText)
 
 void tst_MessageItem::init()
 {
+    test::ui::saveMousePosition();
+
     m_chartModel = new ChartLayoutManager;
     m_undoStack = new QUndoStack();
     cmd::CommandsStack::setCurrent(m_undoStack);
@@ -136,6 +139,8 @@ void tst_MessageItem::cleanup()
 
     m_instances.clear();
     m_instanceItems.clear();
+
+    test::ui::restoreMousePosition();
 }
 
 void tst_MessageItem::testNameUpdate()

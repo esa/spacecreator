@@ -1,0 +1,2 @@
+add_subdirectory(tsti_100messages)
+add_subdirectory(tsti_instanceitem)
