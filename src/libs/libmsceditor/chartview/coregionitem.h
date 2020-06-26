@@ -46,6 +46,8 @@ public:
 protected:
     void initGripPoints() override;
     void rebuildLayout() override;
+    void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    void onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
 private:
     QPointer<ChartLayoutManager> m_model;
@@ -55,6 +57,8 @@ private:
     MscCoregion *m_end = nullptr;
 
     bool m_unorderedEntities = true;
+    QPointF m_topMove;
+    QPointF m_bottomMove;
 };
 
 } // namespace msc

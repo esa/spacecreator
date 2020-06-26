@@ -37,20 +37,24 @@ void sendMousePress(QWidget *widget, const QPoint &point, Qt::MouseButton button
 {
     QMouseEvent event(QEvent::MouseButtonPress, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
     event.setTimestamp(++(QTest::lastMouseTimestamp));
-    QApplication::sendEvent(widget, &event);
-    QApplication::processEvents();
+    QSpontaneKeyEvent::setSpontaneous(&event);
+    qApp->notify(widget, &event);
+
     if (delay > 0)
         QTest::qWait(delay);
 }
 
 void sendMouseMove(QWidget *widget, const QPoint &point, Qt::MouseButton button, Qt::MouseButtons buttons, int delay)
 {
-    QTest::mouseMove(widget, point);
+    QCursor::setPos(widget->mapToGlobal(point));
     QMouseEvent event(QEvent::MouseMove, point, button, buttons, Qt::NoModifier);
-    QApplication::sendEvent(widget, &event);
-    QApplication::processEvents();
-    if (delay > 0)
+    event.setTimestamp(++(QTest::lastMouseTimestamp));
+    QSpontaneKeyEvent::setSpontaneous(&event);
+    qApp->notify(widget, &event);
+
+    if (delay > 0) {
         QTest::qWait(delay);
+    }
 }
 
 void sendMouseRelease(QWidget *widget, const QPoint &point, Qt::MouseButton button, int delay)
@@ -58,20 +62,22 @@ void sendMouseRelease(QWidget *widget, const QPoint &point, Qt::MouseButton butt
     QMouseEvent event(QEvent::MouseButtonRelease, point, widget->mapToGlobal(point), button, button, Qt::NoModifier);
     event.setTimestamp(++(QTest::lastMouseTimestamp));
     QTest::lastMouseTimestamp += QTest::mouseDoubleClickInterval; // avoid double clicks being generated
-    QApplication::sendEvent(widget, &event);
-    QApplication::processEvents();
+    QSpontaneKeyEvent::setSpontaneous(&event);
+    qApp->notify(widget, &event);
+
     if (delay > 0)
         QTest::qWait(delay);
 }
 
 /*!
-Convenient function to call all mouse actions for a mouse drag action
+    Convenient function to call all mouse actions for a mouse drag action
+    Avoids any Qt event handling (QApplication::processEvents()) between the press and the release.
  */
 void sendMouseDrag(QWidget *widget, const QPoint &from, const QPoint &to, int delay)
 {
     sendMouseMove(widget, from, Qt::NoButton, Qt::NoButton, delay);
-    sendMousePress(widget, from, Qt::LeftButton, delay);
-    sendMouseMove(widget, to, Qt::LeftButton, Qt::LeftButton, delay);
+    sendMousePress(widget, from, Qt::LeftButton, 0);
+    sendMouseMove(widget, to, Qt::LeftButton, Qt::LeftButton, 0);
     sendMouseRelease(widget, to, Qt::LeftButton, delay);
 }
 

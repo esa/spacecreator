@@ -26,6 +26,7 @@
 #include "commands/cmdconditionitemcreate.h"
 #include "commands/cmdconditionitemmove.h"
 #include "commands/cmdcoregionitemcreate.h"
+#include "commands/cmdcoregionitemmove.h"
 #include "commands/cmddeleteentity.h"
 #include "commands/cmddocumentcreate.h"
 #include "commands/cmddocumentmove.h"
@@ -93,6 +94,8 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::createActionItemCreate(params);
     case cmd::CreateCoregion:
         return cmd::CommandsFactory::createCoregionItemCreate(params);
+    case cmd::MoveCoRegion:
+        return cmd::CommandsFactory::createCoregionMove(params);
     case cmd::MoveAction:
         return cmd::CommandsFactory::createActionItemMove(params);
     case cmd::InformatActionText:
@@ -323,6 +326,25 @@ QUndoCommand *CommandsFactory::createCoregionItemCreate(const QVariantList &para
         bool ok;
         int eventIndex = params.value(4).toInt(&ok);
         return new CmdCoregionItemCreate(begin, end, chart, instance, ok ? eventIndex : -1);
+    }
+
+    return nullptr;
+}
+
+QUndoCommand *CommandsFactory::createCoregionMove(const QVariantList &params)
+{
+    Q_ASSERT((params.size() == 6));
+
+    auto *itemBegin = params.at(0).value<msc::MscCoregion *>();
+    auto *itemEnd = params.at(1).value<msc::MscCoregion *>();
+    const int newBeginPos = params.at(2).toInt();
+    const int newEndPos = params.at(3).toInt();
+    auto newInstance = params.at(4).value<msc::MscInstance *>();
+    auto chart = params.at(5).value<msc::MscChart *>();
+
+    Q_ASSERT(newBeginPos < newEndPos);
+    if (itemBegin && itemEnd && newInstance && chart) {
+        return new CmdCoRegionItemMove(itemBegin, itemEnd, newBeginPos, newEndPos, newInstance, chart);
     }
 
     return nullptr;

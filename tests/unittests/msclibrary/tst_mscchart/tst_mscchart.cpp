@@ -57,6 +57,7 @@ private Q_SLOTS:
     void testInvalidTimerRelation();
     void testMaxInstanceNameNumber();
     void testSetInstanceNameNumber();
+    void testMoveCoregion();
 
 private:
     MscChart *m_chart = nullptr;
@@ -474,6 +475,72 @@ void tst_MscChart::testSetInstanceNameNumber()
     QCOMPARE(message2->messageInstanceName(), QString("6"));
     QCOMPARE(message3->messageInstanceName(), QString(""));
     QCOMPARE(message4->messageInstanceName(), QString(""));
+}
+
+void tst_MscChart::testMoveCoregion()
+{
+    auto instance1 = new MscInstance("Inst1", m_chart);
+    m_chart->addInstance(instance1);
+    auto instance2 = new MscInstance("Inst2", m_chart);
+    m_chart->addInstance(instance2);
+
+    auto message1 = new MscMessage("Msg1", m_chart);
+    message1->setSourceInstance(instance1);
+    message1->setTargetInstance(instance2);
+    m_chart->addInstanceEvent(message1);
+
+    auto coregionBegin = new MscCoregion(MscCoregion::Type::Begin, m_chart);
+    coregionBegin->setInstance(instance1);
+    m_chart->addInstanceEvent(coregionBegin);
+
+    auto message2 = new MscMessage("Msg2", m_chart);
+    message2->setTargetInstance(instance1);
+    message2->setSourceInstance(instance2);
+    m_chart->addInstanceEvent(message2);
+
+    auto coregionEnd = new MscCoregion(MscCoregion::Type::End, m_chart);
+    coregionEnd->setInstance(instance1);
+    m_chart->addInstanceEvent(coregionEnd);
+
+    auto message3 = new MscMessage("Msg3", m_chart);
+    message3->setSourceInstance(instance1);
+    message3->setTargetInstance(instance2);
+    m_chart->addInstanceEvent(message3);
+
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+
+    // Move begin up
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 0, 3);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+
+    // Move begin down
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 3);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+
+    // Move end down
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 4);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 4);
+
+    // Move end up
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 1, 3);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+
+    // end has to be after begin
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance1, 4, 0);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
+
+    // Move to other instance
+    m_chart->updateCoregionPos(coregionBegin, coregionEnd, instance2, 1, 3);
+    QCOMPARE(coregionBegin->instance(), instance2);
+    QCOMPARE(coregionEnd->instance(), instance2);
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 3);
 }
 
 QTEST_APPLESS_MAIN(tst_MscChart)

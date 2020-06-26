@@ -23,6 +23,7 @@
 
 #include <QColor>
 #include <QCursor>
+#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
@@ -183,6 +184,7 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (m_listener) {
         Q_EMIT m_listener->manualGeometryChangeProgress(this, event->lastScenePos(), event->scenePos());
+        event->accept();
     }
 }
 
@@ -203,6 +205,7 @@ void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (m_listener) {
         Q_EMIT m_listener->manualGeometryChangeFinish(
                 this, event->buttonDownScenePos(event->button()), event->scenePos());
+        event->accept();
     }
 }
 

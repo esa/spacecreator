@@ -4,6 +4,7 @@
 #include "grippointshandler.h"
 #include "highlightrectitem.h"
 
+#include <QDebug>
 #include <QPainter>
 #include <QPen>
 
@@ -25,7 +26,7 @@ struct InteractiveObjectBase::InteractiveObjectBasePrivate {
     QPointer<HighlightRectItem> highlighter;
     QPen selectedPen;
 
-    shared::DelayedSignal *rebuildLayoutSignal;
+    shared::DelayedSignal *rebuildLayoutSignal = nullptr;
 };
 
 InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem *parent)

@@ -29,6 +29,7 @@ namespace msc {
 
 class MscAction;
 class MscCondition;
+class MscCoregion;
 class MscDocument;
 class MscInstance;
 class MscInstanceEvent;
@@ -57,6 +58,7 @@ public:
     QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
     void addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
+    int indexofEvent(MscInstanceEvent *instanceEvent) const;
     MscMessage *messageByName(const QString &name) const;
 
     const QVector<MscGate *> &gates() const;
@@ -69,6 +71,8 @@ public:
 
     void updateInstanceOrder(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
+    void updateCoregionPos(
+            MscCoregion *regionBegin, MscCoregion *regionEnd, MscInstance *newInstance, int beginPos, int endPos);
     void updateConditionPos(MscCondition *condition, MscInstance *newInstance, int eventPos);
     void updateTimerPos(MscTimer *timer, MscInstance *newInstance, int eventPos);
     void updateMessageTarget(MscMessage *message, MscInstance *newInstance, int eventPos, MscMessage::EndType endType);

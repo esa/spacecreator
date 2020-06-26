@@ -23,9 +23,12 @@
 #include "messageitem.h"
 #include "mscchart.h"
 #include "msccoregion.h"
+#include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
+#include <QDebug>
 #include <QPainter>
+#include <cmath>
 
 namespace msc {
 
@@ -34,6 +37,7 @@ CoregionItem::CoregionItem(ChartLayoutManager *model, QGraphicsItem *parent)
     , m_model(model)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(ItemClipsToShape, false);
 }
 
 void CoregionItem::setBegin(MscCoregion *begin)
@@ -44,7 +48,8 @@ void CoregionItem::setBegin(MscCoregion *begin)
 
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    const QRectF rect = boundingRect();
+    painter->save();
+    QRectF rect = boundingRect();
     const QLineF topLine = { rect.topLeft(), rect.topRight() };
     const QLineF bottomLine = { rect.bottomLeft(), rect.bottomRight() };
     painter->setPen(QPen(Qt::darkGray, 2., Qt::SolidLine));
@@ -59,27 +64,31 @@ void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         painter->drawLine(rect.topLeft(), rect.bottomLeft());
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }
+    painter->restore();
     InteractiveObject::paint(painter, option, widget);
 }
 
 void CoregionItem::initGripPoints()
 {
     InteractiveObjectBase::initGripPoints();
-    gripPointsHandler()->setUsedPoints(shared::ui::GripPoint::Locations {});
+    gripPointsHandler()->setUsedPoints({ shared::ui::GripPoint::Top, shared::ui::GripPoint::Bottom });
 }
 
 void CoregionItem::rebuildLayout()
 {
     static const qreal kCoregionWidth = 50;
     static const qreal kOffset = 20;
+    static const qreal kDefaultHeight = 40;
 
-    if (m_instance)
+    if (m_instance) {
         m_instance->stackBefore(this);
+    }
 
     prepareGeometryChange();
     if (!m_begin || !m_end || !m_instance || m_begin->instance() != m_instance->modelItem()
             || m_end->instance() != m_instance->modelItem()) {
-        setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset)));
+        // Not fully defined. Set the default size
+        setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, kDefaultHeight)));
         return;
     }
 
@@ -107,16 +116,21 @@ void CoregionItem::rebuildLayout()
             }
             stackBefore(iObj);
         }
-
         ++it;
     }
+
     const QRectF instanceRect = m_instance->sceneBoundingRect();
     if (!rect.isValid()) {
-        setBoundingRect(QRectF(QPointF(0, 0), QSizeF(kCoregionWidth, 2 * kOffset)));
+        // No events inside this co-region. Set default size
+        const qreal top = std::min(m_topMove.y(), kDefaultHeight - 1.);
+        const qreal bottom = std::max(m_bottomMove.y(), 1.);
+        const qreal height = m_bottomMove.isNull() ? kDefaultHeight - top : (bottom - top);
+        setBoundingRect(QRectF(QPointF(0, top), QSizeF(kCoregionWidth, height)));
         setX(instanceRect.x() + (instanceRect.width() - kCoregionWidth) / 2);
         return;
     }
 
+    // Set size from the events
     rect.setWidth(kCoregionWidth);
     rect.adjust(0, -kOffset, 0, kOffset);
     rect.translate(instanceRect.center().x() - rect.center().x(), 0);
@@ -125,8 +139,42 @@ void CoregionItem::rebuildLayout()
         rect.setTop(axis.y1());
     if (rect.bottom() > axis.y2())
         rect.setBottom(axis.y2());
-    setBoundingRect({ QPointF(0, 0), rect.size() });
+
     setPos(rect.topLeft());
+
+    // adapt height and top, when being resized
+    const qreal top = std::min(m_topMove.y(), rect.height());
+    const qreal bottom = std::max(m_bottomMove.y(), -rect.height());
+    const qreal height = m_bottomMove.isNull() ? rect.height() - top : (bottom - top);
+    rect.setHeight(height);
+
+    setBoundingRect({ QPointF(0, top), rect.size() });
+}
+
+void CoregionItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to)
+{
+    Q_UNUSED(from);
+    if (gp->location() == shared::ui::GripPoint::Top) {
+        m_topMove = mapFromScene(to);
+    }
+    if (gp->location() == shared::ui::GripPoint::Bottom) {
+        m_bottomMove = mapFromScene(to);
+    }
+    instantLayoutUpdate();
+}
+
+void CoregionItem::onManualResizeFinish(shared::ui::GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
+{
+    Q_UNUSED(gp)
+    Q_UNUSED(pressedAt)
+    Q_UNUSED(releasedAt)
+
+    Q_ASSERT(!m_model.isNull());
+
+    m_topMove = QPointF();
+    m_bottomMove = QPointF();
+
+    Q_EMIT moved(this);
 }
 
 void CoregionItem::connectObjects(InstanceItem *instance, qreal y)

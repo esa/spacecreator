@@ -37,6 +37,7 @@ enum Id
     InformatActionText,
     CreateTimer,
     MoveTimer,
+    MoveCoRegion,
     HierarchyType,
     CreateDocument,
     ChangeComment,

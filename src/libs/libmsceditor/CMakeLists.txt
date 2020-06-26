@@ -73,6 +73,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdconditionitemmove.h
     commands/cmdcoregionitemcreate.cpp
     commands/cmdcoregionitemcreate.h
+    commands/cmdcoregionitemmove.cpp
+    commands/cmdcoregionitemmove.h
     commands/cmddeleteentity.cpp
     commands/cmddeleteentity.h
     commands/cmddocumentcreate.cpp

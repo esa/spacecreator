@@ -283,6 +283,17 @@ void MscChart::removeInstanceEvent(MscInstanceEvent *instanceEvent)
     }
 }
 
+/*!
+   Return the index (vertical) of the given event
+ */
+int MscChart::indexofEvent(MscInstanceEvent *instanceEvent) const
+{
+    return m_instanceEvents.indexOf(instanceEvent);
+}
+
+/*!
+   Returns the first message with the given name
+ */
 MscMessage *MscChart::messageByName(const QString &name) const
 {
     for (MscInstanceEvent *message : m_instanceEvents) {
@@ -384,6 +395,24 @@ void MscChart::updateActionPos(MscAction *action, MscInstance *newInstance, int 
 {
     bool changed = setEventInstance(action, newInstance);
     changed |= moveEvent(action, eventPos);
+
+    if (changed) {
+        Q_EMIT eventMoved();
+        Q_EMIT dataChanged();
+    }
+}
+
+void MscChart::updateCoregionPos(
+        MscCoregion *regionBegin, MscCoregion *regionEnd, MscInstance *newInstance, int beginPos, int endPos)
+{
+    if (beginPos >= endPos || !regionBegin || !regionEnd || !newInstance) {
+        return;
+    }
+
+    bool changed = setEventInstance(regionBegin, newInstance);
+    changed |= setEventInstance(regionEnd, newInstance);
+    changed |= moveEvent(regionBegin, beginPos);
+    changed |= moveEvent(regionEnd, endPos);
 
     if (changed) {
         Q_EMIT eventMoved();

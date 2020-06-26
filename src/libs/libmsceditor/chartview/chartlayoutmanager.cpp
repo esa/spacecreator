@@ -1052,6 +1052,10 @@ MscInstance *ChartLayoutManager::nearestInstance(const QPointF &pos)
     return instance;
 }
 
+/*!
+   Returns the index a would have if it was placed at Y-position y.
+   @param y the Y-position in scene coordinates
+ */
 int ChartLayoutManager::eventIndex(qreal y)
 {
     int idx = 0;
@@ -1452,8 +1456,7 @@ void ChartLayoutManager::onInstanceGeometryChanged()
 
 void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectBase *item)
 {
-    auto actionItem = qobject_cast<ActionItem *>(item);
-    if (actionItem) {
+    if (auto actionItem = qobject_cast<ActionItem *>(item)) {
         MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
         const int newIdx = eventIndex(item->y());
@@ -1467,8 +1470,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         }
     }
 
-    auto conditionItem = qobject_cast<ConditionItem *>(item);
-    if (conditionItem) {
+    if (auto conditionItem = qobject_cast<ConditionItem *>(item)) {
         MscInstance *newInstance = nearestInstance(conditionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
         const int newIdx = eventIndex(item->y());
@@ -1482,14 +1484,31 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         }
     }
 
-    auto timerItem = qobject_cast<TimerItem *>(item);
-    if (timerItem) {
+    if (auto timerItem = qobject_cast<TimerItem *>(item)) {
         MscInstance *newInstance = nearestInstance(timerItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
         const int newIdx = eventIndex(item->y());
         if (newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
                     { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
+                            QVariant::fromValue<MscInstance *>(newInstance),
+                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+        } else {
+            updateLayout();
+        }
+    }
+
+    if (auto coregionItem = qobject_cast<CoregionItem *>(item)) {
+        MscInstance *newInstance = nearestInstance(coregionItem->sceneBoundingRect().center());
+        const int currentBeginIdx = d->m_currentChart->instanceEvents().indexOf(coregionItem->begin());
+        const int currentEndIdx = d->m_currentChart->instanceEvents().indexOf(coregionItem->end());
+        const int newIdxBegin = eventIndex(item->sceneBoundingRect().top());
+        const int newIdxEnd = eventIndex(item->sceneBoundingRect().bottom());
+        if (newInstance != coregionItem->begin()->instance() || currentBeginIdx != newIdxBegin
+                || currentEndIdx != newIdxEnd) {
+            msc::cmd::CommandsStack::push(msc::cmd::MoveCoRegion,
+                    { QVariant::fromValue<MscCoregion *>(coregionItem->begin()),
+                            QVariant::fromValue<MscCoregion *>(coregionItem->end()), newIdxBegin, newIdxEnd,
                             QVariant::fromValue<MscInstance *>(newInstance),
                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
         } else {
