@@ -49,7 +49,7 @@ void CoregionItem::setBegin(MscCoregion *begin)
 void CoregionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->save();
-    QRectF rect = boundingRect();
+    const QRectF rect = boundingRect();
     const QLineF topLine = { rect.topLeft(), rect.topRight() };
     const QLineF bottomLine = { rect.bottomLeft(), rect.bottomRight() };
     painter->setPen(QPen(Qt::darkGray, 2., Qt::SolidLine));
