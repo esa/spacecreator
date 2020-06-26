@@ -1460,7 +1460,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(actionItem->modelItem());
         const int newIdx = eventIndex(item->y());
-        if (newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
+        if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
                     { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
@@ -1474,7 +1474,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscInstance *newInstance = nearestInstance(conditionItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(conditionItem->modelItem());
         const int newIdx = eventIndex(item->y());
-        if (newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
+        if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveCondition,
                     { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
@@ -1488,7 +1488,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscInstance *newInstance = nearestInstance(timerItem->sceneBoundingRect().center());
         const int currentIdx = d->m_currentChart->instanceEvents().indexOf(timerItem->modelItem());
         const int newIdx = eventIndex(item->y());
-        if (newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
+        if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
                     { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
@@ -1504,7 +1504,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int currentEndIdx = d->m_currentChart->instanceEvents().indexOf(coregionItem->end());
         const int newIdxBegin = eventIndex(item->sceneBoundingRect().top());
         const int newIdxEnd = eventIndex(item->sceneBoundingRect().bottom());
-        if (newInstance != coregionItem->begin()->instance() || currentBeginIdx != newIdxBegin
+        if (!newInstance || newInstance != coregionItem->begin()->instance() || currentBeginIdx != newIdxBegin
                 || currentEndIdx != newIdxEnd) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveCoRegion,
                     { QVariant::fromValue<MscCoregion *>(coregionItem->begin()),
