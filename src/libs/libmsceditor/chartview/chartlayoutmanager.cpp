@@ -1053,7 +1053,7 @@ MscInstance *ChartLayoutManager::nearestInstance(const QPointF &pos)
 }
 
 /*!
-   Returns the index a would have if it was placed at Y-position y.
+   Returns the index an event would have if it was placed at Y-position \p y.
    @param y the Y-position in scene coordinates
  */
 int ChartLayoutManager::eventIndex(qreal y)
