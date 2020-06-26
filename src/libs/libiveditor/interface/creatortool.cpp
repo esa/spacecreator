@@ -413,7 +413,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
         } else {
             d->previewConnectionItem = new QGraphicsPathItem;
             d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(ZOrder.Connection);
+            d->previewConnectionItem->setZValue(ZOrder.Preview);
             scene->addItem(d->previewConnectionItem);
         }
         d->connectionPoints.append(scenePos);
@@ -428,7 +428,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             const QPointF startPoint = item->mapToScene(QPointF(0, 0));
             d->previewConnectionItem = new QGraphicsPathItem;
             d->previewConnectionItem->setPen(QPen(Qt::black, 2, Qt::DotLine));
-            d->previewConnectionItem->setZValue(ZOrder.Connection);
+            d->previewConnectionItem->setZValue(ZOrder.Preview);
             scene->addItem(d->previewConnectionItem);
             d->connectionPoints.append(startPoint);
             return true;
@@ -444,7 +444,7 @@ bool CreatorTool::onMousePress(QMouseEvent *e)
             d->previewItem = new QGraphicsRectItem(parentItem);
             d->previewItem->setPen(QPen(Qt::blue, kPreviewItemPenWidth, Qt::SolidLine));
             d->previewItem->setBrush(QBrush(QColor(30, 144, 255, 90)));
-            d->previewItem->setZValue(1);
+            d->previewItem->setZValue(ZOrder.Preview);
             d->clickScenePos = scenePos;
 
             if (!parentItem)
