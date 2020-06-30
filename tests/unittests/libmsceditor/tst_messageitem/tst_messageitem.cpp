@@ -109,7 +109,7 @@ void tst_MessageItem::parseMsc(const QString &mscText)
 
 void tst_MessageItem::init()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
 
     m_chartModel = new ChartLayoutManager;
     m_undoStack = new QUndoStack();
@@ -140,7 +140,7 @@ void tst_MessageItem::cleanup()
     m_instances.clear();
     m_instanceItems.clear();
 
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
 }
 
 void tst_MessageItem::testNameUpdate()

@@ -168,7 +168,7 @@ void tst_InteractiveObject::init()
     m_item = new InteractiveObjectImpl();
     m_scene->addItem(m_item);
 
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
 }
 
 void tst_InteractiveObject::cleanup()
@@ -179,7 +179,7 @@ void tst_InteractiveObject::cleanup()
     m_scene->removeItem(m_item);
     delete m_item;
 
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
 }
 
 void tst_InteractiveObject::testMove()
@@ -191,7 +191,7 @@ void tst_InteractiveObject::testMove()
     const QPointF &prevPos(m_item->pos());
     QVERIFY(prevPos.isNull());
 
-    test::ui::sendMouseMove(
+    vstest::sendMouseMove(
             m_view->viewport(), m_view->mapFromScene(m_item->boundingRect().translated(m_item->pos()).center()));
 
     if (GripPoint *gp = m_item->gripPoint(GripPoint::Center)) {
@@ -199,7 +199,7 @@ void tst_InteractiveObject::testMove()
         const QPoint &pntFrom = m_view->mapFromScene(gpScene);
         const QPoint &pntTo(pntFrom + MoveDistance);
 
-        test::ui::sendMouseDrag(m_view->viewport(), pntFrom, pntTo);
+        vstest::sendMouseDrag(m_view->viewport(), pntFrom, pntTo);
     }
 
     QCOMPARE(m_item->pos(), prevPos + MoveDistance);
@@ -212,7 +212,7 @@ void tst_InteractiveObject::testResize()
     QVERIFY(m_item);
 
     // place mouse pointer over item to activate its grippointshandler:
-    test::ui::sendMouseMove(m_view->viewport(), QPoint(), Qt::NoButton, Qt::NoButton);
+    vstest::sendMouseMove(m_view->viewport(), QPoint(), Qt::NoButton, Qt::NoButton);
 
     const QMetaEnum &e = QMetaEnum::fromType<GripPoint::Location>();
     for (int i = 0; i < e.keyCount(); ++i) {
@@ -229,7 +229,7 @@ void tst_InteractiveObject::testResize()
             const QPoint &pntFrom = m_view->viewport()->mapFromGlobal(m_view->mapToGlobal(gpView));
             const QPoint &pntTo(pntFrom + MoveDistance);
 
-            test::ui::sendMouseDrag(m_view->viewport(), pntFrom, pntTo);
+            vstest::sendMouseDrag(m_view->viewport(), pntFrom, pntTo);
             QVERIFY(m_item->boundingRect() != prevRect);
         }
     }

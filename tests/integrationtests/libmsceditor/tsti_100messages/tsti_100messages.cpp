@@ -63,7 +63,7 @@ constexpr bool tsti100messages::SkipBenchmark;
 
 void tsti100messages::initTestCase()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
 
     QScopedPointer<msc::MscChart> chart(new msc::MscChart());
     m_model.setCurrentChart(chart.data());
@@ -85,12 +85,12 @@ void tsti100messages::initTestCase()
 
 void tsti100messages::init()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
 }
 
 void tsti100messages::cleanup()
 {
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
 }
 
 void tsti100messages::testPerformance()
@@ -140,13 +140,13 @@ void tsti100messages::moveInstance(const QPoint &pntMove)
         pntMove // and up (back to initial pos)
     };
 
-    test::ui::sendMouseMove(m_view->viewport(), QPoint());
+    vstest::sendMouseMove(m_view->viewport(), QPoint());
 
-    test::ui::sendMouseMove(m_view->viewport(), pntMove);
-    test::ui::sendMousePress(m_view->viewport(), pntMove, Qt::LeftButton, Qt::LeftButton);
+    vstest::sendMouseMove(m_view->viewport(), pntMove);
+    vstest::sendMousePress(m_view->viewport(), pntMove, Qt::LeftButton, Qt::LeftButton);
 
     for (const QPoint &pnt : path)
-        test::ui::sendMouseMove(m_view->viewport(), pnt, Qt::LeftButton, Qt::LeftButton);
+        vstest::sendMouseMove(m_view->viewport(), pnt, Qt::LeftButton, Qt::LeftButton);
 }
 
 QTEST_MAIN(tsti100messages)

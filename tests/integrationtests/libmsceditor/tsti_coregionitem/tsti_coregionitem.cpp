@@ -23,11 +23,13 @@
 #include "exceptions.h"
 #include "graphicsitemcompare.h"
 #include "instanceitem.h"
+#include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccoregion.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
+#include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "syntheticinteraction.h"
@@ -57,6 +59,7 @@ private:
     void loadView(const QString &mscDoc);
     QPointF topCenter(InteractiveObject *item) const;
     QPointF bottomCenter(InteractiveObject *item) const;
+    bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;
 
     QScopedPointer<ChartLayoutManager> m_chartModel;
     QScopedPointer<QGraphicsView> m_view;
@@ -76,7 +79,7 @@ void tsti_CoregionItem::initTestCase()
 
 void tsti_CoregionItem::init()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
     m_chartModel.reset(new ChartLayoutManager());
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());
@@ -85,7 +88,7 @@ void tsti_CoregionItem::init()
 
 void tsti_CoregionItem::cleanup()
 {
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
     m_model.reset();
 }
 
@@ -108,16 +111,20 @@ void tsti_CoregionItem::testMoveTopUp()
 
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
+
+    QVERIFY(!isInCoregion(coregionItem, action));
+
     const QPoint topGrip = topCenter(coregionItem).toPoint();
     const QPoint actionTop = topCenter(actionItem).toPoint() - QPoint(0, 10);
 
-    test::ui::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
-    test::ui::sendMouseDrag(m_view->viewport(), topGrip, actionTop);
+    vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), topGrip, actionTop);
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
     QCOMPARE(m_chart->indexofEvent(action), 1);
-    QVERIFY(test::ui::isVerticalInside(actionItem, coregionItem));
+    QVERIFY(vstest::isVerticalInside(actionItem, coregionItem));
+    QVERIFY(isInCoregion(coregionItem, action));
 }
 
 void tsti_CoregionItem::testMoveTopDown()
@@ -140,16 +147,19 @@ void tsti_CoregionItem::testMoveTopDown()
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
 
+    QVERIFY(isInCoregion(coregionItem, action));
+
     const QPoint topGrip = topCenter(coregionItem).toPoint();
     const QPoint actionBottom = bottomCenter(actionItem).toPoint() + QPoint(0, 10);
 
-    test::ui::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
-    test::ui::sendMouseDrag(m_view->viewport(), topGrip, actionBottom);
+    vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), topGrip, actionBottom);
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 1);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
     QCOMPARE(m_chart->indexofEvent(action), 0);
-    QVERIFY(test::ui::isAbove(actionItem, coregionItem));
+    QVERIFY(vstest::isAbove(actionItem, coregionItem));
+    QVERIFY(!isInCoregion(coregionItem, action));
 }
 
 void tsti_CoregionItem::testMoveBottomDown()
@@ -172,16 +182,19 @@ void tsti_CoregionItem::testMoveBottomDown()
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
 
+    QVERIFY(!isInCoregion(coregionItem, action));
+
     const QPoint bottomGrip = bottomCenter(coregionItem).toPoint();
     const QPoint actionBottom = bottomCenter(actionItem).toPoint() + QPoint(0, 10);
 
-    test::ui::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
-    test::ui::sendMouseDrag(m_view->viewport(), bottomGrip, actionBottom);
+    vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionBottom);
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
     QCOMPARE(m_chart->indexofEvent(action), 1);
-    QVERIFY(test::ui::isVerticalInside(actionItem, coregionItem));
+    QVERIFY(vstest::isVerticalInside(actionItem, coregionItem));
+    QVERIFY(isInCoregion(coregionItem, action));
 }
 
 void tsti_CoregionItem::testMoveBottomUp()
@@ -204,16 +217,19 @@ void tsti_CoregionItem::testMoveBottomUp()
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
 
+    QVERIFY(isInCoregion(coregionItem, action));
+
     const QPoint bottomGrip = bottomCenter(coregionItem).toPoint();
     const QPoint actionTop = topCenter(actionItem).toPoint() - QPoint(0, 10);
 
-    test::ui::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
-    test::ui::sendMouseDrag(m_view->viewport(), bottomGrip, actionTop);
+    vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionTop);
 
     QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
     QCOMPARE(m_chart->indexofEvent(coregionEnd), 1);
     QCOMPARE(m_chart->indexofEvent(action), 2);
-    QVERIFY(test::ui::isBelow(actionItem, coregionItem));
+    QVERIFY(vstest::isBelow(actionItem, coregionItem));
+    QVERIFY(!isInCoregion(coregionItem, action));
 }
 
 void tsti_CoregionItem::loadView(const QString &mscDoc)
@@ -226,7 +242,7 @@ void tsti_CoregionItem::loadView(const QString &mscDoc)
     // This could be usefull during local development (to see the mouse interaction),
     // but fails the test in CI environment:
     if (m_isLocalBuild) {
-        test::ui::EventsDelayMs = 300;
+        vstest::EventsDelayMs = 300;
         m_view->show();
         bool ok = QTest::qWaitForWindowActive(m_view.data());
         QVERIFY2(ok, "Unable to show the chart view");
@@ -245,6 +261,14 @@ QPointF tsti_CoregionItem::bottomCenter(InteractiveObject *item) const
 {
     const QRectF &r = item->sceneBoundingRect();
     return m_view->mapFromScene({ r.center().x(), r.bottom() });
+}
+
+bool tsti_CoregionItem::isInCoregion(const CoregionItem *coregion, MscInstanceEvent *event) const
+{
+    const int beginIdx = m_chart->indexofEvent(coregion->begin());
+    const int endIdx = m_chart->indexofEvent(coregion->end());
+    const int eventIdx = m_chart->indexofEvent(event);
+    return (beginIdx < eventIdx) && (endIdx > eventIdx) && event->relatesTo(coregion->begin()->instance());
 }
 
 QTEST_MAIN(tsti_CoregionItem)
