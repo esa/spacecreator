@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<InterfaceView>
+    <Function name="Function_1" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 339600 482800 381300"/>
+        <Required_Interface name="RI_1" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="482800 362800"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_2" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="482800 376300"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_3" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="482600 373000"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_4" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="482700 377800"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="482800 357100"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_2" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="482800 369100"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Parametrized_Inheritance" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 560400 583900 568400"/>
+    </Function>
+    <Function name="FunctionType" language="" is_type="YES">
+        <Property name="Taste::coordinates" value="463300 619400 483400 631300"/>
+        <Required_Interface name="RI_26" kind="PROTECTED_OPERATION">
+            <Property name="Taste::coordinates" value="483400 621800"/>
+            <Property name="Taste::labelInheritance" value="false"/>
+        </Required_Interface>
+        <Required_Interface name="RI_27" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="483400 628600"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_Param" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="New property" type="Timer" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="483400 625400"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Function_2" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="494400 339500 514400 381700"/>
+        <Required_Interface name="RI_5" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="495300 375800"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+    </Function>
+    <Function name="Function_1" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 401700 513500 450500"/>
+        <Required_Interface name="RI_9" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="481800 401400"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_10" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="485700 401800"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_14" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="513400 429300"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_10" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="513300 424500"/>
+        </Provided_Interface>
+        <Function name="Function_4" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="471200 411100 506400 442200"/>
+            <Function name="Function_5" language="" is_type="NO" instance_of="">
+                <Property name="Taste::coordinates" value="479800 419400 499800 432800"/>
+                <Required_Interface name="RI_11" kind="SPORADIC_OPERATION">
+                    <Property name="Taste::coordinates" value="494900 419800"/>
+                    <Property name="Taste::labelInheritance" value="true"/>
+                </Required_Interface>
+                <Required_Interface name="RI_12" kind="SPORADIC_OPERATION">
+                    <Property name="Taste::coordinates" value="487800 432700"/>
+                    <Property name="Taste::labelInheritance" value="true"/>
+                </Required_Interface>
+                <Required_Interface name="RI_13" kind="SPORADIC_OPERATION">
+                    <Property name="Taste::coordinates" value="499800 429100"/>
+                    <Property name="Taste::labelInheritance" value="true"/>
+                </Required_Interface>
+                <Provided_Interface name="PI_7" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                    <Property name="Taste::coordinates" value="491000 419300"/>
+                </Provided_Interface>
+                <Provided_Interface name="PI_8" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                    <Property name="Taste::coordinates" value="483000 432700"/>
+                </Provided_Interface>
+                <Provided_Interface name="PI_9" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                    <Property name="Taste::coordinates" value="500000 425000"/>
+                </Provided_Interface>
+            </Function>
+        </Function>
+    </Function>
+    <Function name="Children_Parent" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 387700 560600 395700"/>
+    </Function>
+    <Function name="Function_16" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="554200 488800 582400 506800"/>
+        <Required_Interface name="RI_17" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="554200 500400"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_13" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="554200 493200"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Function_17" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 527000 503100 554500"/>
+        <Required_Interface name="RI_18" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="503000 550600"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_20" kind="CYCLIC_OPERATION">
+            <Property name="Taste::coordinates" value="503700 536500"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_14" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="503000 544300"/>
+        </Provided_Interface>
+        <Provided_Interface name="PI_16" kind="CYCLIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="503000 531000"/>
+        </Provided_Interface>
+        <Function name="Function_18" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="470100 532700 495800 548800"/>
+            <Required_Interface name="RI_21" kind="CYCLIC_OPERATION">
+                <Property name="Taste::coordinates" value="495600 543700"/>
+                <Property name="Taste::labelInheritance" value="true"/>
+            </Required_Interface>
+            <Provided_Interface name="PI_17" kind="CYCLIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="495900 537800"/>
+            </Provided_Interface>
+        </Function>
+    </Function>
+    <Function name="Function_26" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="523900 619400 549600 639700"/>
+    </Function>
+    <Function name="Toplevel" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 325500 549500 333500"/>
+    </Function>
+    <Function name="Function_23" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="515700 574900 545000 599200"/>
+        <Required_Interface name="RI_int_b" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="515700 588400"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_bool_a" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="515900 582100"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="FunctionType_instanceOf" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="463500 605400 582600 613400"/>
+    </Function>
+    <Function name="Function_22" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 574500 495000 599400"/>
+        <Required_Interface name="RI_bool_a_ni" kind="SPORADIC_OPERATION">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="494700 586900"/>
+            <Property name="Taste::labelInheritance" value="false"/>
+        </Required_Interface>
+        <Required_Interface name="RI_inherited" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="494800 592300"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Required_Interface name="RI_25" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="494800 597200"/>
+            <Property name="Taste::labelInheritance" value="false"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_bool_a" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="a" type="T-Boolean" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="495200 581500"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Cyclic" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 512800 595300 520800"/>
+    </Function>
+    <Function name="FunctionTyped" language="" is_type="NO" instance_of="Function_type_2">
+        <Property name="Taste::coordinates" value="489400 619400 513100 640100"/>
+        <Required_Interface name="RI_26" kind="PROTECTED_OPERATION">
+            <Property name="Taste::coordinates" value="513100 625000"/>
+            <Property name="Taste::labelInheritance" value="false"/>
+        </Required_Interface>
+        <Required_Interface name="RI_27" kind="SPORADIC_OPERATION">
+            <Property name="Taste::coordinates" value="513100 634900"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_Param" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+            <Input_Parameter name="New property" type="Timer" encoding="NATIVE"/>
+            <Property name="Taste::coordinates" value="513100 630000"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Function_7" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 470500 546500 506800"/>
+        <Function name="Function_8" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="470400 478200 497500 500400"/>
+            <Required_Interface name="RI_16" kind="SPORADIC_OPERATION">
+                <Property name="Taste::coordinates" value="497500 485100"/>
+                <Property name="Taste::labelInheritance" value="true"/>
+            </Required_Interface>
+            <Provided_Interface name="PI_11" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="497500 491200"/>
+            </Provided_Interface>
+            <Function name="Function_9" language="" is_type="NO" instance_of="">
+                <Property name="Taste::coordinates" value="476000 483200 491900 495400"/>
+            </Function>
+        </Function>
+        <Function name="Function_12" language="" is_type="NO" instance_of="">
+            <Property name="Taste::coordinates" value="513300 478100 538800 498400"/>
+            <Required_Interface name="RI_15" kind="SPORADIC_OPERATION">
+                <Property name="Taste::coordinates" value="513300 484800"/>
+                <Property name="Taste::labelInheritance" value="true"/>
+            </Required_Interface>
+            <Provided_Interface name="PI_12" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">
+                <Property name="Taste::coordinates" value="513300 491700"/>
+            </Provided_Interface>
+            <Function name="Function_13" language="" is_type="NO" instance_of="">
+                <Property name="Taste::coordinates" value="526000 488400 546000 496400"/>
+            </Function>
+        </Function>
+    </Function>
+    <Function name="Function_19" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="524300 526800 558300 554100"/>
+        <Required_Interface name="RI_19" kind="CYCLIC_OPERATION">
+            <Property name="Taste::coordinates" value="524300 537700"/>
+            <Property name="Taste::labelInheritance" value="true"/>
+        </Required_Interface>
+        <Provided_Interface name="PI_15" kind="CYCLIC_OPERATION" period="" wcet="" queue_size="">
+            <Property name="Taste::coordinates" value="524300 532200"/>
+        </Provided_Interface>
+    </Function>
+    <Function name="Nested_Same_Parent" language="" is_type="NO" instance_of="">
+        <Property name="Taste::coordinates" value="462800 456500 582300 464500"/>
+    </Function>
+    <Comment name="1. Despite shared parent, RI to RI and PI to PI is forbidden 2. Same rules for the external toplevel item">
+        <Property name="Taste::coordinates" value="552500 470500 582500 480500"/>
+    </Comment>
+    <Comment name="TopLevel 1. Fn1 to Fn2, Fn2 to Fn1 2. Fn1 RI,PI to Fn2 3. Fn2 to Fn1 RI,PI 4. Forbidden PI to PI, RI to RI, RI to many PI 5. PI to many RI">
+        <Property name="Taste::coordinates" value="520400 339500 549600 352400"/>
+    </Comment>
+    <Comment name="1. Add/rm/edit Interface in FunctionType 2. Add connections 3. Connections to/from FT forbidden 4.  Add/rm/edit Interface in FunctionType">
+        <Property name="Taste::coordinates" value="555500 619400 586100 639800"/>
+    </Comment>
+    <Comment name="Any connection with Ciclyc is forbidden">
+        <Property name="Taste::coordinates" value="564300 526900 594100 535600"/>
+    </Comment>
+    <Comment name="Parent &lt;-&gt; Children 1. With no existing interfaces, both directions 2. With existing start RI, PI, both directions 3. With existing end RI, PI, both directions 4. PI to PI, RI to RI">
+        <Property name="Taste::coordinates" value="519500 401700 560600 430000"/>
+    </Comment>
+    <Comment name="1. PI to PI same params 2. RI inherited to PI param 3. RI not inherited to PI same param 4. RI not inherited to PI param">
+        <Property name="Taste::coordinates" value="555600 575200 583900 593600"/>
+    </Comment>
+</InterfaceView>
