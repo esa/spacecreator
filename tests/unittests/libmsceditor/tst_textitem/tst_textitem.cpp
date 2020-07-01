@@ -67,14 +67,14 @@ QString tst_TextItem::disallowedText() const
 
 void tst_TextItem::init()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
     TextItemBaseTest::initImpl();
 }
 
 void tst_TextItem::cleanup()
 {
     TextItemBaseTest::cleanupImpl();
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
 }
 
 void tst_TextItem::testAllowedInput()

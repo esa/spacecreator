@@ -1,70 +1,38 @@
-mscdocument Untitled_Document /* MSC AND */;
-/* CIF MSCDOCUMENT (0, 0) (1571, 1692) */
-    mscdocument Untitled_Leaf /* MSC LEAF */;
-        msc Untitled;
-            /* CIF INSTANCE (91, 40) (148, 64) (800, 1559) */
-            instance Instance_A;
-            /* CIF MESSAGE (1085, 185) (165, 185) */
-                in CA_1 from Instance_C;
-            /* CIF MESSAGE (165, 286) (1085, 286) */
-                out AC_2 to Instance_C;
-            /* CIF MESSAGE (742, 577) (165, 577) */
-                in BA_3 from Instance_B;
-            /* CIF MESSAGE (165, 679) (742, 679) */
-                out AB_4 to Instance_B;
-            /* CIF MESSAGE (371, 869) (165, 869) */
-                in NA_5 from NEW_INSTANCE;
-            endinstance;
-            /* CIF INSTANCE (270, 343) (203, 73) (800, 941) */
-            instance NEW_INSTANCE;
-                condition Condition_15;
-            /* CIF MESSAGE (371, 869) (165, 869) */
-                out NA_5 to Instance_A;
-                action 'Action_13';
-            /* CIF MESSAGE (742, 1234) (371, 1234) */
-                in BN_7 from Instance_B;
-            /* CIF MESSAGE (371, 1335) (742, 1335) */
-                out NB_8 to Instance_B;
-            stop;
-            /* CIF INSTANCE (671, 40) (146, 64) (800, 1559) */
-            instance Instance_B;
-            /* CIF MESSAGE (742, 577) (165, 577) */
-                out BA_3 to Instance_A;
-            /* CIF MESSAGE (165, 679) (742, 679) */
-                in AB_4 from Instance_A;
-            /* CIF MESSAGE (742, 1052) (1085, 1052) */
-                out BC_6 to Instance_C;
-                action 'Action_14';
-            /* CIF MESSAGE (742, 1234) (371, 1234) */
-                out BN_7 to NEW_INSTANCE;
-            /* CIF MESSAGE (371, 1335) (742, 1335) */
-                in NB_8 from NEW_INSTANCE;
-            /* CIF CREATE (742, 1437) (1460, 1437) */
-                create NEW_INSTANCE2;
-            /* CIF MESSAGE (742, 1538) (1460, 1538) */
-                out BN2_9 to NEW_INSTANCE2;
-            /* CIF MESSAGE (1460, 1639) (742, 1639) */
-                in NB2_10 from NEW_INSTANCE2;
-            endinstance;
-            /* CIF INSTANCE (1012, 40) (148, 64) (800, 970) */
-            instance Instance_C;
-            /* CIF MESSAGE (1085, 185) (165, 185) */
-                out CA_1 to Instance_A;
-            /* CIF MESSAGE (165, 286) (1085, 286) */
-                in AC_2 from Instance_A;
-            /* CIF CREATE (1085, 468) (371, 387) */
-                create NEW_INSTANCE;
-                starttimer Timer_2;
-            /* CIF MESSAGE (742, 1052) (1085, 1052) */
-                in BC_6 from Instance_B;
-            stop;
-            /* CIF INSTANCE (1357, 1393) (208, 65) (800, 205) */
-            instance NEW_INSTANCE2;
-            /* CIF MESSAGE (742, 1538) (1460, 1538) */
-                in BN2_9 from Instance_B;
-            /* CIF MESSAGE (1460, 1639) (742, 1639) */
-                out NB2_10 to Instance_B;
-            endinstance;
-        endmsc;
-    endmscdocument;
-endmscdocument;
+msc Untitled;
+    instance Instance_A;
+        in CA_1 from Instance_C;
+        out AC_2 to Instance_C;
+        in BA_3 from Instance_B;
+        out AB_4 to Instance_B;
+        in NA_5 from NEW_INSTANCE;
+    endinstance;
+
+    instance NEW_INSTANCE;
+        out NA_5 to Instance_A;
+        in BN_7 from Instance_B;
+        out NB_8 to Instance_B;
+    stop;
+
+    instance Instance_C;
+        out CA_1 to Instance_A;
+        in AC_2 from Instance_A;
+        in BC_6 from Instance_B;
+    stop;
+
+    instance NEW_INSTANCE2;
+        in BN2_9 from Instance_B;
+        out NB2_10 to Instance_B;
+    endinstance;
+
+    instance Instance_B;
+        out BA_3 to Instance_A;
+        in AB_4 from Instance_A;
+        create NEW_INSTANCE;
+        out BC_6 to Instance_C;
+        out BN_7 to NEW_INSTANCE;
+        in NB_8 from NEW_INSTANCE;
+        create NEW_INSTANCE2;
+        out BN2_9 to NEW_INSTANCE2;
+        in NB2_10 from NEW_INSTANCE2;
+    endinstance;
+endmsc;

@@ -45,12 +45,12 @@ private Q_SLOTS:
 
 void tsti_InstanceItem::init()
 {
-    test::ui::saveMousePosition();
+    vstest::saveMousePosition();
 }
 
 void tsti_InstanceItem::cleanup()
 {
-    test::ui::restoreMousePosition();
+    vstest::restoreMousePosition();
 }
 
 void tsti_InstanceItem::testMoveByHead()
@@ -98,7 +98,7 @@ void tsti_InstanceItem::testMoveByHead()
         const QPoint &rightHead = getHead(itemB);
         const QPoint &destination = getHead(itemA);
 
-        test::ui::sendMouseDrag(view.data()->viewport(), rightHead, destination);
+        vstest::sendMouseDrag(view.data()->viewport(), rightHead, destination);
 
         // Now instances should be in reversed order
         // and no crash, ofcourse - see https://git.vikingsoftware.com/esa/msceditor/issues/134

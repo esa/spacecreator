@@ -110,15 +110,17 @@ void EntityDeleteTool::deleteSelectedItems()
     for (auto item : m_view->scene()->selectedItems()) {
         auto obj = dynamic_cast<msc::InteractiveObject *>(item);
         if (obj) {
-            if (obj->modelEntity()) {
-                if (obj->modelEntity()->entityType() == MscEntity::EntityType::Comment) {
-                    if (MscComment *comment = qobject_cast<MscComment *>(obj->modelEntity()))
-                        comments.append(comment->attachedEntity());
-                } else {
-                    items.append(obj->modelEntity());
-                }
-            } else if (CoregionItem *coregionItem = qobject_cast<CoregionItem *>(obj)) {
+            if (auto coregionItem = qobject_cast<CoregionItem *>(obj)) {
                 items << coregionItem->begin() << coregionItem->end();
+            } else {
+                if (obj->modelEntity()) {
+                    if (obj->modelEntity()->entityType() == MscEntity::EntityType::Comment) {
+                        if (MscComment *comment = qobject_cast<MscComment *>(obj->modelEntity()))
+                            comments.append(comment->attachedEntity());
+                    } else {
+                        items.append(obj->modelEntity());
+                    }
+                }
             }
         }
 
