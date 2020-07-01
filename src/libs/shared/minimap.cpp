@@ -18,6 +18,7 @@
 #include "minimap.h"
 
 #include <QDebug>
+#include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPainter>
@@ -29,11 +30,51 @@
 namespace shared {
 namespace ui {
 
+/*!
+ * \brief a "hash" holder for rendered scene state.
+ *
+ * While the QGraphicsScene::changed is emitted for *any* content change,
+ * it's impossible to detect what the change actually was.
+ * Thus, when a selection of an item shows grippoints, it triggers the QGraphicsScene::changed
+ * (In our case, in IV even just a mouseover triggers it, I'm not sure why though).
+ *
+ * To minimize count of calls to QGraphicsScene::render here is some heuristic for filtering changes:
+ *
+ * Scene rect;
+ * Items count;
+ * Item geometry; // :(
+ */
+struct SceneHash {
+    QRectF m_rect;
+    int m_count;
+
+    using ItemsGeoms = QMap<const QGraphicsItem *, QRectF>;
+    ItemsGeoms m_itemsGeometry;
+
+    void commitScene(const QGraphicsScene *const scene)
+    {
+        commitSceneRect(scene);
+        commitSceneItemsCount(scene);
+        commitSceneItems(scene);
+    }
+
+    void commitSceneRect(const QGraphicsScene *const scene) { m_rect = scene->sceneRect(); }
+
+    void commitSceneItemsCount(const QGraphicsScene *const scene) { m_count = scene->items().size(); }
+
+    void commitSceneItems(const QGraphicsScene *const scene)
+    {
+        m_itemsGeometry.clear();
+        for (const QGraphicsItem *const item : scene->items())
+            m_itemsGeometry[item] = item->sceneBoundingRect();
+    }
+};
+
 struct MiniMapPrivate {
     MiniMapPrivate()
         : m_renderTimer(new QTimer)
     {
-        static constexpr int renderDelayMs = 500;
+        static constexpr int renderDelayMs = 100;
         m_renderTimer->setInterval(renderDelayMs);
         m_renderTimer->setSingleShot(true);
     }
@@ -46,6 +87,35 @@ struct MiniMapPrivate {
 
     bool isReady() const { return m_view && m_scene; }
 
+    bool ensureSceneChanged()
+    {
+        QRectF newSceneRect = m_scene->sceneRect();
+        if (m_sceneHash.m_rect != newSceneRect) {
+            m_sceneHash.commitScene(m_scene);
+            return true;
+        }
+
+        const QList<QGraphicsItem *> items = m_scene->items();
+        const int count = items.count();
+        if (m_sceneHash.m_count != count) {
+            m_sceneHash.commitScene(m_scene);
+            return true;
+        }
+
+        SceneHash::ItemsGeoms itemGeoms;
+        for (int i = 0; i < count; ++i) {
+            const QGraphicsItem *const item = items.at(i);
+            const QRectF &itemGeometry = item->sceneBoundingRect();
+            const QRectF &hashedItemGeometry = m_sceneHash.m_itemsGeometry.value(item, {});
+            if (itemGeometry != hashedItemGeometry) {
+                m_sceneHash.commitScene(m_scene);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     QPointer<QGraphicsView> m_view { nullptr };
     QPointer<QGraphicsScene> m_scene { nullptr };
     QTimer *m_renderTimer { nullptr };
@@ -54,6 +124,8 @@ struct MiniMapPrivate {
     QRect m_sceneViewport;
 
     QPixmap m_display;
+
+    SceneHash m_sceneHash;
 };
 
 MiniMap::MiniMap(QWidget *parent)
@@ -161,7 +233,12 @@ void MiniMap::onViewUpdated()
 
 void MiniMap::updateSceneContent()
 {
+    if (!d->ensureSceneChanged()) {
+        return;
+    }
+
     LOG;
+
     d->m_sceneContent = QPixmap(d->m_scene->sceneRect().size().toSize());
     d->m_sceneContent.fill(Qt::transparent);
     QPainter p(&d->m_sceneContent);
