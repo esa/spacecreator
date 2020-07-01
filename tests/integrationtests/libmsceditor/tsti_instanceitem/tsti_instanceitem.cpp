@@ -16,6 +16,7 @@
 */
 
 #include "chartlayoutmanager.h"
+#include "chartviewtestbase.h"
 #include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "instanceitem.h"
@@ -32,30 +33,20 @@
 
 using namespace msc;
 
-class tsti_InstanceItem : public QObject
+class tsti_InstanceItem : public ChartViewTestBase
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void init();
-    void cleanup();
+    void initTestCase() { initTestCaseBase(); }
+    void init() { initBase(); }
+    void cleanup() { cleanupBase(); }
 
     void testMoveByHead();
 };
 
-void tsti_InstanceItem::init()
-{
-    vstest::saveMousePosition();
-}
-
-void tsti_InstanceItem::cleanup()
-{
-    vstest::restoreMousePosition();
-}
-
 void tsti_InstanceItem::testMoveByHead()
 {
-    static constexpr bool isLocalBuild = false;
     static constexpr int iterationsCount = 2;
     static constexpr int headVerticalOffsetPixels = 30;
 
@@ -68,43 +59,30 @@ void tsti_InstanceItem::testMoveByHead()
                              ENDMSC; \
                          ENDMSCDOCUMENT;");
 
-    QScopedPointer<ChartLayoutManager> chartModel(new ChartLayoutManager());
-    QScopedPointer<MscReader> reader(new MscReader);
-    QScopedPointer<MscModel> model(reader->parseText(msc));
-    QScopedPointer<QGraphicsView> view(new QGraphicsView());
-    view->setScene(chartModel->graphicsScene());
-
-    chartModel->setCurrentChart(model->documents().first()->charts().first());
-
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-
-    // This could be usefull during local development,
-    // but fails the test in CI environment:
-    if (isLocalBuild)
-        view->show();
+    loadView(msc);
 
     auto getHead = [&](InstanceItem *instance) {
         const QRectF &r = instance->sceneBoundingRect();
-        return view->mapFromScene({ r.center().x(), r.top() + headVerticalOffsetPixels });
+        return m_view->mapFromScene({ r.center().x(), r.top() + headVerticalOffsetPixels });
     };
 
     for (int i = 0; i < iterationsCount; ++i) {
-        MscInstance *instanceA = chartModel->currentChart()->instances().first();
-        MscInstance *instanceB = chartModel->currentChart()->instances().last();
+        MscInstance *instanceA = m_chartModel->currentChart()->instances().first();
+        MscInstance *instanceB = m_chartModel->currentChart()->instances().last();
 
-        InstanceItem *itemA = chartModel->itemForInstance(instanceA);
-        InstanceItem *itemB = chartModel->itemForInstance(instanceB);
+        InstanceItem *itemA = m_chartModel->itemForInstance(instanceA);
+        InstanceItem *itemB = m_chartModel->itemForInstance(instanceB);
 
         const QPoint &rightHead = getHead(itemB);
         const QPoint &destination = getHead(itemA);
 
-        vstest::sendMouseDrag(view.data()->viewport(), rightHead, destination);
+        vstest::sendMouseDrag(m_view.data()->viewport(), rightHead, destination);
 
         // Now instances should be in reversed order
         // and no crash, ofcourse - see https://git.vikingsoftware.com/esa/msceditor/issues/134
         // (crash when moving an instance item by head to the leftmost position).
-        QCOMPARE(instanceA, chartModel->currentChart()->instances().last());
-        QCOMPARE(instanceB, chartModel->currentChart()->instances().first());
+        QCOMPARE(instanceA, m_chartModel->currentChart()->instances().last());
+        QCOMPARE(instanceB, m_chartModel->currentChart()->instances().first());
     }
 }
 
