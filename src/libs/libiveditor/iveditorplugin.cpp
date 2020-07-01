@@ -58,9 +58,10 @@ void IVEditorPlugin::addMenuEditActions(QMenu * /*menu*/, QMainWindow * /*window
     // Nothing to add
 }
 
-void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
+void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    menu->hide();
+    // Nothing to add
+    Plugin::addMenuViewActions(menu, window);
 }
 
 /*!

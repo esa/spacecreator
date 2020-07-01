@@ -35,7 +35,7 @@ public:
     void initMenus(QMainWindow *window);
     virtual void addMenuFileActions(QMenu *menu, QMainWindow *window) = 0;
     virtual void addMenuEditActions(QMenu *menu, QMainWindow *window) = 0;
-    virtual void addMenuViewActions(QMenu *menu, QMainWindow *window) = 0;
+    virtual void addMenuViewActions(QMenu *menu, QMainWindow *window);
     virtual void addMenuHelpActions(QMenu *menu, QMainWindow *window) = 0;
 
     QUndoGroup *undoGroup() { return m_undoGroup; }
@@ -47,6 +47,7 @@ public:
     QAction *actionQuit();
     QAction *actionUndo();
     QAction *actionRedo();
+    QAction *actionToggleMinimap();
 
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
@@ -64,6 +65,7 @@ private:
     QAction *m_actionQuit { nullptr };
     QAction *m_actionUndo { nullptr };
     QAction *m_actionRedo { nullptr };
+    QAction *m_actionToggleMinimap { nullptr };
 };
 
 }

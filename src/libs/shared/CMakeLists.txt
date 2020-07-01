@@ -40,7 +40,8 @@ target_sources(${LIB_NAME} PRIVATE
     settingsmanager.h
     sharedlibrary.cpp
     sharedlibrary.h
-
+    minimap.h
+    minimap.cpp
     sharedresources/sharedresources.qrc
 )
 

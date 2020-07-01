@@ -24,6 +24,7 @@
 #include "context/action/actionsmanager.h"
 #include "interface/interfacedocument.h"
 #include "iveditorplugin.h"
+#include "minimap.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
 #include "ui_mainwindow.h"
@@ -63,6 +64,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
 
     m_document->init();
     setCentralWidget(m_document->view());
+    m_miniMap = new shared::ui::MiniMap(this);
+    m_miniMap->setAllowedAreas(Qt::AllDockWidgetAreas);
 
     statusBar()->addPermanentWidget(m_zoomCtrl);
     m_plugin->addToolBars(this);
@@ -73,6 +76,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     connect(m_plugin->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
     connect(m_plugin->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
+    connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
+    connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
@@ -254,6 +259,9 @@ void MainWindow::initSettings()
 {
     restoreGeometry(aadlinterface::AppOptions::MainWindow.Geometry.read().toByteArray());
     restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
+
+    const bool showMinimap = true; // TODO: use a storable option
+    m_plugin->actionToggleMinimap()->setChecked(showMinimap);
 }
 
 void MainWindow::updateActions()
