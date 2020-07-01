@@ -1,29 +1,4 @@
 msc Untitled;
-    instance Instance_A;
-        in CA_1 from Instance_C;
-        out AC_2 to Instance_C;
-        in BA_3 from Instance_B;
-        out AB_4 to Instance_B;
-        in NA_5 from NEW_INSTANCE;
-    endinstance;
-
-    instance NEW_INSTANCE;
-        out NA_5 to Instance_A;
-        in BN_7 from Instance_B;
-        out NB_8 to Instance_B;
-    stop;
-
-    instance Instance_C;
-        out CA_1 to Instance_A;
-        in AC_2 from Instance_A;
-        in BC_6 from Instance_B;
-    stop;
-
-    instance NEW_INSTANCE2;
-        in BN2_9 from Instance_B;
-        out NB2_10 to Instance_B;
-    endinstance;
-
     instance Instance_B;
         out BA_3 to Instance_A;
         in AB_4 from Instance_A;
@@ -34,5 +9,31 @@ msc Untitled;
         create NEW_INSTANCE2;
         out BN2_9 to NEW_INSTANCE2;
         in NB2_10 from NEW_INSTANCE2;
+    endinstance;
+
+    instance NEW_INSTANCE2;
+        in BN2_9 from Instance_B;
+        out NB2_10 to Instance_B;
+    endinstance;
+
+    instance Instance_C;
+        out CA_1 to Instance_A;
+        in AC_2 from Instance_A;
+        in BC_6 from Instance_B;
+    stop;
+
+
+    instance NEW_INSTANCE;
+        out NA_5 to Instance_A;
+        in BN_7 from Instance_B;
+        out NB_8 to Instance_B;
+    stop;
+
+    instance Instance_A;
+        in CA_1 from Instance_C;
+        out AC_2 to Instance_C;
+        in BA_3 from Instance_B;
+        out AB_4 to Instance_B;
+        in NA_5 from NEW_INSTANCE;
     endinstance;
 endmsc;
