@@ -15,7 +15,7 @@ Plugin::Plugin(QObject *parent)
 {
 }
 
-Plugin::~Plugin() { }
+Plugin::~Plugin() {}
 
 QToolBar *Plugin::mainToolBar()
 {
@@ -63,6 +63,12 @@ void Plugin::initMenus(QMainWindow *window)
     menu = window->menuBar()->addMenu(tr("&Help"));
     addMenuHelpActions(menu, window);
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
+}
+
+void Plugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
+{
+    menu->addAction(actionToggleMinimap());
+    menu->addSeparator();
 }
 
 QAction *Plugin::actionNewFile()
@@ -131,6 +137,15 @@ QAction *Plugin::actionRedo()
         m_actionRedo->setIcon(QIcon(QLatin1String(":/sharedresources/icons/redo.svg")));
     }
     return m_actionRedo;
+}
+
+QAction *Plugin::actionToggleMinimap()
+{
+    if (m_actionToggleMinimap == nullptr) {
+        m_actionToggleMinimap = new QAction(tr("&Mini map"), this);
+        m_actionToggleMinimap->setCheckable(true);
+    }
+    return m_actionToggleMinimap;
 }
 
 }

@@ -25,6 +25,11 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace shared {
+namespace ui {
+class MiniMap;
+}
+}
 namespace aadlinterface {
 
 class InterfaceDocument;
@@ -72,7 +77,8 @@ private:
 
     bool m_dropUnsavedChangesSilently { false };
 
-    aadlinterface::IVEditorPlugin *m_plugin;
+    aadlinterface::IVEditorPlugin *m_plugin { nullptr };
+    shared::ui::MiniMap *m_miniMap { nullptr };
 };
 
 }
