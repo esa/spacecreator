@@ -33,6 +33,7 @@
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "syntheticinteraction.h"
+#include "ui/grippointshandler.h"
 
 #include <QGraphicsView>
 #include <QPointer>
@@ -54,11 +55,12 @@ private Q_SLOTS:
     void testMoveTopDown();
     void testMoveBottomDown();
     void testMoveBottomUp();
+    void textMovemessageInside();
 
 private:
     void loadView(const QString &mscDoc);
-    QPointF topCenter(InteractiveObject *item) const;
-    QPointF bottomCenter(InteractiveObject *item) const;
+    QPoint topCenter(const QGraphicsItem *item) const;
+    QPoint bottomCenter(const QGraphicsItem *item) const;
     bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;
 
     QScopedPointer<ChartLayoutManager> m_chartModel;
@@ -114,8 +116,8 @@ void tsti_CoregionItem::testMoveTopUp()
 
     QVERIFY(!isInCoregion(coregionItem, action));
 
-    const QPoint topGrip = topCenter(coregionItem).toPoint();
-    const QPoint actionTop = topCenter(actionItem).toPoint() - QPoint(0, 10);
+    const QPoint topGrip = topCenter(coregionItem);
+    const QPoint actionTop = topCenter(actionItem) - QPoint(0, 10);
 
     vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionTop);
@@ -149,8 +151,8 @@ void tsti_CoregionItem::testMoveTopDown()
 
     QVERIFY(isInCoregion(coregionItem, action));
 
-    const QPoint topGrip = topCenter(coregionItem).toPoint();
-    const QPoint actionBottom = bottomCenter(actionItem).toPoint() + QPoint(0, 10);
+    const QPoint topGrip = topCenter(coregionItem);
+    const QPoint actionBottom = bottomCenter(actionItem) + QPoint(0, 10);
 
     vstest::sendMouseMove(m_view->viewport(), topGrip + QPoint(0., 15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), topGrip, actionBottom);
@@ -184,8 +186,8 @@ void tsti_CoregionItem::testMoveBottomDown()
 
     QVERIFY(!isInCoregion(coregionItem, action));
 
-    const QPoint bottomGrip = bottomCenter(coregionItem).toPoint();
-    const QPoint actionBottom = bottomCenter(actionItem).toPoint() + QPoint(0, 10);
+    const QPoint bottomGrip = bottomCenter(coregionItem);
+    const QPoint actionBottom = bottomCenter(actionItem) + QPoint(0, 10);
 
     vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionBottom);
@@ -219,8 +221,8 @@ void tsti_CoregionItem::testMoveBottomUp()
 
     QVERIFY(isInCoregion(coregionItem, action));
 
-    const QPoint bottomGrip = bottomCenter(coregionItem).toPoint();
-    const QPoint actionTop = topCenter(actionItem).toPoint() - QPoint(0, 10);
+    const QPoint bottomGrip = bottomCenter(coregionItem);
+    const QPoint actionTop = topCenter(actionItem) - QPoint(0, 10);
 
     vstest::sendMouseMove(m_view->viewport(), bottomGrip + QPoint(0., -15.)); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), bottomGrip, actionTop);
@@ -230,6 +232,47 @@ void tsti_CoregionItem::testMoveBottomUp()
     QCOMPARE(m_chart->indexofEvent(action), 2);
     QVERIFY(vstest::isBelow(actionItem, coregionItem));
     QVERIFY(!isInCoregion(coregionItem, action));
+}
+
+void tsti_CoregionItem::textMovemessageInside()
+{
+    static const QString msc("MSCDOCUMENT doc1; \
+                             MSC msc1; \
+                                 INSTANCE i1; \
+                                     CONCURRENT; \
+                                     ENDCONCURRENT; \
+                                     OUT Msg1 i2; \
+                                 ENDINSTANCE; \
+                                 INSTANCE i2; \
+                                     ACTION 'init'; \
+                                     IN Msg1 i1; \
+                                 ENDINSTANCE; \
+                             ENDMSC; \
+                         ENDMSCDOCUMENT;");
+    loadView(msc);
+
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
+    auto action = qobject_cast<msc::MscAction *>(m_chart->instanceEvents().at(2));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(3));
+
+    msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
+    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+
+    QVERIFY(!isInCoregion(coregionItem, action));
+    QVERIFY(!isInCoregion(coregionItem, message));
+
+    // move message source
+
+    const QPoint targetPos = m_view->mapFromScene(messageItem->head().toPoint());
+    const QPoint sourcePos = m_view->mapFromScene(messageItem->tail().toPoint());
+    const QPoint insideRegion = bottomCenter(coregionItem) + QPoint(0, -10);
+
+    vstest::sendMouseMove(m_view->viewport(), targetPos); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), sourcePos, insideRegion);
+
+    QVERIFY(!isInCoregion(coregionItem, action));
+    QVERIFY(isInCoregion(coregionItem, message));
 }
 
 void tsti_CoregionItem::loadView(const QString &mscDoc)
@@ -251,13 +294,13 @@ void tsti_CoregionItem::loadView(const QString &mscDoc)
     }
 }
 
-QPointF tsti_CoregionItem::topCenter(InteractiveObject *item) const
+QPoint tsti_CoregionItem::topCenter(const QGraphicsItem *item) const
 {
     const QRectF &r = item->sceneBoundingRect();
     return m_view->mapFromScene({ r.center().x(), r.top() });
 }
 
-QPointF tsti_CoregionItem::bottomCenter(InteractiveObject *item) const
+QPoint tsti_CoregionItem::bottomCenter(const QGraphicsItem *item) const
 {
     const QRectF &r = item->sceneBoundingRect();
     return m_view->mapFromScene({ r.center().x(), r.bottom() });
