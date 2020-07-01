@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <QDockWidget>
 #include <QObject>
+#include <QWidget>
 #include <memory>
 
 class QGraphicsView;
@@ -27,7 +27,7 @@ namespace shared {
 namespace ui {
 
 struct MiniMapPrivate;
-class MiniMap : public QDockWidget
+class MiniMap : public QWidget
 {
     Q_OBJECT
 public:
@@ -42,9 +42,20 @@ Q_SIGNALS:
 protected:
     void showEvent(QShowEvent *e) override;
     void hideEvent(QHideEvent *e) override;
+    void paintEvent(QPaintEvent *e) override;
+    void resizeEvent(QResizeEvent *e) override;
+
+    void updateSceneContent();
+    void updateViewportFrame();
+
+protected Q_SLOTS:
+    void onSceneUpdated();
+    void onViewUpdated();
 
 private:
     const std::unique_ptr<MiniMapPrivate> d;
+
+    void composeMap();
 };
 
 } // namespace ui

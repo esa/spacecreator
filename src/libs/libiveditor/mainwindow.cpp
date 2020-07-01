@@ -64,8 +64,10 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
 
     m_document->init();
     setCentralWidget(m_document->view());
-    m_miniMap = new shared::ui::MiniMap(this);
-    m_miniMap->setAllowedAreas(Qt::AllDockWidgetAreas);
+
+    // have to be instantiated after this->ui & this->document
+    m_miniMap = new shared::ui::MiniMap(m_document->view());
+    m_miniMap->setupSourceView(qobject_cast<QGraphicsView *>(m_document->view()));
 
     statusBar()->addPermanentWidget(m_zoomCtrl);
     m_plugin->addToolBars(this);
