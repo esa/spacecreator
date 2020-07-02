@@ -80,8 +80,10 @@ void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
             disconnect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
         }
 
-        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() })
+        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             disconnect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
+            disconnect(scrollBar, &QScrollBar::rangeChanged, this, &MiniMap::onSceneUpdated);
+        }
 
         d->m_view = nullptr;
     }
@@ -90,8 +92,10 @@ void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
 
     if (d->m_view) {
 
-        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() })
+        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             connect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
+            connect(scrollBar, &QScrollBar::rangeChanged, this, &MiniMap::onSceneUpdated);
+        }
 
         d->m_commandsStack = stack;
 
