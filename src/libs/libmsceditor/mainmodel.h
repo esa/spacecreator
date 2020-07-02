@@ -24,6 +24,7 @@
 #include <memory>
 
 class QGraphicsScene;
+class QFileInfo;
 class QUndoStack;
 
 namespace msc {
@@ -95,12 +96,14 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void showChartFromDocument(msc::MscDocument *document);
+    void readAsn1Types();
 
 private:
     msc::MscChart *firstChart() const;
     msc::MscChart *firstChart(const QVector<msc::MscDocument *> &docs) const;
     void clearMscModel();
     void setNewModel(msc::MscModel *model);
+    QFileInfo asn1File() const;
 
     std::unique_ptr<MainModelPrivate> const d;
 };

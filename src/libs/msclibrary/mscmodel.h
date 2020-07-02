@@ -64,6 +64,7 @@ Q_SIGNALS:
     void cleared();
     void dataLanguageChanged(const QString &dataLanguage);
     void dataDefinitionStringChanged(const QString &dataString);
+    void asn1DataChanged();
 
 private:
     QVector<MscDocument *> m_documents;

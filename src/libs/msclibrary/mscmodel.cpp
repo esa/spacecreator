@@ -131,6 +131,7 @@ const QVariantList &MscModel::asn1TypesData() const
 void MscModel::setAsn1TypesData(const QVariantList &asn1TypesData)
 {
     m_asn1TypesData = asn1TypesData;
+    Q_EMIT asn1DataChanged();
 }
 
 void MscModel::clear()

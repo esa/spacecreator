@@ -1,4 +1,6 @@
 mscdocument Untitled_Document;
+language ASN.1;
+data dataview.asn;
 mscdocument LeafDoc1 /* MSC LEAF */;
    msc Untitled_1;
       gate in Msg_6 from Inst_2;
