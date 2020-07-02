@@ -53,7 +53,6 @@ MainWidget::MainWidget(QWidget *parent)
 {
     initUi();
 
-    initActions();
     m_plugin->createActionCopy(nullptr);
     m_plugin->createActionPaste(nullptr);
     m_plugin->initChartTools();

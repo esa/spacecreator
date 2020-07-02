@@ -69,7 +69,6 @@ private Q_SLOTS:
 
 private:
     void initUi();
-    void initActions();
     void initConnections();
 
     QSplitter *m_horizontalSplitter = nullptr;
