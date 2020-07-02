@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
