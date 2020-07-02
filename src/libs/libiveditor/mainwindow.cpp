@@ -65,10 +65,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     m_document->init();
     setCentralWidget(m_document->view());
 
-    // have to be instantiated after this->ui & this->document
-    m_miniMap = new shared::ui::MiniMap(m_document->view());
-    m_miniMap->setupSourceView(qobject_cast<QGraphicsView *>(m_document->view()));
-
     statusBar()->addPermanentWidget(m_zoomCtrl);
     m_plugin->addToolBars(this);
 
@@ -78,8 +74,6 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     connect(m_plugin->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
     connect(m_plugin->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
     connect(m_plugin->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
-    connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
-    connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 
     // Register the actions to the action manager
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionNewFile(), "Create file", "Create new empty file");
@@ -111,6 +105,8 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     }
 
     aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
+
+    setupMiniMap();
 
     updateActions();
 
@@ -395,6 +391,16 @@ bool MainWindow::prepareQuit()
     aadlinterface::AppOptions::MainWindow.Geometry.write(saveGeometry());
 
     return true;
+}
+
+void MainWindow::setupMiniMap()
+{
+    // have to be instantiated after this->ui & this->document
+    m_miniMap = new shared::ui::MiniMap(m_document->view());
+    m_miniMap->setupSourceView(
+            qobject_cast<QGraphicsView *>(m_document->view()), aadlinterface::cmd::CommandsStack::current());
+    connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
+    connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 }
 
 }

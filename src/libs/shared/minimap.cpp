@@ -24,49 +24,10 @@
 #include <QPainter>
 #include <QPointer>
 #include <QTimer>
+#include <QUndoStack>
 
 namespace shared {
 namespace ui {
-
-/*!
- * \brief A "hash" holder for rendered scene state.
- *
- * While the QGraphicsScene::changed is emitted for *any* content change,
- * it's impossible to detect what the change actually was.
- * Thus, when a selection of an item shows grippoints, it triggers the QGraphicsScene::changed
- * (In our case, in IV even just a mouseover triggers it, I'm not sure why though).
- *
- * To minimize count of calls to QGraphicsScene::render here is some heuristic for filtering changes:
- *
- * Scene rect;
- * Items count;
- * Item geometry; // :(
- */
-struct SceneHash {
-    QRectF m_rect;
-    int m_count;
-
-    using ItemsGeoms = QMap<const QGraphicsItem *, QRectF>;
-    ItemsGeoms m_itemsGeometry;
-
-    void commitScene(const QGraphicsScene *const scene)
-    {
-        commitSceneRect(scene);
-        commitSceneItemsCount(scene);
-        commitSceneItems(scene);
-    }
-
-    void commitSceneRect(const QGraphicsScene *const scene) { m_rect = scene->sceneRect(); }
-
-    void commitSceneItemsCount(const QGraphicsScene *const scene) { m_count = scene->items().size(); }
-
-    void commitSceneItems(const QGraphicsScene *const scene)
-    {
-        m_itemsGeometry.clear();
-        for (const QGraphicsItem *const item : scene->items())
-            m_itemsGeometry[item] = item->sceneBoundingRect();
-    }
-};
 
 struct MiniMapPrivate {
     MiniMapPrivate()
@@ -83,47 +44,14 @@ struct MiniMapPrivate {
         m_renderTimer = nullptr;
     }
 
-    bool isReady() const { return m_view && m_scene; }
-
-    bool ensureSceneChanged()
-    {
-        QRectF newSceneRect = m_scene->sceneRect();
-        if (m_sceneHash.m_rect != newSceneRect) {
-            m_sceneHash.commitScene(m_scene);
-            return true;
-        }
-
-        const QList<QGraphicsItem *> items = m_scene->items();
-        const int count = items.count();
-        if (m_sceneHash.m_count != count) {
-            m_sceneHash.commitScene(m_scene);
-            return true;
-        }
-
-        SceneHash::ItemsGeoms itemGeoms;
-        for (int i = 0; i < count; ++i) {
-            const QGraphicsItem *const item = items.at(i);
-            const QRectF &itemGeometry = item->sceneBoundingRect();
-            const QRectF &hashedItemGeometry = m_sceneHash.m_itemsGeometry.value(item, {});
-            if (itemGeometry != hashedItemGeometry) {
-                m_sceneHash.commitScene(m_scene);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     QPointer<QGraphicsView> m_view { nullptr };
-    QPointer<QGraphicsScene> m_scene { nullptr };
+    QPointer<QUndoStack> m_commandsStack { nullptr };
     QTimer *m_renderTimer { nullptr };
 
     QPixmap m_sceneContent;
     QRect m_sceneViewport;
 
     QPixmap m_display;
-
-    SceneHash m_sceneHash;
 };
 
 MiniMap::MiniMap(QWidget *parent)
@@ -139,25 +67,28 @@ MiniMap::MiniMap(QWidget *parent)
 
 MiniMap::~MiniMap() {}
 
-void MiniMap::setupSourceView(QGraphicsView *view)
+void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
 {
     if (d->m_view) {
-        if (d->m_scene) {
-            disconnect(d->m_scene, &QGraphicsScene::changed, this, &MiniMap::onSceneUpdated);
-            d->m_scene = nullptr;
+        if (d->m_commandsStack) {
+            disconnect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
         }
 
-        //        disconnect(d->m_view);
+        // disconnect view
+
         d->m_view = nullptr;
     }
 
     d->m_view = view;
 
     if (d->m_view) {
-        //        connect(d->m_view,&QGraphicsView)
-        if (auto *scene = d->m_view->scene()) {
-            d->m_scene = scene;
-            connect(d->m_scene, &QGraphicsScene::changed, this, &MiniMap::onSceneUpdated);
+
+        // connect view
+
+        d->m_commandsStack = stack;
+
+        if (d->m_commandsStack) {
+            connect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
         }
     }
 }
@@ -223,16 +154,15 @@ void MiniMap::onViewUpdated()
 
 void MiniMap::updateSceneContent()
 {
-    if (!d->ensureSceneChanged()) {
-        return;
+    if (auto scene = d->m_view->scene()) {
+
+        d->m_sceneContent = QPixmap(scene->sceneRect().size().toSize());
+        d->m_sceneContent.fill(Qt::transparent);
+        QPainter p(&d->m_sceneContent);
+        scene->render(&p);
+
+        composeMap();
     }
-
-    d->m_sceneContent = QPixmap(d->m_scene->sceneRect().size().toSize());
-    d->m_sceneContent.fill(Qt::transparent);
-    QPainter p(&d->m_sceneContent);
-    d->m_scene->render(&p);
-
-    composeMap();
 }
 
 void MiniMap::updateViewportFrame()

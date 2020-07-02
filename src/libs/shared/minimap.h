@@ -22,6 +22,7 @@
 #include <memory>
 
 class QGraphicsView;
+class QUndoStack;
 
 namespace shared {
 namespace ui {
@@ -34,7 +35,7 @@ public:
     explicit MiniMap(QWidget *parent = nullptr);
     ~MiniMap(); // the definition (even an empty) is necessary for the dptr (std::unique_ptr)
 
-    void setupSourceView(QGraphicsView *view);
+    void setupSourceView(QGraphicsView *view, QUndoStack *stack);
 
 Q_SIGNALS:
     void visibilityChanged(bool visible);
