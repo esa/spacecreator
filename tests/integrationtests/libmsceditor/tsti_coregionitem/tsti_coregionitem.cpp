@@ -18,9 +18,9 @@
 #include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartlayoutmanager.h"
+#include "chartviewtestbase.h"
 #include "commands/common/commandsstack.h"
 #include "coregionitem.h"
-#include "exceptions.h"
 #include "graphicsitemcompare.h"
 #include "instanceitem.h"
 #include "messageitem.h"
@@ -31,26 +31,23 @@
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "mscreader.h"
 #include "syntheticinteraction.h"
 #include "ui/grippointshandler.h"
 
 #include <QGraphicsView>
-#include <QPointer>
-#include <QScopedPointer>
-#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
 
-class tsti_CoregionItem : public QObject
+class tsti_CoregionItem : public ChartViewTestBase
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase();
-    void init();
-    void cleanup();
+    void initTestCase() { initTestCaseBase(); }
+    void init() { initBase(); }
+    void cleanup() { cleanupBase(); }
+
     void testMoveTopUp();
     void testMoveTopDown();
     void testMoveBottomDown();
@@ -58,41 +55,8 @@ private Q_SLOTS:
     void textMovemessageInside();
 
 private:
-    void loadView(const QString &mscDoc);
-    QPoint topCenter(const QGraphicsItem *item) const;
-    QPoint bottomCenter(const QGraphicsItem *item) const;
     bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;
-
-    QScopedPointer<ChartLayoutManager> m_chartModel;
-    QScopedPointer<QGraphicsView> m_view;
-    QScopedPointer<MscReader> m_reader;
-    QScopedPointer<MscModel> m_model;
-    QPointer<msc::MscChart> m_chart;
-
-    // This could be usefull during local development,
-    // but fails the test in CI environment:
-    const bool m_isLocalBuild = false;
 };
-
-void tsti_CoregionItem::initTestCase()
-{
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-}
-
-void tsti_CoregionItem::init()
-{
-    vstest::saveMousePosition();
-    m_chartModel.reset(new ChartLayoutManager());
-    m_view.reset(new QGraphicsView());
-    m_view->setScene(m_chartModel->graphicsScene());
-    m_reader.reset(new MscReader);
-}
-
-void tsti_CoregionItem::cleanup()
-{
-    vstest::restoreMousePosition();
-    m_model.reset();
-}
 
 void tsti_CoregionItem::testMoveTopUp()
 {
@@ -256,7 +220,6 @@ void tsti_CoregionItem::textMovemessageInside()
     auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(3));
 
     msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
-    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
 
     QVERIFY(!isInCoregion(coregionItem, action));
@@ -273,37 +236,6 @@ void tsti_CoregionItem::textMovemessageInside()
 
     QVERIFY(!isInCoregion(coregionItem, action));
     QVERIFY(isInCoregion(coregionItem, message));
-}
-
-void tsti_CoregionItem::loadView(const QString &mscDoc)
-{
-    m_model.reset(m_reader->parseText(mscDoc));
-
-    m_chart = m_model->documents().first()->charts().first();
-    m_chartModel->setCurrentChart(m_chart);
-
-    // This could be usefull during local development (to see the mouse interaction),
-    // but fails the test in CI environment:
-    if (m_isLocalBuild) {
-        vstest::EventsDelayMs = 300;
-        m_view->show();
-        bool ok = QTest::qWaitForWindowActive(m_view.data());
-        QVERIFY2(ok, "Unable to show the chart view");
-    } else {
-        QApplication::processEvents();
-    }
-}
-
-QPoint tsti_CoregionItem::topCenter(const QGraphicsItem *item) const
-{
-    const QRectF &r = item->sceneBoundingRect();
-    return m_view->mapFromScene({ r.center().x(), r.top() });
-}
-
-QPoint tsti_CoregionItem::bottomCenter(const QGraphicsItem *item) const
-{
-    const QRectF &r = item->sceneBoundingRect();
-    return m_view->mapFromScene({ r.center().x(), r.bottom() });
 }
 
 bool tsti_CoregionItem::isInCoregion(const CoregionItem *coregion, MscInstanceEvent *event) const
