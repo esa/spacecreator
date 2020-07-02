@@ -27,6 +27,8 @@
 #include <QTimer>
 #include <QUndoStack>
 
+#define LOG qDebug() << Q_FUNC_INFO
+
 namespace shared {
 namespace ui {
 
@@ -207,20 +209,27 @@ void MiniMap::updateViewportFrame()
 
 void MiniMap::composeMap()
 {
-    QPixmap holder(d->m_sceneContent);
-
-    if (holder.isNull()) {
+    if (d->m_sceneContent.isNull()) {
         return;
     }
 
-    QPainterPath dimmedOverlay;
-    dimmedOverlay.addRect(holder.rect());
-    dimmedOverlay.addRect(d->m_sceneViewport);
+    QPixmap scaledContent = QPixmap(d->m_sceneContent.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    QPainter painter(&holder);
+    const qreal scaleX = qreal(scaledContent.width()) / qreal(d->m_sceneContent.width());
+    const qreal scaleY = qreal(scaledContent.height()) / qreal(d->m_sceneContent.height());
+    QTransform t;
+    t.scale(scaleX, scaleY);
+
+    const QRect &scaledViewport = t.map(QPolygon(d->m_sceneViewport)).boundingRect();
+
+    QPainterPath dimmedOverlay;
+    dimmedOverlay.addRect(scaledContent.rect());
+    dimmedOverlay.addRect(scaledViewport);
+
+    QPainter painter(&scaledContent);
     painter.fillPath(dimmedOverlay, dimColor());
 
-    d->m_display = holder.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    d->m_display = scaledContent;
 
     update();
 }
