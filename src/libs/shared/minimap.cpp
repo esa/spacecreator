@@ -65,7 +65,6 @@ MiniMap::MiniMap(QWidget *parent)
     : QWidget(parent, Qt::Tool)
     , d(new MiniMapPrivate)
 {
-    qDebug() << Q_FUNC_INFO << parent;
     connect(d->m_renderTimer, &QTimer::timeout, this, &MiniMap::updateSceneContent);
 
     static constexpr int minDimensionPix = 100;
