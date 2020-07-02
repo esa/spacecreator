@@ -53,6 +53,7 @@ private Q_SLOTS:
     void testMoveBottomDown();
     void testMoveBottomUp();
     void textMovemessageInside();
+    void textMovemessageSourceInside();
 
 private:
     bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;
@@ -208,6 +209,44 @@ void tsti_CoregionItem::textMovemessageInside()
                                      OUT Msg1 i2; \
                                  ENDINSTANCE; \
                                  INSTANCE i2; \
+                                     IN Msg1 i1; \
+                                 ENDINSTANCE; \
+                             ENDMSC; \
+                         ENDMSCDOCUMENT;");
+    loadView(msc);
+
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
+    auto coregionEnd = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(1));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+
+    msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+
+    QVERIFY(!isInCoregion(coregionItem, message));
+
+    // move message source
+
+    const QPoint movePos = m_view->mapFromScene(((messageItem->head() + messageItem->tail()) / 2).toPoint());
+    const QPoint insideRegion = QPoint(movePos.x(), bottomCenter(coregionItem).y() - 10);
+
+    vstest::sendMouseDrag(m_view->viewport(), movePos, insideRegion);
+
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
+    QCOMPARE(m_chart->indexofEvent(coregionEnd), 2);
+    QCOMPARE(m_chart->indexofEvent(message), 1);
+    QVERIFY(isInCoregion(coregionItem, message));
+}
+
+void tsti_CoregionItem::textMovemessageSourceInside()
+{
+    static const QString msc("MSCDOCUMENT doc1; \
+                             MSC msc1; \
+                                 INSTANCE i1; \
+                                     CONCURRENT; \
+                                     ENDCONCURRENT; \
+                                     OUT Msg1 i2; \
+                                 ENDINSTANCE; \
+                                 INSTANCE i2; \
                                      ACTION 'init'; \
                                      IN Msg1 i1; \
                                  ENDINSTANCE; \
@@ -234,6 +273,9 @@ void tsti_CoregionItem::textMovemessageInside()
     vstest::sendMouseMove(m_view->viewport(), targetPos); // so the correct grip is pressed
     vstest::sendMouseDrag(m_view->viewport(), sourcePos, insideRegion);
 
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
+    QCOMPARE(m_chart->indexofEvent(message), 1);
+    QCOMPARE(m_chart->indexofEvent(action), 3);
     QVERIFY(!isInCoregion(coregionItem, action));
     QVERIFY(isInCoregion(coregionItem, message));
 }
