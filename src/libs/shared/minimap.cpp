@@ -25,13 +25,11 @@
 #include <QPointer>
 #include <QTimer>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
 namespace shared {
 namespace ui {
 
 /*!
- * \brief a "hash" holder for rendered scene state.
+ * \brief A "hash" holder for rendered scene state.
  *
  * While the QGraphicsScene::changed is emitted for *any* content change,
  * it's impossible to detect what the change actually was.
@@ -161,31 +159,25 @@ void MiniMap::setupSourceView(QGraphicsView *view)
             d->m_scene = scene;
             connect(d->m_scene, &QGraphicsScene::changed, this, &MiniMap::onSceneUpdated);
         }
-        // connect
     }
 }
 
 void MiniMap::showEvent(QShowEvent *e)
 {
-    LOG << 1 << isVisible();
     QWidget::showEvent(e);
     const bool visible = isVisible();
     Q_EMIT visibilityChanged(visible);
 
     if (visible) {
-        composeMap();
+        updateSceneContent();
+        updateViewportFrame();
     }
-    LOG << 2 << isVisible();
 }
 
 void MiniMap::hideEvent(QHideEvent *e)
 {
-    LOG << 1 << isVisible();
-
     QWidget::hideEvent(e);
     Q_EMIT visibilityChanged(isVisible());
-
-    LOG << 2 << isVisible();
 }
 
 void MiniMap::paintEvent(QPaintEvent *event)
@@ -207,7 +199,6 @@ void MiniMap::resizeEvent(QResizeEvent *e)
 
 void MiniMap::onSceneUpdated()
 {
-    LOG;
     // Depending on the actual scene content/size,
     // the rendering process might be a resources consuming task.
     // Do it only when really necessary.
@@ -222,7 +213,6 @@ void MiniMap::onSceneUpdated()
 
 void MiniMap::onViewUpdated()
 {
-    LOG;
     // Just to keep it consistent with the scene's content
     if (!isVisible()) {
         return;
@@ -237,8 +227,6 @@ void MiniMap::updateSceneContent()
         return;
     }
 
-    LOG;
-
     d->m_sceneContent = QPixmap(d->m_scene->sceneRect().size().toSize());
     d->m_sceneContent.fill(Qt::transparent);
     QPainter p(&d->m_sceneContent);
@@ -249,13 +237,11 @@ void MiniMap::updateSceneContent()
 
 void MiniMap::updateViewportFrame()
 {
-    LOG;
     composeMap();
 }
 
 void MiniMap::composeMap()
 {
-    LOG;
     const QPixmap scaledContent = d->m_sceneContent.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     d->m_display = QPixmap(size());
