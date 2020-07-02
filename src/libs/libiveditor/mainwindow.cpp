@@ -258,7 +258,7 @@ void MainWindow::initSettings()
     restoreGeometry(aadlinterface::AppOptions::MainWindow.Geometry.read().toByteArray());
     restoreState(aadlinterface::AppOptions::MainWindow.State.read().toByteArray());
 
-    const bool showMinimap = false; // TODO: use a storable option
+    const bool showMinimap = true; // TODO: use a storable option
     m_plugin->actionToggleMinimap()->setChecked(showMinimap);
 }
 

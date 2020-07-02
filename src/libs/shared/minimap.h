@@ -37,6 +37,9 @@ public:
 
     void setupSourceView(QGraphicsView *view, QUndoStack *stack);
 
+    void setDimColor(const QColor &to);
+    QColor dimColor() const;
+
 Q_SIGNALS:
     void visibilityChanged(bool visible);
 

@@ -23,8 +23,11 @@
 #include <QGraphicsView>
 #include <QPainter>
 #include <QPointer>
+#include <QScrollBar>
 #include <QTimer>
 #include <QUndoStack>
+
+#define LOG qDebug() << Q_FUNC_INFO
 
 namespace shared {
 namespace ui {
@@ -36,6 +39,8 @@ struct MiniMapPrivate {
         static constexpr int renderDelayMs = 100;
         m_renderTimer->setInterval(renderDelayMs);
         m_renderTimer->setSingleShot(true);
+
+        m_dimColor.setAlphaF(0.5);
     }
 
     ~MiniMapPrivate()
@@ -52,6 +57,8 @@ struct MiniMapPrivate {
     QRect m_sceneViewport;
 
     QPixmap m_display;
+
+    QColor m_dimColor { Qt::gray };
 };
 
 MiniMap::MiniMap(QWidget *parent)
@@ -74,7 +81,8 @@ void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
             disconnect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
         }
 
-        // disconnect view
+        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() })
+            disconnect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
 
         d->m_view = nullptr;
     }
@@ -83,7 +91,8 @@ void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
 
     if (d->m_view) {
 
-        // connect view
+        for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() })
+            connect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
 
         d->m_commandsStack = stack;
 
@@ -155,8 +164,8 @@ void MiniMap::onViewUpdated()
 void MiniMap::updateSceneContent()
 {
     if (auto scene = d->m_view->scene()) {
-
-        d->m_sceneContent = QPixmap(scene->sceneRect().size().toSize());
+        const QRect &sceneRectPix = d->m_view->mapFromScene(scene->sceneRect()).boundingRect();
+        d->m_sceneContent = QPixmap(sceneRectPix.size());
         d->m_sceneContent.fill(Qt::transparent);
         QPainter p(&d->m_sceneContent);
         scene->render(&p);
@@ -167,19 +176,45 @@ void MiniMap::updateSceneContent()
 
 void MiniMap::updateViewportFrame()
 {
-    composeMap();
+    if (auto scene = d->m_view->scene()) {
+
+        const QRectF &sceneRect = scene->sceneRect();
+        const QRect &sceneRectPix = d->m_view->mapFromScene(sceneRect).boundingRect();
+
+        d->m_sceneViewport = d->m_view->viewport()->rect();
+        d->m_sceneViewport.translate(d->m_sceneViewport.topLeft() - sceneRectPix.topLeft());
+
+        composeMap();
+    }
 }
 
 void MiniMap::composeMap()
 {
-    const QPixmap scaledContent = d->m_sceneContent.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap holder(d->m_sceneContent);
 
-    d->m_display = QPixmap(size());
-    d->m_display.fill(Qt::white);
+    QPainterPath dimmedOverlay;
+    dimmedOverlay.addRect(holder.rect());
+    dimmedOverlay.addRect(d->m_sceneViewport);
 
-    QPainter painter(&d->m_display);
-    painter.drawPixmap(d->m_display.rect(), scaledContent, scaledContent.rect());
+    QPainter painter(&holder);
+    painter.fillPath(dimmedOverlay, dimColor());
+
+    d->m_display = holder.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     update();
+}
+
+void MiniMap::setDimColor(const QColor &to)
+{
+    if (d->m_dimColor != to) {
+        d->m_dimColor = to;
+        composeMap();
+    }
+}
+
+QColor MiniMap::dimColor() const
+{
+    return d->m_dimColor;
 }
 
 } // namespace ui
