@@ -59,6 +59,9 @@ protected Q_SLOTS:
 private:
     const std::unique_ptr<MiniMapPrivate> d;
 
+    bool grabSceneContent();
+    bool grabViewportRect();
+
     void composeMap();
 };
 

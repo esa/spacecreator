@@ -106,8 +106,9 @@ void MiniMap::showEvent(QShowEvent *e)
     Q_EMIT visibilityChanged(visible);
 
     if (visible) {
-        updateSceneContent();
-        updateViewportFrame();
+        grabSceneContent();
+        grabViewportRect();
+        composeMap();
     }
 }
 
@@ -158,29 +159,48 @@ void MiniMap::onViewUpdated()
     updateViewportFrame();
 }
 
+bool MiniMap::grabSceneContent()
+{
+    auto scene = d->m_view->scene();
+    if (!scene) {
+        return false;
+    }
+
+    const QRect &sceneRectPix = d->m_view->mapFromScene(scene->sceneRect()).boundingRect();
+    d->m_sceneContent = QPixmap(sceneRectPix.size());
+    d->m_sceneContent.fill(Qt::transparent);
+    QPainter p(&d->m_sceneContent);
+    scene->render(&p);
+
+    return true;
+}
+
+bool MiniMap::grabViewportRect()
+{
+    auto scene = d->m_view->scene();
+    if (!scene) {
+        return false;
+    }
+
+    const QRectF &sceneRect = scene->sceneRect();
+    const QRect &sceneRectPix = d->m_view->mapFromScene(sceneRect).boundingRect();
+
+    d->m_sceneViewport = d->m_view->viewport()->rect();
+    d->m_sceneViewport.translate(d->m_sceneViewport.topLeft() - sceneRectPix.topLeft());
+
+    return true;
+}
+
 void MiniMap::updateSceneContent()
 {
-    if (auto scene = d->m_view->scene()) {
-        const QRect &sceneRectPix = d->m_view->mapFromScene(scene->sceneRect()).boundingRect();
-        d->m_sceneContent = QPixmap(sceneRectPix.size());
-        d->m_sceneContent.fill(Qt::transparent);
-        QPainter p(&d->m_sceneContent);
-        scene->render(&p);
-
+    if (grabSceneContent()) {
         composeMap();
     }
 }
 
 void MiniMap::updateViewportFrame()
 {
-    if (auto scene = d->m_view->scene()) {
-
-        const QRectF &sceneRect = scene->sceneRect();
-        const QRect &sceneRectPix = d->m_view->mapFromScene(sceneRect).boundingRect();
-
-        d->m_sceneViewport = d->m_view->viewport()->rect();
-        d->m_sceneViewport.translate(d->m_sceneViewport.topLeft() - sceneRectPix.topLeft());
-
+    if (grabViewportRect()) {
         composeMap();
     }
 }
@@ -188,6 +208,10 @@ void MiniMap::updateViewportFrame()
 void MiniMap::composeMap()
 {
     QPixmap holder(d->m_sceneContent);
+
+    if (holder.isNull()) {
+        return;
+    }
 
     QPainterPath dimmedOverlay;
     dimmedOverlay.addRect(holder.rect());
