@@ -27,8 +27,6 @@
 #include <QTimer>
 #include <QUndoStack>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
 namespace shared {
 namespace ui {
 
