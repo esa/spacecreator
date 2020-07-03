@@ -110,7 +110,12 @@ void BaseTool::setAction(QAction *action)
 
     m_action = action;
 
-    connect(this, &msc::BaseTool::activeChanged, action, &QAction::setChecked);
+    connect(action, &QAction::toggled, this, &msc::BaseTool::setActive);
+    connect(this, &msc::BaseTool::activeChanged, action, [&](bool on) {
+        if (on != m_action->isChecked()) {
+            m_action->setChecked(on);
+        }
+    });
 }
 
 QAction *BaseTool::action() const

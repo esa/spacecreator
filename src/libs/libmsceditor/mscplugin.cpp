@@ -207,15 +207,18 @@ void MSCPlugin::initHierarchyViewActions()
             m_model->setSelectedDocument(document);
         });
 
-        connect(action, &QAction::toggled, this, [&]() {
+        connect(action, &QAction::toggled, this, [&](bool on) {
             auto htool = qobject_cast<msc::HierarchyCreatorTool *>(sender()->parent());
             if (!htool) {
                 qWarning() << "Can't get action's creator tool";
                 return;
             }
-            htool->setActive(!htool->isActive());
-            for (QAction *action : hierarchyActions())
-                action->setChecked(false);
+            htool->setActive(on);
+            for (QAction *action : hierarchyActions()) {
+                if (action != sender()) {
+                    action->setChecked(false);
+                }
+            }
         });
     };
 
