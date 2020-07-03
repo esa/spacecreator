@@ -1,4 +1,5 @@
 mscdocument Untitled_Document;
+mscdocument LeafDoc1 /* MSC LEAF */;
    msc Untitled_1;
       gate in Msg_6 from Inst_2;
       gate in Msg_7 from Inst_3;
@@ -31,4 +32,5 @@ mscdocument Untitled_Document;
          out Msg_4 to Inst_2;
       endinstance;
    endmsc;
+endmscdocument;
 endmscdocument;
