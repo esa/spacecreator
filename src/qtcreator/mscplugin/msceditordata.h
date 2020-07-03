@@ -53,8 +53,8 @@ private:
     Core::Context m_contexts;
     QWidget *m_modeWidget = nullptr;
     MscEditorStack *m_widgetStack = nullptr;
-    QToolBar *m_widgetToolBar = nullptr;
-    Core::EditorToolBar *m_mainToolBar = nullptr;
+    QToolBar *m_widgetToolBar = nullptr; // the actual toolbar shown in m_mainToolBar
+    Core::EditorToolBar *m_mainToolBar = nullptr; // The 'fake' toolbar on top of the document, containing a QToolbar
     QUndoGroup *m_undoGroup = nullptr;
     QAction *m_undoAction = nullptr;
     QAction *m_redoAction = nullptr;

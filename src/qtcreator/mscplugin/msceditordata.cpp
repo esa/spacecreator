@@ -174,11 +174,15 @@ void MscEditorData::updateToolBar()
         m_widgetToolBar->addAction(designWidget->actionPaste());
         // m_widgetToolBar->addAction(designWidget->actionScreenshot());
         m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->toolActions())
+        for (QAction *action : designWidget->toolActions()) {
             m_widgetToolBar->addAction(action);
+        }
         m_widgetToolBar->addSeparator();
-        for (QAction *action : designWidget->mscPlugin()->hierarchyActions())
+        for (QAction *action : designWidget->mscPlugin()->hierarchyActions()) {
             m_widgetToolBar->addAction(action);
+        }
+
+        designWidget->mscPlugin()->showToolbars(false);
     }
 }
 

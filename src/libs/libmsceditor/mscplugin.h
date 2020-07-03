@@ -28,8 +28,16 @@ class MainWindow;
 class MSCPlugin : public shared::Plugin
 {
     Q_OBJECT
+    Q_PROPERTY(msc::MSCPlugin::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)
 
 public:
+    enum class ViewMode
+    {
+        CHART,
+        HIERARCHY
+    };
+    Q_ENUM(ViewMode);
+
     explicit MSCPlugin(QObject *parent = nullptr);
     ~MSCPlugin();
 
@@ -55,6 +63,7 @@ public:
 
     QToolBar *mscToolBar() { return m_mscToolBar; }
     QToolBar *hierarchyToolBar() { return m_hierarchyToolBar; }
+    void showToolbars(bool show);
 
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
@@ -72,18 +81,26 @@ public:
     QAction *createActionCopy(MainWindow *window);
     QAction *createActionPaste(MainWindow *window);
 
+    ViewMode viewMode();
+
 public Q_SLOTS:
+    void setViewMode(ViewMode mode);
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     void activateDefaultTool();
     void selectCurrentChart();
     void checkGlobalComment();
 
+Q_SIGNALS:
+    void viewModeChanged(ViewMode);
+
 private Q_SLOTS:
     void updateMscToolbarActionsChecked();
 
 private:
     std::unique_ptr<msc::MainModel> m_model;
+
+    ViewMode m_viewMode = ViewMode::CHART;
 
     QStackedWidget *m_centerView = nullptr;
     shared::ui::GraphicsViewBase *m_chartView = nullptr;
@@ -118,6 +135,8 @@ private:
     msc::TimerCreatorTool *m_timeoutTimerCreateTool = nullptr;
 
     QVector<msc::BaseTool *> m_hierarchyTools;
+
+    bool m_toolbarsVisible = true;
 };
 
 }

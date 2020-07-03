@@ -48,11 +48,13 @@ MSCPlugin::MSCPlugin(QObject *parent)
 {
     m_mscToolBar->setObjectName("mscTools");
     m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+    m_mscToolBar->setVisible(m_toolbarsVisible);
     m_hierarchyToolBar->setObjectName("hierarchyTools");
     m_hierarchyToolBar->setAllowedAreas(Qt::AllToolBarAreas);
+    m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 }
 
-MSCPlugin::~MSCPlugin() {}
+MSCPlugin::~MSCPlugin() { }
 
 MainModel *MSCPlugin::mainModel() const
 {
@@ -204,7 +206,12 @@ void MSCPlugin::initHierarchyViewActions()
         });
 
         connect(action, &QAction::toggled, this, [&]() {
-            tool->setActive(!tool->isActive());
+            auto htool = qobject_cast<msc::HierarchyCreatorTool *>(sender()->parent());
+            if (!htool) {
+                qWarning() << "Can't get action's creator tool";
+                return;
+            }
+            htool->setActive(!htool->isActive());
             for (QAction *action : hierarchyActions())
                 action->setChecked(false);
         });
@@ -296,6 +303,13 @@ void MSCPlugin::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
     // Do nothing
 }
 
+void MSCPlugin::showToolbars(bool show)
+{
+    m_toolbarsVisible = show;
+    m_mscToolBar->setVisible(m_toolbarsVisible);
+    m_hierarchyToolBar->setVisible(m_toolbarsVisible);
+}
+
 void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
@@ -376,15 +390,40 @@ QAction *MSCPlugin::createActionPaste(MainWindow *window)
     return m_actionPaste;
 }
 
+MSCPlugin::ViewMode MSCPlugin::viewMode()
+{
+    return m_viewMode;
+}
+
+void MSCPlugin::setViewMode(MSCPlugin::ViewMode mode)
+{
+    if (mode == m_viewMode) {
+        return;
+    }
+
+    m_viewMode = mode;
+    if (m_viewMode == ViewMode::CHART) {
+        showDocumentView(true);
+    } else {
+        showHierarchyView(true);
+    }
+
+    Q_EMIT viewModeChanged(m_viewMode);
+}
+
 void MSCPlugin::showDocumentView(bool show)
 {
     if (show) {
+        if (m_centerView->currentWidget() == m_chartView) {
+            return;
+        }
+
         m_centerView->setCurrentWidget(m_chartView);
 
         if (m_hierarchyToolBar) {
             m_hierarchyToolBar->hide();
         }
-        if (m_mscToolBar) {
+        if (m_mscToolBar && m_toolbarsVisible) {
             m_mscToolBar->show();
         }
         for (QAction *action : chartActions()) {
@@ -409,15 +448,23 @@ void MSCPlugin::showDocumentView(bool show)
 
         m_deleteTool->setView(m_chartView);
         m_deleteTool->setCurrentChart(chart);
+
+        setViewMode(ViewMode::CHART);
+    } else {
+        showHierarchyView(true);
     }
 }
 
 void MSCPlugin::showHierarchyView(bool show)
 {
     if (show) {
+        if (m_centerView->currentWidget() == m_hierarchyView) {
+            return;
+        }
+
         m_centerView->setCurrentWidget(m_hierarchyView);
 
-        if (m_hierarchyToolBar) {
+        if (m_hierarchyToolBar && m_toolbarsVisible) {
             m_hierarchyToolBar->show();
         }
         if (m_mscToolBar) {
@@ -439,6 +486,10 @@ void MSCPlugin::showHierarchyView(bool show)
 
         m_deleteTool->setView(m_hierarchyView);
         m_deleteTool->setCurrentChart(nullptr);
+
+        setViewMode(ViewMode::HIERARCHY);
+    } else {
+        showDocumentView(true);
     }
 }
 
