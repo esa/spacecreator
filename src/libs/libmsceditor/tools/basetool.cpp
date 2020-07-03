@@ -110,7 +110,6 @@ void BaseTool::setAction(QAction *action)
 
     m_action = action;
 
-    connect(action, &QAction::toggled, this, &msc::BaseTool::setActive);
     connect(this, &msc::BaseTool::activeChanged, action, &QAction::setChecked);
 }
 
