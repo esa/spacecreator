@@ -158,6 +158,7 @@ void MSCPlugin::initChartTools()
         toolAction->setIcon(tool->icon());
         toolAction->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
         toolAction->setData(QVariant::fromValue<msc::BaseTool::ToolType>(tool->toolType()));
+        toolAction->setEnabled(m_viewMode == ViewMode::CHART);
         tool->setView(m_chartView);
         tool->setAction(toolAction);
 
@@ -192,6 +193,7 @@ void MSCPlugin::initHierarchyViewActions()
         action->setCheckable(true);
         action->setIcon(tool->icon());
         action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        action->setEnabled(m_viewMode == ViewMode::HIERARCHY);
         tool->setAction(action);
         tool->setView(m_hierarchyView);
         if (m_hierarchyToolBar) {
