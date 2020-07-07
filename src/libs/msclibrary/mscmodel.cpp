@@ -17,8 +17,13 @@
 
 #include "mscmodel.h"
 
+#include "asn1valueparser.h"
 #include "mscchart.h"
 #include "mscdocument.h"
+#include "mscmessagedeclaration.h"
+#include "mscmessagedeclarationlist.h"
+
+#include <QDebug>
 
 namespace msc {
 
@@ -174,6 +179,70 @@ void MscModel::checkInstanceNames()
     for (MscDocument *doc : m_documents) {
         nextNumber = doc->setInstanceNameNumbers(nextNumber);
     }
+}
+
+/*!
+   Checks if the given \p parameter complies to the ASN.1 type of the name \p typeName
+ */
+bool MscModel::checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const
+{
+    if (m_asn1TypesData.isEmpty()) {
+        return true;
+    }
+
+    for (const QVariant &type : m_asn1TypesData) {
+        const QVariantMap typeMap = type.toMap();
+        if (typeMap.contains("type") && typeMap["name"] == typeName) {
+            asn1::Asn1ValueParser parser;
+            bool ok;
+            parser.parseAsn1Value(typeMap, parameter, &ok);
+            if (ok) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/*!
+   Checks if the parameters of the \p message comply to the ASN1 definition
+   The message name has to match a \see msc::MscMessageDeclaration
+ */
+bool MscModel::checkMessageAsn1Compliance(const msc::MscMessage &message) const
+{
+    if (m_documents.isEmpty()) {
+        return false;
+    }
+
+    const msc::MscMessageDeclarationList *messageDeclarations = m_documents.at(0)->messageDeclarations();
+    if (!messageDeclarations) {
+        return false;
+    }
+
+    msc::MscMessageDeclaration *usedDeclaration = nullptr;
+    for (msc::MscMessageDeclaration *declaration : *messageDeclarations) {
+        if (declaration && declaration->names().contains(message.name())) {
+            usedDeclaration = declaration;
+        }
+    }
+
+    if (usedDeclaration) {
+        if (message.parameters().size() != usedDeclaration->typeRefList().size()) {
+            return false;
+        }
+        for (int i = 0; i < message.parameters().size(); ++i) {
+            const QString &parameter = message.parameters().at(i).parameter();
+            const QString &type = usedDeclaration->typeRefList().at(i);
+            if (!checkparameterAsn1Compliance(parameter, type)) {
+                return false;
+            }
+        }
+        // All parameters comply
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace msc

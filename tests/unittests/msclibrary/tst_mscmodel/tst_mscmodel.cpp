@@ -18,6 +18,10 @@
 #include "exceptions.h"
 #include "mscchart.h"
 #include "mscdocument.h"
+#include "mscinstance.h"
+#include "mscmessage.h"
+#include "mscmessagedeclaration.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 
 #include <QtTest>
@@ -37,8 +41,11 @@ private Q_SLOTS:
     void testAddChart();
     void testNoDuplicateChart();
     void testNoNullPtrChart();
+    void testAsn1Compliance();
+    void testMessageCompliance();
 
 private:
+    void addAsn1Types();
     MscModel *m_model = nullptr;
 };
 
@@ -101,6 +108,78 @@ void tst_MscModel::testNoNullPtrChart()
 {
     m_model->addChart(nullptr);
     QCOMPARE(m_model->charts().size(), 0);
+}
+
+void tst_MscModel::testAsn1Compliance()
+{
+    m_model->setAsn1TypesData({});
+    bool ok = m_model->checkparameterAsn1Compliance("", "MyInt");
+    QCOMPARE(ok, true);
+
+    addAsn1Types();
+
+    ok = m_model->checkparameterAsn1Compliance("5", "MyInt");
+    QCOMPARE(ok, true);
+
+    ok = m_model->checkparameterAsn1Compliance("false", "MyInt");
+    QCOMPARE(ok, false);
+}
+
+void tst_MscModel::testMessageCompliance()
+{
+    auto doc = new MscDocument("Doc01", m_model);
+    m_model->addDocument(doc);
+    auto chart = new MscChart("Chart", m_model);
+    doc->addChart(chart);
+    auto inst = new MscInstance("Instance01", chart);
+    chart->addInstance(inst);
+    auto message = new MscMessage("sendTo", chart);
+    message->setSourceInstance(inst);
+    MscParameterList parameters;
+    parameters.append(MscParameter("5"));
+    message->setParameters(parameters);
+    chart->addInstanceEvent(message);
+
+    bool ok = m_model->checkMessageAsn1Compliance(*message);
+    QCOMPARE(ok, false);
+
+    addAsn1Types();
+    // add mesage declaration
+    auto declaration = new MscMessageDeclaration;
+    declaration->setNames({ "sendTo" });
+    declaration->setTypeRefList({ "MyInt" });
+    doc->messageDeclarations()->append(declaration);
+
+    ok = m_model->checkMessageAsn1Compliance(*message);
+    QCOMPARE(ok, true);
+
+    // number of parmaters differ
+    parameters.append(MscParameter("foo"));
+    message->setParameters(parameters);
+    ok = m_model->checkMessageAsn1Compliance(*message);
+    QCOMPARE(ok, false);
+
+    // No matching declaration
+    parameters.clear();
+    parameters.append(MscParameter("5"));
+    message->setParameters(parameters);
+    message->setName("ReceiveFrom");
+
+    ok = m_model->checkMessageAsn1Compliance(*message);
+    QCOMPARE(ok, false);
+}
+
+void tst_MscModel::addAsn1Types()
+{
+    QVariantList types;
+    QVariantMap myInt;
+    myInt["name"] = "MyInt";
+    myInt["type"] = 0;
+    myInt["isOptional"] = false;
+    myInt["min"] = 0;
+    myInt["max"] = 255;
+    types.append(myInt);
+    m_model->setAsn1TypesData(types);
 }
 
 QTEST_APPLESS_MAIN(tst_MscModel)

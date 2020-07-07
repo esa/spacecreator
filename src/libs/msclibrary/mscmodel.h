@@ -23,6 +23,7 @@
 namespace msc {
 class MscChart;
 class MscDocument;
+class MscMessage;
 
 class MscModel : public QObject
 {
@@ -56,6 +57,9 @@ public:
     void clear();
 
     void checkInstanceNames();
+
+    bool checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const;
+    bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
 
 Q_SIGNALS:
     void dataChanged();
