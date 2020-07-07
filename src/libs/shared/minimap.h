@@ -49,12 +49,14 @@ protected:
     void paintEvent(QPaintEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
 
-    void updateSceneContent();
     void updateViewportFrame();
 
 protected Q_SLOTS:
     void onSceneUpdated();
     void onViewUpdated();
+
+    void delayedUpdate();
+    void composeMap();
 
 private:
     const std::unique_ptr<MiniMapPrivate> d;
@@ -62,7 +64,8 @@ private:
     bool grabSceneContent();
     bool grabViewportRect();
 
-    void composeMap();
+    void scheduleUpdateContent();
+    void scheduleUpdateViewport();
 };
 
 } // namespace ui

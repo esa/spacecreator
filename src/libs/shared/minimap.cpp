@@ -18,6 +18,7 @@
 #include "minimap.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -36,7 +37,7 @@ struct MiniMapPrivate {
     MiniMapPrivate()
         : m_renderTimer(new QTimer)
     {
-        static constexpr int renderDelayMs = 100;
+        static constexpr int renderDelayMs = 20;
         m_renderTimer->setInterval(renderDelayMs);
         m_renderTimer->setSingleShot(true);
 
@@ -49,6 +50,14 @@ struct MiniMapPrivate {
         m_renderTimer = nullptr;
     }
 
+    enum class RequestedUpdate
+    {
+        None,
+        Content,
+        Viewport,
+        Both
+    };
+
     QPointer<QGraphicsView> m_view { nullptr };
     QPointer<QUndoStack> m_commandsStack { nullptr };
     QTimer *m_renderTimer { nullptr };
@@ -58,14 +67,16 @@ struct MiniMapPrivate {
 
     QPixmap m_display;
 
-    QColor m_dimColor { Qt::gray };
+    QColor m_dimColor { Qt::black };
+
+    RequestedUpdate m_scheduledUpdate { RequestedUpdate::Both };
 };
 
 MiniMap::MiniMap(QWidget *parent)
     : QWidget(parent, Qt::Tool)
     , d(new MiniMapPrivate)
 {
-    connect(d->m_renderTimer, &QTimer::timeout, this, &MiniMap::updateSceneContent);
+    connect(d->m_renderTimer, &QTimer::timeout, this, &MiniMap::delayedUpdate);
 
     static constexpr int minDimensionPix = 100;
     setMinimumSize(minDimensionPix, minDimensionPix);
@@ -112,9 +123,8 @@ void MiniMap::showEvent(QShowEvent *e)
     Q_EMIT visibilityChanged(visible);
 
     if (visible) {
-        grabSceneContent();
-        grabViewportRect();
-        composeMap();
+        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
+        delayedUpdate();
     }
 }
 
@@ -138,31 +148,25 @@ void MiniMap::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
 
-    composeMap();
+    scheduleUpdateContent();
 }
 
 void MiniMap::onSceneUpdated()
 {
-    // Depending on the actual scene content/size,
-    // the rendering process might be a resources consuming task.
-    // Do it only when really necessary.
     if (!isVisible()) {
         return;
     }
 
-    if (d->m_renderTimer->isActive())
-        d->m_renderTimer->stop();
-    d->m_renderTimer->start();
+    scheduleUpdateContent();
 }
 
 void MiniMap::onViewUpdated()
 {
-    // Just to keep it consistent with the scene's content
     if (!isVisible()) {
         return;
     }
 
-    updateViewportFrame();
+    scheduleUpdateViewport();
 }
 
 bool MiniMap::grabSceneContent()
@@ -172,11 +176,15 @@ bool MiniMap::grabSceneContent()
         return false;
     }
 
-    const QRect &sceneRectPix = d->m_view->mapFromScene(scene->sceneRect()).boundingRect();
-    d->m_sceneContent = QPixmap(sceneRectPix.size());
-    d->m_sceneContent.fill(Qt::transparent);
+    QElapsedTimer et;
+    et.start();
+
+    d->m_sceneContent = QPixmap(size());
+    d->m_sceneContent.fill(Qt::white);
     QPainter p(&d->m_sceneContent);
-    scene->render(&p);
+    scene->render(&p, d->m_sceneContent.rect(), QRect());
+
+    d->m_renderTimer->setInterval(et.elapsed() * 2);
 
     return true;
 }
@@ -197,43 +205,31 @@ bool MiniMap::grabViewportRect()
     return true;
 }
 
-void MiniMap::updateSceneContent()
-{
-    if (grabSceneContent()) {
-        composeMap();
-    }
-}
-
-void MiniMap::updateViewportFrame()
-{
-    if (grabViewportRect()) {
-        composeMap();
-    }
-}
-
 void MiniMap::composeMap()
 {
     if (d->m_sceneContent.isNull()) {
         return;
     }
 
-    QPixmap scaledContent = QPixmap(d->m_sceneContent.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    const QRect &actualScene = d->m_view->mapFromScene(d->m_view->scene()->sceneRect()).boundingRect();
+    const qreal scaleFactor = (actualScene.width() < actualScene.height())
+            ? qreal(d->m_sceneContent.width()) / qreal(actualScene.width())
+            : qreal(d->m_sceneContent.height()) / qreal(actualScene.height());
 
-    const qreal scaleX = qreal(scaledContent.width()) / qreal(d->m_sceneContent.width());
-    const qreal scaleY = qreal(scaledContent.height()) / qreal(d->m_sceneContent.height());
-    QTransform t;
-    t.scale(scaleX, scaleY);
-
-    const QRect &scaledViewport = t.map(QPolygon(d->m_sceneViewport)).boundingRect();
+    const QTransform &t = QTransform::fromScale(scaleFactor, scaleFactor);
+    const QRect &scaledViewport = t.mapRect(d->m_sceneViewport);
+    const QRect drawnRect = QRect({ 0, 0 }, t.mapRect(actualScene).size());
 
     QPainterPath dimmedOverlay;
-    dimmedOverlay.addRect(scaledContent.rect());
+    dimmedOverlay.addRect(drawnRect);
     dimmedOverlay.addRect(scaledViewport);
 
-    QPainter painter(&scaledContent);
+    QPixmap composedPreview(d->m_sceneContent);
+    QPainter painter(&composedPreview);
     painter.fillPath(dimmedOverlay, dimColor());
+    d->m_display = composedPreview;
 
-    d->m_display = scaledContent;
+    setFixedSize(drawnRect.size());
 
     update();
 }
@@ -242,6 +238,7 @@ void MiniMap::setDimColor(const QColor &to)
 {
     if (d->m_dimColor != to) {
         d->m_dimColor = to;
+
         composeMap();
     }
 }
@@ -249,6 +246,61 @@ void MiniMap::setDimColor(const QColor &to)
 QColor MiniMap::dimColor() const
 {
     return d->m_dimColor;
+}
+
+void MiniMap::scheduleUpdateContent()
+{
+    if (d->m_renderTimer->isActive())
+        d->m_renderTimer->stop();
+
+    switch (d->m_scheduledUpdate) {
+    case MiniMapPrivate::RequestedUpdate::None:
+        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Content;
+        break;
+    default:
+        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
+        break;
+    }
+
+    d->m_renderTimer->start();
+}
+
+void MiniMap::scheduleUpdateViewport()
+{
+    if (d->m_renderTimer->isActive())
+        d->m_renderTimer->stop();
+
+    switch (d->m_scheduledUpdate) {
+    case MiniMapPrivate::RequestedUpdate::None:
+        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Viewport;
+        break;
+    default:
+        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
+        break;
+    }
+
+    d->m_renderTimer->start();
+}
+
+void MiniMap::delayedUpdate()
+{
+    switch (d->m_scheduledUpdate) {
+    case MiniMapPrivate::RequestedUpdate::Content:
+        grabSceneContent();
+        break;
+    case MiniMapPrivate::RequestedUpdate::Viewport:
+        grabViewportRect();
+        break;
+    default: {
+        grabSceneContent();
+        grabViewportRect();
+        break;
+    }
+    }
+
+    d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::None;
+
+    composeMap();
 }
 
 } // namespace ui
