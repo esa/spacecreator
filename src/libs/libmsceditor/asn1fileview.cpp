@@ -109,9 +109,12 @@ void ASN1FileView::selectFile()
             QFileDialog::getOpenFileName(this, tr("ASN.1 file"), QString(), QStringLiteral("ASN1 files (*.asn *.ASN)"));
     if (!file.isEmpty()) {
         QFileInfo fi(file);
-        const QVariantList params { QVariant::fromValue(m_model.data()), fi.fileName(), "ASN.1" };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        fillPreview(file);
+        if (m_model->dataDefinitionString() != fi.fileName()) {
+            const QVariantList params { QVariant::fromValue(m_model.data()), fi.fileName(), "ASN.1" };
+            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+            fillPreview(file);
+        }
+        Q_EMIT asn1Selected(file);
     }
 }
 

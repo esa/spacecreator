@@ -44,6 +44,9 @@ public:
     void fullInit();
     Core::IEditor *createEditor();
 
+public Q_SLOTS:
+    void openEditor(const QString &fileName);
+
 private:
     void updateToolBar();
     QWidget *createModeWidget();

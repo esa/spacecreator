@@ -62,6 +62,7 @@ public:
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
+    void asn1Selected(const QString &fileName);
 
 private Q_SLOTS:
     void showChart(const QModelIndex &index);

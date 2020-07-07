@@ -39,6 +39,9 @@ public Q_SLOTS:
     void setModel(msc::MscModel *model);
     void setCurrentDirectory(const QString &directory);
 
+Q_SIGNALS:
+    void asn1Selected(const QString &fileName);
+
 private Q_SLOTS:
     void updateView();
     void selectFile();

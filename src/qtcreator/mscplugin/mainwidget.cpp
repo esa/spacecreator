@@ -263,6 +263,8 @@ void MainWidget::initConnections()
         QFileInfo fileInfo(filename);
         m_asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     });
+
+    connect(m_asn1Widget, &msc::ASN1FileView::asn1Selected, this, &MscPlugin::MainWidget::asn1Selected);
 }
 
 }

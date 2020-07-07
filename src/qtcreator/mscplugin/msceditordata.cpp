@@ -156,7 +156,14 @@ Core::IEditor *MscEditorData::createEditor()
         mscEditor->document()->infoBar()->addInfo(info);
     }
 
+    connect(designWidget, &MscPlugin::MainWidget::asn1Selected, this, &MscEditorData::openEditor);
+
     return mscEditor;
+}
+
+void MscEditorData::openEditor(const QString &fileName)
+{
+    Core::EditorManager::instance()->openEditor(fileName);
 }
 
 void MscEditorData::updateToolBar()
