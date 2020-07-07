@@ -245,4 +245,46 @@ bool MscModel::checkMessageAsn1Compliance(const msc::MscMessage &message) const
     return false;
 }
 
+/*!
+   Checks all messages in this model if it complies the asn1 definition
+ */
+bool MscModel::checkAllMessagesForAsn1Compliance() const
+{
+    QVector<msc::MscMessage *> messages;
+
+    for (msc::MscDocument *childDoc : m_documents) {
+        appendMessages(childDoc, messages);
+    }
+    for (msc::MscChart *childChart : m_charts) {
+        appendMessages(childChart, messages);
+    }
+
+    for (msc::MscMessage *message : messages) {
+        if (!checkMessageAsn1Compliance(*message)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void MscModel::appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const
+{
+    for (msc::MscDocument *childDoc : doc->documents()) {
+        appendMessages(childDoc, messages);
+    }
+    for (msc::MscChart *childChart : doc->charts()) {
+        appendMessages(childChart, messages);
+    }
+}
+
+void MscModel::appendMessages(msc::MscChart *chart, QVector<msc::MscMessage *> &messages) const
+{
+    for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
+        if (auto message = qobject_cast<msc::MscMessage *>(event)) {
+            messages.append(message);
+        }
+    }
+}
+
 } // namespace msc

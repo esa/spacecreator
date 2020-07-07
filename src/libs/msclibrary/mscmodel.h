@@ -60,6 +60,7 @@ public:
 
     bool checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const;
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
+    bool checkAllMessagesForAsn1Compliance() const;
 
 Q_SIGNALS:
     void dataChanged();
@@ -71,6 +72,9 @@ Q_SIGNALS:
     void asn1DataChanged();
 
 private:
+    void appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const;
+    void appendMessages(msc::MscChart *chart, QVector<msc::MscMessage *> &messages) const;
+
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
     QString m_dataLanguage;

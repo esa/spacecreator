@@ -43,6 +43,7 @@ private Q_SLOTS:
     void testNoNullPtrChart();
     void testAsn1Compliance();
     void testMessageCompliance();
+    void testAllMessagesCompliance();
 
 private:
     void addAsn1Types();
@@ -166,6 +167,51 @@ void tst_MscModel::testMessageCompliance()
     message->setName("ReceiveFrom");
 
     ok = m_model->checkMessageAsn1Compliance(*message);
+    QCOMPARE(ok, false);
+}
+
+void tst_MscModel::testAllMessagesCompliance()
+{
+    auto doc1 = new MscDocument("Doc01", m_model);
+    m_model->addDocument(doc1);
+
+    auto declaration = new MscMessageDeclaration;
+    declaration->setNames({ "sendTo" });
+    declaration->setTypeRefList({ "MyInt" });
+    doc1->messageDeclarations()->append(declaration);
+
+    auto chart1 = new MscChart("Chart01", m_model);
+    doc1->addChart(chart1);
+    auto inst1 = new MscInstance("Instance01", chart1);
+    chart1->addInstance(inst1);
+    auto message1 = new MscMessage("sendTo", chart1);
+    message1->setSourceInstance(inst1);
+    MscParameterList parameters;
+    parameters.append(MscParameter("5"));
+    message1->setParameters(parameters);
+    chart1->addInstanceEvent(message1);
+
+    auto doc2 = new MscDocument("Doc02", m_model);
+    m_model->addDocument(doc2);
+    auto chart2 = new MscChart("Chart02", m_model);
+    doc2->addChart(chart2);
+    auto inst2 = new MscInstance("Instance02", chart2);
+    chart2->addInstance(inst2);
+    auto message2 = new MscMessage("sendTo", chart2);
+    message2->setSourceInstance(inst2);
+    MscParameterList parameters2;
+    parameters2.append(MscParameter("8"));
+    message2->setParameters(parameters2);
+    chart2->addInstanceEvent(message2);
+
+    addAsn1Types();
+    bool ok = m_model->checkAllMessagesForAsn1Compliance();
+    QCOMPARE(ok, true);
+
+    parameters2.clear();
+    parameters2.append(MscParameter("foo"));
+    message2->setParameters(parameters2);
+    ok = m_model->checkAllMessagesForAsn1Compliance();
     QCOMPARE(ok, false);
 }
 
