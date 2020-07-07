@@ -50,6 +50,7 @@ private Q_SLOTS:
     void testMessageParameterExpression();
     void testMultiParameters();
     void testMessageParametersCurlyBraces();
+    void testMessageChoiceParameter();
 
     void testInstanceCreate();
     void testInstanceCreateNoParameter();
@@ -279,6 +280,22 @@ void tst_MscEventsParsing::testMessageParametersCurlyBraces()
     for (int i = 0; i < chart->instanceEvents().size(); ++i)
         if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i)))
             QCOMPARE(message->paramString(), params.at(i));
+}
+
+void tst_MscEventsParsing::testMessageChoiceParameter()
+{
+    QString msc = "MSC msc1; \
+                   INSTANCE Inst_1;in Msg_1 (act:heater: nominal) from env;ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
 }
 
 void tst_MscEventsParsing::testInstanceCreate()

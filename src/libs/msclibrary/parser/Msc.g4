@@ -475,7 +475,7 @@ parameterList
     ;
 
 paramaterDefn
-    : SEQUENCEOF | sdlText | binding | expression | pattern // SEQUENCEOF and sdlText are not in the spec
+    : SEQUENCEOF | sdlText | choiceOfChoice | binding | expression | pattern // SEQUENCEOF, sdlText and choiceOfChoice are not in the spec
     ;
 
 //
@@ -535,10 +535,16 @@ functionText
     | functionName=name LEFTOPEN functionText RIGHTOPEN
     | functionName=name SEQUENCEOF
     ;
+
 sdlText
     : LEFTOPEN '.' (name (COMMA name)*) '.' RIGHTOPEN
     ;
 
+// Allow something like for ASN.1
+// CHOICE { act CHOICE { heater ENUMERATED { nominal, redundant } } }
+choiceOfChoice
+    : name COLON name (COLON name)+
+    ;
 
 /*Keywords*/
 

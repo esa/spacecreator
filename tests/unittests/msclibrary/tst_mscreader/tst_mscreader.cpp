@@ -51,6 +51,7 @@ private Q_SLOTS:
     void testMscInDocument();
     void testInstance();
     void testInstanceWithKind();
+    void testMessageChoiceParameter();
     void testGateMessage();
     void testCondition();
     void testCoregion();
@@ -271,6 +272,22 @@ void tst_MscReader::testInstanceWithKind()
     QCOMPARE(instance->denominator(), QString("process"));
 }
 
+void tst_MscReader::testMessageChoiceParameter()
+{
+    QString msc = "MSC msc1; \
+                   INSTANCE Inst_1;in Msg_1 (act:heater: nominal) from env;ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
+}
+
 void tst_MscReader::testGateMessage()
 {
     QString msc = "MSC msc1; \
@@ -278,12 +295,11 @@ void tst_MscReader::testGateMessage()
                    INSTANCE Inst_1;in Msg_4 from env;out Msg_3 to Inst_2;ENDINSTANCE; \
                    INSTANCE Inst_2;in Msg_3 from Inst_1;ENDINSTANCE; \
                    ENDMSC;";
-    MscModel *model = m_reader->parseText(msc);
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
     QCOMPARE(model->charts().size(), 1);
     MscChart *chart = model->charts().at(0);
     QCOMPARE(chart->instances().size(), 2);
     QCOMPARE(chart->instanceEvents().size(), 2);
-    delete model;
 }
 
 void tst_MscReader::testCondition()

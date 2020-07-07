@@ -1146,6 +1146,9 @@ msc::MscParameterList MscParserVisitor::readParameterList(MscParser::ParameterLi
         if (pattern.isEmpty()) {
             pattern = ::treeNodeToString(paramaterDefn->SEQUENCEOF());
         }
+        if (pattern.isEmpty()) {
+            pattern = ::treeNodeToString(paramaterDefn->choiceOfChoice());
+        }
         if (!expression.isEmpty() || !pattern.isEmpty()) {
             msc::MscParameter parameter(expression, pattern);
             parameters << parameter;
