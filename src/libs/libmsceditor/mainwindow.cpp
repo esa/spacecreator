@@ -500,6 +500,8 @@ void MainWindow::initConnections()
 
     connect(d->m_plugin->mainModel()->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
             &MainWindow::adaptWindowSizeToChart);
+
+    connect(d->m_plugin->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 }
 
 /*!
@@ -890,6 +892,12 @@ void MainWindow::adaptWindowSizeToChart(const QRectF &rect)
     windowRect = shared::rectInRect(windowRect, availableRect);
 
     setGeometry(windowRect);
+}
+
+void MainWindow::showAsn1Errors(const QStringList &faultyMessages)
+{
+    QMessageBox::warning(
+            this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
 }
 
 void MainWindow::saveSceneRender(const QString &filePath) const

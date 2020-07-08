@@ -135,8 +135,18 @@ const QVariantList &MscModel::asn1TypesData() const
 
 void MscModel::setAsn1TypesData(const QVariantList &asn1TypesData)
 {
+    if (asn1TypesData == m_asn1TypesData) {
+        return;
+    }
+
     m_asn1TypesData = asn1TypesData;
     Q_EMIT asn1DataChanged();
+
+    QStringList faultyMessages;
+    const bool ok = checkAllMessagesForAsn1Compliance(&faultyMessages);
+    if (!ok) {
+        Q_EMIT asn1ParameterErrorDetected(faultyMessages);
+    }
 }
 
 void MscModel::clear()
@@ -242,13 +252,14 @@ bool MscModel::checkMessageAsn1Compliance(const msc::MscMessage &message) const
         return true;
     }
 
-    return false;
+    // no matching declaration available
+    return true;
 }
 
 /*!
    Checks all messages in this model if it complies the asn1 definition
  */
-bool MscModel::checkAllMessagesForAsn1Compliance() const
+bool MscModel::checkAllMessagesForAsn1Compliance(QStringList *faultyMessages) const
 {
     QVector<msc::MscMessage *> messages;
 
@@ -259,13 +270,18 @@ bool MscModel::checkAllMessagesForAsn1Compliance() const
         appendMessages(childChart, messages);
     }
 
+    bool ok = true;
+
     for (msc::MscMessage *message : messages) {
         if (!checkMessageAsn1Compliance(*message)) {
-            return false;
+            ok = false;
+            if (faultyMessages) {
+                *faultyMessages << QString("%1(%2)").arg(message->name(), message->paramString());
+            }
         }
     }
 
-    return true;
+    return ok;
 }
 
 void MscModel::appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const

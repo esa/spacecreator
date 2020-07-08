@@ -35,6 +35,7 @@
 #include <QGraphicsScene>
 #include <QHBoxLayout>
 #include <QImage>
+#include <QMessageBox>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QUndoStack>
@@ -206,6 +207,12 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
     }
 }
 
+void MainWidget::showAsn1Errors(const QStringList &faultyMessages)
+{
+    QMessageBox::warning(
+            this, tr("ASN1 error"), tr("Following messgages have ASN.1 errors:") + "\n" + faultyMessages.join("\n"));
+}
+
 void MainWidget::initUi()
 {
     auto centerView = new QStackedWidget(this);
@@ -265,6 +272,7 @@ void MainWidget::initConnections()
     });
 
     connect(m_asn1Widget, &msc::ASN1FileView::asn1Selected, this, &MscPlugin::MainWidget::asn1Selected);
+    connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MainWidget::showAsn1Errors);
 }
 
 }

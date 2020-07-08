@@ -141,8 +141,9 @@ void tst_MscModel::testMessageCompliance()
     message->setParameters(parameters);
     chart->addInstanceEvent(message);
 
+    // Check without declarations - defaults to "ok"
     bool ok = m_model->checkMessageAsn1Compliance(*message);
-    QCOMPARE(ok, false);
+    QCOMPARE(ok, true);
 
     addAsn1Types();
     // add mesage declaration
@@ -160,14 +161,14 @@ void tst_MscModel::testMessageCompliance()
     ok = m_model->checkMessageAsn1Compliance(*message);
     QCOMPARE(ok, false);
 
-    // No matching declaration
+    // No matching declaration, is "ok" as well
     parameters.clear();
     parameters.append(MscParameter("5"));
     message->setParameters(parameters);
     message->setName("ReceiveFrom");
 
     ok = m_model->checkMessageAsn1Compliance(*message);
-    QCOMPARE(ok, false);
+    QCOMPARE(ok, true);
 }
 
 void tst_MscModel::testAllMessagesCompliance()

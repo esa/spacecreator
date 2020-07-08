@@ -67,6 +67,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    void showAsn1Errors(const QStringList &faultyMessages);
 
 private:
     void initUi();

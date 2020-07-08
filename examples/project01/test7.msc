@@ -1,38 +1,66 @@
-mscdocument Untitled_Document;
-language ASN.1;
-data dataview.asn;
+mscdocument Untitled_Document /* MSC AND */;
+    language ASN.1;
+    data dataview.asn;
+    msg init : (MyInt);
+/* CIF MSCDOCUMENT (0, 0) (2004, 1617) */
 mscdocument LeafDoc1 /* MSC LEAF */;
-   msc Untitled_1;
-      gate in Msg_6 from Inst_2;
-      gate in Msg_7 from Inst_3;
-      gate in Msg_5 from Inst_1;
-      instance Inst_1;
-         out Msg_5 to Inst_2;
-         in Msg_9 from Inst_3;
-         out Msg_1 to Inst_2;
-         out Msg_5 to env;
-      endinstance;
-      instance Inst_2;
-         in Msg_5 from Inst_1;
-         out Msg_6 to env;
-         out Msg_8 to Inst_3;
-         in Msg_10 from Inst_4;
-         in Msg_1 from Inst_1;
-         out Msg_3 to Inst_3;
-         in Msg_4 from Inst_4;
-      endinstance;
-      instance Inst_3;
-         in Msg_8 from Inst_2;
-         out Msg_7 to env;
-         out Msg_9 to Inst_1;
-         in Msg_3 from Inst_2;
-         out Msg_2 to Inst_4;
-      endinstance;
-      instance Inst_4;
-         out Msg_10 to Inst_2;
-         in Msg_2 from Inst_3;
-         out Msg_4 to Inst_2;
-      endinstance;
-   endmsc;
+    language ASN.1;
+    data dataview.asn;
+msc Untitled_1;
+/* CIF INSTANCE (0, 56) (126, 79) (800, 1456) */
+instance Inst_1;
+/* CIF MESSAGE (63, 217) (690, 217) */
+out init(6) to Inst_2;
+
+/* CIF MESSAGE (63, 683) (690, 683) */
+out Msg_1 to Inst_2;
+/* CIF MESSAGE (1314, 916) (63, 916) */
+in Msg_9 from Inst_3;
+/* CIF MESSAGE (63, 1032) (0, 1032) */
+out Msg_5 to env;
+
+endinstance;
+/* CIF INSTANCE (627, 56) (126, 79) (800, 1456) */
+instance Inst_2;
+/* CIF MESSAGE (63, 217) (690, 217) */
+in init(6) from Inst_1;
+/* CIF MESSAGE (690, 333) (0, 333) */
+out Msg_6 to env;
+/* CIF MESSAGE (690, 450) (1314, 450) */
+out Msg_8 to Inst_3;
+/* CIF MESSAGE (1941, 566) (690, 566) */
+in Msg_10 from Inst_4;
+/* CIF MESSAGE (63, 683) (690, 683) */
+in Msg_1 from Inst_1;
+
+/* CIF MESSAGE (690, 1149) (1314, 1149) */
+out Msg_3 to Inst_3;
+/* CIF MESSAGE (1941, 1382) (690, 1382) */
+in Msg_4 from Inst_4;
+endinstance;
+/* CIF INSTANCE (1251, 56) (126, 79) (800, 1456) */
+instance Inst_3;
+/* CIF MESSAGE (690, 450) (1314, 450) */
+in Msg_8 from Inst_2;
+/* CIF MESSAGE (1314, 799) (2004, 799) */
+out Msg_7 to env;
+/* CIF MESSAGE (1314, 916) (63, 916) */
+out Msg_9 to Inst_1;
+/* CIF MESSAGE (690, 1149) (1314, 1149) */
+in Msg_3 from Inst_2;
+/* CIF MESSAGE (1314, 1265) (1941, 1265) */
+out Msg_2 to Inst_4;
+endinstance;
+/* CIF INSTANCE (1878, 56) (126, 79) (800, 1456) */
+instance Inst_4;
+/* CIF MESSAGE (1941, 566) (690, 566) */
+out Msg_10 to Inst_2;
+
+/* CIF MESSAGE (1314, 1265) (1941, 1265) */
+in Msg_2 from Inst_3;
+/* CIF MESSAGE (1941, 1382) (690, 1382) */
+out Msg_4 to Inst_2;
+endinstance;
+endmsc;
 endmscdocument;
 endmscdocument;

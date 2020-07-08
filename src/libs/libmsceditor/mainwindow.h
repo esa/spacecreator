@@ -88,6 +88,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void adaptWindowSizeToChart(const QRectF &rect);
+    void showAsn1Errors(const QStringList &faultyMessages);
 
 private:
     static const QLatin1String DotMscFileExtensionLow;

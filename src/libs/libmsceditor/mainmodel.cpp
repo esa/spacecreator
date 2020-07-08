@@ -527,6 +527,8 @@ void MainModel::setNewModel(MscModel *model)
     connect(d->m_mscModel, &msc::MscModel::chartAdded, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::cleared, this, &MainModel::showFirstChart);
     connect(d->m_mscModel, &msc::MscModel::dataChanged, this, &MainModel::modelDataChanged);
+    connect(d->m_mscModel, &msc::MscModel::asn1ParameterErrorDetected, this,
+            &msc::MainModel::asn1ParameterErrorDetected);
     connect(&d->m_chartLayoutManager, &ChartLayoutManager::cifDataChanged, d->m_mscModel, &msc::MscModel::dataChanged);
 
     showFirstChart();

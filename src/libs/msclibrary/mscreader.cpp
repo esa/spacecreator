@@ -67,13 +67,6 @@ MscModel *MscReader::parseFile(const QString &filename, QStringList *errorMessag
     ANTLRInputStream input(stream);
     MscModel *mscModel = parse(input, errorMessages);
 
-    if (!mscModel->dataDefinitionString().isEmpty()) {
-        // parse ASN.1
-        asn1::Asn1XMLParser xmlParser;
-        mscModel->setAsn1TypesData(xmlParser.parseAsn1File(
-                QFileInfo(filename).absolutePath(), mscModel->dataDefinitionString(), errorMessages));
-    }
-
     return mscModel;
 }
 

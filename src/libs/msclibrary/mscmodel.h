@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QObject>
+#include <QStringList>
 #include <QVector>
 
 namespace msc {
@@ -60,7 +61,7 @@ public:
 
     bool checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const;
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
-    bool checkAllMessagesForAsn1Compliance() const;
+    bool checkAllMessagesForAsn1Compliance(QStringList *faultyMessages = nullptr) const;
 
 Q_SIGNALS:
     void dataChanged();
@@ -70,6 +71,7 @@ Q_SIGNALS:
     void dataLanguageChanged(const QString &dataLanguage);
     void dataDefinitionStringChanged(const QString &dataString);
     void asn1DataChanged();
+    void asn1ParameterErrorDetected(const QStringList &faultyMessages);
 
 private:
     void appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const;
