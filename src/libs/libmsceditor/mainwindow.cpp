@@ -37,8 +37,6 @@
 #include "mscmodel.h"
 #include "mscplugin.h"
 #include "msctimer.h"
-#include "remotecontrolhandler.h"
-#include "remotecontrolwebserver.h"
 #include "settings/appoptions.h"
 #include "textviewdialog.h"
 #include "tools/entitydeletetool.h"
@@ -90,12 +88,7 @@ struct MainWindow::MainWindowPrivate {
 
     msc::TextViewDialog *mscTextBrowser = nullptr;
 
-    RemoteControlWebServer *m_remoteControlWebServer = nullptr;
-    RemoteControlHandler *m_remoteControlHandler = nullptr;
-
     bool m_dropUnsavedChangesSilently = false;
-
-    bool m_streamingMode = false;
 
     Q_DISABLE_COPY(MainWindowPrivate);
 };
@@ -433,34 +426,6 @@ void MainWindow::initActions()
     });
 }
 
-/*!
- * \brief MainWindow::startRemoteControl Start the remote app controller
- * \param port Listen on this port
- * \return True if success
- */
-bool MainWindow::startRemoteControl(quint16 port)
-{
-    if (!d->m_remoteControlWebServer) {
-        d->m_remoteControlWebServer = new RemoteControlWebServer(this);
-        d->m_remoteControlHandler = new RemoteControlHandler(this);
-        d->m_remoteControlHandler->setModel(d->m_plugin->mainModel());
-
-        connect(d->m_remoteControlWebServer, &RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
-                &RemoteControlHandler::handleRemoteCommand);
-        connect(d->m_remoteControlHandler, &RemoteControlHandler::commandDone, d->m_remoteControlWebServer,
-                &RemoteControlWebServer::commandDone);
-    }
-    if (d->m_remoteControlWebServer->start(port))
-        return true;
-
-    d->m_remoteControlWebServer->deleteLater();
-    d->m_remoteControlWebServer = nullptr;
-    d->m_remoteControlHandler->deleteLater();
-    d->m_remoteControlHandler = nullptr;
-    qWarning() << "Continue app running without remote control enabled";
-    return false;
-}
-
 void MainWindow::initMainToolbar()
 {
     auto mainToolBar = d->m_plugin->mainToolBar();
@@ -498,9 +463,6 @@ void MainWindow::initConnections()
         d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
     });
 
-    connect(d->m_plugin->mainModel()->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
-            &MainWindow::adaptWindowSizeToChart);
-
     connect(d->m_plugin->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 }
 
@@ -517,24 +479,6 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return openFileMsc(value);
     case shared::CommandLineParser::Positional::DbgOpenMscExamplesChain:
         return openMscChain(value);
-    case shared::CommandLineParser::Positional::StartRemoteControl:
-        if (startRemoteControl(value.toUShort())) {
-            d->m_streamingMode = true;
-            showDocumentView(true);
-            menuBar()->setVisible(false);
-
-            d->m_plugin->mscToolBar()->setVisible(false);
-            d->m_plugin->hierarchyToolBar()->setVisible(false);
-            d->m_plugin->mainToolBar()->setVisible(false);
-
-            d->ui->dockWidgetDocument->hide();
-            d->ui->dockWidgetDocumenetContents->hide();
-            d->ui->dockWidgetAsn1->hide();
-
-            statusBar()->hide();
-            return true;
-        }
-        break;
     case shared::CommandLineParser::Positional::DropUnsavedChangesSilently:
         d->m_dropUnsavedChangesSilently = true;
         return true;
@@ -876,24 +820,6 @@ void MainWindow::saveScreenshot()
     }
 }
 
-void MainWindow::adaptWindowSizeToChart(const QRectF &rect)
-{
-    if (!d->m_streamingMode) {
-        return;
-    }
-
-    QRect windowRect = geometry();
-    QRect widgetRect = d->m_plugin->chartView()->geometry();
-    const QSize offsets(windowRect.width() - widgetRect.width(), windowRect.height() - widgetRect.height());
-    widgetRect = rect.marginsAdded(ChartItem::chartMargins()).toRect();
-    windowRect.setSize(rect.size().toSize() + offsets);
-
-    const QRect availableRect = screen()->availableGeometry();
-    windowRect = shared::rectInRect(windowRect, availableRect);
-
-    setGeometry(windowRect);
-}
-
 void MainWindow::showAsn1Errors(const QStringList &faultyMessages)
 {
     QMessageBox::warning(
@@ -912,18 +838,6 @@ void MainWindow::saveSceneRender(const QString &filePath) const
         scene->render(&p);
         img.save(filePath);
     }
-}
-
-/**
-   @todo With Qt >= 5.14 use QWidget::screen()
- */
-QScreen *MainWindow::screen() const
-{
-    if (auto screenByPos = QGuiApplication::screenAt(geometry().center())) {
-        return screenByPos;
-    }
-
-    return QGuiApplication::primaryScreen();
 }
 
 }

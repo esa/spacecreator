@@ -23,6 +23,7 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMimeData>
@@ -72,16 +73,16 @@ void MSCPlugin::setPluginActive(bool active)
 void MSCPlugin::setViews(
         QStackedWidget *centerView, shared::ui::GraphicsViewBase *chartView, GraphicsView *hierarchyView)
 {
-    Q_ASSERT(centerView != nullptr);
-    Q_ASSERT(chartView != nullptr);
-    Q_ASSERT(hierarchyView != nullptr);
-
     m_centerView = centerView;
     m_chartView = chartView;
     m_hierarchyView = hierarchyView;
 
-    m_chartView->setScene(mainModel()->graphicsScene());
-    m_hierarchyView->setScene(mainModel()->hierarchyScene());
+    if (m_chartView) {
+        m_chartView->setScene(mainModel()->graphicsScene());
+    }
+    if (m_hierarchyView) {
+        m_hierarchyView->setScene(mainModel()->hierarchyScene());
+    }
 }
 
 QStackedWidget *MSCPlugin::centerView()
@@ -319,7 +320,6 @@ void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) 
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
-    parser->handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 
@@ -532,6 +532,10 @@ void MSCPlugin::selectCurrentChart()
 
 void MSCPlugin::checkGlobalComment()
 {
+    if (!m_globalCommentCreateTool) {
+        return;
+    }
+
     msc::MscChart *currentChart = m_model->chartViewModel().currentChart();
     if (!currentChart) {
         m_globalCommentCreateTool->action()->setEnabled(false);

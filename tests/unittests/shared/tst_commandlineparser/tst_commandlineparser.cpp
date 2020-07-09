@@ -90,7 +90,7 @@ void tst_CommandLineParser::testCmdArgumentRemoteControl()
     const quint16 port = 34567;
 
     CommandLineParser parser;
-    m_pluginMSC.populateCommandLineArguments(&parser);
+    parser.handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
     parser.process({ QApplication::instance()->applicationFilePath(),
             QString("-%1=%2").arg(cmdRemoteControl.names().first(), QString::number(inUsePort)) });
     QCOMPARE(parser.isSet(CommandLineParser::Positional::StartRemoteControl), true);

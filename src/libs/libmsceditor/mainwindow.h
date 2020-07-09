@@ -18,7 +18,6 @@
 #pragma once
 
 #include "commandlineparser.h"
-#include "remotecontrolwebserver.h"
 
 #include <QMainWindow>
 #include <QModelIndex>
@@ -78,7 +77,6 @@ public Q_SLOTS:
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     bool openMscChain(const QString &dirPath);
-    bool startRemoteControl(quint16 port);
     void updateTitles();
     void updateModel();
     void showCoordinatesInfo(const QString &info);
@@ -87,7 +85,6 @@ public Q_SLOTS:
     void saveScreenshot();
 
 private Q_SLOTS:
-    void adaptWindowSizeToChart(const QRectF &rect);
     void showAsn1Errors(const QStringList &faultyMessages);
 
 private:
@@ -125,8 +122,6 @@ private:
 #endif
 
     void saveSceneRender(const QString &filePath) const;
-
-    QScreen *screen() const;
 };
 
 }
