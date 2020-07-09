@@ -50,29 +50,15 @@ int main(int argc, char *argv[])
     plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 
+    msc::MainWindow w(&plugin);
+
     const QVector<shared::CommandLineParser::Positional> args = cmdParser.positionalsSet();
-    if (args.contains(shared::CommandLineParser::Positional::OpenFileMsc)
-            && args.contains(shared::CommandLineParser::Positional::OpenStringTemplateFile)
-            && args.contains(shared::CommandLineParser::Positional::ExportToFile)) {
-        // Convert the .msc file
-        const QString inputFile = cmdParser.value(shared::CommandLineParser::Positional::OpenFileMsc);
-        const QString templateFile = cmdParser.value(shared::CommandLineParser::Positional::OpenStringTemplateFile);
-        const QString outputFile = cmdParser.value(shared::CommandLineParser::Positional::ExportToFile);
-
-        msc::MscWriter writer;
-        const bool ok = writer.convertMscFile(inputFile, templateFile, outputFile);
-        return ok ? 0 : 1;
-    } else {
-        // Show the MSC editor
-        msc::MainWindow w(&plugin);
-
-        for (auto it = args.crbegin(); it != args.crend(); ++it) {
-            auto arg = *it;
-            w.processCommandLineArg(arg, cmdParser.value(arg));
-        }
-
-        w.show();
-
-        return a.exec();
+    for (auto it = args.crbegin(); it != args.crend(); ++it) {
+        auto arg = *it;
+        w.processCommandLineArg(arg, cmdParser.value(arg));
     }
+
+    w.show();
+
+    return a.exec();
 }
