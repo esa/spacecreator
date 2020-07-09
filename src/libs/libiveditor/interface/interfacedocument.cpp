@@ -169,7 +169,9 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
     d->model = new aadl::AADLObjectsModel(this);
     d->mutex = new QMutex(QMutex::NonRecursive);
-    d->desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+    if (QGuiApplication::primaryScreen()) {
+        d->desktopGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+    }
 
     connect(d->commandsStack, &QUndoStack::indexChanged, this, &InterfaceDocument::updateDirtyness);
     connect(d->model, &aadl::AADLObjectsModel::modelReset, this, &InterfaceDocument::clearScene);

@@ -53,4 +53,6 @@ int main(int argc, char *argv[])
     } else {
         cmdParser.showHelp();
     }
+
+    return 0;
 }

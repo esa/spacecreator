@@ -140,7 +140,6 @@ AADLXMLReader::~AADLXMLReader() { }
 
 bool AADLXMLReader::readFile(const QString &file)
 {
-    qDebug() << file;
     QFile in(file);
     if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text))
         return read(&in);
