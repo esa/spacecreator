@@ -18,7 +18,6 @@
 #include "minimap.h"
 
 #include <QDebug>
-#include <QElapsedTimer>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -41,7 +40,7 @@ struct MiniMapPrivate {
     MiniMapPrivate()
         : m_renderTimer(new QTimer)
     {
-        static constexpr int renderDelayMs = 20;
+        static constexpr int renderDelayMs = 10;
         m_renderTimer->setInterval(renderDelayMs);
         m_renderTimer->setSingleShot(true);
 
@@ -185,15 +184,10 @@ bool MiniMap::grabSceneContent()
         return false;
     }
 
-    QElapsedTimer et;
-    et.start();
-
     d->m_sceneContent = QPixmap(size());
     d->m_sceneContent.fill(Qt::white);
     QPainter p(&d->m_sceneContent);
     scene->render(&p, d->m_sceneContent.rect(), QRect());
-
-    d->m_renderTimer->setInterval(et.elapsed());
 
     return true;
 }
