@@ -193,7 +193,7 @@ bool MiniMap::grabSceneContent()
     QPainter p(&d->m_sceneContent);
     scene->render(&p, d->m_sceneContent.rect(), QRect());
 
-    d->m_renderTimer->setInterval(et.elapsed() * 2);
+    d->m_renderTimer->setInterval(et.elapsed());
 
     return true;
 }
@@ -342,12 +342,15 @@ void MiniMap::processMouseInput()
     }
 
     QPointF newCenter;
-    if (d->m_mouseStart == d->m_mouseFinish) {
-        // just a click, center the view on that
-        newCenter = pixelToScene(d->m_mouseStart);
-    } else {
-        // a drag, center the view on the center of the shifted viewport
-    }
+    if (d->m_mouseStart != d->m_mouseFinish) {
+        // It's a drag. In general, we should shift the main viewport accordingly to the shift of the minimap's preview.
+        // But let's just center the main view on the current mouse pos instead — the UX flow seems to be smooth,
+        // but the code is way much simplier.
+        // This seems to be enough, at least for beginning.
+        d->m_mouseStart = d->m_mouseFinish;
+    } // else it's a click - recenter the main view on it
+
+    newCenter = pixelToScene(d->m_mouseStart);
 
     d->m_view->centerOn(newCenter);
 }
