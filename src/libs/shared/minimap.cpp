@@ -22,7 +22,9 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMouseEvent>
 #include <QPainter>
+#include <QPoint>
 #include <QPointer>
 #include <QScrollBar>
 #include <QTimer>
@@ -32,6 +34,8 @@
 
 namespace shared {
 namespace ui {
+
+static const QPoint OutOfView { -1, -1 };
 
 struct MiniMapPrivate {
     MiniMapPrivate()
@@ -70,6 +74,11 @@ struct MiniMapPrivate {
     QColor m_dimColor { Qt::black };
 
     RequestedUpdate m_scheduledUpdate { RequestedUpdate::Both };
+    QRect m_mappedViewport;
+    QRectF m_sceneRect;
+
+    QPoint m_mouseStart = OutOfView;
+    QPoint m_mouseFinish = OutOfView;
 };
 
 MiniMap::MiniMap(QWidget *parent)
@@ -196,8 +205,8 @@ bool MiniMap::grabViewportRect()
         return false;
     }
 
-    const QRectF &sceneRect = scene->sceneRect();
-    const QRect &sceneRectPix = d->m_view->mapFromScene(sceneRect).boundingRect();
+    d->m_sceneRect = scene->sceneRect();
+    const QRect &sceneRectPix = d->m_view->mapFromScene(d->m_sceneRect).boundingRect();
 
     d->m_sceneViewport = d->m_view->viewport()->rect();
     d->m_sceneViewport.translate(d->m_sceneViewport.topLeft() - sceneRectPix.topLeft());
@@ -211,18 +220,18 @@ void MiniMap::composeMap()
         return;
     }
 
-    const QRect &actualScene = d->m_view->mapFromScene(d->m_view->scene()->sceneRect()).boundingRect();
+    const QRect &actualScene = d->m_view->mapFromScene(d->m_sceneRect).boundingRect();
     const qreal scaleFactor = (actualScene.width() < actualScene.height())
             ? qreal(d->m_sceneContent.width()) / qreal(actualScene.width())
             : qreal(d->m_sceneContent.height()) / qreal(actualScene.height());
 
     const QTransform &t = QTransform::fromScale(scaleFactor, scaleFactor);
-    const QRect &scaledViewport = t.mapRect(d->m_sceneViewport);
+    d->m_mappedViewport = t.mapRect(d->m_sceneViewport);
     const QRect drawnRect = QRect({ 0, 0 }, t.mapRect(actualScene).size());
 
     QPainterPath dimmedOverlay;
     dimmedOverlay.addRect(drawnRect);
-    dimmedOverlay.addRect(scaledViewport);
+    dimmedOverlay.addRect(d->m_mappedViewport);
 
     QPixmap composedPreview(d->m_sceneContent);
     QPainter painter(&composedPreview);
@@ -301,6 +310,55 @@ void MiniMap::delayedUpdate()
     d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::None;
 
     composeMap();
+}
+
+void MiniMap::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    d->m_mouseStart = event->pos();
+}
+
+void MiniMap::mouseMoveEvent(QMouseEvent *event)
+{
+    QWidget::mouseMoveEvent(event);
+    d->m_mouseFinish = event->pos();
+    processMouseInput();
+}
+
+void MiniMap::mouseReleaseEvent(QMouseEvent *event)
+{
+    QWidget::mouseReleaseEvent(event);
+    d->m_mouseFinish = event->pos();
+    processMouseInput();
+
+    d->m_mouseStart = OutOfView;
+    d->m_mouseFinish = OutOfView;
+}
+
+void MiniMap::processMouseInput()
+{
+    if (d->m_mouseFinish == OutOfView) {
+        return;
+    }
+
+    QPointF newCenter;
+    if (d->m_mouseStart == d->m_mouseFinish) {
+        // just a click, center the view on that
+        newCenter = pixelToScene(d->m_mouseStart);
+    } else {
+        // a drag, center the view on the center of the shifted viewport
+    }
+
+    d->m_view->centerOn(newCenter);
+}
+
+QPointF MiniMap::pixelToScene(const QPoint &pixel) const
+{
+    const qreal scaleFactor = d->m_sceneRect.width() / d->m_sceneContent.rect().width();
+    const QTransform t = QTransform::fromScale(scaleFactor, scaleFactor);
+
+    const QPointF scenePoint = t.map(pixel) + d->m_sceneRect.topLeft();
+    return scenePoint;
 }
 
 } // namespace ui

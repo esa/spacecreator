@@ -49,6 +49,10 @@ protected:
     void paintEvent(QPaintEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
 
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
     void updateViewportFrame();
 
 protected Q_SLOTS:
@@ -66,6 +70,10 @@ private:
 
     void scheduleUpdateContent();
     void scheduleUpdateViewport();
+
+    void processMouseInput();
+
+    QPointF pixelToScene(const QPoint &pixel) const;
 };
 
 } // namespace ui
