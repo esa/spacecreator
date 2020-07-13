@@ -17,6 +17,7 @@
 
 #include "minimap.h"
 
+#include <QCursor>
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -88,6 +89,8 @@ MiniMap::MiniMap(QWidget *parent)
 
     static constexpr int minDimensionPix = 100;
     setMinimumSize(minDimensionPix, minDimensionPix);
+
+    setMouseTracking(true);
 }
 
 MiniMap::~MiniMap() {}
@@ -306,24 +309,49 @@ void MiniMap::delayedUpdate()
     composeMap();
 }
 
+bool MiniMap::checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const
+{
+    return e->button() == current && e->buttons() == started && e->modifiers() == Qt::NoModifier;
+}
+
+void MiniMap::updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape)
+{
+    const Qt::CursorShape cursorShape = d->m_mappedViewport.contains(pos) ? targetShape : Qt::ArrowCursor;
+    setCursor(cursorShape);
+}
+
 void MiniMap::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    d->m_mouseStart = event->pos();
+
+    if (checkMouseEvent(event, Qt::LeftButton, Qt::LeftButton)) {
+        updateCursorInMappedViewport(event->pos(), Qt::ClosedHandCursor);
+
+        d->m_mouseStart = event->pos();
+    }
 }
 
 void MiniMap::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
-    d->m_mouseFinish = event->pos();
-    processMouseInput();
+
+    if (checkMouseEvent(event, Qt::NoButton, Qt::NoButton)) {
+        updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
+    } else if (checkMouseEvent(event, Qt::NoButton, Qt::LeftButton)) {
+        d->m_mouseFinish = event->pos();
+        processMouseInput();
+    }
 }
 
 void MiniMap::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
-    d->m_mouseFinish = event->pos();
-    processMouseInput();
+    if (checkMouseEvent(event, Qt::LeftButton, Qt::NoButton)) {
+        d->m_mouseFinish = event->pos();
+        processMouseInput();
+    }
+
+    updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
 
     d->m_mouseStart = OutOfView;
     d->m_mouseFinish = OutOfView;

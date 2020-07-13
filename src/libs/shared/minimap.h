@@ -74,6 +74,9 @@ private:
     void processMouseInput();
 
     QPointF pixelToScene(const QPoint &pixel) const;
+
+    bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const;
+    void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
 };
 
 } // namespace ui
