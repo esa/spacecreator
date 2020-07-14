@@ -41,6 +41,7 @@ public:
     explicit AstXmlParserTests(QObject *parent = 0);
 
 private Q_SLOTS:
+    void cleanup();
     void test_emptyFile();
     void test_badXmlRoot();
     void test_emptyDefinitions();
@@ -61,6 +62,7 @@ private Q_SLOTS:
     void test_multipleModules();
     void test_multipleFiles();
     void test_parametrizedInstancesContentsAreIgnored();
+    void test_asn1AstParsing();
 
 private:
     void setXmlData(const QString &str);

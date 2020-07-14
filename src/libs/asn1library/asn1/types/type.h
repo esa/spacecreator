@@ -25,6 +25,7 @@
 #pragma once
 
 #include <QString>
+#include <QVariantMap>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -40,6 +41,9 @@ public:
     virtual QString label() const = 0;
 
     virtual QString baseIconFile() const = 0;
+
+    /// Data values of this ASN1 type (like min/max for numbers)
+    QVariantMap m_values;
 };
 
 } // namespace Types

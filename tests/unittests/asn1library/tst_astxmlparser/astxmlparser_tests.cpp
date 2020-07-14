@@ -35,6 +35,11 @@ AstXmlParserTests::AstXmlParserTests(QObject *parent)
 {
 }
 
+void AstXmlParserTests::cleanup()
+{
+    m_parsedData.clear();
+}
+
 void AstXmlParserTests::setXmlData(const QString &str)
 {
     m_xmlReader.clear();
@@ -613,7 +618,7 @@ void AstXmlParserTests::test_parametrizedInstancesContentsAreIgnored()
           R"(                <SEQUENCE_COMPONENT Name="b" Line="14" CharPositionInLine="2">)"
           R"(                  <Asn1Type Line="14" CharPositionInLine="4">)"
           R"(                    <REFERENCE_TYPE Module="Other" TypeAssignment="MyInt"/>")
-        R"(                  </Asn1Type>)"
+          R"(                  </Asn1Type>)"
           R"(                </SEQUENCE_COMPONENT>)"
           R"(              </SEQUENCE>)"
           R"(            </Asn1Type>)"
@@ -635,6 +640,137 @@ void AstXmlParserTests::test_parametrizedInstancesContentsAreIgnored()
 
     const auto ref = m_parsedData["Test2File.asn"]->referencesMap().find(14);
     QVERIFY(ref == m_parsedData["Test2File.asn"]->referencesMap().end());
+}
+
+void AstXmlParserTests::test_asn1AstParsing()
+{
+    parse(R"(<?xml version="1.0" encoding="UTF-8"?>)"
+          R"(<ASN1AST>)"
+          R"(  <Asn1File FileName="test.asn">)"
+          R"(    <Asn1Module ID="ModuleTest">)"
+          R"(      <TypeAssignments>)"
+          R"(        <TypeAssignment Name="MyInt" Line="6" CharPositionInLine="0">)"
+          R"(          <Type Line="6" CharPositionInLine="10">)"
+          R"(            <IntegerType Min="-5" Max="20" />)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="MyReal" Line="11" CharPositionInLine="3">)"
+          R"(          <Type Line="11" CharPositionInLine="19">
+          R"(            <RealType Min="0.00000000000000000000E+000" Max="1.00000000000000000000E+003" />)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="MyBOOL" Line="6" CharPositionInLine="0">)"
+          R"(          <Type Line="6" CharPositionInLine="10">)"
+          R"(            <BooleanType />)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="TypeEnumerated" Line="11" CharPositionInLine="3">)"
+          R"(          <Type Line="11" CharPositionInLine="19">)"
+          R"(            <EnumeratedType Extensible="False" ValuesAutoCalculated="False">)"
+          R"(              <EnumValues>)"
+          R"(                <EnumValue StringValue="red" IntValue="0" Line="17" CharPositionInLine="4" EnumID="red" />)"
+          R"(                <EnumValue StringValue="green" IntValue="1" Line="18" CharPositionInLine="4" EnumID="green" />)"
+          R"(                <EnumValue StringValue="blue" IntValue="2" Line="19" CharPositionInLine="4" EnumID="blue" />)"
+          R"(              </EnumValues>)"
+          R"(            </EnumeratedType>)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="MyChoice" Line="9" CharPositionInLine="0">)"
+          R"(          <Type Line="9" CharPositionInLine="13">)"
+          R"(            <ChoiceType>)"
+          R"(              <ChoiceChild VarName="hop" Line="9" CharPositionInLine="22" EnumID="hop_PRESENT">)"
+          R"(                <Type Line="9" CharPositionInLine="26">)"
+          R"(                  <BooleanType />)"
+          R"(                </Type>)"
+          R"(              </ChoiceChild>)"
+          R"(              <ChoiceChild VarName="lat" Line="51" CharPositionInLine="4" EnumID="lat_PRESENT">)"
+          R"(                <Type Line="51" CharPositionInLine="13">)"
+          R"(                 <RealType Min="-9.00000000000000000000E+001" Max="9.00000000000000000000E+001" />)"
+          R"(                </Type>)"
+          R"(              </ChoiceChild>)"
+          R"(            </ChoiceType>)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="MySeq" Line="8" CharPositionInLine="0">)"
+          R"(          <Type Line="8" CharPositionInLine="10">)"
+          R"(            <SequenceType>)"
+          R"(              <SequenceOrSetChild VarName="foo" Optional="False" Line="8" CharPositionInLine="21">)"
+          R"(                <Type Line="8" CharPositionInLine="25">)"
+          R"(                  <BooleanType />)"
+          R"(                </Type>)"
+          R"(              </SequenceOrSetChild>)"
+          R"(              <SequenceOrSetChild VarName="int2Val" Optional="False" Line="26" CharPositionInLine="4">)"
+          R"(                <Type Line="26" CharPositionInLine="12">)"
+          R"(                  <IntegerType Min="-10" Max="10" />)"
+          R"(                </Type>)"
+          R"(              </SequenceOrSetChild>)"
+          R"(            </SequenceType>)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(        <TypeAssignment Name="T-UInt32" Line="3" CharPositionInLine="13">)"
+          R"(          <Type Line="3" CharPositionInLine="13">)"
+          R"(            <IntegerType Min="0" Max="4294967295"/>)"
+          R"(          </Type>)"
+          R"(        </TypeAssignment>)"
+          R"(      </TypeAssignments>)"
+          R"(    </Asn1Module>)"
+          R"(  </Asn1File>)"
+          R"(</ASN1AST>)");
+
+    QVERIFY(m_parsedData.find("test.asn") != m_parsedData.end());
+    const Data::Definitions *definitions = m_parsedData["test.asn"]->definitions("ModuleTest");
+    QVERIFY(definitions != nullptr);
+
+    const auto int1 = definitions->type("MyInt");
+    QCOMPARE(int1->type()->name(), QStringLiteral("INTEGER"));
+    auto intType1 = dynamic_cast<const Data::Types::Integer *>(int1->type());
+    QVERIFY(intType1->m_values.contains("min"));
+    QCOMPARE(intType1->m_values["min"].toLongLong(), -5);
+    QVERIFY(intType1->m_values.contains("max"));
+    QCOMPARE(intType1->m_values["max"].toLongLong(), 20);
+
+    const auto real1 = definitions->type("MyReal");
+    QCOMPARE(real1->type()->name(), QStringLiteral("REAL"));
+    auto realType1 = dynamic_cast<const Data::Types::Real *>(real1->type());
+    QVERIFY(realType1->m_values.contains("min"));
+    QVERIFY(qFuzzyCompare(realType1->m_values["min"].toDouble(), 0.0));
+    QVERIFY(realType1->m_values.contains("max"));
+    QVERIFY(qFuzzyCompare(realType1->m_values["max"].toDouble(), 1000.0));
+
+    const auto bool1 = definitions->type("MyBOOL");
+    QCOMPARE(bool1->type()->name(), QStringLiteral("BOOLEAN"));
+
+    const auto enum1 = definitions->type("TypeEnumerated");
+    QCOMPARE(enum1->type()->name(), QStringLiteral("ENUMERATED"));
+    auto enumType1 = dynamic_cast<const Data::Types::Enumerated *>(enum1->type());
+    QVERIFY(enumType1->m_values.contains("values"));
+    QStringList values = enumType1->m_values["values"].toStringList();
+    QCOMPARE(values.size(), 3);
+    QCOMPARE(values.at(0), QString("red"));
+    QCOMPARE(values.at(1), QString("green"));
+    QCOMPARE(values.at(2), QString("blue"));
+
+    const auto choice1 = definitions->type("MyChoice");
+    QCOMPARE(choice1->type()->name(), QStringLiteral("CHOICE"));
+    auto choiceType1 = dynamic_cast<const Data::Types::Choice *>(choice1->type());
+    QCOMPARE(choiceType1->m_choices.size(), 2);
+    QCOMPARE(choiceType1->m_choices.at(0)->name(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(choiceType1->m_choices.at(1)->name(), QStringLiteral("REAL"));
+
+    const auto sequence1 = definitions->type("MySeq");
+    QCOMPARE(sequence1->type()->name(), QStringLiteral("SEQUENCE"));
+    auto sequenceType1 = dynamic_cast<const Data::Types::Sequence *>(sequence1->type());
+    QCOMPARE(sequenceType1->m_sequence.size(), 2);
+    QCOMPARE(sequenceType1->m_sequence.at(0)->name(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(sequenceType1->m_sequence.at(1)->name(), QStringLiteral("INTEGER"));
+
+    const auto int2 = definitions->type("T-UInt32");
+    QCOMPARE(int2->type()->name(), QStringLiteral("INTEGER"));
+    auto intType2 = dynamic_cast<const Data::Types::Integer *>(int2->type());
+    QVERIFY(intType2->m_values.contains("min"));
+    QCOMPARE(intType2->m_values["min"].toLongLong(), 0);
+    QVERIFY(intType2->m_values.contains("max"));
+    QCOMPARE(intType2->m_values["max"].toLongLong(), 4294967295);
 }
 
 void AstXmlParserTests::parsingFails(const QString &xmlData)

@@ -27,9 +27,16 @@
 #include "types/builtintypes.h"
 #include "types/userdefinedtype.h"
 
+#include <QDebug>
 #include <QMap>
+#include <QVariantMap>
 
-using namespace Asn1Acn::Internal;
+namespace Asn1Acn {
+namespace Internal {
+
+static const QString ASN1_MIN = "min";
+static const QString ASN1_MAX = "max";
+static const QString ASN1_VALUES = "values";
 
 AstXmlParser::AstXmlParser(QXmlStreamReader &xmlReader)
     : m_xmlReader(xmlReader)
@@ -39,9 +46,14 @@ AstXmlParser::AstXmlParser(QXmlStreamReader &xmlReader)
 
 bool AstXmlParser::parse()
 {
-    if (nextRequiredElementIs(QStringLiteral("AstRoot")))
+    if (nextRequiredElementIs({ { "AstRoot" }, { "ASN1AST" } }))
         readAstRoot();
-    return !m_xmlReader.hasError();
+
+    const bool ok = !m_xmlReader.hasError();
+    if (!ok) {
+        qDebug() << m_xmlReader.errorString();
+    }
+    return ok;
 }
 
 void AstXmlParser::readAstRoot()
@@ -53,14 +65,30 @@ void AstXmlParser::readAstRoot()
 void AstXmlParser::readAsn1File()
 {
     updateCurrentFile();
-    if (nextRequiredElementIs(QStringLiteral("Modules")))
+
+    if (!m_xmlReader.readNextStartElement()) {
+        m_xmlReader.skipCurrentElement();
+        return;
+    }
+    if (m_xmlReader.name() == QStringLiteral("Modules")) {
         readModules();
+        m_xmlReader.skipCurrentElement();
+        return;
+    }
+    if (m_xmlReader.name() == QStringLiteral("Asn1Module")) {
+        readModule();
+        readModules();
+        return;
+    }
+
+    m_xmlReader.raiseError(QString("XML does not contain expected <%1> element")
+                                   .arg(QStringLiteral("Modules"), QStringLiteral("Asn1Module")));
     m_xmlReader.skipCurrentElement();
 }
 
 void AstXmlParser::readModules()
 {
-    while (nextRequiredElementIs(QStringLiteral("Module")))
+    while (nextRequiredElementIs({ { "Module" }, { "Asn1Module" } }))
         readModule();
 }
 
@@ -92,6 +120,9 @@ void AstXmlParser::createNewModule()
 {
     const auto location = readLocationFromAttributes();
     m_currentModule = readNameAttribute();
+    if (m_currentModule.isEmpty()) {
+        m_currentModule = readIdAttribute();
+    }
     auto module = std::make_unique<Data::Definitions>(m_currentModule, location);
     m_currentDefinitions = module.get();
     m_data[m_currentFile]->add(std::move(module));
@@ -232,6 +263,16 @@ bool AstXmlParser::nextRequiredElementIs(const QString &name)
     return false;
 }
 
+bool AstXmlParser::nextRequiredElementIs(const QStringList &names)
+{
+    if (!m_xmlReader.readNextStartElement())
+        return false;
+    if (names.contains(m_xmlReader.name().toString()))
+        return true;
+    m_xmlReader.raiseError(QString("XML does not contain expected <%1> element").arg(names.join(",")));
+    return false;
+}
+
 Data::SourceLocation AstXmlParser::readLocationFromAttributes()
 {
     return { m_currentFile, readLineAttribute(), readCharPossitionInLineAttribute() };
@@ -239,7 +280,7 @@ Data::SourceLocation AstXmlParser::readLocationFromAttributes()
 
 std::unique_ptr<Data::Types::Type> AstXmlParser::readType()
 {
-    if (!skipToChildElement(QStringLiteral("Asn1Type")))
+    if (!skipToChildElement({ { "Asn1Type" }, { "Type" } }))
         return {};
 
     const auto location = readLocationFromAttributes();
@@ -263,26 +304,44 @@ std::unique_ptr<Data::Types::Type> AstXmlParser::readTypeDetails(const Data::Sou
         return {};
 
     const auto name = m_xmlReader.name();
-    auto type = buildTypeFromName(location, name);
+    std::unique_ptr<Data::Types::Type> type = buildTypeFromName(location, name);
 
     if (isParametrized)
         m_xmlReader.skipCurrentElement();
     else
-        readTypeContents(name);
+        readTypeContents(type->name(), type.get());
 
     return type;
 }
 
-void AstXmlParser::readTypeContents(const QStringRef &name)
+void AstXmlParser::readTypeContents(const QString &name, Data::Types::Type *type)
 {
-    if (name == QStringLiteral("SEQUENCE"))
-        readSequence();
-    else if (name == QStringLiteral("SEQUENCE_OF"))
+    if (name == QStringLiteral("SEQUENCE")) {
+        if (m_xmlReader.name() == "SequenceType") {
+            readSequenceAsn(type);
+        } else {
+            readSequence();
+        }
+    } else if (name == QStringLiteral("SEQUENCE OF")) {
+        parseRange<qlonglong>(*type);
         readSequenceOf();
-    else if (name == QStringLiteral("CHOICE"))
-        readChoice();
-    else
+    } else if (name == QStringLiteral("CHOICE")) {
+        if (m_xmlReader.name() == "ChoiceType") {
+            readChoiceAsn(type);
+        } else {
+            readChoice();
+        }
+    } else if (name == QStringLiteral("INTEGER") || name == QStringLiteral("NumericString")) {
+        parseRange<qlonglong>(*type);
         m_xmlReader.skipCurrentElement();
+    } else if (name == QStringLiteral("REAL")) {
+        parseRange<double>(*type);
+        m_xmlReader.skipCurrentElement();
+    } else if (name == QStringLiteral("ENUMERATED")) {
+        parseEnumeration(*type);
+    } else {
+        m_xmlReader.skipCurrentElement();
+    }
 }
 
 std::unique_ptr<Data::Types::Type> AstXmlParser::buildTypeFromName(
@@ -313,10 +372,36 @@ void AstXmlParser::readSequence()
     }
 }
 
+void AstXmlParser::readSequenceAsn(Data::Types::Type *type)
+{
+    auto sequence = dynamic_cast<Data::Types::Sequence *>(type);
+    if (!sequence) {
+        return;
+    }
+
+    while (skipToChildElement(QStringLiteral("SequenceOrSetChild"))) {
+        auto sequenceType = readType();
+        sequence->m_sequence.append(sequenceType.release());
+        m_xmlReader.skipCurrentElement();
+    }
+}
+
 bool AstXmlParser::skipToChildElement(const QString &name)
 {
     while (m_xmlReader.readNextStartElement()) {
         if (m_xmlReader.name() == name)
+            return true;
+        else
+            m_xmlReader.skipCurrentElement();
+    }
+
+    return false;
+}
+
+bool AstXmlParser::skipToChildElement(const QStringList &names)
+{
+    while (m_xmlReader.readNextStartElement()) {
+        if (names.contains(m_xmlReader.name().toString()))
             return true;
         else
             m_xmlReader.skipCurrentElement();
@@ -337,4 +422,64 @@ void AstXmlParser::readChoice()
         readType();
         m_xmlReader.skipCurrentElement();
     }
+}
+
+void AstXmlParser::readChoiceAsn(Data::Types::Type *type)
+{
+    auto choice = dynamic_cast<Data::Types::Choice *>(type);
+    if (!choice) {
+        return;
+    }
+
+    while (skipToChildElement(QStringLiteral("ChoiceChild"))) {
+        auto choiceType = readType();
+        choice->m_choices.append(choiceType.release());
+        m_xmlReader.skipCurrentElement();
+    }
+}
+
+template<typename T>
+void AstXmlParser::parseRange(Data::Types::Type &type)
+{
+    QXmlStreamAttributes attributes = m_xmlReader.attributes();
+
+    auto parseAttribute = [&](const QString &attrName, const QString &mapName) {
+        if (attributes.hasAttribute(attrName)) {
+            bool ok;
+            const QString valueText = attributes.value(attrName).toString();
+            if (std::is_same<T, qlonglong>::value) {
+                qlonglong valueInt = valueText.toLongLong(&ok);
+                if (ok && !type.m_values.contains(mapName))
+                    type.m_values[mapName] = valueInt;
+            } else {
+                double valueDouble = valueText.toDouble(&ok);
+                if (ok && !type.m_values.contains(mapName))
+                    type.m_values[mapName] = static_cast<T>(valueDouble);
+            }
+        }
+    };
+
+    parseAttribute("Min", ASN1_MIN);
+    parseAttribute("Max", ASN1_MAX);
+}
+
+void AstXmlParser::parseEnumeration(Data::Types::Type &type)
+{
+    m_xmlReader.readNextStartElement();
+    if (m_xmlReader.name() == "EnumValues") {
+        QStringList values;
+        m_xmlReader.readNextStartElement();
+        while (m_xmlReader.name() == "EnumValue") {
+            const QString value = m_xmlReader.attributes().value("StringValue").toString();
+            if (!value.isEmpty()) {
+                values.append(value);
+            }
+            m_xmlReader.readNextStartElement();
+        }
+        type.m_values[ASN1_VALUES] = values;
+        m_xmlReader.skipCurrentElement();
+    }
+}
+
+}
 }

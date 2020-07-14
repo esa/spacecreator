@@ -27,6 +27,8 @@
 #include "file.h"
 
 #include <QString>
+#include <QStringList>
+#include <QVariantMap>
 #include <QXmlStreamReader>
 #include <memory>
 
@@ -77,16 +79,24 @@ private:
     std::unique_ptr<Data::Types::Type> readReferenceType(const Data::SourceLocation &location);
     std::unique_ptr<Data::Types::Type> buildTypeFromName(const Data::SourceLocation &location, const QStringRef &name);
 
-    void readTypeContents(const QStringRef &name);
+    void readTypeContents(const QString &name, Data::Types::Type *type);
     void readSequence();
+    void readSequenceAsn(Data::Types::Type *type);
     void readSequenceOf();
     void readChoice();
+    void readChoiceAsn(Data::Types::Type *type);
 
     QString readTypeAssignmentAttribute();
     QString readModuleAttribute();
 
+    template<typename T>
+    void parseRange(Data::Types::Type &type);
+    void parseEnumeration(Data::Types::Type &type);
+
     bool nextRequiredElementIs(const QString &name);
+    bool nextRequiredElementIs(const QStringList &names);
     bool skipToChildElement(const QString &name);
+    bool skipToChildElement(const QStringList &names);
 
     QXmlStreamReader &m_xmlReader;
     std::map<QString, std::unique_ptr<Data::File>> m_data;

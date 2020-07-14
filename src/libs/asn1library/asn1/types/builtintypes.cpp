@@ -29,16 +29,16 @@ using namespace Asn1Acn::Internal::Data::Types;
 
 std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
 {
-    if (name == QStringLiteral("BOOLEAN"))
+    if (name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive))
         return std::make_unique<Boolean>();
 
     if (name == QStringLiteral("NULL"))
         return std::make_unique<Null>();
 
-    if (name == QStringLiteral("INTEGER"))
+    if (name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive))
         return std::make_unique<Integer>();
 
-    if (name == QStringLiteral("REAL"))
+    if (name.startsWith(QStringLiteral("real"), Qt::CaseInsensitive))
         return std::make_unique<Real>();
 
     if (name == QStringLiteral("BIT_STRING"))
@@ -53,13 +53,13 @@ std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
     if (name == QStringLiteral("NumericString"))
         return std::make_unique<NumericString>();
 
-    if (name == QStringLiteral("ENUMERATED"))
+    if (name.startsWith(QStringLiteral("enumerated"), Qt::CaseInsensitive))
         return std::make_unique<Enumerated>();
 
-    if (name == QStringLiteral("CHOICE"))
+    if (name.startsWith(QStringLiteral("choice"), Qt::CaseInsensitive))
         return std::make_unique<Choice>();
 
-    if (name == QStringLiteral("SEQUENCE"))
+    if (name == QStringLiteral("SEQUENCE") || name == QStringLiteral("SequenceType"))
         return std::make_unique<Sequence>();
 
     if (name == QStringLiteral("SEQUENCE_OF"))
