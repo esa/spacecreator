@@ -67,6 +67,7 @@ StreamingWindow::StreamingWindow(msc::MSCPlugin *plugin, QWidget *parent)
     , d(new StreamingWindowPrivate(plugin))
 {
     d->ui->setupUi(this);
+    d->m_plugin->showToolbars(false);
     d->m_plugin->setViews(nullptr, d->ui->graphicsView, nullptr);
     d->m_plugin->initChartTools();
 
