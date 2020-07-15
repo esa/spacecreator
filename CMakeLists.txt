@@ -89,6 +89,9 @@ endif()
 
 # Installer data
 if(UNIX)
+# install grantlee
+install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
+
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")
 set (CPACK_PACKAGE_HOMEPAGE_URL "https://taste.tools/")
