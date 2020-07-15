@@ -37,6 +37,7 @@
 #include "mscinstance.h"
 #include "msctimer.h"
 #include "timeritem.h"
+#include "ui/graphicsscenebase.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -89,7 +90,7 @@ private:
 struct ChartLayoutManagerPrivate {
     ChartLayoutManagerPrivate() { }
 
-    QGraphicsScene m_scene;
+    shared::ui::GraphicsSceneBase m_scene;
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
     QVector<msc::InstanceItem *> m_instanceItemsSorted;
     QHash<QUuid, msc::InteractiveObject *> m_instanceEventItems;
@@ -312,8 +313,13 @@ MessageItem *ChartLayoutManager::fillMessageItem(
 
 void ChartLayoutManager::updateLayout()
 {
-    if (d->m_layoutDirty)
+    if (d->m_scene.mousePressed()) {
+        return; // Don't trigger re-layouts while the user interacts with the scene
+    }
+
+    if (d->m_layoutDirty) {
         return;
+    }
 
     d->m_layoutDirty = true;
     QMetaObject::invokeMethod(this, "doLayout", Qt::QueuedConnection);

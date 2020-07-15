@@ -10,6 +10,8 @@ target_sources(${LIB_NAME} PRIVATE
     reports/bugreporthandler.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
+    ui/graphicsscenebase.cpp
+    ui/graphicsscenebase.h
     ui/graphicsviewbase.cpp
     ui/graphicsviewbase.h
     ui/grippoint.cpp
