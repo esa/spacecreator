@@ -25,6 +25,7 @@
 #include "messageitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
+#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -64,6 +65,8 @@ private Q_SLOTS:
     void testInstanceCifExtendedChartWidth();
     void testAddTwoMessages();
     void testMaxVisibleItems();
+
+    void testCreateSetsInstanceY();
 
     void testShiftVertialIfNeeded();
 
@@ -428,6 +431,44 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     const int msg3YScrolled = msgItem3->sceneBoundingRect().top();
     QCOMPARE(msg2YScrolled, msg1Y); // Now message 2 is at the former position of message 1
     QCOMPARE(msg3YScrolled, msg2Y); // Message 3 is now at position of message 2
+}
+
+void tst_ChartLayoutManager::testCreateSetsInstanceY()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                                  action 'foo';\
+                              endinstance;\
+                              instance Instance_2;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+
+    parseMsc(mscText);
+
+    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    msc::MscChart *chart = m_chartModel->currentChart();
+
+    msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
+    msc::MscInstance *instance1 = instanceItem1->modelItem();
+    msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
+    msc::MscInstance *instance2 = instanceItem2->modelItem();
+
+    const QRectF inst2Rect = instanceItem2->sceneBoundingRect();
+
+    // now add a create for the second instance
+    msc::MscCreate *create = new msc::MscCreate(chart);
+    create->setSourceInstance(instance1);
+    create->setTargetInstance(instance2);
+    chart->addInstanceEvent(create);
+
+    QApplication::processEvents(); // Perform layout update
+
+    const QRectF newInst2Rect = instanceItem2->sceneBoundingRect();
+    QVERIFY(newInst2Rect.y() > inst2Rect.y()); // the instance got shifted down
 }
 
 void tst_ChartLayoutManager::testShiftVertialIfNeeded()

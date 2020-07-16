@@ -271,7 +271,7 @@ MessageItem *ChartLayoutManager::fillMessageItem(
 
         storeEntityItem(item);
 
-        if (isCreateMsg && !targetItem->geometryManagedByCif()) {
+        if (isCreateMsg) {
             QLineF axisLine(targetItem->axis());
             axisLine.setP1({ axisLine.x1(), newY });
 
