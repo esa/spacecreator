@@ -164,8 +164,6 @@ target_sources(${LIB_NAME} PRIVATE
     tools/coregioncreatortool.h
     tools/entitydeletetool.cpp
     tools/entitydeletetool.h
-    tools/hierarchycreatortool.cpp
-    tools/hierarchycreatortool.h
     tools/instancecreatortool.cpp
     tools/instancecreatortool.h
     tools/instancestoptool.cpp

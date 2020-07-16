@@ -219,6 +219,8 @@ MscDocument *HierarchyViewModel::selectedDocument() const
  */
 void HierarchyViewModel::updateModel()
 {
+    msc::MscDocument *selected = selectedDocument();
+
     d->clear();
 
     if (d->model != nullptr) {
@@ -238,12 +240,16 @@ void HierarchyViewModel::updateModel()
             QObject::connect(item->document(), &MscDocument::nameChanged, this, &HierarchyViewModel::updateModel,
                     Qt::UniqueConnection);
             QObject::connect(item->document(), &MscDocument::hierarchyTypeChanged, this,
-                    &HierarchyViewModel::updateModel, Qt::UniqueConnection);
+                    &HierarchyViewModel::onTypeChanged, Qt::UniqueConnection);
 
             QObject::connect(
                     item, &DocumentItem::moved, this, &HierarchyViewModel::documentMoved, Qt::UniqueConnection);
             QObject::connect(item, &DocumentItem::positionChanged, this, &HierarchyViewModel::documentPositionChanged,
                     Qt::UniqueConnection);
+
+            if (item->document() == selected) {
+                item->setSelected(true);
+            }
         }
     }
 }
@@ -293,6 +299,14 @@ void HierarchyViewModel::documentPositionChanged(const QPointF &position)
                         ? DocumentItem::StateChildEnable
                         : DocumentItem::StateChildDisable);
     }
+}
+
+void HierarchyViewModel::onTypeChanged(MscDocument::HierarchyType type)
+{
+    auto document = qobject_cast<msc::MscDocument *>(sender());
+    Q_EMIT hierarchyTypeChanged(document, type);
+
+    updateModel();
 }
 
 DocumentItem *HierarchyViewModel::nearestDocumentItem(const DocumentItem *documentItem, const QPointF &position)

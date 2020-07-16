@@ -344,19 +344,6 @@ void MainWindow::showSelection(const QModelIndex &current, const QModelIndex &pr
         showHierarchyView(true);
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            bool canNewChild = true;
-            if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf)
-                canNewChild = false;
-            if (document->documents().size() > 0
-                    && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
-                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
-                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
-                canNewChild = false;
-            }
-            for (auto action : d->m_plugin->hierarchyToolBar()->actions()) {
-                action->setEnabled(canNewChild);
-            }
-
             d->m_plugin->mainModel()->setSelectedDocument(document);
             d->m_plugin->actionPaste()->setEnabled(
                     QApplication::clipboard()->mimeData()->hasFormat(MainModel::MscChartMimeType)

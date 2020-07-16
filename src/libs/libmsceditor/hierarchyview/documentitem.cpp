@@ -277,6 +277,7 @@ void msc::DocumentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void msc::DocumentItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    event->accept();
     if (event->button() == Qt::LeftButton) {
         if (auto parent = dynamic_cast<DocumentItem *>(parentItem())) {
             parent->d->disablePaint = true;
@@ -284,10 +285,10 @@ void msc::DocumentItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         d->scenePos = event->scenePos();
 
-        event->accept();
         Q_EMIT clicked(d->document.data());
-    } else
-        event->ignore();
+    } else {
+        QGraphicsObject::mousePressEvent(event);
+    }
 }
 
 void msc::DocumentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

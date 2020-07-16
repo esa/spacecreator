@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "mscdocument.h"
+
 #include <QObject>
 #include <memory>
 
@@ -25,7 +27,6 @@ class QGraphicsScene;
 namespace msc {
 
 class DocumentItem;
-class MscDocument;
 class MscModel;
 
 class HierarchyViewModel : public QObject
@@ -45,6 +46,7 @@ public:
 Q_SIGNALS:
     void documentDoubleClicked(msc::MscDocument *document);
     void selectedDocumentChanged(msc::MscDocument *document);
+    void hierarchyTypeChanged(msc::MscDocument *document, msc::MscDocument::HierarchyType type);
 
 public Q_SLOTS:
     void updateModel();
@@ -53,6 +55,7 @@ private Q_SLOTS:
     void modelDeleted();
     void documentMoved(const msc::DocumentItem *documentItem, const QPointF &point);
     void documentPositionChanged(const QPointF &position);
+    void onTypeChanged(msc::MscDocument::HierarchyType type);
 
 private:
     class HierarchyViewModelPrivate;

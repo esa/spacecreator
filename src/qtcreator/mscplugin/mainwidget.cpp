@@ -189,19 +189,6 @@ void MainWidget::showSelection(const QModelIndex &current, const QModelIndex &pr
         m_plugin->showHierarchyView(true);
 
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
-            bool canNewChild = true;
-            if (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyLeaf)
-                canNewChild = false;
-            if (document->documents().size() > 0
-                    && (document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyRepeat
-                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyIs
-                            || document->hierarchyType() == msc::MscDocument::HierarchyType::HierarchyException)) {
-                canNewChild = false;
-            }
-            for (QAction *action : m_plugin->hierarchyActions()) {
-                action->setEnabled(canNewChild);
-            }
-
             m_plugin->mainModel()->setSelectedDocument(document);
         }
     }

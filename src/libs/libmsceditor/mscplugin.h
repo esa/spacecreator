@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mscdocument.h"
 #include "plugin.h"
 
 #include <QVector>
@@ -96,6 +97,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void updateMscToolbarActionsChecked();
+    void updateHierarchyActions();
+    void addDocument(msc::MscDocument::HierarchyType type);
 
 private:
     std::unique_ptr<msc::MainModel> m_model;
@@ -134,7 +137,7 @@ private:
     msc::TimerCreatorTool *m_stopTimerCreateTool = nullptr;
     msc::TimerCreatorTool *m_timeoutTimerCreateTool = nullptr;
 
-    QVector<msc::BaseTool *> m_hierarchyTools;
+    QVector<QAction *> m_hierarchyActions;
 
     bool m_toolbarsVisible = true;
 };

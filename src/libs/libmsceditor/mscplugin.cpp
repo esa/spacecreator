@@ -3,6 +3,7 @@
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "graphicsview.h"
+#include "hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "mainwindow.h"
 #include "mscdocument.h"
@@ -12,7 +13,6 @@
 #include "tools/conditioncreatortool.h"
 #include "tools/coregioncreatortool.h"
 #include "tools/entitydeletetool.h"
-#include "tools/hierarchycreatortool.h"
 #include "tools/instancecreatortool.h"
 #include "tools/instancestoptool.h"
 #include "tools/messagecreatortool.h"
@@ -186,50 +186,33 @@ void MSCPlugin::initHierarchyViewActions()
 {
     Q_ASSERT(m_hierarchyView != nullptr);
 
-    auto addAction = [&](msc::MscDocument::HierarchyType type) {
-        // create tool
-        auto tool = new msc::HierarchyCreatorTool(type, &(m_model->hierarchyViewModel()), nullptr, this);
-        QAction *action = new QAction(tool->title(), tool);
+    auto addAction = [&](msc::MscDocument::HierarchyType type, const QString &title, const QPixmap &icon) {
+        QAction *action = new QAction(title, this);
         action->setProperty(HIERARCHY_TYPE_TAG, type);
-        action->setCheckable(true);
-        action->setIcon(tool->icon());
-        action->setToolTip(tr("%1: %2").arg(tool->title(), tool->description()));
+        action->setIcon(icon);
+        action->setToolTip(title);
         action->setEnabled(m_viewMode == ViewMode::HIERARCHY);
-        tool->setAction(action);
-        tool->setView(m_hierarchyView);
         if (m_hierarchyToolBar) {
             m_hierarchyToolBar->addAction(action);
         }
 
-        m_hierarchyTools.append(tool);
+        m_hierarchyActions.append(action);
 
-        connect(tool, &msc::HierarchyCreatorTool::documentCreated, this, [&](msc::MscDocument *document) {
-            activateDefaultTool();
-            m_model->setSelectedDocument(document);
-        });
-
-        connect(action, &QAction::toggled, this, [&](bool on) {
-            auto htool = qobject_cast<msc::HierarchyCreatorTool *>(sender()->parent());
-            if (!htool) {
-                qWarning() << "Can't get action's creator tool";
-                return;
-            }
-            htool->setActive(on);
-            for (QAction *action : hierarchyActions()) {
-                if (action != sender()) {
-                    action->setChecked(false);
-                }
-            }
+        connect(action, &QAction::triggered, this, [&]() {
+            msc::MscDocument::HierarchyType type =
+                    sender()->property(HIERARCHY_TYPE_TAG).value<msc::MscDocument::HierarchyType>();
+            addDocument(type);
         });
     };
 
-    addAction(msc::MscDocument::HierarchyAnd);
-    addAction(msc::MscDocument::HierarchyOr);
-    addAction(msc::MscDocument::HierarchyParallel);
-    addAction(msc::MscDocument::HierarchyIs);
-    addAction(msc::MscDocument::HierarchyRepeat);
-    addAction(msc::MscDocument::HierarchyException);
-    addAction(msc::MscDocument::HierarchyLeaf);
+    addAction(msc::MscDocument::HierarchyAnd, tr("Hierarchy And"), QPixmap(":/icons/document_and.png"));
+    addAction(msc::MscDocument::HierarchyOr, tr("Hierarchy Or"), QPixmap(":/icons/document_or.png"));
+    addAction(msc::MscDocument::HierarchyParallel, tr("Hierarchy Parallel"), QPixmap(":/icons/document_parallel.png"));
+    addAction(msc::MscDocument::HierarchyIs, tr("Hierarchy Is"), QPixmap(":/icons/document_is_scenario.png"));
+    addAction(msc::MscDocument::HierarchyRepeat, tr("Hierarchy Repeat"), QPixmap(":/icons/document_repeat.png"));
+    addAction(
+            msc::MscDocument::HierarchyException, tr("Hierarchy Exception"), QPixmap(":/icons/document_exception.png"));
+    addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QPixmap(":/icons/document_leaf.png"));
 }
 
 void MSCPlugin::initConnections()
@@ -248,6 +231,12 @@ void MSCPlugin::initConnections()
             &MSCPlugin::selectCurrentChart);
 
     connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
+
+    connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::selectedDocumentChanged, this,
+            &msc::MSCPlugin::updateHierarchyActions);
+    connect(this, &msc::MSCPlugin::viewModeChanged, this, &msc::MSCPlugin::updateHierarchyActions);
+    connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::hierarchyTypeChanged, this,
+            &msc::MSCPlugin::updateHierarchyActions);
 }
 
 void MSCPlugin::addToolBars(QMainWindow *window)
@@ -347,12 +336,7 @@ QVector<QAction *> MSCPlugin::chartActions() const
 
 QVector<QAction *> MSCPlugin::hierarchyActions() const
 {
-    QVector<QAction *> actions;
-    actions.reserve(m_hierarchyTools.size());
-    for (msc::BaseTool *tool : m_hierarchyTools) {
-        actions.append(tool->action());
-    }
-    return actions;
+    return m_hierarchyActions;
 }
 
 QAction *MSCPlugin::createActionCopy(MainWindow *window)
@@ -560,6 +544,51 @@ void MSCPlugin::updateMscToolbarActionsChecked()
                     action->setChecked(false);
                 }
         }
+}
+
+/*!
+   Enables or disables the hierarchy actions, depending if a new document can be added or not
+ */
+void MSCPlugin::updateHierarchyActions()
+{
+    bool canAdd = true;
+    if (m_viewMode != ViewMode::HIERARCHY) {
+        canAdd = false;
+    }
+    MscDocument *parentDoc = m_model->selectedDocument();
+    if (!parentDoc || !parentDoc->isAddChildEnable()) {
+        canAdd = false;
+    }
+
+    for (QAction *action : m_hierarchyActions) {
+        action->setEnabled(canAdd);
+    }
+}
+
+/*!
+   Adds a MSC document if the hierarhy view is active and a "non-leafe" document is selected
+ */
+void MSCPlugin::addDocument(MscDocument::HierarchyType type)
+{
+    if (m_viewMode != ViewMode::HIERARCHY) {
+        return;
+    }
+    MscDocument *parentDoc = m_model->hierarchyViewModel().selectedDocument();
+    if (!parentDoc) {
+        return;
+    }
+    if (!parentDoc->isAddChildEnable()) {
+        return;
+    }
+
+    MscDocument *document = new MscDocument(QObject::tr("Document_%1").arg(parentDoc->documents().size()));
+    document->setHierarchyType(type);
+
+    const QVariantList &cmdParams = { QVariant::fromValue<msc::MscDocument *>(document),
+        QVariant::fromValue<msc::MscDocument *>(parentDoc) };
+    msc::cmd::CommandsStack::push(msc::cmd::Id::CreateDocument, cmdParams);
+
+    m_model->setSelectedDocument(document);
 }
 
 }
