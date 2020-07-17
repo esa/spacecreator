@@ -59,6 +59,15 @@ const QVector<MscInstance *> &MscChart::instances() const
     return m_instances;
 }
 
+/*!
+   Returns the index of the given \p instance in the list of instances
+   If the instance is not part of this chart, -1 is returned
+ */
+int MscChart::indexOfInstance(MscInstance *instance) const
+{
+    return m_instances.indexOf(instance);
+}
+
 QString MscChart::createUniqueInstanceName() const
 {
     QString instanceName;

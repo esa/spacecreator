@@ -843,28 +843,65 @@ void MscParserVisitor::addInstance(const QString &name)
 
 void MscParserVisitor::resetInstanceEvents()
 {
-    if (!m_instanceEvents.isEmpty()) {
-        m_instanceEventsList.append(m_instanceEvents);
-        m_instanceEvents.clear();
-    }
+    m_instanceEventsList.append(m_instanceEvents);
+    m_instanceEvents.clear();
 }
 
+/*!
+   Fixes the ordering of events
+Algorithm:
+- First fix create-messages, to be on the created instace-list as the first event
+- Loop through all instance event lists and check the first event, if it can be added
+  Adding it is possible if
+    + It has no dependencies to any other instance (action, single condition, timer, ...)
+    + The event is on top of the corresponding instance-list as well
+*/
 void MscParserVisitor::orderInstanceEvents()
 {
     m_cifBlocks.clear();
 
+    // Copy create messages on top of the created instance (event list) - so they are the same as messages
+    for (int i = 0; i < m_instanceEventsList.size(); ++i) {
+        const InstanceEvents &events = m_instanceEventsList[i];
+        for (MscInstanceEvent *event : events) {
+            if (event->entityType() == MscEntity::EntityType::Create) {
+                auto create = static_cast<MscCreate *>(event);
+                const int targetInstanceIdx = m_currentChart->indexOfInstance(create->targetInstance());
+                if (targetInstanceIdx != i && targetInstanceIdx >= 0) { // do not insert in current list
+                    m_instanceEventsList[targetInstanceIdx].prepend(create);
+                }
+            }
+        }
+    }
+
+    // Remove empty event lists
+    auto cleanupStacks = [&]() {
+        for (int i = m_instanceEventsList.size() - 1; i >= 0; --i) {
+            if (m_instanceEventsList[i].isEmpty()) {
+                m_instanceEventsList.remove(i);
+            }
+        }
+    };
+
+    cleanupStacks();
+
+    // Loop through, as long as events exist
     while (!m_instanceEventsList.isEmpty()) {
+        bool added = false;
         bool found = false;
 
         for (int i = 0; i < m_instanceEventsList.size(); ++i) {
-            // First, go through all the stacks and take away non-messages. This has to be done for
-            // every loop
+            // First, go through all the stacks and take away events without dependencies. (Messages, ... have
+            // dependencies).
+            // This has to be done for every loop
             for (int j = 0; j < m_instanceEventsList.size(); ++j) {
                 InstanceEvents &events = m_instanceEventsList[j];
                 while (!events.isEmpty() && events.first()->entityType() != MscEntity::EntityType::Message
+                        && events.first()->entityType() != MscEntity::EntityType::Create
                         && events.first()->entityType() != MscEntity::EntityType::Condition) {
                     // This is not a message, condition and timer move it to the chart
                     m_currentChart->addInstanceEvent(events.takeFirst());
+                    added = true;
                 }
             }
 
@@ -877,25 +914,28 @@ void MscParserVisitor::orderInstanceEvents()
             // annotate the first element of the list
             auto firstEvent = m_instanceEventsList[i][0];
 
+            // Returns, if the given event should be checked for a corresponding event in another instance
             auto checkEvent = [&](MscInstanceEvent *event) {
                 return (event->entityType() == MscEntity::EntityType::Message && event->name() == firstEvent->name())
+                        || (event->entityType() == MscEntity::EntityType::Create && event->name() == firstEvent->name())
                         || (event->entityType() == MscEntity::EntityType::Condition
                                 && event->name() == firstEvent->name()
                                 && static_cast<MscCondition *>(firstEvent)->shared()
                                 && static_cast<MscCondition *>(event)->shared());
             };
 
-            // look first elements of others list
+            // Look first elements of others list
             for (int j = i + 1; j < m_instanceEventsList.size(); ++j) {
                 if (std::count_if(m_instanceEventsList[j].begin(), m_instanceEventsList[j].end(), checkEvent)) {
                     bool isSame = false;
-                    if (firstEvent->entityType() == MscEntity::EntityType::Message)
+                    if (firstEvent->entityType() == MscEntity::EntityType::Message
+                            || firstEvent->entityType() == MscEntity::EntityType::Create) {
                         isSame = m_instanceEventsList[j][0]->internalId() == firstEvent->internalId();
-                    else
+                    } else {
                         isSame = m_instanceEventsList[j][0]->name() == firstEvent->name();
+                    }
                     if (isSame) {
                         m_instanceEventsList[j].removeFirst();
-
                         found = true;
                         break;
                     } else {
@@ -904,19 +944,25 @@ void MscParserVisitor::orderInstanceEvents()
                 }
             }
 
-            if (found || !inOther) {
+            const bool isCreateToAdd = firstEvent->entityType() == MscEntity::EntityType::Create
+                    && found; // Create has to be found in both
+            const bool isOtherEventToAdd =
+                    !(firstEvent->entityType() == MscEntity::EntityType::Create) && (found || !inOther);
+
+            // Dependency is met - add the message
+            if (isCreateToAdd || isOtherEventToAdd) {
                 m_instanceEventsList[i].removeFirst();
                 m_currentChart->addInstanceEvent(firstEvent);
+                added = true;
 
                 break;
             }
         }
 
-        // Remove all empty stacks
-        for (int i = m_instanceEventsList.size() - 1; i >= 0; --i) {
-            if (m_instanceEventsList[i].isEmpty()) {
-                m_instanceEventsList.remove(i);
-            }
+        cleanupStacks();
+
+        if (!added) {
+            throw ParserException("Deadlok in sorting the events - error ins the MSC file");
         }
     }
 

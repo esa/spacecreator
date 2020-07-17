@@ -62,6 +62,8 @@ private Q_SLOTS:
     void testSortedMessage();
     void testSortedMessageTwoCharts();
     void testSortedInstanceEvents();
+    void testSortedMessageCreate();
+    void testSortingDeadlock();
 
     void testMessageCreateInstance();
 
@@ -684,6 +686,88 @@ void tst_MscEventsParsing::testSortedInstanceEvents()
     QCOMPARE(timer->name(), QString("T1"));
 
     delete model;
+}
+
+void tst_MscEventsParsing::testSortedMessageCreate()
+{
+    QString msc = "msc Untitled;\
+    instance Instance_B;\
+      out BA_3 to Instance_A;\
+      in AB_4 from Instance_A;\
+      create NEW_INSTANCE;\
+      out BC_6 to Instance_C;\
+      out BN_7 to NEW_INSTANCE;\
+      in NB_8 from NEW_INSTANCE;\
+      create NEW_INSTANCE2;\
+      out BN2_9 to NEW_INSTANCE2;\
+      in NB2_10 from NEW_INSTANCE2;\
+    endinstance;\
+    instance NEW_INSTANCE2;\
+      in BN2_9 from Instance_B;\
+      out NB2_10 to Instance_B;\
+    endinstance;\
+    instance Instance_C;\
+      out CA_1 to Instance_A;\
+      in AC_2 from Instance_A;\
+      in BC_6 from Instance_B;\
+    stop;\
+    instance NEW_INSTANCE;\
+      out NA_5 to Instance_A;\
+      in BN_7 from Instance_B;\
+      out NB_8 to Instance_B;\
+    stop;\
+    instance Instance_A;\
+      in CA_1 from Instance_C;\
+      out AC_2 to Instance_C;\
+      in BA_3 from Instance_B;\
+      out AB_4 to Instance_B;\
+      in NA_5 from NEW_INSTANCE;\
+    endinstance;\
+    endmsc;";
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 5);
+    QCOMPARE(chart->instanceEvents().size(), 12);
+    QCOMPARE(chart->instanceEvents().at(0)->name(), QString("CA_1"));
+    QCOMPARE(chart->instanceEvents().at(1)->name(), QString("AC_2"));
+    QCOMPARE(chart->instanceEvents().at(2)->name(), QString("BA_3"));
+    QCOMPARE(chart->instanceEvents().at(3)->name(), QString("AB_4"));
+    QVERIFY(chart->instanceEvents().at(4)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->instanceEvents().at(5)->name(), QString("BC_6")); // "NA_5" would be valid as well
+    QCOMPARE(chart->instanceEvents().at(6)->name(), QString("NA_5"));
+    QCOMPARE(chart->instanceEvents().at(7)->name(), QString("BN_7"));
+    QCOMPARE(chart->instanceEvents().at(8)->name(), QString("NB_8"));
+    QVERIFY(chart->instanceEvents().at(9)->entityType() == msc::MscEntity::EntityType::Create);
+    QCOMPARE(chart->instanceEvents().at(10)->name(), QString("BN2_9"));
+    QCOMPARE(chart->instanceEvents().at(11)->name(), QString("NB2_10"));
+}
+
+void tst_MscEventsParsing::testSortingDeadlock()
+{
+    QString msc = "msc Untitled;\
+    instance Instance_A;\
+      out AB_1 from Instance_B;\
+      in BA_2 to Instance_B;\
+    endinstance;\
+    instance Instance_B;\
+      out BA_2 to Instance_A;\
+      in AB_1 from Instance_A;\
+    endinstance;\
+    endmsc;";
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
+
+    msc = "msc Untitled;\
+    instance Instance_A;\
+      create Instance_B;\
+    endinstance;\
+    instance Instance_B;\
+      create Instance_A;\
+    endinstance;\
+    endmsc;";
+    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
 void tst_MscEventsParsing::testMessageCreateInstance()
