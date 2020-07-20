@@ -15,20 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "chartlayoutmanager.h"
 #include "chartviewtestbase.h"
-#include "commands/common/commandsstack.h"
-#include "exceptions.h"
 #include "instanceitem.h"
-#include "mscchart.h"
-#include "mscdocument.h"
-#include "mscinstance.h"
-#include "mscmodel.h"
-#include "mscreader.h"
 #include "syntheticinteraction.h"
 
-#include <QGraphicsView>
-#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;

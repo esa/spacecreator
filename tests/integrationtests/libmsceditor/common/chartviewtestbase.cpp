@@ -70,6 +70,12 @@ void ChartViewTestBase::loadView(const QString &mscDoc)
     }
 }
 
+QPoint ChartViewTestBase::center(const QGraphicsItem *item) const
+{
+    const QRectF &r = item->sceneBoundingRect();
+    return m_view->mapFromScene(r.center());
+}
+
 QPoint ChartViewTestBase::topCenter(const QGraphicsItem *item) const
 {
     const QRectF &r = item->sceneBoundingRect();

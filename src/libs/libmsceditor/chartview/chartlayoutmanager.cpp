@@ -375,10 +375,11 @@ void ChartLayoutManager::addInstanceItems()
         item->setHighlightable(false);
 
         const bool geomByCif = item->geometryManagedByCif();
-        if (geomByCif)
+        if (geomByCif) {
             item->applyCif();
-        else
-            item->setInitialLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
+        } else {
+            item->setInitialXLocation(d->m_layoutInfo.m_pos, chartRect, d->interInstanceSpan());
+        }
         item->setDenominatorAndKind(instance->denominatorAndKind());
         item->setName(instance->name());
 
@@ -917,7 +918,7 @@ void ChartLayoutManager::actualizeInstancesHeights(qreal height) const
             updateCreatedInstanceHeight(instanceItem, height);
             updated = true;
         }
-        if (!updated && !instanceItem->geometryManagedByCif())
+        if (!updated)
             instanceItem->setAxisHeight(height);
     }
 }
@@ -1471,8 +1472,6 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
                     { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
-        } else {
-            updateLayout();
         }
     }
 
@@ -1485,8 +1484,6 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
                     { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
-        } else {
-            updateLayout();
         }
     }
 
@@ -1499,8 +1496,6 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
                     { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
                             QVariant::fromValue<MscInstance *>(newInstance),
                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
-        } else {
-            updateLayout();
         }
     }
 
@@ -1517,10 +1512,10 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
                             QVariant::fromValue<MscCoregion *>(coregionItem->end()), newIdxBegin, newIdxEnd,
                             QVariant::fromValue<MscInstance *>(newInstance),
                             QVariant::fromValue<MscChart *>(d->m_currentChart) });
-        } else {
-            updateLayout();
         }
     }
+
+    updateLayout();
 }
 
 void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &pos, MscMessage::EndType endType)

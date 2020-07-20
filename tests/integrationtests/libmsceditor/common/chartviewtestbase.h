@@ -40,6 +40,8 @@ protected:
     void cleanupBase();
 
     void loadView(const QString &mscDoc);
+
+    QPoint center(const QGraphicsItem *item) const;
     QPoint topCenter(const QGraphicsItem *item) const;
     QPoint bottomCenter(const QGraphicsItem *item) const;
     bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;

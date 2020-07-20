@@ -562,6 +562,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
             updateTarget(from, ObjectAnchor::Snap::SnapTo);
         updateCif();
         commitGeometryChange();
+        Q_EMIT moved(this);
         return;
     }
 
@@ -628,8 +629,11 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
                     QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
     cmd::CommandsStack::current()->endMacro();
 
-    if (auto item = m_chartLayoutManager->itemForComment(m_message->comment()))
+    if (auto item = m_chartLayoutManager->itemForComment(m_message->comment())) {
         item->instantLayoutUpdate();
+    }
+
+    Q_EMIT moved(this);
 }
 
 MessageItem *MessageItem::createDefaultItem(

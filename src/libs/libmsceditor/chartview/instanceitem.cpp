@@ -187,6 +187,10 @@ void InstanceItem::rebuildLayout()
     }
 }
 
+/**
+    Applies the x-position of the instance if it is stored in the CIF information.
+    The y-values are ignored
+ */
 void InstanceItem::applyCif()
 {
     if (const cif::CifBlockShared &cifBlock = cifBlockByType(mainCifType())) {
@@ -197,15 +201,13 @@ void InstanceItem::applyCif()
 
             const QPointF &textBoxTopLeft = scenePoints.at(0);
             const QPointF &textBoxSize = scenePoints.at(1);
-            const QPointF &axisHeight = scenePoints.at(2);
 
             m_headSymbol->setTextboxSize({ textBoxSize.x(), textBoxSize.y() });
             const QRectF currTextBox = m_headSymbol->textBoxSceneRect();
             const QPointF shift = textBoxTopLeft - currTextBox.topLeft();
             // TODO: should we check for overlap here?
-            moveBy(shift.x(), shift.y());
+            moveBy(shift.x(), 0.0); // Only apply the horizontal value
 
-            m_axisHeight = axisHeight.y();
             rebuildLayout();
         }
     }
@@ -251,10 +253,10 @@ void InstanceItem::setGeometry(const QRectF &geometry)
 InstanceItem *InstanceItem::createDefaultItem(
         ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
 {
-    InstanceItem *messageItem = new InstanceItem(instance, model, chart);
-    messageItem->setPos(pos);
+    InstanceItem *instanceItem = new InstanceItem(instance, model, chart);
+    instanceItem->setPos(pos);
 
-    return messageItem;
+    return instanceItem;
 }
 
 QPair<QPointF, bool> InstanceItem::commentPoint() const
@@ -472,7 +474,7 @@ QVariantList InstanceItem::prepareChangePositionCommand() const
     return params;
 }
 
-void InstanceItem::setInitialLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan)
+void InstanceItem::setInitialXLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan)
 {
     const bool isFirstInstance = m_chart->instances().size() && m_chart->instances().first() == modelItem();
     const qreal targetX = isFirstInstance ? chartRect.left() : (requested.x() + horSpan);

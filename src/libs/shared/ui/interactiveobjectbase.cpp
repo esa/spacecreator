@@ -60,8 +60,13 @@ QRectF InteractiveObjectBase::boundingRect() const
 
 void InteractiveObjectBase::setBoundingRect(const QRectF newRect)
 {
+    if (newRect == d->boundingRect) {
+        return;
+    }
+
     d->boundingRect = newRect;
     updateGripPoints();
+    Q_EMIT boundingBoxChanged();
 }
 
 GripPointsHandler *InteractiveObjectBase::gripPointsHandler()

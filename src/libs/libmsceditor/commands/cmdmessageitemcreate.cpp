@@ -85,7 +85,7 @@ void CmdMessageItemCreate::undo()
 {
     Q_ASSERT(m_chart.data());
 
-    auto resotreInstanceGeometry = [this](MscInstance *instance, const InstanceGeometry &geometry) {
+    auto restoreInstanceGeometry = [this](MscInstance *instance, const InstanceGeometry &geometry) {
         if (!instance || !m_viewModel)
             return;
 
@@ -101,8 +101,8 @@ void CmdMessageItemCreate::undo()
         }
     };
 
-    resotreInstanceGeometry(m_message->sourceInstance(), m_sourceGeometryPrev);
-    resotreInstanceGeometry(m_message->targetInstance(), m_targetGeometryPrev);
+    restoreInstanceGeometry(m_message->sourceInstance(), m_sourceGeometryPrev);
+    restoreInstanceGeometry(m_message->targetInstance(), m_targetGeometryPrev);
 
     m_chart->removeInstanceEvent(m_message);
 

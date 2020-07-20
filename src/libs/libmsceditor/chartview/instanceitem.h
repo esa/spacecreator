@@ -40,13 +40,19 @@ class InstanceEndItem;
 class MessageItem;
 class TextItem;
 
+/*!
+   \brief The InstanceItem class is the graphical representation of an MSC instance.
+
+   \note The CIF geometry (for user defined positions) only applies to the X. All the Y information is calulcated
+   automatically. As the user can only control the horizontal position.
+ */
 class InstanceItem : public InteractiveObject
 {
     Q_OBJECT
 
 public:
-    explicit InstanceItem(MscInstance *instance, ChartLayoutManager *chartLayoutManager = nullptr, MscChart *chart = nullptr,
-            QGraphicsItem *parent = nullptr);
+    explicit InstanceItem(MscInstance *instance, ChartLayoutManager *chartLayoutManager = nullptr,
+            MscChart *chart = nullptr, QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
 
@@ -72,7 +78,7 @@ public:
 
     QPointF avoidOverlaps(InstanceItem *caller, const QPointF &delta, const QRectF &shiftedRect) const;
 
-    void setInitialLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan);
+    void setInitialXLocation(const QPointF &requested, const QRectF &chartRect, qreal horSpan);
 
     QRectF kindBox() const;
 

@@ -38,8 +38,8 @@ void GraphicsSceneBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void GraphicsSceneBase::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsScene::mouseReleaseEvent(event);
     setMousePressed(false);
+    QGraphicsScene::mouseReleaseEvent(event);
 }
 
 void GraphicsSceneBase::setMousePressed(bool pressed)
