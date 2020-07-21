@@ -34,11 +34,11 @@ namespace TypesTreeVisitors {
 class IndexFindingVisitor : public OutlineVisitors::IndexFindingVisitor
 {
 public:
-    IndexFindingVisitor(const Data::Node *child);
+    IndexFindingVisitor(const Asn1Acn::Node *child);
     ~IndexFindingVisitor() override;
 
-    int valueFor(const Data::File &file) const override;
-    int valueFor(const Data::Project &project) const override;
+    int valueFor(const Asn1Acn::File &file) const override;
+    int valueFor(const Asn1Acn::Project &project) const override;
 };
 
 } // namespace TypesTreeVisitors

@@ -30,14 +30,13 @@
 #include <asn1/root.h>
 
 using namespace Asn1Acn::Internal::Completion;
-using namespace Asn1Acn::Internal::Data;
 
 ImportFindingVisitor::ImportFindingVisitor(const QString &module, const QString &import)
     : m_module(module)
     , m_import(import)
 {}
 
-Node *ImportFindingVisitor::valueFor(const Root &root) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     for (const auto &project : root.projects()) {
         const auto res = valueFor(*project);
@@ -47,7 +46,7 @@ Node *ImportFindingVisitor::valueFor(const Root &root) const
     return nullptr;
 }
 
-Node *ImportFindingVisitor::valueFor(const Definitions &defs) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     if (defs.name() != m_module)
         return nullptr;
@@ -60,7 +59,7 @@ bool ImportFindingVisitor::isValue() const
 }
 
 template<typename Collection>
-Node *ImportFindingVisitor::findImportByName(const Collection &col) const
+Asn1Acn::Node *ImportFindingVisitor::findImportByName(const Collection &col) const
 {
     for (const auto &element : col)
         if (element->name() == m_import)
@@ -68,25 +67,25 @@ Node *ImportFindingVisitor::findImportByName(const Collection &col) const
     return nullptr;
 }
 
-Node *ImportFindingVisitor::valueFor(const File &file) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     const auto defs = file.definitions(m_module);
     return defs == nullptr ? nullptr : valueFor(*defs);
 }
 
-Node *ImportFindingVisitor::valueFor(const TypeAssignment &type) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     Q_UNUSED(type);
     return nullptr;
 }
 
-Node *ImportFindingVisitor::valueFor(const ValueAssignment &value) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     Q_UNUSED(value);
     return nullptr;
 }
 
-Node *ImportFindingVisitor::valueFor(const Project &project) const
+Asn1Acn::Node *ImportFindingVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     for (const auto &file : project.files()) {
         const auto res = valueFor(*file);

@@ -46,8 +46,8 @@ public:
 
     virtual void run() = 0;
 
-    virtual std::vector<std::unique_ptr<Data::File>> takeDocuments() = 0;
-    virtual const std::vector<Data::ErrorMessage> &errorMessages() const = 0;
+    virtual std::vector<std::unique_ptr<Asn1Acn::File>> takeDocuments() = 0;
+    virtual const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const = 0;
 
 Q_SIGNALS:
     void finished();

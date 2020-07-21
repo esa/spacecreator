@@ -37,12 +37,11 @@ class SearchResultItem;
 } // namespace Core
 
 namespace Asn1Acn {
-namespace Internal {
 
-namespace Data {
 class TypeReference;
 class SourceLocation;
-} // namespace Data
+
+namespace Internal {
 
 class ParsedDataStorage;
 class SourceReader;
@@ -67,10 +66,10 @@ public:
 private:
     void searchAgain();
     void findAll(Core::SearchResult *search, const UsagesFinderParameters &params);
-    void createWatcher(const QFuture<Data::TypeReference> &future, Core::SearchResult *search);
-    QString readLine(const Data::SourceLocation &loc);
+    void createWatcher(const QFuture<Asn1Acn::TypeReference> &future, Core::SearchResult *search);
+    QString readLine(const Asn1Acn::SourceLocation &loc);
     void displayResults(Core::SearchResult *search,
-                        QFutureWatcher<Data::TypeReference> *watcher,
+                        QFutureWatcher<Asn1Acn::TypeReference> *watcher,
                         int first,
                         int last);
 

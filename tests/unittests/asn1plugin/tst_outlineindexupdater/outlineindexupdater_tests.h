@@ -58,13 +58,13 @@ private Q_SLOTS:
     void test_removeEditorAfterLineUpdate();
 
 private:
-    Data::Node *createModelNodes(const QString &filePath);
+    Asn1Acn::Node *createModelNodes(const QString &filePath);
     TextEditor::TextEditorWidget *createEditorWidget();
     ParsedDataStorage *createStorage();
 
     void verifySpyReceivedCorrectData(const QSignalSpy &spy);
 
-    Data::Node *m_data;
+    Asn1Acn::Node *m_data;
     Model *m_model;
     OutlineIndexUpdater *m_indexUpdater;
     TextEditor::TextEditorWidget *m_editorWidget;

@@ -24,18 +24,16 @@
 ****************************************************************************/
 #pragma once
 
-#include <map>
-#include <memory>
-#include <vector>
-
 #include "definitions.h"
 #include "errormessage.h"
 #include "node.h"
 #include "typereference.h"
 
+#include <map>
+#include <memory>
+#include <vector>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class File : public Node
 {
@@ -78,6 +76,4 @@ private:
     bool m_polluted;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

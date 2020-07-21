@@ -38,8 +38,8 @@ public:
     ~ChildReturningVisitor() override;
 
 private:
-    Data::Node *valueFor(const Data::File &file) const override;
-    Data::Node *valueFor(const Data::Project &project) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::File &file) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Project &project) const override;
 };
 
 } // namespace TypesTreeVisitors

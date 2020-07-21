@@ -61,7 +61,7 @@ void ParsedDocumentBuilderTests::test_failed()
     QCOMPARE(spyErrored.count(), 0);
     QCOMPARE(spyFinished.count(), 0);
 
-    std::vector<std::unique_ptr<Data::File>> parsedDocuments = builder->takeDocuments();
+    std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments = builder->takeDocuments();
     QVERIFY(parsedDocuments.size() == 0);
 
     delete builder;
@@ -93,7 +93,7 @@ void ParsedDocumentBuilderTests::test_error()
     QCOMPARE(errorMessages.at(0).location().line(), 8);
     QCOMPARE(errorMessages.at(0).location().column(), 13);
 
-    std::vector<std::unique_ptr<Data::File>> parsedDocuments = builder->takeDocuments();
+    std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments = builder->takeDocuments();
     QVERIFY(parsedDocuments.size() == 0);
 
     delete builder;
@@ -126,7 +126,7 @@ void ParsedDocumentBuilderTests::test_success()
     QCOMPARE(spyErrored.count(), 0);
     QCOMPARE(spyFinished.count(), 1);
 
-    std::vector<std::unique_ptr<Data::File>> parsedDocuments = builder->takeDocuments();
+    std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments = builder->takeDocuments();
     QCOMPARE(parsedDocuments.size(), static_cast<size_t>(1));
 
     delete builder;

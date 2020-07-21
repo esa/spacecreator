@@ -24,6 +24,6 @@
 ****************************************************************************/
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
-Visitor::~Visitor() {}
+Visitor::~Visitor() { }

@@ -234,7 +234,7 @@ void ParsedDataStorageTests::test_getFilesFromNonExistingProject()
 void ParsedDataStorageTests::addFileToProject(
         ParsedDataStorage *storage, const QString &project, const Utils::FileName &filePath)
 {
-    auto document = std::make_unique<Data::File>(filePath.toString());
+    auto document = std::make_unique<Asn1Acn::File>(filePath.toString());
     storage->addFileToProject(project, std::move(document));
 }
 

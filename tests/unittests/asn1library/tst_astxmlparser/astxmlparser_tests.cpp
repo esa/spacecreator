@@ -28,7 +28,7 @@
 
 #include <QtTest>
 
-using namespace Asn1Acn::Internal::Tests;
+using namespace Asn1Acn::Tests;
 
 AstXmlParserTests::AstXmlParserTests(QObject *parent)
     : QObject(parent)
@@ -718,12 +718,12 @@ void AstXmlParserTests::test_asn1AstParsing()
           R"(</ASN1AST>)");
 
     QVERIFY(m_parsedData.find("test.asn") != m_parsedData.end());
-    const Data::Definitions *definitions = m_parsedData["test.asn"]->definitions("ModuleTest");
+    const Asn1Acn::Definitions *definitions = m_parsedData["test.asn"]->definitions("ModuleTest");
     QVERIFY(definitions != nullptr);
 
     const auto int1 = definitions->type("MyInt");
     QCOMPARE(int1->type()->name(), QStringLiteral("INTEGER"));
-    auto intType1 = dynamic_cast<const Data::Types::Integer *>(int1->type());
+    auto intType1 = dynamic_cast<const Asn1Acn::Types::Integer *>(int1->type());
     QVERIFY(intType1->m_values.contains("min"));
     QCOMPARE(intType1->m_values["min"].toLongLong(), -5);
     QVERIFY(intType1->m_values.contains("max"));
@@ -731,7 +731,7 @@ void AstXmlParserTests::test_asn1AstParsing()
 
     const auto real1 = definitions->type("MyReal");
     QCOMPARE(real1->type()->name(), QStringLiteral("REAL"));
-    auto realType1 = dynamic_cast<const Data::Types::Real *>(real1->type());
+    auto realType1 = dynamic_cast<const Asn1Acn::Types::Real *>(real1->type());
     QVERIFY(realType1->m_values.contains("min"));
     QVERIFY(qFuzzyCompare(realType1->m_values["min"].toDouble(), 0.0));
     QVERIFY(realType1->m_values.contains("max"));
@@ -742,7 +742,7 @@ void AstXmlParserTests::test_asn1AstParsing()
 
     const auto enum1 = definitions->type("TypeEnumerated");
     QCOMPARE(enum1->type()->name(), QStringLiteral("ENUMERATED"));
-    auto enumType1 = dynamic_cast<const Data::Types::Enumerated *>(enum1->type());
+    auto enumType1 = dynamic_cast<const Asn1Acn::Types::Enumerated *>(enum1->type());
     QVERIFY(enumType1->m_values.contains("values"));
     QStringList values = enumType1->m_values["values"].toStringList();
     QCOMPARE(values.size(), 3);
@@ -752,21 +752,21 @@ void AstXmlParserTests::test_asn1AstParsing()
 
     const auto choice1 = definitions->type("MyChoice");
     QCOMPARE(choice1->type()->name(), QStringLiteral("CHOICE"));
-    auto choiceType1 = dynamic_cast<const Data::Types::Choice *>(choice1->type());
+    auto choiceType1 = dynamic_cast<const Asn1Acn::Types::Choice *>(choice1->type());
     QCOMPARE(choiceType1->m_choices.size(), 2);
     QCOMPARE(choiceType1->m_choices.at(0)->name(), QStringLiteral("BOOLEAN"));
     QCOMPARE(choiceType1->m_choices.at(1)->name(), QStringLiteral("REAL"));
 
     const auto sequence1 = definitions->type("MySeq");
     QCOMPARE(sequence1->type()->name(), QStringLiteral("SEQUENCE"));
-    auto sequenceType1 = dynamic_cast<const Data::Types::Sequence *>(sequence1->type());
+    auto sequenceType1 = dynamic_cast<const Asn1Acn::Types::Sequence *>(sequence1->type());
     QCOMPARE(sequenceType1->m_sequence.size(), 2);
     QCOMPARE(sequenceType1->m_sequence.at(0)->name(), QStringLiteral("BOOLEAN"));
     QCOMPARE(sequenceType1->m_sequence.at(1)->name(), QStringLiteral("INTEGER"));
 
     const auto int2 = definitions->type("T-UInt32");
     QCOMPARE(int2->type()->name(), QStringLiteral("INTEGER"));
-    auto intType2 = dynamic_cast<const Data::Types::Integer *>(int2->type());
+    auto intType2 = dynamic_cast<const Asn1Acn::Types::Integer *>(int2->type());
     QVERIFY(intType2->m_values.contains("min"));
     QCOMPARE(intType2->m_values["min"].toLongLong(), 0);
     QVERIFY(intType2->m_values.contains("max"));
@@ -783,7 +783,7 @@ void AstXmlParserTests::parsingFails(const QString &xmlData)
 void AstXmlParserTests::parse(const QString &xmlData)
 {
     setXmlData(xmlData);
-    AstXmlParser parser(m_xmlReader);
+    Asn1Acn::AstXmlParser parser(m_xmlReader);
     QVERIFY(parser.parse());
     m_parsedData = parser.takeData();
 }

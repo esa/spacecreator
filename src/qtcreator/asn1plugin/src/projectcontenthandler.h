@@ -75,14 +75,14 @@ private:
     void allProcessingFinished();
 
     void handleFilesProcesedWithSuccess(const QString &projectName,
-                                        std::vector<std::unique_ptr<Data::File>> parsedDocuments);
+                                        std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments);
 
     void handleFilesProcesedWithFailure(const QString &projectName,
-                                        std::vector<std::unique_ptr<Data::File>> parsedDocuments,
-                                        const std::vector<Data::ErrorMessage> &errorMessages);
+                                        std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments,
+                                        const std::vector<Asn1Acn::ErrorMessage> &errorMessages);
 
-    void refreshErrorMessages(Data::File *file,
-                              const std::vector<Data::ErrorMessage> &errorMessages);
+    void refreshErrorMessages(Asn1Acn::File *file,
+                              const std::vector<Asn1Acn::ErrorMessage> &errorMessages);
 
     ParsedDataStorage *m_storage;
     ModelValidityGuard *m_guard;

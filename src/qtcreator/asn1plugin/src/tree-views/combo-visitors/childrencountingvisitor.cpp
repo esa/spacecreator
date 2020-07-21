@@ -24,15 +24,11 @@
 ****************************************************************************/
 #include "childrencountingvisitor.h"
 
-#include <asn1/definitions.h>
 #include <asn1/file.h>
-#include <asn1/project.h>
-#include <asn1/root.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::ComboVisitors;
 
-int ChildrenCountingVisitor::valueFor(const File &file) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return file.valueFor<OutlineVisitors::ChildrenCountingVisitor>() + 1;
 }

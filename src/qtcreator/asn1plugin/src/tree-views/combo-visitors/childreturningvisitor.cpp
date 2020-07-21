@@ -29,14 +29,13 @@
 #include <asn1/types/labeltype.h>
 #include <asn1/types/type.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::ComboVisitors;
 
 ChildReturningVisitor::ChildReturningVisitor(int index)
     : OutlineVisitors::ChildReturningVisitor(index)
 {}
 
-Node *ChildReturningVisitor::valueFor(const File &file) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::File &file) const
 {
     // items are static to satisfy unit testing routines
     static TypeAssignment selectSymbol("<Select Symbol>",

@@ -25,13 +25,11 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <QHash>
 #include <QString>
-
 #include <documentprocessor.h>
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -48,8 +46,8 @@ public:
 
     void addToRun(const QString &filePath, const QString &docContent) override;
     void run() override;
-    std::vector<std::unique_ptr<Data::File>> takeResults() override;
-    const std::vector<Data::ErrorMessage> &errorMessages() const override;
+    std::vector<std::unique_ptr<Asn1Acn::File>> takeResults() override;
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const override;
 
     State state() override;
 
@@ -60,8 +58,8 @@ private:
     QString m_projectName;
 
     QHash<QString, QString> m_documents;
-    std::vector<std::unique_ptr<Data::File>> m_results;
-    std::vector<Data::ErrorMessage> m_errorMessages;
+    std::vector<std::unique_ptr<Asn1Acn::File>> m_results;
+    std::vector<Asn1Acn::ErrorMessage> m_errorMessages;
 };
 
 } // namespace Tests

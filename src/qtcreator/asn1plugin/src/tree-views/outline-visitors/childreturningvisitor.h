@@ -32,7 +32,7 @@ namespace Internal {
 namespace TreeViews {
 namespace OutlineVisitors {
 
-class ChildReturningVisitor : public Data::VisitorWithValue<Data::Node *>
+class ChildReturningVisitor : public Asn1Acn::VisitorWithValue<Asn1Acn::Node *>
 {
 public:
     ChildReturningVisitor(int index);
@@ -41,12 +41,12 @@ public:
     int index() const { return m_index; }
 
 private:
-    Data::Node *valueFor(const Data::Definitions &defs) const override;
-    Data::Node *valueFor(const Data::File &file) const override;
-    Data::Node *valueFor(const Data::TypeAssignment &type) const override;
-    Data::Node *valueFor(const Data::ValueAssignment &value) const override;
-    Data::Node *valueFor(const Data::Project &project) const override;
-    Data::Node *valueFor(const Data::Root &root) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Definitions &defs) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::File &file) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::TypeAssignment &type) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::ValueAssignment &value) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Project &project) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Root &root) const override;
 
     int m_index;
 };

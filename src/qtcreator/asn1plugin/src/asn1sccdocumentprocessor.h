@@ -56,8 +56,8 @@ public:
 
     void addToRun(const QString &filePath, const QString &docContent) override;
     void run() override;
-    std::vector<std::unique_ptr<Data::File>> takeResults() override;
-    const std::vector<Data::ErrorMessage> &errorMessages() const override;
+    std::vector<std::unique_ptr<Asn1Acn::File>> takeResults() override;
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const override;
 
     State state() override;
 
@@ -73,7 +73,7 @@ private:
     QHash<QString, QString> m_documents;
     QString m_projectName;
 
-    std::vector<std::unique_ptr<Data::File>> m_results;
+    std::vector<std::unique_ptr<Asn1Acn::File>> m_results;
     State m_state;
     int m_index;
 

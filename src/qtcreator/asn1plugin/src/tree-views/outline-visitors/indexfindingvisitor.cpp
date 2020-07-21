@@ -29,10 +29,9 @@
 #include <asn1/project.h>
 #include <asn1/root.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::OutlineVisitors;
 
-IndexFindingVisitor::IndexFindingVisitor(const Node *child)
+IndexFindingVisitor::IndexFindingVisitor(const Asn1Acn::Node *child)
     : m_child(child)
 {}
 
@@ -50,7 +49,7 @@ int IndexFindingVisitor::findIndexIn(const Collection &items) const
     return static_cast<int>(std::distance(std::begin(items), it));
 }
 
-int IndexFindingVisitor::valueFor(const Definitions &defs) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     const auto valueIdx = findIndexIn(defs.values());
     if (valueIdx != -1)
@@ -58,28 +57,28 @@ int IndexFindingVisitor::valueFor(const Definitions &defs) const
     return findIndexIn(defs.types());
 }
 
-int IndexFindingVisitor::valueFor(const File &file) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return findIndexIn(file.definitionsList());
 }
 
-int IndexFindingVisitor::valueFor(const Project &project) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return findIndexIn(project.files());
 }
 
-int IndexFindingVisitor::valueFor(const Root &root) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     return findIndexIn(root.projects());
 }
 
-int IndexFindingVisitor::valueFor(const TypeAssignment &type) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     Q_UNUSED(type);
     return -1;
 }
 
-int IndexFindingVisitor::valueFor(const ValueAssignment &value) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     Q_UNUSED(value);
     return -1;

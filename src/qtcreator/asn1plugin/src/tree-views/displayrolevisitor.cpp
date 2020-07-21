@@ -31,36 +31,35 @@
 #include <asn1/valueassignment.h>
 
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 
 DisplayRoleVisitor::~DisplayRoleVisitor() {}
 
-QString DisplayRoleVisitor::valueFor(const Definitions &defs) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     return defs.name();
 }
 
-QString DisplayRoleVisitor::valueFor(const File &file) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return file.location().path();
 }
 
-QString DisplayRoleVisitor::valueFor(const TypeAssignment &type) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     return type.name() + type.type()->label();
 }
 
-QString DisplayRoleVisitor::valueFor(const ValueAssignment &value) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     return value.name() + value.type()->label();
 }
 
-QString DisplayRoleVisitor::valueFor(const Project &project) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return project.name();
 }
 
-QString DisplayRoleVisitor::valueFor(const Root &root) const
+QString DisplayRoleVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     Q_UNUSED(root);
     return {};

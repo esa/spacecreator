@@ -33,7 +33,6 @@
 #include <memory>
 
 namespace Asn1Acn {
-namespace Internal {
 
 class AstXmlParser
 {
@@ -42,7 +41,7 @@ public:
 
     bool parse();
 
-    std::map<QString, std::unique_ptr<Data::File>> takeData() { return std::move(m_data); }
+    std::map<QString, std::unique_ptr<File>> takeData() { return std::move(m_data); }
 
 private:
     void readAstRoot();
@@ -72,26 +71,26 @@ private:
     void readImportedTypes(const QString &moduleName);
     void readImportedType(const QString &moduleName);
 
-    Data::SourceLocation readLocationFromAttributes();
+    SourceLocation readLocationFromAttributes();
 
-    std::unique_ptr<Data::Types::Type> readType();
-    std::unique_ptr<Data::Types::Type> readTypeDetails(const Data::SourceLocation &location);
-    std::unique_ptr<Data::Types::Type> readReferenceType(const Data::SourceLocation &location);
-    std::unique_ptr<Data::Types::Type> buildTypeFromName(const Data::SourceLocation &location, const QStringRef &name);
+    std::unique_ptr<Types::Type> readType();
+    std::unique_ptr<Types::Type> readTypeDetails(const SourceLocation &location);
+    std::unique_ptr<Types::Type> readReferenceType(const SourceLocation &location);
+    std::unique_ptr<Types::Type> buildTypeFromName(const SourceLocation &location, const QStringRef &name);
 
-    void readTypeContents(const QString &name, Data::Types::Type *type);
+    void readTypeContents(const QString &name, Types::Type *type);
     void readSequence();
-    void readSequenceAsn(Data::Types::Type *type);
+    void readSequenceAsn(Types::Type *type);
     void readSequenceOf();
     void readChoice();
-    void readChoiceAsn(Data::Types::Type *type);
+    void readChoiceAsn(Types::Type *type);
 
     QString readTypeAssignmentAttribute();
     QString readModuleAttribute();
 
     template<typename T>
-    void parseRange(Data::Types::Type &type);
-    void parseEnumeration(Data::Types::Type &type);
+    void parseRange(Types::Type &type);
+    void parseEnumeration(Types::Type &type);
 
     bool nextRequiredElementIs(const QString &name);
     bool nextRequiredElementIs(const QStringList &names);
@@ -99,11 +98,10 @@ private:
     bool skipToChildElement(const QStringList &names);
 
     QXmlStreamReader &m_xmlReader;
-    std::map<QString, std::unique_ptr<Data::File>> m_data;
+    std::map<QString, std::unique_ptr<File>> m_data;
     QString m_currentFile;
     QString m_currentModule;
-    Data::Definitions *m_currentDefinitions;
+    Definitions *m_currentDefinitions;
 };
 
-} // namespace Internal
-} // namespace Asn1Acn
+}

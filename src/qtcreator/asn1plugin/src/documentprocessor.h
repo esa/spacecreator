@@ -46,8 +46,8 @@ public:
 
     virtual void addToRun(const QString &filePath, const QString &docContent) = 0;
     virtual void run() = 0;
-    virtual std::vector<std::unique_ptr<Data::File>> takeResults() = 0;
-    virtual const std::vector<Data::ErrorMessage> &errorMessages() const = 0;
+    virtual std::vector<std::unique_ptr<Asn1Acn::File>> takeResults() = 0;
+    virtual const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const = 0;
 
     virtual State state() = 0;
 

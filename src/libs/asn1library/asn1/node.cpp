@@ -24,6 +24,6 @@
 ****************************************************************************/
 #include "node.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
-Node::~Node() {}
+Node::~Node() { }

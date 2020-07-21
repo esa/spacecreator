@@ -105,7 +105,7 @@ void Asn1SccParsedDocumentBuilder::parseXML(const QString &textData)
         m_parsedDocuments.push_back(std::move(item.second));
 }
 
-std::vector<std::unique_ptr<Data::File>> Asn1SccParsedDocumentBuilder::takeDocuments()
+std::vector<std::unique_ptr<Asn1Acn::File>> Asn1SccParsedDocumentBuilder::takeDocuments()
 {
     return std::move(m_parsedDocuments);
 }

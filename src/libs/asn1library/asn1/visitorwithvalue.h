@@ -27,8 +27,6 @@
 #include "visitor.h"
 
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 template<typename Value>
 class VisitorWithValue : public Visitor
@@ -57,6 +55,4 @@ private:
     Value m_value;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

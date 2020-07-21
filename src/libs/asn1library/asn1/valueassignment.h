@@ -24,24 +24,19 @@
 ****************************************************************************/
 #pragma once
 
-#include <memory>
-
-#include <QString>
-
 #include "node.h"
 #include "sourcelocation.h"
 #include "types/type.h"
 
+#include <QString>
+#include <memory>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class ValueAssignment : public Node
 {
 public:
-    ValueAssignment(const QString &name,
-                    const SourceLocation &location,
-                    std::unique_ptr<Types::Type> type);
+    ValueAssignment(const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type);
     ~ValueAssignment() override;
 
     void accept(Visitor &visitor) const override;
@@ -52,6 +47,4 @@ private:
     std::unique_ptr<Types::Type> m_type;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

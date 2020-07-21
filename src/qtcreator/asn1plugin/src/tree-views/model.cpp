@@ -30,7 +30,6 @@
 #include "modelvalidityguard.h"
 
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 
 Model::Model(QObject *parent)
     : QAbstractItemModel(parent)
@@ -117,12 +116,12 @@ int Model::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-void Model::setRoot(const Node *root)
+void Model::setRoot(const Asn1Acn::Node *root)
 {
     m_root = root;
 }
 
-const Node *Model::dataNode(const QModelIndex &index) const
+const Asn1Acn::Node *Model::dataNode(const QModelIndex &index) const
 {
-    return index.isValid() ? static_cast<Node *>(index.internalPointer()) : m_root;
+    return index.isValid() ? static_cast<Asn1Acn::Node *>(index.internalPointer()) : m_root;
 }

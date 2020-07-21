@@ -34,18 +34,18 @@ namespace Asn1Acn {
 namespace Internal {
 namespace TreeViews {
 
-class DecorationRoleVisitor : public Data::VisitorWithValue<QIcon>
+class DecorationRoleVisitor : public Asn1Acn::VisitorWithValue<QIcon>
 {
 public:
     ~DecorationRoleVisitor() override;
 
 private:
-    QIcon valueFor(const Data::Root &root) const override;
-    QIcon valueFor(const Data::Definitions &defs) const override;
-    QIcon valueFor(const Data::File &file) const override;
-    QIcon valueFor(const Data::TypeAssignment &type) const override;
-    QIcon valueFor(const Data::ValueAssignment &value) const override;
-    QIcon valueFor(const Data::Project &project) const override;
+    QIcon valueFor(const Asn1Acn::Root &root) const override;
+    QIcon valueFor(const Asn1Acn::Definitions &defs) const override;
+    QIcon valueFor(const Asn1Acn::File &file) const override;
+    QIcon valueFor(const Asn1Acn::TypeAssignment &type) const override;
+    QIcon valueFor(const Asn1Acn::ValueAssignment &value) const override;
+    QIcon valueFor(const Asn1Acn::Project &project) const override;
 };
 
 QIcon createIcon(const QString &iconFile, Utils::Theme::Color color);

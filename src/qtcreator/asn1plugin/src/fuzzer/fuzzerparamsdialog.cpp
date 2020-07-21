@@ -96,7 +96,7 @@ void FuzzerParamsDialog::fillRootTypeCandidatesFromProject(const QString &projec
 }
 
 void FuzzerParamsDialog::fillRootTypeCandidatesFromDefinitions(
-    const Data::File::DefinitionsList &defs)
+    const Asn1Acn::File::DefinitionsList &defs)
 {
     for (const auto &def : defs) {
         auto &types = def->types();

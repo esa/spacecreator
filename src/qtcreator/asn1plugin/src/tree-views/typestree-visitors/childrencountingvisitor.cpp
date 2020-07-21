@@ -30,24 +30,23 @@
 
 #include <asn1/project.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews;
 using namespace Asn1Acn::Internal::TreeViews::TypesTreeVisitors;
 
 ChildrenCountingVisitor::~ChildrenCountingVisitor() {}
 
-int ChildrenCountingVisitor::valueFor(const File &file) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     Q_UNUSED(file);
     QTC_ASSERT(false && "This visitor should not be called for Data::File", return 0);
 }
 
-int ChildrenCountingVisitor::valueFor(const Project &project) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return std::accumulate(project.files().begin(),
                            project.files().end(),
                            0,
-                           [](int n, const std::unique_ptr<File> &file) {
+                           [](int n, const std::unique_ptr<Asn1Acn::File> &file) {
                                return n
                                       + file->valueFor<OutlineVisitors::ChildrenCountingVisitor>();
                            });

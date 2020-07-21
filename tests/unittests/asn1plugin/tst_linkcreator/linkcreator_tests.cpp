@@ -105,8 +105,9 @@ void LinkCreatorTests::test_createLinksFromEmptyStorage()
 
 void LinkCreatorTests::test_createHighlight()
 {
-    auto file = std::make_unique<Data::File>(m_path);
-    auto ref = std::make_unique<Data::TypeReference>("TypeName", "ModuleName", Data::SourceLocation(m_path, 1, 5));
+    auto file = std::make_unique<Asn1Acn::File>(m_path);
+    auto ref =
+            std::make_unique<Asn1Acn::TypeReference>("TypeName", "ModuleName", Asn1Acn::SourceLocation(m_path, 1, 5));
 
     file->addTypeReference(std::move(ref));
 
@@ -129,14 +130,15 @@ void LinkCreatorTests::test_createHighlight()
 
 void LinkCreatorTests::test_createTarget()
 {
-    auto file = std::make_unique<Data::File>(m_path);
-    auto ref = std::make_unique<Data::TypeReference>("TypeName", "ModuleName", Data::SourceLocation(m_path, 1, 5));
+    auto file = std::make_unique<Asn1Acn::File>(m_path);
+    auto ref =
+            std::make_unique<Asn1Acn::TypeReference>("TypeName", "ModuleName", Asn1Acn::SourceLocation(m_path, 1, 5));
 
     file->addTypeReference(std::move(ref));
 
-    auto typeAssignment = std::make_unique<Data::TypeAssignment>(
-            "TypeName", Data::SourceLocation(m_path, 1, 15), std::make_unique<Data::Types::Integer>());
-    auto defs = std::make_unique<Data::Definitions>("ModuleName", Data::SourceLocation(m_path, 0, 0));
+    auto typeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
+            "TypeName", Asn1Acn::SourceLocation(m_path, 1, 15), std::make_unique<Asn1Acn::Types::Integer>());
+    auto defs = std::make_unique<Asn1Acn::Definitions>("ModuleName", Asn1Acn::SourceLocation(m_path, 0, 0));
 
     defs->addType(std::move(typeAssignment));
     file->add(std::move(defs));

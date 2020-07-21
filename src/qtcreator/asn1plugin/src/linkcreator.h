@@ -47,16 +47,17 @@ public:
     Utils::Link createTargetLink(const QTextCursor &cursor) const;
 
 private:
-    Utils::Link getSymbolLink(const Data::TypeReference &symbolSource,
+    Utils::Link getSymbolLink(const Asn1Acn::TypeReference &symbolSource,
                               const QTextCursor &cursor) const;
 
-    Utils::Link getTargetSymbolLink(const Data::TypeReference &symbolSource,
+    Utils::Link getTargetSymbolLink(const Asn1Acn::TypeReference &symbolSource,
                                     const Utils::Link &symbol) const;
 
-    Data::SourceLocation getTargetLocation(const QString &typeName, const QString &moduleName) const;
-    Data::SourceLocation getTargetLocationFromProject(const QString &projectName,
-                                                      const QString &typeName,
-                                                      const QString &moduleName) const;
+    Asn1Acn::SourceLocation getTargetLocation(const QString &typeName,
+                                              const QString &moduleName) const;
+    Asn1Acn::SourceLocation getTargetLocationFromProject(const QString &projectName,
+                                                         const QString &typeName,
+                                                         const QString &moduleName) const;
 
     const TextEditor::TextDocument &m_textDocument;
     const ParsedDataStorage *m_storage;

@@ -24,17 +24,14 @@
 ****************************************************************************/
 #pragma once
 
+#include "node.h"
+
+#include <QString>
 #include <map>
 #include <memory>
 #include <vector>
 
-#include <QString>
-
-#include "node.h"
-
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class Project;
 
@@ -59,6 +56,4 @@ private:
     std::map<QString, Project *> m_nameToProjectMap;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

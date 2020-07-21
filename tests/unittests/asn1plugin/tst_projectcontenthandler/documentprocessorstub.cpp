@@ -27,7 +27,6 @@
 
 #include <QFileInfo>
 #include <QList>
-
 #include <file.h>
 
 using namespace Asn1Acn::Internal;
@@ -36,7 +35,8 @@ using namespace Asn1Acn::Internal::Tests;
 DocumentProcessorStub::DocumentProcessorStub(const QString &project)
     : m_state(State::Unfinished)
     , m_projectName(project)
-{}
+{
+}
 
 void DocumentProcessorStub::addToRun(const QString &filePath, const QString &docContent)
 {
@@ -48,14 +48,14 @@ void DocumentProcessorStub::run()
     m_state = createState();
 
     for (auto it = m_documents.begin(); it != m_documents.end(); it++) {
-        auto modules = std::make_unique<Data::File>(it.key());
+        auto modules = std::make_unique<Asn1Acn::File>(it.key());
         m_results.push_back(std::move(modules));
     }
 
     emit processingFinished(m_projectName);
 }
 
-std::vector<std::unique_ptr<Data::File>> DocumentProcessorStub::takeResults()
+std::vector<std::unique_ptr<Asn1Acn::File>> DocumentProcessorStub::takeResults()
 {
     return std::move(m_results);
 }
@@ -65,7 +65,7 @@ DocumentProcessorStub::State DocumentProcessorStub::state()
     return m_state;
 }
 
-const std::vector<Data::ErrorMessage> &DocumentProcessorStub::errorMessages() const
+const std::vector<Asn1Acn::ErrorMessage> &DocumentProcessorStub::errorMessages() const
 {
     return m_errorMessages;
 }

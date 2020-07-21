@@ -54,7 +54,7 @@ Utils::Link LinkCreator::createTargetLink(const QTextCursor &cursor) const
     return getTargetSymbolLink(typeRef, sourceSymbol);
 }
 
-Utils::Link LinkCreator::getSymbolLink(const Data::TypeReference &symbolSource,
+Utils::Link LinkCreator::getSymbolLink(const Asn1Acn::TypeReference &symbolSource,
                                        const QTextCursor &cursor) const
 {
     Utils::Link symbol(m_textDocument.filePath().toString());
@@ -70,14 +70,15 @@ Utils::Link LinkCreator::getSymbolLink(const Data::TypeReference &symbolSource,
     return symbol;
 }
 
-Utils::Link LinkCreator::getTargetSymbolLink(const Data::TypeReference &symbolSource,
+Utils::Link LinkCreator::getTargetSymbolLink(const Asn1Acn::TypeReference &symbolSource,
                                              const Utils::Link &symbol) const
 {
     Utils::Link target = symbol;
 
-    Data::SourceLocation targetLocation = m_storage->getDefinitionLocation(m_textDocument.filePath(),
-                                                                           symbolSource.name(),
-                                                                           symbolSource.module());
+    Asn1Acn::SourceLocation targetLocation = m_storage
+                                                 ->getDefinitionLocation(m_textDocument.filePath(),
+                                                                         symbolSource.name(),
+                                                                         symbolSource.module());
 
     if (!targetLocation.isValid()) {
         targetLocation = getTargetLocation(symbolSource.name(), symbolSource.module());
@@ -90,8 +91,8 @@ Utils::Link LinkCreator::getTargetSymbolLink(const Data::TypeReference &symbolSo
     return target;
 }
 
-Data::SourceLocation LinkCreator::getTargetLocation(const QString &typeName,
-                                                    const QString &moduleName) const
+Asn1Acn::SourceLocation LinkCreator::getTargetLocation(const QString &typeName,
+                                                       const QString &moduleName) const
 {
     const auto projects = m_storage->getProjectsForFile(m_textDocument.filePath());
 
@@ -101,12 +102,12 @@ Data::SourceLocation LinkCreator::getTargetLocation(const QString &typeName,
             return location;
     }
 
-    return Data::SourceLocation();
+    return Asn1Acn::SourceLocation();
 }
 
-Data::SourceLocation LinkCreator::getTargetLocationFromProject(const QString &projectName,
-                                                               const QString &typeName,
-                                                               const QString &moduleName) const
+Asn1Acn::SourceLocation LinkCreator::getTargetLocationFromProject(const QString &projectName,
+                                                                  const QString &typeName,
+                                                                  const QString &moduleName) const
 {
     const auto paths = m_storage->getFilesPathsFromProject(projectName);
     for (const auto &path : paths) {

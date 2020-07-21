@@ -25,12 +25,12 @@
 
 #include "parseddocumentbuilderstub.h"
 
-using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Tests;
 
 ParsedDocumentBuilderStub::ParsedDocumentBuilderStub(const QHash<QString, QString> &documents)
     : m_rawDocuments(documents)
-{}
+{
+}
 
 void ParsedDocumentBuilderStub::run()
 {
@@ -42,19 +42,19 @@ void ParsedDocumentBuilderStub::run()
     } else if (value == "FAILED") {
         emit failed();
     } else if (value == "SUCCESS") {
-        auto modules = std::make_unique<Data::File>(it.key());
+        auto modules = std::make_unique<Asn1Acn::File>(it.key());
         m_parsedDocuments.push_back(std::move(modules));
 
         emit finished();
     }
 }
 
-std::vector<std::unique_ptr<Data::File>> ParsedDocumentBuilderStub::takeDocuments()
+std::vector<std::unique_ptr<Asn1Acn::File>> ParsedDocumentBuilderStub::takeDocuments()
 {
     return std::move(m_parsedDocuments);
 }
 
-const std::vector<Data::ErrorMessage> &ParsedDocumentBuilderStub::errorMessages() const
+const std::vector<Asn1Acn::ErrorMessage> &ParsedDocumentBuilderStub::errorMessages() const
 {
     return m_errorMessages;
 }

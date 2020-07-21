@@ -42,22 +42,22 @@ namespace Completion {
 class UserTypesProposalsBuilder : public ProposalsBuilder
 {
 public:
-    UserTypesProposalsBuilder(const Data::File *data);
+    UserTypesProposalsBuilder(const Asn1Acn::File *data);
 
 private:
     void fillProposals() override;
 
-    void appendImportedTypes(const Data::Definitions::ImportedTypes &importedTypes);
-    void appendInternalTypes(const Data::Definitions::Types &types);
+    void appendImportedTypes(const Asn1Acn::Definitions::ImportedTypes &importedTypes);
+    void appendInternalTypes(const Asn1Acn::Definitions::Types &types);
 
-    void appendInternalValues(const Data::Definitions::Values &values);
-    void appendImportedValues(const Data::Definitions::ImportedValues &importedValues);
+    void appendInternalValues(const Asn1Acn::Definitions::Values &values);
+    void appendImportedValues(const Asn1Acn::Definitions::ImportedValues &importedValues);
 
     void appendImportedElement(const QString &module, const QString &name);
 
-    const Data::File *m_data;
+    const Asn1Acn::File *m_data;
 };
 
-} /* nameapsce Completion */
+} // namespace Completion
 } /* namespace Internal */
 } /* namespace Asn1Acn */

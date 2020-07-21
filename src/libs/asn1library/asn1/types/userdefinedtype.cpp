@@ -25,12 +25,13 @@
 
 #include "userdefinedtype.h"
 
-using namespace Asn1Acn::Internal::Data::Types;
+using namespace Asn1Acn::Types;
 
 UserdefinedType::UserdefinedType(const QString &name, const QString &module)
     : m_name(name)
     , m_module(module)
-{}
+{
+}
 
 QString UserdefinedType::name() const
 {

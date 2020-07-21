@@ -44,7 +44,6 @@
 
 using namespace Asn1Acn::Internal;
 using namespace Core;
-using Data::TypeReference;
 
 UsagesFinder::UsagesFinder(ParsedDataStorage *storage,
                            std::unique_ptr<SourceReader> reader,
@@ -82,7 +81,7 @@ void UsagesFinder::searchAgain()
     findAll(search, params);
 }
 
-static void performSearch(QFutureInterface<TypeReference> &future,
+static void performSearch(QFutureInterface<Asn1Acn::TypeReference> &future,
                           ParsedDataStorage *storage,
                           const UsagesFinderParameters &params)
 {
@@ -100,7 +99,7 @@ static void performSearch(QFutureInterface<TypeReference> &future,
 }
 
 void UsagesFinder::displayResults(SearchResult *search,
-                                  QFutureWatcher<TypeReference> *watcher,
+                                  QFutureWatcher<Asn1Acn::TypeReference> *watcher,
                                   int first,
                                   int last)
 {
@@ -114,9 +113,9 @@ void UsagesFinder::displayResults(SearchResult *search,
     }
 }
 
-void UsagesFinder::createWatcher(const QFuture<TypeReference> &future, SearchResult *search)
+void UsagesFinder::createWatcher(const QFuture<Asn1Acn::TypeReference> &future, SearchResult *search)
 {
-    auto watcher = new QFutureWatcher<TypeReference>();
+    auto watcher = new QFutureWatcher<Asn1Acn::TypeReference>();
 
     connect(watcher, &QFutureWatcherBase::finished, watcher, [search, watcher]() {
         search->finishSearch(watcher->isCanceled());
@@ -169,7 +168,7 @@ void UsagesFinder::findAll(SearchResult *search, const UsagesFinderParameters &p
     connect(progress, &FutureProgress::clicked, search, &SearchResult::popup);
 }
 
-QString UsagesFinder::readLine(const Data::SourceLocation &loc)
+QString UsagesFinder::readLine(const Asn1Acn::SourceLocation &loc)
 {
     const auto lines = m_reader->readContent(loc.path()).split('\n');
     return (loc.line() > 0 && lines.size() > loc.line()) ? lines[loc.line() - 1] : QString();

@@ -37,11 +37,11 @@ namespace ComboVisitors {
 class IndexFindingVisitor : public OutlineVisitors::IndexFindingVisitor
 {
 public:
-    IndexFindingVisitor(const Data::Node *child);
+    IndexFindingVisitor(const Asn1Acn::Node *child);
     ~IndexFindingVisitor() override = default;
 
 private:
-    int valueFor(const Data::File &file) const override;
+    int valueFor(const Asn1Acn::File &file) const override;
 };
 
 } // namespace ComboVisitors

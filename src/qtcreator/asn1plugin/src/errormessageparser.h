@@ -36,7 +36,7 @@ class ErrorMessageParser
 {
 public:
     explicit ErrorMessageParser();
-    Data::ErrorMessage parse(const QString &message) const;
+    Asn1Acn::ErrorMessage parse(const QString &message) const;
 };
 
 } // namespace Internal

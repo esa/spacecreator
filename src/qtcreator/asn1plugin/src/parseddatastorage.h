@@ -49,26 +49,26 @@ public:
 
     static ParsedDataStorage *instance();
 
-    const Data::Root *root() const { return m_root.get(); }
+    const Asn1Acn::Root *root() const { return m_root.get(); }
 
     void addProject(const QString &projectName);
     void removeProject(const QString &projectName);
 
-    void addFileToProject(const QString &projectName, std::unique_ptr<Data::File> file);
+    void addFileToProject(const QString &projectName, std::unique_ptr<Asn1Acn::File> file);
     void removeFileFromProject(const QString &projectName, const Utils::FileName &filePath);
 
-    Data::File *getAnyFileForPath(const Utils::FileName &filePath) const;
-    Data::File *getFileForPathFromProject(const QString &project, const Utils::FileName &path);
+    Asn1Acn::File *getAnyFileForPath(const Utils::FileName &filePath) const;
+    Asn1Acn::File *getFileForPathFromProject(const QString &project, const Utils::FileName &path);
 
     const QStringList getProjectsForFile(const Utils::FileName &filePath) const;
     const Utils::FileNameList getFilesPathsFromProject(const QString &project) const;
 
-    Data::SourceLocation getDefinitionLocation(const Utils::FileName &path,
-                                               const QString &typeAssignmentName,
-                                               const QString &definitionsName) const;
-    const Data::TypeAssignment *getTypeAssignment(const Utils::FileName &path,
+    Asn1Acn::SourceLocation getDefinitionLocation(const Utils::FileName &path,
                                                   const QString &typeAssignmentName,
                                                   const QString &definitionsName) const;
+    const Asn1Acn::TypeAssignment *getTypeAssignment(const Utils::FileName &path,
+                                                     const QString &typeAssignmentName,
+                                                     const QString &definitionsName) const;
 
     int getProjectBuildersCount(const QString &projectName) const;
     void setProjectBuildersCount(const QString &projectName, const int version) const;
@@ -82,12 +82,12 @@ private:
     const Utils::FileNameList getFilesPathsFromProjectInternal(const QString &projectName) const;
     void removeFileFromProjectInternal(const QString &projectName, const Utils::FileName &filePath);
 
-    Data::File *getFileForPathInternal(const Utils::FileName &filePath) const;
+    Asn1Acn::File *getFileForPathInternal(const Utils::FileName &filePath) const;
 
-    Data::SourceLocation getLocationFromModule(const Data::Definitions &moduleDefinition,
-                                               const QString &typeAssignmentName) const;
+    Asn1Acn::SourceLocation getLocationFromModule(const Asn1Acn::Definitions &moduleDefinition,
+                                                  const QString &typeAssignmentName) const;
 
-    std::unique_ptr<Data::Root> m_root;
+    std::unique_ptr<Asn1Acn::Root> m_root;
     mutable QMutex m_documentsMutex;
 };
 

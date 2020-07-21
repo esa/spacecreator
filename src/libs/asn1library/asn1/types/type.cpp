@@ -25,4 +25,4 @@
 
 #include "type.h"
 
-using namespace Asn1Acn::Internal::Data::Types;
+using namespace Asn1Acn::Types;

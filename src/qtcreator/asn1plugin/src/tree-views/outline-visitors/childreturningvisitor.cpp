@@ -29,7 +29,6 @@
 #include <asn1/project.h>
 #include <asn1/root.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::OutlineVisitors;
 
 ChildReturningVisitor::ChildReturningVisitor(int index)
@@ -38,36 +37,36 @@ ChildReturningVisitor::ChildReturningVisitor(int index)
 
 ChildReturningVisitor::~ChildReturningVisitor() {}
 
-Node *ChildReturningVisitor::valueFor(const Definitions &defs) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     if (static_cast<std::size_t>(m_index) >= defs.types().size())
         return defs.values().at(m_index - defs.types().size()).get();
     return defs.types().at(m_index).get();
 }
 
-Node *ChildReturningVisitor::valueFor(const File &file) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return file.definitionsList().at(m_index).get();
 }
 
-Node *ChildReturningVisitor::valueFor(const TypeAssignment &type) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     Q_UNUSED(type);
     return nullptr;
 }
 
-Node *ChildReturningVisitor::valueFor(const ValueAssignment &value) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     Q_UNUSED(value);
     return nullptr;
 }
 
-Node *ChildReturningVisitor::valueFor(const Project &project) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return project.files().at(m_index).get();
 }
 
-Node *ChildReturningVisitor::valueFor(const Root &root) const
+Asn1Acn::Node *ChildReturningVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     return root.projects().at(m_index).get();
 }

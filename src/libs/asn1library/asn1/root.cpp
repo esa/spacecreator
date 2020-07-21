@@ -24,18 +24,19 @@
 ****************************************************************************/
 #include "root.h"
 
-#include <QFileInfo>
-
 #include "project.h"
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+#include <QFileInfo>
+
+using namespace Asn1Acn;
 
 Root::Root()
     : Node("ROOT", {})
-{}
+{
+}
 
-Root::~Root() {}
+Root::~Root() { }
 
 void Root::accept(Visitor &visitor) const
 {

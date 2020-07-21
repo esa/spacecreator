@@ -30,7 +30,6 @@
 
 using namespace Asn1Acn::Internal::TreeViews::ComboVisitors;
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 
 ComboModel::ComboModel(const Utils::FileName &filePath, QObject *parent)
     : MutableRootModel(filePath, parent)
@@ -38,22 +37,22 @@ ComboModel::ComboModel(const Utils::FileName &filePath, QObject *parent)
 
 ComboModel::~ComboModel() {}
 
-Node *ComboModel::parentOf(const Node *node) const
+Asn1Acn::Node *ComboModel::parentOf(const Asn1Acn::Node *node) const
 {
     return node ? node->parent() : nullptr;
 }
 
-int ComboModel::childrenCount(const Node *node) const
+int ComboModel::childrenCount(const Asn1Acn::Node *node) const
 {
     return node ? node->valueFor<ChildrenCountingVisitor>() : 0;
 }
 
-int ComboModel::indexInParent(const Node *parent, const Node *node) const
+int ComboModel::indexInParent(const Asn1Acn::Node *parent, const Asn1Acn::Node *node) const
 {
     return parent ? parent->valueFor<IndexFindingVisitor>(node) : 0;
 }
 
-Node *ComboModel::nthChild(const Node *node, int n) const
+Asn1Acn::Node *ComboModel::nthChild(const Asn1Acn::Node *node, int n) const
 {
     return node ? node->valueFor<ChildReturningVisitor>(n) : nullptr;
 }

@@ -26,15 +26,14 @@
 
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
 TypeReference::TypeReference(const SourceLocation &location)
     : m_location(location)
-{}
+{
+}
 
-TypeReference::TypeReference(const QString &name,
-                             const QString &module,
-                             const SourceLocation &location)
+TypeReference::TypeReference(const QString &name, const QString &module, const SourceLocation &location)
     : TypeReference(location)
 {
     m_name = name;

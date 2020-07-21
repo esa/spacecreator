@@ -52,20 +52,22 @@ void OutlineModelTests::test_emptyModel()
 void OutlineModelTests::test_modelWithDummyPopulation()
 {
     const QString filePath("file.asn1");
-    const auto root = std::make_unique<Data::File>(filePath);
+    const auto root = std::make_unique<Asn1Acn::File>(filePath);
 
-    auto definitions1 = std::make_unique<Data::Definitions>("Module1", Data::SourceLocation { "file1.asn1", 0, 0 });
-    definitions1->addType(std::make_unique<Data::TypeAssignment>(
-            "Num1", Data::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Data::Types::Integer>()));
-    definitions1->addType(std::make_unique<Data::TypeAssignment>(
-            "Num2", Data::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Data::Types::Integer>()));
+    auto definitions1 =
+            std::make_unique<Asn1Acn::Definitions>("Module1", Asn1Acn::SourceLocation { "file1.asn1", 0, 0 });
+    definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+            "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+    definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+            "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     root->add(std::move(definitions1));
 
-    auto definitions2 = std::make_unique<Data::Definitions>("Module2", Data::SourceLocation { "file1.asn1", 5, 0 });
-    definitions2->addType(std::make_unique<Data::TypeAssignment>(
-            "Num3", Data::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Data::Types::Integer>()));
-    definitions2->addType(std::make_unique<Data::TypeAssignment>(
-            "Num4", Data::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Data::Types::Integer>()));
+    auto definitions2 =
+            std::make_unique<Asn1Acn::Definitions>("Module2", Asn1Acn::SourceLocation { "file1.asn1", 5, 0 });
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+            "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+            "Num4", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
     root->add(std::move(definitions2));
 
     auto model = new OutlineModel(Utils::FileName::fromString(filePath), this);

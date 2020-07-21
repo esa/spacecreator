@@ -37,19 +37,19 @@ ReferenceFinder::ReferenceFinder(const TextEditor::TextDocument &document,
     , m_storage(storage)
 {}
 
-Data::TypeReference ReferenceFinder::findAt(const QTextCursor &cursor) const
+Asn1Acn::TypeReference ReferenceFinder::findAt(const QTextCursor &cursor) const
 {
     if (!isProperAsn1IdentifierChar(m_textDocument.characterAt(cursor.position())))
-        return Data::TypeReference();
+        return Asn1Acn::TypeReference();
 
     const auto file = m_storage->getAnyFileForPath(m_textDocument.filePath());
     return findAt(file, cursor.blockNumber() + 1, cursor.columnNumber());
 }
 
-Data::TypeReference ReferenceFinder::findAt(const Data::File *file, int line, int col) const
+Asn1Acn::TypeReference ReferenceFinder::findAt(const Asn1Acn::File *file, int line, int col) const
 {
     if (file == nullptr)
-        return Data::TypeReference();
+        return Asn1Acn::TypeReference();
 
     const auto range = file->referencesMap().equal_range(line);
     for (auto it = range.first; it != range.second; it++) {
@@ -59,7 +59,7 @@ Data::TypeReference ReferenceFinder::findAt(const Data::File *file, int line, in
             return *(it->second);
     }
 
-    return Data::TypeReference();
+    return Asn1Acn::TypeReference();
 }
 
 bool ReferenceFinder::isProperAsn1IdentifierChar(QChar ch) const

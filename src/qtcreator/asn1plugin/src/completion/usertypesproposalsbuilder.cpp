@@ -31,7 +31,7 @@
 using namespace Asn1Acn::Internal;
 using namespace Asn1Acn::Internal::Completion;
 
-UserTypesProposalsBuilder::UserTypesProposalsBuilder(const Data::File *data)
+UserTypesProposalsBuilder::UserTypesProposalsBuilder(const Asn1Acn::File *data)
     : m_data(data)
 {}
 
@@ -48,27 +48,27 @@ void UserTypesProposalsBuilder::fillProposals()
     }
 }
 
-void UserTypesProposalsBuilder::appendInternalTypes(const Data::Definitions::Types &types)
+void UserTypesProposalsBuilder::appendInternalTypes(const Asn1Acn::Definitions::Types &types)
 {
     for (const auto &type : types)
         addProposal(type->name(), type->valueFor<TreeViews::DecorationRoleVisitor>());
 }
 
 void UserTypesProposalsBuilder::appendImportedTypes(
-    const Data::Definitions::ImportedTypes &importedTypes)
+    const Asn1Acn::Definitions::ImportedTypes &importedTypes)
 {
     foreach (const auto &importedType, importedTypes)
         appendImportedElement(importedType.module(), importedType.name());
 }
 
-void UserTypesProposalsBuilder::appendInternalValues(const Data::Definitions::Values &values)
+void UserTypesProposalsBuilder::appendInternalValues(const Asn1Acn::Definitions::Values &values)
 {
     for (const auto &value : values)
         addProposal(value->name(), value->valueFor<TreeViews::DecorationRoleVisitor>());
 }
 
 void UserTypesProposalsBuilder::appendImportedValues(
-    const Data::Definitions::ImportedValues &importedValues)
+    const Asn1Acn::Definitions::ImportedValues &importedValues)
 {
     foreach (const auto &importedValue, importedValues)
         appendImportedElement(importedValue.module(), importedValue.name());

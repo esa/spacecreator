@@ -30,7 +30,7 @@ using namespace Asn1Acn::Internal;
 
 ErrorMessageParser::ErrorMessageParser() {}
 
-Data::ErrorMessage ErrorMessageParser::parse(const QString &message) const
+Asn1Acn::ErrorMessage ErrorMessageParser::parse(const QString &message) const
 {
     static const QRegularExpression regExp(R"(^(.+?):(\d+)(?::(\d+))?: error: (.*)$)");
 
@@ -38,8 +38,8 @@ Data::ErrorMessage ErrorMessageParser::parse(const QString &message) const
     if (!match.hasMatch())
         return {};
 
-    const auto loc = Data::SourceLocation(match.captured(1),
-                                          match.captured(2).toInt(),
-                                          match.captured(3).toInt());
+    const auto loc = Asn1Acn::SourceLocation(match.captured(1),
+                                             match.captured(2).toInt(),
+                                             match.captured(3).toInt());
     return {loc, match.captured(4)};
 }

@@ -26,16 +26,15 @@
 
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
-ValueAssignment::ValueAssignment(const QString &name,
-                                 const SourceLocation &location,
-                                 std::unique_ptr<Types::Type> type)
+ValueAssignment::ValueAssignment(const QString &name, const SourceLocation &location, std::unique_ptr<Types::Type> type)
     : Node(name, location)
     , m_type(std::move(type))
-{}
+{
+}
 
-ValueAssignment::~ValueAssignment() {}
+ValueAssignment::~ValueAssignment() { }
 
 void ValueAssignment::accept(Visitor &visitor) const
 {

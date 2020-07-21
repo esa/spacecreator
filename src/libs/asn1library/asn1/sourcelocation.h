@@ -29,8 +29,6 @@
 #include <QString>
 
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class SourceLocation
 {
@@ -38,13 +36,15 @@ public:
     SourceLocation()
         : m_line(-1)
         , m_column(-1)
-    {}
+    {
+    }
 
     SourceLocation(const QString &path, int line, int column)
         : m_path(path)
         , m_line(line)
         , m_column(column)
-    {}
+    {
+    }
 
     const QString fileName() const;
     const QString &path() const { return m_path; }
@@ -62,8 +62,6 @@ private:
 bool operator==(const SourceLocation &a, const SourceLocation &b);
 bool operator!=(const SourceLocation &a, const SourceLocation &b);
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}
 
-Q_DECLARE_METATYPE(Asn1Acn::Internal::Data::SourceLocation)
+Q_DECLARE_METATYPE(Asn1Acn::SourceLocation)

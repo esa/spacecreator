@@ -29,39 +29,38 @@
 #include <asn1/project.h>
 #include <asn1/root.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::OutlineVisitors;
 
 ChildrenCountingVisitor::~ChildrenCountingVisitor() {}
 
-int ChildrenCountingVisitor::valueFor(const Definitions &defs) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     return static_cast<int>(defs.types().size()) + static_cast<int>(defs.values().size());
 }
 
-int ChildrenCountingVisitor::valueFor(const File &file) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return static_cast<int>(file.definitionsList().size());
 }
 
-int ChildrenCountingVisitor::valueFor(const Project &project) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return static_cast<int>(project.files().size());
 }
 
-int ChildrenCountingVisitor::valueFor(const TypeAssignment &type) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     Q_UNUSED(type);
     return 0;
 }
 
-int ChildrenCountingVisitor::valueFor(const ValueAssignment &value) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     Q_UNUSED(value);
     return 0;
 }
 
-int ChildrenCountingVisitor::valueFor(const Root &root) const
+int ChildrenCountingVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     return static_cast<int>(root.projects().size());
 }

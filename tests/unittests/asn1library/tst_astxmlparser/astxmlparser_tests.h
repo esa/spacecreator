@@ -31,7 +31,6 @@
 #include <QXmlStreamReader>
 
 namespace Asn1Acn {
-namespace Internal {
 namespace Tests {
 
 class AstXmlParserTests : public QObject
@@ -70,9 +69,8 @@ private:
     void parse(const QString &xmlData);
 
     QXmlStreamReader m_xmlReader;
-    std::map<QString, std::unique_ptr<Asn1Acn::Internal::Data::File>> m_parsedData;
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> m_parsedData;
 };
 
-} // namespace Tests
-} // namespace Internal
-} // namespace Asn1Acn
+}
+}

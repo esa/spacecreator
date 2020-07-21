@@ -25,14 +25,12 @@
 
 #pragma once
 
-#include <memory>
+#include "asn1/file.h"
+#include "parseddocumentbuilder.h"
 
 #include <QHash>
 #include <QString>
-
-#include "asn1/file.h"
-
-#include "parseddocumentbuilder.h"
+#include <memory>
 
 namespace Asn1Acn {
 namespace Internal {
@@ -47,14 +45,14 @@ public:
 
     void run() override;
 
-    std::vector<std::unique_ptr<Data::File>> takeDocuments() override;
-    const std::vector<Data::ErrorMessage> &errorMessages() const override;
+    std::vector<std::unique_ptr<Asn1Acn::File>> takeDocuments() override;
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const override;
 
 private:
     const QHash<QString, QString> &m_rawDocuments;
-    std::vector<std::unique_ptr<Data::File>> m_parsedDocuments;
+    std::vector<std::unique_ptr<Asn1Acn::File>> m_parsedDocuments;
 
-    std::vector<Data::ErrorMessage> m_errorMessages;
+    std::vector<Asn1Acn::ErrorMessage> m_errorMessages;
 };
 
 } /* namespace Tests */

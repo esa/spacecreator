@@ -24,13 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "sourcelocation.h"
 
+#include <QString>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class Visitor;
 
@@ -41,7 +39,8 @@ protected:
         : m_name(name)
         , m_location(location)
         , m_parent(nullptr)
-    {}
+    {
+    }
 
 public:
     virtual ~Node();
@@ -68,6 +67,4 @@ private:
     Node *m_parent;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

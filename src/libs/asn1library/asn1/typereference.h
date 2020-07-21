@@ -24,13 +24,11 @@
 ****************************************************************************/
 #pragma once
 
-#include <QString>
-
 #include "sourcelocation.h"
 
+#include <QString>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class TypeReference
 {
@@ -48,6 +46,4 @@ private:
     QString m_module;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

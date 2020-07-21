@@ -27,8 +27,6 @@
 #include <QString>
 
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class ImportedValue
 {
@@ -36,7 +34,8 @@ public:
     ImportedValue(const QString &module, const QString &name)
         : m_module(module)
         , m_name(name)
-    {}
+    {
+    }
 
     const QString &module() const { return m_module; }
     const QString &name() const { return m_name; }
@@ -46,6 +45,4 @@ private:
     QString m_name;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

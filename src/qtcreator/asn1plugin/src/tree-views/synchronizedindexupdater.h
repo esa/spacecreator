@@ -59,8 +59,8 @@ public:
 
 protected:
     QModelIndex findIndexInLocation(const QModelIndex &parentIndex,
-                                    Data::SourceLocation cursorLocation) const;
-    Data::SourceLocation getCurrentLocation() const;
+                                    Asn1Acn::SourceLocation cursorLocation) const;
+    Asn1Acn::SourceLocation getCurrentLocation() const;
     Utils::FileName currentFilePath() const;
     bool editorEmpty() const;
 

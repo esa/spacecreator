@@ -52,7 +52,7 @@ public Q_SLOTS:
 private:
     void fillRootTypeCandidates();
     void fillRootTypeCandidatesFromProject(const QString &projectName);
-    void fillRootTypeCandidatesFromDefinitions(const Data::File::DefinitionsList &defs);
+    void fillRootTypeCandidatesFromDefinitions(const Asn1Acn::File::DefinitionsList &defs);
 
     void letProceed(bool val);
 

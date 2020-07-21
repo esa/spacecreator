@@ -24,16 +24,14 @@
 ****************************************************************************/
 #pragma once
 
+#include "file.h"
+#include "node.h"
+
 #include <map>
 #include <memory>
 #include <vector>
 
-#include "file.h"
-#include "node.h"
-
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class Project : public Node
 {
@@ -60,6 +58,4 @@ private:
     std::map<QString, File *> m_filesByPathMap;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

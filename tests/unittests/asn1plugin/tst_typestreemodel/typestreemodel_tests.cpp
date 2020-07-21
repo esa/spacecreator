@@ -53,49 +53,51 @@ void TypesTreeModelTests::test_emptyModel()
 
 void TypesTreeModelTests::test_modelWithDummyPopulation()
 {
-    auto file1 = std::make_unique<Data::File>("file1.asn1");
+    auto file1 = std::make_unique<Asn1Acn::File>("file1.asn1");
     {
-        auto definitions1 = std::make_unique<Data::Definitions>("Module1", Data::SourceLocation { "file1.asn1", 0, 0 });
-        definitions1->addType(std::make_unique<Data::TypeAssignment>(
-                "Num1", Data::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Data::Types::Integer>()));
-        definitions1->addType(std::make_unique<Data::TypeAssignment>(
-                "Num2", Data::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Data::Types::Integer>()));
+        auto definitions1 =
+                std::make_unique<Asn1Acn::Definitions>("Module1", Asn1Acn::SourceLocation { "file1.asn1", 0, 0 });
+        definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num1", Asn1Acn::SourceLocation { "file1.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+        definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num2", Asn1Acn::SourceLocation { "file1.asn1", 3, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file1->add(std::move(definitions1));
 
-        auto definitions2 = std::make_unique<Data::Definitions>("Module2", Data::SourceLocation { "file1.asn1", 5, 0 });
-        definitions2->addType(std::make_unique<Data::TypeAssignment>(
-                "Num3", Data::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Data::Types::Integer>()));
-        definitions2->addType(std::make_unique<Data::TypeAssignment>(
-                "Num4", Data::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Data::Types::Integer>()));
+        auto definitions2 =
+                std::make_unique<Asn1Acn::Definitions>("Module2", Asn1Acn::SourceLocation { "file1.asn1", 5, 0 });
+        definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num3", Asn1Acn::SourceLocation { "file1.asn1", 6, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
+        definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num4", Asn1Acn::SourceLocation { "file1.asn1", 7, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file1->add(std::move(definitions2));
     }
 
-    auto file2 = std::make_unique<Data::File>("file2.asn1");
+    auto file2 = std::make_unique<Asn1Acn::File>("file2.asn1");
     {
         auto definitions1 =
-                std::make_unique<Data::Definitions>("Module10", Data::SourceLocation { "file2.asn1", 0, 0 });
-        definitions1->addType(std::make_unique<Data::TypeAssignment>(
-                "Num10", Data::SourceLocation { "file2.asn1", 2, 3 }, std::make_unique<Data::Types::Integer>()));
+                std::make_unique<Asn1Acn::Definitions>("Module10", Asn1Acn::SourceLocation { "file2.asn1", 0, 0 });
+        definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num10", Asn1Acn::SourceLocation { "file2.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file2->add(std::move(definitions1));
     }
 
-    auto project1 = std::make_unique<Data::Project>("Project1");
+    auto project1 = std::make_unique<Asn1Acn::Project>("Project1");
     project1->add(std::move(file1));
     project1->add(std::move(file2));
 
-    auto file3 = std::make_unique<Data::File>("file3.asn1");
+    auto file3 = std::make_unique<Asn1Acn::File>("file3.asn1");
     {
         auto definitions1 =
-                std::make_unique<Data::Definitions>("Module20", Data::SourceLocation { "file3.asn1", 0, 0 });
-        definitions1->addType(std::make_unique<Data::TypeAssignment>(
-                "Num20", Data::SourceLocation { "file3.asn1", 2, 3 }, std::make_unique<Data::Types::Integer>()));
+                std::make_unique<Asn1Acn::Definitions>("Module20", Asn1Acn::SourceLocation { "file3.asn1", 0, 0 });
+        definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>(
+                "Num20", Asn1Acn::SourceLocation { "file3.asn1", 2, 3 }, std::make_unique<Asn1Acn::Types::Integer>()));
         file3->add(std::move(definitions1));
     }
 
-    auto project2 = std::make_unique<Data::Project>("Project2");
+    auto project2 = std::make_unique<Asn1Acn::Project>("Project2");
     project2->add(std::move(file3));
 
-    auto root = std::make_unique<Data::Root>();
+    auto root = std::make_unique<Asn1Acn::Root>();
     root->add(std::move(project1));
     root->add(std::move(project2));
 

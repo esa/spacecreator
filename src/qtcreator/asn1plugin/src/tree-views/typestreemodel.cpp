@@ -33,7 +33,6 @@
 
 using namespace Asn1Acn::Internal::TreeViews::TypesTreeVisitors;
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 
 TypesTreeModel::TypesTreeModel(QObject *parent)
     : Model(parent)
@@ -51,22 +50,22 @@ void TypesTreeModel::onEndResetModel()
     endResetModel();
 }
 
-Node *TypesTreeModel::parentOf(const Node *node) const
+Asn1Acn::Node *TypesTreeModel::parentOf(const Asn1Acn::Node *node) const
 {
     return node ? node->valueFor<ParentReturningVisitor>() : nullptr;
 }
 
-int TypesTreeModel::childrenCount(const Node *node) const
+int TypesTreeModel::childrenCount(const Asn1Acn::Node *node) const
 {
     return node ? node->valueFor<ChildrenCountingVisitor>() : 0;
 }
 
-int TypesTreeModel::indexInParent(const Node *parent, const Node *node) const
+int TypesTreeModel::indexInParent(const Asn1Acn::Node *parent, const Asn1Acn::Node *node) const
 {
     return parent ? parent->valueFor<IndexFindingVisitor>(node) : 0;
 }
 
-Node *TypesTreeModel::nthChild(const Node *node, int n) const
+Asn1Acn::Node *TypesTreeModel::nthChild(const Asn1Acn::Node *node, int n) const
 {
     return node ? node->valueFor<ChildReturningVisitor>(n) : nullptr;
 }

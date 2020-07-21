@@ -31,41 +31,40 @@
 #include <asn1/root.h>
 #include <asn1/valueassignment.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::TypesTreeVisitors;
 
 ParentReturningVisitor::ParentReturningVisitor() {}
 
 ParentReturningVisitor::~ParentReturningVisitor() {}
 
-Node *ParentReturningVisitor::valueFor(const Definitions &defs) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::Definitions &defs) const
 {
     const auto file = defs.parent();
     return file ? file->parent() : nullptr;
 }
 
-Node *ParentReturningVisitor::valueFor(const File &file) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::File &file) const
 {
     Q_UNUSED(file);
     QTC_ASSERT(false && "This visitor should not be called for Data::File", return 0);
 }
 
-Node *ParentReturningVisitor::valueFor(const TypeAssignment &type) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     return type.parent();
 }
 
-Node *ParentReturningVisitor::valueFor(const ValueAssignment &value) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     return value.parent();
 }
 
-Node *ParentReturningVisitor::valueFor(const Project &project) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     return project.parent();
 }
 
-Node *ParentReturningVisitor::valueFor(const Root &root) const
+Asn1Acn::Node *ParentReturningVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     return root.parent();
 }

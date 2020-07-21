@@ -25,13 +25,11 @@
 
 #pragma once
 
-#include <QString>
-
 #include "type.h"
 
+#include <QString>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 namespace Types {
 
 class LabelType : public Type
@@ -48,7 +46,5 @@ private:
     QString m_name;
 };
 
-} // namespace Types
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}
+}

@@ -25,13 +25,11 @@
 
 #pragma once
 
-#include <QString>
-
 #include "type.h"
 
+#include <QString>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 namespace Types {
 
 class UserdefinedType : public Type
@@ -49,7 +47,5 @@ private:
     QString m_module;
 };
 
-} // namespace Types
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}
+}

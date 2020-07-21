@@ -32,7 +32,6 @@
 #include <QVariantMap>
 
 namespace Asn1Acn {
-namespace Internal {
 
 static const QString ASN1_MIN = "min";
 static const QString ASN1_MAX = "max";
@@ -95,7 +94,7 @@ void AstXmlParser::readModules()
 void AstXmlParser::updateCurrentFile()
 {
     m_currentFile = m_xmlReader.attributes().value(QStringLiteral("FileName")).toString();
-    m_data.insert(std::make_pair(m_currentFile, std::make_unique<Data::File>(m_currentFile)));
+    m_data.insert(std::make_pair(m_currentFile, std::make_unique<File>(m_currentFile)));
 }
 
 void AstXmlParser::readModuleChildren()
@@ -123,7 +122,7 @@ void AstXmlParser::createNewModule()
     if (m_currentModule.isEmpty()) {
         m_currentModule = readIdAttribute();
     }
-    auto module = std::make_unique<Data::Definitions>(m_currentModule, location);
+    auto module = std::make_unique<Definitions>(m_currentModule, location);
     m_currentDefinitions = module.get();
     m_data[m_currentFile]->add(std::move(module));
 }
@@ -159,9 +158,9 @@ void AstXmlParser::readTypeAssignment()
     auto type = readType();
     m_xmlReader.skipCurrentElement();
 
-    m_currentDefinitions->addType(std::make_unique<Data::TypeAssignment>(name, location, std::move(type)));
+    m_currentDefinitions->addType(std::make_unique<TypeAssignment>(name, location, std::move(type)));
     m_data[m_currentFile]->addTypeReference(
-            std::make_unique<Data::TypeReference>(name, m_currentDefinitions->name(), location));
+            std::make_unique<TypeReference>(name, m_currentDefinitions->name(), location));
 }
 
 void AstXmlParser::readValueAssignment()
@@ -172,7 +171,7 @@ void AstXmlParser::readValueAssignment()
     auto type = readType();
     m_xmlReader.skipCurrentElement();
 
-    m_currentDefinitions->addValue(std::make_unique<Data::ValueAssignment>(name, location, std::move(type)));
+    m_currentDefinitions->addValue(std::make_unique<ValueAssignment>(name, location, std::move(type)));
 }
 
 QString AstXmlParser::readTypeAssignmentAttribute()
@@ -273,12 +272,12 @@ bool AstXmlParser::nextRequiredElementIs(const QStringList &names)
     return false;
 }
 
-Data::SourceLocation AstXmlParser::readLocationFromAttributes()
+SourceLocation AstXmlParser::readLocationFromAttributes()
 {
     return { m_currentFile, readLineAttribute(), readCharPossitionInLineAttribute() };
 }
 
-std::unique_ptr<Data::Types::Type> AstXmlParser::readType()
+std::unique_ptr<Types::Type> AstXmlParser::readType()
 {
     if (!skipToChildElement({ { "Asn1Type" }, { "Type" } }))
         return {};
@@ -297,14 +296,14 @@ bool AstXmlParser::isParametrizedTypeInstance() const
     return !value.isNull() && value == QStringLiteral("true");
 }
 
-std::unique_ptr<Data::Types::Type> AstXmlParser::readTypeDetails(const Data::SourceLocation &location)
+std::unique_ptr<Types::Type> AstXmlParser::readTypeDetails(const SourceLocation &location)
 {
     const bool isParametrized = isParametrizedTypeInstance();
     if (!m_xmlReader.readNextStartElement())
         return {};
 
     const auto name = m_xmlReader.name();
-    std::unique_ptr<Data::Types::Type> type = buildTypeFromName(location, name);
+    std::unique_ptr<Types::Type> type = buildTypeFromName(location, name);
 
     if (isParametrized)
         m_xmlReader.skipCurrentElement();
@@ -314,7 +313,7 @@ std::unique_ptr<Data::Types::Type> AstXmlParser::readTypeDetails(const Data::Sou
     return type;
 }
 
-void AstXmlParser::readTypeContents(const QString &name, Data::Types::Type *type)
+void AstXmlParser::readTypeContents(const QString &name, Types::Type *type)
 {
     if (name == QStringLiteral("SEQUENCE")) {
         if (m_xmlReader.name() == "SequenceType") {
@@ -344,24 +343,23 @@ void AstXmlParser::readTypeContents(const QString &name, Data::Types::Type *type
     }
 }
 
-std::unique_ptr<Data::Types::Type> AstXmlParser::buildTypeFromName(
-        const Data::SourceLocation &location, const QStringRef &name)
+std::unique_ptr<Types::Type> AstXmlParser::buildTypeFromName(const SourceLocation &location, const QStringRef &name)
 {
     if (name == QStringLiteral("REFERENCE_TYPE"))
         return readReferenceType(location);
-    return Data::Types::BuiltinType::createBuiltinType(name.toString());
+    return Types::BuiltinType::createBuiltinType(name.toString());
 }
 
-std::unique_ptr<Data::Types::Type> AstXmlParser::readReferenceType(const Data::SourceLocation &location)
+std::unique_ptr<Types::Type> AstXmlParser::readReferenceType(const SourceLocation &location)
 {
     const QString refName = readTypeAssignmentAttribute();
     const QString module = readModuleAttribute();
 
-    auto ref = std::make_unique<Data::TypeReference>(refName, module, location);
+    auto ref = std::make_unique<TypeReference>(refName, module, location);
 
     m_data[m_currentFile]->addTypeReference(std::move(ref));
 
-    return std::make_unique<Data::Types::UserdefinedType>(refName, module);
+    return std::make_unique<Types::UserdefinedType>(refName, module);
 }
 
 void AstXmlParser::readSequence()
@@ -372,9 +370,9 @@ void AstXmlParser::readSequence()
     }
 }
 
-void AstXmlParser::readSequenceAsn(Data::Types::Type *type)
+void AstXmlParser::readSequenceAsn(Types::Type *type)
 {
-    auto sequence = dynamic_cast<Data::Types::Sequence *>(type);
+    auto sequence = dynamic_cast<Types::Sequence *>(type);
     if (!sequence) {
         return;
     }
@@ -424,9 +422,9 @@ void AstXmlParser::readChoice()
     }
 }
 
-void AstXmlParser::readChoiceAsn(Data::Types::Type *type)
+void AstXmlParser::readChoiceAsn(Types::Type *type)
 {
-    auto choice = dynamic_cast<Data::Types::Choice *>(type);
+    auto choice = dynamic_cast<Types::Choice *>(type);
     if (!choice) {
         return;
     }
@@ -439,7 +437,7 @@ void AstXmlParser::readChoiceAsn(Data::Types::Type *type)
 }
 
 template<typename T>
-void AstXmlParser::parseRange(Data::Types::Type &type)
+void AstXmlParser::parseRange(Types::Type &type)
 {
     QXmlStreamAttributes attributes = m_xmlReader.attributes();
 
@@ -463,7 +461,7 @@ void AstXmlParser::parseRange(Data::Types::Type &type)
     parseAttribute("Max", ASN1_MAX);
 }
 
-void AstXmlParser::parseEnumeration(Data::Types::Type &type)
+void AstXmlParser::parseEnumeration(Types::Type &type)
 {
     m_xmlReader.readNextStartElement();
     if (m_xmlReader.name() == "EnumValues") {
@@ -481,5 +479,4 @@ void AstXmlParser::parseEnumeration(Data::Types::Type &type)
     }
 }
 
-}
 }

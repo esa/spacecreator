@@ -26,14 +26,15 @@
 
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
 File::File(const QString &path)
-    : Node(path, {path, 0, 0})
+    : Node(path, { path, 0, 0 })
     , m_polluted(false)
-{}
+{
+}
 
-File::~File() {}
+File::~File() { }
 
 void File::accept(Visitor &visitor) const
 {

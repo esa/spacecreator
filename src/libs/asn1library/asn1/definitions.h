@@ -24,22 +24,19 @@
 ****************************************************************************/
 #pragma once
 
-#include <map>
-#include <memory>
-#include <vector>
-
-#include <QString>
-#include <QStringList>
-
 #include "importedtype.h"
 #include "importedvalue.h"
 #include "node.h"
 #include "typeassignment.h"
 #include "valueassignment.h"
 
+#include <QString>
+#include <QStringList>
+#include <map>
+#include <memory>
+#include <vector>
+
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class Definitions : public Node
 {
@@ -84,6 +81,4 @@ private:
     ImportedValues m_importedValues;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

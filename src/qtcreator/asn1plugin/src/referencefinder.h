@@ -42,11 +42,11 @@ class ReferenceFinder
 public:
     ReferenceFinder(const TextEditor::TextDocument &document, const ParsedDataStorage *storage);
 
-    Data::TypeReference findAt(const QTextCursor &cursor) const;
+    Asn1Acn::TypeReference findAt(const QTextCursor &cursor) const;
 
 private:
     bool isProperAsn1IdentifierChar(QChar ch) const;
-    Data::TypeReference findAt(const Data::File *file, int line, int col) const;
+    Asn1Acn::TypeReference findAt(const Asn1Acn::File *file, int line, int col) const;
     const TextEditor::TextDocument &m_textDocument;
     const ParsedDataStorage *m_storage;
 };

@@ -31,18 +31,18 @@ namespace Internal {
 namespace TreeViews {
 namespace OutlineVisitors {
 
-class ChildrenCountingVisitor : public Data::VisitorWithValue<int>
+class ChildrenCountingVisitor : public Asn1Acn::VisitorWithValue<int>
 {
 public:
     ~ChildrenCountingVisitor() override;
 
 private:
-    int valueFor(const Data::Root &root) const override;
-    int valueFor(const Data::Definitions &defs) const override;
-    int valueFor(const Data::File &file) const override;
-    int valueFor(const Data::TypeAssignment &type) const override;
-    int valueFor(const Data::ValueAssignment &value) const override;
-    int valueFor(const Data::Project &project) const override;
+    int valueFor(const Asn1Acn::Root &root) const override;
+    int valueFor(const Asn1Acn::Definitions &defs) const override;
+    int valueFor(const Asn1Acn::File &file) const override;
+    int valueFor(const Asn1Acn::TypeAssignment &type) const override;
+    int valueFor(const Asn1Acn::ValueAssignment &value) const override;
+    int valueFor(const Asn1Acn::Project &project) const override;
 };
 
 } // namespace OutlineVisitors

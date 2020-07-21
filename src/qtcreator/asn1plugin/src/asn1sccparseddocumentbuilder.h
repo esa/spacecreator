@@ -50,8 +50,8 @@ public:
                                  const QHash<QString, QString> &documents);
     void run() override;
 
-    std::vector<std::unique_ptr<Data::File>> takeDocuments() override;
-    const std::vector<Data::ErrorMessage> &errorMessages() const override
+    std::vector<std::unique_ptr<Asn1Acn::File>> takeDocuments() override;
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages() const override
     {
         return m_errorMessages;
     }
@@ -71,8 +71,8 @@ private:
 
     const QHash<QString, QString> m_documentSources;
 
-    std::vector<std::unique_ptr<Data::File>> m_parsedDocuments;
-    std::vector<Data::ErrorMessage> m_errorMessages;
+    std::vector<std::unique_ptr<Asn1Acn::File>> m_parsedDocuments;
+    std::vector<Asn1Acn::ErrorMessage> m_errorMessages;
 };
 
 } /* namespace Internal */

@@ -171,7 +171,7 @@ void ProjectContentHandler::onFilesProcessingFinished(const QString &projectName
 }
 
 void ProjectContentHandler::handleFilesProcesedWithSuccess(
-    const QString &projectName, std::vector<std::unique_ptr<Data::File>> parsedDocuments)
+    const QString &projectName, std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments)
 {
     for (size_t i = 0; i < parsedDocuments.size(); i++)
         m_storage->addFileToProject(projectName, std::move(parsedDocuments[i]));
@@ -179,8 +179,8 @@ void ProjectContentHandler::handleFilesProcesedWithSuccess(
 
 void ProjectContentHandler::handleFilesProcesedWithFailure(
     const QString &projectName,
-    std::vector<std::unique_ptr<Data::File>> parsedDocuments,
-    const std::vector<Data::ErrorMessage> &errorMessages)
+    std::vector<std::unique_ptr<Asn1Acn::File>> parsedDocuments,
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages)
 {
     for (size_t i = 0; i < parsedDocuments.size(); i++) {
         const auto path = Utils::FileName::fromString(parsedDocuments[i]->location().path());
@@ -195,7 +195,7 @@ void ProjectContentHandler::handleFilesProcesedWithFailure(
 }
 
 void ProjectContentHandler::refreshErrorMessages(
-    Data::File *file, const std::vector<Data::ErrorMessage> &errorMessages)
+    Asn1Acn::File *file, const std::vector<Asn1Acn::ErrorMessage> &errorMessages)
 {
     file->clearErrors();
 

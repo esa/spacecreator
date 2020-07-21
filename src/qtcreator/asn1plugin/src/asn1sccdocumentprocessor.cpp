@@ -31,12 +31,12 @@ using namespace Asn1Acn::Internal;
 
 Asn1SccDocumentProcessor *Asn1SccDocumentProcessor::create(const QString &projectName)
 {
-    return new Asn1SccDocumentProcessor(projectName,
-                                        [](const QHash<QString, QString> &documents)
-                                            -> ParsedDocumentBuilder * {
-                                            return Asn1SccParsedDocumentBuilder::create(documents);
-                                        },
-                                        ParsedDataStorage::instance());
+    return new Asn1SccDocumentProcessor(
+        projectName,
+        [](const QHash<QString, QString> &documents) -> ParsedDocumentBuilder * {
+            return Asn1SccParsedDocumentBuilder::create(documents);
+        },
+        ParsedDataStorage::instance());
 }
 
 Asn1SccDocumentProcessor::Asn1SccDocumentProcessor(const QString &projectName,
@@ -82,7 +82,7 @@ Asn1SccDocumentProcessor::State Asn1SccDocumentProcessor::state()
     return m_state;
 }
 
-std::vector<std::unique_ptr<Data::File>> Asn1SccDocumentProcessor::takeResults()
+std::vector<std::unique_ptr<Asn1Acn::File>> Asn1SccDocumentProcessor::takeResults()
 {
     return std::move(m_results);
 }
@@ -122,10 +122,10 @@ void Asn1SccDocumentProcessor::setState(Asn1SccDocumentProcessor::State expected
 void Asn1SccDocumentProcessor::createFallbackResults()
 {
     for (auto it = m_documents.begin(); it != m_documents.end(); it++)
-        m_results.push_back(std::make_unique<Data::File>(it.key()));
+        m_results.push_back(std::make_unique<Asn1Acn::File>(it.key()));
 }
 
-const std::vector<Data::ErrorMessage> &Asn1SccDocumentProcessor::errorMessages() const
+const std::vector<Asn1Acn::ErrorMessage> &Asn1SccDocumentProcessor::errorMessages() const
 {
     return m_docBuilder->errorMessages();
 }

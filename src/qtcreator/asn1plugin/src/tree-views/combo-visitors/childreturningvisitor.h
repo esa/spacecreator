@@ -41,7 +41,7 @@ public:
     ~ChildReturningVisitor() override = default;
 
 private:
-    Data::Node *valueFor(const Data::File &file) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::File &file) const override;
 };
 
 } // namespace ComboVisitors

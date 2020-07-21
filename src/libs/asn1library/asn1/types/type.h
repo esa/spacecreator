@@ -28,8 +28,6 @@
 #include <QVariantMap>
 
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 namespace Types {
 
 class Type
@@ -46,7 +44,5 @@ public:
     QVariantMap m_values;
 };
 
-} // namespace Types
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}
+}

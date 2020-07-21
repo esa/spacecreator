@@ -30,7 +30,6 @@
 
 using namespace Asn1Acn::Internal::TreeViews::OutlineVisitors;
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 
 OutlineModel::OutlineModel(const Utils::FileName &filePath, QObject *parent)
     : MutableRootModel(filePath, parent)
@@ -38,22 +37,22 @@ OutlineModel::OutlineModel(const Utils::FileName &filePath, QObject *parent)
 
 OutlineModel::~OutlineModel() {}
 
-Node *OutlineModel::parentOf(const Node *node) const
+Asn1Acn::Node *OutlineModel::parentOf(const Asn1Acn::Node *node) const
 {
     return node ? node->parent() : nullptr;
 }
 
-int OutlineModel::childrenCount(const Node *node) const
+int OutlineModel::childrenCount(const Asn1Acn::Node *node) const
 {
     return node ? node->valueFor<ChildrenCountingVisitor>() : 0;
 }
 
-int OutlineModel::indexInParent(const Node *parent, const Node *node) const
+int OutlineModel::indexInParent(const Asn1Acn::Node *parent, const Asn1Acn::Node *node) const
 {
     return parent ? parent->valueFor<IndexFindingVisitor>(node) : 0;
 }
 
-Node *OutlineModel::nthChild(const Node *node, int n) const
+Asn1Acn::Node *OutlineModel::nthChild(const Asn1Acn::Node *node, int n) const
 {
     return node ? node->valueFor<ChildReturningVisitor>(n) : nullptr;
 }

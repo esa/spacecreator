@@ -25,11 +25,12 @@
 
 #include "labeltype.h"
 
-using namespace Asn1Acn::Internal::Data::Types;
+using namespace Asn1Acn::Types;
 
 LabelType::LabelType(const QString &name)
     : m_name(name)
-{}
+{
+}
 
 QString LabelType::name() const
 {

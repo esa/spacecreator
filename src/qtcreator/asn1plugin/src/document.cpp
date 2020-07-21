@@ -94,7 +94,7 @@ void Document::onFileContentChanged()
 
 namespace {
 QList<QTextEdit::ExtraSelection> errorsToSelection(
-    const std::vector<Data::ErrorMessage> &errorMessages, QTextDocument *textDocument)
+    const std::vector<Asn1Acn::ErrorMessage> &errorMessages, QTextDocument *textDocument)
 {
     const auto errorFormat = TextEditor::TextEditorSettings::instance()
                                  ->fontSettings()

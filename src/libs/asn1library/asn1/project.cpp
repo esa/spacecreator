@@ -26,14 +26,15 @@
 
 #include "visitor.h"
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
 Project::Project(const QString &projectName)
     : Node(projectName, {})
     , m_buildersCount(0)
-{}
+{
+}
 
-Project::~Project() {}
+Project::~Project() { }
 
 void Project::accept(Visitor &visitor) const
 {

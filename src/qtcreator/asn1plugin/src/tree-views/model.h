@@ -49,21 +49,21 @@ public:
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
 
-    void setRoot(const Data::Node *root);
+    void setRoot(const Asn1Acn::Node *root);
 
-    const Data::Node *dataNode(const QModelIndex &index) const;
+    const Asn1Acn::Node *dataNode(const QModelIndex &index) const;
 
 protected slots:
     virtual void onEndResetModel() = 0;
 
 protected:
-    virtual Data::Node *parentOf(const Data::Node *node) const = 0;
-    virtual int childrenCount(const Data::Node *node) const = 0;
-    virtual int indexInParent(const Data::Node *parent, const Data::Node *node) const = 0;
-    virtual Data::Node *nthChild(const Data::Node *node, int n) const = 0;
+    virtual Asn1Acn::Node *parentOf(const Asn1Acn::Node *node) const = 0;
+    virtual int childrenCount(const Asn1Acn::Node *node) const = 0;
+    virtual int indexInParent(const Asn1Acn::Node *parent, const Asn1Acn::Node *node) const = 0;
+    virtual Asn1Acn::Node *nthChild(const Asn1Acn::Node *node, int n) const = 0;
 
 private:
-    const Data::Node *m_root;
+    const Asn1Acn::Node *m_root;
 };
 
 } // namespace TreeViews

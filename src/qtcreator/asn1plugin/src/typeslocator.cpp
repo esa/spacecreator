@@ -57,7 +57,7 @@ void TypesLocator::accept(Entry selection,
     Q_UNUSED(newText);
     Q_UNUSED(selectionStart);
     Q_UNUSED(selectionLength);
-    const auto location = qvariant_cast<Data::SourceLocation>(selection.internalData);
+    const auto location = qvariant_cast<Asn1Acn::SourceLocation>(selection.internalData);
     Core::EditorManager::openEditorAt(location.path(), location.line(), location.column());
 }
 
@@ -79,7 +79,7 @@ public:
         : m_parent(parent)
     {}
 
-    void append(const Data::Node *node,
+    void append(const Asn1Acn::Node *node,
                 const QRegularExpressionMatch &current,
                 const QRegularExpressionMatch &parent)
     {
@@ -93,7 +93,7 @@ public:
     QList<Entry> entries() const { return m_betterEntries + m_goodEntries; }
 
 private:
-    Entry buildEntry(const Data::Node *node)
+    Entry buildEntry(const Asn1Acn::Node *node)
     {
         const auto icon = node->valueFor<TreeViews::DecorationRoleVisitor>();
         Entry entry(m_parent, node->name(), qVariantFromValue(node->location()), icon);
@@ -133,7 +133,7 @@ QList<TypesLocator::Entry> TypesLocator::matchesFor(QFutureInterface<Entry> &fut
                 if (future.isCanceled())
                     return collector.entries();
                 const auto defsMatch = regExp.match(defs->name());
-                defs->forAllNodes([&](const Data::Node *node) {
+                defs->forAllNodes([&](const Asn1Acn::Node *node) {
                     if (future.isCanceled())
                         return;
                     collector.append(node, regExp.match(node->name()), defsMatch);

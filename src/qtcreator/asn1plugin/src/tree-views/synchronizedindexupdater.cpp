@@ -84,21 +84,21 @@ namespace {
 
 using Match = std::pair<QModelIndex, int>;
 
-bool locationMatches(const Data::SourceLocation &cursorLocation,
-                     const Data::SourceLocation &itemLocation)
+bool locationMatches(const Asn1Acn::SourceLocation &cursorLocation,
+                     const Asn1Acn::SourceLocation &itemLocation)
 {
     return itemLocation.line() == cursorLocation.line()
            && cursorLocation.column() >= itemLocation.column();
 }
 
-bool isBetterMatch(const Match &currentMatch, const Data::SourceLocation &itemLocation)
+bool isBetterMatch(const Match &currentMatch, const Asn1Acn::SourceLocation &itemLocation)
 {
     return !currentMatch.first.isValid() || itemLocation.column() > currentMatch.second;
 }
 
 void findMatchInParent(const Model *model,
                        const QModelIndex &parentIndex,
-                       Data::SourceLocation cursorLocation,
+                       Asn1Acn::SourceLocation cursorLocation,
                        Match &currentBestMatch)
 {
     for (int row = 0; row < model->rowCount(parentIndex); ++row) {
@@ -119,8 +119,8 @@ void findMatchInParent(const Model *model,
 
 } // namespace
 
-QModelIndex SynchronizedIndexUpdater::findIndexInLocation(const QModelIndex &parentIndex,
-                                                          Data::SourceLocation cursorLocation) const
+QModelIndex SynchronizedIndexUpdater::findIndexInLocation(
+    const QModelIndex &parentIndex, Asn1Acn::SourceLocation cursorLocation) const
 {
     Match found = std::make_pair(QModelIndex(), -1);
 
@@ -129,13 +129,13 @@ QModelIndex SynchronizedIndexUpdater::findIndexInLocation(const QModelIndex &par
     return found.first;
 }
 
-Data::SourceLocation SynchronizedIndexUpdater::getCurrentLocation() const
+Asn1Acn::SourceLocation SynchronizedIndexUpdater::getCurrentLocation() const
 {
     int line = 0;
     int column = 0;
     m_editorWidget->convertPosition(m_editorWidget->position(), &line, &column);
 
-    return Data::SourceLocation(currentFilePath().toString(), line, column);
+    return Asn1Acn::SourceLocation(currentFilePath().toString(), line, column);
 }
 
 Utils::FileName SynchronizedIndexUpdater::currentFilePath() const

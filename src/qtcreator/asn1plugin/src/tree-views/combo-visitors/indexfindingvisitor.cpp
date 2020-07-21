@@ -24,14 +24,13 @@
 ****************************************************************************/
 #include "indexfindingvisitor.h"
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews::ComboVisitors;
 
-IndexFindingVisitor::IndexFindingVisitor(const Node *child)
+IndexFindingVisitor::IndexFindingVisitor(const Asn1Acn::Node *child)
     : OutlineVisitors::IndexFindingVisitor(child)
 {}
 
-int IndexFindingVisitor::valueFor(const File &file) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     return file.valueFor<OutlineVisitors::IndexFindingVisitor>(child()) + 1;
 }

@@ -29,35 +29,33 @@
 #include <asn1/visitorwithvalue.h>
 
 namespace Asn1Acn {
-namespace Internal {
 
-namespace Data {
 class Node;
-}
 
+namespace Internal {
 namespace Completion {
 
-class ImportFindingVisitor : public Data::VisitorWithValue<Data::Node *>
+class ImportFindingVisitor : public Asn1Acn::VisitorWithValue<Asn1Acn::Node *>
 {
 public:
     ImportFindingVisitor(const QString &module, const QString &import);
 
 private:
-    Data::Node *valueFor(const Data::Root &root) const override;
-    Data::Node *valueFor(const Data::Definitions &defs) const override;
-    Data::Node *valueFor(const Data::File &file) const override;
-    Data::Node *valueFor(const Data::TypeAssignment &type) const override;
-    Data::Node *valueFor(const Data::ValueAssignment &value) const override;
-    Data::Node *valueFor(const Data::Project &project) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Root &root) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Definitions &defs) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::File &file) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::TypeAssignment &type) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::ValueAssignment &value) const override;
+    Asn1Acn::Node *valueFor(const Asn1Acn::Project &project) const override;
 
     bool isValue() const;
     template<typename Collection>
-    Data::Node *findImportByName(const Collection &col) const;
+    Asn1Acn::Node *findImportByName(const Collection &col) const;
 
     QString m_module;
     QString m_import;
 };
 
-} /* nameapsce Completion */
+} // namespace Completion
 } /* namespace Internal */
 } /* namespace Asn1Acn */

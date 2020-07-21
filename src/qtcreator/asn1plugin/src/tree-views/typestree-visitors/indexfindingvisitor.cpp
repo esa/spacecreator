@@ -31,7 +31,6 @@
 
 #include <tree-views/outline-visitors/childrencountingvisitor.h>
 
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal::TreeViews;
 using namespace Asn1Acn::Internal::TreeViews::TypesTreeVisitors;
 
@@ -41,13 +40,13 @@ IndexFindingVisitor::IndexFindingVisitor(const Node *child)
 
 IndexFindingVisitor::~IndexFindingVisitor() {}
 
-int IndexFindingVisitor::valueFor(const File &file) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::File &file) const
 {
     Q_UNUSED(file);
     QTC_ASSERT(false && "This visitor should not be called for Data::File", return 0);
 }
 
-int IndexFindingVisitor::valueFor(const Project &project) const
+int IndexFindingVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     int offset = 0;
     for (const auto &file : project.files()) {

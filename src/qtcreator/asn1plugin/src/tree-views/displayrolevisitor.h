@@ -32,18 +32,18 @@ namespace Asn1Acn {
 namespace Internal {
 namespace TreeViews {
 
-class DisplayRoleVisitor : public Data::VisitorWithValue<QString>
+class DisplayRoleVisitor : public Asn1Acn::VisitorWithValue<QString>
 {
 public:
     ~DisplayRoleVisitor() override;
 
 private:
-    QString valueFor(const Data::Root &root) const override;
-    QString valueFor(const Data::Definitions &defs) const override;
-    QString valueFor(const Data::File &file) const override;
-    QString valueFor(const Data::TypeAssignment &type) const override;
-    QString valueFor(const Data::ValueAssignment &value) const override;
-    QString valueFor(const Data::Project &project) const override;
+    QString valueFor(const Asn1Acn::Root &root) const override;
+    QString valueFor(const Asn1Acn::Definitions &defs) const override;
+    QString valueFor(const Asn1Acn::File &file) const override;
+    QString valueFor(const Asn1Acn::TypeAssignment &type) const override;
+    QString valueFor(const Asn1Acn::ValueAssignment &value) const override;
+    QString valueFor(const Asn1Acn::Project &project) const override;
 };
 
 } // namespace TreeViews

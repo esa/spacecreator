@@ -41,10 +41,10 @@ protected:
     void onEndResetModel() override;
 
 private:
-    Data::Node *parentOf(const Data::Node *node) const override;
-    int childrenCount(const Data::Node *node) const override;
-    int indexInParent(const Data::Node *parent, const Data::Node *node) const override;
-    Data::Node *nthChild(const Data::Node *node, int n) const override;
+    Asn1Acn::Node *parentOf(const Asn1Acn::Node *node) const override;
+    int childrenCount(const Asn1Acn::Node *node) const override;
+    int indexInParent(const Asn1Acn::Node *parent, const Asn1Acn::Node *node) const override;
+    Asn1Acn::Node *nthChild(const Asn1Acn::Node *node, int n) const override;
 };
 
 } // namespace TreeViews

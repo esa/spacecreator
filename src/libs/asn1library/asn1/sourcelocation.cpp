@@ -27,14 +27,14 @@
 
 #include <QFileInfo>
 
-using namespace Asn1Acn::Internal::Data;
+using namespace Asn1Acn;
 
-bool Asn1Acn::Internal::Data::operator==(const SourceLocation &a, const SourceLocation &b)
+bool Asn1Acn::operator==(const SourceLocation &a, const SourceLocation &b)
 {
     return a.line() == b.line() && a.column() == b.column() && a.path() == b.path();
 }
 
-bool Asn1Acn::Internal::Data::operator!=(const SourceLocation &a, const SourceLocation &b)
+bool Asn1Acn::operator!=(const SourceLocation &a, const SourceLocation &b)
 {
     return !(a == b);
 }

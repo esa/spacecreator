@@ -33,7 +33,7 @@
 using namespace Asn1Acn::Internal;
 
 ParsedDataStorage::ParsedDataStorage()
-    : m_root(std::make_unique<Data::Root>())
+    : m_root(std::make_unique<Asn1Acn::Root>())
 {}
 
 ParsedDataStorage *ParsedDataStorage::instance()
@@ -42,15 +42,15 @@ ParsedDataStorage *ParsedDataStorage::instance()
     return &instance_;
 }
 
-Data::File *ParsedDataStorage::getAnyFileForPath(const Utils::FileName &filePath) const
+Asn1Acn::File *ParsedDataStorage::getAnyFileForPath(const Utils::FileName &filePath) const
 {
     QMutexLocker locker(&m_documentsMutex);
 
     return getFileForPathInternal(filePath);
 }
 
-Data::File *ParsedDataStorage::getFileForPathFromProject(const QString &projectName,
-                                                         const Utils::FileName &filePath)
+Asn1Acn::File *ParsedDataStorage::getFileForPathFromProject(const QString &projectName,
+                                                            const Utils::FileName &filePath)
 {
     QMutexLocker locker(&m_documentsMutex);
 
@@ -65,7 +65,7 @@ void ParsedDataStorage::addProject(const QString &projectName)
 {
     QMutexLocker locker(&m_documentsMutex);
 
-    m_root->add(std::make_unique<Data::Project>(projectName));
+    m_root->add(std::make_unique<Asn1Acn::Project>(projectName));
 }
 
 void ParsedDataStorage::removeProject(const QString &projectName)
@@ -89,17 +89,18 @@ const Utils::FileNameList ParsedDataStorage::getFilesPathsFromProject(const QStr
     return getFilesPathsFromProjectInternal(project);
 }
 
-Data::SourceLocation ParsedDataStorage::getDefinitionLocation(const Utils::FileName &path,
-                                                              const QString &typeAssignmentName,
-                                                              const QString &definitionsName) const
-{
-    const auto type = getTypeAssignment(path, typeAssignmentName, definitionsName);
-    return (type == nullptr) ? Data::SourceLocation() : type->location();
-}
-
-const Data::TypeAssignment *ParsedDataStorage::getTypeAssignment(const Utils::FileName &path,
+Asn1Acn::SourceLocation ParsedDataStorage::getDefinitionLocation(const Utils::FileName &path,
                                                                  const QString &typeAssignmentName,
                                                                  const QString &definitionsName) const
+{
+    const auto type = getTypeAssignment(path, typeAssignmentName, definitionsName);
+    return (type == nullptr) ? Asn1Acn::SourceLocation() : type->location();
+}
+
+const Asn1Acn::TypeAssignment *ParsedDataStorage::getTypeAssignment(
+    const Utils::FileName &path,
+    const QString &typeAssignmentName,
+    const QString &definitionsName) const
 {
     QMutexLocker locker(&m_documentsMutex);
 
@@ -146,7 +147,7 @@ void ParsedDataStorage::resetProjectBuildersCount()
 }
 
 void ParsedDataStorage::addFileToProject(const QString &projectName,
-                                         std::unique_ptr<Data::File> file)
+                                         std::unique_ptr<Asn1Acn::File> file)
 {
     QMutexLocker locker(&m_documentsMutex);
 
@@ -221,7 +222,7 @@ const Utils::FileNameList ParsedDataStorage::getFilesPathsFromProjectInternal(
     return ret;
 }
 
-Data::File *ParsedDataStorage::getFileForPathInternal(const Utils::FileName &filePath) const
+Asn1Acn::File *ParsedDataStorage::getFileForPathInternal(const Utils::FileName &filePath) const
 {
     for (auto it = m_root->projects().begin(); it != m_root->projects().end(); it++)
         if ((*it)->file(filePath.toString()) != nullptr)
@@ -230,8 +231,8 @@ Data::File *ParsedDataStorage::getFileForPathInternal(const Utils::FileName &fil
     return nullptr;
 }
 
-Data::SourceLocation ParsedDataStorage::getLocationFromModule(
-    const Data::Definitions &moduleDefinition, const QString &typeAssignmentName) const
+Asn1Acn::SourceLocation ParsedDataStorage::getLocationFromModule(
+    const Asn1Acn::Definitions &moduleDefinition, const QString &typeAssignmentName) const
 {
     const auto type = moduleDefinition.type(typeAssignmentName);
     if (!type)

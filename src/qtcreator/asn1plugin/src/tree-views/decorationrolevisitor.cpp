@@ -37,7 +37,6 @@
 #include <utils/stylehelper.h>
 
 using namespace Asn1Acn::Internal::TreeViews;
-using namespace Asn1Acn::Internal::Data;
 using namespace Asn1Acn::Internal;
 
 QIcon Asn1Acn::Internal::TreeViews::createIcon(const QString &iconFile, Utils::Theme::Color color)
@@ -71,29 +70,29 @@ QIcon DecorationRoleVisitor::valueFor(const Definitions &defs) const
     return icon;
 }
 
-QIcon DecorationRoleVisitor::valueFor(const File &file) const
+QIcon DecorationRoleVisitor::valueFor(const Asn1Acn::File &file) const
 {
     Q_UNUSED(file);
     return Core::FileIconProvider::icon(QFileIconProvider::File);
 }
 
-QIcon DecorationRoleVisitor::valueFor(const TypeAssignment &type) const
+QIcon DecorationRoleVisitor::valueFor(const Asn1Acn::TypeAssignment &type) const
 {
     return typeIcon(type.type()->baseIconFile());
 }
 
-QIcon DecorationRoleVisitor::valueFor(const ValueAssignment &value) const
+QIcon DecorationRoleVisitor::valueFor(const Asn1Acn::ValueAssignment &value) const
 {
     return valueIcon(value.type()->baseIconFile());
 }
 
-QIcon DecorationRoleVisitor::valueFor(const Project &project) const
+QIcon DecorationRoleVisitor::valueFor(const Asn1Acn::Project &project) const
 {
     Q_UNUSED(project);
     return Core::FileIconProvider::icon(QFileIconProvider::Folder);
 }
 
-QIcon DecorationRoleVisitor::valueFor(const Root &root) const
+QIcon DecorationRoleVisitor::valueFor(const Asn1Acn::Root &root) const
 {
     Q_UNUSED(root);
     return {};

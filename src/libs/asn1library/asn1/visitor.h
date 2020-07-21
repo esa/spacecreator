@@ -25,8 +25,6 @@
 #pragma once
 
 namespace Asn1Acn {
-namespace Internal {
-namespace Data {
 
 class Definitions;
 class File;
@@ -38,7 +36,7 @@ class Project;
 class Visitor
 {
 protected:
-    Visitor() {}
+    Visitor() { }
 
 public:
     virtual ~Visitor();
@@ -51,6 +49,4 @@ public:
     virtual void visit(const Project &project) = 0;
 };
 
-} // namespace Data
-} // namespace Internal
-} // namespace Asn1Acn
+}

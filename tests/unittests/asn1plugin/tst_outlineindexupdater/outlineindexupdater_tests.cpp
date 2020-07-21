@@ -79,7 +79,7 @@ ParsedDataStorage *OutlineIndexUpdaterTests::createStorage()
     const QString filePath = m_editorWidget->textDocument()->filePath().toString();
 
     storage->addProject(projectName);
-    storage->addFileToProject(projectName, std::make_unique<Data::File>(filePath));
+    storage->addFileToProject(projectName, std::make_unique<Asn1Acn::File>(filePath));
 
     return storage;
 }
@@ -113,27 +113,27 @@ TextEditor::TextEditorWidget *OutlineIndexUpdaterTests::createEditorWidget()
     return editorWidget;
 }
 
-Data::Node *OutlineIndexUpdaterTests::createModelNodes(const QString &filePath)
+Asn1Acn::Node *OutlineIndexUpdaterTests::createModelNodes(const QString &filePath)
 {
-    const auto root = new Data::File(filePath);
+    const auto root = new Asn1Acn::File(filePath);
 
-    auto definitions1 = std::make_unique<Data::Definitions>("Test1", Data::SourceLocation { filePath, 1, 0 });
-    definitions1->addType(std::make_unique<Data::TypeAssignment>("Num1", Data::SourceLocation { filePath, 2, 3 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test1")));
-    definitions1->addType(std::make_unique<Data::TypeAssignment>("Num2", Data::SourceLocation { filePath, 3, 3 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test1")));
+    auto definitions1 = std::make_unique<Asn1Acn::Definitions>("Test1", Asn1Acn::SourceLocation { filePath, 1, 0 });
+    definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num1", Asn1Acn::SourceLocation { filePath, 2, 3 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1")));
+    definitions1->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num2", Asn1Acn::SourceLocation { filePath, 3, 3 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test1")));
     root->add(std::move(definitions1));
 
-    auto definitions2 = std::make_unique<Data::Definitions>("Test2", Data::SourceLocation { filePath, 5, 0 });
-    definitions2->addType(std::make_unique<Data::TypeAssignment>("Num3", Data::SourceLocation { filePath, 6, 3 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test2")));
-    definitions2->addType(std::make_unique<Data::TypeAssignment>("Num4", Data::SourceLocation { filePath, 7, 3 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test2")));
+    auto definitions2 = std::make_unique<Asn1Acn::Definitions>("Test2", Asn1Acn::SourceLocation { filePath, 5, 0 });
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num3", Asn1Acn::SourceLocation { filePath, 6, 3 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num4", Asn1Acn::SourceLocation { filePath, 7, 3 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
 
-    definitions2->addType(std::make_unique<Data::TypeAssignment>("Num5", Data::SourceLocation { filePath, 8, 3 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test2")));
-    definitions2->addType(std::make_unique<Data::TypeAssignment>("Num6", Data::SourceLocation { filePath, 8, 42 },
-            std::make_unique<Data::Types::UserdefinedType>("UserTypeName", "Test2")));
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num5", Asn1Acn::SourceLocation { filePath, 8, 3 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
+    definitions2->addType(std::make_unique<Asn1Acn::TypeAssignment>("Num6", Asn1Acn::SourceLocation { filePath, 8, 42 },
+            std::make_unique<Asn1Acn::Types::UserdefinedType>("UserTypeName", "Test2")));
     root->add(std::move(definitions2));
 
     m_data = root;
@@ -171,7 +171,7 @@ void OutlineIndexUpdaterTests::test_setNonEmpytEditorChangedPosition()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), lineNumber);
 }
 
@@ -191,7 +191,7 @@ void OutlineIndexUpdaterTests::test_cursorMovedToModule()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
 
     QCOMPARE(location.line(), lineNumber);
     QCOMPARE(location.column(), columnNumber);
@@ -213,7 +213,7 @@ void OutlineIndexUpdaterTests::test_cursorMovedToTypeDefinition()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), lineNumber);
 }
 
@@ -251,7 +251,7 @@ void OutlineIndexUpdaterTests::test_cursorMovedToSecondDefinitionInLine()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), 8);
     QCOMPARE(location.column(), 42);
 }
@@ -272,7 +272,7 @@ void OutlineIndexUpdaterTests::test_cursorMovedBetweenDefinitions()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), 8);
     QCOMPARE(location.column(), 3);
 }
@@ -291,7 +291,7 @@ void OutlineIndexUpdaterTests::test_forceUpdate()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), lineNumber);
 }
 
@@ -309,7 +309,7 @@ void OutlineIndexUpdaterTests::test_forceUpdateAfterCursorMoved()
 
     const auto index = qvariant_cast<QModelIndex>(spy.at(0).at(1));
     const auto node = m_model->dataNode(index);
-    const Data::SourceLocation location = node->location();
+    const Asn1Acn::SourceLocation location = node->location();
     QCOMPARE(location.line(), lineNumber);
 }
 
