@@ -62,3 +62,20 @@ void Type::setParameters(const QVariantMap &parameters)
 {
     m_parameters = parameters;
 }
+
+/*!
+   Returns children. Children are possible for the types Choice and Sequence
+ */
+const std::vector<std::unique_ptr<Type>> &Type::children() const
+{
+    return m_children;
+}
+
+/*!
+   Adds a child to this type.
+   \note This type takes over ownership of the \p child
+ */
+void Type::addChild(std::unique_ptr<Type> child)
+{
+    m_children.push_back(std::move(child));
+}

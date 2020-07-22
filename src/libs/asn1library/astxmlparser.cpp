@@ -388,7 +388,7 @@ void AstXmlParser::readSequenceAsn(Types::Type *type)
         const QString name = readVarNameAttribute();
         auto sequenceType = readType();
         sequenceType->setIdentifier(name);
-        sequence->m_sequence.append(sequenceType.release());
+        sequence->addChild(std::move(sequenceType));
         m_xmlReader.skipCurrentElement();
     }
 }
@@ -442,7 +442,7 @@ void AstXmlParser::readChoiceAsn(Types::Type *type)
         const QString name = readVarNameAttribute();
         std::unique_ptr<Types::Type> choiceType = readType();
         choiceType->setIdentifier(name);
-        choice->m_choices.append(choiceType.release());
+        choice->addChild(std::move(choiceType));
         m_xmlReader.skipCurrentElement();
     }
 }

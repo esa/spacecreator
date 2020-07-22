@@ -26,6 +26,8 @@
 
 #include <QString>
 #include <QVariantMap>
+#include <memory>
+#include <vector>
 
 namespace Asn1Acn {
 
@@ -56,7 +58,10 @@ public:
     };
 
     Type(const QString &identifier = QString());
+    Type(const Type &) = delete;
     virtual ~Type() = default;
+
+    Type &operator=(const Type &) = delete;
 
     /*!
        Type as string
@@ -73,11 +78,15 @@ public:
     const QVariantMap &parameters() const;
     void setParameters(const QVariantMap &parameters);
 
+    const std::vector<std::unique_ptr<Type>> &children() const;
+    void addChild(std::unique_ptr<Type> child);
+
 private:
     void setIdentifier(const QString &name);
 
     QString m_identifier;
     QVariantMap m_parameters;
+    std::vector<std::unique_ptr<Type>> m_children;
 
     friend class Asn1Acn::AstXmlParser;
 };

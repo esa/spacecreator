@@ -27,8 +27,6 @@
 #include "type.h"
 
 #include <QString>
-#include <QVector>
-#include <memory>
 
 namespace Asn1Acn {
 namespace Types {
@@ -134,29 +132,21 @@ public:
 class Choice : public BuiltinType
 {
 public:
-    ~Choice() { qDeleteAll(m_choices); }
-
     QString typeName() const override { return QLatin1String("CHOICE"); }
 
     ASN1Type typeEnum() const override { return CHOICE; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/choice.png"); }
-
-    QVector<Type *> m_choices;
 };
 
 class Sequence : public BuiltinType
 {
 public:
-    ~Sequence() { qDeleteAll(m_sequence); }
-
     QString typeName() const override { return QLatin1String("SEQUENCE"); }
 
     ASN1Type typeEnum() const override { return SEQUENCE; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/sequence.png"); }
-
-    QVector<Type *> m_sequence;
 };
 
 class SequenceOf : public BuiltinType

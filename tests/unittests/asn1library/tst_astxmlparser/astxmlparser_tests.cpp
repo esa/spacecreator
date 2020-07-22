@@ -757,20 +757,20 @@ void AstXmlParserTests::test_asn1AstParsing()
     const auto choice1 = definitions->type("MyChoice");
     QCOMPARE(choice1->type()->typeName(), QStringLiteral("CHOICE"));
     auto choiceType1 = dynamic_cast<const Asn1Acn::Types::Choice *>(choice1->type());
-    QCOMPARE(choiceType1->m_choices.size(), 2);
-    QCOMPARE(choiceType1->m_choices.at(0)->typeName(), QStringLiteral("BOOLEAN"));
-    QCOMPARE(choiceType1->m_choices.at(0)->identifier(), QStringLiteral("hop"));
-    QCOMPARE(choiceType1->m_choices.at(1)->typeName(), QStringLiteral("REAL"));
-    QCOMPARE(choiceType1->m_choices.at(1)->identifier(), QStringLiteral("lat"));
+    QCOMPARE(choiceType1->children().size(), 2);
+    QCOMPARE(choiceType1->children().at(0)->typeName(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(choiceType1->children().at(0)->identifier(), QStringLiteral("hop"));
+    QCOMPARE(choiceType1->children().at(1)->typeName(), QStringLiteral("REAL"));
+    QCOMPARE(choiceType1->children().at(1)->identifier(), QStringLiteral("lat"));
 
     const auto sequence1 = definitions->type("MySeq");
     QCOMPARE(sequence1->type()->typeName(), QStringLiteral("SEQUENCE"));
     auto sequenceType1 = dynamic_cast<const Asn1Acn::Types::Sequence *>(sequence1->type());
-    QCOMPARE(sequenceType1->m_sequence.size(), 2);
-    QCOMPARE(sequenceType1->m_sequence.at(0)->typeName(), QStringLiteral("BOOLEAN"));
-    QCOMPARE(sequenceType1->m_sequence.at(0)->identifier(), QStringLiteral("foo"));
-    QCOMPARE(sequenceType1->m_sequence.at(1)->typeName(), QStringLiteral("INTEGER"));
-    QCOMPARE(sequenceType1->m_sequence.at(1)->identifier(), QStringLiteral("int2Val"));
+    QCOMPARE(sequenceType1->children().size(), 2);
+    QCOMPARE(sequenceType1->children().at(0)->typeName(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(sequenceType1->children().at(0)->identifier(), QStringLiteral("foo"));
+    QCOMPARE(sequenceType1->children().at(1)->typeName(), QStringLiteral("INTEGER"));
+    QCOMPARE(sequenceType1->children().at(1)->identifier(), QStringLiteral("int2Val"));
 
     const auto int2 = definitions->type("T-UInt32");
     QCOMPARE(int2->type()->typeName(), QStringLiteral("INTEGER"));
