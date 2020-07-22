@@ -46,6 +46,8 @@ class Boolean : public BuiltinType
 public:
     QString name() const override { return QLatin1String("BOOLEAN"); }
 
+    ASN1Type typeEnum() const override { return BOOLEAN; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/boolean.png"); }
 };
 
@@ -53,6 +55,8 @@ class Null : public BuiltinType
 {
 public:
     QString name() const override { return QLatin1String("NULL"); }
+
+    ASN1Type typeEnum() const override { return NULLTYPE; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/null.png"); }
 };
@@ -62,6 +66,8 @@ class Integer : public BuiltinType
 public:
     QString name() const override { return QLatin1String("INTEGER"); }
 
+    ASN1Type typeEnum() const override { return INTEGER; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/integer.png"); }
 };
 
@@ -69,6 +75,8 @@ class Real : public BuiltinType
 {
 public:
     QString name() const override { return QLatin1String("REAL"); }
+
+    ASN1Type typeEnum() const override { return REAL; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/real.png"); }
 };
@@ -78,6 +86,8 @@ class BitString : public BuiltinType
 public:
     QString name() const override { return QLatin1String("BIT STRING"); }
 
+    ASN1Type typeEnum() const override { return BITSTRING; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/bitstring.png"); }
 };
 
@@ -85,6 +95,8 @@ class OctetString : public BuiltinType
 {
 public:
     QString name() const override { return QLatin1String("OCTET STRING"); }
+
+    ASN1Type typeEnum() const override { return OCTETSTRING; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/octetstring.png"); }
 };
@@ -94,6 +106,8 @@ class IA5String : public BuiltinType
 public:
     QString name() const override { return QLatin1String("IA5String"); }
 
+    ASN1Type typeEnum() const override { return IA5STRING; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/ia5string.png"); }
 };
 
@@ -102,6 +116,8 @@ class NumericString : public BuiltinType
 public:
     QString name() const override { return QLatin1String("NumericString"); }
 
+    ASN1Type typeEnum() const override { return NUMERICSTRING; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/numericstring.png"); }
 };
 
@@ -109,6 +125,8 @@ class Enumerated : public BuiltinType
 {
 public:
     QString name() const override { return QLatin1String("ENUMERATED"); }
+
+    ASN1Type typeEnum() const override { return ENUMERATED; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/enumerated.png"); }
 };
@@ -119,6 +137,8 @@ public:
     ~Choice() { qDeleteAll(m_choices); }
 
     QString name() const override { return QLatin1String("CHOICE"); }
+
+    ASN1Type typeEnum() const override { return CHOICE; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/choice.png"); }
 
@@ -132,6 +152,8 @@ public:
 
     QString name() const override { return QLatin1String("SEQUENCE"); }
 
+    ASN1Type typeEnum() const override { return SEQUENCE; }
+
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/sequence.png"); }
 
     QVector<Type *> m_sequence;
@@ -141,6 +163,8 @@ class SequenceOf : public BuiltinType
 {
 public:
     QString name() const override { return QLatin1String("SEQUENCE OF"); }
+
+    ASN1Type typeEnum() const override { return SEQUENCEOF; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/sequenceof.png"); }
 };

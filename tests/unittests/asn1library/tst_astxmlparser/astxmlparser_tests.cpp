@@ -113,6 +113,7 @@ void AstXmlParserTests::test_builtinTypeReference()
 {
     QFETCH(QString, xmlTypeName);
     QFETCH(QString, typeName);
+    QFETCH(Asn1Acn::Types::Type::ASN1Type, typeEnum);
 
     parse(R"(<?xml version="1.0" encoding="utf-8"?>)"
           R"(<AstRoot>)"
@@ -134,26 +135,28 @@ void AstXmlParserTests::test_builtinTypeReference()
               R"(</AstRoot>)");
 
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), typeName);
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->typeEnum(), typeEnum);
 }
 
 void AstXmlParserTests::test_builtinTypeReference_data()
 {
     QTest::addColumn<QString>("xmlTypeName");
     QTest::addColumn<QString>("typeName");
+    QTest::addColumn<Asn1Acn::Types::Type::ASN1Type>("typeEnum");
 
     // clang-format off
-    QTest::newRow("Boolean")       << "BOOLEAN"       << "BOOLEAN";
-    QTest::newRow("Null")          << "NULL"          << "NULL";
-    QTest::newRow("Integer")       << "INTEGER"       << "INTEGER";
-    QTest::newRow("Real")          << "REAL"          << "REAL";
-    QTest::newRow("BitString")     << "BIT_STRING"    << "BIT STRING";
-    QTest::newRow("OctetString")   << "OCTET_STRING"  << "OCTET STRING";
-    QTest::newRow("IA5String")     << "IA5String"     << "IA5String";
-    QTest::newRow("NumericString") << "NumericString" << "NumericString";
-    QTest::newRow("Enumerated")    << "ENUMERATED"    << "ENUMERATED";
-    QTest::newRow("Choice")        << "CHOICE"        << "CHOICE";
-    QTest::newRow("Sequence")      << "SEQUENCE"      << "SEQUENCE";
-    QTest::newRow("SequenceOf")    << "SEQUENCE_OF"   << "SEQUENCE OF";
+    QTest::newRow("Boolean")       << "BOOLEAN"       << "BOOLEAN"          << Asn1Acn::Types::Type::BOOLEAN;
+    QTest::newRow("Null")          << "NULL"          << "NULL"             << Asn1Acn::Types::Type::NULLTYPE;
+    QTest::newRow("Integer")       << "INTEGER"       << "INTEGER"          << Asn1Acn::Types::Type::INTEGER;
+    QTest::newRow("Real")          << "REAL"          << "REAL"             << Asn1Acn::Types::Type::REAL;
+    QTest::newRow("BitString")     << "BIT_STRING"    << "BIT STRING"       << Asn1Acn::Types::Type::BITSTRING;
+    QTest::newRow("OctetString")   << "OCTET_STRING"  << "OCTET STRING"     << Asn1Acn::Types::Type::OCTETSTRING;
+    QTest::newRow("IA5String")     << "IA5String"     << "IA5String"        << Asn1Acn::Types::Type::IA5STRING;
+    QTest::newRow("NumericString") << "NumericString" << "NumericString"    << Asn1Acn::Types::Type::NUMERICSTRING;
+    QTest::newRow("Enumerated")    << "ENUMERATED"    << "ENUMERATED"       << Asn1Acn::Types::Type::ENUMERATED;
+    QTest::newRow("Choice")        << "CHOICE"        << "CHOICE"           << Asn1Acn::Types::Type::CHOICE;
+    QTest::newRow("Sequence")      << "SEQUENCE"      << "SEQUENCE"         << Asn1Acn::Types::Type::SEQUENCE;
+    QTest::newRow("SequenceOf")    << "SEQUENCE_OF"   << "SEQUENCE OF"      << Asn1Acn::Types::Type::SEQUENCEOF;
     // clang-format on
 }
 

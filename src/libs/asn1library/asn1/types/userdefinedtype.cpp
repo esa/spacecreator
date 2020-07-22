@@ -43,6 +43,11 @@ QString UserdefinedType::label() const
     return ": " + m_module + "." + name();
 }
 
+Type::ASN1Type UserdefinedType::typeEnum() const
+{
+    return USERDEFINED;
+}
+
 QString UserdefinedType::baseIconFile() const
 {
     return QStringLiteral(":/asn1acn/images/outline/userdefined.png");

@@ -33,10 +33,31 @@ namespace Types {
 class Type
 {
 public:
+    enum ASN1Type
+    {
+        INTEGER,
+        REAL,
+        BOOLEAN,
+        SEQUENCE,
+        SEQUENCEOF,
+        ENUMERATED,
+        CHOICE,
+        STRING,
+        NULLTYPE,
+        BITSTRING,
+        IA5STRING,
+        NUMERICSTRING,
+        OCTETSTRING,
+        LABELTYPE,
+        USERDEFINED
+    };
+
     virtual ~Type() = default;
 
     virtual QString name() const = 0;
     virtual QString label() const = 0;
+
+    virtual ASN1Type typeEnum() const = 0;
 
     virtual QString baseIconFile() const = 0;
 
@@ -46,3 +67,5 @@ public:
 
 }
 }
+
+Q_DECLARE_METATYPE(Asn1Acn::Types::Type::ASN1Type)

@@ -43,6 +43,8 @@ public:
 
     const Types::Type *type() const { return m_type.get(); }
 
+    Types::Type::ASN1Type typeEnum() const;
+
 private:
     std::unique_ptr<Types::Type> m_type;
 };

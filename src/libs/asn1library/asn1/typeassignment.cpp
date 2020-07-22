@@ -32,6 +32,7 @@ TypeAssignment::TypeAssignment(const QString &name, const SourceLocation &locati
     : Node(name, location)
     , m_type(std::move(type))
 {
+    Q_ASSERT(m_type);
 }
 
 TypeAssignment::~TypeAssignment() { }
@@ -39,4 +40,12 @@ TypeAssignment::~TypeAssignment() { }
 void TypeAssignment::accept(Visitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+/*!
+   Quick access to the type's enum.
+ */
+Types::Type::ASN1Type TypeAssignment::typeEnum() const
+{
+    return m_type->typeEnum();
 }

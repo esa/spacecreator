@@ -42,6 +42,11 @@ QString LabelType::label() const
     return QString();
 }
 
+Type::ASN1Type LabelType::typeEnum() const
+{
+    return LABELTYPE;
+}
+
 QString LabelType::baseIconFile() const
 {
     return QString();

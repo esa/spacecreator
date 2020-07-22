@@ -40,6 +40,8 @@ public:
     QString name() const override;
     QString label() const override;
 
+    ASN1Type typeEnum() const override;
+
     QString baseIconFile() const override;
 
 private:
