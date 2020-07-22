@@ -28,6 +28,9 @@
 #include <QVariantMap>
 
 namespace Asn1Acn {
+
+class AstXmlParser;
+
 namespace Types {
 
 class Type
@@ -52,17 +55,30 @@ public:
         USERDEFINED
     };
 
+    Type(const QString &identifier = QString());
     virtual ~Type() = default;
 
-    virtual QString name() const = 0;
+    /*!
+       Type as string
+     */
+    virtual QString typeName() const = 0;
+    virtual ASN1Type typeEnum() const = 0;
+
     virtual QString label() const = 0;
 
-    virtual ASN1Type typeEnum() const = 0;
+    const QString &identifier() const;
 
     virtual QString baseIconFile() const = 0;
 
     /// Data values of this ASN1 type (like min/max for numbers)
     QVariantMap m_values;
+
+private:
+    void setIdentifier(const QString &name);
+
+    QString m_identifier;
+
+    friend class Asn1Acn::AstXmlParser;
 };
 
 }

@@ -35,9 +35,9 @@ namespace Types {
 class UserdefinedType : public Type
 {
 public:
-    UserdefinedType(const QString &name, const QString &module);
+    UserdefinedType(const QString &typeName, const QString &module);
 
-    QString name() const override;
+    QString typeName() const override;
     QString label() const override;
 
     ASN1Type typeEnum() const override;

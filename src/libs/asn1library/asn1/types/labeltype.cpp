@@ -32,7 +32,7 @@ LabelType::LabelType(const QString &name)
 {
 }
 
-QString LabelType::name() const
+QString LabelType::typeName() const
 {
     return m_name;
 }

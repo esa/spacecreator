@@ -37,7 +37,7 @@ class LabelType : public Type
 public:
     LabelType(const QString &label);
 
-    QString name() const override;
+    QString typeName() const override;
     QString label() const override;
 
     ASN1Type typeEnum() const override;

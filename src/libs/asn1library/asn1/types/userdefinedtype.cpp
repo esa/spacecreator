@@ -33,14 +33,14 @@ UserdefinedType::UserdefinedType(const QString &name, const QString &module)
 {
 }
 
-QString UserdefinedType::name() const
+QString UserdefinedType::typeName() const
 {
     return m_name;
 }
 
 QString UserdefinedType::label() const
 {
-    return ": " + m_module + "." + name();
+    return ": " + m_module + "." + typeName();
 }
 
 Type::ASN1Type UserdefinedType::typeEnum() const

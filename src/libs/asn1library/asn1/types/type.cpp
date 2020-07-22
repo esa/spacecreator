@@ -26,3 +26,22 @@
 #include "type.h"
 
 using namespace Asn1Acn::Types;
+
+Type::Type(const QString &identifier)
+    : m_identifier(identifier)
+{
+}
+
+/*!
+   Returns the identifier/name of this type
+   \note This is the same as the Asn1Acn::TypeAssignment name()
+ */
+const QString &Type::identifier() const
+{
+    return m_identifier;
+}
+
+void Type::setIdentifier(const QString &name)
+{
+    m_identifier = name;
+}

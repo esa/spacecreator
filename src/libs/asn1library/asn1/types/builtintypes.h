@@ -36,15 +36,15 @@ namespace Types {
 class BuiltinType : public Type
 {
 public:
-    static std::unique_ptr<Type> createBuiltinType(const QString &name);
+    static std::unique_ptr<Type> createBuiltinType(const QString &typeName);
 
-    QString label() const override { return QLatin1String(": ") + name(); }
+    QString label() const override { return QLatin1String(": ") + typeName(); }
 };
 
 class Boolean : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("BOOLEAN"); }
+    QString typeName() const override { return QLatin1String("BOOLEAN"); }
 
     ASN1Type typeEnum() const override { return BOOLEAN; }
 
@@ -54,7 +54,7 @@ public:
 class Null : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("NULL"); }
+    QString typeName() const override { return QLatin1String("NULL"); }
 
     ASN1Type typeEnum() const override { return NULLTYPE; }
 
@@ -64,7 +64,7 @@ public:
 class Integer : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("INTEGER"); }
+    QString typeName() const override { return QLatin1String("INTEGER"); }
 
     ASN1Type typeEnum() const override { return INTEGER; }
 
@@ -74,7 +74,7 @@ public:
 class Real : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("REAL"); }
+    QString typeName() const override { return QLatin1String("REAL"); }
 
     ASN1Type typeEnum() const override { return REAL; }
 
@@ -84,7 +84,7 @@ public:
 class BitString : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("BIT STRING"); }
+    QString typeName() const override { return QLatin1String("BIT STRING"); }
 
     ASN1Type typeEnum() const override { return BITSTRING; }
 
@@ -94,7 +94,7 @@ public:
 class OctetString : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("OCTET STRING"); }
+    QString typeName() const override { return QLatin1String("OCTET STRING"); }
 
     ASN1Type typeEnum() const override { return OCTETSTRING; }
 
@@ -104,7 +104,7 @@ public:
 class IA5String : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("IA5String"); }
+    QString typeName() const override { return QLatin1String("IA5String"); }
 
     ASN1Type typeEnum() const override { return IA5STRING; }
 
@@ -114,7 +114,7 @@ public:
 class NumericString : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("NumericString"); }
+    QString typeName() const override { return QLatin1String("NumericString"); }
 
     ASN1Type typeEnum() const override { return NUMERICSTRING; }
 
@@ -124,7 +124,7 @@ public:
 class Enumerated : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("ENUMERATED"); }
+    QString typeName() const override { return QLatin1String("ENUMERATED"); }
 
     ASN1Type typeEnum() const override { return ENUMERATED; }
 
@@ -136,7 +136,7 @@ class Choice : public BuiltinType
 public:
     ~Choice() { qDeleteAll(m_choices); }
 
-    QString name() const override { return QLatin1String("CHOICE"); }
+    QString typeName() const override { return QLatin1String("CHOICE"); }
 
     ASN1Type typeEnum() const override { return CHOICE; }
 
@@ -150,7 +150,7 @@ class Sequence : public BuiltinType
 public:
     ~Sequence() { qDeleteAll(m_sequence); }
 
-    QString name() const override { return QLatin1String("SEQUENCE"); }
+    QString typeName() const override { return QLatin1String("SEQUENCE"); }
 
     ASN1Type typeEnum() const override { return SEQUENCE; }
 
@@ -162,7 +162,7 @@ public:
 class SequenceOf : public BuiltinType
 {
 public:
-    QString name() const override { return QLatin1String("SEQUENCE OF"); }
+    QString typeName() const override { return QLatin1String("SEQUENCE OF"); }
 
     ASN1Type typeEnum() const override { return SEQUENCEOF; }
 

@@ -61,6 +61,7 @@ private:
     void createNewModule();
     QString readIdAttribute();
     QString readNameAttribute();
+    QString readVarNameAttribute() const;
     int readLineAttribute();
     int readCharPossitionInLineAttribute();
     bool isParametrizedTypeInstance() const;

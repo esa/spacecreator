@@ -155,7 +155,8 @@ void AstXmlParser::readTypeAssignment()
     Q_ASSERT(m_currentDefinitions != nullptr);
     const auto location = readLocationFromAttributes();
     const auto name = readNameAttribute();
-    auto type = readType();
+    std::unique_ptr<Types::Type> type = readType();
+    type->setIdentifier(name);
     m_xmlReader.skipCurrentElement();
 
     m_currentDefinitions->addType(std::make_unique<TypeAssignment>(name, location, std::move(type)));
@@ -168,7 +169,8 @@ void AstXmlParser::readValueAssignment()
     Q_ASSERT(m_currentDefinitions != nullptr);
     const auto location = readLocationFromAttributes();
     const auto name = readNameAttribute();
-    auto type = readType();
+    std::unique_ptr<Types::Type> type = readType();
+    type->setIdentifier(name);
     m_xmlReader.skipCurrentElement();
 
     m_currentDefinitions->addValue(std::make_unique<ValueAssignment>(name, location, std::move(type)));
@@ -187,6 +189,11 @@ QString AstXmlParser::readModuleAttribute()
 QString AstXmlParser::readNameAttribute()
 {
     return m_xmlReader.attributes().value(QStringLiteral("Name")).toString();
+}
+
+QString AstXmlParser::readVarNameAttribute() const
+{
+    return m_xmlReader.attributes().value(QStringLiteral("VarName")).toString();
 }
 
 int AstXmlParser::readLineAttribute()
@@ -308,7 +315,7 @@ std::unique_ptr<Types::Type> AstXmlParser::readTypeDetails(const SourceLocation 
     if (isParametrized)
         m_xmlReader.skipCurrentElement();
     else
-        readTypeContents(type->name(), type.get());
+        readTypeContents(type->typeName(), type.get());
 
     return type;
 }
@@ -378,7 +385,9 @@ void AstXmlParser::readSequenceAsn(Types::Type *type)
     }
 
     while (skipToChildElement(QStringLiteral("SequenceOrSetChild"))) {
+        const QString name = readVarNameAttribute();
         auto sequenceType = readType();
+        sequenceType->setIdentifier(name);
         sequence->m_sequence.append(sequenceType.release());
         m_xmlReader.skipCurrentElement();
     }
@@ -430,7 +439,9 @@ void AstXmlParser::readChoiceAsn(Types::Type *type)
     }
 
     while (skipToChildElement(QStringLiteral("ChoiceChild"))) {
-        auto choiceType = readType();
+        const QString name = readVarNameAttribute();
+        std::unique_ptr<Types::Type> choiceType = readType();
+        choiceType->setIdentifier(name);
         choice->m_choices.append(choiceType.release());
         m_xmlReader.skipCurrentElement();
     }

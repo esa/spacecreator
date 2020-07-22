@@ -102,6 +102,7 @@ void AstXmlParserTests::test_singleTypeAssignment()
     QCOMPARE(m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->types().size(), std::size_t { 1 });
     const auto type = m_parsedData["Test2File.asn"]->definitions("TestDefinitions")->type("MyInt");
     QCOMPARE(type->name(), QStringLiteral("MyInt"));
+    QCOMPARE(type->type()->identifier(), QStringLiteral("MyInt"));
     QCOMPARE(type->location().path(), QStringLiteral("Test2File.asn"));
     QCOMPARE(type->location().line(), 4);
     QCOMPARE(type->location().column(), 10);
@@ -134,7 +135,7 @@ void AstXmlParserTests::test_builtinTypeReference()
               R"(  </Asn1File>)"
               R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), typeName);
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->typeName(), typeName);
     QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->typeEnum(), typeEnum);
 }
 
@@ -179,7 +180,7 @@ void AstXmlParserTests::test_userDefinedTypeReference()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), QStringLiteral("OrgInt"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->typeName(), QStringLiteral("OrgInt"));
 
     const auto ref = m_parsedData["X.asn"]->referencesMap().find(3);
     QVERIFY(ref->second != nullptr);
@@ -220,9 +221,9 @@ void AstXmlParserTests::test_multipleTypeAssignments()
           R"(  </Asn1File>)"
           R"(</AstRoot>)");
 
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->name(), QStringLiteral("INTEGER"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyBool")->type()->name(), QStringLiteral("BOOLEAN"));
-    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyNull")->type()->name(), QStringLiteral("NULL"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyInt")->type()->typeName(), QStringLiteral("INTEGER"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyBool")->type()->typeName(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(m_parsedData["X.asn"]->definitions("Defs")->type("MyNull")->type()->typeName(), QStringLiteral("NULL"));
 }
 
 void AstXmlParserTests::test_importedType()
@@ -343,7 +344,7 @@ void AstXmlParserTests::test_sequenceTypeAssingment()
           R"(</AstRoot>)");
 
     const auto seq = m_parsedData["Test2File.asn"]->definitions("Defs")->type("MySeq");
-    QCOMPARE(seq->type()->name(), QStringLiteral("SEQUENCE"));
+    QCOMPARE(seq->type()->typeName(), QStringLiteral("SEQUENCE"));
 
     QCOMPARE(seq->location().line(), 11);
     QCOMPARE(seq->location().column(), 9);
@@ -394,7 +395,7 @@ void AstXmlParserTests::test_choiceTypeAssignment()
           R"(</AstRoot>)");
 
     const auto choice = m_parsedData["Test2File.asn"]->definitions("Defs")->type("MyChoice");
-    QCOMPARE(choice->type()->name(), QStringLiteral("CHOICE"));
+    QCOMPARE(choice->type()->typeName(), QStringLiteral("CHOICE"));
 
     QCOMPARE(choice->location().line(), 11);
     QCOMPARE(choice->location().column(), 9);
@@ -438,7 +439,7 @@ void AstXmlParserTests::test_sequenceOfTypeAssingment()
           R"(</AstRoot>)");
 
     const auto seq = m_parsedData["Test2File.asn"]->definitions("Defs")->type("MySeqOf");
-    QCOMPARE(seq->type()->name(), QStringLiteral("SEQUENCE OF"));
+    QCOMPARE(seq->type()->typeName(), QStringLiteral("SEQUENCE OF"));
 
     QCOMPARE(seq->location().line(), 11);
     QCOMPARE(seq->location().column(), 9);
@@ -479,7 +480,7 @@ void AstXmlParserTests::test_valueAssignment()
     const auto var = m_parsedData["Test2File.asn"]->definitions("Defs")->value("asnConstant");
     QCOMPARE(var->name(), QStringLiteral("asnConstant"));
     QCOMPARE(var->location().line(), 2);
-    QCOMPARE(var->type()->name(), QStringLiteral("INTEGER"));
+    QCOMPARE(var->type()->typeName(), QStringLiteral("INTEGER"));
 }
 
 void AstXmlParserTests::test_importedValues()
@@ -633,7 +634,7 @@ void AstXmlParserTests::test_parametrizedInstancesContentsAreIgnored()
           R"(</AstRoot>)");
 
     const auto seq = m_parsedData["Test2File.asn"]->definitions("Defs")->type("MySeq");
-    QCOMPARE(seq->type()->name(), QStringLiteral("SEQUENCE"));
+    QCOMPARE(seq->type()->typeName(), QStringLiteral("SEQUENCE"));
 
     QCOMPARE(seq->location().line(), 11);
     QCOMPARE(seq->location().column(), 9);
@@ -725,7 +726,7 @@ void AstXmlParserTests::test_asn1AstParsing()
     QVERIFY(definitions != nullptr);
 
     const auto int1 = definitions->type("MyInt");
-    QCOMPARE(int1->type()->name(), QStringLiteral("INTEGER"));
+    QCOMPARE(int1->type()->typeName(), QStringLiteral("INTEGER"));
     auto intType1 = dynamic_cast<const Asn1Acn::Types::Integer *>(int1->type());
     QVERIFY(intType1->m_values.contains("min"));
     QCOMPARE(intType1->m_values["min"].toLongLong(), -5);
@@ -733,7 +734,7 @@ void AstXmlParserTests::test_asn1AstParsing()
     QCOMPARE(intType1->m_values["max"].toLongLong(), 20);
 
     const auto real1 = definitions->type("MyReal");
-    QCOMPARE(real1->type()->name(), QStringLiteral("REAL"));
+    QCOMPARE(real1->type()->typeName(), QStringLiteral("REAL"));
     auto realType1 = dynamic_cast<const Asn1Acn::Types::Real *>(real1->type());
     QVERIFY(realType1->m_values.contains("min"));
     QVERIFY(qFuzzyCompare(realType1->m_values["min"].toDouble(), 0.0));
@@ -741,10 +742,10 @@ void AstXmlParserTests::test_asn1AstParsing()
     QVERIFY(qFuzzyCompare(realType1->m_values["max"].toDouble(), 1000.0));
 
     const auto bool1 = definitions->type("MyBOOL");
-    QCOMPARE(bool1->type()->name(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(bool1->type()->typeName(), QStringLiteral("BOOLEAN"));
 
     const auto enum1 = definitions->type("TypeEnumerated");
-    QCOMPARE(enum1->type()->name(), QStringLiteral("ENUMERATED"));
+    QCOMPARE(enum1->type()->typeName(), QStringLiteral("ENUMERATED"));
     auto enumType1 = dynamic_cast<const Asn1Acn::Types::Enumerated *>(enum1->type());
     QVERIFY(enumType1->m_values.contains("values"));
     QStringList values = enumType1->m_values["values"].toStringList();
@@ -754,21 +755,25 @@ void AstXmlParserTests::test_asn1AstParsing()
     QCOMPARE(values.at(2), QString("blue"));
 
     const auto choice1 = definitions->type("MyChoice");
-    QCOMPARE(choice1->type()->name(), QStringLiteral("CHOICE"));
+    QCOMPARE(choice1->type()->typeName(), QStringLiteral("CHOICE"));
     auto choiceType1 = dynamic_cast<const Asn1Acn::Types::Choice *>(choice1->type());
     QCOMPARE(choiceType1->m_choices.size(), 2);
-    QCOMPARE(choiceType1->m_choices.at(0)->name(), QStringLiteral("BOOLEAN"));
-    QCOMPARE(choiceType1->m_choices.at(1)->name(), QStringLiteral("REAL"));
+    QCOMPARE(choiceType1->m_choices.at(0)->typeName(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(choiceType1->m_choices.at(0)->identifier(), QStringLiteral("hop"));
+    QCOMPARE(choiceType1->m_choices.at(1)->typeName(), QStringLiteral("REAL"));
+    QCOMPARE(choiceType1->m_choices.at(1)->identifier(), QStringLiteral("lat"));
 
     const auto sequence1 = definitions->type("MySeq");
-    QCOMPARE(sequence1->type()->name(), QStringLiteral("SEQUENCE"));
+    QCOMPARE(sequence1->type()->typeName(), QStringLiteral("SEQUENCE"));
     auto sequenceType1 = dynamic_cast<const Asn1Acn::Types::Sequence *>(sequence1->type());
     QCOMPARE(sequenceType1->m_sequence.size(), 2);
-    QCOMPARE(sequenceType1->m_sequence.at(0)->name(), QStringLiteral("BOOLEAN"));
-    QCOMPARE(sequenceType1->m_sequence.at(1)->name(), QStringLiteral("INTEGER"));
+    QCOMPARE(sequenceType1->m_sequence.at(0)->typeName(), QStringLiteral("BOOLEAN"));
+    QCOMPARE(sequenceType1->m_sequence.at(0)->identifier(), QStringLiteral("foo"));
+    QCOMPARE(sequenceType1->m_sequence.at(1)->typeName(), QStringLiteral("INTEGER"));
+    QCOMPARE(sequenceType1->m_sequence.at(1)->identifier(), QStringLiteral("int2Val"));
 
     const auto int2 = definitions->type("T-UInt32");
-    QCOMPARE(int2->type()->name(), QStringLiteral("INTEGER"));
+    QCOMPARE(int2->type()->typeName(), QStringLiteral("INTEGER"));
     auto intType2 = dynamic_cast<const Asn1Acn::Types::Integer *>(int2->type());
     QVERIFY(intType2->m_values.contains("min"));
     QCOMPARE(intType2->m_values["min"].toLongLong(), 0);
