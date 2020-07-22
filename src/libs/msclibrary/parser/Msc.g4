@@ -465,7 +465,7 @@ wildcard
     | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
     | functionText // extending the spec
     | LEFTCURLYBRACKET functionText RIGHTCURLYBRACKET // extending the spec
-    | LEFTCURLYBRACKET (name | sdlText)+ (COMMA (name | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
+    | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | sdlText)+ (COMMA (NAME | CHARACTERSTRING | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
     ;
 
 // 5.8 Data in message and timer parameters

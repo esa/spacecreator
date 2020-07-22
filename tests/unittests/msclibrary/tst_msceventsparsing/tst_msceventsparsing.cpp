@@ -51,6 +51,7 @@ private Q_SLOTS:
     void testMultiParameters();
     void testMessageParametersCurlyBraces();
     void testMessageChoiceParameter();
+    void testMessageComplexParameter();
 
     void testInstanceCreate();
     void testInstanceCreateNoParameter();
@@ -298,6 +299,38 @@ void tst_MscEventsParsing::testMessageChoiceParameter()
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);
     QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
+}
+
+void tst_MscEventsParsing::testMessageComplexParameter()
+{
+    QString msc = "mscdocument automade;\
+                     inst obsw;\
+                     inst ieu_manager;\
+                     msg acceptance : (Status);\
+                     msc recorded; \
+                       obsw: instance; \
+                         in acceptance,2({tc-id '4143545f494555'H, report success}) from ieu_manager; \
+                       endinstance; \
+                       ieu_manager: instance; \
+                         out acceptance,2({tc-id '4143545f494555'H, report success}) to obsw; \
+                       endinstance; \
+                     endmsc;\
+                   endmscdocument;";
+
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc = model->documents().at(0);
+    QCOMPARE(doc->charts().size(), 1);
+    MscChart *chart = doc->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    QCOMPARE(chart->instanceEvents().size(), 1);
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(), QString("{tc-id '4143545f494555'H, report success}"));
+    QCOMPARE(message->messageInstanceName(), QString("2"));
 }
 
 void tst_MscEventsParsing::testInstanceCreate()
