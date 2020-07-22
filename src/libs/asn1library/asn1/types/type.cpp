@@ -45,3 +45,20 @@ void Type::setIdentifier(const QString &name)
 {
     m_identifier = name;
 }
+
+/*!
+   Data values of this ASN1 type (like min/max for numbers)
+ */
+const QVariantMap &Type::parameters() const
+{
+    return m_parameters;
+}
+
+/*!
+   Set parameters
+   Example for numbers: { { "min", 5 }, { "max", 15 } }
+ */
+void Type::setParameters(const QVariantMap &parameters)
+{
+    m_parameters = parameters;
+}

@@ -70,13 +70,14 @@ public:
 
     virtual QString baseIconFile() const = 0;
 
-    /// Data values of this ASN1 type (like min/max for numbers)
-    QVariantMap m_values;
+    const QVariantMap &parameters() const;
+    void setParameters(const QVariantMap &parameters);
 
 private:
     void setIdentifier(const QString &name);
 
     QString m_identifier;
+    QVariantMap m_parameters;
 
     friend class Asn1Acn::AstXmlParser;
 };

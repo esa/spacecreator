@@ -458,12 +458,12 @@ void AstXmlParser::parseRange(Types::Type &type)
             const QString valueText = attributes.value(attrName).toString();
             if (std::is_same<T, qlonglong>::value) {
                 qlonglong valueInt = valueText.toLongLong(&ok);
-                if (ok && !type.m_values.contains(mapName))
-                    type.m_values[mapName] = valueInt;
+                if (ok && !type.parameters().contains(mapName))
+                    type.m_parameters[mapName] = valueInt;
             } else {
                 double valueDouble = valueText.toDouble(&ok);
-                if (ok && !type.m_values.contains(mapName))
-                    type.m_values[mapName] = static_cast<T>(valueDouble);
+                if (ok && !type.parameters().contains(mapName))
+                    type.m_parameters[mapName] = static_cast<T>(valueDouble);
             }
         }
     };
@@ -485,7 +485,7 @@ void AstXmlParser::parseEnumeration(Types::Type &type)
             }
             m_xmlReader.readNextStartElement();
         }
-        type.m_values[ASN1_VALUES] = values;
+        type.m_parameters[ASN1_VALUES] = values;
         m_xmlReader.skipCurrentElement();
     }
 }

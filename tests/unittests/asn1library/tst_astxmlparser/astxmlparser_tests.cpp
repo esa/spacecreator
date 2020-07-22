@@ -728,18 +728,18 @@ void AstXmlParserTests::test_asn1AstParsing()
     const auto int1 = definitions->type("MyInt");
     QCOMPARE(int1->type()->typeName(), QStringLiteral("INTEGER"));
     auto intType1 = dynamic_cast<const Asn1Acn::Types::Integer *>(int1->type());
-    QVERIFY(intType1->m_values.contains("min"));
-    QCOMPARE(intType1->m_values["min"].toLongLong(), -5);
-    QVERIFY(intType1->m_values.contains("max"));
-    QCOMPARE(intType1->m_values["max"].toLongLong(), 20);
+    QVERIFY(intType1->parameters().contains("min"));
+    QCOMPARE(intType1->parameters()["min"].toLongLong(), -5);
+    QVERIFY(intType1->parameters().contains("max"));
+    QCOMPARE(intType1->parameters()["max"].toLongLong(), 20);
 
     const auto real1 = definitions->type("MyReal");
     QCOMPARE(real1->type()->typeName(), QStringLiteral("REAL"));
     auto realType1 = dynamic_cast<const Asn1Acn::Types::Real *>(real1->type());
-    QVERIFY(realType1->m_values.contains("min"));
-    QVERIFY(qFuzzyCompare(realType1->m_values["min"].toDouble(), 0.0));
-    QVERIFY(realType1->m_values.contains("max"));
-    QVERIFY(qFuzzyCompare(realType1->m_values["max"].toDouble(), 1000.0));
+    QVERIFY(realType1->parameters().contains("min"));
+    QVERIFY(qFuzzyCompare(realType1->parameters()["min"].toDouble(), 0.0));
+    QVERIFY(realType1->parameters().contains("max"));
+    QVERIFY(qFuzzyCompare(realType1->parameters()["max"].toDouble(), 1000.0));
 
     const auto bool1 = definitions->type("MyBOOL");
     QCOMPARE(bool1->type()->typeName(), QStringLiteral("BOOLEAN"));
@@ -747,8 +747,8 @@ void AstXmlParserTests::test_asn1AstParsing()
     const auto enum1 = definitions->type("TypeEnumerated");
     QCOMPARE(enum1->type()->typeName(), QStringLiteral("ENUMERATED"));
     auto enumType1 = dynamic_cast<const Asn1Acn::Types::Enumerated *>(enum1->type());
-    QVERIFY(enumType1->m_values.contains("values"));
-    QStringList values = enumType1->m_values["values"].toStringList();
+    QVERIFY(enumType1->parameters().contains("values"));
+    QStringList values = enumType1->parameters()["values"].toStringList();
     QCOMPARE(values.size(), 3);
     QCOMPARE(values.at(0), QString("red"));
     QCOMPARE(values.at(1), QString("green"));
@@ -775,10 +775,10 @@ void AstXmlParserTests::test_asn1AstParsing()
     const auto int2 = definitions->type("T-UInt32");
     QCOMPARE(int2->type()->typeName(), QStringLiteral("INTEGER"));
     auto intType2 = dynamic_cast<const Asn1Acn::Types::Integer *>(int2->type());
-    QVERIFY(intType2->m_values.contains("min"));
-    QCOMPARE(intType2->m_values["min"].toLongLong(), 0);
-    QVERIFY(intType2->m_values.contains("max"));
-    QCOMPARE(intType2->m_values["max"].toLongLong(), 4294967295);
+    QVERIFY(intType2->parameters().contains("min"));
+    QCOMPARE(intType2->parameters()["min"].toLongLong(), 0);
+    QVERIFY(intType2->parameters().contains("max"));
+    QCOMPARE(intType2->parameters()["max"].toLongLong(), 4294967295);
 }
 
 void AstXmlParserTests::parsingFails(const QString &xmlData)
