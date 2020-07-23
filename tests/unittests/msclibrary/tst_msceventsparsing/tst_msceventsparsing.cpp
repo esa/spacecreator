@@ -207,9 +207,11 @@ void tst_MscEventsParsing::testMessageParameterExpression()
     QString msc = "MSC msc1; \
                       INSTANCE inst1; \
                         in CanFrameIn,111(heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) from inst2; \
+                        out activate_ieu,1({selected-controller controller:nominal, propulsion-board propulsion:nominal}) to inst2;\
                      ENDINSTANCE; \
                      INSTANCE inst2; \
                         out CanFrameIn,111(heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}) to inst1; \
+                        in activate_ieu,1({selected-controller controller:nominal, propulsion-board propulsion:nominal}) from inst1;\
                      ENDINSTANCE; \
                   ENDMSC;";
 
@@ -219,7 +221,13 @@ void tst_MscEventsParsing::testMessageParameterExpression()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+
+    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(1));
+    QVERIFY(message != nullptr);
+    QCOMPARE(message->parameters().size(), 1);
+    QCOMPARE(message->parameters().at(0).parameter(),
+            QString("{selected-controller controller:nominal, propulsion-board propulsion:nominal}"));
 }
 
 void tst_MscEventsParsing::testMultiParameters()

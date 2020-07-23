@@ -481,7 +481,8 @@ paramaterDefn
 //
 
 expressionString
-    : (LEFTCURLYBRACKET)? name COLON NAME (RIGHTCURLYBRACKET)? // TODO not correct ?
+    : name COLON NAME // TODO not correct ?
+    | LEFTCURLYBRACKET name COLON NAME (COMMA name COLON NAME)* RIGHTCURLYBRACKET // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
     | name COLON LEFTCURLYBRACKET NAME SEQUENCEOF RIGHTCURLYBRACKET // extending the spec here
     ;
