@@ -359,6 +359,8 @@ void tst_MscWriter::testSerializeMscActions_data()
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
     chart->addInstance(instance);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
     auto action = new MscAction();
     action->setActionType(MscAction::ActionType::Informal);
     action->setInformalAction("informal_stop");
@@ -368,6 +370,8 @@ void tst_MscWriter::testSerializeMscActions_data()
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
                           "        action 'informal_stop';\n"
+                          "    endinstance;\n"
+                          "    instance Inst_2;\n"
                           "    endinstance;\n"
                           "endmsc;\n");
     QTest::addRow("Informal action") << model << result << removeIndention(result);
@@ -461,6 +465,8 @@ void tst_MscWriter::testSerializeMscConditions_data()
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
     chart->addInstance(instance);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
     auto condition = new MscCondition("Con_1");
     condition->setInstance(instance);
     chart->addInstanceEvent(condition);
@@ -469,6 +475,8 @@ void tst_MscWriter::testSerializeMscConditions_data()
                           "    instance Inst_1;\n"
                           "        condition Con_1;\n"
                           "    endinstance;\n"
+                          "    instance Inst_2;\n"
+                          "    endinstance;\n"
                           "endmsc;\n");
     QTest::addRow("Simple condition") << model << result << removeIndention(result);
 
@@ -476,8 +484,6 @@ void tst_MscWriter::testSerializeMscConditions_data()
     chart = new MscChart("Chart_1");
     instance = new MscInstance("Inst_1");
     chart->addInstance(instance);
-    auto instance2 = new MscInstance("Inst_2");
-    chart->addInstance(instance2);
     condition = new MscCondition("Con_1");
     condition->setShared(true);
     condition->setInstance(instance);
@@ -486,8 +492,6 @@ void tst_MscWriter::testSerializeMscConditions_data()
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
                      "        condition Con_1 shared all;\n"
-                     "    endinstance;\n"
-                     "    instance Inst_2;\n"
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Shared condition") << model << result << removeIndention(result);
@@ -552,6 +556,7 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     auto model = new MscModel(this);
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
+    auto instance2 = new MscInstance("Inst_2");
     auto region1 = new MscCoregion(MscCoregion::Type::Begin);
     region1->setInstance(instance);
     chart->addInstanceEvent(region1);
@@ -559,11 +564,14 @@ void tst_MscWriter::testSerializeMscCoregion_data()
     region2->setInstance(instance);
     chart->addInstanceEvent(region2);
     chart->addInstance(instance);
+    chart->addInstance(instance2);
     model->addChart(chart);
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
                           "        concurrent;\n"
                           "        endconcurrent;\n"
+                          "    endinstance;\n"
+                          "    instance Inst_2;\n"
                           "    endinstance;\n"
                           "endmsc;\n");
     QTest::addRow("Simple coregion") << model << result << removeIndention(result);
@@ -644,6 +652,8 @@ void tst_MscWriter::testSerializeCreate_data()
     chart->addInstance(instance);
     auto instance2 = new MscInstance("Inst_2");
     chart->addInstance(instance2);
+    auto instance3 = new MscInstance("Inst_3");
+    chart->addInstance(instance3);
     auto create = new MscCreate("");
     create->setSourceInstance(instance);
     create->setTargetInstance(instance2);
@@ -654,6 +664,8 @@ void tst_MscWriter::testSerializeCreate_data()
                           "        create Inst_2;\n"
                           "    endinstance;\n"
                           "    instance Inst_2;\n"
+                          "    endinstance;\n"
+                          "    instance Inst_3;\n"
                           "    endinstance;\n"
                           "endmsc;\n");
     QTest::addRow("Simple create") << model << result << removeIndention(result);
@@ -944,6 +956,8 @@ void tst_MscWriter::testSerializeMscTimer_data()
     auto chart = new MscChart("Chart_1");
     auto instance = new MscInstance("Inst_1");
     chart->addInstance(instance);
+    auto instance2 = new MscInstance("Inst_2");
+    chart->addInstance(instance2);
     auto timer = new MscTimer("T1", MscTimer::TimerType::Start);
     timer->setInstance(instance);
     chart->addInstanceEvent(timer);
@@ -951,6 +965,8 @@ void tst_MscWriter::testSerializeMscTimer_data()
     auto result = QString("msc Chart_1;\n"
                           "    instance Inst_1;\n"
                           "        starttimer T1;\n"
+                          "    endinstance;\n"
+                          "    instance Inst_2;\n"
                           "    endinstance;\n"
                           "endmsc;\n");
     QTest::addRow("Start") << model << result << removeIndention(result);

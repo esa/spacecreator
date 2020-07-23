@@ -4,13 +4,13 @@
 {% endif %}instance {{ instance.name }}{% if instance.denominatorAndKind %}: {{ instance.denominatorAndKind }} {{ instance.inheritance }}{% endif %}{% if instance.commentString %}{% if instance.comment.cifText %}
 {{ instance.comment.cifText }}{% else %} {% endif %}comment '{{ instance.commentString }}'{% endif %};
 {% for event in chart.instanceEvents %}
-{% if event.entityType == event.Action %}
+{% if event.entityType == event.Action and event.instance == instance %}
 {% include "mscaction.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Condition %}
+{% if event.entityType == event.Condition and event.instance == instance %}
 {% include "msccondition.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Coregion %}
+{% if event.entityType == event.Coregion and event.instance == instance %}
 {% include "msccoregion.tmplt" %}
 {% endif %}
 {% if event.entityType == event.Create %}
@@ -19,7 +19,7 @@
 {% if event.entityType == event.Message %}
 {% include "mscmessage.tmplt" %}
 {% endif %}
-{% if event.entityType == event.Timer %}
+{% if event.entityType == event.Timer and event.instance == instance  %}
 {% include "msctimer.tmplt" %}
 {% endif %}
 {% endfor %}
