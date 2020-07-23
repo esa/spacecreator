@@ -1,0 +1,128 @@
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+END
+
+
+IEU-DATAVIEW DEFINITIONS ::=
+BEGIN
+IMPORTS T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean FROM TASTE-BasicTypes;
+
+   --  To chose nominal or redundant branch
+   Nom-Red ::= ENUMERATED { nominal, redundant }
+  
+   --  For Power On/Off commands
+   On-Off  ::= ENUMERATED { on, off }
+
+   --  Requests involving an IEU activation/deactivation
+   Requests ::= ENUMERATED { no-request, slave-module, power-cycle }
+
+   -- Complete list of modules
+   Modules ::= CHOICE {
+      controller Nom-Red,
+      analog-hk  Nom-Red,
+      digital-io Nom-Red,
+      heater     Nom-Red,
+      propulsion Nom-Red
+   }
+
+   -- Events emitted upon success/failure of command execution
+   Events ::= ENUMERATED {
+       ieu-act-success,
+       ieu-act-failure,
+       ieu-deact-success,
+       already-on   -- CDMS-C-I-IEU-REQ-9
+   }
+
+   -- Sublist of modules containing just the contoller
+   Controller-Modules ::= Modules
+      (WITH COMPONENTS {
+         analog-hk  ABSENT,
+         digital-io ABSENT,
+         heater     ABSENT,
+         propulsion ABSENT
+      })
+
+   Slave-Modules ::= Modules
+      (WITH COMPONENTS {controller ABSENT})
+
+   --  Parameters for the IEU Activation
+   Act-IEU-Param ::= SEQUENCE {
+      selected-controller Controller-Modules,
+      propulsion-board    Modules
+   }
+
+  Success-Status ::=   ENUMERATED { success, failure }  -- For completion reports
+
+  --  Full Acceptance/Completion reports, with a string parameter for the identifier
+  Status ::= SEQUENCE {
+    tc-id OCTET STRING (SIZE (0..80)),
+    report Success-Status
+  }
+
+
+  -- Selection option for Activate/Deactivate slave module
+  Act-Deact-Slave-Param ::= CHOICE {
+     act   Slave-Modules,
+     deact Slave-Modules
+  }
+
+  --  Command to perform IEU power cycle has a configurable OFF time
+  Power-Cycle-Param ::= SEQUENCE {
+     off-time INTEGER (0..10)  -- Random value
+  }
+
+  --  Standard Acquisition list identifier
+  Acquisition-List-Id ::= INTEGER (0 .. 3)
+
+
+-- ASN.1 Type definitions must start with an uppercase
+-- Field names in records (SEQUENCE) must start with a lowercase
+-- Underscores are not allowed: use dash (hyphen) 
+-- For integers do not assume that small ranges will be translated to small
+-- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
+-- for the range in Ada)
+
+-- Simple types:
+
+-- TASTE-Boolean ::= BOOLEAN
+-- MyInteger   ::= INTEGER (0..255)
+-- MyReal      ::= REAL (0.0 .. 1000.0)
+-- MyBool      ::= BOOLEAN
+-- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
+
+-- Complex types:
+
+--  MySeq       ::= SEQUENCE {
+--      input-data  MyInteger,
+--      output-data MyInteger,
+--      validity    ENUMERATED { valid, invalid }
+--  }
+--
+--  MyChoice    ::= CHOICE {
+--      a BOOLEAN,
+--      b MySeq
+--  }
+--
+--  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
+--
+--  MyOctStr    ::= OCTET STRING (SIZE (3))
+--
+--  -- You can also declare constants
+--  myVar       MySeqOf     ::= { hello, world }
+
+END
+
+

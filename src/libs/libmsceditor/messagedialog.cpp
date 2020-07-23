@@ -316,15 +316,19 @@ void MessageDialog::checkTextValidity()
             QTableWidgetItem *item = ui->parameterTable->item(i, 0);
             if (item) {
                 const QString &value = ui->parameterTable->item(i, 0)->text();
-                const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
-                auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
-                        [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
-                if (find != asn1Types.end()) {
-                    bool ok;
-                    parser.parseAsn1Value((*find).toMap(), value, &ok);
-                    m_isValid = m_isValid && ok;
-                } else
+                if (ui->parameterTable->verticalHeaderItem(i) != nullptr) {
+                    const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
+                    auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
+                            [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
+                    if (find != asn1Types.end()) {
+                        bool ok;
+                        parser.parseAsn1Value((*find).toMap(), value, &ok);
+                        m_isValid = m_isValid && ok;
+                    } else
+                        m_isValid = false;
+                } else {
                     m_isValid = false;
+                }
             }
         }
     }

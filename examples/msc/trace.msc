@@ -1,6 +1,6 @@
 mscdocument automade;
     language ASN.1;
-    data dataview-uniq.asn;
+    data dataview-uniq2.asn;
     inst uart;
     inst obsw;
     inst ctrl_n;
