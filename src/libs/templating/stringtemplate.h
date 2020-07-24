@@ -51,6 +51,7 @@ public:
 
 public Q_SLOTS:
     void setNeedValidateXMLDocument(bool validate);
+    void setEscapeCharacters(bool doEscape);
     void setAutoFormattingIndent(int autoFormattingIndent);
 
 Q_SIGNALS:
@@ -59,10 +60,12 @@ Q_SIGNALS:
 private:
     explicit StringTemplate(QObject *parent = nullptr);
     void init();
-    Grantlee::Engine *m_engine;
+
+    Grantlee::Engine *m_engine = nullptr;
     QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
-    bool m_validateXMLDocument;
-    int m_autoFormattingIndent;
+    bool m_validateXMLDocument = true;
+    bool m_doEscape = true;
+    int m_autoFormattingIndent = 4;
 };
 
 }

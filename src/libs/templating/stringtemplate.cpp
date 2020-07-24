@@ -20,11 +20,46 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFileInfo>
+#include <QSharedPointer>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
+#include <memory>
 
 namespace templating {
+
+/**
+  Don't escape the code generation output.
+'const QString &' should not become 'const QString &amp;'
+*/
+class NoEscapeOutputStream : public Grantlee::OutputStream
+{
+public:
+    NoEscapeOutputStream()
+        : Grantlee::OutputStream()
+    {
+    }
+
+    NoEscapeOutputStream(QTextStream *stream, bool doEscape)
+        : OutputStream(stream)
+        , m_doEscape(doEscape)
+    {
+    }
+
+    QSharedPointer<Grantlee::OutputStream> clone(QTextStream *stream) const override
+    {
+        return QSharedPointer<Grantlee::OutputStream>(new NoEscapeOutputStream(stream, m_doEscape));
+    }
+
+    QString escape(const QString &input) const override
+    {
+        return m_doEscape ? Grantlee::OutputStream::escape(input) : input;
+    }
+
+private:
+    bool m_doEscape = true;
+};
 
 /*!
  * \namespace templating
@@ -44,10 +79,6 @@ StringTemplate *StringTemplate::create(QObject *parent)
  */
 StringTemplate::StringTemplate(QObject *parent)
     : QObject(parent)
-    , m_engine(nullptr)
-    , m_fileLoader(nullptr)
-    , m_validateXMLDocument(true)
-    , m_autoFormattingIndent(4)
 {
 }
 
@@ -116,7 +147,12 @@ bool StringTemplate::parseFile(
         return false;
     }
 
-    const QString result = stringTemplate->render(&context).trimmed();
+    QString output;
+    QTextStream textStream(&output);
+    NoEscapeOutputStream outputStream(&textStream, m_doEscape);
+    stringTemplate->render(&outputStream, &context);
+    const QString result = output.trimmed();
+
     const QString formatted = formatText(result);
     if (!out->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Can't open device for writing:" << out->errorString();
@@ -193,6 +229,14 @@ int StringTemplate::autoFormattingIndent() const
 void StringTemplate::setNeedValidateXMLDocument(bool validate)
 {
     m_validateXMLDocument = validate;
+}
+
+/*!
+   Set, if HTML sensible characters should be escaped
+ */
+void StringTemplate::setEscapeCharacters(bool doEscape)
+{
+    m_doEscape = doEscape;
 }
 
 /**

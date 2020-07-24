@@ -64,6 +64,7 @@ void MscWriter::setSaveMode(MscWriter::SaveMode mode)
     if (m_saveMode == SaveMode::GRANTLEE && m_template == nullptr) {
         m_template = templating::StringTemplate::create(this);
         m_template->setNeedValidateXMLDocument(false);
+        m_template->setEscapeCharacters(false);
     }
     if (m_saveMode == SaveMode::CUSTOM && m_template != nullptr) {
         delete m_template;

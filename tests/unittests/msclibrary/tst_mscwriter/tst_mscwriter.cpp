@@ -842,13 +842,20 @@ void tst_MscWriter::testSerializeMscMessage_data()
     message->setMessageInstanceName("a");
     message->setParameters({ { "longitude:-174.0", "" } });
     chart->addInstanceEvent(message);
+    message2 = new MscMessage("Msg_2");
+    message2->setSourceInstance(instance2);
+    message2->setTargetInstance(instance1);
+    message2->setParameters({ { "{tc-id '4143545f494555'H, report success}", "" } });
+    chart->addInstanceEvent(message2);
     model->addChart(chart);
     result = QString("msc Chart_1;\n"
                      "    instance Inst_1;\n"
                      "        out Msg_1,a(longitude:-174.0) to Inst_2;\n"
+                     "        in Msg_2({tc-id '4143545f494555'H, report success}) from Inst_2;\n"
                      "    endinstance;\n"
                      "    instance Inst_2;\n"
                      "        in Msg_1,a(longitude:-174.0) from Inst_1;\n"
+                     "        out Msg_2({tc-id '4143545f494555'H, report success}) to Inst_1;\n"
                      "    endinstance;\n"
                      "endmsc;\n");
     QTest::addRow("Parameter") << model << result << removeIndention(result);
