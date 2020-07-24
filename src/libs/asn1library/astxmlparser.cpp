@@ -352,8 +352,9 @@ void AstXmlParser::readTypeContents(const QString &name, Types::Type *type)
 
 std::unique_ptr<Types::Type> AstXmlParser::buildTypeFromName(const SourceLocation &location, const QStringRef &name)
 {
-    if (name == QStringLiteral("REFERENCE_TYPE"))
+    if (name == QStringLiteral("REFERENCE_TYPE") || name == QStringLiteral("ReferenceType")) {
         return readReferenceType(location);
+    }
     return Types::BuiltinType::createBuiltinType(name.toString());
 }
 

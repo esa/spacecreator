@@ -63,6 +63,8 @@ public:
     const ImportedTypes &importedTypes() const { return m_importedTypes; }
     const ImportedValues &importedValues() const { return m_importedValues; }
 
+    QStringList typeAssignmentNames() const;
+
     template<typename Functor>
     void forAllNodes(Functor fun) const
     {

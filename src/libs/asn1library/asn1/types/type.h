@@ -32,6 +32,7 @@
 namespace Asn1Acn {
 
 class AstXmlParser;
+class TypeAssignment;
 
 namespace Types {
 
@@ -89,6 +90,7 @@ private:
     std::vector<std::unique_ptr<Type>> m_children;
 
     friend class Asn1Acn::AstXmlParser;
+    friend class Asn1Acn::TypeAssignment;
 };
 
 }

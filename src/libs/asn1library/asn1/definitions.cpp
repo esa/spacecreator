@@ -75,3 +75,12 @@ const ValueAssignment *Definitions::value(const QString &name) const
     const auto it = m_valueByNameMap.find(name);
     return it != m_valueByNameMap.end() ? it->second : nullptr;
 }
+
+QStringList Definitions::typeAssignmentNames() const
+{
+    QStringList names;
+    for (const std::unique_ptr<TypeAssignment> &typeAssign : m_types) {
+        names.append(typeAssign->name());
+    }
+    return names;
+}

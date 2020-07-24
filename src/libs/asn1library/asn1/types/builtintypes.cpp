@@ -32,7 +32,7 @@ std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
     if (name.startsWith(QStringLiteral("boolean"), Qt::CaseInsensitive))
         return std::make_unique<Boolean>();
 
-    if (name == QStringLiteral("NULL"))
+    if (name == QStringLiteral("NULL") || name == QStringLiteral("NullType"))
         return std::make_unique<Null>();
 
     if (name.startsWith(QStringLiteral("Integer"), Qt::CaseInsensitive))
@@ -41,16 +41,16 @@ std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
     if (name.startsWith(QStringLiteral("real"), Qt::CaseInsensitive))
         return std::make_unique<Real>();
 
-    if (name == QStringLiteral("BIT_STRING"))
+    if (name == QStringLiteral("BIT_STRING") || name == QStringLiteral("BitStringType"))
         return std::make_unique<BitString>();
 
-    if (name == QStringLiteral("OCTET_STRING"))
+    if (name == QStringLiteral("OCTET_STRING") || name == QStringLiteral("OctetStringType"))
         return std::make_unique<OctetString>();
 
-    if (name == QStringLiteral("IA5String"))
+    if (name.startsWith(QStringLiteral("IA5String"), Qt::CaseInsensitive))
         return std::make_unique<IA5String>();
 
-    if (name == QStringLiteral("NumericString"))
+    if (name.startsWith(QStringLiteral("NumericString"), Qt::CaseInsensitive))
         return std::make_unique<NumericString>();
 
     if (name.startsWith(QStringLiteral("enumerated"), Qt::CaseInsensitive))
@@ -62,7 +62,7 @@ std::unique_ptr<Type> BuiltinType::createBuiltinType(const QString &name)
     if (name == QStringLiteral("SEQUENCE") || name == QStringLiteral("SequenceType"))
         return std::make_unique<Sequence>();
 
-    if (name == QStringLiteral("SEQUENCE_OF"))
+    if (name == QStringLiteral("SEQUENCE_OF") || name == QStringLiteral("SequenceOfType"))
         return std::make_unique<SequenceOf>();
 
     return nullptr;

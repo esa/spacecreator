@@ -33,6 +33,7 @@ TypeAssignment::TypeAssignment(const QString &name, const SourceLocation &locati
     , m_type(std::move(type))
 {
     Q_ASSERT(m_type);
+    m_type->setIdentifier(name);
 }
 
 TypeAssignment::~TypeAssignment() { }
