@@ -318,9 +318,11 @@ void tst_MscEventsParsing::testMessageComplexParameter()
                      msc recorded; \
                        obsw: instance; \
                          in acceptance,2({tc-id '4143545f494555'H, report success}) from ieu_manager; \
+                         out Completion({tc-id \"ACT-IEU\", report success}) to ieu_manager;\
                        endinstance; \
                        ieu_manager: instance; \
                          out acceptance,2({tc-id '4143545f494555'H, report success}) to obsw; \
+                         in Completion({tc-id \"ACT-IEU\", report success}) from obsw;\
                        endinstance; \
                      endmsc;\
                    endmscdocument;";
@@ -333,7 +335,7 @@ void tst_MscEventsParsing::testMessageComplexParameter()
     MscChart *chart = doc->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
     auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
     QVERIFY(message != nullptr);
     QCOMPARE(message->parameters().size(), 1);

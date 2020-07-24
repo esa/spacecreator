@@ -465,7 +465,7 @@ wildcard
     | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
     | functionText // extending the spec
     | LEFTCURLYBRACKET functionText RIGHTCURLYBRACKET // extending the spec
-    | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | sdlText)+ (COMMA (NAME | CHARACTERSTRING | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
+    | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | variableString | sdlText)+ (COMMA (NAME | CHARACTERSTRING | variableString | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
     ;
 
 // 5.8 Data in message and timer parameters
@@ -733,10 +733,11 @@ NAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS | '`' | '/' )+ ;
 
 FILENAME : ( LETTER | DECIMALDIGIT | UNDERLINE | FULLSTOP | MINUS )+  ;
 
-STRING : '"' (ALPHANUMERIC | SPECIAL | FULLSTOP | UNDERLINE)* '"';
+STRING : '"' (ALPHANUMERIC | SPECIAL | STRINGOTHERCHARACTER)* '"';
+STRINGOTHERCHARACTER : '?' | '%' | '+' | MINUS | '!' | '*' | '=' | '/' | UNDERLINE | FULLSTOP;
 
 SEQUENCEOF // custom
-    : LEFTCURLYBRACKET ( NAME | ' ' | COMMA)* RIGHTCURLYBRACKET
+    : LEFTCURLYBRACKET (NAME | ' ' | COMMA)* RIGHTCURLYBRACKET
     ;
 
 
