@@ -2,7 +2,11 @@ set(TEST_NAME tst_mscreader)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
+    tst_msccreateparsing.cpp
+    tst_mscmessageparsing.cpp
     tst_mscreader.cpp
+    tst_mscreader.h
+    tst_mscreadermain.cpp
 )
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

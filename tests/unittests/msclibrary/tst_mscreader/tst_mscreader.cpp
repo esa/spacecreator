@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "tst_mscreader.h"
+
 #include "exceptions.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -29,54 +31,7 @@
 #include "mscreader.h"
 #include "msctimer.h"
 
-#include <QtTest>
-
 using namespace msc;
-
-class tst_MscReader : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void init();
-    void cleanup();
-    void testFileOpenError();
-    void testSyntaxError();
-    void testExampleFilesParsing_data();
-    void testExampleFilesParsing();
-    void testEmptyDocument();
-    void testComments();
-    void testEntityComments();
-    void testNestedDocuments();
-    void testMscInDocument();
-    void testInstance();
-    void testInstanceWithKind();
-    void testMessageChoiceParameter();
-    void testGateMessage();
-    void testCondition();
-    void testCoregion();
-    void testTimer();
-    void testTimerRelation();
-    void testAction();
-    void testInstanceStop_data();
-    void testInstanceStop();
-    void testHierarchy();
-    void testDataDefinitionLanguage();
-    void testDataDefinitionData();
-    void testKeywordAsName();
-    void testNonStandardVia();
-    void testNonStandardInstance();
-    void testDocumentsType_data();
-    void testDocumentsType();
-    void testDefaultDocumentTypeFromLoad();
-    void testMessageDeclaration();
-    void testNameFiltering();
-
-    // for message-related tests see the tst_MscEventsParsing
-
-private:
-    MscReader *m_reader = nullptr;
-};
 
 void tst_MscReader::init()
 {
@@ -270,22 +225,6 @@ void tst_MscReader::testInstanceWithKind()
     QCOMPARE(instance->name(), QString("mygui_GUI"));
     QCOMPARE(instance->kind(), QString("foo control unit"));
     QCOMPARE(instance->denominator(), QString("process"));
-}
-
-void tst_MscReader::testMessageChoiceParameter()
-{
-    QString msc = "MSC msc1; \
-                   INSTANCE Inst_1;in Msg_1 (act:heater: nominal) from env;ENDINSTANCE; \
-                   ENDMSC;";
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-    QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 1);
-    auto message = qobject_cast<MscMessage *>(chart->instanceEvents().at(0));
-    QVERIFY(message != nullptr);
-    QCOMPARE(message->parameters().size(), 1);
-    QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
 }
 
 void tst_MscReader::testGateMessage()
@@ -679,24 +618,6 @@ void tst_MscReader::testKeywordAsName()
     QCOMPARE(chart->name(), QString("action"));
 }
 
-void tst_MscReader::testNonStandardVia()
-{
-    // Using via that way is not really in line with the standard
-    QString msc = "MSC msc1; \
-                      INSTANCE Inst_1; \
-                         OUT check1 ( pin ) VIA gtX; \
-                         OUT check2(1) TO  VIA gtY; \
-                      ENDINSTANCE; \
-                   ENDMSC;";
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 1);
-    QCOMPARE(chart->instanceEvents().size(), 2);
-}
-
 void tst_MscReader::testNonStandardInstance()
 {
     // Using INSTANCE that way is not really in line with the standard
@@ -837,7 +758,3 @@ void tst_MscReader::testNameFiltering()
     auto *condition = static_cast<MscCondition *>(chart->instanceEvents().at(0));
     QCOMPARE(condition->name(), QString("Con_2"));
 }
-
-QTEST_APPLESS_MAIN(tst_MscReader)
-
-#include "tst_mscreader.moc"

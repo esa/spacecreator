@@ -25,75 +25,13 @@
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "msctimer.h"
+#include "tst_mscreader.h"
 
-#include <QCoreApplication>
 #include <QScopedPointer>
-#include <QtTest>
 
 using namespace msc;
 
-class tst_MscEventsParsing : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void init();
-    void cleanup();
-
-    // Currently here is only the message-related stuff,
-    // see the tst_MscReader for other
-
-    void testMessage();
-    void testSameMessageInTwoInstances();
-    void testMessageWithParameters();
-    void testMessageParameterWildcard();
-    void testMessageParameterExpression();
-    void testMultiParameters();
-    void testMessageParametersCurlyBraces();
-    void testMessageChoiceParameter();
-    void testMessageComplexParameter();
-
-    void testInstanceCreate();
-    void testInstanceCreateNoParameter();
-    void testInstanceCreateMultiParameter();
-    void testInstanceCreateEmptyParameter();
-    void testInstanceCreateNoInstance();
-    void testInstanceCreateDublicate();
-
-    void testSortedMessage();
-    void testSortedMessageTwoCharts();
-    void testSortedInstanceEvents();
-    void testSortedMessageCreate();
-    void testSortingDeadlock();
-
-    void testMessageCreateInstance();
-
-    void testIncompleteMessageIn();
-    void testIncompleteMessageOut();
-
-    void testConditionDublicate();
-
-    void testTestMessageInstanceName();
-    void testSameNameDifferentInstances();
-    void testDifferentParameter();
-    void testMultiMessageOccurrence();
-
-private:
-    MscReader *m_reader = nullptr;
-};
-
-void tst_MscEventsParsing::init()
-{
-    m_reader = new MscReader;
-}
-
-void tst_MscEventsParsing::cleanup()
-{
-    delete m_reader;
-    m_reader = nullptr;
-}
-
-void tst_MscEventsParsing::testMessage()
+void tst_MscReader::testMessage()
 {
     QString msc = "MSC msc1; \
         INSTANCE inst1; \
@@ -122,7 +60,7 @@ void tst_MscEventsParsing::testMessage()
     QCOMPARE(message2->targetInstance(), static_cast<MscInstance *>(nullptr));
 }
 
-void tst_MscEventsParsing::testSameMessageInTwoInstances()
+void tst_MscReader::testSameMessageInTwoInstances()
 {
     QString msc = "MSC msc1; \
                   INSTANCE Initiator;in ICON from Responder;ENDINSTANCE; \
@@ -136,7 +74,7 @@ void tst_MscEventsParsing::testSameMessageInTwoInstances()
     delete model;
 }
 
-void tst_MscEventsParsing::testMessageWithParameters()
+void tst_MscReader::testMessageWithParameters()
 {
     QString msc = "MSC msc1; \
                    INSTANCE Initiator; \
@@ -179,7 +117,7 @@ void tst_MscEventsParsing::testMessageWithParameters()
 #endif
 }
 
-void tst_MscEventsParsing::testMessageParameterWildcard()
+void tst_MscReader::testMessageParameterWildcard()
 {
     QString msc = "MSC msc1; \
                       INSTANCE inst1; \
@@ -202,7 +140,7 @@ void tst_MscEventsParsing::testMessageParameterWildcard()
     QCOMPARE(chart->instanceEvents().size(), 3);
 }
 
-void tst_MscEventsParsing::testMessageParameterExpression()
+void tst_MscReader::testMessageParameterExpression()
 {
     QString msc = "MSC msc1; \
                       INSTANCE inst1; \
@@ -230,7 +168,7 @@ void tst_MscEventsParsing::testMessageParameterExpression()
             QString("{selected-controller controller:nominal, propulsion-board propulsion:nominal}"));
 }
 
-void tst_MscEventsParsing::testMultiParameters()
+void tst_MscReader::testMultiParameters()
 {
     QString msc = "msc Untitled_1; \
        instance Inst_1; \
@@ -255,7 +193,7 @@ void tst_MscEventsParsing::testMultiParameters()
     QCOMPARE(parameters.at(1).pattern(), QString("11"));
 }
 
-void tst_MscEventsParsing::testMessageParametersCurlyBraces()
+void tst_MscReader::testMessageParametersCurlyBraces()
 {
     static const QStringList params { "{}", "{dpu_undervoltage:TRUE}",
         "heartbeat:{header {functionCode 0, nodeID 0, rtr 0, dlc 0}}", "{VBS_Valid: FALSE, CHU_Valid: FALSE}" };
@@ -293,7 +231,7 @@ void tst_MscEventsParsing::testMessageParametersCurlyBraces()
             QCOMPARE(message->paramString(), params.at(i));
 }
 
-void tst_MscEventsParsing::testMessageChoiceParameter()
+void tst_MscReader::testMessageChoiceParameter()
 {
     QString msc = "MSC msc1; \
                    INSTANCE Inst_1;in Msg_1 (act:heater: nominal) from env;ENDINSTANCE; \
@@ -309,7 +247,7 @@ void tst_MscEventsParsing::testMessageChoiceParameter()
     QCOMPARE(message->parameters().at(0).parameter(), QString("act:heater:nominal"));
 }
 
-void tst_MscEventsParsing::testMessageComplexParameter()
+void tst_MscReader::testMessageComplexParameter()
 {
     QString msc = "mscdocument automade;\
                      inst obsw;\
@@ -343,149 +281,7 @@ void tst_MscEventsParsing::testMessageComplexParameter()
     QCOMPARE(message->messageInstanceName(), QString("2"));
 }
 
-void tst_MscEventsParsing::testInstanceCreate()
-{
-    QString msc = "MSC msc1; \
-                      INSTANCE Inst_1; \
-                         in ICONreq from env; \
-                         create subscriber(data); \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                      ENDINSTANCE; \
-                   ENDMSC;";
-
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 2);
-
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(1));
-    QCOMPARE(create->name(), QString());
-    QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
-    QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
-
-    MscParameterList parameters = create->parameters();
-    QCOMPARE(parameters.size(), 1);
-    QCOMPARE(parameters.at(0).pattern(), QString("data"));
-    QCOMPARE(parameters.at(0).expression(), QString());
-}
-
-void tst_MscEventsParsing::testInstanceCreateNoParameter()
-{
-    QString msc = "MSC msc1; \
-                      INSTANCE Inst_1; \
-                         create subscriber; \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                      ENDINSTANCE; \
-                   ENDMSC;";
-
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
-
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
-    QCOMPARE(create->name(), QString());
-    QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
-    QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
-    QVERIFY(create->parameters().isEmpty());
-}
-
-void tst_MscEventsParsing::testInstanceCreateMultiParameter()
-{
-    static const QStringList paramsIn = { "data1", "data2", "data3" };
-    static const QString msc = QString("MSC msc1; \
-                      INSTANCE Inst_1; \
-                         create subscriber(%1); \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                      ENDINSTANCE; \
-                   ENDMSC;")
-                                       .arg(paramsIn.join(", "));
-
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
-
-    auto *create = static_cast<MscCreate *>(chart->instanceEvents().at(0));
-    QCOMPARE(create->name(), QString());
-    QCOMPARE(create->sourceInstance()->name(), QString("Inst_1"));
-    QCOMPARE(create->targetInstance()->name(), QString("subscriber"));
-
-    QStringList paramsOut;
-    for (const MscParameter &param : create->parameters()) {
-        paramsOut << param.pattern();
-    }
-
-    QCOMPARE(paramsOut.size(), paramsIn.size());
-
-    for (int i = 0; i < paramsOut.size(); ++i) {
-        QCOMPARE(paramsOut.at(i), paramsIn.at(i));
-    }
-}
-
-void tst_MscEventsParsing::testInstanceCreateEmptyParameter()
-{
-    static const QString msc = QString("MSC msc1; \
-                      INSTANCE Inst_1; \
-                         out Heartbeat,120() to subscriber; \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                         in Heartbeat,120() from Inst_1; \
-                      ENDINSTANCE; \
-                   ENDMSC;");
-
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-
-    QCOMPARE(model->charts().size(), 1);
-    MscChart *chart = model->charts().at(0);
-
-    QCOMPARE(chart->instances().size(), 2);
-    QCOMPARE(chart->instanceEvents().size(), 1);
-
-    auto *msg = static_cast<MscCreate *>(chart->instanceEvents().at(0));
-    QCOMPARE(msg->fullName(), QString("Heartbeat,120"));
-    QVERIFY(msg->parameters().isEmpty());
-}
-
-void tst_MscEventsParsing::testInstanceCreateNoInstance()
-{
-    static const QLatin1String msc("MSC msc1; \
-                      INSTANCE Inst_1; \
-                         create subscriber2(data1); \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                      ENDINSTANCE; \
-                   ENDMSC;");
-
-    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
-}
-
-void tst_MscEventsParsing::testInstanceCreateDublicate()
-{
-    static const QLatin1String msc("MSC msc1; \
-                      INSTANCE Inst_1; \
-                         create subscriber(data1); \
-                         create subscriber(data2); \
-                      ENDINSTANCE; \
-                      INSTANCE subscriber; \
-                      ENDINSTANCE; \
-                   ENDMSC;");
-    QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
-}
-
-void tst_MscEventsParsing::testSortedMessage()
+void tst_MscReader::testSortedMessage()
 {
     static const QLatin1String msc("msc connection; \
                       instance Initiator; \
@@ -551,7 +347,7 @@ void tst_MscEventsParsing::testSortedMessage()
     delete model;
 }
 
-void tst_MscEventsParsing::testSortedMessageTwoCharts()
+void tst_MscReader::testSortedMessageTwoCharts()
 {
     static const QLatin1String msc("mscdocument doc1; \
                       msc connection1; \
@@ -639,7 +435,7 @@ void tst_MscEventsParsing::testSortedMessageTwoCharts()
     delete model;
 }
 
-void tst_MscEventsParsing::testSortedInstanceEvents()
+void tst_MscReader::testSortedInstanceEvents()
 {
     static const QLatin1String msc("msc connection; \
                       instance Initiator; \
@@ -731,7 +527,7 @@ void tst_MscEventsParsing::testSortedInstanceEvents()
     delete model;
 }
 
-void tst_MscEventsParsing::testSortedMessageCreate()
+void tst_MscReader::testSortedMessageCreate()
 {
     QString msc = "msc Untitled;\
     instance Instance_B;\
@@ -788,7 +584,7 @@ void tst_MscEventsParsing::testSortedMessageCreate()
     QCOMPARE(chart->instanceEvents().at(11)->name(), QString("NB2_10"));
 }
 
-void tst_MscEventsParsing::testSortingDeadlock()
+void tst_MscReader::testSortingDeadlock()
 {
     QString msc = "msc Untitled;\
     instance Instance_A;\
@@ -813,61 +609,7 @@ void tst_MscEventsParsing::testSortingDeadlock()
     QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
-void tst_MscEventsParsing::testMessageCreateInstance()
-{
-    static const QVector<QString> msgNames = { "Msg01", "", "Msg02", "Msg03", "Msg04", "Msg05" };
-    static const QString msc = QString("mscdocument Doc2; \
-                  msc msc3; \
-                      instance Instance_A; \
-                          out %1 to Instance_B; \
-                          create New_Instance1; \
-                          in %2 from Instance_B; \
-                          out %3 to New_Instance1; \
-                          out %5 to New_Instance1; \
-                      endinstance; \
-                      instance New_Instance1; \
-                          in %3 from Instance_A; \
-                          out %4 to Instance_B; \
-                          in %5 from Instance_A; \
-                      endinstance; \
-                      instance Instance_B; \
-                          in %1 from Instance_A; \
-                          out %2 to Instance_A; \
-                          in %4 from New_Instance1; \
-                      stop; \
-                  endmsc; \
-              endmscdocument;")
-                                       .arg(msgNames[0], msgNames[2], msgNames[3], msgNames[4], msgNames[5]);
-
-    // expected messages order is:
-    // 0 / 6 "Msg01"
-    // 1 / 6 "" // create New_Instance1
-    // 2 / 6 "Msg02"
-    // 3 / 6 "Msg03"
-    // 4 / 6 "Msg04"
-    // 5 / 6 "Msg05"
-
-    QScopedPointer<MscModel> model(m_reader->parseText(msc));
-    QCOMPARE(model->documents().size(), 1);
-    QCOMPARE(model->documents().first()->charts().size(), 1);
-
-    MscChart *chart = model->documents().first()->charts().first();
-    QCOMPARE(chart->instances().size(), 3);
-
-    QCOMPARE(chart->instanceEvents().size(), 6);
-
-    for (int i = 0; i < chart->instanceEvents().size(); ++i) {
-        if (MscMessage *message = dynamic_cast<MscMessage *>(chart->instanceEvents().at(i))) {
-            const MscMessage::MessageType expectedType =
-                    i == 1 ? MscMessage::MessageType::Create : MscMessage::MessageType::Message;
-
-            QCOMPARE(message->name(), msgNames.at(i));
-            QCOMPARE(message->messageType(), expectedType);
-        }
-    }
-}
-
-void tst_MscEventsParsing::testIncompleteMessageIn()
+void tst_MscReader::testIncompleteMessageIn()
 {
     static const QLatin1String msc("mscdocument TestDoc; \
                                      msc msc3; \
@@ -886,7 +628,7 @@ void tst_MscEventsParsing::testIncompleteMessageIn()
     QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
-void tst_MscEventsParsing::testIncompleteMessageOut()
+void tst_MscReader::testIncompleteMessageOut()
 {
     static const QLatin1String msc("mscdocument TestDoc; \
                                      msc msc3; \
@@ -905,7 +647,7 @@ void tst_MscEventsParsing::testIncompleteMessageOut()
     QVERIFY_EXCEPTION_THROWN(m_reader->parseText(msc), ParserException);
 }
 
-void tst_MscEventsParsing::testConditionDublicate()
+void tst_MscReader::testConditionDublicate()
 {
     static const QLatin1String msc("msc connection; \
                     instance Initiator; \
@@ -956,7 +698,7 @@ void tst_MscEventsParsing::testConditionDublicate()
     delete model;
 }
 
-void tst_MscEventsParsing::testTestMessageInstanceName()
+void tst_MscReader::testTestMessageInstanceName()
 {
     static const QLatin1String msc("mscdocument automade; \
                     inst mux; \
@@ -982,7 +724,7 @@ void tst_MscEventsParsing::testTestMessageInstanceName()
     QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
-void tst_MscEventsParsing::testSameNameDifferentInstances()
+void tst_MscReader::testSameNameDifferentInstances()
 {
     static const QLatin1String msc("MSC msc1;\
       INSTANCE instA;\
@@ -1003,7 +745,7 @@ void tst_MscEventsParsing::testSameNameDifferentInstances()
     QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
-void tst_MscEventsParsing::testDifferentParameter()
+void tst_MscReader::testDifferentParameter()
 {
     static const QLatin1String msc("msc recorded; \
                         instance mux; \
@@ -1024,7 +766,7 @@ void tst_MscEventsParsing::testDifferentParameter()
     QCOMPARE(chart->instanceEvents().size(), 2);
 }
 
-void tst_MscEventsParsing::testMultiMessageOccurrence()
+void tst_MscReader::testMultiMessageOccurrence()
 {
     static const QLatin1String msc("msc recorded; \
                         instance sender; \
@@ -1047,6 +789,20 @@ void tst_MscEventsParsing::testMultiMessageOccurrence()
     QCOMPARE(chart->instanceEvents().size(), 3);
 }
 
-QTEST_APPLESS_MAIN(tst_MscEventsParsing)
+void tst_MscReader::testNonStandardVia()
+{
+    // Using via that way is not really in line with the standard
+    QString msc = "MSC msc1; \
+                      INSTANCE Inst_1; \
+                         OUT check1 ( pin ) VIA gtX; \
+                         OUT check2(1) TO  VIA gtY; \
+                      ENDINSTANCE; \
+                   ENDMSC;";
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
 
-#include "tst_msceventsparsing.moc"
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    QCOMPARE(chart->instanceEvents().size(), 2);
+}
