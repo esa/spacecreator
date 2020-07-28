@@ -163,6 +163,8 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableaadlobject.h
     commandsstack.cpp
     commandsstack.h
+    endtoendview.cpp
+    endtoendview.h
     iveditor.cpp
     iveditor.h
     iveditorplugin.cpp

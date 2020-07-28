@@ -110,6 +110,12 @@ void GraphicsViewBase::setZoomStepPercent(qreal percent)
     d->zoomStepPercent = percent;
 }
 
+QList<QPair<QPointF, QString>> GraphicsViewBase::mouseMoveCoordinates(
+        QGraphicsScene *, const QPoint &, const QPointF &) const
+{
+    return QList<QPair<QPointF, QString>>();
+}
+
 void GraphicsViewBase::mousePressEvent(QMouseEvent *event)
 {
     if (event->buttons() == Qt::MidButton) {

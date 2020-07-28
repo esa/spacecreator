@@ -15,7 +15,7 @@ Plugin::Plugin(QObject *parent)
 {
 }
 
-Plugin::~Plugin() {}
+Plugin::~Plugin() { }
 
 QToolBar *Plugin::mainToolBar()
 {
@@ -68,6 +68,7 @@ void Plugin::initMenus(QMainWindow *window)
 void Plugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
 {
     menu->addAction(actionToggleMinimap());
+    menu->addAction(actionToggleE2EView());
     menu->addSeparator();
 }
 
@@ -146,6 +147,15 @@ QAction *Plugin::actionToggleMinimap()
         m_actionToggleMinimap->setCheckable(true);
     }
     return m_actionToggleMinimap;
+}
+
+QAction *Plugin::actionToggleE2EView()
+{
+    if (m_actionToggleE2EView == nullptr) {
+        m_actionToggleE2EView = new QAction(tr("&Show end to end dataflow"), this);
+        m_actionToggleE2EView->setCheckable(true);
+    }
+    return m_actionToggleE2EView;
 }
 
 }

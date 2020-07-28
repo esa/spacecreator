@@ -55,9 +55,10 @@ public Q_SLOTS:
     void setZoomStepPercent(qreal percent);
 
 protected:
-    // Return a list of coordinate+name that should be shown in the statusbar on mouse moves
+    //! Return a list of coordinate+name that should be shown in the statusbar on mouse moves
+    //! The default implementation does nothing
     virtual QList<QPair<QPointF, QString>> mouseMoveCoordinates(
-            QGraphicsScene *scene, const QPoint &screenPos, const QPointF &scenePos) const = 0;
+            QGraphicsScene *scene, const QPoint &screenPos, const QPointF &scenePos) const;
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

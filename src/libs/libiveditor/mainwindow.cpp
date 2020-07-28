@@ -22,6 +22,7 @@
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
+#include "endtoendview.h"
 #include "interface/interfacedocument.h"
 #include "iveditorplugin.h"
 #include "minimap.h"
@@ -114,6 +115,13 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
 
     updateWindowTitle();
     connect(m_document, &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+
+    // Create the E2E view and add the action
+    auto endToEndView = new EndToEndView(this);
+    endToEndView->hide();
+    connect(plugin->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
+    connect(endToEndView, &EndToEndView::visibleChanged, plugin->actionToggleE2EView(), &QAction::setChecked);
+    endToEndView->setVisible(plugin->actionToggleE2EView()->isChecked());
 }
 
 /*!
