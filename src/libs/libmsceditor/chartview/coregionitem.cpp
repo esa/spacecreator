@@ -104,10 +104,12 @@ void CoregionItem::rebuildLayout()
             if (messageItem != nullptr) {
                 // insert the messages source or target - depending which is in the co-region
                 QPointF pos;
-                if (m_instance->modelItem() == messageItem->sourceInstanceItem()->modelItem()) {
+                msc::InstanceItem *sourceItem = messageItem->sourceInstanceItem();
+                if (sourceItem && (m_instance->modelItem() == sourceItem->modelItem())) {
                     pos = messageItem->messagePoints().first();
                 }
-                if (m_instance.data()->modelItem() == messageItem->targetInstanceItem()->modelItem()) {
+                msc::InstanceItem *targetItem = messageItem->targetInstanceItem();
+                if (targetItem && (m_instance.data()->modelItem() == targetItem->modelItem())) {
                     pos = messageItem->messagePoints().last();
                 }
                 rect |= QRectF(pos.x() - 1, pos.y() - 1, 2, 2);
