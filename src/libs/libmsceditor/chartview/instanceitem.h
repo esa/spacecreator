@@ -91,6 +91,7 @@ public Q_SLOTS:
     void setDenominatorAndKind(const QString &kind);
     void setExplicitStop(bool exStop);
     void rebuildLayout() override;
+    void syncHeightToChartBox();
 
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
@@ -102,6 +103,10 @@ protected:
 #ifdef QT_DEBUG
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 #endif
+
+private Q_SLOTS:
+    void onNameEdited(const QString &newName);
+    void onKindEdited(const QString &newKind);
 
 private:
     ChartLayoutManager *m_model = nullptr;
@@ -117,10 +122,6 @@ private:
     void updatePropertyString(const QLatin1String &property, const QString &value);
 
     QVariantList prepareChangePositionCommand() const;
-
-private Q_SLOTS:
-    void onNameEdited(const QString &newName);
-    void onKindEdited(const QString &newKind);
 };
 
 } // namespace msc

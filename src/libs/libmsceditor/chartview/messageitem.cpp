@@ -23,7 +23,6 @@
 #include "baseitems/common/objectslink.h"
 #include "baseitems/labeledarrowitem.h"
 #include "baseitems/msgidentificationitem.h"
-#include "chartitem.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
@@ -779,6 +778,11 @@ void MessageItem::setMessagePoints(const QVector<QPointF> &scenePoints)
     setPos(QLineF(scenePoints.first(), scenePoints.last()).center());
     m_arrowItem->arrow()->makeArrow(m_sourceInstance, scenePoints.first(), m_targetInstance, scenePoints.last());
     m_arrowItem->arrow()->setTurnPoints(scenePoints);
+
+    if (geometryManagedByCif()) {
+        updateCif();
+    }
+
     updateGripPoints();
     commitGeometryChange();
 }
@@ -891,15 +895,6 @@ void MessageItem::onChartBoxChanged()
         return;
 
     extendGlobalMessage();
-}
-
-QRectF MessageItem::getChartBox() const
-{
-    if (ChartItem *chartItem = CoordinatesConverter::currentChartItem())
-        return chartItem->contentRect();
-    if (QGraphicsScene *scene = this->scene())
-        return scene->sceneRect();
-    return QRectF();
 }
 
 QPointF MessageItem::extendToNearestEdge(const QPointF &shiftMe) const

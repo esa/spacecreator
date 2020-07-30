@@ -70,6 +70,7 @@ struct ChartViewLayoutInfo {
         if (m_chartItem) {
             removeSceneItem(m_chartItem);
             delete m_chartItem;
+            m_chartItem = nullptr;
         }
 
         m_instancesCommonAxisOffset = 0.;
@@ -242,6 +243,7 @@ void ChartLayoutManager::clearScene()
     qDeleteAll(d->m_instanceItems);
     d->m_instanceItems.clear();
     d->m_instanceItemsSorted.clear();
+    setInstancesRect(QRectF());
 
     d->m_layoutInfo.clear();
 
@@ -255,6 +257,8 @@ MessageItem *ChartLayoutManager::fillMessageItem(
     if (!item) {
         item = new MessageItem(message, this);
         connect(item, &MessageItem::retargeted, this, &ChartLayoutManager::onMessageRetargeted, Qt::UniqueConnection);
+        connect(d->m_layoutInfo.m_chartItem, &msc::ChartItem::contentRectChanged, item,
+                &msc::MessageItem::onChartBoxChanged);
 
         const bool isCreateMsg =
                 item->isCreator() && targetItem && targetItem->modelItem() == message->targetInstance();
@@ -329,7 +333,6 @@ void ChartLayoutManager::doLayout()
 {
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
-    d->m_layoutInfo.m_instancesRect = QRectF();
     d->m_layoutInfo.m_instancesCommonAxisOffset = 0.;
 
     prepareChartBoxItem();
@@ -361,7 +364,7 @@ void ChartLayoutManager::doLayout()
 
 void ChartLayoutManager::addInstanceItems()
 {
-    d->m_layoutInfo.m_instancesRect = QRectF();
+    QRectF newInstancesRect;
     const QRectF &chartRect = d->m_layoutInfo.m_chartItem->contentRect();
 
     qreal maxHeight = 0.0;
@@ -384,7 +387,7 @@ void ChartLayoutManager::addInstanceItems()
         item->setName(instance->name());
 
         d->m_layoutInfo.m_pos.rx() = item->sceneBoundingRect().right();
-        d->m_layoutInfo.m_instancesRect |= item->sceneBoundingRect();
+        newInstancesRect |= item->sceneBoundingRect();
 
         if (isStreamingModeEnabled() && instance->explicitStop()) {
             const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
@@ -426,6 +429,8 @@ void ChartLayoutManager::addInstanceItems()
 
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItems.size());
     Q_ASSERT(d->m_currentChart->instances().size() == d->m_instanceItemsSorted.size());
+
+    setInstancesRect(newInstancesRect);
 }
 
 void ChartLayoutManager::addInstanceEventItems()
@@ -798,31 +803,8 @@ void ChartLayoutManager::updateChartboxToContent()
     if (chartBox == d->m_layoutInfo.m_chartItem->storedCustomRect())
         d->m_currentChart->clearCifs();
 
-    // expand global messages
-    for (InteractiveObject *io : d->m_instanceEventItemsSorted)
-        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
-            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
-                messageItem->onChartBoxChanged();
-
-    // expand non stopped instances to the bottom
-    const qreal targetInstanceBottom = d->m_layoutInfo.m_chartItem->contentRect().bottom();
     for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
-        if (instanceItem->modelItem()->explicitStop())
-            continue;
-
-        const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
-        if (!qFuzzyIsNull(deltaH)) {
-            instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH);
-        }
-    }
-
-    for (InteractiveObject *io : d->m_instanceEventItemsSorted) {
-        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Condition) {
-            if (auto conditionItem = qobject_cast<ConditionItem *>(io)) {
-                if (conditionItem->modelItem()->shared())
-                    conditionItem->setInstancesRect(d->m_layoutInfo.m_instancesRect);
-            }
-        }
+        instanceItem->syncHeightToChartBox();
     }
 }
 
@@ -851,25 +833,6 @@ void ChartLayoutManager::updateContentToChartbox(const QRectF &chartBoxRect)
 
     if (chartBox == actualContentRect())
         d->m_currentChart->clearCifs();
-
-    // expand global messages
-    for (InteractiveObject *io : d->m_instanceEventItemsSorted)
-        if (io->modelEntity() && io->modelEntity()->entityType() == MscEntity::EntityType::Message)
-            if (MessageItem *messageItem = qobject_cast<MessageItem *>(io))
-                if (!messageItem->modelItem()->isOrphan())
-                    messageItem->onChartBoxChanged();
-
-    // expand non stopped instances to the bottom
-    const qreal targetInstanceBottom = d->m_layoutInfo.m_chartItem->contentRect().bottom();
-    for (InstanceItem *instanceItem : d->m_instanceItemsSorted) {
-        if (instanceItem->modelItem()->explicitStop())
-            continue;
-
-        const qreal deltaH = targetInstanceBottom - instanceItem->sceneBoundingRect().bottom();
-        if (!qFuzzyIsNull(deltaH)) {
-            instanceItem->setAxisHeight(instanceItem->axisHeight() + deltaH);
-        }
-    }
 }
 
 /*!
@@ -1136,6 +1099,8 @@ InstanceItem *ChartLayoutManager::createDefaultInstanceItem(MscInstance *orphanI
             if (!qFuzzyIsNull(axisHeight))
                 instanceItem->setAxisHeight(axisHeight);
         }
+        connect(d->m_layoutInfo.m_chartItem, &msc::ChartItem::contentRectChanged, instanceItem,
+                &msc::InstanceItem::syncHeightToChartBox);
         return instanceItem;
     }
     return nullptr;
@@ -1311,6 +1276,7 @@ ConditionItem *ChartLayoutManager::addConditionItem(
     auto *item = itemForCondition(condition);
     if (!item) {
         item = new ConditionItem(condition);
+        connect(this, &msc::ChartLayoutManager::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
         storeEntityItem(item);
     }
 
@@ -1704,7 +1670,6 @@ void ChartLayoutManager::prepareChartBoxItem()
 
 void ChartLayoutManager::applyContentRect(const QRectF &newRect)
 {
-    QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
     d->m_layoutInfo.m_chartItem->setContentRect(newRect);
 }
 
@@ -1734,6 +1699,24 @@ void ChartLayoutManager::forceCifForAll()
 
     QSignalBlocker silently(d->m_layoutInfo.m_chartItem);
     d->m_layoutInfo.m_chartItem->updateCif();
+}
+
+/*!
+    Returns the bounding box of all instances
+ */
+const QRectF &ChartLayoutManager::instancesRect() const
+{
+    return d->m_layoutInfo.m_instancesRect;
+}
+
+void ChartLayoutManager::setInstancesRect(const QRectF &rect)
+{
+    if (rect == d->m_layoutInfo.m_instancesRect) {
+        return;
+    }
+
+    d->m_layoutInfo.m_instancesRect = rect;
+    Q_EMIT instancesRectChanged(d->m_layoutInfo.m_instancesRect);
 }
 
 } // namespace msc

@@ -91,6 +91,9 @@ void ConditionItem::connectObjects(InstanceItem *instance, qreal y, const QRectF
 
 void ConditionItem::setInstancesRect(const QRectF &instancesRect)
 {
+    if (!modelItem()->shared()) {
+        return;
+    }
     if (m_InstancesRect != instancesRect) {
         m_InstancesRect = instancesRect;
         instantLayoutUpdate();

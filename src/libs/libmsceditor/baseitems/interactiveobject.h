@@ -58,6 +58,8 @@ protected:
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     virtual cif::CifLine::CifType mainCifType() const;
 
+    QRectF getChartBox() const;
+
     QPointer<msc::MscEntity> m_entity;
 
     bool m_hovered = false;

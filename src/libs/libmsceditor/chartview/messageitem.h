@@ -91,9 +91,6 @@ public:
 
     QString displayedText() const;
 
-    void onChartBoxChanged();
-
-    QRectF getChartBox() const;
     QPointF extendToNearestEdge(const QPointF &shiftMe) const;
 
 Q_SIGNALS:
@@ -101,6 +98,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void setPositionChangeIgnored(bool ignored);
+    void onChartBoxChanged();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;

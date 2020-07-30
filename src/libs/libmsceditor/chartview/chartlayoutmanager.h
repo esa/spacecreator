@@ -59,6 +59,7 @@ class ChartLayoutManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(msc::MscChart *currentChart READ currentChart WRITE setCurrentChart NOTIFY currentChartChanged)
+    Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
 
 public:
     explicit ChartLayoutManager(QObject *parent = nullptr);
@@ -111,6 +112,8 @@ public:
     const QVector<msc::ConditionItem *> conditionsOfInstance(const MscInstance *instance) const;
     const QVector<msc::TimerItem *> timersOfInstance(const MscInstance *instance) const;
 
+    const QRectF &instancesRect() const;
+
 public Q_SLOTS:
     void updateLayout();
     void updateChartboxToContent();
@@ -122,6 +125,7 @@ Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
     void layoutComplete();
     void cifDataChanged();
+    void instancesRectChanged(const QRectF &rect);
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();
@@ -174,6 +178,8 @@ private:
     QVariantList prepareChangeOrderCommand(MscInstance *instance) const;
 
     void forceCifForAll();
+
+    void setInstancesRect(const QRectF &rect);
 };
 
 } // namespace msc

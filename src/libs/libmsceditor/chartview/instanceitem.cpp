@@ -187,6 +187,21 @@ void InstanceItem::rebuildLayout()
     }
 }
 
+/*!
+   If the instance is not stopped, the bottom is moved to be at the botton of the msc chart box
+ */
+void InstanceItem::syncHeightToChartBox()
+{
+    if (modelItem()->explicitStop()) {
+        return;
+    }
+
+    const qreal deltaH = getChartBox().bottom() - sceneBoundingRect().bottom();
+    if (!qFuzzyIsNull(deltaH)) {
+        setAxisHeight(axisHeight() + deltaH);
+    }
+}
+
 /**
     Applies the x-position of the instance if it is stored in the CIF information.
     The y-values are ignored

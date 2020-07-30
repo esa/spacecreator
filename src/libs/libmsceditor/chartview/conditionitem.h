@@ -44,12 +44,11 @@ public:
 
     void connectObjects(InstanceItem *instance, qreal y, const QRectF &instancesRect);
 
-    void setInstancesRect(const QRectF &instancesRect);
-
     static ConditionItem *createDefaultItem(MscCondition *condition, const QPointF &pos);
 
 public Q_SLOTS:
     void setName(const QString &name);
+    void setInstancesRect(const QRectF &instancesRect);
     void buildLayout();
 
 private Q_SLOTS:

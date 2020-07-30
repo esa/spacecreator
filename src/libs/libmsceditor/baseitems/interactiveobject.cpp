@@ -20,6 +20,7 @@
 
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
+#include "chartitem.h"
 #include "mscentity.h"
 
 #include <QBrush>
@@ -138,6 +139,21 @@ void InteractiveObject::moveSilentlyBy(const QPointF &shift)
 
     QSignalBlocker suppressMoved(this);
     moveBy(shift.x(), shift.y());
+}
+
+/*!
+   Returns the content rect of the msc chart item
+ */
+QRectF InteractiveObject::getChartBox() const
+{
+    // The chart item should be the first one, when AscendingOrder is used
+    for (QGraphicsItem *item : scene()->items(Qt::AscendingOrder)) {
+        auto chartItem = dynamic_cast<msc::ChartItem *>(item);
+        if (chartItem) {
+            return chartItem->contentRect();
+        }
+    }
+    return QRectF();
 }
 
 }
