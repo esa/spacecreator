@@ -18,11 +18,16 @@
 #pragma once
 
 #include <QObject>
+#include <memory>
 
 class QDomElement;
 class QDomNodeList;
 class QFileInfo;
 class QStringList;
+
+namespace Asn1Acn {
+class File;
+}
 
 namespace asn1 {
 
@@ -33,9 +38,10 @@ class Asn1XMLParser : public QObject
 public:
     Asn1XMLParser(QObject *parent = nullptr);
 
-    QVariantList parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages);
-    QVariantList parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages);
-    QVariantList parseAsn1XmlFile(const QString &fileName);
+    std::unique_ptr<Asn1Acn::File> parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages);
+    std::unique_ptr<Asn1Acn::File> parseAsn1File(
+            const QString &filePath, const QString &fileName, QStringList *errorMessages);
+    std::unique_ptr<Asn1Acn::File> parseAsn1XmlFile(const QString &fileName);
 
     QString asn1AsHtml(const QString &filename) const;
 
@@ -43,16 +49,6 @@ Q_SIGNALS:
     void parseError(const QString &error);
 
 private:
-    QVariantList parseXml(const QString &content);
-
-    QVariantMap parseType(
-            const QList<QDomNodeList> &typeAssignments, const QDomElement &type, const QString &name = QString());
-    template<typename T>
-    void parseRange(const QDomElement &type, QVariantMap &result);
-    void parseSequenceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);
-    void parseEnumeratedType(const QDomElement &type, QVariantMap &result);
-    void parseChoiceType(const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result);
-
     void checkforCompiler() const;
     QString asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;

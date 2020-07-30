@@ -19,6 +19,7 @@
 
 #include "asn1xmlparser.h"
 #include "commands/common/commandsstack.h"
+#include "file.h"
 #include "mscmodel.h"
 #include "ui_asn1fileview.h"
 
@@ -143,13 +144,13 @@ void ASN1FileView::fillPreview(const QString &filename)
 
     asn1::Asn1XMLParser parser;
     QStringList errorMessages;
-    QVariantList types = parser.parseAsn1File(QFileInfo(filename), &errorMessages);
+    std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(QFileInfo(filename), &errorMessages);
     if (!errorMessages.isEmpty()) {
         qWarning() << "Asn.1 file" << filename << "is invalid";
         return;
     }
 
-    m_model->setAsn1TypesData(types);
+    m_model->setAsn1TypesData(std::move(types));
 
     QString html = parser.asn1AsHtml(filename);
     if (html.isEmpty()) {

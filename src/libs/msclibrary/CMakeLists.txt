@@ -107,6 +107,7 @@ target_include_directories(${LIB_NAME}
 
 target_link_libraries(${LIB_NAME}
     asn1editor
+    asn1library
     qobjectlistmodel
     templating
     Qt5::Core

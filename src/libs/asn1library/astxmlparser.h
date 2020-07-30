@@ -28,7 +28,6 @@
 
 #include <QString>
 #include <QStringList>
-#include <QVariantMap>
 #include <QXmlStreamReader>
 #include <memory>
 
@@ -95,6 +94,8 @@ private:
 
     bool nextRequiredElementIs(const QString &name);
     bool nextRequiredElementIs(const QStringList &names);
+    bool nextElementIs(const QString &name);
+    bool nextElementIs(const QStringList &names);
     bool skipToChildElement(const QString &name);
     bool skipToChildElement(const QStringList &names);
 

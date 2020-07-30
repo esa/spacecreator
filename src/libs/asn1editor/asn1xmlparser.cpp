@@ -18,6 +18,8 @@
 #include "asn1xmlparser.h"
 
 #include "asn1const.h"
+#include "astxmlparser.h"
+#include "file.h"
 
 #include <QDebug>
 #include <QDir>
@@ -25,7 +27,6 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QProcess>
-#include <QVariantMap>
 #include <cstdlib>
 #include <ctime>
 #include <type_traits>
@@ -40,12 +41,13 @@ Asn1XMLParser::Asn1XMLParser(QObject *parent)
 {
 }
 
-QVariantList Asn1XMLParser::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
+std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
 {
     return parseAsn1File(fileInfo.dir().absolutePath(), fileInfo.fileName(), errorMessages);
 }
 
-QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString &fileName, QStringList *errorMessages)
+std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(
+        const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
     static QString asn1Command;
     if (asn1Command.isEmpty()) {
@@ -98,29 +100,47 @@ QVariantList Asn1XMLParser::parseAsn1File(const QString &filePath, const QString
         return {};
     }
 
-    QVariantList asn1TypesData = parseAsn1XmlFile(asn1XMLFileName);
+    std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlFile(asn1XMLFileName);
 
     QFile::remove(asn1XMLFileName);
 
     return asn1TypesData;
 }
 
-QVariantList Asn1XMLParser::parseAsn1XmlFile(const QString &fileName)
+std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1XmlFile(const QString &fileName)
 {
-    if (QFileInfo::exists(fileName)) {
+    QFileInfo fileInfo;
+    if (fileInfo.exists(fileName)) {
         QFile file(fileName);
 
         if (file.open(QIODevice::ReadOnly)) {
-            const auto content = file.readAll();
-            file.close();
 
-            return parseXml(content);
+            QXmlStreamReader reader(&file);
+            Asn1Acn::AstXmlParser parser(reader);
+            const bool ok = parser.parse();
+            if (!ok) {
+                Q_EMIT parseError(tr("Error parsing the asn1 file %1").arg(fileName));
+            }
+            std::map<QString, std::unique_ptr<Asn1Acn::File>> data = parser.takeData();
+            if (data.empty()) {
+                Q_EMIT parseError(tr("Invalid XML format"));
+                return {};
+            }
+
+            if (data.size() == 1) {
+                return std::move(data.begin()->second);
+            }
+
+            if (data.find(fileInfo.fileName()) != data.end()) {
+                return std::move(data[fileInfo.fileName()]);
+            }
         } else
             Q_EMIT parseError(file.errorString());
-    } else
+    } else {
         Q_EMIT parseError(tr("File not found"));
+    }
 
-    return QVariantList();
+    return {};
 }
 
 QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
@@ -177,205 +197,6 @@ QString Asn1XMLParser::asn1AsHtml(const QString &filename) const
     } else {
         return {};
     }
-}
-
-QVariantList Asn1XMLParser::parseXml(const QString &content)
-{
-    QDomDocument doc;
-    QDomElement root;
-    QString errorMsg;
-    QVariantList asn1TypesData;
-
-    if (!doc.setContent(content, &errorMsg)) {
-        Q_EMIT parseError(errorMsg);
-        return asn1TypesData;
-    }
-
-    root = doc.documentElement();
-    if (root.isNull() || (root.tagName() != "ASN1AST")) {
-        Q_EMIT parseError(tr("Invalid XML format"));
-        return asn1TypesData;
-    }
-
-    root = root.firstChildElement("Asn1File");
-    if (root.isNull()) {
-        Q_EMIT parseError(tr("Invalid XML format"));
-        return asn1TypesData;
-    }
-
-    QDomNodeList asn1Modules = root.elementsByTagName("Asn1Module");
-
-    QList<QDomNodeList> typeAssignments;
-
-    for (int x = 0; x < asn1Modules.size(); ++x) {
-        QDomElement asn1Module = asn1Modules.at(x).toElement();
-
-        // store all TypeAssignment nodes
-        typeAssignments.append(asn1Module.firstChildElement("TypeAssignments").elementsByTagName("TypeAssignment"));
-    }
-
-    for (const QDomNodeList &typeAssignment : typeAssignments) {
-        for (int x = 0; x < typeAssignment.size(); ++x) {
-            QDomElement elem = typeAssignment.at(x).toElement();
-
-            asn1TypesData.append(parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("Name")));
-        }
-    }
-
-    return asn1TypesData;
-}
-
-QVariantMap Asn1XMLParser::parseType(
-        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, const QString &name)
-{
-    QVariantMap typeData;
-
-    typeData[ASN1_NAME] = name;
-    typeData[ASN1_IS_OPTIONAL] = false;
-
-    QDomElement typeElem = type.firstChild().toElement();
-    QString typeName = typeElem.tagName();
-
-    auto typeByTypeName = [](const QString &typeName) {
-        static QMap<QString, ASN1Type> asn1TypeStringMap { { "IntegerType", ASN1Type::INTEGER },
-            { "RealType", ASN1Type::DOUBLE }, { "BooleanType", ASN1Type::BOOL }, { "SequenceType", ASN1Type::SEQUENCE },
-            { "SequenceOfType", ASN1Type::SEQUENCEOF }, { "EnumeratedType", ASN1Type::ENUMERATED },
-            { "ChoiceType", ASN1Type::CHOICE } };
-
-        return asn1TypeStringMap.contains(typeName) ? asn1TypeStringMap[typeName] : ASN1Type::STRING;
-    };
-
-    // find type node for ReferenceType
-    while (typeName == "ReferenceType") {
-        parseRange<qlonglong>(typeElem, typeData);
-
-        for (const QDomNodeList &typeAssignment : typeAssignments) {
-            for (int x = 0; x < typeAssignment.size(); ++x) {
-                QDomElement elem = typeAssignment.at(x).toElement();
-                if (elem.attribute("Name") == typeElem.attribute("ReferencedTypeName")) {
-                    typeElem = elem.firstChildElement("Type").firstChild().toElement();
-                    typeName = typeElem.tagName();
-
-                    break;
-                }
-            }
-
-            if (typeName != "ReferenceType")
-                break;
-        }
-    }
-
-    typeData[ASN1_TYPE] = typeByTypeName(typeName);
-
-    switch (static_cast<ASN1Type>(typeData[ASN1_TYPE].toInt())) {
-    case INTEGER:
-    case STRING:
-        parseRange<qlonglong>(typeElem, typeData);
-        break;
-    case DOUBLE:
-        parseRange<double>(typeElem, typeData);
-        break;
-    case BOOL:
-        typeData["default"] = false;
-        break;
-    case SEQUENCE:
-        parseSequenceType(typeAssignments, typeElem, typeData);
-        break;
-    case SEQUENCEOF:
-        typeData[ASN1_SEQOFTYPE] = parseType(typeAssignments, typeElem.firstChild().toElement());
-        parseRange<qlonglong>(typeElem, typeData);
-        break;
-    case ENUMERATED:
-        parseEnumeratedType(typeElem, typeData);
-        break;
-    case CHOICE:
-        parseChoiceType(typeAssignments, typeElem, typeData);
-        break;
-    }
-
-    return typeData;
-}
-
-void Asn1XMLParser::parseSequenceType(
-        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result)
-{
-    /*
-<SequenceType>
-    <SequenceOrSetChild VarName="foo" Optional="False" Line="8" CharPositionInLine="21">
-        <Type Line="8" CharPositionInLine="25">
-            <BooleanType />
-        </Type>
-    </SequenceOrSetChild>
-    <SequenceOrSetChild VarName="bar" Optional="True" Line="8" CharPositionInLine="34">
-        ...
-    </SequenceOrSetChild>
- </SequenceType>
-*/
-    QVariantList children;
-
-    for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
-        QDomElement elem = n.toElement();
-
-        QVariantMap childType = parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName"));
-
-        childType[ASN1_IS_OPTIONAL] = elem.attribute("Optional") == "True";
-
-        children.append(childType);
-    }
-
-    result[ASN1_CHILDREN] = children;
-}
-
-void Asn1XMLParser::parseEnumeratedType(const QDomElement &type, QVariantMap &result)
-{
-    /*
-<EnumeratedType Extensible="False" ValuesAutoCalculated="False">
-    <EnumValues>
-        <EnumValue StringValue="red" IntValue="0" Line="17" CharPositionInLine="4" EnumID ="red" />
-        ...
-    </EnumValues>
-</EnumeratedType>
- */
-
-    // get all EnumValue elements
-    QDomNodeList enumValueList = type.firstChildElement().elementsByTagName("EnumValue");
-
-    QVariantList values;
-
-    for (int x = 0; x < enumValueList.size(); ++x) {
-        QDomElement enumValue = enumValueList.at(x).toElement();
-
-        values.append(enumValue.attribute("StringValue"));
-    }
-
-    result[ASN1_VALUES] = values;
-}
-
-void Asn1XMLParser::parseChoiceType(
-        const QList<QDomNodeList> &typeAssignments, const QDomElement &type, QVariantMap &result)
-{
-    /*
-<ChoiceType>
-    <ChoiceChild VarName="x" Line="20" CharPositionInLine="15" EnumID ="x_PRESENT">
-        <Type Line="20" CharPositionInLine="17">
-            <BooleanType />
-        </Type>
-    </ChoiceChild>
-    <ChoiceChild VarName="y" Line="20" CharPositionInLine="26" EnumID ="y_PRESENT">
-        ...
-    </ChoiceChild>
-</ChoiceType>
-*/
-
-    QVariantList choices;
-
-    for (QDomNode n = type.firstChild(); !n.isNull(); n = n.nextSibling()) {
-        QDomElement elem = n.toElement();
-
-        choices.append(parseType(typeAssignments, elem.firstChildElement("Type"), elem.attribute("VarName")));
-    }
-
-    result[ASN1_CHOICES] = choices;
 }
 
 void Asn1XMLParser::checkforCompiler() const
@@ -447,29 +268,6 @@ QString Asn1XMLParser::temporaryFileName(const QString &basename, const QString 
 
     int value = std::rand();
     return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
-}
-
-template<typename T>
-void Asn1XMLParser::parseRange(const QDomElement &type, QVariantMap &result)
-{
-    auto parseAttribute = [&](const QString &attrName, const QString &mapName) {
-        if (type.hasAttribute(attrName)) {
-            bool ok;
-            QString valueText = type.attribute(attrName);
-            if (std::is_same<T, qlonglong>::value) {
-                qlonglong valueInt = valueText.toLongLong(&ok);
-                if (ok && !result.contains(mapName))
-                    result[mapName] = valueInt;
-            } else {
-                double valueDouble = valueText.toDouble(&ok);
-                if (ok && !result.contains(mapName))
-                    result[mapName] = static_cast<T>(valueDouble);
-            }
-        }
-    };
-
-    parseAttribute("Min", ASN1_MIN);
-    parseAttribute("Max", ASN1_MAX);
 }
 
 } // namespace asn1

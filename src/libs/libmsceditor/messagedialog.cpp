@@ -20,6 +20,7 @@
 #include "asn1editor.h"
 #include "asn1valueparser.h"
 #include "commands/common/commandsstack.h"
+#include "file.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -177,7 +178,7 @@ void MessageDialog::editDeclarations()
     if (docs.isEmpty())
         return;
 
-    MessageDeclarationsDialog dialog(declarations, mscModel()->asn1TypesData(), this);
+    MessageDeclarationsDialog dialog(declarations, mscModel(), this);
     dialog.setFileName(model->dataDefinitionString());
 
     int result = dialog.exec();
@@ -188,8 +189,6 @@ void MessageDialog::editDeclarations()
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
         const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        model->setDataDefinitionString(dialog.fileName());
-        model->setAsn1TypesData(dialog.asn1Types());
         fillMessageDeclartionBox();
         selectDeclarationFromName();
     }
@@ -247,10 +246,8 @@ void MessageDialog::editItem(QTableWidgetItem *item)
     if (!m_selectedDeclaration)
         return;
 
-    asn1::Asn1Editor editor(this);
-    editor.setValueEditOnlyMode();
-    const QVariantList &types = mscModel()->asn1TypesData();
-    editor.setAsn1Types(types);
+    const std::unique_ptr<Asn1Acn::File> &types = mscModel()->asn1Types();
+    asn1::Asn1Editor editor(types, this);
     const QString type = ui->parameterTable->verticalHeaderItem(item->row())->text();
     editor.showAsn1Type(type);
     editor.setValue(item->text());
@@ -311,18 +308,17 @@ void MessageDialog::checkTextValidity()
 
     if (m_selectedDeclaration) {
         asn1::Asn1ValueParser parser;
-        const QVariantList &asn1Types = mscModel()->asn1TypesData();
+        const std::unique_ptr<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
         for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
             QTableWidgetItem *item = ui->parameterTable->item(i, 0);
             if (item) {
                 const QString &value = ui->parameterTable->item(i, 0)->text();
                 if (ui->parameterTable->verticalHeaderItem(i) != nullptr) {
                     const QString &typeName = ui->parameterTable->verticalHeaderItem(i)->text();
-                    auto find = std::find_if(asn1Types.begin(), asn1Types.end(),
-                            [&](const QVariant &asn1Var) { return asn1Var.toMap()["name"] == typeName; });
-                    if (find != asn1Types.end()) {
+                    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = asn1Data->typeAssignment(typeName);
+                    if (assignment) {
                         bool ok;
-                        parser.parseAsn1Value((*find).toMap(), value, &ok);
+                        parser.parseAsn1Value(assignment->type(), value, &ok);
                         m_isValid = m_isValid && ok;
                     } else
                         m_isValid = false;

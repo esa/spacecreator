@@ -18,10 +18,14 @@
 #pragma once
 
 #include <QDialog>
-#include <QVariantMap>
+#include <memory>
 
 namespace Ui {
 class Asn1Editor;
+}
+
+namespace Asn1Acn {
+class File;
 }
 
 namespace asn1 {
@@ -33,14 +37,8 @@ class Asn1Editor : public QDialog
     Q_OBJECT
 
 public:
-    Asn1Editor(QWidget *parent = nullptr);
+    Asn1Editor(const std::unique_ptr<Asn1Acn::File> &asn1Types, QWidget *parent = nullptr);
     ~Asn1Editor();
-
-    void setAsn1Types(const QVariantList &asn1Types);
-    const QVariantList &asn1Types() const;
-
-    void setFileName(const QString &fileName);
-    const QString &fileName() const;
 
     void setValue(const QString &value);
     QString value() const;
@@ -53,19 +51,17 @@ public Q_SLOTS:
     void showAsn1Type(const QString &text);
 
 private Q_SLOTS:
-    void openFile();
     void showParseError(const QString &error);
     void setAsn1Value();
     void getAsn1Value();
 
 private:
-    void loadFile(const QString &file);
     void addAsn1TypeItems();
 
 private:
     Ui::Asn1Editor *ui;
     Asn1TreeView *m_asn1TreeView;
-    QVariantList m_asn1Types;
+    const std::unique_ptr<Asn1Acn::File> &m_asn1Types;
     QString m_fileName;
 };
 

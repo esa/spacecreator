@@ -18,6 +18,7 @@
 #include "mscmodel.h"
 
 #include "asn1valueparser.h"
+#include "file.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmessagedeclaration.h"
@@ -128,25 +129,19 @@ void MscModel::setDataDefinitionString(const QString &dataString)
     Q_EMIT dataChanged();
 }
 
-const QVariantList &MscModel::asn1TypesData() const
+void MscModel::setAsn1TypesData(std::unique_ptr<Asn1Acn::File> data)
 {
-    return m_asn1TypesData;
-}
-
-void MscModel::setAsn1TypesData(const QVariantList &asn1TypesData)
-{
-    if (asn1TypesData == m_asn1TypesData) {
+    if (data == m_asn1Data) {
         return;
     }
 
-    m_asn1TypesData = asn1TypesData;
+    m_asn1Data.swap(data);
     Q_EMIT asn1DataChanged();
+}
 
-    QStringList faultyMessages;
-    const bool ok = checkAllMessagesForAsn1Compliance(&faultyMessages);
-    if (!ok) {
-        Q_EMIT asn1ParameterErrorDetected(faultyMessages);
-    }
+const std::unique_ptr<Asn1Acn::File> &MscModel::asn1Types() const
+{
+    return m_asn1Data;
 }
 
 void MscModel::clear()
@@ -196,18 +191,19 @@ void MscModel::checkInstanceNames()
  */
 bool MscModel::checkparameterAsn1Compliance(const QString &parameter, const QString &typeName) const
 {
-    if (m_asn1TypesData.isEmpty()) {
+    if (!m_asn1Data) {
         return true;
     }
 
-    for (const QVariant &type : m_asn1TypesData) {
-        const QVariantMap typeMap = type.toMap();
-        if (typeMap.contains("type") && typeMap["name"] == typeName) {
-            asn1::Asn1ValueParser parser;
-            bool ok;
-            parser.parseAsn1Value(typeMap, parameter, &ok);
-            if (ok) {
-                return true;
+    for (const auto &definitions : m_asn1Data->definitionsList()) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssignment : definitions->types()) {
+            if (typeAssignment->name() == typeName) {
+                bool ok;
+                asn1::Asn1ValueParser parser;
+                parser.parseAsn1Value(typeAssignment.get(), parameter, &ok);
+                if (ok) {
+                    return true;
+                }
             }
         }
     }

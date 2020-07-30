@@ -18,10 +18,14 @@
 #include "messagedeclarationsdialog.h"
 
 #include "asn1xmlparser.h"
+#include "commands/common/commandsstack.h"
+#include "definitions.h"
+#include "file.h"
 #include "mscdocument.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "mscwriter.h"
+#include "typeassignment.h"
 #include "ui_messagedeclarationsdialog.h"
 
 #include <QDebug>
@@ -31,13 +35,14 @@
 #include <QRegExpValidator>
 
 MessageDeclarationsDialog::MessageDeclarationsDialog(
-        msc::MscMessageDeclarationList *model, const QVariantList &asn1Types, QWidget *parent)
+        msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDeclarationsDialog)
     , m_model(model->clone())
-    , m_asn1Types(asn1Types)
+    , m_mscModel(mscModel)
 {
-    Q_ASSERT(model);
+    Q_ASSERT(m_model);
+    Q_ASSERT(m_mscModel);
     ui->setupUi(this);
     QString regExPattern = msc::MscEntity::nameVerifier().pattern();
     regExPattern.insert(regExPattern.size() - 2, "|(\\s?,\\s?)"); // name as per spec + "," as separator
@@ -80,11 +85,6 @@ MessageDeclarationsDialog::~MessageDeclarationsDialog()
 msc::MscMessageDeclarationList *MessageDeclarationsDialog::declarations() const
 {
     return m_model;
-}
-
-const QVariantList &MessageDeclarationsDialog::asn1Types() const
-{
-    return m_asn1Types;
 }
 
 void MessageDeclarationsDialog::setFileName(const QString &fileName)
@@ -241,11 +241,13 @@ void MessageDeclarationsDialog::selectAsn1File()
         QFileInfo fileInfo(fileName);
         QStringList errors;
         asn1::Asn1XMLParser parser;
-        const QVariantList &types = parser.parseAsn1File(fileInfo, &errors);
+        std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(fileInfo, &errors);
         if (errors.isEmpty()) {
-            m_asn1Types = types;
             updateAsn1TypesView();
             m_fileName = fileInfo.fileName();
+            const QVariantList params { QVariant::fromValue(m_mscModel), m_fileName, "ASN.1" };
+            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+            m_mscModel->setAsn1TypesData(std::move(types));
         } else {
             qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
         }
@@ -255,8 +257,9 @@ void MessageDeclarationsDialog::selectAsn1File()
 void MessageDeclarationsDialog::updateAsn1TypesView()
 {
     ui->availableListView->clear();
-    for (const QVariant &asn1Type : m_asn1Types) {
-        const QString &name = asn1Type.toMap()["name"].toString();
-        ui->availableListView->addItem(name);
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_mscModel->asn1Types()->definitionsList()) {
+        for (const QString &name : definitions->typeAssignmentNames()) {
+            ui->availableListView->addItem(name);
+        }
     }
 }

@@ -17,6 +17,10 @@
 
 #include "asn1treeview.h"
 #include "asn1xmlparser.h"
+#include "definitions.h"
+#include "file.h"
+#include "typeassignment.h"
+#include "types/builtintypes.h"
 
 #include <QtTest>
 
@@ -49,10 +53,14 @@ void tst_Asn1TreeView::cleanup()
 void tst_Asn1TreeView::testSetAsn1Value()
 {
     Asn1XMLParser parser;
-    const QVariantList &types = parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
+    std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
 
-    QVariantMap asn1Model;
-    m_treeView->setAsn1Model(types[1].toMap());
+    const Asn1Acn::Definitions *definitions = types->definitions("DataView");
+    QVERIFY(definitions != nullptr);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = definitions->types().at(1);
+    QVERIFY(assignment);
+
+    m_treeView->setAsn1Model(assignment);
 
     QVariantMap subValue1;
     subValue1["name"] = QVariant::fromValue(QString("field-a"));
@@ -72,6 +80,7 @@ void tst_Asn1TreeView::testSetAsn1Value()
     asn1Value["name"] = QVariant::fromValue(QString("My-Seq"));
 
     m_treeView->setAsn1Value(asn1Value);
+
     QCOMPARE(m_treeView->getAsn1Value(), QString("{ field-a  FALSE, field-b  choice1 : FALSE }"));
 }
 

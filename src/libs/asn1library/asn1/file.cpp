@@ -75,3 +75,18 @@ void File::clearErrors()
 {
     m_errorList.clear();
 }
+
+/*!
+   Returns the first type assignment with the given name/identifier
+ */
+const std::unique_ptr<TypeAssignment> &File::typeAssignment(const QString &text) const
+{
+    for (const std::unique_ptr<Definitions> &def : m_definitionsList) {
+        for (const std::unique_ptr<TypeAssignment> &assign : def->types()) {
+            if (text == assign->name()) {
+                return assign;
+            }
+        }
+    }
+    return m_noType;
+}

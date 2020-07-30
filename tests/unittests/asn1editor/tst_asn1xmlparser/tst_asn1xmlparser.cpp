@@ -17,6 +17,10 @@
 
 #include "asn1const.h"
 #include "asn1xmlparser.h"
+#include "definitions.h"
+#include "file.h"
+#include "typeassignment.h"
+#include "types/builtintypes.h"
 
 #include <QDomElement>
 #include <QDomNodeList>
@@ -42,7 +46,10 @@ private Q_SLOTS:
 
 private:
     Asn1XMLParser *xmlParser = nullptr;
-    ASN1Type toAsn1Type(const QVariant &value) { return static_cast<ASN1Type>(value.toInt()); }
+    Asn1Acn::Types::Type::ASN1Type toAsn1Type(const QVariant &value)
+    {
+        return static_cast<Asn1Acn::Types::Type::ASN1Type>(value.toInt());
+    }
 };
 
 void tst_Asn1XMLParser::init()
@@ -60,7 +67,8 @@ void tst_Asn1XMLParser::testFileOpenError()
 {
     QSignalSpy spy(xmlParser, SIGNAL(parseError(const QString &)));
 
-    xmlParser->parseAsn1XmlFile("some_dummy_file_name.xml");
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile("some_dummy_file_name.xml");
+    QVERIFY(!asn1Types);
 
     QCOMPARE(spy.count(), 1);
 
@@ -71,9 +79,7 @@ void tst_Asn1XMLParser::testFileOpenError()
 void tst_Asn1XMLParser::testInvalidXMLFormat()
 {
     QSignalSpy spy(xmlParser, SIGNAL(parseError(const QString &)));
-
     xmlParser->parseAsn1XmlFile(QFINDTESTDATA("invalid_format.xml"));
-
     QCOMPARE(spy.count(), 1);
 
     QList<QVariant> arguments = spy.takeFirst();
@@ -82,117 +88,115 @@ void tst_Asn1XMLParser::testInvalidXMLFormat()
 
 void tst_Asn1XMLParser::testEmptyFile()
 {
-    auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("empty.xml"));
-
-    QCOMPARE(asn1Types.count(), 0);
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("empty.xml"));
+    QCOMPARE(asn1Types->definitionsList().size(), 1);
+    QCOMPARE(asn1Types->definitionsList().at(0)->types().size(), 0);
 }
 
 void tst_Asn1XMLParser::testIntRealTypes()
 {
-    auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("number_type.xml"));
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("number_type.xml"));
+    QVERIFY(asn1Types);
 
-    QCOMPARE(asn1Types.count(), 3);
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
+    QVERIFY(definitions != nullptr);
 
-    auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 5);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyInt"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), INTEGER);
-    QCOMPARE(typeMap[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
-    QCOMPARE(typeMap[ASN1_MAX].toLongLong(), static_cast<qlonglong>(20));
+    QCOMPARE(definitions->types().size(), 3);
 
-    typeMap = asn1Types.at(1).toMap();
-    QCOMPARE(typeMap.size(), 5);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyReal"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), DOUBLE);
-    QCOMPARE(typeMap[ASN1_MIN].toDouble(), 0.0);
-    QCOMPARE(typeMap[ASN1_MAX].toDouble(), 1000.0);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("MyInt"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("INTEGER"));
+    const QVariantMap &data1 = typeAssign1->type()->parameters();
+    QCOMPARE(data1.size(), 2);
+    QCOMPARE(data1[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(data1[ASN1_MAX].toLongLong(), static_cast<qlonglong>(20));
 
-    typeMap = asn1Types.at(2).toMap();
-    QCOMPARE(typeMap.size(), 5);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("T-UInt32"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), INTEGER);
-    QCOMPARE(typeMap[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
-    QCOMPARE(typeMap[ASN1_MAX].toLongLong(), static_cast<qlonglong>(4294967295));
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign2 = definitions->types().at(1);
+    QCOMPARE(typeAssign2->name(), QString("MyReal"));
+    QCOMPARE(typeAssign2->type()->typeName(), QString("REAL"));
+    const QVariantMap &data2 = typeAssign2->type()->parameters();
+    QCOMPARE(data2.size(), 2);
+    QCOMPARE(data2[ASN1_MIN].toDouble(), 0.0);
+    QCOMPARE(data2[ASN1_MAX].toLongLong(), 1000.0);
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign3 = definitions->types().at(2);
+    QCOMPARE(typeAssign3->name(), QString("T-UInt32"));
+    QCOMPARE(typeAssign3->type()->typeName(), QString("INTEGER"));
+    const QVariantMap &data3 = typeAssign3->type()->parameters();
+    QCOMPARE(data3.size(), 2);
+    QCOMPARE(data3[ASN1_MIN].toLongLong(), static_cast<qlonglong>(0));
+    QCOMPARE(data3[ASN1_MAX].toLongLong(), static_cast<qlonglong>(4294967295));
 }
 
 void tst_Asn1XMLParser::testBoolEnumTypes()
 {
-    auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("boolenum_type.xml"));
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("boolenum_type.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
 
-    QCOMPARE(asn1Types.count(), 2);
+    QCOMPARE(definitions->types().size(), 2);
 
-    auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyBOOL"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), BOOL);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("MyBOOL"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("BOOLEAN"));
 
-    typeMap = asn1Types.at(1).toMap();
-    QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("TypeEnumerated"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), ENUMERATED);
-
-    auto values = typeMap[ASN1_VALUES].toList();
-
-    QCOMPARE(values.count(), 3);
-
-    QCOMPARE(values.at(0).toString(), QString("red"));
-    QCOMPARE(values.at(1).toString(), QString("green"));
-    QCOMPARE(values.at(2).toString(), QString("blue"));
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign2 = definitions->types().at(1);
+    QCOMPARE(typeAssign2->name(), QString("TypeEnumerated"));
+    QCOMPARE(typeAssign2->type()->typeName(), QString("ENUMERATED"));
+    const QVariantMap &data2 = typeAssign2->type()->parameters();
+    QCOMPARE(data2.size(), 1);
+    QVariantList enumValues = data2[ASN1_VALUES].toList();
+    QCOMPARE(enumValues.count(), 3);
+    QCOMPARE(enumValues.at(0).toString(), QString("red"));
+    QCOMPARE(enumValues.at(1).toString(), QString("green"));
+    QCOMPARE(enumValues.at(2).toString(), QString("blue"));
 }
 
 void tst_Asn1XMLParser::testChoiceType()
 {
-    auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("choice_type.xml"));
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("choice_type.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
+    QCOMPARE(definitions->types().size(), 1);
 
-    QCOMPARE(asn1Types.count(), 1);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("MyChoice"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("CHOICE"));
 
-    auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MyChoice"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), CHOICE);
+    auto choice = dynamic_cast<const Asn1Acn::Types::Choice *>(typeAssign1->type());
+    QCOMPARE(choice->children().size(), 2);
 
-    auto choices = typeMap[ASN1_CHOICES].toList();
+    const std::unique_ptr<Asn1Acn::Types::Type> &choice1 = choice->children().at(0);
+    QCOMPARE(choice1->typeName(), QString("BOOLEAN"));
 
-    QCOMPARE(choices.count(), 2);
-
-    auto choiceItem = choices.at(0).toMap();
-    QCOMPARE(choiceItem.size(), 4);
-    QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("hop"));
-    QCOMPARE(toAsn1Type(choiceItem[ASN1_TYPE]), BOOL);
-
-    choiceItem = choices.at(1).toMap();
-    QCOMPARE(choiceItem.size(), 5);
-    QCOMPARE(choiceItem[ASN1_NAME].toString(), QString("lat"));
-    QCOMPARE(toAsn1Type(choiceItem[ASN1_TYPE]), DOUBLE);
-    QCOMPARE(choiceItem[ASN1_MIN].toDouble(), -90.0);
-    QCOMPARE(choiceItem[ASN1_MAX].toDouble(), 90.0);
+    const std::unique_ptr<Asn1Acn::Types::Type> &choice2 = choice->children().at(1);
+    QCOMPARE(choice2->typeName(), QString("REAL"));
+    const QVariantMap &data = choice2->parameters();
+    QCOMPARE(data.size(), 2);
+    QCOMPARE(data[ASN1_MIN].toDouble(), -90.0);
+    QCOMPARE(data[ASN1_MAX].toLongLong(), 90.0);
 }
 
 void tst_Asn1XMLParser::testSequenceType()
 {
-    auto asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("sequence_type.xml"));
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("sequence_type.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("ModuleTest");
+    QCOMPARE(definitions->types().size(), 1);
 
-    QCOMPARE(asn1Types.count(), 1);
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("MySeq"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("SEQUENCE"));
 
-    auto typeMap = asn1Types.at(0).toMap();
-    QCOMPARE(typeMap.size(), 4);
-    QCOMPARE(typeMap[ASN1_NAME].toString(), QString("MySeq"));
-    QCOMPARE(toAsn1Type(typeMap[ASN1_TYPE]), SEQUENCE);
+    auto sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(typeAssign1->type());
+    QCOMPARE(sequence->children().size(), 2);
 
-    auto children = typeMap[ASN1_CHILDREN].toList();
-    QCOMPARE(children.size(), 2);
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence1 = sequence->children().at(0);
+    QCOMPARE(sequence1->typeName(), QString("BOOLEAN"));
 
-    auto child = children.at(0).toMap();
-    QCOMPARE(child.size(), 4);
-    QCOMPARE(child[ASN1_NAME].toString(), QString("foo"));
-    QCOMPARE(toAsn1Type(child[ASN1_TYPE]), BOOL);
-
-    child = children.at(1).toMap();
-    QCOMPARE(child.size(), 5);
-    QCOMPARE(child[ASN1_NAME].toString(), QString("int2Val"));
-    QCOMPARE(toAsn1Type(child[ASN1_TYPE]), INTEGER);
-    QCOMPARE(child[ASN1_MIN].toInt(), -10);
-    QCOMPARE(child[ASN1_MAX].toInt(), 10);
+    const std::unique_ptr<Asn1Acn::Types::Type> &sequence2 = sequence->children().at(1);
+    QCOMPARE(sequence2->typeName(), QString("INTEGER"));
+    const QVariantMap &data = sequence2->parameters();
+    QCOMPARE(data.size(), 2);
+    QCOMPARE(data[ASN1_MIN].toInt(), -10);
+    QCOMPARE(data[ASN1_MAX].toInt(), 10);
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1XMLParser)

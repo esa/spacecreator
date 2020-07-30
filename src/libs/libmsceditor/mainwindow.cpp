@@ -757,7 +757,7 @@ void MainWindow::openMessageDeclarationEditor()
         return;
     }
 
-    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model->asn1TypesData(), this);
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, this);
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
         msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
@@ -767,7 +767,6 @@ void MainWindow::openMessageDeclarationEditor()
         const QVariantList params { QVariant::fromValue(d->m_plugin->mainModel()->mscModel()), dialog.fileName(),
             "ASN.1" };
         msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        d->m_plugin->mainModel()->mscModel()->setAsn1TypesData(dialog.asn1Types());
         msc::cmd::CommandsStack::current()->endMacro();
     }
 }

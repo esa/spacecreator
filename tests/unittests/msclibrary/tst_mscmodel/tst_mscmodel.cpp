@@ -15,7 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "definitions.h"
 #include "exceptions.h"
+#include "file.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -23,6 +25,8 @@
 #include "mscmessagedeclaration.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "typeassignment.h"
+#include "types/builtintypes.h"
 
 #include <QtTest>
 
@@ -113,7 +117,8 @@ void tst_MscModel::testNoNullPtrChart()
 
 void tst_MscModel::testAsn1Compliance()
 {
-    m_model->setAsn1TypesData({});
+    std::unique_ptr<Asn1Acn::File> asn1Data;
+    m_model->setAsn1TypesData(std::move(asn1Data));
     bool ok = m_model->checkparameterAsn1Compliance("", "MyInt");
     QCOMPARE(ok, true);
 
@@ -218,15 +223,16 @@ void tst_MscModel::testAllMessagesCompliance()
 
 void tst_MscModel::addAsn1Types()
 {
-    QVariantList types;
-    QVariantMap myInt;
-    myInt["name"] = "MyInt";
-    myInt["type"] = 0;
-    myInt["isOptional"] = false;
-    myInt["min"] = 0;
-    myInt["max"] = 255;
-    types.append(myInt);
-    m_model->setAsn1TypesData(types);
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::Integer>();
+    type->setParameters({ { "min", 0 }, { "max", 255 } });
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyInt", location, std::move(type));
+
+    auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>("TestDef", location);
+    asn1Definitions->addType(std::move(assignment));
+    auto asn1Data = std::make_unique<Asn1Acn::File>("/dumm/path");
+    asn1Data->add(std::move(asn1Definitions));
+    m_model->setAsn1TypesData(std::move(asn1Data));
 }
 
 QTEST_APPLESS_MAIN(tst_MscModel)

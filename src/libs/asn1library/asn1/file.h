@@ -35,6 +35,8 @@
 
 namespace Asn1Acn {
 
+class TypeAssignment;
+
 class File : public Node
 {
 public:
@@ -65,6 +67,8 @@ public:
     void clearReferences();
     void clearErrors();
 
+    const std::unique_ptr<TypeAssignment> &typeAssignment(const QString &text) const;
+
 private:
     DefinitionsList m_definitionsList;
     ReferencesMap m_referencesMap;
@@ -74,6 +78,8 @@ private:
     std::map<QString, Definitions *> m_definitionsByNameMap;
 
     bool m_polluted;
+
+    const std::unique_ptr<TypeAssignment> m_noType;
 };
 
 }

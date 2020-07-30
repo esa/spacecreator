@@ -20,6 +20,11 @@
 #include <QObject>
 #include <QStringList>
 #include <QVector>
+#include <memory>
+
+namespace Asn1Acn {
+class File;
+}
 
 namespace msc {
 class MscChart;
@@ -52,8 +57,8 @@ public:
     const QString &dataDefinitionString() const;
     void setDataDefinitionString(const QString &dataString);
 
-    const QVariantList &asn1TypesData() const;
-    void setAsn1TypesData(const QVariantList &asn1TypesData);
+    void setAsn1TypesData(std::unique_ptr<Asn1Acn::File> data);
+    const std::unique_ptr<Asn1Acn::File> &asn1Types() const;
 
     void clear();
 
@@ -81,7 +86,7 @@ private:
     QVector<MscChart *> m_charts;
     QString m_dataLanguage;
     QString m_dataDefinitionString;
-    QVariantList m_asn1TypesData;
+    std::unique_ptr<Asn1Acn::File> m_asn1Data;
 };
 
 }

@@ -19,6 +19,13 @@
 
 #include <QObject>
 
+namespace Asn1Acn {
+class TypeAssignment;
+namespace Types {
+class Type;
+}
+}
+
 namespace asn1 {
 
 class Asn1ValueParser : public QObject
@@ -27,7 +34,10 @@ class Asn1ValueParser : public QObject
 public:
     Asn1ValueParser(QObject *parent = nullptr);
 
-    QVariantMap parseAsn1Value(const QVariantMap &asn1Type, const QString &asn1Value, bool *valueOk = nullptr) const;
+    QVariantMap parseAsn1Value(
+            const Asn1Acn::TypeAssignment *typeAssignemt, const QString &asn1Value, bool *valueOk = nullptr) const;
+    QVariantMap parseAsn1Value(
+            const Asn1Acn::Types::Type *type, const QString &asn1Value, bool *valueOk = nullptr) const;
 
 Q_SIGNALS:
     void parseError(const QString &error) const;
@@ -35,11 +45,13 @@ Q_SIGNALS:
 private:
     bool checkFormat(const QString &asn1Value) const;
 
-    bool parseSequenceValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
-    bool parseSequenceOfValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
-    bool parseChoiceValue(const QVariantMap &asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
+    bool parseSequenceValue(
+            const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
+    bool parseSequenceOfValue(
+            const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
+    bool parseChoiceValue(const Asn1Acn::Types::Type *asn1Type, const QString &asn1Value, QVariantMap &valueMap) const;
 
-    QVariantMap getType(const QString &name, const QVariantMap &asn1Type) const;
+    const Asn1Acn::Types::Type *getType(const QString &name, const Asn1Acn::Types::Type *asn1Type) const;
     bool checkRange(const QVariantMap &asn1Type, const QVariant &value) const;
 
     int nextIndex(const QString &value) const;

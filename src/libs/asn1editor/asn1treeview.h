@@ -20,8 +20,13 @@
 #include <QSharedPointer>
 #include <QTreeView>
 #include <QVariantMap>
+#include <memory>
 
 class QStandardItem;
+
+namespace Asn1Acn {
+class TypeAssignment;
+}
 
 namespace asn1 {
 
@@ -35,8 +40,8 @@ class Asn1TreeView : public QTreeView
 public:
     Asn1TreeView(QWidget *parent = nullptr);
 
-    void setAsn1Model(const QVariantMap &asn1Item, int row = 0);
-    void setAsn1Value(const QVariantMap &asn1Value);
+    void setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item, int row = 0);
+    void setAsn1Value(const QVariantMap &value);
     QString getAsn1Value() const;
 
 private Q_SLOTS:

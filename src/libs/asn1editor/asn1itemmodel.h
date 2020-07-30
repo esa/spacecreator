@@ -19,8 +19,16 @@
 
 #include <QMap>
 #include <QStandardItemModel>
+#include <memory>
 
 class QStandardItem;
+
+namespace Asn1Acn {
+namespace Types {
+class Type;
+}
+class TypeAssignment;
+}
 
 namespace asn1 {
 
@@ -30,24 +38,24 @@ class Asn1ItemModel : public QStandardItemModel
 
 public:
     Asn1ItemModel(QObject *parent = nullptr);
-    Asn1ItemModel(const QVariantMap &asn1Item, QObject *parent = nullptr);
+    Asn1ItemModel(const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item, QObject *parent = nullptr);
 
-    void setAsn1Model(const QVariantMap &asn1Item);
+    void setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item);
 
 private:
     using ItemMap = QMap<QString, QStandardItem *>;
 
-    ItemMap createModelItems(const QVariantMap &asn1Item);
+    ItemMap createModelItems(const Asn1Acn::Types::Type *asn1Item);
 
-    QStandardItem *createNumberItem(const QVariantMap &asn1Item);
-    QStandardItem *createBoolItem(const QVariantMap &asn1Item);
-    QStandardItem *createSequenceItem(const QVariantMap &asn1Item, QStandardItem *parent);
-    QStandardItem *createSequenceOfItem(const QVariantMap &asn1Item, QStandardItem *parent);
-    QStandardItem *createEnumeratedItem(const QVariantMap &asn1Item);
-    QStandardItem *createChoiceItem(const QVariantMap &asn1Item, QStandardItem *parent);
-    QStandardItem *createItem(const QVariantMap &asn1Item, const QString &text = QString());
+    QStandardItem *createNumberItem(const Asn1Acn::Types::Type *asn1Item);
+    QStandardItem *createBoolItem(const Asn1Acn::Types::Type *asn1Item);
+    QStandardItem *createChildItems(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
+    QStandardItem *createSequenceOfItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
+    QStandardItem *createEnumeratedItem(const Asn1Acn::Types::Type *asn1Item);
+    QStandardItem *createChoiceItem(const Asn1Acn::Types::Type *asn1Item, QStandardItem *parent);
+    QStandardItem *createItem(const Asn1Acn::Types::Type *asn1Item, const QString &text = QString());
 
-    QStandardItem *createPresentItem(const QVariantMap &asn1Item);
+    QStandardItem *createPresentItem(const Asn1Acn::Types::Type *asn1Item);
 };
 
 } // namespace asn1

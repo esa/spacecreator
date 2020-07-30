@@ -18,6 +18,7 @@
 #include "mainmodel.h"
 
 #include "asn1xmlparser.h"
+#include "astxmlparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
@@ -443,9 +444,9 @@ void MainModel::readAsn1Types()
     if (asn1FileInfo.exists()) {
         asn1::Asn1XMLParser xmlParser;
         QStringList errorMessages;
-        auto asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
+        std::unique_ptr<Asn1Acn::File> asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
         if (errorMessages.isEmpty()) {
-            d->m_mscModel->setAsn1TypesData(asn1Data);
+            d->m_mscModel->setAsn1TypesData(std::move(asn1Data));
         }
     }
 
@@ -534,7 +535,6 @@ void MainModel::setNewModel(MscModel *model)
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
-    readAsn1Types();
     connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::readAsn1Types);
 
     Q_EMIT modelUpdated(d->m_mscModel);

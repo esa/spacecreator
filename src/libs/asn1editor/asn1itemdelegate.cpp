@@ -18,6 +18,7 @@
 #include "asn1itemdelegate.h"
 
 #include "asn1const.h"
+#include "types/type.h"
 
 #include <QComboBox>
 #include <QPainter>
@@ -62,10 +63,10 @@ QSize Asn1ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
 QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *editor = nullptr;
-    auto asnType = static_cast<ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
+    auto asnType = static_cast<Asn1Acn::Types::Type::ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
 
     switch (asnType) {
-    case SEQUENCEOF: {
+    case Asn1Acn::Types::Type::SEQUENCEOF: {
         QSpinBox *spinBox = new QSpinBox(parent);
 
         if (index.data(MIN_RANGE_ROLE).isValid())
@@ -77,10 +78,10 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
         editor = spinBox;
         break;
     }
-    case INTEGER:
-    case DOUBLE: {
+    case Asn1Acn::Types::Type::INTEGER:
+    case Asn1Acn::Types::Type::REAL: {
         QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
-        if (asnType == INTEGER) {
+        if (asnType == Asn1Acn::Types::Type::INTEGER) {
             spinBox->setDecimals(0);
         }
 
@@ -90,9 +91,9 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
         editor = spinBox;
         break;
     }
-    case ENUMERATED:
-    case CHOICE:
-    case BOOL: {
+    case Asn1Acn::Types::Type::ENUMERATED:
+    case Asn1Acn::Types::Type::CHOICE:
+    case Asn1Acn::Types::Type::BOOLEAN: {
         QComboBox *comboBox = new QComboBox(parent);
         comboBox->addItems(index.data(CHOICE_LIST_ROLE).toStringList());
         comboBox->setCurrentIndex(0);
@@ -109,19 +110,19 @@ QWidget *Asn1ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 
 void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    auto asnType = static_cast<ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
+    auto asnType = static_cast<Asn1Acn::Types::Type::ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
 
     switch (asnType) {
-    case SEQUENCEOF:
+    case Asn1Acn::Types::Type::SEQUENCEOF:
         qobject_cast<QSpinBox *>(editor)->setValue(index.data().toInt());
         break;
-    case ENUMERATED:
-    case CHOICE:
-    case BOOL:
+    case Asn1Acn::Types::Type::ENUMERATED:
+    case Asn1Acn::Types::Type::CHOICE:
+    case Asn1Acn::Types::Type::BOOLEAN:
         qobject_cast<QComboBox *>(editor)->setCurrentText(index.data().toString());
         break;
-    case INTEGER:
-    case DOUBLE:
+    case Asn1Acn::Types::Type::INTEGER:
+    case Asn1Acn::Types::Type::REAL:
         qobject_cast<QDoubleSpinBox *>(editor)->setValue(index.data().toDouble());
         break;
     default:
@@ -131,20 +132,20 @@ void Asn1ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 
 void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    auto asnType = static_cast<ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
+    auto asnType = static_cast<Asn1Acn::Types::Type::ASN1Type>(index.data(ASN1TYPE_ROLE).toInt());
     QVariant value;
 
     switch (asnType) {
-    case SEQUENCEOF:
+    case Asn1Acn::Types::Type::SEQUENCEOF:
         value = qobject_cast<QSpinBox *>(editor)->value();
         break;
-    case ENUMERATED:
-    case CHOICE:
-    case BOOL:
+    case Asn1Acn::Types::Type::ENUMERATED:
+    case Asn1Acn::Types::Type::CHOICE:
+    case Asn1Acn::Types::Type::BOOLEAN:
         value = qobject_cast<QComboBox *>(editor)->currentText();
         break;
-    case INTEGER:
-    case DOUBLE:
+    case Asn1Acn::Types::Type::INTEGER:
+    case Asn1Acn::Types::Type::REAL:
         value = qobject_cast<QDoubleSpinBox *>(editor)->value();
         break;
     default:
@@ -153,10 +154,10 @@ void Asn1ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 
     model->setData(index, value);
 
-    if (asnType == SEQUENCEOF)
+    if (asnType == Asn1Acn::Types::Type::SEQUENCEOF)
         Q_EMIT sequenceOfSizeChanged(index.sibling(index.row(), 0), value, index.data(MAX_RANGE_ROLE));
 
-    if (asnType == CHOICE)
+    if (asnType == Asn1Acn::Types::Type::CHOICE)
         Q_EMIT choiceFieldChanged(index.sibling(index.row(), 0), index.data(CHOICE_LIST_ROLE).toList().size(),
                 qobject_cast<QComboBox *>(editor)->currentIndex());
 }
@@ -166,7 +167,7 @@ void Asn1ItemDelegate::updateEditorGeometry(
 {
     QRect editorRect;
 
-    if (static_cast<ASN1Type>(index.data(ASN1TYPE_ROLE).toInt()) == STRING)
+    if (static_cast<Asn1Acn::Types::Type::ASN1Type>(index.data(ASN1TYPE_ROLE).toInt()) == Asn1Acn::Types::Type::STRING)
         editorRect = QRect(option.rect.x(), option.rect.y(), option.rect.width(), qMax(option.rect.height(), 100));
     else
         editorRect = option.rect;

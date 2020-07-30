@@ -19,6 +19,7 @@
 
 #include <QDialog>
 #include <QVariantList>
+#include <memory>
 
 namespace msc {
 class MscModel;
@@ -36,12 +37,10 @@ class MessageDeclarationsDialog : public QDialog
 
 public:
     explicit MessageDeclarationsDialog(
-            msc::MscMessageDeclarationList *model, const QVariantList &asn1Types, QWidget *parent = nullptr);
+            msc::MscMessageDeclarationList *model, msc::MscModel *mscModel, QWidget *parent = nullptr);
     ~MessageDeclarationsDialog();
 
     msc::MscMessageDeclarationList *declarations() const;
-
-    const QVariantList &asn1Types() const;
 
     void setFileName(const QString &fileName);
     const QString &fileName() const;
@@ -69,6 +68,6 @@ private:
     Ui::MessageDeclarationsDialog *ui;
     msc::MscMessageDeclarationList *m_model = nullptr;
     msc::MscMessageDeclaration *m_selectedDeclaration = nullptr;
-    QVariantList m_asn1Types;
+    msc::MscModel *m_mscModel;
     QString m_fileName;
 };
