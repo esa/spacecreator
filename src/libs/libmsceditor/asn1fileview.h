@@ -35,6 +35,8 @@ public:
     explicit ASN1FileView(QWidget *parent = nullptr);
     ~ASN1FileView();
 
+    QSize sizeHint() const override;
+
 public Q_SLOTS:
     void setModel(msc::MscModel *model);
     void setCurrentDirectory(const QString &directory);

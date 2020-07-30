@@ -52,6 +52,11 @@ ASN1FileView::~ASN1FileView()
     delete ui;
 }
 
+QSize ASN1FileView::sizeHint() const
+{
+    return QSize(200, 200);
+}
+
 /*!
  * Set the model of this widget to \a model.
  *

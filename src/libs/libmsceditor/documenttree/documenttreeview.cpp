@@ -144,6 +144,11 @@ msc::MscDocument *DocumentTreeView::selectedDocument() const
     return qobject_cast<msc::MscDocument *>(obj);
 }
 
+QSize DocumentTreeView::sizeHint() const
+{
+    return QSize(200, 200);
+}
+
 /*!
  * \brief DocumentTreeView::changHierarchyType Update the hierarchy type
  */

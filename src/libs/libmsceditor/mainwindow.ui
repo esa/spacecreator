@@ -69,18 +69,6 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetDocument">
-   <property name="minimumSize">
-    <size>
-     <width>200</width>
-     <height>123</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>800</width>
-     <height>524287</height>
-    </size>
-   </property>
    <property name="windowTitle">
     <string>Documents</string>
    </property>
@@ -106,15 +94,9 @@
      </property>
      <item row="0" column="0">
       <widget class="msc::DocumentTreeView" name="documentTreeView">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>200</width>
          <height>0</height>
         </size>
        </property>

@@ -38,6 +38,8 @@ public:
     void setSelectedDocument(msc::MscDocument *document);
     msc::MscDocument *selectedDocument() const;
 
+    QSize sizeHint() const override;
+
 Q_SIGNALS:
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
 
