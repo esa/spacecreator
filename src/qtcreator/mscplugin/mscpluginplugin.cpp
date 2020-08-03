@@ -18,11 +18,20 @@
 #include "mscpluginplugin.h"
 
 #include "msceditor.h"
+#include "msceditordata.h"
 #include "msceditorfactory.h"
 #include "msclibrary.h"
+#include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
+#include <QMessageBox>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/designmode.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/idocument.h>
+#include <editormanager/editormanager.h>
+#include <editormanager/ieditor.h>
 
 void initMscResources()
 {
@@ -59,7 +68,33 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    (void)new MscEditorFactory(this);
+    auto editorManager = Core::EditorManager::instance();
+
+    m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
+    Core::Command *messageDeclCmd = Core::ActionManager::registerAction(
+            m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(m_messageDeclarationAction, &QAction::triggered, this, &MscPluginPlugin::showMessageDeclarations);
+
+    m_messageDeclarationAction->setEnabled(false);
+    connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
+        if (editor && editor->document()) {
+            const bool isMsc = editor->document()->filePath().toString().endsWith(".msc", Qt::CaseInsensitive);
+            m_messageDeclarationAction->setEnabled(isMsc);
+        }
+    });
+
+    auto action = new QAction(tr("List AADL files ..."), this);
+    Core::Command *listAadlCmd = Core::ActionManager::registerAction(
+            action, Constants::AADL_FILES_LIST_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(action, &QAction::triggered, this, &MscPluginPlugin::showAadlFilesList);
+
+    Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
+    menu->menu()->setTitle(tr("MscPlugin"));
+    menu->addAction(messageDeclCmd);
+    menu->addAction(listAadlCmd);
+    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
+
+    m_factory = new MscEditorFactory(this);
 
     return true;
 }
@@ -78,6 +113,17 @@ ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
     // Disconnect from signals that are not needed during shutdown
     // Hide UI (if you add UI that is not in the main window directly)
     return SynchronousShutdown;
+}
+
+void MscPluginPlugin::showMessageDeclarations()
+{
+    m_factory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
+}
+
+void MscPluginPlugin::showAadlFilesList()
+{
+    QMessageBox::information(
+            Core::ICore::mainWindow(), tr("AADL files"), m_factory->editorData()->aadlFiles().join("\n"));
 }
 
 }

@@ -37,13 +37,19 @@ MscEditorFactory::MscEditorFactory(QObject *parent)
 
 Core::IEditor *MscEditorFactory::createEditor()
 {
+    return editorData()->createEditor();
+}
+
+MscEditorData *MscEditorFactory::editorData() const
+{
     if (!m_editorData) {
-        m_editorData = new MscEditorData(this);
+        m_editorData = new MscEditorData(const_cast<MscEditorFactory *>(this));
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
         m_editorData->fullInit();
         QGuiApplication::restoreOverrideCursor();
     }
-    return m_editorData->createEditor();
+
+    return m_editorData;
 }
 
 }

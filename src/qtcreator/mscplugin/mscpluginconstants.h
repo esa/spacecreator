@@ -32,5 +32,9 @@ const char INFO_READ_ONLY[] = "MscEditor.ReadOnly";
 const char C_MSCEDITOR[] = "Qt5.MscEditor";
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 
+const char MESSAGE_DECLARATIONS_ID[] = "MscPlugin.MessageDeclarations";
+const char AADL_FILES_LIST_ID[] = "MscPlugin.AADLFilesList";
+const char MENU_ID[] = "MscPlugin.Menu";
+
 } // namespace MscPlugin
 } // namespace Constants

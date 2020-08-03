@@ -39,7 +39,10 @@
 #include <coreplugin/minisplitter.h>
 #include <coreplugin/modemanager.h>
 #include <coreplugin/outputpane.h>
+#include <editormanager/editormanager.h>
+#include <projectexplorer/project.h>
 #include <projectexplorer/projectexplorerconstants.h>
+#include <projectexplorer/projecttree.h>
 #include <texteditor/texteditor.h>
 #include <utils/icon.h>
 #include <utils/qtcassert.h>
@@ -159,6 +162,36 @@ Core::IEditor *MscEditorData::createEditor()
     connect(designWidget, &MscPlugin::MainWidget::asn1Selected, this, &MscEditorData::openEditor);
 
     return mscEditor;
+}
+
+/*!
+   Opens the message declaration dialog for the current msc file
+ */
+void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
+{
+    auto editorManager = Core::EditorManager::instance();
+    Core::IDocument *currentDoc = editorManager->currentDocument();
+    auto document = qobject_cast<MscPlugin::MscEditorDocument *>(currentDoc);
+    if (document && document->designWidget()) {
+        document->designWidget()->mscPlugin()->openMessageDeclarationEditor(parentWidget);
+    }
+}
+
+QStringList MscEditorData::aadlFiles() const
+{
+    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
+    if (!project) {
+        return {};
+    }
+
+    QStringList result;
+    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
+        if (fileName.toString().endsWith(".xml", Qt::CaseInsensitive)) {
+            result.append(fileName.toString());
+        }
+    }
+
+    return result;
 }
 
 void MscEditorData::openEditor(const QString &fileName)

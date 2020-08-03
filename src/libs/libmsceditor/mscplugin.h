@@ -91,6 +91,7 @@ public Q_SLOTS:
     void activateDefaultTool();
     void selectCurrentChart();
     void checkGlobalComment();
+    void openMessageDeclarationEditor(QWidget *parentwidget);
 
 Q_SIGNALS:
     void viewModeChanged(ViewMode);

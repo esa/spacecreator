@@ -26,14 +26,12 @@
 #include "geometry.h"
 #include "graphicsview.h"
 #include "mainmodel.h"
-#include "messagedeclarationsdialog.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "msccreate.h"
 #include "mscdocument.h"
 #include "mscmessage.h"
-#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "mscplugin.h"
 #include "msctimer.h"
@@ -748,27 +746,7 @@ void MainWindow::showCoordinatesInfo(const QString &info)
 
 void MainWindow::openMessageDeclarationEditor()
 {
-    msc::MscModel *model = d->m_plugin->mainModel()->mscModel();
-    if (!model)
-        return;
-
-    QVector<msc::MscDocument *> docs = model->documents();
-    if (docs.isEmpty()) {
-        return;
-    }
-
-    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, this);
-    int result = dialog.exec();
-    if (result == QDialog::Accepted) {
-        msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
-        const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
-            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
-        const QVariantList params { QVariant::fromValue(d->m_plugin->mainModel()->mscModel()), dialog.fileName(),
-            "ASN.1" };
-        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-        msc::cmd::CommandsStack::current()->endMacro();
-    }
+    d->m_plugin->openMessageDeclarationEditor(this);
 }
 
 void MainWindow::updateZoomBox(double percent)

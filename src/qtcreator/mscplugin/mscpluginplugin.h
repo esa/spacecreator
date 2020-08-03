@@ -21,7 +21,11 @@
 
 #include <extensionsystem/iplugin.h>
 
+class QAction;
+
 namespace MscPlugin {
+
+class MscEditorFactory;
 
 class MscPluginPlugin : public ExtensionSystem::IPlugin
 {
@@ -35,6 +39,14 @@ public:
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
+
+public Q_SLOTS:
+    void showMessageDeclarations();
+    void showAadlFilesList();
+
+private:
+    MscEditorFactory *m_factory = nullptr;
+    QAction *m_messageDeclarationAction = nullptr;
 };
 
 }

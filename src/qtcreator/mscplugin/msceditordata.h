@@ -20,6 +20,7 @@
 #include <coreplugin/icontext.h>
 
 class QUndoGroup;
+class QStringList;
 class QToolBar;
 
 namespace Core {
@@ -43,6 +44,10 @@ public:
 
     void fullInit();
     Core::IEditor *createEditor();
+
+    void editMessageDeclarations(QWidget *parentWidget);
+
+    QStringList aadlFiles() const;
 
 public Q_SLOTS:
     void openEditor(const QString &fileName);

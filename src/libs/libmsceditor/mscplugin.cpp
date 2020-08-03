@@ -6,7 +6,10 @@
 #include "hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "mainwindow.h"
+#include "messagedeclarationsdialog.h"
 #include "mscdocument.h"
+#include "mscmessagedeclarationlist.h"
+#include "mscmodel.h"
 #include "tools/actioncreatortool.h"
 #include "tools/basetool.h"
 #include "tools/commentcreatortool.h"
@@ -529,6 +532,31 @@ void MSCPlugin::checkGlobalComment()
     const bool hasInstance = currentChart && !currentChart->instances().isEmpty();
     const bool hasGlobalComment = !currentChart->commentString().isEmpty();
     m_globalCommentCreateTool->action()->setEnabled(hasInstance && !hasGlobalComment);
+}
+
+void MSCPlugin::openMessageDeclarationEditor(QWidget *parentwidget)
+{
+    msc::MscModel *model = mainModel()->mscModel();
+    if (!model) {
+        return;
+    }
+
+    QVector<msc::MscDocument *> docs = model->documents();
+    if (docs.isEmpty()) {
+        return;
+    }
+
+    MessageDeclarationsDialog dialog(docs.at(0)->messageDeclarations(), model, parentwidget);
+    int result = dialog.exec();
+    if (result == QDialog::Accepted) {
+        msc::cmd::CommandsStack::current()->beginMacro("Edit message declarations");
+        const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
+            QVariant::fromValue<msc::MscMessageDeclarationList *>(dialog.declarations()) };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+        const QVariantList params { QVariant::fromValue(model), dialog.fileName(), "ASN.1" };
+        msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        msc::cmd::CommandsStack::current()->endMacro();
+    }
 }
 
 void MSCPlugin::updateMscToolbarActionsChecked()
