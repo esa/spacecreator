@@ -23,6 +23,7 @@
 #include "datastatement.h"
 #include "instanceitem.h"
 #include "mscaction.h"
+#include "mscchartviewconstants.h"
 #include "mscreader.h"
 #include "ui/grippointshandler.h"
 
@@ -30,8 +31,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <cmath>
-
-static const qreal kMaxTextWidth = 250.0;
 
 namespace msc {
 
@@ -190,7 +189,7 @@ void ActionItem::rebuildLayout()
     const QSizeF nameSize(m_textItem->boundingRect().size());
     prepareGeometryChange();
 
-    if (nameSize.width() > kMaxTextWidth) {
+    if (nameSize.width() > MAX_TEXT_WIDTH) {
         m_textItem->setTextWrapMode(QTextOption::WrapAnywhere);
         m_textItem->adjustSize();
     }

@@ -28,6 +28,7 @@
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/common/commandsstack.h"
 #include "mscchart.h"
+#include "mscchartviewconstants.h"
 #include "msccomment.h"
 #include "mscentity.h"
 #include "ui/grippointshandler.h"
@@ -35,10 +36,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QtDebug>
-
-static const qreal kBorderWidth = 1;
-static const qreal kMargins = 6 + kBorderWidth;
-static const qreal kLineLength = 20;
 
 namespace msc {
 
@@ -69,7 +66,7 @@ CommentItem::CommentItem(MscChart *chart, QGraphicsItem *parent)
         updateGripPoints();
     });
 
-    m_linkItem->setPen(QPen(Qt::black, kBorderWidth, Qt::DotLine));
+    m_linkItem->setPen(QPen(Qt::black, COMMENT_BORDER_WIDTH, Qt::DotLine));
 
     setHighlightable(false);
 }
@@ -161,16 +158,17 @@ void CommentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     QPen pen = painter->pen();
-    pen.setWidthF(kBorderWidth);
+    pen.setWidthF(COMMENT_BORDER_WIDTH);
     pen.setCapStyle(Qt::FlatCap);
     painter->setPen(pen);
     const QRectF br = mapRectFromItem(m_textItem, m_textItem->boundingRect());
     if ((m_iObj && isGlobal()) || (!m_iObj && m_isGlobalPreview)) {
         painter->setBrush(QColor(0xf9e29c));
-        painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(kMargins, 0), br.topLeft(), br.bottomLeft(),
-                br.bottomRight(), br.topRight() + QPointF(0, kMargins), br.topRight() - QPointF(kMargins, 0) });
-        painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, kMargins),
-                br.topRight() - QPointF(kMargins, -kMargins), br.topRight() - QPointF(kMargins, 0) });
+        painter->drawPolygon(QVector<QPointF> { br.topRight() - QPointF(COMMENT_MARIN, 0), br.topLeft(),
+                br.bottomLeft(), br.bottomRight(), br.topRight() + QPointF(0, COMMENT_MARIN),
+                br.topRight() - QPointF(COMMENT_MARIN, 0) });
+        painter->drawPolyline(QVector<QPointF> { br.topRight() + QPointF(0, COMMENT_MARIN),
+                br.topRight() - QPointF(COMMENT_MARIN, -COMMENT_MARIN), br.topRight() - QPointF(COMMENT_MARIN, 0) });
     } else {
         painter->fillRect(br, QColor(0xf9e29c));
         if (m_inverseLayout)
@@ -219,9 +217,9 @@ void CommentItem::rebuildLayout()
     } else {
         br.moveCenter(commentPosition);
         if (m_inverseLayout)
-            br.moveRight(commentPosition.x() - br.width() / 2 - kLineLength);
+            br.moveRight(commentPosition.x() - br.width() / 2 - COMMENT_LINE_LENGTH);
         else
-            br.moveLeft(commentPosition.x() + br.width() / 2 + kLineLength);
+            br.moveLeft(commentPosition.x() + br.width() / 2 + COMMENT_LINE_LENGTH);
 
         setPos(br.topLeft());
         m_textItem->setExplicitSize(br.size());
@@ -237,10 +235,10 @@ void CommentItem::rebuildLayout()
             link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()), commentPosition });
     } else if (!isGlobal()) {
         if (m_inverseLayout) {
-            if (br.left() - commentPosition.x() > kLineLength) {
+            if (br.left() - commentPosition.x() > COMMENT_LINE_LENGTH) {
                 link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()),
-                        QPointF(br.left() - kLineLength / 2, br.center().y()),
-                        QPointF(br.left() - kLineLength / 2, commentPosition.y()), commentPosition });
+                        QPointF(br.left() - COMMENT_LINE_LENGTH / 2, br.center().y()),
+                        QPointF(br.left() - COMMENT_LINE_LENGTH / 2, commentPosition.y()), commentPosition });
                 m_inverseLayout = false;
             } else {
                 link = QPolygonF(QVector<QPointF> { QPointF(br.right(), br.center().y()),
@@ -248,14 +246,14 @@ void CommentItem::rebuildLayout()
                         QPointF((br.right() + commentPosition.x()) / 2, commentPosition.y()), commentPosition });
             }
         } else {
-            if (br.left() - commentPosition.x() > kLineLength) {
+            if (br.left() - commentPosition.x() > COMMENT_LINE_LENGTH) {
                 link = QPolygonF(QVector<QPointF> { QPointF(br.left(), br.center().y()),
                         QPointF((br.left() + commentPosition.x()) / 2, br.center().y()),
                         QPointF((br.left() + commentPosition.x()) / 2, commentPosition.y()), commentPosition });
             } else {
                 link = QPolygonF(QVector<QPointF> { QPointF(br.right(), br.center().y()),
-                        QPointF(br.right() + kLineLength / 2, br.center().y()),
-                        QPointF(br.right() + kLineLength / 2, commentPosition.y()), commentPosition });
+                        QPointF(br.right() + COMMENT_LINE_LENGTH / 2, br.center().y()),
+                        QPointF(br.right() + COMMENT_LINE_LENGTH / 2, commentPosition.y()), commentPosition });
                 m_inverseLayout = true;
             }
         }

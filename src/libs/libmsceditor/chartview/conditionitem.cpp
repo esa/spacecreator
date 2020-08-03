@@ -19,6 +19,7 @@
 
 #include "baseitems/textitem.h"
 #include "commands/common/commandsstack.h"
+#include "mscchartviewconstants.h"
 #include "msccondition.h"
 #include "ui/grippointshandler.h"
 
@@ -27,11 +28,6 @@
 #include <QGraphicsSceneMouseEvent>
 
 namespace msc {
-
-static const qreal CONDITION_WIDTH = 50.0;
-static const qreal CONDITION_HEIGHT = 25.0;
-static const qreal CONDITION_MARGIN = 10.0;
-static const qreal MAX_TEXT_WIDTH = 150.0;
 
 ConditionItem::ConditionItem(MscCondition *condition, QGraphicsItem *parent)
     : InteractiveObject(condition, parent)
@@ -135,18 +131,18 @@ void ConditionItem::setName(const QString &name)
 
 void ConditionItem::buildLayout()
 {
-
-    m_nameItem->setTextWrapMode(QTextOption::ManualWrap);
+    m_nameItem->setTextWrapMode(QTextOption::NoWrap);
+    m_nameItem->adjustSize();
 
     // set default size:
     QSizeF nameSize(m_nameItem->boundingRect().size());
     prepareGeometryChange();
 
-    if (nameSize.width()
-            > (modelItem()->shared() && m_InstancesRect.isValid() ? m_InstancesRect.width() : MAX_TEXT_WIDTH)) {
-        m_nameItem->setTextWrapMode(QTextOption::WrapAnywhere);
-        m_nameItem->setTextWidth(m_InstancesRect.width() - 2 * CONDITION_MARGIN);
-
+    const qreal maxWidth =
+            (modelItem()->shared() && m_InstancesRect.isValid() ? m_InstancesRect.width() : MAX_TEXT_WIDTH);
+    if (nameSize.width() > maxWidth) {
+        m_nameItem->setTextWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        m_nameItem->setTextWidth(maxWidth - 2 * CONDITION_MARGIN);
         nameSize = m_nameItem->boundingRect().size();
     }
 

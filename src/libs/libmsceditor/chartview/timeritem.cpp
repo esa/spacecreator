@@ -19,6 +19,7 @@
 
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
+#include "chartview/mscchartviewconstants.h"
 #include "commands/common/commandsstack.h"
 #include "instanceitem.h"
 #include "msctimer.h"
@@ -35,8 +36,6 @@ namespace msc {
    The graphical item to represent a timer in the graphicsview.
    \see msc::MscTimer
  */
-
-static const QRectF symbolSize(0, 0, 50, 25);
 
 TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *model, QGraphicsItem *parent)
     : InteractiveObject(timer, parent)
@@ -68,8 +67,8 @@ TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *model, QGraphicsI
     m_timerConnector->setVisible(m_timer->precedingTimer() != nullptr);
     m_timerConnector->setPen(QPen(Qt::black, 1));
 
-    QRectF br = symbolSize;
-    br.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+    QRectF br = TIMER_SYMBOL_SIZE;
+    br.setWidth(TIMER_SYMBOL_SIZE.width() + m_textItem->boundingRect().width());
     setBoundingRect(br);
 }
 
@@ -227,15 +226,15 @@ void TimerItem::rebuildLayout()
 
     prepareGeometryChange();
 
-    m_textItem->setX(symbolSize.right());
-    const qreal textOffset = (symbolSize.height() - m_textItem->boundingRect().height()) / 2.;
+    m_textItem->setX(TIMER_SYMBOL_SIZE.right());
+    const qreal textOffset = (TIMER_SYMBOL_SIZE.height() - m_textItem->boundingRect().height()) / 2.;
     m_textItem->setY(textOffset);
 
-    QRectF br = symbolSize;
+    QRectF br = TIMER_SYMBOL_SIZE;
 
     if (m_timer->precedingTimer() == nullptr) {
         m_textItem->setVisible(true);
-        br.setWidth(symbolSize.width() + m_textItem->boundingRect().width());
+        br.setWidth(TIMER_SYMBOL_SIZE.width() + m_textItem->boundingRect().width());
     } else {
         m_textItem->setVisible(false);
         TimerItem *preTimer = m_model->itemForTimer(m_timer->precedingTimer());
@@ -300,9 +299,9 @@ void TimerItem::drawTimeoutArrow(QPainter *painter, const QPointF &pt)
 
 QRectF TimerItem::symbolBox() const
 {
-    const qreal boxSize = symbolSize.height();
+    const qreal boxSize = TIMER_SYMBOL_SIZE.height();
     const QPointF start(boundingRect().x(), boundingRect().center().y());
-    const QPointF boxCenter(start.x() + symbolSize.width() - boxSize / 2, start.y());
+    const QPointF boxCenter(start.x() + TIMER_SYMBOL_SIZE.width() - boxSize / 2, start.y());
     return QRectF(boxCenter.x() - boxSize / 2, boxCenter.y() - boxSize / 2, boxSize, boxSize);
 }
 

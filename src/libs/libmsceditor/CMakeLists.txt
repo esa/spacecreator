@@ -49,6 +49,7 @@ target_sources(${LIB_NAME} PRIVATE
     chartview/instanceitem.h
     chartview/messageitem.cpp
     chartview/messageitem.h
+    chartview/mscchartviewconstants.h
     chartview/timeritem.cpp
     chartview/timeritem.h
     commands/basecommand.cpp

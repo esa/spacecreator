@@ -24,6 +24,7 @@
 #include "commands/common/commandsstack.h"
 #include "graphicsviewutils.h"
 #include "mscchart.h"
+#include "mscchartviewconstants.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 
@@ -35,7 +36,7 @@
 
 namespace msc {
 
-QPointF ChartItem::m_margin = { 20., 20. };
+QPointF ChartItem::m_margin = { CHART_BOX_ARGIN, CHART_BOX_ARGIN };
 
 /*!
  * \class msc::ChartItem
