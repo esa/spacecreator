@@ -317,6 +317,11 @@ const QHash<shared::Id, aadl::AADLObject *> &InterfaceDocument::objects() const
     return d->model->objects();
 }
 
+aadl::AADLObjectsModel *InterfaceDocument::objectsModel() const
+{
+    return d->model;
+}
+
 QString InterfaceDocument::supportedFileExtensions() const
 {
     return QStringLiteral("*.xml");
@@ -438,11 +443,10 @@ void InterfaceDocument::onRootObjectChanged(shared::Id rootId)
     d->actExitToParent->setEnabled(nullptr != d->model->rootObject());
 
     QList<aadl::AADLObject *> objects = d->model->visibleObjects();
-    std::stable_sort(objects.begin(), objects.end(),
-            [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
-
-    for (auto it = objects.cbegin(); it != objects.cend(); ++it)
-        onAADLObjectAdded(*it);
+    aadl::AADLObject::sortObjectList(objects);
+    for (auto object : objects) {
+        onAADLObjectAdded(object);
+    }
 
     updateSceneRect();
 }

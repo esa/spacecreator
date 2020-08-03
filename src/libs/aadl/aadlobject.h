@@ -109,6 +109,8 @@ public:
         return qobject_cast<const T>(this);
     }
 
+    static void sortObjectList(QList<aadl::AADLObject *> &objects);
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
     void coordinatesChanged(const QVector<qint32> &coordinates);

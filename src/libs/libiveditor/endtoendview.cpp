@@ -1,10 +1,17 @@
 #include "endtoendview.h"
 
+#include "aadlobjectconnection.h"
+#include "aadlobjectfunction.h"
+#include "aadlobjectsmodel.h"
+#include "interface/aadlconnectiongraphicsitem.h"
+#include "interface/aadlfunctiongraphicsitem.h"
+#include "interface/aadlinterfacegraphicsitem.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGraphicsScene>
 #include <QLabel>
 #include <QPushButton>
 
@@ -12,12 +19,16 @@ namespace aadlinterface {
 
 struct EndToEndView::EndToEndViewPrivate {
     shared::ui::GraphicsViewBase *view { nullptr };
+    QGraphicsScene *scene { nullptr };
+    QHash<shared::Id, QGraphicsItem *> items;
+
+    aadl::AADLObjectsModel *objectsModel { nullptr };
 
     QString mscFilePath;
     QString dir;
 };
 
-EndToEndView::EndToEndView(QWidget *parent)
+EndToEndView::EndToEndView(aadl::AADLObjectsModel *objectsModel, QWidget *parent)
     : QDialog(parent)
     , d(new EndToEndViewPrivate)
 {
@@ -30,6 +41,11 @@ EndToEndView::EndToEndView(QWidget *parent)
     auto refreshButton = new QPushButton(tr("&Refresh view"));
 
     d->view = new shared::ui::GraphicsViewBase;
+    d->view->setInteractive(false);
+    d->scene = new QGraphicsScene(this);
+    d->view->setScene(d->scene);
+
+    d->objectsModel = objectsModel;
 
     auto barLayout = new QHBoxLayout;
     barLayout->addWidget(pathLabel);
@@ -72,6 +88,56 @@ void EndToEndView::setVisible(bool visible)
     }
 }
 
-void EndToEndView::refreshView() { }
+void EndToEndView::refreshView()
+{
+    // Remove all the old ones
+    qDeleteAll(d->items.values());
+    d->items.clear();
+
+    // Get the visible non-nested objects
+    QList<aadl::AADLObject *> objects = d->objectsModel->visibleObjects({});
+    aadl::AADLObject::sortObjectList(objects);
+
+    // Add new graphics items for each object
+    for (auto obj : objects) {
+        QGraphicsItem *parentItem = obj->parentObject() ? d->items.value(obj->parentObject()->id()) : nullptr;
+
+        InteractiveObject *item = nullptr;
+        switch (obj->aadlType()) {
+        case aadl::AADLObject::Type::RequiredInterface:
+        case aadl::AADLObject::Type::ProvidedInterface:
+            item = new AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
+            break;
+        case aadl::AADLObject::Type::Connection:
+            if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+                aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
+                auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                        ifaceStart ? d->items.value(ifaceStart->id()) : nullptr);
+
+                aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
+                auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
+                        ifaceEnd ? d->items.value(ifaceEnd->id()) : nullptr);
+
+                auto i = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
+                item = i;
+                if (/* TODO: item is on path */ true) {
+                    i->setEndToEndDataFlowConnection();
+                }
+            }
+            break;
+        case aadl::AADLObject::Type::Function:
+            item = new AADLFunctionGraphicsItem(qobject_cast<aadl::AADLObjectFunction *>(obj), parentItem);
+            break;
+        default:
+            break;
+        }
+
+        if (item != nullptr) {
+            d->items.insert(obj->id(), item);
+            d->scene->addItem(item);
+            item->updateFromEntity();
+        }
+    }
+}
 
 }

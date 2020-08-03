@@ -80,6 +80,8 @@ public:
 
     void layout();
 
+    void setEndToEndDataFlowConnection();
+
 protected:
     void onManualMoveStart(shared::ui::GripPoint *gp, const QPointF &at) override;
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;

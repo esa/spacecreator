@@ -71,6 +71,7 @@ public:
     QMenu *customMenu() const;
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
+    aadl::AADLObjectsModel *objectsModel() const;
     QString supportedFileExtensions() const;
 
 Q_SIGNALS:

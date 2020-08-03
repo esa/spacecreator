@@ -113,34 +113,15 @@ bool AADLObjectsModel::removeObject(AADLObject *obj)
 
 void AADLObjectsModel::setRootObject(shared::Id rootId)
 {
-    if (d->m_rootObjectId == rootId)
+    if (d->m_rootObjectId == rootId) {
         return;
+    }
 
     d->m_rootObjectId = rootId;
     d->m_visibleObjects.clear();
     Q_EMIT modelReset();
 
-    auto rootObj = d->m_objects.value(rootId);
-    for (const auto &id : d->m_objectsOrder) {
-        if (auto obj = getObject(id)) {
-            if (rootId.isNull()) {
-                d->m_visibleObjects.append(obj);
-                continue;
-            }
-
-            if (!obj->isConnection() && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
-                d->m_visibleObjects.append(obj);
-            } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
-                const bool sourceIfaceAncestor =
-                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
-                const bool targetIfaceAncestor =
-                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
-                if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
-                    d->m_visibleObjects.append(obj);
-                }
-            }
-        }
-    }
+    d->m_visibleObjects = visibleObjects(rootId);
     Q_EMIT rootObjectChanged(d->m_rootObjectId);
 }
 
@@ -156,8 +137,9 @@ shared::Id AADLObjectsModel::rootObjectId() const
 
 AADLObject *AADLObjectsModel::getObject(const shared::Id &id) const
 {
-    if (id.isNull())
+    if (id.isNull()) {
         return nullptr;
+    }
 
     return d->m_objects.value(id, nullptr);
 }
@@ -293,6 +275,34 @@ QVector<AADLObjectConnection *> AADLObjectsModel::getConnectionsForIface(const s
 QList<AADLObject *> AADLObjectsModel::visibleObjects() const
 {
     return d->m_visibleObjects;
+}
+
+//! Get the visible objects with this root id
+QList<AADLObject *> AADLObjectsModel::visibleObjects(shared::Id rootId) const
+{
+    QList<AADLObject *> visibleObjects;
+    AADLObject *rootObj = d->m_objects.value(rootId);
+    for (const auto &id : d->m_objectsOrder) {
+        if (auto obj = getObject(id)) {
+            if (rootId.isNull()) {
+                visibleObjects.append(obj);
+                continue;
+            }
+
+            if (!obj->isConnection() && (shared::isAncestorOf(rootObj, obj) || rootObj == nullptr)) {
+                visibleObjects.append(obj);
+            } else if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
+                const bool sourceIfaceAncestor =
+                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->sourceInterface());
+                const bool targetIfaceAncestor =
+                        shared::isAncestorOf<aadl::AADLObject>(rootObj, connection->targetInterface());
+                if ((sourceIfaceAncestor && targetIfaceAncestor) || rootObj == nullptr) {
+                    visibleObjects.append(obj);
+                }
+            }
+        }
+    }
+    return visibleObjects;
 }
 
 void AADLObjectsModel::clear()

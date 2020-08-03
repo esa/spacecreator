@@ -71,6 +71,14 @@ bool AADLObject::postInit()
     return true;
 }
 
+//! This sorts the objects on type.
+//! \sa aadlType
+void AADLObject::sortObjectList(QList<AADLObject *> &objects)
+{
+    std::stable_sort(objects.begin(), objects.end(),
+            [](aadl::AADLObject *obj1, aadl::AADLObject *obj2) { return obj1->aadlType() < obj2->aadlType(); });
+}
+
 shared::Id AADLObject::id() const
 {
     return d->m_id;

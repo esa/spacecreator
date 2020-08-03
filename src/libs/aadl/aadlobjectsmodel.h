@@ -63,7 +63,9 @@ public:
     QVector<AADLObjectConnection *> getConnectionsForIface(const shared::Id &id) const;
 
     const QHash<shared::Id, AADLObject *> &objects() const;
+
     QList<AADLObject *> visibleObjects() const;
+    QList<AADLObject *> visibleObjects(shared::Id rootId) const;
 
     void clear();
 
