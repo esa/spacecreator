@@ -22,6 +22,7 @@
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
+#include "delegates/asn1valuedelegate.h"
 #include "delegates/comboboxdelegate.h"
 #include "delegates/functionattrdelegate.h"
 #include "delegates/interfaceattrdelegate.h"
@@ -137,6 +138,8 @@ void PropertiesDialog::initTabs()
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
         viewAttrs->tableView()->setItemDelegateForColumn(
                 ContextParametersModel::ColumnType, new PropertyTypeDelegate(viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));

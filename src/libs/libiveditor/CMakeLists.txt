@@ -124,6 +124,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/properties/adddynamicropertydialog.cpp
     interface/properties/contextparametersmodel.cpp
     interface/properties/contextparametersmodel.h
+    interface/properties/delegates/asn1valuedelegate.cpp
+    interface/properties/delegates/asn1valuedelegate.h
     interface/properties/delegates/comboboxdelegate.cpp
     interface/properties/delegates/comboboxdelegate.h
     interface/properties/delegates/functionattrdelegate.cpp
