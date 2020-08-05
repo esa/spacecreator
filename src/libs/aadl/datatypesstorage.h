@@ -19,6 +19,11 @@
 
 #include <QMap>
 #include <QString>
+#include <memory>
+
+namespace Asn1Acn {
+class File;
+}
 
 namespace aadl {
 class BasicDataType;
@@ -26,15 +31,18 @@ class BasicDataType;
 class DataTypesStorage
 {
 public:
-    static DataTypesStorage *init();
+    DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
+    ~DataTypesStorage();
+
+    static void init();
     static DataTypesStorage *instance();
-    static const QMap<QString, BasicDataType *> &dataTypes();
+
+    const std::unique_ptr<Asn1Acn::File> &asn1DataTypes() const;
 
 private:
     static DataTypesStorage *m_instance;
 
-    const QMap<QString, BasicDataType *> m_dataTypes;
-    DataTypesStorage(const QMap<QString, BasicDataType *> &dataTypes);
+    std::unique_ptr<Asn1Acn::File> m_asn1DataTypes;
 };
 
 }

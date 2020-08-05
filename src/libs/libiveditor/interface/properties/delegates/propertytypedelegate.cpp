@@ -18,6 +18,9 @@
 #include "propertytypedelegate.h"
 
 #include "aadlparameter.h"
+#include "asn1/definitions.h"
+#include "asn1/file.h"
+#include "asn1/types/builtintypes.h"
 #include "basicdatatype.h"
 #include "datatypesstorage.h"
 
@@ -25,10 +28,13 @@ namespace aadlinterface {
 
 static QStringList initNames()
 {
-    auto types = aadl::DataTypesStorage::dataTypes();
+    const std::unique_ptr<Asn1Acn::File> &types = aadl::DataTypesStorage::instance()->asn1DataTypes();
     QStringList names;
-    for (auto type : types)
-        names.append(type->name());
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+            names.append(assignment->name());
+        }
+    }
 
     names.append(aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Timer));
     names.append(aadl::BasicParameter::typeName(aadl::BasicParameter::Type::Directive));

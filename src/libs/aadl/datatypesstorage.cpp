@@ -36,11 +36,6 @@ namespace aadl {
 
 DataTypesStorage *DataTypesStorage::m_instance = nullptr;
 
-DataTypesStorage::DataTypesStorage(const QMap<QString, BasicDataType *> &dataTypes)
-    : m_dataTypes(dataTypes)
-{
-}
-
 static QString ensureAsnFileExists()
 {
     const QString asnFileName("taste-types.asn");
@@ -121,8 +116,19 @@ static BasicDataType *datatypeFromString(const Asn1Acn::Types::Type *type)
     return nullptr;
 }
 
-DataTypesStorage *DataTypesStorage::init()
+DataTypesStorage::DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
+    : m_asn1DataTypes(std::move(dataTypes))
 {
+}
+
+DataTypesStorage::~DataTypesStorage() { }
+
+void DataTypesStorage::init()
+{
+    if (m_instance) {
+        return;
+    }
+
     const QString &asnFilePath = ensureAsnFileExists();
     QFileInfo fileInfo(asnFilePath);
     QStringList errorMessages;
@@ -130,31 +136,21 @@ DataTypesStorage *DataTypesStorage::init()
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(fileInfo, &errorMessages);
     if (!errorMessages.isEmpty()) {
         qWarning() << "Can't read file:" << asnFilePath << errorMessages.join(", ");
-        return nullptr;
-    }
-    QMap<QString, BasicDataType *> datatypes;
-    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1Data->definitionsList()) {
-        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
-            if (BasicDataType *wrapper = datatypeFromString(assignment->type())) {
-                datatypes[wrapper->name()] = wrapper;
-            }
-        }
+        return;
     }
 
-    return new DataTypesStorage(datatypes);
+    m_instance = new DataTypesStorage(asn1Data);
 }
 
 DataTypesStorage *DataTypesStorage::instance()
 {
-    if (!m_instance) {
-        m_instance = init();
-    }
-
+    init();
     return m_instance;
 }
 
-const QMap<QString, BasicDataType *> &DataTypesStorage::dataTypes()
+const std::unique_ptr<Asn1Acn::File> &DataTypesStorage::asn1DataTypes() const
 {
-    return instance()->m_dataTypes;
+    return m_asn1DataTypes;
 }
+
 }

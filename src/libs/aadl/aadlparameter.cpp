@@ -17,6 +17,11 @@
 
 #include "aadlparameter.h"
 
+#include "asn1/definitions.h"
+#include "asn1/file.h"
+#include "asn1/typeassignment.h"
+#include "asn1/types/type.h"
+#include "asn1valueparser.h"
 #include "basicdatatype.h"
 #include "datatypesstorage.h"
 
@@ -68,20 +73,26 @@ QString BasicParameter::typeName(const BasicParameter::Type &type)
 
 bool BasicParameter::setParamType(const BasicParameter::Type &type)
 {
-    if (m_paramType == type)
+    if (m_paramType == type) {
         return false;
+    }
 
     m_paramType = type;
 
-    if (m_paramType != BasicParameter::Type::Other)
+    if (m_paramType != BasicParameter::Type::Other) {
         setParamTypeName(typeName(m_paramType));
+    }
 
     m_basicDataType = nullptr;
 
-    const QMap<QString, BasicDataType *> &types = DataTypesStorage::dataTypes();
-    if (types.contains(m_typeName))
-        if (BasicDataType *basicType = types.value(m_typeName))
-            m_basicDataType = basicType;
+    const std::unique_ptr<Asn1Acn::File> &types = DataTypesStorage::instance()->asn1DataTypes();
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+            if (assignment->name() == m_typeName) {
+                m_basicDataType = assignment->type();
+            }
+        }
+    }
 
     return true;
 }
@@ -114,35 +125,14 @@ bool BasicParameter::operator==(const BasicParameter &other) const
 
 bool BasicParameter::isValidValue(const QVariant &value) const
 {
-    if (!m_basicDataType)
-        return true;
-
-    switch (m_basicDataType->dataType()) {
-    case DataTypeName::Integer: {
-        if (SignedIntegerDataType *signedData = dynamic_cast<SignedIntegerDataType *>(m_basicDataType)) {
-            const qint64 v = value.toLongLong();
-            return v >= signedData->min() && v <= signedData->max();
-        }
-
-        if (UnsignedIntegerDataType *unsignedData = dynamic_cast<UnsignedIntegerDataType *>(m_basicDataType)) {
-            const quint64 v = value.toUInt();
-            return v >= unsignedData->min() && v <= unsignedData->max();
-        }
-
-        break;
-    }
-    case DataTypeName::Real: {
-        if (RealDataType *unsignedData = dynamic_cast<RealDataType *>(m_basicDataType)) {
-            const qreal v = value.toReal();
-            return v >= unsignedData->min() && v <= unsignedData->max();
-        }
-        break;
-    }
-    default:
+    if (!m_basicDataType) {
         return true;
     }
 
-    return false;
+    asn1::Asn1ValueParser valueParser;
+    bool ok;
+    valueParser.parseAsn1Value(m_basicDataType, value.toString(), &ok);
+    return ok;
 }
 
 QString BasicParameter::toString() const
@@ -313,5 +303,4 @@ bool IfaceParameter::isNull() const
 {
     return BasicParameter::isNull() || this->operator==({});
 }
-
 }

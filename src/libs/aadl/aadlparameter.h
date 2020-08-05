@@ -20,9 +20,13 @@
 #include <QString>
 #include <QVariant>
 
-namespace aadl {
+namespace Asn1Acn {
+namespace Types {
+class Type;
+}
+}
 
-class BasicDataType;
+namespace aadl {
 
 class BasicParameter
 {
@@ -63,7 +67,7 @@ protected:
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
 
-    BasicDataType *m_basicDataType { nullptr };
+    const Asn1Acn::Types::Type *m_basicDataType { nullptr };
 
     bool isValidValue(const QVariant &value) const;
 };
