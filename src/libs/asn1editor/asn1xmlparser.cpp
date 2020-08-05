@@ -66,7 +66,7 @@ std::unique_ptr<Asn1Acn::File> Asn1XMLParser::parseAsn1File(
         return QFileInfo(QDir(path), name).absoluteFilePath();
     };
 
-    QString asn1FileName = fullFilePath(filePath, fileName);
+    QString asn1FileName = "\"" + fullFilePath(filePath, fileName) + "\"";
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
 
     QProcess asn1Process;

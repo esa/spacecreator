@@ -71,13 +71,17 @@ Id createId()
  */
 bool copyResourceFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
 {
-    if (source.isEmpty() || target.isEmpty() || !QFile::exists(source)) {
+    if (source.isEmpty() || target.isEmpty()) {
         return false;
+    }
+    if (!QFile::exists(source)) {
+        qWarning() << "Source file " << source << " does not exist";
     }
 
     if (QFile::exists(target)) {
         if (FileCopyingMode::Overwrite == replaceMode) {
             if (!QFile::remove(target)) {
+                qWarning() << "Unable to remove old file" << target;
                 return false;
             }
         } else {
@@ -93,8 +97,10 @@ bool copyResourceFile(const QString &source, const QString &target, FileCopyingM
         ensureDirExists(QFileInfo(target).path());
         if (QFile::copy(source, target)) {
             QFile storedFile(target);
-            storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
-            result = true;
+            result = storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
+            if (!result) {
+                qWarning() << "Unable to set permissions for " << target;
+            }
         } else {
             qWarning() << "Can't copy resource file " << source << "-->" << target;
         }

@@ -27,7 +27,6 @@ class DataTypesStorage
 {
 public:
     static DataTypesStorage *init();
-    static DataTypesStorage *init(const QString &from);
     static DataTypesStorage *instance();
     static const QMap<QString, BasicDataType *> &dataTypes();
 

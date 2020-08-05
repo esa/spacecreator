@@ -82,7 +82,7 @@ public:
     const std::vector<std::unique_ptr<Type>> &children() const;
     void addChild(std::unique_ptr<Type> child);
 
-private:
+protected:
     void setIdentifier(const QString &name);
 
     QString m_identifier;

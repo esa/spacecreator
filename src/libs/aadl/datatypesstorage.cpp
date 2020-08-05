@@ -17,11 +17,16 @@
 
 #include "datatypesstorage.h"
 
+#include "asn1/definitions.h"
+#include "asn1/file.h"
+#include "asn1/types/builtintypes.h"
+#include "asn1xmlparser.h"
 #include "basicdatatype.h"
 #include "common.h"
 
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QStandardPaths>
@@ -41,16 +46,16 @@ static QString ensureAsnFileExists()
     const QString asnFileName("taste-types.asn");
     const QString targetDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 
-    shared::ensureDirExists(targetDir);
+    const bool ok = shared::ensureDirExists(targetDir);
+    if (!ok) {
+        qWarning() << "Unable to create directory" << targetDir;
+        return {};
+    }
 
     QString asnFilePath = QString("%1/%2").arg(targetDir, asnFileName);
 
-    if (QFileInfo::exists(asnFilePath)) {
-        return asnFilePath;
-    }
-
     const QString &rscFilePath = QString(":/defaults/resources/%1").arg(asnFileName);
-    if (shared::copyResourceFile(rscFilePath, asnFilePath)) {
+    if (shared::copyResourceFile(rscFilePath, asnFilePath, shared::FileCopyingMode::Overwrite)) {
         return asnFilePath;
     }
 
@@ -58,97 +63,81 @@ static QString ensureAsnFileExists()
     return QString();
 }
 
-static QStringList dataRangeFromString(const QString &data)
+static BasicDataType *datatypeFromString(const Asn1Acn::Types::Type *type)
 {
-    if (data.isEmpty()) {
-        return {};
-    }
-
-    QString line = data.mid(1, data.length() - 2);
-    if (line.contains("..")) {
-        return line.split("..", QString::SkipEmptyParts);
-    }
-
-    return line.split(",", QString::SkipEmptyParts);
-}
-
-static BasicDataType *datatypeFromString(const QString &line)
-{
-    if (line.isEmpty()) {
+    if (!type) {
         return nullptr;
     }
 
-    const QRegularExpression rx("(.*\\w+)\\s*::=\\s*(\\w+)\\s*(\\(.*\\))?");
-    const QStringList &matched = rx.match(line).capturedTexts();
-    if (matched.size() >= 3) {
-        const QString &dataName = matched[1];
-        const QString &dataType = matched[2];
-        const QString &dataRangeStr = matched.size() == 4 ? matched[3] : QString();
-        if (!dataRangeStr.isEmpty()) {
-            const QStringList &dataRange = dataRangeFromString(dataRangeStr);
-            if (dataType == "INTEGER") {
-                bool containsMinus(false);
-                for (const QString &str : dataRange)
-                    if (str.contains("-")) {
-                        containsMinus = true;
-                        break;
-                    }
-                if (containsMinus) {
-                    SignedIntegerDataType *data = new SignedIntegerDataType(dataName);
-                    data->setRange({ dataRange.first().toLongLong(), dataRange.last().toLongLong() });
-                    return data;
-                } else {
-                    UnsignedIntegerDataType *data = new UnsignedIntegerDataType(dataName);
-                    data->setRange({ dataRange.first().toULongLong(), dataRange.last().toULongLong() });
-                    return data;
+    switch (type->typeEnum()) {
+    case Asn1Acn::Types::Type::INTEGER: {
+        const QVariantMap &parameters = type->parameters();
+        if (parameters.contains("min")) {
+            qint64 min = parameters["min"].toLongLong();
+            if (min < 0) {
+                auto data = new SignedIntegerDataType(type->identifier());
+                data->setMin(min);
+                if (parameters.contains("max")) {
+                    data->setMax(parameters["max"].toLongLong());
                 }
-            }
-
-            if (dataType == "REAL") {
-                const QStringList &dataRangeReal = dataRangeFromString(dataRangeStr);
-                RealDataType *data = new RealDataType(dataName);
-                data->setRange({ dataRangeReal.first().toDouble(), dataRangeReal.last().toDouble() });
                 return data;
             }
-
-            if (dataType == "ENUMERATION") {
-                const QStringList &dataRangeEnumeration = dataRangeFromString(dataRangeStr);
-                return new EnumDataType(dataName, dataRangeEnumeration.toVector());
-            }
         }
-
-        if (dataType == "BOOLEAN") {
-            return new BoolDataType(dataName);
+        auto data = new UnsignedIntegerDataType(type->identifier());
+        if (parameters.contains("min")) {
+            data->setMin(parameters["min"].toLongLong());
         }
-
-        if (dataType == "STRING") {
-            return new StringDataType(dataName);
+        if (parameters.contains("max")) {
+            data->setMax(parameters["max"].toLongLong());
         }
+        return data;
     }
+    case Asn1Acn::Types::Type::REAL: {
+        auto data = new RealDataType(type->identifier());
+        const QVariantMap &parameters = type->parameters();
+        if (parameters.contains("min")) {
+            data->setMin(parameters["min"].toReal());
+        }
+        if (parameters.contains("max")) {
+            data->setMax(parameters["max"].toReal());
+        }
+        return data;
+    }
+    case Asn1Acn::Types::Type::BOOLEAN:
+        return new BoolDataType(type->identifier());
+    case Asn1Acn::Types::Type::ENUMERATED: {
+        auto data = new EnumDataType(type->identifier(), {});
+        auto enumType = static_cast<const Asn1Acn::Types::Enumerated *>(type);
+        data->setRange(enumType->enumValues().toVector());
+        return data;
+    }
+    case Asn1Acn::Types::Type::IA5STRING: {
+        return new StringDataType(type->identifier());
+    }
+    default:
+        return nullptr;
+    }
+
     return nullptr;
 }
 
 DataTypesStorage *DataTypesStorage::init()
 {
     const QString &asnFilePath = ensureAsnFileExists();
-    QFile asnFile(asnFilePath);
-    if (asnFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return init(asnFile.readAll());
-    } else {
-        qWarning() << "Can't open file:" << asnFilePath << asnFile.errorString();
+    QFileInfo fileInfo(asnFilePath);
+    QStringList errorMessages;
+    asn1::Asn1XMLParser parser;
+    std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(fileInfo, &errorMessages);
+    if (!errorMessages.isEmpty()) {
+        qWarning() << "Can't read file:" << asnFilePath << errorMessages.join(", ");
+        return nullptr;
     }
-
-    return nullptr;
-}
-
-DataTypesStorage *DataTypesStorage::init(const QString &from)
-{
-    QString in(from);
-    QTextStream ts(&in);
     QMap<QString, BasicDataType *> datatypes;
-    while (!ts.atEnd()) {
-        if (BasicDataType *wrapper = datatypeFromString(ts.readLine().trimmed())) {
-            datatypes[wrapper->name()] = wrapper;
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1Data->definitionsList()) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+            if (BasicDataType *wrapper = datatypeFromString(assignment->type())) {
+                datatypes[wrapper->name()] = wrapper;
+            }
         }
     }
 
@@ -168,5 +157,4 @@ const QMap<QString, BasicDataType *> &DataTypesStorage::dataTypes()
 {
     return instance()->m_dataTypes;
 }
-
 }

@@ -3,7 +3,4 @@
         <file>allitems.xml</file>
         <file>ifaceparams.xml</file>
     </qresource>
-    <qresource prefix="/defaults/app/resources">
-        <file>taste-types.asn</file>
-    </qresource>
 </RCC>

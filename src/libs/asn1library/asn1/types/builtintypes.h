@@ -27,6 +27,7 @@
 #include "type.h"
 
 #include <QString>
+#include <QVariantList>
 
 namespace Asn1Acn {
 namespace Types {
@@ -177,6 +178,14 @@ public:
     ASN1Type typeEnum() const override { return ENUMERATED; }
 
     QString baseIconFile() const override { return QStringLiteral(":/asn1acn/images/outline/enumerated.png"); }
+
+    QVariantList enumValues() const
+    {
+        if (m_parameters.contains("values")) {
+            return m_parameters["values"].toList();
+        }
+        return {};
+    }
 };
 
 class Choice : public BuiltinType

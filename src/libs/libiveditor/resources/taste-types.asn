@@ -15,7 +15,8 @@ T-Boolean ::= BOOLEAN
 
 T-Real ::= REAL (-1.0 .. 1.0)
 
-T-Enum ::= ENUMERATION (Enum_0, Enum_1, Enum_2)
+T-Enum  ::= ENUMERATED { enum0, enum1, enum2 }
 
-T-String ::= STRING
+T-String ::= IA5String (SIZE (0..80))
+
 END
