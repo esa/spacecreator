@@ -17,6 +17,7 @@
 
 #include "commandlineparser.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QMetaEnum>
 
@@ -53,6 +54,7 @@ CommandLineParser::CommandLineParser()
 {
     addHelpOption();
     addVersionOption();
+    setApplicationDescription(QCoreApplication::applicationName());
 }
 
 /*!

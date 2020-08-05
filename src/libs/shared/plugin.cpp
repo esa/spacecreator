@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QToolBar>
 #include <QUndoGroup>
 
@@ -37,6 +38,7 @@ QToolBar *Plugin::mainToolBar()
  */
 void Plugin::initMenus(QMainWindow *window)
 {
+    m_mainWindow = window;
     // Initialize the file menu
     auto menu = window->menuBar()->addMenu(tr("File"));
 
@@ -62,6 +64,7 @@ void Plugin::initMenus(QMainWindow *window)
     // Initialize the help menu
     menu = window->menuBar()->addMenu(tr("&Help"));
     addMenuHelpActions(menu, window);
+    menu->addAction(tr("About"), this, &Plugin::showAboutDialog);
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
@@ -156,6 +159,20 @@ QAction *Plugin::actionToggleE2EView()
         m_actionToggleE2EView->setCheckable(true);
     }
     return m_actionToggleE2EView;
+}
+
+/*!
+   Pops upd the about dialog with basic information about the application
+ */
+void Plugin::showAboutDialog()
+{
+    QString info = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
+
+#ifdef VS_BUILD_HASH
+    info += QString(" @%1").arg(VS_BUILD_HASH);
+#endif
+
+    QMessageBox::information(m_mainWindow, tr("About"), info);
 }
 
 }

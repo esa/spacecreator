@@ -53,9 +53,13 @@ public:
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
 
+public Q_SLOTS:
+    void showAboutDialog();
+
 private:
     QUndoGroup *m_undoGroup;
 
+    QMainWindow *m_mainWindow = { nullptr };
     QToolBar *m_mainToolBar { nullptr };
 
     QAction *m_actionNewFile { nullptr };

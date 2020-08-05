@@ -35,8 +35,10 @@ int main(int argc, char *argv[])
     msc::initMscEditor();
 
     QApplication a(argc, argv);
-    a.setApplicationName(QObject::tr("MSC Editor"));
-    a.setApplicationVersion("0.0.1");
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationName("MSC Editor");
 
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())
@@ -46,7 +48,6 @@ int main(int argc, char *argv[])
     msc::MSCPlugin plugin;
 
     shared::CommandLineParser cmdParser;
-    cmdParser.setApplicationDescription("MSC file editor");
     plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 

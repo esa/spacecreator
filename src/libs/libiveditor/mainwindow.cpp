@@ -225,17 +225,6 @@ void MainWindow::onQuitRequested()
         qApp->quit();
 }
 
-void MainWindow::onAboutRequested()
-{
-    QString info = qApp->applicationName();
-
-#ifdef VS_BUILD_HASH
-    info += QString("@%1").arg(VS_BUILD_HASH);
-#endif
-
-    QMessageBox::information(this, tr("About"), info);
-}
-
 void MainWindow::onReportRequested()
 {
     QList<QPixmap> images;

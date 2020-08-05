@@ -71,10 +71,8 @@ void IVEditorPlugin::addMenuHelpActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
     auto report = menu->addAction(tr("Send report..."), mainWindow, &MainWindow::onReportRequested);
-    auto about = menu->addAction(tr("About"), mainWindow, &MainWindow::onAboutRequested);
 
     ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
-    ActionsManager::registerAction(Q_FUNC_INFO, about, "About", "Show About dialog");
 }
 
 void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const

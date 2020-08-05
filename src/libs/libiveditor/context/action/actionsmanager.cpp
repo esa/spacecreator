@@ -82,7 +82,7 @@ ActionsManager *ActionsManager::m_instance = nullptr;
 
 /*!
  * Returns path to a dir that contains custom actions descriptions.
- * The value is something like ~/.local/share/TASTE Editor 3.0/contextMenu
+ * The value is something like ~/.local/share/ESA/TASTE Editor/contextMenu
  */
 QString ActionsManager::storagePath()
 {
@@ -241,8 +241,7 @@ bool ActionsManager::registerScriptableAction(QAction *action, const QString &ke
 
 void ActionsManager::listRegisteredActions()
 {
-    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions =
-            ActionsManager::scriptableActions();
+    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions = ActionsManager::scriptableActions();
     const QStringList &names = actions.keys();
     const int titleLength = std::max_element(names.cbegin(), names.cend(), [](const QString &lhs, const QString &rhs) {
         return lhs.length() < rhs.length();
@@ -271,8 +270,7 @@ QStringList ActionsManager::scriptableActionNames()
  */
 void ActionsManager::triggerActionInternal(const Action &act)
 {
-    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions =
-            ActionsManager::scriptableActions();
+    const QMap<QString, ActionsManager::ScriptableActionHandler> &actions = ActionsManager::scriptableActions();
     if (actions.contains(act.m_internalActName)) {
         qDebug() << "Triggering action:" << act.m_internalActName;
         actions.value(act.m_internalActName).m_action->trigger();

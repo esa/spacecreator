@@ -28,11 +28,12 @@ int main(int argc, char *argv[])
     msc::initMscLibrary();
 
     QCoreApplication a(argc, argv);
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(SC_VERSION);
     a.setApplicationName(QObject::tr("MSC Converter"));
-    a.setApplicationVersion("0.0.1");
 
     shared::CommandLineParser cmdParser;
-    cmdParser.setApplicationDescription("MSC file converter");
     cmdParser.handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     cmdParser.handlePositional(shared::CommandLineParser::Positional::ExportToFile);
     cmdParser.handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);

@@ -1,13 +1,13 @@
 {
     \"Name\" : \"AadlPlugin\",
-    \"Version\" : \"0.0.1\",
+    \"Version\" : \"$$PLUGIN_VERSION\",
     \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
-    \"Vendor\" : \"ESA\",
+    \"Vendor\" : \"$$ORGANISATION\",
     \"Copyright\" : \"(C) 2019 European Space Agency\",
     \"License\" : \"LGPL 2.1\",
     \"Category\" : \"Modeling\",
     \"Description\" : \"Visual Editor for AADL files\",
-    \"Url\" : \"https://gitrepos.estec.esa.int/taste/SpaceCreator",
+    \"Url\" : \"$$ORGANISATION_DOMAIN",
     $$dependencyList,
 
     \"Mimetypes\" : [

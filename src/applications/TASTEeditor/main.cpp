@@ -15,6 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "commandlineparser.h"
 #include "datatypesstorage.h"
 #include "iveditor.h"
 #include "iveditorplugin.h"
@@ -31,7 +32,10 @@ int main(int argc, char *argv[])
     aadlinterface::initIvEditor();
 
     QApplication a(argc, argv);
-    a.setApplicationName(QObject::tr("TASTE Editor 3.0"));
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(SC_VERSION);
+    a.setApplicationName("TASTE Editor");
 
     aadl::DataTypesStorage::init();
 
@@ -45,7 +49,6 @@ int main(int argc, char *argv[])
     aadlinterface::MainWindow w(&plugin);
 
     shared::CommandLineParser cmdParser;
-    cmdParser.setApplicationDescription("TASTE editor");
     plugin.populateCommandLineArguments(&cmdParser);
     cmdParser.process(a.arguments());
 

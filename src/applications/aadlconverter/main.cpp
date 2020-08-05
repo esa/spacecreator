@@ -32,11 +32,12 @@ int main(int argc, char *argv[])
     aadl::DataTypesStorage::init();
 
     QCoreApplication a(argc, argv);
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(SC_VERSION);
     a.setApplicationName(QObject::tr("AADL converter"));
-    a.setApplicationVersion("3.0.0");
 
     shared::CommandLineParser cmdParser;
-    cmdParser.setApplicationDescription("AADL converter");
     cmdParser.handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);
     cmdParser.handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);
     cmdParser.handlePositional(shared::CommandLineParser::Positional::ExportToFile);

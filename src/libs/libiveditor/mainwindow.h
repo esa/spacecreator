@@ -61,7 +61,6 @@ public Q_SLOTS:
     bool exportXml(const QString &savePath = QString(), const QString &templatePath = QString());
     bool exportXmlAs(const QString &savePath = QString(), const QString &templatePath = QString());
     void onQuitRequested();
-    void onAboutRequested();
     void onReportRequested();
     void onDocDirtyChanged(bool dirty);
     void onGraphicsViewInfo(const QString &info);

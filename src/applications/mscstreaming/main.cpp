@@ -34,8 +34,10 @@ int main(int argc, char *argv[])
     msc::initMscEditor();
 
     QApplication a(argc, argv);
+    a.setOrganizationName(SC_ORGANISATION);
+    a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    a.setApplicationVersion(SC_VERSION);
     a.setApplicationName(QObject::tr("MSC Streaming"));
-    a.setApplicationVersion("0.0.1");
 
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())
@@ -45,7 +47,6 @@ int main(int argc, char *argv[])
     msc::MSCPlugin plugin;
 
     shared::CommandLineParser cmdParser;
-    cmdParser.setApplicationDescription("MSC streaming");
     cmdParser.handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
     cmdParser.process(a.arguments());
 

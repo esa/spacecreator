@@ -3,8 +3,14 @@ cmake_minimum_required(VERSION 3.8)
 set(SC_NAME SpaceCreator)
 set(SC_VERSION_MAJOR "0")
 set(SC_VERSION_MINOR "1")
+set(ORGANISATION ESA)
+set(ORGANISATION_DOMAIN https://taste.tools)
 
 project(${SC_NAME} VERSION "${SC_VERSION_MAJOR}.${SC_VERSION_MINOR}" LANGUAGES CXX)
+
+add_definitions(-DSC_VERSION="${CMAKE_PROJECT_VERSION}")
+add_definitions(-DSC_ORGANISATION="${ORGANISATION}")
+add_definitions(-DSC_ORGANISATION_DOMAIN="${ORGANISATION_DOMAIN}")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
