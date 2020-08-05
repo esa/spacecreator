@@ -21,14 +21,12 @@
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
 #include "asn1xmlparser.h"
-#include "basicdatatype.h"
 #include "common.h"
 
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTextStream>
 
@@ -56,64 +54,6 @@ static QString ensureAsnFileExists()
 
     qWarning() << "Can't create default ASN datatypes file" << asnFilePath;
     return QString();
-}
-
-static BasicDataType *datatypeFromString(const Asn1Acn::Types::Type *type)
-{
-    if (!type) {
-        return nullptr;
-    }
-
-    switch (type->typeEnum()) {
-    case Asn1Acn::Types::Type::INTEGER: {
-        const QVariantMap &parameters = type->parameters();
-        if (parameters.contains("min")) {
-            qint64 min = parameters["min"].toLongLong();
-            if (min < 0) {
-                auto data = new SignedIntegerDataType(type->identifier());
-                data->setMin(min);
-                if (parameters.contains("max")) {
-                    data->setMax(parameters["max"].toLongLong());
-                }
-                return data;
-            }
-        }
-        auto data = new UnsignedIntegerDataType(type->identifier());
-        if (parameters.contains("min")) {
-            data->setMin(parameters["min"].toLongLong());
-        }
-        if (parameters.contains("max")) {
-            data->setMax(parameters["max"].toLongLong());
-        }
-        return data;
-    }
-    case Asn1Acn::Types::Type::REAL: {
-        auto data = new RealDataType(type->identifier());
-        const QVariantMap &parameters = type->parameters();
-        if (parameters.contains("min")) {
-            data->setMin(parameters["min"].toReal());
-        }
-        if (parameters.contains("max")) {
-            data->setMax(parameters["max"].toReal());
-        }
-        return data;
-    }
-    case Asn1Acn::Types::Type::BOOLEAN:
-        return new BoolDataType(type->identifier());
-    case Asn1Acn::Types::Type::ENUMERATED: {
-        auto data = new EnumDataType(type->identifier(), {});
-        auto enumType = static_cast<const Asn1Acn::Types::Enumerated *>(type);
-        data->setRange(enumType->enumValues().toVector());
-        return data;
-    }
-    case Asn1Acn::Types::Type::IA5STRING: {
-        return new StringDataType(type->identifier());
-    }
-    default:
-        return nullptr;
-    }
-
-    return nullptr;
 }
 
 DataTypesStorage::DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)

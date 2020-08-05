@@ -26,7 +26,6 @@ class File;
 }
 
 namespace aadl {
-class BasicDataType;
 
 class DataTypesStorage
 {

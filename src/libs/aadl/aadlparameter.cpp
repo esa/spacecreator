@@ -22,7 +22,6 @@
 #include "asn1/typeassignment.h"
 #include "asn1/types/type.h"
 #include "asn1valueparser.h"
-#include "basicdatatype.h"
 #include "datatypesstorage.h"
 
 namespace aadl {

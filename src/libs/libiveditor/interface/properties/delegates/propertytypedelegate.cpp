@@ -21,7 +21,6 @@
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
-#include "basicdatatype.h"
 #include "datatypesstorage.h"
 
 namespace aadlinterface {

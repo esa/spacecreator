@@ -27,8 +27,6 @@ target_sources(${LIB_NAME} PRIVATE
     aadltestutils.h
     aadlxmlreader.cpp
     aadlxmlreader.h
-    basicdatatype.cpp
-    basicdatatype.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
     datatypesstorage.cpp
