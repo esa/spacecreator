@@ -223,20 +223,31 @@ QVector<MscInstanceEvent *> MscChart::eventsForInstance(MscInstance *instance) c
    Adds an instance event, and takes over parentship.
    @param instanceEvent The event (message/action/...) to add.
    @param eventIndex is the vertical position of the new event. If it tis < 0, then the new event is appended.
+   @return Returns the actual index, this event was inserted (might differ because of MSC constraints)
  */
-void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
+int MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
 {
     if (instanceEvent == nullptr) {
-        return;
+        return -1;
     }
     if (m_instanceEvents.contains(instanceEvent)) {
-        return;
+        return -1;
+    }
+
+    if (eventIndex < 0) {
+        eventIndex = m_instanceEvents.size();
     }
 
     if (instanceEvent->entityType() == msc::MscEntity::EntityType::Create) {
         if (MscMessage *message = static_cast<MscMessage *>(instanceEvent)) {
-            if (MscInstance *createdInstance = message->targetInstance())
+            if (MscInstance *createdInstance = message->targetInstance()) {
                 createdInstance->setExplicitCreator(message->sourceInstance());
+                MscInstanceEvent *topEvent = firstEventOfInstance(createdInstance);
+                int topIndex = m_instanceEvents.indexOf(topEvent);
+                if (topIndex >= 0) {
+                    eventIndex = std::min(topIndex, eventIndex);
+                }
+            }
         }
     }
 
@@ -258,6 +269,8 @@ void MscChart::addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex)
     Q_EMIT instanceEventAdded(instanceEvent);
     Q_EMIT instanceEventsChanged();
     Q_EMIT dataChanged();
+
+    return m_instanceEvents.indexOf(instanceEvent);
 }
 
 /*!
@@ -310,6 +323,25 @@ MscMessage *MscChart::messageByName(const QString &name) const
             return static_cast<MscMessage *>(message);
         }
     }
+    return nullptr;
+}
+
+/*!
+   Returns the first/top event of the given instance.
+   Returns nullptr inca case the instance is invalid, or has no event
+ */
+MscInstanceEvent *MscChart::firstEventOfInstance(MscInstance *instance) const
+{
+    if (!instance) {
+        return nullptr;
+    }
+
+    for (MscInstanceEvent *event : m_instanceEvents) {
+        if (event->relatesTo(instance)) {
+            return event;
+        }
+    }
+
     return nullptr;
 }
 

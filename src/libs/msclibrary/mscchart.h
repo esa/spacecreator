@@ -57,10 +57,11 @@ public:
 
     const QVector<MscInstanceEvent *> &instanceEvents() const;
     QVector<MscInstanceEvent *> eventsForInstance(MscInstance *instance) const;
-    void addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
+    int addInstanceEvent(MscInstanceEvent *instanceEvent, int eventIndex = -1);
     void removeInstanceEvent(MscInstanceEvent *instanceEvent);
     int indexofEvent(MscInstanceEvent *instanceEvent) const;
     MscMessage *messageByName(const QString &name) const;
+    MscInstanceEvent *firstEventOfInstance(MscInstance *instance) const;
 
     const QVector<MscGate *> &gates() const;
     void addGate(MscGate *gate);
