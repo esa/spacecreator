@@ -68,7 +68,9 @@ private Q_SLOTS:
 
     void testCreateSetsInstanceY();
 
-    void testShiftVertialIfNeeded();
+    void testShiftHorizontalIfNeeded();
+
+    void testShiftVerticalIfNeeded();
 
 private:
     QGraphicsView m_view;
@@ -471,7 +473,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     QVERIFY(newInst2Rect.y() > inst2Rect.y()); // the instance got shifted down
 }
 
-void tst_ChartLayoutManager::testShiftVertialIfNeeded()
+void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
 {
     QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
@@ -481,7 +483,6 @@ void tst_ChartLayoutManager::testShiftVertialIfNeeded()
                           endmsc;\
                       endmscdocument;\
                   endmscdocument;";
-
     parseMsc(mscText);
 
     QPointer<ChartItem> chartItem = m_chartModel->chartItem();
@@ -508,6 +509,48 @@ void tst_ChartLayoutManager::testShiftVertialIfNeeded()
     QApplication::processEvents(); // Perform layout update
     QVERIFY2(std::abs(instanceItem->scenePos().x()) > 5, "event is wide - instance got moved");
     QVERIFY2(actionItem->scenePos().x() >= 0.0, "event is wide - but still not negative");
+}
+
+void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_1;\
+                              endinstance;\
+                              instance Instance_2;\
+                              endinstance;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
+    msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
+
+    auto message = new msc::MscMessage("Message1");
+    message->setSourceInstance(instanceItem1->modelItem());
+    message->setTargetInstance(instanceItem2->modelItem());
+    m_chart->addInstanceEvent(message);
+
+    QApplication::processEvents(); // Perform layout update
+
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+
+    auto create = new msc::MscCreate("Create");
+    create->setSourceInstance(instanceItem1->modelItem());
+    create->setTargetInstance(instanceItem2->modelItem());
+    m_chart->addInstanceEvent(create);
+
+    QApplication::processEvents(); // Perform layout update
+
+    msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
+    const QRectF createRect = createItem->sceneBoundingRect();
+    const QRectF messageRect = messageItem->sceneBoundingRect();
+
+    // the message has to be after/below the create
+    QVERIFY(createRect.bottom() <= messageRect.top());
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

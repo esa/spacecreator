@@ -140,6 +140,7 @@ private:
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 
+    void checkHorizontalConstraints();
     void checkVerticalConstraints();
     void actualizeInstancesHeights(qreal height) const;
     void updateStoppedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const;

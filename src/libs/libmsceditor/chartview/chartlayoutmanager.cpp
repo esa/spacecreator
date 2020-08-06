@@ -345,6 +345,7 @@ void ChartLayoutManager::doLayout()
     addInstanceItems(); // which are not highlightable now to avoid flickering
     addInstanceEventItems();
     disconnectItems();
+    checkHorizontalConstraints();
     checkVerticalConstraints();
     actualizeInstancesHeights(d->m_layoutInfo.m_pos.y() + d->interMessageSpan());
     updateChartboxToContent();
@@ -838,7 +839,7 @@ void ChartLayoutManager::updateContentToChartbox(const QRectF &chartBoxRect)
 /*!
    Checks that no item is left of the chart box. And no items overlap horizontally.
  */
-void ChartLayoutManager::checkVerticalConstraints()
+void ChartLayoutManager::checkHorizontalConstraints()
 {
     qreal leftXLimit = 0.0;
     for (MscInstance *instance : d->m_currentChart->instances()) {
@@ -867,6 +868,50 @@ void ChartLayoutManager::checkVerticalConstraints()
         }
 
         leftXLimit = rect.right() + 1.0;
+    }
+}
+
+/*!
+   Checks that events do not overlap vertically, so the sorting of MSC is not violated visually
+ */
+void ChartLayoutManager::checkVerticalConstraints()
+{
+    QRectF lastBox;
+    for (MscInstanceEvent *event : d->m_currentChart->instanceEvents()) {
+        InteractiveObject *item = itemForEntity(event);
+        if (!item) {
+            continue;
+        }
+
+        bool updateBox = true;
+        bool shiftIfNeeded = true;
+
+        MscEntity::EntityType currentType = event->entityType();
+        if (currentType == MscEntity::EntityType::Message) {
+            updateBox = false;
+        }
+        if (currentType == MscEntity::EntityType::Coregion) {
+            auto coregion = qobject_cast<msc::MscCoregion *>(event);
+            if (coregion->type() == msc::MscCoregion::Type::Begin) {
+                updateBox = false;
+            }
+            if (coregion->type() == msc::MscCoregion::Type::Begin) {
+                shiftIfNeeded = false;
+            }
+        }
+
+        QRectF currentBox = item->sceneBoundingRect();
+
+        if (shiftIfNeeded) {
+            if (currentBox.top() < lastBox.bottom()) {
+                item->moveBy(0.0, lastBox.bottom() - currentBox.top());
+                currentBox = item->sceneBoundingRect();
+            }
+        }
+
+        if (updateBox) {
+            lastBox = currentBox;
+        }
     }
 }
 
