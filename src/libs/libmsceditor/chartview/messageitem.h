@@ -150,6 +150,7 @@ private:
     cif::CifBlockShared positionCifBlock() const;
 
     void extendGlobalMessage();
+    void applyTargetPointFromInstance();
 
     bool wannabeGlobal() const;
     QPointF validatePoint(const QPointF &requestedPoint, bool isSource, const QPointF &oppositePoint);

@@ -441,7 +441,6 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
                       mscdocument Untitled_Leaf /* MSC LEAF */;\
                           msc Untitled_MSC;\
                               instance Instance_1;\
-                                  action 'foo';\
                               endinstance;\
                               instance Instance_2;\
                               endinstance;\
@@ -451,7 +450,6 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
 
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
     msc::MscChart *chart = m_chartModel->currentChart();
 
     msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
@@ -459,7 +457,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
     msc::MscInstance *instance2 = instanceItem2->modelItem();
 
-    const QRectF inst2Rect = instanceItem2->sceneBoundingRect();
+    const QRectF originalInst2Rect = instanceItem2->sceneBoundingRect();
 
     // now add a create for the second instance
     msc::MscCreate *create = new msc::MscCreate(chart);
@@ -469,8 +467,25 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
 
     QApplication::processEvents(); // Perform layout update
 
-    const QRectF newInst2Rect = instanceItem2->sceneBoundingRect();
-    QVERIFY(newInst2Rect.y() > inst2Rect.y()); // the instance got shifted down
+    msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
+
+    QRectF newInst2Rect = instanceItem2->sceneBoundingRect();
+    QVERIFY(newInst2Rect.y() > originalInst2Rect.y()); // the instance got shifted down
+    QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
+
+    // still correct after instance was moved?
+    instanceItem2->moveBy(50.0, 0.0);
+    QApplication::processEvents(); // Perform layout update
+    QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
+
+    // still correct after event insertion?
+    const QRectF createRectbefore = createItem->sceneBoundingRect();
+    auto action = new msc::MscAction(chart);
+    action->setInstance(instance1);
+    chart->addInstanceEvent(action, 0); // insert before create
+    QApplication::processEvents(); // Perform layout update
+    QVERIFY(createItem->sceneBoundingRect().top() > createRectbefore.top()); // Create item got pushed down
+    QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
 }
 
 void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()

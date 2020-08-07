@@ -302,6 +302,14 @@ QRectF InstanceHeadItem::textBoxSceneRect() const
     return m_rectItem->mapRectToScene(m_rectItem->rect());
 }
 
+/*!
+   Returns the bounding box of the kind (yellow box) in scene coordinates
+ */
+QRectF InstanceHeadItem::kindSceneRect() const
+{
+    return m_rectItem->sceneBoundingRect();
+}
+
 QSizeF InstanceHeadItem::defaultSize()
 {
     static QSizeF sizeScene { 0., 0. };

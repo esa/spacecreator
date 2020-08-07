@@ -275,20 +275,6 @@ MessageItem *ChartLayoutManager::fillMessageItem(
 
         storeEntityItem(item);
 
-        if (isCreateMsg) {
-            QLineF axisLine(targetItem->axis());
-            axisLine.setP1({ axisLine.x1(), newY });
-
-            const qreal deltaY = targetItem->axis().length() - axisLine.length();
-
-            if (!targetItem->modelItem()->explicitStop()) {
-                axisLine.setP2({ axisLine.x2(), axisLine.y2() - axisLine.y1() });
-            }
-
-            targetItem->setAxisHeight(axisLine.length());
-            targetItem->moveSilentlyBy({ 0., deltaY + targetItem->kindBox().height() / 2 });
-        }
-
         QVector<QPointF> points { QPointF(0, 0), QPointF(0, 0) };
         if (item->geometryManagedByCif()) {
             bool converted = false;
@@ -953,10 +939,14 @@ void ChartLayoutManager::updateStoppedInstanceHeight(InstanceItem *instanceItem,
 
 void ChartLayoutManager::updateCreatedInstanceHeight(InstanceItem *instanceItem, qreal totalH) const
 {
-    QLineF axisLine(instanceItem->axis());
-    axisLine.setP2({ axisLine.x2(), totalH });
-
-    instanceItem->setAxisHeight(axisLine.length());
+    MessageItem *createItem = creatorItemOfInstance(instanceItem->modelItem());
+    if (!createItem) {
+        return;
+    }
+    qreal currentTargetY = instanceItem->leftCreatorTarget().y();
+    const qreal deltaY = createItem->messagePoints().last().y() - currentTargetY;
+    instanceItem->moveSilentlyBy(QPointF(0.0, deltaY));
+    instanceItem->setAxisHeight(totalH - instanceItem->headerItem()->sceneBoundingRect().bottom());
 }
 
 InstanceItem *ChartLayoutManager::itemForInstance(msc::MscInstance *instance) const
@@ -1407,6 +1397,26 @@ CoregionItem *ChartLayoutManager::addCoregionItem(MscCoregion *coregion)
     }
 
     return item;
+}
+
+/*!
+   Returns the Message item that creates the given instance.
+   If no create message was found a nullptr is returned
+ */
+MessageItem *ChartLayoutManager::creatorItemOfInstance(MscInstance *instance) const
+{
+    if (!instance->explicitCreator()) {
+        return nullptr;
+    }
+    for (InteractiveObject *event : d->m_instanceEventItemsSorted) {
+        if (event->modelEntity() && event->modelEntity()->entityType() == msc::MscEntity::EntityType::Create) {
+            auto createItem = static_cast<msc::MessageItem *>(event);
+            if (createItem->modelItem()->targetInstance() == instance) {
+                return createItem;
+            }
+        }
+    }
+    return nullptr;
 }
 
 QVariantList ChartLayoutManager::prepareChangeOrderCommand(MscInstance *instance) const

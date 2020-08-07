@@ -196,16 +196,7 @@ bool MessageItem::setTargetInstanceItem(InstanceItem *targetInstance)
                 Qt::DirectConnection);
     }
 
-    QVector<QPointF> points = messagePoints();
-    if (messagePoints().size() > 1) {
-        QPointF &pt = points.last();
-        if (m_targetInstance)
-            pt.setX(m_targetInstance->sceneBoundingRect().center().x());
-        else
-            pt.setX(0);
-        setMessagePoints(points);
-    }
-
+    applyTargetPointFromInstance();
     updateTooltip();
     scheduleLayoutUpdate();
     Q_EMIT needUpdateLayout();
@@ -381,7 +372,12 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, Insta
     if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo)
         keepInstance = hoveredItem(to);
     setTargetInstanceItem(keepInstance);
-    const bool res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
+    bool res = true;
+    if (isCreator()) {
+        res = m_arrowItem->updateTarget(m_targetInstance, to, ObjectAnchor::Snap::NoSnap);
+    } else {
+        res = m_arrowItem->updateTarget(m_targetInstance, to, snap);
+    }
     if (res) {
         updateMessagePoints();
         updateGripPoints();
@@ -885,6 +881,31 @@ void MessageItem::extendGlobalMessage()
     const QPointF &shiftedMe = extendToNearestEdge(shiftMe);
     if (shiftedMe != points.at(shiftPointId)) {
         points.replace(shiftPointId, shiftedMe);
+        setMessagePoints(points);
+    }
+}
+
+/*!
+   Apply X position of the message target from the instance
+ */
+void MessageItem::applyTargetPointFromInstance()
+{
+    QVector<QPointF> points = messagePoints();
+    if (messagePoints().size() > 1) {
+        if (m_targetInstance) {
+            QPointF &pt = points.last();
+            if (isCreator()) {
+                // Creator arrow end at the instance header border
+                if (points.first().x() < pt.x()) {
+                    pt.setX(m_targetInstance->leftCreatorTarget().x());
+                } else {
+                    pt.setX(m_targetInstance->rightCreatorTarget().x());
+                }
+            } else {
+                const QRectF targetRect = m_targetInstance->sceneBoundingRect();
+                pt.setX(targetRect.center().x());
+            }
+        }
         setMessagePoints(points);
     }
 }

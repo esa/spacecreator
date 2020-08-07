@@ -44,6 +44,7 @@ public:
 
     void setTextboxSize(const QSizeF &size);
     QRectF textBoxSceneRect() const;
+    QRectF kindSceneRect() const;
 
     static QSizeF defaultSize();
 

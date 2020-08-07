@@ -158,6 +158,8 @@ private:
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 
+    MessageItem *creatorItemOfInstance(MscInstance *instance) const;
+
     void polishAddedEventItem(MscInstanceEvent *event, InteractiveObject *item);
 
     void addInstanceItems();

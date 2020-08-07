@@ -86,6 +86,9 @@ public:
 
     static qreal defaultAxisHeight();
 
+    QPointF leftCreatorTarget() const;
+    QPointF rightCreatorTarget() const;
+
 public Q_SLOTS:
     void setName(const QString &name);
     void setDenominatorAndKind(const QString &kind);
