@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <QFileInfo>
 #include <QMap>
+#include <QObject>
 #include <QString>
 #include <memory>
 
@@ -27,8 +29,9 @@ class File;
 
 namespace aadl {
 
-class DataTypesStorage
+class DataTypesStorage : public QObject
 {
+    Q_OBJECT
 public:
     DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
     ~DataTypesStorage();
@@ -38,10 +41,21 @@ public:
 
     const std::unique_ptr<Asn1Acn::File> &asn1DataTypes() const;
 
+    Q_SLOT void setFileName(const QFileInfo &fileName);
+    const QFileInfo &fileName() const;
+
+    Q_SLOT bool loadFile();
+
+    void clear();
+
+Q_SIGNALS:
+    void dataTypesChanged();
+
 private:
     static DataTypesStorage *m_instance;
 
     std::unique_ptr<Asn1Acn::File> m_asn1DataTypes;
+    QFileInfo m_fileName;
 };
 
 }
