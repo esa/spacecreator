@@ -5,6 +5,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     baseitems/common/aadlutils.cpp
     baseitems/common/aadlutils.h
+    baseitems/common/positionlookuphelper.h
+    baseitems/common/positionlookuphelper.cpp
     baseitems/graphicsview.cpp
     baseitems/graphicsview.h
     baseitems/interactiveobject.cpp

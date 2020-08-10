@@ -33,6 +33,8 @@ static const QSizeF DefaultGraphicsItemSize = { 200, 80 };
 static const QMarginsF kContentMargins = { 30, 30, 30, 30 };
 static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
+static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
+static const qreal kInterfaceLayoutOffset = 12.0;
 
 /*!
   \brief aadlinterface::ZOrder
@@ -100,5 +102,16 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 QList<int> knownGraphicsItemTypes();
 
 qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected);
+
+QRectF alignRectToSide(
+        const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset);
+
+QRectF adjustedRect(
+        const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side, const bool clockwise);
+
+Qt::Alignment sideFromIndex(const int idx);
+int indexFromSide(Qt::Alignment side);
+
+bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
 
 }

@@ -24,6 +24,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectiface.h"
 #include "baseitems/common/aadlutils.h"
+#include "baseitems/common/positionlookuphelper.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/commandids.h"
@@ -37,9 +38,7 @@ static const qreal kBase = 15;
 static const qreal kHeight = kBase * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
-static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceTitleMaxLength = 80;
-static const int maxMoveIterations = 4;
 
 namespace aadlinterface {
 
@@ -54,11 +53,7 @@ AADLInterfaceGraphicsItem::AADLInterfaceGraphicsItem(aadl::AADLObjectIface *enti
     setZValue(ZOrder.Interface);
     updateKind();
 
-    QPainterPath pp;
-    pp.addPolygon(QVector<QPointF> {
-            QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2), QPointF(2 * kHeight / 3, 0) });
-    pp.closeSubpath();
-    m_iface->setPath(pp);
+    m_iface->setPath(ifacePath());
     //    setInterfaceName(ifaceLabel());
 
     connect(entity, &aadl::AADLObject::attributeChanged, this, &AADLInterfaceGraphicsItem::onAttrOrPropChanged);
@@ -120,74 +115,12 @@ void AADLInterfaceGraphicsItem::setInterfaceName(const QString &name)
     }
 }
 
-static void moveIface(const QRectF &intersectedItemRect, QRectF &rect, int &idx, const QRectF &parentBoundingRect,
-        const QPointF &offset, bool invert, int loopCount = 0)
-{
-    if (!intersectedItemRect.isValid()) {
-        return;
-    }
-    if (loopCount >= maxMoveIterations) {
-        qDebug() << Q_FUNC_INFO << "All four sides have been tested. Aborting the loop";
-        return;
-    }
-
-    QRectF itemRect { rect };
-    const int currentIdx = invert ? idx + 2 : idx;
-    const int index =
-            idx < 0 ? kRectSides.size() - qAbs(currentIdx) % kRectSides.size() : currentIdx % kRectSides.size();
-    switch (kRectSides.value(index % kRectSides.size())) {
-    case Qt::AlignLeft:
-        itemRect.moveBottom(intersectedItemRect.top() - kBase);
-        break;
-    case Qt::AlignRight:
-        itemRect.moveTop(intersectedItemRect.bottom() + kBase);
-        break;
-    case Qt::AlignTop:
-        itemRect.moveLeft(intersectedItemRect.right() + kBase);
-        break;
-    case Qt::AlignBottom:
-        itemRect.moveRight(intersectedItemRect.left() - kBase);
-        break;
-    default:
-        return;
-    }
-    if (!parentBoundingRect.contains(itemRect.topLeft() - offset)) {
-        moveIface(intersectedItemRect, rect, invert ? ++idx : --idx, parentBoundingRect, offset, invert, ++loopCount);
-    } else {
-        rect = itemRect;
-    }
-}
-
 void AADLInterfaceGraphicsItem::updateInternalItems(Qt::Alignment alignment)
 {
     prepareGeometryChange();
 
-    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
-    const qreal offset = kBase + 2;
-
-    qreal rotationDegree = 0.;
-    QPointF shift(0., 0.);
-    switch (alignment) {
-    case Qt::AlignLeft:
-        rotationDegree = insideOut ? 180 : 0;
-        shift.setX(-offset);
-        break;
-    case Qt::AlignRight:
-        rotationDegree = insideOut ? 0 : 180;
-        shift.setX(offset);
-        break;
-    case Qt::AlignTop:
-        rotationDegree = insideOut ? 270 : 90;
-        shift.setY(-offset);
-        break;
-    case Qt::AlignBottom:
-        rotationDegree = insideOut ? 90 : 270;
-        shift.setY(offset);
-        break;
-    }
-
-    m_iface->setTransform(QTransform().rotate(rotationDegree));
-    m_type->setPos(shift);
+    m_iface->setTransform(ifaceTransform(alignment));
+    m_type->setTransform(typeTransform(alignment));
     m_shape = composeShape();
     setBoundingRect(childrenBoundingRect());
 }
@@ -201,7 +134,7 @@ void AADLInterfaceGraphicsItem::rebuildLayout()
     }
 
     const QPointF ifacePos = pos();
-    if (aadlinterface::pos(entity()->coordinates()).isNull()) {
+    if (entity() && aadlinterface::pos(entity()->coordinates()).isNull()) {
         layout();
         return;
     }
@@ -229,13 +162,13 @@ void AADLInterfaceGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
+    setInterfaceName(ifaceLabel());
     const QPointF coordinates = aadlinterface::pos(obj->coordinates());
     if (coordinates.isNull())
         instantLayoutUpdate();
     else
         setTargetItem(parentItem(), coordinates);
     adjustItem();
-    setInterfaceName(ifaceLabel());
 }
 
 void AADLInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
@@ -354,51 +287,33 @@ void AADLInterfaceGraphicsItem::adjustItem()
             siblingsRects.append(sibling->mapRectToParent(sibling->boundingRect()));
     });
 
-    auto checkCollision = [](const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF &collidingRect) {
-        auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
-                [itemRect](const QRectF &siblibgRect) { return siblibgRect.intersects(itemRect); });
-        if (it != itemRects.cend()) {
-            collidingRect = *it;
-            return true;
-        }
-        return false;
-    };
-    const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = getNearestSide(parentRect, pos());
-    const int initialAlignment = kRectSides.indexOf(alignment);
-    const QPointF offset = boundingRect().topLeft();
+    const QPointF initialOffset = boundingRect().topLeft();
     const QRectF itemRect = mapRectToParent(boundingRect());
+    const QRectF parentRect = parentItem()->boundingRect();
 
     QRectF intersectedRect;
-    if (checkCollision(siblingsRects, itemRect, intersectedRect) && parentRect.isValid()) {
-        QRectF cIntersectedRect { intersectedRect };
-        QRectF ccIntersectedRect { intersectedRect };
-        QRectF br { itemRect };
-        QRectF cbr { itemRect };
-        QRectF ccbr { itemRect };
-        int alignmentIdx { initialAlignment };
-        int cAlignmentIdx { initialAlignment };
-        int ccAlignmentIdx { initialAlignment };
-
-        while (qAbs(cAlignmentIdx - initialAlignment) < kRectSides.size()
-                && qAbs(ccAlignmentIdx - initialAlignment) < kRectSides.size()) {
-            moveIface(cIntersectedRect, cbr, cAlignmentIdx, parentRect, offset, false);
-            if (!checkCollision(siblingsRects, cbr, cIntersectedRect)) {
-                alignmentIdx = cAlignmentIdx;
-                br = cbr;
+    if (checkCollision(siblingsRects, itemRect, &intersectedRect) && parentRect.isValid()) {
+        const QHash<Qt::Alignment, QPainterPath> kSidePaths {
+            { Qt::AlignLeft, itemPath(Qt::AlignLeft) },
+            { Qt::AlignTop, itemPath(Qt::AlignTop) },
+            { Qt::AlignRight, itemPath(Qt::AlignRight) },
+            { Qt::AlignBottom, itemPath(Qt::AlignBottom) },
+        };
+        PositionLookupHelper cwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset, true);
+        PositionLookupHelper ccwHelper(kSidePaths, parentRect, siblingsRects, itemRect, initialOffset, false);
+        while (cwHelper.hasNext() || ccwHelper.hasNext()) {
+            if (cwHelper.lookup()) {
+                if (cwHelper.isSideChanged())
+                    updateInternalItems(cwHelper.side());
+                setPos(cwHelper.mappedOriginPoint());
                 break;
-            }
-
-            moveIface(ccIntersectedRect, ccbr, ccAlignmentIdx, parentRect, offset, true);
-            if (!checkCollision(siblingsRects, ccbr, ccIntersectedRect)) {
-                alignmentIdx = ccAlignmentIdx;
-                br = ccbr;
+            } else if (ccwHelper.lookup()) {
+                if (ccwHelper.isSideChanged())
+                    updateInternalItems(ccwHelper.side());
+                setPos(ccwHelper.mappedOriginPoint());
                 break;
             }
         }
-        if (alignmentIdx != initialAlignment)
-            updateInternalItems(kRectSides.value(alignmentIdx));
-        setPos(br.topLeft() - offset);
     }
 }
 
@@ -420,48 +335,7 @@ void AADLInterfaceGraphicsItem::updateLabel()
 
 void AADLInterfaceGraphicsItem::updateKind()
 {
-    auto iface = qobject_cast<aadl::AADLObjectIface *>(entity());
-    if (!iface)
-        return;
-
-    QPainterPath kindPath;
-    switch (iface->kind()) {
-    case aadl::AADLObjectIface::OperationKind::Cyclic: {
-        const qreal kindBaseValue = kHeight;
-        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
-                               kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
-                -90, -270);
-        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
-        kindPath.addPolygon(
-                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
-                        kindPath.currentPosition(),
-                        kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
-        kindPath.translate(0, kindBaseValue / 2);
-        break;
-    }
-    case aadl::AADLObjectIface::OperationKind::Sporadic: {
-        const qreal kindBaseValue = kHeight;
-        kindPath.moveTo(-kindBaseValue / 2, 0);
-        kindPath.lineTo(0, -kindBaseValue / 4);
-        kindPath.lineTo(0, kindBaseValue / 4);
-        kindPath.lineTo(kindBaseValue / 2, 0);
-        break;
-    }
-    case aadl::AADLObjectIface::OperationKind::Protected: {
-        const qreal kindBaseValue = kHeight;
-        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
-        kindPath.addRoundedRect(rect, 2, 2);
-        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
-        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
-        kindPath.moveTo(arcRect.center());
-        kindPath.arcTo(arcRect, 0, 180);
-        kindPath.translate(0, rect.height() / 3);
-        break;
-    }
-    default:
-        break;
-    }
-    m_type->setPath(kindPath);
+    m_type->setPath(typePath());
     m_shape = composeShape();
 }
 
@@ -512,6 +386,115 @@ void AADLInterfaceGraphicsItem::onAttrOrPropChanged(aadl::meta::Props::Token t)
     default:
         break;
     }
+}
+
+QTransform AADLInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
+{
+    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
+    const qreal offset = kBase + 2;
+
+    QPointF shift(0., 0.);
+    switch (alignment) {
+    case Qt::AlignLeft:
+        shift.setX(-offset);
+        break;
+    case Qt::AlignRight:
+        shift.setX(offset);
+        break;
+    case Qt::AlignTop:
+        shift.setY(-offset);
+        break;
+    case Qt::AlignBottom:
+        shift.setY(offset);
+        break;
+    }
+
+    return QTransform().translate(shift.x(), shift.y());
+}
+
+QTransform AADLInterfaceGraphicsItem::ifaceTransform(Qt::Alignment alignment) const
+{
+    const bool insideOut = entity()->direction() == aadl::AADLObjectIface::IfaceType::Required;
+    qreal rotationDegree = 0.;
+    switch (alignment) {
+    case Qt::AlignLeft:
+        rotationDegree = insideOut ? 180 : 0;
+        break;
+    case Qt::AlignRight:
+        rotationDegree = insideOut ? 0 : 180;
+        break;
+    case Qt::AlignTop:
+        rotationDegree = insideOut ? 270 : 90;
+        break;
+    case Qt::AlignBottom:
+        rotationDegree = insideOut ? 90 : 270;
+        break;
+    }
+
+    return QTransform().rotate(rotationDegree);
+}
+
+QPainterPath AADLInterfaceGraphicsItem::ifacePath() const
+{
+    QPainterPath path;
+    path.addPolygon(QVector<QPointF> {
+            QPointF(-kHeight / 3, -kBase / 2), QPointF(-kHeight / 3, kBase / 2), QPointF(2 * kHeight / 3, 0) });
+    path.closeSubpath();
+    return path;
+}
+
+QPainterPath AADLInterfaceGraphicsItem::typePath() const
+{
+    auto iface = qobject_cast<aadl::AADLObjectIface *>(entity());
+    if (!iface)
+        return {};
+
+    QPainterPath kindPath;
+    switch (iface->kind()) {
+    case aadl::AADLObjectIface::OperationKind::Cyclic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.arcTo({ kindPath.currentPosition().x() - kindBaseValue / 2,
+                               kindPath.currentPosition().y() - kindBaseValue, kindBaseValue, kindBaseValue },
+                -90, -270);
+        kindPath.lineTo(kindPath.currentPosition() + QPointF(0, kindBaseValue / 3));
+        kindPath.addPolygon(
+                QVector<QPointF> { kindPath.currentPosition() + QPointF(-kindBaseValue / 3, -kindBaseValue / 3),
+                        kindPath.currentPosition(),
+                        kindPath.currentPosition() + QPointF(kindBaseValue / 3, -kindBaseValue / 3) });
+        kindPath.translate(0, kindBaseValue / 2);
+        break;
+    }
+    case aadl::AADLObjectIface::OperationKind::Sporadic: {
+        const qreal kindBaseValue = kHeight;
+        kindPath.moveTo(-kindBaseValue / 2, 0);
+        kindPath.lineTo(0, -kindBaseValue / 4);
+        kindPath.lineTo(0, kindBaseValue / 4);
+        kindPath.lineTo(kindBaseValue / 2, 0);
+        break;
+    }
+    case aadl::AADLObjectIface::OperationKind::Protected: {
+        const qreal kindBaseValue = kHeight;
+        const QRectF rect { -kindBaseValue / 2, -kindBaseValue / 2, kindBaseValue, kindBaseValue * 2 / 3 };
+        kindPath.addRoundedRect(rect, 2, 2);
+        QRectF arcRect(rect.adjusted(rect.width() / 5, 0, -rect.width() / 5, 0));
+        arcRect.moveCenter(QPointF(rect.center().x(), rect.top()));
+        kindPath.moveTo(arcRect.center());
+        kindPath.arcTo(arcRect, 0, 180);
+        kindPath.translate(0, rect.height() / 3);
+        break;
+    }
+    default:
+        break;
+    }
+    return kindPath;
+}
+
+QPainterPath AADLInterfaceGraphicsItem::itemPath(Qt::Alignment alignment) const
+{
+    QPainterPath path = m_text->shape();
+    path.addPath(typeTransform(alignment).map(m_type->path()));
+    path.addPath(ifaceTransform(alignment).map(m_iface->path()));
+    return path;
 }
 
 QPainterPath AADLInterfaceGraphicsItem::composeShape() const

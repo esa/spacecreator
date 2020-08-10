@@ -23,6 +23,8 @@
 
 #include <QPointer>
 
+class tst_PositionLookupHelper;
+
 namespace aadl {
 class AADLObjectIface;
 }
@@ -82,6 +84,16 @@ protected Q_SLOTS:
     void onAttrOrPropChanged(aadl::meta::Props::Token t);
 
 private:
+    QTransform typeTransform(Qt::Alignment alignment) const;
+    QTransform ifaceTransform(Qt::Alignment alignment) const;
+    QPainterPath itemPath(Qt::Alignment alignment) const;
+
+    QPainterPath ifacePath() const;
+    QPainterPath typePath() const;
+
+private:
+    friend tst_PositionLookupHelper;
+
     QGraphicsPathItem *m_type = nullptr;
     QGraphicsPathItem *m_iface = nullptr;
     QGraphicsTextItem *m_text = nullptr;

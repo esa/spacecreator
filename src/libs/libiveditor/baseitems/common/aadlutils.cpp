@@ -360,4 +360,117 @@ qreal itemLevel(const aadl::AADLObject *const object, bool itemSelected)
     }
 }
 
+/*!
+ * Returns a \a itemRect aligned inside of \a boundingRect but keeping the offset of \a originPointOffset
+ */
+
+QRectF alignRectToSide(
+        const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side, const QPointF &originPointOffset)
+{
+    if (!boundingRect.isValid() || !itemRect.isValid())
+        return {};
+
+    QRectF rect { itemRect };
+    auto adjustVertically = [=](QRectF &rect) {
+        rect.moveTop(qBound(
+                boundingRect.top() + originPointOffset.y(), rect.top(), boundingRect.bottom() + originPointOffset.y()));
+    };
+    auto adjustHorizontally = [=](QRectF &rect) {
+        rect.moveLeft(qBound(boundingRect.left() + originPointOffset.x(), rect.left(),
+                boundingRect.right() + originPointOffset.x()));
+    };
+
+    switch (side) {
+    case Qt::AlignLeft:
+        rect.moveLeft(boundingRect.left() + originPointOffset.x());
+        adjustVertically(rect);
+        break;
+    case Qt::AlignTop:
+        rect.moveTop(boundingRect.top() + originPointOffset.y());
+        adjustHorizontally(rect);
+        break;
+    case Qt::AlignRight:
+        rect.moveLeft(boundingRect.right() + originPointOffset.x());
+        adjustVertically(rect);
+        break;
+    case Qt::AlignBottom:
+        rect.moveTop(boundingRect.bottom() + originPointOffset.y());
+        adjustHorizontally(rect);
+        break;
+    default:
+        return {};
+    }
+    return rect;
+}
+
+/*!
+ * Moves \a itemRect on the \a side from \a intersectedItemRect
+ */
+
+QRectF adjustedRect(
+        const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side, const bool clockwise)
+{
+    QRectF resultRect { itemRect };
+    switch (side) {
+    case Qt::AlignLeft:
+        if (clockwise)
+            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
+        else
+            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignRight:
+        if (clockwise)
+            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
+        else
+            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignTop:
+        if (clockwise)
+            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
+        else
+            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignBottom:
+        if (clockwise)
+            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
+        else
+            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
+        break;
+    default:
+        qWarning() << "Unhandled side:" << side;
+        return {};
+    }
+    return resultRect;
+}
+
+Qt::Alignment sideFromIndex(const int idx)
+{
+    if (idx >= 0)
+        return kRectSides.value(idx % kRectSides.size());
+
+    return kRectSides.value((kRectSides.size() - qAbs(idx)) % kRectSides.size());
+}
+
+int indexFromSide(Qt::Alignment side)
+{
+    return kRectSides.indexOf(side);
+}
+
+/*!
+ * Checks intersection \a itemRect with \a itemRects
+ * and assign first intersection to \a collidingRect
+ */
+
+bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect)
+{
+    auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
+            [itemRect](const QRectF &siblingRect) { return siblingRect.intersects(itemRect); });
+    if (it != itemRects.cend()) {
+        if (collidingRect)
+            *collidingRect = *it;
+        return true;
+    }
+    return false;
+}
+
 }
