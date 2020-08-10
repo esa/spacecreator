@@ -64,13 +64,13 @@ void XmlDocExporter::ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPol
     const QString sourceFile(":/defaults/templating/xml_templates/%1.%2");
     const QString targetFilePath = QFileInfo(interfaceDefaultTemplate()).path();
 
-    const bool forcedOverwrite = policy == RolloutDefaultsPolicy::Overwrite;
+    const shared::FileCopyingMode kopyMode =
+            policy == RolloutDefaultsPolicy::Overwrite ? shared::Overwrite : shared::Keep;
 
-    auto rollOutDefaultTemplate = [forcedOverwrite, sourceFile, targetFilePath](const QString &fileName) {
+    auto rollOutDefaultTemplate = [kopyMode, sourceFile, targetFilePath](const QString &fileName) {
         const QString fileFrom(sourceFile.arg(fileName, TemplateFileExtension));
         const QString fileTo(QString("%1/%2.%3").arg(targetFilePath, fileName, TemplateFileExtension));
-        if (forcedOverwrite || !QFileInfo::exists(fileTo))
-            shared::copyResourceFile(fileFrom, fileTo);
+        shared::copyResourceFile(fileFrom, fileTo, kopyMode);
     };
 
     for (int i = 0; i < fileNames.size(); ++i) {
@@ -113,7 +113,7 @@ bool XmlDocExporter::exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const
         usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
     }
 
-    const QHash<QString, QVariantList> aadlObjects = collectInterfaceObjects(doc);
+    const QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(doc);
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
     return strTemplate->parseFile(aadlObjects, usedTemplatePath, outBuffer);
 }
@@ -159,7 +159,7 @@ bool XmlDocExporter::exportDocInterface(InterfaceDocument *doc, QWidget *parentW
     if (templatePath.isEmpty())
         usedTemplatePath = XmlDocExporter::interfaceDefaultTemplate();
 
-    const QHash<QString, QVariantList> aadlObjects = collectInterfaceObjects(doc);
+    QHash<QString, QVariant> aadlObjects = collectInterfaceObjects(doc);
 
     if (InteractionPolicy::Silently == interaction)
         return runExportSilently(doc, aadlObjects, usedTemplatePath, savePath);
@@ -167,7 +167,7 @@ bool XmlDocExporter::exportDocInterface(InterfaceDocument *doc, QWidget *parentW
         return showExportDialog(doc, parentWindow, aadlObjects, usedTemplatePath, savePath);
 }
 
-bool XmlDocExporter::runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariantList> &content,
+bool XmlDocExporter::runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariant> &content,
         const QString &templateFileName, const QString &outFileName)
 {
     QScopedPointer<templating::StringTemplate> strTemplate(templating::StringTemplate::create());
@@ -179,7 +179,7 @@ bool XmlDocExporter::runExportSilently(InterfaceDocument *doc, const QHash<QStri
 }
 
 bool XmlDocExporter::showExportDialog(InterfaceDocument *doc, QWidget *parentWindow,
-        const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName)
+        const QHash<QString, QVariant> &content, const QString &templateFileName, const QString &outFileName)
 {
     templating::TemplateEditor *previewDialog = new templating::TemplateEditor(outFileName, parentWindow);
     previewDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -192,9 +192,10 @@ bool XmlDocExporter::showExportDialog(InterfaceDocument *doc, QWidget *parentWin
     return templateParsed;
 }
 
-QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(InterfaceDocument *doc)
+QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocument *doc)
 {
-    QHash<QString, QVariantList> grouppedObjects;
+    QHash<QString, QVariant> grouppedObjects;
+
     for (const auto aadlObject : doc->objects()) {
         const aadl::AADLObject::Type t = aadlObject->aadlType();
         switch (t) {
@@ -212,7 +213,19 @@ QHash<QString, QVariantList> XmlDocExporter::collectInterfaceObjects(InterfaceDo
         }
         const QVariant &exportedObject = ExportableAADLObject::createFrom(aadlObject);
         const auto &o = exportedObject.value<ExportableAADLObject>();
-        grouppedObjects[o.groupName()] << exportedObject;
+        const QString groupName = o.groupName();
+        if (!grouppedObjects.contains(groupName)) {
+            grouppedObjects[groupName] = QVariant::fromValue(QList<QVariant>());
+        }
+        QVariantList objects = grouppedObjects[o.groupName()].toList();
+        objects << exportedObject;
+        grouppedObjects[o.groupName()] = objects;
+    }
+
+    // Add meta-data
+    const QString asn1FileName = doc->asn1FileName();
+    if (!asn1FileName.isEmpty()) {
+        grouppedObjects["Asn1FileName"] = QVariant::fromValue(asn1FileName);
     }
 
     return grouppedObjects;

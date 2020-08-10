@@ -536,11 +536,8 @@ QString MscWriter::exportGrantlee(MscModel *model, QString templateFile)
     QByteArray bufferArray;
     buffer.setBuffer(&bufferArray);
     buffer.open(QIODevice::WriteOnly);
-    QHash<QString, QVariantList> grouppedObjects;
-
-    QVariantList varList;
-    varList.append(QVariant::fromValue(model));
-    grouppedObjects.insert("model", varList);
+    QHash<QString, QVariant> grouppedObjects;
+    grouppedObjects.insert("model", QVariant::fromValue(model));
     m_template->parseFile(grouppedObjects, templateFile, &buffer);
 
     buffer.close();

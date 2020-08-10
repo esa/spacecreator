@@ -130,7 +130,7 @@ TemplateEditor::TemplateEditor(const QString &saveHere, QWidget *parent)
  * @param grouppedObjects groupped objects which are used as replacement in template
  * @param templateFileName name of template file
  */
-bool TemplateEditor::parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName)
+bool TemplateEditor::parseTemplate(const QHash<QString, QVariant> &grouppedObjects, const QString &templateFileName)
 {
     m_grouppedObjects = grouppedObjects;
     m_templateFileName = templateFileName;

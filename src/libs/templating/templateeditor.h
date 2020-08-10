@@ -40,7 +40,7 @@ class TemplateEditor : public QDialog
 public:
     TemplateEditor(const QString &saveHere, QWidget *parent = nullptr);
 
-    bool parseTemplate(const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName);
+    bool parseTemplate(const QHash<QString, QVariant> &grouppedObjects, const QString &templateFileName);
     bool saveResultToFile(const QString &fileName);
 
     QString resultText() const;
@@ -67,7 +67,7 @@ private:
     templating::StringTemplate *m_stringTemplate;
     QTabWidget *m_templatesTabWidget;
     QPlainTextEdit *m_resultTextEdit;
-    QHash<QString, QVariantList> m_grouppedObjects;
+    QHash<QString, QVariant> m_grouppedObjects;
     QString m_templateFileName;
     QHash<QString, QString> m_openedTemplates; // key: file name, value: full path
     TemplateSyntaxHelpDialog *m_helpDialog;

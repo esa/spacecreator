@@ -101,7 +101,7 @@ void StringTemplate::init()
  * @return false if data has not been written
  */
 bool StringTemplate::parseFile(
-        const QHash<QString, QVariantList> &grouppedObjects, const QString &templateFileName, QIODevice *out)
+        const QHash<QString, QVariant> &grouppedObjects, const QString &templateFileName, QIODevice *out)
 {
     if (!out || templateFileName.isEmpty()) {
         return false;
@@ -192,7 +192,7 @@ QString StringTemplate::formatText(const QString &text)
     }
 
     if (xmlReader.hasError()) {
-        const QString &errorString = tr("Error: %1, error line: %2:%3")
+        const QString &errorString = tr("Error: %1, error line: %2:%3\n")
                                              .arg(xmlReader.errorString())
                                              .arg(xmlReader.lineNumber())
                                              .arg(xmlReader.columnNumber());

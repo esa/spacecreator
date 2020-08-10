@@ -63,6 +63,7 @@ public:
     void close();
 
     QString path() const;
+    QString asn1FileName() const;
 
     bool isDirty() const;
 

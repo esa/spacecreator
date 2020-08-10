@@ -30,6 +30,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
+#include "datatypesstorage.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -274,6 +275,14 @@ void InterfaceDocument::close()
 QString InterfaceDocument::path() const
 {
     return d->filePath;
+}
+
+/*!
+   Returns the filename of the used asn1 file. It does not contain any path.
+ */
+QString InterfaceDocument::asn1FileName() const
+{
+    return aadl::DataTypesStorage::instance()->fileName().fileName();
 }
 
 bool InterfaceDocument::isDirty() const

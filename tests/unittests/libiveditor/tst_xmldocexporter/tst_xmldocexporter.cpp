@@ -17,6 +17,7 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
+#include "datatypesstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "xmldocexporter.h"
@@ -44,6 +45,7 @@ private Q_SLOTS:
     void testExportFunctions();
     void testExportComment();
     void testExportNestedComment();
+    void testExportAsn1File();
     void testExportToBuffer();
 };
 
@@ -64,6 +66,7 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::init()
 {
+    aadl::DataTypesStorage::instance()->clear();
     if (QFile::exists(testFilePath)) {
         QFile::remove(testFilePath);
     }
@@ -146,6 +149,18 @@ void tst_XmlDocExporter::testExportNestedComment()
                           "        <Comment name=\"TestComment1\"/>\n"
                           "    </Function>\n"
                           "</InterfaceView>";
+    QCOMPARE(text, expected);
+}
+
+void tst_XmlDocExporter::testExportAsn1File()
+{
+    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
+
+    aadl::DataTypesStorage::instance()->setFileName(QFileInfo("/some/path/fake.asn"));
+    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    QByteArray text = testFileContent();
+
+    QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
     QCOMPARE(text, expected);
 }
 

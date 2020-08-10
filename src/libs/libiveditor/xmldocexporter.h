@@ -41,7 +41,7 @@ public:
 
     static bool exportDoc(InterfaceDocument *doc, QBuffer *outBuffer, const QString &templatePath = QString());
 
-    static QHash<QString, QVariantList> collectInterfaceObjects(InterfaceDocument *doc);
+    static QHash<QString, QVariant> collectInterfaceObjects(InterfaceDocument *doc);
 
 private:
     XmlDocExporter();
@@ -61,14 +61,15 @@ private:
     static bool exportDoc(InterfaceDocument *doc, QWidget *root, const QString &outPath, const QString &templatePath,
             InteractionPolicy interaction);
 
-    static void ensureDefaultTemplatesDeployed_interface(RolloutDefaultsPolicy policy = RolloutDefaultsPolicy::Keep);
+    static void ensureDefaultTemplatesDeployed_interface(
+            RolloutDefaultsPolicy policy = RolloutDefaultsPolicy::Overwrite);
     static bool exportDocInterface(InterfaceDocument *doc, QWidget *root, const QString &outPath,
             const QString &templatePath, InteractionPolicy interaction);
 
-    static bool runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariantList> &content,
+    static bool runExportSilently(InterfaceDocument *doc, const QHash<QString, QVariant> &content,
             const QString &templateFileName, const QString &outFileName);
-    static bool showExportDialog(InterfaceDocument *doc, QWidget *parentWindow,
-            const QHash<QString, QVariantList> &content, const QString &templateFileName, const QString &outFileName);
+    static bool showExportDialog(InterfaceDocument *doc, QWidget *parentWindow, const QHash<QString, QVariant> &content,
+            const QString &templateFileName, const QString &outFileName);
 };
 
 }
