@@ -26,8 +26,11 @@ class QGraphicsView;
 class QSplitter;
 class QUndoStack;
 
-namespace msc {
+namespace asn1 {
 class ASN1FileView;
+}
+
+namespace msc {
 class DocumentTreeView;
 class GraphicsView;
 class MSCPlugin;
@@ -77,7 +80,7 @@ private:
     QSplitter *m_leftVerticalSplitter = nullptr;
 
     msc::DocumentTreeView *m_documentTree = nullptr;
-    msc::ASN1FileView *m_asn1Widget = nullptr;
+    asn1::ASN1FileView *m_asn1Widget = nullptr;
 
     std::unique_ptr<msc::MSCPlugin> m_plugin;
 };

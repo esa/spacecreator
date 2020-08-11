@@ -3,9 +3,6 @@ set(LIB_NAME libmsceditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-    asn1fileview.cpp
-    asn1fileview.h
-    asn1fileview.ui
     baseitems/arrowitem.cpp
     baseitems/arrowitem.h
     baseitems/common/abstractinteractiveobject.h

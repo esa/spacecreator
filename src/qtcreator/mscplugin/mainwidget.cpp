@@ -214,7 +214,7 @@ void MainWidget::initUi()
     m_documentTree = new msc::DocumentTreeView(this);
     m_documentTree->header()->setVisible(true);
 
-    m_asn1Widget = new msc::ASN1FileView(this);
+    m_asn1Widget = new asn1::ASN1FileView(this);
 
     m_leftVerticalSplitter = new Core::MiniSplitter(Qt::Vertical);
     m_leftVerticalSplitter->addWidget(m_documentTree);
@@ -255,8 +255,9 @@ void MainWidget::initConnections()
         QFileInfo fileInfo(filename);
         m_asn1Widget->setDirectory(fileInfo.absolutePath());
     });
-    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Widget, &msc::ASN1FileView::setFileName);
-    connect(m_asn1Widget, &msc::ASN1FileView::asn1Selected, this, [this](QString fileName) {
+    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Widget,
+            &asn1::ASN1FileView::setFileName);
+    connect(m_asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this](QString fileName) {
         msc::MscModel *model = m_plugin->mainModel()->mscModel();
         if (model && model->dataDefinitionString() != m_asn1Widget->fileName()) {
             const QVariantList params { QVariant::fromValue(model), m_asn1Widget->fileName(), "ASN.1" };

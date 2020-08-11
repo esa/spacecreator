@@ -139,7 +139,7 @@
       <number>5</number>
      </property>
      <item row="0" column="0">
-      <widget class="msc::ASN1FileView" name="asn1Widget" native="true"/>
+      <widget class="asn1::ASN1FileView" name="asn1Widget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -159,7 +159,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>msc::DocumentTreeView</class>
+   <class>asn1::DocumentTreeView</class>
    <extends>QTreeView</extends>
    <header>documenttreeview.h</header>
   </customwidget>

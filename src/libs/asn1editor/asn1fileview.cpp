@@ -27,7 +27,7 @@
 #include <QFileInfo>
 #include <QFontDatabase>
 
-namespace msc {
+namespace asn1 {
 
 /*!
   \class msc::ASN1FileView

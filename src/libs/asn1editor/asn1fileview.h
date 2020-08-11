@@ -25,7 +25,7 @@ namespace Ui {
 class ASN1FileView;
 }
 
-namespace msc {
+namespace asn1 {
 
 class ASN1FileView : public QWidget
 {

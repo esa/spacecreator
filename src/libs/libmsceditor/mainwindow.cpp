@@ -447,8 +447,8 @@ void MainWindow::initConnections()
         d->ui->asn1Widget->setDirectory(fileInfo.absolutePath());
     });
     connect(d->m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, d->ui->asn1Widget,
-            &msc::ASN1FileView::setFileName);
-    connect(d->ui->asn1Widget, &msc::ASN1FileView::asn1Selected, this, [this]() {
+            &asn1::ASN1FileView::setFileName);
+    connect(d->ui->asn1Widget, &asn1::ASN1FileView::asn1Selected, this, [this]() {
         msc::MscModel *model = d->m_plugin->mainModel()->mscModel();
         if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
             const QVariantList params { QVariant::fromValue(model), d->ui->asn1Widget->fileName(), "ASN.1" };
