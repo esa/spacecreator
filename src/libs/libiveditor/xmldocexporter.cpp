@@ -223,9 +223,11 @@ QHash<QString, QVariant> XmlDocExporter::collectInterfaceObjects(InterfaceDocume
     }
 
     // Add meta-data
-    const QString asn1FileName = doc->asn1FileName();
-    if (!asn1FileName.isEmpty()) {
-        grouppedObjects["Asn1FileName"] = QVariant::fromValue(asn1FileName);
+    if (!doc->asn1FileName().isEmpty()) {
+        grouppedObjects["Asn1FileName"] = QVariant::fromValue(doc->asn1FileName());
+    }
+    if (!doc->mscFileName().isEmpty()) {
+        grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());
     }
 
     return grouppedObjects;

@@ -71,8 +71,7 @@ void DataTypesStorage::init()
 
     std::unique_ptr<Asn1Acn::File> dummy;
     m_instance = new DataTypesStorage(dummy);
-    const QString &asnFilePath = ensureAsnFileExists();
-    m_instance->setFileName(asnFilePath);
+    m_instance->loadDefault();
 }
 
 DataTypesStorage *DataTypesStorage::instance()
@@ -101,6 +100,15 @@ void DataTypesStorage::setFileName(const QFileInfo &fileName)
 const QFileInfo &DataTypesStorage::fileName() const
 {
     return m_fileName;
+}
+
+/*!
+   Loads the default ASN1 data
+ */
+void DataTypesStorage::loadDefault()
+{
+    const QString &asnFilePath = ensureAsnFileExists();
+    m_instance->setFileName(asnFilePath);
 }
 
 /*!

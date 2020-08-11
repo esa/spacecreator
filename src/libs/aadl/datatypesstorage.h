@@ -44,6 +44,8 @@ public:
     Q_SLOT void setFileName(const QFileInfo &fileName);
     const QFileInfo &fileName() const;
 
+    void loadDefault();
+
     Q_SLOT bool loadFile();
 
     void clear();

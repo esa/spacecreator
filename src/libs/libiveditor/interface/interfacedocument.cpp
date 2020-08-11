@@ -44,6 +44,7 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QGraphicsItem>
@@ -155,6 +156,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QQueue<aadl::AADLObject *> rmQueu;
     QRectF desktopGeometry;
     QRectF prevItemsRect;
+
+    QString mscFileName;
 };
 
 /*!
@@ -283,6 +286,24 @@ QString InterfaceDocument::path() const
 QString InterfaceDocument::asn1FileName() const
 {
     return aadl::DataTypesStorage::instance()->fileName().fileName();
+}
+
+/*!
+   Sets the name of the associated msc file. This is only the file name without a path. The File is expected to be next
+   to the aadl file
+ */
+void InterfaceDocument::setMscFileName(const QString &mscfile)
+{
+    d->mscFileName = mscfile;
+}
+
+/*!
+   Returns the name of the associated msc file. This is only the file name without a path. The File is expected to be
+   next to the aadl file
+ */
+const QString &InterfaceDocument::mscFileName() const
+{
+    return d->mscFileName;
 }
 
 bool InterfaceDocument::isDirty() const
@@ -527,6 +548,16 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
+    connect(&parser, &aadl::AADLXMLReader::metadataParsed, this, [this, path](const QVariantMap &metadata) {
+        if (metadata.contains("asn1file")) {
+            QFileInfo fi(path);
+            fi.setFile(fi.absolutePath() + QDir::separator() + metadata["asn1file"].toString());
+            aadl::DataTypesStorage::instance()->setFileName(fi);
+        } else {
+            aadl::DataTypesStorage::instance()->loadDefault();
+        }
+        setMscFileName(metadata["mscfile"].toString());
+    });
     connect(&parser, &aadl::AADLXMLReader::error, [](const QString &msg) { qWarning() << msg; });
 
     return parser.readFile(path);

@@ -20,6 +20,7 @@
 #include "aadlobject.h"
 
 #include <QObject>
+#include <QVariantMap>
 #include <QVector>
 #include <memory>
 
@@ -46,6 +47,7 @@ public:
 
 Q_SIGNALS:
     void objectsParsed(const QVector<aadl::AADLObject *> &objects);
+    void metadataParsed(const QVariantMap &metadata);
     void error(const QString &msg);
 
 private:

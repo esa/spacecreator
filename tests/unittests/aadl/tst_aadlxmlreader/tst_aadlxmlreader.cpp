@@ -36,6 +36,7 @@ private Q_SLOTS:
     void test_emptyInterfaceViewDoc();
     void test_singleItems();
     void test_allItems();
+    void test_readMetaData();
 };
 
 XMLReader::XMLReader()
@@ -100,6 +101,29 @@ void XMLReader::test_allItems()
 {
     for (auto xml : { XmlHelper::instance()->AllItems })
         runReader(xml);
+}
+
+void XMLReader::test_readMetaData()
+{
+    QByteArray xml("<InterfaceView asn1file=\"dataview.asn\" mscfile=\"newfile.msc\"/>");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    QVariantMap metadata;
+    aadl::AADLXMLReader reader;
+    connect(&reader, &aadl::AADLXMLReader::metadataParsed, this,
+            [&metadata](const QVariantMap &data) { metadata = data; });
+
+    QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+
+    QCOMPARE(spyError.count(), 0);
+    QCOMPARE(metadata.count(), 2);
+    QCOMPARE(metadata["asn1file"].toString(), QString("dataview.asn"));
+    QCOMPARE(metadata["mscfile"].toString(), QString("newfile.msc"));
 }
 
 QTEST_APPLESS_MAIN(XMLReader)

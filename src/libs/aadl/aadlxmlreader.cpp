@@ -90,6 +90,7 @@ private:
 typedef QHash<QString, QHash<QString, AADLObjectIface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
 struct AADLXMLReaderPrivate {
     QVector<AADLObject *> m_allObjects {};
+    QVariantMap m_metaData;
     QHash<QString, AADLObjectFunctionType *> m_functionNames {};
     IfacesByFunction m_ifaceRequiredNames {};
     IfacesByFunction m_ifaceProvidedNames {};
@@ -156,6 +157,7 @@ bool AADLXMLReader::read(QIODevice *openForRead)
     if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
         if (readXml(openForRead)) {
             Q_EMIT objectsParsed(d->m_allObjects);
+            Q_EMIT metadataParsed(d->m_metaData);
             return true;
         }
     }
@@ -179,6 +181,10 @@ bool AADLXMLReader::readXml(QIODevice *in)
 
 bool AADLXMLReader::readInterfaceView(QXmlStreamReader &xml)
 {
+    for (const QXmlStreamAttribute &attribute : xml.attributes()) {
+        d->m_metaData[attribute.name().toString()] = QVariant::fromValue(attribute.value().toString());
+    }
+
     while (!xml.atEnd()) {
         if (xml.hasError()) {
             qWarning() << xml.errorString();

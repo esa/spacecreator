@@ -22,6 +22,7 @@
 
 #include <QPointer>
 #include <QQueue>
+#include <QVariantMap>
 
 class QMenu;
 class QToolBar;
@@ -63,7 +64,11 @@ public:
     void close();
 
     QString path() const;
+
     QString asn1FileName() const;
+
+    void setMscFileName(const QString &mscfile);
+    const QString &mscFileName() const;
 
     bool isDirty() const;
 

@@ -8,7 +8,7 @@ conn        :   |_ Instance of connection
 Comments    : List of all available NON-nested comments (provided by application)
 comm        :   |_ Instance of comment
 {% endcomment %}
-<InterfaceView{% if Asn1FileName %} asn1file="{{ Asn1FileName }}"{% endif %}>
+<InterfaceView{% if Asn1FileName %} asn1file="{{ Asn1FileName }}"{% endif %}{% if MscFileName %} mscfile="{{ MscFileName }}"{% endif %}>
 {% for func in Functions %}
     {% include "function.tmplt" %}
 {% endfor %}
