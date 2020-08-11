@@ -18,9 +18,7 @@
 #include "asn1fileview.h"
 
 #include "asn1xmlparser.h"
-#include "commands/common/commandsstack.h"
 #include "file.h"
-#include "mscmodel.h"
 #include "ui_asn1fileview.h"
 
 #include <QDebug>
@@ -58,46 +56,38 @@ QSize ASN1FileView::sizeHint() const
 }
 
 /*!
- * Set the model of this widget to \a model.
- *
- * This will not delete the old model.
+   Returns the asn1 file name without any path.
  */
-void ASN1FileView::setModel(msc::MscModel *model)
+QString ASN1FileView::fileName() const
 {
-    if (model == m_model)
-        return;
-
-    if (m_model) {
-        m_model->disconnect(this);
-    }
-
-    m_model = model;
-    if (m_model)
-        connect(m_model, &msc::MscModel::dataDefinitionStringChanged, this, &ASN1FileView::updateView);
-
-    updateView();
+    return ui->filenameLabel->text();
 }
 
 /*!
  * Update the current directory to \a directory.
  */
-void ASN1FileView::setCurrentDirectory(const QString &directory)
+void ASN1FileView::setDirectory(const QString &directory)
 {
-    m_currentDirectory = directory;
-    updateView();
+    m_directory = directory;
+    fillPreview();
 }
 
 /*!
- * Update the view and fill the preview.
+   Sets the file name without any path.
  */
-void ASN1FileView::updateView()
+void ASN1FileView::setFileName(const QString &fileName)
 {
-    ui->filenameLabel->clear();
+    ui->filenameLabel->setText(fileName);
+    fillPreview();
+}
 
-    if (!m_model)
-        return;
-
-    ui->filenameLabel->setText(m_model->dataDefinitionString());
+/*!
+   Sets the ASN1 full file name including the path.
+ */
+void ASN1FileView::setFile(const QFileInfo &file)
+{
+    m_directory = file.absolutePath();
+    ui->filenameLabel->setText(file.fileName());
     fillPreview();
 }
 
@@ -108,55 +98,30 @@ void ASN1FileView::updateView()
  */
 void ASN1FileView::selectFile()
 {
-    if (!m_model)
-        return;
-
     QString file =
             QFileDialog::getOpenFileName(this, tr("ASN.1 file"), QString(), QStringLiteral("ASN1 files (*.asn *.ASN)"));
     if (!file.isEmpty()) {
         QFileInfo fi(file);
-        if (m_model->dataDefinitionString() != fi.fileName()) {
-            const QVariantList params { QVariant::fromValue(m_model.data()), fi.fileName(), "ASN.1" };
-            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-            fillPreview(file);
+        if (ui->filenameLabel->text() != fi.fileName()) {
+            setFile(fi);
+            Q_EMIT asn1Selected(file);
         }
-        Q_EMIT asn1Selected(file);
     }
 }
 
 /*!
- * Show the contents in the preview
+ * Show the contents of the ASN1 file in the preview
  */
 void ASN1FileView::fillPreview()
 {
-    if (!m_model->dataDefinitionString().isEmpty()) {
-        QString filename = m_currentDirectory + QDir::separator() + m_model->dataDefinitionString();
-        fillPreview(filename);
-    } else
-        ui->textEdit->clear();
-}
-
-/*!
- * \brief ASN1FileView::fillPreview Open a file and use this for the preview.
- * \param filename The filename to open.
- */
-void ASN1FileView::fillPreview(const QString &filename)
-{
+    QString filename = m_directory + QDir::separator() + ui->filenameLabel->text();
     QFileInfo fi(filename);
     if (!fi.exists()) {
+        ui->textEdit->clear();
         return;
     }
 
     asn1::Asn1XMLParser parser;
-    QStringList errorMessages;
-    std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(QFileInfo(filename), &errorMessages);
-    if (!errorMessages.isEmpty()) {
-        qWarning() << "Asn.1 file" << filename << "is invalid";
-        return;
-    }
-
-    m_model->setAsn1TypesData(std::move(types));
-
     QString html = parser.asn1AsHtml(filename);
     if (html.isEmpty()) {
         QFile file(filename);

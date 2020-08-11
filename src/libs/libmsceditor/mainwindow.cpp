@@ -362,7 +362,6 @@ void MainWindow::setupUi()
 
     d->ui->documentTreeView->setModel(d->m_plugin->mainModel()->documentItemModel());
     d->mscTextBrowser->setModel(d->m_plugin->mainModel()->mscModel());
-    d->ui->asn1Widget->setModel(d->m_plugin->mainModel()->mscModel());
 
     initActions();
 
@@ -435,7 +434,6 @@ void MainWindow::initConnections()
 
     connect(d->m_plugin->mainModel(), &MainModel::modelDataChanged, this, &MainWindow::updateModel);
     connect(d->m_plugin->mainModel(), &MainModel::modelUpdated, this, &MainWindow::updateModel);
-    connect(d->m_plugin->mainModel(), &MainModel::modelUpdated, d->ui->asn1Widget, &ASN1FileView::setModel);
 
     connect(d->m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MainWindow::showSelection);
@@ -443,11 +441,20 @@ void MainWindow::initConnections()
     connect(d->m_plugin->mainModel()->undoStack(), &QUndoStack::indexChanged, this, &MainWindow::updateTitles);
     connect(d->m_plugin->mainModel(), &MainModel::lasteSaveUndoChange, this, &MainWindow::updateTitles);
 
+    // ASN1 view
     connect(d->m_plugin->mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
-        d->ui->asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
+        d->ui->asn1Widget->setDirectory(fileInfo.absolutePath());
     });
-
+    connect(d->m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, d->ui->asn1Widget,
+            &msc::ASN1FileView::setFileName);
+    connect(d->ui->asn1Widget, &msc::ASN1FileView::asn1Selected, this, [this]() {
+        msc::MscModel *model = d->m_plugin->mainModel()->mscModel();
+        if (model->dataDefinitionString() != d->ui->asn1Widget->fileName()) {
+            const QVariantList params { QVariant::fromValue(model), d->ui->asn1Widget->fileName(), "ASN.1" };
+            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        }
+    });
     connect(d->m_plugin->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
 }
 

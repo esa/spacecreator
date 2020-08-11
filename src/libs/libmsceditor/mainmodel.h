@@ -85,6 +85,7 @@ Q_SIGNALS:
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
     void lasteSaveUndoChange();
     void currentFilePathChanged(const QString &);
+    void asn1FileNameChanged(const QString &);
     void asn1ParameterErrorDetected(const QStringList &faultyMessages);
 
 public Q_SLOTS:

@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include <QPointer>
 #include <QWidget>
+
+class QFileInfo;
 
 namespace Ui {
 class ASN1FileView;
 }
 
 namespace msc {
-class MscModel;
 
 class ASN1FileView : public QWidget
 {
@@ -37,23 +37,23 @@ public:
 
     QSize sizeHint() const override;
 
+    QString fileName() const;
+
 public Q_SLOTS:
-    void setModel(msc::MscModel *model);
-    void setCurrentDirectory(const QString &directory);
+    void setDirectory(const QString &directory);
+    void setFileName(const QString &fileName);
+    void setFile(const QFileInfo &file);
 
 Q_SIGNALS:
     void asn1Selected(const QString &fileName);
 
 private Q_SLOTS:
-    void updateView();
     void selectFile();
     void fillPreview();
-    void fillPreview(const QString &filename);
 
 private:
     Ui::ASN1FileView *ui;
-    QPointer<msc::MscModel> m_model;
-    QString m_currentDirectory; // directory of the current MSC file
+    QString m_directory;
 };
 
 }

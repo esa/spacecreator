@@ -535,9 +535,12 @@ void MainModel::setNewModel(MscModel *model)
     showFirstChart();
     d->m_hierarchyModel.setModel(d->m_mscModel);
 
+    readAsn1Types();
     connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::readAsn1Types);
+    connect(d->m_mscModel, &msc::MscModel::dataDefinitionStringChanged, this, &msc::MainModel::asn1FileNameChanged);
 
     Q_EMIT modelUpdated(d->m_mscModel);
+    Q_EMIT asn1FileNameChanged(d->m_mscModel->dataDefinitionString());
 }
 
 QFileInfo MainModel::asn1File() const

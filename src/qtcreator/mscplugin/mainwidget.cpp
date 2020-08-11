@@ -19,6 +19,7 @@
 
 #include "asn1fileview.h"
 #include "chartlayoutmanager.h"
+#include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "documenttreeview.h"
 #include "graphicsview.h"
@@ -232,7 +233,6 @@ void MainWidget::initUi()
     layout()->setMargin(0);
 
     m_documentTree->setModel(m_plugin->mainModel()->documentItemModel());
-    m_asn1Widget->setModel(m_plugin->mainModel()->mscModel());
 }
 
 void MainWidget::initConnections()
@@ -242,8 +242,6 @@ void MainWidget::initConnections()
 
     connect(m_plugin->mainModel(), &msc::MainModel::selectedDocumentChanged, m_documentTree,
             &msc::DocumentTreeView::setSelectedDocument);
-
-    connect(m_plugin->mainModel(), &msc::MainModel::modelUpdated, m_asn1Widget, &msc::ASN1FileView::setModel);
 
     connect(m_plugin->mainModel()->documentItemModel(), &msc::DocumentItemModel::dataChanged, this,
             &MainWidget::showSelection);
@@ -255,10 +253,17 @@ void MainWidget::initConnections()
 
     connect(m_plugin->mainModel(), &msc::MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
-        m_asn1Widget->setCurrentDirectory(fileInfo.absolutePath());
+        m_asn1Widget->setDirectory(fileInfo.absolutePath());
     });
-
-    connect(m_asn1Widget, &msc::ASN1FileView::asn1Selected, this, &MscPlugin::MainWidget::asn1Selected);
+    connect(m_plugin->mainModel(), &msc::MainModel::asn1FileNameChanged, m_asn1Widget, &msc::ASN1FileView::setFileName);
+    connect(m_asn1Widget, &msc::ASN1FileView::asn1Selected, this, [this](QString fileName) {
+        msc::MscModel *model = m_plugin->mainModel()->mscModel();
+        if (model && model->dataDefinitionString() != m_asn1Widget->fileName()) {
+            const QVariantList params { QVariant::fromValue(model), m_asn1Widget->fileName(), "ASN.1" };
+            msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
+        }
+        Q_EMIT asn1Selected(fileName);
+    });
     connect(m_plugin->mainModel(), &msc::MainModel::asn1ParameterErrorDetected, this, &MainWidget::showAsn1Errors);
 }
 
