@@ -49,6 +49,8 @@ enum Id
     ChangeRequiredIfaceProperty,
     ChangeIfaceAttribute,
 
+    ChangeAsn1File,
+
     LastId
 };
 

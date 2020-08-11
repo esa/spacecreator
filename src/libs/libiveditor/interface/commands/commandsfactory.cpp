@@ -19,6 +19,7 @@
 
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
+#include "cmdchangeasn1file.h"
 #include "cmdcommentitemcreate.h"
 #include "cmdconnectionitemcreate.h"
 #include "cmdcontextparameterchange.h"
@@ -42,6 +43,7 @@
 #include "cmdrequiredifacepropertychange.h"
 #include "cmdrootentitychange.h"
 #include "commandids.h"
+#include "interface/interfacedocument.h"
 
 #include <QRect>
 #include <QVariant>
@@ -106,6 +108,9 @@ QUndoCommand *CommandsFactory::create(Id id, const QVariantList &params)
         return cmd::CommandsFactory::changeRiPropertyCommand(params);
     case cmd::ChangeIfaceAttribute:
         return cmd::CommandsFactory::changeIfaceAttributeCommand(params);
+
+    case cmd::ChangeAsn1File:
+        return cmd::CommandsFactory::changeAsn1File(params);
 
     default:
         qWarning() << "CommandsStack::push - command ignored" << id;
@@ -419,6 +424,24 @@ QUndoCommand *CommandsFactory::autoLayoutEntityCommand(const QVariantList &param
         }
     }
     return new CmdEntityAutoLayout(objectsData);
+}
+
+QUndoCommand *CommandsFactory::changeAsn1File(const QVariantList &params)
+{
+    if (params.size() != 2) {
+        return nullptr;
+    }
+
+    auto document = params[0].value<aadlinterface::InterfaceDocument *>();
+    if (!document) {
+        return nullptr;
+    }
+    QString fileName = params[1].toString();
+    if (fileName.isNull()) {
+        return nullptr;
+    }
+
+    return new CmdChangeAsn1File(document, fileName);
 }
 
 }

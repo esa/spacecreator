@@ -65,6 +65,7 @@ public Q_SLOTS:
     void onDocDirtyChanged(bool dirty);
     void onGraphicsViewInfo(const QString &info);
     void updateWindowTitle();
+    void openAsn1Dialog();
 
 private:
     bool closeFile();

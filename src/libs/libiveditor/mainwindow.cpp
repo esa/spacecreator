@@ -18,11 +18,13 @@
 #include "mainwindow.h"
 
 #include "aadlobjectfunctiontype.h"
+#include "asn1dialog.h"
 #include "baseitems/common/aadlutils.h"
 #include "commandsstack.h"
 #include "common.h"
 #include "context/action/actionsmanager.h"
 #include "endtoendview.h"
+#include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "iveditorplugin.h"
 #include "minimap.h"
@@ -42,6 +44,7 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTabWidget>
+#include <QUndoCommand>
 #include <QUndoGroup>
 
 namespace aadlinterface {
@@ -348,6 +351,28 @@ void MainWindow::onGraphicsViewInfo(const QString &info)
 void MainWindow::updateWindowTitle()
 {
     setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_document->title()));
+}
+
+/*!
+   Show the dialog to set the ASN1 file
+ */
+void MainWindow::openAsn1Dialog()
+{
+    Asn1Dialog dialog;
+    QFileInfo fi(m_document->path());
+    fi.setFile(fi.absolutePath() + "/" + m_document->asn1FileName());
+    dialog.setFile(fi);
+    dialog.show();
+    int result = dialog.exec();
+    if (result == QDialog::Accepted) {
+        if (m_document->asn1FileName() != dialog.fileName()) {
+            QVariantList params { QVariant::fromValue(m_document), QVariant::fromValue(dialog.fileName()) };
+            QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
+            if (command) {
+                cmd::CommandsStack::current()->push(command);
+            }
+        }
+    }
 }
 
 /*!

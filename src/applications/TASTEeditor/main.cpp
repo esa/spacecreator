@@ -28,6 +28,7 @@
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
     aadlinterface::initIvEditor();
 

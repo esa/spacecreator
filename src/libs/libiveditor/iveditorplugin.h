@@ -24,12 +24,14 @@ public:
     void populateCommandLineArguments(shared::CommandLineParser *parser) const override;
 
     QAction *actionSaveSceneRender() { return m_actionSaveSceneRender; }
+    QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
 
 private:
     GraphicsView *m_graphicsView;
     QToolBar *m_docToolBar;
 
     QAction *m_actionSaveSceneRender { nullptr };
+    QAction *m_actionShowAsnDialog { nullptr };
 };
 
 }

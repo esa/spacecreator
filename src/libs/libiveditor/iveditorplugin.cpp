@@ -48,9 +48,11 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
     m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), mainWindow, &MainWindow::onSaveRenderRequested);
+    m_actionShowAsnDialog = menu->addAction(tr("ASN1 dialog..."), mainWindow, &MainWindow::openAsn1Dialog);
 
     ActionsManager::registerAction(
             Q_FUNC_INFO, m_actionSaveSceneRender, "Render", "Save current scene complete render.");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
 }
 
 void IVEditorPlugin::addMenuEditActions(QMenu * /*menu*/, QMainWindow * /*window*/)

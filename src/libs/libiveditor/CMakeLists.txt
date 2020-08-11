@@ -59,6 +59,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/colors/colormanagerdialog.ui
     interface/colors/colorselectorbutton.cpp
     interface/colors/colorselectorbutton.h
+    interface/commands/cmdchangeasn1file.cpp
+    interface/commands/cmdchangeasn1file.h
     interface/commands/cmdcommentitemcreate.cpp
     interface/commands/cmdcommentitemcreate.h
     interface/commands/cmdconnectionitemcreate.cpp
@@ -165,6 +167,9 @@ target_sources(${LIB_NAME} PRIVATE
     templating/exportableaadliface.h
     templating/exportableaadlobject.cpp
     templating/exportableaadlobject.h
+    asn1dialog.cpp
+    asn1dialog.h
+    asn1dialog.ui
     commandsstack.cpp
     commandsstack.h
     endtoendview.cpp

@@ -54,6 +54,7 @@ private:
     static QUndoCommand *changeIfaceAttributeCommand(const QVariantList &params);
     static QUndoCommand *changeRootEntityCommand(const QVariantList &params);
     static QUndoCommand *autoLayoutEntityCommand(const QVariantList &params);
+    static QUndoCommand *changeAsn1File(const QVariantList &params);
 
 private:
     CommandsFactory() = delete;
