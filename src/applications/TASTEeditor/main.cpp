@@ -16,7 +16,6 @@
 */
 
 #include "commandlineparser.h"
-#include "datatypesstorage.h"
 #include "iveditor.h"
 #include "iveditorplugin.h"
 #include "mainwindow.h"
@@ -37,8 +36,6 @@ int main(int argc, char *argv[])
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
     a.setApplicationVersion(SC_VERSION);
     a.setApplicationName("TASTE Editor");
-
-    aadl::DataTypesStorage::init();
 
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())

@@ -21,6 +21,7 @@
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
 #include "commandsstack.h"
+#include "datatypesstorage.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
@@ -82,6 +83,11 @@ const aadl::AADLObject *ContextParametersModel::dataObject() const
     return m_dataObject;
 }
 
+void ContextParametersModel::setDataTypes(aadl::DataTypesStorage *dataTypes)
+{
+    m_dataTypes = dataTypes;
+}
+
 int ContextParametersModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
@@ -140,7 +146,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             break;
         }
         case ColumnValue: {
-            if (!paramNew.setDefaultValue(value))
+            if (!paramNew.setDefaultValue(m_dataTypes.data(), value))
                 return false;
             break;
         }

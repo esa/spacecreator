@@ -31,6 +31,7 @@ class QUndoStack;
 namespace aadl {
 class AADLObject;
 class AADLObjectsModel;
+class DataTypesStorage;
 }
 
 namespace aadlinterface {
@@ -65,6 +66,7 @@ public:
 
     QString path() const;
 
+    void setAsn1FileName(const QString &asnfile);
     QString asn1FileName() const;
 
     void setMscFileName(const QString &mscfile);
@@ -78,6 +80,9 @@ public:
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     aadl::AADLObjectsModel *objectsModel() const;
+
+    aadl::DataTypesStorage *asn1DataTypes() const;
+
     QString supportedFileExtensions() const;
 
 Q_SIGNALS:

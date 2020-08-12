@@ -28,6 +28,8 @@ class Type;
 
 namespace aadl {
 
+class DataTypesStorage;
+
 class BasicParameter
 {
     Q_GADGET
@@ -67,22 +69,20 @@ protected:
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
 
-    const Asn1Acn::Types::Type *m_basicDataType { nullptr };
-
-    bool isValidValue(const QVariant &value) const;
+    bool isValidValue(aadl::DataTypesStorage *dataTypes, const QVariant &value) const;
 };
 
 class ContextParameter : public BasicParameter
 {
     Q_GADGET
-    Q_PROPERTY(QVariant defaultValue READ defaultValue WRITE setDefaultValue)
+    Q_PROPERTY(QVariant defaultValue READ defaultValue)
 public:
     ContextParameter(const QString &name = QString(), Type t = BasicParameter::Type::Other,
             const QString &paramTypeName = QString(), const QVariant &val = QVariant());
     ~ContextParameter() override;
 
     QVariant defaultValue() const;
-    bool setDefaultValue(const QVariant &value);
+    bool setDefaultValue(DataTypesStorage *dataTypes, const QVariant &value);
 
     bool operator==(const ContextParameter &other) const;
 

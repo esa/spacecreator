@@ -28,15 +28,16 @@ namespace aadlinterface {
 const char *MODEL_INDEX_PROPERTY = "modelIndex";
 const char *DIALOG_PROPERTY = "dialog";
 
-Asn1ValueDelegate::Asn1ValueDelegate(QObject *parent)
+Asn1ValueDelegate::Asn1ValueDelegate(const aadl::DataTypesStorage *asn1Types, QObject *parent)
     : QStyledItemDelegate(parent)
+    , m_asn1Types(asn1Types)
 {
 }
 
 QWidget *Asn1ValueDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
-    auto dialog = new asn1::Asn1Editor(aadl::DataTypesStorage::instance()->asn1DataTypes(), parent);
+    auto dialog = new asn1::Asn1Editor(m_asn1Types->asn1DataTypes(), parent);
     dialog->setProperty(MODEL_INDEX_PROPERTY, QVariant(index));
     dialog->setModal(true);
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);

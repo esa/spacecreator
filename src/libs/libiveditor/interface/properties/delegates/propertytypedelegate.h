@@ -19,13 +19,17 @@
 
 #include "comboboxdelegate.h"
 
+namespace aadl {
+class DataTypesStorage;
+}
+
 namespace aadlinterface {
 
 class PropertyTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
-    PropertyTypeDelegate(QObject *parent = nullptr);
+    PropertyTypeDelegate(const aadl::DataTypesStorage *dataTypes, QObject *parent = nullptr);
     ~PropertyTypeDelegate() override;
 };
 

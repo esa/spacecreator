@@ -25,9 +25,9 @@
 
 namespace aadlinterface {
 
-static QStringList initNames()
+static QStringList initNames(const aadl::DataTypesStorage *dataTypes)
 {
-    const std::unique_ptr<Asn1Acn::File> &types = aadl::DataTypesStorage::instance()->asn1DataTypes();
+    const std::unique_ptr<Asn1Acn::File> &types = dataTypes->asn1DataTypes();
     QStringList names;
     for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
         for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
@@ -41,8 +41,8 @@ static QStringList initNames()
     return names;
 }
 
-PropertyTypeDelegate::PropertyTypeDelegate(QObject *parent)
-    : StringListComboDelegate(initNames(), parent)
+PropertyTypeDelegate::PropertyTypeDelegate(const aadl::DataTypesStorage *dataTypes, QObject *parent)
+    : StringListComboDelegate(initNames(dataTypes), parent)
 {
 }
 

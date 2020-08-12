@@ -18,7 +18,6 @@
 #include "cmdchangeasn1file.h"
 
 #include "commandids.h"
-#include "datatypesstorage.h"
 #include "interface/interfacedocument.h"
 
 #include <QDir>
@@ -54,7 +53,7 @@ void CmdChangeAsn1File::setFile(const QString &fileName)
 {
     QFileInfo fi(m_document->path());
     fi.setFile(fi.absolutePath() + QDir::separator() + fileName);
-    aadl::DataTypesStorage::instance()->setFileName(fi);
+    m_document->setAsn1FileName(fi.fileName());
 }
 
 } // namespace cmd

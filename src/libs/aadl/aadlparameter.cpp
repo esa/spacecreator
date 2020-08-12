@@ -82,17 +82,6 @@ bool BasicParameter::setParamType(const BasicParameter::Type &type)
         setParamTypeName(typeName(m_paramType));
     }
 
-    m_basicDataType = nullptr;
-
-    const std::unique_ptr<Asn1Acn::File> &types = DataTypesStorage::instance()->asn1DataTypes();
-    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
-        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
-            if (assignment->name() == m_typeName) {
-                m_basicDataType = assignment->type();
-            }
-        }
-    }
-
     return true;
 }
 
@@ -122,15 +111,19 @@ bool BasicParameter::operator==(const BasicParameter &other) const
     return m_paramName == other.m_paramName && m_paramType == other.m_paramType && m_typeName == other.m_typeName;
 }
 
-bool BasicParameter::isValidValue(const QVariant &value) const
+bool BasicParameter::isValidValue(DataTypesStorage *dataTypes, const QVariant &value) const
 {
-    if (!m_basicDataType) {
+    if (!dataTypes) {
+        return true;
+    }
+    const Asn1Acn::Types::Type *basicDataType = dataTypes->typeFromName(m_typeName);
+    if (!basicDataType) {
         return true;
     }
 
     asn1::Asn1ValueParser valueParser;
     bool ok;
-    valueParser.parseAsn1Value(m_basicDataType, value.toString(), &ok);
+    valueParser.parseAsn1Value(basicDataType, value.toString(), &ok);
     return ok;
 }
 
@@ -166,12 +159,12 @@ QVariant ContextParameter::defaultValue() const
     return (paramType() == Type::Timer) ? QVariant() : m_defaultValue;
 }
 
-bool ContextParameter::setDefaultValue(const QVariant &value)
+bool ContextParameter::setDefaultValue(DataTypesStorage *dataTypes, const QVariant &value)
 {
     if (paramType() == Type::Timer || m_defaultValue == value)
         return false;
 
-    if (!isValidValue(value))
+    if (!isValidValue(dataTypes, value))
         return false;
 
     m_defaultValue = value;

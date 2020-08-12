@@ -157,6 +157,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QRectF desktopGeometry;
     QRectF prevItemsRect;
 
+    aadl::DataTypesStorage *asnDataTypes { new aadl::DataTypesStorage() };
     QString mscFileName;
 };
 
@@ -187,6 +188,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
 
 InterfaceDocument::~InterfaceDocument()
 {
+    delete d->asnDataTypes;
     delete d->graphicsView;
     delete d->mutex;
     delete d;
@@ -281,11 +283,22 @@ QString InterfaceDocument::path() const
 }
 
 /*!
+  Sets the filename of the used asn1 file. This is only the file name without a path. The File is expected to be next
+   to the aadl file
+ */
+void InterfaceDocument::setAsn1FileName(const QString &asnfile)
+{
+    QFileInfo fi(d->filePath);
+    fi.setFile(fi.absolutePath() + QDir::separator() + asnfile);
+    d->asnDataTypes->setFileName(fi);
+}
+
+/*!
    Returns the filename of the used asn1 file. It does not contain any path.
  */
 QString InterfaceDocument::asn1FileName() const
 {
-    return aadl::DataTypesStorage::instance()->fileName().fileName();
+    return d->asnDataTypes->fileName().fileName();
 }
 
 /*!
@@ -350,6 +363,11 @@ const QHash<shared::Id, aadl::AADLObject *> &InterfaceDocument::objects() const
 aadl::AADLObjectsModel *InterfaceDocument::objectsModel() const
 {
     return d->model;
+}
+
+aadl::DataTypesStorage *InterfaceDocument::asn1DataTypes() const
+{
+    return d->asnDataTypes;
 }
 
 QString InterfaceDocument::supportedFileExtensions() const
@@ -515,7 +533,7 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
     aadlinterface::PropertiesDialog *dialog =
-            new aadlinterface::PropertiesDialog(obj, qobject_cast<QWidget *>(parent()));
+            new aadlinterface::PropertiesDialog(obj, d->asnDataTypes, qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -552,9 +570,9 @@ bool InterfaceDocument::loadImpl(const QString &path)
         if (metadata.contains("asn1file")) {
             QFileInfo fi(path);
             fi.setFile(fi.absolutePath() + QDir::separator() + metadata["asn1file"].toString());
-            aadl::DataTypesStorage::instance()->setFileName(fi);
+            d->asnDataTypes->setFileName(fi);
         } else {
-            aadl::DataTypesStorage::instance()->loadDefault();
+            d->asnDataTypes->loadDefault();
         }
         setMscFileName(metadata["mscfile"].toString());
     });

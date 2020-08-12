@@ -22,6 +22,7 @@
 #include "aadlobjectiface.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
+#include "datatypesstorage.h"
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/comboboxdelegate.h"
 #include "delegates/functionattrdelegate.h"
@@ -38,7 +39,7 @@
 
 namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, QWidget *parent)
+PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, aadl::DataTypesStorage *dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
@@ -46,6 +47,7 @@ PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, QWidget *parent)
               tr("Edit %1 - %2")
                       .arg(aadl::AADLNameValidator::nameOfType(m_dataObject->aadlType()).trimmed(),
                               m_dataObject->title())))
+    , m_dataTypes(dataTypes)
 {
     ui->setupUi(this);
 
@@ -133,13 +135,14 @@ void PropertiesDialog::initTabs()
 
     auto initContextParams = [this]() {
         ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
+        modelCtxParams->setDataTypes(m_dataTypes.data());
         modelCtxParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
+        viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::ColumnType,
+                new PropertyTypeDelegate(m_dataTypes.data(), viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
-                ContextParametersModel::ColumnType, new PropertyTypeDelegate(viewAttrs->tableView()));
-        viewAttrs->tableView()->setItemDelegateForColumn(
-                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(viewAttrs->tableView()));
+                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes.data(), viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
@@ -151,7 +154,7 @@ void PropertiesDialog::initTabs()
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
         viewAttrs->tableView()->setItemDelegateForColumn(
-                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes.data(), viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
                 new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
                         viewAttrs->tableView()));

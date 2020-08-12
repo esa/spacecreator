@@ -16,7 +16,6 @@
 */
 
 #include "commandlineparser.h"
-#include "datatypesstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
@@ -29,7 +28,6 @@ int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
     aadlinterface::initIvEditor();
-    aadl::DataTypesStorage::init();
 
     QCoreApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);

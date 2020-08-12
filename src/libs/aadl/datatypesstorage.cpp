@@ -32,8 +32,6 @@
 
 namespace aadl {
 
-DataTypesStorage *DataTypesStorage::m_instance = nullptr;
-
 static QString ensureAsnFileExists()
 {
     const QString asnFileName("taste-types.asn");
@@ -56,29 +54,17 @@ static QString ensureAsnFileExists()
     return QString();
 }
 
+DataTypesStorage::DataTypesStorage()
+{
+    loadDefault();
+}
+
 DataTypesStorage::DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
     : m_asn1DataTypes(std::move(dataTypes))
 {
 }
 
 DataTypesStorage::~DataTypesStorage() { }
-
-void DataTypesStorage::init()
-{
-    if (m_instance) {
-        return;
-    }
-
-    std::unique_ptr<Asn1Acn::File> dummy;
-    m_instance = new DataTypesStorage(dummy);
-    m_instance->loadDefault();
-}
-
-DataTypesStorage *DataTypesStorage::instance()
-{
-    init();
-    return m_instance;
-}
 
 const std::unique_ptr<Asn1Acn::File> &DataTypesStorage::asn1DataTypes() const
 {
@@ -108,7 +94,7 @@ const QFileInfo &DataTypesStorage::fileName() const
 void DataTypesStorage::loadDefault()
 {
     const QString &asnFilePath = ensureAsnFileExists();
-    m_instance->setFileName(asnFilePath);
+    setFileName(asnFilePath);
 }
 
 /*!
@@ -138,6 +124,21 @@ void DataTypesStorage::clear()
     m_fileName.setFile("");
     m_asn1DataTypes.reset();
     Q_EMIT dataTypesChanged();
+}
+
+/*!
+   Retruns the first type having the given \p name
+ */
+const Asn1Acn::Types::Type *DataTypesStorage::typeFromName(const QString &name) const
+{
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_asn1DataTypes->definitionsList()) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+            if (assignment->name() == name) {
+                return assignment->type();
+            }
+        }
+    }
+    return nullptr;
 }
 
 }

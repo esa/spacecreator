@@ -25,6 +25,10 @@
 
 namespace Asn1Acn {
 class File;
+
+namespace Types {
+class Type;
+}
 }
 
 namespace aadl {
@@ -33,11 +37,11 @@ class DataTypesStorage : public QObject
 {
     Q_OBJECT
 public:
+    DataTypesStorage();
     DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
     ~DataTypesStorage();
 
-    static void init();
-    static DataTypesStorage *instance();
+    void init();
 
     const std::unique_ptr<Asn1Acn::File> &asn1DataTypes() const;
 
@@ -50,12 +54,12 @@ public:
 
     void clear();
 
+    const Asn1Acn::Types::Type *typeFromName(const QString &name) const;
+
 Q_SIGNALS:
     void dataTypesChanged();
 
 private:
-    static DataTypesStorage *m_instance;
-
     std::unique_ptr<Asn1Acn::File> m_asn1DataTypes;
     QFileInfo m_fileName;
 };

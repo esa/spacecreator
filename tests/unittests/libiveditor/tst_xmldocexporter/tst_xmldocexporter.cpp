@@ -36,6 +36,7 @@ public:
 
 private:
     QByteArray testFileContent() const;
+    std::unique_ptr<aadlinterface::InterfaceDocument> m_doc;
 
 private Q_SLOTS:
     void init();
@@ -66,7 +67,8 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::init()
 {
-    aadl::DataTypesStorage::instance()->clear();
+    m_doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
+    m_doc->asn1DataTypes()->clear();
     if (QFile::exists(testFilePath)) {
         QFile::remove(testFilePath);
     }
@@ -81,8 +83,7 @@ void tst_XmlDocExporter::cleanup()
 
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
-    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QCOMPARE(text, expected);
@@ -90,16 +91,15 @@ void tst_XmlDocExporter::testExportEmptyDoc()
 
 void tst_XmlDocExporter::testExportFunctions()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
-    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
+    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", m_doc.get());
     testfunc1->setAttr("foo", QVariant::fromValue(11));
     testfunc1->setProp("bar", QVariant::fromValue(22));
 
     QVector<aadl::AADLObject *> objects;
     objects.append(testfunc1);
-    doc->setObjects(objects);
+    m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -112,16 +112,15 @@ void tst_XmlDocExporter::testExportFunctions()
 
 void tst_XmlDocExporter::testExportComment()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
-    auto testcomment1 = new aadl::AADLObjectComment("TestComment1", doc.get());
+    auto testcomment1 = new aadl::AADLObjectComment("TestComment1", m_doc.get());
     testcomment1->setAttr("foo", QVariant::fromValue(11));
     testcomment1->setProperty("bar", QVariant::fromValue(22)); // ignored for comment
 
     QVector<aadl::AADLObject *> objects;
     objects.append(testcomment1);
-    doc->setObjects(objects);
+    m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -132,16 +131,15 @@ void tst_XmlDocExporter::testExportComment()
 
 void tst_XmlDocExporter::testExportNestedComment()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
-    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", doc.get());
+    auto testfunc1 = new aadl::AADLObjectFunction("TestFunc1", m_doc.get());
     auto testcomment1 = new aadl::AADLObjectComment("TestComment1", testfunc1);
     testfunc1->addChild(testcomment1);
 
     QVector<aadl::AADLObject *> objects;
     objects.append(testfunc1);
-    doc->setObjects(objects);
+    m_doc->setObjects(objects);
 
-    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
@@ -154,10 +152,8 @@ void tst_XmlDocExporter::testExportNestedComment()
 
 void tst_XmlDocExporter::testExportAsn1File()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
-
-    aadl::DataTypesStorage::instance()->setFileName(QFileInfo("/some/path/fake.asn"));
-    aadlinterface::XmlDocExporter::exportDocSilently(doc.get(), testFilePath);
+    m_doc->setAsn1FileName("fake.asn");
+    aadlinterface::XmlDocExporter::exportDocSilently(m_doc.get(), testFilePath);
     QByteArray text = testFileContent();
 
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
@@ -166,10 +162,9 @@ void tst_XmlDocExporter::testExportAsn1File()
 
 void tst_XmlDocExporter::testExportToBuffer()
 {
-    auto doc = std::make_unique<aadlinterface::InterfaceDocument>(this);
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    bool ok = aadlinterface::XmlDocExporter::exportDoc(doc.get(), &buffer);
+    bool ok = aadlinterface::XmlDocExporter::exportDoc(m_doc.get(), &buffer);
     QCOMPARE(ok, true);
     QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QCOMPARE(buffer.data(), expected);

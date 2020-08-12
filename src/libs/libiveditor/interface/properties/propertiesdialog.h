@@ -20,6 +20,7 @@
 #include "commandsstack.h"
 
 #include <QDialog>
+#include <QPointer>
 
 namespace Ui {
 class PropertiesDialog;
@@ -27,6 +28,7 @@ class PropertiesDialog;
 
 namespace aadl {
 class AADLObject;
+class DataTypesStorage;
 }
 
 namespace aadlinterface {
@@ -36,7 +38,7 @@ class PropertiesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(aadl::AADLObject *obj, QWidget *parent = nullptr);
+    explicit PropertiesDialog(aadl::AADLObject *obj, aadl::DataTypesStorage *dataTypes, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
 public Q_SLOTS:
@@ -44,14 +46,13 @@ public Q_SLOTS:
     void done(int r) override;
 
 private:
-    Ui::PropertiesDialog *ui;
-    aadl::AADLObject *m_dataObject { nullptr };
-
     QString objectTypeName() const;
-
     void initTabs();
 
+    Ui::PropertiesDialog *ui;
+    aadl::AADLObject *m_dataObject { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
+    QPointer<aadl::DataTypesStorage> m_dataTypes;
 };
 
 }

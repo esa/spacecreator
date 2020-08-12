@@ -23,19 +23,26 @@ namespace asn1 {
 class Asn1Editor;
 }
 
+namespace aadl {
+class DataTypesStorage;
+}
+
 namespace aadlinterface {
 
 class Asn1ValueDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    Asn1ValueDelegate(QObject *parent = nullptr);
+    Asn1ValueDelegate(const aadl::DataTypesStorage *asn1Types, QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
 protected Q_SLOTS:
     void onDialogAccepted();
+
+private:
+    const aadl::DataTypesStorage *m_asn1Types = nullptr;
 };
 
 }
