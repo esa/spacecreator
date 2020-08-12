@@ -21,7 +21,11 @@
 
 #include <extensionsystem/iplugin.h>
 
+class QAction;
+
 namespace AadlPlugin {
+
+class AadlEditorFactory;
 
 class AadlPlugin : public ExtensionSystem::IPlugin
 {
@@ -35,6 +39,13 @@ public:
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
+
+public Q_SLOTS:
+    void showAsn1Dialog();
+
+private:
+    AadlEditorFactory *m_factory = nullptr;
+    QAction *m_asn1DialogAction = nullptr;
 };
 
 }

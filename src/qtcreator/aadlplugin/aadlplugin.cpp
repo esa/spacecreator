@@ -17,11 +17,18 @@
 
 #include "aadlplugin.h"
 
+#include "aadleditordata.h"
 #include "aadleditorfactory.h"
+#include "aadlpluginconstants.h"
 #include "iveditor.h"
 #include "sharedlibrary.h"
 
+#include <QAction>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/designmode.h>
+#include <editormanager/editormanager.h>
+#include <editormanager/ieditor.h>
 
 namespace AadlPlugin {
 
@@ -49,7 +56,27 @@ bool AadlPlugin::initialize(const QStringList &arguments, QString *errorString)
     Q_UNUSED(arguments)
     Q_UNUSED(errorString)
 
-    (void)new AadlEditorFactory(this);
+    auto editorManager = Core::EditorManager::instance();
+
+    m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
+    Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
+    connect(m_asn1DialogAction, &QAction::triggered, this, &AadlPlugin::showAsn1Dialog);
+
+    m_asn1DialogAction->setEnabled(false);
+    connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
+        if (editor && editor->document()) {
+            const bool isAadl = editor->document()->filePath().toString().endsWith(".xml", Qt::CaseInsensitive);
+            m_asn1DialogAction->setEnabled(isAadl);
+        }
+    });
+
+    Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::AADL_MENU_ID);
+    menu->menu()->setTitle(tr("AADLPlugin"));
+    menu->addAction(showAsn1Cmd);
+    menu->menu()->setEnabled(true);
+    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
+
+    m_factory = new AadlEditorFactory(this);
 
     return true;
 }
@@ -68,6 +95,11 @@ ExtensionSystem::IPlugin::ShutdownFlag AadlPlugin::aboutToShutdown()
     // Disconnect from signals that are not needed during shutdown
     // Hide UI (if you add UI that is not in the main window directly)
     return SynchronousShutdown;
+}
+
+void AadlPlugin::showAsn1Dialog()
+{
+    m_factory->editorData()->showAsn1Dialog();
 }
 
 }

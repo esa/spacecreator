@@ -37,13 +37,18 @@ AadlEditorFactory::AadlEditorFactory(QObject *parent)
 
 Core::IEditor *AadlEditorFactory::createEditor()
 {
+    return editorData()->createEditor();
+}
+
+AadlEditorData *AadlEditorFactory::editorData() const
+{
     if (!m_editorData) {
-        m_editorData = new AadlEditorData(this);
+        m_editorData = new AadlEditorData(const_cast<AadlEditorFactory *>(this));
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
         m_editorData->fullInit();
         QGuiApplication::restoreOverrideCursor();
     }
-    return m_editorData->createEditor();
+    return m_editorData;
 }
 
 }

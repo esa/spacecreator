@@ -17,7 +17,9 @@
 
 #include "aadlmainwidget.h"
 
+#include "asn1dialog.h"
 #include "commandsstack.h"
+#include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
 #include "iveditorplugin.h"
 #include "xmldocexporter.h"
@@ -103,6 +105,29 @@ QString AadlMainWidget::textContents() const
 QVector<QAction *> AadlMainWidget::toolActions() const
 {
     return m_actions;
+}
+
+/*!
+   Show the dialog to display and edit the uased ASN1 file
+ */
+void AadlMainWidget::showAsn1Dialog()
+{
+    aadlinterface::Asn1Dialog dialog;
+    QFileInfo fi(m_document->path());
+    fi.setFile(fi.absolutePath() + "/" + m_document->asn1FileName());
+    dialog.setFile(fi);
+    dialog.show();
+    int result = dialog.exec();
+    if (result == QDialog::Accepted) {
+        if (m_document->asn1FileName() != dialog.fileName()) {
+            QVariantList params { QVariant::fromValue(m_document), QVariant::fromValue(dialog.fileName()) };
+            QUndoCommand *command =
+                    aadlinterface::cmd::CommandsFactory::create(aadlinterface::cmd::ChangeAsn1File, params);
+            if (command) {
+                aadlinterface::cmd::CommandsStack::current()->push(command);
+            }
+        }
+    }
 }
 
 void AadlMainWidget::initUi()

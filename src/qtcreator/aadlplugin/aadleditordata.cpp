@@ -159,6 +159,16 @@ Core::IEditor *AadlEditorData::createEditor()
     return aadlEditor;
 }
 
+void AadlEditorData::showAsn1Dialog()
+{
+    auto editorManager = Core::EditorManager::instance();
+    Core::IDocument *currentDoc = editorManager->currentDocument();
+    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    if (document && document->designWidget()) {
+        document->designWidget()->showAsn1Dialog();
+    }
+}
+
 void AadlEditorData::updateToolBar()
 {
     auto designWidget = static_cast<AadlMainWidget *>(m_widgetStack->currentWidget());

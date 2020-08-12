@@ -43,6 +43,8 @@ public:
     void fullInit();
     Core::IEditor *createEditor();
 
+    void showAsn1Dialog();
+
 private:
     void updateToolBar();
     QWidget *createModeWidget();

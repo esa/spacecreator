@@ -71,8 +71,8 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     auto editorManager = Core::EditorManager::instance();
 
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
-    Core::Command *messageDeclCmd = Core::ActionManager::registerAction(
-            m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID, Core::Context(Core::Constants::C_GLOBAL));
+    Core::Command *messageDeclCmd =
+            Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
     connect(m_messageDeclarationAction, &QAction::triggered, this, &MscPluginPlugin::showMessageDeclarations);
 
     m_messageDeclarationAction->setEnabled(false);

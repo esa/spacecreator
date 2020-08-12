@@ -32,8 +32,10 @@ public:
 
     Core::IEditor *createEditor() override;
 
+    AadlEditorData *editorData() const;
+
 private:
-    AadlEditorData *m_editorData = nullptr;
+    mutable AadlEditorData *m_editorData = nullptr;
 };
 
 }

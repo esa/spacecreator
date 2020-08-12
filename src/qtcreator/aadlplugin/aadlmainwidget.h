@@ -53,7 +53,7 @@ public:
     QVector<QAction *> toolActions() const;
     QVector<QAction *> hierarchyActions() const;
 
-public Q_SLOTS:
+    void showAsn1Dialog();
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
