@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QBuffer>
 #include <QDebug>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QUndoGroup>
 #include <QUndoStack>
@@ -104,14 +105,14 @@ QVector<QAction *> AadlMainWidget::toolActions() const
 void AadlMainWidget::showAsn1Dialog()
 {
     aadlinterface::Asn1Dialog dialog;
-    QFileInfo fi(m_document->path());
-    fi.setFile(fi.absolutePath() + "/" + m_document->asn1FileName());
+    QFileInfo fi(m_plugin->document()->path());
+    fi.setFile(fi.absolutePath() + "/" + m_plugin->document()->asn1FileName());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        if (m_document->asn1FileName() != dialog.fileName()) {
-            QVariantList params { QVariant::fromValue(m_document), QVariant::fromValue(dialog.fileName()) };
+        if (m_plugin->document()->asn1FileName() != dialog.fileName()) {
+            QVariantList params { QVariant::fromValue(m_plugin->document()), QVariant::fromValue(dialog.fileName()) };
             QUndoCommand *command =
                     aadlinterface::cmd::CommandsFactory::create(aadlinterface::cmd::ChangeAsn1File, params);
             if (command) {
