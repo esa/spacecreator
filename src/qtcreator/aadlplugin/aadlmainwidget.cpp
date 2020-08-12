@@ -27,29 +27,20 @@
 #include <QAction>
 #include <QBuffer>
 #include <QDebug>
-#include <QFileInfo>
-#include <QGraphicsScene>
 #include <QHBoxLayout>
-#include <QImage>
-#include <QSplitter>
-#include <QStackedWidget>
 #include <QUndoGroup>
 #include <QUndoStack>
-#include <QtWidgets/QHeaderView>
-#include <coreplugin/minisplitter.h>
 
 namespace AadlPlugin {
 
 AadlMainWidget::AadlMainWidget(QWidget *parent)
     : QWidget(parent)
     , m_plugin(new aadlinterface::IVEditorPlugin(this))
-    , m_document(new aadlinterface::InterfaceDocument(this))
 {
-    m_document->init();
     initUi();
 
     QUndoStack *currentStack { nullptr };
-    currentStack = m_document->commandsStack();
+    currentStack = m_plugin->document()->commandsStack();
     if (currentStack) {
         if (m_plugin->undoGroup()->stacks().contains(currentStack)) {
             m_plugin->undoGroup()->addStack(currentStack);
@@ -66,13 +57,13 @@ AadlMainWidget::~AadlMainWidget() { }
 
 bool AadlMainWidget::load(const QString &filename)
 {
-    m_document->load(filename);
+    m_plugin->document()->load(filename);
     return true;
 }
 
 bool AadlMainWidget::save()
 {
-    return aadlinterface::XmlDocExporter::exportDocSilently(m_document, {}, {});
+    return aadlinterface::XmlDocExporter::exportDocSilently(m_plugin->document(), {}, {});
 }
 
 void AadlMainWidget::setFileName(const QString &filename)
@@ -82,19 +73,19 @@ void AadlMainWidget::setFileName(const QString &filename)
 
 bool AadlMainWidget::isDirty() const
 {
-    return m_document->isDirty();
+    return m_plugin->document()->isDirty();
 }
 
 QUndoStack *AadlMainWidget::undoStack()
 {
-    return m_document->commandsStack();
+    return m_plugin->document()->commandsStack();
 }
 
 QString AadlMainWidget::textContents() const
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    bool ok = aadlinterface::XmlDocExporter::exportDoc(m_document, &buffer);
+    bool ok = aadlinterface::XmlDocExporter::exportDoc(m_plugin->document(), &buffer);
     if (ok) {
         return buffer.data();
     } else {
@@ -133,10 +124,10 @@ void AadlMainWidget::showAsn1Dialog()
 void AadlMainWidget::initUi()
 {
     setLayout(new QVBoxLayout(this));
-    layout()->addWidget(m_document->view());
+    layout()->addWidget(m_plugin->document()->view());
     layout()->setMargin(0);
 
-    m_actions = m_document->initActions();
+    m_actions = m_plugin->document()->initActions();
 }
 
 }

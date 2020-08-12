@@ -32,7 +32,6 @@ class MiniMap;
 }
 namespace aadlinterface {
 
-class InterfaceDocument;
 class IVEditorPlugin;
 class ZoomController;
 
@@ -73,7 +72,6 @@ private:
 
     Ui::MainWindow *ui { nullptr };
     ZoomController *m_zoomCtrl { nullptr };
-    InterfaceDocument *m_document { nullptr };
 
     bool m_dropUnsavedChangesSilently { false };
 

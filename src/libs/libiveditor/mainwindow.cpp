@@ -61,13 +61,11 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())
-    , m_document(new InterfaceDocument(this))
     , m_plugin(plugin)
 {
     ui->setupUi(this);
 
-    m_document->init();
-    setCentralWidget(m_document->view());
+    setCentralWidget(m_plugin->document()->view());
 
     statusBar()->addPermanentWidget(m_zoomCtrl);
     m_plugin->addToolBars(this);
@@ -86,14 +84,14 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionUndo(), "Undo", "Undo the last operation");
     ActionsManager::registerAction(Q_FUNC_INFO, m_plugin->actionRedo(), "Redo", "Redo the last undone operation");
 
-    connect(m_document, &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
+    connect(m_plugin->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 
     m_plugin->initMenus(this);
 
     QUndoStack *currentStack { nullptr };
-    m_document->fillToolBar(m_plugin->docToolBar());
-    currentStack = m_document->commandsStack();
-    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_document->view())) {
+    m_plugin->document()->fillToolBar(m_plugin->docToolBar());
+    currentStack = m_plugin->document()->commandsStack();
+    if (auto view = qobject_cast<aadlinterface::GraphicsView *>(m_plugin->document()->view())) {
         m_zoomCtrl->setView(view);
         connect(view, &aadlinterface::GraphicsView::mouseMoved, this, &MainWindow::onGraphicsViewInfo,
                 Qt::UniqueConnection);
@@ -117,10 +115,10 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     initSettings();
 
     updateWindowTitle();
-    connect(m_document, &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+    connect(m_plugin->document(), &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 
     // Create the E2E view and add the action
-    auto endToEndView = new EndToEndView(m_document->objectsModel(), this);
+    auto endToEndView = new EndToEndView(m_plugin->document()->objectsModel(), this);
     endToEndView->hide();
     connect(plugin->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, plugin->actionToggleE2EView(), &QAction::setChecked);
@@ -152,11 +150,11 @@ void MainWindow::closeEvent(QCloseEvent *e)
  */
 void MainWindow::onOpenFileRequested()
 {
-    const QString prevPath(m_document->path());
-    const QString &fileName =
-            QFileDialog::getOpenFileName(this, tr("Open file"), prevPath, m_document->supportedFileExtensions());
+    const QString prevPath(m_plugin->document()->path());
+    const QString &fileName = QFileDialog::getOpenFileName(
+            this, tr("Open file"), prevPath, m_plugin->document()->supportedFileExtensions());
     if (!fileName.isEmpty() && closeFile()) {
-        m_document->load(fileName);
+        m_plugin->document()->load(fileName);
     }
 }
 
@@ -166,7 +164,7 @@ void MainWindow::onOpenFileRequested()
 void MainWindow::onCreateFileRequested()
 {
     if (closeFile()) {
-        m_document->create();
+        m_plugin->document()->create();
     }
 }
 
@@ -208,7 +206,7 @@ void MainWindow::onSaveRenderRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocSilently(m_document, savePath, templatePath);
+    return XmlDocExporter::exportDocSilently(m_plugin->document(), savePath, templatePath);
 }
 
 /*!
@@ -219,7 +217,7 @@ bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
  */
 bool MainWindow::exportXmlAs(const QString &savePath, const QString &templatePath)
 {
-    return XmlDocExporter::exportDocInteractive(m_document, this, savePath, templatePath);
+    return XmlDocExporter::exportDocInteractive(m_plugin->document(), this, savePath, templatePath);
 }
 
 void MainWindow::onQuitRequested()
@@ -231,8 +229,8 @@ void MainWindow::onQuitRequested()
 void MainWindow::onReportRequested()
 {
     QList<QPixmap> images;
-    if (m_document != nullptr) {
-        if (QGraphicsScene *scene = m_document->scene()) {
+    if (m_plugin->document() != nullptr) {
+        if (QGraphicsScene *scene = m_plugin->document()->scene()) {
             const QSize sceneSize = scene->sceneRect().size().toSize();
             if (!sceneSize.isNull()) {
                 QPixmap pix(sceneSize);
@@ -265,11 +263,11 @@ void MainWindow::initSettings()
 void MainWindow::updateActions()
 {
     bool renderAvailable(false);
-    if (QGraphicsScene *scene = m_document->scene()) {
+    if (QGraphicsScene *scene = m_plugin->document()->scene()) {
         renderAvailable = !scene->sceneRect().isEmpty() && !scene->items().isEmpty();
     }
 
-    m_plugin->actionSaveFile()->setEnabled(m_document->isDirty());
+    m_plugin->actionSaveFile()->setEnabled(m_plugin->document()->isDirty());
     m_plugin->actionSaveSceneRender()->setEnabled(renderAvailable);
 }
 
@@ -287,8 +285,8 @@ bool MainWindow::processCommandLineArg(shared::CommandLineParser::Positional arg
         return true;
     }
     case shared::CommandLineParser::Positional::OpenAADLXMLFile: {
-        if (!value.isEmpty() && m_document != nullptr) {
-            return m_document->load(value);
+        if (!value.isEmpty() && m_plugin->document() != nullptr) {
+            return m_plugin->document()->load(value);
         };
 
         return false;
@@ -321,7 +319,7 @@ void MainWindow::saveSceneRender(const QString &filePath) const
     if (filePath.isEmpty())
         return;
 
-    if (QGraphicsScene *scene = m_document->scene()) {
+    if (QGraphicsScene *scene = m_plugin->document()->scene()) {
         QImage img(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
         img.fill(Qt::transparent);
         QPainter p(&img);
@@ -350,7 +348,7 @@ void MainWindow::onGraphicsViewInfo(const QString &info)
 
 void MainWindow::updateWindowTitle()
 {
-    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_document->title()));
+    setWindowTitle(QString("Interface View Editor [%1][*]").arg(m_plugin->document()->title()));
 }
 
 /*!
@@ -359,14 +357,14 @@ void MainWindow::updateWindowTitle()
 void MainWindow::openAsn1Dialog()
 {
     Asn1Dialog dialog;
-    QFileInfo fi(m_document->path());
-    fi.setFile(fi.absolutePath() + "/" + m_document->asn1FileName());
+    QFileInfo fi(m_plugin->document()->path());
+    fi.setFile(fi.absolutePath() + "/" + m_plugin->document()->asn1FileName());
     dialog.setFile(fi);
     dialog.show();
     int result = dialog.exec();
     if (result == QDialog::Accepted) {
-        if (m_document->asn1FileName() != dialog.fileName()) {
-            QVariantList params { QVariant::fromValue(m_document), QVariant::fromValue(dialog.fileName()) };
+        if (m_plugin->document()->asn1FileName() != dialog.fileName()) {
+            QVariantList params { QVariant::fromValue(m_plugin->document()), QVariant::fromValue(dialog.fileName()) };
             QUndoCommand *command = cmd::CommandsFactory::create(cmd::ChangeAsn1File, params);
             if (command) {
                 cmd::CommandsStack::current()->push(command);
@@ -381,7 +379,7 @@ void MainWindow::openAsn1Dialog()
  */
 bool MainWindow::closeFile()
 {
-    if (m_document->isDirty() && !m_dropUnsavedChangesSilently) {
+    if (m_plugin->document()->isDirty() && !m_dropUnsavedChangesSilently) {
         const QMessageBox::StandardButtons btns(QMessageBox::Save | QMessageBox::No | QMessageBox::Cancel);
         auto btn = QMessageBox::question(this, tr("Document closing"),
                 tr("There are unsaved changes.\nWould you like to save the document?"), btns);
@@ -394,7 +392,7 @@ bool MainWindow::closeFile()
         }
     }
 
-    m_document->close();
+    m_plugin->document()->close();
 
     return true;
 }
@@ -418,9 +416,9 @@ bool MainWindow::prepareQuit()
 void MainWindow::setupMiniMap()
 {
     // have to be instantiated after this->ui & this->document
-    m_miniMap = new shared::ui::MiniMap(m_document->view());
+    m_miniMap = new shared::ui::MiniMap(m_plugin->document()->view());
     m_miniMap->setupSourceView(
-            qobject_cast<QGraphicsView *>(m_document->view()), aadlinterface::cmd::CommandsStack::current());
+            qobject_cast<QGraphicsView *>(m_plugin->document()->view()), aadlinterface::cmd::CommandsStack::current());
     connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
     connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 }

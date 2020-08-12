@@ -17,17 +17,14 @@
 
 #pragma once
 
-#include <QStackedWidget>
 #include <QVector>
 #include <QWidget>
 
 class QAction;
 class QGraphicsView;
-class QSplitter;
 class QUndoStack;
 
 namespace aadlinterface {
-class InterfaceDocument;
 class IVEditorPlugin;
 }
 
@@ -64,7 +61,6 @@ private:
     void initUi();
 
     aadlinterface::IVEditorPlugin *m_plugin = nullptr;
-    aadlinterface::InterfaceDocument *m_document = nullptr;
     QVector<QAction *> m_actions;
 };
 

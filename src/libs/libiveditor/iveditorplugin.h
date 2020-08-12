@@ -5,10 +5,14 @@
 
 namespace aadlinterface {
 
+class InterfaceDocument;
+
 class IVEditorPlugin : public shared::Plugin
 {
 public:
     explicit IVEditorPlugin(QObject *parent = 0);
+
+    aadlinterface::InterfaceDocument *document() const;
 
     void setPluginActive(bool active) override;
 
@@ -27,6 +31,8 @@ public:
     QAction *actionShowAsnDialog() { return m_actionShowAsnDialog; }
 
 private:
+    aadlinterface::InterfaceDocument *m_document { nullptr };
+
     GraphicsView *m_graphicsView;
     QToolBar *m_docToolBar;
 

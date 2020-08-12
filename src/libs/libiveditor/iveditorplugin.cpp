@@ -2,6 +2,7 @@
 
 #include "commandlineparser.h"
 #include "context/action/actionsmanager.h"
+#include "interface/interfacedocument.h"
 #include "mainwindow.h"
 
 #include <QMainWindow>
@@ -17,12 +18,23 @@ namespace aadlinterface {
 
 IVEditorPlugin::IVEditorPlugin(QObject *parent)
     : shared::Plugin(parent)
+    , m_document(new aadlinterface::InterfaceDocument(this))
     , m_graphicsView(new GraphicsView)
     , m_docToolBar(new QToolBar)
 {
+    m_document->init();
+
     m_docToolBar->setObjectName("Document ToolBar");
     m_docToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_docToolBar->setMovable(true);
+}
+
+/*!
+   Returns the interface document
+ */
+InterfaceDocument *IVEditorPlugin::document() const
+{
+    return m_document;
 }
 
 void IVEditorPlugin::setPluginActive(bool active)
