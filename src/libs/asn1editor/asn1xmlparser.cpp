@@ -27,9 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QProcess>
-#include <cstdlib>
-#include <ctime>
-#include <type_traits>
+#include <QRandomGenerator>
 
 namespace asn1 {
 
@@ -260,13 +258,7 @@ QString Asn1XMLParser::asn1CompilerCommand() const
 
 QString Asn1XMLParser::temporaryFileName(const QString &basename, const QString &suffix) const
 {
-    static bool init = false;
-    if (!init) {
-        std::srand(std::time(nullptr));
-        init = true;
-    }
-
-    int value = std::rand();
+    quint32 value = QRandomGenerator::securelySeeded().generate();
     return QDir::tempPath() + QDir::separator() + QString("%1_%2.%3").arg(basename).arg(value).arg(suffix);
 }
 

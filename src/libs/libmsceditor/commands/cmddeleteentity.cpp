@@ -71,10 +71,10 @@ CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *char
         }
 
     } else if (m_document && !items.empty()) {
-        auto document = dynamic_cast<MscDocument *>(items[0]);
-        if (document) {
-            const int idx = m_document->documents().indexOf(document);
-            m_entities[idx] = document;
+        auto itemDocument = dynamic_cast<MscDocument *>(items[0]);
+        if (itemDocument) {
+            const int idx = m_document->documents().indexOf(itemDocument);
+            m_entities[idx] = itemDocument;
         }
     }
 }

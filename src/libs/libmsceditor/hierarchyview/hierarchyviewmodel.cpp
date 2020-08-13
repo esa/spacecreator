@@ -272,7 +272,8 @@ void HierarchyViewModel::documentMoved(const DocumentItem *documentItem, const Q
 {
     DocumentItem *parentItem = nearestDocumentItem(documentItem, point);
 
-    if (parentItem && parentItem != documentItem->parentItem() && parentItem->document()->isAddChildEnable()) {
+    if (parentItem && parentItem != documentItem->parentItem() && parentItem->document()
+            && parentItem->document()->isAddChildEnable()) {
         msc::cmd::CommandsStack::push(msc::cmd::MoveDocument,
                 { QVariant::fromValue<MscDocument *>(documentItem->document()),
                         QVariant::fromValue<MscDocument *>(parentItem->document()) });

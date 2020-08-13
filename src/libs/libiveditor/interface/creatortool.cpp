@@ -1077,7 +1077,6 @@ void CreatorTool::CreatorToolPrivate::handleConnection(const QVector<QPointF> &c
             ifaceCommons.position = intersectionPoints.last();
             ifaceCommons.type = startRequired ? aadl::AADLObjectIface::IfaceType::Provided
                                               : aadl::AADLObjectIface::IfaceType::Required;
-            ifaceCommons.id = ifaceCommons.id;
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;

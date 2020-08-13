@@ -183,7 +183,10 @@ bool PropertiesListModel::setData(const QModelIndex &index, const QVariant &valu
                 const auto propsCmd = cmd::CommandsFactory::create(
                         cmd::RenameEntityProperty, { QVariant::fromValue(m_dataObject), QVariant::fromValue(props) });
                 cmd::CommandsStack::current()->push(propsCmd);
-                m_names.replace(m_names.indexOf(name), newName);
+                const int idx = m_names.indexOf(name);
+                if (idx >= 0) {
+                    m_names.replace(idx, newName);
+                }
                 break;
             }
             default: {

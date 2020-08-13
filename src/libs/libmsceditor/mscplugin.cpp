@@ -202,9 +202,9 @@ void MSCPlugin::initHierarchyViewActions()
         m_hierarchyActions.append(action);
 
         connect(action, &QAction::triggered, this, [&]() {
-            msc::MscDocument::HierarchyType type =
+            msc::MscDocument::HierarchyType selectedType =
                     sender()->property(HIERARCHY_TYPE_TAG).value<msc::MscDocument::HierarchyType>();
-            addDocument(type);
+            addDocument(selectedType);
         });
     };
 

@@ -1009,13 +1009,13 @@ MscEntity *ChartLayoutManager::nearestEntity(const QPointF &pos)
     static const QMarginsF extra_margin = QMarginsF(add_space, add_space, add_space, add_space);
 
     qreal distance = std::numeric_limits<int>::max();
-    auto getNearest = [](qreal &distance, InteractiveObject *iObj, const QPointF &pos) -> MscEntity * {
+    auto getNearest = [](qreal &distance, InteractiveObject *iObj, const QPointF &point) -> MscEntity * {
         MscEntity *entity = nullptr;
         const QRectF itemRect = iObj->sceneBoundingRect().marginsAdded(extra_margin);
-        if (!itemRect.contains(pos) || !iObj->modelEntity())
+        if (!itemRect.contains(point) || !iObj->modelEntity())
             return nullptr;
 
-        qreal dist = std::abs(itemRect.center().x() - pos.x());
+        qreal dist = std::abs(itemRect.center().x() - point.x());
         if (dist < distance) {
             distance = dist;
             entity = iObj->modelEntity();

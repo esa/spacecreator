@@ -78,7 +78,8 @@ void CoordinatesConverter::setScene(QGraphicsScene *scene)
 QPoint CoordinatesConverter::sceneOriginInView(QGraphicsView *view)
 {
     static const QPointF sceneOrigin { 0., 0. };
-    return view ? view->mapFromScene(currentChartItem()->contentRect().topLeft()) : sceneOrigin.toPoint();
+    return (view && currentChartItem()) ? view->mapFromScene(currentChartItem()->contentRect().topLeft())
+                                        : sceneOrigin.toPoint();
 }
 
 static inline qreal viewScaleFactor(QGraphicsView *graphicsView)

@@ -415,8 +415,8 @@ void InterfaceDocument::updateDirtyness()
 void InterfaceDocument::onAADLObjectAdded(aadl::AADLObject *object)
 {
     auto propertyChanged = [this]() {
-        if (auto object = qobject_cast<aadl::AADLObject *>(sender())) {
-            if (auto item = d->items.value(object->id()))
+        if (auto senerObject = qobject_cast<aadl::AADLObject *>(sender())) {
+            if (auto item = d->items.value(senerObject->id()))
                 updateItem(item);
         }
     };

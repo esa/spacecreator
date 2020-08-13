@@ -35,19 +35,25 @@
 
 namespace aadlinterface {
 
+/*!
+   Adds all attribibutes from \p attrs that are not already in \a storage to that data
+ */
+void collectUniqeAttributes(
+        const QHash<QString, DynamicProperty *> &attrs, QHash<DynamicProperty *, DynamicProperty *> &storage)
+{
+    for (auto attr : attrs) {
+        if (!storage.contains(attr)) {
+            storage.insert(attr, attr);
+        }
+    }
+};
+
 struct DynamicPropertyConfig::DynamicPropertyConfigPrivate {
     DynamicPropertyConfigPrivate() { }
     ~DynamicPropertyConfigPrivate() { }
     void init(const QVector<DynamicProperty *> &attrs)
     {
         QHash<DynamicProperty *, DynamicProperty *> uniqeAttrs;
-        auto collectUniqeAttributes = [](const QHash<QString, DynamicProperty *> &attrs,
-                                              QHash<DynamicProperty *, DynamicProperty *> &storage) {
-            for (auto attr : attrs)
-                if (!storage.contains(attr))
-                    storage.insert(attr, attr);
-        };
-
         collectUniqeAttributes(m_functionType, uniqeAttrs);
         collectUniqeAttributes(m_function, uniqeAttrs);
         collectUniqeAttributes(m_iface, uniqeAttrs);
@@ -170,10 +176,13 @@ void DynamicPropertyConfig::generateSampleFile()
         attrsHolder.append(attr->toJson());
 
     QFile tmp("./aadl_properties.json");
-    tmp.open(QIODevice::WriteOnly);
-    QJsonDocument doc(attrsHolder);
-    const QByteArray &j = doc.toJson();
-    tmp.write(j);
+    if (tmp.open(QIODevice::WriteOnly)) {
+        QJsonDocument doc(attrsHolder);
+        const QByteArray &j = doc.toJson();
+        tmp.write(j);
+    } else {
+        qWarning() << "Unable to write file" << tmp.fileName();
+    }
 }
 
 QVector<DynamicProperty *> DynamicPropertyConfig::parseAttributesList(const QByteArray &fromData)

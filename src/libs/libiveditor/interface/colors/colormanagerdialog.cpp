@@ -26,6 +26,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 #include <QPushButton>
 
 namespace aadlinterface {
@@ -128,9 +129,13 @@ void ColorManagerDialog::accept()
     }
 
     QFile out(filePath);
-    out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
-    out.write(QJsonDocument(ja).toJson());
-    out.close();
+    if (out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        out.write(QJsonDocument(ja).toJson());
+        out.close();
+    } else {
+        QMessageBox::warning(this, tr("Error saving"), tr("Unable to save file %1").arg(filePath));
+        return;
+    }
 
     ColorManager::instance()->setSourceFile(filePath);
 
