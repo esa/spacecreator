@@ -6,6 +6,7 @@
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
+#include "interface/interfacedocument.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
@@ -22,13 +23,11 @@ struct EndToEndView::EndToEndViewPrivate {
     QGraphicsScene *scene { nullptr };
     QHash<shared::Id, QGraphicsItem *> items;
 
-    aadl::AADLObjectsModel *objectsModel { nullptr };
-
-    QString mscFilePath;
-    QString dir;
+    InterfaceDocument *document { nullptr };
 };
 
-EndToEndView::EndToEndView(aadl::AADLObjectsModel *objectsModel, QWidget *parent)
+//! Initialize this with the current document
+EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     : QDialog(parent)
     , d(new EndToEndViewPrivate)
 {
@@ -36,7 +35,7 @@ EndToEndView::EndToEndView(aadl::AADLObjectsModel *objectsModel, QWidget *parent
     setAttribute(Qt::WA_DeleteOnClose, false);
     setAttribute(Qt::WA_QuitOnClose, false);
 
-    auto pathLabel = new QLabel(tr("MSC file: -"));
+    auto pathLabel = new QLabel;
     auto pathButton = new QPushButton(tr("&Choose MSC file"));
     auto refreshButton = new QPushButton(tr("&Refresh view"));
 
@@ -45,7 +44,7 @@ EndToEndView::EndToEndView(aadl::AADLObjectsModel *objectsModel, QWidget *parent
     d->scene = new QGraphicsScene(this);
     d->view->setScene(d->scene);
 
-    d->objectsModel = objectsModel;
+    d->document = document;
 
     auto barLayout = new QHBoxLayout;
     barLayout->addWidget(pathLabel);
@@ -56,20 +55,31 @@ EndToEndView::EndToEndView(aadl::AADLObjectsModel *objectsModel, QWidget *parent
     layout->addLayout(barLayout);
     layout->addWidget(d->view);
 
-    connect(pathButton, &QPushButton::clicked, this, [=]() {
-        const QString path = QFileDialog::getOpenFileName(
-                this, tr("Choose MSC file"), d->dir, tr("MSC files (*.msc);;All files (*)"));
-        if (!path.isEmpty()) {
-            d->mscFilePath = path;
-
-            QFileInfo info(path);
+    auto setPath = [this, pathLabel](const QString &path) {
+        d->document->setMscFileName(path);
+        QFileInfo info(path);
+        if (info.exists()) {
             pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
-            d->dir = info.path();
+        } else {
+            pathLabel->setText(tr("MSC file: -"));
+        }
+    };
 
-            refreshButton->click();
+    connect(pathButton, &QPushButton::clicked, this, [this, setPath]() {
+        QFileInfo fi(d->document->mscFileName());
+        const QString dir = fi.path();
+        const QString path =
+                QFileDialog::getOpenFileName(this, tr("Choose MSC file"), dir, tr("MSC files (*.msc);;All files (*)"));
+        if (!path.isEmpty()) {
+            setPath(path);
+            refreshView();
         }
     });
 
+    // Listen to path changes from the document
+    connect(d->document, &InterfaceDocument::mscFileNameChanged, this, setPath);
+
+    // Refresh the view
     connect(refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
 }
 
@@ -79,6 +89,8 @@ EndToEndView::~EndToEndView()
     d = nullptr;
 }
 
+//! This emits visibleChanged after calling the standard setVisible method.
+//! This is used to keep the "show e2e" menu action updated
 void EndToEndView::setVisible(bool visible)
 {
     const bool wasVisible = isVisible();
@@ -88,6 +100,7 @@ void EndToEndView::setVisible(bool visible)
     }
 }
 
+//! Update the view with the current model and MSC file contents
 void EndToEndView::refreshView()
 {
     // Remove all the old ones
@@ -95,7 +108,7 @@ void EndToEndView::refreshView()
     d->items.clear();
 
     // Get the visible non-nested objects
-    QList<aadl::AADLObject *> objects = d->objectsModel->visibleObjects({});
+    QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
 
     // Add new graphics items for each object

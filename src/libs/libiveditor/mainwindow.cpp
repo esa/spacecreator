@@ -118,7 +118,7 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
     connect(m_plugin->document(), &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
 
     // Create the E2E view and add the action
-    auto endToEndView = new EndToEndView(m_plugin->document()->objectsModel(), this);
+    auto endToEndView = new EndToEndView(m_plugin->document(), this);
     endToEndView->hide();
     connect(plugin->actionToggleE2EView(), &QAction::toggled, endToEndView, &QWidget::setVisible);
     connect(endToEndView, &EndToEndView::visibleChanged, plugin->actionToggleE2EView(), &QAction::setChecked);

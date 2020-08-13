@@ -305,9 +305,12 @@ QString InterfaceDocument::asn1FileName() const
    Sets the name of the associated msc file. This is only the file name without a path. The File is expected to be next
    to the aadl file
  */
-void InterfaceDocument::setMscFileName(const QString &mscfile)
+void InterfaceDocument::setMscFileName(const QString &mscFile)
 {
-    d->mscFileName = mscfile;
+    if (mscFile != d->mscFileName) {
+        d->mscFileName = mscFile;
+        Q_EMIT mscFileNameChanged(mscFile);
+    }
 }
 
 /*!

@@ -46,6 +46,8 @@ class InterfaceTabGraphicsScene;
 class InterfaceDocument : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString mscFileName READ mscFileName WRITE setMscFileName NOTIFY mscFileNameChanged)
+
 public:
     explicit InterfaceDocument(QObject *parent = nullptr);
     ~InterfaceDocument() override;
@@ -69,7 +71,7 @@ public:
     void setAsn1FileName(const QString &asnfile);
     QString asn1FileName() const;
 
-    void setMscFileName(const QString &mscfile);
+    void setMscFileName(const QString &mscFile);
     const QString &mscFileName() const;
 
     bool isDirty() const;
@@ -88,6 +90,8 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void titleChanged();
+
+    void mscFileNameChanged(const QString &mscFileName);
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
