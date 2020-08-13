@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<InterfaceView>
+<InterfaceView asn1file="dataview.asn">
     <Function name="HiddenChildren" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="-14900 42400 27300 64500"/>
         <Property name="Taste::RootCoordinates" value="3100 3100 186500 85300"/>

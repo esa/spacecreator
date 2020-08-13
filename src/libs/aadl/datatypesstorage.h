@@ -21,7 +21,10 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <QTimer>
 #include <memory>
+
+class QFileSystemWatcher;
 
 namespace Asn1Acn {
 class File;
@@ -62,6 +65,8 @@ Q_SIGNALS:
 private:
     std::unique_ptr<Asn1Acn::File> m_asn1DataTypes;
     QFileInfo m_fileName;
+    QFileSystemWatcher *m_asn1Watcher = nullptr;
+    QTimer m_reloadTimer;
 };
 
 }

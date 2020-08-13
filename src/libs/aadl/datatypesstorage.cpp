@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QStandardPaths>
 #include <QTextStream>
 
@@ -57,11 +58,15 @@ static QString ensureAsnFileExists()
 DataTypesStorage::DataTypesStorage()
 {
     loadDefault();
+    m_reloadTimer.setSingleShot(true);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &aadl::DataTypesStorage::loadFile);
 }
 
 DataTypesStorage::DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
     : m_asn1DataTypes(std::move(dataTypes))
 {
+    m_reloadTimer.setSingleShot(true);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &aadl::DataTypesStorage::loadFile);
 }
 
 DataTypesStorage::~DataTypesStorage() { }
@@ -76,8 +81,26 @@ const std::unique_ptr<Asn1Acn::File> &DataTypesStorage::asn1DataTypes() const
  */
 void DataTypesStorage::setFileName(const QFileInfo &fileName)
 {
+    if (m_asn1Watcher != nullptr) {
+        // Check if the directory is watched already
+        if (!m_asn1Watcher->files().contains(fileName.absoluteFilePath())) {
+            disconnect(m_asn1Watcher, nullptr, this, nullptr);
+            m_asn1Watcher->deleteLater();
+            m_asn1Watcher = nullptr;
+        }
+    }
+
     m_fileName = fileName;
     loadFile();
+
+    if (m_asn1Watcher == nullptr && m_fileName.exists()) {
+        m_asn1Watcher = new QFileSystemWatcher(this);
+        m_asn1Watcher->addPath(m_fileName.absoluteFilePath());
+        connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this]() {
+            m_reloadTimer.stop();
+            m_reloadTimer.start(20);
+        });
+    }
 }
 
 /*!
