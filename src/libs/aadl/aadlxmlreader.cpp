@@ -157,7 +157,7 @@ bool AADLXMLReader::read(QIODevice *openForRead)
     if (openForRead && openForRead->isOpen() && openForRead->isReadable()) {
         if (readXml(openForRead)) {
             Q_EMIT objectsParsed(d->m_allObjects);
-            Q_EMIT metadataParsed(d->m_metaData);
+            Q_EMIT metaDataParsed(d->m_metaData);
             return true;
         }
     }

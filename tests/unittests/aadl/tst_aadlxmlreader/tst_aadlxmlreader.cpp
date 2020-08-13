@@ -112,7 +112,7 @@ void XMLReader::test_readMetaData()
 
     QVariantMap metadata;
     aadl::AADLXMLReader reader;
-    connect(&reader, &aadl::AADLXMLReader::metadataParsed, this,
+    connect(&reader, &aadl::AADLXMLReader::metaDataParsed, this,
             [&metadata](const QVariantMap &data) { metadata = data; });
 
     QSignalSpy spyError(&reader, &aadl::AADLXMLReader::error);

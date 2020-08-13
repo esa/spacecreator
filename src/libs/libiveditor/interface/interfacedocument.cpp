@@ -569,7 +569,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
     aadl::AADLXMLReader parser;
     connect(&parser, &aadl::AADLXMLReader::objectsParsed, this, &InterfaceDocument::setObjects);
-    connect(&parser, &aadl::AADLXMLReader::metadataParsed, this, [this, path](const QVariantMap &metadata) {
+    connect(&parser, &aadl::AADLXMLReader::metaDataParsed, this, [this, path](const QVariantMap &metadata) {
         if (metadata.contains("asn1file")) {
             QFileInfo fi(path);
             fi.setFile(fi.absolutePath() + QDir::separator() + metadata["asn1file"].toString());
