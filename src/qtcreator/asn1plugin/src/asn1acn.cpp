@@ -215,7 +215,7 @@ void Asn1AcnPlugin::initializeFindUsagesAction(ActionContainer *toolsMenu,
     m_findUsagesAction = action;
 }
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #else
 void Asn1AcnPlugin::addBuildICDToToolsMenu(ActionContainer *toolsMenu)
 {
@@ -294,7 +294,7 @@ void Asn1AcnPlugin::initializeGenerateTestsAction(ActionContainer *toolsMenu,
 
 void Asn1AcnPlugin::initializeBuildICDAction(ActionContainer *toolsMenu)
 {
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #else
     addBuildICDToProjectMenu();
     addBuildICDToToolsMenu(toolsMenu);
@@ -310,7 +310,7 @@ static EditorWidget *currentEditorWidget()
 
 void Asn1AcnPlugin::findUsages()
 {
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #else
     if (auto editorWidget = currentEditorWidget())
         editorWidget->findUsages();

@@ -35,7 +35,7 @@
 
 using namespace Asn1Acn::Internal;
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 Asn1AcnBuildStep::Asn1AcnBuildStep(ProjectExplorer::BuildStepList *parent,
                                    const char *id,
                                    const QString &displayName)

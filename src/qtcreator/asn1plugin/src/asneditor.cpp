@@ -65,7 +65,7 @@ AsnEditorFactory::AsnEditorFactory()
 
     setCompletionAssistProvider(new Completion::AsnCompletionAssistProvider);
     setAutoCompleterCreator([]() { return new Completion::AutoCompleter; });
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
     setIndenterCreator([]() { return new Indenter(); });
 #else
     setIndenterCreator([](QTextDocument *doc) { return new Indenter(doc); });

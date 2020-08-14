@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlplugin.h"
+#include "aadlpluginplugin.h"
 
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
@@ -32,19 +32,19 @@
 
 namespace AadlPlugin {
 
-AadlPlugin::AadlPlugin()
+AadlPluginPlugin::AadlPluginPlugin()
 {
     shared::initSharedLibrary();
     aadlinterface::initIvEditor();
 }
 
-AadlPlugin::~AadlPlugin()
+AadlPluginPlugin::~AadlPluginPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
 }
 
-bool AadlPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -60,7 +60,7 @@ bool AadlPlugin::initialize(const QStringList &arguments, QString *errorString)
 
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
-    connect(m_asn1DialogAction, &QAction::triggered, this, &AadlPlugin::showAsn1Dialog);
+    connect(m_asn1DialogAction, &QAction::triggered, this, &AadlPluginPlugin::showAsn1Dialog);
 
     m_asn1DialogAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
@@ -81,7 +81,7 @@ bool AadlPlugin::initialize(const QStringList &arguments, QString *errorString)
     return true;
 }
 
-void AadlPlugin::extensionsInitialized()
+void AadlPluginPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
@@ -89,7 +89,7 @@ void AadlPlugin::extensionsInitialized()
     Core::DesignMode::setDesignModeIsRequired();
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag AadlPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag AadlPluginPlugin::aboutToShutdown()
 {
     // Save settings
     // Disconnect from signals that are not needed during shutdown
@@ -97,7 +97,7 @@ ExtensionSystem::IPlugin::ShutdownFlag AadlPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void AadlPlugin::showAsn1Dialog()
+void AadlPluginPlugin::showAsn1Dialog()
 {
     m_factory->editorData()->showAsn1Dialog();
 }

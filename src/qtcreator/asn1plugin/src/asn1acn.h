@@ -81,7 +81,7 @@ private:
     void initializeGenerateTestsAction(ActionContainer *toolsMenu,
                                        Settings::FuzzerConstPtr settings);
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #else
     void addBuildICDToToolsMenu(ActionContainer *toolsMenu);
     void addBuildICDToProjectMenu();

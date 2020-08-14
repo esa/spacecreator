@@ -55,7 +55,7 @@ class AcnEditorWidget : public EditorWidget
 public:
     explicit AcnEditorWidget() = default;
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
     void findUsages();
 #else
     void findUsages() override;

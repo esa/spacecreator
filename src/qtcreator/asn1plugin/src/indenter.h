@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 
 #include <texteditor/indenter.h>
 

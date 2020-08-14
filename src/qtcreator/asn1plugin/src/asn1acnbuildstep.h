@@ -26,7 +26,7 @@
 
 #include <memory>
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #include <QFutureInterface>
 #include <QFutureWatcher>
 

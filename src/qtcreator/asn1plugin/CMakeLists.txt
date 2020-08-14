@@ -250,8 +250,8 @@ set(ASN1_SOURCES
 )
 
 set(ASN_QTC_LIBRARIES
-    -L${QTC_LIB_DIR}
-    -L${QTC_LIB_DIR}/plugins
+    -L"${QTC_LIB_DIR}"
+    -L"${QTC_PLUGINS_DIR}"
     Aggregation
     ExtensionSystem
     QtcSsh

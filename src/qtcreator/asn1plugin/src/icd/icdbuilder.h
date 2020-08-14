@@ -24,7 +24,7 @@
 ****************************************************************************/
 #pragma once
 
-#if QTC_VERSION == 480
+#if QTC_VERSION == 48
 #include <projectexplorer/abstractprocessstep.h>
 
 #include "asn1acnbuildstep.h"

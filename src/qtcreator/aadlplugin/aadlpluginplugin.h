@@ -27,14 +27,14 @@ namespace AadlPlugin {
 
 class AadlEditorFactory;
 
-class AadlPlugin : public ExtensionSystem::IPlugin
+class AadlPluginPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "AadlPlugin.json")
 
 public:
-    AadlPlugin();
-    ~AadlPlugin();
+    AadlPluginPlugin();
+    ~AadlPluginPlugin();
 
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;
