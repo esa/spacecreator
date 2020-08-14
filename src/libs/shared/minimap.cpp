@@ -17,6 +17,8 @@
 
 #include "minimap.h"
 
+#include "ui/grippoint.h"
+
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsItem>
@@ -30,99 +32,61 @@
 #include <QTimer>
 #include <QUndoStack>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
 namespace shared {
 namespace ui {
 
-static const QPoint OutOfView { -1, -1 };
+static constexpr QPoint kOutOfView { -1, -1 };
+static constexpr int kMinDimensionPix { 100 };
+static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
+static constexpr qreal kDefaultScaleFactor { 8 };
 
 struct MiniMapPrivate {
-    MiniMapPrivate()
-        : m_renderTimer(new QTimer)
-    {
-        static constexpr int renderDelayMs = 10;
-        m_renderTimer->setInterval(renderDelayMs);
-        m_renderTimer->setSingleShot(true);
-
-        m_dimColor.setAlphaF(0.5);
-    }
-
-    ~MiniMapPrivate()
-    {
-        delete m_renderTimer;
-        m_renderTimer = nullptr;
-    }
-
-    enum class RequestedUpdate
-    {
-        None,
-        Content,
-        Viewport,
-        Both
-    };
-
-    QPointer<QGraphicsView> m_view { nullptr };
-    QPointer<QUndoStack> m_commandsStack { nullptr };
-    QTimer *m_renderTimer { nullptr };
-
-    QPixmap m_sceneContent;
-    QRect m_sceneViewport;
-
-    QPixmap m_display;
-
-    QColor m_dimColor { Qt::black };
-
-    RequestedUpdate m_scheduledUpdate { RequestedUpdate::Both };
-    QRect m_mappedViewport;
-    QRectF m_sceneRect;
-
-    QPoint m_mouseStart = OutOfView;
-    QPoint m_mouseFinish = OutOfView;
+    QPointer<QGraphicsView> m_view;
+    QColor m_dimColor { kDefaultDimColor };
+    QPoint m_mouseStart { kOutOfView };
+    QPoint m_mouseFinish { kOutOfView };
 };
 
 MiniMap::MiniMap(QWidget *parent)
-    : QWidget(parent, Qt::Tool)
+    : QGraphicsView(parent)
     , d(new MiniMapPrivate)
 {
-    connect(d->m_renderTimer, &QTimer::timeout, this, &MiniMap::delayedUpdate);
+    setWindowFlags(Qt::Tool);
+    setOptimizationFlag(QGraphicsView::IndirectPainting);
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    setAttribute(Qt::WA_AlwaysStackOnTop);
 
-    static constexpr int minDimensionPix = 100;
-    setMinimumSize(minDimensionPix, minDimensionPix);
+    setMinimumSize(kMinDimensionPix, kMinDimensionPix);
 
     setMouseTracking(true);
 }
 
 MiniMap::~MiniMap() {}
 
-void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
+void MiniMap::setupSourceView(QGraphicsView *view)
 {
     if (d->m_view) {
-        if (d->m_commandsStack) {
-            disconnect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
-        }
-
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
-            disconnect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
-            disconnect(scrollBar, &QScrollBar::rangeChanged, this, &MiniMap::onSceneUpdated);
+            disconnect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
+            disconnect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
         }
-
-        d->m_view = nullptr;
+        d->m_view.clear();
     }
 
     d->m_view = view;
 
     if (d->m_view) {
-
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
-            connect(scrollBar, &QScrollBar::valueChanged, this, &MiniMap::onViewUpdated);
-            connect(scrollBar, &QScrollBar::rangeChanged, this, &MiniMap::onSceneUpdated);
+            connect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
+            connect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
         }
-
-        d->m_commandsStack = stack;
-
-        if (d->m_commandsStack) {
-            connect(d->m_commandsStack, &QUndoStack::indexChanged, this, &MiniMap::onSceneUpdated);
+        setScene(view->scene());
+        if (scene()) {
+            connect(scene(), &QGraphicsScene::sceneRectChanged, this, &MiniMap::sceneRectChanged);
+            if (!scene()->itemsBoundingRect().isValid())
+                resize(kMinDimensionPix, kMinDimensionPix);
+        } else {
+            resize(kMinDimensionPix, kMinDimensionPix);
         }
     }
 }
@@ -130,13 +94,7 @@ void MiniMap::setupSourceView(QGraphicsView *view, QUndoStack *stack)
 void MiniMap::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
-    const bool visible = isVisible();
-    Q_EMIT visibilityChanged(visible);
-
-    if (visible) {
-        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
-        delayedUpdate();
-    }
+    Q_EMIT visibilityChanged(isVisible());
 }
 
 void MiniMap::hideEvent(QHideEvent *e)
@@ -145,107 +103,20 @@ void MiniMap::hideEvent(QHideEvent *e)
     Q_EMIT visibilityChanged(isVisible());
 }
 
-void MiniMap::paintEvent(QPaintEvent *event)
-{
-    QWidget::paintEvent(event);
-
-    if (!d->m_display.isNull()) {
-        QPainter painter(this);
-        painter.drawPixmap(rect(), d->m_display);
-    }
-}
-
 void MiniMap::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
-
-    scheduleUpdateContent();
-}
-
-void MiniMap::onSceneUpdated()
-{
-    if (!isVisible()) {
-        return;
+    if (const auto graphicsScene = scene()) {
+        fitInView(graphicsScene->sceneRect(), Qt::KeepAspectRatio);
+        viewport()->update();
     }
-
-    scheduleUpdateContent();
-}
-
-void MiniMap::onViewUpdated()
-{
-    if (!isVisible()) {
-        return;
-    }
-
-    scheduleUpdateViewport();
-}
-
-bool MiniMap::grabSceneContent()
-{
-    auto scene = d->m_view->scene();
-    if (!scene) {
-        return false;
-    }
-
-    d->m_sceneContent = QPixmap(size());
-    d->m_sceneContent.fill(Qt::white);
-    QPainter p(&d->m_sceneContent);
-    scene->render(&p, d->m_sceneContent.rect(), QRect());
-
-    return true;
-}
-
-bool MiniMap::grabViewportRect()
-{
-    auto scene = d->m_view->scene();
-    if (!scene) {
-        return false;
-    }
-
-    d->m_sceneRect = scene->sceneRect();
-    const QRect &sceneRectPix = d->m_view->mapFromScene(d->m_sceneRect).boundingRect();
-
-    d->m_sceneViewport = d->m_view->viewport()->rect();
-    d->m_sceneViewport.translate(d->m_sceneViewport.topLeft() - sceneRectPix.topLeft());
-
-    return true;
-}
-
-void MiniMap::composeMap()
-{
-    if (d->m_sceneContent.isNull()) {
-        return;
-    }
-
-    const QRect &actualScene = d->m_view->mapFromScene(d->m_sceneRect).boundingRect();
-    const qreal scaleFactor = (actualScene.width() < actualScene.height())
-            ? qreal(d->m_sceneContent.width()) / qreal(actualScene.width())
-            : qreal(d->m_sceneContent.height()) / qreal(actualScene.height());
-
-    const QTransform &t = QTransform::fromScale(scaleFactor, scaleFactor);
-    d->m_mappedViewport = t.mapRect(d->m_sceneViewport);
-    const QRect drawnRect = QRect({ 0, 0 }, t.mapRect(actualScene).size());
-
-    QPainterPath dimmedOverlay;
-    dimmedOverlay.addRect(drawnRect);
-    dimmedOverlay.addRect(d->m_mappedViewport);
-
-    QPixmap composedPreview(d->m_sceneContent);
-    QPainter painter(&composedPreview);
-    painter.fillPath(dimmedOverlay, dimColor());
-    d->m_display = composedPreview;
-
-    setFixedSize(drawnRect.size());
-
-    update();
 }
 
 void MiniMap::setDimColor(const QColor &to)
 {
     if (d->m_dimColor != to) {
         d->m_dimColor = to;
-
-        composeMap();
+        viewport()->update();
     }
 }
 
@@ -254,59 +125,9 @@ QColor MiniMap::dimColor() const
     return d->m_dimColor;
 }
 
-void MiniMap::scheduleUpdateContent()
+void MiniMap::sceneRectChanged(const QRectF &sceneRect)
 {
-    if (d->m_renderTimer->isActive())
-        d->m_renderTimer->stop();
-
-    switch (d->m_scheduledUpdate) {
-    case MiniMapPrivate::RequestedUpdate::None:
-        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Content;
-        break;
-    default:
-        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
-        break;
-    }
-
-    d->m_renderTimer->start();
-}
-
-void MiniMap::scheduleUpdateViewport()
-{
-    if (d->m_renderTimer->isActive())
-        d->m_renderTimer->stop();
-
-    switch (d->m_scheduledUpdate) {
-    case MiniMapPrivate::RequestedUpdate::None:
-        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Viewport;
-        break;
-    default:
-        d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::Both;
-        break;
-    }
-
-    d->m_renderTimer->start();
-}
-
-void MiniMap::delayedUpdate()
-{
-    switch (d->m_scheduledUpdate) {
-    case MiniMapPrivate::RequestedUpdate::Content:
-        grabSceneContent();
-        break;
-    case MiniMapPrivate::RequestedUpdate::Viewport:
-        grabViewportRect();
-        break;
-    default: {
-        grabSceneContent();
-        grabViewportRect();
-        break;
-    }
-    }
-
-    d->m_scheduledUpdate = MiniMapPrivate::RequestedUpdate::None;
-
-    composeMap();
+    resize(QSizeF(sceneRect.size() / kDefaultScaleFactor).toSize());
 }
 
 bool MiniMap::checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const
@@ -316,8 +137,16 @@ bool MiniMap::checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::Mouse
 
 void MiniMap::updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape)
 {
-    const Qt::CursorShape cursorShape = d->m_mappedViewport.contains(pos) ? targetShape : Qt::ArrowCursor;
+    const auto viewportOnScene = d->m_view->mapToScene(d->m_view->viewport()->rect());
+    const auto targetViewport = mapFromScene(viewportOnScene).boundingRect();
+    const Qt::CursorShape cursorShape = targetViewport.contains(pos) ? targetShape : Qt::ArrowCursor;
     setCursor(cursorShape);
+}
+
+QRectF MiniMap::mappedViewportOnScene() const
+{
+    const auto viewportOnScene = d->m_view->mapToScene(d->m_view->viewport()->rect());
+    return viewportOnScene.boundingRect();
 }
 
 void MiniMap::mousePressEvent(QMouseEvent *event)
@@ -337,7 +166,7 @@ void MiniMap::mouseMoveEvent(QMouseEvent *event)
 
     if (checkMouseEvent(event, Qt::NoButton, Qt::NoButton)) {
         updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
-    } else if (checkMouseEvent(event, Qt::NoButton, Qt::LeftButton)) {
+    } else if (checkMouseEvent(event, Qt::LeftButton, Qt::LeftButton)) {
         d->m_mouseFinish = event->pos();
         processMouseInput();
     }
@@ -353,13 +182,13 @@ void MiniMap::mouseReleaseEvent(QMouseEvent *event)
 
     updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
 
-    d->m_mouseStart = OutOfView;
-    d->m_mouseFinish = OutOfView;
+    d->m_mouseStart = kOutOfView;
+    d->m_mouseFinish = kOutOfView;
 }
 
 void MiniMap::processMouseInput()
 {
-    if (d->m_mouseFinish == OutOfView) {
+    if (d->m_mouseFinish == kOutOfView) {
         return;
     }
 
@@ -369,21 +198,38 @@ void MiniMap::processMouseInput()
         // But let's just center the main view on the current mouse pos instead — the UX flow seems to be smooth,
         // but the code is way much simplier.
         // This seems to be enough, at least for beginning.
-        d->m_mouseStart = d->m_mouseFinish;
-    } // else it's a click - recenter the main view on it
 
-    newCenter = pixelToScene(d->m_mouseStart);
+        const auto sceneOffset = mapToScene(d->m_mouseFinish) - mapToScene(d->m_mouseStart);
+        const auto viewportCenterOnScene = d->m_view->mapToScene(d->m_view->viewport()->rect().center());
+        newCenter = viewportCenterOnScene + sceneOffset;
+        d->m_mouseStart = d->m_mouseFinish;
+    } else { // else it's a click - recenter the main view on it
+        newCenter = mapToScene(d->m_mouseStart);
+    }
 
     d->m_view->centerOn(newCenter);
 }
 
-QPointF MiniMap::pixelToScene(const QPoint &pixel) const
+void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options)
 {
-    const qreal scaleFactor = d->m_sceneRect.width() / d->m_sceneContent.rect().width();
-    const QTransform t = QTransform::fromScale(scaleFactor, scaleFactor);
+    for (int idx = 0; idx < numItems; ++idx) {
+        if (items[idx]->type() == GripPoint::Type)
+            continue;
 
-    const QPointF scenePoint = t.map(pixel) + d->m_sceneRect.topLeft();
-    return scenePoint;
+        painter->save();
+        painter->setMatrix(items[idx]->sceneMatrix(), true);
+        items[idx]->paint(painter, &options[idx], this);
+        painter->restore();
+    }
+}
+
+void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    QPainterPath dimmedOverlay;
+    dimmedOverlay.addRect(rect);
+    dimmedOverlay.addRect(mappedViewportOnScene());
+    painter->setPen(Qt::NoPen);
+    painter->fillPath(dimmedOverlay, dimColor());
 }
 
 } // namespace ui

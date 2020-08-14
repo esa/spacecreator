@@ -58,7 +58,7 @@ MSCPlugin::MSCPlugin(QObject *parent)
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 }
 
-MSCPlugin::~MSCPlugin() { }
+MSCPlugin::~MSCPlugin() {}
 
 MainModel *MSCPlugin::mainModel() const
 {
@@ -273,6 +273,8 @@ void MSCPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window)
 
 void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
+    Plugin::addMenuViewActions(menu, window);
+
     auto mainWindow = dynamic_cast<MainWindow *>(window);
 
     m_actionShowDocument = menu->addAction(tr("Show &Document"), mainWindow, &MainWindow::showDocumentView, tr("F8"));

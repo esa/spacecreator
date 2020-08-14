@@ -417,8 +417,7 @@ void MainWindow::setupMiniMap()
 {
     // have to be instantiated after this->ui & this->document
     m_miniMap = new shared::ui::MiniMap(m_plugin->document()->view());
-    m_miniMap->setupSourceView(
-            qobject_cast<QGraphicsView *>(m_plugin->document()->view()), aadlinterface::cmd::CommandsStack::current());
+    m_miniMap->setupSourceView(qobject_cast<QGraphicsView *>(m_plugin->document()->view()));
     connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
     connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 }

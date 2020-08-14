@@ -17,25 +17,32 @@
 
 #pragma once
 
+#include <QGraphicsItem>
+#include <QGraphicsView>
 #include <QObject>
+#include <QStyleOptionGraphicsItem>
 #include <QWidget>
 #include <memory>
-
-class QGraphicsView;
-class QUndoStack;
 
 namespace shared {
 namespace ui {
 
+class MiniView : public QGraphicsView
+{
+    Q_OBJECT
+public:
+    explicit MiniView(QGraphicsScene *scene, QWidget *parent = nullptr);
+};
+
 struct MiniMapPrivate;
-class MiniMap : public QWidget
+class MiniMap : public QGraphicsView
 {
     Q_OBJECT
 public:
     explicit MiniMap(QWidget *parent = nullptr);
     ~MiniMap(); // the definition (even an empty) is necessary for the dptr (std::unique_ptr)
 
-    void setupSourceView(QGraphicsView *view, QUndoStack *stack);
+    void setupSourceView(QGraphicsView *view);
 
     void setDimColor(const QColor &to);
     QColor dimColor() const;
@@ -46,37 +53,28 @@ Q_SIGNALS:
 protected:
     void showEvent(QShowEvent *e) override;
     void hideEvent(QHideEvent *e) override;
-    void paintEvent(QPaintEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 
-    void updateViewportFrame();
+    void drawItems(
+            QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options) override;
+
+    void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 protected Q_SLOTS:
-    void onSceneUpdated();
-    void onViewUpdated();
+    void sceneRectChanged(const QRectF &sceneRect);
 
-    void delayedUpdate();
-    void composeMap();
+private:
+    void processMouseInput();
+    bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const;
+    void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
+    QRectF mappedViewportOnScene() const;
 
 private:
     const std::unique_ptr<MiniMapPrivate> d;
-
-    bool grabSceneContent();
-    bool grabViewportRect();
-
-    void scheduleUpdateContent();
-    void scheduleUpdateViewport();
-
-    void processMouseInput();
-
-    QPointF pixelToScene(const QPoint &pixel) const;
-
-    bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const;
-    void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
 };
 
 } // namespace ui
