@@ -32,6 +32,8 @@ public:
 
     void activate();
 
+    bool validateCreate(MscMessage *message) const;
+
 private:
     void createPreviewItem() override;
     void commitPreviewItem() override;

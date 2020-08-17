@@ -85,21 +85,26 @@ void MessageCreatorTool::createPreviewItem()
 
 bool isCyclicCreation(MscMessage *message)
 {
-    if (message->sourceInstance()->explicitCreator() == message->targetInstance())
-        return false;
+    if (message->sourceInstance()->explicitCreator() == message->targetInstance()) {
+        return true;
+    }
 
     MscInstance *excludedCreator = message->targetInstance();
 
     MscInstance *currentCreator = message->sourceInstance();
     while (currentCreator) {
         currentCreator = currentCreator->explicitCreator();
-        if (currentCreator == excludedCreator)
+        if (currentCreator == excludedCreator) {
             return true;
+        }
     }
     return false;
 }
 
-bool validateCreate(MscMessage *message)
+/*!
+   Returns if the create, as defined in \p message, is allowed
+ */
+bool MessageCreatorTool::validateCreate(MscMessage *message) const
 {
     if (message->sourceInstance() && message->targetInstance()) {
         if (message->sourceInstance() != message->targetInstance()) {
