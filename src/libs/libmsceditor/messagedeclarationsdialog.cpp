@@ -257,6 +257,10 @@ void MessageDeclarationsDialog::selectAsn1File()
 void MessageDeclarationsDialog::updateAsn1TypesView()
 {
     ui->availableListView->clear();
+    if (!m_mscModel || !m_mscModel->asn1Types()) {
+        return;
+    }
+
     for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_mscModel->asn1Types()->definitionsList()) {
         for (const QString &name : definitions->typeAssignmentNames()) {
             ui->availableListView->addItem(name);
