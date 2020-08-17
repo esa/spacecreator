@@ -13,6 +13,10 @@
 
 set(QTC_FOUND FALSE)
 
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
 if(LINUX)
     find_path(QTC_LIB_DIR libExtensionSystem.so
         "$ENV{QTC_INSTALL}/lib/qtcreator"
