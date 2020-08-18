@@ -61,7 +61,7 @@ MainWidget::MainWidget(QWidget *parent)
     m_plugin->initHierarchyViewActions();
     initConnections();
     m_plugin->initConnections();
-
+    m_plugin->setupMiniMap();
     m_plugin->showDocumentView(true);
 }
 

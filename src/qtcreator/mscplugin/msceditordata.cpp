@@ -199,6 +199,19 @@ void MscEditorData::openEditor(const QString &fileName)
     Core::EditorManager::instance()->openEditor(fileName);
 }
 
+void MscEditorData::setMinimapVisible(bool visible)
+{
+    m_minimapVisible = visible;
+
+    for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
+        if (auto document = qobject_cast<MscPlugin::MscEditorDocument *>(openedDocument)) {
+            if (document && document->designWidget()) {
+                document->designWidget()->mscPlugin()->minimapView()->setVisible(visible);
+            }
+        }
+    }
+}
+
 void MscEditorData::updateToolBar()
 {
     auto designWidget = static_cast<MainWidget *>(m_widgetStack->currentWidget());

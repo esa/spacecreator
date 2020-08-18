@@ -34,6 +34,7 @@ const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "
 
 const char MESSAGE_DECLARATIONS_ID[] = "MscPlugin.MessageDeclarations";
 const char AADL_FILES_LIST_ID[] = "MscPlugin.AADLFilesList";
+const char SHOW_MINIMAP_ID[] = "MscPlugin.Minimap";
 const char MENU_ID[] = "MscPlugin.Menu";
 
 } // namespace MscPlugin

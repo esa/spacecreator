@@ -43,6 +43,7 @@ public:
 public Q_SLOTS:
     void showMessageDeclarations();
     void showAadlFilesList();
+    void setMinimapVisible(bool visible);
 
 private:
     MscEditorFactory *m_factory = nullptr;

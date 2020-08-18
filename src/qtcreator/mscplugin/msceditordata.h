@@ -51,6 +51,7 @@ public:
 
 public Q_SLOTS:
     void openEditor(const QString &fileName);
+    void setMinimapVisible(bool visible);
 
 private:
     void updateToolBar();
@@ -68,6 +69,7 @@ private:
     QAction *m_redoAction = nullptr;
 
     MscTextEditorFactory *m_editorFactory = nullptr;
+    bool m_minimapVisible = false;
 };
 
 }

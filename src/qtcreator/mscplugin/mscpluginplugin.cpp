@@ -88,10 +88,17 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
             action, Constants::AADL_FILES_LIST_ID, Core::Context(Core::Constants::C_GLOBAL));
     connect(action, &QAction::triggered, this, &MscPluginPlugin::showAadlFilesList);
 
+    auto showMinimapAction = new QAction(tr("Show minimap"), this);
+    showMinimapAction->setCheckable(true);
+    Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
+            showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(showMinimapAction, &QAction::triggered, this, &MscPluginPlugin::setMinimapVisible);
+
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("MscPlugin"));
     menu->addAction(messageDeclCmd);
     menu->addAction(listAadlCmd);
+    menu->addAction(showMinimapCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     m_factory = new MscEditorFactory(this);
@@ -124,6 +131,11 @@ void MscPluginPlugin::showAadlFilesList()
 {
     QMessageBox::information(
             Core::ICore::mainWindow(), tr("AADL files"), m_factory->editorData()->aadlFiles().join("\n"));
+}
+
+void MscPluginPlugin::setMinimapVisible(bool visible)
+{
+    m_factory->editorData()->setMinimapVisible(visible);
 }
 
 }
