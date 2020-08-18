@@ -137,13 +137,12 @@ void EntityDeleteTool::deleteSelectedItems()
 
     msc::cmd::CommandsStack::current()->beginMacro(tr("Removing Entities"));
     for (msc::MscEntity *entity : comments) {
-        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                { QVariant::fromValue<msc::MscEntity *>(m_currentChart), QVariant::fromValue<msc::MscEntity *>(entity),
-                        QString() });
+        msc::cmd::CommandsStack::push(
+                msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(entity), QString() });
     }
     msc::cmd::CommandsStack::push(msc::cmd::DeleteEntity,
             { QVariant::fromValue<QVector<msc::MscEntity *>>(items),
-                    QVariant::fromValue<msc::MscChart *>(m_currentChart),
+
                     QVariant::fromValue<msc::MscDocument *>(parentDocument) });
     msc::cmd::CommandsStack::current()->endMacro();
 }

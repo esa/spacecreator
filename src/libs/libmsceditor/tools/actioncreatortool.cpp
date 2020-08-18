@@ -66,8 +66,7 @@ void ActionCreatorTool::commitPreviewItem()
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventIndex(m_previewItem->y());
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(action),
-        QVariant::fromValue<msc::MscChart *>(m_activeChart), QVariant::fromValue<msc::MscInstance *>(instance),
-        eventIndex };
+        QVariant::fromValue<msc::MscInstance *>(instance), eventIndex };
     msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
 
     startWaitForModelLayoutComplete(action);

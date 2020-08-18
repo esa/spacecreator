@@ -179,7 +179,7 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QP
     if (!CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
 
-    const QVariantList params { cifRectPrev, cifRectCurr, QVariant::fromValue<MscChart *>(chart()) };
+    const QVariantList params { cifRectPrev, cifRectCurr };
     msc::cmd::CommandsStack::push(msc::cmd::ChangeChartGeometry, params);
     m_prevContentRect = QRectF();
 }

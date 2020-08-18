@@ -21,22 +21,28 @@
 
 #include <QObject>
 #include <QVariantList>
+#include <memory>
 
 class QUndoStack;
 
 namespace msc {
 namespace cmd {
+class CommandsFactory;
 
 class CommandsStack : public QObject
 {
     Q_OBJECT
 public:
+    ~CommandsStack();
+
     static CommandsStack *instance();
 
     static void setCurrent(QUndoStack *stack);
     static QUndoStack *current();
 
     static bool push(msc::cmd::Id id, const QVariantList &params);
+
+    CommandsFactory *factory();
 
 Q_SIGNALS:
     void currentStackChanged(QUndoStack *to);
@@ -49,6 +55,7 @@ private:
 
     static CommandsStack *m_instance;
     QUndoStack *m_current = nullptr;
+    std::unique_ptr<CommandsFactory> m_cmdFactory;
 };
 
 } // namespace cmd

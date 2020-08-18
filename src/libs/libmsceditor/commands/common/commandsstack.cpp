@@ -25,10 +25,19 @@ namespace cmd {
 
 CommandsStack *CommandsStack::m_instance = nullptr;
 
+CommandsStack::CommandsStack(QObject *parent)
+    : QObject(parent)
+    , m_cmdFactory(std::make_unique<CommandsFactory>())
+{
+}
+
+CommandsStack::~CommandsStack() { }
+
 CommandsStack *CommandsStack::instance()
 {
-    if (!m_instance)
+    if (!m_instance) {
         m_instance = new CommandsStack();
+    }
 
     return m_instance;
 }
@@ -45,7 +54,7 @@ QUndoStack *CommandsStack::current()
 
 bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
 {
-    QUndoCommand *command = cmd::CommandsFactory::create(id, params);
+    QUndoCommand *command = instance()->m_cmdFactory->create(id, params);
 
     if (command && CommandsStack::current()) {
         CommandsStack::current()->push(command);
@@ -55,9 +64,12 @@ bool CommandsStack::push(msc::cmd::Id id, const QVariantList &params)
     return false;
 }
 
-CommandsStack::CommandsStack(QObject *parent)
-    : QObject(parent)
+/*!
+   Access to the factory of the commands.
+ */
+CommandsFactory *CommandsStack::factory()
 {
+    return m_cmdFactory.get();
 }
 
 void CommandsStack::setCurrentStack(QUndoStack *stack)

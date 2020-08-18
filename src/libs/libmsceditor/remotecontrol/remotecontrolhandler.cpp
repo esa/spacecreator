@@ -156,8 +156,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
     m_model->chartViewModel().currentChart()->addInstance(mscInstance, pos);
 
-    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance),
-        QVariant::fromValue<msc::MscChart *>(mscChart), pos };
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
     if (!result)
         *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
@@ -288,8 +287,8 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     mscChart->addInstanceEvent(mscTimer, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscTimer *>(mscTimer),
-        QVariant::fromValue<msc::MscTimer::TimerType>(timerType), QVariant::fromValue<msc::MscChart *>(mscChart),
-        QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscTimer::TimerType>(timerType), QVariant::fromValue<msc::MscInstance *>(mscInstance),
+        pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateTimer, cmdParams);
     if (!result)
         *errorString = tr("Timer is added but unavailable for Undo/Redo actions");
@@ -323,7 +322,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     mscChart->addInstanceEvent(mscAction, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscAction *>(mscAction),
-        QVariant::fromValue<msc::MscChart *>(mscChart), QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateAction, cmdParams);
     if (!result)
         *errorString = tr("Action is added but unavailable for Undo/Redo actions");
@@ -357,7 +356,7 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     mscChart->addInstanceEvent(mscCondition, pos);
 
     const QVariantList &cmdParams = { QVariant::fromValue<msc::MscCondition *>(mscCondition),
-        QVariant::fromValue<msc::MscChart *>(mscChart), QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+        QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
     if (!result)
         *errorString = tr("Condition is added but unavailable for Undo/Redo actions");

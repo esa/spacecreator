@@ -23,6 +23,7 @@
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
+#include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "commentitem.h"
 #include "conditionitem.h"
@@ -190,6 +191,7 @@ void ChartLayoutManager::setCurrentChart(MscChart *chart)
     }
 
     d->m_currentChart = chart;
+    cmd::CommandsStack::instance()->factory()->setCurrentChart(d->m_currentChart);
 
     clearScene();
 
@@ -1491,8 +1493,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
                     { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance),
-                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                            QVariant::fromValue<MscInstance *>(newInstance) });
         }
     }
 
@@ -1503,8 +1504,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         if (!newInstance || newInstance != conditionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveCondition,
                     { QVariant::fromValue<MscCondition *>(conditionItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance),
-                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                            QVariant::fromValue<MscInstance *>(newInstance) });
         }
     }
 
@@ -1515,8 +1515,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         if (!newInstance || newInstance != timerItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveTimer,
                     { QVariant::fromValue<MscTimer *>(timerItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance),
-                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                            QVariant::fromValue<MscInstance *>(newInstance) });
         }
     }
 
@@ -1531,8 +1530,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
             msc::cmd::CommandsStack::push(msc::cmd::MoveCoRegion,
                     { QVariant::fromValue<MscCoregion *>(coregionItem->begin()),
                             QVariant::fromValue<MscCoregion *>(coregionItem->end()), newIdxBegin, newIdxEnd,
-                            QVariant::fromValue<MscInstance *>(newInstance),
-                            QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                            QVariant::fromValue<MscInstance *>(newInstance) });
         }
     }
 
@@ -1568,8 +1566,7 @@ void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &p
         }
         msc::cmd::CommandsStack::push(msc::cmd::RetargetMessage,
                 { QVariant::fromValue<MscMessage *>(message), newIdx, QVariant::fromValue<MscInstance *>(newInstance),
-                        QVariant::fromValue<MscMessage::EndType>(endType),
-                        QVariant::fromValue<MscChart *>(d->m_currentChart) });
+                        QVariant::fromValue<MscMessage::EndType>(endType) });
     } else {
         if (item->geometryManagedByCif())
             item->applyCif();

@@ -19,51 +19,60 @@
 
 #include "commandids.h"
 
+#include <QPointer>
 #include <QVariantList>
 
 class QUndoCommand;
 
 namespace msc {
+
+class MscChart;
+
 namespace cmd {
 
 class CommandsFactory
 {
 public:
-    static QUndoCommand *create(msc::cmd::Id id, const QVariantList &params);
+    CommandsFactory();
 
-    static QUndoCommand *createChangeComment(const QVariantList &params);
-    static QUndoCommand *createRenameEntity(const QVariantList &params);
-    static QUndoCommand *createDeleteEntity(const QVariantList &params);
-    static QUndoCommand *createMessageItemRetarget(const QVariantList &params);
-    static QUndoCommand *createMessageItemCreate(const QVariantList &params);
-    static QUndoCommand *createSetParameterList(const QVariantList &params);
-    static QUndoCommand *createChangeInstanceOrder(const QVariantList &params);
-    static QUndoCommand *createInstanceItemCreate(const QVariantList &params);
-    static QUndoCommand *createInstanceKindChange(const QVariantList &params);
-    static QUndoCommand *createInstanceStopChange(const QVariantList &params);
-    static QUndoCommand *createConditionItemCreate(const QVariantList &params);
-    static QUndoCommand *createConditionItemMove(const QVariantList &params);
-    static QUndoCommand *createActionItemCreate(const QVariantList &params);
-    static QUndoCommand *createCoregionItemCreate(const QVariantList &params);
-    static QUndoCommand *createCoregionMove(const QVariantList &params);
-    static QUndoCommand *createActionItemMove(const QVariantList &params);
-    static QUndoCommand *createActionInformalText(const QVariantList &params);
-    static QUndoCommand *createTimerItemCreate(const QVariantList &params);
-    static QUndoCommand *createTimerItemMove(const QVariantList &params);
-    static QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
-    static QUndoCommand *createDocumentCreate(const QVariantList &params);
-    static QUndoCommand *createChartGeometryChange(const QVariantList &params);
-    static QUndoCommand *createCommentGeometryChange(const QVariantList &params);
-    static QUndoCommand *createDocumentMove(const QVariantList &params);
-    static QUndoCommand *createSetMessageDeclarations(const QVariantList &params);
-    static QUndoCommand *createChartPaste(const QVariantList &params);
-    static QUndoCommand *createAsn1File(const QVariantList &params);
-    static QUndoCommand *createChangeInstancePosition(const QVariantList &params);
-    static QUndoCommand *createEditMessagePoints(const QVariantList &params);
+    QUndoCommand *create(msc::cmd::Id id, const QVariantList &params);
+
+    void setCurrentChart(msc::MscChart *chart);
+
+    QUndoCommand *createChangeComment(const QVariantList &params);
+    QUndoCommand *createRenameEntity(const QVariantList &params);
+    QUndoCommand *createDeleteEntity(const QVariantList &params);
+    QUndoCommand *createMessageItemRetarget(const QVariantList &params);
+    QUndoCommand *createMessageItemCreate(const QVariantList &params);
+    QUndoCommand *createSetParameterList(const QVariantList &params);
+    QUndoCommand *createChangeInstanceOrder(const QVariantList &params);
+    QUndoCommand *createInstanceItemCreate(const QVariantList &params);
+    QUndoCommand *createInstanceKindChange(const QVariantList &params);
+    QUndoCommand *createInstanceStopChange(const QVariantList &params);
+    QUndoCommand *createConditionItemCreate(const QVariantList &params);
+    QUndoCommand *createConditionItemMove(const QVariantList &params);
+    QUndoCommand *createActionItemCreate(const QVariantList &params);
+    QUndoCommand *createCoregionItemCreate(const QVariantList &params);
+    QUndoCommand *createCoregionMove(const QVariantList &params);
+    QUndoCommand *createActionItemMove(const QVariantList &params);
+    QUndoCommand *createActionInformalText(const QVariantList &params);
+    QUndoCommand *createTimerItemCreate(const QVariantList &params);
+    QUndoCommand *createTimerItemMove(const QVariantList &params);
+    QUndoCommand *createHierarchyTypeChange(const QVariantList &params);
+    QUndoCommand *createDocumentCreate(const QVariantList &params);
+    QUndoCommand *createChartGeometryChange(const QVariantList &params);
+    QUndoCommand *createCommentGeometryChange(const QVariantList &params);
+    QUndoCommand *createDocumentMove(const QVariantList &params);
+    QUndoCommand *createSetMessageDeclarations(const QVariantList &params);
+    QUndoCommand *createChartPaste(const QVariantList &params);
+    QUndoCommand *createAsn1File(const QVariantList &params);
+    QUndoCommand *createChangeInstancePosition(const QVariantList &params);
+    QUndoCommand *createEditMessagePoints(const QVariantList &params);
 
 private:
-    CommandsFactory() = delete;
     CommandsFactory(const CommandsFactory &other) = delete;
+
+    QPointer<msc::MscChart> m_chart;
 };
 
 } // ns cmd

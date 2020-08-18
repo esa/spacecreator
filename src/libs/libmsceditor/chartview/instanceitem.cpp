@@ -432,9 +432,8 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
             }
 
             if (oldIdx != newIdx) {
-                cmd::CommandsStack::push(cmd::Id::ReorderInstance,
-                        { QVariant::fromValue<MscInstance *>(m_instance), newIdx,
-                                QVariant::fromValue<MscChart *>(m_chart) });
+                cmd::CommandsStack::push(
+                        cmd::Id::ReorderInstance, { QVariant::fromValue<MscInstance *>(m_instance), newIdx });
             }
         }
         cmd::CommandsStack::push(cmd::Id::ChangeInstancePosition, paramsPosition);

@@ -604,8 +604,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
                 { QVariant::fromValue<MscMessage *>(m_message), newIdx,
                         QVariant::fromValue<MscInstance *>(
                                 sourceInstanceItem() ? sourceInstanceItem()->modelItem() : nullptr),
-                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL),
-                        QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
+                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::SOURCE_TAIL) });
     }
     if (targetChanged) {
         const int newIdx = m_chartLayoutManager->eventIndex(head().y());
@@ -613,15 +612,13 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
                 { QVariant::fromValue<MscMessage *>(m_message), newIdx,
                         QVariant::fromValue<MscInstance *>(
                                 targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr),
-                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD),
-                        QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
+                        QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD) });
     }
 
     const int newIdx = m_chartLayoutManager->eventIndex(sceneBoundingRect().y());
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
             { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
-                    QVariant::fromValue(newPointsCif), newIdx,
-                    QVariant::fromValue<MscChart *>(m_chartLayoutManager->currentChart()) });
+                    QVariant::fromValue(newPointsCif), newIdx });
     cmd::CommandsStack::current()->endMacro();
 
     if (auto item = m_chartLayoutManager->itemForComment(m_message->comment())) {

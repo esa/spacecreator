@@ -339,8 +339,7 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
 
         rebuildLayout();
         updateGripPoints();
@@ -398,8 +397,7 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
         msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                        QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
 
         rebuildLayout();
         updateGripPoints();
@@ -423,11 +421,9 @@ void CommentItem::textEdited(const QString &text)
         if (oldRect != newRect || oldText != text) {
             msc::cmd::CommandsStack::current()->beginMacro(tr("Change comment"));
             msc::cmd::CommandsStack::push(msc::cmd::ChangeCommentGeometry,
-                    { QVariant::fromValue<MscChart *>(m_chart), oldRect, newRect,
-                            QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
+                    { oldRect, newRect, QVariant::fromValue<MscEntity *>(m_iObj->modelEntity()) });
             msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-                    { QVariant::fromValue<MscChart *>(m_chart),
-                            QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
+                    { QVariant::fromValue<msc::MscEntity *>(m_iObj->modelEntity()), text });
             msc::cmd::CommandsStack::current()->endMacro();
         }
     }

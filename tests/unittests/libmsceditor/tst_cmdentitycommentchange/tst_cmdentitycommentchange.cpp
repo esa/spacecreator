@@ -49,6 +49,7 @@ void tst_CmdEntityCommentChange::init()
 {
     m_chart = new msc::MscChart();
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
+    cmd::CommandsStack::instance()->factory()->setCurrentChart(m_chart);
 }
 
 void tst_CmdEntityCommentChange::cleanup()
@@ -62,20 +63,17 @@ void tst_CmdEntityCommentChange::testRedo()
     QCOMPARE(m_chart->commentString(), QString(""));
 
     // no comment entity exists yet
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
-                    "Test01" });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), "Test01" });
     QCOMPARE(m_chart->commentString(), QString("Test01"));
 
     // update comment entity
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
-                    "Test02" });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), "Test02" });
     QCOMPARE(m_chart->commentString(), QString("Test02"));
 
     // Set empty comment (remove comment)
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart), "" });
+    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), "" });
     QVERIFY(m_chart->comment() == nullptr);
     QCOMPARE(m_chart->commentString(), QString(""));
 }
@@ -85,9 +83,8 @@ void tst_CmdEntityCommentChange::testUndo()
     QCOMPARE(m_chart->commentString(), QString(""));
     QVERIFY(m_chart->comment() == nullptr);
 
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
-                    "Test01" });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), "Test01" });
     QVERIFY(m_chart->comment() != nullptr);
     QCOMPARE(m_chart->commentString(), QString("Test01"));
 
@@ -98,9 +95,8 @@ void tst_CmdEntityCommentChange::testUndo()
 
     // Normal undo
     m_chart->setCommentString("TestXY");
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
-                    "Test02" });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), "Test02" });
     QVERIFY(m_chart->comment() != nullptr);
     QCOMPARE(m_chart->commentString(), QString("Test02"));
 
@@ -115,9 +111,8 @@ void tst_CmdEntityCommentChange::testSettingEmptyString()
     m_chart->setCommentString("Comment A");
 
     // Applying an empty string is the same as deleting the comment
-    msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeComment,
-            { QVariant::fromValue<msc::MscChart *>(m_chart), QVariant::fromValue<msc::MscEntity *>(m_chart),
-                    QString("") });
+    msc::cmd::CommandsStack::push(
+            msc::cmd::Id::ChangeComment, { QVariant::fromValue<msc::MscEntity *>(m_chart), QString("") });
 
     QCOMPARE(m_chart->commentString(), QString(""));
 

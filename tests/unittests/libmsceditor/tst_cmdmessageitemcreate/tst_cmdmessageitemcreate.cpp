@@ -71,6 +71,7 @@ void tst_CmdMessageItemCreate::initTestCase()
     m_chartModel.setCurrentChart(m_chart);
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
+    cmd::CommandsStack::instance()->factory()->setCurrentChart(m_chart);
 }
 
 void tst_CmdMessageItemCreate::cleanupTestCase()
@@ -80,8 +81,8 @@ void tst_CmdMessageItemCreate::cleanupTestCase()
 
 QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int insertId)
 {
-    return { QVariant::fromValue<msc::MscMessage *>(message), QVariant::fromValue<msc::ChartLayoutManager *>(&m_chartModel),
-        insertId, m_dummyCif };
+    return { QVariant::fromValue<msc::MscMessage *>(message),
+        QVariant::fromValue<msc::ChartLayoutManager *>(&m_chartModel), insertId, m_dummyCif };
 }
 
 void tst_CmdMessageItemCreate::testCreate()
