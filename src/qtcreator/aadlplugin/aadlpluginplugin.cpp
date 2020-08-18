@@ -62,6 +62,12 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
     connect(m_asn1DialogAction, &QAction::triggered, this, &AadlPluginPlugin::showAsn1Dialog);
 
+    m_minimapWidgetAction = new QAction(tr("Show minimap"), this);
+    m_minimapWidgetAction->setCheckable(true);
+    Core::Command *showMinimapCmd =
+            Core::ActionManager::registerAction(m_minimapWidgetAction, Constants::AADL_SHOW_MINIMAP_ID);
+    connect(m_minimapWidgetAction, &QAction::triggered, this, &AadlPluginPlugin::showMinimap);
+
     m_asn1DialogAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
         if (editor && editor->document()) {
@@ -73,6 +79,7 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::AADL_MENU_ID);
     menu->menu()->setTitle(tr("AADLPlugin"));
     menu->addAction(showAsn1Cmd);
+    menu->addAction(showMinimapCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -100,6 +107,11 @@ ExtensionSystem::IPlugin::ShutdownFlag AadlPluginPlugin::aboutToShutdown()
 void AadlPluginPlugin::showAsn1Dialog()
 {
     m_factory->editorData()->showAsn1Dialog();
+}
+
+void AadlPluginPlugin::showMinimap(bool visible)
+{
+    m_factory->editorData()->showMinimap(visible);
 }
 
 }

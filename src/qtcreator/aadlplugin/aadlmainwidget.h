@@ -51,6 +51,7 @@ public:
     QVector<QAction *> hierarchyActions() const;
 
     void showAsn1Dialog();
+    void setMinimapVisible(bool visible);
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);

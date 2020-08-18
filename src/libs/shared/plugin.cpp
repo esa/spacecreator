@@ -1,5 +1,8 @@
 #include "plugin.h"
 
+#include "minimap.h"
+#include "ui/graphicsviewbase.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QMainWindow>
@@ -17,6 +20,11 @@ Plugin::Plugin(QObject *parent)
 }
 
 Plugin::~Plugin() { }
+
+QWidget *Plugin::minimapView() const
+{
+    return m_miniMap;
+}
 
 QToolBar *Plugin::mainToolBar()
 {
@@ -173,6 +181,14 @@ void Plugin::showAboutDialog()
 #endif
 
     QMessageBox::information(m_mainWindow, tr("About"), info);
+}
+
+void Plugin::setupMiniMap()
+{
+    m_miniMap = new ui::MiniMap;
+    m_miniMap->setupSourceView(chartView());
+    connect(actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
+    connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, actionToggleMinimap(), &QAction::setChecked);
 }
 
 }

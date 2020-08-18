@@ -1,7 +1,7 @@
 #pragma once
 
-#include "baseitems/graphicsview.h"
 #include "plugin.h"
+#include "ui/graphicsviewbase.h"
 
 namespace aadlinterface {
 
@@ -16,7 +16,7 @@ public:
 
     void setPluginActive(bool active) override;
 
-    GraphicsView *chartView() override;
+    shared::ui::GraphicsViewBase *chartView() override;
     void addToolBars(QMainWindow *window) override;
     void addMenuFileActions(QMenu *menu, QMainWindow *window) override;
     void addMenuEditActions(QMenu *menu, QMainWindow *window) override;
@@ -33,7 +33,6 @@ public:
 private:
     aadlinterface::InterfaceDocument *m_document { nullptr };
 
-    GraphicsView *m_graphicsView;
     QToolBar *m_docToolBar;
 
     QAction *m_actionSaveSceneRender { nullptr };

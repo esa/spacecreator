@@ -19,7 +19,6 @@ namespace aadlinterface {
 IVEditorPlugin::IVEditorPlugin(QObject *parent)
     : shared::Plugin(parent)
     , m_document(new aadlinterface::InterfaceDocument(this))
-    , m_graphicsView(new GraphicsView)
     , m_docToolBar(new QToolBar)
 {
     m_document->init();
@@ -42,9 +41,9 @@ void IVEditorPlugin::setPluginActive(bool active)
     m_actionSaveSceneRender->setVisible(active);
 }
 
-GraphicsView *IVEditorPlugin::chartView()
+shared::ui::GraphicsViewBase *IVEditorPlugin::chartView()
 {
-    return m_graphicsView;
+    return qobject_cast<shared::ui::GraphicsViewBase *>(m_document->view());
 }
 
 void IVEditorPlugin::addToolBars(QMainWindow *window)

@@ -36,9 +36,8 @@ namespace shared {
 namespace ui {
 
 static constexpr QPoint kOutOfView { -1, -1 };
-static constexpr int kMinDimensionPix { 100 };
 static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
-static constexpr qreal kDefaultScaleFactor { 8 };
+static constexpr qreal kDefaultScaleFactor { 6 };
 
 struct MiniMapPrivate {
     QPointer<QGraphicsView> m_view;
@@ -51,21 +50,21 @@ MiniMap::MiniMap(QWidget *parent)
     : QGraphicsView(parent)
     , d(new MiniMapPrivate)
 {
-    setWindowFlags(Qt::Tool);
     setOptimizationFlag(QGraphicsView::IndirectPainting);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    setAttribute(Qt::WA_AlwaysStackOnTop);
-
-    setMinimumSize(kMinDimensionPix, kMinDimensionPix);
-
     setMouseTracking(true);
+    setVisible(false);
 }
 
-MiniMap::~MiniMap() {}
+MiniMap::~MiniMap() { }
 
 void MiniMap::setupSourceView(QGraphicsView *view)
 {
+    Q_ASSERT(view);
+    Q_ASSERT(view->scene());
+
     if (d->m_view) {
+        d->m_view->removeEventFilter(this);
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             disconnect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
             disconnect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
@@ -74,42 +73,26 @@ void MiniMap::setupSourceView(QGraphicsView *view)
     }
 
     d->m_view = view;
+    setParent(view);
 
     if (d->m_view) {
+        d->m_view->installEventFilter(this);
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             connect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
             connect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
         }
         setScene(view->scene());
+        pinToParentCorner();
         if (scene()) {
-            connect(scene(), &QGraphicsScene::sceneRectChanged, this, &MiniMap::sceneRectChanged);
-            if (!scene()->itemsBoundingRect().isValid())
-                resize(kMinDimensionPix, kMinDimensionPix);
-        } else {
-            resize(kMinDimensionPix, kMinDimensionPix);
+            connect(scene(), &QGraphicsScene::sceneRectChanged, this, &MiniMap::adjustGeometry);
         }
     }
-}
-
-void MiniMap::showEvent(QShowEvent *e)
-{
-    QWidget::showEvent(e);
-    Q_EMIT visibilityChanged(isVisible());
-}
-
-void MiniMap::hideEvent(QHideEvent *e)
-{
-    QWidget::hideEvent(e);
-    Q_EMIT visibilityChanged(isVisible());
 }
 
 void MiniMap::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
-    if (const auto graphicsScene = scene()) {
-        fitInView(graphicsScene->sceneRect(), Qt::KeepAspectRatio);
-        viewport()->update();
-    }
+    updateScaling();
 }
 
 void MiniMap::setDimColor(const QColor &to)
@@ -123,11 +106,6 @@ void MiniMap::setDimColor(const QColor &to)
 QColor MiniMap::dimColor() const
 {
     return d->m_dimColor;
-}
-
-void MiniMap::sceneRectChanged(const QRectF &sceneRect)
-{
-    resize(QSizeF(sceneRect.size() / kDefaultScaleFactor).toSize());
 }
 
 bool MiniMap::checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const
@@ -149,6 +127,49 @@ QRectF MiniMap::mappedViewportOnScene() const
     return viewportOnScene.boundingRect();
 }
 
+void MiniMap::adjustGeometry()
+{
+    if (auto widget = parentWidget()) {
+        const QRect parentRect = widget->rect();
+        const QSize sceneSize = scene()->sceneRect().size().toSize();
+        QRect geometry { pos(),
+            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatioByExpanding) };
+        if (geometry.left() < parentRect.left()) {
+            geometry.moveLeft(parentRect.left());
+        }
+        if (geometry.top() < parentRect.top()) {
+            geometry.moveTop(parentRect.top());
+        }
+        if (geometry.right() > parentRect.right()) {
+            geometry.moveRight(parentRect.right());
+        }
+        if (geometry.bottom() > parentRect.bottom()) {
+            geometry.moveBottom(parentRect.bottom());
+        }
+        setGeometry(geometry);
+    }
+}
+
+void MiniMap::pinToParentCorner()
+{
+    if (auto widget = parentWidget()) {
+        const auto parentRect = widget->rect();
+        const QSize sceneSize = scene()->sceneRect().size().toSize();
+        QRect currentRect { QPoint(0, 0),
+            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatioByExpanding) };
+        currentRect.moveTopRight(parentRect.topRight());
+        setGeometry(currentRect);
+    }
+}
+
+void MiniMap::updateScaling()
+{
+    if (const auto graphicsScene = scene()) {
+        fitInView(graphicsScene->sceneRect(), Qt::KeepAspectRatio);
+        viewport()->update();
+    }
+}
+
 void MiniMap::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
@@ -166,7 +187,7 @@ void MiniMap::mouseMoveEvent(QMouseEvent *event)
 
     if (checkMouseEvent(event, Qt::NoButton, Qt::NoButton)) {
         updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
-    } else if (checkMouseEvent(event, Qt::LeftButton, Qt::LeftButton)) {
+    } else if (checkMouseEvent(event, Qt::NoButton, Qt::LeftButton)) {
         d->m_mouseFinish = event->pos();
         processMouseInput();
     }
@@ -194,10 +215,9 @@ void MiniMap::processMouseInput()
 
     QPointF newCenter;
     if (d->m_mouseStart != d->m_mouseFinish) {
-        // It's a drag. In general, we should shift the main viewport accordingly to the shift of the minimap's preview.
-        // But let's just center the main view on the current mouse pos instead — the UX flow seems to be smooth,
-        // but the code is way much simplier.
-        // This seems to be enough, at least for beginning.
+        // It's a drag. In general, we should shift the main viewport accordingly to the shift of the minimap's
+        // preview. But let's just center the main view on the current mouse pos instead — the UX flow seems to be
+        // smooth, but the code is way much simplier. This seems to be enough, at least for beginning.
 
         const auto sceneOffset = mapToScene(d->m_mouseFinish) - mapToScene(d->m_mouseStart);
         const auto viewportCenterOnScene = d->m_view->mapToScene(d->m_view->viewport()->rect().center());
@@ -230,6 +250,14 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
     dimmedOverlay.addRect(mappedViewportOnScene());
     painter->setPen(Qt::NoPen);
     painter->fillPath(dimmedOverlay, dimColor());
+}
+
+bool MiniMap::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == parentWidget() && event->type() == QEvent::Resize) {
+        pinToParentCorner();
+    }
+    return QGraphicsView::eventFilter(object, event);
 }
 
 } // namespace ui

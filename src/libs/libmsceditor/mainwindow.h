@@ -101,8 +101,6 @@ private:
     void initMainToolbar();
     void initConnections();
 
-    void setupMiniMap();
-
     void closeEvent(QCloseEvent *e) override;
 
     void keyPressEvent(QKeyEvent *e) override;

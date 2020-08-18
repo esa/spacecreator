@@ -76,9 +76,6 @@ private:
     bool m_dropUnsavedChangesSilently { false };
 
     aadlinterface::IVEditorPlugin *m_plugin { nullptr };
-    shared::ui::MiniMap *m_miniMap { nullptr };
-
-    void setupMiniMap();
 };
 
 }

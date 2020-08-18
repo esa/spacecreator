@@ -27,13 +27,6 @@
 namespace shared {
 namespace ui {
 
-class MiniView : public QGraphicsView
-{
-    Q_OBJECT
-public:
-    explicit MiniView(QGraphicsScene *scene, QWidget *parent = nullptr);
-};
-
 struct MiniMapPrivate;
 class MiniMap : public QGraphicsView
 {
@@ -51,8 +44,6 @@ Q_SIGNALS:
     void visibilityChanged(bool visible);
 
 protected:
-    void showEvent(QShowEvent *e) override;
-    void hideEvent(QHideEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
 
     void mousePressEvent(QMouseEvent *event) override;
@@ -63,15 +54,16 @@ protected:
             QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options) override;
 
     void drawForeground(QPainter *painter, const QRectF &rect) override;
-
-protected Q_SLOTS:
-    void sceneRectChanged(const QRectF &sceneRect);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
     void processMouseInput();
     bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const;
     void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
     QRectF mappedViewportOnScene() const;
+    void adjustGeometry();
+    void pinToParentCorner();
+    void updateScaling();
 
 private:
     const std::unique_ptr<MiniMapPrivate> d;

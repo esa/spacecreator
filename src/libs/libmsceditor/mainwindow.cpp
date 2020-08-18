@@ -83,8 +83,6 @@ struct MainWindow::MainWindowPrivate {
 
     msc::MSCPlugin *m_plugin;
 
-    shared::ui::MiniMap *m_miniMap = nullptr;
-
     QComboBox *m_zoomBox = nullptr;
 
     msc::TextViewDialog *mscTextBrowser = nullptr;
@@ -119,7 +117,6 @@ MainWindow::MainWindow(msc::MSCPlugin *plugin, QWidget *parent)
     d->m_plugin->selectCurrentChart();
     d->m_plugin->showDocumentView(true);
 
-    setupMiniMap();
     loadSettings();
 
     d->m_plugin->mscToolBar()->setVisible(d->m_plugin->centerView()->currentWidget() == d->m_plugin->chartView());
@@ -374,6 +371,8 @@ void MainWindow::setupUi()
     d->m_plugin->initMenus(this);
     initMainToolbar();
 
+    d->m_plugin->setupMiniMap();
+
     // status bar
     d->m_zoomBox = new QComboBox(d->ui->statusBar);
     for (auto x = d->m_plugin->chartView()->minZoomPercent(); x <= d->m_plugin->chartView()->maxZoomPercent();
@@ -460,16 +459,6 @@ void MainWindow::initConnections()
         }
     });
     connect(d->m_plugin->mainModel(), &MainModel::asn1ParameterErrorDetected, this, &MainWindow::showAsn1Errors);
-}
-
-void MainWindow::setupMiniMap()
-{
-    // have to be instantiated after this->ui & this->document
-    d->m_miniMap = new shared::ui::MiniMap(d->m_plugin->chartView());
-    d->m_miniMap->setupSourceView(qobject_cast<QGraphicsView *>(d->m_plugin->chartView()));
-    connect(d->m_plugin->actionToggleMinimap(), &QAction::toggled, d->m_miniMap, &shared::ui::MiniMap::setVisible);
-    connect(d->m_miniMap, &shared::ui::MiniMap::visibilityChanged, d->m_plugin->actionToggleMinimap(),
-            &QAction::setChecked);
 }
 
 /*!

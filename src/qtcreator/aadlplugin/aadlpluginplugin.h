@@ -42,10 +42,12 @@ public:
 
 public Q_SLOTS:
     void showAsn1Dialog();
+    void showMinimap(bool visible);
 
 private:
     AadlEditorFactory *m_factory = nullptr;
     QAction *m_asn1DialogAction = nullptr;
+    QAction *m_minimapWidgetAction = nullptr;
 };
 
 }

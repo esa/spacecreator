@@ -142,6 +142,7 @@ void AadlEditorData::fullInit()
 Core::IEditor *AadlEditorData::createEditor()
 {
     auto designWidget = new AadlMainWidget;
+    designWidget->setMinimapVisible(m_minimapVisible);
     AadlTextEditor *aadlEditor = m_editorFactory->create(designWidget);
 
     m_undoGroup->addStack(designWidget->undoStack());
@@ -166,6 +167,19 @@ void AadlEditorData::showAsn1Dialog()
     auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
     if (document && document->designWidget()) {
         document->designWidget()->showAsn1Dialog();
+    }
+}
+
+void AadlEditorData::showMinimap(bool visible)
+{
+    m_minimapVisible = visible;
+
+    for (auto openedDocument : Core::DocumentModel::openedDocuments()) {
+        if (auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(openedDocument)) {
+            if (document && document->designWidget()) {
+                document->designWidget()->setMinimapVisible(visible);
+            }
+        }
     }
 }
 

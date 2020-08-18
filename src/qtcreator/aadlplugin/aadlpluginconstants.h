@@ -32,6 +32,7 @@ const char INFO_READ_ONLY[] = "AadlEditor.ReadOnly";
 const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AADL Editor");
 
 const char AADL_SHOW_ASN1_ID[] = "AadlEditor.MessageDeclarations";
+const char AADL_SHOW_MINIMAP_ID[] = "AadlEditor.Minimap";
 const char AADL_MENU_ID[] = "AadlEditor.Menu";
 }
 }

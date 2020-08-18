@@ -122,6 +122,11 @@ void AadlMainWidget::showAsn1Dialog()
     }
 }
 
+void AadlMainWidget::setMinimapVisible(bool visible)
+{
+    m_plugin->minimapView()->setVisible(visible);
+}
+
 void AadlMainWidget::initUi()
 {
     setLayout(new QVBoxLayout(this));
@@ -129,6 +134,8 @@ void AadlMainWidget::initUi()
     layout()->setMargin(0);
 
     m_actions = m_plugin->document()->initActions();
+
+    m_plugin->setupMiniMap();
 }
 
 }

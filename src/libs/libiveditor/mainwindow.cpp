@@ -108,14 +108,14 @@ MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
 
     aadlinterface::cmd::CommandsStack::setCurrent(currentStack);
 
-    setupMiniMap();
-
     updateActions();
 
     initSettings();
 
     updateWindowTitle();
     connect(m_plugin->document(), &InterfaceDocument::titleChanged, this, &MainWindow::updateWindowTitle);
+
+    m_plugin->setupMiniMap();
 
     // Create the E2E view and add the action
     auto endToEndView = new EndToEndView(m_plugin->document(), this);
@@ -411,15 +411,6 @@ bool MainWindow::prepareQuit()
     aadlinterface::AppOptions::MainWindow.Geometry.write(saveGeometry());
 
     return true;
-}
-
-void MainWindow::setupMiniMap()
-{
-    // have to be instantiated after this->ui & this->document
-    m_miniMap = new shared::ui::MiniMap(m_plugin->document()->view());
-    m_miniMap->setupSourceView(qobject_cast<QGraphicsView *>(m_plugin->document()->view()));
-    connect(m_plugin->actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
-    connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, m_plugin->actionToggleMinimap(), &QAction::setChecked);
 }
 
 }

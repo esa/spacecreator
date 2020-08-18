@@ -44,6 +44,7 @@ public:
     Core::IEditor *createEditor();
 
     void showAsn1Dialog();
+    void showMinimap(bool visible);
 
 private:
     void updateToolBar();
@@ -61,6 +62,7 @@ private:
     QAction *m_redoAction = nullptr;
 
     AadlTextEditorFactory *m_editorFactory = nullptr;
+    bool m_minimapVisible = false;
 };
 
 }

@@ -14,6 +14,7 @@ class CommandLineParser;
 
 namespace ui {
 class GraphicsViewBase;
+class MiniMap;
 }
 
 class Plugin : public QObject
@@ -27,6 +28,7 @@ public:
     // Override this to show or hide actions
     virtual void setPluginActive(bool active) = 0;
 
+    QWidget *minimapView() const;
     virtual ui::GraphicsViewBase *chartView() = 0;
     virtual QToolBar *mainToolBar();
     virtual void addToolBars(QMainWindow *window) = 0;
@@ -53,6 +55,8 @@ public:
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;
 
+    void setupMiniMap();
+
 public Q_SLOTS:
     void showAboutDialog();
 
@@ -61,6 +65,8 @@ private:
 
     QMainWindow *m_mainWindow = { nullptr };
     QToolBar *m_mainToolBar { nullptr };
+
+    ui::MiniMap *m_miniMap { nullptr };
 
     QAction *m_actionNewFile { nullptr };
     QAction *m_actionOpenFile { nullptr };
