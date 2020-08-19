@@ -1797,8 +1797,13 @@ QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() cons
                     d->m_currentChart->instanceEvents());
         } else {
             auto eventEntity = static_cast<msc::MscInstanceEvent *>(eventitem->modelEntity());
-            insertEntity(
-                    events, eventitem->sceneBoundingRect().top(), eventEntity, d->m_currentChart->instanceEvents());
+            qreal eventReference = eventitem->sceneBoundingRect().top();
+            if (eventitem->modelEntity()->entityType() == msc::MscEntity::EntityType::Message
+                    || eventitem->modelEntity()->entityType() == msc::MscEntity::EntityType::Create) {
+                auto messageItem = static_cast<MessageItem *>(eventitem);
+                eventReference = messageItem->tail().y();
+            }
+            insertEntity(events, eventReference, eventEntity, d->m_currentChart->instanceEvents());
         }
     }
 

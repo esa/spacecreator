@@ -54,6 +54,7 @@ private Q_SLOTS:
     void testMoveBottomUp();
     void testMovemessageInside();
     void testMovemessageSourceInside();
+    void testMoveMessageCloseToCoregion();
     void testPushedCoregionIncludesnewMessage();
 
 private:
@@ -280,6 +281,43 @@ void tsti_CoregionItem::testMovemessageSourceInside()
     QCOMPARE(m_chart->indexofEvent(action), 3);
     QVERIFY(!isInCoregion(coregionItem, actionItem));
     QVERIFY(isInCoregion(coregionItem, messageItem));
+}
+
+void tsti_CoregionItem::testMoveMessageCloseToCoregion()
+{
+    static const QString msc("MSCDOCUMENT doc1; \
+                             MSC msc1; \
+                                 INSTANCE i1; \
+                                     CONCURRENT; \
+                                     ENDCONCURRENT; \
+                                     OUT Msg1 i2; \
+                                 ENDINSTANCE; \
+                                 INSTANCE i2; \
+                                     IN Msg1 i1; \
+                                 ENDINSTANCE; \
+                             ENDMSC; \
+                         ENDMSCDOCUMENT;");
+    loadView(msc);
+
+    auto coregionBegin = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(2));
+
+    msc::CoregionItem *coregionItem = m_chartModel->itemForCoregion(coregionBegin);
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+
+    QVERIFY(!isInCoregion(coregionItem, messageItem));
+
+    // move message close below the coregion
+    const QPoint initPos = m_view->mapFromScene(messageItem->head().toPoint());
+    const QPoint sourcePos = center(messageItem);
+    const QPoint closeBelowRegion(sourcePos.x(), bottomCenter(coregionItem).y() + 5);
+
+    vstest::sendMouseMove(m_view->viewport(), initPos); // so the correct grip is pressed
+    vstest::sendMouseDrag(m_view->viewport(), sourcePos, closeBelowRegion);
+
+    QCOMPARE(m_chart->indexofEvent(coregionBegin), 0);
+    QCOMPARE(m_chart->indexofEvent(message), 2);
+    QVERIFY(!isInCoregion(coregionItem, messageItem));
 }
 
 void tsti_CoregionItem::testPushedCoregionIncludesnewMessage()

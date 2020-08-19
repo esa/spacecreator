@@ -615,7 +615,7 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
                         QVariant::fromValue<MscMessage::EndType>(MscMessage::EndType::TARGET_HEAD) });
     }
 
-    const int newIdx = m_chartLayoutManager->eventIndex(sceneBoundingRect().y());
+    const int newIdx = m_chartLayoutManager->eventIndex(tail().y());
     msc::cmd::CommandsStack::push(msc::cmd::EditMessagePoints,
             { QVariant::fromValue(m_message.data()), QVariant::fromValue(oldPointsCif),
                     QVariant::fromValue(newPointsCif), newIdx });
