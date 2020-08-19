@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 #include <QRectF>
@@ -28,11 +28,12 @@ class MscChart;
 
 namespace cmd {
 
-class CmdChartItemChangeGeometry : public BaseCommand
+class CmdChartItemChangeGeometry : public ChartBaseCommand
 {
     Q_OBJECT
 public:
-    explicit CmdChartItemChangeGeometry(const QRectF &oldRect, const QRectF &newRect, MscChart *chart);
+    explicit CmdChartItemChangeGeometry(
+            const QRectF &oldRect, const QRectF &newRect, MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -40,7 +41,6 @@ public:
     int id() const override;
 
 protected:
-    QPointer<MscChart> m_chart;
     const QRectF m_oldRect;
     QRectF m_newRect;
 };

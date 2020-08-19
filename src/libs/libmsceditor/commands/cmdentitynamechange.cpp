@@ -25,8 +25,9 @@
 namespace msc {
 namespace cmd {
 
-CmdEntityNameChange::CmdEntityNameChange(MscEntity *item, const QString &newName)
-    : BaseCommand(item)
+CmdEntityNameChange::CmdEntityNameChange(
+        MscEntity *item, const QString &newName, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, chart, layoutManager)
     , m_oldName(item->name())
     , m_newName(newName)
 {
@@ -37,6 +38,7 @@ void CmdEntityNameChange::redo()
     if (m_modelItem) {
         m_modelItem->setName(m_newName);
         setChartDocumentName(m_newName);
+        checkVisualSorting();
     }
 }
 
@@ -45,6 +47,7 @@ void CmdEntityNameChange::undo()
     if (m_modelItem) {
         m_modelItem->setName(m_oldName);
         setChartDocumentName(m_oldName);
+        undoVisualSorting();
     }
 }
 

@@ -17,17 +17,18 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 namespace msc {
 class MscInstance;
 
 namespace cmd {
 
-class CmdInstanceStopChange : public BaseCommand
+class CmdInstanceStopChange : public ChartBaseCommand
 {
 public:
-    explicit CmdInstanceStopChange(MscInstance *item, bool newValue);
+    explicit CmdInstanceStopChange(
+            MscInstance *item, bool newValue, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

@@ -25,9 +25,9 @@
 namespace msc {
 namespace cmd {
 
-CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(const QRectF &oldRect, const QRectF &newRect, MscChart *chart)
-    : BaseCommand(chart)
-    , m_chart(chart)
+CmdChartItemChangeGeometry::CmdChartItemChangeGeometry(
+        const QRectF &oldRect, const QRectF &newRect, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(chart, chart, layoutManager)
     , m_oldRect(oldRect)
     , m_newRect(newRect)
 {

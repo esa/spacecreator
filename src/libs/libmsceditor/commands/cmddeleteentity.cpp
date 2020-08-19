@@ -28,9 +28,9 @@
 namespace msc {
 namespace cmd {
 
-CmdDeleteEntity::CmdDeleteEntity(QVector<MscEntity *> items, msc::MscChart *chart, msc::MscDocument *document)
-    : QUndoCommand()
-    , m_chart(chart)
+CmdDeleteEntity::CmdDeleteEntity(
+        QVector<MscEntity *> items, msc::MscDocument *document, msc::MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(nullptr, chart, layoutManager)
     , m_document(document)
 {
     setText(QObject::tr("Delete"));
@@ -89,6 +89,7 @@ void CmdDeleteEntity::redo()
         for (auto instance : m_entities) {
             m_chart->removeInstance(dynamic_cast<MscInstance *>(instance));
         }
+        checkVisualSorting();
     } else if (m_document) {
         for (auto document : m_entities) {
             m_document->removeDocument(dynamic_cast<MscDocument *>(document), false);
@@ -114,6 +115,7 @@ void CmdDeleteEntity::undo()
             MscInstanceEvent *event = it.value();
             m_chart->addInstanceEvent(event, idx);
         }
+        undoVisualSorting();
     } else if (m_document) {
         if (!m_document->charts().empty()) {
             m_document->blockSignals(true);

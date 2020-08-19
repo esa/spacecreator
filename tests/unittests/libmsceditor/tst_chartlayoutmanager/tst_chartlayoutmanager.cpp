@@ -73,6 +73,13 @@ private Q_SLOTS:
     void testShiftVerticalIfNeeded();
 
 private:
+    void waitForLayoutUpdate()
+    {
+        QApplication::processEvents();
+        QTest::qWait(2);
+        QApplication::processEvents();
+    }
+
     QGraphicsView m_view;
 
     QScopedPointer<ChartLayoutManager> m_chartModel;
@@ -101,7 +108,7 @@ void tst_ChartLayoutManager::parseMsc(const QString &mscText)
         m_chart = m_mscModel->charts().at(0);
     }
     m_chartModel->setCurrentChart(m_chart);
-    QApplication::processEvents();
+    waitForLayoutUpdate();
 
     for (MscInstance *instance : m_chart->instances()) {
         InstanceItem *instanceItem = m_chartModel->itemForInstance(instance);
@@ -355,7 +362,7 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     message1->setSourceInstance(instanceA);
     message1->setTargetInstance(instanceB);
     m_chart->addInstanceEvent(message1);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     InstanceItem *instanceItemA = m_chartModel->instanceItems().at(0);
     MessageItem *msgItem1 = m_chartModel->itemForMessage(message1);
@@ -368,7 +375,7 @@ void tst_ChartLayoutManager::testAddTwoMessages()
     message2->setSourceInstance(instanceA);
     message2->setTargetInstance(instanceB);
     m_chart->addInstanceEvent(message2);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     // Message 1 still at same y position? - check from issue #65
     msgItem1 = m_chartModel->itemForMessage(message1);
@@ -404,13 +411,13 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     message1->setSourceInstance(instanceA);
     message1->setTargetInstance(instanceB);
     m_chart->addInstanceEvent(message1);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     auto message2 = new MscMessage("Msg2");
     message2->setSourceInstance(instanceA);
     message2->setTargetInstance(instanceB);
     m_chart->addInstanceEvent(message2);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     MessageItem *msgItem1 = m_chartModel->itemForMessage(message1);
     MessageItem *msgItem2 = m_chartModel->itemForMessage(message2);
@@ -422,7 +429,7 @@ void tst_ChartLayoutManager::testMaxVisibleItems()
     message3->setSourceInstance(instanceA);
     message3->setTargetInstance(instanceB);
     m_chart->addInstanceEvent(message3);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     msgItem1 = m_chartModel->itemForMessage(message1);
     QCOMPARE(msgItem1, nullptr); // as only 2 events are visible, the first was removed
@@ -465,7 +472,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     create->setTargetInstance(instance2);
     chart->addInstanceEvent(create);
 
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
 
@@ -475,7 +482,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
 
     // still correct after instance was moved?
     instanceItem2->moveBy(50.0, 0.0);
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
     QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
 
     // still correct after event insertion?
@@ -483,7 +490,7 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     auto action = new msc::MscAction(chart);
     action->setInstance(instance1);
     chart->addInstanceEvent(action, 0); // insert before create
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
     QVERIFY(createItem->sceneBoundingRect().top() > createRectbefore.top()); // Create item got pushed down
     QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
 }
@@ -511,7 +518,7 @@ void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
     action->setName("A");
     m_chart->addInstanceEvent(action);
 
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     // event is narrow
     msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
@@ -521,7 +528,7 @@ void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
 
     // event is wide
     actionItem->setActionText("Action that is a lot wider than before is named here.");
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
     QVERIFY2(std::abs(instanceItem->scenePos().x()) > 5, "event is wide - instance got moved");
     QVERIFY2(actionItem->scenePos().x() >= 0.0, "event is wide - but still not negative");
 }
@@ -549,7 +556,7 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     message->setTargetInstance(instanceItem2->modelItem());
     m_chart->addInstanceEvent(message);
 
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
 
@@ -558,7 +565,7 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
     create->setTargetInstance(instanceItem2->modelItem());
     m_chart->addInstanceEvent(create);
 
-    QApplication::processEvents(); // Perform layout update
+    waitForLayoutUpdate();
 
     msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
     const QRectF createRect = createItem->sceneBoundingRect();

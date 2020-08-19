@@ -41,18 +41,16 @@ CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(
     return geometry;
 }
 
-CmdMessageItemCreate::CmdMessageItemCreate(
-        msc::MscMessage *message, msc::ChartLayoutManager *model, int eventIndex, const QVector<QPoint> &points)
-    : BaseCommand(message)
+CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, int eventIndex, MscChart *chart,
+        ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
+    : ChartBaseCommand(message, chart, layoutManager)
     , m_message(message)
-    , m_viewModel(model)
-    , m_chart(m_viewModel ? m_viewModel->currentChart() : nullptr)
     , m_eventIndex(eventIndex)
     , m_msgPoints(points)
     , m_sourceGeometryPrev(initGeometryHolder(
-              (m_viewModel && m_message) ? m_viewModel->itemForInstance(m_message->sourceInstance()) : nullptr))
+              (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->sourceInstance()) : nullptr))
     , m_targetGeometryPrev(initGeometryHolder(
-              (m_viewModel && m_message) ? m_viewModel->itemForInstance(m_message->targetInstance()) : nullptr))
+              (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->targetInstance()) : nullptr))
 {
     Q_ASSERT(m_chart.data());
 
@@ -79,6 +77,8 @@ void CmdMessageItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_message, m_eventIndex);
+
+    checkVisualSorting();
 }
 
 void CmdMessageItemCreate::undo()
@@ -86,10 +86,10 @@ void CmdMessageItemCreate::undo()
     Q_ASSERT(m_chart.data());
 
     auto restoreInstanceGeometry = [this](MscInstance *instance, const InstanceGeometry &geometry) {
-        if (!instance || !m_viewModel)
+        if (!instance || !m_layoutManager)
             return;
 
-        if (InstanceItem *item = m_viewModel->itemForInstance(instance)) {
+        if (InstanceItem *item = m_layoutManager->itemForInstance(instance)) {
             QSignalBlocker silently(instance);
             if (!geometry.m_cif.isEmpty()) {
                 instance->setCifGeometry(geometry.m_cif);
@@ -108,8 +108,11 @@ void CmdMessageItemCreate::undo()
 
     // this command takes over ownership
     m_message->setParent(this);
-    if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance())
+    if (m_message->messageType() == MscMessage::MessageType::Create && m_message->targetInstance()) {
         m_message->targetInstance()->setExplicitCreator(nullptr);
+    }
+
+    undoVisualSorting();
 }
 
 bool CmdMessageItemCreate::mergeWith(const QUndoCommand *command)

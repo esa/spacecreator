@@ -57,6 +57,7 @@ private Q_SLOTS:
 private:
     void enterText(const QString &text);
     void parseMsc(const QString &mscText);
+    void waitForLayoutUpdate();
 
     MscMessage *m_message = nullptr;
     QPointer<MessageItem> m_messageItem = nullptr;
@@ -96,7 +97,7 @@ void tst_MessageItem::parseMsc(const QString &mscText)
     QVERIFY(m_chart);
 
     m_chartModel->setCurrentChart(m_chart);
-    QApplication::processEvents();
+    waitForLayoutUpdate();
 
     for (MscInstance *instance : m_chart->instances()) {
         InstanceItem *instanceItem = m_chartModel->itemForInstance(instance);
@@ -105,6 +106,13 @@ void tst_MessageItem::parseMsc(const QString &mscText)
         m_instances.append(instance);
         m_instanceItems.append(instanceItem);
     }
+}
+
+void tst_MessageItem::waitForLayoutUpdate()
+{
+    QApplication::processEvents();
+    QTest::qWait(2);
+    QApplication::processEvents();
 }
 
 void tst_MessageItem::init()
@@ -239,14 +247,14 @@ void tst_MessageItem::testPositionUpdateOnInstanceChange()
     QVERIFY(qFuzzyCompare(points[1].x(), instanceAxesX[1]));
 
     message->setTargetInstance(m_instances[2]);
-    QApplication::processEvents();
+    waitForLayoutUpdate();
     points = messageItem->messagePoints();
 
     QVERIFY(std::abs(points[0].x() - instanceAxesX[0]) < m_maxOffset);
     QVERIFY(std::abs(points[1].x() - instanceAxesX[2]) < m_maxOffset);
 
     message->setSourceInstance(m_instances[1]);
-    QApplication::processEvents();
+    waitForLayoutUpdate();
     points = messageItem->messagePoints();
     QVERIFY(std::abs(points[0].x() - instanceAxesX[1]) < m_maxOffset);
     QVERIFY(std::abs(points[1].x() - instanceAxesX[2]) < m_maxOffset);

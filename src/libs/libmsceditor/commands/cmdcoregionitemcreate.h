@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "commands/basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
@@ -29,12 +29,12 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdCoregionItemCreate : public BaseCommand
+class CmdCoregionItemCreate : public ChartBaseCommand
 {
     Q_OBJECT
 public:
-    explicit CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscChart *chart,
-            msc::MscInstance *instance, int eventIndex);
+    explicit CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscInstance *instance,
+            int eventIndex, msc::MscChart *chart, ChartLayoutManager *layoutManager);
     void redo() override;
     void undo() override;
     bool mergeWith(const QUndoCommand *command) override;
@@ -44,7 +44,6 @@ private:
     MscCoregion *m_begin = nullptr;
     MscCoregion *m_end = nullptr;
     QPointer<MscInstance> m_instance;
-    QPointer<MscChart> m_chart;
     int m_eventIndex = -1;
 };
 

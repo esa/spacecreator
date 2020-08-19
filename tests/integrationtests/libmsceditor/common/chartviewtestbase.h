@@ -41,10 +41,11 @@ protected:
 
     void loadView(const QString &mscDoc);
 
+    void waitForLayoutUpdate();
+
     QPoint center(const QGraphicsItem *item) const;
     QPoint topCenter(const QGraphicsItem *item) const;
     QPoint bottomCenter(const QGraphicsItem *item) const;
-    bool isInCoregion(const msc::CoregionItem *coregion, MscInstanceEvent *event) const;
 
     QScopedPointer<ChartLayoutManager> m_chartModel;
     QScopedPointer<QGraphicsView> m_view;

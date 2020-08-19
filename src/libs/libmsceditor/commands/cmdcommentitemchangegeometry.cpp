@@ -27,10 +27,9 @@
 namespace msc {
 namespace cmd {
 
-CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(
-        MscChart *chart, const QRect &oldRect, const QRect &newRect, MscEntity *entity)
-    : BaseCommand(entity)
-    , m_chart(chart)
+CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(const QRect &oldRect, const QRect &newRect,
+        MscEntity *entity, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(entity, chart, layoutManager)
     , m_oldRect(oldRect)
     , m_newRect(newRect)
 {
@@ -47,6 +46,8 @@ void CmdCommentItemChangeGeometry::redo()
         m_chart->addInstanceEvent(comment);
     }
     comment->setRect(m_newRect);
+
+    checkVisualSorting();
 }
 
 void CmdCommentItemChangeGeometry::undo()
@@ -60,6 +61,8 @@ void CmdCommentItemChangeGeometry::undo()
         m_chart->addInstanceEvent(comment);
     }
     comment->setRect(m_oldRect);
+
+    undoVisualSorting();
 }
 
 bool CmdCommentItemChangeGeometry::mergeWith(const QUndoCommand *command)

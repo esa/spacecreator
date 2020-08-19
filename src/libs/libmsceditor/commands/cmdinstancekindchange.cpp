@@ -23,8 +23,9 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceKindChange::CmdInstanceKindChange(MscInstance *item, const QString &newKind)
-    : BaseCommand(item)
+CmdInstanceKindChange::CmdInstanceKindChange(
+        MscInstance *item, const QString &newKind, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, chart, layoutManager)
     , m_instance(item)
     , m_oldValue(item->denominatorAndKind())
     , m_newValue(newKind)
@@ -35,6 +36,7 @@ void CmdInstanceKindChange::redo()
 {
     if (m_instance) {
         m_instance->setDenominatorAndKind(m_newValue);
+        checkVisualSorting();
     }
 }
 
@@ -42,6 +44,7 @@ void CmdInstanceKindChange::undo()
 {
     if (m_instance) {
         m_instance->setDenominatorAndKind(m_oldValue);
+        undoVisualSorting();
     }
 }
 

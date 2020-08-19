@@ -25,13 +25,12 @@
 namespace msc {
 namespace cmd {
 
-CmdCoregionItemCreate::CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscChart *chart,
-        msc::MscInstance *instance, int eventIndex)
-    : BaseCommand(nullptr)
+CmdCoregionItemCreate::CmdCoregionItemCreate(msc::MscCoregion *begin, msc::MscCoregion *end, msc::MscInstance *instance,
+        int eventIndex, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(nullptr, chart, layoutManager)
     , m_begin(begin)
     , m_end(end)
     , m_instance(instance)
-    , m_chart(chart)
     , m_eventIndex(eventIndex)
 {
 }
@@ -52,6 +51,8 @@ void CmdCoregionItemCreate::redo()
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_begin, m_eventIndex);
     m_chart->addInstanceEvent(m_end, m_eventIndex + 1);
+
+    checkVisualSorting();
 }
 
 void CmdCoregionItemCreate::undo()
@@ -63,6 +64,8 @@ void CmdCoregionItemCreate::undo()
     // this command takes over ownership
     m_begin->setParent(this);
     m_end->setParent(this);
+
+    undoVisualSorting();
 }
 
 bool CmdCoregionItemCreate::mergeWith(const QUndoCommand *command)

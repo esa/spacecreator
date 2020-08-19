@@ -18,22 +18,25 @@
 
 #include "cmdactionitemmove.h"
 
+#include "chartlayoutmanager.h"
 #include "common/commandids.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 
+#include <QDebug>
+
 namespace msc {
 namespace cmd {
 
-CmdActionItemMove::CmdActionItemMove(MscAction *action, int newPos, MscInstance *newInsance, MscChart *chart)
-    : BaseCommand(action)
+CmdActionItemMove::CmdActionItemMove(
+        MscAction *action, int newPos, MscInstance *newInsance, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(action, chart, layoutManager)
     , m_action(action)
     , m_oldIndex(chart->instanceEvents().indexOf(action))
     , m_newIndex(newPos)
     , m_oldInstance(action->instance())
     , m_newInstance(newInsance)
-    , m_chart(chart)
 {
     setText(QObject::tr("Move action"));
 }
@@ -42,6 +45,7 @@ void CmdActionItemMove::redo()
 {
     if (m_action && m_chart && m_newInstance) {
         m_chart->updateActionPos(m_action, m_newInstance, m_newIndex);
+        checkVisualSorting();
     }
 }
 
@@ -49,6 +53,7 @@ void CmdActionItemMove::undo()
 {
     if (m_action && m_chart && m_oldInstance) {
         m_chart->updateActionPos(m_action, m_oldInstance, m_oldIndex);
+        undoVisualSorting();
     }
 }
 

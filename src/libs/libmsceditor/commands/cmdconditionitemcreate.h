@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "commands/basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
@@ -29,11 +29,11 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdConditionItemCreate : public BaseCommand
+class CmdConditionItemCreate : public ChartBaseCommand
 {
 public:
-    CmdConditionItemCreate(
-            msc::MscCondition *condition, msc::MscChart *chart, msc::MscInstance *instance, int eventIndex);
+    CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance, int eventIndex,
+            msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -42,7 +42,6 @@ public:
 
 private:
     MscCondition *m_condition = nullptr;
-    QPointer<MscChart> m_chart;
     QPointer<MscInstance> m_instance;
     int m_eventIndex = -1;
 };

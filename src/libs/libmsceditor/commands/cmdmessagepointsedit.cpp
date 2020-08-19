@@ -28,10 +28,9 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-        const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart)
-    : BaseCommand(message)
+        const QVector<QPoint> &cifPointsNew, int newIdx, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(message, chart, layoutManager)
     , m_message(message)
-    , m_chart(chart)
     , m_newCif(cifPointsNew)
     , m_oldCif(cifPointsOld)
     , m_newIdx(newIdx)
@@ -47,6 +46,8 @@ void CmdMessagePointsEdit::redo()
 
     if (m_message)
         m_message->setCifPoints(m_newCif);
+
+    checkVisualSorting();
 }
 
 void CmdMessagePointsEdit::undo()
@@ -56,6 +57,8 @@ void CmdMessagePointsEdit::undo()
 
     if (m_message)
         m_message->setCifPoints(m_oldCif);
+
+    undoVisualSorting();
 }
 
 bool CmdMessagePointsEdit::mergeWith(const QUndoCommand *command)

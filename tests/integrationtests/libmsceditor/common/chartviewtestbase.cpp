@@ -17,11 +17,13 @@
 
 #include "chartviewtestbase.h"
 
+#include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "exceptions.h"
 #include "mscdocument.h"
 #include "syntheticinteraction.h"
 
+#include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsView>
 #include <QStandardPaths>
@@ -40,6 +42,7 @@ void ChartViewTestBase::initBase()
 {
     vstest::saveMousePosition();
     m_chartModel.reset(new ChartLayoutManager());
+    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(m_chartModel.get());
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());
     m_reader.reset(new MscReader);
@@ -66,8 +69,15 @@ void ChartViewTestBase::loadView(const QString &mscDoc)
         bool ok = QTest::qWaitForWindowActive(m_view.data());
         QVERIFY2(ok, "Unable to show the chart view");
     } else {
-        QApplication::processEvents();
+        waitForLayoutUpdate();
     }
+}
+
+void ChartViewTestBase::waitForLayoutUpdate()
+{
+    QApplication::processEvents();
+    QTest::qWait(2);
+    QApplication::processEvents();
 }
 
 QPoint ChartViewTestBase::center(const QGraphicsItem *item) const

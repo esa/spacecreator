@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 namespace msc {
 
@@ -25,10 +25,11 @@ class MscEntity;
 
 namespace cmd {
 
-class CmdEntityNameChange : public BaseCommand
+class CmdEntityNameChange : public ChartBaseCommand
 {
 public:
-    CmdEntityNameChange(MscEntity *item, const QString &newName);
+    CmdEntityNameChange(
+            MscEntity *item, const QString &newName, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

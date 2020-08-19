@@ -26,8 +26,8 @@ namespace msc {
 namespace cmd {
 
 CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos,
-        int newEndPos, MscInstance *newInsance, MscChart *chart)
-    : BaseCommand(coregionBegin)
+        int newEndPos, MscInstance *newInsance, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(coregionBegin, chart, layoutManager)
     , m_coregionBegin(coregionBegin)
     , m_coregionEnd(coregionEnd)
     , m_oldBeginIndex(chart->instanceEvents().indexOf(coregionBegin))
@@ -36,7 +36,6 @@ CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion
     , m_newEndIndex(newEndPos)
     , m_oldInstance(coregionEnd->instance())
     , m_newInstance(newInsance)
-    , m_chart(chart)
 {
     setText(QObject::tr("Move coregion"));
 }
@@ -46,6 +45,7 @@ void CmdCoRegionItemMove::redo()
     if (m_coregionBegin && m_coregionEnd && m_chart && m_newInstance) {
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_newInstance, m_newBeginIndex, m_newEndIndex);
+        checkVisualSorting();
     }
 }
 
@@ -54,6 +54,7 @@ void CmdCoRegionItemMove::undo()
     if (m_coregionBegin && m_coregionEnd && m_chart && m_oldInstance) {
         m_chart->updateCoregionPos(
                 m_coregionBegin.data(), m_coregionEnd.data(), m_oldInstance, m_oldBeginIndex, m_oldEndIndex);
+        undoVisualSorting();
     }
 }
 

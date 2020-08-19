@@ -24,9 +24,9 @@
 namespace msc {
 namespace cmd {
 
-CmdEntityCommentChange::CmdEntityCommentChange(MscChart *chart, MscEntity *item, const QString &newComment)
-    : BaseCommand(item)
-    , m_chart(chart)
+CmdEntityCommentChange::CmdEntityCommentChange(
+        MscEntity *item, const QString &newComment, msc::MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, chart, layoutManager)
     , m_oldComment(item && item->comment() ? item->comment()->text() : QString())
     , m_newComment(newComment)
 {
@@ -53,6 +53,8 @@ void CmdEntityCommentChange::redo()
         m_chart->addInstanceEvent(comment);
         comment->setText(m_newComment);
     }
+
+    checkVisualSorting();
 }
 
 void CmdEntityCommentChange::undo()
@@ -77,6 +79,8 @@ void CmdEntityCommentChange::undo()
         m_chart->addInstanceEvent(comment);
         comment->setText(m_oldComment);
     }
+
+    undoVisualSorting();
 }
 
 bool CmdEntityCommentChange::mergeWith(const QUndoCommand *command)

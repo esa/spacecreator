@@ -25,11 +25,10 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemCreate::CmdConditionItemCreate(
-        MscCondition *condition, MscChart *chart, msc::MscInstance *instance, int eventIndex)
-    : BaseCommand(condition)
+CmdConditionItemCreate::CmdConditionItemCreate(MscCondition *condition, msc::MscInstance *instance, int eventIndex,
+        msc::MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(condition, chart, layoutManager)
     , m_condition(condition)
-    , m_chart(chart)
     , m_instance(instance)
     , m_eventIndex(eventIndex)
 {
@@ -53,6 +52,8 @@ void CmdConditionItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_condition, m_eventIndex);
+
+    checkVisualSorting();
 }
 
 void CmdConditionItemCreate::undo()
@@ -62,6 +63,8 @@ void CmdConditionItemCreate::undo()
 
     // this command takes over ownership
     m_condition->setParent(this);
+
+    undoVisualSorting();
 }
 
 bool CmdConditionItemCreate::mergeWith(const QUndoCommand *command)

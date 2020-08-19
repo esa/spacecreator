@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
@@ -29,10 +29,11 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdConditionItemMove : public BaseCommand
+class CmdConditionItemMove : public ChartBaseCommand
 {
 public:
-    CmdConditionItemMove(MscCondition *condition, int newPos, msc::MscInstance *newInsance, MscChart *chart);
+    CmdConditionItemMove(MscCondition *condition, int newPos, msc::MscInstance *newInsance, msc::MscChart *chart,
+            ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -45,7 +46,6 @@ private:
     int m_newIndex = -1;
     QPointer<msc::MscInstance> m_oldInstance;
     QPointer<msc::MscInstance> m_newInstance;
-    QPointer<msc::MscChart> m_chart;
 };
 
 } // ns cmd

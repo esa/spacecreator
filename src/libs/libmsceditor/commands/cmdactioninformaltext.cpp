@@ -23,8 +23,9 @@
 namespace msc {
 namespace cmd {
 
-CmdActionInformalText::CmdActionInformalText(MscAction *action, const QString &newText)
-    : BaseCommand(action)
+CmdActionInformalText::CmdActionInformalText(
+        MscAction *action, const QString &newText, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(action, chart, layoutManager)
     , m_action(action)
     , m_oldText(action->informalAction())
     , m_newText(newText)
@@ -35,6 +36,7 @@ void CmdActionInformalText::redo()
 {
     if (m_action) {
         m_action->setInformalAction(m_newText);
+        checkVisualSorting();
     }
 }
 
@@ -42,6 +44,7 @@ void CmdActionInformalText::undo()
 {
     if (m_action) {
         m_action->setInformalAction(m_oldText);
+        undoVisualSorting();
     }
 }
 

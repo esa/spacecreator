@@ -43,6 +43,13 @@ private Q_SLOTS:
     void testDeleteCoregion();
 
 private:
+    void waitForLayoutUpdate()
+    {
+        QApplication::processEvents();
+        QTest::qWait(2);
+        QApplication::processEvents();
+    }
+
     QScopedPointer<ChartLayoutManager> m_chartModel;
     QScopedPointer<QGraphicsView> m_view;
     QScopedPointer<MscReader> m_reader;
@@ -86,7 +93,7 @@ void tst_EntityDeleteTool::testDeleteCoregion()
     msc::EntityDeleteTool delTool(m_chartModel.data(), m_view.data());
     delTool.setCurrentChart(m_chart);
     delTool.action()->trigger(); // do the delete of the selected item
-    QApplication::processEvents();
+    waitForLayoutUpdate();
     QCOMPARE(m_chart->instanceEvents().size(), 0);
 }
 

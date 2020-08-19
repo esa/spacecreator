@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 namespace msc {
 
@@ -25,10 +25,11 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdInstanceKindChange : public BaseCommand
+class CmdInstanceKindChange : public ChartBaseCommand
 {
 public:
-    CmdInstanceKindChange(MscInstance *item, const QString &newKind);
+    CmdInstanceKindChange(
+            MscInstance *item, const QString &newKind, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

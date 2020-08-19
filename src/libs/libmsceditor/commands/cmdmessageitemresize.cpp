@@ -24,9 +24,9 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemResize::CmdMessageItemResize(
-        MscMessage *message, int newPos, MscInstance *newInsance, MscMessage::EndType endType, MscChart *chart)
-    : BaseCommand(message)
+CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, int newPos, MscInstance *newInsance,
+        MscMessage::EndType endType, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(message, chart, layoutManager)
     , m_message(message)
     , m_oldIndex(chart->instanceEvents().indexOf(message))
     , m_newIndex(newPos)
@@ -34,7 +34,6 @@ CmdMessageItemResize::CmdMessageItemResize(
               endType == msc::MscMessage::EndType::SOURCE_TAIL ? message->sourceInstance() : message->targetInstance())
     , m_newInstance(newInsance)
     , m_endType(endType)
-    , m_chart(chart)
 
 {
     setText(QObject::tr("ReTarget message"));
@@ -44,6 +43,7 @@ void CmdMessageItemResize::redo()
 {
     if (m_message && m_chart) {
         m_chart->updateMessageTarget(m_message, m_newInstance, m_newIndex, m_endType);
+        checkVisualSorting();
     }
 }
 
@@ -51,6 +51,7 @@ void CmdMessageItemResize::undo()
 {
     if (m_message && m_chart) {
         m_chart->updateMessageTarget(m_message, m_oldInstance, m_oldIndex, m_endType);
+        undoVisualSorting();
     }
 }
 

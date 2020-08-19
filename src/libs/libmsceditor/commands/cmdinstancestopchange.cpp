@@ -23,8 +23,9 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceStopChange::CmdInstanceStopChange(msc::MscInstance *item, bool newValue)
-    : BaseCommand(item)
+CmdInstanceStopChange::CmdInstanceStopChange(
+        msc::MscInstance *item, bool newValue, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(item, chart, layoutManager)
     , m_instance(item)
     , m_newExStop(newValue)
 {
@@ -32,14 +33,18 @@ CmdInstanceStopChange::CmdInstanceStopChange(msc::MscInstance *item, bool newVal
 
 void CmdInstanceStopChange::redo()
 {
-    if (m_instance)
+    if (m_instance) {
         m_instance->setExplicitStop(m_newExStop);
+        checkVisualSorting();
+    }
 }
 
 void CmdInstanceStopChange::undo()
 {
-    if (m_instance)
+    if (m_instance) {
         m_instance->setExplicitStop(!m_newExStop);
+        undoVisualSorting();
+    }
 }
 
 bool CmdInstanceStopChange::mergeWith(const QUndoCommand *command)

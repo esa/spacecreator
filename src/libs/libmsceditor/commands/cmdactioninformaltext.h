@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
@@ -27,10 +27,11 @@ class MscAction;
 
 namespace cmd {
 
-class CmdActionInformalText : public BaseCommand
+class CmdActionInformalText : public ChartBaseCommand
 {
 public:
-    CmdActionInformalText(MscAction *action, const QString &newText);
+    CmdActionInformalText(
+            MscAction *action, const QString &newText, MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;

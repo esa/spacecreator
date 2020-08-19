@@ -26,14 +26,14 @@
 namespace msc {
 namespace cmd {
 
-CmdTimerItemMove::CmdTimerItemMove(msc::MscTimer *timer, int newPos, MscInstance *newInsance, MscChart *chart)
-    : BaseCommand(timer)
+CmdTimerItemMove::CmdTimerItemMove(
+        msc::MscTimer *timer, int newPos, MscInstance *newInsance, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(timer, chart, layoutManager)
     , m_timer(timer)
     , m_oldIndex(chart->instanceEvents().indexOf(timer))
     , m_newIndex(newPos)
     , m_oldInstance(timer->instance())
     , m_newInstance(newInsance)
-    , m_chart(chart)
 {
     setText(QObject::tr("Move timer"));
 }
@@ -42,6 +42,7 @@ void CmdTimerItemMove::redo()
 {
     if (m_timer && m_chart && m_newInstance) {
         m_chart->updateTimerPos(m_timer, m_newInstance, m_newIndex);
+        checkVisualSorting();
     }
 }
 
@@ -49,6 +50,7 @@ void CmdTimerItemMove::undo()
 {
     if (m_timer && m_chart && m_oldInstance) {
         m_chart->updateTimerPos(m_timer, m_oldInstance, m_oldIndex);
+        undoVisualSorting();
     }
 }
 

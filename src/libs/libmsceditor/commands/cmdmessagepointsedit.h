@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPoint>
 #include <QPointer>
@@ -31,11 +31,11 @@ class MscMessage;
 
 namespace cmd {
 
-class CmdMessagePointsEdit : public BaseCommand
+class CmdMessagePointsEdit : public ChartBaseCommand
 {
 public:
     CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
-            int newIdx, MscChart *chart);
+            int newIdx, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -44,7 +44,6 @@ public:
 
 private:
     QPointer<MscMessage> m_message;
-    QPointer<MscChart> m_chart;
     QVector<QPoint> m_newCif;
     const QVector<QPoint> m_oldCif;
     const int m_newIdx;

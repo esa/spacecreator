@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "commands/basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointF>
 #include <QPointer>
@@ -32,11 +32,11 @@ class InstanceItem;
 
 namespace cmd {
 
-class CmdMessageItemCreate : public BaseCommand
+class CmdMessageItemCreate : public ChartBaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, msc::ChartLayoutManager *chart, int eventIndex,
-            const QVector<QPoint> &points = QVector<QPoint>());
+    CmdMessageItemCreate(msc::MscMessage *message, int eventIndex, msc::MscChart *chart,
+            ChartLayoutManager *layoutManager, const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
     void undo() override;
@@ -45,8 +45,6 @@ public:
 
 private:
     MscMessage *m_message = nullptr;
-    QPointer<ChartLayoutManager> m_viewModel;
-    QPointer<MscChart> m_chart;
     int m_eventIndex;
     QVector<QPoint> m_msgPoints;
 

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "chartbasecommand.h"
+
 #include <QMap>
 #include <QPointer>
 #include <QUndoCommand>
@@ -31,10 +33,11 @@ class MscInstanceEvent;
 
 namespace cmd {
 
-class CmdDeleteEntity : public QUndoCommand
+class CmdDeleteEntity : public ChartBaseCommand
 {
 public:
-    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscChart *chart, msc::MscDocument *document);
+    CmdDeleteEntity(QVector<msc::MscEntity *> items, msc::MscDocument *document, msc::MscChart *chart,
+            ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -42,7 +45,6 @@ public:
     int id() const override;
 
 private:
-    QPointer<MscChart> m_chart;
     QMap<int, MscInstanceEvent *> m_events;
     QMap<int, MscEntity *> m_entities;
     QPointer<MscDocument> m_document;

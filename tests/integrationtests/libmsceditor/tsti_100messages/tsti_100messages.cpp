@@ -47,6 +47,13 @@ private Q_SLOTS:
     void testPerformance();
 
 private:
+    void waitForLayoutUpdate()
+    {
+        QApplication::processEvents();
+        QTest::qWait(2);
+        QApplication::processEvents();
+    }
+
     ChartLayoutManager m_model;
     QPointer<QGraphicsView> m_view;
     QPointer<InstanceItem> m_instanceItem;
@@ -69,6 +76,7 @@ void tsti100messages::initTestCase()
     m_model.setCurrentChart(chart.data());
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
+    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&m_model);
 
     m_instanceItem = new InstanceItem(new MscInstance("Instance", this), &m_model);
     m_instanceItem->setAxisHeight(2 * CommandsCount);
@@ -108,8 +116,7 @@ void tsti100messages::testPerformance()
         const QPointF &instacneCenter = m_instanceItem->boundingRect().translated(m_instanceItem->pos()).center();
         const QPointF &messagePos = { instacneCenter.x() - ArrowItem::defaultWidth() / 2, instacneCenter.y() };
 
-        QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()),
-            QVariant::fromValue<ChartLayoutManager *>(&m_model), QPointF() };
+        QVariantList params = { QVariant::fromValue<QGraphicsScene *>(m_model.graphicsScene()), QPointF() };
 
         for (int j = 0; j < CommandsCount / 2; ++j) {
 
@@ -117,16 +124,18 @@ void tsti100messages::testPerformance()
             cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
             params.replace(2, QPointF(messagePos.x(), messagePos.y() - j));
             cmd::CommandsStack::push(cmd::Id::CreateMessage, params);
-            if (IsLocalBuild)
-                QApplication::processEvents();
+            if (IsLocalBuild) {
+                waitForLayoutUpdate();
+            }
         }
 
         moveInstance(m_view->mapFromScene(instacneCenter));
 
         while (cmd::CommandsStack::current()->canUndo()) {
             cmd::CommandsStack::current()->undo();
-            if (IsLocalBuild)
-                QApplication::processEvents();
+            if (IsLocalBuild) {
+                waitForLayoutUpdate();
+            }
         }
     }
 }

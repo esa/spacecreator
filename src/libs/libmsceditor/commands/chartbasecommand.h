@@ -17,40 +17,34 @@
 
 #pragma once
 
-#include "chartbasecommand.h"
+#include "basecommand.h"
 
 #include <QPointer>
+#include <QVector>
 
 namespace msc {
 
-class MscCoregion;
+class ChartLayoutManager;
 class MscChart;
-class MscInstance;
+class MscInstanceEvent;
 
 namespace cmd {
 
-class CmdCoRegionItemMove : public ChartBaseCommand
+class ChartBaseCommand : public BaseCommand
 {
-    Q_OBJECT
 public:
-    CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos, int newEndPos,
-            MscInstance *newInsance, msc::MscChart *chart, ChartLayoutManager *layoutManager);
+    ChartBaseCommand(
+            MscEntity *item, MscChart *chart, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
 
-    void redo() override;
-    void undo() override;
-    bool mergeWith(const QUndoCommand *command) override;
-    int id() const override;
+protected:
+    void checkVisualSorting();
+    void undoVisualSorting();
 
-private:
-    QPointer<msc::MscCoregion> m_coregionBegin;
-    QPointer<msc::MscCoregion> m_coregionEnd;
-    int m_oldBeginIndex = -1;
-    int m_oldEndIndex = -1;
-    int m_newBeginIndex = -1;
-    int m_newEndIndex = -1;
-    QPointer<msc::MscInstance> m_oldInstance;
-    QPointer<msc::MscInstance> m_newInstance;
+    QPointer<msc::MscChart> m_chart;
+    QPointer<msc::ChartLayoutManager> m_layoutManager;
+    QVector<msc::MscInstanceEvent *> m_newSortedEvents;
+    QVector<msc::MscInstanceEvent *> m_oldSortedEvents;
 };
 
-}
-}
+} // namespace cmd
+} // namespace msc

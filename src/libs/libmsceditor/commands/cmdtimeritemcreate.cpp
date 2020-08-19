@@ -24,11 +24,10 @@
 namespace msc {
 namespace cmd {
 
-CmdTimerItemCreate::CmdTimerItemCreate(
-        MscTimer *timer, MscTimer::TimerType timerType, MscChart *chart, msc::MscInstance *instance, int eventIndex)
-    : BaseCommand(timer)
+CmdTimerItemCreate::CmdTimerItemCreate(MscTimer *timer, MscTimer::TimerType timerType, msc::MscInstance *instance,
+        int eventIndex, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(timer, chart, layoutManager)
     , m_timer(timer)
-    , m_chart(chart)
     , m_instance(instance)
     , m_eventIndex(eventIndex)
     , m_timerType(m_timer ? m_timer->timerType() : timerType)
@@ -52,6 +51,8 @@ void CmdTimerItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_timer, m_eventIndex);
+
+    checkVisualSorting();
 }
 
 void CmdTimerItemCreate::undo()
@@ -61,6 +62,8 @@ void CmdTimerItemCreate::undo()
 
     // this command takes over ownership
     m_timer->setParent(this);
+
+    undoVisualSorting();
 }
 
 bool CmdTimerItemCreate::mergeWith(const QUndoCommand *command)

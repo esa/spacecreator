@@ -27,16 +27,14 @@
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(
-        MscCondition *condition, int newPos, MscInstance *newInsance, MscChart *chart)
-    : BaseCommand(condition)
+CmdConditionItemMove::CmdConditionItemMove(MscCondition *condition, int newPos, MscInstance *newInsance,
+        msc::MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(condition, chart, layoutManager)
     , m_condition(condition)
     , m_oldIndex(chart->instanceEvents().indexOf(condition))
     , m_newIndex(newPos)
     , m_oldInstance(condition->instance())
     , m_newInstance(newInsance)
-    , m_chart(chart)
-
 {
     setText(QObject::tr("Move condition"));
 }
@@ -45,6 +43,7 @@ void CmdConditionItemMove::redo()
 {
     if (m_condition && m_chart && m_newInstance) {
         m_chart->updateConditionPos(m_condition, m_newInstance, m_newIndex);
+        checkVisualSorting();
     }
 }
 
@@ -52,6 +51,7 @@ void CmdConditionItemMove::undo()
 {
     if (m_condition && m_chart && m_newInstance) {
         m_chart->updateConditionPos(m_condition, m_oldInstance, m_oldIndex);
+        undoVisualSorting();
     }
 }
 

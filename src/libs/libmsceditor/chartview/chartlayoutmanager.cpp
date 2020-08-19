@@ -44,6 +44,7 @@
 #include <QGraphicsScene>
 #include <QMap>
 #include <QPointer>
+#include <QTimer>
 #include <QVector>
 #include <cmath>
 #include <limits>
@@ -120,7 +121,7 @@ struct ChartLayoutManagerPrivate {
     }
 
     int m_visibleItemLimit = -1;
-    bool m_layoutDirty = false;
+    QTimer m_layoutUpdateTimer;
 
     ChartViewLayoutInfo m_layoutInfo;
 
@@ -165,6 +166,9 @@ ChartLayoutManager::ChartLayoutManager(QObject *parent)
     : QObject(parent)
     , d(new ChartLayoutManagerPrivate())
 {
+    d->m_layoutUpdateTimer.setInterval(1);
+    d->m_layoutUpdateTimer.setSingleShot(true);
+    connect(&d->m_layoutUpdateTimer, &QTimer::timeout, this, &msc::ChartLayoutManager::doLayout);
 }
 
 ChartLayoutManager::~ChartLayoutManager()
@@ -303,22 +307,28 @@ MessageItem *ChartLayoutManager::fillMessageItem(
     return item;
 }
 
+/*!
+   Triggers an update. The update is sheduled, so multiple calls of this function trigger only one layout update.
+   \sa doLayout()
+ */
 void ChartLayoutManager::updateLayout()
 {
     if (d->m_scene.mousePressed()) {
         return; // Don't trigger re-layouts while the user interacts with the scene
     }
 
-    if (d->m_layoutDirty) {
-        return;
-    }
-
-    d->m_layoutDirty = true;
-    QMetaObject::invokeMethod(this, "doLayout", Qt::QueuedConnection);
+    d->m_layoutUpdateTimer.start();
 }
 
+/*!
+   Updates the layout. In contrast to updateLayout(), it's done right away.
+   For performance reasons prefer to use updateLayout().
+   \sa updateLayout()
+ */
 void ChartLayoutManager::doLayout()
 {
+    d->m_layoutUpdateTimer.stop();
+
     d->m_layoutInfo.m_dynamicInstanceMarkers.clear();
     d->m_layoutInfo.m_pos = { 0., 0. };
     d->m_layoutInfo.m_instancesCommonAxisOffset = 0.;
@@ -343,8 +353,6 @@ void ChartLayoutManager::doLayout()
     for (MscInstance *instance : d->m_currentChart->instances())
         if (InstanceItem *item = itemForInstance(instance))
             item->setHighlightable(true);
-
-    d->m_layoutDirty = false;
 
     forceCifForAll();
 
@@ -1492,8 +1500,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         const int newIdx = eventIndex(item->y());
         if (!newInstance || newInstance != actionItem->modelItem()->instance() || newIdx != currentIdx) {
             msc::cmd::CommandsStack::push(msc::cmd::MoveAction,
-                    { QVariant::fromValue<MscAction *>(actionItem->modelItem()), newIdx,
-                            QVariant::fromValue<MscInstance *>(newInstance) });
+                    { QVariant::fromValue(actionItem->modelItem()), newIdx, QVariant::fromValue(newInstance) });
         }
     }
 
@@ -1759,6 +1766,45 @@ void ChartLayoutManager::forceCifForAll()
 const QRectF &ChartLayoutManager::instancesRect() const
 {
     return d->m_layoutInfo.m_instancesRect;
+}
+
+void insertEntity(QMap<int, msc::MscInstanceEvent *> &events, int key, msc::MscInstanceEvent *value,
+        const QVector<MscInstanceEvent *> &originalEvents)
+{
+    if (events.contains(key)) {
+        // if on same position, preserve sorting of the existing
+        msc::MscInstanceEvent *oldValue = events[key];
+        if (originalEvents.indexOf(value) > originalEvents.indexOf(oldValue)) {
+            insertEntity(events, ++key, value, originalEvents); // insert afer oldvalue
+        } else {
+            events[key] = value;
+            insertEntity(events, ++key, oldValue, originalEvents); // move old value
+        }
+    } else {
+        events[key] = value;
+    }
+}
+
+QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() const
+{
+    QMap<int, msc::MscInstanceEvent *> events;
+
+    for (msc::InteractiveObject *eventitem : d->m_instanceEventItemsSorted) {
+        if (auto coregionItem = qobject_cast<CoregionItem *>(eventitem)) {
+            insertEntity(events, coregionItem->sceneBoundingRect().top(), coregionItem->begin(),
+                    d->m_currentChart->instanceEvents());
+            insertEntity(events, coregionItem->sceneBoundingRect().bottom(), coregionItem->end(),
+                    d->m_currentChart->instanceEvents());
+        } else {
+            auto eventEntity = static_cast<msc::MscInstanceEvent *>(eventitem->modelEntity());
+            insertEntity(
+                    events, eventitem->sceneBoundingRect().top(), eventEntity, d->m_currentChart->instanceEvents());
+        }
+    }
+
+    Q_ASSERT(events.size() == d->m_currentChart->instanceEvents().size());
+
+    return events.values().toVector();
 }
 
 void ChartLayoutManager::setInstancesRect(const QRectF &rect)

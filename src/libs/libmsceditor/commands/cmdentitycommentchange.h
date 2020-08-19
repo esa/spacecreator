@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 namespace msc {
 
@@ -26,10 +26,11 @@ class MscChart;
 
 namespace cmd {
 
-class CmdEntityCommentChange : public BaseCommand
+class CmdEntityCommentChange : public ChartBaseCommand
 {
 public:
-    CmdEntityCommentChange(MscChart *chart, MscEntity *item, const QString &newComment);
+    CmdEntityCommentChange(
+            MscEntity *item, const QString &newComment, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -37,7 +38,6 @@ public:
     int id() const override;
 
 private:
-    QPointer<MscChart> m_chart;
     QString m_oldComment;
     QString m_newComment;
 };

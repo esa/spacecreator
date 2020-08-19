@@ -25,10 +25,10 @@
 namespace msc {
 namespace cmd {
 
-CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, MscChart *chart)
-    : BaseCommand(instance)
+CmdChangeInstanceOrder::CmdChangeInstanceOrder(
+        msc::MscInstance *instance, int pos, MscChart *chart, ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(instance, chart, layoutManager)
     , m_instance(instance)
-    , m_chart(chart)
     , m_posFrom(chart->instances().indexOf(m_instance))
     , m_posTo(pos)
 {
@@ -37,14 +37,18 @@ CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int p
 
 void CmdChangeInstanceOrder::redo()
 {
-    if (m_chart && m_instance)
+    if (m_chart && m_instance) {
         m_chart->updateInstanceOrder(m_instance, m_posTo);
+        checkVisualSorting();
+    }
 }
 
 void CmdChangeInstanceOrder::undo()
 {
-    if (m_chart && m_instance)
+    if (m_chart && m_instance) {
         m_chart->updateInstanceOrder(m_instance, m_posFrom);
+        undoVisualSorting();
+    }
 }
 
 bool CmdChangeInstanceOrder::mergeWith(const QUndoCommand *command)

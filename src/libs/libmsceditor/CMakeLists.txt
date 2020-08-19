@@ -51,6 +51,8 @@ target_sources(${LIB_NAME} PRIVATE
     chartview/timeritem.h
     commands/basecommand.cpp
     commands/basecommand.h
+    commands/chartbasecommand.cpp
+    commands/chartbasecommand.h
     commands/cmdactioninformaltext.cpp
     commands/cmdactioninformaltext.h
     commands/cmdactionitemcreate.cpp

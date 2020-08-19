@@ -87,6 +87,8 @@ public:
     QString createUniqueInstanceName() const;
     bool moveEvent(MscInstanceEvent *event, int newIndex);
 
+    void rearrangeEvents(const QVector<msc::MscInstanceEvent *> &sortedEvents);
+
 public Q_SLOTS:
     void resetTimerRelations(msc::MscTimer *timer);
     void updatePrecedingTimer(msc::MscTimer *timer, int idx = -1);

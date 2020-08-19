@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "commands/basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
@@ -28,10 +28,11 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdInstanceItemCreate : public BaseCommand
+class CmdInstanceItemCreate : public ChartBaseCommand
 {
 public:
-    CmdInstanceItemCreate(msc::MscInstance *instance, msc::MscChart *chart, int orderId);
+    CmdInstanceItemCreate(
+            msc::MscInstance *instance, int orderId, msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -40,7 +41,6 @@ public:
 
 private:
     MscInstance *m_instance = nullptr;
-    QPointer<MscChart> m_chart;
     const int m_instanceOrderNum;
 };
 

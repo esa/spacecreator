@@ -114,8 +114,11 @@ public:
 
     const QRectF &instancesRect() const;
 
+    QVector<MscInstanceEvent *> visuallySortedEvents() const;
+
 public Q_SLOTS:
     void updateLayout();
+    void doLayout();
     void updateChartboxToContent();
     void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);
@@ -135,8 +138,6 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<ChartLayoutManagerPrivate> const d;
-
-    Q_INVOKABLE void doLayout();
 
     QVector<QGraphicsObject *> instanceEventItems(MscInstance *instance) const;
 

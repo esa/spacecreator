@@ -26,6 +26,7 @@ class QUndoCommand;
 
 namespace msc {
 
+class ChartLayoutManager;
 class MscChart;
 
 namespace cmd {
@@ -38,6 +39,7 @@ public:
     QUndoCommand *create(msc::cmd::Id id, const QVariantList &params);
 
     void setCurrentChart(msc::MscChart *chart);
+    void setChartLayoutManager(msc::ChartLayoutManager *layoutManager);
 
     QUndoCommand *createChangeComment(const QVariantList &params);
     QUndoCommand *createRenameEntity(const QVariantList &params);
@@ -73,6 +75,7 @@ private:
     CommandsFactory(const CommandsFactory &other) = delete;
 
     QPointer<msc::MscChart> m_chart;
+    QPointer<msc::ChartLayoutManager> m_layoutManager;
 };
 
 } // ns cmd

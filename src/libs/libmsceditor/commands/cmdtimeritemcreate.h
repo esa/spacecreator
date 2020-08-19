@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "commands/basecommand.h"
+#include "chartbasecommand.h"
 #include "msctimer.h"
 
 #include <QPointer>
@@ -29,11 +29,11 @@ class MscInstance;
 
 namespace cmd {
 
-class CmdTimerItemCreate : public BaseCommand
+class CmdTimerItemCreate : public ChartBaseCommand
 {
 public:
-    CmdTimerItemCreate(msc::MscTimer *timer, MscTimer::TimerType timerType, msc::MscChart *chart,
-            msc::MscInstance *instance, int eventIndex);
+    CmdTimerItemCreate(msc::MscTimer *timer, MscTimer::TimerType timerType, msc::MscInstance *instance, int eventIndex,
+            msc::MscChart *chart, ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -42,7 +42,6 @@ public:
 
 private:
     MscTimer *m_timer = nullptr;
-    QPointer<MscChart> m_chart;
     QPointer<MscInstance> m_instance;
     int m_eventIndex = -1;
     MscTimer::TimerType m_timerType = MscTimer::TimerType::Start;

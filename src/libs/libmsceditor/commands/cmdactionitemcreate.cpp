@@ -25,10 +25,10 @@
 namespace msc {
 namespace cmd {
 
-CmdActionItemCreate::CmdActionItemCreate(MscAction *action, MscChart *chart, msc::MscInstance *instance, int eventIndex)
-    : BaseCommand(action)
+CmdActionItemCreate::CmdActionItemCreate(MscAction *action, msc::MscInstance *instance, int eventIndex, MscChart *chart,
+        ChartLayoutManager *layoutManager)
+    : ChartBaseCommand(action, chart, layoutManager)
     , m_action(action)
-    , m_chart(chart)
     , m_instance(instance)
     , m_eventIndex(eventIndex)
 {
@@ -52,6 +52,8 @@ void CmdActionItemCreate::redo()
 
     // The chart takes over parent-/owner-ship
     m_chart->addInstanceEvent(m_action, m_eventIndex);
+
+    checkVisualSorting();
 }
 
 void CmdActionItemCreate::undo()
@@ -61,6 +63,8 @@ void CmdActionItemCreate::undo()
 
     // this command takes over ownership
     m_action->setParent(this);
+
+    undoVisualSorting();
 }
 
 bool CmdActionItemCreate::mergeWith(const QUndoCommand *command)

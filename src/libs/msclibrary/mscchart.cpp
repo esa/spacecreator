@@ -499,6 +499,29 @@ bool MscChart::moveEvent(MscInstanceEvent *event, int newIndex)
     return false;
 }
 
+/*!
+   Does set the sorting of the events of this chart at once. Be careful to have the same set of events, as already
+   available
+ */
+void MscChart::rearrangeEvents(const QVector<MscInstanceEvent *> &sortedEvents)
+{
+    if (sortedEvents == m_instanceEvents) {
+        return;
+    }
+
+    int idx = 0;
+    bool changed = false;
+    for (MscInstanceEvent *event : sortedEvents) {
+        changed |= moveEvent(event, idx);
+        idx++;
+    }
+
+    if (changed) {
+        Q_EMIT eventMoved();
+        Q_EMIT dataChanged();
+    }
+}
+
 void MscChart::updateMessageTarget(
         MscMessage *message, MscInstance *newInstance, int eventPos, msc::MscMessage::EndType endType)
 {

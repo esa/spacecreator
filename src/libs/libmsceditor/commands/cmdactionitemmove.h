@@ -17,22 +17,25 @@
 
 #pragma once
 
-#include "basecommand.h"
+#include "chartbasecommand.h"
 
 #include <QPointer>
 
 namespace msc {
 
+class ChartLayoutManager;
 class MscAction;
 class MscChart;
 class MscInstance;
+class MscInstanceEvent;
 
 namespace cmd {
 
-class CmdActionItemMove : public BaseCommand
+class CmdActionItemMove : public ChartBaseCommand
 {
 public:
-    CmdActionItemMove(msc::MscAction *action, int newPos, msc::MscInstance *newInsance, MscChart *chart);
+    CmdActionItemMove(msc::MscAction *action, int newPos, msc::MscInstance *newInsance, MscChart *chart,
+            ChartLayoutManager *layoutManager);
 
     void redo() override;
     void undo() override;
@@ -45,7 +48,6 @@ private:
     int m_newIndex = -1;
     QPointer<msc::MscInstance> m_oldInstance;
     QPointer<msc::MscInstance> m_newInstance;
-    QPointer<msc::MscChart> m_chart;
 };
 
 } // namespace cmd

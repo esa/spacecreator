@@ -20,6 +20,7 @@
 #include "asn1xmlparser.h"
 #include "astxmlparser.h"
 #include "chartlayoutmanager.h"
+#include "commands/common/commandsfactory.h"
 #include "commands/common/commandsstack.h"
 #include "documentitemmodel.h"
 #include "exceptions.h"
@@ -106,6 +107,7 @@ MainModel::MainModel(QObject *parent)
     showFirstChart();
 
     msc::cmd::CommandsStack::setCurrent(&d->m_undoStack);
+    msc::cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&d->m_chartLayoutManager);
 }
 
 MainModel::~MainModel()

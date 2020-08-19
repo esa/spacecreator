@@ -65,6 +65,7 @@ void tst_CmdInstanceItemCreate::initTestCase()
     cmd::CommandsStack::setCurrent(new QUndoStack(this));
     cmd::CommandsStack::current()->setUndoLimit(CommandsCount);
     cmd::CommandsStack::instance()->factory()->setCurrentChart(m_chart);
+    cmd::CommandsStack::instance()->factory()->setChartLayoutManager(&m_chartModel);
 }
 
 void tst_CmdInstanceItemCreate::cleanupTestCase()
