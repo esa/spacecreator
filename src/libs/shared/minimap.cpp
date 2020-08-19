@@ -82,7 +82,7 @@ void MiniMap::setupSourceView(QGraphicsView *view)
             connect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
         }
         setScene(view->scene());
-        pinToParentCorner();
+        adjustGeometry();
         if (scene()) {
             connect(scene(), &QGraphicsScene::sceneRectChanged, this, &MiniMap::adjustGeometry);
         }
@@ -130,33 +130,10 @@ QRectF MiniMap::mappedViewportOnScene() const
 void MiniMap::adjustGeometry()
 {
     if (auto widget = parentWidget()) {
-        const QRect parentRect = widget->rect();
-        const QSize sceneSize = scene()->sceneRect().size().toSize();
-        QRect geometry { pos(),
-            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatioByExpanding) };
-        if (geometry.left() < parentRect.left()) {
-            geometry.moveLeft(parentRect.left());
-        }
-        if (geometry.top() < parentRect.top()) {
-            geometry.moveTop(parentRect.top());
-        }
-        if (geometry.right() > parentRect.right()) {
-            geometry.moveRight(parentRect.right());
-        }
-        if (geometry.bottom() > parentRect.bottom()) {
-            geometry.moveBottom(parentRect.bottom());
-        }
-        setGeometry(geometry);
-    }
-}
-
-void MiniMap::pinToParentCorner()
-{
-    if (auto widget = parentWidget()) {
         const auto parentRect = widget->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
-            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatioByExpanding) };
+            sceneSize.scaled(parentRect.width() / kDefaultScaleFactor, parentRect.height(), Qt::KeepAspectRatio) };
         currentRect.moveTopRight(parentRect.topRight());
         setGeometry(currentRect);
     }
@@ -165,7 +142,7 @@ void MiniMap::pinToParentCorner()
 void MiniMap::updateScaling()
 {
     if (const auto graphicsScene = scene()) {
-        fitInView(graphicsScene->sceneRect(), Qt::KeepAspectRatio);
+        fitInView(graphicsScene->sceneRect());
         viewport()->update();
     }
 }
@@ -255,7 +232,7 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
 bool MiniMap::eventFilter(QObject *object, QEvent *event)
 {
     if (object == parentWidget() && event->type() == QEvent::Resize) {
-        pinToParentCorner();
+        adjustGeometry();
     }
     return QGraphicsView::eventFilter(object, event);
 }

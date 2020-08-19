@@ -62,7 +62,6 @@ private:
     void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
     QRectF mappedViewportOnScene() const;
     void adjustGeometry();
-    void pinToParentCorner();
     void updateScaling();
 
 private:
