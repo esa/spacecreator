@@ -221,10 +221,10 @@ bool CoordinatesConverter::sceneToCif(const QRectF sceneRect, QRect &cifRect)
 
 bool CoordinatesConverter::cifToScene(const QRect &cifRect, QRectF &sceneRect)
 {
-    const QVector<QPoint> cifPoints { cifRect.topLeft(), cifRect.bottomRight() };
+    const QVector<QPoint> cifPoints { cifRect.topLeft(), { cifRect.width(), cifRect.height() } };
     bool converted(false);
     const QVector<QPointF> scenePoints = CoordinatesConverter::cifToScene(cifPoints, &converted);
-    sceneRect = { scenePoints.first(), scenePoints.last() };
+    sceneRect = { scenePoints.first(), QSizeF(scenePoints.last().x(), scenePoints.last().y()) };
     return converted;
 }
 
