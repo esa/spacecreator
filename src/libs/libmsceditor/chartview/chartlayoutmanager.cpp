@@ -918,7 +918,8 @@ void ChartLayoutManager::actualizeInstancesHeights(qreal height) const
         if (instanceItem->modelItem()->explicitStop()) {
             updateStoppedInstanceHeight(instanceItem, height);
             updated = true;
-        } else if (instanceItem->modelItem()->explicitCreator()) {
+        }
+        if (instanceItem->modelItem()->explicitCreator()) {
             updateCreatedInstanceHeight(instanceItem, height);
             updated = true;
         }

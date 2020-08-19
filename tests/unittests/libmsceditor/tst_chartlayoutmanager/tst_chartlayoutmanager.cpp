@@ -67,6 +67,7 @@ private Q_SLOTS:
     void testMaxVisibleItems();
 
     void testCreateSetsInstanceY();
+    void testCreateSetsYOfStoppedInstance();
 
     void testShiftHorizontalIfNeeded();
 
@@ -454,7 +455,6 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
                           endmsc;\
                       endmscdocument;\
                   endmscdocument;";
-
     parseMsc(mscText);
 
     msc::MscChart *chart = m_chartModel->currentChart();
@@ -493,6 +493,45 @@ void tst_ChartLayoutManager::testCreateSetsInstanceY()
     waitForLayoutUpdate();
     QVERIFY(createItem->sceneBoundingRect().top() > createRectbefore.top()); // Create item got pushed down
     QCOMPARE(instanceItem2->leftCreatorTarget(), createItem->messagePoints().last());
+}
+
+void tst_ChartLayoutManager::testCreateSetsYOfStoppedInstance()
+{
+    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
+                      mscdocument Untitled_Leaf /* MSC LEAF */;\
+                          msc Untitled_MSC;\
+                              instance Instance_A;\
+                                action 'info';\
+                                create Instance_B;\
+                                in init_b_done from Instance_B;\
+                                condition 'upside';\
+                                action 'close';\
+                              endinstance;\
+                              instance Instance_B;\
+                                out init_b_done to Instance_A;\
+                              stop;\
+                          endmsc;\
+                      endmscdocument;\
+                  endmscdocument;";
+    parseMsc(mscText);
+
+    msc::InstanceItem *instanceItemA = m_chartModel->instanceItems().at(0);
+    msc::InstanceItem *instanceItemB = m_chartModel->instanceItems().at(1);
+
+    MscAction *action = qobject_cast<MscAction *>(m_chart->instanceEvents().at(0));
+    QVERIFY(action);
+    MscMessage *create = qobject_cast<MscMessage *>(m_chart->instanceEvents().at(1));
+    QVERIFY(create);
+
+    msc::ActionItem *actionItem = m_chartModel->itemForAction(action);
+    msc::MessageItem *createItem = m_chartModel->itemForMessage(create);
+
+    // Check that the create message points to the instance head
+    QCOMPARE(instanceItemB->leftCreatorTarget(), createItem->messagePoints().last());
+    // The created instance should be below the action event
+    QVERIFY(instanceItemB->sceneBoundingRect().top() > actionItem->sceneBoundingRect().top());
+    // The stop should be above the unstopped
+    QVERIFY(instanceItemB->sceneBoundingRect().bottom() < instanceItemA->sceneBoundingRect().bottom());
 }
 
 void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
