@@ -338,18 +338,19 @@ QString InterfaceDocument::title() const
 
 QMenu *InterfaceDocument::customMenu() const
 {
-    QMenu *root = new QMenu(title());
+    QMenu *root = new QMenu(tr("Common Settings"));
     QAction *actCommonProps = root->addAction(tr("Common Properties"));
     connect(actCommonProps, &QAction::triggered, this, &InterfaceDocument::onAttributesManagerRequested);
-    QAction *actDataTypes = root->addAction(tr("Data types"));
-    connect(actDataTypes, &QAction::triggered, this, &InterfaceDocument::onDataTypesMenuInvoked);
+    //    QAction *actDataTypes = root->addAction(tr("Data types"));
+    //    connect(actDataTypes, &QAction::triggered, this, &InterfaceDocument::onDataTypesMenuInvoked);
     QAction *actColorScheme = root->addAction(tr("Color Scheme"));
     connect(actColorScheme, &QAction::triggered, this, &InterfaceDocument::onColorSchemeMenuInvoked);
     QAction *actDynContext = root->addAction(tr("Context Actions"));
     connect(actDynContext, &QAction::triggered, this, &InterfaceDocument::onDynContextEditorMenuInvoked);
 
     ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
-    ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common Datatypes");
+    //    ActionsManager::registerAction(Q_FUNC_INFO, actDataTypes, "Edit Datatypes", "Show editor for common
+    //    Datatypes");
     ActionsManager::registerAction(
             Q_FUNC_INFO, actColorScheme, "Edit Color scheme", "Show editor for common Color schemes");
     ActionsManager::registerAction(

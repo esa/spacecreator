@@ -66,14 +66,13 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
     ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
 }
 
-void IVEditorPlugin::addMenuEditActions(QMenu * /*menu*/, QMainWindow * /*window*/)
+void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
 {
-    // Nothing to add
+    menu->addMenu(document()->customMenu());
 }
 
 void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    // Nothing to add
     Plugin::addMenuViewActions(menu, window);
 }
 
