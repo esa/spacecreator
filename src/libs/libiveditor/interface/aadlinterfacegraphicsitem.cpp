@@ -314,6 +314,9 @@ void AADLInterfaceGraphicsItem::adjustItem()
                 break;
             }
         }
+        for (auto connection: m_connections) {
+            connection->layout();
+        }
     }
 }
 
