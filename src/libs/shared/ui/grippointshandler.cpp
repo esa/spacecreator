@@ -144,8 +144,12 @@ void GripPointsHandler::hideAnimated()
 
 void GripPointsHandler::opacityAnimationFinished()
 {
-    if (!m_visible)
-        setVisible(false);
+    if (!m_visible) {
+        // The visible flag needs to be set to false. But setting it directly has the side effect to leave some
+        // semi-transparent grip points visible
+        QMetaObject::invokeMethod(
+                this, [this]() { hide(); }, Qt::QueuedConnection);
+    }
 }
 
 void GripPointsHandler::changeVisibilityAnimated(bool appear)
@@ -173,7 +177,11 @@ QPointF GripPointsHandler::viewScale() const
             const int viewsCount = scene()->views().size();
             if (viewsCount) {
                 if (viewsCount > 1) {
-                    qWarning() << Q_FUNC_INFO << "The multiple views support is not implemented yet.";
+                    static bool warningShown = false;
+                    if (!warningShown) {
+                        qWarning() << Q_FUNC_INFO << "The multiple views support is not implemented yet.";
+                        warningShown = true;
+                    }
                 }
 
                 const QTransform &t = parent->deviceTransform(scene()->views().first()->viewportTransform());
