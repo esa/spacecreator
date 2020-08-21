@@ -33,6 +33,9 @@ const char C_AADLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", 
 
 const char AADL_SHOW_ASN1_ID[] = "AadlEditor.MessageDeclarations";
 const char AADL_SHOW_MINIMAP_ID[] = "AadlEditor.Minimap";
+const char AADL_SHOW_COMMON_PROPS_ID[] = "AadlEditor.CommonProps";
+const char AADL_SHOW_COLOR_SCHEME_ID[] = "AadlEditor.ColorScheme";
+const char AADL_SHOW_DYN_CONTEXT_ID[] = "AadlEditor.DynContext";
 const char AADL_MENU_ID[] = "AadlEditor.Menu";
 }
 }

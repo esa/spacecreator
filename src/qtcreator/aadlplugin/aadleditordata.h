@@ -45,6 +45,9 @@ public:
 
     void showAsn1Dialog();
     void showMinimap(bool visible);
+    void onAttributesManagerRequested();
+    void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
 private:
     void updateToolBar();

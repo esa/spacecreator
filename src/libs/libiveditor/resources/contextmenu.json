@@ -25,9 +25,9 @@
             }
         ],
         "action": "",
-        "app": "TASTEeditor",
+        "app": "IVEditor",
         "appArgs": [ "-l" ],
-        "appCwd": "TASTE3",
+        "appCwd": "iveditor",
         "title": "List scriptable actions"
     }
 ]

@@ -127,6 +127,21 @@ void AadlMainWidget::setMinimapVisible(bool visible)
     m_plugin->minimapView()->setVisible(visible);
 }
 
+void AadlMainWidget::onAttributesManagerRequested()
+{
+    m_plugin->document()->onAttributesManagerRequested();
+}
+
+void AadlMainWidget::onColorSchemeMenuInvoked()
+{
+    m_plugin->document()->onColorSchemeMenuInvoked();
+}
+
+void AadlMainWidget::onDynContextEditorMenuInvoked()
+{
+    m_plugin->document()->onDynContextEditorMenuInvoked();
+}
+
 void AadlMainWidget::initUi()
 {
     setLayout(new QVBoxLayout(this));

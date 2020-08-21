@@ -52,6 +52,9 @@ public:
 
     void showAsn1Dialog();
     void setMinimapVisible(bool visible);
+    void onAttributesManagerRequested();
+    void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);

@@ -64,8 +64,8 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
 
     m_minimapWidgetAction = new QAction(tr("Show minimap"), this);
     m_minimapWidgetAction->setCheckable(true);
-    Core::Command *showMinimapCmd =
-            Core::ActionManager::registerAction(m_minimapWidgetAction, Constants::AADL_SHOW_MINIMAP_ID);
+    Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
+            m_minimapWidgetAction, Constants::AADL_SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
     connect(m_minimapWidgetAction, &QAction::triggered, this, &AadlPluginPlugin::showMinimap);
 
     m_asn1DialogAction->setEnabled(false);
@@ -76,10 +76,28 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
         }
     });
 
+    QAction *actCommonProps = new QAction(tr("Common Properties"), this);
+    Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
+            actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actCommonProps, &QAction::triggered, this, &AadlPluginPlugin::onAttributesManagerRequested);
+
+    QAction *actColorScheme = new QAction(tr("Color Scheme"), this);
+    Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
+            actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actColorScheme, &QAction::triggered, this, &AadlPluginPlugin::onColorSchemeMenuInvoked);
+
+    QAction *actDynContext = new QAction(tr("Context Actions"), this);
+    Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
+            actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
+    connect(actDynContext, &QAction::triggered, this, &AadlPluginPlugin::onDynContextEditorMenuInvoked);
+
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::AADL_MENU_ID);
     menu->menu()->setTitle(tr("AADLPlugin"));
     menu->addAction(showAsn1Cmd);
     menu->addAction(showMinimapCmd);
+    menu->addAction(showCommonPropsCmd);
+    menu->addAction(showColorSchemeCmd);
+    menu->addAction(showDynContextCmd);
     menu->menu()->setEnabled(true);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
@@ -112,6 +130,21 @@ void AadlPluginPlugin::showAsn1Dialog()
 void AadlPluginPlugin::showMinimap(bool visible)
 {
     m_factory->editorData()->showMinimap(visible);
+}
+
+void AadlPluginPlugin::onAttributesManagerRequested()
+{
+    m_factory->editorData()->onAttributesManagerRequested();
+}
+
+void AadlPluginPlugin::onColorSchemeMenuInvoked()
+{
+    m_factory->editorData()->onColorSchemeMenuInvoked();
+}
+
+void AadlPluginPlugin::onDynContextEditorMenuInvoked()
+{
+    m_factory->editorData()->onDynContextEditorMenuInvoked();
 }
 
 }

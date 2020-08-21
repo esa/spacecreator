@@ -68,7 +68,9 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
 
 void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
 {
-    menu->addMenu(document()->customMenu());
+    QMenu *root = new QMenu(tr("Common Settings"));
+    root->addActions(document()->customActions());
+    menu->addMenu(root);
 }
 
 void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)

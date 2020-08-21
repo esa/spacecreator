@@ -78,7 +78,7 @@ public:
 
     QString title() const;
 
-    QMenu *customMenu() const;
+    QList<QAction *> customActions() const;
 
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     aadl::AADLObjectsModel *objectsModel() const;
@@ -96,6 +96,9 @@ Q_SIGNALS:
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
     void setObjects(const QVector<aadl::AADLObject *> &objects);
+    void onAttributesManagerRequested();
+    void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
 private Q_SLOTS:
     void updateDirtyness();
@@ -105,11 +108,7 @@ private Q_SLOTS:
     void onItemDoubleClicked();
     void onRootObjectChanged(shared::Id rootId);
 
-    void onAttributesManagerRequested();
     void onDataTypesMenuInvoked();
-    void onColorSchemeMenuInvoked();
-    void onDynContextEditorMenuInvoked();
-
     void showPropertyEditor(aadl::AADLObject *obj);
 
     void showInfoMessage(const QString &title, const QString &message);

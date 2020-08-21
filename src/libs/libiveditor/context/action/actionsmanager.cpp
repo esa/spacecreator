@@ -82,7 +82,7 @@ ActionsManager *ActionsManager::m_instance = nullptr;
 
 /*!
  * Returns path to a dir that contains custom actions descriptions.
- * The value is something like ~/.local/share/ESA/TASTE Editor/contextMenu
+ * The value is something like ~/.local/share/ESA/IV Editor/contextMenu
  */
 QString ActionsManager::storagePath()
 {
@@ -150,7 +150,7 @@ void ActionsManager::deployDefaults()
     shared::ensureDirExists(targetDir);
 
     if (!QFileInfo::exists(targetFilePath)) {
-        shared::copyResourceFile(":/defaults/app/resources/" + targetFile, targetFilePath);
+        shared::copyResourceFile(":/defaults/resources/" + targetFile, targetFilePath);
     }
 }
 

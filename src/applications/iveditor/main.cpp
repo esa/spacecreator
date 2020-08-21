@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
     a.setApplicationVersion(SC_VERSION);
-    a.setApplicationName("TASTE Editor");
+    a.setApplicationName("IV Editor");
 
     QDirIterator dirIt(":/fonts");
     while (dirIt.hasNext())

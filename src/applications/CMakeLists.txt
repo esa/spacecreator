@@ -1,4 +1,4 @@
-add_subdirectory(TASTEeditor)
+add_subdirectory(iveditor)
 add_subdirectory(aadlconverter)
 add_subdirectory(mscconverter)
 add_subdirectory(msceditor)

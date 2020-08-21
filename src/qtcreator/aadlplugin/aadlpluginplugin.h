@@ -43,6 +43,9 @@ public:
 public Q_SLOTS:
     void showAsn1Dialog();
     void showMinimap(bool visible);
+    void onAttributesManagerRequested();
+    void onColorSchemeMenuInvoked();
+    void onDynContextEditorMenuInvoked();
 
 private:
     AadlEditorFactory *m_factory = nullptr;

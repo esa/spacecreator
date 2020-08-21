@@ -8,7 +8,7 @@ This repository depends on these parts:
 * Java SE 8
 * On Windows: Visual Studio 2017 or 2019
 * CMake
- 
+
 Custom Qt Creator build (for plugins) also needs:
 
 * The QtScrip module (marked as deprecated now)
@@ -107,7 +107,7 @@ git submodule init && \
 git submodule update --recursive
 ```
 
-1. Get the source code as shown above. Remember the `qt-creator' directory path, we'll need it at step 5; 
+1. Get the source code as shown above. Remember the `qt-creator' directory path, we'll need it at step 5;
 1. Use the same Qt version for all projects (*SpaceCreator*, *QtC*, *Grantlee*). Ensure its **QtScript** module (deprecated now) is installed;
 1. Install **clang** development files (`sudo apt install libclang-dev`);
 1. build the QtC;
@@ -129,7 +129,7 @@ The current implementation is based on the [Grantlee string template library](ht
 `win32: CONFIG(debug, debug|release):GRANTLEE_LIB = $$join(GRANTLEE_LIB,,,d)`<br>
 `LIBS += -L$$GRANTLEE_LIB_DIR -l$$GRANTLEE_LIB`<br>
 `macx: INCLUDEPATH += $$[QT_INSTALL_HEADERS]`
-*  Add next files from *taste3/TASTEeditor/templating/* to your project and set them in *.pro file:<br>
+*  Add next files from *src/libs/libiveditor/templating/xml_templates/* to your project and set them in CMakeLists.txt file:<br>
 `HEADERS += \`<br>
 `        ...`<br>
 `        templating/abstractexportableobject.h \`<br>
@@ -147,7 +147,7 @@ The current implementation is based on the [Grantlee string template library](ht
 `        templating/xmlhighlighter.cpp \`<br>
 `        templating/templatesyntaxhelpdialog.cpp`
 *  Write a successor of `AbstractExportableObject` as a lightweight wrapper to export your QObject-derived objects. Use implementation of `ExportableAADLObject` and its successors as a reference.
-*  Create exportable an object, cast it to `QVariant` and append it in `QHash<QString, QVariantList>` by using a `groupName()` as a key. Then invoke `StringTemplate::parseFile()` for parsing a template. Use implementation of `XmlDocExporter` from *taste3/TASTEeditor/app/* as a reference.
+*  Create exportable an object, cast it to `QVariant` and append it in `QHash<QString, QVariantList>` by using a `groupName()` as a key. Then invoke `StringTemplate::parseFile()` for parsing a template. Use implementation of `XmlDocExporter` from *src/libs/libiveditor/* as a reference.
 
 # Import of existing editors
 

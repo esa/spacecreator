@@ -336,16 +336,19 @@ QString InterfaceDocument::title() const
     return fileName;
 }
 
-QMenu *InterfaceDocument::customMenu() const
+QList<QAction *> InterfaceDocument::customActions() const
 {
-    QMenu *root = new QMenu(tr("Common Settings"));
-    QAction *actCommonProps = root->addAction(tr("Common Properties"));
+    QList<QAction *> actions;
+    QAction *actCommonProps = new QAction(tr("Common Properties"));
+    actions.append(actCommonProps);
     connect(actCommonProps, &QAction::triggered, this, &InterfaceDocument::onAttributesManagerRequested);
     //    QAction *actDataTypes = root->addAction(tr("Data types"));
     //    connect(actDataTypes, &QAction::triggered, this, &InterfaceDocument::onDataTypesMenuInvoked);
-    QAction *actColorScheme = root->addAction(tr("Color Scheme"));
+    QAction *actColorScheme = new QAction(tr("Color Scheme"));
+    actions.append(actColorScheme);
     connect(actColorScheme, &QAction::triggered, this, &InterfaceDocument::onColorSchemeMenuInvoked);
-    QAction *actDynContext = root->addAction(tr("Context Actions"));
+    QAction *actDynContext = new QAction(tr("Context Actions"));
+    actions.append(actDynContext);
     connect(actDynContext, &QAction::triggered, this, &InterfaceDocument::onDynContextEditorMenuInvoked);
 
     ActionsManager::registerAction(Q_FUNC_INFO, actCommonProps, "Edit Properties", "Show editor for common Properties");
@@ -356,7 +359,7 @@ QMenu *InterfaceDocument::customMenu() const
     ActionsManager::registerAction(
             Q_FUNC_INFO, actDynContext, "Context actions", "Show editor for common custom context menu actions");
 
-    return root;
+    return actions;
 }
 
 const QHash<shared::Id, aadl::AADLObject *> &InterfaceDocument::objects() const

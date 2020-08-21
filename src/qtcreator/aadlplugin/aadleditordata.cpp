@@ -183,6 +183,36 @@ void AadlEditorData::showMinimap(bool visible)
     }
 }
 
+void AadlEditorData::onAttributesManagerRequested()
+{
+    auto editorManager = Core::EditorManager::instance();
+    Core::IDocument *currentDoc = editorManager->currentDocument();
+    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    if (document && document->designWidget()) {
+        document->designWidget()->onAttributesManagerRequested();
+    }
+}
+
+void AadlEditorData::onColorSchemeMenuInvoked()
+{
+    auto editorManager = Core::EditorManager::instance();
+    Core::IDocument *currentDoc = editorManager->currentDocument();
+    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    if (document && document->designWidget()) {
+        document->designWidget()->onColorSchemeMenuInvoked();
+    }
+}
+
+void AadlEditorData::onDynContextEditorMenuInvoked()
+{
+    auto editorManager = Core::EditorManager::instance();
+    Core::IDocument *currentDoc = editorManager->currentDocument();
+    auto document = qobject_cast<AadlPlugin::AadlEditorDocument *>(currentDoc);
+    if (document && document->designWidget()) {
+        document->designWidget()->onDynContextEditorMenuInvoked();
+    }
+}
+
 void AadlEditorData::updateToolBar()
 {
     auto designWidget = static_cast<AadlMainWidget *>(m_widgetStack->currentWidget());
