@@ -212,9 +212,8 @@ void ChartLayoutManager::setCurrentChart(MscChart *chart)
                 QSignalBlocker suppressCifChangeNotifycation(d->m_layoutInfo.m_chartItem);
                 d->m_layoutInfo.m_chartItem->updateCif();
             }
-
-            doLayout();
         }
+        doLayout();
 
         connect(d->m_currentChart, &msc::MscChart::instanceAdded, this, &ChartLayoutManager::updateLayout);
         connect(d->m_currentChart, &msc::MscChart::instanceRemoved, this,
@@ -290,10 +289,19 @@ MessageItem *ChartLayoutManager::fillMessageItem(
                 points = pointsScene;
         }
 
-        QPointF pntSource = sourceItem ? sourceItem->sceneBoundingRect().center() : points.front();
-        pntSource.setY(newY);
-        QPointF pntTarget = targetItem ? targetItem->sceneBoundingRect().center() : points.back();
-        pntTarget.setY(newY);
+        // Alings point to the X of the given instance, and pushes the Y  if needed
+        auto alignPoint = [&](const QPointF &defaultPos, InstanceItem *connectedItem) {
+            QPointF pnt = defaultPos;
+            if (connectedItem) {
+                // make sure the message start/stop aligns with the instance
+                pnt.setX(connectedItem->sceneBoundingRect().center().x());
+            }
+            pnt.setY(std::max(pnt.y(), newY));
+            return pnt;
+        };
+
+        QPointF pntSource = alignPoint(points.front(), sourceItem);
+        QPointF pntTarget = alignPoint(points.back(), targetItem);
 
         MessageItem::GeometryNotificationBlocker geometryNotificationBlocker(item);
         item->setMessagePoints({ pntSource, pntTarget });
@@ -689,8 +697,6 @@ QRectF ChartLayoutManager::actualContentRect() const
     }
 
     r = shrinkChartMargins(r, globalToLeft, globalToRight);
-
-    //    r.setTopLeft(QPointF(0., 0.));
 
     return r;
 }
@@ -1298,11 +1304,11 @@ MessageItem *ChartLayoutManager::addMessageItem(MscMessage *message)
 ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
 {
     InstanceItem *instance(nullptr);
-    qreal instanceVertiacalOffset(0);
+    qreal instanceVerticalOffset(0);
     if (action->instance()) {
         instance = itemForInstance(action->instance());
         if (instance)
-            instanceVertiacalOffset = instance->axis().p1().y();
+            instanceVerticalOffset = instance->axis().p1().y();
     }
 
     ActionItem *item = itemForAction(action);
@@ -1310,7 +1316,7 @@ ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
         item = new ActionItem(action);
         storeEntityItem(item);
     }
-    item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVertiacalOffset);
+    item->connectObjects(instance, d->m_layoutInfo.m_pos.y() + instanceVerticalOffset);
     item->instantLayoutUpdate();
 
     return item;

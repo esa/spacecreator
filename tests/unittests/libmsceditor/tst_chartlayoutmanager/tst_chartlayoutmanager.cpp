@@ -21,6 +21,7 @@
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
+#include "chartlayouttestbase.h"
 #include "instanceitem.h"
 #include "messageitem.h"
 #include "mscaction.h"
@@ -45,12 +46,9 @@
 
 using namespace msc;
 
-class tst_ChartLayoutManager : public QObject
+class tst_ChartLayoutManager : public ChartLayoutTestBase
 {
     Q_OBJECT
-
-private:
-    void parseMsc(const QString &mscText);
 
 private Q_SLOTS:
     void init();
@@ -73,19 +71,12 @@ private Q_SLOTS:
 
     void testShiftVerticalIfNeeded();
 
+    void testMessageWithCifInformation();
+
+protected:
+    void parseMsc(const QString &mscDoc) override;
+
 private:
-    void waitForLayoutUpdate()
-    {
-        QApplication::processEvents();
-        QTest::qWait(2);
-        QApplication::processEvents();
-    }
-
-    QGraphicsView m_view;
-
-    QScopedPointer<ChartLayoutManager> m_chartModel;
-    QScopedPointer<MscModel> m_mscModel;
-    QPointer<MscChart> m_chart;
     QVector<MscInstance *> m_instances;
     QVector<InstanceItem *> m_instanceItems;
     QVector<QRectF> m_instanceRects;
@@ -96,20 +87,7 @@ private:
 
 void tst_ChartLayoutManager::parseMsc(const QString &mscText)
 {
-    MscReader mscReader;
-    m_mscModel.reset(mscReader.parseText(mscText));
-
-    if (m_mscModel->charts().isEmpty()) {
-        MscDocument *doc = m_mscModel->documents().at(0);
-        while (doc->charts().isEmpty()) {
-            doc = doc->documents().at(0);
-        }
-        m_chart = doc->charts().at(0);
-    } else {
-        m_chart = m_mscModel->charts().at(0);
-    }
-    m_chartModel->setCurrentChart(m_chart);
-    waitForLayoutUpdate();
+    ChartLayoutTestBase::parseMsc(mscText);
 
     for (MscInstance *instance : m_chart->instances()) {
         InstanceItem *instanceItem = m_chartModel->itemForInstance(instance);
@@ -123,15 +101,12 @@ void tst_ChartLayoutManager::parseMsc(const QString &mscText)
 
 void tst_ChartLayoutManager::init()
 {
-    m_chartModel.reset(new ChartLayoutManager);
-    m_view.setScene(m_chartModel->graphicsScene());
-    CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
-    static const QPointF dpi1to1(CoordinatesConverter::Dpi1To1, CoordinatesConverter::Dpi1To1);
-    CoordinatesConverter::setDPI(dpi1to1, dpi1to1); // results in cif <-> pixel as 1:1
+    initBase();
 }
 
 void tst_ChartLayoutManager::cleanup()
 {
+    cleanupBase();
     m_instances.clear();
     m_instanceItems.clear();
     m_instanceRects.clear();
@@ -612,6 +587,27 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
 
     // the message has to be after/below the create
     QVERIFY(createRect.bottom() <= messageRect.top());
+}
+
+void tst_ChartLayoutManager::testMessageWithCifInformation()
+{
+    const QString msc("mscdocument doc1;\
+                       msc Untitled_MSC;\
+                         /* CIF INSTANCE (0, 56) (189, 79) (800, 508) */\
+                         instance Instance_1;\
+                           /* CIF MESSAGE (96, 210) (620, 634) */\
+                           out Message to env;\
+                         endinstance;\
+                       endmsc;\
+                       endmscdocument;");
+    parseMsc(msc);
+
+    auto message = qobject_cast<msc::MscMessage *>(m_chart->instanceEvents().at(0));
+    msc::MessageItem *messageItem = m_chartModel->itemForMessage(message);
+    const QRectF loadedGeometry = messageItem->sceneBoundingRect();
+    // Check that the message is pointing bottom right
+    qreal widthHeightRatio = std::abs(loadedGeometry.width() / loadedGeometry.height());
+    QVERIFY(widthHeightRatio > 0.7 && widthHeightRatio < 1.3);
 }
 
 QTEST_MAIN(tst_ChartLayoutManager)

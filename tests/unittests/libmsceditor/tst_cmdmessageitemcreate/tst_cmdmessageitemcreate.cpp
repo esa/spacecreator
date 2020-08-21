@@ -87,7 +87,6 @@ QVariantList tst_CmdMessageItemCreate::createParams(MscMessage *message, int ins
 
 void tst_CmdMessageItemCreate::testCreate()
 {
-    QSKIP("");
     m_chartModel.clearScene();
     cmd::CommandsStack::current()->clear();
 
@@ -102,7 +101,6 @@ void tst_CmdMessageItemCreate::testCreate()
 
 void tst_CmdMessageItemCreate::testUndo()
 {
-    QSKIP("");
     QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
     int undone(0);
     while (cmd::CommandsStack::current()->canUndo()) {
@@ -116,7 +114,6 @@ void tst_CmdMessageItemCreate::testUndo()
 
 void tst_CmdMessageItemCreate::testRedo()
 {
-    QSKIP("");
     QCOMPARE(cmd::CommandsStack::current()->count(), CommandsCount);
     int redone(0);
     while (cmd::CommandsStack::current()->canRedo()) {
@@ -130,7 +127,6 @@ void tst_CmdMessageItemCreate::testRedo()
 
 void tst_CmdMessageItemCreate::testPerformance()
 {
-    QSKIP("");
     if (SkipBenchmark)
         QSKIP(qPrintable(QString("This benchmark detects the time spent to perform %1 "
                                  "CreateMessage commands (create, undo, redo).\n"

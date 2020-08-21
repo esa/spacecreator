@@ -16,58 +16,36 @@
 */
 
 #include "chartlayoutmanager.h"
-#include "commands/common/commandsstack.h"
+#include "chartlayouttestbase.h"
 #include "coregionitem.h"
 #include "mscchart.h"
 #include "msccoregion.h"
-#include "mscdocument.h"
 #include "mscmodel.h"
-#include "mscreader.h"
 #include "tools/entitydeletetool.h"
 
 #include <QGraphicsView>
-#include <QPointer>
-#include <QScopedPointer>
-#include <QUndoStack>
 #include <QtTest>
 
 using namespace msc;
 
-class tst_EntityDeleteTool : public QObject
+class tst_EntityDeleteTool : public ChartLayoutTestBase
 {
     Q_OBJECT
 
 private Q_SLOTS:
-    void initTestCase();
     void init();
+    void cleanup();
     void testDeleteCoregion();
-
-private:
-    void waitForLayoutUpdate()
-    {
-        QApplication::processEvents();
-        QTest::qWait(2);
-        QApplication::processEvents();
-    }
-
-    QScopedPointer<ChartLayoutManager> m_chartModel;
-    QScopedPointer<QGraphicsView> m_view;
-    QScopedPointer<MscReader> m_reader;
-    QScopedPointer<MscModel> m_model;
-    QPointer<msc::MscChart> m_chart;
 };
-
-void tst_EntityDeleteTool::initTestCase()
-{
-    cmd::CommandsStack::setCurrent(new QUndoStack(this));
-}
 
 void tst_EntityDeleteTool::init()
 {
-    m_chartModel.reset(new ChartLayoutManager());
-    m_view.reset(new QGraphicsView());
-    m_view->setScene(m_chartModel->graphicsScene());
-    m_reader.reset(new MscReader);
+    initBase();
+}
+
+void tst_EntityDeleteTool::cleanup()
+{
+    cleanupBase();
 }
 
 void tst_EntityDeleteTool::testDeleteCoregion()
@@ -80,17 +58,14 @@ void tst_EntityDeleteTool::testDeleteCoregion()
                                  ENDINSTANCE; \
                              ENDMSC; \
                          ENDMSCDOCUMENT;");
-
-    m_model.reset(m_reader->parseText(msc));
-    m_chart = m_model->documents().first()->charts().first();
-    m_chartModel->setCurrentChart(m_chart);
+    parseMsc(msc);
 
     QCOMPARE(m_chart->instanceEvents().size(), 2); // Coregion has a begin- and end-event.
     auto coregion = qobject_cast<msc::MscCoregion *>(m_chart->instanceEvents().at(0));
     msc::CoregionItem *regionItem = m_chartModel->itemForCoregion(coregion);
     regionItem->setSelected(true);
 
-    msc::EntityDeleteTool delTool(m_chartModel.data(), m_view.data());
+    msc::EntityDeleteTool delTool(m_chartModel.get(), m_view.get());
     delTool.setCurrentChart(m_chart);
     delTool.action()->trigger(); // do the delete of the selected item
     waitForLayoutUpdate();

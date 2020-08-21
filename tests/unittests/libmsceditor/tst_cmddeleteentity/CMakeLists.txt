@@ -1,8 +1,8 @@
-set(TEST_NAME tst_chartlayoutmanager)
+set(TEST_NAME tst_cmddeleteentity)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-    tst_chartlayoutmanager.cpp
+    tst_cmddeleteentity.cpp
     ../common/chartlayouttestbase.cpp
     ../common/chartlayouttestbase.h
 )
