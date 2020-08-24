@@ -49,6 +49,7 @@ private:
     bool handleTimerCommand(const QVariantMap &params, QString *errorString);
     bool handleActionCommand(const QVariantMap &params, QString *errorString);
     bool handleConditionCommand(const QVariantMap &params, QString *errorString);
+    bool handleMessageDeclarationCommand(const QVariantMap &params, QString *errorString);
 
     QPointer<msc::MainModel> m_model;
 };

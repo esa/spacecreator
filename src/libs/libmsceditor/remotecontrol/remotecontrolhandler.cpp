@@ -24,8 +24,11 @@
 #include "mscchart.h"
 #include "msccondition.h"
 #include "msccreate.h"
+#include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "mscmessagedeclaration.h"
+#include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
 
@@ -90,6 +93,9 @@ void RemoteControlHandler::handleRemoteCommand(
         break;
     case RemoteControlWebServer::CommandType::Condition:
         result = handleConditionCommand(params, &errorString);
+        break;
+    case RemoteControlWebServer::CommandType::MessageDeclaration:
+        result = handleMessageDeclarationCommand(params, &errorString);
         break;
     case RemoteControlWebServer::CommandType::Undo:
         result = msc::cmd::CommandsStack::current()->canUndo();
@@ -359,6 +365,50 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateCondition, cmdParams);
     if (!result)
         *errorString = tr("Condition is added but unavailable for Undo/Redo actions");
+
+    return result;
+}
+
+/*!
+   Add a message declarationto the main document with the given parameters
+ */
+bool RemoteControlHandler::handleMessageDeclarationCommand(const QVariantMap &params, QString *errorString)
+{
+    if (errorString == nullptr) {
+        return false;
+    }
+    if (!params.contains(QLatin1String("names"))) {
+        *errorString = tr("Parameter 'names' for the declaration is missing");
+        return false;
+    }
+    QVector<msc::MscDocument *> docs = m_model->mscModel()->documents();
+    if (docs.isEmpty()) {
+        *errorString = tr("No document in the MSC model");
+        return false;
+    }
+
+    std::unique_ptr<msc::MscMessageDeclarationList> declarations(docs.at(0)->messageDeclarations()->clone());
+
+    QStringList names = params.value(QLatin1String("names")).toString().split(",");
+    for (QString &name : names) {
+        name = name.trimmed();
+    }
+    QStringList typeRefList = params.value(QLatin1String("typeRefList")).toString().split(",");
+    for (QString &type : typeRefList) {
+        type = type.trimmed();
+    }
+
+    auto declaration = new msc::MscMessageDeclaration;
+    declaration->setNames(names);
+    declaration->setTypeRefList(typeRefList);
+    declarations->append(declaration);
+
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscDocument *>(docs.at(0)),
+        QVariant::fromValue<msc::MscMessageDeclarationList *>(declarations.get()) };
+    const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::SetMessageDeclarations, cmdParams);
+    if (!result) {
+        *errorString = tr("Message declaration add failed with the Undo/Redo action");
+    }
 
     return result;
 }

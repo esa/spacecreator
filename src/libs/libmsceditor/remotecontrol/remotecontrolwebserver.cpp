@@ -80,6 +80,9 @@ total left. Default is '-1' which means append at the right. Optional parameter.
     + **name** - Condition's Name, optional
     + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name,mandatory
     + **shared** - is it shared Condition, optional, default No
+- **MessageDeclaration** - Adds a message declaration
+    + **names** Names of the message declaration separated by commas ","
+    + **typeRefList** String representation of the (ASN.1)types of each parameters, separated by commas ","
 - **Undo** - revert the last command
 - **Redo** - Redo the last reverted comand
 - **Save** - save the current chart to a file

@@ -19,6 +19,7 @@
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
+#include "mscmessagedeclaration.h"
 #include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
@@ -39,14 +40,12 @@ public:
         , m_handler(new msc::RemoteControlHandler(this))
         , m_model(new msc::MainModel(this))
         , m_socket(new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, this))
-        , m_socketConnectedSpy(m_socket, SIGNAL(connected()))
         , m_textMessageReceived(m_socket, SIGNAL(textMessageReceived(QString)))
         , m_socketError(m_socket, SIGNAL(error(QAbstractSocket::SocketError)))
     {
     }
 
 private Q_SLOTS:
-
     void initTestCase()
     {
         m_model->initialModel();
@@ -61,16 +60,17 @@ private Q_SLOTS:
 
     void init()
     {
-        m_socketConnectedSpy.clear();
         m_textMessageReceived.clear();
         m_socketError.clear();
+
+        m_socket->open(QUrl(QStringLiteral("ws://localhost:%1").arg(kPort)));
+        QTRY_COMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
     }
+
+    void cleanup() { m_socket->close(); }
 
     void testInstanceCommand()
     {
-        m_socket->open(QUrl(QStringLiteral("ws://localhost:%1").arg(kPort)));
-
-        QTRY_COMPARE(m_socketConnectedSpy.count(), 1);
         QCOMPARE(m_socketError.count(), 0);
         QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
         QJsonObject obj;
@@ -83,10 +83,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Testing creating second instance with the same name,
@@ -94,10 +91,7 @@ private Q_SLOTS:
         m_socket->sendTextMessage(json);
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Testing creating second instance with the another name,
@@ -108,10 +102,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Testing creating third instance at pos 1
@@ -124,10 +115,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         msc::MscChart *chart = m_model->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
@@ -138,8 +126,6 @@ private Q_SLOTS:
 
     void testMessageCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Message command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Message"));
@@ -151,10 +137,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding at least one instanceName (source) to make it valid
@@ -166,10 +149,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
@@ -181,10 +161,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding target instanceName to make command valid
@@ -196,10 +173,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding msc::MscMessage::MessageType::Create
@@ -211,17 +185,12 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
     void testTimerCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Timer command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Timer"));
@@ -233,10 +202,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
@@ -248,10 +214,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding valid instanceName but without setting any Timer Type
@@ -264,10 +227,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Various Timer types
@@ -280,10 +240,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// msc::MscTimer::TimerType::Stop
@@ -295,10 +252,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// msc::MscTimer::TimerType::Timeout
@@ -310,10 +264,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// msc::MscTimer::TimerType::Unknown
@@ -325,17 +276,12 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
     }
 
     void testActionCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Action command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Action"));
@@ -347,10 +293,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
@@ -362,10 +305,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding valid instanceName to make command successful
@@ -377,17 +317,12 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
     void testConditionCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Condition command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Condition"));
@@ -399,10 +334,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding nonexistent instanceName to make command invalid
@@ -414,10 +346,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Adding valid instanceName to make command successful
@@ -429,17 +358,50 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+    }
+
+    void testMessageDeclarationCommand()
+    {
+        msc::MscDocument *mainDocument = m_model->mscModel()->documents().at(0);
+        QCOMPARE(mainDocument->declarations().size(), 0);
+
+        // Message declaration command without any name should fail
+        QJsonObject obj;
+        obj.insert(QLatin1String("CommandType"), QLatin1String("MessageDeclaration"));
+        QJsonObject params;
+        obj.insert(QLatin1String("Parameters"), params);
+        QByteArray json = QJsonDocument(obj).toJson();
+        m_socket->sendTextMessage(json);
+
+        QVERIFY(m_textMessageReceived.wait(1000));
+        QCOMPARE(m_textMessageReceived.count(), 1);
+        QJsonObject resultObj = takeFirstResultMessage();
+        QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
+        QCOMPARE(mainDocument->declarations().size(), 0);
+
+        // Add a real declaration
+        params.insert(QLatin1String("names"), QLatin1String("reset"));
+        params.insert(QLatin1String("typeRefList"), QLatin1String("Int32, UInt16"));
+        obj[QLatin1String("Parameters")] = params;
+        json = QJsonDocument(obj).toJson();
+        m_socket->sendTextMessage(json);
+
+        QVERIFY(m_textMessageReceived.wait(1000));
+        QCOMPARE(m_textMessageReceived.count(), 1);
+        resultObj = takeFirstResultMessage();
+        QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+        QCOMPARE(mainDocument->declarations().size(), 1);
+        msc::MscMessageDeclaration *declaration = mainDocument->declarations().at(0);
+        const QStringList expectedNames = { "reset" };
+        QCOMPARE(declaration->names(), expectedNames);
+        const QStringList expectedTypes = { "Int32", "UInt16" };
+        QCOMPARE(declaration->typeRefList(), expectedTypes);
     }
 
     void testUndoRedoCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Redo command should fail cause no one Undo was done
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Redo"));
@@ -448,10 +410,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Undo
@@ -461,10 +420,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
         /// Redo
@@ -474,17 +430,12 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
     void testSaveCommand()
     {
-        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
-
         /// Save command should fail because no filename set
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Save"));
@@ -493,10 +444,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
-        QString messageReceived = arguments.at(0).toString();
-
-        QJsonObject resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        QJsonObject resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         QJsonObject params;
@@ -507,35 +455,22 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        arguments = m_textMessageReceived.takeFirst();
-        messageReceived = arguments.at(0).toString();
-
-        resultObj = QJsonDocument::fromJson(messageReceived.toUtf8()).object();
+        resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
     }
 
-    void cleanupTestCase()
+private:
+    QJsonObject takeFirstResultMessage()
     {
-        m_socket->close();
-        delete m_socket;
-        m_socket = nullptr;
-
-        delete m_server;
-        m_server = nullptr;
-
-        delete m_handler;
-        m_handler = nullptr;
-
-        delete m_model;
-        m_model = nullptr;
+        QList<QVariant> arguments = m_textMessageReceived.takeFirst();
+        QString messageReceived = arguments.at(0).toString();
+        return QJsonDocument::fromJson(messageReceived.toUtf8()).object();
     }
 
-private:
     msc::RemoteControlWebServer *m_server = nullptr;
     msc::RemoteControlHandler *m_handler = nullptr;
     msc::MainModel *m_model = nullptr;
     QWebSocket *m_socket = nullptr;
-    QSignalSpy m_socketConnectedSpy;
     QSignalSpy m_textMessageReceived;
     QSignalSpy m_socketError;
 };

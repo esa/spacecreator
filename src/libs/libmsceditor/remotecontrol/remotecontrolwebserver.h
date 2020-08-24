@@ -38,6 +38,7 @@ public:
         Timer,
         Action,
         Condition,
+        MessageDeclaration,
         Undo,
         Redo,
         Save,
@@ -49,13 +50,14 @@ public:
     ~RemoteControlWebServer() override;
 
     bool start(quint16 port);
+
+public Q_SLOTS:
     void onNewConnection();
     void processTextMessage(const QString &message);
     void socketConnected();
     void socketDisconnected();
     void error(QAbstractSocket::SocketError error);
 
-public Q_SLOTS:
     void commandDone(RemoteControlWebServer::CommandType commandType, bool result, const QString &peerName,
             const QString &errorString);
 
