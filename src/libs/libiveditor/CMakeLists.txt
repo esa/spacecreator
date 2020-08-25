@@ -172,6 +172,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.ui
     commandsstack.cpp
     commandsstack.h
+    endtoendconnections.cpp
+    endtoendconnections.h
     endtoendview.cpp
     endtoendview.h
     iveditor.cpp
@@ -193,6 +195,7 @@ target_link_libraries(${LIB_NAME}
     aadl
     shared
     templating
+    msclibrary
     Qt5::Concurrent
     Qt5::Network
     Qt5::Svg

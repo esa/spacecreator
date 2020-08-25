@@ -3,6 +3,7 @@
 #include "aadlobjectconnection.h"
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
+#include "endtoendconnections.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
 #include "interface/aadlinterfacegraphicsitem.h"
@@ -24,6 +25,8 @@ struct EndToEndView::EndToEndViewPrivate {
     QHash<shared::Id, QGraphicsItem *> items;
 
     InterfaceDocument *document { nullptr };
+
+    EndToEndConnections dataflow;
 };
 
 //! Initialize this with the current document
@@ -57,6 +60,7 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
 
     auto setPath = [this, pathLabel](const QString &path) {
         d->document->setMscFileName(path);
+        d->dataflow.setPath(path);
         QFileInfo info(path);
         if (info.exists()) {
             pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
@@ -110,6 +114,8 @@ void EndToEndView::refreshView()
     // Get the visible non-nested objects
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
+
+    QVector<QPair<QString, QString>> dataflow = d->dataflow.dataflow();
 
     // Add new graphics items for each object
     for (auto obj : objects) {
