@@ -115,7 +115,7 @@ void EndToEndView::refreshView()
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
 
-    QVector<QPair<QString, QString>> dataflow = d->dataflow.dataflow();
+    QVector<EndToEndConnections::Connection> dataflow = d->dataflow.dataflow();
 
     // Add new graphics items for each object
     for (auto obj : objects) {

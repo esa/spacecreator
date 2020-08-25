@@ -26,7 +26,7 @@ struct EndToEndConnections::EndToEndConnectionsPrivate {
 
     bool dirty { false };
 
-    QVector<QPair<QString, QString>> dataflow;
+    QVector<Connection> dataflow;
 };
 
 EndToEndConnections::EndToEndConnections(QObject *parent)
@@ -64,8 +64,8 @@ static QString instanceName(msc::MscInstance *instance)
 
 //! Get the end to end dataflow. If the dirty flag is set, this will read from the file
 //! It will return something like this:
-//! QVector(QPair("Start_Transaction","User_Interface"), QPair("Open_File","File_Manager"), QPair("Access_Database","Database_Manager"))
-QVector<QPair<QString, QString>> EndToEndConnections::dataflow() const
+//! QVector((""; "Start_Transaction","User_Interface"), QPair("Open_File","File_Manager"), QPair("Access_Database","Database_Manager"))
+QVector<EndToEndConnections::Connection> EndToEndConnections::dataflow() const
 {
     if (d->dirty) {
         // Read the stuff
@@ -76,10 +76,10 @@ QVector<QPair<QString, QString>> EndToEndConnections::dataflow() const
     return d->dataflow;
 }
 
-static QVector<QPair<QString, QString>> readDataFlowFromDocument(msc::MscDocument *document)
+static QVector<EndToEndConnections::Connection> readDataFlowFromDocument(msc::MscDocument *document)
 {
     for (auto chart : document->charts()) {
-        QVector<QPair<QString, QString>> dataflow;
+        QVector<EndToEndConnections::Connection> dataflow;
         QString lastInstance;
         for (auto event : chart->instanceEvents()) {
             auto msg = dynamic_cast<msc::MscMessage *>(event);
@@ -90,7 +90,7 @@ static QVector<QPair<QString, QString>> readDataFlowFromDocument(msc::MscDocumen
 
                 // The source must match, except for the first call which can be from global or any instance
                 if (source == lastInstance || dataflow.isEmpty()) {
-                    dataflow.append({ message, target });
+                    dataflow.append({ source, target, message });
                     lastInstance = target;
                 }
             }
@@ -106,7 +106,7 @@ static QVector<QPair<QString, QString>> readDataFlowFromDocument(msc::MscDocumen
 
 //! Read the dataflow from a file or string. If file is a filename, isFile should be true.
 //! If file is the contents of the file, isFile should be false
-QVector<QPair<QString, QString>> EndToEndConnections::readDataflow(const QString &file, bool isFile)
+QVector<EndToEndConnections::Connection> EndToEndConnections::readDataflow(const QString &file, bool isFile)
 {
     msc::MscReader reader;
     std::unique_ptr<msc::MscModel> model(isFile ? reader.parseFile(file) : reader.parseText(file));

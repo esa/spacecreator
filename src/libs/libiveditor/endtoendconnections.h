@@ -17,6 +17,12 @@ class EndToEndConnections : public QObject
     Q_PROPERTY(bool dirty READ isDirty NOTIFY dirtyChanged)
 
 public:
+    struct Connection {
+        QString from;
+        QString to;
+        QString message;
+    };
+
     EndToEndConnections(QObject *parent = nullptr);
     ~EndToEndConnections();
 
@@ -24,9 +30,9 @@ public:
 
     QString path() const;
 
-    QVector<QPair<QString, QString>> dataflow() const;
+    QVector<Connection> dataflow() const;
 
-    static QVector<QPair<QString, QString>> readDataflow(const QString &file, bool isFile);
+    static QVector<Connection> readDataflow(const QString &file, bool isFile);
 
 Q_SIGNALS:
     void pathChanged(const QString &path);
