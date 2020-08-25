@@ -196,7 +196,7 @@ void InstanceItem::syncHeightToChartBox()
         return;
     }
 
-    const qreal deltaH = getChartBox().bottom() - sceneBoundingRect().bottom();
+    const qreal deltaH = getChartContentBox().bottom() - sceneBoundingRect().bottom();
     if (!qFuzzyIsNull(deltaH)) {
         setAxisHeight(axisHeight() + deltaH);
     }

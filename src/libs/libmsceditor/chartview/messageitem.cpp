@@ -271,6 +271,10 @@ void MessageItem::rebuildLayout()
             setTargetInstanceItem(nullptr);
     }
 
+    if (wannabeGlobal()) {
+        extendGlobalMessage();
+    }
+
     update();
 }
 

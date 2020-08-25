@@ -298,7 +298,7 @@ void tst_MessageItem::testFirstMessagePosition()
 
     // the first message has to start at the left chart
     QVector<QPointF> points = messageItem->messagePoints();
-    QVERIFY(std::abs(points[0].x() - chartItem->contentRect().x()) < m_maxOffset);
+    QVERIFY(std::abs(points[0].x() - chartItem->boundingRect().x()) < m_maxOffset);
     QVERIFY(std::abs(points[1].x() - m_instanceItems[0]->axis().p1().x()) < m_maxOffset);
 }
 

@@ -144,13 +144,28 @@ void InteractiveObject::moveSilentlyBy(const QPointF &shift)
 /*!
    Returns the content rect of the msc chart item
  */
-QRectF InteractiveObject::getChartBox() const
+QRectF InteractiveObject::getChartContentBox() const
 {
     // The chart item should be the first one, when AscendingOrder is used
     for (QGraphicsItem *item : scene()->items(Qt::AscendingOrder)) {
         auto chartItem = dynamic_cast<msc::ChartItem *>(item);
         if (chartItem) {
             return chartItem->contentRect();
+        }
+    }
+    return QRectF();
+}
+
+/*!
+   Returns the outer bounding box of the chart (the frame around the box)
+ */
+QRectF InteractiveObject::getChartBox() const
+{
+    // The chart item should be the first one, when AscendingOrder is used
+    for (QGraphicsItem *item : scene()->items(Qt::AscendingOrder)) {
+        auto chartItem = dynamic_cast<msc::ChartItem *>(item);
+        if (chartItem) {
+            return chartItem->boundingRect();
         }
     }
     return QRectF();
