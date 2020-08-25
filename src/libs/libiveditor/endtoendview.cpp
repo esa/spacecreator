@@ -147,7 +147,10 @@ void EndToEndView::refreshView()
 
         if (item != nullptr) {
             d->items.insert(obj->id(), item);
-            d->scene->addItem(item);
+            if (item->parentItem() == nullptr) {
+                // Only items without a parent should be added to the scene or we get a warning
+                d->scene->addItem(item);
+            }
             item->updateFromEntity();
         }
     }
