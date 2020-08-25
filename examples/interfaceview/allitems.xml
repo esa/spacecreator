@@ -98,6 +98,51 @@
         <Comment name="Nested_Comment">
             <Property name="Taste::coordinates" value="-19400 2800 300 20600"/>
         </Comment>
+        <Connection>
+            <Source func_name="NestedFn_Typed_Global" pi_name="PI_8"/>
+            <Target func_name="Global_Fn2" pi_name="PI_7"/>
+            <Property name="Taste::coordinates" value="-36500 17600 -36300 23600"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Nested_Fn2" ri_name="RI_10"/>
+            <Target func_name="Nested_Fn1" pi_name="PI_11"/>
+            <Property name="Taste::coordinates" value="-67000 100 -46900 -6200"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Nested_Fn2" pi_name="PI_5"/>
+            <Target func_name="NestedFn_Typed_local" ri_name="LocalFnType_RI"/>
+            <Property name="Taste::coordinates" value="-70000 17800 -70000 17700 -69600 40200 25100 39700 23900 -19300 -1500 -19300"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Nested_Fn2" ri_name="RI_5"/>
+            <Target func_name="NestedFn_Typed_local" pi_name="LocalFnType_PI"/>
+            <Property name="Taste::coordinates" value="-63200 17800 -63200 17700 -63100 34100 19400 33300 20000 -12600 -1500 -12600"/>
+        </Connection>
+        <Connection>
+            <Source func_name="NestedFn_Typed_local" ri_name="RI_6"/>
+            <Target func_name="Nested_Fn2" pi_name="PI_6"/>
+            <Property name="Taste::coordinates" value="-21200 -7500 -55900 700"/>
+        </Connection>
+        <Connection>
+            <Source func_name="NestedFn_Typed_Global" ri_name="GlobalFnType_RI"/>
+            <Target func_name="Global_Fn2" ri_name="RI_3"/>
+            <Property name="Taste::coordinates" value="-47400 4500 -79900 3500"/>
+        </Connection>
+        <Connection>
+            <Source func_name="Nested_Fn2" pi_name="PI_9"/>
+            <Target func_name="Global_Fn2" pi_name="PI_10"/>
+            <Property name="Taste::coordinates" value="-75900 12200 -79900 10800"/>
+        </Connection>
+        <Connection>
+            <Source func_name="NestedFn_Typed_Global" pi_name="GlobalFnType_PI"/>
+            <Target func_name="Global_Fn2" pi_name="PI_4"/>
+            <Property name="Taste::coordinates" value="-38400 -200 -38400 -2800 -79900 -3000"/>
+        </Connection>
+        <Connection>
+            <Source func_name="NestedFn_Typed_Global" ri_name="RI_7"/>
+            <Target func_name="Global_Fn2" ri_name="RI_8"/>
+            <Property name="Taste::coordinates" value="-43100 17600 -43000 23600"/>
+        </Connection>
     </Function>
     <Function name="Global_Fn" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="-110000 -15000 -90000 -7000"/>
@@ -124,29 +169,9 @@
         </Provided_Interface>
     </Function>
     <Connection>
-        <Source func_name="NestedFn_Typed_Global" pi_name="PI_8"/>
-        <Target func_name="Global_Fn2" pi_name="PI_7"/>
-        <Property name="Taste::coordinates" value="-36500 17600 -36300 23600"/>
-    </Connection>
-    <Connection>
-        <Source func_name="Nested_Fn2" ri_name="RI_10"/>
-        <Target func_name="Nested_Fn1" pi_name="PI_11"/>
-        <Property name="Taste::coordinates" value="-67000 100 -46900 -6200"/>
-    </Connection>
-    <Connection>
         <Source func_name="Global_FnTyped_Fn" ri_name="RI_9"/>
         <Target func_name="Global_Fn2" pi_name="PI_10"/>
         <Property name="Taste::coordinates" value="-89900 7400 -79900 10800"/>
-    </Connection>
-    <Connection>
-        <Source func_name="Nested_Fn2" pi_name="PI_5"/>
-        <Target func_name="NestedFn_Typed_local" ri_name="LocalFnType_RI"/>
-        <Property name="Taste::coordinates" value="-70000 17800 -70000 17700 -69600 40200 25100 39700 23900 -19300 -1500 -19300"/>
-    </Connection>
-    <Connection>
-        <Source func_name="NestedFn_Typed_Global" ri_name="GlobalFnType_RI"/>
-        <Target func_name="Global_Fn2" ri_name="RI_3"/>
-        <Property name="Taste::coordinates" value="-47400 4500 -79900 3500"/>
     </Connection>
     <Connection>
         <Source func_name="Global_FnTyped_Fn" ri_name="GlobalFnType_RI"/>
@@ -157,31 +182,6 @@
         <Source func_name="Global_Fn" ri_name="RI_4"/>
         <Target func_name="Global_Fn2" pi_name="PI_4"/>
         <Property name="Taste::coordinates" value="-90000 -9800 -90200 -9800 -85000 -9900 -84900 -3000 -79900 -3000"/>
-    </Connection>
-    <Connection>
-        <Source func_name="NestedFn_Typed_local" ri_name="RI_6"/>
-        <Target func_name="Nested_Fn2" pi_name="PI_6"/>
-        <Property name="Taste::coordinates" value="-21200 -7500 -55900 700"/>
-    </Connection>
-    <Connection>
-        <Source func_name="Nested_Fn2" pi_name="PI_9"/>
-        <Target func_name="Global_Fn2" pi_name="PI_10"/>
-        <Property name="Taste::coordinates" value="-75900 12200 -79900 10800"/>
-    </Connection>
-    <Connection>
-        <Source func_name="NestedFn_Typed_Global" pi_name="GlobalFnType_PI"/>
-        <Target func_name="Global_Fn2" pi_name="PI_4"/>
-        <Property name="Taste::coordinates" value="-38400 -200 -38400 -2800 -79900 -3000"/>
-    </Connection>
-    <Connection>
-        <Source func_name="NestedFn_Typed_Global" ri_name="RI_7"/>
-        <Target func_name="Global_Fn2" ri_name="RI_8"/>
-        <Property name="Taste::coordinates" value="-43100 17600 -43000 23600"/>
-    </Connection>
-    <Connection>
-        <Source func_name="Nested_Fn2" ri_name="RI_5"/>
-        <Target func_name="NestedFn_Typed_local" pi_name="LocalFnType_PI"/>
-        <Property name="Taste::coordinates" value="-63200 17800 -63200 17700 -63100 34100 19400 33300 20000 -12600 -1500 -12600"/>
     </Connection>
     <Connection>
         <Source func_name="Global_Fn2" ri_name="RI_3"/>

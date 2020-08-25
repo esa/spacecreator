@@ -18,6 +18,7 @@ QVariant SettingsAppOption::read() const
 void SettingsAppOption::write(const QVariant &val)
 {
     shared::SettingsManager::instance()->storage()->setValue(Name, val);
+    shared::SettingsManager::instance()->storage()->sync();
 }
 
 }
