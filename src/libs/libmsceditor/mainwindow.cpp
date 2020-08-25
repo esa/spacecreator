@@ -618,7 +618,11 @@ void MainWindow::onGeometryRestored()
 {
     // A new document should be created only if no files were opened by command line args
     if (d->m_plugin->mainModel()->currentFilePath().isEmpty()) {
-        QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
+        if (auto chart = d->m_plugin->mainModel()->chartViewModel().currentChart()) {
+            if (chart->isEmpty()) {
+                QMetaObject::invokeMethod(this, "createNewDocument", Qt::QueuedConnection);
+            }
+        }
     }
 }
 

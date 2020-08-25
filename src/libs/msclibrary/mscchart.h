@@ -71,6 +71,8 @@ public:
 
     MscEntity::EntityType entityType() const override;
 
+    bool isEmpty() const;
+
     void updateInstanceOrder(MscInstance *instance, int pos);
     void updateActionPos(MscAction *action, MscInstance *newInstance, int eventPos);
     void updateCoregionPos(

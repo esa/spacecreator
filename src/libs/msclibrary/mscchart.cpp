@@ -403,6 +403,11 @@ MscEntity::EntityType MscChart::entityType() const
     return MscEntity::EntityType::Chart;
 }
 
+bool MscChart::isEmpty() const
+{
+    return m_instances.isEmpty() && m_instanceEvents.isEmpty();
+}
+
 void MscChart::updateInstanceOrder(MscInstance *instance, int pos)
 {
     Q_ASSERT(instance);
