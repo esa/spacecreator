@@ -902,6 +902,7 @@ void InterfaceDocument::updateSceneRect()
 {
     const QRectF itemsRect = d->graphicsScene->itemsBoundingRect();
     if (itemsRect.isEmpty()) {
+        d->prevItemsRect = {};
         d->graphicsScene->setSceneRect(d->desktopGeometry);
         return;
     }
