@@ -1814,8 +1814,6 @@ QVector<msc::MscInstanceEvent *> ChartLayoutManager::visuallySortedEvents() cons
         }
     }
 
-    Q_ASSERT(events.size() == d->m_currentChart->instanceEvents().size());
-
     return events.values().toVector();
 }
 
