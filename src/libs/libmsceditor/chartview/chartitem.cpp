@@ -55,14 +55,7 @@ ChartItem::ChartItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QG
     framePen.setWidthF(1.);
     m_rectItem->setPen(framePen);
     m_rectItem->setBrush(Qt::white);
-    const QColor &borderColor = QColor(
-#ifdef QT_DEBUG
-            Qt::black
-#else
-            Qt::white
-#endif
-    );
-    m_contentArea->setPen(borderColor);
+    m_contentArea->setPen(QPen(Qt::white));
     m_contentArea->setBrush(Qt::white);
 
     m_textItemName->setEditable(true);
