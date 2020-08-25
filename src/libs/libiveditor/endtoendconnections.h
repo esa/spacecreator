@@ -26,6 +26,8 @@ public:
 
     QVector<QPair<QString, QString>> dataflow() const;
 
+    static QVector<QPair<QString, QString>> readDataflow(const QString &file, bool isFile);
+
 Q_SIGNALS:
     void pathChanged(const QString &path);
     void dirtyChanged(bool dirty);
