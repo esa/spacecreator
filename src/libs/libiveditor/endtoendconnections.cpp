@@ -69,56 +69,70 @@ QVector<QPair<QString, QString>> EndToEndConnections::dataflow() const
 {
     if (d->dirty) {
         // Read the stuff
-        QVector<QPair<QString, QString>> dataflow;
-        msc::MscReader reader;
-        std::unique_ptr<msc::MscModel> model(reader.parseFile(d->path));
-
-        // We assume to work on the first leaf with a chart (at least for now)
-        msc::MscDocument *document = nullptr;
-        if (model) {
-            QList<msc::MscDocument *> documents = model->documents().toList();
-            while (document == nullptr && !documents.isEmpty()) {
-                auto doc = documents.takeFirst();
-                if (doc->hierarchyType() == msc::MscDocument::HierarchyLeaf && !doc->charts().isEmpty()) {
-                    // Use this one
-                    document = doc;
-                } else {
-                    // We should also check the children
-                    documents.append(doc->documents().toList());
-                }
-            }
-        }
-
-        if (document != nullptr) {
-            // Read this document for the flow
-            const auto charts = document->charts();
-            if (!charts.isEmpty()) {
-                msc::MscChart *chart = charts.at(0);
-                if (chart != nullptr) {
-                    QString lastInstance;
-                    for (auto event : chart->instanceEvents()) {
-                        auto msg = dynamic_cast<msc::MscMessage *>(event);
-                        if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
-                            const QString source = instanceName(msg->sourceInstance());
-                            const QString target = instanceName(msg->targetInstance());
-                            const QString message = msg->name();
-
-                            // The source must match, except for the first call which can be from global or any instance
-                            if (source == lastInstance || dataflow.isEmpty()) {
-                                dataflow.append({ message, target });
-                                lastInstance = target;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        d->dataflow = dataflow;
+        d->dataflow = readDataflow(d->path, true);
         d->dirty = false;
     }
 
     return d->dataflow;
+}
+
+static QVector<QPair<QString, QString>> readDataFlowFromDocument(msc::MscDocument *document)
+{
+    for (auto chart : document->charts()) {
+        QVector<QPair<QString, QString>> dataflow;
+        QString lastInstance;
+        for (auto event : chart->instanceEvents()) {
+            auto msg = dynamic_cast<msc::MscMessage *>(event);
+            if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
+                const QString source = instanceName(msg->sourceInstance());
+                const QString target = instanceName(msg->targetInstance());
+                const QString message = msg->name();
+
+                // The source must match, except for the first call which can be from global or any instance
+                if (source == lastInstance || dataflow.isEmpty()) {
+                    dataflow.append({ message, target });
+                    lastInstance = target;
+                }
+            }
+        }
+
+        if (!dataflow.isEmpty()) {
+            // If there is a flow in this chart, assume it's the right one
+            return dataflow;
+        }
+    }
+    return {};
+}
+
+//! Read the dataflow from a file or string. If file is a filename, isFile should be true.
+//! If file is the contents of the file, isFile should be false
+QVector<QPair<QString, QString>> EndToEndConnections::readDataflow(const QString &file, bool isFile)
+{
+    msc::MscReader reader;
+    std::unique_ptr<msc::MscModel> model(isFile ? reader.parseFile(file) : reader.parseText(file));
+
+    // We assume to work on the first leaf with a chart that has messages (at least for now)
+    msc::MscDocument *document = nullptr;
+    if (model) {
+        QList<msc::MscDocument *> documents = model->documents().toList();
+        while (document == nullptr && !documents.isEmpty()) {
+            auto doc = documents.takeFirst();
+            if (doc != nullptr && doc->hierarchyType() == msc::MscDocument::HierarchyLeaf && !doc->charts().isEmpty()) {
+                // Read this document
+                auto dataflow = readDataFlowFromDocument(doc);
+                if (!dataflow.isEmpty()) {
+                    // We found a flow! Use it
+                    return dataflow;
+                }
+            } else {
+                // We should also check the children
+                documents.append(doc->documents().toList());
+            }
+        }
+    }
+
+    // We did not find anything
+    return {};
 }
 
 //! Set the path of the MSC file
