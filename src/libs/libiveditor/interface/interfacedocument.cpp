@@ -243,6 +243,7 @@ bool InterfaceDocument::create(const QString &path)
         created = loadImpl(path);
     }
     if (created) {
+        d->commandsStack->clear();
         resetDirtyness();
     }
     return created;
@@ -273,6 +274,7 @@ void InterfaceDocument::close()
     d->model->clear();
     updateSceneRect();
     setPath(QString());
+    d->commandsStack->clear();
     resetDirtyness();
     Q_EMIT dirtyChanged(false);
 }
