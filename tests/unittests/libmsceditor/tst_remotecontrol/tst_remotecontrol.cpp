@@ -15,16 +15,21 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "baseitems/common/coordinatesconverter.h"
+#include "chartitem.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
+#include "msclibrary.h"
 #include "mscmessagedeclaration.h"
 #include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 
 #include <QCoreApplication>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QJsonDocument>
 #include <QWebSocket>
 #include <QtTest>
@@ -42,12 +47,20 @@ public:
         , m_socket(new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, this))
         , m_textMessageReceived(m_socket, SIGNAL(textMessageReceived(QString)))
         , m_socketError(m_socket, SIGNAL(error(QAbstractSocket::SocketError)))
+        , m_chartItem(nullptr, nullptr)
     {
+        msc::initMscLibrary();
+        m_view.setGeometry(10, 10, 400, 400);
     }
 
 private Q_SLOTS:
     void initTestCase()
     {
+        m_view.setScene(m_model->graphicsScene());
+        msc::CoordinatesConverter::init(m_model->graphicsScene(), &m_chartItem);
+        auto converter = msc::CoordinatesConverter::instance();
+        converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
+
         m_model->initialModel();
         m_handler->setModel(m_model);
         connect(m_server, &msc::RemoteControlWebServer::executeCommand, m_handler,
@@ -67,7 +80,11 @@ private Q_SLOTS:
         QTRY_COMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
     }
 
-    void cleanup() { m_socket->close(); }
+    void cleanup()
+    {
+        m_socket->close();
+        m_model->initialModel();
+    }
 
     void testInstanceCommand()
     {
@@ -126,6 +143,8 @@ private Q_SLOTS:
 
     void testMessageCommand()
     {
+        addTestInstances();
+
         /// Message command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Message"));
@@ -191,6 +210,8 @@ private Q_SLOTS:
 
     void testTimerCommand()
     {
+        addTestInstances();
+
         /// Timer command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Timer"));
@@ -282,6 +303,8 @@ private Q_SLOTS:
 
     void testActionCommand()
     {
+        addTestInstances();
+
         /// Action command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Action"));
@@ -323,6 +346,8 @@ private Q_SLOTS:
 
     void testConditionCommand()
     {
+        addTestInstances();
+
         /// Condition command without any instanceName should fail
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Condition"));
@@ -402,6 +427,22 @@ private Q_SLOTS:
 
     void testUndoRedoCommand()
     {
+        addTestInstances();
+
+        // Add an action
+        QJsonObject objAdd;
+        objAdd.insert(QLatin1String("CommandType"), QLatin1String("Action"));
+        QJsonObject params;
+        params.insert(QLatin1String("name"), QLatin1String("Action"));
+        params[QLatin1String("instanceName")] = QLatin1String("B");
+        objAdd.insert(QLatin1String("Parameters"), params);
+        auto jsonDoc = QJsonDocument(objAdd).toJson();
+        m_socket->sendTextMessage(jsonDoc);
+        QVERIFY(m_textMessageReceived.wait(1000));
+        QCOMPARE(m_textMessageReceived.count(), 1);
+        QJsonObject resultObj = takeFirstResultMessage();
+        QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+
         /// Redo command should fail cause no one Undo was done
         QJsonObject obj;
         obj.insert(QLatin1String("CommandType"), QLatin1String("Redo"));
@@ -410,7 +451,7 @@ private Q_SLOTS:
 
         QVERIFY(m_textMessageReceived.wait(1000));
         QCOMPARE(m_textMessageReceived.count(), 1);
-        QJsonObject resultObj = takeFirstResultMessage();
+        resultObj = takeFirstResultMessage();
         QVERIFY(!resultObj.value(QLatin1String("result")).toBool());
 
         /// Undo
@@ -467,12 +508,23 @@ private:
         return QJsonDocument::fromJson(messageReceived.toUtf8()).object();
     }
 
+    void addTestInstances()
+    {
+        msc::MscChart *chart = m_model->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+        auto instanceA = new msc::MscInstance("A");
+        chart->addInstance(instanceA);
+        auto instanceB = new msc::MscInstance("B");
+        chart->addInstance(instanceB);
+    }
+
     msc::RemoteControlWebServer *m_server = nullptr;
     msc::RemoteControlHandler *m_handler = nullptr;
     msc::MainModel *m_model = nullptr;
     QWebSocket *m_socket = nullptr;
     QSignalSpy m_textMessageReceived;
     QSignalSpy m_socketError;
+    QGraphicsView m_view;
+    msc::ChartItem m_chartItem;
 };
 
 QTEST_MAIN(tst_RemoteControl)
