@@ -54,7 +54,6 @@ protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual ColorManager::HandledColors handledColorType() const override;
-    bool allowGeometryChange(const QPointF &from, const QPointF &to) override;
 
 private:
     QString m_text;

@@ -85,6 +85,7 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(pen());
     painter->setBrush(brush());
+    painter->setFont(font());
 
     const QRectF br = boundingRect();
     auto preparePolygon = [](const QRectF &rect) {
@@ -101,7 +102,10 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
 
     qreal y = kMargins;
     const qreal lineWidth = boundingRect().width() - 2 * kMargins;
-    for (auto line : m_text.split("\n")) {
+    const qreal maxY = boundingRect().height() - kMargins;
+    const QFontMetricsF fm(font());
+    bool complete = false;
+    for (auto line : m_text.split(QLatin1Char('\n'))) {
         QTextLayout textLayout(line);
         textLayout.setFont(font());
         textLayout.beginLayout();
@@ -111,12 +115,21 @@ void AADLCommentGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphic
                 break;
             }
 
-            textLine.setPosition(QPointF(kMargins, y));
             textLine.setLineWidth(lineWidth);
+            if (maxY < y + textLine.height()) {
+                const QString lastLine = line.mid(textLine.textStart());
+                const QString elidedLastLine = fm.elidedText(lastLine, Qt::ElideRight, lineWidth);
+                painter->drawText(QPointF(kMargins, y + fm.ascent()), elidedLastLine);
+                complete = true;
+                break;
+            }
+
+            textLine.draw(painter, QPointF(kMargins, y));
             y += textLine.height();
         }
         textLayout.endLayout();
-        textLayout.draw(painter, QPointF(0, 0));
+        if (complete)
+            break;
     }
 
     painter->restore();
@@ -148,11 +161,6 @@ void AADLCommentGraphicsItem::applyColorScheme()
     setPen(pen);
     setBrush(h.brush());
     update();
-}
-
-bool AADLCommentGraphicsItem::allowGeometryChange(const QPointF & /*from*/, const QPointF & /*to*/)
-{
-    return true;
 }
 
 }
