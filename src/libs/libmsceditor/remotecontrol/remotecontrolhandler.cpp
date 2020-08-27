@@ -17,8 +17,10 @@
 
 #include "remotecontrolhandler.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "chartlayoutmanager.h"
 #include "commands/common/commandsstack.h"
+#include "instanceitem.h"
 #include "mainmodel.h"
 #include "mscaction.h"
 #include "mscchart.h"
@@ -150,22 +152,51 @@ void RemoteControlHandler::handleRemoteCommand(
 bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QString *errorString)
 {
     msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
-    const int instanceIdx = mscChart->instances().size();
+    int instanceIdx = mscChart->instances().size();
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Instance_%1").arg(instanceIdx)).toString();
     if (mscChart->instanceByName(name)) {
         *errorString = tr("Chart already has instance with the name: %1").arg(name);
         return false;
     }
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
+    if (pos >= 0) {
+        instanceIdx = 0;
+        for (const msc::InstanceItem *instanceItem : m_model->chartViewModel().instanceItems()) {
+            if (pos > instanceItem->sceneBoundingRect().x()) {
+                ++instanceIdx;
+            }
+        }
+    } else {
+        instanceIdx = -1;
+    }
 
     msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
-    m_model->chartViewModel().currentChart()->addInstance(mscInstance, pos);
 
-    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance), pos };
+    msc::cmd::CommandsStack::current()->beginMacro("Add instance");
+    const QVariantList cmdParams = { QVariant::fromValue<msc::MscInstance *>(mscInstance), instanceIdx };
     const bool result = msc::cmd::CommandsStack::push(msc::cmd::Id::CreateInstance, cmdParams);
-    if (!result)
+    if (!result) {
         *errorString = tr("Instance is added but unavailable for Undo/Redo actions");
+    }
+
+    if (pos >= 0) {
+        QVariantList params;
+        params << QVariant::fromValue(mscInstance);
+
+        QVector<QPoint> geometryCif = mscInstance->cifGeometry();
+        if (!geometryCif.isEmpty()) {
+            QPoint posCif = msc::CoordinatesConverter::sceneToCif(QPointF(pos, 10.));
+            posCif.setY(geometryCif.at(0).y());
+            geometryCif[0] = posCif;
+        }
+
+        params << QVariant::fromValue(geometryCif);
+        msc::cmd::CommandsStack::push(msc::cmd::Id::ChangeInstancePosition, params);
+        m_model->chartViewModel().doLayout();
+    }
+
+    msc::cmd::CommandsStack::current()->endMacro();
 
     return result;
 }

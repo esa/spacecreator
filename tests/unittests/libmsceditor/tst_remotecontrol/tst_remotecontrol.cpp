@@ -17,6 +17,8 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
+#include "chartlayoutmanager.h"
+#include "instanceitem.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -122,10 +124,13 @@ private Q_SLOTS:
         resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
 
-        /// Testing creating third instance at pos 1
+        /// Testing creating third instance at pos 1 - pushing instance B to the right
         params[QLatin1String("name")] = QLatin1String("C");
         params[QLatin1String("kind")] = QLatin1String("instaaa");
-        params[QLatin1String("pos")] = 1;
+        const QVector<msc::InstanceItem *> &instanceItems = m_model->chartViewModel().instanceItems();
+        QCOMPARE(instanceItems.size(), 2);
+        const int positionC = instanceItems.at(1)->sceneBoundingRect().toRect().x() - 1;
+        params[QLatin1String("pos")] = positionC;
         obj[QLatin1String("Parameters")] = params;
         json = QJsonDocument(obj).toJson();
         m_socket->sendTextMessage(json);
@@ -139,6 +144,18 @@ private Q_SLOTS:
         msc::MscInstance *instanceC = chart->instances().at(1);
         QCOMPARE(instanceC->name(), QString("C"));
         QCOMPARE(instanceC->kind(), QString("instaaa"));
+
+        // Check position of instance C
+        msc::InstanceItem *itemC = m_model->chartViewModel().itemForInstance(instanceC);
+        const QRectF itemCRect = itemC->sceneBoundingRect();
+        QCOMPARE(itemCRect.toRect().x(), positionC);
+
+        // Check position of instance B it's pushed to the right
+        msc::MscInstance *instanceB = chart->instances().at(2);
+        QCOMPARE(instanceB->name(), QString("B"));
+        msc::InstanceItem *itemB = m_model->chartViewModel().itemForInstance(instanceB);
+        const QRectF itemBRect = itemB->sceneBoundingRect();
+        QVERIFY(itemCRect.right() < itemBRect.left());
     }
 
     void testMessageCommand()
