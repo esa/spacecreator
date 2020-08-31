@@ -22,7 +22,6 @@ namespace aadlinterface {
 struct EndToEndView::EndToEndViewPrivate {
     shared::ui::GraphicsViewBase *view { nullptr };
     QGraphicsScene *scene { nullptr };
-    QHash<shared::Id, QGraphicsItem *> items;
 
     InterfaceDocument *document { nullptr };
 
@@ -108,8 +107,7 @@ void EndToEndView::setVisible(bool visible)
 void EndToEndView::refreshView()
 {
     // Remove all the old ones
-    qDeleteAll(d->items.values());
-    d->items.clear();
+    qDeleteAll(d->scene->items());
 
     // Get the visible non-nested objects
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
@@ -118,8 +116,9 @@ void EndToEndView::refreshView()
     QVector<EndToEndConnections::Connection> dataflow = d->dataflow.dataflow();
 
     // Add new graphics items for each object
+    QHash<shared::Id, QGraphicsItem *> items;
     for (auto obj : objects) {
-        QGraphicsItem *parentItem = obj->parentObject() ? d->items.value(obj->parentObject()->id()) : nullptr;
+        QGraphicsItem *parentItem = obj->parentObject() ? items.value(obj->parentObject()->id()) : nullptr;
 
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
@@ -131,15 +130,15 @@ void EndToEndView::refreshView()
             if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
                 aadl::AADLObjectIface *ifaceStart = connection->sourceInterface();
                 auto startItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                        ifaceStart ? d->items.value(ifaceStart->id()) : nullptr);
+                        ifaceStart ? items.value(ifaceStart->id()) : nullptr);
 
                 aadl::AADLObjectIface *ifaceEnd = connection->targetInterface();
                 auto endItem = qgraphicsitem_cast<AADLInterfaceGraphicsItem *>(
-                        ifaceEnd ? d->items.value(ifaceEnd->id()) : nullptr);
+                        ifaceEnd ? items.value(ifaceEnd->id()) : nullptr);
 
                 auto i = new AADLConnectionGraphicsItem(connection, startItem, endItem, parentItem);
                 item = i;
-                if (/* TODO: item is on path */ true) {
+                if (EndToEndConnections::isInDataflow(dataflow, connection)) {
                     i->setEndToEndDataFlowConnection();
                 }
             }
@@ -152,7 +151,7 @@ void EndToEndView::refreshView()
         }
 
         if (item != nullptr) {
-            d->items.insert(obj->id(), item);
+            items.insert(obj->id(), item);
             if (item->parentItem() == nullptr) {
                 // Only items without a parent should be added to the scene or we get a warning
                 d->scene->addItem(item);

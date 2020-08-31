@@ -22,6 +22,10 @@
 #include <QString>
 #include <QVector>
 
+namespace aadl {
+class AADLObjectConnection;
+}
+
 namespace aadlinterface {
 
 /*!
@@ -50,6 +54,8 @@ public:
     QVector<Connection> dataflow() const;
 
     static QVector<Connection> readDataflow(const QString &file, bool isFile);
+
+    static bool isInDataflow(const QVector<Connection> &connectionList, aadl::AADLObjectConnection *connection);
 
 Q_SIGNALS:
     void pathChanged(const QString &path);
