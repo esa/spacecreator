@@ -17,6 +17,7 @@
 
 #include "endtoendconnections.h"
 
+#include "aadlnamevalidator.h"
 #include "aadlobjectconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -77,7 +78,7 @@ static QString instanceName(msc::MscInstance *instance)
     if (instance == nullptr) {
         return {};
     }
-    return instance->name();
+    return aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::Function, instance->name());
 }
 
 //! Get the end to end dataflow. If the dirty flag is set, this will read from the file
@@ -104,7 +105,8 @@ static QVector<EndToEndConnections::Connection> readDataFlowFromDocument(msc::Ms
             if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
                 const QString source = instanceName(msg->sourceInstance());
                 const QString target = instanceName(msg->targetInstance());
-                const QString message = msg->name();
+                const QString message =
+                        aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name());
 
                 // The source must match, except for the first call which can be from global or any instance
                 if (source == lastInstance || dataflow.isEmpty()) {
@@ -162,12 +164,7 @@ bool EndToEndConnections::isInDataflow(
     }
 
     Connection c = { connection->sourceName(), connection->targetName(), connection->targetInterfaceName() };
-    for (auto co : connectionList) {
-        if (c.from == co.from && c.to == co.to && c.message == co.message) {
-            return true;
-        }
-    }
-    return false;
+    return connectionList.contains(c);
 }
 
 //! Set the path of the MSC file
