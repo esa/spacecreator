@@ -1,4 +1,21 @@
-#include "iveditorplugin.h"
+/*
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
+#include "iveditorcore.h"
 
 #include "commandlineparser.h"
 #include "context/action/actionsmanager.h"
@@ -16,7 +33,7 @@ namespace aadlinterface {
  * \brief Has most of the code for the Interface View Editor UI
  */
 
-IVEditorPlugin::IVEditorPlugin(QObject *parent)
+IVEditorCore::IVEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_document(new aadlinterface::InterfaceDocument(this))
     , m_docToolBar(new QToolBar)
@@ -31,22 +48,22 @@ IVEditorPlugin::IVEditorPlugin(QObject *parent)
 /*!
    Returns the interface document
  */
-InterfaceDocument *IVEditorPlugin::document() const
+InterfaceDocument *IVEditorCore::document() const
 {
     return m_document;
 }
 
-void IVEditorPlugin::setPluginActive(bool active)
+void IVEditorCore::setPluginActive(bool active)
 {
     m_actionSaveSceneRender->setVisible(active);
 }
 
-shared::ui::GraphicsViewBase *IVEditorPlugin::chartView()
+shared::ui::GraphicsViewBase *IVEditorCore::chartView()
 {
     return qobject_cast<shared::ui::GraphicsViewBase *>(m_document->view());
 }
 
-void IVEditorPlugin::addToolBars(QMainWindow *window)
+void IVEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
     window->addToolBar(m_docToolBar);
@@ -55,7 +72,7 @@ void IVEditorPlugin::addToolBars(QMainWindow *window)
 /*!
  * \brief Fills the File menu with actions.
  */
-void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
+void IVEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
     m_actionSaveSceneRender = menu->addAction(tr("Render Scene..."), mainWindow, &MainWindow::onSaveRenderRequested);
@@ -66,14 +83,14 @@ void IVEditorPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
     ActionsManager::registerAction(Q_FUNC_INFO, m_actionShowAsnDialog, "Asn1", "Edit the ASN1 file");
 }
 
-void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
+void IVEditorCore::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
 {
     QMenu *root = new QMenu(tr("Common Settings"));
     root->addActions(document()->customActions());
     menu->addMenu(root);
 }
 
-void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
+void IVEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
     EditorCore::addMenuViewActions(menu, window);
 }
@@ -81,7 +98,7 @@ void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 /*!
  * \brief Fills the Help menu with actions.
  */
-void IVEditorPlugin::addMenuHelpActions(QMenu *menu, QMainWindow *window)
+void IVEditorCore::addMenuHelpActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
     auto report = menu->addAction(tr("Send report..."), mainWindow, &MainWindow::onReportRequested);
@@ -89,7 +106,7 @@ void IVEditorPlugin::addMenuHelpActions(QMenu *menu, QMainWindow *window)
     ActionsManager::registerAction(Q_FUNC_INFO, report, "Report", "Send the debug information");
 }
 
-void IVEditorPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
+void IVEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenAADLXMLFile);
     parser->handlePositional(shared::CommandLineParser::Positional::OpenStringTemplateFile);

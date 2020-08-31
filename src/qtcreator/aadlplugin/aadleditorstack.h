@@ -21,7 +21,7 @@
 #include <coreplugin/id.h>
 
 namespace aadlinterface {
-class IVEditorPlugin;
+class IVEditorCore;
 }
 
 namespace Core {
@@ -45,7 +45,7 @@ public:
     void removeAadlTextEditor(QObject *);
     bool setVisibleEditor(Core::IEditor *xmlEditor);
 
-    aadlinterface::IVEditorPlugin *ivPlugin(const QString &fileName) const;
+    aadlinterface::IVEditorCore *ivPlugin(const QString &fileName) const;
 
 private:
     void modeAboutToChange(Core::Id m);

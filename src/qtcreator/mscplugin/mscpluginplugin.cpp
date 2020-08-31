@@ -19,7 +19,7 @@
 
 #include "aadlchecks.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "mscchart.h"
 #include "msceditor.h"
 #include "msceditordata.h"
@@ -137,7 +137,7 @@ void MscPluginPlugin::showMessageDeclarations()
 
 void MscPluginPlugin::checkInstances()
 {
-    aadlinterface::IVEditorPlugin *ivp = ivPlugin();
+    aadlinterface::IVEditorCore *ivp = ivPlugin();
     if (!ivp) {
         return;
     }
@@ -182,7 +182,7 @@ ExtensionSystem::IPlugin *MscPluginPlugin::aadlPlugin() const
     return nullptr;
 }
 
-aadlinterface::IVEditorPlugin *MscPluginPlugin::ivPlugin() const
+aadlinterface::IVEditorCore *MscPluginPlugin::ivPlugin() const
 {
     QStringList aadlFiles = m_factory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
@@ -196,9 +196,9 @@ aadlinterface::IVEditorPlugin *MscPluginPlugin::ivPlugin() const
         return nullptr;
     }
 
-    aadlinterface::IVEditorPlugin *ivp = nullptr;
+    aadlinterface::IVEditorCore *ivp = nullptr;
     bool ok = QMetaObject::invokeMethod(plugin, "ivPlugin", Qt::DirectConnection,
-            Q_RETURN_ARG(aadlinterface::IVEditorPlugin *, ivp), Q_ARG(QString, aadlFiles.first()));
+            Q_RETURN_ARG(aadlinterface::IVEditorCore *, ivp), Q_ARG(QString, aadlFiles.first()));
     if (!ok) {
         qWarning() << "Unable to call 'ivPlugin' from the AadlPlugin";
         return nullptr;

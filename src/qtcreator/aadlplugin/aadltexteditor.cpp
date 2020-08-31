@@ -21,7 +21,7 @@
 #include "aadlmainwidget.h"
 #include "aadlpluginconstants.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 
 #include <QFileInfo>
 #include <utils/qtcassert.h>
@@ -67,7 +67,7 @@ bool AadlTextEditor::open(QString *errorString, const QString &fileName, const Q
 
 QString AadlTextEditor::fileName() const
 {
-    aadlinterface::IVEditorPlugin *plugin = ivPlugin();
+    aadlinterface::IVEditorCore *plugin = ivPlugin();
     if (plugin && plugin->document()) {
         return plugin->document()->path();
     }
@@ -75,7 +75,7 @@ QString AadlTextEditor::fileName() const
     return {};
 }
 
-aadlinterface::IVEditorPlugin *AadlTextEditor::ivPlugin() const
+aadlinterface::IVEditorCore *AadlTextEditor::ivPlugin() const
 {
     auto document = qobject_cast<AadlEditorDocument *>(textDocument());
     AadlMainWidget *designWidget = document->designWidget();

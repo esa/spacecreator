@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 #include "chartitem.h"
 #include "commandsstack.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscinstance.h"
@@ -76,7 +76,7 @@ void tst_AadlChecks::testCheckInstanceNames()
     msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    aadlinterface::IVEditorPlugin ivPlugin;
+    aadlinterface::IVEditorCore ivPlugin;
     checker.setIvPlugin(&ivPlugin);
     result = checker.checkInstances();
     QCOMPARE(result.size(), 0);

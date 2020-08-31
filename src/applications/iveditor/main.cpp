@@ -17,7 +17,7 @@
 
 #include "commandlineparser.h"
 #include "iveditor.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "mainwindow.h"
 #include "sharedlibrary.h"
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    aadlinterface::IVEditorPlugin plugin;
+    aadlinterface::IVEditorCore plugin;
 
     aadlinterface::MainWindow w(&plugin);
 

@@ -25,7 +25,7 @@ class QGraphicsView;
 class QUndoStack;
 
 namespace aadlinterface {
-class IVEditorPlugin;
+class IVEditorCore;
 }
 
 namespace AadlPlugin {
@@ -56,7 +56,7 @@ public:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-    aadlinterface::IVEditorPlugin *ivPlugin() const;
+    aadlinterface::IVEditorCore *ivPlugin() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -66,7 +66,7 @@ private Q_SLOTS:
 private:
     void initUi();
 
-    aadlinterface::IVEditorPlugin *m_plugin = nullptr;
+    aadlinterface::IVEditorCore *m_plugin = nullptr;
     QVector<QAction *> m_actions;
 };
 

@@ -21,7 +21,7 @@
 #include "aadleditorfactory.h"
 #include "aadlpluginconstants.h"
 #include "iveditor.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
@@ -151,7 +151,7 @@ void AadlPluginPlugin::onDynContextEditorMenuInvoked()
 /*!
    Returns the IV plugin for the given file
  */
-aadlinterface::IVEditorPlugin *AadlPluginPlugin::ivPlugin(const QString &fileName) const
+aadlinterface::IVEditorCore *AadlPluginPlugin::ivPlugin(const QString &fileName) const
 {
     return m_factory->editorData()->ivPlugin(fileName);
 }

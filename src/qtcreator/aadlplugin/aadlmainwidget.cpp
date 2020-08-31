@@ -21,7 +21,7 @@
 #include "commandsstack.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "xmldocexporter.h"
 
 #include <QAction>
@@ -36,7 +36,7 @@ namespace AadlPlugin {
 
 AadlMainWidget::AadlMainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new aadlinterface::IVEditorPlugin(this))
+    , m_plugin(new aadlinterface::IVEditorCore(this))
 {
     initUi();
 
@@ -142,7 +142,7 @@ void AadlMainWidget::onDynContextEditorMenuInvoked()
     m_plugin->document()->onDynContextEditorMenuInvoked();
 }
 
-aadlinterface::IVEditorPlugin *AadlMainWidget::ivPlugin() const
+aadlinterface::IVEditorCore *AadlMainWidget::ivPlugin() const
 {
     return m_plugin;
 }

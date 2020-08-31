@@ -16,7 +16,7 @@
 */
 
 #include "commandlineparser.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "mainwindow.h"
 #include "mscplugin.h"
 
@@ -55,7 +55,7 @@ private Q_SLOTS:
 
 private:
     msc::MSCPlugin m_pluginMSC;
-    aadlinterface::IVEditorPlugin m_pluginAADL;
+    aadlinterface::IVEditorCore m_pluginAADL;
 };
 
 void tst_CommandLineParser::testCmdArgumentOpenMsc()

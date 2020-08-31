@@ -32,7 +32,7 @@ class MiniMap;
 }
 namespace aadlinterface {
 
-class IVEditorPlugin;
+class IVEditorCore;
 class ZoomController;
 
 class MainWindow : public QMainWindow
@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent = nullptr);
+    explicit MainWindow(aadlinterface::IVEditorCore *plugin, QWidget *parent = nullptr);
     ~MainWindow() override;
 
     bool processCommandLineArg(shared::CommandLineParser::Positional arg, const QString &value);
@@ -75,7 +75,7 @@ private:
 
     bool m_dropUnsavedChangesSilently { false };
 
-    aadlinterface::IVEditorPlugin *m_plugin { nullptr };
+    aadlinterface::IVEditorCore *m_plugin { nullptr };
 };
 
 }

@@ -20,7 +20,7 @@
 #include <texteditor/texteditor.h>
 
 namespace aadlinterface {
-class IVEditorPlugin;
+class IVEditorCore;
 }
 
 namespace AadlPlugin {
@@ -41,7 +41,7 @@ public:
 
     QString fileName() const;
 
-    aadlinterface::IVEditorPlugin *ivPlugin() const;
+    aadlinterface::IVEditorCore *ivPlugin() const;
 };
 
 } // namespace MscPlugin

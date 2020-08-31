@@ -26,7 +26,7 @@
 #include "endtoendview.h"
 #include "interface/commands/commandsfactory.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "minimap.h"
 #include "reports/bugreportdialog.h"
 #include "settings/appoptions.h"
@@ -57,7 +57,7 @@ process command line arguments and user actions.
 \sa aadlinterface::InterfaceDocument, shared::CommandLineParser
 */
 
-MainWindow::MainWindow(aadlinterface::IVEditorPlugin *plugin, QWidget *parent)
+MainWindow::MainWindow(aadlinterface::IVEditorCore *plugin, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_zoomCtrl(new ZoomController())

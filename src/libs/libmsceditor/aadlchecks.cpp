@@ -19,7 +19,7 @@
 
 #include "aadlobjectsmodel.h"
 #include "interface/interfacedocument.h"
-#include "iveditorplugin.h"
+#include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscinstance.h"
@@ -39,7 +39,7 @@ void AadlChecks::setMscPlugin(MSCPlugin *mscPlugin)
     m_mscPlugin = mscPlugin;
 }
 
-void AadlChecks::setIvPlugin(aadlinterface::IVEditorPlugin *ivPlugin)
+void AadlChecks::setIvPlugin(aadlinterface::IVEditorCore *ivPlugin)
 {
     m_ivPlugin = ivPlugin;
 }

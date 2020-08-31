@@ -24,7 +24,7 @@
 class QAction;
 
 namespace aadlinterface {
-class IVEditorPlugin;
+class IVEditorCore;
 }
 
 namespace MscPlugin {
@@ -51,7 +51,7 @@ public Q_SLOTS:
 
 private:
     ExtensionSystem::IPlugin *aadlPlugin() const;
-    aadlinterface::IVEditorPlugin *ivPlugin() const;
+    aadlinterface::IVEditorCore *ivPlugin() const;
 
     MscEditorFactory *m_factory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;

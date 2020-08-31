@@ -178,8 +178,8 @@ target_sources(${LIB_NAME} PRIVATE
     endtoendview.h
     iveditor.cpp
     iveditor.h
-    iveditorplugin.cpp
-    iveditorplugin.h
+    iveditorcore.cpp
+    iveditorcore.h
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui

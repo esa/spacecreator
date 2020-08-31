@@ -22,7 +22,7 @@
 #include <QVector>
 
 namespace aadlinterface {
-class IVEditorPlugin;
+class IVEditorCore;
 }
 
 namespace msc {
@@ -40,13 +40,13 @@ public:
     ~AadlChecks();
 
     void setMscPlugin(msc::MSCPlugin *mscPlugin);
-    void setIvPlugin(aadlinterface::IVEditorPlugin *ivPlugin);
+    void setIvPlugin(aadlinterface::IVEditorCore *ivPlugin);
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstances();
 
 private:
     QPointer<msc::MSCPlugin> m_mscPlugin;
-    QPointer<aadlinterface::IVEditorPlugin> m_ivPlugin;
+    QPointer<aadlinterface::IVEditorCore> m_ivPlugin;
 };
 
 }
