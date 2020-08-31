@@ -39,6 +39,12 @@ class EndToEndConnections : public QObject
 
 public:
     struct Connection {
+        inline bool operator==(const Connection &other) const
+        {
+            return from == other.from && to == other.to && message == other.message;
+        }
+        inline bool operator!=(const Connection &other) const { return !(*this == other); }
+
         QString from;
         QString to;
         QString message;
