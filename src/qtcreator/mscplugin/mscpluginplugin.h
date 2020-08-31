@@ -23,6 +23,10 @@
 
 class QAction;
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace MscPlugin {
 
 class MscEditorFactory;
@@ -42,10 +46,13 @@ public:
 
 public Q_SLOTS:
     void showMessageDeclarations();
-    void showAadlFilesList();
+    void checkInstances();
     void setMinimapVisible(bool visible);
 
 private:
+    ExtensionSystem::IPlugin *aadlPlugin() const;
+    aadlinterface::IVEditorPlugin *ivPlugin() const;
+
     MscEditorFactory *m_factory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
 };

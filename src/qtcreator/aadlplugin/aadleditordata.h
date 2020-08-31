@@ -22,6 +22,10 @@
 class QUndoGroup;
 class QToolBar;
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace Core {
 class EditorToolBar;
 class IEditor;
@@ -48,6 +52,8 @@ public:
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
+
+    aadlinterface::IVEditorPlugin *ivPlugin(const QString &fileName);
 
 private:
     void updateToolBar();

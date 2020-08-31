@@ -51,6 +51,9 @@ public:
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
 
+    QVector<MscDocument *> allDocuments() const;
+    QVector<MscChart *> allCharts() const;
+
     const QString &dataLanguage() const;
     void setDataLanguage(const QString &language);
 

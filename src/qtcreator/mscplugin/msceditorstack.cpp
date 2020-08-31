@@ -66,6 +66,11 @@ bool MscEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
     return true;
 }
 
+QVector<MscTextEditor *> MscEditorStack::editors() const
+{
+    return m_editors;
+}
+
 QWidget *MscEditorStack::widgetForEditor(MscTextEditor *xmlEditor)
 {
     const int i = m_editors.indexOf(xmlEditor);

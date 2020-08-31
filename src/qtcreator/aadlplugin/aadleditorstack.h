@@ -20,6 +20,10 @@
 #include <QStackedWidget>
 #include <coreplugin/id.h>
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace Core {
 class IEditor;
 class IMode;
@@ -40,6 +44,8 @@ public:
     QWidget *widgetForEditor(AadlTextEditor *editor);
     void removeAadlTextEditor(QObject *);
     bool setVisibleEditor(Core::IEditor *xmlEditor);
+
+    aadlinterface::IVEditorPlugin *ivPlugin(const QString &fileName) const;
 
 private:
     void modeAboutToChange(Core::Id m);

@@ -23,6 +23,10 @@
 
 class QAction;
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace AadlPlugin {
 
 class AadlEditorFactory;
@@ -46,6 +50,8 @@ public Q_SLOTS:
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
+
+    aadlinterface::IVEditorPlugin *ivPlugin(const QString &fileName) const;
 
 private:
     AadlEditorFactory *m_factory = nullptr;

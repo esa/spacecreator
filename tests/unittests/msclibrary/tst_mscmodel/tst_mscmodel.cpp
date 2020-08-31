@@ -48,6 +48,8 @@ private Q_SLOTS:
     void testAsn1Compliance();
     void testMessageCompliance();
     void testAllMessagesCompliance();
+    void testAllDocuments();
+    void testAllCharts();
 
 private:
     void addAsn1Types();
@@ -219,6 +221,44 @@ void tst_MscModel::testAllMessagesCompliance()
     message2->setParameters(parameters2);
     ok = m_model->checkAllMessagesForAsn1Compliance();
     QCOMPARE(ok, false);
+}
+
+void tst_MscModel::testAllDocuments()
+{
+    auto doc1 = new MscDocument("Doc01", m_model);
+    m_model->addDocument(doc1);
+
+    auto doc2 = new MscDocument("Doc02", doc1);
+    doc1->addDocument(doc2);
+    auto doc21 = new MscDocument("Doc021", doc1);
+    doc1->addDocument(doc21);
+
+    auto doc3 = new MscDocument("Doc03", doc2);
+    doc2->addDocument(doc3);
+
+    QVector<msc::MscDocument *> documents = m_model->allDocuments();
+    QCOMPARE(documents.size(), 4);
+}
+
+void tst_MscModel::testAllCharts()
+{
+    auto chart0 = new MscChart("Chart0", m_model);
+    m_model->addChart(chart0);
+
+    auto doc1 = new MscDocument("Doc01", m_model);
+    m_model->addDocument(doc1);
+    auto chart1 = new MscChart("Chart01", doc1);
+    doc1->addChart(chart1);
+    auto chart11 = new MscChart("Chart01", doc1);
+    doc1->addChart(chart11);
+
+    auto doc2 = new MscDocument("Doc02", doc1);
+    doc1->addDocument(doc2);
+    auto chart2 = new MscChart("Chart02", doc2);
+    doc2->addChart(chart2);
+
+    QVector<msc::MscChart *> charts = m_model->allCharts();
+    QCOMPARE(charts.size(), 4);
 }
 
 void tst_MscModel::addAsn1Types()

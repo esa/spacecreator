@@ -34,11 +34,12 @@ set(MSC_QTC_PLUGINS
     ProjectExplorer
     QtSupport
     TextEditor
+#    AadlPlugin
 )
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES MSCPLUGIN_LIBRARY
-    DEPENDS libmsceditor Qt5::Core Qt5::Gui Qt5::Widgets ${MSC_QTC_LIBRARIES} ${MSC_QTC_PLUGINS}
+    DEPENDS libmsceditor libiveditor Qt5::Core Qt5::Gui Qt5::Widgets ${MSC_QTC_LIBRARIES} ${MSC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${MSC_QTC_PLUGINS}
     SOURCES ${MSC_PLUGIN_SOURCES}
 )

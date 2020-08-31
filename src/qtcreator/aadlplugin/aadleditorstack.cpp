@@ -19,6 +19,7 @@
 
 #include "aadleditordocument.h"
 #include "aadltexteditor.h"
+#include "iveditorplugin.h"
 
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/modemanager.h>
@@ -65,6 +66,16 @@ bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
     }
 
     return true;
+}
+
+aadlinterface::IVEditorPlugin *AadlEditorStack::ivPlugin(const QString &fileName) const
+{
+    for (AadlTextEditor *editor : m_editors) {
+        if (editor->fileName() == fileName) {
+            return editor->ivPlugin();
+        }
+    }
+    return nullptr;
 }
 
 QWidget *AadlEditorStack::widgetForEditor(AadlTextEditor *xmlEditor)

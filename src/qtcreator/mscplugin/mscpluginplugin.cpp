@@ -17,10 +17,16 @@
 
 #include "mscpluginplugin.h"
 
+#include "aadlchecks.h"
+#include "interface/interfacedocument.h"
+#include "iveditorplugin.h"
+#include "mscchart.h"
 #include "msceditor.h"
 #include "msceditordata.h"
 #include "msceditorfactory.h"
+#include "mscinstance.h"
 #include "msclibrary.h"
+#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
@@ -32,6 +38,8 @@
 #include <coreplugin/idocument.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <extensionsystem/pluginmanager.h>
+#include <extensionsystem/pluginspec.h>
 
 void initMscResources()
 {
@@ -83,10 +91,10 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
         }
     });
 
-    auto action = new QAction(tr("List AADL files ..."), this);
+    auto action = new QAction(tr("Check instances"), this);
     Core::Command *listAadlCmd = Core::ActionManager::registerAction(
-            action, Constants::AADL_FILES_LIST_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &MscPluginPlugin::showAadlFilesList);
+            action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
+    connect(action, &QAction::triggered, this, &MscPluginPlugin::checkInstances);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);
@@ -127,15 +135,80 @@ void MscPluginPlugin::showMessageDeclarations()
     m_factory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
 }
 
-void MscPluginPlugin::showAadlFilesList()
+void MscPluginPlugin::checkInstances()
 {
-    QMessageBox::information(
-            Core::ICore::mainWindow(), tr("AADL files"), m_factory->editorData()->aadlFiles().join("\n"));
+    aadlinterface::IVEditorPlugin *ivp = ivPlugin();
+    if (!ivp) {
+        return;
+    }
+
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
+    for (msc::MSCPlugin *mplugin : m_factory->editorData()->mscPlugins()) {
+        mplugin->aadlChecker()->setIvPlugin(ivp);
+        result += mplugin->aadlChecker()->checkInstances();
+    }
+
+    if (result.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
+    } else {
+        QString text;
+        for (auto item : result) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+        QMessageBox::information(nullptr, tr("Non conforming instance names"), text);
+    }
 }
 
 void MscPluginPlugin::setMinimapVisible(bool visible)
 {
     m_factory->editorData()->setMinimapVisible(visible);
+}
+
+/*!
+   Returns the AadlPlugin
+ */
+ExtensionSystem::IPlugin *MscPluginPlugin::aadlPlugin() const
+{
+    ExtensionSystem::PluginManager *manager = ExtensionSystem::PluginManager::instance();
+    QList<ExtensionSystem::PluginSpec *> plugins = manager->plugins();
+    for (ExtensionSystem::PluginSpec *pluginSpec : plugins) {
+        if (pluginSpec->name() == "AadlPlugin") {
+            return pluginSpec->plugin();
+        }
+    }
+    return nullptr;
+}
+
+aadlinterface::IVEditorPlugin *MscPluginPlugin::ivPlugin() const
+{
+    QStringList aadlFiles = m_factory->editorData()->aadlFiles();
+    if (aadlFiles.empty()) {
+        qWarning() << "No AADL file in the projec";
+        return nullptr;
+    }
+
+    IPlugin *plugin = aadlPlugin();
+    if (!plugin) {
+        qWarning() << "AadlPlugin is not found or loaded";
+        return nullptr;
+    }
+
+    aadlinterface::IVEditorPlugin *ivp = nullptr;
+    bool ok = QMetaObject::invokeMethod(plugin, "ivPlugin", Qt::DirectConnection,
+            Q_RETURN_ARG(aadlinterface::IVEditorPlugin *, ivp), Q_ARG(QString, aadlFiles.first()));
+    if (!ok) {
+        qWarning() << "Unable to call 'ivPlugin' from the AadlPlugin";
+        return nullptr;
+    }
+    if (ivp == nullptr) {
+        qWarning() << "No IVEditorPlugin for file (maybe the file is not open)" << aadlFiles.first();
+        return nullptr;
+    }
+
+    return ivp;
 }
 
 }

@@ -21,6 +21,7 @@
 #include "aadleditorfactory.h"
 #include "aadlpluginconstants.h"
 #include "iveditor.h"
+#include "iveditorplugin.h"
 #include "sharedlibrary.h"
 
 #include <QAction>
@@ -145,6 +146,14 @@ void AadlPluginPlugin::onColorSchemeMenuInvoked()
 void AadlPluginPlugin::onDynContextEditorMenuInvoked()
 {
     m_factory->editorData()->onDynContextEditorMenuInvoked();
+}
+
+/*!
+   Returns the IV plugin for the given file
+ */
+aadlinterface::IVEditorPlugin *AadlPluginPlugin::ivPlugin(const QString &fileName) const
+{
+    return m_factory->editorData()->ivPlugin(fileName);
 }
 
 }

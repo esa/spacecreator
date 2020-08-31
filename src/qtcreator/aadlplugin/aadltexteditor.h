@@ -19,6 +19,10 @@
 
 #include <texteditor/texteditor.h>
 
+namespace aadlinterface {
+class IVEditorPlugin;
+}
+
 namespace AadlPlugin {
 
 class AadlTextEditor : public TextEditor::BaseTextEditor
@@ -34,6 +38,10 @@ public:
     QWidget *toolBar() override { return nullptr; }
 
     bool isDesignModePreferred() const override { return true; }
+
+    QString fileName() const;
+
+    aadlinterface::IVEditorPlugin *ivPlugin() const;
 };
 
 } // namespace MscPlugin

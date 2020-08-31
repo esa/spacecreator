@@ -142,6 +142,11 @@ void AadlMainWidget::onDynContextEditorMenuInvoked()
     m_plugin->document()->onDynContextEditorMenuInvoked();
 }
 
+aadlinterface::IVEditorPlugin *AadlMainWidget::ivPlugin() const
+{
+    return m_plugin;
+}
+
 void AadlMainWidget::initUi()
 {
     setLayout(new QVBoxLayout(this));

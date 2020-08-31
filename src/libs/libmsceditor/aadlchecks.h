@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,36 +17,36 @@
 
 #pragma once
 
-#include <QStackedWidget>
-#include <coreplugin/id.h>
+#include <QPair>
+#include <QPointer>
+#include <QVector>
 
-namespace Core {
-class IEditor;
-class IMode;
+namespace aadlinterface {
+class IVEditorPlugin;
 }
 
-namespace MscPlugin {
+namespace msc {
+class MSCPlugin;
+class MscChart;
+class MscInstance;
 
-class MscTextEditor;
-
-class MscEditorStack : public QStackedWidget
+/*!
+   \brief The AadlChecks class is used to check consistency of a msc model with one aadl model
+ */
+class AadlChecks
 {
-    Q_OBJECT
-
 public:
-    MscEditorStack(QWidget *parent = nullptr);
+    AadlChecks();
+    ~AadlChecks();
 
-    void add(MscTextEditor *editor, QWidget *widget);
-    QWidget *widgetForEditor(MscTextEditor *editor);
-    void removeMscTextEditor(QObject *);
-    bool setVisibleEditor(Core::IEditor *xmlEditor);
+    void setMscPlugin(msc::MSCPlugin *mscPlugin);
+    void setIvPlugin(aadlinterface::IVEditorPlugin *ivPlugin);
 
-    QVector<MscTextEditor *> editors() const;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstances();
 
 private:
-    void modeAboutToChange(Core::Id m);
-
-    QVector<MscTextEditor *> m_editors;
+    QPointer<msc::MSCPlugin> m_mscPlugin;
+    QPointer<aadlinterface::IVEditorPlugin> m_ivPlugin;
 };
 
 }

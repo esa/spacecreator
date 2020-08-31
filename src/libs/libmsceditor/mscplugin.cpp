@@ -1,5 +1,23 @@
+/*
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #include "mscplugin.h"
 
+#include "aadlchecks.h"
 #include "commandlineparser.h"
 #include "commands/common/commandsstack.h"
 #include "graphicsview.h"
@@ -47,9 +65,12 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 MSCPlugin::MSCPlugin(QObject *parent)
     : shared::Plugin(parent)
     , m_model(new msc::MainModel())
+    , m_aadlChecks(new AadlChecks)
     , m_mscToolBar(new QToolBar(tr("MSC")))
     , m_hierarchyToolBar(new QToolBar(tr("Hierarchy")))
 {
+    m_aadlChecks->setMscPlugin(this);
+
     m_mscToolBar->setObjectName("mscTools");
     m_mscToolBar->setAllowedAreas(Qt::AllToolBarAreas);
     m_mscToolBar->setVisible(m_toolbarsVisible);
@@ -58,7 +79,7 @@ MSCPlugin::MSCPlugin(QObject *parent)
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 }
 
-MSCPlugin::~MSCPlugin() {}
+MSCPlugin::~MSCPlugin() { }
 
 MainModel *MSCPlugin::mainModel() const
 {
@@ -380,6 +401,14 @@ QAction *MSCPlugin::createActionPaste(MainWindow *window)
         }
     }
     return m_actionPaste;
+}
+
+/*!
+   Returns the checker for aadl consistency
+ */
+AadlChecks *MSCPlugin::aadlChecker() const
+{
+    return m_aadlChecks.get();
 }
 
 MSCPlugin::ViewMode MSCPlugin::viewMode()

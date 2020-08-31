@@ -23,6 +23,10 @@ class QUndoGroup;
 class QStringList;
 class QToolBar;
 
+namespace msc {
+class MSCPlugin;
+}
+
 namespace Core {
 class EditorToolBar;
 class IEditor;
@@ -48,6 +52,8 @@ public:
     void editMessageDeclarations(QWidget *parentWidget);
 
     QStringList aadlFiles() const;
+
+    QVector<msc::MSCPlugin *> mscPlugins() const;
 
 public Q_SLOTS:
     void openEditor(const QString &fileName);

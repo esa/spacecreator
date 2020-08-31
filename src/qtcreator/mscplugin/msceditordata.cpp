@@ -52,6 +52,7 @@ namespace MscPlugin {
 
 class MscTextEditorWidget : public TextEditor::TextEditorWidget
 {
+    Q_OBJECT
 public:
     MscTextEditorWidget() = default;
 
@@ -194,6 +195,24 @@ QStringList MscEditorData::aadlFiles() const
     return result;
 }
 
+QVector<msc::MSCPlugin *> MscEditorData::mscPlugins() const
+{
+    QVector<msc::MSCPlugin *> plugins;
+    for (MscTextEditor *editor : m_widgetStack->editors()) {
+        auto mscEdit = qobject_cast<MscTextEditorWidget *>(editor->editorWidget());
+        if (mscEdit) {
+            auto document = qobject_cast<MscEditorDocument *>(mscEdit->textDocument());
+            if (document) {
+                MainWidget *designWidget = document->designWidget();
+                if (designWidget && designWidget->mscPlugin()) {
+                    plugins.append(designWidget->mscPlugin());
+                }
+            }
+        }
+    }
+    return plugins;
+}
+
 void MscEditorData::openEditor(const QString &fileName)
 {
     Core::EditorManager::instance()->openEditor(fileName);
@@ -272,3 +291,5 @@ QWidget *MscEditorData::createModeWidget()
 }
 
 }
+
+#include "msceditordata.moc"

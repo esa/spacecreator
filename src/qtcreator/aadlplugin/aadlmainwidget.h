@@ -56,6 +56,8 @@ public:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
+    aadlinterface::IVEditorPlugin *ivPlugin() const;
+
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
 

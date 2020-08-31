@@ -23,6 +23,7 @@
 #include "aadlmainwidget.h"
 #include "aadlpluginconstants.h"
 #include "aadltexteditor.h"
+#include "iveditorplugin.h"
 
 #include <QToolBar>
 #include <QUndoGroup>
@@ -211,6 +212,11 @@ void AadlEditorData::onDynContextEditorMenuInvoked()
     if (document && document->designWidget()) {
         document->designWidget()->onDynContextEditorMenuInvoked();
     }
+}
+
+aadlinterface::IVEditorPlugin *AadlEditorData::ivPlugin(const QString &fileName)
+{
+    return m_widgetStack->ivPlugin(fileName);
 }
 
 void AadlEditorData::updateToolBar()

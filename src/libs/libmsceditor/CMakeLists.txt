@@ -3,6 +3,8 @@ set(LIB_NAME libmsceditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    aadlchecks.cpp
+    aadlchecks.h
     baseitems/arrowitem.cpp
     baseitems/arrowitem.h
     baseitems/common/abstractinteractiveobject.h
@@ -188,6 +190,7 @@ target_link_libraries(${LIB_NAME}
     shared
     msclibrary
     asn1editor
+    libiveditor
     Qt5::Core
     Qt5::Gui
     Qt5::Network

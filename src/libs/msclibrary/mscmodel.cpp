@@ -75,6 +75,9 @@ void MscModel::removeDocument(MscDocument *document)
     }
 }
 
+/*!
+   Returns the charts owned by this model directly
+ */
 const QVector<MscChart *> &MscModel::charts() const
 {
     return m_charts;
@@ -94,6 +97,38 @@ void MscModel::addChart(MscChart *chart)
     connect(chart, &MscChart::dataChanged, this, &MscModel::dataChanged);
     Q_EMIT chartAdded(chart);
     Q_EMIT dataChanged();
+}
+
+void addChildDocuments(msc::MscDocument *doc, QVector<MscDocument *> &allDocs)
+{
+    allDocs += doc->documents();
+    for (msc::MscDocument *child : doc->documents()) {
+        addChildDocuments(child, allDocs);
+    }
+}
+
+/*!
+   Returns all documents of this model in one flat list.
+ */
+QVector<MscDocument *> MscModel::allDocuments() const
+{
+    QVector<MscDocument *> documents = m_documents;
+    for (msc::MscDocument *child : m_documents) {
+        addChildDocuments(child, documents);
+    }
+    return documents;
+}
+
+/*!
+   Returns all charts of the whole model in one flat list. So this includes all charts owned by documents
+ */
+QVector<MscChart *> MscModel::allCharts() const
+{
+    QVector<MscChart *> charts = m_charts;
+    for (msc::MscDocument *doc : allDocuments()) {
+        charts += doc->charts();
+    }
+    return charts;
 }
 
 const QString &MscModel::dataLanguage() const
