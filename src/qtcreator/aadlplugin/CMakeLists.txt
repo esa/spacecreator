@@ -14,8 +14,8 @@ set(MSC_PLUGIN_SOURCES
     aadleditorstack.h
     aadlmainwidget.cpp
     aadlmainwidget.h
-    aadlpluginplugin.cpp
-    aadlpluginplugin.h
+    aadlplugin.cpp
+    aadlplugin.h
     aadlplugin_global.h
     aadlpluginconstants.h
     aadltexteditor.cpp

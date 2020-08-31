@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "aadlpluginplugin.h"
+#include "aadlplugin.h"
 
 #include "aadleditordata.h"
 #include "aadleditorfactory.h"
@@ -33,19 +33,19 @@
 
 namespace AadlPlugin {
 
-AadlPluginPlugin::AadlPluginPlugin()
+AADLPlugin::AADLPlugin()
 {
     shared::initSharedLibrary();
     aadlinterface::initIvEditor();
 }
 
-AadlPluginPlugin::~AadlPluginPlugin()
+AADLPlugin::~AADLPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
 }
 
-bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool AADLPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -61,13 +61,13 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
 
     m_asn1DialogAction = new QAction(tr("Show ASN1 dialog ..."), this);
     Core::Command *showAsn1Cmd = Core::ActionManager::registerAction(m_asn1DialogAction, Constants::AADL_SHOW_ASN1_ID);
-    connect(m_asn1DialogAction, &QAction::triggered, this, &AadlPluginPlugin::showAsn1Dialog);
+    connect(m_asn1DialogAction, &QAction::triggered, this, &AADLPlugin::showAsn1Dialog);
 
     m_minimapWidgetAction = new QAction(tr("Show minimap"), this);
     m_minimapWidgetAction->setCheckable(true);
     Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
             m_minimapWidgetAction, Constants::AADL_SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(m_minimapWidgetAction, &QAction::triggered, this, &AadlPluginPlugin::showMinimap);
+    connect(m_minimapWidgetAction, &QAction::triggered, this, &AADLPlugin::showMinimap);
 
     m_asn1DialogAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
@@ -80,17 +80,17 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
     QAction *actCommonProps = new QAction(tr("Common Properties"), this);
     Core::Command *showCommonPropsCmd = Core::ActionManager::registerAction(
             actCommonProps, Constants::AADL_SHOW_COMMON_PROPS_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actCommonProps, &QAction::triggered, this, &AadlPluginPlugin::onAttributesManagerRequested);
+    connect(actCommonProps, &QAction::triggered, this, &AADLPlugin::onAttributesManagerRequested);
 
     QAction *actColorScheme = new QAction(tr("Color Scheme"), this);
     Core::Command *showColorSchemeCmd = Core::ActionManager::registerAction(
             actColorScheme, Constants::AADL_SHOW_COLOR_SCHEME_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actColorScheme, &QAction::triggered, this, &AadlPluginPlugin::onColorSchemeMenuInvoked);
+    connect(actColorScheme, &QAction::triggered, this, &AADLPlugin::onColorSchemeMenuInvoked);
 
     QAction *actDynContext = new QAction(tr("Context Actions"), this);
     Core::Command *showDynContextCmd = Core::ActionManager::registerAction(
             actDynContext, Constants::AADL_SHOW_DYN_CONTEXT_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(actDynContext, &QAction::triggered, this, &AadlPluginPlugin::onDynContextEditorMenuInvoked);
+    connect(actDynContext, &QAction::triggered, this, &AADLPlugin::onDynContextEditorMenuInvoked);
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::AADL_MENU_ID);
     menu->menu()->setTitle(tr("AADLPlugin"));
@@ -107,7 +107,7 @@ bool AadlPluginPlugin::initialize(const QStringList &arguments, QString *errorSt
     return true;
 }
 
-void AadlPluginPlugin::extensionsInitialized()
+void AADLPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
@@ -115,7 +115,7 @@ void AadlPluginPlugin::extensionsInitialized()
     Core::DesignMode::setDesignModeIsRequired();
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag AadlPluginPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag AADLPlugin::aboutToShutdown()
 {
     // Save settings
     // Disconnect from signals that are not needed during shutdown
@@ -123,27 +123,27 @@ ExtensionSystem::IPlugin::ShutdownFlag AadlPluginPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void AadlPluginPlugin::showAsn1Dialog()
+void AADLPlugin::showAsn1Dialog()
 {
     m_factory->editorData()->showAsn1Dialog();
 }
 
-void AadlPluginPlugin::showMinimap(bool visible)
+void AADLPlugin::showMinimap(bool visible)
 {
     m_factory->editorData()->showMinimap(visible);
 }
 
-void AadlPluginPlugin::onAttributesManagerRequested()
+void AADLPlugin::onAttributesManagerRequested()
 {
     m_factory->editorData()->onAttributesManagerRequested();
 }
 
-void AadlPluginPlugin::onColorSchemeMenuInvoked()
+void AADLPlugin::onColorSchemeMenuInvoked()
 {
     m_factory->editorData()->onColorSchemeMenuInvoked();
 }
 
-void AadlPluginPlugin::onDynContextEditorMenuInvoked()
+void AADLPlugin::onDynContextEditorMenuInvoked()
 {
     m_factory->editorData()->onDynContextEditorMenuInvoked();
 }
@@ -151,7 +151,7 @@ void AadlPluginPlugin::onDynContextEditorMenuInvoked()
 /*!
    Returns the IV plugin for the given file
  */
-aadlinterface::IVEditorCore *AadlPluginPlugin::ivPlugin(const QString &fileName) const
+aadlinterface::IVEditorCore *AADLPlugin::ivPlugin(const QString &fileName) const
 {
     return m_factory->editorData()->ivPlugin(fileName);
 }
