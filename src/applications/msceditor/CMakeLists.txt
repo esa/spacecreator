@@ -9,6 +9,7 @@ target_sources(${APP_NAME} PRIVATE
 
 target_link_libraries(${APP_NAME} PUBLIC
     libmsceditor
+    libiveditor
     asn1editor
     msclibrary
     Qt5::Core
