@@ -17,6 +17,7 @@
 
 #include "endtoendconnections.h"
 
+#include "aadlobjectconnection.h"
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
@@ -150,6 +151,23 @@ QVector<EndToEndConnections::Connection> EndToEndConnections::readDataflow(const
 
     // We did not find anything
     return {};
+}
+
+bool EndToEndConnections::isInDataflow(
+        const QVector<Connection> &connectionList, aadl::AADLObjectConnection *connection)
+{
+    // Just to be on the save side
+    if (connection == nullptr) {
+        return false;
+    }
+
+    Connection c = { connection->sourceName(), connection->targetName(), connection->targetInterfaceName() };
+    for (auto co : connectionList) {
+        if (c.from == co.from && c.to == co.to && c.message == co.message) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //! Set the path of the MSC file
