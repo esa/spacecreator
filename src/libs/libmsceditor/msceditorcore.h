@@ -44,10 +44,10 @@ class TimerCreatorTool;
 
 class MainWindow;
 
-class MSCPlugin : public shared::EditorCore
+class MSCEditorCore : public shared::EditorCore
 {
     Q_OBJECT
-    Q_PROPERTY(msc::MSCPlugin::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)
+    Q_PROPERTY(msc::MSCEditorCore::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)
 
 public:
     enum class ViewMode
@@ -57,8 +57,8 @@ public:
     };
     Q_ENUM(ViewMode);
 
-    explicit MSCPlugin(QObject *parent = nullptr);
-    ~MSCPlugin();
+    explicit MSCEditorCore(QObject *parent = nullptr);
+    ~MSCEditorCore();
 
     msc::MainModel *mainModel() const;
 

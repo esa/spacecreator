@@ -22,11 +22,11 @@
 #include "iveditorcore.h"
 #include "mscchart.h"
 #include "msceditor.h"
+#include "msceditorcore.h"
 #include "msceditordata.h"
 #include "msceditorfactory.h"
 #include "mscinstance.h"
 #include "msclibrary.h"
-#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
@@ -143,7 +143,7 @@ void MscPluginPlugin::checkInstances()
     }
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
-    for (msc::MSCPlugin *mplugin : m_factory->editorData()->mscPlugins()) {
+    for (msc::MSCEditorCore *mplugin : m_factory->editorData()->mscPlugins()) {
         mplugin->aadlChecker()->setIvPlugin(ivp);
         result += mplugin->aadlChecker()->checkInstances();
     }

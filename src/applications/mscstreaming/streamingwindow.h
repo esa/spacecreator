@@ -30,14 +30,14 @@ class StreamingWindow;
 }
 
 namespace msc {
-class MSCPlugin;
+class MSCEditorCore;
 
 class StreamingWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit StreamingWindow(msc::MSCPlugin *plugin, QWidget *parent = nullptr);
+    explicit StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent = nullptr);
     ~StreamingWindow();
 
     bool startRemoteControl(quint16 port);

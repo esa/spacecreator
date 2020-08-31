@@ -38,14 +38,14 @@ namespace msc {
 
 class MscDocument;
 class BaseTool;
-class MSCPlugin;
+class MSCEditorCore;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(msc::MSCPlugin *plugin, QWidget *parent = nullptr);
+    explicit MainWindow(msc::MSCEditorCore *plugin, QWidget *parent = nullptr);
     ~MainWindow();
 
     QGraphicsView *currentView() const;

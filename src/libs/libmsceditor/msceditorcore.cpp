@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscplugin.h"
+#include "msceditorcore.h"
 
 #include "aadlchecks.h"
 #include "commandlineparser.h"
@@ -62,7 +62,7 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
  * \brief Has most of the code for the MSC Editor UI and the underlying library
  */
 
-MSCPlugin::MSCPlugin(QObject *parent)
+MSCEditorCore::MSCEditorCore(QObject *parent)
     : shared::EditorCore(parent)
     , m_model(new msc::MainModel())
     , m_aadlChecks(new AadlChecks)
@@ -79,14 +79,14 @@ MSCPlugin::MSCPlugin(QObject *parent)
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 }
 
-MSCPlugin::~MSCPlugin() { }
+MSCEditorCore::~MSCEditorCore() { }
 
-MainModel *MSCPlugin::mainModel() const
+MainModel *MSCEditorCore::mainModel() const
 {
     return m_model.get();
 }
 
-void MSCPlugin::setPluginActive(bool active)
+void MSCEditorCore::setPluginActive(bool active)
 {
     m_actionScreenshot->setVisible(active);
     m_editSeparator->setVisible(active);
@@ -94,7 +94,7 @@ void MSCPlugin::setPluginActive(bool active)
     m_actionPaste->setVisible(active);
 }
 
-void MSCPlugin::setViews(
+void MSCEditorCore::setViews(
         QStackedWidget *centerView, shared::ui::GraphicsViewBase *chartView, GraphicsView *hierarchyView)
 {
     m_centerView = centerView;
@@ -109,22 +109,22 @@ void MSCPlugin::setViews(
     }
 }
 
-QStackedWidget *MSCPlugin::centerView()
+QStackedWidget *MSCEditorCore::centerView()
 {
     return m_centerView;
 }
 
-shared::ui::GraphicsViewBase *MSCPlugin::chartView()
+shared::ui::GraphicsViewBase *MSCEditorCore::chartView()
 {
     return m_chartView;
 }
 
-GraphicsView *MSCPlugin::hierarchyView()
+GraphicsView *MSCEditorCore::hierarchyView()
 {
     return m_hierarchyView;
 }
 
-void MSCPlugin::initChartTools()
+void MSCEditorCore::initChartTools()
 {
     Q_ASSERT(m_chartView != nullptr);
 
@@ -188,11 +188,11 @@ void MSCPlugin::initChartTools()
         tool->setAction(toolAction);
 
         if (msc::BaseCreatorTool *creatorTool = qobject_cast<msc::BaseCreatorTool *>(tool)) {
-            connect(creatorTool, &msc::BaseCreatorTool::created, this, &MSCPlugin::activateDefaultTool);
+            connect(creatorTool, &msc::BaseCreatorTool::created, this, &MSCEditorCore::activateDefaultTool);
         }
 
         toolsActions->addAction(toolAction);
-        connect(toolAction, &QAction::toggled, this, &MSCPlugin::updateMscToolbarActionsChecked);
+        connect(toolAction, &QAction::toggled, this, &MSCEditorCore::updateMscToolbarActionsChecked);
     }
 
     m_defaultToolAction = toolsActions->actions().first();
@@ -206,7 +206,7 @@ void MSCPlugin::initChartTools()
     activateDefaultTool();
 }
 
-void MSCPlugin::initHierarchyViewActions()
+void MSCEditorCore::initHierarchyViewActions()
 {
     Q_ASSERT(m_hierarchyView != nullptr);
 
@@ -239,7 +239,7 @@ void MSCPlugin::initHierarchyViewActions()
     addAction(msc::MscDocument::HierarchyLeaf, tr("Hierarchy Leaf"), QPixmap(":/icons/document_leaf.png"));
 }
 
-void MSCPlugin::initConnections()
+void MSCEditorCore::initConnections()
 {
     Q_ASSERT(m_chartView != nullptr);
 
@@ -252,18 +252,18 @@ void MSCPlugin::initConnections()
     }
 
     connect(&(m_model->chartViewModel()), &msc::ChartLayoutManager::currentChartChanged, this,
-            &MSCPlugin::selectCurrentChart);
+            &MSCEditorCore::selectCurrentChart);
 
     connect(m_model.get(), &msc::MainModel::showChartVew, this, [this]() { showDocumentView(true); });
 
     connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::selectedDocumentChanged, this,
-            &msc::MSCPlugin::updateHierarchyActions);
-    connect(this, &msc::MSCPlugin::viewModeChanged, this, &msc::MSCPlugin::updateHierarchyActions);
+            &msc::MSCEditorCore::updateHierarchyActions);
+    connect(this, &msc::MSCEditorCore::viewModeChanged, this, &msc::MSCEditorCore::updateHierarchyActions);
     connect(&(m_model->hierarchyViewModel()), &msc::HierarchyViewModel::hierarchyTypeChanged, this,
-            &msc::MSCPlugin::updateHierarchyActions);
+            &msc::MSCEditorCore::updateHierarchyActions);
 }
 
-void MSCPlugin::addToolBars(QMainWindow *window)
+void MSCEditorCore::addToolBars(QMainWindow *window)
 {
     window->addToolBar(mainToolBar());
     window->addToolBar(Qt::LeftToolBarArea, m_mscToolBar);
@@ -273,7 +273,7 @@ void MSCPlugin::addToolBars(QMainWindow *window)
 /*!
  * Fills the File menu with actions.
  */
-void MSCPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
+void MSCEditorCore::addMenuFileActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
     m_actionScreenshot = menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")),
@@ -281,7 +281,7 @@ void MSCPlugin::addMenuFileActions(QMenu *menu, QMainWindow *window)
     menu->addSeparator();
 }
 
-void MSCPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window)
+void MSCEditorCore::addMenuEditActions(QMenu *menu, QMainWindow *window)
 {
     auto mainWindow = dynamic_cast<MainWindow *>(window);
 
@@ -292,7 +292,7 @@ void MSCPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window)
     menu->addAction(createActionPaste(mainWindow));
 }
 
-void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
+void MSCEditorCore::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
     EditorCore::addMenuViewActions(menu, window);
 
@@ -319,26 +319,26 @@ void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
     menuWindows->addAction(mainWindow->dockWidgetAsn1ToggleAction());
 }
 
-void MSCPlugin::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
+void MSCEditorCore::addMenuHelpActions(QMenu * /*menu*/, QMainWindow * /*window*/)
 {
     // Do nothing
 }
 
-void MSCPlugin::showToolbars(bool show)
+void MSCEditorCore::showToolbars(bool show)
 {
     m_toolbarsVisible = show;
     m_mscToolBar->setVisible(m_toolbarsVisible);
     m_hierarchyToolBar->setVisible(m_toolbarsVisible);
 }
 
-void MSCPlugin::populateCommandLineArguments(shared::CommandLineParser *parser) const
+void MSCEditorCore::populateCommandLineArguments(shared::CommandLineParser *parser) const
 {
     parser->handlePositional(shared::CommandLineParser::Positional::OpenFileMsc);
     parser->handlePositional(shared::CommandLineParser::Positional::DbgOpenMscExamplesChain);
     parser->handlePositional(shared::CommandLineParser::Positional::DropUnsavedChangesSilently);
 }
 
-BaseTool *MSCPlugin::activeTool() const
+BaseTool *MSCEditorCore::activeTool() const
 {
     for (auto tool : m_tools) {
         if (tool->isActive()) {
@@ -349,7 +349,7 @@ BaseTool *MSCPlugin::activeTool() const
     return nullptr;
 }
 
-QVector<QAction *> MSCPlugin::chartActions() const
+QVector<QAction *> MSCEditorCore::chartActions() const
 {
     QVector<QAction *> actions;
     actions.reserve(m_tools.size());
@@ -360,12 +360,12 @@ QVector<QAction *> MSCPlugin::chartActions() const
     return actions;
 }
 
-QVector<QAction *> MSCPlugin::hierarchyActions() const
+QVector<QAction *> MSCEditorCore::hierarchyActions() const
 {
     return m_hierarchyActions;
 }
 
-QAction *MSCPlugin::createActionCopy(MainWindow *window)
+QAction *MSCEditorCore::createActionCopy(MainWindow *window)
 {
     if (m_actionCopy == nullptr) {
         if (window != nullptr) {
@@ -385,7 +385,7 @@ QAction *MSCPlugin::createActionCopy(MainWindow *window)
     return m_actionCopy;
 }
 
-QAction *MSCPlugin::createActionPaste(MainWindow *window)
+QAction *MSCEditorCore::createActionPaste(MainWindow *window)
 {
     if (m_actionPaste == nullptr) {
         if (window) {
@@ -406,17 +406,17 @@ QAction *MSCPlugin::createActionPaste(MainWindow *window)
 /*!
    Returns the checker for aadl consistency
  */
-AadlChecks *MSCPlugin::aadlChecker() const
+AadlChecks *MSCEditorCore::aadlChecker() const
 {
     return m_aadlChecks.get();
 }
 
-MSCPlugin::ViewMode MSCPlugin::viewMode()
+MSCEditorCore::ViewMode MSCEditorCore::viewMode()
 {
     return m_viewMode;
 }
 
-void MSCPlugin::setViewMode(MSCPlugin::ViewMode mode)
+void MSCEditorCore::setViewMode(MSCEditorCore::ViewMode mode)
 {
     if (mode == m_viewMode) {
         return;
@@ -432,7 +432,7 @@ void MSCPlugin::setViewMode(MSCPlugin::ViewMode mode)
     Q_EMIT viewModeChanged(m_viewMode);
 }
 
-void MSCPlugin::showDocumentView(bool show)
+void MSCEditorCore::showDocumentView(bool show)
 {
     if (show) {
         if (m_centerView->currentWidget() == m_chartView) {
@@ -476,7 +476,7 @@ void MSCPlugin::showDocumentView(bool show)
     }
 }
 
-void MSCPlugin::showHierarchyView(bool show)
+void MSCEditorCore::showHierarchyView(bool show)
 {
     if (show) {
         if (m_centerView->currentWidget() == m_hierarchyView) {
@@ -514,7 +514,7 @@ void MSCPlugin::showHierarchyView(bool show)
     }
 }
 
-void MSCPlugin::activateDefaultTool()
+void MSCEditorCore::activateDefaultTool()
 {
     for (msc::BaseTool *tool : m_tools) {
         if (tool != m_pointerTool)
@@ -526,7 +526,7 @@ void MSCPlugin::activateDefaultTool()
 /*!
  * \brief msc::MSCPlugin::selectCurrentChart Set the current chart as the currently selected.
  */
-void MSCPlugin::selectCurrentChart()
+void MSCEditorCore::selectCurrentChart()
 {
     msc::MscChart *chart = m_model->chartViewModel().currentChart();
 
@@ -541,14 +541,14 @@ void MSCPlugin::selectCurrentChart()
         }
         msc::cmd::CommandsStack::setCurrent(undoGroup()->activeStack());
 
-        connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCPlugin::checkGlobalComment,
+        connect(chart, &msc::MscEntity::commentChanged, this, &msc::MSCEditorCore::checkGlobalComment,
                 Qt::UniqueConnection);
     }
 
     checkGlobalComment();
 }
 
-void MSCPlugin::checkGlobalComment()
+void MSCEditorCore::checkGlobalComment()
 {
     if (!m_globalCommentCreateTool) {
         return;
@@ -565,7 +565,7 @@ void MSCPlugin::checkGlobalComment()
     m_globalCommentCreateTool->action()->setEnabled(hasInstance && !hasGlobalComment);
 }
 
-void MSCPlugin::openMessageDeclarationEditor(QWidget *parentwidget)
+void MSCEditorCore::openMessageDeclarationEditor(QWidget *parentwidget)
 {
     msc::MscModel *model = mainModel()->mscModel();
     if (!model) {
@@ -590,7 +590,7 @@ void MSCPlugin::openMessageDeclarationEditor(QWidget *parentwidget)
     }
 }
 
-void MSCPlugin::updateMscToolbarActionsChecked()
+void MSCEditorCore::updateMscToolbarActionsChecked()
 {
     if (!m_mscToolBar) {
         return;
@@ -608,7 +608,7 @@ void MSCPlugin::updateMscToolbarActionsChecked()
 /*!
    Enables or disables the hierarchy actions, depending if a new document can be added or not
  */
-void MSCPlugin::updateHierarchyActions()
+void MSCEditorCore::updateHierarchyActions()
 {
     bool canAdd = true;
     if (m_viewMode != ViewMode::HIERARCHY) {
@@ -627,7 +627,7 @@ void MSCPlugin::updateHierarchyActions()
 /*!
    Adds a MSC document if the hierarhy view is active and a "non-leafe" document is selected
  */
-void MSCPlugin::addDocument(MscDocument::HierarchyType type)
+void MSCEditorCore::addDocument(MscDocument::HierarchyType type)
 {
     if (m_viewMode != ViewMode::HIERARCHY) {
         return;

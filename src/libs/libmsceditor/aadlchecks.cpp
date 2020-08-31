@@ -22,9 +22,9 @@
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
+#include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmodel.h"
-#include "mscplugin.h"
 
 #include <QDebug>
 
@@ -34,7 +34,7 @@ AadlChecks::AadlChecks() { }
 
 AadlChecks::~AadlChecks() { }
 
-void AadlChecks::setMscPlugin(MSCPlugin *mscPlugin)
+void AadlChecks::setMscPlugin(MSCEditorCore *mscPlugin)
 {
     m_mscPlugin = mscPlugin;
 }

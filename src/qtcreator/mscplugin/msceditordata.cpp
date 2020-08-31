@@ -19,9 +19,9 @@
 
 #include "mainwidget.h"
 #include "msccontext.h"
+#include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "msceditorstack.h"
-#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "msctexteditor.h"
 
@@ -195,9 +195,9 @@ QStringList MscEditorData::aadlFiles() const
     return result;
 }
 
-QVector<msc::MSCPlugin *> MscEditorData::mscPlugins() const
+QVector<msc::MSCEditorCore *> MscEditorData::mscPlugins() const
 {
-    QVector<msc::MSCPlugin *> plugins;
+    QVector<msc::MSCEditorCore *> plugins;
     for (MscTextEditor *editor : m_widgetStack->editors()) {
         auto mscEdit = qobject_cast<MscTextEditorWidget *>(editor->editorWidget());
         if (mscEdit) {

@@ -26,7 +26,7 @@ class IVEditorCore;
 }
 
 namespace msc {
-class MSCPlugin;
+class MSCEditorCore;
 class MscChart;
 class MscInstance;
 
@@ -39,13 +39,13 @@ public:
     AadlChecks();
     ~AadlChecks();
 
-    void setMscPlugin(msc::MSCPlugin *mscPlugin);
+    void setMscPlugin(msc::MSCEditorCore *mscPlugin);
     void setIvPlugin(aadlinterface::IVEditorCore *ivPlugin);
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstances();
 
 private:
-    QPointer<msc::MSCPlugin> m_mscPlugin;
+    QPointer<msc::MSCEditorCore> m_mscPlugin;
     QPointer<aadlinterface::IVEditorCore> m_ivPlugin;
 };
 

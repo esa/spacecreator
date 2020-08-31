@@ -141,9 +141,9 @@ target_sources(${LIB_NAME} PRIVATE
     messagedialog.ui
     msceditor.cpp
     msceditor.h
+    msceditorcore.cpp
+    msceditorcore.h
     msceditorresources.qrc
-    mscplugin.cpp
-    mscplugin.h
     remotecontrol/remotecontrolhandler.cpp
     remotecontrol/remotecontrolhandler.h
     remotecontrol/remotecontrolwebserver.cpp

@@ -34,7 +34,7 @@
 #include "mscdocument.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 #include "msctimer.h"
 #include "settings/appoptions.h"
 #include "textviewdialog.h"
@@ -70,7 +70,7 @@ namespace msc {
 const QLatin1String MainWindow::DotMscFileExtensionLow = QLatin1String(".msc");
 
 struct MainWindow::MainWindowPrivate {
-    explicit MainWindowPrivate(msc::MSCPlugin *plugin, MainWindow *mainWindow)
+    explicit MainWindowPrivate(msc::MSCEditorCore *plugin, MainWindow *mainWindow)
         : ui(new Ui::MainWindow)
         , m_plugin(plugin)
         , mscTextBrowser(new TextViewDialog(mainWindow))
@@ -81,7 +81,7 @@ struct MainWindow::MainWindowPrivate {
 
     Ui::MainWindow *ui = nullptr;
 
-    msc::MSCPlugin *m_plugin;
+    msc::MSCEditorCore *m_plugin;
 
     QComboBox *m_zoomBox = nullptr;
 
@@ -103,7 +103,7 @@ struct MainWindow::MainWindowPrivate {
  * \param plugin hosts most code of the code for the MSC Editor UI of type \ref msc::MSCPlugin
  * \param parent
  */
-MainWindow::MainWindow(msc::MSCPlugin *plugin, QWidget *parent)
+MainWindow::MainWindow(msc::MSCEditorCore *plugin, QWidget *parent)
     : QMainWindow(parent)
     , d(new MainWindowPrivate(plugin, this))
 {

@@ -24,7 +24,7 @@ class QStringList;
 class QToolBar;
 
 namespace msc {
-class MSCPlugin;
+class MSCEditorCore;
 }
 
 namespace Core {
@@ -53,7 +53,7 @@ public:
 
     QStringList aadlFiles() const;
 
-    QVector<msc::MSCPlugin *> mscPlugins() const;
+    QVector<msc::MSCEditorCore *> mscPlugins() const;
 
 public Q_SLOTS:
     void openEditor(const QString &fileName);

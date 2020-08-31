@@ -19,7 +19,7 @@
 #include "mainwindow.h"
 #include "msceditor.h"
 #include "msclibrary.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 #include "mscwriter.h"
 #include "sharedlibrary.h"
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    msc::MSCPlugin plugin;
+    msc::MSCEditorCore plugin;
 
     shared::CommandLineParser cmdParser;
     plugin.populateCommandLineArguments(&cmdParser);

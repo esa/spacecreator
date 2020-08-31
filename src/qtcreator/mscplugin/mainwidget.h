@@ -33,7 +33,7 @@ class ASN1FileView;
 namespace msc {
 class DocumentTreeView;
 class GraphicsView;
-class MSCPlugin;
+class MSCEditorCore;
 }
 
 namespace MscPlugin {
@@ -61,7 +61,7 @@ public:
     QAction *actionToolDelete() const;
     QVector<QAction *> toolActions() const;
 
-    msc::MSCPlugin *mscPlugin() const;
+    msc::MSCEditorCore *mscPlugin() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -82,7 +82,7 @@ private:
     msc::DocumentTreeView *m_documentTree = nullptr;
     asn1::ASN1FileView *m_asn1Widget = nullptr;
 
-    std::unique_ptr<msc::MSCPlugin> m_plugin;
+    std::unique_ptr<msc::MSCEditorCore> m_plugin;
 };
 
 }

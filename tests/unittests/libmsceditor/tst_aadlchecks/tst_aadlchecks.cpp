@@ -25,9 +25,9 @@
 #include "iveditorcore.h"
 #include "mainmodel.h"
 #include "mscchart.h"
+#include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmodel.h"
-#include "mscplugin.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -69,7 +69,7 @@ void tst_AadlChecks::testCheckInstanceNames()
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstances();
     QCOMPARE(result.size(), 0);
 
-    msc::MSCPlugin mscPlugin;
+    msc::MSCEditorCore mscPlugin;
     mscPlugin.mainModel()->initialModel();
     checker.setMscPlugin(&mscPlugin);
     result = checker.checkInstances();

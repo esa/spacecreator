@@ -18,7 +18,7 @@
 #include "commandlineparser.h"
 #include "iveditorcore.h"
 #include "mainwindow.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 
 #include <QtTest>
 
@@ -54,7 +54,7 @@ private Q_SLOTS:
     void testCoverage();
 
 private:
-    msc::MSCPlugin m_pluginMSC;
+    msc::MSCEditorCore m_pluginMSC;
     aadlinterface::IVEditorCore m_pluginAADL;
 };
 

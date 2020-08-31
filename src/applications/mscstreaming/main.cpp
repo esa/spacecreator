@@ -18,7 +18,7 @@
 #include "commandlineparser.h"
 #include "msceditor.h"
 #include "msclibrary.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 #include "sharedlibrary.h"
 #include "streamingwindow.h"
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    msc::MSCPlugin plugin;
+    msc::MSCEditorCore plugin;
 
     shared::CommandLineParser cmdParser;
     cmdParser.handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);

@@ -27,7 +27,7 @@
 #include "mscchart.h"
 #include "mscdocument.h"
 #include "mscmodel.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 #include "tools/entitydeletetool.h"
 
 #include <QAction>
@@ -51,7 +51,7 @@ namespace MscPlugin {
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new msc::MSCPlugin(this))
+    , m_plugin(new msc::MSCEditorCore(this))
 {
     initUi();
 
@@ -137,7 +137,7 @@ QVector<QAction *> MainWidget::toolActions() const
     return m_plugin->chartActions();
 }
 
-msc::MSCPlugin *MainWidget::mscPlugin() const
+msc::MSCEditorCore *MainWidget::mscPlugin() const
 {
     return m_plugin.get();
 }

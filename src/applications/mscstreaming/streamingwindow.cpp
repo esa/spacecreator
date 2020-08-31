@@ -21,7 +21,7 @@
 #include "chartlayoutmanager.h"
 #include "geometry.h"
 #include "mainmodel.h"
-#include "mscplugin.h"
+#include "msceditorcore.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 #include "ui_streamingwindow.h"
@@ -33,7 +33,7 @@
 namespace msc {
 
 struct StreamingWindow::StreamingWindowPrivate {
-    explicit StreamingWindowPrivate(msc::MSCPlugin *plugin)
+    explicit StreamingWindowPrivate(msc::MSCEditorCore *plugin)
         : ui(new Ui::StreamingWindow)
         , m_plugin(plugin)
     {
@@ -43,7 +43,7 @@ struct StreamingWindow::StreamingWindowPrivate {
 
     Ui::StreamingWindow *ui = nullptr;
 
-    msc::MSCPlugin *m_plugin;
+    msc::MSCEditorCore *m_plugin;
 
     msc::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     msc::RemoteControlHandler *m_remoteControlHandler = nullptr;
@@ -62,7 +62,7 @@ struct StreamingWindow::StreamingWindowPrivate {
  * \param plugin hosts most code of the code for the MSC UI of type \ref msc::MSCPlugin
  * \param parent
  */
-StreamingWindow::StreamingWindow(msc::MSCPlugin *plugin, QWidget *parent)
+StreamingWindow::StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent)
     : QMainWindow(parent)
     , d(new StreamingWindowPrivate(plugin))
 {
