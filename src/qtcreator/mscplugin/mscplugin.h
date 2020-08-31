@@ -31,14 +31,14 @@ namespace MscPlugin {
 
 class MscEditorFactory;
 
-class MscPluginPlugin : public ExtensionSystem::IPlugin
+class MSCPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "MscPlugin.json")
 
 public:
-    MscPluginPlugin();
-    ~MscPluginPlugin();
+    MSCPlugin();
+    ~MSCPlugin();
 
     bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;

@@ -15,8 +15,8 @@ set(MSC_PLUGIN_SOURCES
     msceditorstack.cpp
     msceditorstack.h
     mscpluginconstants.h
-    mscpluginplugin.cpp
-    mscpluginplugin.h
+    mscplugin.cpp
+    mscplugin.h
     mscplugin_global.h
     msctexteditor.cpp
     msctexteditor.h

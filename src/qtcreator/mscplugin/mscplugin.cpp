@@ -15,8 +15,6 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscpluginplugin.h"
-
 #include "aadlchecks.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
@@ -27,6 +25,7 @@
 #include "msceditorfactory.h"
 #include "mscinstance.h"
 #include "msclibrary.h"
+#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
@@ -53,18 +52,18 @@ using namespace Core;
 
 namespace MscPlugin {
 
-MscPluginPlugin::MscPluginPlugin()
+MSCPlugin::MSCPlugin()
 {
     initMscResources();
 }
 
-MscPluginPlugin::~MscPluginPlugin()
+MSCPlugin::~MSCPlugin()
 {
     // Unregister objects from the plugin manager's object pool
     // Delete members
 }
 
-bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -81,7 +80,7 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     m_messageDeclarationAction = new QAction(tr("Message declarations ..."), this);
     Core::Command *messageDeclCmd =
             Core::ActionManager::registerAction(m_messageDeclarationAction, Constants::MESSAGE_DECLARATIONS_ID);
-    connect(m_messageDeclarationAction, &QAction::triggered, this, &MscPluginPlugin::showMessageDeclarations);
+    connect(m_messageDeclarationAction, &QAction::triggered, this, &MSCPlugin::showMessageDeclarations);
 
     m_messageDeclarationAction->setEnabled(false);
     connect(editorManager, &Core::EditorManager::currentEditorChanged, this, [&](Core::IEditor *editor) {
@@ -94,13 +93,13 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     auto action = new QAction(tr("Check instances"), this);
     Core::Command *listAadlCmd = Core::ActionManager::registerAction(
             action, Constants::CHECK_INSTANCES_ID, Core::Context(Core::Constants::C_GLOBAL));
-    connect(action, &QAction::triggered, this, &MscPluginPlugin::checkInstances);
+    connect(action, &QAction::triggered, this, &MSCPlugin::checkInstances);
 
     auto showMinimapAction = new QAction(tr("Show minimap"), this);
     showMinimapAction->setCheckable(true);
     Core::Command *showMinimapCmd = Core::ActionManager::registerAction(
             showMinimapAction, Constants::SHOW_MINIMAP_ID, Core::Context(Core::Constants::C_DESIGN_MODE));
-    connect(showMinimapAction, &QAction::triggered, this, &MscPluginPlugin::setMinimapVisible);
+    connect(showMinimapAction, &QAction::triggered, this, &MSCPlugin::setMinimapVisible);
 
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("MscPlugin"));
@@ -114,7 +113,7 @@ bool MscPluginPlugin::initialize(const QStringList &arguments, QString *errorStr
     return true;
 }
 
-void MscPluginPlugin::extensionsInitialized()
+void MSCPlugin::extensionsInitialized()
 {
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
@@ -122,7 +121,7 @@ void MscPluginPlugin::extensionsInitialized()
     DesignMode::setDesignModeIsRequired();
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
+ExtensionSystem::IPlugin::ShutdownFlag MSCPlugin::aboutToShutdown()
 {
     // Save settings
     // Disconnect from signals that are not needed during shutdown
@@ -130,12 +129,12 @@ ExtensionSystem::IPlugin::ShutdownFlag MscPluginPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void MscPluginPlugin::showMessageDeclarations()
+void MSCPlugin::showMessageDeclarations()
 {
     m_factory->editorData()->editMessageDeclarations(Core::ICore::mainWindow());
 }
 
-void MscPluginPlugin::checkInstances()
+void MSCPlugin::checkInstances()
 {
     aadlinterface::IVEditorCore *ivp = ivPlugin();
     if (!ivp) {
@@ -162,7 +161,7 @@ void MscPluginPlugin::checkInstances()
     }
 }
 
-void MscPluginPlugin::setMinimapVisible(bool visible)
+void MSCPlugin::setMinimapVisible(bool visible)
 {
     m_factory->editorData()->setMinimapVisible(visible);
 }
@@ -170,7 +169,7 @@ void MscPluginPlugin::setMinimapVisible(bool visible)
 /*!
    Returns the AadlPlugin
  */
-ExtensionSystem::IPlugin *MscPluginPlugin::aadlPlugin() const
+ExtensionSystem::IPlugin *MSCPlugin::aadlPlugin() const
 {
     ExtensionSystem::PluginManager *manager = ExtensionSystem::PluginManager::instance();
     QList<ExtensionSystem::PluginSpec *> plugins = manager->plugins();
@@ -182,7 +181,7 @@ ExtensionSystem::IPlugin *MscPluginPlugin::aadlPlugin() const
     return nullptr;
 }
 
-aadlinterface::IVEditorCore *MscPluginPlugin::ivPlugin() const
+aadlinterface::IVEditorCore *MSCPlugin::ivPlugin() const
 {
     QStringList aadlFiles = m_factory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
