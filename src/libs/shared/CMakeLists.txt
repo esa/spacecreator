@@ -30,12 +30,12 @@ target_sources(${LIB_NAME} PRIVATE
     common.h
     delayedsignal.cpp
     delayedsignal.h
+    editorcore.cpp
+    editorcore.h
     geometry.cpp
     geometry.h
     graphicsviewutils.cpp
     graphicsviewutils.h
-    plugin.cpp
-    plugin.h
     settingsappoption.cpp
     settingsappoption.h
     settingsmanager.cpp

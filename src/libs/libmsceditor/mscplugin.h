@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "editorcore.h"
 #include "mscdocument.h"
-#include "plugin.h"
 
 #include <QVector>
 #include <memory>
@@ -44,7 +44,7 @@ class TimerCreatorTool;
 
 class MainWindow;
 
-class MSCPlugin : public shared::Plugin
+class MSCPlugin : public shared::EditorCore
 {
     Q_OBJECT
     Q_PROPERTY(msc::MSCPlugin::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)

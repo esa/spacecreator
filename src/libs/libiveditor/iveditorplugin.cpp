@@ -17,7 +17,7 @@ namespace aadlinterface {
  */
 
 IVEditorPlugin::IVEditorPlugin(QObject *parent)
-    : shared::Plugin(parent)
+    : shared::EditorCore(parent)
     , m_document(new aadlinterface::InterfaceDocument(this))
     , m_docToolBar(new QToolBar)
 {
@@ -75,7 +75,7 @@ void IVEditorPlugin::addMenuEditActions(QMenu *menu, QMainWindow * /*window*/)
 
 void IVEditorPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    Plugin::addMenuViewActions(menu, window);
+    EditorCore::addMenuViewActions(menu, window);
 }
 
 /*!

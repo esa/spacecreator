@@ -1,4 +1,4 @@
-#include "plugin.h"
+#include "editorcore.h"
 
 #include "minimap.h"
 #include "ui/graphicsviewbase.h"
@@ -13,20 +13,20 @@
 
 namespace shared {
 
-Plugin::Plugin(QObject *parent)
+EditorCore::EditorCore(QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
 {
 }
 
-Plugin::~Plugin() { }
+EditorCore::~EditorCore() { }
 
-QWidget *Plugin::minimapView() const
+QWidget *EditorCore::minimapView() const
 {
     return m_miniMap;
 }
 
-QToolBar *Plugin::mainToolBar()
+QToolBar *EditorCore::mainToolBar()
 {
     if (m_mainToolBar == nullptr) {
         m_mainToolBar = new QToolBar;
@@ -44,7 +44,7 @@ QToolBar *Plugin::mainToolBar()
 /*!
  * \brief initMenus Initialize the menus. Calls each menu initialization
  */
-void Plugin::initMenus(QMainWindow *window)
+void EditorCore::initMenus(QMainWindow *window)
 {
     m_mainWindow = window;
     // Initialize the file menu
@@ -72,18 +72,18 @@ void Plugin::initMenus(QMainWindow *window)
     // Initialize the help menu
     menu = window->menuBar()->addMenu(tr("&Help"));
     addMenuHelpActions(menu, window);
-    menu->addAction(tr("About"), this, &Plugin::showAboutDialog);
+    menu->addAction(tr("About"), this, &EditorCore::showAboutDialog);
     menu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 }
 
-void Plugin::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
+void EditorCore::addMenuViewActions(QMenu *menu, QMainWindow * /*window*/)
 {
     menu->addAction(actionToggleMinimap());
     menu->addAction(actionToggleE2EView());
     menu->addSeparator();
 }
 
-QAction *Plugin::actionNewFile()
+QAction *EditorCore::actionNewFile()
 {
     if (m_actionNewFile == nullptr) {
         m_actionNewFile = new QAction(tr("&New file"), this);
@@ -93,7 +93,7 @@ QAction *Plugin::actionNewFile()
     return m_actionNewFile;
 }
 
-QAction *Plugin::actionOpenFile()
+QAction *EditorCore::actionOpenFile()
 {
     if (m_actionOpenFile == nullptr) {
         m_actionOpenFile = new QAction(tr("&Open file..."), this);
@@ -103,7 +103,7 @@ QAction *Plugin::actionOpenFile()
     return m_actionOpenFile;
 }
 
-QAction *Plugin::actionSaveFile()
+QAction *EditorCore::actionSaveFile()
 {
     if (m_actionSaveFile == nullptr) {
         m_actionSaveFile = new QAction(tr("&Save file"), this);
@@ -113,7 +113,7 @@ QAction *Plugin::actionSaveFile()
     return m_actionSaveFile;
 }
 
-QAction *Plugin::actionSaveFileAs()
+QAction *EditorCore::actionSaveFileAs()
 {
     if (m_actionSaveFileAs == nullptr) {
         m_actionSaveFileAs = new QAction(tr("Save file &as..."), this);
@@ -122,7 +122,7 @@ QAction *Plugin::actionSaveFileAs()
     return m_actionSaveFileAs;
 }
 
-QAction *Plugin::actionQuit()
+QAction *EditorCore::actionQuit()
 {
     if (m_actionQuit == nullptr) {
         m_actionQuit = new QAction(tr("&Quit"), this);
@@ -131,7 +131,7 @@ QAction *Plugin::actionQuit()
     return m_actionQuit;
 }
 
-QAction *Plugin::actionUndo()
+QAction *EditorCore::actionUndo()
 {
     if (m_actionUndo == nullptr) {
         m_actionUndo = m_undoGroup->createUndoAction(this);
@@ -141,7 +141,7 @@ QAction *Plugin::actionUndo()
     return m_actionUndo;
 }
 
-QAction *Plugin::actionRedo()
+QAction *EditorCore::actionRedo()
 {
     if (m_actionRedo == nullptr) {
         m_actionRedo = m_undoGroup->createRedoAction(this);
@@ -151,7 +151,7 @@ QAction *Plugin::actionRedo()
     return m_actionRedo;
 }
 
-QAction *Plugin::actionToggleMinimap()
+QAction *EditorCore::actionToggleMinimap()
 {
     if (m_actionToggleMinimap == nullptr) {
         m_actionToggleMinimap = new QAction(tr("&Mini map"), this);
@@ -160,7 +160,7 @@ QAction *Plugin::actionToggleMinimap()
     return m_actionToggleMinimap;
 }
 
-QAction *Plugin::actionToggleE2EView()
+QAction *EditorCore::actionToggleE2EView()
 {
     if (m_actionToggleE2EView == nullptr) {
         m_actionToggleE2EView = new QAction(tr("&Show end to end dataflow"), this);
@@ -172,7 +172,7 @@ QAction *Plugin::actionToggleE2EView()
 /*!
    Pops upd the about dialog with basic information about the application
  */
-void Plugin::showAboutDialog()
+void EditorCore::showAboutDialog()
 {
     QString info = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
 
@@ -183,7 +183,7 @@ void Plugin::showAboutDialog()
     QMessageBox::information(m_mainWindow, tr("About"), info);
 }
 
-void Plugin::setupMiniMap()
+void EditorCore::setupMiniMap()
 {
     m_miniMap = new ui::MiniMap;
     m_miniMap->setupSourceView(chartView());

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "plugin.h"
+#include "editorcore.h"
 #include "ui/graphicsviewbase.h"
 
 namespace aadlinterface {
 
 class InterfaceDocument;
 
-class IVEditorPlugin : public shared::Plugin
+class IVEditorPlugin : public shared::EditorCore
 {
 public:
     explicit IVEditorPlugin(QObject *parent = 0);

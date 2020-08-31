@@ -63,7 +63,7 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
  */
 
 MSCPlugin::MSCPlugin(QObject *parent)
-    : shared::Plugin(parent)
+    : shared::EditorCore(parent)
     , m_model(new msc::MainModel())
     , m_aadlChecks(new AadlChecks)
     , m_mscToolBar(new QToolBar(tr("MSC")))
@@ -294,7 +294,7 @@ void MSCPlugin::addMenuEditActions(QMenu *menu, QMainWindow *window)
 
 void MSCPlugin::addMenuViewActions(QMenu *menu, QMainWindow *window)
 {
-    Plugin::addMenuViewActions(menu, window);
+    EditorCore::addMenuViewActions(menu, window);
 
     auto mainWindow = dynamic_cast<MainWindow *>(window);
 

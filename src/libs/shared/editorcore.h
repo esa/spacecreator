@@ -17,13 +17,13 @@ class GraphicsViewBase;
 class MiniMap;
 }
 
-class Plugin : public QObject
+class EditorCore : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Plugin(QObject *parent = nullptr);
-    virtual ~Plugin();
+    explicit EditorCore(QObject *parent = nullptr);
+    virtual ~EditorCore();
 
     // Override this to show or hide actions
     virtual void setPluginActive(bool active) = 0;
