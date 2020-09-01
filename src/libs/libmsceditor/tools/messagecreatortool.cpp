@@ -348,7 +348,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
     auto instanceItemRect = [&](MscInstance *instance) {
         if (instance)
             if (InstanceItem *item = m_model->itemForInstance(instance))
-                return item->sceneBoundingRect();
+                return item->extendedSceneBoundingRect();
 
         return QRectF();
     };

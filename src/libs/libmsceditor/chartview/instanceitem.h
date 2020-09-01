@@ -67,6 +67,8 @@ public:
     QPainterPath shape() const override;
     void setGeometry(const QRectF &geometry);
 
+    QRectF extendedSceneBoundingRect() const;
+
     static InstanceItem *createDefaultItem(
             ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos);
 

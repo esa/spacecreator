@@ -17,7 +17,9 @@
 #include "mscutils.h"
 
 #include "baseitems/interactiveobject.h"
+#include "chartitem.h"
 #include "instanceitem.h"
+#include "mscinstance.h"
 
 #include <QDebug>
 #include <QGraphicsView>
@@ -57,14 +59,21 @@ bool removeSceneItem(QGraphicsItem *item)
     return true;
 }
 
-QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos)
+QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos, bool extendToBottom)
 {
     QVector<InstanceItem *> items;
-    if (scene)
-        for (InstanceItem *item : shared::graphicsviewutils::toplevelItems<InstanceItem>(scene))
-            if (item->sceneBoundingRect().contains(scenePos))
-                items << item;
+    if (scene) {
+        for (InstanceItem *item : shared::graphicsviewutils::toplevelItems<InstanceItem>(scene)) {
+            QRectF box = item->sceneBoundingRect();
+            if (extendToBottom && item->modelItem()->explicitStop()) {
+                box = item->extendedSceneBoundingRect();
+            }
 
+            if (box.contains(scenePos)) {
+                items << item;
+            }
+        }
+    }
     return items;
 }
 

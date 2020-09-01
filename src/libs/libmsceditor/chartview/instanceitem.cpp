@@ -265,6 +265,22 @@ void InstanceItem::setGeometry(const QRectF &geometry)
     scheduleLayoutUpdate();
 }
 
+/*!
+   Returns the bounding rect in scene coordinates \sa QGraphicsItem::sceneBoundingRect()
+   For instances that are stopped, the box is extended to the bottom of the chart
+ */
+QRectF InstanceItem::extendedSceneBoundingRect() const
+{
+    if (!m_instance || !m_instance->explicitStop() || !m_model || !m_model->chartItem()) {
+        return sceneBoundingRect();
+    }
+
+    const qreal chartbottom = m_model->chartItem()->contentRect().bottom();
+    QRectF box = sceneBoundingRect();
+    box.setBottom(chartbottom);
+    return box;
+}
+
 InstanceItem *InstanceItem::createDefaultItem(
         ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
 {

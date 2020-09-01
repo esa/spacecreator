@@ -360,7 +360,7 @@ bool MessageItem::updateSourceAndTarget(const QPointF &shift)
 bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
     if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo)
-        keepInstance = hoveredItem(to);
+        keepInstance = hoveredInstance(to);
     setSourceInstanceItem(keepInstance);
     const bool res = m_arrowItem->updateSource(m_sourceInstance, to, snap);
     if (res) {
@@ -373,8 +373,10 @@ bool MessageItem::updateSource(const QPointF &to, ObjectAnchor::Snap snap, Insta
 
 bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, InstanceItem *keepInstance)
 {
-    if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo)
-        keepInstance = hoveredItem(to);
+    if (keepInstance == nullptr && snap == ObjectAnchor::Snap::SnapTo) {
+        static const bool extendToTarget = true;
+        keepInstance = hoveredInstance(to, extendToTarget);
+    }
     setTargetInstanceItem(keepInstance);
     bool res = true;
     if (isCreator()) {
@@ -391,9 +393,13 @@ bool MessageItem::updateTarget(const QPointF &to, ObjectAnchor::Snap snap, Insta
     return res;
 }
 
-InstanceItem *MessageItem::hoveredItem(const QPointF &hoverPoint) const
+/*!
+   Returns the instance that is on position \p hoverPoint
+   Returns nullptr if there is no instance.
+ */
+InstanceItem *MessageItem::hoveredInstance(const QPointF &hoverPoint, bool extendToBottom) const
 {
-    const QVector<InstanceItem *> &others = instanceItemsByPos(scene(), hoverPoint);
+    const QVector<InstanceItem *> &others = instanceItemsByPos(scene(), hoverPoint, extendToBottom);
     return others.isEmpty() ? nullptr : others.first();
 }
 

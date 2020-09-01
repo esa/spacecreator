@@ -70,7 +70,7 @@ QVector<MscEntityType *> getEntityFromSelection(QGraphicsScene *scene)
 }
 
 bool removeSceneItem(QGraphicsItem *item);
-QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos);
+QVector<InstanceItem *> instanceItemsByPos(QGraphicsScene *scene, const QPointF &scenePos, bool extendToBottom = false);
 
 bool isHorizontal(const QLineF &line, const qreal verticalTolerance = LineHorizontalityTolerance);
 bool isHorizontal(const QPointF &p1, const QPointF &p2, const qreal verticalTolerance = LineHorizontalityTolerance);

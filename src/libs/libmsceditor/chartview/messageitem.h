@@ -142,7 +142,7 @@ private:
     bool ignorePositionChange() const;
     bool proceedPositionChange() const;
 
-    InstanceItem *hoveredItem(const QPointF &hoverPoint) const;
+    InstanceItem *hoveredInstance(const QPointF &hoverPoint, bool extendToBottom = false) const;
 
     void updateMessagePoints();
 
