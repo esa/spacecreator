@@ -60,16 +60,16 @@ void tst_EndToEndConnections::testReader()
     const auto dataflow = aadlinterface::EndToEndConnections::readDataflow(::mscFile1, false);
     QCOMPARE(dataflow.size(), 3);
     QCOMPARE(dataflow[0].from, QString());
-    QCOMPARE(dataflow[0].to, QString("User_Interface"));
-    QCOMPARE(dataflow[0].message, QString("Start_Transaction"));
+    QCOMPARE(dataflow[0].to, QString("User Interface"));
+    QCOMPARE(dataflow[0].message, QString("Start Transaction"));
 
-    QCOMPARE(dataflow[1].from, QString("User_Interface"));
-    QCOMPARE(dataflow[1].to, QString("File_Manager"));
-    QCOMPARE(dataflow[1].message, QString("Open_File"));
+    QCOMPARE(dataflow[1].from, QString("User Interface"));
+    QCOMPARE(dataflow[1].to, QString("File Manager"));
+    QCOMPARE(dataflow[1].message, QString("Open File"));
 
-    QCOMPARE(dataflow[2].from, QString("File_Manager"));
-    QCOMPARE(dataflow[2].to, QString("Database_Manager"));
-    QCOMPARE(dataflow[2].message, QString("Access_Database"));
+    QCOMPARE(dataflow[2].from, QString("File Manager"));
+    QCOMPARE(dataflow[2].to, QString("Database Manager"));
+    QCOMPARE(dataflow[2].message, QString("Access Database"));
 }
 
 QTEST_MAIN(tst_EndToEndConnections)
