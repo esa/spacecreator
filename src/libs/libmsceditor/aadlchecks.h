@@ -21,6 +21,10 @@
 #include <QPointer>
 #include <QVector>
 
+namespace aadl {
+class AADLObjectFunction;
+}
+
 namespace aadlinterface {
 class IVEditorCore;
 }
@@ -42,9 +46,11 @@ public:
     void setMscPlugin(msc::MSCEditorCore *mscPlugin);
     void setIvPlugin(aadlinterface::IVEditorCore *ivPlugin);
 
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstances();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
 
 private:
+    QVector<aadl::AADLObjectFunction *> currentAadlFunctions() const;
+
     QPointer<msc::MSCEditorCore> m_mscPlugin;
     QPointer<aadlinterface::IVEditorCore> m_ivPlugin;
 };

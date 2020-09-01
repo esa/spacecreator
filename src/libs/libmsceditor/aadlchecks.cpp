@@ -17,6 +17,7 @@
 
 #include "aadlchecks.h"
 
+#include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
@@ -27,6 +28,7 @@
 #include "mscmodel.h"
 
 #include <QDebug>
+#include <algorithm>
 
 namespace msc {
 
@@ -47,10 +49,34 @@ void AadlChecks::setIvPlugin(aadlinterface::IVEditorCore *ivPlugin)
 /*!
    Checks all instances if they are defined in the IV model
  */
-QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstances()
+QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
 {
     QVector<QPair<MscChart *, MscInstance *>> result;
     if (!m_ivPlugin || !m_mscPlugin) {
+        return result;
+    }
+
+    QVector<aadl::AADLObjectFunction *> aadlFunctions = currentAadlFunctions();
+
+    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    for (msc::MscChart *chart : charts) {
+        for (msc::MscInstance *instance : chart->instances()) {
+            auto it = std::find_if(aadlFunctions.begin(), aadlFunctions.end(),
+                    [&instance](aadl::AADLObjectFunction *func) { return instance->name() == func->title(); });
+            if (it == aadlFunctions.end()) {
+                result << QPair<MscChart *, MscInstance *>(chart, instance);
+            }
+        }
+    }
+
+    return result;
+}
+
+QVector<aadl::AADLObjectFunction *> AadlChecks::currentAadlFunctions() const
+{
+    QVector<aadl::AADLObjectFunction *> result;
+
+    if (!m_ivPlugin) {
         return result;
     }
 
@@ -61,19 +87,11 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstances()
     }
     aadlModel = m_ivPlugin->document()->objectsModel();
 
-    QStringList functionNames;
     const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
     for (auto obj : aadlObjects) {
         if (obj->aadlType() == aadl::AADLObject::Type::Function) {
-            functionNames.append(obj->title());
-        }
-    }
-
-    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
-    for (msc::MscChart *chart : charts) {
-        for (msc::MscInstance *instance : chart->instances()) {
-            if (!functionNames.contains(instance->name())) {
-                result << QPair<MscChart *, MscInstance *>(chart, instance);
+            if (auto func = qobject_cast<aadl::AADLObjectFunction *>(obj)) {
+                result.append(func);
             }
         }
     }

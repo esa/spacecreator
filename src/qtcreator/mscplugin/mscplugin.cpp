@@ -144,7 +144,7 @@ void MSCPlugin::checkInstances()
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
     for (msc::MSCEditorCore *mplugin : m_factory->editorData()->mscPlugins()) {
         mplugin->aadlChecker()->setIvPlugin(ivp);
-        result += mplugin->aadlChecker()->checkInstances();
+        result += mplugin->aadlChecker()->checkInstanceNames();
     }
 
     if (result.isEmpty()) {

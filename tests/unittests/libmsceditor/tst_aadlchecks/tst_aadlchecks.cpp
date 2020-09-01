@@ -66,25 +66,25 @@ void tst_AadlChecks::initTestCase()
 void tst_AadlChecks::testCheckInstanceNames()
 {
     msc::AadlChecks checker;
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstances();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
     msc::MSCEditorCore mscPlugin;
     mscPlugin.mainModel()->initialModel();
     checker.setMscPlugin(&mscPlugin);
-    result = checker.checkInstances();
+    result = checker.checkInstanceNames();
     msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
     aadlinterface::IVEditorCore ivPlugin;
     checker.setIvPlugin(&ivPlugin);
-    result = checker.checkInstances();
+    result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
     // add instance
     auto instance = new msc::MscInstance("Dummy", chart);
     chart->addInstance(instance);
-    result = checker.checkInstances();
+    result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 1);
 
     // Add function with different name
@@ -95,7 +95,7 @@ void tst_AadlChecks::testCheckInstanceNames()
 
     // set instance name to the function name
     instance->setName("init");
-    result = checker.checkInstances();
+    result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 }
 
