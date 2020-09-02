@@ -11,6 +11,7 @@
 #include "ui/graphicsviewbase.h"
 
 #include <QBoxLayout>
+#include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGraphicsScene>
@@ -106,6 +107,35 @@ void EndToEndView::setVisible(bool visible)
 //! Update the view with the current model and MSC file contents
 void EndToEndView::refreshView()
 {
+    struct InternalConnection {
+        InternalConnection(const EndToEndConnections::ConnectionInsideFunction &c)
+            : connection(c)
+        {
+        }
+
+        EndToEndConnections::ConnectionInsideFunction connection;
+        AADLInterfaceGraphicsItem *ri { nullptr };
+        AADLInterfaceGraphicsItem *pi { nullptr };
+    };
+    QVector<InternalConnection> internalConnections;
+
+    // We need both the ri and the pi graphics item to be able to create a connection between them
+    auto updateInternalConnection = [&](const QString &instance, const QString &interface,
+                                            AADLInterfaceGraphicsItem *ri, AADLInterfaceGraphicsItem *pi) {
+        for (auto &ic : internalConnections) {
+            if (instance == ic.connection.instance) {
+                if (pi != nullptr && interface == ic.connection.interface1) {
+                    // This is the ri side
+                    ic.pi = pi;
+                    return;
+                } else if (ri != nullptr && interface == ic.connection.interface2) {
+                    ic.ri = ri;
+                    return;
+                }
+            }
+        }
+    };
+
     // Remove all the old ones
     qDeleteAll(d->scene->items());
 
@@ -113,7 +143,10 @@ void EndToEndView::refreshView()
     QList<aadl::AADLObject *> objects = d->document->objectsModel()->visibleObjects({});
     aadl::AADLObject::sortObjectList(objects);
 
-    QVector<EndToEndConnections::Connection> dataflow = d->dataflow.dataflow();
+    const EndToEndConnections::Dataflow dataflow = d->dataflow.dataflow();
+    for (auto c : dataflow.internalConnections) {
+        internalConnections << InternalConnection(c);
+    };
 
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
@@ -123,6 +156,25 @@ void EndToEndView::refreshView()
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
         case aadl::AADLObject::Type::RequiredInterface:
+            if (auto ri = qobject_cast<aadl::AADLObjectIface *>(obj)) {
+                // Add the RI
+                auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
+                item = graphicsItem;
+
+                auto function = ri->function();
+                if (function != nullptr) {
+                    // Check if this is to the environment
+                    const EndToEndConnections::ConnectionWithEnvironment c { function->title(), ri->title(), false };
+                    qDebug() << "Env" << c.instance << c.interface << c.toInstance;
+                    if (dataflow.envConnections.contains(c)) {
+                        // TODO: Add a connection from the outside
+                    }
+
+                    // Check if this is part of an internal connection
+                    updateInternalConnection(c.instance, c.interface, graphicsItem, nullptr);
+                }
+            }
+            break;
         case aadl::AADLObject::Type::ProvidedInterface:
             item = new AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
             break;
