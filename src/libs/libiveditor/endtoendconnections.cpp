@@ -45,7 +45,7 @@ struct EndToEndConnections::EndToEndConnectionsPrivate {
 
     bool dirty { false };
 
-    QVector<Connection> dataflow;
+    Dataflow dataflow;
 };
 
 EndToEndConnections::EndToEndConnections(QObject *parent)
@@ -82,9 +82,9 @@ static QString instanceName(msc::MscInstance *instance)
 }
 
 //! Get the end to end dataflow. If the dirty flag is set, this will read from the file
-//! It will return something like this:
+//! It will return something like this in the connections list:
 //! QVector((""; "Start_Transaction","User_Interface"), QPair("Open_File","File_Manager"), QPair("Access_Database","Database_Manager"))
-QVector<EndToEndConnections::Connection> EndToEndConnections::dataflow() const
+EndToEndConnections::Dataflow EndToEndConnections::dataflow() const
 {
     if (d->dirty) {
         // Read the stuff
@@ -95,11 +95,12 @@ QVector<EndToEndConnections::Connection> EndToEndConnections::dataflow() const
     return d->dataflow;
 }
 
-static QVector<EndToEndConnections::Connection> readDataFlowFromDocument(msc::MscDocument *document)
+static EndToEndConnections::Dataflow readDataFlowFromDocument(msc::MscDocument *document)
 {
     for (auto chart : document->charts()) {
-        QVector<EndToEndConnections::Connection> dataflow;
+        EndToEndConnections::Dataflow dataflow;
         QString lastInstance;
+        QString lastRI;
         for (auto event : chart->instanceEvents()) {
             auto msg = dynamic_cast<msc::MscMessage *>(event);
             if (msg != nullptr && msg->messageType() == msc::MscMessage::MessageType::Message) {
@@ -109,9 +110,27 @@ static QVector<EndToEndConnections::Connection> readDataFlowFromDocument(msc::Ms
                         aadl::AADLNameValidator::decodeName(aadl::AADLObject::Type::RequiredInterface, msg->name());
 
                 // The source must match, except for the first call which can be from global or any instance
-                if (source == lastInstance || dataflow.isEmpty()) {
-                    dataflow.append({ source, target, message });
+                if (!message.isEmpty() && !(source.isEmpty() && target.isEmpty())
+                        && (source == lastInstance || dataflow.isEmpty())) {
+                    if (source.isEmpty()) {
+                        // This is a message to the environment
+                        dataflow.envConnections.append({ target, message, true });
+                    } else if (target.isEmpty()) {
+                        // This is a message from the environment
+                        dataflow.envConnections.append({ source, message, false });
+                    } else {
+                        // This is a normal message
+                        dataflow.connections.append({ source, target, message });
+                    }
+
+                    if (source != target && !source.isEmpty() && !target.isEmpty() && !message.isEmpty()) {
+                        // A message came in to this instance and now a new message is leaving it. Show this in the
+                        // dataflow
+                        dataflow.internalConnections.append({ source, lastRI, message });
+                    }
+
                     lastInstance = target;
+                    lastRI = message;
                 }
             }
         }
@@ -126,7 +145,7 @@ static QVector<EndToEndConnections::Connection> readDataFlowFromDocument(msc::Ms
 
 //! Read the dataflow from a file or string. If file is a filename, isFile should be true.
 //! If file is the contents of the file, isFile should be false
-QVector<EndToEndConnections::Connection> EndToEndConnections::readDataflow(const QString &file, bool isFile)
+EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &file, bool isFile)
 {
     msc::MscReader reader;
     std::unique_ptr<msc::MscModel> model(isFile ? reader.parseFile(file) : reader.parseText(file));
@@ -155,8 +174,7 @@ QVector<EndToEndConnections::Connection> EndToEndConnections::readDataflow(const
     return {};
 }
 
-bool EndToEndConnections::isInDataflow(
-        const QVector<Connection> &connectionList, aadl::AADLObjectConnection *connection)
+bool EndToEndConnections::isInDataflow(const Dataflow &dataflow, aadl::AADLObjectConnection *connection)
 {
     // Just to be on the save side
     if (connection == nullptr) {
@@ -164,7 +182,7 @@ bool EndToEndConnections::isInDataflow(
     }
 
     Connection c = { connection->sourceName(), connection->targetName(), connection->targetInterfaceName() };
-    return connectionList.contains(c);
+    return dataflow.connections.contains(c);
 }
 
 //! Set the path of the MSC file
