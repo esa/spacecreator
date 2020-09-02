@@ -17,6 +17,7 @@
 
 #include "endtoendconnections.h"
 
+#include <QDebug>
 #include <QtTest>
 
 // This is copied from a saved MSC file
@@ -58,18 +59,27 @@ private Q_SLOTS:
 void tst_EndToEndConnections::testReader()
 {
     const auto dataflow = aadlinterface::EndToEndConnections::readDataflow(::mscFile1, false);
-    QCOMPARE(dataflow.size(), 3);
-    QCOMPARE(dataflow[0].from, QString());
-    QCOMPARE(dataflow[0].to, QString("User Interface"));
-    QCOMPARE(dataflow[0].message, QString("Start Transaction"));
 
-    QCOMPARE(dataflow[1].from, QString("User Interface"));
-    QCOMPARE(dataflow[1].to, QString("File Manager"));
-    QCOMPARE(dataflow[1].message, QString("Open File"));
+    QCOMPARE(dataflow.connections.size(), 2);
+    QCOMPARE(dataflow.connections[0].from, QString("User Interface"));
+    QCOMPARE(dataflow.connections[0].to, QString("File Manager"));
+    QCOMPARE(dataflow.connections[0].message, QString("Open File"));
+    QCOMPARE(dataflow.connections[1].from, QString("File Manager"));
+    QCOMPARE(dataflow.connections[1].to, QString("Database Manager"));
+    QCOMPARE(dataflow.connections[1].message, QString("Access Database"));
 
-    QCOMPARE(dataflow[2].from, QString("File Manager"));
-    QCOMPARE(dataflow[2].to, QString("Database Manager"));
-    QCOMPARE(dataflow[2].message, QString("Access Database"));
+    QCOMPARE(dataflow.envConnections.size(), 1);
+    QCOMPARE(dataflow.envConnections[0].instance, QString("User Interface"));
+    QCOMPARE(dataflow.envConnections[0].interface, QString("Start Transaction"));
+    QCOMPARE(dataflow.envConnections[0].toInstance, true);
+
+    QCOMPARE(dataflow.internalConnections.size(), 2);
+    QCOMPARE(dataflow.internalConnections[0].instance, QString("User Interface"));
+    QCOMPARE(dataflow.internalConnections[0].interface1, QString("Start Transaction"));
+    QCOMPARE(dataflow.internalConnections[0].interface2, QString("Open File"));
+    QCOMPARE(dataflow.internalConnections[1].instance, QString("File Manager"));
+    QCOMPARE(dataflow.internalConnections[1].interface1, QString("Open File"));
+    QCOMPARE(dataflow.internalConnections[1].interface2, QString("Access Database"));
 }
 
 QTEST_MAIN(tst_EndToEndConnections)
