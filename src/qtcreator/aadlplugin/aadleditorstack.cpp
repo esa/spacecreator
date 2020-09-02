@@ -68,7 +68,7 @@ bool AadlEditorStack::setVisibleEditor(Core::IEditor *xmlEditor)
     return true;
 }
 
-aadlinterface::IVEditorCore *AadlEditorStack::ivPlugin(const QString &fileName) const
+QSharedPointer<aadlinterface::IVEditorCore> AadlEditorStack::ivPlugin(const QString &fileName) const
 {
     for (AadlTextEditor *editor : m_editors) {
         if (editor->fileName() == fileName) {

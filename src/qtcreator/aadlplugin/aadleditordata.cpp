@@ -158,6 +158,8 @@ Core::IEditor *AadlEditorData::createEditor()
         aadlEditor->document()->infoBar()->addInfo(info);
     }
 
+    connect(designWidget, &AadlMainWidget::aadlDataLoaded, this, &AadlEditorData::aadlDataLoaded);
+
     return aadlEditor;
 }
 
@@ -214,7 +216,7 @@ void AadlEditorData::onDynContextEditorMenuInvoked()
     }
 }
 
-aadlinterface::IVEditorCore *AadlEditorData::ivPlugin(const QString &fileName)
+QSharedPointer<aadlinterface::IVEditorCore> AadlEditorData::ivPlugin(const QString &fileName)
 {
     return m_widgetStack->ivPlugin(fileName);
 }

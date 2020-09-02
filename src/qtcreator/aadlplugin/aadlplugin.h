@@ -18,14 +18,12 @@
 #pragma once
 
 #include "aadlplugin_global.h"
+#include "iveditorcore.h"
 
+#include <QSharedPointer>
 #include <extensionsystem/iplugin.h>
 
 class QAction;
-
-namespace aadlinterface {
-class IVEditorCore;
-}
 
 namespace AadlPlugin {
 
@@ -51,7 +49,10 @@ public Q_SLOTS:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-    aadlinterface::IVEditorCore *ivPlugin(const QString &fileName) const;
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(const QString &fileName) const;
+
+Q_SIGNALS:
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
     AadlEditorFactory *m_factory = nullptr;

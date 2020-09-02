@@ -36,7 +36,7 @@ namespace AadlPlugin {
 
 AadlMainWidget::AadlMainWidget(QWidget *parent)
     : QWidget(parent)
-    , m_plugin(new aadlinterface::IVEditorCore(this))
+    , m_plugin(new aadlinterface::IVEditorCore)
 {
     initUi();
 
@@ -58,8 +58,11 @@ AadlMainWidget::~AadlMainWidget() { }
 
 bool AadlMainWidget::load(const QString &filename)
 {
-    m_plugin->document()->load(filename);
-    return true;
+    const bool ok = m_plugin->document()->load(filename);
+    if (ok) {
+        Q_EMIT aadlDataLoaded(filename, m_plugin);
+    }
+    return ok;
 }
 
 bool AadlMainWidget::save()
@@ -142,7 +145,7 @@ void AadlMainWidget::onDynContextEditorMenuInvoked()
     m_plugin->document()->onDynContextEditorMenuInvoked();
 }
 
-aadlinterface::IVEditorCore *AadlMainWidget::ivPlugin() const
+QSharedPointer<aadlinterface::IVEditorCore> AadlMainWidget::ivPlugin() const
 {
     return m_plugin;
 }

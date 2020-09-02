@@ -19,7 +19,9 @@
 
 #include <QPair>
 #include <QPointer>
+#include <QSharedPointer>
 #include <QVector>
+#include <QWeakPointer>
 
 namespace aadl {
 class AADLObjectFunction;
@@ -44,7 +46,7 @@ public:
     ~AadlChecks();
 
     void setMscPlugin(msc::MSCEditorCore *mscPlugin);
-    void setIvPlugin(aadlinterface::IVEditorCore *ivPlugin);
+    void setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin);
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations();
@@ -57,7 +59,7 @@ private:
     bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscPlugin;
-    QPointer<aadlinterface::IVEditorCore> m_ivPlugin;
+    QWeakPointer<aadlinterface::IVEditorCore> m_ivPlugin;
 
     QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
 };

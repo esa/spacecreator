@@ -15,34 +15,35 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
+#include <QHash>
+#include <QObject>
 #include <QSharedPointer>
-#include <texteditor/texteditor.h>
+
+#pragma once
 
 namespace aadlinterface {
 class IVEditorCore;
 }
 
-namespace AadlPlugin {
+namespace MscPlugin {
 
-class AadlTextEditor : public TextEditor::BaseTextEditor
+/*!
+   Stores shared pointers to all aadl files. And creates a new one is needed
+ */
+class AadlModelStorage : public QObject
 {
     Q_OBJECT
 
 public:
-    AadlTextEditor();
+    explicit AadlModelStorage(QObject *parent = nullptr);
 
-    void finalizeInitialization() override;
-    bool open(QString *errorString, const QString &fileName, const QString &realFileName);
+    QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
 
-    QWidget *toolBar() override { return nullptr; }
+public Q_SLOTS:
+    void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
 
-    bool isDesignModePreferred() const override { return true; }
-
-    QString fileName() const;
-
-    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
+private:
+    QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;
 };
 
 } // namespace MscPlugin

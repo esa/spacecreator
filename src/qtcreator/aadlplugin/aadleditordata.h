@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
+#include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
 class QUndoGroup;
@@ -53,7 +56,10 @@ public:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-    aadlinterface::IVEditorCore *ivPlugin(const QString &fileName);
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(const QString &fileName);
+
+Q_SIGNALS:
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
     void updateToolBar();

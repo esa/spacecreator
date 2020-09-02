@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
+#include <QSharedPointer>
 #include <QVector>
 #include <QWidget>
 
@@ -56,17 +59,16 @@ public:
     void onColorSchemeMenuInvoked();
     void onDynContextEditorMenuInvoked();
 
-    aadlinterface::IVEditorCore *ivPlugin() const;
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
-
-private Q_SLOTS:
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
     void initUi();
 
-    aadlinterface::IVEditorCore *m_plugin = nullptr;
+    QSharedPointer<aadlinterface::IVEditorCore> m_plugin;
     QVector<QAction *> m_actions;
 };
 

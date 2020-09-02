@@ -437,7 +437,7 @@ void InterfaceDocument::onAADLObjectAdded(aadl::AADLObject *object)
                     &InterfaceDocument::onItemDoubleClicked, Qt::QueuedConnection);
         }
         d->items.insert(object->id(), item);
-        if (d->graphicsScene != item->scene())
+        if (d->graphicsScene && (d->graphicsScene != item->scene()))
             d->graphicsScene->addItem(item);
     }
     updateItem(item);
@@ -447,11 +447,13 @@ void InterfaceDocument::onAADLObjectRemoved(aadl::AADLObject *object)
 {
     d->rmQueu.enqueue(object);
 
-    while (d->rmQueu.size()) {
+    while (!d->rmQueu.isEmpty()) {
         if (d->mutex->tryLock()) {
             aadl::AADLObject *obj = d->rmQueu.dequeue();
             if (auto item = d->items.take(obj->id())) {
-                d->graphicsScene->removeItem(item);
+                if (d->graphicsScene) {
+                    d->graphicsScene->removeItem(item);
+                }
                 delete item;
                 updateSceneRect();
             }
@@ -496,8 +498,12 @@ void InterfaceDocument::onRootObjectChanged(shared::Id rootId)
 
     QMutexLocker lockme(d->mutex);
 
-    d->actExitToRoot->setEnabled(nullptr != d->model->rootObject());
-    d->actExitToParent->setEnabled(nullptr != d->model->rootObject());
+    if (d->actExitToRoot) {
+        d->actExitToRoot->setEnabled(nullptr != d->model->rootObject());
+    }
+    if (d->actExitToParent) {
+        d->actExitToParent->setEnabled(nullptr != d->model->rootObject());
+    }
 
     QList<aadl::AADLObject *> objects = d->model->visibleObjects();
     aadl::AADLObject::sortObjectList(objects);
@@ -900,6 +906,10 @@ void InterfaceDocument::showNIYGUI(const QString &title)
 
 void InterfaceDocument::updateSceneRect()
 {
+    if (!d->graphicsScene || !d->graphicsView) {
+        return;
+    }
+
     const QRectF itemsRect = d->graphicsScene->itemsBoundingRect();
     if (itemsRect.isEmpty()) {
         d->prevItemsRect = {};

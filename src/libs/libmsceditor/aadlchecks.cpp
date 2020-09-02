@@ -41,7 +41,7 @@ void AadlChecks::setMscPlugin(MSCEditorCore *mscPlugin)
     m_mscPlugin = mscPlugin;
 }
 
-void AadlChecks::setIvPlugin(aadlinterface::IVEditorCore *ivPlugin)
+void AadlChecks::setIvPlugin(QSharedPointer<aadlinterface::IVEditorCore> ivPlugin)
 {
     m_ivPlugin = ivPlugin;
 }
@@ -119,11 +119,12 @@ void AadlChecks::updateAadlFunctions()
     }
 
     aadl::AADLObjectsModel *aadlModel = nullptr;
-    if (!m_ivPlugin->document() || !m_ivPlugin->document()->objectsModel()) {
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin = m_ivPlugin.toStrongRef();
+    if (!ivPlugin->document() || !ivPlugin->document()->objectsModel()) {
         qWarning() << "No AADLObjectsModel";
         return;
     }
-    aadlModel = m_ivPlugin->document()->objectsModel();
+    aadlModel = ivPlugin->document()->objectsModel();
 
     const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
     for (auto obj : aadlObjects) {

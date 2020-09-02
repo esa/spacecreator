@@ -67,7 +67,7 @@ bool AadlTextEditor::open(QString *errorString, const QString &fileName, const Q
 
 QString AadlTextEditor::fileName() const
 {
-    aadlinterface::IVEditorCore *plugin = ivPlugin();
+    QSharedPointer<aadlinterface::IVEditorCore> plugin = ivPlugin();
     if (plugin && plugin->document()) {
         return plugin->document()->path();
     }
@@ -75,7 +75,7 @@ QString AadlTextEditor::fileName() const
     return {};
 }
 
-aadlinterface::IVEditorCore *AadlTextEditor::ivPlugin() const
+QSharedPointer<aadlinterface::IVEditorCore> AadlTextEditor::ivPlugin() const
 {
     auto document = qobject_cast<AadlEditorDocument *>(textDocument());
     AadlMainWidget *designWidget = document->designWidget();

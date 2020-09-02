@@ -18,6 +18,7 @@
 #include "mscplugin.h"
 
 #include "aadlchecks.h"
+#include "aadlmodelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
 #include "mscchart.h"
@@ -109,7 +110,16 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     menu->addAction(showMinimapCmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
+    m_aadlStorage = new AadlModelStorage(this);
     m_factory = new MscEditorFactory(this);
+
+    IPlugin *plugin = aadlPlugin();
+    if (!plugin) {
+        qWarning() << "AadlPlugin is not found or loaded";
+    } else {
+        connect(plugin, SIGNAL(aadlDataLoaded(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)),
+                m_aadlStorage, SLOT(setIvData(const QString &, QSharedPointer<aadlinterface::IVEditorCore>)));
+    }
 
     return true;
 }
@@ -137,7 +147,7 @@ void MSCPlugin::showMessageDeclarations()
 
 void MSCPlugin::checkInstances()
 {
-    aadlinterface::IVEditorCore *ivp = ivPlugin();
+    QSharedPointer<aadlinterface::IVEditorCore> ivp = ivPlugin();
     if (!ivp) {
         return;
     }
@@ -203,33 +213,15 @@ ExtensionSystem::IPlugin *MSCPlugin::aadlPlugin() const
     return nullptr;
 }
 
-aadlinterface::IVEditorCore *MSCPlugin::ivPlugin() const
+QSharedPointer<aadlinterface::IVEditorCore> MSCPlugin::ivPlugin() const
 {
     QStringList aadlFiles = m_factory->editorData()->aadlFiles();
     if (aadlFiles.empty()) {
         qWarning() << "No AADL file in the projec";
-        return nullptr;
+        return {};
     }
 
-    IPlugin *plugin = aadlPlugin();
-    if (!plugin) {
-        qWarning() << "AadlPlugin is not found or loaded";
-        return nullptr;
-    }
-
-    aadlinterface::IVEditorCore *ivp = nullptr;
-    bool ok = QMetaObject::invokeMethod(plugin, "ivPlugin", Qt::DirectConnection,
-            Q_RETURN_ARG(aadlinterface::IVEditorCore *, ivp), Q_ARG(QString, aadlFiles.first()));
-    if (!ok) {
-        qWarning() << "Unable to call 'ivPlugin' from the AadlPlugin";
-        return nullptr;
-    }
-    if (ivp == nullptr) {
-        qWarning() << "No IVEditorPlugin for file (maybe the file is not open)" << aadlFiles.first();
-        return nullptr;
-    }
-
-    return ivp;
+    return m_aadlStorage->ivData(aadlFiles.first());
 }
 
 }

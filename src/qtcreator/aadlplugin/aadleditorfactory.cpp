@@ -46,6 +46,7 @@ AadlEditorData *AadlEditorFactory::editorData() const
         m_editorData = new AadlEditorData(const_cast<AadlEditorFactory *>(this));
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
         m_editorData->fullInit();
+        connect(m_editorData, &AadlEditorData::aadlDataLoaded, this, &AadlEditorFactory::aadlDataLoaded);
         QGuiApplication::restoreOverrideCursor();
     }
     return m_editorData;

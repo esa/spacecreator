@@ -1,6 +1,8 @@
 set(PLUGIN_NAME MscPlugin)
 
 set(MSC_PLUGIN_SOURCES
+    aadlmodelstorage.cpp
+    aadlmodelstorage.h
     MscPlugin.json.in
     mainwidget.cpp
     mainwidget.h

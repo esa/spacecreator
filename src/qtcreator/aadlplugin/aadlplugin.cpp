@@ -103,6 +103,7 @@ bool AADLPlugin::initialize(const QStringList &arguments, QString *errorString)
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     m_factory = new AadlEditorFactory(this);
+    connect(m_factory, &AadlEditorFactory::aadlDataLoaded, this, &AADLPlugin::aadlDataLoaded);
 
     return true;
 }
@@ -151,7 +152,7 @@ void AADLPlugin::onDynContextEditorMenuInvoked()
 /*!
    Returns the IV plugin for the given file
  */
-aadlinterface::IVEditorCore *AADLPlugin::ivPlugin(const QString &fileName) const
+QSharedPointer<aadlinterface::IVEditorCore> AADLPlugin::ivPlugin(const QString &fileName) const
 {
     return m_factory->editorData()->ivPlugin(fileName);
 }

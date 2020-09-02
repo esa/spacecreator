@@ -77,8 +77,8 @@ void tst_AadlChecks::testCheckInstanceNames()
     msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    aadlinterface::IVEditorCore ivPlugin;
-    checker.setIvPlugin(&ivPlugin);
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    checker.setIvPlugin(ivPlugin);
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
@@ -89,7 +89,7 @@ void tst_AadlChecks::testCheckInstanceNames()
     QCOMPARE(result.size(), 1);
 
     // Add function with different name
-    aadlinterface::InterfaceDocument *doc = ivPlugin.document();
+    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     aadlModel->addObject(new aadl::AADLObjectFunction("init"));
     QCOMPARE(result.size(), 1);
@@ -113,8 +113,8 @@ void tst_AadlChecks::testCheckInstanceRelations()
     msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
     QVERIFY(chart != nullptr);
 
-    aadlinterface::IVEditorCore ivPlugin;
-    checker.setIvPlugin(&ivPlugin);
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin(new aadlinterface::IVEditorCore);
+    checker.setIvPlugin(ivPlugin);
     result = checker.checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
@@ -127,7 +127,7 @@ void tst_AadlChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 0);
 
     // Add function for the instances
-    aadlinterface::InterfaceDocument *doc = ivPlugin.document();
+    aadlinterface::InterfaceDocument *doc = ivPlugin->document();
     aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
     auto function1 = new aadl::AADLObjectFunction("init");
     aadlModel->addObject(function1);

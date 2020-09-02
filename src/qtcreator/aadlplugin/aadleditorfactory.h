@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "iveditorcore.h"
+
+#include <QSharedPointer>
+#include <QString>
 #include <coreplugin/editormanager/ieditorfactory.h>
 
 namespace AadlPlugin {
@@ -33,6 +37,9 @@ public:
     Core::IEditor *createEditor() override;
 
     AadlEditorData *editorData() const;
+
+Q_SIGNALS:
+    void aadlDataLoaded(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> data);
 
 private:
     mutable AadlEditorData *m_editorData = nullptr;

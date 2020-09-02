@@ -19,6 +19,7 @@
 
 #include "mscplugin_global.h"
 
+#include <QSharedPointer>
 #include <extensionsystem/iplugin.h>
 
 class QAction;
@@ -29,6 +30,7 @@ class IVEditorCore;
 
 namespace MscPlugin {
 
+class AadlModelStorage;
 class MscEditorFactory;
 
 class MSCPlugin : public ExtensionSystem::IPlugin
@@ -51,10 +53,11 @@ public Q_SLOTS:
 
 private:
     ExtensionSystem::IPlugin *aadlPlugin() const;
-    aadlinterface::IVEditorCore *ivPlugin() const;
+    QSharedPointer<aadlinterface::IVEditorCore> ivPlugin() const;
 
     MscEditorFactory *m_factory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
+    AadlModelStorage *m_aadlStorage = nullptr;
 };
 
 }
