@@ -108,7 +108,7 @@ void EndToEndView::setVisible(bool visible)
 void EndToEndView::refreshView()
 {
     struct InternalConnection {
-        InternalConnection(const EndToEndConnections::ConnectionInsideFunction &c)
+        InternalConnection(const EndToEndConnections::ConnectionInsideFunction &c = {})
             : connection(c)
         {
         }
