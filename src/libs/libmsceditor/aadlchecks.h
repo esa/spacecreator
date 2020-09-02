@@ -49,10 +49,13 @@ public:
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
 
 private:
-    QVector<aadl::AADLObjectFunction *> currentAadlFunctions() const;
+    void updateAadlFunctions();
+    aadl::AADLObjectFunction *correspondingFunction(msc::MscInstance *instance) const;
 
     QPointer<msc::MSCEditorCore> m_mscPlugin;
     QPointer<aadlinterface::IVEditorCore> m_ivPlugin;
+
+    QVector<aadl::AADLObjectFunction *> m_aadlFunctions;
 };
 
 }

@@ -56,14 +56,13 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
         return result;
     }
 
-    QVector<aadl::AADLObjectFunction *> aadlFunctions = currentAadlFunctions();
+    updateAadlFunctions();
 
     QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
     for (msc::MscChart *chart : charts) {
         for (msc::MscInstance *instance : chart->instances()) {
-            auto it = std::find_if(aadlFunctions.begin(), aadlFunctions.end(),
-                    [&instance](aadl::AADLObjectFunction *func) { return instance->name() == func->title(); });
-            if (it == aadlFunctions.end()) {
+            aadl::AADLObjectFunction *aadlFunction = correspondingFunction(instance);
+            if (!aadlFunction) {
                 result << QPair<MscChart *, MscInstance *>(chart, instance);
             }
         }
@@ -72,18 +71,18 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
     return result;
 }
 
-QVector<aadl::AADLObjectFunction *> AadlChecks::currentAadlFunctions() const
+void AadlChecks::updateAadlFunctions()
 {
-    QVector<aadl::AADLObjectFunction *> result;
+    m_aadlFunctions.clear();
 
     if (!m_ivPlugin) {
-        return result;
+        return;
     }
 
     aadl::AADLObjectsModel *aadlModel = nullptr;
     if (!m_ivPlugin->document() || !m_ivPlugin->document()->objectsModel()) {
         qWarning() << "No AADLObjectsModel";
-        return result;
+        return;
     }
     aadlModel = m_ivPlugin->document()->objectsModel();
 
@@ -91,12 +90,26 @@ QVector<aadl::AADLObjectFunction *> AadlChecks::currentAadlFunctions() const
     for (auto obj : aadlObjects) {
         if (obj->aadlType() == aadl::AADLObject::Type::Function) {
             if (auto func = qobject_cast<aadl::AADLObjectFunction *>(obj)) {
-                result.append(func);
+                m_aadlFunctions.append(func);
             }
         }
     }
+}
 
-    return result;
+aadl::AADLObjectFunction *AadlChecks::correspondingFunction(MscInstance *instance) const
+{
+    if (!instance) {
+        return nullptr;
+    }
+
+    auto it = std::find_if(m_aadlFunctions.begin(), m_aadlFunctions.end(),
+            [&instance](aadl::AADLObjectFunction *func) { return instance->name() == func->title(); });
+
+    if (it == m_aadlFunctions.end()) {
+        return nullptr;
+    }
+
+    return *it;
 }
 
 }
