@@ -47,10 +47,14 @@ public:
     void setIvPlugin(aadlinterface::IVEditorCore *ivPlugin);
 
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceNames();
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> checkInstanceRelations();
 
 private:
     void updateAadlFunctions();
     aadl::AADLObjectFunction *correspondingFunction(msc::MscInstance *instance) const;
+    bool hasAncestor(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
+    bool hasDescendant(aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const;
+    bool isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const;
 
     QPointer<msc::MSCEditorCore> m_mscPlugin;
     QPointer<aadlinterface::IVEditorCore> m_ivPlugin;

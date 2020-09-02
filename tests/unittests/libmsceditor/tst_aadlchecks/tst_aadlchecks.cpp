@@ -49,6 +49,7 @@ private Q_SLOTS:
     void initTestCase();
 
     void testCheckInstanceNames();
+    void testCheckInstanceRelations();
 
 private:
     QGraphicsView m_view;
@@ -81,7 +82,7 @@ void tst_AadlChecks::testCheckInstanceNames()
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
 
-    // add instance
+    // Add instance
     auto instance = new msc::MscInstance("Dummy", chart);
     chart->addInstance(instance);
     result = checker.checkInstanceNames();
@@ -97,6 +98,56 @@ void tst_AadlChecks::testCheckInstanceNames()
     instance->setName("init");
     result = checker.checkInstanceNames();
     QCOMPARE(result.size(), 0);
+}
+
+void tst_AadlChecks::testCheckInstanceRelations()
+{
+    msc::AadlChecks checker;
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 0);
+
+    msc::MSCEditorCore mscPlugin;
+    mscPlugin.mainModel()->initialModel();
+    checker.setMscPlugin(&mscPlugin);
+    result = checker.checkInstanceRelations();
+    msc::MscChart *chart = mscPlugin.mainModel()->mscModel()->documents().at(0)->documents().at(0)->charts().at(0);
+    QVERIFY(chart != nullptr);
+
+    aadlinterface::IVEditorCore ivPlugin;
+    checker.setIvPlugin(&ivPlugin);
+    result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 0);
+
+    // Add instance2
+    auto instance1 = new msc::MscInstance("init", chart);
+    chart->addInstance(instance1);
+    auto instance2 = new msc::MscInstance("reset", chart);
+    chart->addInstance(instance2);
+    result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 0);
+
+    // Add function for the instances
+    aadlinterface::InterfaceDocument *doc = ivPlugin.document();
+    aadl::AADLObjectsModel *aadlModel = doc->objectsModel();
+    auto function1 = new aadl::AADLObjectFunction("init");
+    aadlModel->addObject(function1);
+    auto function2 = new aadl::AADLObjectFunction("reset");
+    aadlModel->addObject(function2);
+    result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 0);
+
+    // Make function2 be nested by function1
+    function2->setParent(function1);
+    result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 2);
+
+    // Make function2 be nested by function1 via another one
+    auto function15 = new aadl::AADLObjectFunction("init");
+    aadlModel->addObject(function15);
+    function15->setParent(function1);
+    function2->setParent(function15);
+    result = checker.checkInstanceRelations();
+    QCOMPARE(result.size(), 2);
 }
 
 QTEST_MAIN(tst_AadlChecks)

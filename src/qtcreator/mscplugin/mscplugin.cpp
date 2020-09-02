@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "mscplugin.h"
+
 #include "aadlchecks.h"
 #include "interface/interfacedocument.h"
 #include "iveditorcore.h"
@@ -25,7 +27,6 @@
 #include "msceditorfactory.h"
 #include "mscinstance.h"
 #include "msclibrary.h"
-#include "mscplugin.h"
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
@@ -141,23 +142,44 @@ void MSCPlugin::checkInstances()
         return;
     }
 
-    QVector<QPair<msc::MscChart *, msc::MscInstance *>> result;
+    // Check for names
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
     for (msc::MSCEditorCore *mplugin : m_factory->editorData()->mscPlugins()) {
         mplugin->aadlChecker()->setIvPlugin(ivp);
-        result += mplugin->aadlChecker()->checkInstanceNames();
+        resultNames += mplugin->aadlChecker()->checkInstanceNames();
     }
 
-    if (result.isEmpty()) {
-        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
-    } else {
-        QString text;
-        for (auto item : result) {
+    // Check for nested functions usage
+    QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
+    for (msc::MSCEditorCore *mplugin : m_factory->editorData()->mscPlugins()) {
+        mplugin->aadlChecker()->setIvPlugin(ivp);
+        resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
+    }
+
+    QString text;
+    if (!resultNames.isEmpty()) {
+        text += tr("Following instances have no corresponding aadl function:\n");
+        for (auto item : resultNames) {
             if (!text.isEmpty()) {
                 text += "\n";
             }
             text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
         }
-        QMessageBox::information(nullptr, tr("Non conforming instance names"), text);
+    }
+    if (!resultRelations.isEmpty()) {
+        text += tr("Following instances are used with parent/hild of nested functions:\n");
+        for (auto item : resultRelations) {
+            if (!text.isEmpty()) {
+                text += "\n";
+            }
+            text += QString("%1 from chart %2").arg(item.second->name(), item.first->name());
+        }
+    }
+
+    if (resultNames.isEmpty() && resultRelations.isEmpty()) {
+        QMessageBox::information(nullptr, tr("All instaces are ok"), tr("All instaces are ok"));
+    } else {
+        QMessageBox::information(nullptr, tr("Non conforming instances"), text);
     }
 }
 

@@ -71,6 +71,45 @@ QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceNames()
     return result;
 }
 
+/*!
+   Checks if in a chart instances with parent/child relations re used
+ */
+QVector<QPair<MscChart *, MscInstance *>> AadlChecks::checkInstanceRelations()
+{
+    QVector<QPair<MscChart *, MscInstance *>> result;
+    if (!m_ivPlugin || !m_mscPlugin) {
+        return result;
+    }
+
+    updateAadlFunctions();
+
+    QVector<msc::MscChart *> charts = m_mscPlugin->mainModel()->mscModel()->allCharts();
+    for (msc::MscChart *chart : charts) {
+        QVector<QPair<MscInstance *, aadl::AADLObjectFunction *>> pairs;
+        for (msc::MscInstance *instance : chart->instances()) {
+            aadl::AADLObjectFunction *aadlFunction = correspondingFunction(instance);
+            if (aadlFunction) {
+                pairs << QPair<MscInstance *, aadl::AADLObjectFunction *>(instance, aadlFunction);
+            }
+        }
+
+        QVector<aadl::AADLObjectFunction *> aadlChartFunctions;
+        for (QPair<MscInstance *, aadl::AADLObjectFunction *> pair : pairs) {
+            aadlChartFunctions.append(pair.second);
+        }
+        for (QPair<MscInstance *, aadl::AADLObjectFunction *> pair : pairs) {
+            if (hasAncestor(pair.second, aadlChartFunctions) || hasDescendant(pair.second, aadlChartFunctions)) {
+                result << QPair<MscChart *, MscInstance *>(chart, pair.first);
+            }
+        }
+    }
+
+    return result;
+}
+
+/*!
+   Updates the list of functions from the aadl model
+ */
 void AadlChecks::updateAadlFunctions()
 {
     m_aadlFunctions.clear();
@@ -89,13 +128,16 @@ void AadlChecks::updateAadlFunctions()
     const QHash<shared::Id, aadl::AADLObject *> &aadlObjects = aadlModel->objects();
     for (auto obj : aadlObjects) {
         if (obj->aadlType() == aadl::AADLObject::Type::Function) {
-            if (auto func = qobject_cast<aadl::AADLObjectFunction *>(obj)) {
+            if (auto func = dynamic_cast<aadl::AADLObjectFunction *>(obj)) {
                 m_aadlFunctions.append(func);
             }
         }
     }
 }
 
+/*!
+   Returns the aadl functions that correlates to the given msc instance
+ */
 aadl::AADLObjectFunction *AadlChecks::correspondingFunction(MscInstance *instance) const
 {
     if (!instance) {
@@ -110,6 +152,54 @@ aadl::AADLObjectFunction *AadlChecks::correspondingFunction(MscInstance *instanc
     }
 
     return *it;
+}
+
+/*!
+   Returns if the given aadl function \p func has an ancestor (is nesed by) one of the functions
+ */
+bool AadlChecks::hasAncestor(
+        aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const
+{
+    for (aadl::AADLObjectFunction *f : allFunctions) {
+        if (isAncestor(func, f)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*!
+   Returns if the given aadl function \p func has an descendant (is nesting by) at least one of the functions
+ */
+bool AadlChecks::hasDescendant(
+        aadl::AADLObjectFunction *func, const QVector<aadl::AADLObjectFunction *> allFunctions) const
+{
+    for (aadl::AADLObjectFunction *f : allFunctions) {
+        if (isAncestor(f, func)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*!
+   Returns if the given aadl function \p otherFunc is an ancestor (parent, grand-parent, ...) of the function \p func
+ */
+bool AadlChecks::isAncestor(aadl::AADLObjectFunction *func, aadl::AADLObjectFunction *otherFunc) const
+{
+    if (!func || !otherFunc || func == otherFunc) {
+        return false;
+    }
+
+    auto checkObj = dynamic_cast<aadl::AADLObject *>(func->parent());
+    while (checkObj) {
+        if (checkObj == otherFunc) {
+            return true;
+        }
+        checkObj = dynamic_cast<aadl::AADLObject *>(checkObj->parent());
+    }
+
+    return false;
 }
 
 }
