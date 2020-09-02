@@ -127,10 +127,8 @@ void EndToEndView::refreshView()
                 if (pi != nullptr && interface == ic.connection.interface1) {
                     // This is the ri side
                     ic.pi = pi;
-                    return;
                 } else if (ri != nullptr && interface == ic.connection.interface2) {
                     ic.ri = ri;
-                    return;
                 }
             }
         }
@@ -148,6 +146,9 @@ void EndToEndView::refreshView()
         internalConnections << InternalConnection(c);
     };
 
+    // This is used to draw our extra connections
+    QPen connectionPen;
+
     // Add new graphics items for each object
     QHash<shared::Id, QGraphicsItem *> items;
     for (auto obj : objects) {
@@ -156,27 +157,28 @@ void EndToEndView::refreshView()
         InteractiveObject *item = nullptr;
         switch (obj->aadlType()) {
         case aadl::AADLObject::Type::RequiredInterface:
-            if (auto ri = qobject_cast<aadl::AADLObjectIface *>(obj)) {
-                // Add the RI
-                auto graphicsItem = new AADLInterfaceGraphicsItem(ri, parentItem);
+        case aadl::AADLObject::Type::ProvidedInterface:
+            if (auto newItem = qobject_cast<aadl::AADLObjectIface *>(obj)) {
+                // Add the RI/PI
+                auto graphicsItem = new AADLInterfaceGraphicsItem(newItem, parentItem);
                 item = graphicsItem;
 
-                auto function = ri->function();
+                auto function = newItem->function();
                 if (function != nullptr) {
                     // Check if this is to the environment
-                    const EndToEndConnections::ConnectionWithEnvironment c { function->title(), ri->title(), false };
+                    const EndToEndConnections::ConnectionWithEnvironment c { function->title(), newItem->title(),
+                        false };
                     qDebug() << "Env" << c.instance << c.interface << c.toInstance;
                     if (dataflow.envConnections.contains(c)) {
                         // TODO: Add a connection from the outside
                     }
 
                     // Check if this is part of an internal connection
-                    updateInternalConnection(c.instance, c.interface, graphicsItem, nullptr);
+                    auto ri = obj->aadlType() == aadl::AADLObject::Type::RequiredInterface ? graphicsItem : nullptr;
+                    auto pi = obj->aadlType() == aadl::AADLObject::Type::ProvidedInterface ? graphicsItem : nullptr;
+                    updateInternalConnection(c.instance, c.interface, ri, pi);
                 }
             }
-            break;
-        case aadl::AADLObject::Type::ProvidedInterface:
-            item = new AADLInterfaceGraphicsItem(qobject_cast<aadl::AADLObjectIface *>(obj), parentItem);
             break;
         case aadl::AADLObject::Type::Connection:
             if (auto connection = qobject_cast<aadl::AADLObjectConnection *>(obj)) {
@@ -193,6 +195,8 @@ void EndToEndView::refreshView()
                 if (EndToEndConnections::isInDataflow(dataflow, connection)) {
                     i->setEndToEndDataFlowConnection();
                 }
+
+                connectionPen = item->pen();
             }
             break;
         case aadl::AADLObject::Type::Function:
@@ -209,6 +213,20 @@ void EndToEndView::refreshView()
                 d->scene->addItem(item);
             }
             item->updateFromEntity();
+        }
+    }
+
+    connectionPen.setWidth(5);
+    for (auto ic : internalConnections) {
+        if (ic.pi != nullptr && ic.ri != nullptr) {
+            auto item = new QGraphicsPathItem;
+            ;
+            item->setPen(connectionPen);
+            QPainterPath path;
+            path.moveTo(ic.pi->scenePos());
+            path.lineTo(ic.ri->scenePos());
+            item->setPath(path);
+            d->scene->addItem(item);
         }
     }
 }
