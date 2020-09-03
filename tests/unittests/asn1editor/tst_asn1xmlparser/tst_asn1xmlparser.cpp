@@ -43,6 +43,7 @@ private Q_SLOTS:
     void testBoolEnumTypes();
     void testChoiceType();
     void testSequenceType();
+    void testMixedTypes();
 
 private:
     Asn1XMLParser *xmlParser = nullptr;
@@ -197,6 +198,53 @@ void tst_Asn1XMLParser::testSequenceType()
     QCOMPARE(data.size(), 2);
     QCOMPARE(data[ASN1_MIN].toInt(), -10);
     QCOMPARE(data[ASN1_MAX].toInt(), 10);
+}
+
+void tst_Asn1XMLParser::testMixedTypes()
+{
+    std::unique_ptr<Asn1Acn::File> asn1Types = xmlParser->parseAsn1XmlFile(QFINDTESTDATA("mixed_types01.xml"));
+    const Asn1Acn::Definitions *definitions = asn1Types->definitions("TASTE-BasicTypes");
+    //    QCOMPARE(definitions->types().size(), 10);
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign1 = definitions->types().at(0);
+    QCOMPARE(typeAssign1->name(), QString("T-UInt32"));
+    QCOMPARE(typeAssign1->type()->typeName(), QString("INTEGER"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign2 = definitions->types().at(1);
+    QCOMPARE(typeAssign2->name(), QString("TASTE-Peek-id"));
+    QCOMPARE(typeAssign2->type()->typeName(), QString("INTEGER"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign3 = definitions->types().at(2);
+    QCOMPARE(typeAssign3->name(), QString("TASTE-Peek-id-list"));
+    QCOMPARE(typeAssign3->type()->typeName(), QString("SEQUENCE OF"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign4 = definitions->types().at(3);
+    QCOMPARE(typeAssign4->name(), QString("FixedIntList"));
+    QCOMPARE(typeAssign4->type()->typeName(), QString("SEQUENCE OF"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign5 = definitions->types().at(4);
+    QCOMPARE(typeAssign5->name(), QString("MyEnum"));
+    QCOMPARE(typeAssign5->type()->typeName(), QString("ENUMERATED"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign6 = definitions->types().at(5);
+    QCOMPARE(typeAssign6->name(), QString("MyChoice"));
+    QCOMPARE(typeAssign6->type()->typeName(), QString("CHOICE"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign7 = definitions->types().at(6);
+    QCOMPARE(typeAssign7->name(), QString("MySeq"));
+    QCOMPARE(typeAssign7->type()->typeName(), QString("SEQUENCE"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign8 = definitions->types().at(7);
+    QCOMPARE(typeAssign8->name(), QString("MySetOf"));
+    QCOMPARE(typeAssign8->type()->typeName(), QString("SEQUENCE OF"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign9 = definitions->types().at(8);
+    QCOMPARE(typeAssign9->name(), QString("MySeqOf"));
+    QCOMPARE(typeAssign9->type()->typeName(), QString("SEQUENCE OF"));
+
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssign10 = definitions->types().at(9);
+    QCOMPARE(typeAssign10->name(), QString("MySimpleSeq"));
+    QCOMPARE(typeAssign10->type()->typeName(), QString("SEQUENCE"));
 }
 
 QTEST_APPLESS_MAIN(tst_Asn1XMLParser)

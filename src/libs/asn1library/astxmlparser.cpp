@@ -461,8 +461,10 @@ bool AstXmlParser::skipToChildElement(const QStringList &names)
 
 void AstXmlParser::readSequenceOf()
 {
-    if (readType())
+    auto type = readType();
+    if (type && m_xmlReader.name() == QStringLiteral("Type")) {
         m_xmlReader.skipCurrentElement();
+    }
 }
 
 void AstXmlParser::readChoice()
