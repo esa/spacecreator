@@ -26,8 +26,8 @@
 #include "mainmodel.h"
 #include "mscchart.h"
 #include "mscdocument.h"
-#include "mscmodel.h"
 #include "msceditorcore.h"
+#include "mscmodel.h"
 #include "tools/entitydeletetool.h"
 
 #include <QAction>
@@ -82,6 +82,7 @@ bool MainWidget::load(const QString &filename)
     const bool ok = m_plugin->mainModel()->loadFile(filename);
     if (ok) {
         m_plugin->chartView()->setZoom(100);
+        Q_EMIT mscDataLoaded(filename, m_plugin);
     }
 
     return ok;
@@ -137,9 +138,9 @@ QVector<QAction *> MainWidget::toolActions() const
     return m_plugin->chartActions();
 }
 
-msc::MSCEditorCore *MainWidget::mscPlugin() const
+QSharedPointer<msc::MSCEditorCore> MainWidget::mscPlugin() const
 {
-    return m_plugin.get();
+    return m_plugin;
 }
 
 void MainWidget::showChart(const QModelIndex &index)

@@ -195,9 +195,9 @@ QStringList MscEditorData::aadlFiles() const
     return result;
 }
 
-QVector<msc::MSCEditorCore *> MscEditorData::mscPlugins() const
+QVector<QSharedPointer<msc::MSCEditorCore>> MscEditorData::mscPlugins() const
 {
-    QVector<msc::MSCEditorCore *> plugins;
+    QVector<QSharedPointer<msc::MSCEditorCore>> plugins;
     for (MscTextEditor *editor : m_widgetStack->editors()) {
         auto mscEdit = qobject_cast<MscTextEditorWidget *>(editor->editorWidget());
         if (mscEdit) {

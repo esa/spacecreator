@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <coreplugin/icontext.h>
 
 class QUndoGroup;
@@ -53,7 +54,7 @@ public:
 
     QStringList aadlFiles() const;
 
-    QVector<msc::MSCEditorCore *> mscPlugins() const;
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscPlugins() const;
 
 public Q_SLOTS:
     void openEditor(const QString &fileName);

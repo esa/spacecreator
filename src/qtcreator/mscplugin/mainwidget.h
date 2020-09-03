@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <QStackedWidget>
 #include <QWidget>
 #include <memory>
@@ -61,11 +62,12 @@ public:
     QAction *actionToolDelete() const;
     QVector<QAction *> toolActions() const;
 
-    msc::MSCEditorCore *mscPlugin() const;
+    QSharedPointer<msc::MSCEditorCore> mscPlugin() const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void asn1Selected(const QString &fileName);
+    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private Q_SLOTS:
     void showChart(const QModelIndex &index);
@@ -82,7 +84,7 @@ private:
     msc::DocumentTreeView *m_documentTree = nullptr;
     asn1::ASN1FileView *m_asn1Widget = nullptr;
 
-    std::unique_ptr<msc::MSCEditorCore> m_plugin;
+    QSharedPointer<msc::MSCEditorCore> m_plugin;
 };
 
 }
