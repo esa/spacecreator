@@ -1,4 +1,2 @@
 add_subdirectory(tst_asn1itemmodel)
 add_subdirectory(tst_asn1treeview)
-add_subdirectory(tst_asn1valueparser)
-add_subdirectory(tst_asn1xmlparser)

@@ -1,1 +1,3 @@
+add_subdirectory(tst_asn1valueparser)
+add_subdirectory(tst_asn1xmlparser)
 add_subdirectory(tst_astxmlparser)
