@@ -210,7 +210,7 @@ void AADLFunctionGraphicsItem::onManualMoveFinish(
         return;
 
     if (allowGeometryChange(pressedAt, releasedAt)) {
-        layoutConnectionsOnMove(ConnectionLayoutPolicy::RebuildOnCollision);
+        layoutConnectionsOnMove(ConnectionLayoutPolicy::PartialRebuildOnCollision);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
         updateFromEntity();
@@ -244,6 +244,8 @@ void AADLFunctionGraphicsItem::layoutConnectionsOnMove(ConnectionLayoutPolicy la
                 if (connection->parentItem() != this) {
                     if (ConnectionLayoutPolicy::IgnoreCollisions == layoutPolicy) {
                         connection->updateEdgePoint(iface);
+                    } else if (ConnectionLayoutPolicy::PartialRebuildOnCollision == layoutPolicy) {
+                        connection->updateLastChunk(iface);
                     } else {
                         for (const QGraphicsItem *item : scene()->collidingItems(connection)) {
                             if (kNestedTypes.contains(item->type()) && item != this) {

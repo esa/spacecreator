@@ -71,7 +71,8 @@ private:
     enum ConnectionLayoutPolicy
     {
         IgnoreCollisions = 0,
-        RebuildOnCollision
+        RebuildOnCollision,
+        PartialRebuildOnCollision
     };
     void layoutConnectionsOnMove(ConnectionLayoutPolicy layoutPolicy);
     void layoutConnectionsOnResize();

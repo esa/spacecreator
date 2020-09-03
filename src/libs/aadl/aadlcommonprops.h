@@ -60,15 +60,10 @@ public:
         pi_name,
         func_name,
 
-        // TASTE props:
-        Active_Interfaces,
+        // KNOWN TASTE props:
         coordinates,
         InnerCoordinates,
         RootCoordinates,
-        Deadline,
-        InterfaceName,
-        RCMoperationKind,
-        RCMperiod,
         InheritPI,
         Autonamed,
     };

@@ -46,8 +46,6 @@ public:
     ~AADLConnectionGraphicsItem() override;
 
     static QVector<QPointF> connectionPath(AADLInterfaceGraphicsItem *ifaceStart, AADLInterfaceGraphicsItem *ifaceEnd);
-    static QVector<QPointF> connectionPath(QGraphicsScene *scene, const QPointF &startIfacePos,
-            const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect);
 
     void setPoints(const QVector<QPointF> &points);
     QVector<QPointF> points() const;
@@ -60,8 +58,6 @@ public:
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    static QVector<QPointF> simplify(const QVector<QPointF> &points);
 
     void initGripPoints() override;
     void updateGripPoints() override;
@@ -76,6 +72,7 @@ public:
 
     QString prepareTooltip() const override;
 
+    void updateLastChunk(const AADLInterfaceGraphicsItem *iface);
     void updateEdgePoint(const AADLInterfaceGraphicsItem *iface);
 
     void layout();
@@ -95,7 +92,6 @@ protected Q_SLOTS:
     void onSelectionChanged(bool isSelected) override;
 
 private:
-    //    void adjustGripPointCount();
     bool removeCollidedGrips(shared::ui::GripPoint *gp);
     void simplify();
     void updateBoundingRect();

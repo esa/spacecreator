@@ -52,14 +52,9 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "func_name", Token::func_name },
 
     // TASTE props:
-    { "Taste::Active_Interfaces", Token::Active_Interfaces },
     { "Taste::coordinates", Token::coordinates },
     { "Taste::InnerCoordinates", Token::InnerCoordinates },
     { "Taste::RootCoordinates", Token::RootCoordinates },
-    { "Taste::Deadline", Token::Deadline },
-    { "Taste::InterfaceName", Token::InterfaceName },
-    { "Taste::RCMoperationKind", Token::RCMoperationKind },
-    { "Taste::RCMperiod", Token::RCMperiod },
     { "Taste::InheritPI", Token::InheritPI },
     { "Taste::Autonamed", Token::Autonamed },
 };

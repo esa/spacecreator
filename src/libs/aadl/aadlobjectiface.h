@@ -52,10 +52,10 @@ public:
     enum class OperationKind
     {
         Any = 0,
-        Cyclic, // period, deadline, wcet
-        Sporadic, // min interval t,deadline, wcet,queuesize
-        Protected, // deadline, wcet
-        Unprotected, // deadline, wcet
+        Cyclic,
+        Sporadic,
+        Protected,
+        Unprotected,
     };
     Q_ENUM(OperationKind)
 

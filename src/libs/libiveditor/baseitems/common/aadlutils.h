@@ -35,6 +35,8 @@ static const QMarginsF kRootMargins = { 50, 50, 50, 50 };
 static const QMarginsF kTextMargins = { 20, 20, 20, 20 };
 static const QList<Qt::Alignment> kRectSides = { Qt::AlignLeft, Qt::AlignTop, Qt::AlignRight, Qt::AlignBottom };
 static const qreal kInterfaceLayoutOffset = 12.0;
+static const qreal kConnectionMargin = 20;
+static const qreal kMinLineLength = 20;
 
 /*!
   \brief aadlinterface::ZOrder
@@ -113,5 +115,26 @@ Qt::Alignment sideFromIndex(const int idx);
 int indexFromSide(Qt::Alignment side);
 
 bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
+
+QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint);
+
+QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &endDirection);
+
+QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const QPointF &lastEndPoint);
+
+QList<QVector<QPointF>> findSubPath(const QRectF &itemRect, const QVector<QPointF> &prevPoints,
+        const QVector<QPointF> &nextPoints, bool strict = true);
+
+QVector<QPointF> findPath(
+        QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect);
+
+QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint);
+
+QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection);
+
+QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &startIfacePos, const QRectF &sourceRect,
+        const QPointF &endIfacePos, const QRectF &targetRect);
+
+QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
 
 }

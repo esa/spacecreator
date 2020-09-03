@@ -19,6 +19,7 @@
 
 #include "aadlobject.h"
 #include "baseitems/interactiveobject.h"
+#include "graphicsviewutils.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -38,6 +39,9 @@ namespace aadlinterface {
  */
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 {
+    if (!boundingArea.isValid())
+        return 0;
+
     Qt::Alignment side = Qt::AlignCenter;
     if (boundingArea.contains(pos)) {
         qreal distance = std::numeric_limits<qreal>::max();
@@ -471,6 +475,395 @@ bool checkCollision(const QList<QRectF> &itemRects, const QRectF &itemRect, QRec
         return true;
     }
     return false;
+}
+
+/*!
+ * Generates angled segments for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * \param startDirection as previous point for generated one
+ * \param endDirection as next point for generated one
+ * \return set of points as segment for \a AADLConnectionGraphicsItem connects \a startPoint and \a endPoint
+ */
+QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint)
+{
+    if (startPoint == endPoint)
+        return {};
+
+    if (qFuzzyCompare(startPoint.x(), endPoint.x()) || qFuzzyCompare(startPoint.y(), endPoint.y()))
+        return { { startPoint, endPoint } };
+
+    return { { startPoint, { startPoint.x(), endPoint.y() }, endPoint },
+        { startPoint, { endPoint.x(), startPoint.y() }, endPoint } };
+}
+
+/*!
+ * Generates angled segments for \a AADLConnectionGraphicsItem from \a startDirection to \a endDirection
+ * \param startDirection as previous segment for generated one
+ * \param endDirection as next segment for generated one
+ * \return set of points as segment for \a AADLConnectionGraphicsItem connects \a startDirection and \a endDirection
+ */
+QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &endDirection)
+{
+    if (startDirection.isNull() || endDirection.isNull())
+        return {};
+
+    QVector<QPointF> connectionPoints { startDirection.p2(), endDirection.p2() };
+    const qreal angle = startDirection.angleTo(endDirection);
+    static const qreal tolerance = 0.1;
+    if (qAbs(qSin(qDegreesToRadians(angle))) <= tolerance) { // ||
+        const QPointF mid = QLineF(connectionPoints.first(), connectionPoints.last()).center();
+        QLineF midLine { mid, QPointF(0, 0) };
+        midLine.setAngle(startDirection.angle() - 90);
+
+        QPointF startLastPoint;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        midLine.intersects(startDirection, &startLastPoint);
+#else
+        midLine.intersect(startDirection, &startLastPoint);
+#endif
+        connectionPoints.insert(connectionPoints.size() - 1, startLastPoint);
+
+        QPointF endLastPoint;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        midLine.intersects(endDirection, &endLastPoint);
+#else
+        midLine.intersect(endDirection, &endLastPoint);
+#endif
+        connectionPoints.insert(connectionPoints.size() - 1, endLastPoint);
+    } else { // |_, \_, /_, etc
+        QPointF mid;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        startDirection.intersects(endDirection, &mid);
+#else
+        startDirection.intersect(endDirection, &mid);
+#endif
+        connectionPoints.insert(connectionPoints.size() - 1, mid);
+    }
+    return connectionPoints;
+}
+
+static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
+{
+    switch (getNearestSide(sceneRect, point)) {
+    case Qt::AlignTop:
+        return QLineF(sceneRect.topLeft(), sceneRect.topRight()).normalVector();
+    case Qt::AlignBottom:
+        return QLineF(sceneRect.bottomRight(), sceneRect.bottomLeft()).normalVector();
+    case Qt::AlignLeft:
+        return QLineF(sceneRect.bottomLeft(), sceneRect.topLeft()).normalVector();
+    case Qt::AlignRight:
+        return QLineF(sceneRect.topRight(), sceneRect.bottomRight()).normalVector();
+    default:
+        break;
+    }
+    return QLineF();
+};
+
+/*!
+ * Generates the segments for \a AADLConnectionGraphicsItem from \a firstEndPoint with direction to \a lastEndPoint
+ * \param sceneRect as a geometry of an item where connected \a AADLInterfaceGraphicsItem is placed
+ * \param firstEndPoint as starting point
+ * \param lastEndPoint as point used to find direction of segment (into/out the \a sceneRect)
+ * \return last segment for \a AADLConnectionGraphicsItem linked to \a AADLInterfaceGraphicsItem
+ */
+QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const QPointF &lastEndPoint)
+{
+    QLineF vector = getDirection(sceneRect, firstEndPoint);
+    if (vector.isNull())
+        return {};
+
+    vector.translate(firstEndPoint - vector.p1());
+    vector.setLength(kConnectionMargin);
+
+    if (sceneRect.contains(lastEndPoint))
+        vector.setAngle(180 + vector.angle());
+
+    return vector;
+}
+
+/*!
+ * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param startPoint as first polyline node
+ * \param endDirection as last polyline node
+ * \return set of polyline nodes coordinates
+ */
+QVector<QPointF> path(QGraphicsScene *scene, const QPointF &startPoint, const QPointF &endPoint)
+{
+    QVector<QPointF> points { startPoint, endPoint };
+    QList<QGraphicsItem *> intersectedItems = scene->items(points);
+    if (intersectedItems.isEmpty()) {
+        return points;
+    }
+
+    std::sort(
+            intersectedItems.begin(), intersectedItems.end(), [startPoint](QGraphicsItem *item1, QGraphicsItem *item2) {
+                return distanceLine(startPoint, item1->sceneBoundingRect().center())
+                        < distanceLine(startPoint, item2->sceneBoundingRect().center());
+            });
+
+    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
+    auto it = std::find_if(intersectedItems.constBegin(), intersectedItems.constEnd(), [points](QGraphicsItem *item) {
+        if (!types.contains(item->type()))
+            return false;
+
+        const auto intersectionPoints =
+                shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
+        return intersectionPoints.size() > 1;
+    });
+    if (it == intersectedItems.constEnd())
+        return points;
+
+    const QList<QVector<QPointF>> possiblePaths =
+            findSubPath((*it)->sceneBoundingRect(), { startPoint }, { endPoint }, false);
+    if (possiblePaths.isEmpty()) {
+        return {};
+    }
+
+    QList<QVector<QPointF>> paths;
+    for (const QVector<QPointF> &possiblePath : possiblePaths) {
+        if (possiblePath.isEmpty()) {
+            continue;
+        }
+
+        if (possiblePath.last() == endPoint) {
+            paths.append(possiblePath);
+        } else {
+            const auto p = path(scene, possiblePath.last(), endPoint);
+            if (!p.isEmpty()) {
+                QVector<QPointF> prevPath(possiblePath);
+                prevPath.removeLast();
+                paths.append(prevPath << p);
+            }
+        }
+    }
+    if (paths.isEmpty()) {
+        return {};
+    }
+
+    QVector<QPointF> shortestPath;
+    qreal minLength = std::numeric_limits<qreal>::max();
+    for (const QVector<QPointF> &path : paths) {
+        if (path.size() < 2) {
+            continue;
+        }
+        const qreal length = distancePolygon(path);
+        if (minLength > length && !qFuzzyIsNull(length)) {
+            minLength = length;
+            shortestPath = path;
+        }
+    }
+    if (shortestPath.isEmpty())
+        return {};
+
+    return shortestPath;
+}
+
+/*!
+ * Generates the segments for \a AADLConnectionGraphicsItem from \a prevPoints to \a nextPoints
+ * \param itemRect geometry of intersected item bounding box
+ * \param prevPoints as starting points
+ * \param nextPoints as points generated segments should be connected to
+ * \param strict as a flag showing if it should check full intersection with \a itemRect
+ * or some node could be placed on the edge of noticed rect
+ * \return set of possible paths
+ */
+QList<QVector<QPointF>> findSubPath(
+        const QRectF &itemRect, const QVector<QPointF> &prevPoints, const QVector<QPointF> &nextPoints, bool strict)
+{
+    Q_ASSERT(itemRect.isValid());
+    Q_ASSERT(!prevPoints.isEmpty());
+    Q_ASSERT(!nextPoints.isEmpty());
+
+    if (!itemRect.isValid() || prevPoints.isEmpty() || nextPoints.isEmpty())
+        return {};
+
+    const QPointF startPoint = prevPoints.last();
+    const QPointF endPoint = nextPoints.last();
+    Q_ASSERT(startPoint != endPoint);
+    if (startPoint == endPoint)
+        return {};
+
+    const QRectF itemRectMargins =
+            itemRect.adjusted(-kConnectionMargin, -kConnectionMargin, kConnectionMargin, kConnectionMargin);
+    const QList<QPointF> rectCorners = sortedCorners(itemRectMargins, startPoint, endPoint);
+    QList<QVector<QPointF>> allPaths;
+    for (const QPointF &p : rectCorners) {
+        const QVector<QPointF> lastSegment = { p, endPoint };
+        for (const auto &polygon : generateSegments(startPoint, p)) {
+            const bool withoutIntersections = strict
+                    ? !shared::graphicsviewutils::intersects(itemRect, polygon)
+                            && !shared::graphicsviewutils::intersects(itemRect, QLineF(p, endPoint))
+                    : shared::graphicsviewutils::intersectionPoints(itemRect, polygon).size() < 2
+                            && shared::graphicsviewutils::intersectionPoints(itemRect, lastSegment).size() < 2;
+            if (withoutIntersections) {
+                QVector<QPointF> previousPoints(prevPoints);
+                previousPoints.removeLast();
+                previousPoints << polygon;
+                allPaths << previousPoints;
+            }
+        }
+    }
+    return allPaths;
+}
+
+/*!
+ * Generates the path for \a AADLConnectionGraphicsItem from \a startPoint to \a endPoint
+ * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param startPoint as first polyline node
+ * \param endDirection as last polyline node
+ * \return set of polyline nodes coordinates
+ */
+QVector<QPointF> findPath(
+        QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection, QRectF *intersectedRect)
+{
+    static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
+    QVector<QPointF> points = generateSegments(startDirection, endDirection);
+    const QList<QGraphicsItem *> intersectedItems = scene->items(points);
+
+    auto it = std::find_if(intersectedItems.constBegin(), intersectedItems.constEnd(),
+            [](const QGraphicsItem *item) { return types.contains(item->type()); });
+    if (it == intersectedItems.constEnd())
+        return points;
+
+    *intersectedRect = (*it)->sceneBoundingRect();
+    return {};
+}
+
+/*!
+ * Generates the whole path for \a AADLConnectionGraphicsItem
+ * \param scene QGraphicsScene pointer for finding overlappings with other items
+ * \param startDirection as first polyline segment
+ * \param endDirection as last polyline segment
+ * \return set of polyline nodes coordinates
+ */
+QVector<QPointF> path(QGraphicsScene *scene, const QLineF &startDirection, const QLineF &endDirection)
+{
+    QRectF intersectedRect;
+    QList<QVector<QPointF>> paths { { startDirection.p1(), startDirection.p2() } };
+    while (true) {
+        QList<QVector<QPointF>> deeper;
+        QList<QVector<QPointF>> results;
+        for (const auto &path : paths) {
+            Q_ASSERT(path.size() >= 2);
+            if (path.size() < 2)
+                return {};
+
+            const QLineF prevDirection { path.value(path.size() - 2), path.value(path.size() - 1) };
+            auto shortPath = findPath(scene, prevDirection, endDirection, &intersectedRect);
+            if (!shortPath.isEmpty()) {
+                QVector<QPointF> result;
+                result.append(startDirection.p1());
+                result.append(path);
+                result.append(shortPath);
+                result.append(endDirection.p1());
+                results.append(result);
+                continue;
+            }
+            const auto subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
+            static const QList<int> types = { AADLFunctionGraphicsItem::Type, AADLFunctionTypeGraphicsItem::Type };
+            for (auto subPath : subPaths) {
+                if (subPath.isEmpty()) {
+                    continue;
+                }
+
+                const QList<QGraphicsItem *> intersectedItems = scene->items(subPath);
+                auto it = std::find_if(
+                        intersectedItems.constBegin(), intersectedItems.constEnd(), [subPath](QGraphicsItem *item) {
+                            if (!types.contains(item->type())) {
+                                return false;
+                            }
+                            auto points =
+                                    shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), subPath);
+                            return points.size() > 1;
+                        });
+                if (it != intersectedItems.constEnd())
+                    continue;
+                else if (subPath.last() == endDirection.p2())
+                    results.append(subPath);
+                else
+                    deeper.append(subPath);
+            }
+        }
+        if (!results.isEmpty()) {
+            std::sort(results.begin(), results.end(), [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
+                if (v1.size() == v2.size())
+                    return distancePolygon(v1) < distancePolygon(v2);
+                return v1.size() < v2.size();
+            });
+
+            return results.first();
+        }
+
+        if (paths.size() != deeper.size() || !std::equal(paths.constBegin(), paths.constEnd(), deeper.constBegin()))
+            paths = deeper;
+        else if (!deeper.isEmpty())
+            return deeper.front();
+        else
+            break;
+    }
+    return {};
+}
+
+QVector<QPointF> createConnectionPath(QGraphicsScene *scene, const QPointF &startIfacePos, const QRectF &sourceRect,
+        const QPointF &endIfacePos, const QRectF &targetRect)
+{
+    Q_ASSERT(scene);
+
+    const QLineF startDirection = ifaceSegment(sourceRect, startIfacePos, endIfacePos);
+    if (startDirection.isNull())
+        return {};
+
+    const QLineF endDirection = ifaceSegment(targetRect, endIfacePos, startIfacePos);
+    if (endDirection.isNull())
+        return {};
+
+    const auto points = path(scene, startDirection, endDirection);
+    return simplifyPoints(points);
+}
+
+QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
+{
+    if (points.size() <= 3)
+        return points;
+
+    /// TODO: optimize flow
+    QVector<QPointF> simplifiedPoints(points);
+
+    for (int idx = 0; idx < simplifiedPoints.size() - 1;) {
+        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
+        if (qFuzzyIsNull(currentLine.length())) {
+            simplifiedPoints.removeAt(idx + 1);
+            continue;
+        }
+        if (idx + 2 < simplifiedPoints.size()) {
+            const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
+            if (qFuzzyIsNull(nextLine.length()) || qFuzzyCompare(currentLine.angle(), nextLine.angle())
+                    || int(currentLine.angleTo(nextLine)) % 180 == 0) {
+                simplifiedPoints.removeAt(idx + 1);
+                continue;
+            }
+        }
+
+        ++idx;
+    }
+    for (int idx = 1; idx < simplifiedPoints.size() - 2; ++idx) {
+        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
+        const QLineF prevLine { simplifiedPoints.value(idx - 1), simplifiedPoints.value(idx) };
+        const QLineF nextLine { simplifiedPoints.value(idx + 1), simplifiedPoints.value(idx + 2) };
+
+        if (qFuzzyCompare(prevLine.angle(), nextLine.angle()) && currentLine.length() < kMinLineLength) {
+            const QPointF midPoint = currentLine.center();
+            const QPointF prevOffset = midPoint - currentLine.p1();
+            simplifiedPoints[idx - 1] = prevLine.p1() + prevOffset;
+            const QPointF nextOffset = midPoint - currentLine.p2();
+            simplifiedPoints[idx + 2] = nextLine.p2() + nextOffset;
+            simplifiedPoints.removeAt(idx + 1);
+            simplifiedPoints.removeAt(idx);
+        }
+    }
+    if (simplifiedPoints.size() == 2)
+        return { points.first(), points.last() };
+    return simplifiedPoints;
 }
 
 }
