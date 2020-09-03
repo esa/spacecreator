@@ -20,8 +20,8 @@
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
+#include "asn1modelstorage.h"
 #include "commandsstack.h"
-#include "datatypesstorage.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
 #include "interface/commands/cmdentitypropertycreate.h"
@@ -83,7 +83,7 @@ const aadl::AADLObject *ContextParametersModel::dataObject() const
     return m_dataObject;
 }
 
-void ContextParametersModel::setDataTypes(aadl::DataTypesStorage *dataTypes)
+void ContextParametersModel::setDataTypes(Asn1Acn::Asn1ModelStorage *dataTypes)
 {
     m_dataTypes = dataTypes;
 }

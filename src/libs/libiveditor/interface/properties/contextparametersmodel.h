@@ -22,10 +22,13 @@
 
 #include <QPointer>
 
+namespace Asn1Acn {
+class Asn1ModelStorage;
+}
+
 namespace aadl {
 class AADLObject;
 class ContextParameter;
-class DataTypesStorage;
 }
 
 namespace aadlinterface {
@@ -54,7 +57,7 @@ public:
     void setDataObject(aadl::AADLObject *obj);
     const aadl::AADLObject *dataObject() const override;
 
-    void setDataTypes(aadl::DataTypesStorage *dataTypes);
+    void setDataTypes(Asn1Acn::Asn1ModelStorage *dataTypes);
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -69,7 +72,7 @@ public:
 private:
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<aadl::ContextParameter> m_params;
-    QPointer<aadl::DataTypesStorage> m_dataTypes;
+    QPointer<Asn1Acn::Asn1ModelStorage> m_dataTypes;
 
     void createNewRow(const aadl::ContextParameter &param, int row);
 };

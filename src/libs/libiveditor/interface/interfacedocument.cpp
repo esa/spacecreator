@@ -22,6 +22,7 @@
 #include "aadlobjectfunction.h"
 #include "aadlobjectsmodel.h"
 #include "aadlxmlreader.h"
+#include "asn1modelstorage.h"
 #include "baseitems/common/aadlutils.h"
 #include "baseitems/graphicsview.h"
 #include "commands/commandids.h"
@@ -30,7 +31,6 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "creatortool.h"
-#include "datatypesstorage.h"
 #include "interface/aadlcommentgraphicsitem.h"
 #include "interface/aadlconnectiongraphicsitem.h"
 #include "interface/aadlfunctiongraphicsitem.h"
@@ -157,7 +157,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QRectF desktopGeometry;
     QRectF prevItemsRect;
 
-    aadl::DataTypesStorage *asnDataTypes { new aadl::DataTypesStorage() };
+    Asn1Acn::Asn1ModelStorage *asnDataTypes { new Asn1Acn::Asn1ModelStorage() };
     QString mscFileName;
 };
 
@@ -374,7 +374,7 @@ aadl::AADLObjectsModel *InterfaceDocument::objectsModel() const
     return d->model;
 }
 
-aadl::DataTypesStorage *InterfaceDocument::asn1DataTypes() const
+Asn1Acn::Asn1ModelStorage *InterfaceDocument::asn1DataTypes() const
 {
     return d->asnDataTypes;
 }

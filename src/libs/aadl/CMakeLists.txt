@@ -29,14 +29,13 @@ target_sources(${LIB_NAME} PRIVATE
     aadlxmlreader.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
-    datatypesstorage.cpp
-    datatypesstorage.h
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
     asn1editor
+    asn1library
     shared
     Qt5::Core
     Qt5::Gui

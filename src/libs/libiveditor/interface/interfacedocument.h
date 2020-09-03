@@ -28,10 +28,13 @@ class QMenu;
 class QToolBar;
 class QUndoStack;
 
+namespace Asn1Acn {
+class Asn1ModelStorage;
+}
+
 namespace aadl {
 class AADLObject;
 class AADLObjectsModel;
-class DataTypesStorage;
 }
 
 namespace aadlinterface {
@@ -83,7 +86,7 @@ public:
     const QHash<shared::Id, aadl::AADLObject *> &objects() const;
     aadl::AADLObjectsModel *objectsModel() const;
 
-    aadl::DataTypesStorage *asn1DataTypes() const;
+    Asn1Acn::Asn1ModelStorage *asn1DataTypes() const;
 
     QString supportedFileExtensions() const;
 

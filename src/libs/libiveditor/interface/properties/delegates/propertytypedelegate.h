@@ -19,8 +19,8 @@
 
 #include "comboboxdelegate.h"
 
-namespace aadl {
-class DataTypesStorage;
+namespace Asn1Acn {
+class Asn1ModelStorage;
 }
 
 namespace aadlinterface {
@@ -29,7 +29,7 @@ class PropertyTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
-    PropertyTypeDelegate(const aadl::DataTypesStorage *dataTypes, QObject *parent = nullptr);
+    PropertyTypeDelegate(const Asn1Acn::Asn1ModelStorage *dataTypes, QObject *parent = nullptr);
     ~PropertyTypeDelegate() override;
 };
 

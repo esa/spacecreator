@@ -193,6 +193,7 @@ target_sources(${LIB_NAME} PRIVATE
 
 target_link_libraries(${LIB_NAME}
     aadl
+    asn1library
     shared
     templating
     msclibrary

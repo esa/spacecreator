@@ -18,7 +18,7 @@
 #include "asn1valuedelegate.h"
 
 #include "asn1editor.h"
-#include "datatypesstorage.h"
+#include "asn1modelstorage.h"
 
 #include <QLabel>
 #include <QVariant>
@@ -28,7 +28,7 @@ namespace aadlinterface {
 const char *MODEL_INDEX_PROPERTY = "modelIndex";
 const char *DIALOG_PROPERTY = "dialog";
 
-Asn1ValueDelegate::Asn1ValueDelegate(const aadl::DataTypesStorage *asn1Types, QObject *parent)
+Asn1ValueDelegate::Asn1ValueDelegate(const Asn1Acn::Asn1ModelStorage *asn1Types, QObject *parent)
     : QStyledItemDelegate(parent)
     , m_asn1Types(asn1Types)
 {

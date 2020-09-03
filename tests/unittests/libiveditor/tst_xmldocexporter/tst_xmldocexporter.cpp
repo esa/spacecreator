@@ -17,7 +17,7 @@
 
 #include "aadlobjectcomment.h"
 #include "aadlobjectfunction.h"
-#include "datatypesstorage.h"
+#include "asn1modelstorage.h"
 #include "interface/interfacedocument.h"
 #include "iveditor.h"
 #include "xmldocexporter.h"

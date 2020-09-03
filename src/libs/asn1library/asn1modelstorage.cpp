@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "datatypesstorage.h"
+#include "asn1modelstorage.h"
 
 #include "asn1/definitions.h"
 #include "asn1/file.h"
@@ -31,7 +31,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
-namespace aadl {
+namespace Asn1Acn {
 
 static QString ensureAsnFileExists()
 {
@@ -55,23 +55,23 @@ static QString ensureAsnFileExists()
     return QString();
 }
 
-DataTypesStorage::DataTypesStorage()
+Asn1ModelStorage::Asn1ModelStorage()
 {
     loadDefault();
     m_reloadTimer.setSingleShot(true);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &aadl::DataTypesStorage::loadFile);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
 }
 
-DataTypesStorage::DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
+Asn1ModelStorage::Asn1ModelStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
     : m_asn1DataTypes(std::move(dataTypes))
 {
     m_reloadTimer.setSingleShot(true);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &aadl::DataTypesStorage::loadFile);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
 }
 
-DataTypesStorage::~DataTypesStorage() { }
+Asn1ModelStorage::~Asn1ModelStorage() { }
 
-const std::unique_ptr<Asn1Acn::File> &DataTypesStorage::asn1DataTypes() const
+const std::unique_ptr<Asn1Acn::File> &Asn1ModelStorage::asn1DataTypes() const
 {
     return m_asn1DataTypes;
 }
@@ -79,7 +79,7 @@ const std::unique_ptr<Asn1Acn::File> &DataTypesStorage::asn1DataTypes() const
 /*!
    Set the asn1 file for this types storage. \note The data is reloaded by this function
  */
-void DataTypesStorage::setFileName(const QFileInfo &fileName)
+void Asn1ModelStorage::setFileName(const QFileInfo &fileName)
 {
     if (m_asn1Watcher != nullptr) {
         // Check if the directory is watched already
@@ -106,7 +106,7 @@ void DataTypesStorage::setFileName(const QFileInfo &fileName)
 /*!
    Returns the full file information of the asn1 file used for this types storage
  */
-const QFileInfo &DataTypesStorage::fileName() const
+const QFileInfo &Asn1ModelStorage::fileName() const
 {
     return m_fileName;
 }
@@ -114,7 +114,7 @@ const QFileInfo &DataTypesStorage::fileName() const
 /*!
    Loads the default ASN1 data
  */
-void DataTypesStorage::loadDefault()
+void Asn1ModelStorage::loadDefault()
 {
     const QString &asnFilePath = ensureAsnFileExists();
     setFileName(asnFilePath);
@@ -123,7 +123,7 @@ void DataTypesStorage::loadDefault()
 /*!
    Load the data types stored the file \sa fileName
  */
-bool DataTypesStorage::loadFile()
+bool Asn1ModelStorage::loadFile()
 {
     QStringList errorMessages;
     Asn1Acn::Asn1XMLParser parser;
@@ -142,7 +142,7 @@ bool DataTypesStorage::loadFile()
 /*!
    Clear the types data and set the filename to empty.
  */
-void DataTypesStorage::clear()
+void Asn1ModelStorage::clear()
 {
     m_fileName.setFile("");
     m_asn1DataTypes.reset();
@@ -152,7 +152,7 @@ void DataTypesStorage::clear()
 /*!
    Retruns the first type having the given \p name
  */
-const Asn1Acn::Types::Type *DataTypesStorage::typeFromName(const QString &name) const
+const Asn1Acn::Types::Type *Asn1ModelStorage::typeFromName(const QString &name) const
 {
     for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_asn1DataTypes->definitionsList()) {
         for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {

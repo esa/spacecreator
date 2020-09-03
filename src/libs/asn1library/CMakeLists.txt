@@ -4,6 +4,8 @@ add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
     asn1const.h
+    asn1modelstorage.cpp
+    asn1modelstorage.h
     asn1valueparser.cpp
     asn1valueparser.h
     asn1xmlparser.cpp
@@ -49,4 +51,7 @@ target_include_directories(${LIB_NAME}
     PUBLIC asn1
 )
 
-target_link_libraries(${LIB_NAME} Qt5::Core)
+target_link_libraries(${LIB_NAME}
+    shared
+    Qt5::Core
+)

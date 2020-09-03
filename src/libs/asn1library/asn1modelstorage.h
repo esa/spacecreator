@@ -32,17 +32,14 @@ class File;
 namespace Types {
 class Type;
 }
-}
 
-namespace aadl {
-
-class DataTypesStorage : public QObject
+class Asn1ModelStorage : public QObject
 {
     Q_OBJECT
 public:
-    DataTypesStorage();
-    DataTypesStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
-    ~DataTypesStorage();
+    Asn1ModelStorage();
+    Asn1ModelStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
+    ~Asn1ModelStorage();
 
     void init();
 

@@ -20,9 +20,9 @@
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
+#include "asn1modelstorage.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
-#include "datatypesstorage.h"
 #include "delegates/asn1valuedelegate.h"
 #include "delegates/comboboxdelegate.h"
 #include "delegates/functionattrdelegate.h"
@@ -39,7 +39,7 @@
 
 namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, aadl::DataTypesStorage *dataTypes, QWidget *parent)
+PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, Asn1Acn::Asn1ModelStorage *dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)

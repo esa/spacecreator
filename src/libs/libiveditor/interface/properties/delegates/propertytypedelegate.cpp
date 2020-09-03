@@ -21,11 +21,11 @@
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
-#include "datatypesstorage.h"
+#include "asn1modelstorage.h"
 
 namespace aadlinterface {
 
-static QStringList initNames(const aadl::DataTypesStorage *dataTypes)
+static QStringList initNames(const Asn1Acn::Asn1ModelStorage *dataTypes)
 {
     QStringList names;
 
@@ -44,7 +44,7 @@ static QStringList initNames(const aadl::DataTypesStorage *dataTypes)
     return names;
 }
 
-PropertyTypeDelegate::PropertyTypeDelegate(const aadl::DataTypesStorage *dataTypes, QObject *parent)
+PropertyTypeDelegate::PropertyTypeDelegate(const Asn1Acn::Asn1ModelStorage *dataTypes, QObject *parent)
     : StringListComboDelegate(initNames(dataTypes), parent)
 {
 }
