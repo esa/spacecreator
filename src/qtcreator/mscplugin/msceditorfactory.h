@@ -17,7 +17,12 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
+
+namespace msc {
+class MSCEditorCore;
+}
 
 namespace MscPlugin {
 
@@ -33,6 +38,9 @@ public:
     Core::IEditor *createEditor() override;
 
     MscEditorData *editorData() const;
+
+Q_SIGNALS:
+    void mscDataLoaded(const QString &fileName, QSharedPointer<msc::MSCEditorCore> data);
 
 private:
     mutable MscEditorData *m_editorData = nullptr;

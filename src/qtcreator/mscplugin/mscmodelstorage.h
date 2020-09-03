@@ -15,35 +15,34 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#pragma once
+
 #include <QHash>
 #include <QObject>
 #include <QSharedPointer>
 
-#pragma once
-
-namespace aadlinterface {
-class IVEditorCore;
+namespace msc {
+class MSCEditorCore;
 }
 
 namespace MscPlugin {
 
 /*!
-   Stores shared pointers to all aadl file objects. And creates a new one if needed
+   Stores shared pointers to all msc file objects. And creates a new one if needed
  */
-class AadlModelStorage : public QObject
+class MscModelStorage : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit AadlModelStorage(QObject *parent = nullptr);
+    explicit MscModelStorage(QObject *parent = nullptr);
 
-    QSharedPointer<aadlinterface::IVEditorCore> ivData(const QString &fileName);
+    QSharedPointer<msc::MSCEditorCore> mscData(const QString &fileName);
 
 public Q_SLOTS:
-    void setIvData(const QString &fileName, QSharedPointer<aadlinterface::IVEditorCore> ivData);
+    void setMscData(const QString &fileName, QSharedPointer<msc::MSCEditorCore> mscData);
 
 private:
-    QHash<QString, QSharedPointer<aadlinterface::IVEditorCore>> m_store;
+    QHash<QString, QSharedPointer<msc::MSCEditorCore>> m_store;
 };
 
 }

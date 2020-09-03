@@ -28,6 +28,7 @@
 #include "msceditorfactory.h"
 #include "mscinstance.h"
 #include "msclibrary.h"
+#include "mscmodelstorage.h"
 #include "mscpluginconstants.h"
 #include "sharedlibrary.h"
 
@@ -111,7 +112,9 @@ bool MSCPlugin::initialize(const QStringList &arguments, QString *errorString)
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
 
     m_aadlStorage = new AadlModelStorage(this);
+    m_mscStorage = new MscModelStorage(this);
     m_factory = new MscEditorFactory(this);
+    connect(m_factory, &MscEditorFactory::mscDataLoaded, m_mscStorage, &MscModelStorage::setMscData);
 
     IPlugin *plugin = aadlPlugin();
     if (!plugin) {
@@ -152,16 +155,25 @@ void MSCPlugin::checkInstances()
         return;
     }
 
+    QStringList mscFiles = m_factory->editorData()->mscFiles();
+    QVector<QSharedPointer<msc::MSCEditorCore>> mscCores;
+    for (const QString &mscFile : mscFiles) {
+        QSharedPointer<msc::MSCEditorCore> core = m_mscStorage->mscData(mscFile);
+        if (core) {
+            mscCores.append(core);
+        }
+    }
+
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : m_factory->editorData()->mscPlugins()) {
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
         mplugin->aadlChecker()->setIvPlugin(ivp);
         resultNames += mplugin->aadlChecker()->checkInstanceNames();
     }
 
     // Check for nested functions usage
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultRelations;
-    for (QSharedPointer<msc::MSCEditorCore> mplugin : m_factory->editorData()->mscPlugins()) {
+    for (QSharedPointer<msc::MSCEditorCore> mplugin : mscCores) {
         mplugin->aadlChecker()->setIvPlugin(ivp);
         resultRelations += mplugin->aadlChecker()->checkInstanceRelations();
     }

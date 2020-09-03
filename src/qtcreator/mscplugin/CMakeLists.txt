@@ -16,6 +16,8 @@ set(MSC_PLUGIN_SOURCES
     msceditorfactory.h
     msceditorstack.cpp
     msceditorstack.h
+    mscmodelstorage.cpp
+    mscmodelstorage.h
     mscpluginconstants.h
     mscplugin.cpp
     mscplugin.h

@@ -161,6 +161,7 @@ Core::IEditor *MscEditorData::createEditor()
     }
 
     connect(designWidget, &MscPlugin::MainWidget::asn1Selected, this, &MscEditorData::openEditor);
+    connect(designWidget, &MscPlugin::MainWidget::mscDataLoaded, this, &MscEditorData::mscDataLoaded);
 
     return mscEditor;
 }
@@ -178,39 +179,20 @@ void MscEditorData::editMessageDeclarations(QWidget *parentWidget)
     }
 }
 
+/*!
+   Returns all aald files in this project
+ */
 QStringList MscEditorData::aadlFiles() const
 {
-    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
-    if (!project) {
-        return {};
-    }
-
-    QStringList result;
-    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
-        if (fileName.toString().endsWith(".xml", Qt::CaseInsensitive)) {
-            result.append(fileName.toString());
-        }
-    }
-
-    return result;
+    return projectFiles(".xml");
 }
 
-QVector<QSharedPointer<msc::MSCEditorCore>> MscEditorData::mscPlugins() const
+/*!
+   Returns all msc files in this project
+ */
+QStringList MscEditorData::mscFiles() const
 {
-    QVector<QSharedPointer<msc::MSCEditorCore>> plugins;
-    for (MscTextEditor *editor : m_widgetStack->editors()) {
-        auto mscEdit = qobject_cast<MscTextEditorWidget *>(editor->editorWidget());
-        if (mscEdit) {
-            auto document = qobject_cast<MscEditorDocument *>(mscEdit->textDocument());
-            if (document) {
-                MainWidget *designWidget = document->designWidget();
-                if (designWidget && designWidget->mscPlugin()) {
-                    plugins.append(designWidget->mscPlugin());
-                }
-            }
-        }
-    }
-    return plugins;
+    return projectFiles(".msc");
 }
 
 void MscEditorData::openEditor(const QString &fileName)
@@ -266,6 +248,23 @@ Core::EditorToolBar *MscEditorData::createMainToolBar()
     toolBar->addCenterToolBar(m_widgetToolBar);
 
     return toolBar;
+}
+
+QStringList MscEditorData::projectFiles(const QString &suffix) const
+{
+    ProjectExplorer::Project *project = ProjectExplorer::ProjectTree::currentProject();
+    if (!project) {
+        return {};
+    }
+
+    QStringList result;
+    for (Utils::FileName fileName : project->files(ProjectExplorer::Project::AllFiles)) {
+        if (fileName.toString().endsWith(suffix, Qt::CaseInsensitive)) {
+            result.append(fileName.toString());
+        }
+    }
+
+    return result;
 }
 
 QWidget *MscEditorData::createModeWidget()

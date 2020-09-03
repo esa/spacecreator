@@ -17,6 +17,7 @@
 
 #include "msceditorfactory.h"
 
+#include "msceditorcore.h"
 #include "msceditordata.h"
 #include "mscpluginconstants.h"
 
@@ -46,6 +47,7 @@ MscEditorData *MscEditorFactory::editorData() const
         m_editorData = new MscEditorData(const_cast<MscEditorFactory *>(this));
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
         m_editorData->fullInit();
+        connect(m_editorData, &MscEditorData::mscDataLoaded, this, &MscEditorFactory::mscDataLoaded);
         QGuiApplication::restoreOverrideCursor();
     }
 

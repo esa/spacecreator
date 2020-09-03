@@ -32,6 +32,7 @@ namespace MscPlugin {
 
 class AadlModelStorage;
 class MscEditorFactory;
+class MscModelStorage;
 
 class MSCPlugin : public ExtensionSystem::IPlugin
 {
@@ -58,6 +59,7 @@ private:
     MscEditorFactory *m_factory = nullptr;
     QAction *m_messageDeclarationAction = nullptr;
     AadlModelStorage *m_aadlStorage = nullptr;
+    MscModelStorage *m_mscStorage = nullptr;
 };
 
 }
