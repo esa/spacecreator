@@ -4,7 +4,7 @@ add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
     asn1_resources.qrc
-    asn1const.h
+    asn1editorconst.h
     asn1editor.cpp
     asn1editor.h
     asn1editor.ui
@@ -17,10 +17,6 @@ target_sources(${LIB_NAME} PRIVATE
     asn1itemmodel.h
     asn1treeview.cpp
     asn1treeview.h
-    asn1valueparser.cpp
-    asn1valueparser.h
-    asn1xmlparser.cpp
-    asn1xmlparser.h
 )
 
 target_include_directories(${LIB_NAME}
@@ -32,7 +28,6 @@ target_link_libraries(${LIB_NAME}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    Qt5::Xml
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")

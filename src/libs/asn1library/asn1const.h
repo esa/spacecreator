@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,20 +18,8 @@
 #pragma once
 
 #include <QString>
-#include <Qt>
 
-namespace asn1 {
-
-const int ASN1TYPE_ROLE = Qt::UserRole;
-const int MIN_RANGE_ROLE = Qt::UserRole + 1;
-const int MAX_RANGE_ROLE = Qt::UserRole + 2;
-const int CHOICE_LIST_ROLE = Qt::UserRole + 3;
-const int OPTIONAL_ROLE = Qt::UserRole + 4;
-
-const int MODEL_NAME_INDEX = 0;
-const int MODEL_TYPE_INDEX = 1;
-const int MODEL_VALUE_INDEX = 2;
-const int MODEL_IS_OPTIONAL_INDEX = 3;
+namespace Asn1Acn {
 
 static const QString ASN1_IS_OPTIONAL = "isOptional";
 static const QString ASN1_MIN = "min";
@@ -41,4 +29,5 @@ static const QString ASN1_VALUES = "values";
 static const QString ASN1_CHOICES = "choices";
 static const QString ASN1_CHILDREN = "children";
 static const QString ASN1_SEQOFTYPE = "seqoftype";
+
 }

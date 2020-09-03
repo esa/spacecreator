@@ -20,16 +20,11 @@
 #include <QObject>
 #include <memory>
 
-class QDomElement;
-class QDomNodeList;
 class QFileInfo;
 class QStringList;
 
 namespace Asn1Acn {
 class File;
-}
-
-namespace asn1 {
 
 class Asn1XMLParser : public QObject
 {

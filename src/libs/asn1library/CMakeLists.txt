@@ -3,6 +3,11 @@ set(LIB_NAME asn1library)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    asn1const.h
+    asn1valueparser.cpp
+    asn1valueparser.h
+    asn1xmlparser.cpp
+    asn1xmlparser.h
     astxmlparser.cpp
     astxmlparser.h
     asn1/definitions.cpp

@@ -444,7 +444,7 @@ void MainModel::readAsn1Types()
     }
 
     if (asn1FileInfo.exists()) {
-        asn1::Asn1XMLParser xmlParser;
+        Asn1Acn::Asn1XMLParser xmlParser;
         QStringList errorMessages;
         std::unique_ptr<Asn1Acn::File> asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
         if (errorMessages.isEmpty()) {

@@ -23,13 +23,11 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QFileInfo>
 #include <QProcess>
 #include <QRandomGenerator>
 
-namespace asn1 {
+namespace Asn1Acn {
 
 QString Asn1XMLParser::m_asn1Compiler {};
 QString Asn1XMLParser::m_mono {};

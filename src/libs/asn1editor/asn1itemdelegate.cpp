@@ -17,7 +17,7 @@
 
 #include "asn1itemdelegate.h"
 
-#include "asn1const.h"
+#include "asn1editorconst.h"
 #include "types/type.h"
 
 #include <QComboBox>

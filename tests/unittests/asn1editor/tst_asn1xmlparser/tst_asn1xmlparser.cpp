@@ -22,12 +22,10 @@
 #include "typeassignment.h"
 #include "types/builtintypes.h"
 
-#include <QDomElement>
-#include <QDomNodeList>
 #include <QSignalSpy>
 #include <QtTest>
 
-using namespace asn1;
+using namespace Asn1Acn;
 
 class tst_Asn1XMLParser : public QObject
 {

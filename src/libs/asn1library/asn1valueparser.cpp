@@ -23,7 +23,7 @@
 
 #include <QVariant>
 
-namespace asn1 {
+namespace Asn1Acn {
 
 /*!
  * \class Asn1ValueParser

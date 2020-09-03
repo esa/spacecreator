@@ -24,6 +24,7 @@
 ****************************************************************************/
 #include "astxmlparser.h"
 
+#include "asn1const.h"
 #include "types/builtintypes.h"
 #include "types/userdefinedtype.h"
 
@@ -32,10 +33,6 @@
 #include <QVariantMap>
 
 namespace Asn1Acn {
-
-static const QString ASN1_MIN = "min";
-static const QString ASN1_MAX = "max";
-static const QString ASN1_VALUES = "values";
 
 AstXmlParser::AstXmlParser(QXmlStreamReader &xmlReader)
     : m_xmlReader(xmlReader)

@@ -24,9 +24,6 @@ class TypeAssignment;
 namespace Types {
 class Type;
 }
-}
-
-namespace asn1 {
 
 class Asn1ValueParser : public QObject
 {

@@ -17,7 +17,7 @@
 
 #include "asn1treeview.h"
 
-#include "asn1const.h"
+#include "asn1editorconst.h"
 #include "asn1itemdelegate.h"
 #include "asn1itemmodel.h"
 #include "typeassignment.h"

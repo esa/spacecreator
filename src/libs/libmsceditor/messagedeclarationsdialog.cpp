@@ -240,7 +240,7 @@ void MessageDeclarationsDialog::selectAsn1File()
     if (!fileName.isEmpty()) {
         QFileInfo fileInfo(fileName);
         QStringList errors;
-        asn1::Asn1XMLParser parser;
+        Asn1Acn::Asn1XMLParser parser;
         std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(fileInfo, &errors);
         if (errors.isEmpty()) {
             updateAsn1TypesView();

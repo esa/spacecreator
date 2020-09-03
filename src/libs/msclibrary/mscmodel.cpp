@@ -234,7 +234,7 @@ bool MscModel::checkparameterAsn1Compliance(const QString &parameter, const QStr
         for (const std::unique_ptr<Asn1Acn::TypeAssignment> &typeAssignment : definitions->types()) {
             if (typeAssignment->name() == typeName) {
                 bool ok;
-                asn1::Asn1ValueParser parser;
+                Asn1Acn::Asn1ValueParser parser;
                 parser.parseAsn1Value(typeAssignment.get(), parameter, &ok);
                 if (ok) {
                     return true;

@@ -52,7 +52,7 @@ void tst_Asn1TreeView::cleanup()
 
 void tst_Asn1TreeView::testSetAsn1Value()
 {
-    Asn1XMLParser parser;
+    Asn1Acn::Asn1XMLParser parser;
     std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
 
     const Asn1Acn::Definitions *definitions = types->definitions("DataView");

@@ -121,7 +121,7 @@ void ASN1FileView::fillPreview()
         return;
     }
 
-    asn1::Asn1XMLParser parser;
+    Asn1Acn::Asn1XMLParser parser;
     QString html = parser.asn1AsHtml(filename);
     if (html.isEmpty()) {
         QFile file(filename);

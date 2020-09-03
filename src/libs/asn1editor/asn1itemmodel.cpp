@@ -18,6 +18,7 @@
 #include "asn1itemmodel.h"
 
 #include "asn1const.h"
+#include "asn1editorconst.h"
 #include "typeassignment.h"
 #include "types/builtintypes.h"
 
@@ -81,8 +82,9 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::REAL:
         valueItem = createNumberItem(asn1Item);
 
-        if (values.contains(ASN1_MIN) && values.contains(ASN1_MAX)) {
-            typeLimit = QString(" (%1..%2)").arg(values[ASN1_MIN].toString(), values[ASN1_MAX].toString());
+        if (values.contains(Asn1Acn::ASN1_MIN) && values.contains(Asn1Acn::ASN1_MAX)) {
+            typeLimit = QString(" (%1..%2)")
+                                .arg(values[Asn1Acn::ASN1_MIN].toString(), values[Asn1Acn::ASN1_MAX].toString());
         }
         break;
     case Asn1Acn::Types::Type::BOOLEAN:
@@ -94,11 +96,12 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::SEQUENCEOF:
         valueItem = createSequenceOfItem(asn1Item, nameItem);
 
-        if (values.contains(ASN1_MIN) && values.contains(ASN1_MAX)) {
-            if (values[ASN1_MIN] == values[ASN1_MAX])
-                typeLimit = QString(tr(" Size(%1)")).arg(values[ASN1_MIN].toString());
+        if (values.contains(Asn1Acn::ASN1_MIN) && values.contains(Asn1Acn::ASN1_MAX)) {
+            if (values[Asn1Acn::ASN1_MIN] == values[Asn1Acn::ASN1_MAX])
+                typeLimit = QString(tr(" Size(%1)")).arg(values[Asn1Acn::ASN1_MIN].toString());
             else
-                typeLimit = QString(tr(" Size(%1..%2)")).arg(values[ASN1_MIN].toString(), values[ASN1_MAX].toString());
+                typeLimit = QString(tr(" Size(%1..%2)"))
+                                    .arg(values[Asn1Acn::ASN1_MIN].toString(), values[Asn1Acn::ASN1_MAX].toString());
         }
         break;
     case Asn1Acn::Types::Type::ENUMERATED:
@@ -114,12 +117,12 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::IA5STRING:
         valueItem = createItem(asn1Item);
 
-        if (values.contains(ASN1_MIN) && values.contains(ASN1_MAX)) {
-            if (values[ASN1_MIN] == values[ASN1_MAX])
-                typeLimit = QString(tr(" Length(%1)")).arg(values[ASN1_MIN].toString());
+        if (values.contains(Asn1Acn::ASN1_MIN) && values.contains(Asn1Acn::ASN1_MAX)) {
+            if (values[Asn1Acn::ASN1_MIN] == values[Asn1Acn::ASN1_MAX])
+                typeLimit = QString(tr(" Length(%1)")).arg(values[Asn1Acn::ASN1_MIN].toString());
             else
-                typeLimit =
-                        QString(tr(" Length(%1..%2)")).arg(values[ASN1_MIN].toString(), values[ASN1_MAX].toString());
+                typeLimit = QString(tr(" Length(%1..%2)"))
+                                    .arg(values[Asn1Acn::ASN1_MIN].toString(), values[Asn1Acn::ASN1_MAX].toString());
         }
         break;
     default:
@@ -152,7 +155,7 @@ QStandardItem *Asn1ItemModel::createNumberItem(const Asn1Acn::Types::Type *asn1I
 {
     // set default value (min range):
     const QVariantMap &values = asn1Item->parameters();
-    return createItem(asn1Item, values[ASN1_MIN].toString());
+    return createItem(asn1Item, values[Asn1Acn::ASN1_MIN].toString());
 }
 
 /*!
@@ -215,7 +218,7 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(const Asn1Acn::Types::Type *a
         const Asn1Acn::Types::Type *type = asn1Item->children().at(0).get();
 
         if (type != nullptr) {
-            for (int x = 0; x < asn1Item->parameters()[ASN1_MAX].toInt(); ++x) {
+            for (int x = 0; x < asn1Item->parameters()[Asn1Acn::ASN1_MAX].toInt(); ++x) {
                 ItemMap chilItem = createModelItems(type);
 
                 chilItem["item"]->setText(QString(tr("elem%1")).arg(x + 1));
@@ -243,7 +246,7 @@ QStandardItem *Asn1ItemModel::createSequenceOfItem(const Asn1Acn::Types::Type *a
 QStandardItem *Asn1ItemModel::createEnumeratedItem(const Asn1Acn::Types::Type *asn1Item)
 {
     const QVariantMap &values = asn1Item->parameters();
-    return createItem(asn1Item, values[ASN1_VALUES].toList().at(0).toString());
+    return createItem(asn1Item, values[Asn1Acn::ASN1_VALUES].toList().at(0).toString());
 }
 
 /*!
@@ -290,14 +293,14 @@ QStandardItem *Asn1ItemModel::createItem(const Asn1Acn::Types::Type *asn1Item, c
 
     item->setData(asn1Item->typeEnum(), ASN1TYPE_ROLE);
     const QVariantMap &values = asn1Item->parameters();
-    if (values.contains(ASN1_MIN))
-        item->setData(values[ASN1_MIN], MIN_RANGE_ROLE);
+    if (values.contains(Asn1Acn::ASN1_MIN))
+        item->setData(values[Asn1Acn::ASN1_MIN], MIN_RANGE_ROLE);
 
-    if (values.contains(ASN1_MAX))
-        item->setData(values[ASN1_MAX], MAX_RANGE_ROLE);
+    if (values.contains(Asn1Acn::ASN1_MAX))
+        item->setData(values[Asn1Acn::ASN1_MAX], MAX_RANGE_ROLE);
 
-    if (values.contains(ASN1_VALUES))
-        item->setData(values[ASN1_VALUES], CHOICE_LIST_ROLE);
+    if (values.contains(Asn1Acn::ASN1_VALUES))
+        item->setData(values[Asn1Acn::ASN1_VALUES], CHOICE_LIST_ROLE);
 
     return item;
 }
@@ -307,14 +310,14 @@ QStandardItem *Asn1ItemModel::createPresentItem(const Asn1Acn::Types::Type *asn1
     QStandardItem *item = new QStandardItem();
 
     const QVariantMap &values = asn1Item->parameters();
-    if (values[ASN1_IS_OPTIONAL].toBool() == true) {
+    if (values[Asn1Acn::ASN1_IS_OPTIONAL].toBool() == true) {
         item->setCheckState(Qt::Unchecked);
         item->setCheckable(true);
     } else {
         item->setEnabled(false);
     }
 
-    item->setData(values[ASN1_IS_OPTIONAL], OPTIONAL_ROLE);
+    item->setData(values[Asn1Acn::ASN1_IS_OPTIONAL], OPTIONAL_ROLE);
 
     return item;
 }

@@ -76,8 +76,8 @@ void Asn1Editor::setValue(const QString &value)
         return;
     }
 
-    Asn1ValueParser valueParser;
-    connect(&valueParser, &Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
+    Asn1Acn::Asn1ValueParser valueParser;
+    connect(&valueParser, &Asn1Acn::Asn1ValueParser::parseError, this, &Asn1Editor::showParseError);
 
     const std::unique_ptr<Asn1Acn::TypeAssignment> &asn1Item = m_asn1Types->typeAssignment(currentType);
     if (asn1Item) {

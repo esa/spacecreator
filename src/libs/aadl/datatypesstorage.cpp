@@ -126,7 +126,7 @@ void DataTypesStorage::loadDefault()
 bool DataTypesStorage::loadFile()
 {
     QStringList errorMessages;
-    asn1::Asn1XMLParser parser;
+    Asn1Acn::Asn1XMLParser parser;
     std::unique_ptr<Asn1Acn::File> asn1Data = parser.parseAsn1File(m_fileName, &errorMessages);
     if (!errorMessages.isEmpty()) {
         qWarning() << "Can't read file:" << m_fileName << errorMessages.join(", ");

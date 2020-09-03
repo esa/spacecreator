@@ -307,7 +307,7 @@ void MessageDialog::checkTextValidity()
     }
 
     if (m_selectedDeclaration) {
-        asn1::Asn1ValueParser parser;
+        Asn1Acn::Asn1ValueParser parser;
         const std::unique_ptr<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
         for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
             QTableWidgetItem *item = ui->parameterTable->item(i, 0);

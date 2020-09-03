@@ -121,7 +121,7 @@ bool BasicParameter::isValidValue(DataTypesStorage *dataTypes, const QVariant &v
         return true;
     }
 
-    asn1::Asn1ValueParser valueParser;
+    Asn1Acn::Asn1ValueParser valueParser;
     bool ok;
     valueParser.parseAsn1Value(basicDataType, value.toString(), &ok);
     return ok;

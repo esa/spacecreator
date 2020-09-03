@@ -26,7 +26,7 @@
 #include <QtTest>
 #include <memory>
 
-using namespace asn1;
+using namespace Asn1Acn;
 
 class tst_Asn1ValueParser : public QObject
 {
