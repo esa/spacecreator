@@ -447,8 +447,9 @@ void MainModel::readAsn1Types()
         Asn1Acn::Asn1XMLParser xmlParser;
         QStringList errorMessages;
         std::unique_ptr<Asn1Acn::File> asn1Data = xmlParser.parseAsn1File(asn1FileInfo, &errorMessages);
+        QSharedPointer<Asn1Acn::File> sharedAsn1Data(asn1Data.release());
         if (errorMessages.isEmpty()) {
-            d->m_mscModel->setAsn1TypesData(std::move(asn1Data));
+            d->m_mscModel->setAsn1TypesData(sharedAsn1Data);
         }
     }
 

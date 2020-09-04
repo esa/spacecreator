@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
 #include <QTimer>
 #include <memory>
@@ -38,12 +39,12 @@ class Asn1ModelStorage : public QObject
     Q_OBJECT
 public:
     Asn1ModelStorage();
-    Asn1ModelStorage(std::unique_ptr<Asn1Acn::File> &dataTypes);
+    Asn1ModelStorage(QSharedPointer<Asn1Acn::File> &dataTypes);
     ~Asn1ModelStorage();
 
     void init();
 
-    const std::unique_ptr<Asn1Acn::File> &asn1DataTypes() const;
+    const QSharedPointer<Asn1Acn::File> &asn1DataTypes() const;
 
     Q_SLOT void setFileName(const QFileInfo &fileName);
     const QFileInfo &fileName() const;
@@ -60,7 +61,7 @@ Q_SIGNALS:
     void dataTypesChanged();
 
 private:
-    std::unique_ptr<Asn1Acn::File> m_asn1DataTypes;
+    QSharedPointer<Asn1Acn::File> m_asn1DataTypes;
     QFileInfo m_fileName;
     QFileSystemWatcher *m_asn1Watcher = nullptr;
     QTimer m_reloadTimer;

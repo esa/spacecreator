@@ -146,8 +146,13 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             break;
         }
         case ColumnValue: {
-            if (!paramNew.setDefaultValue(m_dataTypes.data(), value))
+            if (!m_dataTypes.data()) {
+                return true;
+            }
+            const Asn1Acn::Types::Type *basicDataType = m_dataTypes.data()->typeFromName(paramNew.paramTypeName());
+            if (!paramNew.setDefaultValue(basicDataType, value)) {
                 return false;
+            }
             break;
         }
         default:

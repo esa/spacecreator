@@ -62,8 +62,8 @@ Asn1ModelStorage::Asn1ModelStorage()
     connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
 }
 
-Asn1ModelStorage::Asn1ModelStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
-    : m_asn1DataTypes(std::move(dataTypes))
+Asn1ModelStorage::Asn1ModelStorage(QSharedPointer<File> &dataTypes)
+    : m_asn1DataTypes(dataTypes)
 {
     m_reloadTimer.setSingleShot(true);
     connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::loadFile);
@@ -71,7 +71,7 @@ Asn1ModelStorage::Asn1ModelStorage(std::unique_ptr<Asn1Acn::File> &dataTypes)
 
 Asn1ModelStorage::~Asn1ModelStorage() { }
 
-const std::unique_ptr<Asn1Acn::File> &Asn1ModelStorage::asn1DataTypes() const
+const QSharedPointer<Asn1Acn::File> &Asn1ModelStorage::asn1DataTypes() const
 {
     return m_asn1DataTypes;
 }
@@ -133,7 +133,7 @@ bool Asn1ModelStorage::loadFile()
         return false;
     }
 
-    m_asn1DataTypes.swap(asn1Data);
+    m_asn1DataTypes.reset(asn1Data.release());
     Q_EMIT dataTypesChanged();
 
     return true;

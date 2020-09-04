@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QSharedPointer>
 #include <memory>
 
 namespace Ui {
@@ -37,7 +38,7 @@ class Asn1Editor : public QDialog
     Q_OBJECT
 
 public:
-    Asn1Editor(const std::unique_ptr<Asn1Acn::File> &asn1Types, QWidget *parent = nullptr);
+    Asn1Editor(const QSharedPointer<Asn1Acn::File> &asn1Types, QWidget *parent = nullptr);
     ~Asn1Editor();
 
     void setValue(const QString &value);
@@ -61,7 +62,7 @@ private:
 private:
     Ui::Asn1Editor *ui;
     Asn1TreeView *m_asn1TreeView;
-    const std::unique_ptr<Asn1Acn::File> &m_asn1Types;
+    const QSharedPointer<Asn1Acn::File> &m_asn1Types;
     QString m_fileName;
 };
 

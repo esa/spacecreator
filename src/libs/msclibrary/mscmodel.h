@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QObject>
+#include <QSharedPointer>
 #include <QStringList>
 #include <QVector>
 #include <memory>
@@ -60,8 +61,8 @@ public:
     const QString &dataDefinitionString() const;
     void setDataDefinitionString(const QString &dataString);
 
-    void setAsn1TypesData(std::unique_ptr<Asn1Acn::File> data);
-    const std::unique_ptr<Asn1Acn::File> &asn1Types() const;
+    void setAsn1TypesData(QSharedPointer<Asn1Acn::File> data);
+    const QSharedPointer<Asn1Acn::File> &asn1Types() const;
 
     void clear();
 
@@ -89,7 +90,7 @@ private:
     QVector<MscChart *> m_charts;
     QString m_dataLanguage;
     QString m_dataDefinitionString;
-    std::unique_ptr<Asn1Acn::File> m_asn1Data;
+    QSharedPointer<Asn1Acn::File> m_asn1Data;
 };
 
 }

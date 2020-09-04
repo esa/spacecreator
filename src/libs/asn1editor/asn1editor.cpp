@@ -39,7 +39,7 @@ namespace asn1 {
  * \brief Asn1Editor::Asn1Editor Constructor
  * \param parent Dialog parent
  */
-Asn1Editor::Asn1Editor(const std::unique_ptr<Asn1Acn::File> &asn1Types, QWidget *parent)
+Asn1Editor::Asn1Editor(const QSharedPointer<Asn1Acn::File> &asn1Types, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Asn1Editor)
     , m_asn1Types(asn1Types)

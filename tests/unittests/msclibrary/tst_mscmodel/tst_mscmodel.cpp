@@ -119,8 +119,8 @@ void tst_MscModel::testNoNullPtrChart()
 
 void tst_MscModel::testAsn1Compliance()
 {
-    std::unique_ptr<Asn1Acn::File> asn1Data;
-    m_model->setAsn1TypesData(std::move(asn1Data));
+    QSharedPointer<Asn1Acn::File> asn1Data;
+    m_model->setAsn1TypesData(asn1Data);
     bool ok = m_model->checkparameterAsn1Compliance("", "MyInt");
     QCOMPARE(ok, true);
 
@@ -270,9 +270,9 @@ void tst_MscModel::addAsn1Types()
 
     auto asn1Definitions = std::make_unique<Asn1Acn::Definitions>("TestDef", location);
     asn1Definitions->addType(std::move(assignment));
-    auto asn1Data = std::make_unique<Asn1Acn::File>("/dumm/path");
+    auto asn1Data = QSharedPointer<Asn1Acn::File>().create("/dumm/path");
     asn1Data->add(std::move(asn1Definitions));
-    m_model->setAsn1TypesData(std::move(asn1Data));
+    m_model->setAsn1TypesData(asn1Data);
 }
 
 QTEST_APPLESS_MAIN(tst_MscModel)

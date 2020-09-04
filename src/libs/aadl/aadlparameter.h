@@ -24,7 +24,6 @@ namespace Asn1Acn {
 namespace Types {
 class Type;
 }
-class Asn1ModelStorage;
 }
 
 namespace aadl {
@@ -68,7 +67,7 @@ protected:
     Type m_paramType = { Type::Other };
     QString m_typeName = {};
 
-    bool isValidValue(Asn1Acn::Asn1ModelStorage *dataTypes, const QVariant &value) const;
+    bool isValidValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value) const;
 };
 
 class ContextParameter : public BasicParameter
@@ -81,7 +80,7 @@ public:
     ~ContextParameter() override;
 
     QVariant defaultValue() const;
-    bool setDefaultValue(Asn1Acn::Asn1ModelStorage *dataTypes, const QVariant &value);
+    bool setDefaultValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value);
 
     bool operator==(const ContextParameter &other) const;
 

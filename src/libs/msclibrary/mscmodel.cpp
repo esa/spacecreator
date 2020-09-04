@@ -164,7 +164,7 @@ void MscModel::setDataDefinitionString(const QString &dataString)
     Q_EMIT dataChanged();
 }
 
-void MscModel::setAsn1TypesData(std::unique_ptr<Asn1Acn::File> data)
+void MscModel::setAsn1TypesData(QSharedPointer<Asn1Acn::File> data)
 {
     if (data == m_asn1Data) {
         return;
@@ -174,7 +174,7 @@ void MscModel::setAsn1TypesData(std::unique_ptr<Asn1Acn::File> data)
     Q_EMIT asn1DataChanged();
 }
 
-const std::unique_ptr<Asn1Acn::File> &MscModel::asn1Types() const
+const QSharedPointer<Asn1Acn::File> &MscModel::asn1Types() const
 {
     return m_asn1Data;
 }

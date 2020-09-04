@@ -246,7 +246,7 @@ void MessageDialog::editItem(QTableWidgetItem *item)
     if (!m_selectedDeclaration)
         return;
 
-    const std::unique_ptr<Asn1Acn::File> &types = mscModel()->asn1Types();
+    const QSharedPointer<Asn1Acn::File> &types = mscModel()->asn1Types();
     asn1::Asn1Editor editor(types, this);
     const QString type = ui->parameterTable->verticalHeaderItem(item->row())->text();
     editor.showAsn1Type(type);
@@ -308,7 +308,7 @@ void MessageDialog::checkTextValidity()
 
     if (m_selectedDeclaration) {
         Asn1Acn::Asn1ValueParser parser;
-        const std::unique_ptr<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
+        const QSharedPointer<Asn1Acn::File> &asn1Data = mscModel()->asn1Types();
         for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {
             QTableWidgetItem *item = ui->parameterTable->item(i, 0);
             if (item) {

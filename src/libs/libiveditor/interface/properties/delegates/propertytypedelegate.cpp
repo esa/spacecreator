@@ -23,13 +23,15 @@
 #include "asn1/types/builtintypes.h"
 #include "asn1modelstorage.h"
 
+#include <QSharedPointer>
+
 namespace aadlinterface {
 
 static QStringList initNames(const Asn1Acn::Asn1ModelStorage *dataTypes)
 {
     QStringList names;
 
-    const std::unique_ptr<Asn1Acn::File> &types = dataTypes->asn1DataTypes();
+    const QSharedPointer<Asn1Acn::File> &types = dataTypes->asn1DataTypes();
     if (types) {
         for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
             for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {

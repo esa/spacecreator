@@ -21,7 +21,6 @@
 #include "asn1/file.h"
 #include "asn1/typeassignment.h"
 #include "asn1/types/type.h"
-#include "asn1modelstorage.h"
 #include "asn1valueparser.h"
 
 namespace aadl {
@@ -111,12 +110,8 @@ bool BasicParameter::operator==(const BasicParameter &other) const
     return m_paramName == other.m_paramName && m_paramType == other.m_paramType && m_typeName == other.m_typeName;
 }
 
-bool BasicParameter::isValidValue(Asn1Acn::Asn1ModelStorage *dataTypes, const QVariant &value) const
+bool BasicParameter::isValidValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value) const
 {
-    if (!dataTypes) {
-        return true;
-    }
-    const Asn1Acn::Types::Type *basicDataType = dataTypes->typeFromName(m_typeName);
     if (!basicDataType) {
         return true;
     }
@@ -159,12 +154,12 @@ QVariant ContextParameter::defaultValue() const
     return (paramType() == Type::Timer) ? QVariant() : m_defaultValue;
 }
 
-bool ContextParameter::setDefaultValue(Asn1Acn::Asn1ModelStorage *dataTypes, const QVariant &value)
+bool ContextParameter::setDefaultValue(const Asn1Acn::Types::Type *basicDataType, const QVariant &value)
 {
     if (paramType() == Type::Timer || m_defaultValue == value)
         return false;
 
-    if (!isValidValue(dataTypes, value))
+    if (!isValidValue(basicDataType, value))
         return false;
 
     m_defaultValue = value;

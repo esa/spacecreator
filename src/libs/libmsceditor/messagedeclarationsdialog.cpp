@@ -242,12 +242,13 @@ void MessageDeclarationsDialog::selectAsn1File()
         QStringList errors;
         Asn1Acn::Asn1XMLParser parser;
         std::unique_ptr<Asn1Acn::File> types = parser.parseAsn1File(fileInfo, &errors);
+        QSharedPointer<Asn1Acn::File> sharedTypes(types.release());
         if (errors.isEmpty()) {
             updateAsn1TypesView();
             m_fileName = fileInfo.fileName();
             const QVariantList params { QVariant::fromValue(m_mscModel), m_fileName, "ASN.1" };
             msc::cmd::CommandsStack::push(msc::cmd::Id::SetAsn1File, params);
-            m_mscModel->setAsn1TypesData(std::move(types));
+            m_mscModel->setAsn1TypesData(sharedTypes);
         } else {
             qWarning() << "File" << fileName << "is no valid ASN.1 file:" << errors;
         }
