@@ -21,9 +21,10 @@
 #include "propertiesmodelbase.h"
 
 #include <QPointer>
+#include <QSharedPointer>
 
 namespace Asn1Acn {
-class Asn1ModelStorage;
+class File;
 }
 
 namespace aadl {
@@ -57,7 +58,7 @@ public:
     void setDataObject(aadl::AADLObject *obj);
     const aadl::AADLObject *dataObject() const override;
 
-    void setDataTypes(Asn1Acn::Asn1ModelStorage *dataTypes);
+    void setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes);
 
     bool createProperty(const QString &propName) override;
     bool removeProperty(const QModelIndex &index) override;
@@ -72,7 +73,7 @@ public:
 private:
     aadl::AADLObject *m_dataObject { nullptr };
     QVector<aadl::ContextParameter> m_params;
-    QPointer<Asn1Acn::Asn1ModelStorage> m_dataTypes;
+    QSharedPointer<Asn1Acn::File> m_dataTypes;
 
     void createNewRow(const aadl::ContextParameter &param, int row);
 };

@@ -20,7 +20,7 @@
 #include "comboboxdelegate.h"
 
 namespace Asn1Acn {
-class Asn1ModelStorage;
+class File;
 }
 
 namespace aadlinterface {
@@ -29,7 +29,7 @@ class PropertyTypeDelegate : public StringListComboDelegate
 {
     Q_OBJECT
 public:
-    PropertyTypeDelegate(const Asn1Acn::Asn1ModelStorage *dataTypes, QObject *parent = nullptr);
+    PropertyTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent = nullptr);
     ~PropertyTypeDelegate() override;
 };
 

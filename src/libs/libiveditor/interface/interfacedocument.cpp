@@ -547,8 +547,8 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 
 void InterfaceDocument::showPropertyEditor(aadl::AADLObject *obj)
 {
-    aadlinterface::PropertiesDialog *dialog =
-            new aadlinterface::PropertiesDialog(obj, d->asnDataTypes, qobject_cast<QWidget *>(parent()));
+    aadlinterface::PropertiesDialog *dialog = new aadlinterface::PropertiesDialog(
+            obj, d->asnDataTypes->asn1DataTypes(), qobject_cast<QWidget *>(parent()));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

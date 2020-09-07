@@ -21,17 +21,16 @@
 #include "asn1/definitions.h"
 #include "asn1/file.h"
 #include "asn1/types/builtintypes.h"
-#include "asn1modelstorage.h"
 
 #include <QSharedPointer>
 
 namespace aadlinterface {
 
-static QStringList initNames(const Asn1Acn::Asn1ModelStorage *dataTypes)
+static QStringList initNames(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
     QStringList names;
 
-    const QSharedPointer<Asn1Acn::File> &types = dataTypes->asn1DataTypes();
+    const QSharedPointer<Asn1Acn::File> &types = dataTypes;
     if (types) {
         for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : types->definitionsList()) {
             for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
@@ -46,7 +45,7 @@ static QStringList initNames(const Asn1Acn::Asn1ModelStorage *dataTypes)
     return names;
 }
 
-PropertyTypeDelegate::PropertyTypeDelegate(const Asn1Acn::Asn1ModelStorage *dataTypes, QObject *parent)
+PropertyTypeDelegate::PropertyTypeDelegate(const QSharedPointer<Asn1Acn::File> &dataTypes, QObject *parent)
     : StringListComboDelegate(initNames(dataTypes), parent)
 {
 }

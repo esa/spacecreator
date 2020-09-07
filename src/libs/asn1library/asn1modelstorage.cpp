@@ -149,19 +149,4 @@ void Asn1ModelStorage::clear()
     Q_EMIT dataTypesChanged();
 }
 
-/*!
-   Retruns the first type having the given \p name
- */
-const Asn1Acn::Types::Type *Asn1ModelStorage::typeFromName(const QString &name) const
-{
-    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_asn1DataTypes->definitionsList()) {
-        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
-            if (assignment->name() == name) {
-                return assignment->type();
-            }
-        }
-    }
-    return nullptr;
-}
-
 }

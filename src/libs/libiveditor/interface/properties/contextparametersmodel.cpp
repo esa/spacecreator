@@ -20,7 +20,7 @@
 #include "aadlcommonprops.h"
 #include "aadlobject.h"
 #include "aadlobjectfunction.h"
-#include "asn1modelstorage.h"
+#include "asn1/file.h"
 #include "commandsstack.h"
 #include "interface/commands/cmdentityattributechange.h"
 #include "interface/commands/cmdentitypropertychange.h"
@@ -29,7 +29,6 @@
 #include "interface/properties/dynamicproperty.h"
 #include "interface/properties/dynamicpropertyconfig.h"
 
-#include <QDebug>
 #include <algorithm>
 
 namespace aadlinterface {
@@ -83,7 +82,7 @@ const aadl::AADLObject *ContextParametersModel::dataObject() const
     return m_dataObject;
 }
 
-void ContextParametersModel::setDataTypes(Asn1Acn::Asn1ModelStorage *dataTypes)
+void ContextParametersModel::setDataTypes(const QSharedPointer<Asn1Acn::File> &dataTypes)
 {
     m_dataTypes = dataTypes;
 }
@@ -149,7 +148,7 @@ bool ContextParametersModel::setData(const QModelIndex &index, const QVariant &v
             if (!m_dataTypes.data()) {
                 return true;
             }
-            const Asn1Acn::Types::Type *basicDataType = m_dataTypes.data()->typeFromName(paramNew.paramTypeName());
+            const Asn1Acn::Types::Type *basicDataType = m_dataTypes->typeFromName(paramNew.paramTypeName());
             if (!paramNew.setDefaultValue(basicDataType, value)) {
                 return false;
             }

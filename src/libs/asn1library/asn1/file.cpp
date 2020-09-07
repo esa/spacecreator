@@ -90,3 +90,18 @@ const std::unique_ptr<TypeAssignment> &File::typeAssignment(const QString &text)
     }
     return m_noType;
 }
+
+/*!
+   Retruns the first type having the given \p name
+ */
+const Types::Type *File::typeFromName(const QString &name) const
+{
+    for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : m_definitionsList) {
+        for (const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment : definitions->types()) {
+            if (assignment->name() == name) {
+                return assignment->type();
+            }
+        }
+    }
+    return nullptr;
+}

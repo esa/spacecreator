@@ -17,10 +17,11 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <QStyledItemDelegate>
 
 namespace Asn1Acn {
-class Asn1ModelStorage;
+class File;
 }
 namespace asn1 {
 class Asn1Editor;
@@ -32,7 +33,7 @@ class Asn1ValueDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    Asn1ValueDelegate(const Asn1Acn::Asn1ModelStorage *asn1Types, QObject *parent = nullptr);
+    Asn1ValueDelegate(const QSharedPointer<Asn1Acn::File> &asn1Types, QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
@@ -41,7 +42,7 @@ protected Q_SLOTS:
     void onDialogAccepted();
 
 private:
-    const Asn1Acn::Asn1ModelStorage *m_asn1Types = nullptr;
+    QSharedPointer<Asn1Acn::File> m_asn1Types;
 };
 
 }

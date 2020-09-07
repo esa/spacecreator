@@ -21,18 +21,18 @@
 
 #include <QDialog>
 #include <QPointer>
+#include <QSharedPointer>
 
 namespace Ui {
 class PropertiesDialog;
 }
 
 namespace Asn1Acn {
-class Asn1ModelStorage;
+class File;
 }
 
 namespace aadl {
 class AADLObject;
-class Asn1ModelStorage;
 }
 
 namespace aadlinterface {
@@ -42,7 +42,8 @@ class PropertiesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(aadl::AADLObject *obj, Asn1Acn::Asn1ModelStorage *dataTypes, QWidget *parent = nullptr);
+    explicit PropertiesDialog(
+            aadl::AADLObject *obj, const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
 public Q_SLOTS:
@@ -56,7 +57,7 @@ private:
     Ui::PropertiesDialog *ui;
     aadl::AADLObject *m_dataObject { nullptr };
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
-    QPointer<Asn1Acn::Asn1ModelStorage> m_dataTypes;
+    QSharedPointer<Asn1Acn::File> m_dataTypes;
 };
 
 }

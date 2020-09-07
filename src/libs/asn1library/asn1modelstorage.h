@@ -55,8 +55,6 @@ public:
 
     void clear();
 
-    const Asn1Acn::Types::Type *typeFromName(const QString &name) const;
-
 Q_SIGNALS:
     void dataTypesChanged();
 

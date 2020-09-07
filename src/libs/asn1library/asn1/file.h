@@ -28,6 +28,7 @@
 #include "errormessage.h"
 #include "node.h"
 #include "typereference.h"
+#include "types/type.h"
 
 #include <map>
 #include <memory>
@@ -68,6 +69,8 @@ public:
     void clearErrors();
 
     const std::unique_ptr<TypeAssignment> &typeAssignment(const QString &text) const;
+
+    const Asn1Acn::Types::Type *typeFromName(const QString &name) const;
 
 private:
     DefinitionsList m_definitionsList;

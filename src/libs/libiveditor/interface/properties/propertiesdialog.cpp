@@ -20,7 +20,6 @@
 #include "aadlnamevalidator.h"
 #include "aadlobject.h"
 #include "aadlobjectiface.h"
-#include "asn1modelstorage.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -39,7 +38,8 @@
 
 namespace aadlinterface {
 
-PropertiesDialog::PropertiesDialog(aadl::AADLObject *obj, Asn1Acn::Asn1ModelStorage *dataTypes, QWidget *parent)
+PropertiesDialog::PropertiesDialog(
+        aadl::AADLObject *obj, const QSharedPointer<Asn1Acn::File> &dataTypes, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::PropertiesDialog)
     , m_dataObject(obj)
@@ -135,14 +135,14 @@ void PropertiesDialog::initTabs()
 
     auto initContextParams = [this]() {
         ContextParametersModel *modelCtxParams = new ContextParametersModel(this);
-        modelCtxParams->setDataTypes(m_dataTypes.data());
+        modelCtxParams->setDataTypes(m_dataTypes);
         modelCtxParams->setDataObject(m_dataObject);
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
-        viewAttrs->tableView()->setItemDelegateForColumn(ContextParametersModel::ColumnType,
-                new PropertyTypeDelegate(m_dataTypes.data(), viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(
-                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes.data(), viewAttrs->tableView()));
+                ContextParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
+        viewAttrs->tableView()->setItemDelegateForColumn(
+                ContextParametersModel::ColumnValue, new Asn1ValueDelegate(m_dataTypes, viewAttrs->tableView()));
         viewAttrs->tableView()->horizontalHeader()->show();
         viewAttrs->setModel(modelCtxParams);
         ui->tabWidget->insertTab(0, viewAttrs, tr("Context Parameters"));
@@ -154,7 +154,7 @@ void PropertiesDialog::initTabs()
 
         PropertiesViewBase *viewAttrs = new PropertiesViewBase(this);
         viewAttrs->tableView()->setItemDelegateForColumn(
-                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes.data(), viewAttrs->tableView()));
+                IfaceParametersModel::ColumnType, new PropertyTypeDelegate(m_dataTypes, viewAttrs->tableView()));
         viewAttrs->tableView()->setItemDelegateForColumn(IfaceParametersModel::ColumnEncoding,
                 new StringListComboDelegate({ tr("NATIVE"), tr("UPER"), tr("ACN") }, // TODO: is it configurable?
                         viewAttrs->tableView()));

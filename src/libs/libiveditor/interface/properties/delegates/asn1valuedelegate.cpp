@@ -18,7 +18,7 @@
 #include "asn1valuedelegate.h"
 
 #include "asn1editor.h"
-#include "asn1modelstorage.h"
+#include "file.h"
 
 #include <QLabel>
 #include <QVariant>
@@ -28,7 +28,7 @@ namespace aadlinterface {
 const char *MODEL_INDEX_PROPERTY = "modelIndex";
 const char *DIALOG_PROPERTY = "dialog";
 
-Asn1ValueDelegate::Asn1ValueDelegate(const Asn1Acn::Asn1ModelStorage *asn1Types, QObject *parent)
+Asn1ValueDelegate::Asn1ValueDelegate(const QSharedPointer<Asn1Acn::File> &asn1Types, QObject *parent)
     : QStyledItemDelegate(parent)
     , m_asn1Types(asn1Types)
 {
@@ -37,7 +37,7 @@ Asn1ValueDelegate::Asn1ValueDelegate(const Asn1Acn::Asn1ModelStorage *asn1Types,
 QWidget *Asn1ValueDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
-    auto dialog = new asn1::Asn1Editor(m_asn1Types->asn1DataTypes(), parent);
+    auto dialog = new asn1::Asn1Editor(m_asn1Types, parent);
     dialog->setProperty(MODEL_INDEX_PROPERTY, QVariant(index));
     dialog->setModal(true);
     QModelIndex typeIndex = index.siblingAtColumn(index.column() - 1);
